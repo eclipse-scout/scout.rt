@@ -1,0 +1,47 @@
+16.08.2010 abr
+merged org.eclipse.scout.nls classes into org.eclipse.scout.commons bundle
+moved public static methods from org.eclipse.scout.nls.NlsPlugin to org.eclipse.scout.nls.sdk.operations.AbstractCreateNlsProjectOperation
+REMOVE dependencies on org.eclipse.scout.nls from MANIFEST.MF, feature.xml and product files
+RENAME import org.eclipse.scout.nls. TO import org.eclipse.scout.commons.nls.
+
+08.09.20101 imo
+Since slf4j and logback is highly fragmented without any benefit, merged all slf4j and logback to one plugin "ch.qos.logback.all" at
+https://svn.bsiag.com/tools/internal/logback.bsi/trunk/ch.qos.logback.all
+
+Migration is optional
+1. In the *.product files remove the following plugins
+ch.qos.logback.core
+ch.qos.logback.slf4j
+org.slf4j.api
+org.slf4j.ext
+org.slf4j.jcl
+org.slf4j.jul
+org.slf4j.log4j
+2. Add only the plugin
+ch.qos.logback.all
+3. In the project-specific fragment containing the logback.xml change the bundle-host in the MANIFEST.mf to "ch.qos.logback.all"
+
+03.11.2010 abr
+Modified MatrixUtility.sort: use NLSLocale instead of the formatting locale (i.e. Locale.getDefault()) for sorting arrays if
+the sort method without a Locale is used: org.eclipse.scout.commons.MatrixUtility.sort(Object[][], int...)
+Migration: none. If really the formatting Locale is required switch to MatrixUtility.sort(Locale.getDefault(), ...)
+
+16.11.2010 imo
+Since slf4j and logback is sometimes hiding log entries and due to the fact that scout must not support these out of the box,
+reverted basic log handling to only supporting java and eclipse log out of the box.
+Scout therefore supports classic eclipse log (using IStatus) and java log (using java.util.logging.Logger).
+Details can be found in javadoc of org.eclipse.scout.commons.logger.ScoutLogManager
+
+Migration: It is recommended NOT to use slf4j and logback with eclipse scout projects, it is too complex.
+Remove all "ch.qos.logback*" "org.slf4j*" and log4j plugins from your product configurations and dependencies.
+Remove the project-specific logback fragments from the project.
+When using special logging filters, rollover logs etc. configure this in the standard java logger.properties in the project.
+Details can be found in the google: "java util logger config"
+*** Settings in config.ini for using classic eclipse log, this is normally used only in client appliactions on swt:
+eclipse.consoleLog=true
+org.eclipse.scout.log=eclipse
+org.eclipse.scout.log.level=WARNING
+
+*** Settings in config.ini for using java standard log, this is the recommended usage:
+eclipse.consoleLog=false
+org.eclipse.scout.log=java

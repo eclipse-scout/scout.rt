@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: IBM DB2 JDBC Fragment
+Bundle-SymbolicName: org.eclipse.scout.rt.server.jdbc.db2_97.fragment
+Bundle-Version: 9.7
+Bundle-Vendor: Eclipse Scout Project
+Fragment-Host: org.eclipse.scout.rt.server;bundle-version="0.0.0"
+Bundle-ClassPath: lib/db2jcc.jar
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Fenix-Unpack: true

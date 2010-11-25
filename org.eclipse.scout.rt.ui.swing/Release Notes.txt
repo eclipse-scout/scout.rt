@@ -1,0 +1,4 @@
+06.09.2010 imo
+Renamed org.eclipse.scout.rt.ui.swing.ext.calendar.JTimeChooser to org.eclipse.scout.rt.ui.swing.ext.calendar.TimeChooser
+Renamed org.eclipse.scout.rt.ui.swing.ext.calendar.JCalendar to org.eclipse.scout.rt.ui.swing.ext.calendar.DateChooser
+Migration (occurs only in rare cases): Rename *.java files

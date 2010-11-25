@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.scout.service.services">
+      <service
+            class="org.eclipse.scout.rt.testing.ui.swing.SwingMockService"
+            createImmediately="false">
+      </service>
+      <service
+            class="org.eclipse.scout.rt.client.services.common.icon.IconProviderService"
+            createImmediately="false"
+            factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+            ranking="-90">
+      </service>
+   </extension>
+
+</plugin>

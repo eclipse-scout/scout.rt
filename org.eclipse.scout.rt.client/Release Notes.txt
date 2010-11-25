@@ -1,0 +1,134 @@
+14.07.2010 imo
+Since model-based selection filtering leads to many defects and misunderstandings. See ticket 87693 and others (follow).
+removed ITable.acceptSelection and AbstractTable.execAcceptSelection
+removed ITree.acceptSelection and AbstractTree.execAcceptSelection
+removed AbstractListBox.execAcceptSelection
+removed AbstractTreeBox.execAcceptSelection
+old:
+      @Override
+      protected boolean execAcceptSelection(ITreeNode node, Long value, int level) {
+        return level >= 2;
+      }
+new:
+      @Override
+      protected void execFilterNewNode(ITreeNode newNode, int level) throws ProcessingException {
+        newNode.setEnabled(level >= 2);
+      }
+
+14.07.2010 imo
+Disabled rows on ITable and disabled nodes on ITree are (now) selectable, and support for context menus.
+
+14.07.2010 imo
+Changed model of listbox and treebox. The value (checked keys) is separated from the selection (table selection)
+The (existing) checkable property is used to distinguish between listboxes with checkboxes and listboxes that behave like tables.
+On checkable listboxes (normally multi-selection boxes) selecting a row is NOT the same as checking the rows checkbox.
+On non-checkable listboxes (normally single-selection boxes) selecting a row is the same as checking the corresponding key.
+renamed getConfiguredFilterSelectedRows to getConfiguredFilterCheckedRows
+added ITableRow.isChecked
+added ITableRow.setChecked
+added ITreeNode.isChecked
+added ITreeNode.setChecked
+renamed all IListBox.*Select* to IListBox.*Check*
+renamed all ITreeBox.*Select* to ITreeBox.*Check*
+Migration:
+Check all occurrences of ITable.setMultiSelect(true/false) and check if it is a listbox table.
+Most such cases are replaced by ITable.setMultiCheck(true/false), except those where the listbox was set to non-checkable
+either by getConfiguredCheckable(){return false;} or by getMyListBox().getTable().setCheckable(false);
+
+14.07.2010 imo
+Removed the ITable.getContextRow since this is now the same as getSelectedRow()
+Removed the ITree.getContextNode since this is now the same as getSelectedNode()
+
+14.07.2010 imo
+Removed AbstractAction/AbstractMenu.getConfiguredNonSelectionAction() since this is obsolete now that disabled rows can be selected.
+
+15.07.2010 imo
+Removed table context row and tree context node
+old:
+    protected void execContextCellChanged(ITableRow row, IColumn col) throws ProcessingException {
+      ...
+    }
+new:
+	protected void execRowClick(ITableRow row) throws ProcessingException {
+	  IColumn col=getContextColumn();
+	  ...
+	}
+
+17.07.2010 imo
+Merged Rayo and Scout core widget copies of DateField, TimeField. Created new combined popup window with date/time and a new analog clock.
+
+20.07.2010 imo
+Refactoring IGroupbox.isBorderEnabled and BORDER_DECORATION_NONE
+Due to misleading naming and for better understanding
+Migration:
+RENAME AbstractGroupbox.getConfiguredBorderEnabled TO AbstractGroupbox.getConfiguredBorderVisible
+RENAME IGroupbox.isBorderEnabled TO IGroupbox.isBorderVisible
+RENAME IGroupbox.setBorderEnabled TO IGroupbox.setBorderVisible
+RENAME IGroupbox.BORDER_DECORATION_NONE TO IGroupbox.BORDER_DECORATION_EMPTY.
+
+20.07.2010 imo
+Merged concepts of cyclic locking on swingscout compositions using only a scout-update lock and a ignore-scout-event set throughout all implementations.
+Removed various separate optimistic locks.
+Migration: none necessary
+
+22.07.2010 imo
+NEW property "Tray visible" on IDesktop
+NEW broadcast event TYPE_TRAY_POPUP on DesktopEvent to collect menus for the tray
+NEW method IDesktopUiFacade.fireTrayPopupFromUI to get the tray menus
+NEW operation AbstractDesktop.execAddTrayMenus to contribute to the tray menu
+Migration: none necessary
+
+11.08.2010 imo
+Added cache to Introspector.getBeanInfo: 500ms down to 1 ms
+Saves 1 seconds on all forms when loading and storing
+Migration: none necessary
+
+19.08.2010 imo
+Tuned Introspector.getBeanInfo: 1ms down to 0.05 ms
+Saves 1-4 seconds on all forms when loading and storing
+Migration: none necessary
+
+20.08.2010 imo
+Moved org.eclipse.scout.rt.client.ui.form.fields.htmlfield.HTMLUtility to org.eclipse.scout.commons.HTMLUtility
+Migration: rename org.eclipse.scout.rt.client.ui.form.fields.htmlfield.HTMLUtility by org.eclipse.scout.commons.HTMLUtility
+
+20.08.2010 imo
+Ticket 92'775 revealed that WizardEvents for Suspend,Finish,Cancel are never fired and also not used, since they are subsumized under TYPE_CLOSED.
+However, in order to find out under which condition the wizard was closed, there is a new property IWizard.getCloseType that returns the CloseType enum.
+Migration: (rare) if really used, replace the WizardEvent types TYPE_CANCELLED, TYPE_SUSPENDED, TYPE_FINISHED by TYPE_CLOSED and use IWizard.getCloseType() for details.
+
+30.08.2010 imo
+Ticket 90'088
+Dropped AbstractTable.execSortDataSource(IColumn[] sortColumns)
+This operation is a legacy from scout 2 and is never and nowhere used.
+Migration: if however used, please report to tools@bsiag.com
+
+30.08.2010 abr
+Ticket 93'106: Fixed visibility of the IOutlineTableForm when it is initialized.
+Migration: none
+
+30.08.2010 imo
+Ticket 90'088
+Reset of table columns was re-modeled to be more finegrained.
+Merged AbstractTable.execResetColumnSortOrder with AbstractTable.execResetDisplayableColumns to
+AbstractTable.execResetColumns(boolean visibility, boolean order, boolean sorting, boolean widths)
+This operation is rarely used in custom code.
+Migration: When using these operations, rename it and check the boolean argument as to what aspect is resetting.
+
+30.08.2010 imo
+Ticket 90'088
+Additional table header menu for "Column Filter" similar to excel AutoFilter
+Migration: None
+
+07.09.2010 imo
+Added new IForm display hint: DISPLAY_HINT_POPUP
+
+13.09.2010 abr
+Ticket 91'279
+Added IColumn.isVisibleInternal() that is used to for storing a table column's UI preferences (uses visible only instead of visible && displayable && visibleGranted).
+Migration: None
+
+01.11.2010 pba
+Added opportunity for lazy initialization of search forms on table pages.
+Added org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable.execInitSearchForm().
+Migration: optional MOVE all your search form related initialization code form the execInitPage() method to execInitSearchForm().

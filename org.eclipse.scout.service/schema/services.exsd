@@ -1,0 +1,273 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.scout.service" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.scout.service" id="services" name="services"/>
+      </appInfo>
+      <documentation>
+
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="service" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="proxy" minOccurs="0" maxOccurs="unbounded"/>
+         </choice>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="service">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="class"/>
+         </appInfo>
+         <documentation>
+            An OSGi service that is registered using BundleContext.registerService
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="init-param" minOccurs="0" maxOccurs="unbounded"/>
+         </choice>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The implementation class of the service.
+Subclasses of IService, normally extending AbstractService.
+The service is registered with all its super types and super interfaces except Object.class
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="factory" type="string">
+            <annotation>
+               <documentation>
+                  An optional service factory.
+The service factory may be of type org.eclipse.scout.service.IServiceFactory to get notified when it was registered.
+The service factory must provide one of the following constructors (the first in the list is chosen)
+1. a constructor with a Class argument (the service class)
+2. an empty constructor
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.osgi.framework.ServiceFactory"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="session" type="string">
+            <annotation>
+               <documentation>
+                  The service is restricted to a specific session scope.
+Typical sessions include IClientSession and IServerSession and subclasses of it.
+This attribute can only be used together with a service factory.
+
+The session is provided to the osgi service by the init parameter with the name &quot;service.scope&quot; ( ServiceConstants.SERVICE_SCOPE )
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="ranking" type="string">
+            <annotation>
+               <documentation>
+                  The service ranking as defined in org.osgi.framework.Constants.SERVICE_RANKING
+Alternatively a service can define its ranking by using the org.eclipse.scout.commons.annotations.Priority annotation.
+
+The ranking is provided to the osgi service by the init parameter with the name &quot;service.ranking&quot; ( Constants.SERVICE_RANKING)
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="createImmediately" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  This atttribute is used to control the moment when the service instance is effectively created.
+Default value is false.
+
+A value of true creates the service instance immediately when the extension point loads.
+
+A value of false does not create the service instance on extension point load. It creates the service instance lazy on the first usage of the service.
+
+This can be useful if a service is for example listening for client notifications (to come up from the server) to perform some actions.
+Consider a CTI service handling telephony events that come up from the server-side.
+
+The attribute is provided to the osgi service by the init parameter with the name &quot;service.createImmediately&quot;  ( ServiceConstants.SERVICE_CREATE_IMMEDIATELY)
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="proxy">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="class"/>
+         </appInfo>
+         <documentation>
+            An OSGi service proxy that is registered using BundleContext.registerService
+A proxy requires a client-side service tunnel and a server-side service tunnel servlet.
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="init-param" minOccurs="0" maxOccurs="unbounded"/>
+         </choice>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The definition interface of the service proxy.
+The service is registered only with its interface.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="factory" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An optional service factory.
+The service factory may be of type org.eclipse.scout.service.IServiceFactory to get notified when it was registered.
+The service factory must provide one of the following constructors (the first in the list is chosen)
+1. a constructor with a Class argument (the service interface class)
+2. an empty constructor
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.service.IServiceFactory"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="session" type="string">
+            <annotation>
+               <documentation>
+                  The service is restricted to a specific session scope.
+Typical sessions include IClientSession and IServerSession and subclasses of it.
+This attribute can only be used together with a service factory.
+
+The session is provided to the osgi service by the init parameter with the name &quot;service.scope&quot; ( ServiceConstants.SERVICE_SCOPE )
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="ranking" type="string">
+            <annotation>
+               <documentation>
+                  The service ranking as defined in org.osgi.framework.Constants.SERVICE_RANKING
+Alternatively a service can define its ranking by using the org.eclipse.scout.commons.annotations.Priority annotation.
+
+The ranking is provided to the osgi service by the init parameter with the name &quot;service.ranking&quot; ( Constants.SERVICE_RANKING)
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="createImmediately" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  This atttribute is used to control the moment when the service instance is effectively created.
+Default value is false.
+
+A value of true creates the service instance immediately when the extension point loads.
+
+A value of false does not create the service instance on extension point load. It creates the service instance lazy on the first usage of the service.
+
+This can be useful if a service is for example listening for client notifications (to come up from the server) to perform some actions.
+Consider a CTI service handling telephony events that come up from the server-side.
+
+The attribute is provided to the osgi service by the init parameter with the name &quot;service.createImmediately&quot;  ( ServiceConstants.SERVICE_CREATE_IMMEDIATELY)
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="init-param">
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

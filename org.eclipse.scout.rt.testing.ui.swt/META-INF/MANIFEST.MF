@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Eclipse Scout Runtime SWT Testing
+Bundle-SymbolicName: org.eclipse.scout.rt.testing.ui.swt;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.scout.rt.testing.ui.swt.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.testing.client;bundle-version="1.0.0",
+ org.eclipse.scout.rt.ui.swt;bundle-version="3.4.1",
+ org.eclipse.scout.rt.testing.shared;bundle-version="1.0.0",
+ org.eclipse.scout.rt.client;bundle-version="3.5.5"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Vendor: Eclipse Scout Project
+Export-Package: org.eclipse.scout.rt.testing.ui.swt
+Import-Package: org.apache.log4j

@@ -1,0 +1,279 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.scout.rt.ui.swt" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.scout.rt.ui.swt" id="lookAndFeel" name="Look and feel"/>
+      </appInfo>
+      <documentation>
+         [Enter description of this extension point.]
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="decorations" minOccurs="0" maxOccurs="1"/>
+            <element ref="properties" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="properties">
+      <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="property"/>
+         </sequence>
+         <attribute name="scope" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="global">
+                  </enumeration>
+                  <enumeration value="default">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="property">
+      <complexType>
+         <attribute name="name" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="dialog.minWidth">
+                  </enumeration>
+                  <enumeration value="dialog.minHeight">
+                  </enumeration>
+                  <enumeration value="formFieldLabel.Width">
+                  </enumeration>
+                  <enumeration value="logicalGridLayout.defaultColumnWidth">
+                  </enumeration>
+                  <enumeration value="logicalGridLayout.rowHeight">
+                  </enumeration>
+                  <enumeration value="logicalGridLayout.horizontalGap">
+                  </enumeration>
+                  <enumeration value="logicalGridLayout.verticalGap">
+                  </enumeration>
+                  <enumeration value="formfield.activationButton.width">
+                  </enumeration>
+                  <enumeration value="formfield.activationButtonWithMenu.width">
+                  </enumeration>
+                  <enumeration value="formfield.activationButton.height">
+                  </enumeration>
+                  <enumeration value="processButton.height">
+                  </enumeration>
+                  <enumeration value="processButton.minWidth">
+                  </enumeration>
+                  <enumeration value="processButton.maxWidth">
+                  </enumeration>
+                  <enumeration value="color.forground.disabled">
+                  </enumeration>
+                  <enumeration value="formFieldLabel.alignment">
+                  </enumeration>
+                  <enumeration value="messageBox.minWidth">
+                  </enumeration>
+                  <enumeration value="messageBox.minHeight">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="decorations">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="mandatory" minOccurs="0" maxOccurs="1"/>
+            <element ref="enableBehaviour" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="scope" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="global">
+                  </enumeration>
+                  <enumeration value="default">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="mandatory">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="fieldBackground" minOccurs="0" maxOccurs="1"/>
+            <element ref="labelFont" minOccurs="0" maxOccurs="1"/>
+            <element ref="labelTextColor"/>
+            <element ref="starMarker" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="fieldBackground">
+      <complexType>
+         <attribute name="color" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="labelTextColor">
+      <complexType>
+         <attribute name="color" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="labelFont">
+      <complexType>
+         <attribute name="font" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="starMarker">
+      <complexType>
+         <attribute name="placement" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="beforeLabel">
+                  </enumeration>
+                  <enumeration value="afterLabel">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="enableBehaviour">
+      <complexType>
+         <attribute name="enabled" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="readOnly">
+                  </enumeration>
+                  <enumeration value="enabled">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiinfo"/>
+      </appInfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

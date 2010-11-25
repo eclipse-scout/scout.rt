@@ -1,0 +1,164 @@
+19.07.2010 imo (contributed by Sandro Schifferle, ticket 91038)
+Improved security and added possibility to easily reset access control store
+Moved the permission loading away from server session to the (new) project-specific AccessControlService.
+Migration:
+CHANGED ServerSession.java
+OLD
+  void execLoadSession()
+    ...
+    SQL.select(...);
+    SERVICES.getService(IAccessControlService.class).setPermissions(...);
+
+NEW
+  void execLoadSession()
+    ...
+    //no such code any more
+
+ADDED com.bsiag.crm.server.core.services.custom.security.AccessControlService
+package com.bsiag.crm.server.core.services.custom.security;
+import java.security.Permissions;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.services.common.jdbc.SQL;
+import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
+import org.eclipse.scout.rt.shared.services.common.security.AccessControlUtility;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+
+public class AccessControlService extends AbstractAccessControlService implements IAccessControlService {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlService.class);
+
+  @Override
+  protected Permissions execLoadPermissions() {
+    //moved select statement to here
+    try {
+      Object[][] permissionData = SQL.select(
+          "SELECT  P.PERMISSION_NAME, " +
+              "        MAX(P.PERMISSION_LEVEL) " +
+              "FROM    ORS_USER_ROLE R, ORS_ROLE_PERMISSION P " +
+              "WHERE   R.ROLE_UID=P.ROLE_UID " +
+              "AND     P.PERMISSION_LEVEL>0 " +
+              "AND     R.USER_NR IN( " +
+              "        SELECT  S.USER_NR " +
+              "        FROM    ORS_USER_SUBSTITUTE S " +
+              "        WHERE   S.SUBSTITUTE_NR=:userNr " +
+              "        UNION ALL " +
+              "        SELECT  TO_NUMBER(:userNr) FROM DUAL) " +
+              "GROUP BY P.PERMISSION_NAME"
+          );
+
+      return AccessControlUtility.createPermissions(permissionData);
+    }
+    catch (Throwable t) {
+      LOG.error("update due to client notification", t);
+      return null;
+      // nop
+    }
+  }
+}
+
+ADDED service registration to server plugin.xml
+    <service class="com.bsiag.crm.server.core.services.custom.security.AccessControlService" session="com.bsiag.crm.server.core.ServerSession" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory"/>
+
+16.08.2010 abr (contributed by Daniel Buehler, ticket 91072)
+ADDED two new properties to the org.eclipse.scout.rt.server.services.common.smtp.ISMTPService:
+  useSmtps: controls whether the connection to the SMPT host is encrypted
+  sslProtocols: comma-separated list of SSL protocols used for establishing the connection to the SMTP host
+
+23.08.2010 sle
+Ticket 86'471: SQL Logging
+ADDED AbstractSqlService prints on LogLevel INFO the PlainText-SqlStatement.
+Migration:
+CHANGED SqlService.java
+REMOVED FUNCTIONS:
+  private void createPlainTextLog(String s, Object... bindBases) throws ProcessingException {}
+  public Object[][] select(String s, Object... bindBases) throws ProcessingException {}
+  public void selectInto(String s, Object... bindBases) throws ProcessingException {}
+  public Object[][] selectLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException {}
+  public int delete(String s, Object... bindBases) throws ProcessingException {}
+  public int update(String s, Object... bindBases) throws ProcessingException {}
+  public int insert(String s, Object... bindBases) throws ProcessingException {}
+
+07.09.2010 imo
+Ticket 89'314
+In ISqlService added support for database specific keyword replacement using ant notation ${name} for:
+${sysdate}
+${upper}
+${lower}
+${trim}
+${nvl}
+
+09.09.2010 imo
+Eliminated direct dependencies to Plug-In javax.servlet and replaced by import-dependencies to package javax.servlet
+Affected Plug-Ins:
+org.eclipse.scout.http.servletfilter
+org.eclipse.scout.rt.server
+Migration:
+com.bsiag.<crm>.server.core, com.bsiag.<crm>.server.online must add an import dependency in their MANIFEST.MF to package javax.servlet.
+In DEVELOPMENT products add the javax.servlet Plug-In.
+In PRODUCTION products eliminate the javax.servlet Plug-In.
+
+13.09.2010 abr
+Merged Tickets 92'255 and 93'777 from branch 20091231.
+Oracle Lite and DB2 require date comparisons making use of to_number(...)
+Migration: None
+
+16.09.2010 abr
+Ticket 94'031
+FormDataStatementBuilder does not take externally defined form data classes into account.
+Migration:
+CHANGED method signature in org.eclipse.scout.rt.server.services.common.jdbc.builder.ValuePartDefinition
+FROM accept(AbstractFormData) TO accept(AbstractFormData, Map<Integer, Map<String, AbstractFormFieldData>>, Map<Integer, Map<String, AbstractPropertyData<?>>>)
+
+03.11.2010 abr
+Ticket 95'772
+FormDataStatementBuilder cannot distinguish between entries of template classes if the template is used multiple times within the same form.
+Now, a ProcessingException is thrown if the statement builder is used with ambiguous ValuePartDefinitions.
+Added org.eclipse.scout.commons.ClassIdentifier for identifying inner template field classes.
+Migration: Added and changed signatures from Class to ClassIdentifier in the following classes:
+  org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder
+  org.eclipse.scout.rt.server.services.common.jdbc.builder.ValuePartDefinition
+  org.eclipse.scout.rt.shared.data.form.AbstractFormData
+
+Example (simplified, without getters):
+  // template field data definition
+  public static class AbstractTemplateFieldData extends AbstractFormFieldData {
+    private static final long serialVersionUID = 1L;
+
+    public class TemplateText extends AbstractValueFieldData<String> {
+      private static final long serialVersionUID = 1L;
+    }
+  }
+
+  public static class FormData extends AbstractFormData {
+    private static final long serialVersionUID = 1L;
+
+    // usual field data
+    public class Text extends AbstractValueFieldData<String> {
+      private static final long serialVersionUID = 1L;
+    }
+
+    // first usage of template field
+    public class Template1GroupBox extends AbstractTemplateFieldData {
+      private static final long serialVersionUID = 1L;
+    }
+
+    // second usage of template field
+    public class Template2GroupBox extends AbstractTemplateFieldData {
+      private static final long serialVersionUID = 1L;
+    }
+  }
+
+Defining a FormDataStatementBuilder for template types works as follows:
+  FormDataStatementBuilder builder = new FormDataStatementBuilder(new OracleSqlStyle());
+  // usual field data
+  builder.setValueDefinition( FormData.Text.class , "SQL_ATTRIBUTE", ComposerConstants.OPERATOR_EQ);
+                              ^^^^^^^^^^^^^^^^^^^
+  // inner field of the template requires a ClassIdentifier that provides the 'path to the class'. This one references the TemplateText that is within the Template1Group.
+  builder.setValueDefinition( new ClassIdentifier(FormData.Template1GroupBox.class, FormData.Template1GroupBox.TemplateText.class) , "SQL_ATTRIBUTE", ComposerConstants.OPERATOR_EQ);
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  // Like above but it uses the AbstractTemplateFieldData as starting point to get the reference on the TemplateText. This one references the TemplateText that is within the Template2Group.
+  builder.setValueDefinition( new ClassIdentifier(FormData.Template2GroupBox.class, AbstractTemplateFieldData.TemplateText.class) , "SQL_ATTRIBUTE", ComposerConstants.OPERATOR_EQ);
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Migration: actually no migration but fix occurrences in your projects, if already used at all.

@@ -1,0 +1,11 @@
+The following icons are provided by http://www.famfamfam.com
+- smartfield_browse.png (original name: magnifier.png)
+- bookmark.png (original name: star.png)
+- composerfield_attribute.png (original name: bullet_white.png)
+- composerfield_eitheror.png (original name: tag.png)
+- composerfield_aggregation.png (original name: text_superscript.png)
+- datefield_time.png (original name: time.png)
+- datefield_date.png (original name: date.png)
+
+And are published under Creative Commons Attribution 3.0 License:
+http://creativecommons.org/licenses/by/3.0/

@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Eclipse Scout Runtime Shared Testing
+Bundle-SymbolicName: org.eclipse.scout.rt.testing.shared;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.scout.rt.testing.shared.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.apache.ant;bundle-version="1.7.1";visibility:=reexport,
+ org.eclipse.scout.rt.shared;bundle-version="3.2.2",
+ org.junit4;bundle-version="4.5.0";visibility:=reexport,
+ org.easymock;bundle-version="2.4.0";visibility:=reexport
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Vendor: Eclipse Scout Project
+Export-Package: org.eclipse.scout.rt.testing.shared,
+ org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler

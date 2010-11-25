@@ -1,0 +1,4 @@
+14.09.2010 imo
+Removed org.eclipse.scout.rt.shared.security.AllAccessPermission since it never worked and is not a valid jaas concept
+Migration:
+replace by java.security.AllPermission

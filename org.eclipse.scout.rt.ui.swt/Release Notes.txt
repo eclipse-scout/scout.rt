@@ -1,0 +1,22 @@
+28.09.2010 sle
+In our project we had the problem, that from two different Applications two KeyStrokeManager where instanciated. The KeyStrokeManager were not
+aware of the SwtEnvironment where they were instatiatetd from. This resulted that key-strokes where "used" two times.
+Problem: If one would close a SmartfieldProposal with an esc-keystroke, the whole form would close.
+Solution: The KeyStrokeManager is aware of the SwtEnvironment where it was instaciated and gives the environment to the filters.
+old:
+      getEnvironment().addKeyStrokeFilter(textField, new ISwtKeyStrokeFilter(){
+        @Override
+        public boolean accept(Event e){
+          return doSomething();
+        }
+      });
+new:
+      getEnvironment().addKeyStrokeFilter(textField, new ISwtKeyStrokeFilter(){
+        @Override
+        public boolean accept(Event e, ISwtEnvironment environment){
+          if(getEnvironment().equals(environment)){
+            return doSomething();
+          }
+          return false;
+        }
+      });

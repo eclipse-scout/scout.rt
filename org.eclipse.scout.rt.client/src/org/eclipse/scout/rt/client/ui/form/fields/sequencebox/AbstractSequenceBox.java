@@ -1,0 +1,359 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.internal.SequenceBoxGrid;
+import org.eclipse.scout.rt.shared.ScoutTexts;
+
+public abstract class AbstractSequenceBox extends AbstractCompositeField implements ISequenceBox {
+
+  private boolean m_autoCheckFromTo;
+  private OptimisticLock m_labelCompositionLock;
+  private SequenceBoxGrid m_grid;
+  private String m_labelBase;
+  private String m_labelSuffix;
+  private boolean m_equalColumnWidths;
+
+  public AbstractSequenceBox() {
+    this(true);
+  }
+
+  public AbstractSequenceBox(boolean callInitializer) {
+    super(callInitializer);
+  }
+
+  /*
+   * Configuration
+   */
+
+  /**
+   * @return true: A value change trigger ensures that all fields in the range
+   *         box have consistent (ascending values) by calling {@link #execCheckFromTo(IValueField)}
+   *         <p>
+   *         Examples:
+   * 
+   *         <pre>
+   * fromField.value &lt;= toField.value
+   * minField.value &lt;= preferredField.value &lt;= maxField.value
+   * </pre>
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(200)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredAutoCheckFromTo() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(210)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredEqualColumnWidths() {
+    return false;
+  }
+
+  @Override
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredGridUseUiHeight() {
+    return true;
+  }
+
+  /**
+   * Default implementation ensures that all fields in the range box have
+   * ascending values.<br>
+   * Only active when {@link #isAutoCheckFromTo()} resp. {@link #getConfiguredAutoCheckFromTo()} is set to true
+   * 
+   * @param valueFields
+   *          all value fields in the range box that have the same {@link IHolder#getHolderType()} and are comparable
+   * @param changedIndex
+   *          the field that triggered the change
+   */
+  @ConfigOperation
+  @Order(200)
+  protected <T extends Comparable<T>> void execCheckFromTo(IValueField<T>[] valueFields, int changedIndex) throws ProcessingException {
+    ArrayList<IValueField<T>> nonEmptyFields = new ArrayList<IValueField<T>>();
+    HashSet<Class> beanTypes = new HashSet<Class>();
+    int nonEmptyIndex = -1;
+    for (int i = 0; i < valueFields.length; i++) {
+      if (valueFields[i].getValue() != null) {
+        beanTypes.add(valueFields[i].getValue().getClass());
+        nonEmptyFields.add(valueFields[i]);
+        if (i == changedIndex) {
+          nonEmptyIndex = nonEmptyFields.size() - 1;
+        }
+      }
+    }
+    //check if there are exactly two field and all of them are comparable with same type
+    if (nonEmptyFields.size() != 2 || beanTypes.size() != 1) {
+      clearInvalidSequenceStatus(valueFields);
+      return;
+    }
+    // check changed field against its non-empty neighbours
+    if (nonEmptyIndex >= 0) {
+      IValueField<T> v = nonEmptyFields.get(nonEmptyIndex);
+      if (nonEmptyIndex - 1 >= 0) {
+        IValueField<T> left = nonEmptyFields.get(nonEmptyIndex - 1);
+        if (CompareUtility.compareTo(left.getValue(), v.getValue()) > 0) {
+          InvalidSequenceStatus errorStatus = new InvalidSequenceStatus(ScoutTexts.get("XMustBeGreaterThanOrEqualY", v.getLabel(), left.getLabel()));
+          if (!v.isLabelSuppressed()) {
+            v.setErrorStatus(errorStatus);
+          }
+          else {
+            //first field's label is suppressed and error status updated on own label
+            setErrorStatus(errorStatus);
+          }
+          return;
+        }
+      }
+      if (nonEmptyIndex + 1 < nonEmptyFields.size()) {
+        IValueField<T> right = nonEmptyFields.get(nonEmptyIndex + 1);
+        if (CompareUtility.compareTo(v.getValue(), right.getValue()) > 0) {
+          InvalidSequenceStatus errorStatus = new InvalidSequenceStatus(ScoutTexts.get("XMustBeLessThanOrEqualY", v.getLabel(), right.getLabel()));
+          if (!v.isLabelSuppressed()) {
+            v.setErrorStatus(errorStatus);
+          }
+          else {
+            //first field's label is suppressed and error status updated on own label
+            setErrorStatus(errorStatus);
+          }
+          return;
+        }
+      }
+    }
+    clearInvalidSequenceStatus(valueFields);
+  }
+
+  /**
+   * Validate all fields including own and remove error status when it is an
+   * InvalidSequenceStatus
+   * 
+   * @param valueFields
+   */
+  private void clearInvalidSequenceStatus(IValueField[] valueFields) {
+    for (IValueField v : valueFields) {
+      if (v.getErrorStatus() instanceof InvalidSequenceStatus) {
+        v.clearErrorStatus();
+      }
+    }
+    //remove error status on own
+    if (getErrorStatus() instanceof InvalidSequenceStatus) {
+      clearErrorStatus();
+    }
+  }
+
+  @Override
+  protected void initConfig() {
+    m_labelCompositionLock = new OptimisticLock();
+    m_grid = new SequenceBoxGrid(this);
+    super.initConfig();
+    setAutoCheckFromTo(getConfiguredAutoCheckFromTo());
+    setEqualColumnWidths(getConfiguredEqualColumnWidths());
+    // when range box has visible label, suppress first field's label and append
+    // to own label
+    propertySupport.addPropertyChangeListener(
+        new PropertyChangeListener() {
+          public void propertyChange(PropertyChangeEvent e) {
+            if (e.getPropertyName().equals(IFormField.PROP_LABEL_VISIBLE) || e.getPropertyName().equals(IFormField.PROP_LABEL) || e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
+              updateLabelComposition();
+            }
+          }
+        }
+        );
+    // <bsh 2010-10-01>
+    // If inner fields change their visibility dynamically, the label of the SequenceBox might change.
+    for (IFormField field : getFields()) {
+      field.addPropertyChangeListener(
+          new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent e) {
+              if (e.getPropertyName().equals(IFormField.PROP_LABEL_VISIBLE) || e.getPropertyName().equals(IFormField.PROP_LABEL) || e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
+                updateLabelComposition();
+              }
+            }
+          }
+          );
+    }
+    updateLabelComposition();
+    // attach change triggers
+    Class<?> sharedType = null;
+    ArrayList<IValueField> valueFieldList = new ArrayList<IValueField>();
+    for (IFormField f : getFields()) {
+      if (f instanceof IValueField) {
+        IValueField v = (IValueField) f;
+        Class<?> valueType = v.getHolderType();
+        if (Comparable.class.isAssignableFrom(valueType)) {
+          if (sharedType == null || valueType == sharedType) {
+            sharedType = valueType;
+            valueFieldList.add(v);
+          }
+        }
+      }
+    }
+    if (valueFieldList.size() >= 2) {
+      final IValueField[] valueFields = valueFieldList.toArray(new IValueField[valueFieldList.size()]);
+      for (int i = 0; i < valueFields.length; i++) {
+        final int index = i;
+        valueFields[index].addPropertyChangeListener(
+            IValueField.PROP_VALUE,
+            new PropertyChangeListener() {
+              public void propertyChange(PropertyChangeEvent e) {
+                if (getForm() != null && isAutoCheckFromTo()) {
+                  checkFromTo(valueFields, index);
+                }
+              }
+            }
+            );
+      }
+    }
+  }
+
+  /*
+   * Runtime
+   */
+
+  public boolean isEqualColumnWidths() {
+    return m_equalColumnWidths;
+  }
+
+  public void setEqualColumnWidths(boolean b) {
+    m_equalColumnWidths = b;
+  }
+
+  @Override
+  public void rebuildFieldGrid() {
+    m_grid.validate();
+    if (isInitialized()) {
+      if (getForm() != null) {
+        getForm().structureChanged(this);
+      }
+    }
+  }
+
+  // box is only visible when it has at least one visible item
+  @Override
+  protected void handleFieldVisibilityChanged() {
+    super.handleFieldVisibilityChanged();
+    if (isInitialized()) {
+      rebuildFieldGrid();
+    }
+  }
+
+  public final int getGridColumnCount() {
+    return m_grid.getGridColumnCount();
+  }
+
+  public final int getGridRowCount() {
+    return m_grid.getGridRowCount();
+  }
+
+  public boolean isAutoCheckFromTo() {
+    return m_autoCheckFromTo;
+  }
+
+  public void setAutoCheckFromTo(boolean b) {
+    m_autoCheckFromTo = b;
+  }
+
+  @SuppressWarnings("unchecked")
+  private void checkFromTo(IValueField[] valueFields, int changedIndex) {
+    try {
+      execCheckFromTo(valueFields, changedIndex);
+    }
+    catch (VetoException e) {
+      valueFields[changedIndex].setErrorStatus(e.getStatus());
+    }
+    catch (ProcessingException e) {
+      valueFields[changedIndex].setErrorStatus(e.getStatus());
+    }
+  }
+
+  private void updateLabelComposition() {
+    try {
+      if (m_labelCompositionLock.acquire()) {
+        IFormField suppressingField = null;
+        for (IFormField f : getFields()) {
+          f.setLabelSuppressed(false);
+        }
+        if (isLabelVisible()) {
+          for (IFormField f : getFields()) {
+            if (f.isVisible() && f.isLabelVisible()
+                && f.getLabelPosition() != IFormField.LABEL_POSITION_ON_FIELD) { // bsh 2010-10-01: don't use "on field" label in the label of the SequenceBox
+              suppressingField = f;
+              break;
+            }
+          }
+        }
+        if (suppressingField != null) {
+          m_labelSuffix = suppressingField.getLabel();
+          suppressingField.setLabelSuppressed(true);
+        }
+        else {
+          m_labelSuffix = null;
+        }
+        calculateExtendedLabel();
+      }
+    }
+    finally {
+      m_labelCompositionLock.release();
+    }
+  }
+
+  @Override
+  public void setLabel(String name) {
+    m_labelBase = name;
+    calculateExtendedLabel();
+  }
+
+  private void calculateExtendedLabel() {
+    if (StringUtility.hasText(m_labelBase) && StringUtility.hasText(m_labelSuffix)) {
+      super.setLabel(StringUtility.emptyIfNull(m_labelBase) + " " + StringUtility.emptyIfNull(m_labelSuffix));
+    }
+    else {
+      super.setLabel(StringUtility.emptyIfNull(m_labelBase) + StringUtility.emptyIfNull(m_labelSuffix));
+    }
+  }
+
+  @Override
+  public String getFullyQualifiedLabel(String separator) {
+    StringBuffer b = new StringBuffer();
+    IFormField p = getParentField();
+    if (p != null) {
+      String s = p.getFullyQualifiedLabel(separator);
+      if (s != null) {
+        b.append(s);
+      }
+    }
+    String s = m_labelBase;
+    if (s != null) {
+      if (b.length() > 0) {
+        b.append(separator);
+      }
+      b.append(s);
+    }
+    return b.toString();
+  }
+}

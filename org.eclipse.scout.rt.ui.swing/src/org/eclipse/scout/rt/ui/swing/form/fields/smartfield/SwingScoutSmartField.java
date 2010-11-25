@@ -1,0 +1,631 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.ui.swing.form.fields.smartfield;
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.Icon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+
+import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
+import org.eclipse.scout.rt.ui.swing.LogicalGridData;
+import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
+import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
+import org.eclipse.scout.rt.ui.swing.ext.JButtonEx;
+import org.eclipse.scout.rt.ui.swing.ext.JDropDownButton;
+import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
+import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
+import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
+import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
+import org.eclipse.scout.rt.ui.swing.ext.JTreeEx;
+import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
+import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutDropDownPopup;
+import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
+
+/**
+ * Proposal support feature: typing up/down key selects up and down in proposal
+ * popup typing space just AFTER up/down key selects the currently selected row
+ * in the proposal popup
+ */
+public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartField<?>> implements ISwingScoutSmartField {
+  private static final long serialVersionUID = 1L;
+
+  private JDropDownButton m_dropDownButton;
+  // proposal support
+  private SwingScoutDropDownPopup m_proposalPopup;
+  private P_PendingProposalJob m_pendingProposalJob;
+  private Object m_pendingProposalJobLock;
+
+  @Override
+  @SuppressWarnings("serial")
+  protected void initializeSwing() {
+    m_pendingProposalJobLock = new Object();
+    //
+    JPanelEx container = new JPanelEx();
+    container.setOpaque(false);
+    JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+    container.add(label);
+    JTextComponent textField = createTextField(container);
+    Document doc = textField.getDocument();
+    if (doc instanceof AbstractDocument) {
+      ((AbstractDocument) doc).setDocumentFilter(new BasicDocumentFilter(2000));
+    }
+    doc.addDocumentListener(
+        new DocumentListener() {
+          public void changedUpdate(DocumentEvent e) {
+            handleSwingDocumentChanged(e);
+          }
+
+          public void insertUpdate(DocumentEvent e) {
+            handleSwingDocumentChanged(e);
+          }
+
+          public void removeUpdate(DocumentEvent e) {
+            handleSwingDocumentChanged(e);
+          }
+        }
+        );
+    //
+    installSwingKeyStrokeDelegate(textField, SwingUtility.createKeystroke("UP"), "upArrow");
+    installSwingKeyStrokeDelegate(textField, SwingUtility.createKeystroke("DOWN"), "downArrow");
+    installSwingKeyStrokeDelegate(textField, SwingUtility.createKeystroke("PAGE_UP"), "pageUp");
+    installSwingKeyStrokeDelegate(textField, SwingUtility.createKeystroke("PAGE_DOWN"), "pageDown");
+    //
+    // key mappings
+    InputMap inputMap = textField.getInputMap(JTextField.WHEN_FOCUSED);
+    inputMap.put(SwingUtility.createKeystroke("F2"), "smartChooser");
+    ActionMap actionMap = textField.getActionMap();
+    actionMap.put(
+        "smartChooser",
+        new AbstractAction() {
+          public void actionPerformed(ActionEvent e) {
+            handleSwingSmartChooserAction(0);
+          }
+        }
+        );
+    //
+    setSwingContainer(container);
+    setSwingLabel(label);
+    setSwingField(textField);
+    // layout
+    getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
+  }
+
+  /**
+   * Create and add the text field to the container.
+   * <p>
+   * May add additional components to the container.
+   */
+  protected JTextComponent createTextField(JComponent container) {
+    JTextFieldEx textField = new JTextFieldEx();
+    container.add(textField);
+    //
+    JButtonEx pushButton = new JButtonEx();
+    m_dropDownButton = new JDropDownButton(pushButton);
+    m_dropDownButton.getPushButton().setContentAreaFilled(false);
+    m_dropDownButton.getMenuButton().setContentAreaFilled(false);
+    JButton menuButton = m_dropDownButton.getMenuButton();
+    m_dropDownButton.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, LogicalGridDataBuilder.createButton1(getSwingEnvironment()));
+    pushButton.setRequestFocusEnabled(false);
+    pushButton.setFocusable(false);
+    pushButton.setHorizontalAlignment(SwingConstants.CENTER);
+    pushButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        getSwingTextField().requestFocus();
+        handleSwingSmartChooserAction(0);
+      }
+    });
+    menuButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        handleSwingPopup((JComponent) e.getSource());
+      }
+    });
+    SwingLayoutUtility.setIconButtonWithPopupSizes(getSwingEnvironment(), m_dropDownButton);
+    container.add(m_dropDownButton);
+    //
+    return textField;
+  }
+
+  public JTextComponent getSwingTextField() {
+    return (JTextComponent) getSwingField();
+  }
+
+  @Override
+  protected void attachScout() {
+    super.attachScout();
+    ISmartField f = getScoutObject();
+    setIconIdFromScout(f.getIconId());
+    if (m_dropDownButton != null) m_dropDownButton.getMenuButton().setEnabled(f.hasMenus());
+    setProposalFormFromScout(f.getProposalForm());
+  }
+
+  @Override
+  protected void detachScout() {
+    hideProposalPopup();
+    super.detachScout();
+  }
+
+  @Override
+  protected void setHorizontalAlignmentFromScout(int scoutAlign) {
+    if (getSwingTextField() instanceof JTextField) {
+      int swingAlign = SwingUtility.createHorizontalAlignment(scoutAlign);
+      ((JTextField) getSwingTextField()).setHorizontalAlignment(swingAlign);
+    }
+  }
+
+  @Override
+  protected void setDisplayTextFromScout(String s) {
+    JTextComponent swingField = getSwingTextField();
+    String oldText = swingField.getText();
+    swingField.setText(s);
+    // ticket 77424
+    if (swingField.hasFocus() && swingField.getDocument().getLength() > 0) {
+      swingField.setCaretPosition(swingField.getDocument().getLength());
+      swingField.moveCaretPosition(0);
+    }
+    else {
+      swingField.setCaretPosition(0);
+    }
+    // disarm browse button in case text was changed
+    if (m_dropDownButton != null) {
+      if (!CompareUtility.equals(oldText, s)) {
+        m_dropDownButton.getPushButton().getModel().setArmed(false);
+      }
+    }
+  }
+
+  @Override
+  protected void setEnabledFromScout(boolean b) {
+    super.setEnabledFromScout(b);
+    if (m_dropDownButton != null) {
+      m_dropDownButton.setEnabled(b);
+    }
+  }
+
+  protected void setIconIdFromScout(String s) {
+    if (m_dropDownButton != null) {
+      Icon browseIcon = getSwingEnvironment().getIcon(s);
+      m_dropDownButton.getPushButton().setIcon(browseIcon);
+    }
+  }
+
+  protected void setProposalFormFromScout(ISmartFieldProposalForm form) {
+    if (form != null) {
+      showProposalPopup(form);
+    }
+    else {
+      hideProposalPopup();
+    }
+  }
+
+  @Override
+  protected void setForegroundFromScout(String scoutColor) {
+    JComponent fld = getSwingField();
+    if (fld != null && scoutColor != null && fld instanceof JTextComponent) {
+      setDisabledTextColor(SwingUtility.createColor(scoutColor), (JTextComponent) fld);
+    }
+    super.setForegroundFromScout(scoutColor);
+  }
+
+  protected void handleSwingDocumentChanged(DocumentEvent e) {
+    setInputDirty(true);
+    if (getUpdateSwingFromScoutLock().isReleased()) {
+      if (getSwingTextField().isShowing() && getSwingTextField().isFocusOwner()) {
+        String text = getSwingTextField().getText();
+        if (text == null || text.length() == 0) {
+          // allow empty field without proposal
+          if (m_proposalPopup != null) {
+            requestProposalSupportFromSwing(text, false, 400);
+          }
+        }
+        else {
+          requestProposalSupportFromSwing(text, false, 400);
+        }
+      }
+    }
+  }
+
+  /**
+   * install a key stroke delegate from the textfield to the popup table/tree
+   */
+  protected void installSwingKeyStrokeDelegate(JComponent textField, final KeyStroke k, String name) {
+    textField.getInputMap(JComponent.WHEN_FOCUSED).put(k, name);
+    textField.getActionMap().put(name, new AbstractAction() {
+      private static final long serialVersionUID = 1L;
+
+      public void actionPerformed(ActionEvent e) {
+        if (getSwingTextField().isVisible() && getSwingTextField().isEditable()) {
+          if (m_proposalPopup == null) {
+            requestProposalSupportFromSwing(ISmartField.BROWSE_ALL_TEXT, true, 0);
+          }
+          else {
+            JComponent c = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTable.class);
+            if (c == null) {
+              c = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTree.class);
+            }
+            if (c != null) {
+              ActionListener a = c.getActionForKeyStroke(k);
+              if (a != null) {
+                a.actionPerformed(new ActionEvent(c, ActionEvent.ACTION_PERFORMED, null));
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  private void requestProposalSupportFromSwing(String text, boolean selectCurrentValue, long initialDelay) {
+    synchronized (m_pendingProposalJobLock) {
+      boolean created = false;
+      if (m_pendingProposalJob == null) {
+        m_pendingProposalJob = new P_PendingProposalJob();
+        created = true;
+      }
+      m_pendingProposalJob.update(text, selectCurrentValue);
+      if (created) {
+        m_pendingProposalJob.startTimer(initialDelay);
+      }
+    }
+  }
+
+  private void acceptProposalFromSwing() {
+    synchronized (m_pendingProposalJobLock) {
+      m_pendingProposalJob = null;
+    }
+    // notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        getScoutObject().getUIFacade().acceptProposalFromUI();
+      }
+    };
+    getSwingEnvironment().invokeScoutLater(t, 0);
+    // end notify
+  }
+
+  private void showProposalPopup(ISmartFieldProposalForm form) {
+    setInputDirty(true);
+    // close old
+    if (m_proposalPopup != null) {
+      if (m_proposalPopup.isVisible()) {
+        m_proposalPopup.closeView();
+      }
+      m_proposalPopup = null;
+    }
+    // show new
+    getSwingTextField().getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("ENTER"), "enter");
+    getSwingTextField().getActionMap().put("enter", new AbstractAction() {
+      private static final long serialVersionUID = 1L;
+
+      public void actionPerformed(ActionEvent e) {
+        acceptProposalFromSwing();
+      }
+    });
+    getSwingTextField().getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("ESCAPE"), "escape");
+    getSwingTextField().getActionMap().put("escape", new AbstractAction() {
+      private static final long serialVersionUID = 1L;
+
+      public void actionPerformed(ActionEvent e) {
+        if (m_proposalPopup != null) {
+          m_proposalPopup.closeView();
+        }
+      }
+    });
+    //
+    m_proposalPopup = new SwingScoutDropDownPopup(getSwingEnvironment(), getSwingTextField(), getSwingTextField());
+    getSwingEnvironment().createForm(m_proposalPopup, form);
+    m_proposalPopup.makeNonFocusable();
+    // adjust size of popup every time the table/tree changes in the model
+    final JTableEx proposalTable = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTableEx.class);
+    final JTreeEx proposalTree = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTreeEx.class);
+    if (proposalTree != null || proposalTable != null) {
+      form.addFormListener(
+          new FormListener() {
+            public void formChanged(FormEvent e) throws ProcessingException {
+              switch (e.getType()) {
+                case FormEvent.TYPE_STRUCTURE_CHANGED: {
+                  Runnable t = new Runnable() {
+                    @Override
+                    public void run() {
+                      if (m_proposalPopup != null && m_proposalPopup.getSwingWindow().isShowing()) {
+                        optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
+                      }
+                    }
+                  };
+                  getSwingEnvironment().invokeSwingLater(t);
+                  break;
+                }
+              }
+            }
+          }
+          );
+    }
+    m_proposalPopup.getSwingWindow().setSize(new Dimension(getSwingTextField().getWidth(), 200));
+    optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
+    m_proposalPopup.openView();
+  }
+
+  private void optimizePopupSize(SwingScoutPopup popup, JTableEx proposalTable, JTreeEx proposalTree) {
+    if (proposalTable != null) {
+      if (proposalTable.isVisible()) {
+        JViewport viewPort = (proposalTable.getParent() instanceof JViewport ? (JViewport) proposalTable.getParent() : null);
+        JScrollPane scrollPane = (viewPort != null && viewPort.getParent() instanceof JScrollPane ? (JScrollPane) viewPort.getParent() : null);
+        int scrollbarSize = scrollPane != null ? scrollPane.getVerticalScrollBar().getPreferredSize().width + 2 : 0;
+        Dimension d = proposalTable.getPreferredContentSize(1000);
+        d.width += scrollbarSize;
+        d.width = Math.max(getSwingTextField().getWidth(), Math.min(d.width, 400));
+        d.height = Math.max(getSwingEnvironment().getFormRowHeight(), Math.min(d.height, 280));
+        Insets insets = proposalTable.getInsets();
+        if (insets != null) {
+          d.width += insets.left + insets.right;
+          d.height += insets.top + insets.bottom;
+        }
+        proposalTable.setPreferredScrollableViewportSize(d);
+        Component c = proposalTable;
+        while (c != null && !(c instanceof Window)) {
+          c.invalidate();
+          c = c.getParent();
+        }
+      }
+    }
+    else if (proposalTree != null) {
+      if (proposalTree.isVisible()) {
+        JViewport viewPort = (proposalTree.getParent() instanceof JViewport ? (JViewport) proposalTree.getParent() : null);
+        JScrollPane scrollPane = (viewPort != null && viewPort.getParent() instanceof JScrollPane ? (JScrollPane) viewPort.getParent() : null);
+        int scrollbarSize = scrollPane != null ? scrollPane.getVerticalScrollBar().getPreferredSize().width + 2 : 0;
+        Dimension d = proposalTree.getPreferredContentSize(1000);
+        d.width += scrollbarSize;
+        d.width = Math.max(getSwingTextField().getWidth(), Math.min(d.width, 400));
+        d.height = Math.max(getSwingEnvironment().getFormRowHeight(), Math.min(d.height, 280));
+        Insets insets = proposalTree.getInsets();
+        if (insets != null) {
+          d.width += insets.left + insets.right;
+          d.height += insets.top + insets.bottom;
+        }
+        proposalTree.setPreferredScrollableViewportSize(d);
+        Component c = proposalTree;
+        while (c != null && !(c instanceof Window)) {
+          c.invalidate();
+          c = c.getParent();
+        }
+      }
+    }
+    popup.autoAdjustBounds();
+  }
+
+  private void hideProposalPopup() {
+    getSwingTextField().getInputMap(JComponent.WHEN_FOCUSED).remove(SwingUtility.createKeystroke("ENTER"));
+    getSwingTextField().getActionMap().remove("enter");
+    getSwingTextField().getInputMap(JComponent.WHEN_FOCUSED).remove(SwingUtility.createKeystroke("ESCAPE"));
+    getSwingTextField().getActionMap().remove("escape");
+    if (m_proposalPopup != null) {
+      m_proposalPopup.closeView();
+      m_proposalPopup = null;
+    }
+  }
+
+  @Override
+  protected boolean handleSwingInputVerifier() {
+    synchronized (m_pendingProposalJobLock) {
+      m_pendingProposalJob = null;
+    }
+    final String text = getSwingTextField().getText();
+    // only handle if text has changed
+    if (m_dropDownButton != null) {
+      if (CompareUtility.notEquals(text, getScoutObject().getDisplayText())) {
+        m_dropDownButton.getPushButton().getModel().setArmed(false);
+      }
+    }
+    final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, true);
+    //
+    // notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        boolean b = getScoutObject().getUIFacade().setTextFromUI(text);
+        result.setValue(b);
+      }
+    };
+    JobEx job = getSwingEnvironment().invokeScoutLater(t, 0);
+    try {
+      job.join(2345);
+    }
+    catch (InterruptedException e) {
+      //nop
+    }
+    boolean processed = job.getState() == JobEx.NONE;
+    // end notify
+    getSwingEnvironment().dispatchImmediateSwingJobs();
+    if (processed && (!result.getValue())) {
+      // keep focus
+      return false;
+    }
+    else {
+      // advance focus
+      return true;
+    }
+  }
+
+  @Override
+  protected void handleSwingFocusGained() {
+    super.handleSwingFocusGained();
+    JTextComponent swingField = getSwingTextField();
+    if (swingField.getDocument().getLength() > 0) {
+      swingField.setCaretPosition(swingField.getDocument().getLength());
+      swingField.moveCaretPosition(0);
+    }
+    if (getScoutObject().getErrorStatus() != null) {
+      requestProposalSupportFromSwing(getScoutObject().getDisplayText(), false, 0);
+    }
+  }
+
+  protected boolean isSmartChooserEnabled() {
+    if (m_dropDownButton != null) {
+      return (m_dropDownButton.getPushButton().isVisible() && m_dropDownButton.getPushButton().isEnabled());
+    }
+    return false;
+  }
+
+  protected void handleSwingSmartChooserAction(long initialDelay) {
+    if (isSmartChooserEnabled()) {
+      requestProposalSupportFromSwing(ISmartField.BROWSE_ALL_TEXT, true, initialDelay);
+    }
+  }
+
+  protected void handleSwingPopup(final JComponent target) {
+    if (getScoutObject().hasMenus()) {
+      // notify Scout
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          IMenu[] scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
+          // call swing menu
+          new SwingPopupWorker(getSwingEnvironment(), target, new Point(0, target.getHeight()), scoutMenus).enqueue();
+        }
+      };
+      getSwingEnvironment().invokeScoutLater(t, 5678);
+      // end notify
+    }
+  }
+
+  @Override
+  protected void handleScoutPropertyChange(String name, Object newValue) {
+    super.handleScoutPropertyChange(name, newValue);
+    if (name.equals(ISmartField.PROP_ICON_ID)) {
+      setIconIdFromScout((String) newValue);
+    }
+    else if (name.equals(ISmartField.PROP_PROPOSAL_FORM)) {
+      setProposalFormFromScout((ISmartFieldProposalForm) newValue);
+    }
+  }
+
+  /*
+   * Text change timer
+   */
+  private class P_PendingProposalJob implements Runnable {
+    private String m_text;
+    private boolean m_selectCurrentValue;
+    private long m_lastChanged = System.currentTimeMillis();
+
+    public void update(String text, boolean selectCurrentValue) {
+      m_text = text;
+      m_selectCurrentValue = selectCurrentValue;
+      m_lastChanged = System.currentTimeMillis();
+    }
+
+    /*
+     * this runnable runs in swing
+     */
+    @Override
+    public void run() {
+      synchronized (m_pendingProposalJobLock) {
+        if (m_pendingProposalJob == this) {
+          m_pendingProposalJob = null;
+        }
+        else {
+          return;
+        }
+      }
+      if (getSwingField().isFocusOwner()) {
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
+          }
+        };
+        getSwingEnvironment().invokeScoutLater(t, 0);
+      }
+    }
+
+    /*
+     * Timer that waits first the initialDelay and then 400ms for further typed
+     * keys before sending to scout
+     */
+    public void startTimer(final long initialDelay) {
+      if (initialDelay <= 0) {
+        SwingUtilities.invokeLater(P_PendingProposalJob.this);
+      }
+      else {
+        Thread t = new Thread() {
+          /*
+           * this runnable runs in timer thread
+           */
+          @Override
+          public void run() {
+            long delay = initialDelay;
+            while (m_pendingProposalJob == P_PendingProposalJob.this) {
+              long dt = m_lastChanged + delay - System.currentTimeMillis();
+              if (dt > 0) {
+                try {
+                  sleep(dt);
+                }
+                catch (InterruptedException ie) {
+                }
+                delay = 400;
+              }
+              else {
+                break;
+              }
+            }
+            synchronized (m_pendingProposalJobLock) {
+              if (m_pendingProposalJob == P_PendingProposalJob.this) {
+                // notify Scout
+                SwingUtilities.invokeLater(P_PendingProposalJob.this);
+                // end notify
+              }
+            }
+          }
+        };
+        t.setDaemon(true);
+        t.start();
+      }
+    }
+
+  }// end private class
+
+}

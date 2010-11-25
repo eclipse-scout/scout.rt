@@ -1,0 +1,45 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.server.services.common.jdbc.builder;
+
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerConstants;
+
+/**
+ * Example handler that demonstrates custom part building for a full-text search field based on a oracle
+ * database
+ * with full-text engine.
+ * <p>
+ * the part is registered with {@link FormDataStatementBuilder#setPartDefinition(Class, new
+ * PartDefinition("LAST_NAME"))}
+ */
+public class ExampleFullTextPartDefinition extends ValuePartDefinition {
+
+  /**
+   * @param attribute
+   */
+  public ExampleFullTextPartDefinition(Class fieldType, String sqlAttribute) {
+    super(fieldType, sqlAttribute, ComposerConstants.OPERATOR_NONE);
+  }
+
+  @Override
+  public String createNewInstance(FormDataStatementBuilder builder, List<Object> fieldDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
+    String pattern = (String) bindValues.get(0);
+    //generate a search patter from pattern, decorate and replace pattern
+    //...
+    String sqlAttribute = "CONTAINS(<attribute>" + this.getSqlAttribute() + "</attribute>,'" + pattern + "')>0";
+    return builder.createStatementPart(ComposerConstants.AGGREGATION_NONE, sqlAttribute, getOperation(), null, null, isPlainBind(), parentAliasMap);
+  }
+
+}
