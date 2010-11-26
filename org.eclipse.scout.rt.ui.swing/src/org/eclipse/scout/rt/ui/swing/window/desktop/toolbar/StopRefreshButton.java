@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,7 +17,7 @@ import java.awt.Point;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
-import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.JNavigationWidget.ButtonName;
 
 public class StopRefreshButton extends NavigationWidgetButton {
@@ -98,15 +98,15 @@ public class StopRefreshButton extends NavigationWidgetButton {
 
   private int m_glowDir = 1;
 
-  public StopRefreshButton(ISwingEnvironment env, JComponent parent) {
-    super(env, ButtonName.STOP_REFRESH, parent);
+  public StopRefreshButton(JComponent parent) {
+    super(ButtonName.STOP_REFRESH, parent);
   }
 
   void loadGlowAnimation(String iconUrl) {
     m_glowFrames = new Icon[10];
     for (int i = 0; i < 10; i++) {
       String frameUrl = iconUrl + "_" + i;
-      m_glowFrames[i] = m_env.getIcon(frameUrl);
+      m_glowFrames[i] = Activator.getIcon(frameUrl);
     }
   }
 

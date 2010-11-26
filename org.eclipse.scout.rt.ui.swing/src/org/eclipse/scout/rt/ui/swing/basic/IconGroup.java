@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
 /**
@@ -32,6 +33,37 @@ public class IconGroup {
   private final Map<IconState, Icon> iconMap = new HashMap<IconState, Icon>();
 
   public IconGroup() {
+  }
+
+  public IconGroup(String iconId) {
+    if (iconId != null) {
+      Icon normal = Activator.getIcon(iconId);
+      Icon rollover = Activator.getIcon(iconId + "_mouse_over");
+      if (rollover == null) {
+        rollover = Activator.getIcon(iconId + "_rollover");
+        if (rollover == null) {
+          rollover = normal;
+        }
+      }
+      Icon selected = Activator.getIcon(iconId + "_active");
+      if (selected == null) {
+        selected = Activator.getIcon(iconId + "_pressed");
+        if (selected == null) {
+          selected = Activator.getIcon(iconId + "_selected");
+          if (selected == null) {
+            selected = normal;
+          }
+        }
+      }
+      Icon disabled = Activator.getIcon(iconId + "_disabled");
+      if (disabled == null) {
+        disabled = normal;
+      }
+      iconMap.put(IconState.NORMAL, normal);
+      iconMap.put(IconState.ROLLOVER, rollover);
+      iconMap.put(IconState.SELECTED, selected);
+      iconMap.put(IconState.DISABLED, disabled);
+    }
   }
 
   public IconGroup(ISwingEnvironment env, String iconId) {

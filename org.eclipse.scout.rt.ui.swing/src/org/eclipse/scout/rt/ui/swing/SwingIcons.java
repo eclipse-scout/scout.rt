@@ -46,6 +46,9 @@ public interface SwingIcons {
   String ViewTabLeft = "view_tab_left";
   String ViewTabRight = "view_tab_right";
   String Splash = "splash";
+  String StatusInfo = "status_info";
+  String StatusError = "status_error";
+  String StatusWarning = "status_warning";
   String StatusInterrupt = "status_interrupt";
 
 }

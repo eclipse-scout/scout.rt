@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,6 +27,7 @@ import javax.swing.plaf.synth.SynthLookAndFeel;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -45,19 +46,19 @@ import org.eclipse.scout.rt.ui.swing.window.desktop.menubar.SwingScoutMainMenuPo
 public class JViewTabsBar extends AbstractJTabBar {
   private static final long serialVersionUID = 1L;
 
-  private final ISwingEnvironment m_env;
   private Icon m_activeTabLeftIcon;
   private Icon m_activeTabRightIcon;
   private IconGroup m_menuIcon;
   private IDesktop m_desktop;
   private JLabel m_menuLabel;
   private SwingScoutMainMenuPopup m_popupMenu;
+  private ISwingEnvironment m_env;
 
   JViewTabsBar(ISwingEnvironment env) {
     m_env = env;
-    m_activeTabLeftIcon = m_env.getIcon(SwingIcons.ViewTabLeft);
-    m_activeTabRightIcon = m_env.getIcon(SwingIcons.ViewTabRight);
-    m_menuIcon = new IconGroup(m_env, SwingIcons.IconMenu);
+    m_activeTabLeftIcon = Activator.getIcon(SwingIcons.ViewTabLeft);
+    m_activeTabRightIcon = Activator.getIcon(SwingIcons.ViewTabRight);
+    m_menuIcon = new IconGroup(SwingIcons.IconMenu);
     setName("Synth.ViewTabsBar");
     setLayout(new Layout());
     setOpaque(true);

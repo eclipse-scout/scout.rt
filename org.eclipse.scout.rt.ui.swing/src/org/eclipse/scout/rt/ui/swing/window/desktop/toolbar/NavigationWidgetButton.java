@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,7 +21,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
-import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.JNavigationWidget.ButtonName;
 
 /**
@@ -57,10 +57,9 @@ public class NavigationWidgetButton {
 
   private ButtonName m_name;
 
-  protected final ISwingEnvironment m_env;
+//  protected final ISwingEnvironment m_env;
 
-  NavigationWidgetButton(ISwingEnvironment env, ButtonName name, JComponent parent) {
-    m_env = env;
+  NavigationWidgetButton(ButtonName name, JComponent parent) {
     m_name = name;
     m_parent = parent;
   }
@@ -145,8 +144,8 @@ public class NavigationWidgetButton {
 
   public void loadButtonStates(String iconUrl) {
     m_button = new Icon[2];
-    m_button[0] = m_env.getIcon(iconUrl);
-    m_button[1] = m_env.getIcon(iconUrl + "_mo");
+    m_button[0] = Activator.getIcon(iconUrl);
+    m_button[1] = Activator.getIcon(iconUrl + "_mo");
   }
 
   public void loadIconStates(String iconUrl) {
@@ -155,9 +154,9 @@ public class NavigationWidgetButton {
 
   protected Icon[] loadTriStateIcon(String iconUrl) { // TODO AWE use IconGroup here
     Icon[] icon = new Icon[3];
-    icon[0] = m_env.getIcon(iconUrl);
-    icon[1] = m_env.getIcon(iconUrl + "_mo");
-    icon[2] = m_env.getIcon(iconUrl + "_da");
+    icon[0] = Activator.getIcon(iconUrl);
+    icon[1] = Activator.getIcon(iconUrl + "_mo");
+    icon[2] = Activator.getIcon(iconUrl + "_da");
     return icon;
   }
 

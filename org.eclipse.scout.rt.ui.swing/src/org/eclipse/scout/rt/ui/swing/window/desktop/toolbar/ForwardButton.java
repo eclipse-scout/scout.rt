@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,7 +18,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
-import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.JNavigationWidget.ButtonName;
 
 public class ForwardButton extends NavigationWidgetButton {
@@ -29,8 +28,8 @@ public class ForwardButton extends NavigationWidgetButton {
 
   private boolean historyEnabled = false;
 
-  public ForwardButton(ISwingEnvironment env, JComponent parent) {
-    super(env, ButtonName.FORWARD, parent);
+  public ForwardButton(JComponent parent) {
+    super(ButtonName.FORWARD, parent);
   }
 
   public void loadHistoryIcon(String iconUrl) {

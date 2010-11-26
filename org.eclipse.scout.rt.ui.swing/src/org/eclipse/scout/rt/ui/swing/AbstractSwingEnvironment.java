@@ -1011,7 +1011,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   @Override
   public JStatusLabelEx createStatusLabel() {
-    JStatusLabelEx ui = new JStatusLabelEx(this);
+    JStatusLabelEx ui = new JStatusLabelEx();
     ui.setName("Synth.StatusLabel");
     return ui;
   }

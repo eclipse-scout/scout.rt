@@ -22,7 +22,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
-public class Activator extends Plugin {
+public class Activator extends Plugin implements SwingIcons {
   public static final String PLUGIN_ID = "org.eclipse.scout.rt.ui.swing";
 
   // The shared instance
@@ -71,7 +71,9 @@ public class Activator extends Plugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     plugin = this;
-    m_iconLocator = new SwingIconLocator(new BundleIconLocator(getBundle()));
+    BundleIconLocator iconLocator = new BundleIconLocator(getBundle());
+    iconLocator.getIconLocatorService().setFolderName("resources/icons/internal/");
+    m_iconLocator = new SwingIconLocator(iconLocator);
     // register net authenticator ui
     Hashtable<String, Object> map = new Hashtable<String, Object>();
     map.put(Constants.SERVICE_RANKING, -2);

@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -46,7 +46,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 public class JStatusLabelEx extends JComponent {
   private static final long serialVersionUID = 1L;
 
-  private final ISwingEnvironment m_env;
+//  private final ISwingEnvironment m_env;
   private IProcessingStatus m_status;
   private boolean m_mandatoryLabelVisible; // contains actual state, needed for error status overlay (bsh 2010-10-08)
 
@@ -59,11 +59,11 @@ public class JStatusLabelEx extends JComponent {
   private Icon m_mandatoryIconEnabled;
   private Icon m_mandatoryIconDisabled;
 
-  public JStatusLabelEx(ISwingEnvironment env) {
-    m_env = env;
+  public JStatusLabelEx() {
+//    m_env = env;
     setLayout(new BorderLayoutEx(0, 0));
-    m_mandatoryIconEnabled = m_env.getIcon(SwingIcons.Mandantory);
-    m_mandatoryIconDisabled = m_env.getIcon(SwingIcons.MandantoryDisabled);
+    m_mandatoryIconEnabled = Activator.getIcon(SwingIcons.Mandantory);
+    m_mandatoryIconDisabled = Activator.getIcon(SwingIcons.MandantoryDisabled);
 
     // Create two panels
     m_labelPanel = new JPanelEx();
@@ -183,7 +183,7 @@ public class JStatusLabelEx extends JComponent {
             break;
         }
       }
-      m_statusLabel.setIcon(m_env.getIcon(iconId));
+      m_statusLabel.setIcon(Activator.getIcon(iconId));
       // tooltip
       StringBuffer buf = new StringBuffer();
       if (m_status.getTitle() != null) {

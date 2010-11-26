@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -45,7 +45,7 @@ public class CollapseButton extends JPanelEx {
     add(m_label);
     m_label.setBorder(null);
     //addIcon
-    m_arrowIcon = new IconGroup(env, SwingIcons.IconSlider);
+    m_arrowIcon = new IconGroup(SwingIcons.IconSlider);
     m_label.setIcon(m_arrowIcon.getIcon(IconState.NORMAL));
     m_label.setIconTextGap(7);
     //addTitle

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.services.common.icon.IconProviderService;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -21,7 +20,7 @@ import org.osgi.framework.Bundle;
  */
 public class BundleIconLocator implements IIconLocator {
 
-  private final IIconProviderService m_iconLocatorService;
+  private final IconProviderService m_iconLocatorService;
 
   public BundleIconLocator(Bundle bundle) {
     m_iconLocatorService = new P_BundleIconProviderService(bundle);
@@ -33,6 +32,10 @@ public class BundleIconLocator implements IIconLocator {
     }
     IconSpec spec = m_iconLocatorService.getIconSpec(name);
     return spec;
+  }
+
+  public IconProviderService getIconLocatorService() {
+    return m_iconLocatorService;
   }
 
   private class P_BundleIconProviderService extends IconProviderService {

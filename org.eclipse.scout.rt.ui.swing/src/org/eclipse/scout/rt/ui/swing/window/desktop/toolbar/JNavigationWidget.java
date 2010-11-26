@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 
@@ -109,7 +110,7 @@ public class JNavigationWidget extends JPanel {
   }
 
   private void initButtons() {
-    NavigationWidgetButton back = new NavigationWidgetButton(m_env, ButtonName.BACK, this);
+    NavigationWidgetButton back = new NavigationWidgetButton(ButtonName.BACK, this);
     back.loadButtonStates(SwingIcons.NavigationBtnBack);
     back.loadIconStates(SwingIcons.NavigationIcoBack);
     back.m_buttonPos = new Point(5, 4);
@@ -117,7 +118,7 @@ public class JNavigationWidget extends JPanel {
     m_buttonMap.put(ButtonName.BACK, back);
     addDisabledListener(back);
 
-    final ForwardButton forward = new ForwardButton(m_env, this);
+    final ForwardButton forward = new ForwardButton(this);
     forward.loadButtonStates(SwingIcons.NavigationBtnForward);
     forward.loadIconStates(SwingIcons.NavigationIcoForward);
     forward.m_buttonPos = new Point(39, 4);
@@ -129,7 +130,7 @@ public class JNavigationWidget extends JPanel {
     m_buttonMap.put(ButtonName.FORWARD, forward);
     addDisabledListener(forward);
 
-    StopRefreshButton stopRefresh = new StopRefreshButton(m_env, this);
+    StopRefreshButton stopRefresh = new StopRefreshButton(this);
     stopRefresh.loadButtonStates(SwingIcons.NavigationBtnStopRefresh);
     stopRefresh.loadIconStates(SwingIcons.NavigationIcoRefresh);
     stopRefresh.m_buttonPos = new Point(73, 4);
@@ -188,7 +189,7 @@ public class JNavigationWidget extends JPanel {
   }
 
   private void paintDropshadow(Graphics g) {
-    Icon icon = m_env.getIcon(m_dropshadowBelowButton.m_dropshadowIcon);
+    Icon icon = Activator.getIcon(m_dropshadowBelowButton.m_dropshadowIcon);
     if (icon != null) {
       icon.paintIcon(this, g, SHADOW_DISTANCE, SHADOW_DISTANCE);
     }

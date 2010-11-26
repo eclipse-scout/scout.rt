@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,6 +29,7 @@ import javax.swing.plaf.synth.SynthLookAndFeel;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -61,7 +62,7 @@ public class JToolTabsBar extends AbstractJTabBar {
 
   JToolTabsBar(ISwingEnvironment env) {
     m_env = env;
-    m_activeTabIcon = m_env.getIcon(SwingIcons.ToolTab);
+    m_activeTabIcon = Activator.getIcon(SwingIcons.ToolTab);
     setLayout(new Layout());
     setName("Synth.ToolTabsBar");
     if (!(UIManager.getLookAndFeel() instanceof SynthLookAndFeel)) {
