@@ -4,13 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.internal;
 
+import java.awt.Image;
 import java.util.Hashtable;
+
+import javax.swing.Icon;
 
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.rt.ui.swing.login.internal.InternalNetAuthenticator;
@@ -31,6 +34,18 @@ public class Activator extends Plugin {
    */
   public static Activator getDefault() {
     return plugin;
+  }
+
+  public static Image getImage(String name) {
+    System.out.println("XXX getImage " + name);
+    //XXX aho
+    return null;
+  }
+
+  public static Icon getIcon(String name) {
+    System.out.println("XXX getIcon " + name);
+    //XXX aho
+    return null;
   }
 
   private ServiceRegistration m_netAuthRegistration;

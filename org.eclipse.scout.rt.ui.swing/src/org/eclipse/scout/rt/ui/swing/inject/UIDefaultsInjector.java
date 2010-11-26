@@ -28,22 +28,21 @@ import javax.swing.plaf.InsetsUIResource;
 
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
+import org.eclipse.scout.rt.ui.swing.internal.Activator;
 import org.eclipse.scout.rt.ui.swing.splash.SplashWindow;
 
 /**
- *
+ * Sets the default ui properties used in swing scout composites
  */
 public class UIDefaultsInjector {
-
   public UIDefaultsInjector() {
   }
 
   /**
    * used by swingscout widgets and {@link SplashWindow}
    */
-  public void inject(ISwingEnvironment env, UIDefaults defaults) {
+  public void inject(UIDefaults defaults) {
     /*
      * Defaults
      */
@@ -60,11 +59,11 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "ListBox.rowHeight", 20);
     putIfUndefined(defaults, "MenuBar.policy", "menubar");
     putIfUndefined(defaults, "PopupMenu.innerBorder", null);
-    putIfUndefined(defaults, "Splash.icon", createIconUIResource(env, "splash"));
+    putIfUndefined(defaults, "Splash.icon", createIconUIResource("splash"));
     putIfUndefined(defaults, "Splash.text", new ColorUIResource(0x0086A6));
     //putIfUndefined(defaults, "Splash.versionLocation", new Point(0,200));
     //putIfUndefined(defaults, "Splash.statusTextLocation", new Point(0,180));
-    putIfUndefined(defaults, "StatusBar.StopButton.icon", createIconUIResource(env, SwingIcons.StatusInterrupt));
+    putIfUndefined(defaults, "StatusBar.StopButton.icon", createIconUIResource(SwingIcons.StatusInterrupt));
     putIfUndefined(defaults, "StatusBar.height", 29);
     putIfUndefined(defaults, "StatusBar.icon", null);
     putIfUndefined(defaults, "StatusBar.visible", true);
@@ -82,22 +81,22 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "TitledBorder.border", new BorderUIResource(new EmptyBorder(0, 0, 0, 0)));
     putIfUndefined(defaults, "TitledBorder.font", new FontUIResource("Dialog", Font.PLAIN, 12));
     putIfUndefined(defaults, "TitledBorder.titleColor", new ColorUIResource(0x000000));
-    putIfUndefined(defaults, "Tooltip.icon", createIconUIResource(env, SwingIcons.Tooltip));
-    putIfUndefined(defaults, "Tree.closedIcon", createIconUIResource(env, AbstractIcons.Folder));
-    putIfUndefined(defaults, "Tree.openIcon", createIconUIResource(env, AbstractIcons.FolderOpen));
+    putIfUndefined(defaults, "Tooltip.icon", createIconUIResource(SwingIcons.Tooltip));
+    putIfUndefined(defaults, "Tree.closedIcon", createIconUIResource(AbstractIcons.Folder));
+    putIfUndefined(defaults, "Tree.openIcon", createIconUIResource(AbstractIcons.FolderOpen));
     putIfUndefined(defaults, "Tree.rowHeight", 24);
     putIfUndefined(defaults, "TreeBox.rowHeight", 20);
-    Icon icon = env.getIcon("window");
+    Icon icon = Activator.getIcon("window");
     if (icon != null) { // legacy
       putIfUndefined(defaults, "Window.icon", icon);// must be an ImageIcon, not an IconUIResource
     }
     else {
       // multiple icons for newer versions of Java
       List<Image> icons = new ArrayList<Image>();
-      icons.add(env.getImage("window16"));
-      icons.add(env.getImage("window32"));
-      icons.add(env.getImage("window48"));
-      icons.add(env.getImage("window256"));
+      icons.add(Activator.getImage("window16"));
+      icons.add(Activator.getImage("window32"));
+      icons.add(Activator.getImage("window48"));
+      icons.add(Activator.getImage("window256"));
       putIfUndefined(defaults, "Window.icons", icons);
     }
 
@@ -157,8 +156,8 @@ public class UIDefaultsInjector {
     }
   }
 
-  protected IconUIResource createIconUIResource(ISwingEnvironment env, String resourceSimpleName) {
-    Icon icon = env.getIcon(resourceSimpleName);
+  protected IconUIResource createIconUIResource(String resourceSimpleName) {
+    Icon icon = Activator.getIcon(resourceSimpleName);
     if (icon != null) {
       return new IconUIResource(icon);
     }

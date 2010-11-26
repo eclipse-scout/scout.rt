@@ -78,6 +78,7 @@ import org.eclipse.scout.rt.ui.swing.inject.AppendActionsInjector;
 import org.eclipse.scout.rt.ui.swing.inject.CreateActionInjector;
 import org.eclipse.scout.rt.ui.swing.inject.InitLookAndFeelInjector;
 import org.eclipse.scout.rt.ui.swing.inject.UIDefaultsInjector;
+import org.eclipse.scout.rt.ui.swing.internal.Activator;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutBoundsProvider;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
 import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
@@ -136,9 +137,14 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       System.setProperty("sun.java2d.noddraw", "true");
       System.getProperty("sun.java2d.noddraw", "true");// read to make it
       // only system properties are visible inside javax.swing
-
+      initLookAndFeel(System.getProperties());
+      interceptUIDefaults(UIManager.getDefaults());
+      CSSPatch.apply();
+      m_rootFrame = createRootFrame();
+      if (m_rootFrame != null) {
+        setWindowIcon(m_rootFrame);
+      }
       m_synchronizer = new SwingScoutSynchronizer(this);
-
       // add job manager listener for busy handling
       Job.getJobManager().addJobChangeListener(new JobChangeAdapter() {
         @Override
@@ -201,7 +207,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
    * Properties: scout.laf, javax.swing.plaf.synth.style, swing.defaultlaf
    */
   protected void initLookAndFeel(Properties initProperties) {
-    new InitLookAndFeelInjector().inject(this, initProperties);
+    new InitLookAndFeelInjector().inject(initProperties);
   }
 
   public Icon getIcon(String name) {
@@ -230,14 +236,25 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   /**
    * Sets the icon of the specified window (e.g. used in the Task bar, Title bar, etc.).
    * If 'legacyIcon' is not null, the specified image is used. If (and only if) 'legacyIcon'
-   * s null, the 'icons' list is used. The operating system can then choose the best
+   * is null, the 'icons' list is used. The operating system can then choose the best
    * matching image out of this list (usually, you put different sizes of icons in this list).
    */
-  private void setWindowIcon(Window window, Image legacyIcon, List<Image> icons) {
+  protected void setWindowIcon(Window window) {
+    // legacy
+    Image legacyIcon = Activator.getImage("window");
     if (legacyIcon != null) {
       window.setIconImage(legacyIcon);
     }
     else {
+      ArrayList<Image> icons = new ArrayList<Image>();
+      for (String name : new String[]{"window16", "window32", "window48", "window256"}) {
+        if (name != null) {
+          Image img = Activator.getImage(name);
+          if (img != null) {
+            icons.add(img);
+          }
+        }
+      }
       window.setIconImages(icons);
     }
   }
@@ -289,7 +306,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   }
 
   public void interceptUIDefaults(UIDefaults defaults) {
-    new UIDefaultsInjector().inject(this, defaults);
+    new UIDefaultsInjector().inject(defaults);
   }
 
   public Frame getRootFrame() {
@@ -304,20 +321,11 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public void showGUI(IClientSession session) {
     checkThread();
     m_scoutSession = session;
-    m_iconLocator = createIconLocator();
-    initLookAndFeel(System.getProperties());
-    interceptUIDefaults(UIManager.getDefaults());
-    CSSPatch.apply();
-    m_rootFrame = createRootFrame();
-    if (m_rootFrame != null) {
-      setWindowIcon(m_rootFrame,
-          getImage("window"), // legacy
-          getImages("window16", "window32", "window48", "window256"));
-    }
     if (m_rootFrame == null) {
       m_scoutSession.stopSession();
       return;
     }
+    m_iconLocator = createIconLocator();
     final IDesktop desktop = m_scoutSession.getDesktop();
     if (desktop != null) {
       m_scoutSession.getDesktop().addDesktopListener(new DesktopListener() {
@@ -856,9 +864,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     ui.setName("Synth.Dialog");
     Window w = SwingUtilities.getWindowAncestor(ui.getSwingContentPane());
     if (w != null) {
-      setWindowIcon(w,
-          getImage("window"), // legacy
-          getImages("window16", "window32", "window48", "window256"));
+      setWindowIcon(w);
     }
     decorate(form, ui);
     return ui;
@@ -873,9 +879,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     ui.setName("Synth.Frame");
     Window w = SwingUtilities.getWindowAncestor(ui.getSwingContentPane());
     if (w != null) {
-      setWindowIcon(w,
-          getImage("window"), // legacy
-          getImages("window16", "window32", "window48", "window256"));
+      setWindowIcon(w);
     }
     decorate(form, ui);
     return ui;
@@ -908,9 +912,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     ui.setName("Synth.Dialog");
     Window w = SwingUtilities.getWindowAncestor(ui.getSwingContentPane());
     if (w != null) {
-      setWindowIcon(w,
-          getImage("window"), // legacy
-          getImages("window16", "window32", "window48", "window256"));
+      setWindowIcon(w);
     }
     decorate(form, ui);
     return ui;
