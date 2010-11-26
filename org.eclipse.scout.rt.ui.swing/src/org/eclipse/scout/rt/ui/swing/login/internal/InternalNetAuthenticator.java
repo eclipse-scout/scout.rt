@@ -21,7 +21,7 @@ import javax.swing.SwingUtilities;
 import org.eclipse.scout.commons.SecurePreferencesUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.swing.internal.Activator;
+import org.eclipse.scout.rt.ui.swing.Activator;
 
 public class InternalNetAuthenticator extends Authenticator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalNetAuthenticator.class);

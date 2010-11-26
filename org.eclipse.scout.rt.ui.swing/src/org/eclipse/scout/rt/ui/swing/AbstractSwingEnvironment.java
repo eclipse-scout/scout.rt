@@ -78,7 +78,6 @@ import org.eclipse.scout.rt.ui.swing.inject.AppendActionsInjector;
 import org.eclipse.scout.rt.ui.swing.inject.CreateActionInjector;
 import org.eclipse.scout.rt.ui.swing.inject.InitLookAndFeelInjector;
 import org.eclipse.scout.rt.ui.swing.inject.UIDefaultsInjector;
-import org.eclipse.scout.rt.ui.swing.internal.Activator;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutBoundsProvider;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
 import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;

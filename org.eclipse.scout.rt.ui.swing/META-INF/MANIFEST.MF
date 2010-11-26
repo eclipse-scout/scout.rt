@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Swing UI Plug-in
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.swing;singleton:=true
 Bundle-Version: 3.2.1.qualifier
-Bundle-Activator: org.eclipse.scout.rt.ui.swing.internal.Activator
+Bundle-Activator: org.eclipse.scout.rt.ui.swing.Activator
 Bundle-Vendor: Eclipse Scout Project
 Import-Package: javax.mail;resolution:=optional,
  javax.mail.internet;resolution:=optional,

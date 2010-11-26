@@ -20,8 +20,8 @@ import javax.swing.plaf.synth.SynthLookAndFeel;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ILookAndFeelProvider;
-import org.eclipse.scout.rt.ui.swing.internal.Activator;
 
 /**
  *

@@ -28,8 +28,8 @@ import javax.swing.plaf.InsetsUIResource;
 
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
-import org.eclipse.scout.rt.ui.swing.internal.Activator;
 import org.eclipse.scout.rt.ui.swing.splash.SplashWindow;
 
 /**

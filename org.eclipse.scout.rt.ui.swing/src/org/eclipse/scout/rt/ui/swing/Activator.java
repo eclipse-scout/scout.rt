@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swing.internal;
+package org.eclipse.scout.rt.ui.swing;
 
 import java.awt.Image;
 import java.util.Hashtable;
@@ -16,6 +16,7 @@ import java.util.Hashtable;
 import javax.swing.Icon;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.scout.rt.client.ui.BundleIconLocator;
 import org.eclipse.scout.rt.ui.swing.login.internal.InternalNetAuthenticator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -26,6 +27,7 @@ public class Activator extends Plugin {
 
   // The shared instance
   private static Activator plugin;
+  private SwingIconLocator m_iconLocator;
 
   /**
    * Returns the shared instance
@@ -37,15 +39,19 @@ public class Activator extends Plugin {
   }
 
   public static Image getImage(String name) {
-    System.out.println("XXX getImage " + name);
-    //XXX aho
-    return null;
+    return getDefault().getImageImpl(name);
+  }
+
+  private Image getImageImpl(String name) {
+    return m_iconLocator.getImage(name);
   }
 
   public static Icon getIcon(String name) {
-    System.out.println("XXX getIcon " + name);
-    //XXX aho
-    return null;
+    return getDefault().getIconImpl(name);
+  }
+
+  private Icon getIconImpl(String name) {
+    return m_iconLocator.getIcon(name);
   }
 
   private ServiceRegistration m_netAuthRegistration;
@@ -65,6 +71,7 @@ public class Activator extends Plugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     plugin = this;
+    m_iconLocator = new SwingIconLocator(new BundleIconLocator(getBundle()));
     // register net authenticator ui
     Hashtable<String, Object> map = new Hashtable<String, Object>();
     map.put(Constants.SERVICE_RANKING, -2);
@@ -77,6 +84,7 @@ public class Activator extends Plugin {
    */
   @Override
   public void stop(BundleContext context) throws Exception {
+    m_iconLocator = null;
     if (m_netAuthRegistration != null) {
       m_netAuthRegistration.unregister();
       m_netAuthRegistration = null;

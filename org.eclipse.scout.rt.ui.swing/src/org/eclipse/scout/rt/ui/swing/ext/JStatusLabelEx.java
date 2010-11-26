@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,6 +22,7 @@ import javax.swing.border.EmptyBorder;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
@@ -172,13 +173,13 @@ public class JStatusLabelEx extends JComponent {
         switch (m_status.getSeverity()) {
           case IProcessingStatus.FATAL:
           case IProcessingStatus.ERROR:
-            iconId = SwingIcons.StatusError;
+            iconId = AbstractIcons.StatusError;
             break;
           case IProcessingStatus.WARNING:
-            iconId = SwingIcons.StatusWarning;
+            iconId = AbstractIcons.StatusWarning;
             break;
           default:
-            iconId = SwingIcons.StatusInfo;
+            iconId = AbstractIcons.StatusInfo;
             break;
         }
       }
