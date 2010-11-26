@@ -11,11 +11,13 @@
 package org.eclipse.scout.rt.ui.swing;
 
 /**
- *
+ * These are icons that are only used in the UI i.e. they appear nowhere in the model code.
  */
 public interface SwingIcons {
 
   String ColumnFilterEnabled = "column_filter_enabled";
+  String FolderOpen = "folder_open";
+  String FolderClosed = "folder_closed";
   String Mandantory = "mandatory";
   String MandantoryDisabled = "mandatory_disabled";
   String IconMenu = "icon_menu";

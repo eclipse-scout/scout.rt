@@ -26,7 +26,6 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.InsetsUIResource;
 
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
@@ -82,8 +81,8 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "TitledBorder.font", new FontUIResource("Dialog", Font.PLAIN, 12));
     putIfUndefined(defaults, "TitledBorder.titleColor", new ColorUIResource(0x000000));
     putIfUndefined(defaults, "Tooltip.icon", createIconUIResource(SwingIcons.Tooltip));
-    putIfUndefined(defaults, "Tree.closedIcon", createIconUIResource(AbstractIcons.Folder));
-    putIfUndefined(defaults, "Tree.openIcon", createIconUIResource(AbstractIcons.FolderOpen));
+    putIfUndefined(defaults, "Tree.closedIcon", createIconUIResource(SwingIcons.FolderClosed));
+    putIfUndefined(defaults, "Tree.openIcon", createIconUIResource(SwingIcons.FolderOpen));
     putIfUndefined(defaults, "Tree.rowHeight", 24);
     putIfUndefined(defaults, "TreeBox.rowHeight", 20);
     Icon icon = Activator.getIcon("window");
