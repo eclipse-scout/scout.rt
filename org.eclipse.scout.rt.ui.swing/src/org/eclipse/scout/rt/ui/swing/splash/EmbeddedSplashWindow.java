@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -118,24 +118,6 @@ public class EmbeddedSplashWindow implements ISplashWindow {
       m_statusText = s;
       m_splash.repaint();
     }
-  }
-
-  public void addCustomPanel(JComponent panel) {
-    if (panel != null) {
-      panel.setOpaque(false);
-      JComponent pane = (JComponent) m_owner.getGlassPane();
-      pane.add(panel);
-      pane.setVisible(true);
-      panel.repaint();
-    }
-  }
-
-  public void removeCustomPanel(JComponent panel) {
-    JComponent pane = (JComponent) m_owner.getGlassPane();
-    if (panel != null) {
-      pane.remove(panel);
-    }
-    pane.setVisible(pane.getComponentCount() > 0);
   }
 
   private class P_SplashScreen implements Icon {

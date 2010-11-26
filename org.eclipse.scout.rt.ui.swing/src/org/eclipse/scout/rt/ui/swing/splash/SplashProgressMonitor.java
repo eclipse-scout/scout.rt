@@ -4,13 +4,12 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.splash;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
@@ -111,29 +110,6 @@ public class SplashProgressMonitor extends NullProgressMonitor {
     if (m_splash != null) {
       m_splash.disposeSplash();
       m_splash = null;
-    }
-  }
-
-  /**
-   * Must be called in swing thread
-   */
-  public void addCustomPanel(JComponent panel) {
-    if (!SwingUtilities.isEventDispatchThread()) {
-      throw new IllegalStateException("must be called in swing thread");
-    }
-    showSplashInSwingThread();
-    m_splash.addCustomPanel(panel);
-  }
-
-  /**
-   * Must be called in swing thread
-   */
-  public void removeCustomPanel(JComponent panel) {
-    if (!SwingUtilities.isEventDispatchThread()) {
-      throw new IllegalStateException("must be called in swing thread");
-    }
-    if (m_splash != null) {
-      m_splash.removeCustomPanel(panel);
     }
   }
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
+import org.eclipse.scout.rt.ui.swing.splash.SplashWindow;
 
 /**
  *
@@ -39,6 +40,9 @@ public class UIDefaultsInjector {
   public UIDefaultsInjector() {
   }
 
+  /**
+   * used by swingscout widgets and {@link SplashWindow}
+   */
   public void inject(ISwingEnvironment env, UIDefaults defaults) {
     /*
      * Defaults
@@ -58,6 +62,8 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "PopupMenu.innerBorder", null);
     putIfUndefined(defaults, "Splash.icon", createIconUIResource(env, "splash"));
     putIfUndefined(defaults, "Splash.text", new ColorUIResource(0x0086A6));
+    //putIfUndefined(defaults, "Splash.versionLocation", new Point(0,200));
+    //putIfUndefined(defaults, "Splash.statusTextLocation", new Point(0,180));
     putIfUndefined(defaults, "StatusBar.StopButton.icon", createIconUIResource(env, SwingIcons.StatusInterrupt));
     putIfUndefined(defaults, "StatusBar.height", 29);
     putIfUndefined(defaults, "StatusBar.icon", null);
