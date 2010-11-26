@@ -66,22 +66,28 @@ public class SwingIconLocator {
     Image img;
     synchronized (m_cacheLock) {
       img = m_imagesByNameCache.get(name);
-      if (img != null || m_imagesByNameCache.containsKey(name)) {
-        return img;
-      }
-    }
-    if (img == null) {
-      img = createImageImpl(name);
-      synchronized (m_cacheLock) {
+      if (img == null && !m_imagesByNameCache.containsKey(name)) {
+        img = createImageImpl(name);
         m_imagesByNameCache.put(name, img);
+        if (LOG.isDebugEnabled()) LOG.debug("load image '" + name + "' as " + img);
+        if (img == null) {
+          warnImageNotFound(name);
+        }
       }
-      if (img == null) {
-        LOG.warn("could not find image '" + name + "'.");
-      }
-      if (LOG.isDebugEnabled()) LOG.debug("load image '" + name + "'.");
     }
-
     return img;
+  }
+
+  protected void warnImageNotFound(String name) {
+    if (name.equals("window")) {
+      //optional image, maybe the new style window16, window256 etc were specified
+      return;
+    }
+    if (name.matches(".*(_active|_disabled|_mouse|_open|_over|_pressed|_rollover|_selected)")) {
+      //optional "sub" images
+      return;
+    }
+    LOG.warn("could not find image '" + name + "'");
   }
 
   private Image createImageImpl(String name) {
