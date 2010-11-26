@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.logger;
 
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,27 +75,31 @@ public final class ScoutLogManager {
     }
   }
 
+  /**
+   * Redirect eclipse log to java log
+   * <p>
+   * Make two enhancements
+   * <ol>
+   * <li>set default log level for root to WARNING if there is no custom config. INFO is insane as a default-default</li>
+   * <li>install "better" simple log formatter when SimpleFormatter is used</li>
+   * </ol>
+   */
   private static void setupJavaLogStrategy() {
     Logger root = Logger.getLogger("");
-    for (Handler h : root.getHandlers()) {
-      if (h != null && h.getClass() == ConsoleHandler.class) {
-        if (h.getFormatter() instanceof SimpleFormatter) {
-          /*
-           * install "better" log formatter than default one (when ConsoleHandler is used together with SimpleFormatter)
-           */
-          h.setFormatter(new JavaLogFormatter());
-        }
-        /*
-         * set default log level for root to WARNING. INFO is insane as a default for production
-         */
-        if (root.getLevel() == Level.INFO) {
-          root.setLevel(Level.WARNING);
-        }
+    if (Platform.isRunning()) {
+      Platform.addLogListener(new EclipseToJavaDelegateListener());
+    }
+    //
+    if (root.getLevel() == Level.INFO) {
+      if (System.getProperty("java.util.logging.config.class") == null && System.getProperty("java.util.logging.config.file") == null) {
+        root.setLevel(Level.WARNING);
       }
     }
     //
-    if (Platform.isRunning()) {
-      Platform.addLogListener(new EclipseToJavaDelegateListener());
+    for (Handler h : root.getHandlers()) {
+      if (h.getFormatter() instanceof SimpleFormatter) {
+        h.setFormatter(new JavaLogFormatter());
+      }
     }
   }
 
