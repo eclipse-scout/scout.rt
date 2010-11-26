@@ -73,7 +73,7 @@ public class IconProviderService extends AbstractService implements IIconProvide
       StringTokenizer tokenizer = new StringTokenizer(getIconExtensions(), ",;");
       while (tokenizer.hasMoreTokens()) {
         String t = tokenizer.nextToken().trim();
-        if (!t.isEmpty()) {
+        if (t.length() > 0) {
           fileExtensions.add(t);
         }
       }
