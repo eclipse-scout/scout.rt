@@ -16,7 +16,6 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -35,7 +34,6 @@ public class IconProviderService extends AbstractService implements IIconProvide
   private String m_folderName = "resources/icons";
   private String m_iconExtensions = "png,gif,jpg";
   private Bundle m_hostBundle;
-  private Bundle[] m_fragments;
   private String[] m_iconExtensionsArray;
   private int m_ranking;
 
@@ -51,23 +49,8 @@ public class IconProviderService extends AbstractService implements IIconProvide
 
   public void setHostBundle(Bundle bundle) {
     // bundle itself
-    if (bundle.getEntry(getFolderName()) != null) {
-      m_hostBundle = bundle;
-    }
-    // find fragments
-    ArrayList<Bundle> collector = new ArrayList<Bundle>();
-    if (bundle != null) {
-      Bundle[] fragements = Platform.getFragments(bundle);
-      if (fragements != null) {
-        for (Bundle frag : fragements) {
-          if (frag.getEntry(getFolderName()) != null) {
-            collector.add(frag);
-          }
-        }
-      }
-    }
-    // parse file extensions
-    m_fragments = collector.toArray(new Bundle[collector.size()]);
+    m_hostBundle = bundle;
+
     ArrayList<String> fileExtensions = new ArrayList<String>();
     if (getIconExtensions() != null) {
       StringTokenizer tokenizer = new StringTokenizer(getIconExtensions(), ",;");
@@ -87,10 +70,6 @@ public class IconProviderService extends AbstractService implements IIconProvide
 
   public Bundle getHostBundle() {
     return m_hostBundle;
-  }
-
-  public Bundle[] getFragments() {
-    return m_fragments;
   }
 
   protected String[] getIconExtensionsArray() {
@@ -113,14 +92,6 @@ public class IconProviderService extends AbstractService implements IIconProvide
     }
 
     IconSpec spec = null;
-    // fragments
-    for (Bundle fragment : getFragments()) {
-      spec = findIconSpec(fragment, names);
-      if (spec != null) {
-        return spec;
-      }
-    }
-    // host bundle
     spec = findIconSpec(m_hostBundle, names);
     return spec;
 
@@ -130,13 +101,14 @@ public class IconProviderService extends AbstractService implements IIconProvide
     for (String fqn : iconNames) {
       URL[] entries = FileLocator.findEntries(bundle, new Path(fqn));
       if (entries != null && entries.length > 0) {
-        URL url = entries[0];
+        URL url = entries[entries.length - 1];
         try {
           byte[] content = IOUtility.getContent(url.openStream(), true);
           if (content != null) {
             if (LOG.isDebugEnabled()) {
               LOG.debug("find image " + fqn + " in bundle " + bundle.getSymbolicName() + "->" + url);
             }
+            System.out.println("fould icon '" + fqn + "' in bundle '" + bundle.getSymbolicName() + "'");
             return new IconSpec(content);
           }
         }

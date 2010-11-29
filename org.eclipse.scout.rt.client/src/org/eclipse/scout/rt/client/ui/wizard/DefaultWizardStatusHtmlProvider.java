@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.osgi.framework.Bundle;
 
@@ -120,13 +121,13 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
    * @return
    */
   protected List<RemoteFile> collectAttachments() {
-    Bundle sharedBundle = org.eclipse.scout.rt.shared.Activator.getDefault().getBundle();
+    Bundle clientBundle = Activator.getDefault().getBundle();
     List<RemoteFile> attachments = new LinkedList<RemoteFile>();
 
-    attachments.add(new RemoteFile(sharedBundle.getResource("resources/icons/empty.png"), true));
-    attachments.add(new RemoteFile(sharedBundle.getResource("resources/icons/wiz_bullet.png"), true));
-    attachments.add(new RemoteFile(sharedBundle.getResource("resources/icons/wiz_bullet_disabled.png"), true));
-    attachments.add(new RemoteFile(sharedBundle.getResource("resources/icons/wiz_bullet_selected.png"), true));
+    attachments.add(new RemoteFile(clientBundle.getResource("resources/icons/empty.png"), true));
+    attachments.add(new RemoteFile(clientBundle.getResource("resources/icons/wiz_bullet.png"), true));
+    attachments.add(new RemoteFile(clientBundle.getResource("resources/icons/wiz_bullet_disabled.png"), true));
+    attachments.add(new RemoteFile(clientBundle.getResource("resources/icons/wiz_bullet_selected.png"), true));
 
     return attachments;
   }
