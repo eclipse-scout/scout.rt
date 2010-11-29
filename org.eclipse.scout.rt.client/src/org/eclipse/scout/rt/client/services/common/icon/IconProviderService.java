@@ -48,8 +48,10 @@ public class IconProviderService extends AbstractService implements IIconProvide
   }
 
   public void setHostBundle(Bundle bundle) {
-    // bundle itself
-    m_hostBundle = bundle;
+    URL[] iconEntries = FileLocator.findEntries(bundle, new Path(getFolderName()));
+    if (iconEntries != null && iconEntries.length > 0) {
+      m_hostBundle = bundle;
+    }
 
     ArrayList<String> fileExtensions = new ArrayList<String>();
     if (getIconExtensions() != null) {
@@ -77,6 +79,9 @@ public class IconProviderService extends AbstractService implements IIconProvide
   }
 
   public IconSpec getIconSpec(String iconName) {
+    if (m_hostBundle == null) {
+      return null;
+    }
     String name = iconName;
     if (StringUtility.isNullOrEmpty(name)) {
       return null;
