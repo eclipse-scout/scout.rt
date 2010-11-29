@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 
@@ -38,9 +39,9 @@ public class SwingScoutTray extends SwingScoutComposite<IDesktop> implements ISw
 
   @Override
   protected void initializeSwing() {
-    Image icon = getSwingEnvironment().getImage("window"); // legacy
+    Image icon = Activator.getImage("window"); // legacy
     if (icon == null) {
-      icon = getSwingEnvironment().getImage("tray"); // different from window icon (should be a GIF for Win XP)
+      icon = Activator.getImage("tray"); // different from window icon (should be a GIF for Win XP)
     }
     m_trayIcon = new TrayIcon(icon);
     PopupMenu pm = new PopupMenu();
