@@ -108,7 +108,6 @@ public class IconProviderService extends AbstractService implements IIconProvide
             if (LOG.isDebugEnabled()) {
               LOG.debug("find image " + fqn + " in bundle " + bundle.getSymbolicName() + "->" + url);
             }
-            System.out.println("fould icon '" + fqn + "' in bundle '" + bundle.getSymbolicName() + "'");
             return new IconSpec(content);
           }
         }
