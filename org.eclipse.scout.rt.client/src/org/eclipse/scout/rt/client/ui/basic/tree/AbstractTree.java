@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -1539,6 +1539,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   public void removeTreeListener(TreeListener listener) {
     m_listenerList.remove(TreeListener.class, listener);
+  }
+
+  public void addPriorityTreeListener(TreeListener listener) {
+    m_listenerList.insert(TreeListener.class, listener, 0);
   }
 
   private void fireNodesInserted(ITreeNode parent, ITreeNode[] children) {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.VirtualPage;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 
 public interface ITree extends IPropertyObserver, IDNDSupport {
@@ -232,6 +233,15 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
   void addTreeListener(TreeListener listener);
 
   void removeTreeListener(TreeListener listener);
+
+  /**
+   * Add the listener at the top (front) of the listener list.
+   * <p>
+   * This method is normally only used by the ui layer to update its state before other listeners handle them
+   * <p>
+   * Use {@link #addTreeListener(TreeListener)} in all other cases
+   */
+  void addPriorityTreeListener(TreeListener listener);
 
   /**
    * true if multiple nodes can be selected (default false)

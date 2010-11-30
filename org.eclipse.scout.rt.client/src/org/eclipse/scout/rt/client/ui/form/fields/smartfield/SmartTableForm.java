@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,13 +32,11 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.Main
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.StatusField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 public class SmartTableForm extends AbstractSmartFieldProposalForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SmartTableForm.class);
 
-  private ILookupCallFetcher m_updatePostProcessor;
   private Object m_lastSelectedKey;
 
   public SmartTableForm(ISmartField<?> smartField) throws ProcessingException {
@@ -50,113 +48,91 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     table.selectNextRow();
   }
 
-  public void update(boolean synchronous, final boolean selectCurrentValue) throws ProcessingException {
+  public void update(boolean selectCurrentValue) throws ProcessingException {
     String text = getSearchText();
     if (text == null) {
       text = "";
     }
-    final int maxCount = getSmartField().getBrowseMaxRowCount();
-    m_updatePostProcessor = new ILookupCallFetcher() {
-      public void dataFetched(LookupRow[] rows, ProcessingException failed) {
-        if (m_updatePostProcessor != this) {
-          return;
-        }
-        else {
-          m_updatePostProcessor = null;
-        }
-        try {
-          // populate table
-          ResultTableField.Table table = getResultTableField().getTable();
-          if (rows == null) {
-            rows = new LookupRow[0];
-          }
-          int n = rows.length;
-          if (maxCount > 0) n = Math.min(n, maxCount);
-          ITableRow[] tableRows = new ITableRow[n];
-          for (int i = 0; i < n; i++) {
-            tableRows[i] = table.createRow(new Object[]{rows[i], null});
-            tableRows[i].setEnabled(rows[i].isEnabled());
-          }
-          try {
-            table.setTableChanging(true);
-            //
-            //backup selection
-            LookupRow selectedRow = table.getKeyColumn().getSelectedValue();
-            if (selectedRow != null) {
-              m_lastSelectedKey = selectedRow.getKey();
-            }
-            else if (selectCurrentValue) {
-              m_lastSelectedKey = getSmartField().getValue();
-            }
-            table.discardAllRows();
-            table.addRows(tableRows);
-            //restore selection
-            if (m_lastSelectedKey != null) {
-              for (ITableRow row : table.getRows()) {
-                if (CompareUtility.equals(m_lastSelectedKey, table.getKeyColumn().getValue(row).getKey())) {
-                  table.selectRow(row);
-                  break;
-                }
-              }
-            }
-          }
-          finally {
-            table.setTableChanging(false);
-          }
-          String statusText = null;
-          if (failed != null) {
-            statusText = failed.getStatus().getMessage();
-          }
-          else if (rows.length <= 0) {
-            statusText = ScoutTexts.get("SmartFieldCannotComplete", getSearchText());
-          }
-          else if (rows.length > getSmartField().getBrowseMaxRowCount()) {
-            statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + getSmartField().getBrowseMaxRowCount());
-          }
-          getStatusField().setValue(statusText);
-          getStatusField().setVisible(statusText != null);
-          if (getNewButton().isEnabled()) {
-            getNewButton().setVisible(table.getRowCount() <= 0);
-          }
-          structureChanged(getResultTableField());
-        }
-        catch (ProcessingException e) {
-          LOG.warn("update proposal list", e);
-        }
-      }
-    };
-    //
+    int maxCount = getSmartField().getBrowseMaxRowCount();
     getStatusField().setValue(ScoutTexts.get("searchingProposals"));
     getStatusField().setVisible(true);
-    // go async/sync
-    if (synchronous) {
-      try {
-        LookupRow[] rows;
-        if (ISmartField.BROWSE_ALL_TEXT.equals(text)) {
-          rows = getSmartField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
-        }
-        else if (text.length() == 0) {
-          rows = getSmartField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
-        }
-        else {
-          rows = getSmartField().callTextLookup(text, maxCount > 0 ? maxCount + 1 : 0);
-        }
-        m_updatePostProcessor.dataFetched(rows, null);
-      }
-      catch (ProcessingException e) {
-        m_updatePostProcessor.dataFetched(null, e);
-      }
-    }
-    else {
+    try {
+      LookupRow[] rows;
       if (ISmartField.BROWSE_ALL_TEXT.equals(text)) {
-        getSmartField().callBrowseLookupInBackground(text, maxCount > 0 ? maxCount + 1 : 0, m_updatePostProcessor);
+        rows = getSmartField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
       }
       else if (text.length() == 0) {
-        getSmartField().callBrowseLookupInBackground(text, maxCount > 0 ? maxCount + 1 : 0, m_updatePostProcessor);
+        rows = getSmartField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
       }
       else {
-        getSmartField().callTextLookupInBackground(text, maxCount > 0 ? maxCount + 1 : 0, m_updatePostProcessor);
+        rows = getSmartField().callTextLookup(text, maxCount > 0 ? maxCount + 1 : 0);
       }
+      dataFetched(rows, null, maxCount, selectCurrentValue);
+    }
+    catch (ProcessingException e) {
+      dataFetched(null, e, maxCount, selectCurrentValue);
+    }
+  }
+
+  private void dataFetched(LookupRow[] rows, ProcessingException failed, int maxCount, boolean selectCurrentValue) {
+    try {
+      // populate table
+      ResultTableField.Table table = getResultTableField().getTable();
+      if (rows == null) {
+        rows = new LookupRow[0];
+      }
+      int n = rows.length;
+      if (maxCount > 0) n = Math.min(n, maxCount);
+      ITableRow[] tableRows = new ITableRow[n];
+      for (int i = 0; i < n; i++) {
+        tableRows[i] = table.createRow(new Object[]{rows[i], null});
+        tableRows[i].setEnabled(rows[i].isEnabled());
+      }
+      try {
+        table.setTableChanging(true);
+        //
+        //backup selection
+        LookupRow selectedRow = table.getKeyColumn().getSelectedValue();
+        if (selectedRow != null) {
+          m_lastSelectedKey = selectedRow.getKey();
+        }
+        else if (selectCurrentValue) {
+          m_lastSelectedKey = getSmartField().getValue();
+        }
+        table.discardAllRows();
+        table.addRows(tableRows);
+        //restore selection
+        if (m_lastSelectedKey != null) {
+          for (ITableRow row : table.getRows()) {
+            if (CompareUtility.equals(m_lastSelectedKey, table.getKeyColumn().getValue(row).getKey())) {
+              table.selectRow(row);
+              break;
+            }
+          }
+        }
+      }
+      finally {
+        table.setTableChanging(false);
+      }
+      String statusText = null;
+      if (failed != null) {
+        statusText = failed.getStatus().getMessage();
+      }
+      else if (rows.length <= 0) {
+        statusText = ScoutTexts.get("SmartFieldCannotComplete", getSearchText());
+      }
+      else if (rows.length > getSmartField().getBrowseMaxRowCount()) {
+        statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + getSmartField().getBrowseMaxRowCount());
+      }
+      getStatusField().setValue(statusText);
+      getStatusField().setVisible(statusText != null);
+      if (getNewButton().isEnabled()) {
+        getNewButton().setVisible(table.getRowCount() <= 0);
+      }
+      structureChanged(getResultTableField());
+    }
+    catch (ProcessingException e) {
+      LOG.warn("update proposal list", e);
     }
   }
 
@@ -357,7 +333,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
       protected void execChangedValue() throws ProcessingException {
         if (isVisible() && !isFormLoading()) {
           getSmartField().setActiveFilter(getValue());
-          update(false, false);
+          update(false);
         }
       }
 
@@ -500,11 +476,6 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     @Override
     protected boolean execValidate() throws ProcessingException {
       return getAcceptedProposal() != null;
-    }
-
-    @Override
-    protected void execFinally() throws ProcessingException {
-      m_updatePostProcessor = null;
     }
   }
 

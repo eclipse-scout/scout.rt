@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -99,6 +99,41 @@ public class EventListenerList implements IEventListenerSource {
       }
     }
     return count;
+  }
+
+  public <T extends EventListener> void insert(Class<T> t, T listener, int index) {
+    if (listener == null) {
+      return;
+    }
+    Object ref;
+    if (listener instanceof WeakEventListener) {
+      ref = new WeakReference<EventListener>(listener);
+    }
+    else {
+      ref = listener;
+    }
+    synchronized (listenerListLock) {
+      if (listenerList == NULL_ARRAY) {
+        listenerList = new Object[]{t, ref};
+      }
+      else {
+        int n = listenerList.length + 2;
+        int k = index * 2;
+        if (k < 0) k = 0;
+        else if (k >= n) k = n - 2;
+        Object[] tmp = new Object[n];
+        if (k > 0) {
+          System.arraycopy(listenerList, 0, tmp, 0, k);
+        }
+        if (k < n - 2) {
+          System.arraycopy(listenerList, k, tmp, k + 2, n - 2 - k);
+        }
+        tmp[k] = t;
+        tmp[k + 1] = ref;
+        listenerList = tmp;
+      }
+      maintainListNoLocking();
+    }
   }
 
   public <T extends EventListener> void add(Class<T> t, T listener) {

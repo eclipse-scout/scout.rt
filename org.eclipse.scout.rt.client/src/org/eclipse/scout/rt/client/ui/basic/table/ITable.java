@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -410,12 +410,18 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
 
   void requestFocus();
 
-  /*
-   * modification observer
-   */
   void addTableListener(TableListener listener);
 
   void removeTableListener(TableListener listener);
+
+  /**
+   * Add the listener at the top (front) of the listener list.
+   * <p>
+   * This method is normally only used by the ui layer to update its state before other listeners handle them
+   * <p>
+   * Use {@link #addTableListener(TableListener)} in all other cases
+   */
+  void addPriorityTableListener(TableListener listener);
 
   /**
    * when performing a batch mutation use this marker like try{

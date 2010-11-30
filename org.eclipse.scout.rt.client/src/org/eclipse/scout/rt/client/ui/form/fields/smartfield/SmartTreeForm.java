@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -76,7 +76,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     });
   }
 
-  public void update(boolean synchronous, boolean selectCurrentValue) throws ProcessingException {
+  public void update(boolean selectCurrentValue) throws ProcessingException {
     ITree tree = getResultTreeField().getTree();
     try {
       tree.setTreeChanging(true);
@@ -285,7 +285,8 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       key = null;
     }
     if (key != null) {
-      for (LookupRow row : getSmartField().callKeyLookup(key)) {
+      ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
+      for (LookupRow row : sf.callKeyLookup(key)) {
         return row;
       }
     }
@@ -345,14 +346,15 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       @Override
       protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
         ITreeNode[] subTree;
-        if (getSmartField().isBrowseLoadIncremental()) {
+        ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
+        if (sf.isBrowseLoadIncremental()) {
           LookupRow b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
-          LookupRow[] data = getSmartField().callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
+          LookupRow[] data = sf.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
           subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
         }
         else if (parentNode == getTree().getRootNode()) {
           // called on root only
-          LookupRow[] data = getSmartField().callBrowseLookup(ISmartField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED);
+          LookupRow[] data = sf.callBrowseLookup(ISmartField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED);
           subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, true);
         }
         else {
@@ -593,6 +595,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
 
     @SuppressWarnings("unchecked")
     public boolean accept(ITreeNode node, int level) {
+      ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
       LookupRow row = (LookupRow) node.getCell().getValue();
       if (node.isChildrenLoaded()) {
         if (row != null) {
@@ -605,7 +608,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
                 // use "level-1" because a tree smart field assumes its tree to
                 // have multiple roots, but the ITree model is built as
                 // single-root tree with invisible root node
-                if (getSmartField().acceptBrowseHierarchySelection(row.getKey(), level - 1, node.isLeaf())) {
+                if (sf.acceptBrowseHierarchySelection(row.getKey(), level - 1, node.isLeaf())) {
                   return true;
                 }
               }
@@ -631,7 +634,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       getNewButton().setLabel(getSmartField().getBrowseNewText());
       getResultTreeField().loadRootNode();
       updateActiveFilter();
-      update(true, false);
+      update(false);
       if (getSmartField().isBrowseAutoExpandAll() && !getSmartField().isBrowseLoadIncremental()) {
         ITree tree = getResultTreeField().getTree();
         tree.expandAll(getResultTreeField().getTree().getRootNode());

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 
 public abstract class AbstractSmartFieldProposalForm extends AbstractForm implements ISmartFieldProposalForm {
 
-  private final ISmartField m_smartField;
+  private final ISmartField<?> m_smartField;
 
-  public AbstractSmartFieldProposalForm(ISmartField<? extends Object> smartField) throws ProcessingException {
+  public AbstractSmartFieldProposalForm(ISmartField<?> smartField) throws ProcessingException {
     super(false);
     m_smartField = smartField;
     callInitializer();
@@ -40,7 +40,7 @@ public abstract class AbstractSmartFieldProposalForm extends AbstractForm implem
     return DISPLAY_HINT_VIEW;
   }
 
-  public ISmartField getSmartField() {
+  public ISmartField<? extends Object> getSmartField() {
     return m_smartField;
   }
 

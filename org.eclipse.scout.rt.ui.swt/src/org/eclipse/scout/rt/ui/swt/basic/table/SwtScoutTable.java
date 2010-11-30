@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -245,7 +245,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     if (getScoutObject() != null) {
       if (m_scoutTableListener == null) {
         m_scoutTableListener = new P_ScoutTableListener();
-        getScoutObject().addTableListener(m_scoutTableListener);
+        getScoutObject().addPriorityTableListener(m_scoutTableListener);
       }
       // setMultilineTextFromScout(getScoutObject().isMultilineText());
       setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());

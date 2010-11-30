@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -167,7 +167,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     if (getScoutObject() != null) {
       if (m_scoutTreeListener == null) {
         m_scoutTreeListener = new P_ScoutTreeListener();
-        getScoutObject().addTreeListener(m_scoutTreeListener);
+        getScoutObject().addPriorityTreeListener(m_scoutTreeListener);
       }
       if (getScoutObject().isRootNodeVisible()) {
         setExpansionFromScout(getScoutObject().getRootNode());

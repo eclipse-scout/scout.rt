@@ -418,7 +418,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     try {
-    injectColumnsInternal(colList);
+      injectColumnsInternal(colList);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contribute columns.", e);
@@ -2752,6 +2752,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   public void removeTableListener(TableListener listener) {
     m_listenerList.remove(TableListener.class, listener);
+  }
+
+  public void addPriorityTableListener(TableListener listener) {
+    m_listenerList.insert(TableListener.class, listener, 0);
   }
 
   private void fireRowsInserted(ITableRow[] rows) {

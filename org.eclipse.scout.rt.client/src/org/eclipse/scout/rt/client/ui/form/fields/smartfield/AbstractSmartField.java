@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -718,11 +718,11 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
             smartForm = createProposalForm();
             smartForm.setSearchText(text);
             smartForm.startForm();
-            smartForm.update(true, false);
+            smartForm.update(false);
           }
           else {
             smartForm.setSearchText(text);
-            smartForm.update(true, false);
+            smartForm.update(false);
           }
           acceptedProposalRow = smartForm.getAcceptedProposal();
           if (acceptedProposalRow != null) {
@@ -1370,14 +1370,14 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
           smartForm.setSearchText(newText);
           smartForm.startForm();
           if (smartForm.isFormOpen()) {
-            smartForm.update(false, selectCurrentValue);
+            smartForm.update(selectCurrentValue);
             registerProposalFormInternal(smartForm);
           }
         }
         else {
           if (!StringUtility.equalsIgnoreNewLines(smartForm.getSearchText(), newText)) {
             smartForm.setSearchText(newText);
-            smartForm.update(false, false);
+            smartForm.update(false);
           }
         }
       }
