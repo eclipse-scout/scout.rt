@@ -4,20 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields.mailfield;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -36,20 +32,7 @@ public class SwingMailAttachmentView extends JPanel {
 
   public SwingMailAttachmentView(SwingMailAttachment attachment) {
     m_attachment = attachment;
-    setBorder(BorderFactory.createLineBorder(getBackground()));
     createContent();
-    addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseEntered(MouseEvent e) {
-        setBorder(BorderFactory.createLineBorder(Color.blue));
-
-      }
-
-      @Override
-      public void mouseExited(MouseEvent e) {
-        setBorder(BorderFactory.createLineBorder(getBackground()));
-      }
-    });
 
     setToolTipText(m_attachment.getFile().getName());
     setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

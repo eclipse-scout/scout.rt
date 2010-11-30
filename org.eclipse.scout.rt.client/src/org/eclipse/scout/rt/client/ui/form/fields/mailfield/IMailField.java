@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,6 +22,7 @@ public interface IMailField extends IValueField<MimeMessage> {
   String PROP_LABEL_TO = "labelTo";
   String PROP_LABEL_CC = "labelCC";
   String PROP_LABEL_SUBJECT = "labelSubject";
+  String PROP_LABEL_SENT = "labelSent";
 
   boolean isMailEditor();
 
@@ -42,6 +43,10 @@ public interface IMailField extends IValueField<MimeMessage> {
   String getLabelSubject();
 
   void setLabelSubject(String subjectLabel);
+
+  String getLabelSent();
+
+  void setLabelSent(String sentLabel);
 
   IMailFieldUIFacade getUIFacade();
 }

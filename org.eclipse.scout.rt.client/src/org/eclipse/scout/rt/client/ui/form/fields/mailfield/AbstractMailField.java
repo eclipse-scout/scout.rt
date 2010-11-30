@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -78,6 +78,13 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
     return ScoutTexts.get("EmailSubject");
   }
 
+  @ConfigProperty(ConfigProperty.TEXT)
+  @Order(300)
+  @ConfigPropertyValue("\"Sent\"")
+  protected String getConfiguredLabelSent() {
+    return ScoutTexts.get("EmailSent");
+  }
+
   /**
    * @param url
    * @param path
@@ -113,6 +120,7 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
     setLabelFrom(getConfiguredLabelFrom());
     setLabelTo(getConfiguredLabelTo());
     setLabelCc(getConfiguredLabelCc());
+    setLabelSent(getConfiguredLabelSent());
     setLabelSubject(getConfiguredLabelSubject());
   }
 
@@ -147,6 +155,14 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
 
   public String getLabelSubject() {
     return propertySupport.getPropertyString(PROP_LABEL_SUBJECT);
+  }
+
+  public void setLabelSent(String sentLabel) {
+    propertySupport.setProperty(PROP_LABEL_SENT, sentLabel);
+  }
+
+  public String getLabelSent() {
+    return propertySupport.getPropertyString(PROP_LABEL_SENT);
   }
 
   public IMailFieldUIFacade getUIFacade() {

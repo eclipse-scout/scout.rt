@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -46,7 +46,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
@@ -97,13 +96,14 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
   private JTextPane m_htmlView;
   private JPanelEx m_htmlViewPanel;
   private JScrollPane m_scrollPane;
-  private JTextField m_subject;
   private ArrayList<SwingMailAttachment> m_attachments;
   private JPanel m_attachementPanel;
   private MouseListener m_attachementListener;
   private File m_tempFolder;
+  private JLabelEx m_sentLabel;
   private JLabelEx m_receivedDate;
   private JLabelEx m_subjectLabel;
+  private JLabelEx m_subject;
 
   @Override
   protected void detachScout() {
@@ -145,10 +145,14 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     JComponent header = createHeaderComponent();
     JComponent body = createBodyComponent();
     JComponent attachements = createAttachementComponent();
-    //
+
+    JPanelEx bodyAttachmentPanel = new JPanelEx(new BorderLayoutEx(0, 0));
+    bodyAttachmentPanel.setBorder(BorderFactory.createEtchedBorder());
+    bodyAttachmentPanel.add(body, BorderLayoutEx.CENTER);
+    bodyAttachmentPanel.add(attachements, BorderLayoutEx.SOUTH);
+
     mailContainer.add(header, BorderLayoutEx.NORTH);
-    mailContainer.add(body, BorderLayoutEx.CENTER);
-    mailContainer.add(attachements, BorderLayoutEx.SOUTH);
+    mailContainer.add(bodyAttachmentPanel, BorderLayoutEx.CENTER);
     return mailContainer;
   }
 
@@ -175,7 +179,6 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     });
     //
     m_htmlViewPanel = new JPanelEx(new SingleLayout());
-    m_htmlViewPanel.setBorder(BorderFactory.createEtchedBorder());
     if (getScoutObject().isScrollBarEnabled()) {
       m_scrollPane = new JScrollPaneEx(m_htmlView);
       m_htmlViewPanel.add(m_scrollPane);
@@ -189,11 +192,6 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
 
   protected JComponent createHeaderComponent() {
     JPanel headerPanel = new JPanel(new GridBagLayout());
-    m_subjectLabel = new JLabelEx();
-    m_subject = new JTextField();
-    m_subject.setEditable(false);
-    m_subject.setBorder(null);
-    m_receivedDate = new JLabelEx();
     // FROM
     P_AddressComponent fromComp = new P_AddressComponent();
     m_addressComponents.put(KEY_FROM, fromComp);
@@ -203,51 +201,84 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     // CC
     P_AddressComponent ccComp = new P_AddressComponent();
     m_addressComponents.put(KEY_CC, ccComp);
+    // SENT
+    m_sentLabel = new JLabelEx();
+    m_receivedDate = new JLabelEx();
+    // SUBJECT
+    m_subjectLabel = new JLabelEx();
+    m_subject = new JLabelEx();
 
     // layout
-    m_subjectLabel.setMinimumSize(new Dimension(80, 20));
-    m_subjectLabel.setPreferredSize(new Dimension(80, 20));
     GridBagConstraints constrains = new GridBagConstraints();
-    constrains.insets = new Insets(2, 2, 2, 2);
     constrains.gridx = 0;
     constrains.gridy = 0;
-    constrains.weightx = 0;
-    headerPanel.add(m_subjectLabel, constrains);
-
-    constrains.gridx = 1;
-    constrains.gridy = 0;
-    constrains.weightx = 0.5;
-    constrains.fill = GridBagConstraints.BOTH;
-    headerPanel.add(m_subject, constrains);
-
-    constrains.gridx = 2;
-    constrains.gridy = 0;
-    constrains.weightx = 0;
-    constrains.fill = GridBagConstraints.BOTH;
-    headerPanel.add(m_receivedDate, constrains);
-
-    constrains.gridx = 0;
-    constrains.gridy = 1;
-    constrains.gridwidth = 3;
     constrains.weightx = 0.5;
     constrains.insets = new Insets(0, 0, 0, 0);
     constrains.fill = GridBagConstraints.BOTH;
     headerPanel.add(fromComp, constrains);
 
     constrains.gridx = 0;
-    constrains.gridy = 2;
+    constrains.gridy = 1;
     headerPanel.add(toComp, constrains);
 
     constrains.gridx = 0;
-    constrains.gridy = 3;
+    constrains.gridy = 2;
     headerPanel.add(ccComp, constrains);
+
+    constrains.gridx = 0;
+    constrains.gridy = 3;
+    headerPanel.add(createReceivedDatePanel(), constrains);
+
+    constrains.gridx = 0;
+    constrains.gridy = 4;
+    headerPanel.add(createSubjectPanel(), constrains);
 
     return headerPanel;
   }
 
+  private Component createSubjectPanel() {
+    JPanel panel = new JPanel(new GridBagLayout());
+    GridBagConstraints constrains = new GridBagConstraints();
+    constrains.insets = new Insets(2, 2, 2, 2);
+    constrains.gridx = 0;
+    constrains.gridy = 0;
+    constrains.weightx = 0;
+    m_subjectLabel.setMinimumSize(new Dimension(80, 20));
+    m_subjectLabel.setPreferredSize(new Dimension(80, 20));
+    panel.add(m_subjectLabel, constrains);
+
+    constrains.gridx = 1;
+    constrains.gridy = 0;
+    constrains.weightx = 0.5;
+    constrains.fill = GridBagConstraints.BOTH;
+    panel.add(m_subject, constrains);
+
+    return panel;
+  }
+
+  private Component createReceivedDatePanel() {
+    JPanel panel = new JPanel(new GridBagLayout());
+    GridBagConstraints Constrains = new GridBagConstraints();
+    Constrains.insets = new Insets(2, 2, 2, 2);
+    Constrains.gridx = 0;
+    Constrains.gridy = 0;
+    Constrains.weightx = 0;
+    m_sentLabel.setMinimumSize(new Dimension(80, 20));
+    m_sentLabel.setPreferredSize(new Dimension(80, 20));
+    panel.add(m_sentLabel, Constrains);
+
+    Constrains.gridx = 1;
+    Constrains.gridy = 0;
+    Constrains.weightx = 0.5;
+    Constrains.fill = GridBagConstraints.BOTH;
+    panel.add(m_receivedDate, Constrains);
+
+    return panel;
+  }
+
   protected JComponent createAttachementComponent() {
     //scrollable when more than one line of attachements
-    m_attachementPanel = new JPanelEx(new FlowLayoutEx());
+    m_attachementPanel = new JPanelEx(new FlowLayoutEx(FlowLayoutEx.LEFT));
     JScrollPaneEx pane = new JScrollPaneEx(m_attachementPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     return pane;
   }
@@ -261,6 +292,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     updateFromLabelFromScout();
     updateToLabelFromScout();
     updateCcLabelFromScout();
+    updateSentLabelFromScout();
     updateSubjectLabelFromScout();
   }
 
@@ -284,7 +316,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
         subject = message.getSubject();
         Date received = message.getSentDate();
         if (received != null) {
-          receivedDate = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.DEFAULT, SimpleDateFormat.SHORT).format(received);
+          receivedDate = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.FULL, SimpleDateFormat.SHORT).format(received);
         }
         // addresses
         fromAddresses = message.getFrom();
@@ -411,6 +443,10 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     }
   }
 
+  private void updateSentLabelFromScout() {
+    m_sentLabel.setText(getScoutObject().getLabelSent());
+  }
+
   private void updateSubjectLabelFromScout() {
     m_subjectLabel.setText(getScoutObject().getLabelSubject());
   }
@@ -492,6 +528,9 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     else if (IMailField.PROP_LABEL_CC.equals(name)) {
       updateCcLabelFromScout();
     }
+    else if (IMailField.PROP_LABEL_SENT.equals(name)) {
+      updateSentLabelFromScout();
+    }
     else if (IMailField.PROP_LABEL_SUBJECT.equals(name)) {
       updateSubjectLabelFromScout();
     }
@@ -558,7 +597,6 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
       m_label.setMinimumSize(new Dimension(80, 20));
       m_label.setPreferredSize(new Dimension(80, 20));
       m_addressField = new JLabelEx();
-      m_addressField.setEnabled(false);
       // m_addressField.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
       // JScrollPane scrollPane=new JScrollPaneEx(m_addressField);
       // layout
