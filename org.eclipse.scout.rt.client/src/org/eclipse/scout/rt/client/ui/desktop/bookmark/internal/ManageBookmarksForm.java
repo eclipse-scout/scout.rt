@@ -14,6 +14,8 @@ import java.security.Permission;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
+import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.AbstractBookmarkTreeField;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.internal.ManageBookmarksForm.MainBox.CancelButton;
@@ -35,7 +37,7 @@ import org.eclipse.scout.rt.shared.security.UpdateGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
 import org.eclipse.scout.service.SERVICES;
 
-public class ManageBookmarksForm extends AbstractForm {
+public class ManageBookmarksForm extends AbstractForm implements BookmarkServiceListener {
 
   public ManageBookmarksForm() throws ProcessingException {
     super();
@@ -44,6 +46,11 @@ public class ManageBookmarksForm extends AbstractForm {
   @Override
   protected String getConfiguredTitle() {
     return ScoutTexts.get("Bookmarks");
+  }
+
+  public void bookmarksChanged(BookmarkServiceEvent e) {
+    getGlobalBookmarkTreeField().setBookmarkRootFolder(e.getBookmarkService().getBookmarkData().getGlobalBookmarks());
+    getUserBookmarkTreeField().setBookmarkRootFolder(e.getBookmarkService().getBookmarkData().getUserBookmarks());
   }
 
   public void startModify() throws ProcessingException {
@@ -169,6 +176,8 @@ public class ManageBookmarksForm extends AbstractForm {
     @Override
     protected void execLoad() throws ProcessingException {
       IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+      //get notified about changes
+      service.addBookmarkServiceListener(ManageBookmarksForm.this);
       service.loadBookmarks();//load most recent state
       getGlobalBookmarkTreeField().setBookmarkRootFolder(service.getBookmarkData().getGlobalBookmarks());
       getUserBookmarkTreeField().setBookmarkRootFolder(service.getBookmarkData().getUserBookmarks());
@@ -190,6 +199,12 @@ public class ManageBookmarksForm extends AbstractForm {
     public void execDiscard() throws ProcessingException {
       //revert all changes
       SERVICES.getService(IBookmarkService.class).loadBookmarks();
+    }
+
+    @Override
+    protected void execFinally() throws ProcessingException {
+      IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+      service.removeBookmarkServiceListener(ManageBookmarksForm.this);
     }
   }
 
