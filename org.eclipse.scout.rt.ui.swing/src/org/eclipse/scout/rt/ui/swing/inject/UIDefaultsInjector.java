@@ -13,10 +13,13 @@ package org.eclipse.scout.rt.ui.swing.inject;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Toolkit;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.UIDefaults;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -26,15 +29,25 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.InsetsUIResource;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.splash.SplashWindow;
+import org.osgi.framework.Bundle;
 
 /**
  * Sets the default ui properties used in swing scout composites
  */
 public class UIDefaultsInjector {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UIDefaultsInjector.class);
+
   public UIDefaultsInjector() {
   }
 
@@ -58,7 +71,7 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "ListBox.rowHeight", 20);
     putIfUndefined(defaults, "MenuBar.policy", "menubar");
     putIfUndefined(defaults, "PopupMenu.innerBorder", null);
-    putIfUndefined(defaults, "Splash.icon", createIconUIResource("splash"));
+    putIfUndefined(defaults, "Splash.icon", getSplashUIResource());
     putIfUndefined(defaults, "Splash.text", new ColorUIResource(0x0086A6));
     //putIfUndefined(defaults, "Splash.versionLocation", new Point(0,200));
     //putIfUndefined(defaults, "Splash.statusTextLocation", new Point(0,180));
@@ -163,6 +176,43 @@ public class UIDefaultsInjector {
     else {
       return null;
     }
+  }
+
+  protected String[] m_splashExtensions = new String[]{"png", "jpg", "bmp"};
+
+  protected IconUIResource getSplashUIResource() {
+    IconUIResource iconresource = null;
+    String splashPathProp = Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.splashPath");
+    try {
+      if (!StringUtility.isNullOrEmpty(splashPathProp)) {
+        Path p = new Path(splashPathProp);
+        String bunldeName = p.lastSegment();
+        Bundle splashBundle = Platform.getBundle(bunldeName);
+        if (splashBundle != null) {
+          for (String ext : m_splashExtensions) {
+            String imageName = "splash." + ext;
+            URL[] entries = FileLocator.findEntries(splashBundle, new Path(imageName));
+            if (entries != null && entries.length > 0) {
+              URL splashUrl = entries[entries.length - 1];
+              if (splashUrl != null) {
+                Image img = Toolkit.getDefaultToolkit().createImage(IOUtility.getContent(splashUrl.openStream()));
+                if (img != null) {
+                  iconresource = new IconUIResource(new ImageIcon(img, imageName));
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    catch (Exception e) {
+      LOG.error("could not find splash for config.ini property 'osgi.splashPath' -> value '" + splashPathProp + "'.", e);
+    }
+    if (iconresource == null) {
+      iconresource = createIconUIResource("splash");
+    }
+    return iconresource;
   }
 
 }
