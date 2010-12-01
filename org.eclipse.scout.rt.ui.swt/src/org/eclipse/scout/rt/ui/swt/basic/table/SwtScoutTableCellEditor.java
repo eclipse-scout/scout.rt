@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,17 +24,21 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
+import org.eclipse.scout.rt.ui.swt.ext.table.TableViewerEx;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.keystroke.SwtKeyStroke;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * <h3>SwtScoutTableCellEditor</h3> ...
@@ -47,6 +51,8 @@ public class SwtScoutTableCellEditor {
 
   private final ISwtScoutTable m_tableComposite;
   private final Listener m_rowHeightListener;
+  //cache
+  private boolean m_tableIsEditingAndContainsFocus;
 
   public SwtScoutTableCellEditor(ISwtScoutTable tableComposite) {
     m_tableComposite = tableComposite;
@@ -95,6 +101,25 @@ public class SwtScoutTableCellEditor {
     else {
       viewer.getTable().removeListener(SWT.MeasureItem, m_rowHeightListener);
     }
+    //add a hysteresis listener that commits the cell editor when the table has first received focus and then lost it
+    m_tableComposite.getEnvironment().getDisplay().addFilter(SWT.FocusIn, new Listener() {
+      @Override
+      public void handleEvent(Event e) {
+        Widget c = e.widget;
+        if (c == null || !(c instanceof Control)) {
+          return;
+        }
+        boolean oldValue = m_tableIsEditingAndContainsFocus;
+        boolean newValue = SwtUtility.isAncestorOf(m_tableComposite.getSwtField(), (Control) c);
+        m_tableIsEditingAndContainsFocus = newValue;
+        if (oldValue && !newValue) {
+          TableViewer v = m_tableComposite.getSwtTableViewer();
+          if (v instanceof TableViewerEx) {
+            ((TableViewerEx) v).applyEditorValue();
+          }
+        }
+      }
+    });
   }
 
   protected Control getEditorControl(Composite parent, ITableRow scoutRow, IColumn<?> scoutCol) {
@@ -154,6 +179,7 @@ public class SwtScoutTableCellEditor {
   }
 
   protected void saveEditorFromSwt() {
+    m_tableIsEditingAndContainsFocus = false;
     Runnable t = new Runnable() {
       @Override
       public void run() {
@@ -164,6 +190,7 @@ public class SwtScoutTableCellEditor {
   }
 
   protected void cancelEditorFromSwt() {
+    m_tableIsEditingAndContainsFocus = false;
     Runnable t = new Runnable() {
       @Override
       public void run() {
@@ -224,7 +251,15 @@ public class SwtScoutTableCellEditor {
 
     @Override
     protected Control createControl(Composite parent) {
-      m_container = new Composite(parent, SWT.NONE);
+      m_container = new Composite(parent, SWT.NONE) {
+        /*
+         * disable inner components preferred sizes
+         */
+        @Override
+        public Point computeSize(int wHint, int hHint, boolean changed) {
+          return new Point(wHint, hHint);
+        }
+      };
       m_container.setLayout(new FillLayout());
       m_tableComposite.getEnvironment().addKeyStroke(m_container, new SwtKeyStroke(SWT.ESC) {
         @Override

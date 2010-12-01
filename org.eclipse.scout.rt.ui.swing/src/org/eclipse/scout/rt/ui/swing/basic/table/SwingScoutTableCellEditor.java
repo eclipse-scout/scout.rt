@@ -4,17 +4,20 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.basic.table;
 
 import java.awt.Component;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.EventObject;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -22,6 +25,7 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComponent;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
@@ -39,6 +43,7 @@ public class SwingScoutTableCellEditor {
   private ISwingScoutTable m_tableComposite;
   private TableCellEditor m_cellEditor;
   //cache
+  private boolean m_tableIsEditingAndContainsFocus;
   private JComponent m_cachedSwingEditorComponent;
 
   public SwingScoutTableCellEditor(ISwingScoutTable tableComposite) {
@@ -142,6 +147,7 @@ public class SwingScoutTableCellEditor {
   }
 
   protected void saveEditorFromSwing() {
+    m_tableIsEditingAndContainsFocus = false;
     if (m_cachedSwingEditorComponent != null) {
       m_cachedSwingEditorComponent = null;
       Runnable t = new Runnable() {
@@ -155,6 +161,7 @@ public class SwingScoutTableCellEditor {
   }
 
   protected void cancelEditorFromSwing() {
+    m_tableIsEditingAndContainsFocus = false;
     if (m_cachedSwingEditorComponent != null) {
       m_cachedSwingEditorComponent = null;
       Runnable t = new Runnable() {
@@ -186,6 +193,7 @@ public class SwingScoutTableCellEditor {
         if (table.isCellEditable(row, col)) {
           table.getSelectionModel().setSelectionInterval(row, row);
           table.getColumnModel().getSelectionModel().setSelectionInterval(col, col);
+          table.scrollRectToVisible(table.getCellRect(row, col, true));
           table.editCellAt(row, col);
           return;
         }
@@ -212,6 +220,7 @@ public class SwingScoutTableCellEditor {
         if (table.isCellEditable(row, col)) {
           table.getSelectionModel().setSelectionInterval(row, row);
           table.getColumnModel().getSelectionModel().setSelectionInterval(col, col);
+          table.scrollRectToVisible(table.getCellRect(row, col, true));
           table.editCellAt(row, col);
           return;
         }
@@ -249,6 +258,24 @@ public class SwingScoutTableCellEditor {
         @Override
         public void actionPerformed(ActionEvent e) {
           m_cellEditor.stopCellEditing();
+        }
+      });
+      //add a hysteresis listener that commits the cell editor when the table has first received focus and then lost it
+      KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("permanentFocusOwner", new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent e) {
+          Component c = (Component) e.getNewValue();
+          if (c == null) {
+            return;
+          }
+          boolean oldValue = m_tableIsEditingAndContainsFocus;
+          boolean newValue = SwingUtilities.isDescendingFrom(c, m_tableComposite.getSwingContainer());
+          m_tableIsEditingAndContainsFocus = newValue;
+          if (oldValue && !newValue) {
+            if (m_cellEditor != null) {
+              m_cellEditor.stopCellEditing();
+            }
+          }
         }
       });
     }

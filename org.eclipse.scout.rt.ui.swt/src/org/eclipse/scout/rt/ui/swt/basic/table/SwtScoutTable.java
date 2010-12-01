@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.ext.table.TableEx;
+import org.eclipse.scout.rt.ui.swt.ext.table.TableViewerEx;
 import org.eclipse.scout.rt.ui.swt.ext.table.util.TableRolloverSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.AbstractSwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
@@ -124,7 +125,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         }
       }
     });
-    TableViewer viewer = new TableViewer(table);
+    TableViewer viewer = new TableViewerEx(table);
     viewer.setUseHashlookup(true);
     setSwtTableViewer(viewer);
     setSwtField(table);
