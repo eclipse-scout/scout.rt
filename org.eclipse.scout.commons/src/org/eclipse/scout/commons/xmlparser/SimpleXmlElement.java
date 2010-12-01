@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,7 +19,6 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -33,6 +32,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.osgi.ContextFinderBasedObjectInputStream;
 
 /**
  * Simple xml parser/writer. Very efficient and performant when handling xml
@@ -359,7 +359,10 @@ public class SimpleXmlElement {
   }
 
   /**
-   * read a serialized object attribute
+   * @return a serialized object attribute from base64 serialized data using {@link ContextFinderBasedObjectInputStream}
+   *         that tries
+   *         to find the class using default osgi class loading and in a
+   *         second stage using the caller classes class loaders.
    */
   public Object getObjectAttribute(String name, Object defaultValue) throws IOException, ClassNotFoundException {
     String base64 = getStringAttribute(name, "");
@@ -367,10 +370,12 @@ public class SimpleXmlElement {
       return defaultValue;
     }
     byte[] raw = Base64Utility.decode(base64);
-    Object o = new ObjectInputStream(new ByteArrayInputStream(raw)).readObject();
+    ContextFinderBasedObjectInputStream oi = new ContextFinderBasedObjectInputStream(new ByteArrayInputStream(raw));
+    Object o = oi.readObject();
     if (o == null) {
       o = defaultValue;
     }
+    oi.close();
     return o;
   }
 
