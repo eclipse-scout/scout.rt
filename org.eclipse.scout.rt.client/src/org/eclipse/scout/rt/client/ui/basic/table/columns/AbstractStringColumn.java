@@ -131,6 +131,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     f.setMultilineText(getTable() != null ? getTable().isMultilineText() : false);
     f.setLabelVisible(false);
     f.setValue(getValue(row));
+    f.markSaved();
     return f;
   }
 

@@ -194,6 +194,7 @@ public abstract class AbstractDoubleColumn extends AbstractColumn<Double> implem
     f.setPercent(isPercent());
     f.setLabelVisible(false);
     f.setValue(getValue(row));
+    f.markSaved();
     return f;
   }
 

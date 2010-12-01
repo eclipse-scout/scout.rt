@@ -112,6 +112,7 @@ public abstract class AbstractLongColumn extends AbstractColumn<Long> implements
     f.setGroupingUsed(isGroupingUsed());
     f.setLabelVisible(false);
     f.setValue(getValue(row));
+    f.markSaved();
     return f;
   }
 

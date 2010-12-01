@@ -201,6 +201,7 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
     f.setPercent(isPercent());
     f.setLabelVisible(false);
     f.setValue(getValue(row));
+    f.markSaved();
     return f;
   }
 

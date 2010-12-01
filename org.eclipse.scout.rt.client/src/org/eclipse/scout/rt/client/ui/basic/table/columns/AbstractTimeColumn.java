@@ -94,6 +94,7 @@ public abstract class AbstractTimeColumn extends AbstractColumn<Double> implemen
     f.setFormat(getFormat());
     f.setLabelVisible(false);
     f.setValue(getValue(row));
+    f.markSaved();
     return f;
   }
 
