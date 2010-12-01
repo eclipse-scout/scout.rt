@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
@@ -44,7 +45,7 @@ public class SwingTableHeaderCellRenderer implements TableCellRenderer {
     m_swingScoutTable = t;
     m_sortUpIcon = new SortIcon(true);
     m_sortDownIcon = new SortIcon(false);
-    m_filterActiveIcon = t.getSwingEnvironment().getIcon(SwingIcons.ColumnFilterEnabled);
+    m_filterActiveIcon = Activator.getIcon(SwingIcons.ColumnFilterEnabled);
   }
 
   @Override
