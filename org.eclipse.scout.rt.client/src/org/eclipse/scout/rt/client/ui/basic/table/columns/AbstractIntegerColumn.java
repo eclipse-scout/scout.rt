@@ -110,9 +110,6 @@ public abstract class AbstractIntegerColumn extends AbstractColumn<Integer> impl
     };
     f.setFormat(getFormat());
     f.setGroupingUsed(isGroupingUsed());
-    f.setLabelVisible(false);
-    f.setValue(getValue(row));
-    f.markSaved();
     return f;
   }
 

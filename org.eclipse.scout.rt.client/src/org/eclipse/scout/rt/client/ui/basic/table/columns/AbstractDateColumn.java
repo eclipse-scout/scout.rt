@@ -103,9 +103,6 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     };
     f.setFormat(getFormat());
     f.setHasTime(isHasTime());
-    f.setLabelVisible(false);
-    f.setValue(getValue(row));
-    f.markSaved();
     return f;
   }
 

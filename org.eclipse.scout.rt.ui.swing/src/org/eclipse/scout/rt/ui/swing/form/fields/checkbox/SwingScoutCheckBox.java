@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ import javax.swing.SwingConstants;
 
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JCheckBoxEx;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
@@ -60,6 +61,13 @@ public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanFi
 
   public JCheckBoxEx getSwingCheckBox() {
     return (JCheckBoxEx) getSwingField();
+  }
+
+  @Override
+  protected void setHorizontalAlignmentFromScout(int scoutAlign) {
+    if (getSwingCheckBox() != null) {
+      getSwingCheckBox().setHorizontalAlignment(SwingUtility.createHorizontalAlignment(scoutAlign));
+    }
   }
 
   @Override

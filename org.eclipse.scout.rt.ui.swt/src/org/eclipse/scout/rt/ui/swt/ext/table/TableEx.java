@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -189,6 +189,11 @@ public class TableEx extends Table {
         case SWT.PaintItem:
           TableItem pitem = (TableItem) event.item;
           String ptext = pitem.getText(event.index);
+          int align = SWT.LEFT;
+          TableColumn tc = getColumn(event.index);
+          if (tc != null) {
+            align = (tc.getStyle() & (SWT.CENTER | SWT.LEFT | SWT.RIGHT));
+          }
           /* center column 1 vertically */
           Rectangle itemBounds = pitem.getBounds(event.index);
           int xOffset = itemBounds.x;
@@ -200,7 +205,19 @@ public class TableEx extends Table {
             event.gc.drawImage(pImg, xOffset, yOffset + yAdj);
             xOffset += 1 + imgBounds.width;
           }
-          xOffset += TEXT_MARGIN;
+          if (align == SWT.RIGHT) {
+            Point extent = event.gc.stringExtent(ptext);
+            int dx = Math.max(TEXT_MARGIN, (itemBounds.x + itemBounds.width - xOffset - extent.x - TEXT_MARGIN));
+            xOffset += dx;
+          }
+          else if (align == SWT.CENTER) {
+            Point extent = event.gc.stringExtent(ptext);
+            int dx = Math.max(TEXT_MARGIN, (itemBounds.x + itemBounds.width - xOffset - extent.x - TEXT_MARGIN) / 2);
+            xOffset += dx;
+          }
+          else {
+            xOffset += TEXT_MARGIN;
+          }
           Point psize = event.gc.textExtent(ptext);
           int yAdj = Math.max(0, (getItemHeight() - psize.y) / 2);
           event.gc.drawText(ptext, xOffset, yOffset + yAdj, true);

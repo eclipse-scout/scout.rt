@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
@@ -128,10 +129,11 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     AbstractStringField f = new AbstractStringField() {
     };
     f.setInputMasked(isInputMasked());
-    f.setMultilineText(getTable() != null ? getTable().isMultilineText() : false);
-    f.setLabelVisible(false);
-    f.setValue(getValue(row));
-    f.markSaved();
+    boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
+    f.setMultilineText(multi);
+    GridData gd = f.getGridData();
+    gd.h = 4;
+    f.setGridDataInternal(gd);
     return f;
   }
 

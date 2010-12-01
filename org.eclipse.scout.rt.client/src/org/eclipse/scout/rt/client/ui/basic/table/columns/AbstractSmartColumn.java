@@ -184,9 +184,6 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
     };
 
     f.setLookupCall(getLookupCall());
-    f.setLabelVisible(false);
-    f.setValue(getValue(row));
-    f.markSaved();
     return f;
   }
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -271,10 +271,22 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    *          on which editing occurs
    * @return a field for editing, use super.{@link #execPrepareEdit(ITableRow)} for the default implementation.
    */
+  @SuppressWarnings("unchecked")
   @ConfigOperation
   @Order(60)
   protected IFormField execPrepareEdit(ITableRow row) throws ProcessingException {
-    return prepareEditInternal(row);
+    IFormField f = prepareEditInternal(row);
+    if (f != null) {
+      f.setLabelVisible(false);
+      GridData gd = f.getGridData();
+      gd.horizontalAlignment = getHorizontalAlignment();
+      f.setGridDataInternal(gd);
+      if (f instanceof IValueField<?>) {
+        ((IValueField<T>) f).setValue(getValue(row));
+      }
+      f.markSaved();
+    }
+    return f;
   }
 
   /**
@@ -744,9 +756,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
         return AbstractColumn.this.getDataType();
       }
     };
-    f.setLabelVisible(false);
-    f.setValue(getValue(row));
-    f.markSaved();
     return f;
   }
 

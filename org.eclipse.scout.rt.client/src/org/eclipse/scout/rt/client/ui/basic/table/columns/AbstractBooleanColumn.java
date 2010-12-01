@@ -57,7 +57,6 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   protected IFormField prepareEditInternal(final ITableRow row) throws ProcessingException {
     final AbstractBooleanField f = new AbstractBooleanField() {
     };
-    f.setLabelVisible(false);
     f.setValue(getValue(row));
     f.markSaved();
     //automatic save when value changes

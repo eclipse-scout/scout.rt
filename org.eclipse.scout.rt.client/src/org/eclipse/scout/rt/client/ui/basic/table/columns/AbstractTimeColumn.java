@@ -92,9 +92,6 @@ public abstract class AbstractTimeColumn extends AbstractColumn<Double> implemen
     AbstractTimeField f = new AbstractTimeField() {
     };
     f.setFormat(getFormat());
-    f.setLabelVisible(false);
-    f.setValue(getValue(row));
-    f.markSaved();
     return f;
   }
 
