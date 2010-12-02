@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jre16 Plug-in
+Bundle-SymbolicName: javax.mail.jre16;singleton:=true
+Bundle-Version: 1.4.3
+Require-Bundle: org.eclipse.core.runtime
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: com.sun.mail.auth;version="1.4.3",
+ com.sun.mail.dsn;version="1.4.3",
+ com.sun.mail.handlers;version="1.4.3",
+ com.sun.mail.iap;version="1.4.3",
+ com.sun.mail.imap;version="1.4.3",
+ com.sun.mail.imap.protocol;version="1.4.3",
+ com.sun.mail.pop3;version="1.4.3",
+ com.sun.mail.smtp;version="1.4.3",
+ com.sun.mail.util;version="1.4.3",
+ com.sun.mail.util.logging;version="1.4.3",
+ javax.mail;version="1.4.3",
+ javax.mail.event;version="1.4.3",
+ javax.mail.internet;version="1.4.3",
+ javax.mail.search;version="1.4.3",
+ javax.mail.util;version="1.4.3"

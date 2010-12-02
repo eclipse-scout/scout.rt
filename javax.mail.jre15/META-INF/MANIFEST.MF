@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Eclipse-ExtensibleAPI: true
+Bundle-ManifestVersion: 2
+Bundle-Name: Java Mail API
+Bundle-SymbolicName: javax.mail.jre15;singleton:=true
+Bundle-Version: 1.4.1
+Require-Bundle: org.eclipse.core.runtime
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: com.sun.activation.registries;version="1.4.1",
+ com.sun.activation.viewers;version="1.4.1",
+ com.sun.mail.dsn;version="1.4.1",
+ com.sun.mail.handlers;version="1.4.1",
+ com.sun.mail.iap;version="1.4.1",
+ com.sun.mail.imap;version="1.4.1",
+ com.sun.mail.imap.protocol;version="1.4.1",
+ com.sun.mail.pop3;version="1.4.1",
+ com.sun.mail.smtp;version="1.4.1",
+ com.sun.mail.util;version="1.4.1",
+ javax.activation;version="1.4.1",
+ javax.mail;version="1.4.1",
+ javax.mail.event;version="1.4.1",
+ javax.mail.internet;version="1.4.1",
+ javax.mail.search;version="1.4.1",
+ javax.mail.util;version="1.4.1"

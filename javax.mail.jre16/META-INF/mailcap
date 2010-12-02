@@ -1,0 +1,21 @@
+#
+#
+# Default mailcap file for the JavaMail System.
+#
+# JavaMail content-handlers:
+#
+text/plain;;		x-java-content-handler=com.sun.mail.handlers.text_plain
+text/html;;		x-java-content-handler=com.sun.mail.handlers.text_html
+text/rfc822-headers;;	x-java-content-handler=com.sun.mail.dsn.text_rfc822headers
+text/xml;;		x-java-content-handler=com.sun.mail.handlers.text_xml
+multipart/report;;	x-java-content-handler=com.sun.mail.dsn.multipart_report
+multipart/*;;		x-java-content-handler=com.sun.mail.handlers.multipart_mixed; x-java-fallback-entry=true
+message/rfc822;;	x-java-content-handler=com.sun.mail.handlers.message_rfc822
+message/delivery-status;; x-java-content-handler=com.sun.mail.dsn.message_deliverystatus
+message/disposition-notification;; x-java-content-handler=com.sun.mail.dsn.message_dispositionnotification
+#
+# can't support image types because java.awt.Toolkit doesn't work on servers
+#
+#image/gif;;		x-java-content-handler=com.sun.mail.handlers.image_gif
+#image/jpeg;;		x-java-content-handler=com.sun.mail.handlers.image_jpeg
+
