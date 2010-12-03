@@ -79,7 +79,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   public void setServerSessionClass(String className) {
     int i = className.lastIndexOf('.');
     try {
-      m_serverSessionClass = Platform.getBundle(className.substring(0, i)).loadClass(className);
+      m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(className.substring(0, i)).loadClass(className);
     }
     catch (ClassNotFoundException e) {
       throw new IllegalArgumentException("Loading class " + className, e);
@@ -95,7 +95,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       int i = className.lastIndexOf('.');
       try {
         LOG.warn("missing config.ini property: " + getClass().getName() + "#serverSessionClass=your.app.server.ServerSession. Trying to find default class " + className);
-        m_serverSessionClass = Platform.getBundle(className.substring(0, i)).loadClass(className);
+        m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(className.substring(0, i)).loadClass(className);
       }
       catch (ClassNotFoundException e) {
         // nop

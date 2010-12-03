@@ -106,7 +106,7 @@ public class ServerServiceFactory implements IServiceFactory {
             m_sessionClass = IServerSession.class;
           }
           else {
-            m_sessionClass = m_bundle.loadClass(m_sessionType);
+            m_sessionClass = (Class<? extends IServerSession>) m_bundle.loadClass(m_sessionType);
             if (!IServerSession.class.isAssignableFrom(m_sessionClass)) throw new IllegalArgumentException("session type must be a subtype of " + IServerSession.class + ": " + m_sessionType);
           }
         }

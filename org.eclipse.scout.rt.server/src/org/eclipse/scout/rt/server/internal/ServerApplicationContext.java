@@ -12,9 +12,13 @@ package org.eclipse.scout.rt.server.internal;
 
 import java.util.Map;
 
+import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.osgi.framework.Bundle;
 
+/**
+ * Empty Application Context
+ */
 public class ServerApplicationContext implements IApplicationContext {
 
   public void applicationRunning() {
@@ -46,6 +50,9 @@ public class ServerApplicationContext implements IApplicationContext {
 
   public String getBrandingProperty(String key) {
     return null;
+  }
+
+  public void setResult(Object result, IApplication application) {
   }
 
 }

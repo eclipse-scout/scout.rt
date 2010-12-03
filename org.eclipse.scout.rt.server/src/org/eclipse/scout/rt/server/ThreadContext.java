@@ -57,22 +57,26 @@ public final class ThreadContext {
     }
   }
 
+  public static HttpServletRequest getHttpServletRequest() {
+    return getInternal(HttpServletRequest.class);
+  }
+
+  public static HttpServletResponse getHttpServletResponse() {
+    return getInternal(HttpServletResponse.class);
+  }
+
+  public static IServerSession getServerSession() {
+    return getInternal(IServerSession.class);
+  }
+
+  public static ITransaction getTransaction() {
+    return getInternal(ITransaction.class);
+  }
+
   /**
    * @return the value of type <T> stored in the current thread context
    */
-  public static <T extends HttpServletRequest> T get(Class<T> key) {
-    return getInternal(key);
-  }
-
-  public static <T extends HttpServletResponse> T get(Class<T> key) {
-    return getInternal(key);
-  }
-
-  public static <T extends IServerSession> T get(Class<T> key) {
-    return getInternal(key);
-  }
-
-  public static <T extends ITransaction> T get(Class<T> key) {
+  public static <T> T get(Class<T> key) {
     return getInternal(key);
   }
 

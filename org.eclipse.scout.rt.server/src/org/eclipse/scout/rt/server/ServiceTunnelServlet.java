@@ -43,9 +43,9 @@ import org.eclipse.scout.commons.exception.PlaceholderException;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
@@ -107,7 +107,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       if (qname != null) {
         int i = qname.lastIndexOf('.');
         try {
-          m_serverSessionClass = Platform.getBundle(qname.substring(0, i)).loadClass(qname);
+          m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);
         }
         catch (ClassNotFoundException e) {
           throw new ServletException("Loading class " + qname, e);
@@ -119,7 +119,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       try {
         Bundle bundle = findServletContributor(req.getServletPath());
         if (bundle != null) {
-          m_serverSessionClass = bundle.loadClass(bundle.getSymbolicName() + ".ServerSession");
+          m_serverSessionClass = (Class<? extends IServerSession>) bundle.loadClass(bundle.getSymbolicName() + ".ServerSession");
         }
       }
       catch (Throwable t) {

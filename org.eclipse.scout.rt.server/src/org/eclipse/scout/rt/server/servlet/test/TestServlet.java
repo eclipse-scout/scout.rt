@@ -69,7 +69,7 @@ public class TestServlet extends HttpServletEx {
     //
     int i = qname.lastIndexOf('.');
     try {
-      m_serverSessionClass = Platform.getBundle(qname.substring(0, i)).loadClass(qname);
+      m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);
     }
     catch (ClassNotFoundException e) {
       throw new ServletException("Loading class " + qname, e);

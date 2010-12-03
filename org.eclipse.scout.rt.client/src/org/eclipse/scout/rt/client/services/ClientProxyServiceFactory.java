@@ -119,7 +119,7 @@ public class ClientProxyServiceFactory implements IServiceFactory {
             m_sessionClass = IClientSession.class;
           }
           else {
-            m_sessionClass = m_bundle.loadClass(m_sessionType);
+            m_sessionClass = (Class<? extends IClientSession>) m_bundle.loadClass(m_sessionType);
             if (!IClientSession.class.isAssignableFrom(m_sessionClass)) throw new IllegalArgumentException("session type must be a subtype of " + IClientSession.class + ": " + m_sessionType);
           }
         }
