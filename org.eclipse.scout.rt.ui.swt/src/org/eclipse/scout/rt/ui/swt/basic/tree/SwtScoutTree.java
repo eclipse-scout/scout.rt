@@ -46,6 +46,8 @@ import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
@@ -93,6 +95,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     viewer.getTree().addListener(SWT.MouseDown, swtTreeListener);
     viewer.getTree().addListener(SWT.MouseUp, swtTreeListener);
     viewer.getTree().addListener(SWT.KeyUp, swtTreeListener);
+    viewer.getTree().addKeyListener(new P_SwtKeyReturnAvoidDoubleClickListener());
 
     // context menu
     m_contextMenu = new Menu(viewer.getTree().getShell(), SWT.POP_UP);
@@ -644,6 +647,25 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       setExpansionFromSwt((ITreeNode) event.getElement(), true);
     }
   } // end class P_SwtExpansionListener
+
+  /**
+   * @rn sle, 03.12.2010, ticket #97056
+   */
+  private class P_SwtKeyReturnAvoidDoubleClickListener implements KeyListener {
+    @Override
+    public void keyPressed(KeyEvent e) {
+      if (e != null
+          && (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR)) {
+        //to avoid the postEvent(DoubleClickEvent) from Tree.WM_CHAR(...) set e.doit to false
+        e.doit = false;
+      }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+      //do nothing
+    }
+  } // end class P_SwtKeyReturnAvoidDoubleClickListener
 
   private class P_SwtDoubleClickListener implements IDoubleClickListener {
     @SuppressWarnings("unchecked")
