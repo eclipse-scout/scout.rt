@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipse.scout.rt.feature_3.5.2.qualifier.jar" id="org.eclipse.scout.rt.feature" version="3.5.2.qualifier">
+      <category name="org.eclipse.scout.rt"/>
+   </feature>
+   <category-def name="org.eclipse.scout.rt" label="Scout RT"/>
+</site>
