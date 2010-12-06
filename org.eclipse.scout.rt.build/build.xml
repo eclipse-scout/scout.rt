@@ -26,18 +26,18 @@ _build/pde/plugins   (pde build)
 	</target>
 
 	<target name="clean">
-		<delete dir="${buildDirectory}" />
+		<delete dir="${build.bundle}/eclipse.build" />
 		<delete dir="${build.bundle}/working/eclipse"/>
 	</target>
 
 
 	<target name="createBuildDir" unless="createBuildDir">
 		<echo message="createBuildDir" />
-		<delete dir="${buildDirectory}" />
-		<mkdir dir="${buildDirectory}" />
+		<delete dir="${build.bundle}/eclipse.build" />
+		<mkdir dir="${build.bundle}/eclipse.build" />
 		<!-- move plugins to build to the buildDirectory -->
-		<mkdir dir="${buildDirectory}/plugins" />
-		<copy todir="${buildDirectory}/plugins">
+		<mkdir dir="${build.bundle}/eclipse.build/plugins" />
+		<copy todir="${build.bundle}/eclipse.build/plugins">
 			<fileset dir="${build.workspace}">
 				<include name="org.eclipse.scout.*/**" />
 				<include name="javax.*/**" />
@@ -48,15 +48,15 @@ _build/pde/plugins   (pde build)
 				<exclude name="*feature*/**" />
 			</fileset>
 		</copy>
-		<mkdir dir="${buildDirectory}/features" />
-		<copy todir="${buildDirectory}/features">
+		<mkdir dir="${build.bundle}/eclipse.build/features" />
+		<copy todir="${build.bundle}/eclipse.build/features">
 			<fileset dir="${build.workspace}/">
 				<include name="${build.feature}/**" />
 			</fileset>
 		</copy>
 		<!-- source tamplate -->
-		<copy todir="${buildDirectory}/features/${build.feature}" failonerror="false">
-			<fileset dir="${base}">
+		<copy todir="${build.bundle}/eclipse.build/features/${build.feature}" failonerror="false">
+			<fileset dir="${build.working}">
 				<include name="sourceTemplateFeature/**" />
 			</fileset>
 		</copy>
@@ -65,30 +65,30 @@ _build/pde/plugins   (pde build)
 
 	<target name="setupEclipse" depends="downloadEclipse, downloadDeltapack">
 		<echo message="setup Eclipse" />
-		<unzip dest="${base}" overwrite="true" src="${base}/${eclipse.name}" />
-		<unzip dest="${base}" overwrite="true" src="${base}/${eclipse.deltaPack.file}" />
-		<echo message="${base}/dropins" />
-		<copy todir="${base}" failonerror="false">
-			<fileset dir="${base}/dropins" />
+		<unzip dest="${build.working}" overwrite="true" src="${build.working}/${eclipse.name}" />
+		<unzip dest="${build.working}" overwrite="true" src="${build.working}/${eclipse.deltaPack.file}" />
+		<echo message="${build.working}/dropins" />
+		<copy todir="${build.working}" failonerror="false">
+			<fileset dir="${build.working}/dropins" />
 		</copy>
 	</target>
 
 	<target name="downloadEclipse" depends="checkEclipseDownload" unless="skipDownload">
-		<echo message="download eclipse to '${base}'" />
-		<get src="${eclipse.download.url}" dest="${base}/${eclipse.name}" />
+		<echo message="download eclipse to '${build.working}'" />
+		<get src="${eclipse.download.url}" dest="${build.working}/${eclipse.name}" />
 	</target>
 
 	<target name="checkEclipseDownload">
-		<available file="${base}/${eclipse.name}" property="skipDownload" />
+		<available file="${build.working}/${eclipse.name}" property="skipDownload" />
 	</target>
 
 	<target name="downloadDeltapack" depends="checkDeltapackDownload" unless="skipDeltapackDownload">
-		<echo message="download delta pack '${base}'" />
-		<get src="${eclipse.deltaPack.url}" dest="${base}/${eclipse.deltaPack.file}" />
+		<echo message="download delta pack '${build.working}'" />
+		<get src="${eclipse.deltaPack.url}" dest="${build.working}/${eclipse.deltaPack.file}" />
 	</target>
 
 	<target name="checkDeltapackDownload">
-		<available file="${base}/${eclipse.deltaPack.file}" property="skipDeltapackDownload" />
+		<available file="${build.working}/${eclipse.deltaPack.file}" property="skipDeltapackDownload" />
 	</target>
 
 
@@ -98,21 +98,21 @@ _build/pde/plugins   (pde build)
 		</echo>
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
-			<arg line="-buildfile ${baseLocation}/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
+			<arg line="-buildfile ${build.working}/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
 			<arg line="-DtopLevelElementId=${build.feature}" />
 			<arg line="-DbuildId=all" />
 			<arg line="-Dtimestamp=${timestamp}" />
-			<arg line="-Dbuilder=${build.bundle}" />
+			<arg line="-Dbuilder=${build.bundle}/featureBuild" />
 			<arg line="-Dworkspace=${build.workspace}" />
 			<arg line="-DIndividualSourceBundles=true" />
 			<classpath>
-				<pathelement location="${baseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+				<pathelement location="${build.working}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
 		</java>
 	</target>
 
 	<target name="productBuild">
-		<echo message="baselocation '${baseLocation}'">
+		<echo message="baselocation '${build.working}/eclipse'">
 		</echo>
 		<echo message="workspace = ${env.WORKSPACE}">
 		</echo>
@@ -121,20 +121,20 @@ _build/pde/plugins   (pde build)
 			<arg value="-application" />
 			<arg value="org.eclipse.ant.core.antRunner" />
 			<arg value="-buildfile" />
-			<arg value="${baseLocation}/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/productBuild/productBuild.xml" />
+			<arg value="${build.working}/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/productBuild/productBuild.xml" />
 			<arg value="-Dproduct=/${product}" />
 			<arg value="-DbuildId=all" />
 			<arg value="-Dtimestamp=${timestamp}" />
 			<arg line="-Dbuilder=${build.bundle}" />
 			<arg line="-Dworkspace=${build.workspace}" />
 			<classpath>
-				<pathelement location="${baseLocation}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+				<pathelement location="${build.working}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
 		</java>
 	</target>
 
 	<target name="postCleanUp">
-		<delete dir="${buildDirectory}" />
+		<delete dir="${build.bundle}/eclipse.build" />
 	</target>
 
 </project>

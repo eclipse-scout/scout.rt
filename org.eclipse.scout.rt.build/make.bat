@@ -22,3 +22,4 @@ PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 call ant -f build.xml %buildOpts% %workspaceDir% %*  > %logfile%
 
 endlocal
+

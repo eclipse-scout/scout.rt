@@ -64,7 +64,8 @@
 	<!-- Steps to do before setup -->
 	<!-- ===================================================================== -->
 	<target name="preSetup">
-		<echo message="PRE SETUP.... '${build.bundle}'"/>
+		<echo message="PRE SETUP [base]'${base}'"/>
+			<echo message="PRE SETUP [baseLocation] '${baseLocation }'"/>
 		<echo message="PRE SETUP individual source bundles.... '${individualSourceBundles}'"/>
 	</target>
 
