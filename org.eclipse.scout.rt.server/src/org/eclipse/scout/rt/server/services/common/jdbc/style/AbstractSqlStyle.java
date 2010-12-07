@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -277,20 +277,10 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     switch (bind.getSqlType()) {
       case Types.NULL: {
         try {
-          /*XXX
-          ResultSetMetaData meta = ps.getMetaData();
-          if (meta != null && meta.getColumnCount() >= jdbcBindIndex) {
-            ps.setNull(jdbcBindIndex, meta.getColumnType(jdbcBindIndex));
-          }
-          else {
-            ps.setNull(jdbcBindIndex, Types.NULL);
-          }
-          */
           ps.setNull(jdbcBindIndex, Types.NULL);
 
         }
         catch (SQLException e) {
-          System.out.println("XXX failed setting null " + e);//XXX
           ps.setNull(jdbcBindIndex, Types.VARCHAR);
         }
         break;
