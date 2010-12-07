@@ -4,32 +4,43 @@ import java.io.File;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
-public interface IDocumentField extends IValueField<Object[][]> {
+/**
+ * see {@link AbstractDocumentField}
+ */
+public interface IDocumentField extends IValueField<File> {
 
-  String PROP_INSERT_TEXT = "insertText";
-  String PROP_TOGGLE_RIBBONS = "toggleRibbons";
-  String PROP_FILE = "file";
-  String PROP_DISPLAY_RULERS = "displayRulers";
-  String PROP_AUTORESIZE_DOCUMENT = "autoResizeDocument";
-  String PROP_DISPLAY_STATUS_BAR = "displayStatusBar";
+  String PROP_RULERS_VISIBLE = "rulerVisible";
+  String PROP_STATUS_BAR_VISIBLE = "statusBarVisible";
 
-  public void insertText(String text);
+  void addDocumentFieldListener(DocumentFieldListener listener);
 
-  public void toggleRibbon();
+  void removeDocumentFieldListener(DocumentFieldListener listener);
 
-  public void setFile(File file);
+  boolean isRulersVisible();
 
-  public File getFile();
+  void setRulersVisible(boolean b);
 
-  public void setDisplayRulers(boolean displayRulers);
+  boolean isStatusBarVisible();
 
-  public boolean isDisplayRulers();
+  void setStatusBarVisible(boolean b);
 
-  public void setAutoResizeDocument(boolean autoResizeDocument);
+  /**
+   * insert text at current location
+   */
+  void insertText(String text);
 
-  public boolean isAutoResizeDocument();
+  /**
+   * save the document to the file specified
+   * 
+   * @param formatType
+   *          doc, dot, odt, html, pdf, ...
+   */
+  void saveAs(File file, String formatType);
 
-  public void setDisplayStatusBar(boolean displayStatusBar);
+  void autoResizeDocument();
 
-  public boolean isDisplayStatusBar();
+  void toggleRibbons();
+
+  IDocumentFieldUIFacade getUIFacade();
+
 }
