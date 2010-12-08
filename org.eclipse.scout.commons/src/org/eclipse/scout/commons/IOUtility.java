@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -227,20 +227,22 @@ public final class IOUtility {
     }
   }
 
-  public static File createTempDirectory(String dirName) throws ProcessingException {
+  /**
+   * creates a temporary directory with a random name and the given suffix
+   */
+  public static File createTempDirectory(String dirSuffix) throws ProcessingException {
     try {
-      if (dirName != null) {
-        dirName = dirName.replaceAll("[:*?\\\"<>|]*", "");
+      if (dirSuffix != null) {
+        dirSuffix = dirSuffix.replaceAll("[:*?\\\"<>|]*", "");
       }
-      File tmp = File.createTempFile("tmp", "");
+      File tmp = File.createTempFile("dir", dirSuffix);
+      tmp.delete();
+      tmp.mkdirs();
       tmp.deleteOnExit();
-      File dir = new File(tmp.getParentFile(), dirName + File.separatorChar);
-      deleteDirectory(dir);
-      dir.mkdirs();
-      return dir;
+      return tmp;
     }
     catch (IOException e) {
-      throw new ProcessingException("dir: " + dirName, e);
+      throw new ProcessingException("dir: " + dirSuffix, e);
     }
   }
 
