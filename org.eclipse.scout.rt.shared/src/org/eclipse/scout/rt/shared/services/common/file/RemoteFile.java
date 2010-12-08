@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,9 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +28,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Locale;
+
+import org.eclipse.scout.commons.FileUtility;
 
 /**
  * file path with / as delimiter
@@ -260,6 +265,10 @@ public class RemoteFile implements Serializable {
     return new DecompressedInputStream(this);
   }
 
+  public long/* crc */writeData(File f) throws IOException {
+    return writeData(new FileOutputStream(f));
+  }
+
   public long/* crc */writeData(Writer w) throws IOException {
     Reader in = null;
     BufferedWriter out = null;
@@ -306,6 +315,10 @@ public class RemoteFile implements Serializable {
       }
     }
     return getCRC();
+  }
+
+  public long/* crc */readData(File f) throws IOException {
+    return readData(new FileInputStream(f));
   }
 
   public long/* crc */readData(Reader r) throws IOException {
@@ -377,6 +390,27 @@ public class RemoteFile implements Serializable {
     ByteArrayOutputStream bos = new ByteArrayOutputStream(m_compressedData.length * 3);
     writeData(bos);
     return bos.toByteArray();
+  }
+
+  /**
+   * If the remote file is a zip archive, unpack its content to the directory
+   * see {@link #readZipContentFromDirectory(File)}
+   */
+  public void writeZipContentToDirectory(File directory) throws IOException {
+    directory.mkdirs();
+    File tmp = File.createTempFile("tmp", ".zip");
+    writeData(tmp);
+    FileUtility.extractArchive(tmp, directory);
+  }
+
+  /**
+   * Read all files from the directory and pack them as zip, so this remote file represents a zip archive
+   * see {@link #writeZipContentToDirectory(File)}
+   */
+  public void readZipContentFromDirectory(File directory) throws IOException {
+    File tmp = File.createTempFile("tmp", ".zip");
+    FileUtility.compressArchive(directory, tmp);
+    readData(tmp);
   }
 
   @Override
