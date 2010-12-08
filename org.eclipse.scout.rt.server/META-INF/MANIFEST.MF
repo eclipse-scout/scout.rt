@@ -8,7 +8,7 @@ Import-Package: javax.jms;resolution:=optional,
  javax.servlet.http
 Bundle-Name: BSI Scout Server Plug-in
 Bundle-SymbolicName: org.eclipse.scout.rt.server;singleton:=true
-Bundle-Version: 3.2.2.qualifier
+Bundle-Version: 3.5.5.qualifier
 Bundle-Activator: org.eclipse.scout.rt.server.internal.Activator
 Bundle-Vendor: Eclipse Scout Project
 Eclipse-BuddyPolicy: registered

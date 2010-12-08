@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Commons Plug-in
 Bundle-SymbolicName: org.eclipse.scout.commons;singleton:=true
-Bundle-Version: 1.1.2.qualifier
+Bundle-Version: 3.5.5.qualifier
 Bundle-Activator: org.eclipse.scout.commons.internal.Activator
 Bundle-Vendor: Eclipse Scout Project
 Import-Package: javax.activation;resolution:=optional,

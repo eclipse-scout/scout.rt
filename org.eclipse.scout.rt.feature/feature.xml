@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.scout.rt.feature"
-      label="Scout RT Feature"
-      version="3.5.2.qualifier"
-      provider-name="Eclipse Scout Project">
+      label="%featureName"
+      version="3.5.5.qualifier"
+      provider-name="%providerName">
 
    <description>
       Scout runtime environment.
@@ -25,8 +25,25 @@ BSI Business Systems Integration AG - initial API and implementation
    </license>
 
    <url>
+      <discovery label="Orbit" url="http://download.eclipse.org/tools/orbit/downloads/drops/I20101104194033/repository"/>
       <discovery label="The Eclipse Project Updates" url="http://download.eclipse.org/eclipse/updates/3.5"/>
    </url>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.equinox.security" version="1.0.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.equinox.http.registry"/>
+      <import plugin="javax.servlet"/>
+      <import plugin="org.eclipse.core.net" version="1.2.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.scout.service" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.scout.commons" version="1.1.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.scout.rt.server" version="3.2.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.5.0" match="greaterOrEqual"/>
+   </requires>
 
    <plugin
          id="org.eclipse.scout.commons"
@@ -131,5 +148,26 @@ BSI Business Systems Integration AG - initial API and implementation
          download-size="0"
          install-size="0"
          version="0.0.0"/>
-  <plugin id="org.eclipse.jdt.source" version="0.0.0"/>
+
+   <plugin
+         id="javax.jms"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.mail.jre15"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.mail.jre16"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>
