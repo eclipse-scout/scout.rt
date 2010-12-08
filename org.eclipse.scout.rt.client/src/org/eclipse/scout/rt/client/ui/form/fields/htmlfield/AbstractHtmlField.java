@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,12 +24,21 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
+import org.eclipse.scout.rt.client.ui.form.fields.documentfield.AbstractDocumentField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.service.SERVICES;
 
+/**
+ * @deprecated replaced by {@link AbstractBrowserField} for html viewing and {@link AbstractDocumentField} for html
+ *             editing
+ *             (requires a fragment such as microsoft word editor)
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHtmlField.class);
 
