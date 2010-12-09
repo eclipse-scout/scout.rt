@@ -438,7 +438,9 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
                       }
                     }
                   }
-
+                  if (!PlatformUI.isWorkbenchRunning()) {
+                    return Status.OK_STATUS;
+                  }
                   if (m_busyStatus == BusyStatus.BUSY || m_busyStatus == BusyStatus.DETECTING) {
                     getDisplay().asyncExec(new Runnable() {
                       public void run() {

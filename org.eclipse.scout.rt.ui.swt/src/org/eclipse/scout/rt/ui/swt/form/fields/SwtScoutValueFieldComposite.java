@@ -22,8 +22,8 @@ public abstract class SwtScoutValueFieldComposite<T extends IValueField<?>> exte
 
   @Override
   protected void attachScout() {
-
     super.attachScout();
+    setValueFromScout();
     setDisplayTextFromScout(getScoutObject().getDisplayText());
   }
 
