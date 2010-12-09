@@ -515,29 +515,36 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       // restore currently selected tree node when it was owned by our table
       // rows.
       // in case selection was lost, try to select similar index as before
+
       if (tree != null && oldSelectionOwned && tree.getSelectedNode() == null) {
+        ITreeNode newSelectedNode = null;
         ITableRow row = getTable().getSelectedRow();
         if (row != null) {
-          tree.selectNode(getTreeNodeFor(row));
+          newSelectedNode = getTreeNodeFor(row);
         }
         else {
           row = getTable().findRowByKey(oldSelectedRowKeys);
           if (row != null) {
-            tree.selectNode(getTreeNodeFor(row));
+            newSelectedNode = getTreeNodeFor(row);
           }
           else if (oldSelectedNode != null && oldSelectedNode.getTree() == tree) {
-            tree.selectNode(oldSelectedNode);
+            newSelectedNode = oldSelectedNode;
           }
           else {
             int index = Math.max(-1, Math.min(oldSelectionDirectChildIndex, getChildNodeCount() - 1));
             if (index >= 0 && index < getChildNodeCount()) {
-              tree.selectNode(getChildNode(index));
+              newSelectedNode = getChildNode(index);
             }
             else {
-              tree.selectNode(this);
+              newSelectedNode = this;
             }
           }
         }
+        if (newSelectedNode != null) {
+          newSelectedNode = tree.resolveVirtualNode(newSelectedNode);
+          tree.selectNode(newSelectedNode);
+        }
+
       }
     }
     finally {
