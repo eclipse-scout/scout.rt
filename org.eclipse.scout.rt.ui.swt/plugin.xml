@@ -194,6 +194,15 @@
       </formField>
       <formField
             active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField"
+            name="Browser field"
+            scope="default">
+         <uiClass
+               class="org.eclipse.scout.rt.ui.swt.form.fields.browserfield.SwtScoutBrowserField">
+         </uiClass>
+      </formField>
+      <formField
+            active="true"
             modelClass="org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField"
             name="Html field"
             scope="default">
@@ -231,7 +240,7 @@
       <formField
             active="true"
             modelClass="org.eclipse.scout.rt.client.ui.form.fields.timefield.ITimeField"
-            name="Time Field"
+            name="Time field"
             scope="default">
          <uiClass
                class="org.eclipse.scout.rt.ui.swt.form.fields.timefield.SwtScoutTimeField">
@@ -240,7 +249,7 @@
       <formField
             active="true"
             modelClass="org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField"
-            name="Composer Field">
+            name="Composer field">
          <uiClass
                class="org.eclipse.scout.rt.ui.swt.form.fields.composer.SwtScoutComposerField">
          </uiClass>

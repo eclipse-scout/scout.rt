@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,6 +27,9 @@ public abstract class SwtScoutValueFieldComposite<T extends IValueField<?>> exte
     setDisplayTextFromScout(getScoutObject().getDisplayText());
   }
 
+  protected void setValueFromScout() {
+  }
+
   protected void setDisplayTextFromScout(String s) {
   }
 
@@ -35,6 +38,9 @@ public abstract class SwtScoutValueFieldComposite<T extends IValueField<?>> exte
     super.handleScoutPropertyChange(name, newValue);
     if (name.equals(IValueField.PROP_DISPLAY_TEXT)) {
       setDisplayTextFromScout((String) newValue);
+    }
+    else if (name.equals(IValueField.PROP_VALUE)) {
+      setValueFromScout();
     }
   }
 
