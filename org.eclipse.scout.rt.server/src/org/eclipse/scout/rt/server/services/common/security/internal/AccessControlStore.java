@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.PrincipalNameFilter;
+import org.eclipse.scout.rt.server.services.common.clientnotification.SingleUserFilter;
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
 import org.eclipse.scout.service.SERVICES;
@@ -144,6 +145,8 @@ public class AccessControlStore {
       principalNames = m_store.keySet().toArray(new String[m_store.size()]);
     }
     clearCacheOfPrincipals(principalNames);
+    // notify with a filter, that will be accepted nowhere
+    SERVICES.getService(IClientNotificationService.class).putNotification(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
   }
 
   /**
@@ -164,7 +167,6 @@ public class AccessControlStore {
     for (String principalName : principalNames) {
       if (principalName != null) {
         SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(null), new PrincipalNameFilter(principalName, 120000L));
-        SERVICES.getService(IClientNotificationService.class).putNotification(new ResetAccessControlChangedNotification(), new PrincipalNameFilter(principalName, 120000L));
       }
     }
   }
