@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import javax.mail.AuthenticationFailedException;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -199,6 +200,9 @@ public class ImapAdapter {
             m_store.connect();
           }
         }
+      }
+      catch (AuthenticationFailedException e) {
+        throw new ProcessingException("IMAP-Authentication failed on " + (m_host == null ? "?" : m_host) + ":" + m_port);
       }
       catch (Exception e) {
         throw new ProcessingException(e.getMessage(), e);
