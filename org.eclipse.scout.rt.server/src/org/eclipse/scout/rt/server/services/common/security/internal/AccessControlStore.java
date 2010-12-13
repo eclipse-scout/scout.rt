@@ -144,9 +144,9 @@ public class AccessControlStore {
     synchronized (m_storeLock) {
       principalNames = m_store.keySet().toArray(new String[m_store.size()]);
     }
-    clearCacheOfPrincipals(principalNames);
     // notify with a filter, that will be accepted nowhere
     SERVICES.getService(IClientNotificationService.class).putNotification(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
+    clearCacheOfPrincipals(principalNames);
   }
 
   /**
