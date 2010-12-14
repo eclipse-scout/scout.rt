@@ -17,7 +17,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 /**
- * html page viewer using swing JContentPane / swt Browser
+ * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor, in swt it is the native
+ * browser.
+ * This may be changed by adding a fragment that uses the swt Browser in swing
+ * (org.eclipse.scout.rt.ui.swing.browser.swt.fragment)
  * <p>
  * The content is either the value (remote file) or the {@link #setExternalURL()}
  * <p>

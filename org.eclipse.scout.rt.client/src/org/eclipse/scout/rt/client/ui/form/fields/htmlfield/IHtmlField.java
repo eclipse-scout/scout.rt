@@ -19,11 +19,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.documentfield.IDocumentField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 /**
- * @deprecated replaced by {@link IBrowserField} for html viewing and {@link IDocumentField} for html editing (requires
- *             a
- *             fragment such as microsoft word editor)
+ * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor, in swt it is the native
+ * browser.
+ * <p>
+ * See also the {@link IBrowserField} for html viewing and {@link IDocumentField} for html editing (requires a fragment
+ * such as microsoft word editor)
  */
-@Deprecated
 public interface IHtmlField extends IValueField<String> {
 
   String PROP_MAX_LENGTH = "maxLength";

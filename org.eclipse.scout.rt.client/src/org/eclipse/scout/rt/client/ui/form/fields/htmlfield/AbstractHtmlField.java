@@ -33,12 +33,12 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * @deprecated replaced by {@link AbstractBrowserField} for html viewing and {@link AbstractDocumentField} for html
- *             editing
- *             (requires a fragment such as microsoft word editor)
+ * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor, in swt it is the native
+ * browser.
+ * <p>
+ * See also {@link AbstractBrowserField} for html viewing and {@link AbstractDocumentField} for html editing (requires a
+ * fragment such as microsoft word editor)
  */
-@SuppressWarnings("deprecation")
-@Deprecated
 public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHtmlField.class);
 
