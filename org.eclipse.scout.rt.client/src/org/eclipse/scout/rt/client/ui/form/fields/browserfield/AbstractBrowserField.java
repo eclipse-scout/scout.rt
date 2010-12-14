@@ -20,10 +20,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile> implements IBrowserField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBrowserField.class);
@@ -42,17 +40,38 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
   }
 
   /**
-   * @param url
+   * This callback is invoked before the link is followed, can be used as handler an vetoer. The default returns true.
+   * 
+   * @return true to accept this location, false to prevent the browser from going to that location (equal to browser
+   *         esc/stop button)
+   * @param location
    * @param path
-   *          {@link URL#getPath()}
+   *          may be null for locations like about:blank or javascript:... {@link URL#getPath()}
    * @param local
    *          true if the url is not a valid external url but a local model url
    *          (http://local/...)
    */
   @ConfigOperation
   @Order(230)
-  protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
-    LOG.info("execHyperlinkAction " + url + " (in " + getClass().getName() + ")");
+  protected boolean execBeforeLocationChanged(String location, String path, boolean local) throws ProcessingException {
+    return true;
+  }
+
+  /**
+   * This callback is invoked after the link was followed, thus it is already at that location
+   * <p>
+   * The default does noting.
+   * 
+   * @param location
+   * @param path
+   *          may be null for locations like about:blank or javascript:... {@link URL#getPath()}
+   * @param local
+   *          true if the url is not a valid external url but a local model url
+   *          (http://local/...)
+   */
+  @ConfigOperation
+  @Order(230)
+  protected void execAfterLocationChanged(String location, String path, boolean local) throws ProcessingException {
   }
 
   @Override
@@ -67,16 +86,18 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
     //nop
   }
 
-  public void doHyperlinkAction(URL url) throws ProcessingException {
-    execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
+  public void doLocationChange(String location) throws ProcessingException {
+    if (getUIFacade().fireBeforeLocationChangedFromUI(location)) {
+      getUIFacade().fireAfterLocationChangedFromUI(location);
+    }
   }
 
-  public void setExternalURL(URL url) {
-    propertySupport.setProperty(PROP_EXTERNAL_URL, url);
+  public void setLocation(String location) {
+    propertySupport.setProperty(PROP_LOCATION, location);
   }
 
-  public URL getExternalURL() {
-    return (URL) propertySupport.getProperty(PROP_EXTERNAL_URL);
+  public String getLocation() {
+    return (String) propertySupport.getProperty(PROP_LOCATION);
   }
 
   public IBrowserFieldUIFacade getUIFacade() {
@@ -89,12 +110,36 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
 
   private class P_UIFacade implements IBrowserFieldUIFacade {
 
-    public void fireHyperlinkActionFromUI(URL url) {
+    public boolean fireBeforeLocationChangedFromUI(String location) {
       try {
-        doHyperlinkAction(url);
+        URL url = null;
+        try {
+          url = new URL(location);
+        }
+        catch (Throwable t) {
+          //nop
+        }
+        return execBeforeLocationChanged(location, url != null ? url.getPath() : null, url != null && url.getHost().equals("local"));
       }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      catch (Throwable t) {
+        LOG.error("location: " + location, t);
+      }
+      return false;
+    }
+
+    public void fireAfterLocationChangedFromUI(String location) {
+      try {
+        URL url = null;
+        try {
+          url = new URL(location);
+        }
+        catch (Throwable t) {
+          //nop
+        }
+        execAfterLocationChanged(location, url != null ? url.getPath() : null, url != null && url.getHost().equals("local"));
+      }
+      catch (Throwable t) {
+        LOG.error("location: " + location, t);
       }
     }
   }

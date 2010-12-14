@@ -11,8 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.browserfield;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -36,7 +35,7 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutBrowserField.class);
 
   private File m_tempDir;
-  private URL m_currentURL;
+  private String m_currentLocation;
 
   public SwtScoutBrowserField() {
   }
@@ -62,25 +61,12 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
     browser.addLocationListener(new LocationAdapter() {
       @Override
       public void changing(LocationEvent event) {
-        URL url = null;
-        try {
-          url = new URL(event.location);
-        }
-        catch (MalformedURLException e) {
-          try {
-            url = new File(event.location).toURI().toURL();
-          }
-          catch (MalformedURLException e1) {
-            e1.printStackTrace();
-          }
-        }
-        if (url != null) {
-          event.doit = url.getProtocol().equals("file");
-          if (!event.doit) {
-            handleSwtLinkAction(url);
-          }
-        }
+        event.doit = fireBeforeLocationChangedFromSwt(event.location);
+      }
 
+      @Override
+      public void changed(LocationEvent event) {
+        fireAfterLocationChangedFromSwt(event.location);
       }
     });
     //
@@ -97,14 +83,6 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
     return (Browser) super.getSwtField();
   }
 
-  /*
-   * scout properties
-   */
-  @Override
-  protected void attachScout() {
-    super.attachScout();
-  }
-
   @Override
   protected void detachScout() {
     if (m_tempDir != null) {
@@ -117,20 +95,20 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (IBrowserField.PROP_EXTERNAL_URL.equals(name)) {
-      setExternalURLFromScout();
+    if (IBrowserField.PROP_LOCATION.equals(name)) {
+      setLocationFromScout();
     }
   }
 
   @Override
   protected void setValueFromScout() {
-    setExternalURLFromScout();
+    setLocationFromScout();
   }
 
-  protected void setExternalURLFromScout() {
-    URL url = getScoutObject().getExternalURL();
+  protected void setLocationFromScout() {
+    String location = getScoutObject().getLocation();
     RemoteFile r = getScoutObject().getValue();
-    if (url == null && r != null && r.exists()) {
+    if (location == null && r != null && r.exists()) {
       try {
         if (m_tempDir == null) {
           try {
@@ -145,7 +123,7 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
           String simpleName = r.getName().replaceAll("\\.(zip|jar)", ".htm");
           for (File f : m_tempDir.listFiles()) {
             if (f.getName().startsWith(simpleName)) {
-              url = f.toURI().toURL();
+              location = f.toURI().toURL().toExternalForm();
               break;
             }
           }
@@ -153,47 +131,58 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
         else {
           File f = new File(m_tempDir, r.getName());
           r.writeData(f);
-          url = f.toURI().toURL();
+          location = f.toURI().toURL().toExternalForm();
         }
       }
       catch (Throwable t) {
         LOG.error("preparing html content for " + r, t);
       }
     }
-    m_currentURL = url;
-    if (m_currentURL != null) {
-      getSwtField().setUrl(m_currentURL.toExternalForm());
+    m_currentLocation = location;
+    if (m_currentLocation != null) {
+      getSwtField().setUrl(m_currentLocation);
     }
     else {
       getSwtField().setText("");
     }
   }
 
-  protected void handleSwtLinkAction(final URL location) {
-    Runnable job = new Runnable() {
-      @Override
-      public void run() {
-        // try {
-
-        getScoutObject().getUIFacade().fireHyperlinkActionFromUI(location);
-        // } catch (MalformedURLException e) {
-        // LOG.warn("could not create an URL out of '"+location.toExternalForm()+"'.",e);
-        // }
-      }
-    };
-    getEnvironment().invokeScoutLater(job, 0);
-  }
-
   @Override
   protected void setEnabledFromScout(boolean b) {
   }
 
-  protected void fireHyperlinkActionFromSwt(final URL url) {
+  protected boolean fireBeforeLocationChangedFromSwt(final String location) {
+    final AtomicReference<Boolean> accept = new AtomicReference<Boolean>();
+    synchronized (accept) {
+      // notify Scout
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          synchronized (accept) {
+            accept.set(getScoutObject().getUIFacade().fireBeforeLocationChangedFromUI(location));
+            accept.notifyAll();
+          }
+        }
+      };
+      getEnvironment().invokeScoutLater(t, 0);
+      // end notify
+      //wait at most 10 seconds
+      try {
+        accept.wait(10000L);
+      }
+      catch (InterruptedException e) {
+        //nop
+      }
+    }
+    return accept.get() != null ? accept.get().booleanValue() : false;
+  }
+
+  protected void fireAfterLocationChangedFromSwt(final String location) {
     // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().fireHyperlinkActionFromUI(url);
+        getScoutObject().getUIFacade().fireAfterLocationChangedFromUI(location);
       }
     };
     getEnvironment().invokeScoutLater(t, 0);

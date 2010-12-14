@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
-import java.net.URL;
-
 public interface IBrowserFieldUIFacade {
 
-  void fireHyperlinkActionFromUI(URL url);
+  /**
+   * return true to accept, false to veto the change
+   */
+  boolean fireBeforeLocationChangedFromUI(String location);
+
+  void fireAfterLocationChangedFromUI(String location);
 
 }

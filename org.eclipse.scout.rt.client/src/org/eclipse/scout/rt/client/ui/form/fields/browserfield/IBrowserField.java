@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
-import java.net.URL;
-
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -32,19 +30,25 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 public interface IBrowserField extends IValueField<RemoteFile> {
 
   String PROP_SCROLLBARS_ENABLED = "scrollBarsEnabled";
-  String PROP_EXTERNAL_URL = "externalUrl";
+  /**
+   * String
+   */
+  String PROP_LOCATION = "location";
 
   boolean isScrollBarEnabled();
 
   IBrowserFieldUIFacade getUIFacade();
 
-  void doHyperlinkAction(URL url) throws ProcessingException;
+  /**
+   * emulate a location change in order to handle it in the model
+   */
+  void doLocationChange(String location) throws ProcessingException;
 
   /**
-   * instead of using direct content, show an external url
+   * instead of using local content, show an external location
    */
-  void setExternalURL(URL url);
+  void setLocation(String url);
 
-  URL getExternalURL();
+  String getLocation();
 
 }
