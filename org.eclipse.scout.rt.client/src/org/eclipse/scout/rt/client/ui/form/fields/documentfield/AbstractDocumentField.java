@@ -85,15 +85,15 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
 
   // main handler
   protected Object fireDocumentFieldEventInternal(DocumentFieldEvent e) throws ProcessingException {
-    Object returnvalue = null;
+    Object returnValue = null;
     ProcessingException exception = null;
     DocumentFieldListener[] listeners = m_listenerList.getListeners(DocumentFieldListener.class);
     if (listeners != null && listeners.length > 0) {
       for (int i = 0; i < listeners.length; i++) {
         try {
           Object tmp = listeners[i].documentFieldChanged(e);
-          if (returnvalue == null) {
-            returnvalue = tmp;
+          if (returnValue == null) {
+            returnValue = tmp;
           }
         }
         catch (ProcessingException t) {
@@ -106,7 +106,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
       throw exception;
     }
 
-    return returnvalue;
+    return returnValue;
   }
 
   @Override
