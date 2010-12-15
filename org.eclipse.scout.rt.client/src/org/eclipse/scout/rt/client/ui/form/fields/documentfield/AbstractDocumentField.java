@@ -114,7 +114,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     if (!isInitialized() || getForm().isFormLoading()) {
       return false;
     }
-    // mark field for saving. there is no event to listen on...
+    // mark field for saving. There is no event to listen on...
     Object ret = fireDocumentFieldEventInternal(new DocumentFieldEvent(AbstractDocumentField.this, DocumentFieldEvent.TYPE_SAVE_NEEDED));
     return TypeCastUtility.castValue(ret, boolean.class);
   }
