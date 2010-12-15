@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -54,7 +54,10 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
     getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
     ButtonEx dateChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH);
+    dateChooserButton.setImage(getEnvironment().getIcon(AbstractIcons.DateFieldDate));
     ButtonEx timeChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH);
+    timeChooserButton.setImage(getEnvironment().getIcon(AbstractIcons.DateFieldTime));
+    timeChooserButton.setVisible(getScoutObject().isHasTime());
     container.setTabList(new Control[]{textField});
 
     // ui key strokes
@@ -98,18 +101,6 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
     return (StyledText) super.getSwtField();
   }
 
-  /*
-   * scout properties
-   */
-  @Override
-  protected void attachScout() {
-    super.attachScout();
-    IDateField f = getScoutObject();
-    setHasTimeFromScout(f.isHasTime());
-    setDateIconIdFromScout(AbstractIcons.DateFieldDate);
-    setTimeIconIdFromScout(AbstractIcons.DateFieldTime);
-  }
-
   @Override
   protected void setFieldEnabled(Control swtField, boolean enabled) {
     if (UiDecorationExtensionPoint.getLookAndFeel().isEnabledAsReadOnly()) {
@@ -140,20 +131,6 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
     m_timeChooserButton.setEnabled(b);
   }
 
-  protected void setHasTimeFromScout(boolean b) {
-    m_hasTime = b;
-    m_timeChooserButton.setVisible(b);
-    getSwtContainer().layout(true);
-  }
-
-  protected void setDateIconIdFromScout(String s) {
-    m_dateChooserButton.setImage(getEnvironment().getIcon(s));
-  }
-
-  protected void setTimeIconIdFromScout(String s) {
-    m_timeChooserButton.setImage(getEnvironment().getIcon(s));
-  }
-
   @Override
   protected boolean handleSwtInputVerifier() {
     final String text = getSwtField().getText();
@@ -166,7 +143,7 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        boolean b = getScoutObject().getUIFacade().setTextFromUI(text);
+        boolean b = getScoutObject().getUIFacade().setDateTimeTextFromUI(text);
         result.setValue(b);
       }
     };
@@ -206,7 +183,7 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().setDateFromUI(newDate, false);
+            getScoutObject().getUIFacade().setDateFromUI(newDate);
           }
         };
 
@@ -231,22 +208,6 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
       }
       getSwtField().setFocus();
     }
-  }
-
-  @Override
-  protected void handleScoutPropertyChange(String name, Object newValue) {
-    super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(IDateField.PROP_HAS_TIME)) {
-      setHasTimeFromScout(((Boolean) newValue).booleanValue());
-    }
-    /*XXX merge date and time into one popup
-    else if (name.equals(IDateField.PROP_DATE_ICON_ID)) {
-      setDateIconIdFromScout((String) newValue);
-    }
-    else if (name.equals(IDateField.PROP_TIME_ICON_ID)) {
-      setTimeIconIdFromScout((String) newValue);
-    }
-    */
   }
 
   private class P_SwtBrowseButtonListener implements Listener {
@@ -323,7 +284,7 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
             public void run() {
               // store current (possibly changed) value
               if (!CompareUtility.equals(newDisplayText, getScoutObject().getDisplayText())) {
-                getScoutObject().getUIFacade().setTextFromUI(newDisplayText);
+                getScoutObject().getUIFacade().setDateTimeTextFromUI(newDisplayText);
               }
               getScoutObject().getUIFacade().fireDateShiftActionFromUI(levelFinal, valueFinal);
             }

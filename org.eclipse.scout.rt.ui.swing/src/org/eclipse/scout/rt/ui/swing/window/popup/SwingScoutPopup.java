@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -54,7 +54,7 @@ public class SwingScoutPopup implements ISwingScoutView {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutPopup.class);
 
   private ISwingEnvironment m_env;
-  private int m_minWidth;
+  private int m_fixedWidth;
   private EventListenerList m_listenerList;
   private P_SwingScoutRootListener m_swingScoutRootListener;
   private Component m_ownerComponent;
@@ -68,15 +68,15 @@ public class SwingScoutPopup implements ISwingScoutView {
   private boolean m_closeFired;
 
   public SwingScoutPopup(ISwingEnvironment env, Component ownerComponent, Rectangle ownerBounds) {
-    this(env, ownerComponent, ownerBounds, env.getFormColumnWidth() / 2);
+    this(env, ownerComponent, ownerBounds, 0);
   }
 
-  public SwingScoutPopup(ISwingEnvironment env, Component ownerComponent, Rectangle ownerBounds, int minWidth) {
+  public SwingScoutPopup(ISwingEnvironment env, Component ownerComponent, Rectangle ownerBounds, int fixedWidth) {
     m_env = env;
     m_ownerComponent = ownerComponent;
     m_ownerBounds = ownerBounds;
     m_listenerList = new EventListenerList();
-    m_minWidth = minWidth;
+    m_fixedWidth = fixedWidth;
     m_positionBelowReferenceField = true;
     //
     Window w = SwingUtilities.getWindowAncestor(m_ownerComponent);
@@ -106,8 +106,15 @@ public class SwingScoutPopup implements ISwingScoutView {
         m_swingWindow.getRootPane().revalidate();
         //
         Dimension d = m_swingWindow.getPreferredSize();
-        d.width = Math.max(d.width, m_minWidth);
-        int minWidth = Math.max(m_minWidth, m_swingWindow.getMinimumSize().width);
+        int minWidth;
+        if (m_fixedWidth > 0) {
+          d.width = m_fixedWidth;
+          minWidth = m_fixedWidth;
+        }
+        else {
+          d.width = Math.max(m_env.getFormColumnWidth() / 2, d.width);
+          minWidth = Math.max(m_env.getFormColumnWidth() / 2, m_swingWindow.getMinimumSize().width);
+        }
         Point p = m_ownerBounds.getLocation();
         Point above = new Point(p.x, p.y - 2);
         Rectangle aboveView = SwingUtility.intersectRectangleWithScreen(new Rectangle(above.x, above.y - d.height, d.width, d.height), false, false);

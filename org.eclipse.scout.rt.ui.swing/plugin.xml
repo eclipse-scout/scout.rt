@@ -36,9 +36,9 @@
            modelClass="org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField"
            name="Date field"
            scope="default">
-        <uiClass
-              class="org.eclipse.scout.rt.ui.swing.form.fields.datefield.SwingScoutDateField">
-        </uiClass>
+        <factory
+              class="org.eclipse.scout.rt.ui.swing.form.fields.datefield.DateFieldFactory">
+        </factory>
      </formField>
      <formField
            active="true"

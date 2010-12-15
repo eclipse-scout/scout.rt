@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.form.fields.timefield.ITimeField;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
@@ -45,6 +46,7 @@ public class SwtScoutTimeField extends SwtScoutValueFieldComposite<ITimeField> i
     getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
     ButtonEx timeChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH);
+    timeChooserButton.setImage(getEnvironment().getIcon(AbstractIcons.DateFieldTime));
     container.setTabList(new Control[]{textField});
 
     // ui key strokes
@@ -75,16 +77,6 @@ public class SwtScoutTimeField extends SwtScoutValueFieldComposite<ITimeField> i
     return (StyledText) super.getSwtField();
   }
 
-  /*
-   * scout properties
-   */
-  @Override
-  protected void attachScout() {
-    super.attachScout();
-    ITimeField f = getScoutObject();
-    setTimeIconIdFromScout(f.getTimeIconId());
-  }
-
   @Override
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
@@ -112,10 +104,6 @@ public class SwtScoutTimeField extends SwtScoutValueFieldComposite<ITimeField> i
     getSwtField().setText(s);
     super.handleSwtFocusGained();
     getSwtField().setCaretOffset(0);
-  }
-
-  protected void setTimeIconIdFromScout(String s) {
-    m_timeChooserButton.setImage(getEnvironment().getIcon(s));
   }
 
   @Override
@@ -170,14 +158,6 @@ public class SwtScoutTimeField extends SwtScoutValueFieldComposite<ITimeField> i
         handleSwtInputVerifier();
       }
       getSwtField().setFocus();
-    }
-  }
-
-  @Override
-  protected void handleScoutPropertyChange(String name, Object newValue) {
-    super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(ITimeField.PROP_TIME_ICON_ID)) {
-      setTimeIconIdFromScout((String) newValue);
     }
   }
 

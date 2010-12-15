@@ -8,12 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.timefield;
+package org.eclipse.scout.rt.ui.swing.ext;
 
-public interface ITimeFieldUIFacade {
+/**
+ *
+ */
+public interface IDropDownButtonListener{
 
-  boolean setTextFromUI(String newText);
+  /**
+   * Fired when icon has been left clicked.
+   */
+  void iconClicked(Object source);
 
-  void setTimeFromUI(Double d);
+  /**
+   * Fired when arrow has been left clicked, or icon has been clicked with right mouse button.
+   */
+  void menuClicked(Object source);
 
 }

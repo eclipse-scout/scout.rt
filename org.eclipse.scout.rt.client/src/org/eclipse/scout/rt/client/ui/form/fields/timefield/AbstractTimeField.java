@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,8 +25,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractTimeField extends AbstractValueField<Double> implements ITimeField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTimeField.class);
@@ -47,19 +48,11 @@ public abstract class AbstractTimeField extends AbstractValueField<Double> imple
     return null;
   }
 
-  @ConfigProperty(ConfigProperty.ICON_ID)
-  @Order(240)
-  @ConfigPropertyValue("AbstractIcons.DateFieldTime")
-  protected String getConfiguredTimeIconId() {
-    return AbstractIcons.DateFieldTime;
-  }
-
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
     super.initConfig();
     setFormat(getConfiguredFormat());
-    setTimeIconId(getConfiguredTimeIconId());
   }
 
   public void setFormat(String s) {
@@ -73,14 +66,6 @@ public abstract class AbstractTimeField extends AbstractValueField<Double> imple
 
   public String getFormat() {
     return m_format;
-  }
-
-  public void setTimeIconId(String s) {
-    propertySupport.setPropertyString(PROP_TIME_ICON_ID, s);
-  }
-
-  public String getTimeIconId() {
-    return propertySupport.getPropertyString(PROP_TIME_ICON_ID);
   }
 
   public Double getTimeValue() {
@@ -205,6 +190,15 @@ public abstract class AbstractTimeField extends AbstractValueField<Double> imple
   }
 
   private class P_UIFacade implements ITimeFieldUIFacade {
+
+    public void setTimeFromUI(Double d) {
+      try {
+        setValue(d);
+      }
+      catch (Throwable t) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      }
+    }
 
     public boolean setTextFromUI(String newText) {
       if (newText != null && newText.length() == 0) newText = null;

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,9 +20,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.Icon;
 import javax.swing.InputMap;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -30,7 +28,6 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -38,7 +35,6 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
@@ -47,20 +43,17 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
-import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
-import org.eclipse.scout.rt.ui.swing.ext.JButtonEx;
-import org.eclipse.scout.rt.ui.swing.ext.JDropDownButton;
+import org.eclipse.scout.rt.ui.swing.ext.IDropDownButtonListener;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
-import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
+import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithDropDownButton;
 import org.eclipse.scout.rt.ui.swing.ext.JTreeEx;
-import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutDropDownPopup;
 import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
@@ -73,7 +66,6 @@ import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
 public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartField<?>> implements ISwingScoutSmartField {
   private static final long serialVersionUID = 1L;
 
-  private JDropDownButton m_dropDownButton;
   // proposal support
   private SwingScoutDropDownPopup m_proposalPopup;
   private P_PendingProposalJob m_pendingProposalJob;
@@ -140,33 +132,19 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
    * May add additional components to the container.
    */
   protected JTextComponent createTextField(JComponent container) {
-    JTextFieldEx textField = new JTextFieldEx();
+    JTextFieldWithDropDownButton textField = new JTextFieldWithDropDownButton(getSwingEnvironment());
     container.add(textField);
-    //
-    JButtonEx pushButton = new JButtonEx();
-    m_dropDownButton = new JDropDownButton(pushButton);
-    m_dropDownButton.getPushButton().setContentAreaFilled(false);
-    m_dropDownButton.getMenuButton().setContentAreaFilled(false);
-    JButton menuButton = m_dropDownButton.getMenuButton();
-    m_dropDownButton.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, LogicalGridDataBuilder.createButton1(getSwingEnvironment()));
-    pushButton.setRequestFocusEnabled(false);
-    pushButton.setFocusable(false);
-    pushButton.setHorizontalAlignment(SwingConstants.CENTER);
-    pushButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
+    textField.addDropDownButtonListener(new IDropDownButtonListener() {
+      @Override
+      public void iconClicked(Object source) {
         getSwingTextField().requestFocus();
         handleSwingSmartChooserAction(0);
       }
-    });
-    menuButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        handleSwingPopup((JComponent) e.getSource());
+
+      public void menuClicked(Object source) {
+        handleSwingPopup((JComponent) source);
       }
     });
-    SwingLayoutUtility.setIconButtonWithPopupSizes(getSwingEnvironment(), m_dropDownButton);
-    container.add(m_dropDownButton);
-    //
     return textField;
   }
 
@@ -179,8 +157,10 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     super.attachScout();
     ISmartField f = getScoutObject();
     setIconIdFromScout(f.getIconId());
-    if (m_dropDownButton != null) m_dropDownButton.getMenuButton().setEnabled(f.hasMenus());
     setProposalFormFromScout(f.getProposalForm());
+    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
+      ((JTextFieldWithDropDownButton) getSwingField()).setMenuEnabled(getScoutObject().hasMenus());
+    }
   }
 
   @Override
@@ -200,7 +180,6 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
   @Override
   protected void setDisplayTextFromScout(String s) {
     JTextComponent swingField = getSwingTextField();
-    String oldText = swingField.getText();
     swingField.setText(s);
     // ticket 77424
     if (swingField.hasFocus() && swingField.getDocument().getLength() > 0) {
@@ -210,26 +189,19 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     else {
       swingField.setCaretPosition(0);
     }
-    // disarm browse button in case text was changed
-    if (m_dropDownButton != null) {
-      if (!CompareUtility.equals(oldText, s)) {
-        m_dropDownButton.getPushButton().getModel().setArmed(false);
-      }
-    }
   }
 
   @Override
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
-    if (m_dropDownButton != null) {
-      m_dropDownButton.setEnabled(b);
+    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
+      ((JTextFieldWithDropDownButton) getSwingField()).setDropDownButtonEnabled(b);
     }
   }
 
-  protected void setIconIdFromScout(String s) {
-    if (m_dropDownButton != null) {
-      Icon browseIcon = getSwingEnvironment().getIcon(s);
-      m_dropDownButton.getPushButton().setIcon(browseIcon);
+  protected void setIconIdFromScout(String iconId) {
+    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
+      ((JTextFieldWithDropDownButton) getSwingField()).setIconGroup(new IconGroup(getSwingEnvironment(), iconId));
     }
   }
 
@@ -455,12 +427,6 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
       m_pendingProposalJob = null;
     }
     final String text = getSwingTextField().getText();
-    // only handle if text has changed
-    if (m_dropDownButton != null) {
-      if (CompareUtility.notEquals(text, getScoutObject().getDisplayText())) {
-        m_dropDownButton.getPushButton().getModel().setArmed(false);
-      }
-    }
     final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, true);
     //
     // notify Scout
@@ -505,8 +471,8 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
   }
 
   protected boolean isSmartChooserEnabled() {
-    if (m_dropDownButton != null) {
-      return (m_dropDownButton.getPushButton().isVisible() && m_dropDownButton.getPushButton().isEnabled());
+    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
+      return (((JTextFieldWithDropDownButton) getSwingField()).isDropDownButtonEnabled());
     }
     return false;
   }
@@ -524,8 +490,19 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
         @Override
         public void run() {
           IMenu[] scoutMenus = getScoutObject().getUIFacade().firePopupFromUI();
+          // <bsh 2010-10-08>
+          // The default implemention positions the popup menu on the left side of the
+          // "target" component. This is no longer correct in Rayo. So we use the target's
+          // width and substract a certain amount.
+          int x = 0;
+          if (target instanceof JTextFieldWithDropDownButton) {
+            JTextFieldWithDropDownButton tf = (JTextFieldWithDropDownButton) target;
+            x = tf.getWidth() - tf.getMargin().right;
+          }
+          Point point = new Point(x, target.getHeight());
+          // </bsh>
           // call swing menu
-          new SwingPopupWorker(getSwingEnvironment(), target, new Point(0, target.getHeight()), scoutMenus).enqueue();
+          new SwingPopupWorker(getSwingEnvironment(), target, point, scoutMenus).enqueue();
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 5678);

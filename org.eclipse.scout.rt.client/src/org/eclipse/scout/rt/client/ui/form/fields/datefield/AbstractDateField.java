@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -55,16 +54,16 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(240)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredHasDate() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(241)
   @ConfigPropertyValue("false")
   protected boolean getConfiguredHasTime() {
     return false;
-  }
-
-  @ConfigProperty(ConfigProperty.ICON_ID)
-  @Order(260)
-  @ConfigPropertyValue("null")
-  protected String getConfiguredDateIconId() {
-    return null;
   }
 
   /**
@@ -81,9 +80,9 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
    * Depending whether subclass overrides this method
    * <p>
    * Default is as follows<br>
-   * Level 0: shift day up/down<br>
-   * Level 1: shift month up/down<br>
-   * Level 2: shift year up/down
+   * Level 0: shift day up/down [UP, DOWN]<br>
+   * Level 1: shift month up/down [shift-UP,shift-DOWN]<br>
+   * Level 2: shift year up/down [ctrl-UP,ctrl-DOWN]
    * <p>
    * see {@link #adjustDate(int, int, int)}
    */
@@ -104,17 +103,40 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
   }
 
+  /**
+   * Depending whether subclass overrides this method
+   * <p>
+   * Default is as follows<br>
+   * Level 0: shift minute up/down [UP, DOWN]<br>
+   * Level 1: shift hour up/down [shift-UP, shift-DOWN]<br>
+   * Level 2: nop [ctrl-UP, ctrl-DOWN]<br>
+   * <p>
+   * see {@link #adjustDate(int, int, int)}
+   */
+  protected void execShiftTime(int level, int value) throws ProcessingException {
+    switch (level) {
+      case 0: {
+        adjustTime(value, 0, 0);
+        break;
+      }
+      case 1: {
+        adjustTime(0, value, 0);
+        break;
+      }
+      case 2: {
+        adjustTime(0, 0, value);
+        break;
+      }
+    }
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
     super.initConfig();
     setFormat(getConfiguredFormat());
+    setHasDate(getConfiguredHasDate());
     setHasTime(getConfiguredHasTime());
-    String iconId = getConfiguredDateIconId();
-    if (iconId == null) {
-      iconId = getConfiguredHasTime() ? AbstractIcons.DateFieldTime : AbstractIcons.DateFieldDate;
-    }
-    setDateIconId(iconId);
     setAutoTimeMillis(getConfiguredAutoTimeMillis());
   }
 
@@ -131,6 +153,10 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     return m_format;
   }
 
+  public boolean isHasTime() {
+    return propertySupport.getPropertyBool(PROP_HAS_TIME);
+  }
+
   public void setHasTime(boolean b) {
     propertySupport.setPropertyBool(PROP_HAS_TIME, b);
     if (isInitialized()) {
@@ -138,16 +164,15 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
   }
 
-  public boolean isHasTime() {
-    return propertySupport.getPropertyBool(PROP_HAS_TIME);
+  public boolean isHasDate() {
+    return propertySupport.getPropertyBool(PROP_HAS_DATE);
   }
 
-  public void setDateIconId(String s) {
-    propertySupport.setPropertyString(PROP_DATE_ICON_ID, s);
-  }
-
-  public String getDateIconId() {
-    return propertySupport.getPropertyString(PROP_DATE_ICON_ID);
+  public void setHasDate(boolean b) {
+    propertySupport.setPropertyBool(PROP_HAS_DATE, b);
+    if (isInitialized()) {
+      setValue(getValue());
+    }
   }
 
   public void setAutoTimeMillis(long l) {
@@ -174,6 +199,22 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       cal.add(Calendar.DATE, days);
       cal.add(Calendar.MONTH, months);
       cal.add(Calendar.YEAR, years);
+      d = cal.getTime();
+    }
+    setValue(d);
+  }
+
+  public void adjustTime(int minutes, int hours, int reserved) {
+    Date d = getValue();
+    if (d == null) {
+      d = new Date();
+      d = applyAutoTime(d);
+    }
+    else {
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(d);
+      cal.add(Calendar.MINUTE, minutes);
+      cal.add(Calendar.HOUR_OF_DAY, hours);
       d = cal.getTime();
     }
     setValue(d);
@@ -206,72 +247,71 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   protected Date parseValueInternal(String text) throws ProcessingException {
     Date retVal = null;
     if (text != null && text.trim().length() == 0) text = null;
-
-    if (text != null) {
-      Matcher verboseDeltaMatcher = Pattern.compile("([+-])([0-9]+)").matcher(text);
-      if (verboseDeltaMatcher.matches()) {
-        int i = Integer.parseInt(verboseDeltaMatcher.group(2));
-        if (verboseDeltaMatcher.group(1).equals("-")) {
-          i = -i;
-        }
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.DATE, i);
-        retVal = cal.getTime();
+    if (text == null) {
+      return retVal;
+    }
+    Matcher verboseDeltaMatcher = Pattern.compile("([+-])([0-9]+)").matcher(text);
+    if (verboseDeltaMatcher.matches()) {
+      int i = Integer.parseInt(verboseDeltaMatcher.group(2));
+      if (verboseDeltaMatcher.group(1).equals("-")) {
+        i = -i;
       }
-      else {
-        List<DateFormat> dfList = createDateFormatsForParsing(text);
-        ParseException pe = null;
-        boolean includesTime = true;
-        for (DateFormat df : dfList) {
-          try {
-            df.setLenient(false);
-            retVal = df.parse(text);
-            if (retVal != null) {
-              if (df instanceof SimpleDateFormat) {
-                String pattern = ((SimpleDateFormat) df).toPattern();
-                includesTime = pattern.matches(".*[hHM].*");
-              }
-              else {
-                includesTime = true;
-              }
-              break;
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(new Date());
+      cal.add(Calendar.DATE, i);
+      retVal = cal.getTime();
+    }
+    else {
+      List<DateFormat> dfList = createDateFormatsForParsing(text);
+      ParseException pe = null;
+      boolean includesTime = true;
+      for (DateFormat df : dfList) {
+        try {
+          df.setLenient(false);
+          retVal = df.parse(text);
+          if (retVal != null) {
+            if (df instanceof SimpleDateFormat) {
+              String pattern = ((SimpleDateFormat) df).toPattern();
+              includesTime = pattern.matches(".*[hHM].*");
             }
-          }
-          catch (ParseException e) {
-            if (pe == null) pe = e;
+            else {
+              includesTime = true;
+            }
+            break;
           }
         }
-        if (retVal == null) {
-          throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), pe);
-        }
-        // range check -2000 ... +9000
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(retVal);
-        if (cal.get(Calendar.YEAR) < -2000) cal.set(Calendar.YEAR, -2000);
-        if (cal.get(Calendar.YEAR) > 9000) cal.set(Calendar.YEAR, 9000);
-        retVal = cal.getTime();
-        if (!includesTime) {
-          retVal = applyAutoTime(retVal);
+        catch (ParseException e) {
+          if (pe == null) pe = e;
         }
       }
-      // truncate value
-      DateFormat df = getDateFormat();
-      try {
-        //re-set the year, since it might have been truncated to previous century, ticket 87172
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(retVal);
-        int year = cal.get(Calendar.YEAR);
-        retVal = df.parse(df.format(retVal));
-        cal.setTime(retVal);
-        cal.set(Calendar.YEAR, year);
-        retVal = cal.getTime();
+      if (retVal == null) {
+        throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), pe);
       }
-      catch (ParseException e) {
-        throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), e);
+      // range check -2000 ... +9000
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(retVal);
+      if (cal.get(Calendar.YEAR) < -2000) cal.set(Calendar.YEAR, -2000);
+      if (cal.get(Calendar.YEAR) > 9000) cal.set(Calendar.YEAR, 9000);
+      retVal = cal.getTime();
+      if (!includesTime) {
+        retVal = applyAutoTime(retVal);
       }
     }
-
+    // truncate value
+    DateFormat df = getDateFormat();
+    try {
+      //re-set the year, since it might have been truncated to previous century, ticket 87172
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(retVal);
+      int year = cal.get(Calendar.YEAR);
+      retVal = df.parse(df.format(retVal));
+      cal.setTime(retVal);
+      cal.set(Calendar.YEAR, year);
+      retVal = cal.getTime();
+    }
+    catch (ParseException e) {
+      throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), e);
+    }
     return retVal;
   }
 
@@ -318,7 +358,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     return d;
   }
 
-  private DateFormat getDateFormat() {
+  public DateFormat getDateFormat() {
     DateFormat df = null;
     if (getFormat() != null) {
       df = new SimpleDateFormat(getFormat());
@@ -333,6 +373,40 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       df.setLenient(true);
     }
     return df;
+  }
+
+  public DateFormat getIsolatedDateFormat() {
+    DateFormat f = getDateFormat();
+    if (f instanceof SimpleDateFormat) {
+      String pat = ((SimpleDateFormat) f).toPattern();
+      int h = pat.toLowerCase().indexOf('h');
+      if (h >= 0) {
+        try {
+          return new SimpleDateFormat(pat.substring(0, h).trim());
+        }
+        catch (Throwable t) {
+          LOG.error("could not isolate date pattern from '" + pat + "'", t);
+        }
+      }
+    }
+    return f;
+  }
+
+  public DateFormat getIsolatedTimeFormat() {
+    DateFormat f = getDateFormat();
+    if (f instanceof SimpleDateFormat) {
+      String pat = ((SimpleDateFormat) f).toPattern();
+      int h = pat.toLowerCase().indexOf('h');
+      if (h >= 0) {
+        try {
+          return new SimpleDateFormat(pat.substring(h).trim());
+        }
+        catch (Throwable t) {
+          LOG.error("could not isolate time pattern from '" + pat + "'", t);
+        }
+      }
+    }
+    return null;
   }
 
   protected List<DateFormat> createDateFormatsForParsing(String text) {
@@ -423,15 +497,58 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
 
   private class P_UIFacade implements IDateFieldUIFacade {
 
-    public boolean setTextFromUI(String newText) {
-      if (newText != null && newText.length() == 0) newText = null;
+    public boolean setDateTextFromUI(String newDate) {
+      if (!isHasDate()) {
+        //nop
+        return false;
+      }
+      if (newDate != null && newDate.length() == 0) {
+        newDate = null;
+      }
+      // parse always, validity might change even if text is same
+      Date currentValue = getValue();
+      if (newDate == null) {
+        return parseValue(null);
+      }
+      if (!isHasTime()) {
+        return parseValue(newDate);
+      }
+      //add existing time
+      String currentTime = getIsolatedTimeFormat().format(currentValue != null ? currentValue : new Date());
+      return parseValue(newDate + " " + currentTime);
+    }
+
+    public boolean setTimeTextFromUI(String newTime) {
+      if (!isHasTime()) {
+        //nop
+        return false;
+      }
+      if (newTime != null && newTime.length() == 0) {
+        newTime = null;
+      }
+      // parse always, validity might change even if text is same
+      Date currentValue = getValue();
+      if (newTime == null && (currentValue == null || !isHasDate())) {
+        return parseValue(null);
+      }
+      String currentDate = getIsolatedDateFormat().format(currentValue != null ? currentValue : new Date());
+      if (newTime == null) {
+        newTime = getIsolatedTimeFormat().format(currentValue != null ? currentValue : new Date());
+      }
+      return parseValue(currentDate + " " + newTime);
+    }
+
+    public boolean setDateTimeTextFromUI(String newText) {
+      if (newText != null && newText.length() == 0) {
+        newText = null;
+      }
       // parse always, validity might change even if text is same
       return parseValue(newText);
     }
 
-    public void setDateFromUI(Date d, boolean includesTime) {
+    public void setDateFromUI(Date d) {
       try {
-        if (d != null && !includesTime) {
+        if (d != null) {
           // preserve time
           Date oldDate = getValue();
           if (oldDate != null) {
@@ -457,9 +574,56 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
 
+    public void setTimeFromUI(Date d) {
+      try {
+        Date oldDate = getValue();
+        if (d != null) {
+          // preserve date
+          if (oldDate != null) {
+            Calendar calOld = Calendar.getInstance();
+            calOld.setTime(oldDate);
+            Calendar calNew = Calendar.getInstance();
+            calNew.setTime(d);
+            calNew.set(Calendar.YEAR, calOld.get(Calendar.YEAR));
+            calNew.set(Calendar.MONTH, calOld.get(Calendar.MONTH));
+            calNew.set(Calendar.DATE, calOld.get(Calendar.DATE));
+            d = calNew.getTime();
+          }
+        }
+        else if (isHasDate() && oldDate != null) {
+          d = applyAutoTime(oldDate);
+        }
+        setValue(d);
+      }
+      catch (Throwable t) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      }
+    }
+
+    public void setDateTimeFromUI(Date d) {
+      try {
+        setValue(d);
+      }
+      catch (Throwable t) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      }
+    }
+
     public void fireDateShiftActionFromUI(int level, int value) {
       try {
         execShiftDate(level, value);
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+      catch (Throwable t) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      }
+    }
+
+    public void fireTimeShiftActionFromUI(int level, int value) {
+      try {
+        execShiftTime(level, value);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);

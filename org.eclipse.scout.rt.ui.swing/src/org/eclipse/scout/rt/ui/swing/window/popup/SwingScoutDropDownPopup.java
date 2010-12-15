@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -49,6 +49,11 @@ public class SwingScoutDropDownPopup extends SwingScoutPopup {
 
   public SwingScoutDropDownPopup(ISwingEnvironment env, Component ownerComponent, Component focusComponent) {
     super(env, ownerComponent, new Rectangle(ownerComponent.getLocationOnScreen(), ownerComponent.getSize()));
+    m_focusComponent = focusComponent;
+  }
+
+  public SwingScoutDropDownPopup(ISwingEnvironment env, Component ownerComponent, Component focusComponent, int fixedWidth) {
+    super(env, ownerComponent, new Rectangle(ownerComponent.getLocationOnScreen(), ownerComponent.getSize()), fixedWidth);
     m_focusComponent = focusComponent;
   }
 

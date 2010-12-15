@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -229,8 +230,22 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   @SuppressWarnings("unchecked")
   public T getValue() {
-    if (isValueValidating()) {
+    if (isValueValidating() && ClientSyncJob.isSyncClientJob()) {
       throw new IllegalStateException("The value of " + getClass().getSimpleName() + " can not be accessed while the value is beeing validated");
+    }
+    else {
+      //caller from outside thread (ui)
+      //wait at most 10 seconds
+      int i = 0;
+      while (isValueValidating() && i < 100) {
+        try {
+          Thread.sleep(100);
+        }
+        catch (InterruptedException e) {
+          //nop
+        }
+        i++;
+      }
     }
     return (T) propertySupport.getProperty(PROP_VALUE);
   }

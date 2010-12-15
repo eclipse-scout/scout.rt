@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -17,8 +18,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 public interface IDateField extends IValueField<Date> {
   long MILLIS_PER_DAY = 1000L * 3600L * 24L;
 
+  String PROP_HAS_DATE = "hasDate";
   String PROP_HAS_TIME = "hasTime";
-  String PROP_DATE_ICON_ID = "dateIconId";
 
   IDateFieldUIFacade getUIFacade();
 
@@ -26,13 +27,28 @@ public interface IDateField extends IValueField<Date> {
 
   String getFormat();
 
-  void setHasTime(boolean b);
+  /**
+   * @return the date-time format created using {@link #getFormat()} that contains the date and time part
+   */
+  DateFormat getDateFormat();
+
+  /**
+   * @return the date format created using {@link #getFormat()} that only contains the date part
+   */
+  DateFormat getIsolatedDateFormat();
+
+  /**
+   * @return the time format created using {@link #getFormat()} that only contains the time part
+   */
+  DateFormat getIsolatedTimeFormat();
+
+  boolean isHasDate();
+
+  void setHasDate(boolean b);
 
   boolean isHasTime();
 
-  void setDateIconId(String s);
-
-  String getDateIconId();
+  void setHasTime(boolean b);
 
   void setAutoTimeMillis(long l);
 
@@ -43,4 +59,6 @@ public interface IDateField extends IValueField<Date> {
   Double getTimeValue();
 
   void adjustDate(int days, int months, int years);
+
+  void adjustTime(int days, int months, int years);
 }

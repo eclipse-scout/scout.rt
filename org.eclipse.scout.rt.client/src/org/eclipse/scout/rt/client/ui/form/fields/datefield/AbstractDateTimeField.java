@@ -10,30 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
-import java.util.Date;
+import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
-public interface IDateFieldUIFacade {
+/**
+ * convenience subclass of {@link AbstractDateField} with hasTime=true
+ */
+public abstract class AbstractDateTimeField extends AbstractDateField {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDateTimeField.class);
 
-  boolean setDateTimeTextFromUI(String newText);
+  public AbstractDateTimeField() {
+  }
 
-  boolean setDateTextFromUI(String newText);
-
-  boolean setTimeTextFromUI(String newText);
-
-  void setDateTimeFromUI(Date d);
-
-  void setDateFromUI(Date d);
-
-  void setTimeFromUI(Date d);
-
-  /**
-   * see {@link AbstractDateField#execShiftDate(int, int)}
-   */
-  void fireDateShiftActionFromUI(int level, int value);
-
-  /**
-   * see {@link AbstractDateField#execShiftTime(int, int)}
-   */
-  void fireTimeShiftActionFromUI(int level, int value);
-
+  @ConfigPropertyValue("true")
+  @Override
+  protected boolean getConfiguredHasTime() {
+    return true;
+  }
 }
