@@ -15,5 +15,5 @@ import java.util.EventListener;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 public interface DocumentFieldListener extends EventListener {
-  void documentFieldChanged(DocumentFieldEvent e) throws ProcessingException;
+  Object documentFieldChanged(DocumentFieldEvent e) throws ProcessingException;
 }

@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -83,18 +84,39 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
   }
 
   // main handler
-  protected void fireDocumentFieldEventInternal(DocumentFieldEvent e) {
+  protected Object fireDocumentFieldEventInternal(DocumentFieldEvent e) throws ProcessingException {
+    Object returnvalue = null;
+    ProcessingException exception = null;
     DocumentFieldListener[] listeners = m_listenerList.getListeners(DocumentFieldListener.class);
     if (listeners != null && listeners.length > 0) {
       for (int i = 0; i < listeners.length; i++) {
         try {
-          listeners[i].documentFieldChanged(e);
+          Object tmp = listeners[i].documentFieldChanged(e);
+          if (returnvalue == null) {
+            returnvalue = tmp;
+          }
         }
-        catch (Throwable t) {
-          LOG.error("fire " + e, t);
+        catch (ProcessingException t) {
+          exception = t;
         }
       }
     }
+
+    if (exception != null) {
+      throw exception;
+    }
+
+    return returnvalue;
+  }
+
+  @Override
+  protected boolean execIsSaveNeeded() throws ProcessingException {
+    if (!isInitialized() || getForm().isFormLoading()) {
+      return false;
+    }
+    // mark field for saving. there is no event to listen on...
+    Object ret = fireDocumentFieldEventInternal(new DocumentFieldEvent(AbstractDocumentField.this, DocumentFieldEvent.TYPE_SAVE_NEEDED));
+    return TypeCastUtility.castValue(ret, boolean.class);
   }
 
   public RemoteFile saveAs(String name, String formatType, long timeout) throws ProcessingException {
@@ -136,7 +158,12 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
   }
 
   public void autoResizeDocument() {
-    fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_AUTORESIZE_DOCUMENT));
+    try {
+      fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_AUTORESIZE_DOCUMENT));
+    }
+    catch (ProcessingException e) {
+      LOG.warn("Could not auto resize document", e);
+    }
   }
 
   protected IDocumentFieldUIFacade createUIFacade() {

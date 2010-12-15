@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -1255,6 +1255,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     m_closeType = IButton.SYSTEM_TYPE_CANCEL;
     try {
+      // ensure all fields have the right save-needed-state
+      checkSaveNeeded();
       // find any fields that needs save
       P_AbstractCollectingFieldVisitor<IFormField> collector = new P_AbstractCollectingFieldVisitor<IFormField>() {
         public boolean visitField(IFormField field, int level, int fieldIndex) {
@@ -1346,6 +1348,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     try {
       m_closeType = IButton.SYSTEM_TYPE_NONE;
+      checkSaveNeeded();
       validateForm();
       m_closeType = IButton.SYSTEM_TYPE_OK;
       if (isSaveNeeded()) {
@@ -1367,6 +1370,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     try {
       m_closeType = IButton.SYSTEM_TYPE_NONE;
+      // ensure all fields have the right save-needed-state
+      checkSaveNeeded();
       validateForm();
       m_closeType = IButton.SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE;
       storeStateInternal();
@@ -1384,6 +1389,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     try {
       m_closeType = IButton.SYSTEM_TYPE_NONE;
+      // ensure all fields have the right save-needed-state
+      checkSaveNeeded();
       validateForm();
       m_closeType = IButton.SYSTEM_TYPE_SAVE;
       if (isSaveNeeded()) {
@@ -1450,6 +1457,19 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     };
     visitFields(v);
     return v.getCollection();
+  }
+
+  public final void checkSaveNeeded() {
+    // call checkSaveNeeded on all fields
+    P_AbstractCollectingFieldVisitor<IFormField> v = new P_AbstractCollectingFieldVisitor<IFormField>() {
+      public boolean visitField(IFormField f, int level, int fieldIndex) {
+        if (f instanceof IFormField) {
+          ((IFormField) f).checkSaveNeeded();
+        }
+        return true;
+      }
+    };
+    visitFields(v);
   }
 
   private boolean/* ok */checkForVerifyingFields() {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -351,6 +351,12 @@ public interface IForm extends IPropertyObserver {
    * Determine whether a save is needed for the form.
    */
   boolean isSaveNeeded();
+
+  /**
+   * this method calls execCheckSaveNeeded on every field<br>
+   * to ensure that {@link #isSaveNeeded()} returns the correct value
+   */
+  void checkSaveNeeded();
 
   /**
    * Mark the form as saved so that a save is no longer needed.

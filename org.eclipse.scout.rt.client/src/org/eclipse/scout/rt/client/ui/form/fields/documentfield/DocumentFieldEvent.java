@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 
 import java.util.EventObject;
 
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -21,6 +22,7 @@ public class DocumentFieldEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
   public static final int TYPE_SAVE_AS = 10;
+  public static final int TYPE_SAVE_NEEDED = 12;
 
   public static final int TYPE_AUTORESIZE_DOCUMENT = 20;
 
@@ -53,7 +55,7 @@ public class DocumentFieldEvent extends EventObject {
 
   public String getDataString() {
     try {
-      return (String) m_data;
+      return TypeCastUtility.castValue(m_data, String.class);
     }
     catch (ClassCastException e) {
       LOG.error("Could not cast data to String");
@@ -61,19 +63,19 @@ public class DocumentFieldEvent extends EventObject {
     return null;
   }
 
-  public Boolean getDataBool() {
+  public boolean getDataBool() {
     try {
-      return (Boolean) m_data;
+      return TypeCastUtility.castValue(m_data, boolean.class);
     }
     catch (ClassCastException e) {
       LOG.error("Could not cast data to Boolean");
     }
-    return null;
+    return false;
   }
 
   public Long getDataLong() {
     try {
-      return (Long) m_data;
+      return TypeCastUtility.castValue(m_data, Long.class);
     }
     catch (ClassCastException e) {
       LOG.error("Could not cast data to Long");
@@ -83,7 +85,7 @@ public class DocumentFieldEvent extends EventObject {
 
   public Integer getDataInt() {
     try {
-      return (Integer) m_data;
+      return TypeCastUtility.castValue(m_data, Integer.class);
     }
     catch (ClassCastException e) {
       LOG.error("Could not cast data to Integer");

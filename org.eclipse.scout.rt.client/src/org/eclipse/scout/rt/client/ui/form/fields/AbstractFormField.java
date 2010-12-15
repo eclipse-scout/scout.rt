@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -963,16 +963,20 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     setVisibleGranted(b);
   }
 
+  /**
+   * for thread-safety-reason this method is final
+   */
   public final boolean isSaveNeeded() {
     return propertySupport.getPropertyBool(PROP_SAVE_NEEDED);
   }
 
   /**
-   * Default implementation just calls {@link #execIsSaveNeeded()}
+   * Default implementation just calls {@link #execIsSaveNeeded()}<br>
+   * For thread-safety-reason this method is final
    * 
    * @throws ProcessingException
    */
-  protected final void checkSaveNeeded() {
+  public final void checkSaveNeeded() {
     if (isInitialized()) {
       try {
         propertySupport.setPropertyBool(PROP_SAVE_NEEDED, m_touched || execIsSaveNeeded());
