@@ -7,12 +7,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 /**
- * see {@link AbstractDocuentField}
+ * see {@link AbstractDocumentField}
  */
 public interface IDocumentField extends IValueField<RemoteFile> {
 
   String PROP_RULERS_VISIBLE = "rulerVisible";
   String PROP_STATUS_BAR_VISIBLE = "statusBarVisible";
+  String PROP_COM_READY = "comReady";
 
   void addDocumentFieldListener(DocumentFieldListener listener);
 
@@ -26,10 +27,7 @@ public interface IDocumentField extends IValueField<RemoteFile> {
 
   void setStatusBarVisible(boolean b);
 
-  /**
-   * insert text at current location
-   */
-  void insertText(String text);
+  boolean isComReady();
 
   /**
    * save the document content and updates the new value (RemoteFile) of this document field
@@ -50,8 +48,5 @@ public interface IDocumentField extends IValueField<RemoteFile> {
 
   void autoResizeDocument();
 
-  void toggleRibbons();
-
   IDocumentFieldUIFacade getUIFacade();
-
 }

@@ -10,39 +10,33 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 
-import java.io.File;
 import java.util.EventObject;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+
 public class DocumentFieldEvent extends EventObject {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DocumentFieldEvent.class);
+
   private static final long serialVersionUID = 1L;
 
   public static final int TYPE_SAVE_AS = 10;
 
-  public static final int TYPE_INSERT_TEXT = 11;
-
-  public static final int TYPE_TOGGLE_RIBBONS = 20;
-
-  public static final int TYPE_AUTORESIZE_DOCUMENT = 30;
+  public static final int TYPE_AUTORESIZE_DOCUMENT = 20;
 
   private final int m_type;
-  private String m_text;
-  private File m_saveAsFile;
-  private String m_saveAsType;
+  private final Object m_data;
 
   public DocumentFieldEvent(IDocumentField source, int type) {
     super(source);
     m_type = type;
+    m_data = null;
   }
 
-  public DocumentFieldEvent(IDocumentField source, int type, String text) {
-    this(source, type);
-    m_text = text;
-  }
-
-  public DocumentFieldEvent(IDocumentField source, int type, File saveAsFile, String saveAsType) {
-    this(source, type);
-    m_saveAsFile = saveAsFile;
-    m_saveAsType = saveAsType;
+  public DocumentFieldEvent(IDocumentField source, int type, Object data) {
+    super(source);
+    m_type = type;
+    m_data = data;
   }
 
   public IDocumentField getDocumentField() {
@@ -53,19 +47,47 @@ public class DocumentFieldEvent extends EventObject {
     return m_type;
   }
 
-  public String getText() {
-    return m_text;
+  public Object getData() {
+    return m_data;
   }
 
-  public File getSaveAsFile() {
-    return m_saveAsFile;
+  public String getDataString() {
+    try {
+      return (String) m_data;
+    }
+    catch (ClassCastException e) {
+      LOG.error("Could not cast data to String");
+    }
+    return null;
   }
 
-  /**
-   * @return the file extension to write (html, doc, odf, ...)
-   */
-  public String getSaveAsType() {
-    return m_saveAsType;
+  public Boolean getDataBool() {
+    try {
+      return (Boolean) m_data;
+    }
+    catch (ClassCastException e) {
+      LOG.error("Could not cast data to Boolean");
+    }
+    return null;
   }
 
+  public Long getDataLong() {
+    try {
+      return (Long) m_data;
+    }
+    catch (ClassCastException e) {
+      LOG.error("Could not cast data to Long");
+    }
+    return null;
+  }
+
+  public Integer getDataInt() {
+    try {
+      return (Integer) m_data;
+    }
+    catch (ClassCastException e) {
+      LOG.error("Could not cast data to Integer");
+    }
+    return null;
+  }
 }

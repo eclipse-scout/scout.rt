@@ -10,7 +10,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.documentfield.eventdata.DocumentFile;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * The document field is an editor field that presents a document for editing.
@@ -38,7 +41,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
 
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = createUIFacade();
     super.initConfig();
     setRulersVisible(getConfiguredRulersVisible());
     setStatusBarVisible(getConfiguredStatusBarVisible());
@@ -72,6 +75,13 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     m_listenerList.remove(DocumentFieldListener.class, listener);
   }
 
+  public boolean isComReady() {
+    return propertySupport.getPropertyBool(PROP_COM_READY);
+  }
+
+  protected void execComReadyStatusChanged(boolean ready) throws ProcessingException {
+  }
+
   // main handler
   protected void fireDocumentFieldEventInternal(DocumentFieldEvent e) {
     DocumentFieldListener[] listeners = m_listenerList.getListeners(DocumentFieldListener.class);
@@ -98,22 +108,22 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     }
     String simpleName = name.substring(0, name.lastIndexOf('.'));
     File dir = IOUtility.createTempDirectory("doc");
-    File f = new File(dir, simpleName + "." + formatType);
-    fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_SAVE_AS, f, formatType));
+    File file = new File(dir, simpleName + "." + formatType);
+    fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_SAVE_AS, new DocumentFile(file, formatType)));
     try {
       long steps = timeout / 100;
-      for (long i = 0; i < steps && !f.exists(); i++) {
+      for (long i = 0; i < steps && !file.exists(); i++) {
         Thread.sleep(100L);
       }
-      if (!f.exists()) {
+      if (!file.exists()) {
         throw new ProcessingException("Timeout waiting for document creation");
       }
       if (dir.listFiles().length == 1) {
-        RemoteFile r = new RemoteFile(f.getName(), f.lastModified());
-        r.readData(f);
+        RemoteFile r = new RemoteFile(file.getName(), file.lastModified());
+        r.readData(file);
         return r;
       }
-      RemoteFile r = new RemoteFile(simpleName + ".zip", f.lastModified());
+      RemoteFile r = new RemoteFile(simpleName + ".zip", file.lastModified());
       r.readZipContentFromDirectory(dir);
       return r;
     }
@@ -125,18 +135,28 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     }
   }
 
-  public void insertText(String text) {
-    fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_INSERT_TEXT, text));
-  }
-
-  public void toggleRibbons() {
-    fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_TOGGLE_RIBBONS));
-  }
-
   public void autoResizeDocument() {
     fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_AUTORESIZE_DOCUMENT));
   }
 
-  private class P_UIFacade implements IDocumentFieldUIFacade {
+  protected IDocumentFieldUIFacade createUIFacade() {
+    return new P_UIFacade();
+  }
+
+  protected class P_UIFacade implements IDocumentFieldUIFacade {
+
+    public void fireComReady(boolean comReady) {
+      try {
+        if (propertySupport.setPropertyBool(PROP_COM_READY, comReady)) {
+          execComReadyStatusChanged(comReady);
+        }
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+      catch (Throwable t) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      }
+    }
   }
 }

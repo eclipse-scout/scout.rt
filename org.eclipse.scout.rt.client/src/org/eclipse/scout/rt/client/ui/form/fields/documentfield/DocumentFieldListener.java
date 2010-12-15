@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 
 import java.util.EventListener;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
+
 public interface DocumentFieldListener extends EventListener {
-  void documentFieldChanged(DocumentFieldEvent e);
+  void documentFieldChanged(DocumentFieldEvent e) throws ProcessingException;
 }

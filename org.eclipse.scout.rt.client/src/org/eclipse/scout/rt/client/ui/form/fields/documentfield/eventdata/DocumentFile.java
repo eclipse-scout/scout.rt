@@ -8,9 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
+package org.eclipse.scout.rt.client.ui.form.fields.documentfield.eventdata;
 
-public interface IDocumentFieldUIFacade {
+import java.io.File;
 
-  void fireComReady(boolean comReady);
+public class DocumentFile {
+  private File m_file;
+  private String m_format;
+
+  public DocumentFile() {
+  }
+
+  public DocumentFile(File file, String format) {
+    m_file = file;
+    m_format = format;
+  }
+
+  public File getFile() {
+    return m_file;
+  }
+
+  public void File(File file) {
+    m_file = file;
+  }
+
+  public String getFormat() {
+    return m_format;
+  }
+
+  public void setFormat(String format) {
+    m_format = format;
+  }
 }
