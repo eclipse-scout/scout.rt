@@ -7,18 +7,9 @@
     <service class="org.eclipse.scout.rt.client.services.common.file.FileService" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
     <service class="org.eclipse.scout.rt.client.services.common.session.internal.ClientSessionRegistryService"/>
     <service class="org.eclipse.scout.rt.client.services.common.progress.internal.SimpleProgressService"/>
-    <service
-          class="org.eclipse.scout.rt.client.services.common.clientnotification.internal.ClientNotificationConsumerService">
-    </service>
-    <service
-          class="org.eclipse.scout.rt.client.services.common.perf.internal.PerformanceAnalyzerService">
-    </service>
-    <service
-          class="org.eclipse.scout.rt.client.ui.desktop.navigation.internal.NavigationHistoryService"
-          createImmediately="false"
-          factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
-          ranking="-1">
-    </service>
+    <service class="org.eclipse.scout.rt.client.services.common.clientnotification.internal.ClientNotificationConsumerService"/>
+    <service class="org.eclipse.scout.rt.client.services.common.perf.internal.PerformanceAnalyzerService"/>
+    <service class="org.eclipse.scout.rt.client.ui.desktop.navigation.internal.NavigationHistoryService" createImmediately="false" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory" ranking="-1"/>
     <proxy class="org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy" createImmediately="true" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.client.services.common.security.AccessControlServiceClientProxy" createImmediately="true" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.client.services.lookup.BatchLookupServiceClientProxy" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
@@ -28,15 +19,7 @@
     <proxy class="org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.calendar.IHolidayCalendarService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.workflow.IWorkflowProviderService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
-    <service
-          class="org.eclipse.scout.rt.client.services.common.shell.DefaultShellService"
-          createImmediately="false">
-    </service>
-    <service
-          class="org.eclipse.scout.rt.client.services.common.icon.IconProviderService"
-          createImmediately="false"
-          factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
-          ranking="-100">
-    </service>
+    <service class="org.eclipse.scout.rt.client.services.common.shell.DefaultShellService" createImmediately="false"/>
+    <service class="org.eclipse.scout.rt.client.services.common.icon.IconProviderService" createImmediately="false" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory" ranking="-100"/>
   </extension>
 </plugin>
