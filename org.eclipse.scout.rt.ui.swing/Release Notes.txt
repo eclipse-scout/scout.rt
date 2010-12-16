@@ -2,3 +2,11 @@
 Renamed org.eclipse.scout.rt.ui.swing.ext.calendar.JTimeChooser to org.eclipse.scout.rt.ui.swing.ext.calendar.TimeChooser
 Renamed org.eclipse.scout.rt.ui.swing.ext.calendar.JCalendar to org.eclipse.scout.rt.ui.swing.ext.calendar.DateChooser
 Migration (occurs only in rare cases): Rename *.java files
+
+15.12.2010 imo
+Refactored the date time fields in order to use two fields when entering date and time.
+Migration: None
+
+15.12.2010 imo
+Changed fields with dropdownbutton to single field with integrated drop down button
+Migration: None
