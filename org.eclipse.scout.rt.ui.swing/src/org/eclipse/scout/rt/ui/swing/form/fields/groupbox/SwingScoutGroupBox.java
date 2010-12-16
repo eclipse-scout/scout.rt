@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -281,7 +281,10 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
         section.getContentPane().setBorder(border);
       }
       else if (IGroupBox.BORDER_DECORATION_LINE.equals(containerBorderDecoration)) {
-        border = new TitledGroupBorder(containerLabel != null ? containerLabel : "", new Insets(26, border.getBorderInsets(null).left, border.getBorderInsets(null).bottom, border.getBorderInsets(null).right));
+        Insets insets = new Insets(26, border.getBorderInsets(null).left, border.getBorderInsets(null).bottom, border.getBorderInsets(null).right);
+        insets.bottom += 6;
+        insets.right += 6;
+        border = new TitledGroupBorder(containerLabel != null ? containerLabel : "", insets);
         Border bgBorder;
         if (containerImage != null) {
           Icon icon = getSwingEnvironment().getIcon(containerImage);
