@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -79,6 +79,14 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       setLabelWidthInPixelFromScout();
       setLabelHorizontalAlignmentFromScout();
       setTooltipTextFromScout(getScoutObject().getTooltipText());
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD && getScoutObject().getLabel() != null) {
+        if (getScoutObject().getTooltipText() != null) {
+          setTooltipTextFromScout(getScoutObject().getLabel() + "\n" + getScoutObject().getTooltipText());
+        }
+        else {
+          setTooltipTextFromScout(getScoutObject().getLabel());
+        }
+      }
       setFontFromScout(getScoutObject().getFont());
       setSaveNeededFromScout(getScoutObject().isSaveNeeded());
       setFocusableFromScout(getScoutObject().isFocusable());
@@ -179,7 +187,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     if (getSwtField() != null) {
       if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
         if (m_onFieldLabelDecorator == null) {
-          m_onFieldLabelDecorator = new OnFieldLabelDecorator(getEnvironment());
+          m_onFieldLabelDecorator = new OnFieldLabelDecorator(getEnvironment(), getScoutObject().isMandatory());
           m_onFieldLabelDecorator.setText(getScoutObject().getLabel());
         }
         m_onFieldLabelDecorator.attach(getSwtField());

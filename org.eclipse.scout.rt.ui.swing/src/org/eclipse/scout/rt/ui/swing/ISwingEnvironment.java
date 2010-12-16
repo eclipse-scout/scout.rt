@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
+import org.eclipse.scout.rt.ui.swing.form.fields.OnFieldLabelDecorator;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.ISwingScoutTabItem;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
@@ -322,6 +323,8 @@ public interface ISwingEnvironment {
   boolean acceptAsFocusTarget(Component comp);
 
   JStatusLabelEx createStatusLabel();
+
+  OnFieldLabelDecorator createOnFieldLabelDecorator(JComponent c, boolean mandatory);
 
   /**
    * Creates the logo of the application. May return a simple JLabel with an icon or an animation.

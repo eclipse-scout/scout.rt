@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -82,6 +82,14 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
       setLabelFromScout(scoutField.getLabel());
       setLabelVisibleFromScout();
       setTooltipTextFromScout(scoutField.getTooltipText());
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD && scoutField.getLabel() != null) {
+        if (scoutField.getTooltipText() != null) {
+          setTooltipTextFromScout(scoutField.getLabel() + "\n" + scoutField.getTooltipText());
+        }
+        else {
+          setTooltipTextFromScout(scoutField.getLabel());
+        }
+      }
       setBackgroundFromScout(scoutField.getBackgroundColor());
       setForegroundFromScout(scoutField.getForegroundColor());
       setFontFromScout(scoutField.getFont());
@@ -145,7 +153,11 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
   }
 
   protected void setLabelVisibleFromScout() {
-    boolean b = getScoutObject().isLabelVisible() && getScoutObject().getLabelPosition() != IFormField.LABEL_POSITION_ON_FIELD;
+    boolean b = getScoutObject().isLabelVisible();
+    if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
+      m_swingStatusLabel.setText(null);
+      m_swingStatusLabel.setLayoutWidthHint(0);
+    }
     if (m_swingStatusLabel != null) {
       m_swingStatusLabel.setVisible(b);
       if (m_swingContainer != null) {
@@ -165,7 +177,7 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
       JTextFieldEx tf = (JTextFieldEx) getSwingField();
       if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
         if (tf.getOnFieldLabelHandler() == null) {
-          tf.setOnFieldLabelHandler(new OnFieldLabelDecorator(tf));
+          tf.setOnFieldLabelHandler(getSwingEnvironment().createOnFieldLabelDecorator(tf, getScoutObject().isMandatory()));
         }
         tf.getOnFieldLabelHandler().setLabel(s);
       }

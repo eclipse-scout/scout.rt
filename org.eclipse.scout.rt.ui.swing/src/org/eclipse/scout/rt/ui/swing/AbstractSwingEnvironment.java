@@ -71,6 +71,7 @@ import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.SwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
+import org.eclipse.scout.rt.ui.swing.form.fields.OnFieldLabelDecorator;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.ISwingScoutTabItem;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.SwingScoutTabItem;
 import org.eclipse.scout.rt.ui.swing.inject.AcceptFocusTargetInjector;
@@ -1014,6 +1015,11 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     JStatusLabelEx ui = new JStatusLabelEx();
     ui.setName("Synth.StatusLabel");
     return ui;
+  }
+
+  @Override
+  public OnFieldLabelDecorator createOnFieldLabelDecorator(JComponent c, boolean mandatory) {
+    return new OnFieldLabelDecorator(c, mandatory);
   }
 
   @Override

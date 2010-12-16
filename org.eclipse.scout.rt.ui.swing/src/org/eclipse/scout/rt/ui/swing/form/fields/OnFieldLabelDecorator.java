@@ -4,13 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -27,9 +28,11 @@ public class OnFieldLabelDecorator {
   private JComponent m_component;
   private FocusListener m_focusListener;
   private String m_label;
+  private boolean m_mandatory;
 
-  public OnFieldLabelDecorator(JComponent c) {
+  public OnFieldLabelDecorator(JComponent c, boolean mandatory) {
     m_component = c;
+    m_mandatory = mandatory;
     m_focusListener = new FocusListener() {
       @Override
       public void focusGained(FocusEvent e) {
@@ -70,6 +73,10 @@ public class OnFieldLabelDecorator {
     if (m_label != null && m_label.length() > 0) {
       int baseline = field.getBaseline(field.getWidth(), field.getHeight());
       g.setColor(Color.lightGray);
+      if (m_mandatory) {
+        Font f = field.getFont().deriveFont(Font.BOLD);
+        g.setFont(f);
+      }
       g.drawString(m_label, field.getInsets().left, baseline);
     }
   }
