@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.basic.table;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jface.viewers.CellEditor;
@@ -223,21 +224,38 @@ public class SwtScoutTableCellEditor {
 
     @Override
     public boolean canModify(Object element, String property) {
-      ITable table = m_tableComposite.getScoutObject();
-      if (table != null) {
-        try {
-          // try first
-          ITableRow row = (ITableRow) element;
-          IColumn<?> column = getScoutColumn(property);
-          if (row != null && column != null) {
-            return table.isCellEditable(row, column);
+      final ITable table = m_tableComposite.getScoutObject();
+      final ITableRow row = (ITableRow) element;
+      final IColumn<?> column = getScoutColumn(property);
+      //make a safe model call
+      final AtomicBoolean b = new AtomicBoolean();
+      synchronized (b) {
+        Runnable r = new Runnable() {
+          @Override
+          public void run() {
+            // try first
+            synchronized (b) {
+              try {
+                if (table != null && row != null && column != null) {
+                  b.set(table.isCellEditable(row, column));
+                }
+              }
+              catch (Throwable ex) {
+                //fast access: ignore
+              }
+              b.notifyAll();
+            }
           }
+        };
+        m_tableComposite.getEnvironment().invokeScoutLater(r, 2345);
+        try {
+          b.wait(2345);
         }
-        catch (Exception e) {
-          //fast access: ignore
+        catch (InterruptedException e) {
+          //nop
         }
       }
-      return false;
+      return b.get();
     }
   }
 
@@ -281,7 +299,7 @@ public class SwtScoutTableCellEditor {
 
     @Override
     protected void doSetFocus() {
-      m_container.setFocus();
+      m_container.traverse(SWT.TRAVERSE_TAB_NEXT);
       Control focusControl = m_container.getDisplay().getFocusControl();
       if (focusControl != null) {
         focusControl.addTraverseListener(new TraverseListener() {

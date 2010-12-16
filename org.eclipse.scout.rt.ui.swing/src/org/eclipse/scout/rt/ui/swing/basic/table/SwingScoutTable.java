@@ -1072,7 +1072,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             ((JLabel) c).setDisabledIcon(icon);
           }
           // foreground
-          //XXX use row fg if cells value is null
+          //TODO use row fg if cells value is null
           if (cell.getForegroundColor() != null) {
             Color color = SwingUtility.createColor(cell.getForegroundColor());
             if (isSelected) {
@@ -1081,7 +1081,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             c.setForeground(color);
           }
           // font (must be set before text, otherwise html view is null again)
-          //XXX use row font if cells value is null
+          //TODO use row font if cells value is null
           if (cell.getFont() != null) {
             Font oldf = getFont();
             Font newf = SwingUtility.createFont(cell.getFont(), oldf);
@@ -1111,7 +1111,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             }
           }
           // tooltip
-          //XXX use row tt if cells value is null
+          //TODO use row tt if cells value is null
           String s = cell.getTooltipText();
           if (s != null && s.length() == 0) {
             s = null;
@@ -1119,7 +1119,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           s = SwingUtility.createHtmlLabelText(s, true);
           c.setToolTipText(s);
           // background
-          //XXX use row bg if cells value is null
+          //TODO use row bg if cells value is null
           if (cell.getBackgroundColor() != null) {
             Color color = SwingUtility.createColor(cell.getBackgroundColor());
             if (isSelected) {

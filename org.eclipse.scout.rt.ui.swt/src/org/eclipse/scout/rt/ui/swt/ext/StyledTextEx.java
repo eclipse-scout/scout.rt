@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -190,10 +190,12 @@ public class StyledTextEx extends StyledText {
     private long m_timestamp;
 
     public void handleEvent(Event event) {
+      if (isDisposed()) {
+        return;
+      }
       if (event.time == m_timestamp) {
         return;
       }
-
       switch (event.type) {
         case SWT.Traverse:
           if (event.keyCode == SWT.TAB && event.stateMask == SWT.CONTROL) {
@@ -207,6 +209,7 @@ public class StyledTextEx extends StyledText {
             event.doit = false;
             traverse(SWT.TRAVERSE_TAB_NEXT);
           }
+          break;
         }
         case SWT.Modify: {
           updateVerticalScrollbarVisibility();

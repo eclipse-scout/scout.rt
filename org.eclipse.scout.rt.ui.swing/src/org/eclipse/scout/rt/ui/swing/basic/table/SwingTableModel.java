@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.basic.table;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
@@ -71,18 +73,37 @@ public class SwingTableModel extends AbstractTableModel {
   }
 
   @Override
-  public boolean isCellEditable(int x, int y) {
-    ITable table = m_swingScoutTable.getScoutObject();
-    if (table != null) {
+  public boolean isCellEditable(final int x, final int y) {
+    //make a safe model call
+    final AtomicBoolean b = new AtomicBoolean();
+    synchronized (b) {
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          // try first
+          synchronized (b) {
+            try {
+              ITable table = m_swingScoutTable.getScoutObject();
+              if (table != null) {
+                b.set(table.isCellEditable(table.getFilteredRow(x), y));
+              }
+            }
+            catch (Throwable ex) {
+              //fast access: ignore
+            }
+            b.notifyAll();
+          }
+        }
+      };
+      m_swingScoutTable.getSwingEnvironment().invokeScoutLater(r, 2345);
       try {
-        // try first
-        return table.isCellEditable(table.getFilteredRow(x), y);
+        b.wait(2345);
       }
-      catch (Throwable ex) {
-        //fast access: ignore
+      catch (InterruptedException e) {
+        //nop
       }
     }
-    return false;
+    return b.get();
   }
 
   public void updateModelState(int newRowCount) {

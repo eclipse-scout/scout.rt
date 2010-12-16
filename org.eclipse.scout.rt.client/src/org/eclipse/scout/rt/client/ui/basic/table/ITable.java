@@ -14,6 +14,8 @@ import java.net.URL;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ClientRule;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -329,10 +331,22 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    */
   ICell getSummaryCell(ITableRow row);
 
+  /**
+   * Note that this is not a java bean getter and thus not thread-safe.
+   * Calls to this method must be inside a {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
+   */
   boolean isCellEditable(int rowIndex, int columnIndex);
 
+  /**
+   * Note that this is not a java bean getter and thus not thread-safe.
+   * Calls to this method must be inside a {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
+   */
   boolean isCellEditable(ITableRow row, int visibleColumnIndex);
 
+  /**
+   * Note that this is not a java bean getter and thus not thread-safe.
+   * Calls to this method must be inside a {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
+   */
   boolean isCellEditable(ITableRow row, IColumn column);
 
   /*

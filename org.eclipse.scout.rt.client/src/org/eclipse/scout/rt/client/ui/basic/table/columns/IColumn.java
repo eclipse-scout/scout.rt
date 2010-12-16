@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -231,6 +231,13 @@ public interface IColumn<T> extends IPropertyObserver {
   boolean isEditable();
 
   void setEditable(boolean editable);
+
+  /**
+   * @return true if this cell (row, column) is editable <b>and</b> the column is editable {@link #isEditable()}
+   *         <p>
+   *         Note that this is not a java bean method and thus not thread-safe
+   */
+  boolean isCellEditable(ITableRow row);
 
   String getForegroundColor();
 

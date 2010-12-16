@@ -801,7 +801,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   public boolean isCellEditable(ITableRow row, IColumn column) {
-    return isEnabled() && column != null && column.isVisible() && column.isEditable() && row != null && row.isEnabled();
+    return row != null & column != null && column.isCellEditable(row);
   }
 
   public boolean isCheckable() {
@@ -1181,7 +1181,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           try {
             oldRow.setRowChanging(true);
             //
-            //XXX set row icon,bg,fg,tooltip on row-main-cell
+            //TODO set row icon,bg,fg,tooltip on row-main-cell
             oldRow.setEnabled(newRow.isEnabled());
             oldRow.setStatus(newRow.getStatus());
             for (int columnIndex = 0; columnIndex < getColumnCount(); columnIndex++) {

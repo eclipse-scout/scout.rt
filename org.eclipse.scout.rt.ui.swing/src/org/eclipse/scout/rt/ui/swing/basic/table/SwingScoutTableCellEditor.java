@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.basic.table;
 
+import java.awt.AWTKeyStroke;
 import java.awt.Component;
+import java.awt.FocusTraversalPolicy;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
@@ -18,7 +20,9 @@ import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.WeakReference;
 import java.util.EventObject;
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.AbstractAction;
@@ -37,10 +41,12 @@ import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
+import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 
 public class SwingScoutTableCellEditor {
 
   private ISwingScoutTable m_tableComposite;
+  private FocusTraversalPolicy m_focusTraversalPolicy;
   private TableCellEditor m_cellEditor;
   //cache
   private boolean m_tableIsEditingAndContainsFocus;
@@ -48,6 +54,7 @@ public class SwingScoutTableCellEditor {
 
   public SwingScoutTableCellEditor(ISwingScoutTable tableComposite) {
     m_tableComposite = tableComposite;
+    m_focusTraversalPolicy = new SwingScoutFocusTraversalPolicy();
     m_cellEditor = new P_SwingCellEditor();
     m_cellEditor.addCellEditorListener(new CellEditorListener() {
       @Override
@@ -112,38 +119,54 @@ public class SwingScoutTableCellEditor {
   }
 
   protected void decorateEditorComposite(ISwingScoutComposite<? extends IFormField> editorComposite, final int row, final int col) {
-    JComponent editorField = editorComposite.getSwingField();
-    editorField.addHierarchyListener(new HierarchyListener() {
-      @Override
-      public void hierarchyChanged(HierarchyEvent e) {
-        if (e.getID() == HierarchyEvent.HIERARCHY_CHANGED) {
-          if ((e.getChangeFlags() & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0 && e.getComponent().isDisplayable()) {
-            e.getComponent().requestFocus();
+    JComponent editorField = editorComposite.getSwingContainer();
+    Component firstField = m_focusTraversalPolicy.getFirstComponent(editorField);
+    Component lastField = m_focusTraversalPolicy.getLastComponent(editorField);
+    if (firstField != null) {
+      firstField.addHierarchyListener(new HierarchyListener() {
+        @Override
+        public void hierarchyChanged(final HierarchyEvent e) {
+          if (e.getID() == HierarchyEvent.HIERARCHY_CHANGED) {
+            if (((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) && e.getComponent().isShowing()) {
+              SwingUtilities.invokeLater(
+                  new Runnable() {
+                    public void run() {
+                      e.getComponent().requestFocus();
+                    }
+                  });
+            }
           }
         }
-      }
-    });
-    editorField.setFocusTraversalKeysEnabled(false);
-    editorField.getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("TAB"), "tab");
-    editorField.getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("shift TAB"), "reverse-tab");
-    editorField.getActionMap().put("tab", new AbstractAction() {
-      private static final long serialVersionUID = 1L;
+      });
+    }
+    if (firstField instanceof JComponent) {
+      JComponent jc = (JComponent) firstField;
+      jc.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, new HashSet<AWTKeyStroke>());
+      jc.getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("shift TAB"), "reverse-tab");
+      jc.getActionMap().put("reverse-tab", new AbstractAction() {
+        private static final long serialVersionUID = 1L;
 
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        m_cellEditor.stopCellEditing();
-        editNextTableCell(row, col);
-      }
-    });
-    editorField.getActionMap().put("reverse-tab", new AbstractAction() {
-      private static final long serialVersionUID = 1L;
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          m_cellEditor.stopCellEditing();
+          editPreviousTableCell(row, col);
+        }
+      });
+    }
+    if (lastField instanceof JComponent) {
+      JComponent jc = (JComponent) lastField;
+      jc.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, new HashSet<AWTKeyStroke>());
+      jc.getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("TAB"), "tab");
+      jc.getActionMap().put("tab", new AbstractAction() {
+        private static final long serialVersionUID = 1L;
 
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        m_cellEditor.stopCellEditing();
-        editPreviousTableCell(row, col);
-      }
-    });
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          m_cellEditor.stopCellEditing();
+          editNextTableCell(row, col);
+        }
+      });
+    }
   }
 
   protected void saveEditorFromSwing() {
@@ -228,6 +251,21 @@ public class SwingScoutTableCellEditor {
     }
   }
 
+  protected void permanentFocusOwnerChanged(PropertyChangeEvent e) {
+    Component c = (Component) e.getNewValue();
+    if (c == null) {
+      return;
+    }
+    boolean oldValue = m_tableIsEditingAndContainsFocus;
+    boolean newValue = SwingUtilities.isDescendingFrom(c, m_tableComposite.getSwingTable()) && c != m_tableComposite.getSwingTable();
+    m_tableIsEditingAndContainsFocus = newValue;
+    if (oldValue && !newValue) {
+      if (m_cellEditor != null) {
+        m_cellEditor.stopCellEditing();
+      }
+    }
+  }
+
   private class P_SwingCellEditor extends AbstractCellEditor implements TableCellEditor {
     private static final long serialVersionUID = 1L;
 
@@ -261,23 +299,7 @@ public class SwingScoutTableCellEditor {
         }
       });
       //add a hysteresis listener that commits the cell editor when the table has first received focus and then lost it
-      KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("permanentFocusOwner", new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent e) {
-          Component c = (Component) e.getNewValue();
-          if (c == null) {
-            return;
-          }
-          boolean oldValue = m_tableIsEditingAndContainsFocus;
-          boolean newValue = SwingUtilities.isDescendingFrom(c, m_tableComposite.getSwingContainer());
-          m_tableIsEditingAndContainsFocus = newValue;
-          if (oldValue && !newValue) {
-            if (m_cellEditor != null) {
-              m_cellEditor.stopCellEditing();
-            }
-          }
-        }
-      });
+      KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("permanentFocusOwner", new GlobalFocusListener(SwingScoutTableCellEditor.this));
     }
 
     public void setClickCountToStart(int count) {
@@ -309,4 +331,24 @@ public class SwingScoutTableCellEditor {
       return m_container;
     }
   }
+
+  private static class GlobalFocusListener implements PropertyChangeListener {
+    private WeakReference<SwingScoutTableCellEditor> m_editorRef;
+
+    public GlobalFocusListener(SwingScoutTableCellEditor editor) {
+      m_editorRef = new WeakReference<SwingScoutTableCellEditor>(editor);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent e) {
+      SwingScoutTableCellEditor editor = m_editorRef.get();
+      if (editor == null) {
+        //auto-detach
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("permanentFocusOwner", this);
+        return;
+      }
+      editor.permanentFocusOwnerChanged(e);
+    }
+  }
+
 }

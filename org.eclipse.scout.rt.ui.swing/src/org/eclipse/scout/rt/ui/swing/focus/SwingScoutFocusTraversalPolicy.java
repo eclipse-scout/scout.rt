@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.focus;
 
+import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Window;
@@ -58,25 +59,15 @@ public class SwingScoutFocusTraversalPolicy extends InternalFrameFocusTraversalP
     if (!aComponent.isFocusCycleRoot(focusCycleRoot)) {
       throw new IllegalArgumentException("focusCycleRoot is not a focus cyle root of aComponent");
     }
-
-    ArrayList<Container> cycle = new ArrayList<Container>();
-    enumerateCycle(focusCycleRoot, cycle);
-
+    ArrayList<Component> cycle = new ArrayList<Component>();
+    enumerateCycle(focusCycleRoot, aComponent, cycle);
     int index = cycle.indexOf(aComponent);
     Component nextComp = null;
     if (index >= 0) {
-      // find next fit comp after this one
-      for (int k = 1, nk = cycle.size(); k < nk; k++) {
-        Component test = cycle.get((index + k) % nk);
-        if (accept(test)) {
-          nextComp = test;
-          break;
-        }
-      }
+      nextComp = cycle.get((index + 1) % cycle.size());
     }
-
-    if (nextComp == null) {
-      nextComp = getFirstComponentV(focusCycleRoot);
+    else if (cycle.size() > 0) {
+      nextComp = cycle.get(0);
     }
     if (LOG.isDebugEnabled()) LOG.debug("curr: " + aComponent);
     if (LOG.isDebugEnabled()) LOG.debug("next: " + nextComp);
@@ -101,25 +92,15 @@ public class SwingScoutFocusTraversalPolicy extends InternalFrameFocusTraversalP
     if (!aComponent.isFocusCycleRoot(focusCycleRoot)) {
       throw new IllegalArgumentException("focusCycleRoot is not a focus cyle root of aComponent");
     }
-
-    ArrayList<Container> cycle = new ArrayList<Container>();
-    enumerateCycle(focusCycleRoot, cycle);
-
+    ArrayList<Component> cycle = new ArrayList<Component>();
+    enumerateCycle(focusCycleRoot, aComponent, cycle);
     int index = cycle.indexOf(aComponent);
     Component prevComp = null;
     if (index >= 0) {
-      // find next fit comp after this one
-      for (int k = 1, nk = cycle.size(); k < nk; k++) {
-        Component test = cycle.get((index + nk - k) % nk);
-        if (accept(test)) {
-          prevComp = test;
-          break;
-        }
-      }
+      prevComp = cycle.get((index - 1 + cycle.size()) % cycle.size());
     }
-
-    if (prevComp == null) {
-      prevComp = getLastComponentV(focusCycleRoot);
+    else if (cycle.size() > 0) {
+      prevComp = cycle.get(cycle.size() - 1);
     }
     if (LOG.isDebugEnabled()) LOG.debug("curr: " + aComponent);
     if (LOG.isDebugEnabled()) LOG.debug("prev: " + prevComp);
@@ -144,8 +125,8 @@ public class SwingScoutFocusTraversalPolicy extends InternalFrameFocusTraversalP
     if (focusCycleRoot == null) {
       throw new IllegalArgumentException("focusCycleRoot cannot be null");
     }
-    ArrayList<Container> cycle = new ArrayList<Container>();
-    enumerateCycle(focusCycleRoot, cycle);
+    ArrayList<Component> cycle = new ArrayList<Component>();
+    enumerateCycle(focusCycleRoot, null, cycle);
     if (cycle.size() > 0) {
       return cycle.get(0);
     }
@@ -163,8 +144,8 @@ public class SwingScoutFocusTraversalPolicy extends InternalFrameFocusTraversalP
     if (focusCycleRoot == null) {
       throw new IllegalArgumentException("focusCycleRoot cannot be null");
     }
-    ArrayList<Container> cycle = new ArrayList<Container>();
-    enumerateCycle(focusCycleRoot, cycle);
+    ArrayList<Component> cycle = new ArrayList<Component>();
+    enumerateCycle(focusCycleRoot, null, cycle);
     if (cycle.size() > 0) {
       return cycle.get(cycle.size() - 1);
     }
@@ -173,49 +154,57 @@ public class SwingScoutFocusTraversalPolicy extends InternalFrameFocusTraversalP
     }
   }
 
-  private void enumerateCycle(Container focusCycleRoot, List<Container> cycle) {
-    if (!focusCycleRoot.isShowing()) {
-      return;
-    }
-    enumerateCycleRec(focusCycleRoot, cycle);
+  /**
+   * currentOwner must be part of the enumeration, regardless of its state
+   */
+  private void enumerateCycle(Container focusCycleRoot, Component currentOwner, List<Component> cycle) {
+    enumerateCycleRec(focusCycleRoot, currentOwner, cycle);
   }
 
-  private void enumerateCycleRec(Container container, List<Container> cycle) {
-    if (!(container.isVisible() && container.isDisplayable())) {
-      return;
+  private void enumerateCycleRec(Container container, Component currentOwner, List<Component> cycle) {
+    if (container == currentOwner || accept(container)) {
+      cycle.add(container);
     }
-    cycle.add(container);
     Component[] components = container.getComponents();
     for (int i = 0; i < components.length; i++) {
       Component comp = components[i];
-      if ((comp instanceof Container) && !((Container) comp).isFocusCycleRoot()) {
-        enumerateCycleRec((Container) comp, cycle);
+      if (comp instanceof Container) {
+        enumerateCycleRec((Container) comp, currentOwner, cycle);
       }
       else {
-        // nop
+        //component
+        if (comp == currentOwner || accept(comp)) {
+          cycle.add(comp);
+        }
       }
     }
   }
 
   protected boolean accept(Component comp) {
-    if (!(comp.isVisible() && comp.isDisplayable() && comp.isFocusable() && comp.isEnabled())) {
+    if (!(comp.isVisible() && comp.isFocusable() && comp.isEnabled())) {
       return false;
     }
-    // Verify that the Component is recursively enabled. Disabling a
+    // Verify that the Component is recursively enabled and visible. Disabling a
     // heavyweight Container disables its children, whereas disabling
     // a lightweight Container does not.
     if (!(comp instanceof Window)) {
-      for (Container enableTest = comp.getParent(); enableTest != null; enableTest = enableTest.getParent()) {
-        if (!(enableTest.isEnabled() || enableTest.isLightweight())) {
+      for (Container test = comp.getParent(); test != null; test = test.getParent()) {
+        if (!test.isVisible()) {
           return false;
         }
-        if (enableTest instanceof Window) {
+        if (!test.isEnabled() && !test.isLightweight()) {
+          return false;
+        }
+        if (test instanceof Window) {
           break;
         }
       }
     }
-    // Pass 0: non-lightweight components
-    if (!comp.isLightweight()) {
+    // Pass 0: non-lightweight components (must check displayable to check peer!=null)
+    if (comp.isDisplayable() && !comp.isLightweight()) {
+      if (comp instanceof Canvas) {
+        return true;
+      }
       return false;
     }
     // Pass 1: special revocations, non-focusable items

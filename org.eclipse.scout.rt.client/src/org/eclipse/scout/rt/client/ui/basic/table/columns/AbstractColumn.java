@@ -260,6 +260,19 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   }
 
   /**
+   * @return true if the cell (row, column) is editable
+   *         <p>
+   *         use this method only for dynamic checks of editable otherwise use {@link #getConfiguredEditable()}
+   *         <p>
+   *         make sure to first make the super call that checks for default editable on table, row and column.
+   */
+  @ConfigOperation
+  @Order(60)
+  protected boolean execIsEditable(ITableRow row) throws ProcessingException {
+    return getTable() != null && getTable().isEnabled() && this.isVisible() && this.isEditable() && row != null && row.isEnabled();
+  }
+
+  /**
    * Prepare editing of a cell in the table.
    * <p>
    * Cell editing is canceled (normally by typing escape) or saved (normally by clicking another cell, typing enter).
@@ -273,7 +286,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    */
   @SuppressWarnings("unchecked")
   @ConfigOperation
-  @Order(60)
+  @Order(61)
   protected IFormField execPrepareEdit(ITableRow row) throws ProcessingException {
     IFormField f = prepareEditInternal(row);
     if (f != null) {
@@ -296,7 +309,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * and {@link #execValidateValue(ITableRow, Object)}.
    */
   @ConfigOperation
-  @Order(61)
+  @Order(62)
   protected void execCompleteEdit(ITableRow row, IFormField editingField) throws ProcessingException {
     if (editingField instanceof IValueField) {
       IValueField v = (IValueField) editingField;
@@ -906,6 +919,16 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   public void setEditable(boolean editable) {
     m_editable = editable;
+  }
+
+  public boolean isCellEditable(ITableRow row) {
+    try {
+      return execIsEditable(row);
+    }
+    catch (Throwable t) {
+      LOG.error("checking row " + row, t);
+      return false;
+    }
   }
 
   public String getForegroundColor() {
