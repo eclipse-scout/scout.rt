@@ -434,9 +434,17 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
                 DateFormat.getDateInstance(DateFormat.MEDIUM),
                 DateFormat.getDateInstance(DateFormat.LONG)}) {
         if (t instanceof SimpleDateFormat) {
-          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HH:mm"));
+          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mm a"));
+          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hhmm a"));
+          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hmm a"));
+          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h a"));
+          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mma"));
+          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hhmma"));
+          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " ha"));
+          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " H:mm"));
           dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HHmm"));
-          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HH"));
+          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " Hmm"));
+          dfList.add(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " H"));
           dfList.add(t);
         }
       }
@@ -514,7 +522,10 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
         return parseValue(newDate);
       }
       //add existing time
-      String currentTime = getIsolatedTimeFormat().format(currentValue != null ? currentValue : new Date());
+      if (currentValue == null) {
+        currentValue = applyAutoTime(new Date());
+      }
+      String currentTime = getIsolatedTimeFormat().format(currentValue);
       return parseValue(newDate + " " + currentTime);
     }
 

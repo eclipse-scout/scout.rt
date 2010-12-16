@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.swing.ext.calendar;
 
 import java.awt.Component;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DateFormat;
@@ -90,6 +92,16 @@ public class TimeChooser {
     JScrollPaneEx sp = new JScrollPaneEx(m_table);
     m_container = new JPanelEx(new SingleLayout());
     m_container.add(sp);
+    m_container.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        int row = m_table.getSelectedRow();
+        if (row >= 0) {
+          m_table.scrollRectToVisible(m_table.getCellRect(Math.min(m_table.getRowCount() - 1, row + 6), 0, true));
+          m_table.scrollRectToVisible(m_table.getCellRect(Math.max(0, row - 6), 0, true));
+        }
+      }
+    });
     //synth
     m_container.setBackground(UIManager.getColor("Calendar.date.background"));
     m_container.setName("Synth.TimeChooser");
@@ -136,14 +148,12 @@ public class TimeChooser {
 
   public void setTime(Date value) {
     if (value == null) {
-      m_table.clearSelection();
-      return;
+      value = new Date();
     }
     Calendar cal = Calendar.getInstance();
     cal.setTime(value);
     int row = (cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE)) / 30;
     m_table.setRowSelectionInterval(row, row);
-    m_table.scrollRectToVisible(m_table.getCellRect(row, 0, true));
   }
 
   public Double getTimeAsDouble() {
