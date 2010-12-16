@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -90,6 +90,18 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
       catch (Exception e) {
         LOG.warn(null, e);
       }
+    }
+  }
+
+  /**
+   * propagate both enabled levels to inner form
+   */
+  @Override
+  protected void calculateEnabled() {
+    super.calculateEnabled();
+    if (getInnerForm() != null) {
+      getInnerForm().setEnabledGranted(isEnabledGranted());
+      getInnerForm().setAllEnabled(getEnabledProperty());
     }
   }
 

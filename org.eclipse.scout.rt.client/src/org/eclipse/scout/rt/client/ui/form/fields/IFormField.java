@@ -364,10 +364,29 @@ public interface IFormField extends IPropertyObserver {
 
   void setEnabledPermission(Permission p);
 
+  /**
+   * Enabling of a field has two levels: granting and property level.
+   * <p>
+   * This is the "harder" level of granting.
+   * <p>
+   * Note that a field with grantEnabled=false remains disabled even though setEnabled(true) was called.
+   */
   boolean isEnabledGranted();
+
+  /**
+   * Enabling of a field has two levels: granting and property level.
+   * <p>
+   * This is the "softer" level of property.
+   * <p>
+   * Note that a field with grantEnabled=false remains disabled even though setEnabled(true) was called.
+   */
+  boolean getEnabledProperty();
 
   void setEnabledGranted(boolean b);
 
+  /**
+   * @return {@link #isEnabledGranted()} && {@link #getEnabledProperty()}
+   */
   boolean isEnabled();
 
   /**

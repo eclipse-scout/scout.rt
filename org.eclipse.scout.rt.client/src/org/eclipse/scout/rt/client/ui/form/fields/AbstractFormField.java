@@ -897,6 +897,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return m_enabledGranted;
   }
 
+  public boolean getEnabledProperty() {
+    return m_enabledProperty;
+  }
+
   public void setEnabledGranted(boolean b) {
     m_enabledGranted = b;
     calculateEnabled();
@@ -913,7 +917,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * no access control for system buttons CANCEL and CLOSE
    */
-  private void calculateEnabled() {
+  protected void calculateEnabled() {
     // access control
     boolean applyAccessControl = true;
     if (this instanceof IButton) {
