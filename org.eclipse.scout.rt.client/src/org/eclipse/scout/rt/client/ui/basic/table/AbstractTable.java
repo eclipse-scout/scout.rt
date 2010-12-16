@@ -2196,9 +2196,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     synchronized (m_cachedRowsLock) {
       m_cachedRows = null;
+      m_rows.clear();
+      m_rows.addAll(Arrays.asList(resolvedRows));
     }
-    m_rows.clear();
-    m_rows.addAll(Arrays.asList(resolvedRows));
     //sort selection without firing an event
     if (m_selectedRows != null && m_selectedRows.size() > 0) {
       ArrayList<ITableRow> backupSelection = new ArrayList<ITableRow>(m_selectedRows.size());
