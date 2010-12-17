@@ -76,7 +76,6 @@ public class SwingScoutFrame implements ISwingScoutView {
     m_swingFrame.addWindowListener(new P_SwingWindowListener());
     // focus handling
     SwingUtility.installFocusCycleRoot(m_swingFrame, new SwingScoutFocusTraversalPolicy());
-    m_swingFrame.setFocusable(false);
     m_swingFrame.addWindowFocusListener(new WindowFocusListener() {
       @Override
       public void windowGainedFocus(WindowEvent e) {

@@ -101,8 +101,6 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     JComponent contentPane = (JComponent) m_swingView.getContentPane();
     contentPane.setLayout(new BorderLayoutEx());
     contentPane.setCursor(Cursor.getDefaultCursor());
-    contentPane.setFocusCycleRoot(false);
-    contentPane.setFocusTraversalPolicy(null);
     m_swingView.addInternalFrameListener(new P_SwingWindowListener());
     m_swingView.addFocusListener(new FocusAdapter() {
       @Override

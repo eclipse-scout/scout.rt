@@ -58,6 +58,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolTip;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.RootPaneContainer;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -620,6 +621,13 @@ public final class SwingUtility {
   public static void installFocusCycleRoot(Container c, FocusTraversalPolicy cyclePolicy) {
     c.setFocusCycleRoot(true);
     c.setFocusTraversalPolicy(cyclePolicy);
+    if (c instanceof RootPaneContainer) {
+      Container contentPane = ((RootPaneContainer) c).getContentPane();
+      if (contentPane != null) {
+        contentPane.setFocusTraversalPolicy(null);
+        contentPane.setFocusCycleRoot(false);
+      }
+    }
   }
 
   public static void installAlternateCopyPaste(JComponent comp) {

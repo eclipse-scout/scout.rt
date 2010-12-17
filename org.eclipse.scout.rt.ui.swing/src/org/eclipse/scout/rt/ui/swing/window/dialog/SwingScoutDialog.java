@@ -95,7 +95,6 @@ public class SwingScoutDialog implements ISwingScoutView {
     m_swingDialog.addWindowListener(new P_SwingWindowListener());
     // focus handling
     SwingUtility.installFocusCycleRoot(m_swingDialog, new SwingScoutFocusTraversalPolicy());
-    m_swingDialog.setFocusable(false);
     m_swingDialog.addWindowFocusListener(new WindowFocusListener() {
       @Override
       public void windowGainedFocus(WindowEvent e) {

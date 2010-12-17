@@ -112,8 +112,6 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     }
     // focus handling
     SwingUtility.installFocusCycleRoot(m_swingRootPane, new SwingScoutFocusTraversalPolicy());
-    m_swingRootPane.getContentPane().setFocusTraversalPolicy(null);
-    m_swingRootPane.getContentPane().setFocusCycleRoot(false);
     //
     m_swingFrame.addWindowListener(new P_SwingWindowListener());
     // menubar
