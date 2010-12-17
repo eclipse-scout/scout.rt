@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -447,16 +447,11 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * load table data
    */
   private void loadTableDataImpl() throws ProcessingException {
-    ISearchForm searchForm = getSearchFormInternal();
     if (m_table != null) {
       try {
         m_table.setTableChanging(true);
         //
         execPopulateTable();
-        // set minimized status of search form
-        if (searchForm != null) {
-          searchForm.setMinimized(getTable().getRowCount() > 0);
-        }
       }
       finally {
         m_table.setTableChanging(false);
@@ -544,11 +539,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           newSelectedNode = tree.resolveVirtualNode(newSelectedNode);
           tree.selectNode(newSelectedNode);
         }
-
       }
     }
     finally {
       if (tree != null) tree.setTreeChanging(false);
+    }
+    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    if (desktop != null) {
+      desktop.afterTablePageLoaded(this);
     }
   }
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -235,6 +235,15 @@ public interface IDesktop extends IPropertyObserver {
    *      {@link AbstractPage#execDataChanged(Object...)} {@link AbstractPage#execDataChanged(Object...)}
    */
   void dataChanged(Object... dataTypes);
+
+  /**
+   * Called after a page was loaded or reloaded.
+   * <p>
+   * Default minimizes page search form when data was found.
+   * 
+   * @param page
+   */
+  void afterTablePageLoaded(IPageWithTable<?> page) throws ProcessingException;
 
   /**
    * Unload and release unused pages in all outlines, such as closed and

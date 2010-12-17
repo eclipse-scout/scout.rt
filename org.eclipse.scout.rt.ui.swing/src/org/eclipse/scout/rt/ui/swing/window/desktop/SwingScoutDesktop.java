@@ -76,19 +76,19 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
     return (JDesktopPane) getSwingField();
   }
 
+  /**
+   * sort frames top-down-left-right
+   */
   private void handleSwingTabAction(int delta) {
     JInternalFrame[] frames = getSwingDesktopPane().getAllFrames();
     TreeMap<Integer, JInternalFrame> sortedMap = new TreeMap<Integer, JInternalFrame>();
-    for (int i = 0; i < frames.length; i++) {
-      if (frames[i].isVisible() && !frames[i].isIcon()) {
-        int tabIndex = i;
-        if (frames[i] instanceof JInternalFrameEx) {
-          tabIndex = ((JInternalFrameEx) frames[i]).getTabIndex();
-        }
+    for (JInternalFrame f : frames) {
+      if (f.isVisible()) {
+        int tabIndex = f.getX() * 100000 + f.getY();
         if (delta < 0) {
           tabIndex = -tabIndex;
         }
-        sortedMap.put(tabIndex, frames[i]);
+        sortedMap.put(tabIndex, f);
       }
     }
     JInternalFrame next = null;

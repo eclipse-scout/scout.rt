@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -57,6 +57,8 @@ import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryServi
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -277,6 +279,22 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       m_outlineTableForm.setCurrentTable(newTable);
     }
     setOutlineTableFormVisible(newTable != null);
+  }
+
+  /**
+   * Called after a page was loaded or reloaded.
+   * <p>
+   * Default minimizes page search form when data was found.
+   * 
+   * @param page
+   */
+  @Order(62)
+  @ConfigOperation
+  protected void execTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+    ISearchForm searchForm = tablePage.getSearchFormInternal();
+    if (searchForm != null) {
+      searchForm.setMinimized(tablePage.getTable().getRowCount() > 0);
+    }
   }
 
   /**
@@ -1172,6 +1190,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     for (IOutline outline : getAvailableOutlines()) {
       outline.releaseUnusedPages();
     }
+  }
+
+  public void afterTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+    execTablePageLoaded(tablePage);
   }
 
   public void closeInternal() throws ProcessingException {
