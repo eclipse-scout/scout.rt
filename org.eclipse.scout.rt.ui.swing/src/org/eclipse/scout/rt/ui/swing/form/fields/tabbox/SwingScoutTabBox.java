@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -113,6 +113,7 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
   @Override
   protected void attachScout() {
     super.attachScout();
+    applyTopMarginIfTabBoxIsNotOnTop();
     if (m_scoutVisiblePropertyListener == null) {
       m_scoutVisiblePropertyListener = new PropertyChangeListener() {
         public void propertyChange(final PropertyChangeEvent e) {
@@ -129,6 +130,16 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
       }
     }
     setSelectedTabFromScout();
+  }
+
+  /**
+   * Whenever the tabbox is not the top element in a container, we need to add a bit of extra margin on top.
+   * The name set is interpreted by the Rayo L/F.
+   */
+  private void applyTopMarginIfTabBoxIsNotOnTop() {
+    if (getScoutObject().getGridData().y != 0) {
+      getSwingTabbedPane().setName("TabbedPane.topMargin");
+    }
   }
 
   @Override

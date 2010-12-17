@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -301,6 +301,11 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
+          protected boolean getConfiguredGridUseUiHeight() {
+            return true;
+          }
+
+          @Override
           protected void execClickAction() {
             ITableRow row = getColumnsTableField().getTable().getSelectedRow();
             if (row != null && row.getRowIndex() - 1 >= 0) {
@@ -329,6 +334,11 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected boolean getConfiguredGridUseUiWidth() {
+            return true;
+          }
+
+          @Override
+          protected boolean getConfiguredGridUseUiHeight() {
             return true;
           }
 
@@ -368,6 +378,11 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
+          protected boolean getConfiguredGridUseUiHeight() {
+            return true;
+          }
+
+          @Override
           protected void execClickAction() throws ProcessingException {
             getColumnsTableField().getTable().getCheckBoxColumn().fill(true);
           }
@@ -396,6 +411,11 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected boolean getConfiguredGridUseUiWidth() {
+            return true;
+          }
+
+          @Override
+          protected boolean getConfiguredGridUseUiHeight() {
             return true;
           }
 
