@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -75,8 +75,7 @@ public class SwingScoutFrame implements ISwingScoutView {
     m_swingFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     m_swingFrame.addWindowListener(new P_SwingWindowListener());
     // focus handling
-    m_swingFrame.getRootPane().setFocusTraversalPolicy(new SwingScoutFocusTraversalPolicy());
-    m_swingFrame.getRootPane().setFocusCycleRoot(true);
+    SwingUtility.installFocusCycleRoot(m_swingFrame, new SwingScoutFocusTraversalPolicy());
     m_swingFrame.setFocusable(false);
     m_swingFrame.addWindowFocusListener(new WindowFocusListener() {
       @Override

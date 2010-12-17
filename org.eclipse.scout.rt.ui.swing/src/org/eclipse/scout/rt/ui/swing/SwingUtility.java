@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -590,6 +591,9 @@ public final class SwingUtility {
     }
   }
 
+  /**
+   * install focus forward and backward
+   */
   public static void installDefaultFocusHandling(Container c) {
     // focus TAB
     TreeSet<KeyStroke> set = new TreeSet<KeyStroke>();
@@ -608,6 +612,14 @@ public final class SwingUtility {
         inputMapWhenFocused.put(KeyStroke.getKeyStroke(KeyEvent.VK_STOP, KeyEvent.KEY_TYPED), "swingDummyFocusKey");
       }
     }
+  }
+
+  /**
+   * installs a focus cycle, its keys and the (optional) policy
+   */
+  public static void installFocusCycleRoot(Container c, FocusTraversalPolicy cyclePolicy) {
+    c.setFocusCycleRoot(true);
+    c.setFocusTraversalPolicy(cyclePolicy);
   }
 
   public static void installAlternateCopyPaste(JComponent comp) {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,8 +32,10 @@ import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListen
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
+import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 import org.eclipse.scout.rt.ui.swing.window.desktop.ProgressHandler;
 import org.eclipse.scout.service.SERVICES;
 
@@ -61,6 +63,7 @@ public class SwingScoutToolBar extends SwingScoutComposite<IDesktop> {
 
     m_topLevelMenuCount = getScoutObject().getMenus().length;
     JPanelEx toolBar = new JPanelEx(layout);
+    SwingUtility.installFocusCycleRoot(toolBar, new SwingScoutFocusTraversalPolicy());
 
     m_navigationWidget = new JNavigationWidget(getSwingEnvironment());
     toolBar.add(m_navigationWidget);

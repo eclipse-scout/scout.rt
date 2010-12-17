@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -94,8 +94,7 @@ public class SwingScoutDialog implements ISwingScoutView {
     m_swingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     m_swingDialog.addWindowListener(new P_SwingWindowListener());
     // focus handling
-    m_swingDialog.getRootPane().setFocusTraversalPolicy(new SwingScoutFocusTraversalPolicy());
-    m_swingDialog.getRootPane().setFocusCycleRoot(true);
+    SwingUtility.installFocusCycleRoot(m_swingDialog, new SwingScoutFocusTraversalPolicy());
     m_swingDialog.setFocusable(false);
     m_swingDialog.addWindowFocusListener(new WindowFocusListener() {
       @Override

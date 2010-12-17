@@ -68,13 +68,13 @@ import org.eclipse.scout.rt.ui.swing.concurrency.SwingScoutSynchronizer;
 import org.eclipse.scout.rt.ui.swing.ext.IEmbeddedFrameProviderService;
 import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
+import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.SwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.eclipse.scout.rt.ui.swing.form.fields.OnFieldLabelDecorator;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.ISwingScoutTabItem;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.SwingScoutTabItem;
-import org.eclipse.scout.rt.ui.swing.inject.AcceptFocusTargetInjector;
 import org.eclipse.scout.rt.ui.swing.inject.AppendActionsInjector;
 import org.eclipse.scout.rt.ui.swing.inject.CreateActionInjector;
 import org.eclipse.scout.rt.ui.swing.inject.InitLookAndFeelInjector;
@@ -294,7 +294,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   @Override
   public int getProcessButtonHeight() {
-    return 27;
+    return 28;
   }
 
   public int getIconButtonSize() {
@@ -1005,9 +1005,10 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   /**
    * @return true if component can realistically gain focus
    */
+  @SuppressWarnings("deprecation")
   public boolean acceptAsFocusTarget(Component comp) {
     checkThread();
-    return new AcceptFocusTargetInjector().inject(this, comp);
+    return new SwingScoutFocusTraversalPolicy().accept(comp);
   }
 
   @Override

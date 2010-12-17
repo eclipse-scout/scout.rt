@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JInternalFrameEx;
-import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitDesktopManager;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitLayout;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitLayoutConstraints;
@@ -59,9 +58,10 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
     swingDesktop.setOpaque(true);
     // cursor
     swingDesktop.setCursor(null);
+
     // focus root
-    swingDesktop.setFocusCycleRoot(true);
-    swingDesktop.setFocusTraversalPolicy(new SwingScoutFocusTraversalPolicy());
+    swingDesktop.setFocusCycleRoot(false);
+    swingDesktop.setFocusTraversalPolicy(null);
     // AWE: this could be integrated in new ui (was forgotton in metal laf)
     swingDesktop.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(SwingUtility.createKeystroke("shift ctrl TAB"), "selectPreviousFrame");
     // register ctrl-TAB and ctrl-shift-TAB actions according to ui

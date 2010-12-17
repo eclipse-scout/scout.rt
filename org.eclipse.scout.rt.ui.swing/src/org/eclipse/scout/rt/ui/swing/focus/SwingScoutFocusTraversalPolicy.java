@@ -180,7 +180,7 @@ public class SwingScoutFocusTraversalPolicy extends InternalFrameFocusTraversalP
     }
   }
 
-  protected boolean accept(Component comp) {
+  public boolean accept(Component comp) {
     if (!(comp.isVisible() && comp.isFocusable() && comp.isEnabled())) {
       return false;
     }

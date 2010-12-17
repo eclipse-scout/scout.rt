@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.JInternalFrameEx;
 import org.eclipse.scout.rt.ui.swing.ext.JRootPaneEx;
@@ -96,7 +97,7 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
       }
     };
     m_swingView.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
-    m_swingView.setFocusTraversalPolicy(new SwingScoutFocusTraversalPolicy());
+    SwingUtility.installFocusCycleRoot(m_swingView, new SwingScoutFocusTraversalPolicy());
     JComponent contentPane = (JComponent) m_swingView.getContentPane();
     contentPane.setLayout(new BorderLayoutEx());
     contentPane.setCursor(Cursor.getDefaultCursor());

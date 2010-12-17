@@ -320,6 +320,10 @@ public interface ISwingEnvironment {
    */
   void invokeSwingLater(Runnable j);
 
+  /**
+   * @deprecated will be removed
+   */
+  @Deprecated
   boolean acceptAsFocusTarget(Component comp);
 
   JStatusLabelEx createStatusLabel();

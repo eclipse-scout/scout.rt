@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,12 +22,16 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 
 /**
- * fix layout to BorderLayoutEx fix dimensions. use container sizes and not ui
- * sizes support for non-y-resizing frames set cursor to null when default to
- * support for overall hour-glass cursor when parent frame is showing busy
- * support for a model tab index to be used instead of simply container order
- * tabbing fixed behaviour for resizing cursor. only visible when resizing is in
- * fact possible
+ * <ul>
+ * <li>fix layout to BorderLayoutEx</li>
+ * <li>fix dimensions</li>
+ * <li>use container sizes and not ui sizes. support for non-y-resizing frames</li>
+ * <li>set cursor to null when default to support for overall hour-glass cursor when parent frame is showing busy</li>
+ * <li>support for a model tab index to be used instead of simply container order tabbing</li>
+ * <li>fixed behaviour for resize-cursor display. only visible when resizing is in fact possible</li>
+ * <li>fix resture sub focus: transferFocus instead of request focus and only use existing focus component iff it is
+ * still showing and enabled</li>
+ * </ul>
  */
 public class JInternalFrameEx extends JInternalFrame implements IWaitSupport {
   private static final long serialVersionUID = 1L;
@@ -45,8 +49,7 @@ public class JInternalFrameEx extends JInternalFrame implements IWaitSupport {
     m_resizableY = true;
     JComponent contentPane = (JComponent) getContentPane();
     contentPane.setCursor(Cursor.getDefaultCursor());
-    // setUI(new PerspectiveInternalFrameUI(this));
-    // WORKAROUND correct layout (swing is too stupid to consider maximum size
+    // WORKAROUND correct layout (swing is not capable of considering the maximum size
     contentPane.setLayout(new BorderLayoutEx());
     // end workaround
     setCursor(null);
@@ -241,6 +244,22 @@ public class JInternalFrameEx extends JInternalFrame implements IWaitSupport {
       d = super.getMaximumSize();
     }
     return d;
+  }
+
+  @Override
+  public void restoreSubcomponentFocus() {
+    if (isIcon()) {
+      super.restoreSubcomponentFocus();
+    }
+    else {
+      Component c = getMostRecentFocusOwner();
+      if (c != null && c.isShowing() && c.isEnabled()) {
+        c.requestFocus();
+      }
+      else {
+        getContentPane().transferFocus();
+      }
+    }
   }
 
   public boolean isWaitCursor() {
