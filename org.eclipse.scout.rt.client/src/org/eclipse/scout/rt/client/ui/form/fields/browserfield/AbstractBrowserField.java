@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -40,7 +41,10 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
   }
 
   /**
-   * This callback is invoked before the link is followed, can be used as handler an vetoer. The default returns true.
+   * This callback is invoked before the link is followed, it can be used as handler and vetoer. The default returns
+   * true.<br>
+   * If there is more to do then simply return true/false, put the
+   * code in a {@link ClientSyncJob} to prevent deadlocks and other problems
    * 
    * @return true to accept this location, false to prevent the browser from going to that location (equal to browser
    *         esc/stop button)
@@ -53,7 +57,7 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
    */
   @ConfigOperation
   @Order(230)
-  protected boolean execBeforeLocationChanged(String location, String path, boolean local) throws ProcessingException {
+  protected boolean execAcceptLocationChange(String location, String path, boolean local) throws ProcessingException {
     return true;
   }
 
@@ -71,7 +75,7 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
    */
   @ConfigOperation
   @Order(230)
-  protected void execAfterLocationChanged(String location, String path, boolean local) throws ProcessingException {
+  protected void execLocationChanged(String location, String path, boolean local) throws ProcessingException {
   }
 
   @Override
@@ -119,7 +123,7 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
         catch (Throwable t) {
           //nop
         }
-        return execBeforeLocationChanged(location, url != null ? url.getPath() : null, url != null && url.getHost().equals("local"));
+        return execAcceptLocationChange(location, url != null ? url.getPath() : null, url != null && url.getHost().equals("local"));
       }
       catch (Throwable t) {
         LOG.error("location: " + location, t);
@@ -136,7 +140,7 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
         catch (Throwable t) {
           //nop
         }
-        execAfterLocationChanged(location, url != null ? url.getPath() : null, url != null && url.getHost().equals("local"));
+        execLocationChanged(location, url != null ? url.getPath() : null, url != null && url.getHost().equals("local"));
       }
       catch (Throwable t) {
         LOG.error("location: " + location, t);
