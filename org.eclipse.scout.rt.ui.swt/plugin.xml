@@ -80,9 +80,9 @@
             modelClass="org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField"
             name="Date field"
             scope="default">
-           <uiClass
-           	class="org.eclipse.scout.rt.ui.swt.form.fields.datefield.SwtScoutDateField">
-           </uiClass>
+         <factory
+               class="org.eclipse.scout.rt.ui.swt.form.fields.datefield.DateFieldFactory">
+         </factory>
       </formField>
       <formField
             active="true"
@@ -235,15 +235,6 @@
             scope="default">
          <uiClass
                class="org.eclipse.scout.rt.ui.swt.form.fields.placeholder.SwtScoutPlaceholderField">
-         </uiClass>
-      </formField>
-      <formField
-            active="true"
-            modelClass="org.eclipse.scout.rt.client.ui.form.fields.timefield.ITimeField"
-            name="Time field"
-            scope="default">
-         <uiClass
-               class="org.eclipse.scout.rt.ui.swt.form.fields.timefield.SwtScoutTimeField">
          </uiClass>
       </formField>
       <formField
