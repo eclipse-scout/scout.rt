@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -93,10 +93,10 @@ public final class ComposerFieldUtility {
       }
     }
     if (parentEntity != null) {
-      return findEntity(f, parentEntity.getComposerEntities(), elemName);
+      return findEntity(parentEntity.getComposerEntities(), elemName);
     }
     else {
-      return findEntity(f, f.getComposerEntities(), elemName);
+      return findEntity(f.getComposerEntities(), elemName);
     }
   }
 
@@ -132,7 +132,7 @@ public final class ComposerFieldUtility {
    * @return the entity for an external id part (no '/' characters) using
    *         {@link IComposerField#createExternalIdPartForEntity(IComposerEntity)}
    */
-  public static IComposerEntity findEntity(IComposerField f, IComposerEntity[] array, String simpleName) {
+  public static IComposerEntity findEntity(IComposerEntity[] array, String simpleName) {
     if (array != null) {
       for (IComposerEntity e : array) {
         if (e.getClass().getSimpleName().equals(simpleName)) {
