@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,14 +16,18 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.activation.CommandMap;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.activation.MailcapCommandMap;
 import javax.activation.MimetypesFileTypeMap;
 import javax.mail.BodyPart;
 import javax.mail.Message;
@@ -39,6 +43,7 @@ import javax.mail.internet.MimePart;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 public final class MailUtility {
   private static final String CONTENT_TYPE_ID = "Content-Type";
@@ -397,13 +402,20 @@ public final class MailUtility {
     return characterEncoding;
   }
 
+  static {
+    setupExtendedMimeMappings();
+    fixMailcapCommandMap();
+  }
+
   /**
    * Static extension to mimetype mapper
-   * 
-   * @since 2.7
    */
-  private static final HashMap<String, String> EXT_TO_MIME_TYPE_MAP;
-  static {
+  private static HashMap<String, String> EXT_TO_MIME_TYPE_MAP;
+
+  /**
+   * Static extension to mimetype mapper
+   */
+  private static void setupExtendedMimeMappings() {
     EXT_TO_MIME_TYPE_MAP = new HashMap<String, String>();
     EXT_TO_MIME_TYPE_MAP.put("ai", "application/postscript");
     EXT_TO_MIME_TYPE_MAP.put("aif", "audio/x-aiff");
@@ -568,5 +580,47 @@ public final class MailUtility {
     EXT_TO_MIME_TYPE_MAP.put("msg", "application/vnd.ms-outlook");
     EXT_TO_MIME_TYPE_MAP.put("eml", "message/rfc822");
     EXT_TO_MIME_TYPE_MAP.put("ini", "text/plain");
+  }
+
+  /**
+   * jax-ws in jre 1.6.0 and priopr to 1.2.7 breaks support for "Umlaute" ä, ö, ü due to a bug in
+   * StringDataContentHandler.writeTo
+   * <p>
+   * This patch uses reflection to eliminate this buggy mapping from the command map and adds the default text_plain
+   * mapping (if available, e.g. sun jre)
+   */
+  @SuppressWarnings("unchecked")
+  private static void fixMailcapCommandMap() {
+    try {
+      //set the com.sun.mail.handlers.text_plain to level 0 (programmatic) to prevent others from overriding in level 0
+      Class textPlainClass;
+      try {
+        textPlainClass = Class.forName("com.sun.mail.handlers.text_plain");
+      }
+      catch (Throwable t) {
+        //class not found, cancel
+        return;
+      }
+      CommandMap cmap = MailcapCommandMap.getDefaultCommandMap();
+      if (!(cmap instanceof MailcapCommandMap)) {
+        return;
+      }
+      ((MailcapCommandMap) cmap).addMailcap("text/plain;;x-java-content-handler=" + textPlainClass.getName());
+      //use reflection to clear out all other mappings of text/plain in level 0
+      Field f = MailcapCommandMap.class.getDeclaredField("DB");
+      f.setAccessible(true);
+      Object[] dbArray = (Object[]) f.get(cmap);
+      f = Class.forName("com.sun.activation.registries.MailcapFile").getDeclaredField("type_hash");
+      f.setAccessible(true);
+      Map<Object, Object> db0 = (Map<Object, Object>) f.get(dbArray[0]);
+      Map<Object, Object> typeMap = (Map<Object, Object>) db0.get("text/plain");
+      List<String> handlerList = (List<String>) typeMap.get("content-handler");
+      //put text_plain in front
+      handlerList.remove("com.sun.mail.handlers.text_plain");
+      handlerList.add(0, "com.sun.mail.handlers.text_plain");
+    }
+    catch (Throwable t) {
+      ScoutLogManager.getLogger(MailUtility.class).warn("Failed fixing MailcapComandMap string handling: " + t);
+    }
   }
 }
