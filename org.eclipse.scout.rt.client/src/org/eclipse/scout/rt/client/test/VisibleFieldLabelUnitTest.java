@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,10 +18,10 @@ import org.eclipse.scout.rt.client.services.common.test.ClientTestUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.client.ui.form.fields.timefield.AbstractTimeField;
 import org.osgi.framework.Bundle;
 
 public class VisibleFieldLabelUnitTest extends AbstractClientTest {
@@ -40,7 +40,7 @@ public class VisibleFieldLabelUnitTest extends AbstractClientTest {
             setSubTitle(form.getTitle() + " > " + childField.getLabel() + " [" + form.getClass().getSimpleName() + "." + childField.getClass().getSimpleName() + "]");
             JLabel l = new JLabel();
             int pix = l.getFontMetrics(l.getFont()).stringWidth(childField.getLabel());
-            if (pix > 130 && (AbstractTimeField.class.isAssignableFrom(childField.getClass()) || AbstractDoubleField.class.isAssignableFrom(childField.getClass()) || AbstractSmartField.class.isAssignableFrom(childField.getClass()) || AbstractStringField.class.isAssignableFrom(childField.getClass()))) {
+            if (pix > 130 && (AbstractDateField.class.isAssignableFrom(childField.getClass()) || AbstractDoubleField.class.isAssignableFrom(childField.getClass()) || AbstractSmartField.class.isAssignableFrom(childField.getClass()) || AbstractStringField.class.isAssignableFrom(childField.getClass()))) {
               addWarningStatus(childField.getLabel() + " (" + pix + "px) > 130px");
             }
             else if (pix > (185 * childField.getGridData().w) && AbstractButton.class.isAssignableFrom(childField.getClass()) || AbstractButton.class.isAssignableFrom(childField.getClass())) {

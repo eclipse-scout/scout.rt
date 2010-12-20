@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -31,6 +32,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   // initConfig()
   private String m_format;
   private boolean m_hasTime;
+  private boolean m_hasDate;
   private DateFormat m_fmt;
 
   public AbstractDateColumn() {
@@ -49,6 +51,13 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(150)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredHasDate() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(151)
   @ConfigPropertyValue("false")
   protected boolean getConfiguredHasTime() {
     return false;
@@ -58,6 +67,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   protected void initConfig() {
     super.initConfig();
     setFormat(getConfiguredFormat());
+    setHasDate(getConfiguredHasDate());
     setHasTime(getConfiguredHasTime());
   }
 
@@ -73,9 +83,18 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     return m_format;
   }
 
+  public void setHasDate(boolean b) {
+    m_hasDate = b;
+    m_fmt = null;
+  }
+
   public void setHasTime(boolean b) {
     m_hasTime = b;
     m_fmt = null;
+  }
+
+  public boolean isHasDate() {
+    return m_hasDate;
   }
 
   public boolean isHasTime() {
@@ -84,6 +103,10 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
 
   @Override
   protected Date parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+    //legacy support
+    if (rawValue instanceof Number) {
+      rawValue = convertDoubleTimeToDate((Number) rawValue);
+    }
     Date validValue = null;
     if (rawValue == null) {
       validValue = null;
@@ -97,11 +120,29 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     return validValue;
   }
 
+  private Date convertDoubleTimeToDate(Number d) {
+    if (d == null) {
+      return null;
+    }
+    int m = (int) (((long) (d.doubleValue() * MILLIS_PER_DAY + 0.5)) % MILLIS_PER_DAY);
+    Calendar c = Calendar.getInstance();
+    c.clear();
+    c.set(Calendar.MILLISECOND, m % 1000);
+    m = m / 1000;
+    c.set(Calendar.SECOND, m % 60);
+    m = m / 60;
+    c.set(Calendar.MINUTE, m % 60);
+    m = m / 60;
+    c.set(Calendar.HOUR_OF_DAY, m % 24);
+    return c.getTime();
+  }
+
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
     AbstractDateField f = new AbstractDateField() {
     };
     f.setFormat(getFormat());
+    f.setHasDate(isHasDate());
     f.setHasTime(isHasTime());
     return f;
   }
@@ -118,21 +159,23 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   }
 
   private DateFormat getDateFormat() {
-    if (m_fmt == null) {
-      if (getFormat() != null) {
-        m_fmt = new SimpleDateFormat(getFormat());
+    DateFormat df = null;
+    if (getFormat() != null) {
+      df = new SimpleDateFormat(getFormat());
+    }
+    else {
+      if (isHasDate() && !isHasTime()) {
+        df = DateFormat.getDateInstance(DateFormat.MEDIUM);
+      }
+      else if (!isHasDate() && isHasTime()) {
+        df = DateFormat.getTimeInstance(DateFormat.SHORT);
       }
       else {
-        if (isHasTime()) {
-          m_fmt = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-        }
-        else {
-          m_fmt = DateFormat.getDateInstance(DateFormat.MEDIUM);
-        }
-        m_fmt.setLenient(true);
+        df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
       }
+      df.setLenient(true);
     }
-    return m_fmt;
+    return df;
   }
 
 }

@@ -15,17 +15,22 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * convenience subclass of {@link AbstractDateField} with hasDate=true and hasTime=true
+ * convenience subclass of {@link AbstractDateField} with hasDate=false and hasTime=true
  */
-public abstract class AbstractDateTimeField extends AbstractDateField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDateTimeField.class);
+public abstract class AbstractTimeField extends AbstractDateField {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTimeField.class);
 
-  public AbstractDateTimeField() {
+  public AbstractTimeField() {
   }
 
   @ConfigPropertyValue("true")
   @Override
   protected boolean getConfiguredHasTime() {
     return true;
+  }
+
+  @Override
+  protected boolean getConfiguredHasDate() {
+    return false;
   }
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.operator.IComposerOp;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractTimeField;
 import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
@@ -38,7 +39,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBo
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.client.ui.form.fields.timefield.AbstractTimeField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -419,8 +419,16 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
       try {
-        if (values != null && values.length == 1 && values[0] instanceof Double) {
-          setValue((Double) values[0]);
+        if (values != null && values.length == 1) {
+          if (values[0] instanceof Double) {
+            setTimeValue((Double) values[0]);
+          }
+          else if (values[0] instanceof Date) {
+            setValue((Date) values[0]);
+          }
+          else {
+            setValue(null);
+          }
         }
         else {
           setValue(null);
@@ -870,10 +878,16 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
         getFieldByClass(BetweenTimeField.ToField.class).setValue(null);
         if (values != null && values.length == 2) {
           if (values[0] instanceof Double) {
-            getFieldByClass(BetweenTimeField.FromField.class).setValue((Double) values[0]);
+            getFieldByClass(BetweenTimeField.FromField.class).setTimeValue((Double) values[0]);
+          }
+          else if (values[0] instanceof Date) {
+            getFieldByClass(BetweenTimeField.FromField.class).setValue((Date) values[0]);
           }
           if (values[1] instanceof Double) {
-            getFieldByClass(BetweenTimeField.ToField.class).setValue((Double) values[1]);
+            getFieldByClass(BetweenTimeField.ToField.class).setTimeValue((Double) values[1]);
+          }
+          else if (values[1] instanceof Date) {
+            getFieldByClass(BetweenTimeField.ToField.class).setValue((Date) values[1]);
           }
         }
       }

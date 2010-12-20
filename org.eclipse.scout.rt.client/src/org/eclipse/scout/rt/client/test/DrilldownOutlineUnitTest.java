@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -48,7 +48,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
-import org.eclipse.scout.rt.client.ui.form.fields.timefield.ITimeField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
@@ -240,9 +239,6 @@ public class DrilldownOutlineUnitTest extends AbstractClientTest {
       else if (field instanceof IStringField) {
         successful = fillStringField((IStringField) field);
       }
-      else if (field instanceof ITimeField) {
-        successful = fillTimeField((ITimeField) field);
-      }
       else if (field instanceof ITreeBox) {
         successful = fillTreeBox((ITreeBox<?>) field);
       }
@@ -375,11 +371,6 @@ public class DrilldownOutlineUnitTest extends AbstractClientTest {
   protected boolean fillStringField(IStringField field) {
     field.setValue("abcd1234");
     return field.isContentValid();
-  }
-
-  protected boolean fillTimeField(ITimeField field) {
-    field.setValue(Double.valueOf(0.5d));
-    return true;
   }
 
   @SuppressWarnings("unchecked")
