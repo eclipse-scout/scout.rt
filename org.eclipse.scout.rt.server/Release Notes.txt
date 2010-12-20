@@ -162,3 +162,8 @@ Defining a FormDataStatementBuilder for template types works as follows:
                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Migration: actually no migration but fix occurrences in your projects, if already used at all.
+
+20.12.2010 jgu
+Merged BSI Ticket 95648:
+Passwords are not displayed in service property page anymore, but can still be edited.
+Migration: None
