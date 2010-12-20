@@ -319,11 +319,11 @@ public class ServicesView extends DefaultView {
         p.tableCell(propName);
         p.startTableCell();
         if (editable) {
-          p.formTextArea("value", propValue);
+          p.formTextArea("value", getPropertyDisplayValue(propName, propValue));
           p.formSubmit("Change");
         }
         else {
-          p.print(propValue);
+          p.print(getPropertyDisplayValue(propName, propValue));
         }
         p.endTableCell();
         p.endTableRow();
@@ -365,6 +365,25 @@ public class ServicesView extends DefaultView {
       }
       p.raw("</pre>");
     }
+  }
+
+  /**
+   * @return Value to be displayed (sensitive information is not displayed).
+   */
+  private String getPropertyDisplayValue(String propertyName, String propertyValue) {
+    if (isPropertySuppressed(propertyName)) {
+      return "***";
+    }
+    else {
+      return propertyValue;
+    }
+  }
+
+  /**
+   * @return true if property contains sensitive information and is therefore not shown
+   */
+  private boolean isPropertySuppressed(String propertyName) {
+    return propertyName != null && propertyName.toLowerCase().contains("password");
   }
 
   private String formatPropertyValue(PropertyDescriptor p, Object value) {
