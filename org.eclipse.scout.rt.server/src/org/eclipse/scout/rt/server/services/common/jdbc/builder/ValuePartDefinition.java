@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,8 +18,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerConstants;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 
 /**
  * Definition of a property-to-sql and valueField-to-sql mapping for {@link AbstractPropertyData} and
@@ -40,7 +40,7 @@ public class ValuePartDefinition {
    *          If different bind names are used,
    *          {@link #createNewInstance(FormDataStatementBuilder, List, List, List, Map)} shoult be overridden
    * @param operator
-   *          any of the {@link ComposerConstants#OPERATOR_*} values
+   *          any of the {@link DataModelConstants#OPERATOR_*} values
    */
   public ValuePartDefinition(Class valueType, String sqlAttribute, int operator) {
     this(new Class[]{valueType}, sqlAttribute, operator, false);
@@ -59,14 +59,14 @@ public class ValuePartDefinition {
    * see {@link #ValuePartDefinition(Class, String, int)}
    */
   public ValuePartDefinition(Class valueType, String sqlAttribute) {
-    this(new Class[]{valueType}, sqlAttribute, ComposerConstants.OPERATOR_NONE, false);
+    this(new Class[]{valueType}, sqlAttribute, DataModelConstants.OPERATOR_NONE, false);
   }
 
   /**
    * see {@link #ValuePartDefinition(Class, String, int)}
    */
   public ValuePartDefinition(Class[] valueTypes, String sqlAttribute) {
-    this(valueTypes, sqlAttribute, ComposerConstants.OPERATOR_NONE, false);
+    this(valueTypes, sqlAttribute, DataModelConstants.OPERATOR_NONE, false);
   }
 
   /**
@@ -192,7 +192,8 @@ public class ValuePartDefinition {
 
   /**
    * Override this method to intercept and change part instance properties such as values, operation type, etc.<br>
-   * Sometimes it is convenient to set the operation to {@link ComposerConstants#OPERATOR_NONE} which uses the attribute
+   * Sometimes it is convenient to set the operation to {@link DataModelConstants#OPERATOR_NONE} which uses the
+   * attribute
    * itself as the complete statement part.
    * 
    * @param builder
@@ -217,6 +218,6 @@ public class ValuePartDefinition {
    * @throws ProcessingException
    */
   public String createNewInstance(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
-    return builder.createStatementPart(ComposerConstants.AGGREGATION_NONE, getSqlAttribute(), getOperation(), bindNames, bindValues, isPlainBind(), parentAliasMap);
+    return builder.createStatementPart(DataModelConstants.AGGREGATION_NONE, getSqlAttribute(), getOperation(), bindNames, bindValues, isPlainBind(), parentAliasMap);
   }
 }

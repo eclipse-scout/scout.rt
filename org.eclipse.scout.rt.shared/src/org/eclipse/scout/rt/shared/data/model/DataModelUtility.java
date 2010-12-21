@@ -4,16 +4,18 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.data.form.fields.composer;
+package org.eclipse.scout.rt.shared.data.model;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.eclipse.scout.commons.CompareUtility;
 
 /**
  * Transform entities and attributes from and to shared data objects and external ids (using folder and meta syntax:
@@ -21,10 +23,14 @@ import java.util.regex.Pattern;
  * <p>
  * The external id is used to identify an entity, attribute or inner entity, attribute when using xml storages,
  * bookmarks, server calls.
+ * <p>
+ * see {@link AbstractDataModelAttributeData}, {@link AbstractDataModelEntityData},
+ * {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)},
+ * {@link IDataModel#getMetaDataOfAttributeData(AbstractDataModelAttributeData, Object[])}
  */
-public final class ComposerDataUtility {
+public final class DataModelUtility {
 
-  private ComposerDataUtility() {
+  private DataModelUtility() {
   }
 
   /**
@@ -35,13 +41,12 @@ public final class ComposerDataUtility {
   private static final Pattern PAT_NVPAIR = Pattern.compile("([^=]+)=(.*)");
 
   /**
-   * @return the external id (foo/bar/foo) for an entity data using
-   *         {@link IComposerField#createExternalIdPartForEntityData(AbstractComposerEntityData)} and
-   *         {@link IComposerField#createExternalIdPartForAttributeData(AbstractComposerAttributeData)}
+   * @return the external id (foo/bar/foo) for an entity using
+   *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
-  public static String entityDataToExternalId(AbstractComposerEntityData e) {
+  public static String entityToExternalId(IDataModel f, IDataModelEntity e) {
     if (e.getParentEntity() != null) {
-      return entityDataToExternalId(e.getParentEntity()) + "/" + e.getClass().getSimpleName();
+      return entityToExternalId(f, e.getParentEntity()) + "/" + e.getClass().getSimpleName();
     }
     else {
       return e.getClass().getSimpleName();
@@ -49,58 +54,51 @@ public final class ComposerDataUtility {
   }
 
   /**
-   * @return the external id (foo/bar/foo) for an attribute data using
-   *         {@link IComposerField#createExternalIdPartForEntityData(AbstractComposerEntityData)} and
-   *         {@link IComposerField#createExternalIdPartForAttributeData(AbstractComposerAttributeData)}
-   * @param values
-   *          of the node containing the attribute; this may contain some meta data relevant for dynamic attributes
+   * @return the external id (foo/bar/foo) for an attribute using
+   *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
-  public static String attributeDataToExternalId(AbstractComposerAttributeData a, Map<String, String> metaData) {
+  public static String attributeToExternalId(IDataModel f, IDataModelAttribute a) {
     if (a.getParentEntity() != null) {
-      return entityDataToExternalId(a.getParentEntity()) + "/" + a.getClass().getSimpleName() + exportMetaData(metaData);
+      return entityToExternalId(f, a.getParentEntity()) + "/" + a.getClass().getSimpleName() + exportMetaData(f.getMetaDataOfAttribute(a));
     }
     else {
-      return a.getClass().getSimpleName() + exportMetaData(metaData);
+      return a.getClass().getSimpleName() + exportMetaData(f.getMetaDataOfAttribute(a));
     }
   }
 
   /**
-   * @return the entity data for an external id (foo/bar/foo) using
-   *         {@link IComposerField#createExternalIdPartForEntityData(AbstractComposerEntityData)} and
-   *         {@link IComposerField#createExternalIdPartForAttributeData(AbstractComposerAttributeData)}
+   * @return the entity for an external id (foo/bar/foo) using
+   *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    * @param parentEntity
    *          is the entity on which to start resolving or null to start on top of the entity/attribute tree
    */
-  public static AbstractComposerEntityData externalIdToEntityData(AbstractComposerData formData, String externalId, AbstractComposerEntityData parentEntity) {
+  public static IDataModelEntity externalIdToEntity(IDataModel f, String externalId, IDataModelEntity parentEntity) {
     if (externalId == null) return null;
     Matcher m = PAT_EXTERNAL_ID.matcher(externalId);
     if (!m.matches()) throw new IllegalArgumentException("externalId is invalid: " + externalId);
     String folderName = m.group(2);
     String elemName = m.group(3);
     if (folderName != null) {
-      parentEntity = externalIdToEntityData(formData, folderName, parentEntity);
+      parentEntity = externalIdToEntity(f, folderName, parentEntity);
       if (parentEntity == null) {
         return null;
       }
     }
     if (parentEntity != null) {
-      return findEntityData(parentEntity.getEntities(), elemName);
+      return findEntity(parentEntity.getEntities(), elemName);
     }
     else {
-      return findEntityData(formData.getEntities(), elemName);
+      return findEntity(f.getEntities(), elemName);
     }
   }
 
   /**
-   * @return the attribute data for an external id (foo/bar/foo) using
-   *         {@link IComposerField#createExternalIdPartForEntityData(AbstractComposerEntityData)} and
-   *         {@link IComposerField#createExternalIdPartForAttributeData(AbstractComposerAttributeData)}
+   * @return the attribute for an external id (foo/bar/foo) using
+   *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    * @param parentEntity
    *          is the entity on which to start resolving or null to start on top of the entity/attribute tree
-   * @param values
-   *          of the node containing the attribute; this may contain some meta data relevant for dynamic attributes
    */
-  public static AbstractComposerAttributeData externalIdToAttributeData(AbstractComposerData formData, String externalId, AbstractComposerEntityData parentEntity) {
+  public static IDataModelAttribute externalIdToAttribute(IDataModel f, String externalId, IDataModelEntity parentEntity) {
     if (externalId == null) return null;
     Matcher m = PAT_EXTERNAL_ID.matcher(externalId);
     if (!m.matches()) throw new IllegalArgumentException("externalId is invalid: " + externalId);
@@ -108,26 +106,26 @@ public final class ComposerDataUtility {
     String elemName = m.group(3);
     Map<String, String> meta = importMetaData(m.group(5));
     if (folderName != null) {
-      parentEntity = externalIdToEntityData(formData, folderName, parentEntity);
+      parentEntity = externalIdToEntity(f, folderName, parentEntity);
       if (parentEntity == null) {
         return null;
       }
     }
     if (parentEntity != null) {
-      return findAttributeData(parentEntity.getAttributes(), elemName, meta);
+      return findAttribute(f, parentEntity.getAttributes(), elemName, meta);
     }
     else {
-      return findAttributeData(formData.getAttributes(), elemName, meta);
+      return findAttribute(f, f.getAttributes(), elemName, meta);
     }
   }
 
   /**
-   * @return the entity data for an external id part (no '/' characters) using
-   *         {@link IComposerField#createExternalIdPartForEntityData(AbstractComposerEntityData)}
+   * @return the entity for an external id part (no '/' characters) using
+   *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
-  public static AbstractComposerEntityData findEntityData(AbstractComposerEntityData[] array, String simpleName) {
+  public static IDataModelEntity findEntity(IDataModelEntity[] array, String simpleName) {
     if (array != null) {
-      for (AbstractComposerEntityData e : array) {
+      for (IDataModelEntity e : array) {
         if (e.getClass().getSimpleName().equals(simpleName)) {
           return e;
         }
@@ -137,20 +135,22 @@ public final class ComposerDataUtility {
   }
 
   /**
-   * @return the attribute data for an external id part (no '/' characters) using
-   *         {@link IComposerField#createExternalIdPartForAttributeData(AbstractComposerAttributeData)}
-   * @param values
-   *          of the node containing the attribute; this may contain some meta data relevant for dynamic attributes
+   * @return the attribute for an external id part (no '/' characters) using
+   *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
-  public static AbstractComposerAttributeData findAttributeData(AbstractComposerAttributeData[] array, String simpleName, Map<String, String> metaData) {
+  public static IDataModelAttribute findAttribute(IDataModel f, IDataModelAttribute[] array, String simpleName, Map<String, String> metaData) {
+    IDataModelAttribute secondaryMatch = null;
     if (array != null) {
-      for (AbstractComposerAttributeData a : array) {
+      for (IDataModelAttribute a : array) {
         if (a.getClass().getSimpleName().equals(simpleName)) {
-          return a;
+          secondaryMatch = a;
+          if (CompareUtility.equals(f.getMetaDataOfAttribute(a), metaData)) {
+            return a;
+          }
         }
       }
     }
-    return null;
+    return secondaryMatch;
   }
 
   /**
@@ -161,7 +161,7 @@ public final class ComposerDataUtility {
    * empty values are imported as null
    */
   public static Map<String, String> importMetaData(String s) {
-    if (s == null || s.indexOf(';') < 0) return null;
+    if (s == null) return null;
     Map<String, String> map = new HashMap<String, String>(1);
     for (String e : PAT_SEMI_COLON.split(s)) {
       Matcher m = PAT_NVPAIR.matcher(e);

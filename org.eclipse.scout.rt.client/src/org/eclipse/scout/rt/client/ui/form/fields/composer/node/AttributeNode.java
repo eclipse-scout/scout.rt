@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,16 +16,16 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.operator.IComposerOp;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerConstants;
+import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 
 public class AttributeNode extends AbstractComposerNode {
-  private IComposerAttribute m_attribute;
+  private IDataModelAttribute m_attribute;
   private Integer m_aggregationType;
-  private IComposerOp m_op;
+  private IDataModelAttributeOp m_op;
   private String m_verbose;
   private Object[] m_values;
   private String[] m_texts;
@@ -38,11 +38,11 @@ public class AttributeNode extends AbstractComposerNode {
   @Override
   protected void execDecorateCell(Cell cell) {
     // text
-    int dataType = IComposerAttribute.TYPE_NONE;
+    int dataType = DataModelConstants.TYPE_NONE;
     if (m_op != null) {
       dataType = m_op.getType();
     }
-    if (dataType == IComposerAttribute.TYPE_INHERITED) {
+    if (dataType == DataModelConstants.TYPE_INHERITED) {
       if (m_attribute != null) {
         dataType = m_attribute.getType();
       }
@@ -52,7 +52,7 @@ public class AttributeNode extends AbstractComposerNode {
       prefix = ScoutTexts.get("ExtendedSearchAnd") + " ";
     }
     if (m_op != null && m_attribute != null) {
-      if (m_attribute.getType() == IComposerAttribute.TYPE_AGGREGATE_COUNT) {
+      if (m_attribute.getType() == DataModelConstants.TYPE_AGGREGATE_COUNT) {
         cell.setText(prefix + m_op.createVerboseText(null, m_attribute.getText(), m_texts));
       }
       else {
@@ -89,19 +89,19 @@ public class AttributeNode extends AbstractComposerNode {
     m_texts = s;
   }
 
-  public IComposerAttribute getAttribute() {
+  public IDataModelAttribute getAttribute() {
     return m_attribute;
   }
 
-  public void setAttribute(IComposerAttribute a) {
+  public void setAttribute(IDataModelAttribute a) {
     m_attribute = a;
   }
 
-  public IComposerOp getOp() {
+  public IDataModelAttributeOp getOp() {
     return m_op;
   }
 
-  public void setOp(IComposerOp op) {
+  public void setOp(IDataModelAttributeOp op) {
     m_op = op;
   }
 
@@ -118,7 +118,7 @@ public class AttributeNode extends AbstractComposerNode {
    *         see {@link ComposerConstants#AGGREGATION_*} values
    */
   public void setAggregationType(Integer a) {
-    if (a != null && a == ComposerConstants.AGGREGATION_NONE) {
+    if (a != null && a == DataModelConstants.AGGREGATION_NONE) {
       a = null;
     }
     m_aggregationType = a;
@@ -137,10 +137,10 @@ public class AttributeNode extends AbstractComposerNode {
       ComposerAttributeForm form = new ComposerAttributeForm();
       ITreeNode parent = getParentNode();
       if (parent instanceof EntityNode) {
-        form.setAvailableAttributes(((EntityNode) parent).getEntity().getComposerAttributes());
+        form.setAvailableAttributes(((EntityNode) parent).getEntity().getAttributes());
       }
       else {
-        form.setAvailableAttributes(getComposerField().getComposerAttributes());
+        form.setAvailableAttributes(getComposerField().getAttributes());
       }
       form.setSelectedAttribute(getAttribute());
       form.setSelectedOp(getOp());

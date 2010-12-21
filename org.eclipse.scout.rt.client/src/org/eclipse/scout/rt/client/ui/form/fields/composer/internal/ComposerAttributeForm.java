@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.CancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.OkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.AttributeField;
@@ -44,7 +43,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttr
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.StringField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.TimeField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.TreeBoxField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.operator.IComposerOp;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractTimeField;
 import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
@@ -61,6 +59,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -69,7 +70,7 @@ import org.eclipse.scout.service.SERVICES;
 public class ComposerAttributeForm extends AbstractForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ComposerAttributeForm.class);
 
-  private IComposerAttribute[] m_validAttributes;
+  private IDataModelAttribute[] m_validAttributes;
   /**
    * result value
    */
@@ -86,11 +87,11 @@ public class ComposerAttributeForm extends AbstractForm {
   /**
    * form property
    */
-  public IComposerAttribute[] getAvailableAttributes() {
+  public IDataModelAttribute[] getAvailableAttributes() {
     return m_validAttributes;
   }
 
-  public void setAvailableAttributes(IComposerAttribute[] a) throws ProcessingException {
+  public void setAvailableAttributes(IDataModelAttribute[] a) throws ProcessingException {
     m_validAttributes = a;
     // single observer, reload attributes listbox
     getAttributeField().loadListBoxData();
@@ -125,19 +126,19 @@ public class ComposerAttributeForm extends AbstractForm {
     m_selectedDisplayValue = s;
   }
 
-  public IComposerAttribute getSelectedAttribute() {
+  public IDataModelAttribute getSelectedAttribute() {
     return getAttributeField().getCheckedKey();
   }
 
-  public void setSelectedAttribute(IComposerAttribute a) {
+  public void setSelectedAttribute(IDataModelAttribute a) {
     getAttributeField().checkKey(a);
   }
 
-  public IComposerOp getSelectedOp() {
+  public IDataModelAttributeOp getSelectedOp() {
     return getOperatorField().getCheckedKey();
   }
 
-  public void setSelectedOp(IComposerOp op) {
+  public void setSelectedOp(IDataModelAttributeOp op) {
     getOperatorField().checkKey(op);
   }
 
@@ -152,34 +153,34 @@ public class ComposerAttributeForm extends AbstractForm {
    */
   @SuppressWarnings("unchecked")
   private void activateValueField() {
-    IComposerAttribute att = getAttributeField().getCheckedKey();
-    IComposerOp op = getOperatorField().getCheckedKey();
+    IDataModelAttribute att = getAttributeField().getCheckedKey();
+    IDataModelAttributeOp op = getOperatorField().getCheckedKey();
     HashMap<Integer, IValueField> map = new HashMap<Integer, IValueField>();
-    map.put(IComposerAttribute.TYPE_DATE, getDateField());
-    map.put(IComposerAttribute.TYPE_DATE_TIME, getDateTimeField());
-    map.put(IComposerAttribute.TYPE_DOUBLE, getDoubleField());
-    map.put(IComposerAttribute.TYPE_INTEGER, getIntegerField());
-    map.put(IComposerAttribute.TYPE_AGGREGATE_COUNT, getLongField());
-    map.put(IComposerAttribute.TYPE_NUMBER_LIST, getListBoxField());
-    map.put(IComposerAttribute.TYPE_NUMBER_TREE, getTreeBoxField());
-    map.put(IComposerAttribute.TYPE_CODE_LIST, getListBoxField());
-    map.put(IComposerAttribute.TYPE_CODE_TREE, getTreeBoxField());
-    map.put(IComposerAttribute.TYPE_LONG, getLongField());
-    map.put(IComposerAttribute.TYPE_PERCENT, getPercentField());
-    map.put(IComposerAttribute.TYPE_PLAIN_DOUBLE, getPlainDoubleField());
-    map.put(IComposerAttribute.TYPE_PLAIN_INTEGER, getPlainIntegerField());
-    map.put(IComposerAttribute.TYPE_PLAIN_LONG, getPlainLongField());
-    map.put(IComposerAttribute.TYPE_STRING, getStringField());
-    map.put(IComposerAttribute.TYPE_FULL_TEXT, getStringField());
-    map.put(IComposerAttribute.TYPE_SMART, getSmartField());
-    map.put(IComposerAttribute.TYPE_TIME, getTimeField());
-    map.put(IComposerAttribute.TYPE_NONE, getDummyField());
+    map.put(DataModelConstants.TYPE_DATE, getDateField());
+    map.put(DataModelConstants.TYPE_DATE_TIME, getDateTimeField());
+    map.put(DataModelConstants.TYPE_DOUBLE, getDoubleField());
+    map.put(DataModelConstants.TYPE_INTEGER, getIntegerField());
+    map.put(DataModelConstants.TYPE_AGGREGATE_COUNT, getLongField());
+    map.put(DataModelConstants.TYPE_NUMBER_LIST, getListBoxField());
+    map.put(DataModelConstants.TYPE_NUMBER_TREE, getTreeBoxField());
+    map.put(DataModelConstants.TYPE_CODE_LIST, getListBoxField());
+    map.put(DataModelConstants.TYPE_CODE_TREE, getTreeBoxField());
+    map.put(DataModelConstants.TYPE_LONG, getLongField());
+    map.put(DataModelConstants.TYPE_PERCENT, getPercentField());
+    map.put(DataModelConstants.TYPE_PLAIN_DOUBLE, getPlainDoubleField());
+    map.put(DataModelConstants.TYPE_PLAIN_INTEGER, getPlainIntegerField());
+    map.put(DataModelConstants.TYPE_PLAIN_LONG, getPlainLongField());
+    map.put(DataModelConstants.TYPE_STRING, getStringField());
+    map.put(DataModelConstants.TYPE_FULL_TEXT, getStringField());
+    map.put(DataModelConstants.TYPE_SMART, getSmartField());
+    map.put(DataModelConstants.TYPE_TIME, getTimeField());
+    map.put(DataModelConstants.TYPE_NONE, getDummyField());
     //
-    int type = IComposerAttribute.TYPE_NONE;
+    int type = DataModelConstants.TYPE_NONE;
     if (op != null) {
       type = op.getType();
     }
-    if (type == IComposerAttribute.TYPE_INHERITED) {
+    if (type == DataModelConstants.TYPE_INHERITED) {
       if (att != null) {
         type = att.getType();
       }
@@ -396,7 +397,7 @@ public class ComposerAttributeForm extends AbstractForm {
       }
 
       @Order(1)
-      public class AttributeField extends AbstractListBox<IComposerAttribute> {
+      public class AttributeField extends AbstractListBox<IDataModelAttribute> {
         @Override
         protected String getConfiguredLabel() {
           return ScoutTexts.get("Attribute");
@@ -409,7 +410,7 @@ public class ComposerAttributeForm extends AbstractForm {
 
         @Override
         protected LookupRow[] execLoadTableData() throws ProcessingException {
-          IComposerAttribute[] a = getAvailableAttributes();
+          IDataModelAttribute[] a = getAvailableAttributes();
           ArrayList<LookupRow> list = new ArrayList<LookupRow>();
           if (a != null) {
             for (int i = 0; i < a.length; i++) {
@@ -446,11 +447,11 @@ public class ComposerAttributeForm extends AbstractForm {
         protected void execChangedValue() {
           // change operator set
           try {
-            IComposerOp oldOp = getOperatorField().getCheckedKey();
+            IDataModelAttributeOp oldOp = getOperatorField().getCheckedKey();
             getOperatorField().loadListBoxData();
             getOperatorField().checkKey(oldOp);
             if (getOperatorField().getCheckedKey() == null) {
-              IComposerOp[] ops = getOperatorField().getValue();
+              IDataModelAttributeOp[] ops = getOperatorField().getValue();
               if (ops != null && ops.length > 0) {
                 getOperatorField().checkKey(ops[0]);
               }
@@ -465,7 +466,7 @@ public class ComposerAttributeForm extends AbstractForm {
       }
 
       @Order(2)
-      public class OperatorField extends AbstractListBox<IComposerOp> {
+      public class OperatorField extends AbstractListBox<IDataModelAttributeOp> {
         @Override
         protected String getConfiguredLabel() {
           return ScoutTexts.get("Op");
@@ -473,8 +474,8 @@ public class ComposerAttributeForm extends AbstractForm {
 
         @Override
         protected LookupRow[] execLoadTableData() throws ProcessingException {
-          IComposerOp[] ops = null;
-          IComposerAttribute att = getAttributeField().getCheckedKey();
+          IDataModelAttributeOp[] ops = null;
+          IDataModelAttribute att = getAttributeField().getCheckedKey();
           if (att != null) {
             ops = att.getOperators();
           }
@@ -482,7 +483,7 @@ public class ComposerAttributeForm extends AbstractForm {
           if (ops != null) {
             rows = new LookupRow[ops.length];
             for (int i = 0; i < rows.length; i++) {
-              IComposerOp id = ops[i];
+              IDataModelAttributeOp id = ops[i];
               String text = ops[i].getText();
               if (text != null && text.indexOf("{0}") >= 0) {
                 text = text.replace("{0}", "n");
@@ -557,7 +558,7 @@ public class ComposerAttributeForm extends AbstractForm {
 
         @Override
         protected void execPrepareLookup(LookupCall call) throws ProcessingException {
-          IComposerAttribute att = getAttributeField().getCheckedKey();
+          IDataModelAttribute att = getAttributeField().getCheckedKey();
           if (att != null) {
             att.prepareLookup(call);
           }
@@ -599,7 +600,7 @@ public class ComposerAttributeForm extends AbstractForm {
 
         @Override
         protected void execPrepareLookup(LookupCall call, ITreeNode parent) throws ProcessingException {
-          IComposerAttribute att = getAttributeField().getCheckedKey();
+          IDataModelAttribute att = getAttributeField().getCheckedKey();
           if (att != null) {
             att.prepareLookup(call);
           }
@@ -938,7 +939,7 @@ public class ComposerAttributeForm extends AbstractForm {
 
         @Override
         public void execPrepareLookup(LookupCall call) throws ProcessingException {
-          IComposerAttribute att = getAttributeField().getCheckedKey();
+          IDataModelAttribute att = getAttributeField().getCheckedKey();
           if (att != null) {
             att.prepareLookup(call);
           }

@@ -4,19 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.composer.operator;
+package org.eclipse.scout.rt.shared.data.model;
 
-/**
- * Title: BSI Scout V3
- */
-
-import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
-
-public interface IComposerOp {
+public interface IDataModelAttributeOp {
 
   String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts);
 

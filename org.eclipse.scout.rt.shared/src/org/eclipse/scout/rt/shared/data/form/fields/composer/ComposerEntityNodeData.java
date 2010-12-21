@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,15 +21,19 @@ import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
 public class ComposerEntityNodeData extends TreeNodeData {
   private static final long serialVersionUID = 1L;
 
-  private AbstractComposerEntityData m_entity;
+  private String m_entityExternalId;
   private boolean m_negated = false;
   private String m_alias;
 
   public ComposerEntityNodeData() {
   }
 
-  public AbstractComposerEntityData getEntity() {
-    return m_entity;
+  public String getEntityExternalId() {
+    return m_entityExternalId;
+  }
+
+  public void setEntityExternalId(String entityExternalId) {
+    m_entityExternalId = entityExternalId;
   }
 
   /**
@@ -54,10 +58,6 @@ public class ComposerEntityNodeData extends TreeNodeData {
         visitContainingAttributeNodesRec(child, list);
       }
     }
-  }
-
-  public void setEntity(AbstractComposerEntityData entity) {
-    m_entity = entity;
   }
 
   public boolean isNegative() {

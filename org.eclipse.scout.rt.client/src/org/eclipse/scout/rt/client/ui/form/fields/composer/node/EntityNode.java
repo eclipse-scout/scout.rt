@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,13 +20,13 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
+import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 public class EntityNode extends AbstractComposerNode {
 
-  private IComposerEntity m_entity;
+  private IDataModelEntity m_entity;
   private boolean m_negated = false;
   private Object[] m_values;
   private String[] m_texts;
@@ -69,11 +69,11 @@ public class EntityNode extends AbstractComposerNode {
     cell.setText(label.toString());
   }
 
-  public IComposerEntity getEntity() {
+  public IDataModelEntity getEntity() {
     return m_entity;
   }
 
-  public void setEntity(IComposerEntity e) {
+  public void setEntity(IDataModelEntity e) {
     m_entity = e;
   }
 
@@ -117,8 +117,8 @@ public class EntityNode extends AbstractComposerNode {
 
     @Override
     protected void execPrepareAction() throws ProcessingException {
-      IComposerAttribute[] atts = m_entity.getComposerAttributes();
-      IComposerEntity[] ents = m_entity.getComposerEntities();
+      IDataModelAttribute[] atts = m_entity.getAttributes();
+      IDataModelEntity[] ents = m_entity.getEntities();
       setVisible((atts != null && atts.length > 0) || (ents != null && ents.length > 0));
     }
 

@@ -2,3 +2,9 @@
 Removed org.eclipse.scout.rt.shared.security.AllAccessPermission since it never worked and is not a valid jaas concept
 Migration:
 replace by java.security.AllPermission
+
+21.12.2010 imo
+Extracted DataModel with entities and attributes out of AbstractComposerField and moved to org.eclipse.scout.rt.shared.data.model
+Migration: None, sometimes organize imports is necessary.
+Legacy: There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
+and wrapped in a ComposerFieldDataModel.

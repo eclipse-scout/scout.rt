@@ -8,27 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.composer.entity;
+package org.eclipse.scout.rt.shared.data.model;
 
-import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
+import java.util.Map;
 
-/**
- * @deprecated use {@link IDataModelEntity}
- */
-
-@Deprecated
-public interface IComposerEntity extends IDataModelEntity {
+public interface IDataModel {
 
   /**
-   * @deprecated the id must always by the class simple name
+   * call init before using the data model structure
    */
-  @Deprecated
-  String getId();
+  void init();
+
+  IDataModelAttribute[] getAttributes();
+
+  IDataModelEntity[] getEntities();
 
   /**
-   * @deprecated the id must always by the class simple name
+   * @return meta data for the attribute, default returns null
+   *         <p>
+   *         see {@link DataModelUtility}
    */
-  @Deprecated
-  void setId(String s);
+  Map<String, String> getMetaDataOfAttribute(IDataModelAttribute a);
 
 }

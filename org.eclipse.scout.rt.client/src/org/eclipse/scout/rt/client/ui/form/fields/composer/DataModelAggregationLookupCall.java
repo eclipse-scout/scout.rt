@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,25 +17,25 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerConstants;
+import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
- * Convenience lookup call to present {@link IComposerAttribute#getAggregationTypes()}
+ * Convenience lookup call to present {@link IDataModelAttribute#getAggregationTypes()}
  * <p>
- * This lookup call expects the property {@link #setComposerAttribute(IComposerAttribute)} to be set.
+ * This lookup call expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
-public class ComposerAggregationLookupCall extends LocalLookupCall {
+public class DataModelAggregationLookupCall extends LocalLookupCall {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ComposerAggregationLookupCall.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DataModelAggregationLookupCall.class);
 
-  private IComposerAttribute m_attribute;
+  private IDataModelAttribute m_attribute;
   private List<LookupRow> m_lookupRows;
 
-  public void setComposerAttribute(IComposerAttribute attribute) {
+  public void setAttribute(IDataModelAttribute attribute) {
     if (m_attribute != attribute) {
       m_attribute = attribute;
       try {
@@ -48,7 +48,7 @@ public class ComposerAggregationLookupCall extends LocalLookupCall {
     }
   }
 
-  public IComposerAttribute getComposerAttribute() {
+  public IDataModelAttribute getAttribute() {
     return m_attribute;
   }
 
@@ -56,9 +56,9 @@ public class ComposerAggregationLookupCall extends LocalLookupCall {
     List<LookupRow> result = new ArrayList<LookupRow>();
     int[] ags = null;
     if (m_attribute != null) {
-      if (m_attribute.getType() != IComposerAttribute.TYPE_AGGREGATE_COUNT) {
+      if (m_attribute.getType() != DataModelConstants.TYPE_AGGREGATE_COUNT) {
         //add default entry
-        result.add(new LookupRow(ComposerConstants.AGGREGATION_NONE, m_attribute.getText()));
+        result.add(new LookupRow(DataModelConstants.AGGREGATION_NONE, m_attribute.getText()));
       }
       //add valid entries
       ags = m_attribute.getAggregationTypes();
@@ -66,12 +66,12 @@ public class ComposerAggregationLookupCall extends LocalLookupCall {
         for (int ag : ags) {
           String text = null;
           switch (ag) {
-            case ComposerConstants.AGGREGATION_AVG: {
+            case DataModelConstants.AGGREGATION_AVG: {
               text = ScoutTexts.get("ComposerFieldAggregationAvg", m_attribute.getText());
               break;
             }
-            case ComposerConstants.AGGREGATION_COUNT: {
-              if (m_attribute.getType() == IComposerAttribute.TYPE_AGGREGATE_COUNT) {
+            case DataModelConstants.AGGREGATION_COUNT: {
+              if (m_attribute.getType() == IDataModelAttribute.TYPE_AGGREGATE_COUNT) {
                 text = m_attribute.getText();
               }
               else {
@@ -79,19 +79,19 @@ public class ComposerAggregationLookupCall extends LocalLookupCall {
               }
               break;
             }
-            case ComposerConstants.AGGREGATION_MAX: {
+            case DataModelConstants.AGGREGATION_MAX: {
               text = ScoutTexts.get("ComposerFieldAggregationMax", m_attribute.getText());
               break;
             }
-            case ComposerConstants.AGGREGATION_MEDIAN: {
+            case DataModelConstants.AGGREGATION_MEDIAN: {
               text = ScoutTexts.get("ComposerFieldAggregationMedian", m_attribute.getText());
               break;
             }
-            case ComposerConstants.AGGREGATION_MIN: {
+            case DataModelConstants.AGGREGATION_MIN: {
               text = ScoutTexts.get("ComposerFieldAggregationMin", m_attribute.getText());
               break;
             }
-            case ComposerConstants.AGGREGATION_SUM: {
+            case DataModelConstants.AGGREGATION_SUM: {
               text = ScoutTexts.get("ComposerFieldAggregationSum", m_attribute.getText());
               break;
             }
@@ -105,7 +105,7 @@ public class ComposerAggregationLookupCall extends LocalLookupCall {
 
   /**
    * @return the life list of lookup rows that were created for the current attribute
-   *         Changed whenever {@link #setComposerAttribute(IComposerAttribute)} is called with another attribute by
+   *         Changed whenever {@link #setAttribute(IDataModelAttribute)} is called with another attribute by
    *         calling {@link #updateLookupRows()}.
    */
   public List<LookupRow> getLookupRows() {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerConstants;
+import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 
 /**
  * Example handler that demonstrates custom part building for a full-text search field based on a oracle
@@ -30,7 +30,7 @@ public class ExampleFullTextPartDefinition extends ValuePartDefinition {
    * @param attribute
    */
   public ExampleFullTextPartDefinition(Class fieldType, String sqlAttribute) {
-    super(fieldType, sqlAttribute, ComposerConstants.OPERATOR_NONE);
+    super(fieldType, sqlAttribute, DataModelConstants.OPERATOR_NONE);
   }
 
   @Override
@@ -39,7 +39,7 @@ public class ExampleFullTextPartDefinition extends ValuePartDefinition {
     //generate a search patter from pattern, decorate and replace pattern
     //...
     String sqlAttribute = "CONTAINS(<attribute>" + this.getSqlAttribute() + "</attribute>,'" + pattern + "')>0";
-    return builder.createStatementPart(ComposerConstants.AGGREGATION_NONE, sqlAttribute, getOperation(), null, null, isPlainBind(), parentAliasMap);
+    return builder.createStatementPart(DataModelConstants.AGGREGATION_NONE, sqlAttribute, getOperation(), null, null, isPlainBind(), parentAliasMap);
   }
 
 }

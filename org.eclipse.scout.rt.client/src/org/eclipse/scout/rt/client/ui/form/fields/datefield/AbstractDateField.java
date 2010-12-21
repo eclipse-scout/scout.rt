@@ -777,15 +777,15 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       if (newDate != null && newDate.length() == 0) {
         newDate = null;
       }
-      // parse always, validity might change even if text is same
-      Date currentValue = getValue();
-      if (newDate == null) {
-        return parseValue(null);
-      }
       if (!isHasTime()) {
         return parseValue(newDate);
       }
+      if (newDate == null) {
+        return parseValue(null);
+      }
+      //date and time
       //add existing time
+      Date currentValue = getValue();
       if (currentValue == null) {
         currentValue = applyAutoTime(new Date());
       }
@@ -801,15 +801,18 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       if (newTime != null && newTime.length() == 0) {
         newTime = null;
       }
-      // parse always, validity might change even if text is same
+      if (!isHasDate()) {
+        return parseValue(newTime);
+      }
+      //date and time
       Date currentValue = getValue();
-      if (newTime == null && (currentValue == null || !isHasDate())) {
+      if (newTime == null && currentValue == null) {
         return parseValue(null);
       }
-      String currentDate = getIsolatedDateFormat().format(currentValue != null ? currentValue : new Date());
       if (newTime == null) {
         newTime = getIsolatedTimeFormat().format(currentValue != null ? currentValue : new Date());
       }
+      String currentDate = getIsolatedDateFormat().format(currentValue != null ? currentValue : new Date());
       return parseValue(currentDate + " " + newTime);
     }
 

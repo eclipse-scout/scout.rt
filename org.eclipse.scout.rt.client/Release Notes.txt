@@ -133,7 +133,13 @@ Added opportunity for lazy initialization of search forms on table pages.
 Added org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable.execInitSearchForm().
 Migration: optional MOVE all your search form related initialization code form the execInitPage() method to execInitSearchForm().
 
-30.12.2010 imo
+20.12.2010 imo
 Consolidation of date/time fields. The existing ITimeField is based on Double and is replaced by a new AbstractTimeField based on Date and subclassing AbstractDateField.
 Migration: Usages of AbstractTimeField must be reviewed, form data fields must be changed from Double to Date.
 Legacy support: AbstractTimeColumn and AbstractTimeField have setTimeValue/getTimeValue of type Double, the column accepts/tolerates Double and Date as values.
+
+21.12.2010 imo
+Extracted DataModel with entities and attributes out of AbstractComposerField and moved to org.eclipse.scout.rt.shared.data.model
+Migration: None, sometimes organize imports is necessary.
+Legacy: There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
+and wrapped in a ComposerFieldDataModel.

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,8 +14,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 /**
  * Dynamic menu to add a new entity to the composer tree
@@ -23,9 +23,9 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 public class AddEntityMenu extends AbstractMenu {
   private final IComposerField m_field;
   private final ITreeNode m_parentNode;
-  private final IComposerEntity m_entity;
+  private final IDataModelEntity m_entity;
 
-  public AddEntityMenu(IComposerField field, ITreeNode parentNode, IComposerEntity e) {
+  public AddEntityMenu(IComposerField field, ITreeNode parentNode, IDataModelEntity e) {
     super(false);
     m_field = field;
     m_parentNode = parentNode;

@@ -8,22 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.composer.operator;
+package org.eclipse.scout.rt.shared.data.model;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerConstants;
 
-public final class ComposerOp implements ComposerConstants {
+public final class DataModelAttributeOp implements DataModelConstants {
 
-  private ComposerOp() {
+  private DataModelAttributeOp() {
   }
 
   /**
-   * @return a new {@link IComposerOp} for a {@link ComposerConstants#OPERATOR_*}
+   * @return a new {@link IDataModelAttributeOp} for a {@link DataModelConstants#OPERATOR_*}
    */
-  public static IComposerOp create(int operator) {
+  public static IDataModelAttributeOp create(int operator) {
     switch (operator) {
       case OPERATOR_BETWEEN:
         return new Between(OPERATOR_BETWEEN);
@@ -149,10 +147,10 @@ public final class ComposerOp implements ComposerConstants {
     return null;
   }
 
-  private abstract static class AbstractComposerOp implements IComposerOp, ComposerConstants {
+  private abstract static class AbstractDataModelOp implements IDataModelAttributeOp, DataModelConstants {
     private final int m_operator;
 
-    AbstractComposerOp(int operator) {
+    AbstractDataModelOp(int operator) {
       m_operator = operator;
     }
 
@@ -187,27 +185,27 @@ public final class ComposerOp implements ComposerConstants {
       if (aggregationType != null) {
         switch (aggregationType.intValue()) {
           case AGGREGATION_AVG: {
-            b.append(ScoutTexts.get("ComposerFieldAggregationAvg", attributeText));
+            b.append(ScoutTexts.get("DataModelFieldAggregationAvg", attributeText));
             break;
           }
           case AGGREGATION_COUNT: {
-            b.append(ScoutTexts.get("ComposerFieldAggregationCount", attributeText));
+            b.append(ScoutTexts.get("DataModelFieldAggregationCount", attributeText));
             break;
           }
           case AGGREGATION_MAX: {
-            b.append(ScoutTexts.get("ComposerFieldAggregationMax", attributeText));
+            b.append(ScoutTexts.get("DataModelFieldAggregationMax", attributeText));
             break;
           }
           case AGGREGATION_MEDIAN: {
-            b.append(ScoutTexts.get("ComposerFieldAggregationMedian", attributeText));
+            b.append(ScoutTexts.get("DataModelFieldAggregationMedian", attributeText));
             break;
           }
           case AGGREGATION_MIN: {
-            b.append(ScoutTexts.get("ComposerFieldAggregationMin", attributeText));
+            b.append(ScoutTexts.get("DataModelFieldAggregationMin", attributeText));
             break;
           }
           case AGGREGATION_SUM: {
-            b.append(ScoutTexts.get("ComposerFieldAggregationSum", attributeText));
+            b.append(ScoutTexts.get("DataModelFieldAggregationSum", attributeText));
             break;
           }
           default: {
@@ -244,7 +242,7 @@ public final class ComposerOp implements ComposerConstants {
     }
   }
 
-  private static class NEQ extends AbstractComposerOp {
+  private static class NEQ extends AbstractDataModelOp {
 
     /**
      * @param aggregationType
@@ -262,11 +260,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class LT extends AbstractComposerOp {
+  private static class LT extends AbstractDataModelOp {
 
     /**
      * @param aggregationType
@@ -284,11 +282,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class LE extends AbstractComposerOp {
+  private static class LE extends AbstractDataModelOp {
 
     /**
      * @param aggregationType
@@ -306,11 +304,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class EQ extends AbstractComposerOp {
+  private static class EQ extends AbstractDataModelOp {
 
     /**
      * @param aggregationType
@@ -328,11 +326,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class GT extends AbstractComposerOp {
+  private static class GT extends AbstractDataModelOp {
 
     /**
      * @param aggregationType
@@ -350,11 +348,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class GE extends AbstractComposerOp {
+  private static class GE extends AbstractDataModelOp {
 
     /**
      * @param aggregationType
@@ -372,11 +370,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class DateIsInDays extends AbstractComposerOp {
+  private static class DateIsInDays extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -393,11 +391,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateIsInGEDays extends AbstractComposerOp {
+  private static class DateIsInGEDays extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -414,11 +412,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateIsInGEMonths extends AbstractComposerOp {
+  private static class DateIsInGEMonths extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -435,11 +433,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateIsInLEDays extends AbstractComposerOp {
+  private static class DateIsInLEDays extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -456,11 +454,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateIsInLEMonths extends AbstractComposerOp {
+  private static class DateIsInLEMonths extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -477,11 +475,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateIsInLastDays extends AbstractComposerOp {
+  private static class DateIsInLastDays extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -498,11 +496,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateIsInLastMonths extends AbstractComposerOp {
+  private static class DateIsInLastMonths extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -519,11 +517,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateIsInMonths extends AbstractComposerOp {
+  private static class DateIsInMonths extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -540,11 +538,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateIsInNextDays extends AbstractComposerOp {
+  private static class DateIsInNextDays extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -561,11 +559,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateIsInNextMonths extends AbstractComposerOp {
+  private static class DateIsInNextMonths extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -582,11 +580,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateIsNotToday extends AbstractComposerOp {
+  private static class DateIsNotToday extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -603,11 +601,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_NONE;
+      return IDataModelAttribute.TYPE_NONE;
     }
   }
 
-  private static class DateIsToday extends AbstractComposerOp {
+  private static class DateIsToday extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -624,11 +622,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_NONE;
+      return IDataModelAttribute.TYPE_NONE;
     }
   }
 
-  private static class DateTimeIsInGEHours extends AbstractComposerOp {
+  private static class DateTimeIsInGEHours extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -645,11 +643,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateTimeIsInGEMinutes extends AbstractComposerOp {
+  private static class DateTimeIsInGEMinutes extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -666,11 +664,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateTimeIsInLEHours extends AbstractComposerOp {
+  private static class DateTimeIsInLEHours extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -687,11 +685,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateTimeIsInLEMinutes extends AbstractComposerOp {
+  private static class DateTimeIsInLEMinutes extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -708,11 +706,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class DateTimeIsNotNow extends AbstractComposerOp {
+  private static class DateTimeIsNotNow extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -729,11 +727,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_NONE;
+      return IDataModelAttribute.TYPE_NONE;
     }
   }
 
-  private static class DateTimeIsNow extends AbstractComposerOp {
+  private static class DateTimeIsNow extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -750,11 +748,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_NONE;
+      return IDataModelAttribute.TYPE_NONE;
     }
   }
 
-  private static class EndsWith extends AbstractComposerOp {
+  private static class EndsWith extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -771,11 +769,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class NotEndsWith extends AbstractComposerOp {
+  private static class NotEndsWith extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -792,11 +790,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class In extends AbstractComposerOp {
+  private static class In extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -813,11 +811,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class Contains extends AbstractComposerOp {
+  private static class Contains extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -834,11 +832,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class NotIn extends AbstractComposerOp {
+  private static class NotIn extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -855,11 +853,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class NotContains extends AbstractComposerOp {
+  private static class NotContains extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -876,11 +874,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class NotNull extends AbstractComposerOp {
+  private static class NotNull extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -897,14 +895,14 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_NONE;
+      return IDataModelAttribute.TYPE_NONE;
     }
   }
 
   /**
    * nvl(x,0)<>0
    */
-  private static class NumberNotNull extends AbstractComposerOp {
+  private static class NumberNotNull extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -921,11 +919,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_NONE;
+      return IDataModelAttribute.TYPE_NONE;
     }
   }
 
-  private static class Null extends AbstractComposerOp {
+  private static class Null extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -942,14 +940,14 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_NONE;
+      return IDataModelAttribute.TYPE_NONE;
     }
   }
 
   /**
    * nvl(x,0)==0
    */
-  private static class NumberNull extends AbstractComposerOp {
+  private static class NumberNull extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -966,11 +964,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_NONE;
+      return IDataModelAttribute.TYPE_NONE;
     }
   }
 
-  private static class StartsWith extends AbstractComposerOp {
+  private static class StartsWith extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -987,11 +985,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class NotStartsWith extends AbstractComposerOp {
+  private static class NotStartsWith extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -1008,11 +1006,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class TimeIsInGEHours extends AbstractComposerOp {
+  private static class TimeIsInGEHours extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -1029,11 +1027,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class TimeIsInGEMinutes extends AbstractComposerOp {
+  private static class TimeIsInGEMinutes extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -1050,11 +1048,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class TimeIsInHours extends AbstractComposerOp {
+  private static class TimeIsInHours extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -1071,11 +1069,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class TimeIsInLEHours extends AbstractComposerOp {
+  private static class TimeIsInLEHours extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -1092,11 +1090,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class TimeIsInLEMinutes extends AbstractComposerOp {
+  private static class TimeIsInLEMinutes extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -1113,11 +1111,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class TimeIsInMinutes extends AbstractComposerOp {
+  private static class TimeIsInMinutes extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -1134,11 +1132,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 
-  private static class TimeIsNow extends AbstractComposerOp {
+  private static class TimeIsNow extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -1155,11 +1153,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_NONE;
+      return IDataModelAttribute.TYPE_NONE;
     }
   }
 
-  private static class TimeIsNotNow extends AbstractComposerOp {
+  private static class TimeIsNotNow extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -1176,11 +1174,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_NONE;
+      return IDataModelAttribute.TYPE_NONE;
     }
   }
 
-  private static class Between extends AbstractComposerOp {
+  private static class Between extends AbstractDataModelOp {
 
     /**
      * @param aggregationType
@@ -1211,11 +1209,11 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_INHERITED;
+      return IDataModelAttribute.TYPE_INHERITED;
     }
   }
 
-  private static class Like extends AbstractComposerOp {
+  private static class Like extends AbstractDataModelOp {
     /**
      * @param aggregationType
      */
@@ -1232,7 +1230,7 @@ public final class ComposerOp implements ComposerConstants {
     }
 
     public int getType() {
-      return IComposerAttribute.TYPE_STRING;
+      return IDataModelAttribute.TYPE_STRING;
     }
   }
 }

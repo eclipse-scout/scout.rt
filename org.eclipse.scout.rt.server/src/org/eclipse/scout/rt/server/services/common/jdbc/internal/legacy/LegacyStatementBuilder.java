@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerAttributeData;
+import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 
 public class LegacyStatementBuilder {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LegacyStatementBuilder.class);
@@ -144,174 +144,174 @@ public class LegacyStatementBuilder {
    */
   protected String createComposerAttributeOpPattern(int op, String attribute, String bindName, Object value) {
     switch (op) {
-      case AbstractComposerAttributeData.OPERATOR_NEQ: {
+      case DataModelConstants.OPERATOR_NEQ: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createNEQ(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_LT: {
+      case DataModelConstants.OPERATOR_LT: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createLT(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_LE: {
+      case DataModelConstants.OPERATOR_LE: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createLE(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_EQ: {
+      case DataModelConstants.OPERATOR_EQ: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createEQ(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_GT: {
+      case DataModelConstants.OPERATOR_GT: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createGT(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_GE: {
+      case DataModelConstants.OPERATOR_GE: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createGE(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_IN_DAYS: {
+      case DataModelConstants.OPERATOR_DATE_IS_IN_DAYS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateIsInDays(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_IN_GE_DAYS: {
+      case DataModelConstants.OPERATOR_DATE_IS_IN_GE_DAYS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateIsInGEDays(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_IN_GE_MONTHS: {
+      case DataModelConstants.OPERATOR_DATE_IS_IN_GE_MONTHS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateIsInGEMonths(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_IN_LE_DAYS: {
+      case DataModelConstants.OPERATOR_DATE_IS_IN_LE_DAYS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateIsInLEDays(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_IN_LE_MONTHS: {
+      case DataModelConstants.OPERATOR_DATE_IS_IN_LE_MONTHS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateIsInLEMonths(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_IN_LAST_DAYS: {
+      case DataModelConstants.OPERATOR_DATE_IS_IN_LAST_DAYS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateIsInLastDays(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_IN_LAST_MONTHS: {
+      case DataModelConstants.OPERATOR_DATE_IS_IN_LAST_MONTHS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateIsInLastMonths(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_IN_MONTHS: {
+      case DataModelConstants.OPERATOR_DATE_IS_IN_MONTHS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateIsInMonths(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_IN_NEXT_DAYS: {
+      case DataModelConstants.OPERATOR_DATE_IS_IN_NEXT_DAYS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateIsInNextDays(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_IN_NEXT_MONTHS: {
+      case DataModelConstants.OPERATOR_DATE_IS_IN_NEXT_MONTHS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateIsInNextMonths(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_NOT_TODAY: {
+      case DataModelConstants.OPERATOR_DATE_IS_NOT_TODAY: {
         return m_sqlStyle.createDateIsNotToday(attribute);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_IS_TODAY: {
+      case DataModelConstants.OPERATOR_DATE_IS_TODAY: {
         return m_sqlStyle.createDateIsToday(attribute);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_TIME_IS_IN_GE_HOURS: {
+      case DataModelConstants.OPERATOR_DATE_TIME_IS_IN_GE_HOURS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateTimeIsInGEHours(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_TIME_IS_IN_GE_MINUTES: {
+      case DataModelConstants.OPERATOR_DATE_TIME_IS_IN_GE_MINUTES: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateTimeIsInGEMinutes(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_TIME_IS_IN_LE_HOURS: {
+      case DataModelConstants.OPERATOR_DATE_TIME_IS_IN_LE_HOURS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateTimeIsInLEHours(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_TIME_IS_IN_LE_MINUTES: {
+      case DataModelConstants.OPERATOR_DATE_TIME_IS_IN_LE_MINUTES: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createDateTimeIsInLEMinutes(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_TIME_IS_NOT_NOW: {
+      case DataModelConstants.OPERATOR_DATE_TIME_IS_NOT_NOW: {
         return m_sqlStyle.createDateTimeIsNotNow(attribute);
       }
-      case AbstractComposerAttributeData.OPERATOR_DATE_TIME_IS_NOW: {
+      case DataModelConstants.OPERATOR_DATE_TIME_IS_NOW: {
         return m_sqlStyle.createDateTimeIsNow(attribute);
       }
-      case AbstractComposerAttributeData.OPERATOR_ENDS_WITH: {
+      case DataModelConstants.OPERATOR_ENDS_WITH: {
         getBindMap().put(bindName, m_sqlStyle.toLikePattern(value));
         return m_sqlStyle.createEndsWith(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_NOT_ENDS_WITH: {
+      case DataModelConstants.OPERATOR_NOT_ENDS_WITH: {
         getBindMap().put(bindName, m_sqlStyle.toLikePattern(value));
         return m_sqlStyle.createNotEndsWith(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_IN: {
+      case DataModelConstants.OPERATOR_IN: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createIn(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_CONTAINS: {
+      case DataModelConstants.OPERATOR_CONTAINS: {
         getBindMap().put(bindName, m_sqlStyle.toLikePattern(value));
         return m_sqlStyle.createContains(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_LIKE: {
+      case DataModelConstants.OPERATOR_LIKE: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createLike(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_NOT_IN: {
+      case DataModelConstants.OPERATOR_NOT_IN: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createNotIn(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_NOT_CONTAINS: {
+      case DataModelConstants.OPERATOR_NOT_CONTAINS: {
         getBindMap().put(bindName, m_sqlStyle.toLikePattern(value));
         return m_sqlStyle.createNotContains(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_NOT_NULL: {
+      case DataModelConstants.OPERATOR_NOT_NULL: {
         return m_sqlStyle.createNotNull(attribute);
       }
-      case AbstractComposerAttributeData.OPERATOR_NUMBER_NOT_NULL: {
+      case DataModelConstants.OPERATOR_NUMBER_NOT_NULL: {
         return m_sqlStyle.createNumberNotNull(attribute);
       }
-      case AbstractComposerAttributeData.OPERATOR_NULL: {
+      case DataModelConstants.OPERATOR_NULL: {
         return m_sqlStyle.createNull(attribute);
       }
-      case AbstractComposerAttributeData.OPERATOR_NUMBER_NULL: {
+      case DataModelConstants.OPERATOR_NUMBER_NULL: {
         return m_sqlStyle.createNumberNull(attribute);
       }
-      case AbstractComposerAttributeData.OPERATOR_STARTS_WITH: {
+      case DataModelConstants.OPERATOR_STARTS_WITH: {
         getBindMap().put(bindName, m_sqlStyle.toLikePattern(value));
         return m_sqlStyle.createStartsWith(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_NOT_STARTS_WITH: {
+      case DataModelConstants.OPERATOR_NOT_STARTS_WITH: {
         getBindMap().put(bindName, m_sqlStyle.toLikePattern(value));
         return m_sqlStyle.createNotStartsWith(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_TIME_IS_IN_GE_HOURS: {
+      case DataModelConstants.OPERATOR_TIME_IS_IN_GE_HOURS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createTimeIsInGEHours(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_TIME_IS_IN_GE_MINUTES: {
+      case DataModelConstants.OPERATOR_TIME_IS_IN_GE_MINUTES: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createTimeIsInGEMinutes(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_TIME_IS_IN_HOURS: {
+      case DataModelConstants.OPERATOR_TIME_IS_IN_HOURS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createTimeIsInHours(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_TIME_IS_IN_LE_HOURS: {
+      case DataModelConstants.OPERATOR_TIME_IS_IN_LE_HOURS: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createTimeIsInLEHours(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_TIME_IS_IN_LE_MINUTES: {
+      case DataModelConstants.OPERATOR_TIME_IS_IN_LE_MINUTES: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createTimeIsInLEMinutes(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_TIME_IS_IN_MINUTES: {
+      case DataModelConstants.OPERATOR_TIME_IS_IN_MINUTES: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createTimeIsInMinutes(attribute, bindName);
       }
-      case AbstractComposerAttributeData.OPERATOR_TIME_IS_NOW: {
+      case DataModelConstants.OPERATOR_TIME_IS_NOW: {
         return m_sqlStyle.createTimeIsNow(attribute);
       }
-      case AbstractComposerAttributeData.OPERATOR_TIME_IS_NOT_NOW: {
+      case DataModelConstants.OPERATOR_TIME_IS_NOT_NOW: {
         return m_sqlStyle.createTimeIsNotNow(attribute);
       }
       default: {

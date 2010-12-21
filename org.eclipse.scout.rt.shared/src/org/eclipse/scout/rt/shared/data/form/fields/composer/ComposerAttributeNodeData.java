@@ -4,21 +4,22 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form.fields.composer;
 
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
+import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 
 /**
  * Data representation for a composer attribute value instance in a {@link AbstractComposerData}
  */
-public class ComposerAttributeNodeData extends TreeNodeData implements ComposerConstants {
+public class ComposerAttributeNodeData extends TreeNodeData implements DataModelConstants {
   private static final long serialVersionUID = 1L;
 
-  private AbstractComposerAttributeData m_attribute;
+  private String m_attributeExternalId;
   private int m_operator;
   private Integer m_aggregationType;
   private boolean m_negated = false;
@@ -26,12 +27,12 @@ public class ComposerAttributeNodeData extends TreeNodeData implements ComposerC
   public ComposerAttributeNodeData() {
   }
 
-  public AbstractComposerAttributeData getAttribute() {
-    return m_attribute;
+  public String getAttributeExternalId() {
+    return m_attributeExternalId;
   }
 
-  public void setAttribute(AbstractComposerAttributeData attribute) {
-    m_attribute = attribute;
+  public void setAttributeExternalId(String attributeExternalId) {
+    m_attributeExternalId = attributeExternalId;
   }
 
   /**

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,38 +14,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.operator.IComposerOp;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
- * Convenience lookup call to present {@link IComposerAttribute#getOperators()}
+ * Convenience lookup call to present {@link IDataModelAttribute#getOperators()}
  * <p>
- * This lookup call expects the property {@link #setComposerAttribute(IComposerAttribute)} to be set.
+ * This lookup call expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
-public class ComposerOperatorLookupCall extends LocalLookupCall {
+public class DataModelOperatorLookupCall extends LocalLookupCall {
   private static final long serialVersionUID = 1L;
 
-  private IComposerAttribute m_attribute;
+  private IDataModelAttribute m_attribute;
 
-  public void setComposerAttribute(IComposerAttribute attribute) {
+  public void setAttribute(IDataModelAttribute attribute) {
     m_attribute = attribute;
   }
 
-  public IComposerAttribute getComposerAttribute() {
+  public IDataModelAttribute getAttribute() {
     return m_attribute;
   }
 
   @Override
   protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
     List<LookupRow> result = new ArrayList<LookupRow>();
-    IComposerOp[] ops = null;
+    IDataModelAttributeOp[] ops = null;
     if (m_attribute != null) {
       ops = m_attribute.getOperators();
     }
     if (ops != null) {
-      for (IComposerOp op : ops) {
+      for (IDataModelAttributeOp op : ops) {
         String text = op.getShortText();
         if (text != null && text.indexOf("{0}") >= 0) {
           text = text.replace("{0}", "n");

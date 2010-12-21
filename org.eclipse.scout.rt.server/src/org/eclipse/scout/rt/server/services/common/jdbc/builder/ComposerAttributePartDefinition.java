@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,24 +15,24 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerAttributeData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNodeData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerConstants;
+import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 
 /**
- * Definition of a attribute-to-sql mapping for {@link AbstractComposerAttributeData}
+ * Definition of a attribute-to-sql mapping for {@link IDataModelAttribute}
  */
 public class ComposerAttributePartDefinition {
   private final String m_whereClause;
   private final String m_selectClause;
   private final boolean m_plainBind;
-  private final Class<? extends AbstractComposerAttributeData> m_attributeType;
+  private final Class<? extends IDataModelAttribute> m_attributeType;
 
   /**
    * @param whereClause
    *          is normally something like @Person@.LAST_NAME or in a special case EXISTS(...<attribute>...)
    */
-  public ComposerAttributePartDefinition(Class<? extends AbstractComposerAttributeData> attributeType, String whereClause, boolean plainBind) {
+  public ComposerAttributePartDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, boolean plainBind) {
     this(attributeType, whereClause, whereClause, plainBind);
   }
 
@@ -43,7 +43,7 @@ public class ComposerAttributePartDefinition {
    *          is by default the same as the where clause, but sometimes it is necessary to have a different select
    *          clause than the where clause.
    */
-  public ComposerAttributePartDefinition(Class<? extends AbstractComposerAttributeData> attributeType, String whereClause, String selectClause, boolean plainBind) {
+  public ComposerAttributePartDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, String selectClause, boolean plainBind) {
     m_attributeType = attributeType;
     m_whereClause = whereClause;
     m_selectClause = selectClause;
@@ -66,7 +66,7 @@ public class ComposerAttributePartDefinition {
     return m_selectClause;
   }
 
-  public Class<? extends AbstractComposerAttributeData> getAttributeType() {
+  public Class<? extends IDataModelAttribute> getAttributeType() {
     return m_attributeType;
   }
 
@@ -79,7 +79,8 @@ public class ComposerAttributePartDefinition {
 
   /**
    * Override this method to intercept and change part instance properties such as values, operation type, etc.<br>
-   * Sometimes it is convenient to set the operation to {@link ComposerConstants#OPERATOR_NONE} which uses the attribute
+   * Sometimes it is convenient to set the operation to {@link DataModelConstants#OPERATOR_NONE} which uses the
+   * attribute
    * itself as the complete statement part.
    * 
    * @param builder

@@ -167,3 +167,9 @@ Migration: actually no migration but fix occurrences in your projects, if alread
 Merged BSI Ticket 95648:
 Passwords are not displayed in service property page anymore, but can still be edited.
 Migration: None
+
+21.12.2010 imo
+Extracted DataModel with entities and attributes out of AbstractComposerField and moved to org.eclipse.scout.rt.shared.data.model
+Migration: None, sometimes organize imports is necessary.
+Legacy: There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
+and wrapped in a ComposerFieldDataModel.

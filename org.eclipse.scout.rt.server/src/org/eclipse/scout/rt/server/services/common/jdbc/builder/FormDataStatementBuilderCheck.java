@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,9 +18,9 @@ import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerAttributeData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerEntityData;
+import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
+import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 /**
  * @author imo
@@ -92,6 +92,7 @@ public class FormDataStatementBuilderCheck {
     else {
       m_visited.add(o.getClass());
     }
+    //
     if (o instanceof AbstractFormData) {
       for (Object f : ((AbstractFormData) o).getFields()) {
         checkRec(f);
@@ -101,31 +102,31 @@ public class FormDataStatementBuilderCheck {
       if (o instanceof AbstractValueFieldData<?>) {
         checkValueField((AbstractValueFieldData<?>) o);
       }
-      else if (o instanceof AbstractComposerData) {
-        for (Object a : ((AbstractComposerData) o).getAttributes()) {
-          checkRec(a);
-        }
-        for (Object e : ((AbstractComposerData) o).getEntities()) {
-          checkRec(e);
-        }
-      }
       //children
       for (Object f : ((AbstractFormFieldData) o).getFields()) {
         checkRec(f);
       }
     }
-    else if (o instanceof AbstractComposerEntityData) {
-      checkComposerEntity((AbstractComposerEntityData) o);
-      //only
-      for (Object a : ((AbstractComposerEntityData) o).getAttributes()) {
+    else if (o instanceof AbstractDataModel) {
+      for (Object a : ((AbstractDataModel) o).getAttributes()) {
         checkRec(a);
       }
-      for (Object e : ((AbstractComposerEntityData) o).getEntities()) {
+      for (Object e : ((AbstractDataModel) o).getEntities()) {
         checkRec(e);
       }
     }
-    else if (o instanceof AbstractComposerAttributeData) {
-      checkComposerAttribute((AbstractComposerAttributeData) o);
+    else if (o instanceof IDataModelEntity) {
+      checkDataModelEntity((IDataModelEntity) o);
+      //only
+      for (Object a : ((IDataModelEntity) o).getAttributes()) {
+        checkRec(a);
+      }
+      for (Object e : ((IDataModelEntity) o).getEntities()) {
+        checkRec(e);
+      }
+    }
+    else if (o instanceof IDataModelAttribute) {
+      checkDataModelAttribute((IDataModelAttribute) o);
     }
   }
 
@@ -157,7 +158,7 @@ public class FormDataStatementBuilderCheck {
     }
   }
 
-  protected void checkComposerEntity(AbstractComposerEntityData e) {
+  protected void checkDataModelEntity(IDataModelEntity e) {
     ComposerEntityPartDefinition part = builder.getComposerEntityPartDefinitions().get(e.getClass());
     if (part == null) {
       String name = entityToName(e);
@@ -165,7 +166,7 @@ public class FormDataStatementBuilderCheck {
       String sqlPKName = toSqlPrimaryKey(name);
       String parentName = name;
       String parentSqlPKName = sqlPKName;
-      AbstractComposerEntityData parentE = e.getParentEntity();
+      IDataModelEntity parentE = e.getParentEntity();
       if (parentE != null) {
         parentName = entityToName(parentE);
         parentSqlPKName = toSqlPrimaryKey(parentName);
@@ -187,7 +188,7 @@ public class FormDataStatementBuilderCheck {
     }
   }
 
-  protected void checkComposerAttribute(AbstractComposerAttributeData a) {
+  protected void checkDataModelAttribute(IDataModelAttribute a) {
     ComposerAttributePartDefinition part = builder.getComposerAttributePartDefinitions().get(a.getClass());
     if (part == null) {
       if (a.getClass().getSimpleName().endsWith("CountAttribute")) {
@@ -195,7 +196,7 @@ public class FormDataStatementBuilderCheck {
         return;
       }
       String parentName = null;
-      AbstractComposerEntityData parentE = a.getParentEntity();
+      IDataModelEntity parentE = a.getParentEntity();
       if (parentE != null) {
         parentName = entityToName(parentE);
       }

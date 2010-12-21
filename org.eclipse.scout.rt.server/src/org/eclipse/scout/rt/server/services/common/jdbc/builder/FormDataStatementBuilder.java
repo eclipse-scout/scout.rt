@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -35,15 +35,17 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerAttributeData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerEntityData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNodeData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerConstants;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEitherOrNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
+import org.eclipse.scout.rt.shared.data.model.DataModelUtility;
+import org.eclipse.scout.rt.shared.data.model.IDataModel;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
+import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 /**
  * <pre>
@@ -113,12 +115,13 @@ import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
  * 
  * @author imo
  */
-public class FormDataStatementBuilder implements ComposerConstants {
+public class FormDataStatementBuilder implements DataModelConstants {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormDataStatementBuilder.class);
 
   private static final Pattern PLAIN_ATTRIBUTE_PATTERN = Pattern.compile("(<attribute>)([a-zA-Z_][a-zA-Z0-9_]*)(</attribute>)");
 
   private ISqlStyle m_sqlStyle;
+  private IDataModel m_dataModel;
   private AliasMapper m_aliasMapper;
   private Map<Class, ComposerAttributePartDefinition> m_composerAttMap;
   private Map<Class, ComposerEntityPartDefinition> m_composerEntMap;
@@ -138,6 +141,14 @@ public class FormDataStatementBuilder implements ComposerConstants {
     m_composerEntMap = new HashMap<Class, ComposerEntityPartDefinition>();
     m_valueDefs = new ArrayList<ValuePartDefinition>();
     setSequenceProvider(new AtomicInteger(0));
+  }
+
+  public IDataModel getDataModel() {
+    return m_dataModel;
+  }
+
+  public void setDataModel(IDataModel dataModel) {
+    m_dataModel = dataModel;
   }
 
   /**
@@ -224,21 +235,21 @@ public class FormDataStatementBuilder implements ComposerConstants {
    *          When multiple occurrences are simultaneously used, the sqlAttribute may be written as
    *          <code>(&lt;attribute&gt;ORDER_STATUS&lt;/attribute&gt; OR &lt;attribute&gt;DELIVERY_STATUS&lt;/attribute&gt;)</code>
    */
-  public void setComposerAttributeDefinition(Class<? extends AbstractComposerAttributeData> attributeType, String sqlAttribute) {
+  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute) {
     setComposerAttributeDefinition(attributeType, sqlAttribute, false);
   }
 
   /**
    * see {@link #setComposerAttributeDefinition(Class, String)}
    */
-  public void setComposerAttributeDefinition(Class<? extends AbstractComposerAttributeData> attributeType, String sqlAttribute, boolean plainBind) {
+  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute, boolean plainBind) {
     setComposerAttributeDefinition(new ComposerAttributePartDefinition(attributeType, sqlAttribute, plainBind));
   }
 
   /**
    * see {@link #setComposerAttributeDefinition(Class, String)}
    */
-  public void setComposerAttributeDefinition(Class<? extends AbstractComposerAttributeData> attributeType, String whereClause, String selectClause, boolean plainBind) {
+  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, String selectClause, boolean plainBind) {
     setComposerAttributeDefinition(new ComposerAttributePartDefinition(attributeType, whereClause, selectClause, plainBind));
   }
 
@@ -268,7 +279,7 @@ public class FormDataStatementBuilder implements ComposerConstants {
    * The <i>havingParts</i> tag is replaced with all attributes contained in the entity that have an aggregation type.
    * Every aggregation attribute contributes a "AND <i>fun</i>(<i>attribute</i>) <i>op</i> <i>value</i>" line.<br>
    */
-  public void setComposerEntityDefinition(Class<? extends AbstractComposerEntityData> entityType, String sqlAttribute) {
+  public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String sqlAttribute) {
     setComposerEntityDefinition(new ComposerEntityPartDefinition(entityType, sqlAttribute));
   }
 
@@ -615,12 +626,17 @@ public class FormDataStatementBuilder implements ComposerConstants {
   }
 
   protected String buildComposerEntityNode(ComposerEntityNodeData node) throws ProcessingException {
-    if (node.getEntity() == null) {
-      LOG.warn("entity does not reference an entity: " + node.getClass());
+    if (getDataModel() == null) {
+      throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
     }
-    ComposerEntityPartDefinition def = m_composerEntMap.get(node.getEntity().getClass());
+    IDataModelEntity entity = DataModelUtility.externalIdToEntity(getDataModel(), node.getEntityExternalId(), null);
+    if (entity == null) {
+      LOG.warn("no entity for external id: " + node.getEntityExternalId());
+      return null;
+    }
+    ComposerEntityPartDefinition def = m_composerEntMap.get(entity.getClass());
     if (def == null) {
-      LOG.warn("entity does not map to a PartDefinition: " + node.getEntity());
+      LOG.warn("no PartDefinition for entity: " + entity);
       return null;
     }
     ComposerEntityNodeData parentEntityNode = getParentNodeOfType(node, ComposerEntityNodeData.class);
@@ -708,7 +724,7 @@ public class FormDataStatementBuilder implements ComposerConstants {
     for (TreeNodeData ch : childParts) {
       if (ch instanceof ComposerAttributeNodeData) {
         Integer agg = ((ComposerAttributeNodeData) ch).getAggregationType();
-        if (agg == null || agg == ComposerConstants.AGGREGATION_NONE) {
+        if (agg == null || agg == AGGREGATION_NONE) {
           ComposerAttributeNodeData attributeData = (ComposerAttributeNodeData) ch;
           wherePartChildren.add(attributeData);
           if (!isZeroTraversingAttribute(attributeData.getOperator(), attributeData.getValues())) {
@@ -727,7 +743,7 @@ public class FormDataStatementBuilder implements ComposerConstants {
     for (TreeNodeData ch : childParts) {
       if (ch instanceof ComposerAttributeNodeData) {
         Integer agg = ((ComposerAttributeNodeData) ch).getAggregationType();
-        if (agg != null && agg != ComposerConstants.AGGREGATION_NONE) {
+        if (agg != null && agg != AGGREGATION_NONE) {
           ComposerAttributeNodeData attributeData = (ComposerAttributeNodeData) ch;
           havingPartChildren.add(attributeData);
           if (!isZeroTraversingAttribute(attributeData.getOperator(), attributeData.getValues())) {
@@ -788,18 +804,23 @@ public class FormDataStatementBuilder implements ComposerConstants {
   }
 
   protected String buildComposerAttributeNode(final ComposerAttributeNodeData node) throws ProcessingException {
-    if (node.getAttribute() == null) {
-      LOG.warn("attribute does not reference an attribute: " + node.getClass());
+    if (getDataModel() == null) {
+      throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
     }
-    ComposerAttributePartDefinition def = m_composerAttMap.get(node.getAttribute().getClass());
+    IDataModelAttribute attribute = DataModelUtility.externalIdToAttribute(getDataModel(), node.getAttributeExternalId(), null);
+    if (attribute == null) {
+      LOG.warn("no attribute for external id: " + node.getAttributeExternalId());
+      return null;
+    }
+    ComposerAttributePartDefinition def = m_composerAttMap.get(attribute.getClass());
     if (def == null) {
       Integer agg = node.getAggregationType();
-      if (agg != null && agg == ComposerConstants.AGGREGATION_COUNT) {
+      if (agg != null && agg == AGGREGATION_COUNT) {
         def = new ComposerAttributePartDefinition(null, "1", false);
       }
     }
     if (def == null) {
-      LOG.warn("composer attribute does not map to a PartDefinition: " + node.getAttribute());
+      LOG.warn("no PartDefinition for attribute: " + attribute);
       return null;
     }
     List<Object> bindValues = new ArrayList<Object>();
@@ -841,10 +862,10 @@ public class FormDataStatementBuilder implements ComposerConstants {
   /**
    * Create sql text, makes bind names unique, and adds all binds to the bind map
    * <p>
-   * To use no operator use {@link ComposerConstants#OPERATOR_NONE} and null for binds and values, stm will be decorated
-   * and is the result itself
+   * To use no operator use {@link DataModelConstants#OPERATOR_NONE} and null for binds and values, stm will be
+   * decorated and is the result itself
    * <p>
-   * To use no aggregation use {@link ComposerConstants#AGGREGATION_NONE}
+   * To use no aggregation use {@link DataModelConstants#AGGREGATION_NONE}
    */
   public String createStatementPart(final Integer aggregationType, String stm, final int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
     if (stm == null) stm = "";

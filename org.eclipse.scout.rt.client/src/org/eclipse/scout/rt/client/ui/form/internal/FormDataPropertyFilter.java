@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,8 +16,6 @@ import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerAttributeData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerEntityData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 public class FormDataPropertyFilter implements IPropertyFilter {
@@ -26,7 +24,7 @@ public class FormDataPropertyFilter implements IPropertyFilter {
   }
 
   public boolean accept(FastPropertyDescriptor descriptor) {
-    Class propertyType = descriptor.getPropertyType();
+    Class<?> propertyType = descriptor.getPropertyType();
     if (propertyType == null) {
       return false;
     }
@@ -43,12 +41,6 @@ public class FormDataPropertyFilter implements IPropertyFilter {
       return false;
     }
     if (AbstractPropertyData.class.isAssignableFrom(propertyType)) {
-      return false;
-    }
-    if (AbstractComposerAttributeData.class.isAssignableFrom(propertyType)) {
-      return false;
-    }
-    if (AbstractComposerEntityData.class.isAssignableFrom(propertyType)) {
       return false;
     }
     if (descriptor.getName().startsWith("configured")) {

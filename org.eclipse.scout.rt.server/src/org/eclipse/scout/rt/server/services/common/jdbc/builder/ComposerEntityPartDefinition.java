@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,17 +13,17 @@ package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerEntityData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeData;
+import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 /**
- * Definition of a entity-to-sql mapping for {@link AbstractComposerEntityData}
+ * Definition of a entity-to-sql mapping for {@link IDataModelEntity}
  */
 public class ComposerEntityPartDefinition {
   private final String m_sql;
-  private final Class<? extends AbstractComposerEntityData> m_entityType;
+  private final Class<? extends IDataModelEntity> m_entityType;
 
-  public ComposerEntityPartDefinition(Class<? extends AbstractComposerEntityData> entityType, String sql) {
+  public ComposerEntityPartDefinition(Class<? extends IDataModelEntity> entityType, String sql) {
     m_entityType = entityType;
     m_sql = sql;
   }
@@ -32,7 +32,7 @@ public class ComposerEntityPartDefinition {
     return m_sql;
   }
 
-  public Class<? extends AbstractComposerEntityData> getEntityType() {
+  public Class<? extends IDataModelEntity> getEntityType() {
     return m_entityType;
   }
 

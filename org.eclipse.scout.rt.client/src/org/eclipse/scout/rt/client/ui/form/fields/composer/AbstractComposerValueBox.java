@@ -26,8 +26,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.operator.IComposerOp;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractTimeField;
 import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
@@ -42,7 +40,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerConstants;
+import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
+import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
@@ -55,7 +55,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
   private Map<Integer/*operator*/, Map<Integer/*dataType*/, IComposerValueField>> m_opTypeToFieldMap;
   //selection context
-  private IComposerAttribute m_attribute;
+  private IDataModelAttribute m_attribute;
   private IComposerValueField m_selectedField;
   private PropertyChangeListener m_valueChangedListener;
 
@@ -90,40 +90,40 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     m_opTypeToFieldMap = new HashMap<Integer, Map<Integer, IComposerValueField>>();
     //specific operators
     HashMap<Integer, IComposerValueField> betweenMap = new HashMap<Integer, IComposerValueField>();
-    betweenMap.put(IComposerAttribute.TYPE_DATE, getFieldByClass(BetweenDateField.class));
-    betweenMap.put(IComposerAttribute.TYPE_DATE_TIME, getFieldByClass(BetweenDateTimeField.class));
-    betweenMap.put(IComposerAttribute.TYPE_DOUBLE, getFieldByClass(BetweenDoubleField.class));
-    betweenMap.put(IComposerAttribute.TYPE_AGGREGATE_COUNT, getFieldByClass(BetweenIntegerField.class));
-    betweenMap.put(IComposerAttribute.TYPE_INTEGER, getFieldByClass(BetweenIntegerField.class));
-    betweenMap.put(IComposerAttribute.TYPE_LONG, getFieldByClass(BetweenLongField.class));
-    betweenMap.put(IComposerAttribute.TYPE_PERCENT, getFieldByClass(BetweenDoubleField.class));
-    betweenMap.put(IComposerAttribute.TYPE_PLAIN_DOUBLE, getFieldByClass(BetweenDoubleField.class));
-    betweenMap.put(IComposerAttribute.TYPE_PLAIN_INTEGER, getFieldByClass(BetweenIntegerField.class));
-    betweenMap.put(IComposerAttribute.TYPE_PLAIN_LONG, getFieldByClass(BetweenLongField.class));
-    betweenMap.put(IComposerAttribute.TYPE_TIME, getFieldByClass(BetweenTimeField.class));
-    m_opTypeToFieldMap.put(ComposerConstants.OPERATOR_BETWEEN, betweenMap);
-    m_opTypeToFieldMap.put(ComposerConstants.OPERATOR_DATE_BETWEEN, betweenMap);
-    m_opTypeToFieldMap.put(ComposerConstants.OPERATOR_DATE_TIME_BETWEEN, betweenMap);
+    betweenMap.put(IDataModelAttribute.TYPE_DATE, getFieldByClass(BetweenDateField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_DATE_TIME, getFieldByClass(BetweenDateTimeField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_DOUBLE, getFieldByClass(BetweenDoubleField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_AGGREGATE_COUNT, getFieldByClass(BetweenIntegerField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_INTEGER, getFieldByClass(BetweenIntegerField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_LONG, getFieldByClass(BetweenLongField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_PERCENT, getFieldByClass(BetweenDoubleField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_PLAIN_DOUBLE, getFieldByClass(BetweenDoubleField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_PLAIN_INTEGER, getFieldByClass(BetweenIntegerField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_PLAIN_LONG, getFieldByClass(BetweenLongField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_TIME, getFieldByClass(BetweenTimeField.class));
+    m_opTypeToFieldMap.put(DataModelConstants.OPERATOR_BETWEEN, betweenMap);
+    m_opTypeToFieldMap.put(DataModelConstants.OPERATOR_DATE_BETWEEN, betweenMap);
+    m_opTypeToFieldMap.put(DataModelConstants.OPERATOR_DATE_TIME_BETWEEN, betweenMap);
     //type defaults
     HashMap<Integer, IComposerValueField> defaultMap = new HashMap<Integer, IComposerValueField>();
-    defaultMap.put(IComposerAttribute.TYPE_DATE, getFieldByClass(DateField.class));
-    defaultMap.put(IComposerAttribute.TYPE_DATE_TIME, getFieldByClass(DateTimeField.class));
-    defaultMap.put(IComposerAttribute.TYPE_DOUBLE, getFieldByClass(DoubleField.class));
-    defaultMap.put(IComposerAttribute.TYPE_AGGREGATE_COUNT, getFieldByClass(IntegerField.class));
-    defaultMap.put(IComposerAttribute.TYPE_INTEGER, getFieldByClass(IntegerField.class));
-    defaultMap.put(IComposerAttribute.TYPE_NUMBER_LIST, getFieldByClass(ListBoxField.class));
-    defaultMap.put(IComposerAttribute.TYPE_NUMBER_TREE, getFieldByClass(TreeBoxField.class));
-    defaultMap.put(IComposerAttribute.TYPE_CODE_LIST, getFieldByClass(ListBoxField.class));
-    defaultMap.put(IComposerAttribute.TYPE_CODE_TREE, getFieldByClass(TreeBoxField.class));
-    defaultMap.put(IComposerAttribute.TYPE_LONG, getFieldByClass(LongField.class));
-    defaultMap.put(IComposerAttribute.TYPE_PERCENT, getFieldByClass(DoubleField.class));
-    defaultMap.put(IComposerAttribute.TYPE_PLAIN_DOUBLE, getFieldByClass(DoubleField.class));
-    defaultMap.put(IComposerAttribute.TYPE_PLAIN_INTEGER, getFieldByClass(IntegerField.class));
-    defaultMap.put(IComposerAttribute.TYPE_PLAIN_LONG, getFieldByClass(LongField.class));
-    defaultMap.put(IComposerAttribute.TYPE_STRING, getFieldByClass(StringField.class));
-    defaultMap.put(IComposerAttribute.TYPE_FULL_TEXT, getFieldByClass(StringField.class));
-    defaultMap.put(IComposerAttribute.TYPE_SMART, getFieldByClass(SmartField.class));
-    defaultMap.put(IComposerAttribute.TYPE_TIME, getFieldByClass(TimeField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_DATE, getFieldByClass(DateField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_DATE_TIME, getFieldByClass(DateTimeField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_DOUBLE, getFieldByClass(DoubleField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_AGGREGATE_COUNT, getFieldByClass(IntegerField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_INTEGER, getFieldByClass(IntegerField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_NUMBER_LIST, getFieldByClass(ListBoxField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_NUMBER_TREE, getFieldByClass(TreeBoxField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_CODE_LIST, getFieldByClass(ListBoxField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_CODE_TREE, getFieldByClass(TreeBoxField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_LONG, getFieldByClass(LongField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_PERCENT, getFieldByClass(DoubleField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_PLAIN_DOUBLE, getFieldByClass(DoubleField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_PLAIN_INTEGER, getFieldByClass(IntegerField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_PLAIN_LONG, getFieldByClass(LongField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_STRING, getFieldByClass(StringField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_FULL_TEXT, getFieldByClass(StringField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_SMART, getFieldByClass(SmartField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_TIME, getFieldByClass(TimeField.class));
     m_opTypeToFieldMap.put(0, defaultMap);
     //
     m_valueChangedListener = new PropertyChangeListener() {
@@ -161,7 +161,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     return m_selectedField;
   }
 
-  public void setSelectionContext(IComposerAttribute attribute, IComposerOp op, Object[] values) {
+  public void setSelectionContext(IDataModelAttribute attribute, IDataModelAttributeOp op, Object[] values) {
     if (op == null) {
       return;
     }
@@ -171,7 +171,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     m_attribute = attribute;
     //
     int dataType = op.getType();
-    if (dataType == IComposerAttribute.TYPE_INHERITED) {
+    if (dataType == IDataModelAttribute.TYPE_INHERITED) {
       dataType = attribute.getType();
     }
     Map<Integer, IComposerValueField> typeToFieldMap = m_opTypeToFieldMap.get(op.getOperator());
@@ -243,7 +243,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       this.removePropertyChangeListener(listener);
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       LookupCall newCall = attribute.getLookupCall();
       if (getLookupCall() != newCall) {
         setLookupCall(attribute.getLookupCall());
@@ -317,7 +317,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       this.removePropertyChangeListener(listener);
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       LookupCall newCall = attribute.getLookupCall();
       if (getLookupCall() != newCall) {
         setLookupCall(newCall);
@@ -373,7 +373,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       this.removePropertyChangeListener(listener);
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
         if (values != null && values.length == 1 && values[0] instanceof Date) {
           setValue((Date) values[0]);
@@ -417,7 +417,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       this.removePropertyChangeListener(listener);
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
         if (values != null && values.length == 1) {
           if (values[0] instanceof Double) {
@@ -475,7 +475,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       this.removePropertyChangeListener(listener);
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
         if (values != null && values.length == 1 && values[0] instanceof Date) {
           setValue((Date) values[0]);
@@ -519,13 +519,13 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       this.removePropertyChangeListener(listener);
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       switch (dataType) {
-        case IComposerAttribute.TYPE_INTEGER: {
+        case IDataModelAttribute.TYPE_INTEGER: {
           setGroupingUsed(true);
           break;
         }
-        case IComposerAttribute.TYPE_PLAIN_INTEGER: {
+        case IDataModelAttribute.TYPE_PLAIN_INTEGER: {
           setGroupingUsed(false);
           break;
         }
@@ -573,13 +573,13 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       this.removePropertyChangeListener(listener);
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       switch (dataType) {
-        case IComposerAttribute.TYPE_LONG: {
+        case IDataModelAttribute.TYPE_LONG: {
           setGroupingUsed(true);
           break;
         }
-        case IComposerAttribute.TYPE_PLAIN_LONG: {
+        case IDataModelAttribute.TYPE_PLAIN_LONG: {
           setGroupingUsed(false);
           break;
         }
@@ -627,19 +627,19 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       this.removePropertyChangeListener(listener);
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       switch (dataType) {
-        case IComposerAttribute.TYPE_DOUBLE: {
+        case IDataModelAttribute.TYPE_DOUBLE: {
           setGroupingUsed(true);
           setPercent(false);
           break;
         }
-        case IComposerAttribute.TYPE_PERCENT: {
+        case IDataModelAttribute.TYPE_PERCENT: {
           setGroupingUsed(true);
           setPercent(true);
           break;
         }
-        case IComposerAttribute.TYPE_PLAIN_DOUBLE: {
+        case IDataModelAttribute.TYPE_PLAIN_DOUBLE: {
           setGroupingUsed(false);
           setPercent(false);
           break;
@@ -688,7 +688,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       this.removePropertyChangeListener(listener);
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
         if (values != null && values.length == 1 && values[0] instanceof String) {
           setValue((String) values[0]);
@@ -746,7 +746,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       this.removePropertyChangeListener(listener);
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       LookupCall newCall = attribute.getLookupCall();
       if (getLookupCall() != newCall) {
         setLookupCall(newCall);
@@ -808,7 +808,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       }
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
         getFieldByClass(BetweenDateField.FromField.class).setValue(null);
         getFieldByClass(BetweenDateField.ToField.class).setValue(null);
@@ -872,7 +872,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       }
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
         getFieldByClass(BetweenTimeField.FromField.class).setValue(null);
         getFieldByClass(BetweenTimeField.ToField.class).setValue(null);
@@ -950,7 +950,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       }
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
         getFieldByClass(BetweenDateTimeField.FromField.class).setValue(null);
         getFieldByClass(BetweenDateTimeField.ToField.class).setValue(null);
@@ -1014,7 +1014,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       }
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
         getFieldByClass(BetweenIntegerField.FromField.class).setValue(null);
         getFieldByClass(BetweenIntegerField.ToField.class).setValue(null);
@@ -1078,7 +1078,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       }
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
         getFieldByClass(BetweenLongField.FromField.class).setValue(null);
         getFieldByClass(BetweenLongField.ToField.class).setValue(null);
@@ -1142,7 +1142,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
       }
     }
 
-    public void setSelectionContext(IComposerAttribute attribute, int dataType, IComposerOp op, Object[] values) {
+    public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
         getFieldByClass(BetweenDoubleField.FromField.class).setValue(null);
         getFieldByClass(BetweenDoubleField.ToField.class).setValue(null);

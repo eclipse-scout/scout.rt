@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity;
+import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 /**
  * Control Structure node for NOT, OR, AND, etc.
@@ -98,7 +98,7 @@ public abstract class AbstractComposerNode extends AbstractTreeNode {
        */
     }
     else {
-      for (IComposerEntity e : getComposerField().getComposerEntities()) {
+      for (IDataModelEntity e : getComposerField().getEntities()) {
         menus.add(new AddEntityMenu(getComposerField(), this, e));
       }
     }
