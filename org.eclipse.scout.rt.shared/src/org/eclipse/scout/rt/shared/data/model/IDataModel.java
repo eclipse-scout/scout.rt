@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.model;
 
-import java.util.Map;
 
 public interface IDataModel {
 
@@ -22,12 +21,4 @@ public interface IDataModel {
   IDataModelAttribute[] getAttributes();
 
   IDataModelEntity[] getEntities();
-
-  /**
-   * @return meta data for the attribute, default returns null
-   *         <p>
-   *         see {@link DataModelUtility}
-   */
-  Map<String, String> getMetaDataOfAttribute(IDataModelAttribute a);
-
 }

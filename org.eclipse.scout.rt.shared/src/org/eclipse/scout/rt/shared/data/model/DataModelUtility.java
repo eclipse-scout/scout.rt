@@ -44,9 +44,9 @@ public final class DataModelUtility {
    * @return the external id (foo/bar/foo) for an entity using
    *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
-  public static String entityToExternalId(IDataModel f, IDataModelEntity e) {
+  public static String entityToExternalId(IDataModelEntity e) {
     if (e.getParentEntity() != null) {
-      return entityToExternalId(f, e.getParentEntity()) + "/" + e.getClass().getSimpleName();
+      return entityToExternalId(e.getParentEntity()) + "/" + e.getClass().getSimpleName();
     }
     else {
       return e.getClass().getSimpleName();
@@ -57,12 +57,12 @@ public final class DataModelUtility {
    * @return the external id (foo/bar/foo) for an attribute using
    *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
-  public static String attributeToExternalId(IDataModel f, IDataModelAttribute a) {
+  public static String attributeToExternalId(IDataModelAttribute a) {
     if (a.getParentEntity() != null) {
-      return entityToExternalId(f, a.getParentEntity()) + "/" + a.getClass().getSimpleName() + exportMetaData(f.getMetaDataOfAttribute(a));
+      return entityToExternalId(a.getParentEntity()) + "/" + a.getClass().getSimpleName() + exportMetaData(a.getMetaDataOfAttribute());
     }
     else {
-      return a.getClass().getSimpleName() + exportMetaData(f.getMetaDataOfAttribute(a));
+      return a.getClass().getSimpleName() + exportMetaData(a.getMetaDataOfAttribute());
     }
   }
 
@@ -112,10 +112,10 @@ public final class DataModelUtility {
       }
     }
     if (parentEntity != null) {
-      return findAttribute(f, parentEntity.getAttributes(), elemName, meta);
+      return findAttribute(parentEntity.getAttributes(), elemName, meta);
     }
     else {
-      return findAttribute(f, f.getAttributes(), elemName, meta);
+      return findAttribute(f.getAttributes(), elemName, meta);
     }
   }
 
@@ -138,13 +138,13 @@ public final class DataModelUtility {
    * @return the attribute for an external id part (no '/' characters) using
    *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
-  public static IDataModelAttribute findAttribute(IDataModel f, IDataModelAttribute[] array, String simpleName, Map<String, String> metaData) {
+  public static IDataModelAttribute findAttribute(IDataModelAttribute[] array, String simpleName, Map<String, String> metaData) {
     IDataModelAttribute secondaryMatch = null;
     if (array != null) {
       for (IDataModelAttribute a : array) {
         if (a.getClass().getSimpleName().equals(simpleName)) {
           secondaryMatch = a;
-          if (CompareUtility.equals(f.getMetaDataOfAttribute(a), metaData)) {
+          if (CompareUtility.equals(a.getMetaDataOfAttribute(), metaData)) {
             return a;
           }
         }

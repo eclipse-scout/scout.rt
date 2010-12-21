@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.data.model;
 
 import java.security.Permission;
+import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -126,6 +127,10 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   @ConfigOperation
   @Order(20)
   protected void execPrepareLookup(LookupCall call) throws ProcessingException {
+  }
+
+  public Map<String, String> getMetaDataOfAttribute() {
+    return null;
   }
 
   protected void initConfig() {

@@ -442,7 +442,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       if (node instanceof EntityNode) {
         EntityNode entityNode = (EntityNode) node;
         SimpleXmlElement xEntity = new SimpleXmlElement("entity");
-        xEntity.setAttribute("id", DataModelUtility.entityToExternalId(getDataModel(), entityNode.getEntity()));
+        xEntity.setAttribute("id", DataModelUtility.entityToExternalId(entityNode.getEntity()));
         xEntity.setAttribute("negated", (entityNode.isNegative() ? "true" : "false"));
         String[] texts = entityNode.getTexts();
         xEntity.setAttribute("displayValues", texts != null && texts.length > 0 ? StringUtility.emptyIfNull(texts[0]) : null);
@@ -453,7 +453,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       else if (node instanceof AttributeNode) {
         AttributeNode attNode = (AttributeNode) node;
         SimpleXmlElement xAtt = new SimpleXmlElement("attribute");
-        xAtt.setAttribute("id", DataModelUtility.attributeToExternalId(getDataModel(), attNode.getAttribute()));
+        xAtt.setAttribute("id", DataModelUtility.attributeToExternalId(attNode.getAttribute()));
         IDataModelAttributeOp op = attNode.getOp();
         try {
           xAtt.setAttribute("op", op.getOperator());
@@ -634,7 +634,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     protected TreeNodeData exportTreeNodeData(ITreeNode node, AbstractTreeFieldData treeData) throws ProcessingException {
       if (node instanceof EntityNode) {
         EntityNode enode = (EntityNode) node;
-        String externalId = DataModelUtility.entityToExternalId(getDataModel(), enode.getEntity());
+        String externalId = DataModelUtility.entityToExternalId(enode.getEntity());
         if (externalId == null) {
           LOG.warn("could not find entity data for: " + enode.getEntity());
           return null;
@@ -646,7 +646,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       }
       else if (node instanceof AttributeNode) {
         AttributeNode anode = (AttributeNode) node;
-        String externalId = DataModelUtility.attributeToExternalId(getDataModel(), anode.getAttribute());
+        String externalId = DataModelUtility.attributeToExternalId(anode.getAttribute());
         if (externalId == null) {
           LOG.warn("could not find attribute data for: " + anode.getAttribute());
           return null;

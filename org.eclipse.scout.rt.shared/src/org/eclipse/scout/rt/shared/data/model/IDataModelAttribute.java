@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.data.model;
 
 import java.security.Permission;
+import java.util.Map;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -94,4 +95,11 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
   IDataModelEntity getParentEntity();
 
   void setParentEntity(IDataModelEntity parent);
+
+  /**
+   * @return meta data for the attribute, default returns null
+   *         <p>
+   *         see {@link DataModelUtility}
+   */
+  Map<String, String> getMetaDataOfAttribute();
 }
