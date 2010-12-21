@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -185,27 +185,27 @@ public final class DataModelAttributeOp implements DataModelConstants {
       if (aggregationType != null) {
         switch (aggregationType.intValue()) {
           case AGGREGATION_AVG: {
-            b.append(ScoutTexts.get("DataModelFieldAggregationAvg", attributeText));
+            b.append(ScoutTexts.get("ComposerFieldAggregationAvg", attributeText));
             break;
           }
           case AGGREGATION_COUNT: {
-            b.append(ScoutTexts.get("DataModelFieldAggregationCount", attributeText));
+            b.append(ScoutTexts.get("ComposerFieldAggregationCount", attributeText));
             break;
           }
           case AGGREGATION_MAX: {
-            b.append(ScoutTexts.get("DataModelFieldAggregationMax", attributeText));
+            b.append(ScoutTexts.get("ComposerFieldAggregationMax", attributeText));
             break;
           }
           case AGGREGATION_MEDIAN: {
-            b.append(ScoutTexts.get("DataModelFieldAggregationMedian", attributeText));
+            b.append(ScoutTexts.get("ComposerFieldAggregationMedian", attributeText));
             break;
           }
           case AGGREGATION_MIN: {
-            b.append(ScoutTexts.get("DataModelFieldAggregationMin", attributeText));
+            b.append(ScoutTexts.get("ComposerFieldAggregationMin", attributeText));
             break;
           }
           case AGGREGATION_SUM: {
-            b.append(ScoutTexts.get("DataModelFieldAggregationSum", attributeText));
+            b.append(ScoutTexts.get("ComposerFieldAggregationSum", attributeText));
             break;
           }
           default: {
