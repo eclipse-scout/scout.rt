@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.data.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -118,9 +117,4 @@ public abstract class AbstractDataModel implements IDataModel {
   public IDataModelEntity[] getEntities() {
     return m_entities;
   }
-
-  public Map<String, String> getMetaDataOfAttribute(IDataModelAttribute a) {
-    return null;
-  }
-
 }
