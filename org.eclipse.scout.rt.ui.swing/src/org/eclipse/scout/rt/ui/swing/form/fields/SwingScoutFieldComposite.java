@@ -82,13 +82,8 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
       setLabelFromScout(scoutField.getLabel());
       setLabelVisibleFromScout();
       setTooltipTextFromScout(scoutField.getTooltipText());
-      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD && scoutField.getLabel() != null) {
-        if (scoutField.getTooltipText() != null) {
-          setTooltipTextFromScout(scoutField.getLabel() + "\n" + scoutField.getTooltipText());
-        }
-        else {
-          setTooltipTextFromScout(scoutField.getLabel());
-        }
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD && scoutField.getLabel() != null && scoutField.getTooltipText() == null) {
+        setTooltipTextFromScout(scoutField.getLabel());
       }
       setBackgroundFromScout(scoutField.getBackgroundColor());
       setForegroundFromScout(scoutField.getForegroundColor());

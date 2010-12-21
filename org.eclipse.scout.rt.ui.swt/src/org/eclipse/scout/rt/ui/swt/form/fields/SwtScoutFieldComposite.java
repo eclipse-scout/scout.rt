@@ -79,13 +79,8 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       setLabelWidthInPixelFromScout();
       setLabelHorizontalAlignmentFromScout();
       setTooltipTextFromScout(getScoutObject().getTooltipText());
-      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD && getScoutObject().getLabel() != null) {
-        if (getScoutObject().getTooltipText() != null) {
-          setTooltipTextFromScout(getScoutObject().getLabel() + "\n" + getScoutObject().getTooltipText());
-        }
-        else {
-          setTooltipTextFromScout(getScoutObject().getLabel());
-        }
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD && getScoutObject().getLabel() != null && getScoutObject().getTooltipText() == null) {
+        setTooltipTextFromScout(getScoutObject().getLabel());
       }
       setFontFromScout(getScoutObject().getFont());
       setSaveNeededFromScout(getScoutObject().isSaveNeeded());
