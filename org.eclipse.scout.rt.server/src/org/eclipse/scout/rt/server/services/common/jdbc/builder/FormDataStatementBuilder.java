@@ -261,8 +261,16 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
+   * see {@link #setComposerEntityDefinition(Class, String, String)}
+   */
+  public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause) {
+    setComposerEntityDefinition(new ComposerEntityPartDefinition(entityType, whereClause));
+  }
+
+  /**
    * <b>Composer entity</b>:<br>
-   * The sqlAttribute is something like <code><pre>
+   * The whereClause is something like <code><pre>
+   * EXISTS (
    * SELECT 1
    * FROM PERSON @PERSON@
    * WHERE @PERSON@.PERSON_ID=@parent.PERSON@.PERSON_ID
@@ -272,6 +280,14 @@ public class FormDataStatementBuilder implements DataModelConstants {
    *  HAVING 1=1
    *  &lt;havingParts/&gt;
    * &lt;/groupBy&gt;
+   * )
+   * </pre></code> <br>
+   * The selectClause is something like <code><pre>
+   * ( SELECT &lt;column/&gt;
+   * FROM PERSON @PERSON@
+   * WHERE @PERSON@.PERSON_ID=@parent.PERSON@.PERSON_ID
+   * &lt;whereParts/&gt;
+   * )
    * </pre></code> <br>
    * The <i>whereParts</i> tag is replaced with all attributes contained in the entity that have no aggregation type.
    * Every attribute contributes a "AND <i>attribute</i> <i>op</i> <i>value</i>" line.<br>
@@ -279,8 +295,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * The <i>havingParts</i> tag is replaced with all attributes contained in the entity that have an aggregation type.
    * Every aggregation attribute contributes a "AND <i>fun</i>(<i>attribute</i>) <i>op</i> <i>value</i>" line.<br>
    */
-  public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String sqlAttribute) {
-    setComposerEntityDefinition(new ComposerEntityPartDefinition(entityType, sqlAttribute));
+  public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause, String selectClause) {
+    setComposerEntityDefinition(new ComposerEntityPartDefinition(entityType, whereClause, selectClause));
   }
 
   /**
