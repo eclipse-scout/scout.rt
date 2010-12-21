@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
@@ -241,7 +242,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     //legacy support
     Object legacyValue = rawValue;
     if (legacyValue instanceof Number) {
-      rawValue = convertDoubleTimeToDate((Number) legacyValue);
+      rawValue = DateUtility.convertDoubleTimeToDate((Number) legacyValue);
     }
     Date validValue = null;
     rawValue = super.validateValueInternal(rawValue);
@@ -287,38 +288,11 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   }
 
   public Double getTimeValue() {
-    if (getValue() == null) {
-      return null;
-    }
-    Calendar c = Calendar.getInstance();
-    c.setTime(getValue());
-    double t = ((c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE)) * 60 + c.get(Calendar.SECOND)) * 1000 + c.get(Calendar.MILLISECOND);
-    Double d = new Double(t / MILLIS_PER_DAY);
-    // range check;
-    if (d.doubleValue() < 0) d = new Double(0);
-    if (d.doubleValue() > 1) d = new Double(1);
-    return d;
+    return DateUtility.convertDateToDoubleTime(getValue());
   }
 
   public void setTimeValue(Double d) {
-    setValue(convertDoubleTimeToDate(d));
-  }
-
-  private Date convertDoubleTimeToDate(Number d) {
-    if (d == null) {
-      return null;
-    }
-    int m = (int) (((long) (d.doubleValue() * MILLIS_PER_DAY + 0.5)) % MILLIS_PER_DAY);
-    Calendar c = Calendar.getInstance();
-    c.clear();
-    c.set(Calendar.MILLISECOND, m % 1000);
-    m = m / 1000;
-    c.set(Calendar.SECOND, m % 60);
-    m = m / 60;
-    c.set(Calendar.MINUTE, m % 60);
-    m = m / 60;
-    c.set(Calendar.HOUR_OF_DAY, m % 24);
-    return c.getTime();
+    setValue(DateUtility.convertDoubleTimeToDate(d));
   }
 
   /**

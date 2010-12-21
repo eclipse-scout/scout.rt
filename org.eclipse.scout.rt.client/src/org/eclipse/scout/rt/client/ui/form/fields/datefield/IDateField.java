@@ -16,8 +16,6 @@ import java.util.Date;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 public interface IDateField extends IValueField<Date> {
-  long MILLIS_PER_DAY = 1000L * 3600L * 24L;
-
   String PROP_HAS_DATE = "hasDate";
   String PROP_HAS_TIME = "hasTime";
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -425,5 +425,42 @@ public final class DateUtility {
     cal1.set(Calendar.SECOND, cal2.get(Calendar.SECOND));
     cal1.set(Calendar.MILLISECOND, cal2.get(Calendar.MILLISECOND));
     return cal1.getTime();
+  }
+
+  /**
+   * set the time value as a double in the range from [0..1[ for 00:00 - 23:59:59
+   */
+  public static Date convertDoubleTimeToDate(Number d) {
+    if (d == null) {
+      return null;
+    }
+    int m = (int) (((long) (d.doubleValue() * DAY_MILLIS + 0.5)) % DAY_MILLIS);
+    Calendar c = Calendar.getInstance();
+    c.clear();
+    c.set(Calendar.MILLISECOND, m % 1000);
+    m = m / 1000;
+    c.set(Calendar.SECOND, m % 60);
+    m = m / 60;
+    c.set(Calendar.MINUTE, m % 60);
+    m = m / 60;
+    c.set(Calendar.HOUR_OF_DAY, m % 24);
+    return c.getTime();
+  }
+
+  /**
+   * @return the time value as a double in the range from [0..1[ for 00:00 - 23:59:59
+   */
+  public static Double convertDateToDoubleTime(Date time) {
+    if (time == null) {
+      return null;
+    }
+    Calendar c = Calendar.getInstance();
+    c.setTime(time);
+    double t = ((c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE)) * 60 + c.get(Calendar.SECOND)) * 1000 + c.get(Calendar.MILLISECOND);
+    Double d = new Double(t / DAY_MILLIS);
+    // range check;
+    if (d.doubleValue() < 0) d = new Double(0);
+    if (d.doubleValue() > 1) d = new Double(1);
+    return d;
   }
 }
