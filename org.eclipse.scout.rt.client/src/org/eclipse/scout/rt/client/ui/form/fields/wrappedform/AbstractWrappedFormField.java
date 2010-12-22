@@ -93,15 +93,19 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     }
   }
 
-  /**
-   * propagate both enabled levels to inner form
-   */
   @Override
-  protected void calculateEnabled() {
-    super.calculateEnabled();
+  public void setEnabledGranted(boolean b) {
+    super.setEnabledGranted(b);
     if (getInnerForm() != null) {
-      getInnerForm().setEnabledGranted(isEnabledGranted());
-      getInnerForm().setAllEnabled(getEnabledProperty());
+      getInnerForm().setEnabledGranted(b);
+    }
+  }
+
+  @Override
+  public void setEnabled(boolean b) {
+    super.setEnabled(b);
+    if (getInnerForm() != null) {
+      getInnerForm().setAllEnabled(b);
     }
   }
 

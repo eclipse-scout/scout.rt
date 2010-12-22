@@ -1200,7 +1200,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     if (field != null) {
       field.addMasterListener(m_currentMasterListener = new P_MasterListener());
       m_enabledSlave = (field.getValue() != null || !isMasterRequired());
-      calculateEnabled();
+      setEnabledGranted(m_enabledGranted);
     }
     m_masterField = field;
   }
@@ -1281,7 +1281,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       // only active if the unique listener itself
       if (this == m_currentMasterListener) {
         m_enabledSlave = (newMasterValue != null || !isMasterRequired());
-        calculateEnabled();
+        setEnabledGranted(m_enabledGranted);
         try {
           execChangedMasterValue(newMasterValue);
         }
