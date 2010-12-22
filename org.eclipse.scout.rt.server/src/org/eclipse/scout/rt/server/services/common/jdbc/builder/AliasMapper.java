@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -183,7 +183,7 @@ public class AliasMapper {
   }
 
   /**
-   * Parse all entity definitions in the statement part and define in the root map if there iy not yet a definition for
+   * Parse all entity definitions in the statement part and define in the root map if there is not yet a definition for
    * it.
    */
   public void addMissingRootEntitiesFrom(String statementPart) {
