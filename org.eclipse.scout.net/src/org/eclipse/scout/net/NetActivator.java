@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -35,10 +35,13 @@ import org.osgi.framework.BundleContext;
  * Use init property (config.ini, system properties, etc.) with name java.net.authenticate.cache.enabled=true|false to
  * allow/disallow caching of passwords. This property may/should be queried by {@link Authenticator} ui implementations
  * to decide whether to show/not show a checkbox or something simliar to save the passwords.
+ * <p/>
+ * Use org.eclipse.scout.net.proxy.autodetect=false to disable proxy detection
  */
 public final class NetActivator extends Plugin {
   public static final String PLUGIN_ID = "org.eclipse.scout.net";
   public static boolean DEBUG;
+  public static boolean PROXY_AUTODETECTION;
 
   private static NetActivator plugin;
 
@@ -69,10 +72,19 @@ public final class NetActivator extends Plugin {
     plugin = this;
     String debugText = context.getProperty(PLUGIN_ID + ".debug");
     DEBUG = (debugText != null && debugText.equalsIgnoreCase("true"));
+
+    String proxyDetectionText = context.getProperty(PLUGIN_ID + ".proxy.autodetect");
+    PROXY_AUTODETECTION = (proxyDetectionText == null || proxyDetectionText.equalsIgnoreCase("true"));
+
     // setup java.net
     m_oldProxySelector = ProxySelector.getDefault();
     m_oldCookieHandler = CookieHandler.getDefault();
-    ProxySelector.setDefault(m_newProxySelector = new EclipseProxySelector());
+    if (PROXY_AUTODETECTION) {
+      ProxySelector.setDefault(m_newProxySelector = new EclipseProxySelector());
+    }
+    else {
+      ProxySelector.setDefault(null);
+    }
     CookieManager.setDefault(m_newCookieHandler = new CookieManager(null, CookiePolicy.ACCEPT_ALL));
     Authenticator.setDefault(new EclipseAuthenticator());
   }
