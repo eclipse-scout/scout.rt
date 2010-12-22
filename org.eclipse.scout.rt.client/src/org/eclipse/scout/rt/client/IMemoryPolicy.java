@@ -4,13 +4,15 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 
 /**
@@ -30,12 +32,34 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 public interface IMemoryPolicy {
 
   /**
+   * After policy was set to a {@link IClientSession}.
+   */
+  void addNotify();
+
+  /**
+   * Before policy is removed from a {@link IClientSession} and replaced by another one.
+   */
+  void removeNotify();
+
+  /**
+   * This method is called just after a new page was created using {@link IPage#initPage()}.
+   */
+  void pageCreated(IPage page) throws ProcessingException;
+
+  /**
    * Whenever a new page is selected this methode is called to give the possibility to release unused pages.
    */
-  void afterOutlineSelectionChanged(IDesktop desktop);
+  void afterOutlineSelectionChanged(IDesktop desktop) throws ProcessingException;
 
-  void beforeTablePageLoadData(IPageWithTable<?> page);
+  /**
+   * Before data is fetched and loaded this methode is called to give the possibility to previously manipulate the
+   * table.
+   */
+  void beforeTablePageLoadData(IPageWithTable<?> page) throws ProcessingException;
 
-  void afterTablePageLoadData(IPageWithTable<?> page);
+  /**
+   * After data is fetched and loaded this methode is called to give the possibility to manipulate the table.
+   */
+  void afterTablePageLoadData(IPageWithTable<?> page) throws ProcessingException;
 
 }

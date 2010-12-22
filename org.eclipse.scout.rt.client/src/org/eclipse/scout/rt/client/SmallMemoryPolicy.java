@@ -11,17 +11,20 @@
 package org.eclipse.scout.rt.client;
 
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 
-public class SmallMemoryPolicy implements IMemoryPolicy {
-
-  public void afterOutlineSelectionChanged(final IDesktop desktop) {
-  }
+/**
+ * dont cache table page search form contents, releaseUnusedPages before every page reload and force gc to free
+ * memory
+ */
+public class SmallMemoryPolicy extends AbstractMemoryPolicy {
 
   /**
    * clear table before loading new data, thus disabling "replaceRow" mechanism but saving memory
    */
+  @Override
   public void beforeTablePageLoadData(IPageWithTable<?> page) {
     ClientJob.getCurrentSession().getDesktop().releaseUnusedPages();
     System.gc();
@@ -36,7 +39,9 @@ public class SmallMemoryPolicy implements IMemoryPolicy {
     }
   }
 
-  public void afterTablePageLoadData(IPageWithTable<?> page) {
+  @Override
+  public void pageCreated(IPage p) throws ProcessingException {
+    //nop
   }
 
   @Override

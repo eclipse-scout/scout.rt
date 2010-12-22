@@ -1316,7 +1316,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           if (page != null) {
             SERVICES.getService(INavigationHistoryService.class).addStep(0, page.getCell().getText(), page.getCell().getIconId());
           }
-          ClientSyncJob.getCurrentSession().getMemoryPolicy().afterOutlineSelectionChanged(AbstractDesktop.this);
+          try {
+            ClientSyncJob.getCurrentSession().getMemoryPolicy().afterOutlineSelectionChanged(AbstractDesktop.this);
+          }
+          catch (Throwable t) {
+            LOG.warn("MemoryPolicy.afterOutlineSelectionChanged", t);
+          }
           break;
         }
       }

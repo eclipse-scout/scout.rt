@@ -131,7 +131,7 @@ public abstract class AbstractClientSession implements IClientSession {
   protected void initConfig() {
     m_webSession = getConfiguredWebSession();
     m_virtualDesktop = new VirtualDesktop();
-    m_memoryPolicy = new LargeMemoryPolicy();
+    setMemoryPolicy(new LargeMemoryPolicy());
     // add client notification listener
     IClientNotificationConsumerService clientNotificationConsumerService = SERVICES.getService(IClientNotificationConsumerService.class);
     if (clientNotificationConsumerService != null) {
@@ -295,7 +295,13 @@ public abstract class AbstractClientSession implements IClientSession {
   }
 
   public void setMemoryPolicy(IMemoryPolicy p) {
+    if (m_memoryPolicy != null) {
+      m_memoryPolicy.removeNotify();
+    }
     m_memoryPolicy = p;
+    if (m_memoryPolicy != null) {
+      m_memoryPolicy.addNotify();
+    }
   }
 
   public void goOnline() throws ProcessingException {

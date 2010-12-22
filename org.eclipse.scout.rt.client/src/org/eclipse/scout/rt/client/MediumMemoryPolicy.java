@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.LRUCache;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -22,11 +24,45 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public class MediumMemoryPolicy implements IMemoryPolicy {
+/**
+ * cache only last 5 table page search form contents, releaseUnusedPages after every page reload and force gc do free
+ * memory
+ */
+public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MediumMemoryPolicy.class);
-  private boolean m_release = false;
 
+  private boolean m_release = false;
+  //cache last 5 search form contents
+  private final LRUCache<String/*pageFormIdentifier*/, String/*formXml*/> m_searchFormCache;
+
+  public MediumMemoryPolicy() {
+    m_searchFormCache = new LRUCache<String, String>(5, 0L);
+  }
+
+  @Override
+  protected void loadSearchFormState(IForm f, String pageFormIdentifier) throws ProcessingException {
+    //check if there is stored search form data
+    String xml = m_searchFormCache.get(pageFormIdentifier);
+    if (xml != null) {
+      f.setXML(xml);
+    }
+  }
+
+  @Override
+  protected void storeSearchFormState(IForm f, String pageFormIdentifier) throws ProcessingException {
+    //cache search form data
+    if (f.isEmpty()) {
+      m_searchFormCache.remove(pageFormIdentifier);
+    }
+    else {
+      String xml = f.getXML("UTF-8");
+      m_searchFormCache.put(pageFormIdentifier, xml);
+    }
+  }
+
+  @Override
   public void afterOutlineSelectionChanged(final IDesktop desktop) {
     try {
       final AtomicLong nodeCount = new AtomicLong();
@@ -76,6 +112,7 @@ public class MediumMemoryPolicy implements IMemoryPolicy {
   /**
    * when table contains 1000+ rows clear table before loading new data, thus disabling "replaceRow" mechanism
    */
+  @Override
   public void beforeTablePageLoadData(IPageWithTable<?> page) {
     if (m_release) {
       ClientJob.getCurrentSession().getDesktop().releaseUnusedPages();
@@ -91,9 +128,6 @@ public class MediumMemoryPolicy implements IMemoryPolicy {
     if (page.getTable() != null && page.getTable().getRowCount() > 1000) {
       page.getTable().discardAllRows();
     }
-  }
-
-  public void afterTablePageLoadData(IPageWithTable<?> page) {
   }
 
   @Override
