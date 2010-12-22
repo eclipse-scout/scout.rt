@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -870,7 +870,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     setCloseTypeInternal(CloseType.Unknown);
     createContainerForm();
     execStart();
-    if (!m_containerForm.isFormOpen()) {
+    if (m_containerForm != null && !m_containerForm.isFormOpen()) {
       m_containerForm.startWizard();
     }
   }
