@@ -68,7 +68,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
   protected void execAttributeChanged(IDataModelAttribute attribute) throws ProcessingException {
     Integer newAg = null;
     if (attribute != null) {
-      setView(true, true, false);
+      setEnabled(true);
       LookupRow[] rows = callKeyLookup(DataModelConstants.AGGREGATION_NONE);
       if (rows.length == 0) {
         rows = callKeyLookup(DataModelConstants.AGGREGATION_COUNT);
@@ -78,7 +78,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
       }
     }
     else {
-      setView(false, false, false);
+      setEnabled(false);
     }
     setValue(newAg);
     refreshDisplayText();
