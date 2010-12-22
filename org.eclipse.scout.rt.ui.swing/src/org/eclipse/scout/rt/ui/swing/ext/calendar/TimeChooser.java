@@ -22,7 +22,6 @@ import java.util.EventListener;
 
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -61,7 +60,6 @@ public class TimeChooser {
       @Override
       public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         String text = m_timeFormat.format((Date) value);
-        setHorizontalAlignment(SwingConstants.CENTER);
         return super.getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
       }
     });
