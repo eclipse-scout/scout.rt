@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
 import org.eclipse.scout.rt.ui.swing.ext.IDropDownButtonListener;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
-import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithDropDownButton;
+import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithTransparentIcon;
 import org.eclipse.scout.rt.ui.swing.ext.calendar.DateChooser;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
@@ -126,7 +126,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
    * May add additional components to the container.
    */
   protected JTextField createDateField(JComponent container) {
-    JTextFieldWithDropDownButton textField = new JTextFieldWithDropDownButton(getSwingEnvironment());
+    JTextFieldWithTransparentIcon textField = new JTextFieldWithTransparentIcon();
     textField.setIconGroup(new IconGroup(getSwingEnvironment(), AbstractIcons.DateFieldDate));
     container.add(textField);
     textField.addDropDownButtonListener(new IDropDownButtonListener() {
@@ -167,15 +167,6 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
     DateFormat format = f.getIsolatedDateFormat();
     dateField.setText(format.format(value));
     dateField.setCaretPosition(0);
-  }
-
-  @Override
-  protected void setEnabledFromScout(boolean b) {
-    super.setEnabledFromScout(b);
-    JTextComponent dateField = getSwingDateField();
-    if (dateField instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) dateField).setDropDownButtonEnabled(b);
-    }
   }
 
   @Override
@@ -242,7 +233,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
   }
 
   protected boolean isDateChooserEnabled() {
-    return getSwingDateField() != null && ((JTextFieldWithDropDownButton) getSwingDateField()).isDropDownButtonEnabled();
+    return getSwingDateField() != null && getSwingDateField().isEnabled();
   }
 
   protected void handleSwingDateChooserAction() {

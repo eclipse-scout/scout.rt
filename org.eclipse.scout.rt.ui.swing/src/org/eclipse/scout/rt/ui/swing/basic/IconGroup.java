@@ -101,6 +101,10 @@ public class IconGroup {
     return iconMap.get(state);
   }
 
+  public void setIcon(IconState state, Icon icon) {
+    iconMap.put(state, icon);
+  }
+
   public boolean hasIcon(IconState state) {
     return iconMap.containsKey(state);
   }

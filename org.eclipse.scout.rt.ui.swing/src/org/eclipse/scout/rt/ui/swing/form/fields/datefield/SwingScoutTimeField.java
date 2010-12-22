@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
 import org.eclipse.scout.rt.ui.swing.ext.IDropDownButtonListener;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
-import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithDropDownButton;
+import org.eclipse.scout.rt.ui.swing.ext.JTextFieldWithTransparentIcon;
 import org.eclipse.scout.rt.ui.swing.ext.calendar.TimeChooser;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
@@ -125,7 +125,7 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
    * May add additional components to the container.
    */
   protected JTextField createTimeField(JComponent container) {
-    JTextFieldWithDropDownButton textField = new JTextFieldWithDropDownButton(getSwingEnvironment());
+    JTextFieldWithTransparentIcon textField = new JTextFieldWithTransparentIcon();
     textField.setIconGroup(new IconGroup(getSwingEnvironment(), AbstractIcons.DateFieldTime));
     container.add(textField);
     textField.addDropDownButtonListener(new IDropDownButtonListener() {
@@ -166,15 +166,6 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
     if (format != null) {
       textField.setText(format.format(value));
       textField.setCaretPosition(0);
-    }
-  }
-
-  @Override
-  protected void setEnabledFromScout(boolean b) {
-    super.setEnabledFromScout(b);
-    JTextComponent timeField = getSwingTimeField();
-    if (timeField instanceof JTextFieldWithDropDownButton) {
-      ((JTextFieldWithDropDownButton) timeField).setDropDownButtonEnabled(b);
     }
   }
 
@@ -242,7 +233,7 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
   }
 
   protected boolean isTimeChooserEnabled() {
-    return getSwingTimeField() != null && ((JTextFieldWithDropDownButton) getSwingTimeField()).isDropDownButtonEnabled();
+    return getSwingTimeField() != null && getSwingTimeField().isEnabled();
   }
 
   protected void handleSwingTimeChooserAction() {

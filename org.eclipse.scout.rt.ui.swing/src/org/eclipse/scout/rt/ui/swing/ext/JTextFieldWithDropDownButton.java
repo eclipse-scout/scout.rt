@@ -35,7 +35,7 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
   private Cursor m_defaultCursor;
   private int m_insetsRight = 0;
 
-  private Collection<IDropDownButtonListener> listeners = new ArrayList<IDropDownButtonListener>();
+  private Collection<IDropDownButtonListener> m_listeners = new ArrayList<IDropDownButtonListener>();
 
   public JTextFieldWithDropDownButton(ISwingEnvironment env) {
     registerMouseMotionListener();
@@ -86,12 +86,12 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
           clickedMenu = true;
         }
         if (clickedMenu) {
-          for (IDropDownButtonListener l : listeners) {
+          for (IDropDownButtonListener l : m_listeners) {
             l.menuClicked(e.getSource());
           }
         }
         else {
-          for (IDropDownButtonListener l : listeners) {
+          for (IDropDownButtonListener l : m_listeners) {
             l.iconClicked(e.getSource());
           }
         }
@@ -191,18 +191,18 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
 
   private void paintIcon(Graphics g) {
     if (m_dropDownButton != null) {
-      int x = getWidth() - m_dropDownButton.getIconWidth() - m_insetsRight;
+      int x = getWidth() - m_dropDownButton.getIconWidth() - 6/*- m_insetsRight*/;
       int y = (getHeight() - m_dropDownButton.getIconHeight()) / 2;
       m_dropDownButton.paintIcon(this, g, x, y);
     }
   }
 
   public void addDropDownButtonListener(IDropDownButtonListener l) {
-    listeners.add(l);
+    m_listeners.add(l);
   }
 
   public void removeDropDownButtonListener(IDropDownButtonListener l) {
-    listeners.remove(l);
+    m_listeners.remove(l);
   }
 
   public boolean isDropDownButtonEnabled() {
