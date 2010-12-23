@@ -8,3 +8,13 @@ Extracted DataModel with entities and attributes out of AbstractComposerField an
 Migration: None, sometimes organize imports is necessary.
 Legacy: There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
 and wrapped in a ComposerFieldDataModel.
+Renaming:
+AbstractComposerAttribute -> AbstractDataModelAttribute
+AbstractComposerEntity -> AbstractDataModelEntity
+ComposerAttributeInjector -> DataModelAttributeInjector
+ComposerOp -> DataModelAttributeOp
+ComposerConstants -> DataModelConstants
+ComposerUtility -> DataModelUtility
+IComposerAttribute -> IDataModelAttribute
+IComposerOp -> IDataModelAttributeOp
+IComposerEntity -> IDataModelEntity
