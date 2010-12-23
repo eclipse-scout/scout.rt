@@ -87,7 +87,8 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
   protected void handlePageFormEvent(FormEvent e, String pageFormIdentifier) throws ProcessingException {
     switch (e.getType()) {
       case FormEvent.TYPE_LOAD_COMPLETE: {
-        loadSearchFormState(e.getForm(), pageFormIdentifier);
+        //store form state since it was probably reset
+        storeSearchFormState(e.getForm(), pageFormIdentifier);
         break;
       }
       case FormEvent.TYPE_STORE_AFTER: {
