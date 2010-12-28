@@ -21,10 +21,10 @@ public class ValidationFailedStatus extends ScoutFieldStatus {
   private static final long serialVersionUID = 1L;
 
   public ValidationFailedStatus(String message) {
-    super(message, ERROR);
+    super(message, WARNING);
   }
 
   public ValidationFailedStatus(IProcessingStatus s) {
-    super(s, ERROR);
+    super(s, WARNING);
   }
 }

@@ -15,6 +15,7 @@ import java.util.EventListener;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -266,18 +267,26 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       setValueChanging(true);
       //
       T validatedValue = null;
-      if (getErrorStatus() instanceof ParsingFailedStatus) {
-        clearErrorStatus();
-      }
-      else if (getErrorStatus() instanceof ValidationFailedStatus) {
+
+      if (getErrorStatus() instanceof ValidationFailedStatus) {
         clearErrorStatus();
       }
       try {
         validatedValue = validateValue(rawValue);
+
+        //parsing error may be cleared after successful validation
+        if (getErrorStatus() instanceof ParsingFailedStatus) {
+          clearErrorStatus();
+        }
       }
       catch (Throwable t) {
         ProcessingException e = (t instanceof ProcessingException ? (ProcessingException) t : new ProcessingException("Unexpected", t));
-        setErrorStatus(new ValidationFailedStatus(e.getStatus()));
+
+        //parsing error remains unchanged, regardless of validation error
+        if (!(getErrorStatus() instanceof ParsingFailedStatus)) {
+          setErrorStatus(new ValidationFailedStatus(e.getStatus()));
+        }
+
         e.consume();
         e.addContextMessage(getLabel() + " = " + rawValue);
         if (!(e instanceof VetoException)) {
@@ -430,10 +439,23 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       setValueParsing(true);
       //
       T parsedValue = execParseValue(text);
-      if (getErrorStatus() instanceof ParsingFailedStatus) {
-        clearErrorStatus();
-      }
+
+      //
+      IProcessingStatus oldErrorStatus = getErrorStatus();
+      String oldDisplayText = getDisplayText();
+
+      clearErrorStatus();
       setValue(parsedValue);
+
+      //do not clear validation errors, if the display text has not changed
+      if (oldErrorStatus instanceof ValidationFailedStatus && getErrorStatus() == null &&
+          StringUtility.nvl(text, "").equals(StringUtility.nvl(oldDisplayText, ""))) {
+        setErrorStatus(oldErrorStatus);
+      }
+      //convert validation error to parsing error
+      else if (getErrorStatus() instanceof ValidationFailedStatus) {
+        setErrorStatus(new ParsingFailedStatus(getErrorStatus()));
+      }
       return true;
     }
     catch (Throwable t) {

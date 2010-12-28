@@ -143,3 +143,27 @@ Extracted DataModel with entities and attributes out of AbstractComposerField an
 Migration: None, sometimes organize imports is necessary.
 Legacy: There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
 and wrapped in a ComposerFieldDataModel.
+
+27.12.2010 jgu
+Change in field validation: Error status is set to WARN instead of ERROR when an invalid date is entered via date picker.
+Affected Field Types: AbstractDateField, AbstractTimeField, AbstractDateTimeField
+
+Problem:
+Validation errors of text input in date fields lead to different results in the GUI than validation of date input (via date picker of keystrokes).
+Invalid date input is not displayed in the text field whereas invalid text input is. In both cases an error icon is shown to indicate that the entered value is not valid.
+In the case of date input, the date is not displayed in the text field, if it is invalid. When the field is re-validated and the previously entered value was valid, the field is valid again and the error disappears.
+A user might not notice that his input value was not accepted, when working fast.
+
+In both cases the model contains only valid values (as always) and an error status (IProcessingStatus.ERROR).
+
+Solution:
+If a date input is invalid, the error status is set to (IProcessingStatus.WARNING) to indicate that the selected value was not accepted, but there might still be a valid value in the text field.
+The warn status only disappears, if a new date or text is entered.
+
+This solution was chosen based on the following principles:
+- The model should only contain valid values (as before)
+- Text input should not be removed or changed when it is wrong (user experience).
+- Date input should not be displayed in the text field, if invalid, because it may not be possible to format it and the date input may depend on the value in the model (keystrokes).
+
+Migration: None
+
