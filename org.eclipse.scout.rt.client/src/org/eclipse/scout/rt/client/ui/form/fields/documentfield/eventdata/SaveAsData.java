@@ -10,26 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.documentfield.eventdata;
 
-import java.io.File;
 
-public class DocumentFile {
-  private File m_file;
+public class SaveAsData {
+  private String m_name;
   private String m_format;
 
-  public DocumentFile() {
+  public SaveAsData() {
   }
 
-  public DocumentFile(File file, String format) {
-    m_file = file;
+  public SaveAsData(String name, String format) {
+    m_name = name;
     m_format = format;
   }
 
-  public File getFile() {
-    return m_file;
+  public String getName() {
+    return m_name;
   }
 
-  public void File(File file) {
-    m_file = file;
+  public void setName(String name) {
+    m_name = name;
   }
 
   public String getFormat() {

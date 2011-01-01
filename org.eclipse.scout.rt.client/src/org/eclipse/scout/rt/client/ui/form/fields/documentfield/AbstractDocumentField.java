@@ -1,9 +1,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 
-import java.io.File;
-
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
@@ -11,7 +8,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.documentfield.eventdata.DocumentFile;
+import org.eclipse.scout.rt.client.ui.form.fields.documentfield.eventdata.SaveAsData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.service.SERVICES;
@@ -119,42 +116,12 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     return TypeCastUtility.castValue(ret, boolean.class);
   }
 
-  public RemoteFile saveAs(String name, String formatType, long timeout) throws ProcessingException {
-    if (name == null) {
-      if (getValue() != null) {
-        name = getValue().getName();
-      }
-      else {
-        name = "document.doc";
-      }
-    }
-    String simpleName = name.substring(0, name.lastIndexOf('.'));
-    File dir = IOUtility.createTempDirectory("doc");
-    File file = new File(dir, simpleName + "." + formatType);
-    fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_SAVE_AS, new DocumentFile(file, formatType)));
-    try {
-      long steps = timeout / 100;
-      for (long i = 0; i < steps && !file.exists(); i++) {
-        Thread.sleep(100L);
-      }
-      if (!file.exists()) {
-        throw new ProcessingException("Timeout waiting for document creation");
-      }
-      if (dir.listFiles().length == 1) {
-        RemoteFile r = new RemoteFile(file.getName(), file.lastModified());
-        r.readData(file);
-        return r;
-      }
-      RemoteFile r = new RemoteFile(simpleName + ".zip", file.lastModified());
-      r.readZipContentFromDirectory(dir);
-      return r;
-    }
-    catch (ProcessingException pe) {
-      throw pe;
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Unexpected", t);
-    }
+  public RemoteFile saveAs(String name) throws ProcessingException {
+    return saveAs(name, null);
+  }
+
+  public RemoteFile saveAs(String name, String format) throws ProcessingException {
+    return (RemoteFile) fireDocumentFieldEventInternal(new DocumentFieldEvent(this, DocumentFieldEvent.TYPE_SAVE_AS, new SaveAsData(name, format)));
   }
 
   public void autoResizeDocument() {
@@ -172,7 +139,17 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
 
   protected class P_UIFacade implements IDocumentFieldUIFacade {
 
-    public void fireComReady(boolean comReady) {
+    public void setDocumentFromUI(RemoteFile remoteFile) {
+      try {
+        setFieldChanging(true);
+        setValue(remoteFile);
+      }
+      finally {
+        setFieldChanging(false);
+      }
+    }
+
+    public void fireComReadyFromUI(boolean comReady) {
       try {
         if (propertySupport.setPropertyBool(PROP_COM_READY, comReady)) {
           execComReadyStatusChanged(comReady);

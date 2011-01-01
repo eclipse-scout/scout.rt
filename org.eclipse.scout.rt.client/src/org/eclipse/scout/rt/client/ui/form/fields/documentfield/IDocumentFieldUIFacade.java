@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 
+import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
+
 public interface IDocumentFieldUIFacade {
 
-  void fireComReady(boolean comReady);
+  void setDocumentFromUI(RemoteFile remoteFile);
+
+  void fireComReadyFromUI(boolean comReady);
 }

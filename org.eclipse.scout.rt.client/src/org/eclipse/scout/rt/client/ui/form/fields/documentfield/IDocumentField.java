@@ -1,7 +1,5 @@
 package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 
-import java.io.File;
-
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -30,21 +28,20 @@ public interface IDocumentField extends IValueField<RemoteFile> {
   boolean isComReady();
 
   /**
-   * save the document content and updates the new value (RemoteFile) of this document field
    * <p>
-   * This method will call {@link #saveAs(File, String)}
+   * Saves the document without updating the value of this document field.
+   * </p>
    * <p>
    * When the save of the document (for example in format type html) produces multiple files, then the created
    * RemoteFile contains compressed data (*.zip)
-   * <p>
-   * Note that this call is waiting for the producing of the file and synchronously completes
+   * </p>
    * 
-   * @param formatType
+   * @param format
    *          doc, dot, odt, html, pdf, ...
-   * @param timeout
-   *          milliseconds to wait for document production until a interruption error occurs
    */
-  RemoteFile saveAs(String name, String formatType, long timeout) throws ProcessingException;
+  public RemoteFile saveAs(String name, String format) throws ProcessingException;
+
+  public RemoteFile saveAs(String name) throws ProcessingException;
 
   void autoResizeDocument();
 
