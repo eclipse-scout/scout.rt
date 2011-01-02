@@ -46,6 +46,7 @@ import javax.swing.border.EmptyBorder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.calendar.DateTimeFormatFactory;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
 public class LargeCalendarCell extends AbstractCalendarCell {
   private static final long serialVersionUID = 1L;
@@ -295,7 +296,8 @@ public class LargeCalendarCell extends AbstractCalendarCell {
   public String getToolTipText(MouseEvent e) {
     Object item = getItemAt(e.getPoint());
     if (item != null) {
-      return m_dateChooser.getModel().getTooltip(item, getRepresentedDate());
+      String text = m_dateChooser.getModel().getTooltip(item, getRepresentedDate());
+      return SwingUtility.createHtmlLabelText(text, true);
     }
     else {
       return null;
