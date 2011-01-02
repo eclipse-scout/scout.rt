@@ -428,13 +428,23 @@ public final class DateUtility {
   }
 
   /**
-   * set the time value as a double in the range from [0..1[ for 00:00 - 23:59:59
+   * @param d
+   *          a value in [0..1[ representing a day
+   * @return the time value as date in the range from 00:00 - 23:59:59
+   * @see #convertDateToDoubleTime(Date) inverse function
    */
   public static Date convertDoubleTimeToDate(Number d) {
     if (d == null) {
       return null;
     }
-    int m = (int) (((long) (d.doubleValue() * DAY_MILLIS + 0.5)) % DAY_MILLIS);
+    int m;
+    if (d.doubleValue() < 0) {
+      m = (int) (((long) (d.doubleValue() * DAY_MILLIS - 0.5)) % DAY_MILLIS);
+    }
+    else {
+      m = (int) (((long) (d.doubleValue() * DAY_MILLIS + 0.5)) % DAY_MILLIS);
+    }
+
     Calendar c = Calendar.getInstance();
     c.clear();
     c.set(Calendar.MILLISECOND, m % 1000);
@@ -444,11 +454,17 @@ public final class DateUtility {
     c.set(Calendar.MINUTE, m % 60);
     m = m / 60;
     c.set(Calendar.HOUR_OF_DAY, m % 24);
+    if (m < 0) {
+      c.add(Calendar.DAY_OF_MONTH, 1);
+    }
     return c.getTime();
   }
 
   /**
-   * @return the time value as a double in the range from [0..1[ for 00:00 - 23:59:59
+   * @param time
+   *          a time (hh:mm:ss) in the interval 00:00:00 - 23:59:59
+   * @return the time value as a double in the range from [0..1[
+   * @see #convertDoubleTimeToDate(Number) inverse function
    */
   public static Double convertDateToDoubleTime(Date time) {
     if (time == null) {
