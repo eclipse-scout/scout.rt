@@ -24,8 +24,4 @@ public abstract class AbstractComposerData extends AbstractTreeFieldData {
   public AbstractComposerData() {
   }
 
-  @Override
-  protected void initConfig() { // TODO dwi ask imo why no super call
-  }
-
 }
