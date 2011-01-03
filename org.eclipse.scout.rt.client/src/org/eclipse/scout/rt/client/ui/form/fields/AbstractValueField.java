@@ -444,7 +444,10 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       IProcessingStatus oldErrorStatus = getErrorStatus();
       String oldDisplayText = getDisplayText();
 
-      clearErrorStatus();
+      if (getErrorStatus() instanceof ParsingFailedStatus) {
+        clearErrorStatus();
+      }
+
       setValue(parsedValue);
 
       //do not clear validation errors, if the display text has not changed
