@@ -33,14 +33,25 @@ public interface IDocumentField extends IValueField<RemoteFile> {
    * </p>
    * <p>
    * When the save of the document (for example in format type html) produces multiple files, then the created
-   * RemoteFile contains compressed data (*.zip)
+   * RemoteFile contains compressed data (*.zip).
+   * </p>
+   * <p>
+   * If the format is html, a plain-text representation of the document is created as well. Thereby, the name of this
+   * file corresponds to the given name and txt as file extension. This file is located in the root directory of the
+   * archive generated.
    * </p>
    * 
    * @param format
-   *          doc, dot, odt, html, pdf, ...
+   *          doc, dot, odt, html, pdf, ... or null to use the default format.
    */
   public RemoteFile saveAs(String name, String format) throws ProcessingException;
 
+  /**
+   * @see IDocumentField#saveAs(String, String).
+   * @param name
+   * @return
+   * @throws ProcessingException
+   */
   public RemoteFile saveAs(String name) throws ProcessingException;
 
   void autoResizeDocument();
