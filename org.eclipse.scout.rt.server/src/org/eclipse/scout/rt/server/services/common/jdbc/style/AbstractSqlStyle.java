@@ -203,7 +203,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
           large = isLargeString(s);
         }
         else {
-          // char[] binds are always threated as lobs
+          // char[] binds are always treated as lobs
           s = new String((char[]) o);
           large = true;
         }

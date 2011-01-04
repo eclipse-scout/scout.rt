@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -59,10 +59,20 @@ import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
  * </p>
  */
 public interface ISqlStyle extends Serializable {
+  /**
+   * Can be used to escape plain text that must not be prefixed by <code>:</code><br />
+   * E.g.
+   * 
+   * <pre>
+   * createNotLike(&quot;P.NAME&quot;, PLAIN_BIND_MARKER_PREFIX + &quot;'%test'&quot;)
+   * </pre>
+   * 
+   * to generate <code>P.NAME not like '%test'</code> instead of <code>P.NAME not like :'%test'</code>
+   */
   String PLAIN_BIND_MARKER_PREFIX = "&";
 
   /**
-   * ansi: +
+   * ansi: <code>+</code>
    */
   String getConcatOp();
 
@@ -89,32 +99,32 @@ public interface ISqlStyle extends Serializable {
   SqlBind buildBindFor(Object o, Class nullType);
 
   /**
-   * COUNT(p.BUDGET)
+   * <code>COUNT(p.BUDGET)</code>
    */
   String toAggregationCount(String attribute);
 
   /**
-   * MIN(p.BUDGET)
+   * <code>MIN(p.BUDGET)</code>
    */
   String toAggregationMin(String attribute);
 
   /**
-   * MAX(p.BUDGET)
+   * <code>MAX(p.BUDGET)</code>
    */
   String toAggregationMax(String attribute);
 
   /**
-   * SUM(p.BUDGET)
+   * <code>SUM(p.BUDGET)</code>
    */
   String toAggregationSum(String attribute);
 
   /**
-   * AVG(p.BUDGET)
+   * <code>AVG(p.BUDGET)</code>
    */
   String toAggregationAvg(String attribute);
 
   /**
-   * MEDIAN(p.BUDGET)
+   * <code>MEDIAN(p.BUDGET)</code>
    */
   String toAggregationMedian(String attribute);
 
@@ -134,411 +144,485 @@ public interface ISqlStyle extends Serializable {
   void registerOutput(CallableStatement cs, int index, Class bindType) throws SQLException;
 
   /**
-   * test a connection before use Note: this method is called before *every* sql
-   * connection pool transaction Note: this methode is not called when an rmi
-   * connection pool is used
+   * test a connection before use<br />
+   * Note: this method is called before *every* sql connection pool transaction<br />
+   * Note: this method is not called when an rmi connection pool is used
    */
   void testConnection(Connection conn) throws SQLException;
 
   /**
-   * flag signalling whether BLOB or LONG RAW should be used for byte[] binds
+   * flag signaling whether <code>BLOB</code> or <code>LONG RAW</code> should be used for <code>byte[]</code> binds
    */
   boolean isBlobEnabled();
 
   /**
-   * flag signalling whether CLOB or LONG VARCHAR should be used for char[] and
-   * large String binds
+   * flag signaling whether <code>CLOB</code> or <code>LONG VARCHAR</code> should be used for <code>char[]</code> and
+   * large {@link String} binds
    */
   boolean isClobEnabled();
 
   /**
-   * @return true to handle string as CLOB resp. LONG VARCHAR or false to handle
-   *         string as simple String see {@link #isClobEnabled()}
+   * @return <code>true</code> to handle string as <code>CLOB</code> resp. <code>LONG VARCHAR</code> or
+   *         <code>false</code> to handle
+   *         string as simple {@link String} see {@link #isClobEnabled()}
    */
   boolean isLargeString(String s);
 
   /*
-   * Attribute filters Areate SQL code transforming the template code to
-   * specific database sql the folloging methods display an example of an
-   * "sql attrinute constraint" in the javadoc comment
+   * Attribute filters Aggregate SQL code transforming the template code to
+   * specific database sql the following methods display an example of an
+   * "sql attribute constraint" in the javadoc comment
    */
 
   /**
-   * P.BUDGET between :bindName1 and :bindName2 (or "&text" for non-binds)
+   * <code>P.BUDGET between :bindName1 and :bindName2</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <p>
    * for dates use {@link #createDateBetween(String, String, String)} and
    * {@link #createDateTimeBetween(String, String, String)}
+   * </p>
    */
   String createBetween(String attribute, String bindName1, String bindName2);
 
   /**
-   * P.EVT_CREATED between :bindName1 and :bindName2 (or "&text" for non-binds)
-   * for dates use
+   * <code>P.EVT_CREATED between :bindName1 and :bindName2</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateBetween(String attribute, String bindName1, String bindName2);
 
   /**
-   * P.EVT_CREATED between :bindName1 and :bindName2 (or "&text" for non-binds)
-   * for dates use
+   * <code>P.EVT_CREATED between :bindName1 and :bindName2</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeBetween(String attribute, String bindName1, String bindName2);
 
   /**
-   * P.NAME like :bindName||'*' (or "&text" for non-binds)
+   * <code>P.NAME like :bindName||'*'</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createStartsWith(String attribute, String bindName);
 
   /**
-   * P.NAME not like :bindName||'*' (or "&text" for non-binds)
+   * <code>P.NAME not like :bindName||'*'</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createNotStartsWith(String attribute, String bindName);
 
   /**
-   * P.NAME like '*'||:bindName (or "&text" for non-binds)
+   * <code>P.NAME like '*'||:bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createEndsWith(String attribute, String bindName);
 
   /**
-   * P.NAME not like '*'||:bindName (or "&text" for non-binds)
+   * <code>P.NAME not like '*'||:bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createNotEndsWith(String attribute, String bindName);
 
   /**
-   * P.NAME like '*'||:bindName||'*' (or "&text" for non-binds)
+   * <code>P.NAME like '*'||:bindName||'*'</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createContains(String attribute, String bindName);
 
   /**
-   * P.NAME not like '*'||:bindName||'*' (or "&text" for non-binds)
+   * <code>P.NAME not like '*'||:bindName||'*'</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createNotContains(String attribute, String bindName);
 
   /**
-   * P.NAME like :bindName (or "&text" for non-binds)
+   * <code>P.NAME like :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createLike(String attribute, String bindName);
 
   /**
-   * P.NAME not like :bindName (or "&text" for non-binds)
+   * <code>P.NAME not like :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createNotLike(String attribute, String bindName);
 
   /**
-   * P.NAME null (or "&text" for non-binds)
+   * <code>P.NAME is null</code>
    */
   String createNull(String attribute);
 
   /**
-   * P.NAME not null (or "&text" for non-binds)
+   * <code>P.NAME not null</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createNotNull(String attribute);
 
   /**
-   * nvl(P.NAME,0)=0 special case for 'number is null' when 0 and null are
-   * threated as the same
+   * <code>nvl(P.NAME,0) = 0</code><br />
+   * special case for '<code>number is null</code>', if <code>0</code> and <code>null</code> are
+   * treated equally
    */
   String createNumberNull(String attribute);
 
   /**
-   * nvl(P.NAME,0)<>0 special case for 'number is null' when 0 and null are
-   * threated as the same
+   * <code>nvl(P.NAME,0)<>0</code><br />
+   * special case for '<code>number is null</code>', if <code>0</code> and <code>null</code> are
+   * treated equally
    */
   String createNumberNotNull(String attribute);
 
   /**
-   * nvl(P.NAME,'0')=='0' special case for 'text is null' when '0' and null are
-   * threated as the same
+   * <code>nvl(P.NAME,'0')=='0'</code><br />
+   * special case for '<code>text is null</code>', if <code>'0'</code> and <code>null</code> are
+   * treated equally
    */
   String createTextNull(String attribute);
 
   /**
-   * nvl(P.NAME,'0')<>'0' special case for 'text is null' when '0' and null are
-   * threated as the same
+   * <code>nvl(P.NAME,'0')<>'0'</code><br />
+   * special case for '<code>text is null</code>' when <code>'0'</code> and <code>null</code> are
+   * treated equally
    */
   String createTextNotNull(String attribute);
 
   /**
-   * P.NAME in :bindName (or "&text" for non-binds)
+   * <code>P.NAME in :bindName</code> (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX}
+   * )
    */
   String createIn(String attribute, String bindName);
 
   /**
-   * P.NAME not in :bindName (or "&text" for non-binds)
+   * <code>P.NAME not in :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createNotIn(String attribute, String bindName);
 
   /**
-   * P.NAME in (o1,o2,...) (or "&text" for non-binds)
+   * <code>P.NAME in (o1,o2,...)</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createInList(String attribute, Object array);
 
   /**
-   * P.NAME not in (o1,o2,...) (or "&text" for non-binds)
+   * <code>P.NAME not in (o1,o2,...)</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createNotInList(String attribute, Object array);
 
   /**
-   * P.NAME dateIsToday (or "&text" for non-binds)
+   * <code>P.NAME dateIsToday</code>
    */
   String createDateIsToday(String attribute);
 
   /**
-   * P.NAME dateIsInLastDays :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInLastDays :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInLastDays(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInNextDays :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInNextDays :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInNextDays(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInDays :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInDays :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInDays(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInWeeks :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInWeeks :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInWeeks(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInLastMonths :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInLastMonths :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInLastMonths(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInNextMonths :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInNextMonths :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInNextMonths(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInMonths :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInMonths :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInMonths(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInLEDays :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInLEDays :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInLEDays(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInLEWeeks :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInLEWeeks :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
    */
   String createDateIsInLEWeeks(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInLEMonths :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInLEMonths :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInLEMonths(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInGEDays :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInGEDays :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInGEDays(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInGEWeeks :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInGEWeeks :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
    */
   String createDateIsInGEWeeks(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsInGEMonths :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateIsInGEMonths :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateIsInGEMonths(String attribute, String bindName);
 
   /**
-   * P.NAME dateIsNotToday (or "&text" for non-binds)
+   * <code>P.NAME dateIsNotToday</code>
    */
   String createDateIsNotToday(String attribute);
 
   /**
-   * P.NAME dateTimeIsNow (or "&text" for non-binds)
+   * <code>P.NAME dateTimeIsNow</code>
    */
   String createDateTimeIsNow(String attribute);
 
   /**
-   * P.NAME dateTimeIsInLEMinutes :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateTimeIsInLEMinutes :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeIsInLEMinutes(String attribute, String bindName);
 
   /**
-   * P.NAME dateTimeIsInLEHours :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateTimeIsInLEHours :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeIsInLEHours(String attribute, String bindName);
 
   /**
-   * P.NAME dateTimeIsInGEMinutes :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateTimeIsInGEMinutes :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeIsInGEMinutes(String attribute, String bindName);
 
   /**
-   * P.NAME dateTimeIsInGEHours :bindName (or "&text" for non-binds)
+   * <code>P.NAME dateTimeIsInGEHours :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeIsInGEHours(String attribute, String bindName);
 
   /**
-   * P.NAME dateTimeIsNotNow (or "&text" for non-binds)
+   * <code>P.NAME dateTimeIsNotNow</code>
    */
   String createDateTimeIsNotNow(String attribute);
 
   /**
-   * P.NAME timeIsNow (or "&text" for non-binds)
+   * <code>P.NAME timeIsNow</code>
    */
   String createTimeIsNow(String attribute);
 
   /**
-   * P.NAME timeIsNow (or "&text" for non-binds)
+   * <code>P.NAME timeIsNow</code>
    */
   String createTimeIsNotNow(String attribute);
 
   /**
-   * P.NAME timeIsInMinutes :bindName (or "&text" for non-binds)
+   * <code>P.NAME timeIsInMinutes :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
    */
   String createTimeIsInMinutes(String attribute, String bindName);
 
   /**
-   * P.NAME timeIsInHours :bindName (or "&text" for non-binds)
+   * <code>P.NAME timeIsInHours :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createTimeIsInHours(String attribute, String bindName);
 
   /**
-   * P.NAME timeIsInLEMinutes :bindName (or "&text" for non-binds)
+   * <code>P.NAME timeIsInLEMinutes :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createTimeIsInLEMinutes(String attribute, String bindName);
 
   /**
-   * P.NAME timeIsInLEHours :bindName (or "&text" for non-binds)
+   * <code>P.NAME timeIsInLEHours :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
    */
   String createTimeIsInLEHours(String attribute, String bindName);
 
   /**
-   * P.NAME timeIsInGEMinutes :bindName (or "&text" for non-binds)
+   * <code>P.NAME timeIsInGEMinutes :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createTimeIsInGEMinutes(String attribute, String bindName);
 
   /**
-   * P.NAME timeIsInGEHours :bindName (or "&text" for non-binds)
+   * <code>P.NAME timeIsInGEHours :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
    */
   String createTimeIsInGEHours(String attribute, String bindName);
 
   /**
-   * P.NAME = :bindName (or "&text" for non-binds)
+   * <code>P.NAME = :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <p>
    * for dates use {@link #createDateEQ(String, String)} and {@link #createDateTimeEQ(String, String)}
+   * </p>
    */
   String createEQ(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED= :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED= :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateEQ(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED = :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED = :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeEQ(String attribute, String bindName);
 
   /**
-   * P.NAME <> :bindName (or "&text" for non-binds)
+   * <code>P.NAME <> :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <p>
    * for dates use {@link #createDateNEQ(String, String)} and {@link #createDateTimeNEQ(String, String)}
+   * </p>
    */
   String createNEQ(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED<> :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED<> :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateNEQ(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED <> :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED <> :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeNEQ(String attribute, String bindName);
 
   /**
-   * P.NAME < :bindName (or "&text" for non-binds)
+   * <code>P.NAME < :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <p>
    * for dates use {@link #createDateLT(String, String)} and {@link #createDateTimeLT(String, String)}
+   * </p>
    */
   String createLT(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED < :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED < :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateLT(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED < :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED < :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeLT(String attribute, String bindName);
 
   /**
-   * P.NAME <= :bindName (or "&text" for non-binds)
+   * <code>P.NAME <= :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <p>
    * for dates use {@link #createDateLE(String, String)} and {@link #createDateTimeLE(String, String)}
+   * </p>
    */
   String createLE(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED <= :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED <= :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateLE(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED <= :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED <= :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeLE(String attribute, String bindName);
 
   /**
-   * P.NAME > :bindName (or "&text" for non-binds)
+   * <code>P.NAME > :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <p>
    * for dates use {@link #createDateGT(String, String)} and {@link #createDateTimeGT(String, String)}
+   * </p>
    */
   String createGT(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED > :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED > :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateGT(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED > :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED > :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeGT(String attribute, String bindName);
 
   /**
-   * P.NAME >= :bindName (or "&text" for non-binds)
+   * <code>P.NAME >= :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <p>
    * for dates use {@link #createDateGE(String, String)} and {@link #createDateTimeGE(String, String)}
+   * </p>
    */
   String createGE(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED >= :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED >= :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateGE(String attribute, String bindName);
 
   /**
-   * P.EVT_CREATED >= :bindName (or "&text" for non-binds)
+   * <code>P.EVT_CREATED >= :bindName</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
    */
   String createDateTimeGE(String attribute, String bindName);
 
   /**
-   * expression for the current date using the database specific keyword, SYSDATE on oracle
+   * expression for the current date using the database specific keyword, <code>SYSDATE</code> on oracle
    */
   String getSysdateToken();
 
   /**
-   * expression for upper case text using the database specific keyword, UPPER on oracle
+   * expression for upper case text using the database specific keyword, <code>UPPER</code> on oracle
    */
   String getUpperToken();
 
   /**
-   * expression for lower case text using the database specific keyword, LOWER on oracle
+   * expression for lower case text using the database specific keyword, <code>LOWER</code> on oracle
    */
   String getLowerToken();
 
   /**
-   * expression for trimmed text using the database specific keyword, TRIM on oracle
+   * expression for trimmed text using the database specific keyword, <code>TRIM</code> on oracle
    */
   String getTrimToken();
 
   /**
-   * expression for null-value/default-value using the database specific keyword, NVL on oracle
+   * expression for null-value/default-value using the database specific keyword, <code>NVL</code> on oracle
    */
   String getNvlToken();
 
