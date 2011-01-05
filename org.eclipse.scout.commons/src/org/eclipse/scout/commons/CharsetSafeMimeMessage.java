@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,12 +23,12 @@ import javax.mail.internet.MimeUtility;
 public class CharsetSafeMimeMessage extends MimeMessage {
   private String m_charset;
 
-  CharsetSafeMimeMessage() {
+  public CharsetSafeMimeMessage() {
     super((Session) null);
     m_charset = "UTF-8";
   }
 
-  CharsetSafeMimeMessage(String charset) {
+  public CharsetSafeMimeMessage(String charset) {
     super((Session) null);
     m_charset = charset;
   }
