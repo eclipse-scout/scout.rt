@@ -45,3 +45,24 @@ org.eclipse.scout.log.level=WARNING
 *** Settings in config.ini for using java standard log, this is the recommended usage:
 eclipse.consoleLog=false
 org.eclipse.scout.log=java
+
+05.01.2011 imo
+Eliminated javax.mail and javax.jms plugins due to severe issues in sun's handling of javamail and mailcap configuration.
+jax-ws interferes with javamail in a global static way which is dependent on which classloader initiates the factory.
+The result is a lucky guess which class loader context loads the mailcap resources.
+Migration:
+* the endorsed jars are at O:\Scout SDK\Releases\Head\jre-lib-endorsed
+* when using JRE 1.5: copy  javax.mail.jre15_1.4.1.jar and javax.jms_1.1.0.jar to the jre\lib\endorsed folder of the JRE.
+* when using JRE 1.6: copy javax.mail.jre16_1.4.3.jar and javax.jms_1.1.0.jar to the jre\lib\endorsed folder of the JRE.
+* restart eclipse, check installed jre's eventually press the button "Restore Defaults"
+* remove the plugins from the IDE, the trunk IDE is automatically updated
+* remove all import dependencies to javax.jms, javax.mail, javax.activation and com.sun
+* remove all references to javax.mail, javax.activation, javax.jms and com.sun in *.product, *.xml and MANIFEST.MF files
+* for every project using javax.* open project properties:
+Build Path
+ Libraries
+  JRE System Library
+   Access Rule
+    Button "Edit..."
+     Button "Add"
+      add a new entry with "Accessible" javax/**
