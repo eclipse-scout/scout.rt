@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.osgi.framework.internal.core.BundleFragment;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.junit.Test;
@@ -44,7 +43,7 @@ public class JUnitTestClassBrowser {
     List<Class<?>> devClasses = new ArrayList<Class<?>>();
     for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
       // exclude fragments as their content is searched by their host bundles.
-      if (bundle instanceof BundleFragment) {
+      if (bundle instanceof org.eclipse.osgi.framework.internal.core.BundleFragment) {
         continue;
       }
 
