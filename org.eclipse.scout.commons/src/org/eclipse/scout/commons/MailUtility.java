@@ -13,7 +13,10 @@ package org.eclipse.scout.commons;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -43,9 +46,13 @@ import javax.mail.internet.MimePart;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 public final class MailUtility {
+
+  public static final IScoutLogger LOG = ScoutLogManager.getLogger(MailUtility.class);
+
   private static final String CONTENT_TYPE_ID = "Content-Type";
   public static final String CONTENT_TYPE_TEXT_HTML = "text/html; charset=\"UTF-8\"";
   public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset=\"UTF-8\"";
@@ -272,8 +279,79 @@ public final class MailUtility {
     }
   }
 
-  public static MimeMessage createMimeMessage(String bodyPart, String htmlBodyPart, DataSource[] attachements) throws ProcessingException {
-    return instance.createMimeMessageInternal(bodyPart, htmlBodyPart, attachements);
+  public static MimeMessage createMimeMessage(String messagePlain, String messageHtml, DataSource[] attachements) throws ProcessingException {
+    return instance.createMimeMessageInternal(messagePlain, messageHtml, attachements);
+  }
+
+  public static MimeMessage createMimeMessageFromWordArchieve(File archiveFile, File[] attachments) throws ProcessingException {
+    return instance.createMimeMessageFromWordArchieveInternal(archiveFile, attachments);
+  }
+
+  @SuppressWarnings("restriction")
+  private MimeMessage createMimeMessageFromWordArchieveInternal(File archiveFile, File[] attachments) throws ProcessingException {
+    try {
+      File tempDir = IOUtility.createTempDirectory("");
+      FileUtility.extractArchive(archiveFile, tempDir);
+
+      String simpleName = archiveFile.getName();
+      if (archiveFile.getName().lastIndexOf('.') != -1) {
+        simpleName = archiveFile.getName().substring(0, archiveFile.getName().lastIndexOf('.'));
+      }
+
+      File plainTextFile = new File(tempDir, simpleName + ".txt");
+      String plainTextMessage = null;
+      if (plainTextFile.exists()) {
+        Reader reader = new FileReader(plainTextFile);
+        plainTextMessage = IOUtility.getContent(reader);
+        reader.close();
+      }
+
+      File filesFolder = new File(tempDir, simpleName + "_files");
+      List<DataSource> dataSourceList = new ArrayList<DataSource>();
+      if (filesFolder.exists()) {
+        // add all auxilary files as attachment
+        for (File file : filesFolder.listFiles()) {
+          // exclude Microsoft Word specific directory file. This is only used to edit HTML in Word.
+          if (!file.getName().equals("filelist.xml")) {
+            DataSource dataSource = MailUtility.createDataSource(file);
+            dataSourceList.add(dataSource);
+          }
+        }
+      }
+
+      for (File attachment : attachments) {
+        dataSourceList.add(MailUtility.createDataSource(attachment));
+      }
+
+      File htmlFile = new File(tempDir, simpleName + ".html");
+      if (!htmlFile.exists()) {
+        htmlFile = new File(tempDir, simpleName + ".htm");
+      }
+      String htmlMessage = null;
+      if (htmlFile.exists()) {
+        Reader reader = new FileReader(htmlFile);
+        htmlMessage = IOUtility.getContent(reader);
+        reader.close();
+        // replace directory entry
+        // replace all paths to the 'files directory' with the root directory
+        htmlMessage = htmlMessage.replaceAll(simpleName + "_files/", "");
+
+        // remove 'files directory' registration
+        Pattern pattern = Pattern.compile("<link rel=File-List[^>].+?>", Pattern.DOTALL | Pattern.MULTILINE);
+        htmlMessage = pattern.matcher(htmlMessage).replaceAll("");
+      }
+
+      MimeMessage mimeMessage = MailUtility.createMimeMessage(plainTextMessage, htmlMessage, dataSourceList.toArray(new DataSource[dataSourceList.size()]));
+      mimeMessage.setFileName(simpleName + ".eml");
+      mimeMessage.setHeader("X-Unsent", "1"); // only supported in Outlook 2010
+      return mimeMessage;
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error occured while accessing files", e);
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException("Error occured while creating MIME-message", e);
+    }
   }
 
   private MimeMessage createMimeMessageInternal(String bodyTextPlain, String bodyTextHtml, DataSource[] attachements) throws ProcessingException {
