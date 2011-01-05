@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -24,6 +25,21 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
 
   private final EventListenerList m_listenerList = new EventListenerList();
   private IDocumentFieldUIFacade m_uiFacade;
+
+  @Override
+  protected double getConfiguredGridWeightX() {
+    return 1;
+  }
+
+  @Override
+  protected double getConfiguredGridWeightY() {
+    return 1;
+  }
+
+  @Override
+  protected boolean getConfiguredLabelVisible() {
+    return false;
+  }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @ConfigPropertyValue("false")
@@ -77,6 +93,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     return propertySupport.getPropertyBool(PROP_COM_READY);
   }
 
+  @ConfigOperation
   protected void execComReadyStatusChanged(boolean ready) throws ProcessingException {
   }
 
