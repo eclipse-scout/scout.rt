@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -118,7 +118,7 @@ public final class ConfigurationUtility {
   /**
    * @return true if the declared method is overwritten in implementationType
    */
-  public static boolean isMethodOverwrite(Class declaringType, String methodName, Class[] parameterTypes, Class implementationType) {
+  public static boolean isMethodOverwrite(Class<?> declaringType, String methodName, Class[] parameterTypes, Class<?> implementationType) {
     try {
       Method declaredMethod;
       try {
@@ -128,7 +128,7 @@ public final class ConfigurationUtility {
         LOG.error("cannot find declared method " + declaringType.getName() + "." + methodName, e);
         return false;
       }
-      Class c = implementationType;
+      Class<?> c = implementationType;
       while (c != null && c != declaringType) {
         try {
           Method overrideMethod = c.getDeclaredMethod(declaredMethod.getName(), declaredMethod.getParameterTypes());
