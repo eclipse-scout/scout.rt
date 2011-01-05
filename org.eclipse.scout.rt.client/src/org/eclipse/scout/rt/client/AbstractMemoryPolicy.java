@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.pagefield.AbstractPageField;
 
 public class AbstractMemoryPolicy implements IMemoryPolicy {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMemoryPolicy.class);
@@ -62,13 +63,17 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
    * Attaches listener on table page search forms
    */
   public void pageCreated(IPage p) throws ProcessingException {
-    if (p instanceof IPageWithTable<?>) {
-      IForm f = ((IPageWithTable<?>) p).getSearchFormInternal();
-      if (f != null) {
-        String pageFormIdentifier = registerPageForm(p, f);
-        if (f.isFormOpen()) {
-          loadSearchFormState(f, pageFormIdentifier);
-        }
+    if (!(p instanceof IPageWithTable<?>)) {
+      return;
+    }
+    if (p.getOutline() instanceof AbstractPageField.SimpleOutline) {
+      return;
+    }
+    IForm f = ((IPageWithTable<?>) p).getSearchFormInternal();
+    if (f != null) {
+      String pageFormIdentifier = registerPageForm(p, f);
+      if (f.isFormOpen()) {
+        loadSearchFormState(f, pageFormIdentifier);
       }
     }
   }
