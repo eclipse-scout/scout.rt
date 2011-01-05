@@ -39,4 +39,4 @@ Export-Package: org.eclipse.scout.rt.shared,
  org.eclipse.scout.rt.shared.servicetunnel
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
