@@ -619,7 +619,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
   }
 
   public String createDateIsInWeeks(String attribute, String bindName) {
-    return attribute + ">=TRUNC(SYSDATE+" + adaptBindNameTimeDateOp(bindName) + ") AND " + attribute + "<TRUNC(SYSDATE+((" + adaptBindNameTimeDateOp(bindName) + ")*7)+1)";
+    return attribute + ">=TRUNC(SYSDATE+((" + adaptBindNameTimeDateOp(bindName) + ")*7)) AND " + attribute + "<TRUNC(SYSDATE+((" + adaptBindNameTimeDateOp(bindName) + ")*7)+1)";
   }
 
   public String createDateIsInLastMonths(String attribute, String bindName) {
