@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -100,8 +100,17 @@ public class HolidayCalendarItemParser {
     startYear = cal.get(Calendar.YEAR);
     cal.setTime(maxDate);
     endYear = cal.get(Calendar.YEAR);
+    // load all holidays of the given years
     for (int year = startYear; year <= endYear; year++) {
       addHolidays(loc, year, itemList);
+    }
+    // remove all the holidays lying before minDate or after maxDate
+    Iterator<HolidayItem> iter = itemList.iterator();
+    while (iter.hasNext()) {
+      HolidayItem item = iter.next();
+      if (minDate.after(item.getStart()) || maxDate.before(item.getStart())) {
+        iter.remove();
+      }
     }
     return itemList.toArray(new HolidayItem[itemList.size()]);
   }
