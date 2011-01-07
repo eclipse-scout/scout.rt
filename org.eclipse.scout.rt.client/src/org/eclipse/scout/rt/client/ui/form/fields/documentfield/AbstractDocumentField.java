@@ -133,6 +133,10 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     return TypeCastUtility.castValue(ret, boolean.class);
   }
 
+  public RemoteFile save() throws ProcessingException {
+    return saveAs(null, null);
+  }
+
   public RemoteFile saveAs(String name) throws ProcessingException {
     return saveAs(name, null);
   }

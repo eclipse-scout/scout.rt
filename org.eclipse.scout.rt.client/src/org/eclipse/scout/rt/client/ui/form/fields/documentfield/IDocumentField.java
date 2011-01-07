@@ -54,6 +54,8 @@ public interface IDocumentField extends IValueField<RemoteFile> {
    */
   public RemoteFile saveAs(String name) throws ProcessingException;
 
+  public RemoteFile save() throws ProcessingException;
+
   void autoResizeDocument();
 
   IDocumentFieldUIFacade getUIFacade();
