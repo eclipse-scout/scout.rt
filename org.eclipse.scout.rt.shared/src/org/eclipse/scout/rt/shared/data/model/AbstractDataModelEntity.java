@@ -203,6 +203,24 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     return m_entities.toArray(new IDataModelEntity[0]);
   }
 
+  public IDataModelAttribute getAttribute(Class<? extends IDataModelAttribute> attributeClazz) {
+    for (IDataModelAttribute attribute : m_attributes) {
+      if (attribute.getClass() == attributeClazz) {
+        return attribute;
+      }
+    }
+    return null;
+  }
+
+  public IDataModelEntity getEntity(Class<? extends IDataModelEntity> entityClazz) {
+    for (IDataModelEntity entity : m_entities) {
+      if (entity.getClass() == entityClazz) {
+        return entity;
+      }
+    }
+    return null;
+  }
+
   public IDataModelEntity getParentEntity() {
     return m_parentEntity;
   }

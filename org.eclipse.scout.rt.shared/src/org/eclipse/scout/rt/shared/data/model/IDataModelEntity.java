@@ -33,7 +33,11 @@ public interface IDataModelEntity extends IPropertyObserver {
 
   IDataModelAttribute[] getAttributes();
 
+  public IDataModelAttribute getAttribute(Class<? extends IDataModelAttribute> attributeClazz);
+
   IDataModelEntity[] getEntities();
+
+  IDataModelEntity getEntity(Class<? extends IDataModelEntity> entityClazz);
 
   IDataModelEntity getParentEntity();
 

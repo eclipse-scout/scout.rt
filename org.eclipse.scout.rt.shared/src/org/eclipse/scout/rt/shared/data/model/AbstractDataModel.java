@@ -117,4 +117,22 @@ public abstract class AbstractDataModel implements IDataModel {
   public IDataModelEntity[] getEntities() {
     return m_entities;
   }
+
+  public IDataModelAttribute getAttribute(Class<? extends IDataModelAttribute> attributeClazz) {
+    for (IDataModelAttribute attribute : m_attributes) {
+      if (attribute.getClass() == attributeClazz) {
+        return attribute;
+      }
+    }
+    return null;
+  }
+
+  public IDataModelEntity getEntity(Class<? extends IDataModelEntity> entityClazz) {
+    for (IDataModelEntity entity : m_entities) {
+      if (entity.getClass() == entityClazz) {
+        return entity;
+      }
+    }
+    return null;
+  }
 }
