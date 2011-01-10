@@ -121,4 +121,18 @@ public class DataModelAggregationLookupCall extends LocalLookupCall {
       return Collections.emptyList();
     }
   }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (super.equals(obj)) {
+      DataModelAggregationLookupCall other = (DataModelAggregationLookupCall) obj;
+      return this.m_attribute == other.m_attribute;
+    }
+    return false;
+  }
 }
