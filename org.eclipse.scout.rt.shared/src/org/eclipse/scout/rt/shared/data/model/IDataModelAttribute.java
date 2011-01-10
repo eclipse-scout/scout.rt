@@ -46,13 +46,13 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
   void setOperators(IDataModelAttributeOp[] ops);
 
   /**
-   * @return array of {@link ComposerConstants#AGGREGATION_*}
+   * @return array of {@link DataModelConstants#AGGREGATION_*}
    */
   int[] getAggregationTypes();
 
   /**
    * @param aggregationTypes
-   *          array of {@link ComposerConstants#AGGREGATION_*}
+   *          array of {@link DataModelConstants#AGGREGATION_*}
    */
   void setAggregationTypes(int[] aggregationTypes);
 
