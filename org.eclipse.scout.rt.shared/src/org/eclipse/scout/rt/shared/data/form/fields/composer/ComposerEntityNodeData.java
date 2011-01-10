@@ -50,7 +50,7 @@ public class ComposerEntityNodeData extends TreeNodeData {
   }
 
   private void visitContainingAttributeNodesRec(TreeNodeData node, List<ComposerAttributeNodeData> list) {
-    for (TreeNodeData child : getChildNodes()) {
+    for (TreeNodeData child : node.getChildNodes()) {
       if (child instanceof ComposerAttributeNodeData) {
         list.add((ComposerAttributeNodeData) child);
       }

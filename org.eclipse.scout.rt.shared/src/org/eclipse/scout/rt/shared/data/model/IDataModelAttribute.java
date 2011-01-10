@@ -56,6 +56,8 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
    */
   void setAggregationTypes(int[] aggregationTypes);
 
+  boolean containsAggregationType(int agType);
+
   String getIconId();
 
   void setIconId(String s);

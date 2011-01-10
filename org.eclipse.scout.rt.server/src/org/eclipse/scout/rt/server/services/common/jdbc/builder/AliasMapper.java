@@ -76,7 +76,7 @@ public class AliasMapper {
   }
 
   /**
-   * @return a map with the effective aliases per entity for example {PERSON = p, TASK = t}
+   * @return the live map with the effective aliases per entity for example {PERSON = p, TASK = t}
    *         never returns null
    */
   public Map<String, String> getRootAliases() {
@@ -116,7 +116,7 @@ public class AliasMapper {
   }
 
   /**
-   * @return a map with the effective aliases per entity for example {PERSON = p, TASK = t}
+   * @return the live map with the effective aliases per entity for example {PERSON = p, TASK = t}
    *         never returns null
    */
   public Map<String, String> getNodeAliases(Object node) {

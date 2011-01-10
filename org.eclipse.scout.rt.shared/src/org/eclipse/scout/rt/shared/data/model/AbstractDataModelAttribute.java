@@ -222,6 +222,19 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     m_aggregationTypes = aggregationTypes;
   }
 
+  @Override
+  public boolean containsAggregationType(int agType) {
+    if (m_aggregationTypes == null) {
+      return false;
+    }
+    for (int i : m_aggregationTypes) {
+      if (i == agType) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public boolean isNullOperatorEnabled() {
     return m_allowNullOperator;
   }

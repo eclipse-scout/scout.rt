@@ -51,7 +51,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  * <pre>
  * Usage:
  * <ul>
- * <li>call {@link #setComposerEntityDefinition(Class, String, boolean)}, {@link #setComposerAttributeDefinition(Class, String, boolean)} and {@link #addStatementMapping(Class, String, int, int, boolean)}
+ * <li>call {@link #setDataModelEntityDefinition(Class, String, boolean)}, {@link #setDataModelAttributeDefinition(Class, String, boolean)} and {@link #addStatementMapping(Class, String, int, int, boolean)}
  * for all member classes in the FormData</li>
  * <li>call {@link #build(AbstractFormData)}</li>
  * <li>add {@link #getWhereConstraints()} to the base sql statement (starts with an AND)</li>
@@ -123,8 +123,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
   private ISqlStyle m_sqlStyle;
   private IDataModel m_dataModel;
   private AliasMapper m_aliasMapper;
-  private Map<Class, ComposerAttributePartDefinition> m_composerAttMap;
-  private Map<Class, ComposerEntityPartDefinition> m_composerEntMap;
+  private Map<Class, DataModelAttributePartDefinition> m_dataModelAttMap;
+  private Map<Class, DataModelEntityPartDefinition> m_dataModelEntMap;
   private List<ValuePartDefinition> m_valueDefs;
   private Map<String, Object> m_bindMap;
   private AtomicInteger m_sequenceProvider;
@@ -137,8 +137,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
     m_sqlStyle = sqlStyle;
     m_aliasMapper = new AliasMapper();
     m_bindMap = new HashMap<String, Object>();
-    m_composerAttMap = new HashMap<Class, ComposerAttributePartDefinition>();
-    m_composerEntMap = new HashMap<Class, ComposerEntityPartDefinition>();
+    m_dataModelAttMap = new HashMap<Class, DataModelAttributePartDefinition>();
+    m_dataModelEntMap = new HashMap<Class, DataModelEntityPartDefinition>();
     m_valueDefs = new ArrayList<ValuePartDefinition>();
     setSequenceProvider(new AtomicInteger(0));
   }
@@ -169,63 +169,64 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   /**
    * Define the statement part for a sql part. For composer attributes and entites use
-   * {@link #addAttributeMapping(Class, String)} and {@link #addEntityMapping(Class, String)}
+   * {@link #setDataModelAttributeDefinition(DataModelAttributePartDefinition)} and
+   * {@link #setDataModelEntityDefinition(DataModelEntityPartDefinition)}
    * <p>
    * <b>Number, Date, String, Boolean field</b>:<br>
    * The sqlAttribute is something like <code>@PERSON@.LAST_NAME</code><br>
    * When multiple occurrences are simultaneously used, the sqlAttribute may be written as
    * <code>(&lt;attribute&gt;@PERSON@.ORDER_STATUS&lt;/attribute&gt; OR &lt;attribute&gt;@PERSON@.DELIVERY_STATUS&lt;/attribute&gt;)</code>
    * <p>
-   * The operator and aggregationType are required, unless a {@link IStatementPartBuilder} is used.
+   * The operator and aggregationType are required, unless a {@link ValuePartDefinition} is used.
    */
   public void setValueDefinition(Class fieldType, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldType, sqlAttribute, operator));
   }
 
   /**
-   * see {@link #setFieldDefinition(Class, String, int)}
+   * see {@link #setValueDefinition(Class, String, int)}
    */
   public void setValueDefinition(ClassIdentifier fieldTypeIdentifier, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldTypeIdentifier, sqlAttribute, operator));
   }
 
   /**
-   * see {@link #setFieldDefinition(Class, String, int)}
+   * see {@link #setValueDefinition(Class, String, int)}
    */
   public void setValueDefinition(Class fieldType, String sqlAttribute, int operator, boolean plainBind) {
     setValueDefinition(new ValuePartDefinition(fieldType, sqlAttribute, operator, plainBind));
   }
 
   /**
-   * see {@link #setFieldDefinition(Class, String, int)}
+   * see {@link #setValueDefinition(Class, String, int)}
    */
   public void setValueDefinition(ClassIdentifier fieldTypeIdentifier, String sqlAttribute, int operator, boolean plainBind) {
     setValueDefinition(new ValuePartDefinition(fieldTypeIdentifier, sqlAttribute, operator, plainBind));
   }
 
   /**
-   * see {@link #setFieldDefinition(Class, String, int)}
+   * see {@link #setValueDefinition(Class, String, int)}
    */
   public void setValueDefinition(Class[] fieldTypes, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldTypes, sqlAttribute, operator, false));
   }
 
   /**
-   * see {@link #setFieldDefinition(Class, String, int)}
+   * see {@link #setValueDefinition(Class, String, int)}
    */
   public void setValueDefinition(ClassIdentifier[] fieldTypeIdentifiers, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldTypeIdentifiers, sqlAttribute, operator, false));
   }
 
   /**
-   * see {@link #setFieldDefinition(Class, String, int)}
+   * see {@link #setValueDefinition(Class, String, int)}
    */
   public void setValueDefinition(ValuePartDefinition def) {
     m_valueDefs.add(def);
   }
 
   /**
-   * <b>Composer attribute</b>:<br>
+   * <b>Data model attribute</b>:<br>
    * The sqlAttribute is something like LAST_NAME, STATUS or @PERSON@.LAST_NAME, @PERSON@.STATUS.
    * 
    * @PERSON@ will be replaced by the parent entitie's generated alias.
@@ -235,40 +236,40 @@ public class FormDataStatementBuilder implements DataModelConstants {
    *          When multiple occurrences are simultaneously used, the sqlAttribute may be written as
    *          <code>(&lt;attribute&gt;ORDER_STATUS&lt;/attribute&gt; OR &lt;attribute&gt;DELIVERY_STATUS&lt;/attribute&gt;)</code>
    */
-  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute) {
-    setComposerAttributeDefinition(attributeType, sqlAttribute, false);
+  public void setDataModelAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute) {
+    setDataModelAttributeDefinition(attributeType, sqlAttribute, false);
   }
 
   /**
-   * see {@link #setComposerAttributeDefinition(Class, String)}
+   * see {@link #setDataModelAttributeDefinition(Class, String)}
    */
-  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute, boolean plainBind) {
-    setComposerAttributeDefinition(new ComposerAttributePartDefinition(attributeType, sqlAttribute, plainBind));
+  public void setDataModelAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute, boolean plainBind) {
+    setDataModelAttributeDefinition(new DataModelAttributePartDefinition(attributeType, sqlAttribute, plainBind));
   }
 
   /**
-   * see {@link #setComposerAttributeDefinition(Class, String)}
+   * see {@link #setDataModelAttributeDefinition(Class, String)}
    */
-  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, String selectClause, boolean plainBind) {
-    setComposerAttributeDefinition(new ComposerAttributePartDefinition(attributeType, whereClause, selectClause, plainBind));
+  public void setDataModelAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, String selectClause, boolean plainBind) {
+    setDataModelAttributeDefinition(new DataModelAttributePartDefinition(attributeType, whereClause, selectClause, plainBind));
   }
 
   /**
-   * see {@link #setComposerAttributeDefinition(Class, String)}
+   * see {@link #setDataModelAttributeDefinition(Class, String)}
    */
-  public void setComposerAttributeDefinition(ComposerAttributePartDefinition def) {
-    m_composerAttMap.put(def.getAttributeType(), def);
+  public void setDataModelAttributeDefinition(DataModelAttributePartDefinition def) {
+    m_dataModelAttMap.put(def.getAttributeType(), def);
   }
 
   /**
-   * see {@link #setComposerEntityDefinition(Class, String, String)}
+   * see {@link #setDataModelEntityDefinition(Class, String, String)}
    */
-  public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause) {
-    setComposerEntityDefinition(new ComposerEntityPartDefinition(entityType, whereClause));
+  public void setDataModelEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause) {
+    setDataModelEntityDefinition(new DataModelEntityPartDefinition(entityType, whereClause));
   }
 
   /**
-   * <b>Composer entity</b>:<br>
+   * <b>Data model entity</b>:<br>
    * The whereClause is something like <code><pre>
    * EXISTS (
    * SELECT 1
@@ -295,15 +296,15 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * The <i>havingParts</i> tag is replaced with all attributes contained in the entity that have an aggregation type.
    * Every aggregation attribute contributes a "AND <i>fun</i>(<i>attribute</i>) <i>op</i> <i>value</i>" line.<br>
    */
-  public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause, String selectClause) {
-    setComposerEntityDefinition(new ComposerEntityPartDefinition(entityType, whereClause, selectClause));
+  public void setDataModelEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause, String selectClause) {
+    setDataModelEntityDefinition(new DataModelEntityPartDefinition(entityType, whereClause, selectClause));
   }
 
   /**
-   * see {@link #setComposerEntityDefinition(Class, String)}
+   * see {@link #setDataModelEntityDefinition(Class, String)}
    */
-  public void setComposerEntityDefinition(ComposerEntityPartDefinition def) {
-    m_composerEntMap.put(def.getEntityType(), def);
+  public void setDataModelEntityDefinition(DataModelEntityPartDefinition def) {
+    m_dataModelEntMap.put(def.getEntityType(), def);
   }
 
   /**
@@ -492,12 +493,12 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return Collections.unmodifiableList(m_valueDefs);
   }
 
-  public Map<Class, ComposerAttributePartDefinition> getComposerAttributePartDefinitions() {
-    return Collections.unmodifiableMap(m_composerAttMap);
+  public Map<Class, DataModelAttributePartDefinition> getDataModelAttributePartDefinitions() {
+    return Collections.unmodifiableMap(m_dataModelAttMap);
   }
 
-  public Map<Class, ComposerEntityPartDefinition> getComposerEntityPartDefinitions() {
-    return Collections.unmodifiableMap(m_composerEntMap);
+  public Map<Class, DataModelEntityPartDefinition> getDataModelEntityPartDefinitions() {
+    return Collections.unmodifiableMap(m_dataModelEntMap);
   }
 
   public String getWhereConstraints() {
@@ -650,7 +651,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
       LOG.warn("no entity for external id: " + node.getEntityExternalId());
       return null;
     }
-    ComposerEntityPartDefinition def = m_composerEntMap.get(entity.getClass());
+    DataModelEntityPartDefinition def = m_dataModelEntMap.get(entity.getClass());
     if (def == null) {
       LOG.warn("no PartDefinition for entity: " + entity);
       return null;
@@ -828,11 +829,11 @@ public class FormDataStatementBuilder implements DataModelConstants {
       LOG.warn("no attribute for external id: " + node.getAttributeExternalId());
       return null;
     }
-    ComposerAttributePartDefinition def = m_composerAttMap.get(attribute.getClass());
+    DataModelAttributePartDefinition def = m_dataModelAttMap.get(attribute.getClass());
     if (def == null) {
       Integer agg = node.getAggregationType();
       if (agg != null && agg == AGGREGATION_COUNT) {
-        def = new ComposerAttributePartDefinition(null, "1", false);
+        def = new DataModelAttributePartDefinition(null, "1", false);
       }
     }
     if (def == null) {
@@ -1254,6 +1255,82 @@ public class FormDataStatementBuilder implements DataModelConstants {
         throw new IllegalArgumentException("invalid operator: " + operation);
       }
     }
+  }
+
+  /*
+   * deprecated api
+   */
+
+  /**
+   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String)}
+   */
+  @Deprecated
+  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute) {
+    setDataModelAttributeDefinition(attributeType, sqlAttribute);
+  }
+
+  /**
+   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String, boolean)}
+   */
+  @Deprecated
+  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute, boolean plainBind) {
+    setDataModelAttributeDefinition(attributeType, sqlAttribute, plainBind);
+  }
+
+  /**
+   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String, String, boolean)}
+   */
+  @Deprecated
+  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, String selectClause, boolean plainBind) {
+    setDataModelAttributeDefinition(attributeType, whereClause, selectClause, plainBind);
+  }
+
+  /**
+   * @deprecated use {@link #setDataModelAttributeDefinition(DataModelAttributePartDefinition)}
+   */
+  @Deprecated
+  public void setComposerAttributeDefinition(DataModelAttributePartDefinition def) {
+    setDataModelAttributeDefinition(def);
+  }
+
+  /**
+   * @deprecated use {@link #setDataModelEntityDefinition(Class, String)}
+   */
+  @Deprecated
+  public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause) {
+    setDataModelEntityDefinition(entityType, whereClause);
+  }
+
+  /**
+   * @deprecated use {@link #setDataModelEntityDefinition(Class, String, String)}
+   */
+  @Deprecated
+  public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause, String selectClause) {
+    setDataModelEntityDefinition(entityType, whereClause, selectClause);
+  }
+
+  /**
+   * @deprecated use {@link #setDataModelEntityDefinition(DataModelEntityPartDefinition)}
+   */
+  @Deprecated
+  public void setComposerEntityDefinition(DataModelEntityPartDefinition def) {
+    setDataModelEntityDefinition(def);
+  }
+
+  /**
+   * @deprecated use {@link #getDataModelAttributePartDefinitions()}
+   */
+  @Deprecated
+  public Map<Class, DataModelAttributePartDefinition> getComposerAttributePartDefinitions() {
+    return getDataModelAttributePartDefinitions();
+  }
+
+  /**
+   * @deprecated use {@link #getDataModelEntityPartDefinitions()}
+   */
+  @Deprecated
+  public Map<Class, DataModelEntityPartDefinition> getComposerEntityPartDefinitions() {
+    return getDataModelEntityPartDefinitions();
   }
 
 }

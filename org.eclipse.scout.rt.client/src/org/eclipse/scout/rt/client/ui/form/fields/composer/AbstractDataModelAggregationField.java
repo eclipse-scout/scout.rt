@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
+import java.util.HashSet;
+
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -50,6 +52,22 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
     //nop
   }
 
+  public IDataModelAttribute getAttribute() {
+    return ((DataModelAggregationLookupCall) getLookupCall()).getAttribute();
+  }
+
+  public void setAttribute(IDataModelAttribute attribute) throws ProcessingException {
+    ((DataModelAggregationLookupCall) getLookupCall()).setAttribute(attribute);
+    if (attribute != null) {
+      setEnabled(true);
+    }
+    else {
+      setEnabled(false);
+    }
+    execAttributeChanged(attribute);
+    refreshDisplayText();
+  }
+
   /**
    * Whenever the reference attribute changes, this method is called to customize the texts, values and new value of
    * this smart field.
@@ -58,7 +76,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
    * smartfield is adapted.
    * <p>
    * The default sets the value to {@link DataModelConstants#AGGREGATION_NONE} if valid, else to
-   * {@link DataModelConstants#AGGREGATION_COUNT} if valid and else to null.
+   * {@link DataModelConstants#AGGREGATION_COUNT} if valid and else to the first valid aggregation available or null.
    * 
    * @param attribute
    *          the new attribute
@@ -68,29 +86,21 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
   protected void execAttributeChanged(IDataModelAttribute attribute) throws ProcessingException {
     Integer newAg = null;
     if (attribute != null) {
-      setEnabled(true);
-      LookupRow[] rows = callKeyLookup(DataModelConstants.AGGREGATION_NONE);
-      if (rows.length == 0) {
-        rows = callKeyLookup(DataModelConstants.AGGREGATION_COUNT);
+      HashSet<Integer> agSet = new HashSet<Integer>();
+      for (LookupRow row : ((DataModelAggregationLookupCall) getLookupCall()).getLookupRows()) {
+        agSet.add((Integer) row.getKey());
       }
-      if (rows.length > 0) {
-        newAg = (Integer) rows[0].getKey();
+      if (agSet.contains(DataModelConstants.AGGREGATION_NONE)) {
+        newAg = DataModelConstants.AGGREGATION_NONE;
       }
-    }
-    else {
-      setEnabled(false);
+      else if (agSet.contains(DataModelConstants.AGGREGATION_COUNT)) {
+        newAg = DataModelConstants.AGGREGATION_COUNT;
+      }
+      else if (agSet.size() > 0) {
+        newAg = agSet.iterator().next();
+      }
     }
     setValue(newAg);
-    refreshDisplayText();
-  }
-
-  public void setAttribute(IDataModelAttribute attribute) throws ProcessingException {
-    ((DataModelAggregationLookupCall) getLookupCall()).setAttribute(attribute);
-    execAttributeChanged(attribute);
-  }
-
-  public IDataModelAttribute getAttribute() {
-    return ((DataModelAggregationLookupCall) getLookupCall()).getAttribute();
   }
 
 }

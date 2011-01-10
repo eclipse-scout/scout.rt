@@ -159,7 +159,7 @@ public class FormDataStatementBuilderCheck {
   }
 
   protected void checkDataModelEntity(IDataModelEntity e) {
-    ComposerEntityPartDefinition part = builder.getComposerEntityPartDefinitions().get(e.getClass());
+    DataModelEntityPartDefinition part = builder.getDataModelEntityPartDefinitions().get(e.getClass());
     if (part == null) {
       String name = entityToName(e);
       String sqlTableName = toSqlTable(name);
@@ -189,7 +189,7 @@ public class FormDataStatementBuilderCheck {
   }
 
   protected void checkDataModelAttribute(IDataModelAttribute a) {
-    ComposerAttributePartDefinition part = builder.getComposerAttributePartDefinitions().get(a.getClass());
+    DataModelAttributePartDefinition part = builder.getDataModelAttributePartDefinitions().get(a.getClass());
     if (part == null) {
       if (a.getClass().getSimpleName().endsWith("CountAttribute")) {
         //default aggregate count attribute
