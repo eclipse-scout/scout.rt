@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -33,7 +34,7 @@ public class DataModelAttributePartDefinition {
    *          is normally something like @Person@.LAST_NAME or in a special case EXISTS(...<attribute>...)
    */
   public DataModelAttributePartDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, boolean plainBind) {
-    this(attributeType, whereClause, whereClause, plainBind);
+    this(attributeType, whereClause, autoCreateSelectClause(whereClause), plainBind);
   }
 
   /**
@@ -48,6 +49,16 @@ public class DataModelAttributePartDefinition {
     m_whereClause = whereClause;
     m_selectClause = selectClause;
     m_plainBind = plainBind;
+  }
+
+  private static String autoCreateSelectClause(String whereClause) {
+    if (whereClause == null) {
+      return null;
+    }
+    if (Pattern.compile("[^a-zA-Z_$]SELECT[^a-zA-Z_$]").matcher(whereClause).find()) {
+      return null;
+    }
+    return whereClause;
   }
 
   /**
