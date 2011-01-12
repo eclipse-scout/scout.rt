@@ -129,6 +129,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
   private Map<String, Object> m_bindMap;
   private AtomicInteger m_sequenceProvider;
   private StringBuffer m_where;
+  //these members are only here until the deprecation is cleared
+  private boolean m_tmpIncludeWherePartTag;
+  private boolean m_tmpIncludeAttributeTag;
 
   /**
    * @param sqlStyle
@@ -540,10 +543,26 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
+   * @param nodes
    * @return the complete string of all attribute contributions
    * @throws ProcessingException
    */
   protected String buildTreeNodes(List<TreeNodeData> nodes) throws ProcessingException {
+    return buildTreeNodes(nodes, true, true);
+  }
+
+  /**
+   * @param nodes
+   * @param includeWherePartTag
+   *          applied to attributes only: some attributes in the having section contain wherePart tags that belong to
+   *          the where section and not the having section
+   * @param includeAttributeTag
+   *          applied to attributes only: some attributes in the having section contain wherePart tags that belong to
+   *          the where section and not the having section
+   * @return the complete string of all attribute contributions
+   * @throws ProcessingException
+   */
+  protected String buildTreeNodes(List<TreeNodeData> nodes, boolean includeWherePartTag, boolean includeAttributeTag) throws ProcessingException {
     StringBuilder buf = new StringBuilder();
     int count = 0;
     int i = 0;
@@ -554,7 +573,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
         i++;
       }
       else if (nodes.get(i) instanceof ComposerAttributeNodeData) {
-        s = buildComposerAttributeNode((ComposerAttributeNodeData) nodes.get(i));
+        s = buildComposerAttributeNode((ComposerAttributeNodeData) nodes.get(i), includeWherePartTag, includeAttributeTag);
         i++;
       }
       else if (nodes.get(i) instanceof ComposerEitherOrNodeData) {
@@ -788,8 +807,12 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   protected String buildEntityPart(String baseStm, boolean negative, List<TreeNodeData> whereParts, List<TreeNodeData> havingParts) throws ProcessingException {
-    String wherePartsText = buildTreeNodes(whereParts);
-    String havingPartsText = buildTreeNodes(havingParts);
+    String whereParts1Text = buildTreeNodes(whereParts, true, true);
+    String whereParts2Text = buildTreeNodes(havingParts, true, false);
+    String havingPartsText = buildTreeNodes(havingParts, false, true);
+    //
+    String wherePartsText = whereParts1Text;
+    wherePartsText = (whereParts2Text != null ? (wherePartsText != null ? wherePartsText + " AND " + whereParts2Text : whereParts2Text) : wherePartsText);
     String entityPart = baseStm;
     // negation
     if (negative) {
@@ -820,7 +843,15 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return entityPart;
   }
 
-  protected String buildComposerAttributeNode(final ComposerAttributeNodeData node) throws ProcessingException {
+  /**
+   * @param includeWherePartTag
+   *          applied to attributes only: some attributes in the having section contain wherePart tags that belong to
+   *          the where section and not the having section
+   * @param includeAttributeTag
+   *          applied to attributes only: some attributes in the having section contain wherePart tags that belong to
+   *          the where section and not the having section
+   */
+  protected String buildComposerAttributeNode(final ComposerAttributeNodeData node, boolean includeWherePartTag, boolean includeAttributeTag) throws ProcessingException {
     if (getDataModel() == null) {
       throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
     }
@@ -851,10 +882,50 @@ public class FormDataStatementBuilder implements DataModelConstants {
     AliasMapper aliasMap = getAliasMapper();
     ComposerEntityNodeData parentEntityNode = FormDataStatementBuilder.getParentNodeOfType(node, ComposerEntityNodeData.class);
     Map<String, String> parentAliasMap = parentEntityNode != null ? aliasMap.getNodeAliases(parentEntityNode) : aliasMap.getRootAliases();
-    return def.createNewInstance(this, node, bindNames, bindValues, parentAliasMap);
+    try {
+      m_tmpIncludeWherePartTag = includeWherePartTag;
+      m_tmpIncludeAttributeTag = includeAttributeTag;
+      return def.createNewInstance(this, node, bindNames, bindValues, parentAliasMap, includeWherePartTag, includeAttributeTag);
+    }
+    finally {
+      m_tmpIncludeWherePartTag = true;
+      m_tmpIncludeAttributeTag = true;
+    }
   }
 
+  /**
+   * @deprecated use
+   *             {@link #createComposerAttributeStatementPart(Integer, String, int, List, List, boolean, Map, boolean, boolean)}
+   */
+  @Deprecated
   public String createComposerAttributeStatementPart(final Integer aggregationType, String stm, final int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
+    return createComposerAttributeStatementPart(aggregationType, stm, operation, bindNames, bindValues, plainBind, parentAliasMap, m_tmpIncludeWherePartTag, m_tmpIncludeAttributeTag);
+  }
+
+  /**
+   * @param includeWherePartTag
+   *          see
+   *          {@link DataModelAttributePartDefinition#createNewInstance(FormDataStatementBuilder, ComposerAttributeNodeData, List, List, Map, boolean, boolean)}
+   * @param includeAttributeTag
+   *          see
+   *          {@link DataModelAttributePartDefinition#createNewInstance(FormDataStatementBuilder, ComposerAttributeNodeData, List, List, Map, boolean, boolean)}
+   */
+  public String createComposerAttributeStatementPart(Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap, boolean includeWherePartTag, boolean includeAttributeTag) throws ProcessingException {
+    if (!includeWherePartTag) {
+      stm = StringUtility.removeTag(stm, "wherePart");
+    }
+    if (!includeAttributeTag) {
+      stm = StringUtility.removeTag(stm, "attribute");
+      aggregationType = AGGREGATION_NONE;
+      operation = OPERATOR_NONE;
+    }
+    if (stm.endsWith(" AND ")) {
+      stm = stm.substring(0, stm.length() - 4).trim();
+    }
+    if (stm.startsWith(" AND ")) {
+      stm = stm.substring(4).trim();
+    }
+    //convenience: automatically wrap attribute in attribute tags
     if (stm.indexOf("<attribute>") < 0) {
       stm = "<attribute>" + stm + "</attribute>";
     }
@@ -888,6 +959,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     if (stm == null) stm = "";
     if (bindNames == null) bindNames = new ArrayList<String>(0);
     if (bindValues == null) bindValues = new ArrayList<Object>(0);
+    stm = StringUtility.removeTagBounds(stm, "wherePart");
     // the attribute was of the form: NAME or
     // <attribute>NAME</attribute>
     // make sure there is an attribute tag in the string, if none enclose all
