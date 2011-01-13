@@ -182,6 +182,15 @@ public class AliasMapper {
     }
   }
 
+  public void addMissingNodeEntitiesFrom(Object node, String statementPart) {
+    Matcher m = ENTITY_DEFINITION.matcher(statementPart);
+    while (m.find()) {
+      if (getNodeAlias(node, m.group(1)) == null) {
+        setNodeAlias(node, m.group(1), nextAlias());
+      }
+    }
+  }
+
   /**
    * Parse all entity definitions in the statement part and define in the root map if there is not yet a definition for
    * it.
