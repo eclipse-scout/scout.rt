@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -237,51 +237,49 @@ public final class StringUtility {
    * @return a single tag <foo/>
    */
   private static TagBounds getSingleTag(String text, String tagName, int pos) {
-    int i = text.indexOf("<" + tagName, pos);
-    if (i < 0) return TAG_BOUNDS_NOT_FOUND;
-    int k1 = text.indexOf("/>", i + 1);
-    int k2 = text.indexOf("<", i + 1);
-    if (k1 < 0 || (k2 >= 0 && k2 < k1)) return TAG_BOUNDS_NOT_FOUND;
-    return new TagBounds(i, k1 + 2);
+    if (text == null) {
+      return TAG_BOUNDS_NOT_FOUND;
+    }
+    Pattern pat = Pattern.compile("<" + tagName + "(\\s[^<>]*)?/>", Pattern.DOTALL);
+    Matcher m = pat.matcher(text);
+    if (m.find(pos)) {
+      return new TagBounds(m.start(), m.end());
+    }
+    return TAG_BOUNDS_NOT_FOUND;
   }
 
   /**
    * @return a start tag (ignores single tags) <foo> (not <foo/>)
    */
   private static TagBounds getStartTag(String text, String tagName, int pos) {
-    int i = text.indexOf("<" + tagName, pos);
-    while (true) {
-      if (i < 0) return TAG_BOUNDS_NOT_FOUND;
-      int k1 = text.indexOf(">", i + 1);
-      if (k1 < 0) return TAG_BOUNDS_NOT_FOUND;
-      int k2 = text.indexOf("<", i + 1);
-      if (k2 >= 0 && k2 < k1) return TAG_BOUNDS_NOT_FOUND;
-      k2 = text.indexOf("/>", i + 1);
-      if (k2 >= 0 && k2 + 1 == k1) {
-        //try next
-        pos = k2 + 2;
-      }
-      else {
-        return new TagBounds(i, k1 + 1);
-      }
-    }
-  }
-
-  /**
-   * @return a end tag </foo>
-   */
-  private static TagBounds getEndTag(String text, String tagName, int pos) {
-    int i = text.indexOf("</" + tagName + ">", pos);
-    if (i >= 0) {
-      return new TagBounds(i, i + 2 + tagName.length() + 1);
-    }
-    else {
+    if (text == null) {
       return TAG_BOUNDS_NOT_FOUND;
     }
+    Pattern pat = Pattern.compile("<" + tagName + "(\\s[^<>]*[^/])?>", Pattern.DOTALL);
+    Matcher m = pat.matcher(text);
+    if (m.find(pos)) {
+      return new TagBounds(m.start(), m.end());
+    }
+    return TAG_BOUNDS_NOT_FOUND;
   }
 
   /**
-   * @return the contents between a start and a end tag
+   * @return an end tag </foo>
+   */
+  private static TagBounds getEndTag(String text, String tagName, int pos) {
+    if (text == null) {
+      return TAG_BOUNDS_NOT_FOUND;
+    }
+    Pattern pat = Pattern.compile("</" + tagName + ">");
+    Matcher m = pat.matcher(text);
+    if (m.find(pos)) {
+      return new TagBounds(m.start(), m.end());
+    }
+    return TAG_BOUNDS_NOT_FOUND;
+  }
+
+  /**
+   * @return the contents between a start and a end tag, resp "" when there is a single tag
    */
   public static String getTag(String text, String tagName) {
     if (text == null) return null;
@@ -289,6 +287,9 @@ public final class StringUtility {
     TagBounds b;
     if ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = getEndTag(text, tagName, a.end)).begin >= 0) {
       return text.substring(a.end, b.begin).trim();
+    }
+    if ((a = getSingleTag(text, tagName, 0)).begin >= 0) {
+      return "";
     }
     return null;
   }
@@ -301,6 +302,13 @@ public final class StringUtility {
     });
   }
 
+  /**
+   * tag processor returns the replacement for every tag
+   * <p>
+   * the tag content is either "" for single tags or the tag content else
+   * <p>
+   * be careful to not replace the tag again with the tag, this will result in an endless loop
+   */
   public static String replaceTags(String text, String tagName, ITagProcessor processor) {
     if (text == null) return null;
     TagBounds a;
