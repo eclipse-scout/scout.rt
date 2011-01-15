@@ -318,6 +318,17 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return m_rootComposite;
   }
 
+  /**
+   * Is called before desktop is displayed
+   * 
+   * @param clientSession
+   * @return true to start desktop or false to exit application
+   * @throws Exception
+   */
+  protected boolean execBeforeDesktop(IClientSession clientSession) throws Exception {
+    return true;
+  }
+
   public void showGUI(IClientSession session) {
     checkThread();
     m_scoutSession = session;
@@ -326,6 +337,15 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       return;
     }
     m_iconLocator = createIconLocator();
+    try {
+      if (!execBeforeDesktop(session)) {
+        System.exit(0);
+      }
+    }
+    catch (Exception e) {
+      LOG.error("GUI initialization failed", e);
+      System.exit(0);
+    }
     final IDesktop desktop = m_scoutSession.getDesktop();
     if (desktop != null) {
       m_scoutSession.getDesktop().addDesktopListener(new DesktopListener() {
