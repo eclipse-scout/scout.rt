@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,6 +21,8 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 public class CopyWidthsOfColumnsMenu extends AbstractMenu {
+
+  public static final String COLUMN_COPY_CLIPBOARD_IDENTIFIER = "dev.table.menu.column.width.copy.ident";
   private final ITable m_table;
 
   public CopyWidthsOfColumnsMenu(ITable table) {
@@ -49,6 +51,11 @@ public class CopyWidthsOfColumnsMenu extends AbstractMenu {
   protected void execAction() {
     try {
       StringBuffer buf = new StringBuffer();
+
+      // Add an identifier for fast identification
+      buf.append(COLUMN_COPY_CLIPBOARD_IDENTIFIER);
+      buf.append("\n");
+
       for (IColumn<?> column : getTable().getColumnSet().getColumns()) {
         buf.append(column.getClass().getName());
         buf.append("\t");
