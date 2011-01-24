@@ -167,3 +167,6 @@ This solution was chosen based on the following principles:
 
 Migration: None
 
+24.01.2011 dwi
+By default, table cells that are disabled should not be editable.
+Migration: None

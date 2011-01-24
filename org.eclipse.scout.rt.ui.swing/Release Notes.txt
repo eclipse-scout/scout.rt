@@ -10,3 +10,8 @@ Migration: None
 15.12.2010 imo
 Changed fields with dropdownbutton to single field with integrated drop down button
 Migration: None
+
+24.01.2011 dwi
+Ticket 95'946
+Visual markup for editable cells
+Migration: None
