@@ -1455,6 +1455,10 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
         }
       }
     }
+    
+    public void unregisterProposalFormFromUI(ISmartFieldProposalForm form) {
+      unregisterProposalFormInternal(form);
+    }
   }
 
 }

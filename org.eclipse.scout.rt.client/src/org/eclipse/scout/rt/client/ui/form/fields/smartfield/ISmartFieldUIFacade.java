@@ -26,4 +26,5 @@ public interface ISmartFieldUIFacade {
 
   boolean setTextFromUI(String text);
 
+  void unregisterProposalFormFromUI(ISmartFieldProposalForm form);
 }
