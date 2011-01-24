@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
@@ -35,6 +36,7 @@ import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -45,6 +47,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MouseInputAdapter;
@@ -1067,6 +1070,10 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           else if (column == 0) {
             icon = getSwingEnvironment().getIcon(scoutRow.getIconId());
           }
+          if (scoutCol.isCellEditable(scoutRow)) {
+            icon = new P_IconWithMarker(icon);
+          }
+
           if (c instanceof JLabel) {
             ((JLabel) c).setIcon(icon);
             ((JLabel) c).setDisabledIcon(icon);
@@ -1149,6 +1156,42 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       }
       return c;
+    }
+  }
+
+  private class P_IconWithMarker implements Icon {
+
+    private static final int MARKER_SIZE = 5;
+    private Icon m_icon;
+
+    private P_IconWithMarker(Icon icon) {
+      m_icon = icon;
+      if (m_icon == null) {
+        // in case of no custom icon is set
+        m_icon = new ImageIcon();
+      }
+    }
+
+    @Override
+    public int getIconHeight() {
+      return m_icon.getIconHeight();
+    }
+
+    @Override
+    public int getIconWidth() {
+      return m_icon.getIconWidth();
+    }
+
+    @Override
+    public void paintIcon(Component c, Graphics g, int x, int y) {
+      // draw marker into icon
+      Color editableCellMarkerColor = UIManager.getColor("Table.cell.markerColorEditableCell");
+      if (editableCellMarkerColor == null) {
+        editableCellMarkerColor = Color.GRAY;
+      }
+      g.setColor(editableCellMarkerColor);
+      g.fillPolygon(new int[]{0, MARKER_SIZE, 0}, new int[]{0, 0, MARKER_SIZE}, 3);
+      m_icon.paintIcon(c, g, x, y);
     }
   }
 
