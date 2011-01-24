@@ -269,7 +269,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   @ConfigOperation
   @Order(60)
   protected boolean execIsEditable(ITableRow row) throws ProcessingException {
-    return getTable() != null && getTable().isEnabled() && this.isVisible() && this.isEditable() && row != null && row.isEnabled();
+    return getTable() != null && getTable().isEnabled() && this.isVisible() && row.getCell(this).isEnabled() && this.isEditable() && row != null && row.isEnabled();
   }
 
   /**
