@@ -183,4 +183,4 @@ Solution:
 - Change of Cell: added Cell#isEditable(), added Cell#setEditableInternal(boolean). Accessor setEditableInternal(boolean) is internal by intention as not intended for public use as various checks in AbstractColumn#execIsEditable are bypassed otherwise (JavaDoc added). E.g., do not use in execDecorateCell.
 - Change of SwingTableModel#isCellEditable() --> synchronization with model thread not neccessary anymore as property can be evaluated thread safe. (Java bean property)
 - Change of SwingScoutTable#prepareRenderer() --> synchronization with model thread for querying editable state not neccessary anymore as property can be evaluated thread safe. (Java bean property)
-
+Migration: None
