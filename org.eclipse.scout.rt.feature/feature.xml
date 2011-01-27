@@ -154,25 +154,4 @@ BSI Business Systems Integration AG - initial API and implementation
          install-size="0"
          version="0.0.0"/>
 
-   <plugin
-         id="javax.jms"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="javax.mail.jre15"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="javax.mail.jre16"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
 </feature>
