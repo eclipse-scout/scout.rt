@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,6 +22,7 @@ public class CellExtension implements ICellSpecialization {
 
   private String m_tooltipText;
   private boolean m_enabled;
+  private boolean m_editable;
   private CellStyle m_cellStyle;
 
   public CellExtension(ICellSpecialization specialization) {
@@ -53,6 +54,14 @@ public class CellExtension implements ICellSpecialization {
 
   public void setEnabled(boolean enabled) {
     m_enabled = enabled;
+  }
+
+  public boolean isEditable() {
+    return m_editable;
+  }
+
+  public void setEditable(boolean editable) {
+    m_editable = editable;
   }
 
   public CellStyle getCellStyle() {

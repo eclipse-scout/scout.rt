@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -1072,7 +1071,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             icon = getSwingEnvironment().getIcon(scoutRow.getIconId());
           }
 
-          if (isCellEditableFromSwing(scoutCol, scoutRow)) {
+          if (cell.isEditable()) {
             icon = new P_IconWithMarker(icon);
           }
 
@@ -1158,29 +1157,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       }
       return c;
-    }
-
-    private boolean isCellEditableFromSwing(final IColumn scoutCol, final ITableRow scoutRow) {
-      final AtomicBoolean cellEditable = new AtomicBoolean(false);
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          cellEditable.set(scoutCol.isCellEditable(scoutRow));
-          synchronized (cellEditable) {
-            cellEditable.notifyAll();
-          }
-        }
-      };
-      synchronized (cellEditable) {
-        getSwingEnvironment().invokeScoutLater(t, 2345);
-        try {
-          cellEditable.wait(2345);
-        }
-        catch (InterruptedException e) {
-          //nop
-        }
-      }
-      return cellEditable.get();
     }
   }
 

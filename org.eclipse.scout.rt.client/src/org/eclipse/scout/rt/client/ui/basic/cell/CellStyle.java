@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -48,12 +48,20 @@ public class CellStyle implements ICellSpecialization {
     throw new UnsupportedOperationException();
   }
 
+  public void setEditable(boolean editable) {
+    throw new UnsupportedOperationException();
+  }
+
   public String getTooltipText() {
     return null;
   }
 
   public boolean isEnabled() {
     return true;
+  }
+
+  public boolean isEditable() {
+    return false;
   }
 
   public CellStyle getCellStyle() {

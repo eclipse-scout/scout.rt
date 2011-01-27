@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,6 +23,7 @@ public interface ICell {
   int FG_COLOR_BIT = 7;
   int FONT_BIT = 8;
   int ENABLED_BIT = 9;// default true, value Boolean
+  int EDITABLE_BIT = 10;// default false, value Boolean
 
   Object getValue();
 
@@ -41,6 +42,8 @@ public interface ICell {
   FontSpec getFont();
 
   boolean isEnabled();
+
+  boolean isEditable();
 
   ICellObserver getObserver();
 

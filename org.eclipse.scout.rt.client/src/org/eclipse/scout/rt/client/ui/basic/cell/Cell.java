@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
@@ -215,6 +216,29 @@ public class Cell implements ICell {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setEnabled(b);
       setValueInternal(ENABLED_BIT, newStyle);
+    }
+  }
+
+  public boolean isEditable() {
+    return m_cellSpecialization.isEditable();
+  }
+
+  /**
+   * do not use or override this internal method. Use {@link AbstractColumn#execIsEditable()} instead which covers
+   * various other checks. Refer to its JavaDoc for more detail.
+   */
+  public void setEditableInternal(boolean b) {
+    if (m_cellSpecialization instanceof CellStyle) {
+      if (b) {
+        ICellSpecialization newStyle = new CellExtension(m_cellSpecialization);
+        newStyle.setEditable(b);
+        setValueInternal(EDITABLE_BIT, newStyle);
+      }
+    }
+    else if (m_cellSpecialization.isEditable() != b) {
+      ICellSpecialization newStyle = m_cellSpecialization.copy();
+      newStyle.setEditable(b);
+      setValueInternal(EDITABLE_BIT, newStyle);
     }
   }
 

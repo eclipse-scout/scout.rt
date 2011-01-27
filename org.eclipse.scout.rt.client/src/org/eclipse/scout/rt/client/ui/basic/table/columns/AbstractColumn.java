@@ -814,6 +814,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
       cell.setFont(getFont());
     }
     cell.setHorizontalAlignment(getConfiguredHorizontalAlignment());
+    cell.setEditableInternal(isCellEditable(row));
   }
 
   public void decorateHeaderCell() {

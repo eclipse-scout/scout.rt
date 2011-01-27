@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.basic.table;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
@@ -20,6 +18,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
 public class SwingTableModel extends AbstractTableModel {
@@ -74,36 +73,16 @@ public class SwingTableModel extends AbstractTableModel {
 
   @Override
   public boolean isCellEditable(final int x, final int y) {
-    //make a safe model call
-    final AtomicBoolean b = new AtomicBoolean();
-    synchronized (b) {
-      Runnable r = new Runnable() {
-        @Override
-        public void run() {
-          // try first
-          synchronized (b) {
-            try {
-              ITable table = m_swingScoutTable.getScoutObject();
-              if (table != null) {
-                b.set(table.isCellEditable(table.getFilteredRow(x), y));
-              }
-            }
-            catch (Throwable ex) {
-              //fast access: ignore
-            }
-            b.notifyAll();
-          }
-        }
-      };
-      m_swingScoutTable.getSwingEnvironment().invokeScoutLater(r, 2345);
-      try {
-        b.wait(2345);
-      }
-      catch (InterruptedException e) {
-        //nop
-      }
+    ITable table = m_swingScoutTable.getScoutObject();
+    if (table == null) {
+      return false;
     }
-    return b.get();
+    ITableRow row = table.getFilteredRow(x);
+    IColumn column = table.getColumnSet().getVisibleColumn(y);
+    if (row == null || column == null) {
+      return false;
+    }
+    return table.getCell(row, column).isEditable();
   }
 
   public void updateModelState(int newRowCount) {

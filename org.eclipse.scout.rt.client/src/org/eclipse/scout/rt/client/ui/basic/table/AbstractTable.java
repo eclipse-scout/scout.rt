@@ -792,14 +792,23 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return row.getCell(col.getColumnIndex());
   }
 
+  /**
+   * Note that this is not a java bean method and thus not thread-safe
+   */
   public boolean isCellEditable(int rowIndex, int columnIndex) {
     return isCellEditable(getRow(rowIndex), getColumnSet().getColumn(columnIndex));
   }
 
+  /**
+   * Note that this is not a java bean method and thus not thread-safe
+   */
   public boolean isCellEditable(ITableRow row, int visibleColumnIndex) {
     return isCellEditable(row, getColumnSet().getVisibleColumn(visibleColumnIndex));
   }
 
+  /**
+   * Note that this is not a java bean method and thus not thread-safe
+   */
   public boolean isCellEditable(ITableRow row, IColumn column) {
     return row != null & column != null && column.isCellEditable(row);
   }
@@ -2603,14 +2612,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       ColumnSet cset = getColumnSet();
       for (int c = 0; c < tableRow.getCellCount(); c++) {
         // cell decorator on column
-        IColumn col = cset.getColumn(c);
+        IColumn<?> col = cset.getColumn(c);
         col.decorateCell(tableRow);
         // cell decorator on table
         this.decorateCell(tableRow, col);
       }
     }
     catch (Throwable t) {
-      t.printStackTrace();
+      LOG.error("Error occured while applying row decoration", t);
     }
     finally {
       tableRow.setRowPropertiesChanged(false);
