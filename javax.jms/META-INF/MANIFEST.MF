@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: JMS API
-Bundle-SymbolicName: javax.jms
-Bundle-Version: 1.1.0
-Bundle-Vendor: Sun Microsystems
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: javax.jms;version="1.1.0"
