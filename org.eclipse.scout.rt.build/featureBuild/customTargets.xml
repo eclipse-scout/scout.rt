@@ -117,7 +117,7 @@
 	<!-- Steps to do before running the build.xmls for the elements being built. -->
 	<!-- ===================================================================== -->
 	<target name="preProcess">
-		<echo message="pre PRocess   "></echo>
+		<echo message="pre PRocess   "/>
 	</target>
 
 	<!-- ===================================================================== -->
