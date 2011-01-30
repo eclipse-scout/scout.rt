@@ -25,7 +25,7 @@ BSI Business Systems Integration AG - initial API and implementation
    </license>
 
    <url>
-      <discovery label="Orbit" url="http://download.eclipse.org/tools/orbit/downloads/drops/I20101104194033/repository"/>
+      <discovery label="Orbit" url="http://download.eclipse.org/tools/orbit/downloads/drops/updateSite"/>
       <discovery label="The Eclipse Project Updates" url="http://download.eclipse.org/eclipse/updates/3.5"/>
    </url>
 
@@ -45,6 +45,11 @@ BSI Business Systems Integration AG - initial API and implementation
       <import plugin="org.eclipse.ui.forms"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.core.runtime" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="javax.xml"/>
+      <import plugin="org.apache.xerces"/>
+      <import plugin="org.apache.xml.resolver"/>
+      <import plugin="org.apache.xml.serializer"/>
+      <import plugin="org.easymock"/>
    </requires>
 
    <plugin
@@ -150,40 +155,5 @@ BSI Business Systems Integration AG - initial API and implementation
          download-size="0"
          install-size="0"
          version="0.0.0"/>
-
-   <plugin
-         id="org.apache.xerces"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.xml.resolver"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="javax.xml"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.xml.serializer"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.easymock"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
 </feature>
