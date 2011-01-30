@@ -446,7 +446,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     catch (Exception e) {
       LOG.error("error occured while dynamically contribute menus.", e);
     }
-
     m_menus = menuList.toArray(new IMenu[0]);
     // key strokes
     ArrayList<IKeyStroke> ksList = new ArrayList<IKeyStroke>();
@@ -534,9 +533,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
    * 
-   * @param fieldList
-   *          live and mutable list of configured menus, not yet initialized
-   *          and added to composite field
+   * @param menuList
+   *          live and mutable list of configured menus
    */
   protected void injectMenusInternal(List<IMenu> menuList) {
   }

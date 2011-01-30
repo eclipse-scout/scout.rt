@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -161,7 +161,24 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
         LOG.warn(null, e);
       }
     }
+
+    try {
+      injectMenusInternal(menuList);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contribute menus.", e);
+    }
     m_menus = menuList.toArray(new IMenu[0]);
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to manage menu list and add/remove menus
+   * 
+   * @param menuList
+   *          live and mutable list of configured menus
+   */
+  protected void injectMenusInternal(List<IMenu> menuList) {
   }
 
   /*
