@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.scout.rt.feature"
       label="%featureName"
-      version="3.5.5.qualifier"
+      version="3.7.0.qualifier"
       provider-name="%providerName">
 
    <description>
