@@ -82,9 +82,6 @@ public final class NetActivator extends Plugin {
     if (PROXY_AUTODETECTION) {
       ProxySelector.setDefault(m_newProxySelector = new EclipseProxySelector());
     }
-    else {
-      ProxySelector.setDefault(null);
-    }
     CookieManager.setDefault(m_newCookieHandler = new CookieManager(null, CookiePolicy.ACCEPT_ALL));
     Authenticator.setDefault(new EclipseAuthenticator());
   }
