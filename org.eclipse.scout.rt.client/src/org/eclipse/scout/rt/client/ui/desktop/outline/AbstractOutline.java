@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -146,32 +146,35 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   public void releaseUnusedPages() {
     final HashSet<IPage> preservationSet = new HashSet<IPage>();
-    IPage p = (IPage) getSelectedNode();
+    IPage oldSelection = (IPage) getSelectedNode();
+    IPage p = oldSelection;
     if (p != null) {
       while (p != null) {
         preservationSet.add(p);
         p = p.getParentPage();
       }
-      ITreeVisitor v = new ITreeVisitor() {
-        public boolean visit(ITreeNode node) {
-          IPage page = (IPage) node;
-          if (preservationSet.contains(page)) {
-            // nop
-          }
-          else if (page.isChildrenLoaded() && (!page.isExpanded() || !page.getParentPage().isChildrenLoaded())) {
-            try {
-              unloadNode(page);
-            }
-            catch (ProcessingException e) {
-              SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-            }
-          }
-          return true;
+    }
+    ITreeVisitor v = new ITreeVisitor() {
+      public boolean visit(ITreeNode node) {
+        IPage page = (IPage) node;
+        if (preservationSet.contains(page)) {
+          // nop
         }
-      };
-      try {
-        setTreeChanging(true);
-        visitNode(getRootNode(), v);
+        else if (page.isChildrenLoaded() && (!page.isExpanded() || !(page.getParentPage() != null && page.getParentPage().isChildrenLoaded()))) {
+          try {
+            unloadNode(page);
+          }
+          catch (ProcessingException e) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          }
+        }
+        return true;
+      }
+    };
+    try {
+      setTreeChanging(true);
+      visitNode(getRootNode(), v);
+      if (oldSelection != null) {
         IPage selectedPage = (IPage) getSelectedNode();
         if (selectedPage == null) {
           try {
@@ -186,9 +189,9 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
           }
         }
       }
-      finally {
-        setTreeChanging(false);
-      }
+    }
+    finally {
+      setTreeChanging(false);
     }
   }
 

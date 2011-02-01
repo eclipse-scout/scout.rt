@@ -95,11 +95,9 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
           outline.visitNode(outline.getRootNode(), v);
         }
       }
-
       long memTotal = Runtime.getRuntime().totalMemory();
       long memUsed = (memTotal - Runtime.getRuntime().freeMemory());
       long memMax = Runtime.getRuntime().maxMemory();
-      LOG.error("nodeCount: " + nodeCount);
       if (memUsed > memMax * 80L / 100L || nodeCount.get() > 10000) {
         m_release = true;
       }
@@ -115,6 +113,13 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   @Override
   public void beforeTablePageLoadData(IPageWithTable<?> page) {
     if (m_release) {
+      //make sure inactive outlines have no selection that "keeps" the pages
+      IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+      for (IOutline o : desktop.getAvailableOutlines()) {
+        if (o != desktop.getOutline()) {
+          o.selectNode(null);
+        }
+      }
       ClientJob.getCurrentSession().getDesktop().releaseUnusedPages();
       System.gc();
       for (Job j : Job.getJobManager().find(ClientJob.class)) {
