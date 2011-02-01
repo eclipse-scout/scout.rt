@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 
@@ -26,6 +28,13 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
    */
   @Override
   public void beforeTablePageLoadData(IPageWithTable<?> page) {
+    //make sure inactive outlines have no selection that "keeps" the pages
+    IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+    for (IOutline o : desktop.getAvailableOutlines()) {
+      if (o != desktop.getOutline()) {
+        o.selectNode(null);
+      }
+    }
     ClientJob.getCurrentSession().getDesktop().releaseUnusedPages();
     System.gc();
     for (Job j : Job.getJobManager().find(ClientJob.class)) {
