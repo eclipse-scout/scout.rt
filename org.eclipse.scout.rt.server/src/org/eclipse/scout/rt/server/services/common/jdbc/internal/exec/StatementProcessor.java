@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.parsers.BindModel;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.BindParser;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.IntoModel;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.IntoParser;
+import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlFormatter;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.DatabaseSpecificToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.FunctionInputToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.IToken;
@@ -543,7 +544,7 @@ public class StatementProcessor implements IStatementProcessor {
       debugBuf = new StringBuffer();
       debugBuf.append("SQL");
       debugBuf.append("\n");
-      debugBuf.append(m_originalStm);
+      debugBuf.append(SqlFormatter.wellform(m_originalStm));
     }
     // bind inputs and set replace token on inputs
     m_currentInputBindMap = new TreeMap<Integer, SqlBind>();

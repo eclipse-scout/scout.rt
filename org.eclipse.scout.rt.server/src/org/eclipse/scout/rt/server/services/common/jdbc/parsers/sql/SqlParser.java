@@ -80,13 +80,13 @@ public class SqlParser {
   private static final Pattern QUOT_PAT = Pattern.compile("(\"[^\"]*\")");
   //make all uppercase and single space
   private static final Pattern UNION_PAT = Pattern.compile("[^" + nameChars + "](UNION ALL|INTERSECT|MINUS|UNION)[^" + nameChars + "]");
-  private static final Pattern PART_PAT = Pattern.compile("[^" + nameChars + "](SELECT|FROM|WHERE|GROUP BY|HAVING|ORDER BY|INTO|CONNECT BY|START WITH|INSERT|UPDATE|DELETE|VALUES)[^" + nameChars + "]");
-  private static final Pattern UNARY_PREFIX_PAT = Pattern.compile("[^" + nameChars + "](NOT|DISTINCT)[^" + nameChars + "]");
+  private static final Pattern PART_PAT = Pattern.compile("[^" + nameChars + "](SELECT|FROM|JOIN|ON|WHERE|GROUP BY|HAVING|ORDER BY|INSERT INTO|INSERT|INTO|CONNECT BY|START WITH|UPDATE|DELETE FROM|DELETE|SET|VALUES)[^" + nameChars + "]");
   private static final Pattern OUTER_JOIN_PAT = Pattern.compile("(\\(\\+\\))");
   private static final Pattern OR_OP_PAT = Pattern.compile("[^" + nameChars + "](OR)[^" + nameChars + "]");
   private static final Pattern AND_OP_PAT = Pattern.compile("[^" + nameChars + "](AND)[^" + nameChars + "]");
-  private static final Pattern MATH_OP_PAT1 = Pattern.compile("[^" + nameChars + "](IN|IS|BETWEEN|LIKE)[^" + nameChars + "]");
+  private static final Pattern MATH_OP_PAT1 = Pattern.compile("[^" + nameChars + "](NOT IN|IN|IS NOT|IS|NOT BETWEEN|BETWEEN|NOT LIKE|LIKE)[^" + nameChars + "]");
   private static final Pattern MATH_OP_PAT2 = Pattern.compile("(=|<>|!=|<=|>=|<|>|\\%|\\^|\\+|\\-|\\*|/|\\|\\||\\&\\&)");
+  private static final Pattern UNARY_PREFIX_PAT = Pattern.compile("[^" + nameChars + "](NOT|DISTINCT)[^" + nameChars + "]");
   //eliminate all remaining spaces
   private static final Pattern NAME_PAT = Pattern.compile("([" + nameChars + "]+)");
   private static final Pattern OPEN_BRACKET_PAT = Pattern.compile("([(])");
@@ -156,6 +156,18 @@ public class SqlParser {
   public Statement parse(String s) {
     List<IToken> list = tokenize(s);
     Statement stm = parseStatement(list, new ParseContext());
+    //sometimes sql is wrapped into brackets
+    if (stm == null) {
+      list = tokenize(s);
+      BracketExpr be = parseBracketExpr(list, new ParseContext());
+      if (be != null) {
+        for (IToken t : be.getChildren()) {
+          if (t instanceof Statement) {
+            stm = (Statement) t;
+          }
+        }
+      }
+    }
     if (list.size() > 0) {
       Unparsed up = new Unparsed();
       up.setText(flatten(list));
@@ -551,12 +563,12 @@ public class SqlParser {
     }
     list = tokenizeRaw(list, UNION_PAT, UnionToken.class, false);
     list = tokenizeRaw(list, PART_PAT, PartToken.class, false);
-    list = tokenizeRaw(list, UNARY_PREFIX_PAT, UnaryPrefix.class, false);
     list = tokenizeRaw(list, OUTER_JOIN_PAT, OuterJoinToken.class, false);
     list = tokenizeRaw(list, OR_OP_PAT, OrOp.class, false);
     list = tokenizeRaw(list, AND_OP_PAT, AndOp.class, false);
     list = tokenizeRaw(list, MATH_OP_PAT1, MathOp.class, false);
     list = tokenizeRaw(list, MATH_OP_PAT2, MathOp.class, false);
+    list = tokenizeRaw(list, UNARY_PREFIX_PAT, UnaryPrefix.class, false);
     list = tokenizeRaw(list, NAME_PAT, Name.class, false);
     list = tokenizeRaw(list, OPEN_BRACKET_PAT, OpenBracketToken.class, false);
     list = tokenizeRaw(list, CLOSE_BRACKET_PAT, CloseBracketToken.class, false);
