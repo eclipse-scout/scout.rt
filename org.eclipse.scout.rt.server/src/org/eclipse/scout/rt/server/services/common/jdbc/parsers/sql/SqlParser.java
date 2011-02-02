@@ -65,7 +65,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserTok
  * _simpleExpr = UnaryPrefixExpr | MinusExpr | Atom
  * UnaryPrefixExpr = UnaryPrefix Atom
  * MinusExpr = BinaryOp['-'] Atom
- * Atom= (BracketExpr | Statement | OrExpr | FunExpr | Name | Text | BinaryOp['*']) (OuterJoinToken)? (Name["AS"])? (Name[alias])?
+ * Atom= (BracketExpr | Statement | OrExpr | FunExpr | Name | Text | BinaryOp['*']) (OuterJoinToken)? (Name[alias])?
  * BracketExpr = OpenBracketToken (Statement | ListExpr) CloseBracketToken
  * FunExpr = Name BracketExpr
  * </code>
@@ -80,7 +80,7 @@ public class SqlParser {
   private static final Pattern QUOT_PAT = Pattern.compile("(\"[^\"]*\")");
   //make all uppercase and single space
   private static final Pattern UNION_PAT = Pattern.compile("[^" + nameChars + "](UNION ALL|INTERSECT|MINUS|UNION)[^" + nameChars + "]");
-  private static final Pattern PART_PAT = Pattern.compile("[^" + nameChars + "](SELECT|FROM|JOIN|ON|WHERE|GROUP BY|HAVING|ORDER BY|INSERT INTO|INSERT|INTO|CONNECT BY|START WITH|UPDATE|DELETE FROM|DELETE|SET|VALUES)[^" + nameChars + "]");
+  private static final Pattern PART_PAT = Pattern.compile("[^" + nameChars + "](WITH|AS|SELECT|FROM|JOIN|ON|WHERE|GROUP BY|HAVING|ORDER BY|INSERT INTO|INSERT|INTO|CONNECT BY|START WITH|UPDATE|DELETE FROM|DELETE|SET|VALUES)[^" + nameChars + "]");
   private static final Pattern OUTER_JOIN_PAT = Pattern.compile("(\\(\\+\\))");
   private static final Pattern OR_OP_PAT = Pattern.compile("[^" + nameChars + "](OR)[^" + nameChars + "]");
   private static final Pattern AND_OP_PAT = Pattern.compile("[^" + nameChars + "](AND)[^" + nameChars + "]");
@@ -509,7 +509,6 @@ public class SqlParser {
       if ((t = removeToken(list, OuterJoinToken.class)) != null) {
         a.addChild(t);
       }
-      removeToken(list, Name.class, "AS");
       if ((t = removeToken(list, Name.class)) != null) {
         a.addChild(t);
       }
