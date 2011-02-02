@@ -427,6 +427,10 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         lsm.setValueIsAdjusting(false);
       }
     }
+    //ticket 96051
+    if (getScoutObject().isScrollToSelection()) {
+      scrollToSelection();
+    }
   }
 
   protected void setSelectionFromSwing(final int[] swingRows) {
