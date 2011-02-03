@@ -4,14 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.service;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -39,6 +41,39 @@ public final class ServiceUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceUtility.class);
 
   private ServiceUtility() {
+  }
+
+  /**
+   * see {@link INullService} and {@link SERVICES#getService(Class)}
+   * <p>
+   * Creates a void proxy for a service interface that does nothing and uses a classloader that return itself for every
+   * query. This trick voids out the ServiceUse class type check.
+   */
+  public static final INullService NULL_SERVICE;
+
+  static {
+    INullService n = null;
+    try {
+      ClassLoader identityLoader = new ClassLoader(INullService.class.getClassLoader()) {
+        @Override
+        public Class<?> loadClass(String name) throws ClassNotFoundException {
+          if (name.startsWith("java.lang.")) {
+            return super.loadClass(name);
+          }
+          return INullService.class;
+        }
+      };
+      n = (INullService) Proxy.newProxyInstance(identityLoader, new Class<?>[]{INullService.class}, new InvocationHandler() {
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+          return null;
+        }
+      });
+    }
+    catch (Throwable t) {
+      //nop
+    }
+    NULL_SERVICE = n;
   }
 
   /**
