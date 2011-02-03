@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -36,7 +36,7 @@ public class UiDecoration implements IUiDecoration {
   private int m_processButtonHeight;
   private int m_processButtonMinWidth;
   private int m_processButtonMaxWidth;
-  private String m_colorForegroundDiabled;
+  private String m_colorForegroundDisabled;
   private boolean m_enabledAsReadOnly;
   private int m_messageBoxMinWidth = 400;
   private int m_messageBoxMinHeight = 100;
@@ -182,12 +182,12 @@ public class UiDecoration implements IUiDecoration {
     m_logicalGridLayoutRowHeight = logicalGridLayoutRowHeight;
   }
 
-  public String getColorForegroundDiabled() {
-    return m_colorForegroundDiabled;
+  public String getColorForegroundDisabled() {
+    return m_colorForegroundDisabled;
   }
 
-  public void setColorForegroundDiabled(String colorForegroundDiabled) {
-    m_colorForegroundDiabled = colorForegroundDiabled;
+  public void setColorForegroundDisabled(String colorForegroundDisabled) {
+    m_colorForegroundDisabled = colorForegroundDisabled;
   }
 
   public int getFormFieldLabelAlignment() {

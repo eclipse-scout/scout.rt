@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -52,7 +52,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     m_columnManager = columnManager;
     m_imgCheckboxTrue = m_environment.getIcon(AbstractIcons.CheckboxYes);
     m_imgCheckboxFalse = m_environment.getIcon(AbstractIcons.CheckboxNo);
-    m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDiabled());
+    m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
     rebuildCache();
 
   }

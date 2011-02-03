@@ -118,7 +118,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
         setForegroundFromScout(getScoutObject().getForegroundColor());
       }
       else {
-        setForegroundFromScout(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDiabled());
+        setForegroundFromScout(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
       }
     }
     if (getSwtLabel() != null) {
@@ -129,7 +129,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
           getSwtLabel().setForeground(null);
         }
         else {
-          getSwtLabel().setForeground(getEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDiabled()));
+          getSwtLabel().setForeground(getEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled()));
         }
       }
     }

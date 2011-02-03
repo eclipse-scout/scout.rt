@@ -44,7 +44,7 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     m_treeViewer = treeViewer;
     m_imgCheckboxTrue = m_environment.getIcon(AbstractIcons.CheckboxYes);
     m_imgCheckboxFalse = m_environment.getIcon(AbstractIcons.CheckboxNo);
-    m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDiabled());
+    m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
   }
 
   public Object[] getChildren(Object parentElement) {

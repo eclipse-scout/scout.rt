@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -242,7 +242,7 @@ public final class UiDecorationExtensionPoint {
         LOOK_AND_FEEL.setProcessButtonMinWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_PROCESS_BUTTON_MIN_WIDTH));
       }
       if (props.getPropertyString(ILookAndFeelProperties.PROP_COLOR_FOREGROUND_DISABLED) != null) {
-        LOOK_AND_FEEL.setColorForegroundDiabled(props.getPropertyString(ILookAndFeelProperties.PROP_COLOR_FOREGROUND_DISABLED));
+        LOOK_AND_FEEL.setColorForegroundDisabled(props.getPropertyString(ILookAndFeelProperties.PROP_COLOR_FOREGROUND_DISABLED));
       }
       if (props.getPropertyString(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_WIDTH) != null) {
         LOOK_AND_FEEL.setMessageBoxMinWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_WIDTH));
