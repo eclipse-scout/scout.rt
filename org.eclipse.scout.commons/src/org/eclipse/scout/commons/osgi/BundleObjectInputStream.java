@@ -114,7 +114,7 @@ public class BundleObjectInputStream extends ObjectInputStream {
       return c;
     }
     catch (ClassNotFoundException e) {
-      if (LOG.isInfoEnabled()) LOG.info("reading serialized object from http proxy tunnel: " + e.getMessage(), e);
+      LOG.error("reading serialized object from http proxy tunnel: " + e.getMessage(), e);
       throw e;
     }
   }
