@@ -28,6 +28,7 @@ import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.IService2;
 import org.eclipse.scout.service.IServiceFactory;
 import org.eclipse.scout.service.ServiceConstants;
+import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
 
@@ -85,7 +86,7 @@ public class ServerServiceFactory implements IServiceFactory {
         return m_service;
       }
     }
-    return null;
+    return ServiceUtility.NULL_SERVICE;
   }
 
   public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
