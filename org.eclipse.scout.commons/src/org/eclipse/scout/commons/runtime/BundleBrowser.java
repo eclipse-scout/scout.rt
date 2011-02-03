@@ -30,6 +30,13 @@ public class BundleBrowser {
 
   private Bundle m_bundle;
   private String m_packagePath;
+  //context as members (performance)
+  private HashSet<String> m_set;
+  private String m_prefix;
+  private int m_prefixLen;
+  private boolean m_doubleCheckPrefix;
+  boolean m_includeInnerTypes;
+  boolean m_includeSubtree;
 
   public BundleBrowser(String symbolicName, String packageName) {
     m_bundle = Platform.getBundle(symbolicName);
@@ -49,26 +56,28 @@ public class BundleBrowser {
    */
   @SuppressWarnings("unchecked")
   public String[] getClasses(boolean includeInnerTypes, boolean includeSubtree) {
-    HashSet<String> set = new HashSet<String>();
+    m_includeInnerTypes = includeInnerTypes;
+    m_includeSubtree = includeSubtree;
+    m_set = new HashSet<String>();
     if (m_bundle != null && m_packagePath != null) {
       String path = removeLeadingSlash(m_packagePath);
-
-      String prefix = "/bin/";
-      Enumeration<String> en = getResourcesEnumeration(m_bundle, prefix + path);
-
+      m_prefix = "/bin/";
+      m_doubleCheckPrefix = true;
+      Enumeration<String> en = getResourcesEnumeration(m_bundle, m_prefix + path);
       if (en == null) {
-        prefix = "/classes/";
-        en = getResourcesEnumeration(m_bundle, prefix + path);
+        m_prefix = "/classes/";
+        m_doubleCheckPrefix = true;
+        en = getResourcesEnumeration(m_bundle, m_prefix + path);
       }
-
       if (en == null) {
-        prefix = "/";
-        en = getResourcesEnumeration(m_bundle, prefix + path);
+        m_prefix = "/";
+        m_doubleCheckPrefix = false;
+        en = getResourcesEnumeration(m_bundle, m_prefix + path);
       }
-
-      visit(set, prefix, en, includeInnerTypes, includeSubtree);
+      m_prefixLen = m_prefix.length();
+      visit(en);
     }
-    return set.toArray(new String[set.size()]);
+    return m_set.toArray(new String[m_set.size()]);
   }
 
   private String removeLeadingSlash(String path) {
@@ -116,20 +125,36 @@ public class BundleBrowser {
   }
 
   @SuppressWarnings("unchecked")
-  private void visit(HashSet<String> set, String prefix, Enumeration<String> en, boolean includeInnerTypes, boolean includeSubtree) {
+  private void visit(Enumeration<String> en) {
     if (en != null) {
       while (en.hasMoreElements()) {
         String path = en.nextElement();
         if (path.endsWith(".class")) {
-          String className = path.substring(prefix.length(), path.length() - 6);
-          if (path.indexOf("$") < 0 || includeInnerTypes) {
+          /*
+           * fix: when running in dev mode, all classes are spidered twice, but even worse
+           * if the prefix is /bin/ then the enum returns paths such as bin/... without the leading /
+           * The double-check verifies this fact.
+           */
+          String className;
+          if (m_doubleCheckPrefix) {
+            if (path.startsWith(m_prefix)) {
+              className = path.substring(m_prefixLen, path.length() - 6);
+            }
+            else {
+              className = path.substring(m_prefixLen - 1, path.length() - 6);
+            }
+          }
+          else {
+            className = path.substring(m_prefixLen, path.length() - 6);
+          }
+          if (path.indexOf("$") < 0 || m_includeInnerTypes) {
             className = className.replaceAll("[/]", ".");
-            set.add(className);
+            m_set.add(className);
           }
         }
         else {
-          if (includeSubtree) {
-            visit(set, prefix, m_bundle.getEntryPaths(path), includeInnerTypes, includeSubtree);
+          if (m_includeSubtree) {
+            visit(m_bundle.getEntryPaths(path));
           }
         }
       }
