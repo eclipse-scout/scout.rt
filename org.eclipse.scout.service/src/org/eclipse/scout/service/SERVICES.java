@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,6 +26,8 @@ import org.osgi.framework.ServiceReference;
  * <p>
  * There might be log warnings when a service returns null due to factory visiblity decisions. see bug
  * https://bugs.eclipse.org/bugs/show_bug.cgi?id=299351
+ * <p>
+ * see also {@link INullService}
  */
 public final class SERVICES {
   @SuppressWarnings("unused")
@@ -123,6 +125,10 @@ public final class SERVICES {
   }
 
   private static Object safeGetService(BundleContext context, ServiceReference ref) {
-    return context.getService(ref);
+    Object o = context.getService(ref);
+    if (o instanceof INullService) {
+      o = null;
+    }
+    return o;
   }
 }
