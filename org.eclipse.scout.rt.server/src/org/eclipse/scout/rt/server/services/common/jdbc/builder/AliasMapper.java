@@ -25,6 +25,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 public class AliasMapper {
   private static final Pattern CLEAN_ENTITY_NAME = Pattern.compile("[@]?(parent\\.)?([a-zA-Z0-9_]+)[@]?");
   private static final Pattern ENTITY_NAME = Pattern.compile("[@](parent\\.)?([a-zA-Z0-9_]+)[@]");
+
+  /**
+   * Pattern to recognize entity definitions.
+   * The pattern does not recognize an entity definition in case the
+   * string is terminated after the ending @. Thus when using the entity definition,
+   * append a space to the string before applying the pattern.
+   */
   private static final Pattern ENTITY_DEFINITION = Pattern.compile("[@]([a-zA-Z0-9_]+)[@]([^.])");
   private static final Pattern ENTITY_REFERENCE = Pattern.compile("[@](parent\\.)?([a-zA-Z0-9_]+)[@][.]");
 
@@ -176,14 +183,14 @@ public class AliasMapper {
    * Parse all entity definitions in the statement part and define a new (local) alias that is associate with the node.
    */
   public void addAllNodeEntitiesFrom(Object node, String statementPart) {
-    Matcher m = ENTITY_DEFINITION.matcher(statementPart);
+    Matcher m = ENTITY_DEFINITION.matcher(statementPart + " ");
     while (m.find()) {
       setNodeAlias(node, m.group(1), nextAlias());
     }
   }
 
   public void addMissingNodeEntitiesFrom(Object node, String statementPart) {
-    Matcher m = ENTITY_DEFINITION.matcher(statementPart);
+    Matcher m = ENTITY_DEFINITION.matcher(statementPart + " ");
     while (m.find()) {
       if (getNodeAlias(node, m.group(1)) == null) {
         setNodeAlias(node, m.group(1), nextAlias());
@@ -196,7 +203,7 @@ public class AliasMapper {
    * it.
    */
   public void addMissingRootEntitiesFrom(String statementPart) {
-    Matcher m = ENTITY_DEFINITION.matcher(statementPart);
+    Matcher m = ENTITY_DEFINITION.matcher(statementPart + " ");
     while (m.find()) {
       if (getRootAlias(m.group(1)) == null) {
         setRootAlias(m.group(1), nextAlias());
