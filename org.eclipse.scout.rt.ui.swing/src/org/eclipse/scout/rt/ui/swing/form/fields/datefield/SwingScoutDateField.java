@@ -260,7 +260,9 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
 
         @Override
         public void actionPerformed(ActionEvent e) {
-          acceptProposalFromSwing(dateChooser.getDate());
+          closePopup();
+          //save text that was entered, NOT popup selection
+          handleSwingInputVerifier();
         }
       };
       Action escAction = new AbstractAction() {
