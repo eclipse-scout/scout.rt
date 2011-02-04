@@ -65,7 +65,7 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
 
       @Override
       public void mouseReleased(MouseEvent e) {
-        fix.mouseReleased(this, e);
+        if(fix!=null) fix.mouseReleased(this, e);
       }
 
       @Override

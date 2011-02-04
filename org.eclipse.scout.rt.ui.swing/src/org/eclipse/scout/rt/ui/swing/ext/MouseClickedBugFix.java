@@ -44,7 +44,7 @@ import javax.swing.JTree;
  *       ...
  *     }
  *     finally{
- *       fix.mouseReleased(this,e);
+ *       if(fix!=null) fix.mouseReleased(this,e);
  *     }
  *   }
  * 
