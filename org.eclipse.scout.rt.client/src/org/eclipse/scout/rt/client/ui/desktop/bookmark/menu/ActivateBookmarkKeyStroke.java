@@ -4,41 +4,32 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.bookmark.menu;
 
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
-public class ActivateBookmarkKeyStroke extends AbstractKeyStroke {
+public class ActivateBookmarkKeyStroke extends KeyStroke {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ActivateBookmarkKeyStroke.class);
 
   private final Bookmark m_bookmark;
 
   public ActivateBookmarkKeyStroke(Bookmark b) {
-    super(false);
+    super(b.getKeyStroke());
     m_bookmark = b;
     callInitializer();
   }
 
   public Bookmark getBookmark() {
     return m_bookmark;
-  }
-
-  @Override
-  @ConfigOperation
-  @Order(10)
-  protected void execInitAction() {
-    setKeyStroke(m_bookmark.getKeyStroke());
   }
 
   @Override
