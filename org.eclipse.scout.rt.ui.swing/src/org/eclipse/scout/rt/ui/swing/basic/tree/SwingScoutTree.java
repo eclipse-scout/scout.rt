@@ -922,7 +922,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
           handleSwingHyperlinkAction(detector.getTreePath(), detector.getHyperlink());
         }
       }
-      fix.mouseReleased(this, e);
+      if(fix!=null) fix.mouseReleased(this, e);
     }
 
     @Override

@@ -1243,7 +1243,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           }
         }
       }
-      fix.mouseReleased(this, e);
+      if(fix!=null) fix.mouseReleased(this, e);
     }
 
     @Override
@@ -1329,7 +1329,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       if (e.isPopupTrigger()) {
         handleSwingRowPopup(e);
       }
-      fix.mouseReleased(this, e);
+      if(fix!=null) fix.mouseReleased(this, e);
     }
 
     @Override

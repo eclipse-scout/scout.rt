@@ -85,7 +85,7 @@ public class JActivityMap extends JComponent implements Scrollable {
           public void mouseReleased(MouseEvent e) {
             Component parent = getParentAt(e.getComponent(), e.getPoint());
             parent.dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, parent));
-            fix.mouseReleased(this, e);
+            if(fix!=null) fix.mouseReleased(this, e);
           }
 
           @Override
@@ -269,7 +269,7 @@ public class JActivityMap extends JComponent implements Scrollable {
         if (isButton1(e)) {
           dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, JActivityMap.this));
         }
-        fix.mouseReleased(this, e);
+        if(fix!=null) fix.mouseReleased(this, e);
       }
 
       public void mouseClicked(MouseEvent e) {

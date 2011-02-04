@@ -86,7 +86,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
                 handleSwingEditActivityPopup(e);
               }
             }
-            fix.mouseReleased(this, e);
+            if(fix!=null) fix.mouseReleased(this, e);
           }
 
           @Override
@@ -147,7 +147,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
 
           @Override
           public void mouseReleased(MouseEvent e) {
-            fix.mouseReleased(this, e);
+            if(fix!=null) fix.mouseReleased(this, e);
           }
 
           @Override

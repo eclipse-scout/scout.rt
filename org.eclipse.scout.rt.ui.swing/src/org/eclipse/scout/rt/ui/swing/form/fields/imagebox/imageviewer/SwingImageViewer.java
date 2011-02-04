@@ -80,7 +80,7 @@ public class SwingImageViewer extends JComponent {
 
       @Override
       public void mouseReleased(MouseEvent e) {
-        if (fix != null) fix.mouseReleased(this, e);
+        if (fix != null) if(fix!=null) fix.mouseReleased(this, e);
       }
 
       @Override

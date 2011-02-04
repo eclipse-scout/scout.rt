@@ -282,7 +282,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
       if (e.isPopupTrigger()) {
         handleSwingCalendarPopup(e);
       }
-      fix.mouseReleased(this, e);
+      if(fix!=null) fix.mouseReleased(this, e);
     }
 
     @Override

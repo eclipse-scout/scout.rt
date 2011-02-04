@@ -475,7 +475,7 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
 
     @Override
     public void mouseReleased(MouseEvent e) {
-      fix.mouseReleased(this, e);
+      if(fix!=null) fix.mouseReleased(this, e);
     }
 
     @Override

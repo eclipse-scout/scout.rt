@@ -90,7 +90,7 @@ public class JHyperlink extends JLabelEx {
 
       @Override
       public void mouseReleased(MouseEvent e) {
-        fix.mouseReleased(this, e);
+        if(fix!=null) fix.mouseReleased(this, e);
       }
 
       @Override

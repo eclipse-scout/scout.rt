@@ -559,7 +559,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
           handleSwingPopup(((SwingMailAttachmentView) source));
         }
       }
-      fix.mouseReleased(this, e);
+      if(fix!=null) fix.mouseReleased(this, e);
     }
 
     @Override
