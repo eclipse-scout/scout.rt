@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
 public class GroupBoxBodyGrid {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(GroupBoxBodyGrid.class);
 
-  private IGroupBox m_groupBox;
+  private final IGroupBox m_groupBox;
   private IFormField[] m_fieldsExceptProcessButtons;
   private int m_gridColumns;
   private int m_gridRows;
@@ -141,17 +141,11 @@ public class GroupBoxBodyGrid {
               GridCell split = splitRoot.getSplitCell(0, maxWeight, k);
               if (split != null && split != splitRoot) {
                 split.getUp().setDown(null);
-                int splitOffMaxCols = Math.max(1, splitRoot.getMaxCols());// maximum
-                // columns
-                // in
-                // part
-                // before
-                // split
-                // (normally
-                // 1)
+                int splitOffMaxCols = Math.max(1, splitRoot.getMaxCols());
+                //maximum columns in part before split (normally 1)
                 splitRoot.setRight(split);
                 splitRoot = split;
-                // reduce by maximum column countof split-off part
+                // reduce by maximum column count of split-off part
                 k = k - splitOffMaxCols;
               }
               else {
@@ -193,16 +187,11 @@ public class GroupBoxBodyGrid {
           GridCell split = splitRoot.getSplitCell(0, maxWeight, k);
           if (split != null && split != splitRoot) {
             split.getUp().setDown(null);
-            int splitOffMaxCols = Math.max(1, splitRoot.getMaxCols());// maximum
-            // columns
-            // in part
-            // before
-            // split
-            // (normally
-            // 1)
+            int splitOffMaxCols = Math.max(1, splitRoot.getMaxCols());
+            // maximum columns in part before split (normally 1)
             splitRoot.setRight(split);
             splitRoot = split;
-            // reduce by maximum column countof split-off part
+            // reduce by maximum column count of split-off part
             k = k - splitOffMaxCols;
           }
           else {
