@@ -4,13 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.net;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ProxySelector;
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.net.internal.TTLCache;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 
 /**
  * Implementation of a java.net {@link ProxySelector}. To activate this
@@ -162,7 +164,22 @@ public final class EclipseProxySelector extends ProxySelector {
     if (ref != null) {
       try {
         IProxyService service = (IProxyService) context.getService(ref);
-        return service.select(uri);
+
+        //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
+        Version frameworkVersion = new Version(NetActivator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
+        if (frameworkVersion.getMajor() == 3
+            && frameworkVersion.getMinor() <= 4) {
+          return new IProxyData[0];
+        }
+        else {
+          try {
+            Method method = IProxyService.class.getMethod("select", URI.class);
+            return (IProxyData[]) method.invoke(service, uri);
+          }
+          catch (Exception e) {
+            NetActivator.getDefault().getLog().log(new Status(Status.WARNING, NetActivator.PLUGIN_ID, "could not access method 'addImageAndLabel' on 'JavaHoover'.", e));
+          }
+        }
       }
       finally {
         context.ungetService(ref);
@@ -170,5 +187,4 @@ public final class EclipseProxySelector extends ProxySelector {
     }
     return new IProxyData[0];
   }
-
 }

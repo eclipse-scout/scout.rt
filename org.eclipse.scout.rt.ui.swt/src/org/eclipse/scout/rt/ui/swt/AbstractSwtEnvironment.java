@@ -123,6 +123,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
 /**
  * <h3>SwtEnvironment</h3> ...
@@ -1009,7 +1010,15 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
               break;
             }
             case IProcessingStatus.CANCEL: {
-              iconId = SWT.ICON_CANCEL;
+              //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
+              Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
+              if (frameworkVersion.getMajor() == 3
+                  && frameworkVersion.getMinor() <= 4) {
+                iconId = SWT.ICON_INFORMATION;
+              }
+              else {
+                iconId = 1 << 8;//SWT.ICON_CANCEL
+              }
               break;
             }
             default: {
