@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -82,8 +82,7 @@ public abstract class TableKeyboardNavigationSupport extends AbstractKeyboardNav
 
   @Override
   void handleSearchPattern(final String regex) {
-    m_table.getDisplay().syncExec(new Runnable() {
-
+    m_table.getDisplay().asyncExec(new Runnable() {
       @Override
       public void run() {
         int column = m_contextColumnIndex;
