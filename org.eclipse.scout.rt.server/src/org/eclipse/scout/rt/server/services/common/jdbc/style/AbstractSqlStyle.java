@@ -33,10 +33,13 @@ import java.util.Date;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 
 public abstract class AbstractSqlStyle implements ISqlStyle {
   private static final long serialVersionUID = 1L;
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlStyle.class);
 
   public String getConcatOp() {
     return "||";
@@ -70,15 +73,25 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     }
     else if (value instanceof String) {
       String s = (String) value;
+      if (s.length() > 4000) {
+        s = s.substring(0, 4000);
+        LOG.warn("toPlainText of a String with more than 4000 characters failed; truncated to '" + s + "'");
+        return "'" + s.replaceAll("'", "''") + "'";
+      }
       return "'" + s.replaceAll("'", "''") + "'";
     }
     else if (value instanceof char[]) {
+      if (((char[]) value).length > 4000) {
+        String s = new String((char[]) value, 0, 4000);
+        LOG.warn("toPlainText of a CLOB with more than 4000 characters failed; truncated to '" + s + "'");
+        return "'" + s.replaceAll("'", "''") + "'";
+      }
       String s = new String((char[]) value);
       return "'" + s.replaceAll("'", "''") + "'";
     }
     else if (value instanceof byte[]) {
-      String s = new String((byte[]) value);
-      return "'" + s.replaceAll("'", "''") + "'";
+      LOG.warn("toPlainText of a BLOB failed; using NULL");
+      return "NULL";
     }
     else if (value instanceof Date) {
       Date d = (Date) value;
