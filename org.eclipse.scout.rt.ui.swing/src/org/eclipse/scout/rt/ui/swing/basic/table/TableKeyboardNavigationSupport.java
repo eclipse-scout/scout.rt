@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -72,43 +72,38 @@ public abstract class TableKeyboardNavigationSupport extends AbstractKeyboardNav
 
   @Override
   void handleSearchPattern(final String regex) {
-    try {
-      SwingUtilities.invokeAndWait(new Runnable() {
-        @Override
-        public void run() {
-          SwingTableModel tableModel = (SwingTableModel) m_table.getModel();
-          int column = m_contextColumnIndex;
-          if (column < 0 && m_table.getColumnCount() > 0) {
-            column = 0;
-          }
-          if (column < 0) {
-            return;
-          }
-          if (LOG.isInfoEnabled()) LOG.info("finding regex:" + regex + " in column " + tableModel.getColumnName(column));
-          // loop over values and find matching one
-          int startIndex = m_table.getSelectionModel().getAnchorSelectionIndex();
-          if (startIndex < 0) {
-            startIndex = 0;
-          }
-          else {
-            startIndex++;
-          }
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        SwingTableModel tableModel = (SwingTableModel) m_table.getModel();
+        int column = m_contextColumnIndex;
+        if (column < 0 && m_table.getColumnCount() > 0) {
+          column = 0;
+        }
+        if (column < 0) {
+          return;
+        }
+        if (LOG.isInfoEnabled()) LOG.info("finding regex:" + regex + " in column " + tableModel.getColumnName(column));
+        // loop over values and find matching one
+        int startIndex = m_table.getSelectionModel().getAnchorSelectionIndex();
+        if (startIndex < 0) {
+          startIndex = 0;
+        }
+        else {
+          startIndex++;
+        }
 
-          int itemCount = m_table.getRowCount();
-          for (int i = 0; i < itemCount; i++) {
-            int rowIndex = (startIndex + i) % itemCount;
-            String value = tableModel.getValueAt(rowIndex, column).toString();
-            if (value.toLowerCase().matches(regex)) {
-              handleKeyboardNavigation(rowIndex);
-              break;
-            }
+        int itemCount = m_table.getRowCount();
+        for (int i = 0; i < itemCount; i++) {
+          int rowIndex = (startIndex + i) % itemCount;
+          String value = tableModel.getValueAt(rowIndex, column).toString();
+          if (value.toLowerCase().matches(regex)) {
+            handleKeyboardNavigation(rowIndex);
+            break;
           }
         }
-      });
-    }
-    catch (Exception e) {
-      LOG.warn("could not execute keybaord navigation.", e);
-    }
+      }
+    });
   }
 
   abstract void handleKeyboardNavigation(int rowIndex);
