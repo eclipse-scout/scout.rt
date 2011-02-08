@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -70,7 +70,7 @@ public class IntoParser {
   }
 
   private boolean parseStatement() {
-    if (LOG.isDebugEnabled()) debug("parseStatement");
+    if (LOG.isTraceEnabled()) trace("parseStatement");
     int index = m_pos.getIndex();
     parseWhitespace(0);
     if (parseTokenList()) {
@@ -83,7 +83,7 @@ public class IntoParser {
   }
 
   private boolean parseTokenList() {
-    if (LOG.isDebugEnabled()) debug("parseTokenList");
+    if (LOG.isTraceEnabled()) trace("parseTokenList");
     int index = m_pos.getIndex();
     if (parseToken()) {
       index = m_pos.getIndex();
@@ -102,7 +102,7 @@ public class IntoParser {
   }
 
   private boolean parseToken() {
-    if (LOG.isDebugEnabled()) debug("parseToken");
+    if (LOG.isTraceEnabled()) trace("parseToken");
     if (parseText() ||
         parseInto() ||
         parseChar()) {
@@ -114,7 +114,7 @@ public class IntoParser {
   }
 
   private boolean parseText() {
-    if (LOG.isDebugEnabled()) debug("parseText");
+    if (LOG.isTraceEnabled()) trace("parseText");
     int index = m_pos.getIndex();
     if (matches("'")) {
       while (parseTextChar()) {
@@ -129,7 +129,7 @@ public class IntoParser {
   }
 
   private boolean parseInto() {
-    if (LOG.isDebugEnabled()) debug("parseInto");
+    if (LOG.isTraceEnabled()) trace("parseInto");
     int index = m_pos.getIndex();
     if (matches("into") && parseWhitespace(1) && parseBindList()) {
       addTextUntil(index);
@@ -143,7 +143,7 @@ public class IntoParser {
   }
 
   private boolean parseBindList() {
-    if (LOG.isDebugEnabled()) debug("parseBindList");
+    if (LOG.isTraceEnabled()) trace("parseBindList");
     int index = m_pos.getIndex();
     if (parseBind()) {
       index = m_pos.getIndex();
@@ -160,7 +160,7 @@ public class IntoParser {
   }
 
   private boolean parseBind() {
-    if (LOG.isDebugEnabled()) debug("parseBind");
+    if (LOG.isTraceEnabled()) trace("parseBind");
     int index = m_pos.getIndex();
     if (parseHashBind() ||
         parsePlainBind() ||
@@ -174,7 +174,7 @@ public class IntoParser {
   }
 
   private boolean parseHashBind() {
-    if (LOG.isDebugEnabled()) debug("parseHashBind");
+    if (LOG.isTraceEnabled()) trace("parseHashBind");
     int index = m_pos.getIndex();
     if (matches("#") && parseName() && matches("#")) {
       addIntoToken(new ValueOutputToken(m_str.substring(index, m_pos.getIndex()), m_str.substring(index + 1, m_pos.getIndex() - 1), true));
@@ -185,7 +185,7 @@ public class IntoParser {
   }
 
   private boolean parsePlainBind() {
-    if (LOG.isDebugEnabled()) debug("parsePlainBind");
+    if (LOG.isTraceEnabled()) trace("parsePlainBind");
     int index = m_pos.getIndex();
     if (matches("&") && parseName() && matches("&")) {
       addIntoToken(new ValueOutputToken(m_str.substring(index, m_pos.getIndex()), m_str.substring(index + 1, m_pos.getIndex() - 1), true));
@@ -196,7 +196,7 @@ public class IntoParser {
   }
 
   private boolean parseStdBind() {
-    if (LOG.isDebugEnabled()) debug("parseStdBind");
+    if (LOG.isTraceEnabled()) trace("parseStdBind");
     int index = m_pos.getIndex();
     if (matches(":") && parseName()) {
       addIntoToken(new ValueOutputToken(m_str.substring(index, m_pos.getIndex()), m_str.substring(index + 1, m_pos.getIndex()), true));
@@ -207,7 +207,7 @@ public class IntoParser {
   }
 
   private boolean parseName() {
-    if (LOG.isDebugEnabled()) debug("parseName");
+    if (LOG.isTraceEnabled()) trace("parseName");
     int index = m_pos.getIndex();
     while (parseNameChar()) {
     }
@@ -221,7 +221,7 @@ public class IntoParser {
   }
 
   private boolean parseChar() {
-    if (LOG.isDebugEnabled()) debug("parseChar");
+    if (LOG.isTraceEnabled()) trace("parseChar");
     int index = m_pos.getIndex();
     if (index < m_str.length()) {
       m_pos.setIndex(index + 1);
@@ -243,7 +243,7 @@ public class IntoParser {
   }
 
   private boolean parseTextChar() {
-    if (LOG.isDebugEnabled()) debug("parseTextChar");
+    if (LOG.isTraceEnabled()) trace("parseTextChar");
     int index = m_pos.getIndex();
     int len = m_str.length();
     if (index < len && m_str.charAt(index) != '\'') {
@@ -260,7 +260,7 @@ public class IntoParser {
   }
 
   private boolean parseNameChar() {
-    if (LOG.isDebugEnabled()) debug("parseNameChar");
+    if (LOG.isTraceEnabled()) trace("parseNameChar");
     int index = m_pos.getIndex();
     int len = m_str.length();
     if (index < len && NAME_MAP.indexOf(m_str.charAt(index)) >= 0) {
@@ -287,11 +287,11 @@ public class IntoParser {
     }
   }
 
-  private void debug(String s) {
+  private void trace(String s) {
     int len = m_str.length();
     int i0 = Math.min(m_pos.getIndex(), len - 1);
     int i1 = Math.min(i0 + 32, len);
-    LOG.debug("# " + s + " at:" + m_str.substring(i0, i1));
+    LOG.trace("# " + s + " at:" + m_str.substring(i0, i1));
   }
 
   private void addTextUntil(int endIndex) {
