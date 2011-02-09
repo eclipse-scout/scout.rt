@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,7 +25,14 @@ public class TablePageState extends AbstractPageState implements Serializable, C
   private String m_searchFormState;
   private boolean m_searchFilterComplete;
   private String m_searchFilterState;
+  /**
+   * legacy, replaced by m_availableColumns
+   */
   private List<TableColumnState> m_visibleColumns;
+  /**
+   * available columns at point in time when bookmark was created
+   */
+  private List<TableColumnState> m_availableColumns;
 
   public TablePageState() {
   }
@@ -43,6 +50,12 @@ public class TablePageState extends AbstractPageState implements Serializable, C
       this.m_visibleColumns = new ArrayList<TableColumnState>();
       for (TableColumnState col : state.m_visibleColumns) {
         this.m_visibleColumns.add(new TableColumnState(col));
+      }
+    }
+    if (state.m_availableColumns != null) {
+      this.m_availableColumns = new ArrayList<TableColumnState>();
+      for (TableColumnState col : state.m_availableColumns) {
+        this.m_availableColumns.add(new TableColumnState(col));
       }
     }
   }
@@ -105,17 +118,41 @@ public class TablePageState extends AbstractPageState implements Serializable, C
     m_searchFilterState = state;
   }
 
+  /**
+   * @deprecated use {@link #getAvailableColumns()} and filter by visible property
+   */
+  @SuppressWarnings("unchecked")
+  @Deprecated
   public List<TableColumnState> getVisibleColumns() {
-    if (m_visibleColumns == null) return null;
-    else return Collections.unmodifiableList(m_visibleColumns);
+    return Collections.unmodifiableList(m_visibleColumns != null ? m_visibleColumns : Collections.EMPTY_LIST);
   }
 
+  /**
+   * @deprecated use {@link #setAvailableColumns()} and set all available columns (with sort index, dispayable, visible
+   *             and width property), not just the visible ones
+   */
+  @Deprecated
   public void setVisibleColumns(List<TableColumnState> cols) {
     if (cols == null) {
       m_visibleColumns = null;
     }
     else {
       m_visibleColumns = new ArrayList<TableColumnState>(cols);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<TableColumnState> getAvailableColumns() {
+    return Collections.unmodifiableList(m_availableColumns != null ? m_availableColumns : Collections.EMPTY_LIST);
+  }
+
+  public void setAvailableColumns(List<TableColumnState> cols) {
+    m_visibleColumns = null;
+    if (cols == null) {
+      m_availableColumns = null;
+    }
+    else {
+      m_availableColumns = new ArrayList<TableColumnState>(cols);
     }
   }
 
