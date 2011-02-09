@@ -177,7 +177,7 @@ public final class EclipseProxySelector extends ProxySelector {
             return (IProxyData[]) method.invoke(service, uri);
           }
           catch (Exception e) {
-            NetActivator.getDefault().getLog().log(new Status(Status.WARNING, NetActivator.PLUGIN_ID, "could not access method 'addImageAndLabel' on 'JavaHoover'.", e));
+            NetActivator.getDefault().getLog().log(new Status(Status.WARNING, NetActivator.PLUGIN_ID, "could not access method 'select' on 'IProxyService'.", e));
           }
         }
       }
