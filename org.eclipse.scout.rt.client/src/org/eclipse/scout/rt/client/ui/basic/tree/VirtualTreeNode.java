@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,6 +25,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   private ITree m_tree;
   private ITreeNode m_parentNode;
+  private ITreeNode m_resolvedNode;
   private boolean m_filterAccepted;
   private final Cell m_cell;
   private int m_childNodeIndex;
@@ -34,6 +35,16 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   public void initTreeNode() {
+  }
+
+  @Override
+  public ITreeNode getResolvedNode() {
+    return m_resolvedNode;
+  }
+
+  @Override
+  public void setResolvedNode(ITreeNode resolvedNode) {
+    m_resolvedNode = resolvedNode;
   }
 
   public String getNodeId() {

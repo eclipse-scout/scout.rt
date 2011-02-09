@@ -1110,19 +1110,26 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   public ITreeNode resolveVirtualNode(ITreeNode node) throws ProcessingException {
     if (node instanceof IVirtualTreeNode) {
-      if (node.getTree() == this) {
-        ITreeNode parentNode = node.getParentNode();
-        if (parentNode != null) {
-          try {
-            setTreeChanging(true);
-            //
-            ITreeNode resolvedNode = parentNode.resolveVirtualChildNode(node);
-            return resolvedNode;
-          }
-          finally {
-            setTreeChanging(false);
-          }
-        }
+      IVirtualTreeNode vnode = (IVirtualTreeNode) node;
+      if (vnode.getResolvedNode() != null && vnode.getResolvedNode().getTree() == this) {
+        return vnode.getResolvedNode();
+      }
+      if (vnode.getTree() != this) {
+        return null;
+      }
+      ITreeNode parentNode = vnode.getParentNode();
+      if (parentNode == null) {
+        return null;
+      }
+      try {
+        setTreeChanging(true);
+        //
+        ITreeNode resolvedNode = parentNode.resolveVirtualChildNode(vnode);
+        vnode.setResolvedNode(resolvedNode);
+        return resolvedNode;
+      }
+      finally {
+        setTreeChanging(false);
       }
     }
     return node;
@@ -1496,6 +1503,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private ITreeNode resolveNode(ITreeNode node) {
+    if (node instanceof IVirtualTreeNode && ((IVirtualTreeNode) node).getResolvedNode() != null) {
+      node = ((IVirtualTreeNode) node).getResolvedNode();
+    }
     // unwrapping
     if (node == null) {
       return null;
