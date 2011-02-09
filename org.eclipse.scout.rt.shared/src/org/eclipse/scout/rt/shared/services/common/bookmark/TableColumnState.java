@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,8 @@ public class TableColumnState implements Serializable, Cloneable {
   private int m_width;
   private int m_sortOrder = -1;
   private boolean m_sortAscending;
+  private Boolean m_displayable;
+  private Boolean m_visible;
 
   public TableColumnState() {
   }
@@ -60,6 +62,22 @@ public class TableColumnState implements Serializable, Cloneable {
 
   public void setSortAscending(boolean b) {
     m_sortAscending = b;
+  }
+
+  public Boolean getDisplayable() {
+    return m_displayable;
+  }
+
+  public void setDisplayable(Boolean displayable) {
+    m_displayable = displayable;
+  }
+
+  public Boolean getVisible() {
+    return m_visible;
+  }
+
+  public void setVisible(Boolean visible) {
+    m_visible = visible;
   }
 
   @Override

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import java.util.zip.CRC32;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -34,7 +36,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.shared.data.basic.table.SortSpec;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.NodePageState;
@@ -65,18 +66,30 @@ public final class BookmarkUtility {
     return null;
   }
 
-  public static IColumn resolveColumn(IColumn[] columns, String className) {
-    if (className == null) return null;
+  /**
+   * @param columns
+   *          is the set of available columns to search in
+   * @param className
+   *          is the columnId, simple class name or class name of the columns to find
+   */
+  public static IColumn resolveColumn(IColumn[] columns, String identifier) {
+    if (identifier == null) return null;
     // pass 1: fully qualified name
     for (IColumn c : columns) {
-      if (c.getClass().getName().equals(className)) {
+      if (identifier.equals(c.getClass().getName())) {
         return c;
       }
     }
-    // pass 2: simple name, not case sensitive
-    String simpleClassName = className.replaceAll("^.*\\.", "");
+    // pass 2: columnId
     for (IColumn c : columns) {
-      if (c.getClass().getSimpleName().equalsIgnoreCase(simpleClassName)) {
+      if (identifier.equals(c.getColumnId())) {
+        return c;
+      }
+    }
+    // pass 3: simple name, not case sensitive
+    String simpleClassName = identifier.replaceAll("^.*\\.", "");
+    for (IColumn c : columns) {
+      if (simpleClassName.equalsIgnoreCase(c.getClass().getSimpleName())) {
         return c;
       }
     }
@@ -373,36 +386,69 @@ public final class BookmarkUtility {
     return null;
   }
 
+  @SuppressWarnings({"unchecked", "deprecation"})
   private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean loadChildren) throws ProcessingException {
     ITable table = tablePage.getTable();
+    ColumnSet cs = table.getColumnSet();
     // setup table
     try {
       table.setTableChanging(true);
-      // visible columns and order
-      if (tablePageState.getVisibleColumns() != null) {
-        TreeMap<Integer, IColumn> sortColMap = new TreeMap<Integer, IColumn>();
-        HashMap<IColumn, Boolean> sortColAscMap = new HashMap<IColumn, Boolean>();
+      //legacy support
+      List<TableColumnState> allColumns = tablePageState.getVisibleColumns();
+      if (allColumns == null || allColumns.size() == 0) {
+        allColumns = tablePageState.getAvailableColumns();
+      }
+      if (allColumns != null && allColumns.size() > 0) {
+        // visible columns and width
         ArrayList<IColumn> visibleColumns = new ArrayList<IColumn>();
-        for (TableColumnState colState : tablePageState.getVisibleColumns()) {
-          IColumn col = BookmarkUtility.resolveColumn(table.getColumnSet().getDisplayableColumns(), colState.getClassName());
-          if (col != null && col.isDisplayable()) {
-            if (colState.getWidth() > 0) {
-              col.setWidth(colState.getWidth());
-            }
-            visibleColumns.add(col);
-            if (colState.getSortOrder() >= 0) {
-              sortColMap.put(colState.getSortOrder(), col);
-              sortColAscMap.put(col, colState.isSortAscending());
+        for (TableColumnState colState : allColumns) {
+          //legacy support: null=true
+          if (colState.getVisible() == null || colState.getVisible()) {
+            IColumn col = resolveColumn(cs.getDisplayableColumns(), colState.getClassName());
+            if (col != null && col.isDisplayable()) {
+              if (colState.getWidth() > 0) {
+                col.setWidth(colState.getWidth());
+              }
+              visibleColumns.add(col);
             }
           }
         }
-        if (visibleColumns.size() > 0) {
-          table.getColumnSet().setVisibleColumns(visibleColumns.toArray(new IColumn[0]));
+        List<IColumn> existingVisibleCols = Arrays.asList(cs.getVisibleColumns());
+        if (!existingVisibleCols.equals(visibleColumns)) {
+          cs.setVisibleColumns(visibleColumns.toArray(new IColumn[0]));
         }
-        if (sortColMap.size() > 0 || table.getColumnSet().getSortColumnCount() > 0) {
-          table.getColumnSet().clearSortColumns();
+        //sort order (only respect visible and user-sort columns)
+        boolean userSortValid = true;
+        TreeMap<Integer, IColumn> sortColMap = new TreeMap<Integer, IColumn>();
+        HashMap<IColumn, Boolean> sortColAscMap = new HashMap<IColumn, Boolean>();
+        for (TableColumnState colState : allColumns) {
+          if (colState.getSortOrder() >= 0) {
+            IColumn col = BookmarkUtility.resolveColumn(cs.getColumns(), colState.getClassName());
+            if (col != null) {
+              sortColMap.put(colState.getSortOrder(), col);
+              sortColAscMap.put(col, colState.isSortAscending());
+              if (col.getSortIndex() != colState.getSortOrder()) {
+                userSortValid = false;
+              }
+              if (col.isSortAscending() != colState.isSortAscending()) {
+                userSortValid = false;
+              }
+            }
+          }
+        }
+        HashSet<IColumn<?>> existingExplicitUserSortCols = new HashSet<IColumn<?>>();
+        for (IColumn<?> c : cs.getUserSortColumns()) {
+          if (c.isSortExplicit()) {
+            existingExplicitUserSortCols.add(c);
+          }
+        }
+        if (!sortColMap.values().containsAll(existingExplicitUserSortCols)) {
+          userSortValid = false;
+        }
+        if (!userSortValid) {
+          cs.clearSortColumns();
           for (IColumn col : sortColMap.values()) {
-            table.getColumnSet().addSortColumn(col, sortColAscMap.get(col));
+            cs.addSortColumn(col, sortColAscMap.get(col));
           }
           table.sort();
         }
@@ -493,6 +539,7 @@ public final class BookmarkUtility {
 
   private static TablePageState bmStoreTablePage(IPageWithTable page, IPage childPage) throws ProcessingException {
     ITable table = page.getTable();
+    ColumnSet cs = table.getColumnSet();
     TablePageState state = new TablePageState();
     state.setPageClassName(page.getClass().getName());
     state.setBookmarkIdentifier(page.getBookmarkIdentifier());
@@ -503,22 +550,28 @@ public final class BookmarkUtility {
       state.setSearchFormState(searchForm.getXML("UTF-8"));
       state.setSearchFilterState(searchForm.getSearchFilter().isCompleted(), "" + createSearchFilterCRC(searchForm.getSearchFilter()));
     }
-    SortSpec sortSpec = table.getColumnSet().getSortSpec();
-    ArrayList<TableColumnState> columns = new ArrayList<TableColumnState>();
-    for (IColumn c : table.getColumnSet().getVisibleColumns()) {
+    ArrayList<TableColumnState> allColumns = new ArrayList<TableColumnState>();
+    //add all columns but in user order
+    for (IColumn<?> c : cs.getAllColumnsInUserOrder()) {
       TableColumnState colState = new TableColumnState();
-      colState.setColumnClassName(c.getClass().getName());
+      colState.setColumnClassName(c.getColumnId());
+      colState.setDisplayable(c.isDisplayable());
+      colState.setVisible(c.isDisplayable() && c.isVisible());
       colState.setWidth(c.getWidth());
-      if (sortSpec != null) {
-        int sortOrder = sortSpec.getSortColumnOrder(c.getColumnIndex());
+      if (cs.isUserSortColumn(c) && c.isSortExplicit()) {
+        int sortOrder = cs.getSortColumnIndex(c);
         if (sortOrder >= 0) {
           colState.setSortOrder(sortOrder);
-          colState.setSortAscending(sortSpec.isColumnAscending(sortOrder));
+          colState.setSortAscending(c.isSortAscending());
+        }
+        else {
+          colState.setSortOrder(-1);
         }
       }
-      columns.add(colState);
+      allColumns.add(colState);
     }
-    state.setVisibleColumns(columns);
+    state.setAvailableColumns(allColumns);
+    //
     ArrayList<CompositeObject> pkList = new ArrayList<CompositeObject>();
     for (ITableRow row : table.getSelectedRows()) {
       pkList.add(new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues())));
