@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -520,12 +520,36 @@ public class ColumnSet {
     return m_userSortColumns.size() + m_permanentHeadSortColumns.size() + m_permanentTailSortColumns.size();
   }
 
+  /**
+   * @return all sort columns including permanent-head, user, permanent-tail
+   */
   public IColumn[] getSortColumns() {
     ArrayList<IColumn> list = new ArrayList<IColumn>(getSortColumnCount());
     list.addAll(m_permanentHeadSortColumns);
     list.addAll(m_userSortColumns);
     list.addAll(m_permanentTailSortColumns);
     return list.toArray(new IColumn[list.size()]);
+  }
+
+  /**
+   * @return only user sort columns
+   */
+  public IColumn<?>[] getUserSortColumns() {
+    return m_userSortColumns.toArray(new IColumn[m_userSortColumns.size()]);
+  }
+
+  /**
+   * @return only permanent head sort columns
+   */
+  public IColumn<?>[] getPermanentHeadSortColumns() {
+    return m_permanentHeadSortColumns.toArray(new IColumn[m_permanentHeadSortColumns.size()]);
+  }
+
+  /**
+   * @return only permanent tail sort columns
+   */
+  public IColumn<?>[] getPermanentTailSortColumns() {
+    return m_permanentTailSortColumns.toArray(new IColumn[m_permanentTailSortColumns.size()]);
   }
 
   public SortSpec getSortSpec() {
@@ -580,17 +604,55 @@ public class ColumnSet {
     }
   }
 
+  /**
+   * @return true if the column is either a permanent-head, user or permanent-tail sort column
+   */
   public boolean isSortColumn(IColumn col) {
     return m_permanentHeadSortColumns.contains(col) || m_userSortColumns.contains(col) || m_permanentTailSortColumns.contains(col);
   }
 
+  /**
+   * @return true if the column is a user sort column
+   */
+  public boolean isUserSortColumn(IColumn<?> col) {
+    return m_userSortColumns.contains(col);
+  }
+
+  /**
+   * @return true if the column is a permanent-head sort column
+   */
+  public boolean isPermanentHeadSortColumn(IColumn<?> col) {
+    return m_permanentHeadSortColumns.contains(col);
+  }
+
+  /**
+   * @return true if the column is a permanent-tail sort column
+   */
+  public boolean isPermanentTailSortColumn(IColumn<?> col) {
+    return m_permanentTailSortColumns.contains(col);
+  }
+
+  /**
+   * @return the absolut sort index
+   */
   public int getSortColumnIndex(IColumn col) {
-    return m_userSortColumns.indexOf(col);
+    if (isPermanentHeadSortColumn(col)) {
+      return m_permanentHeadSortColumns.indexOf(col);
+    }
+    if (isUserSortColumn(col)) {
+      return m_permanentHeadSortColumns.size() + m_userSortColumns.indexOf(col);
+    }
+    if (isPermanentTailSortColumn(col)) {
+      return m_permanentHeadSortColumns.size() + m_userSortColumns.size() + m_permanentTailSortColumns.indexOf(col);
+    }
+    return -1;
   }
 
   /**
    * add column at beginning of sort columns but keep sort history of max
    * keepHistoryCount last columns
+   * <p>
+   * The column is added as a user sort column
    */
   public void setSortColumn(IColumn col, boolean ascending, int keepHistoryCount) {
     col = resolveColumn(col);
@@ -621,6 +683,12 @@ public class ColumnSet {
     }
   }
 
+  /**
+   * add column to the user sort columns
+   * <p>
+   * see also {@link #addPermanentHeadSortColumn(IColumn, boolean)} and
+   * {@link #addPermanentTailSortColumn(IColumn, boolean)}
+   */
   public void addSortColumn(IColumn col, boolean ascending) {
     col = resolveColumn(col);
     if (col != null) {
@@ -683,6 +751,11 @@ public class ColumnSet {
     }
   }
 
+  /**
+   * only clears user sort columns.
+   * <p>
+   * see also {@link #clearPermanentHeadSortColumns()} and {@link #clearPermanentTailSortColumns()}
+   */
   public void clearSortColumns() {
     if (m_userSortColumns.size() == 0) {
       return;
