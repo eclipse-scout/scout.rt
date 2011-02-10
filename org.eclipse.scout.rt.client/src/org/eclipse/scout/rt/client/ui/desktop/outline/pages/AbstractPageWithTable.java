@@ -453,6 +453,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         //
         execPopulateTable();
       }
+      catch (ProcessingException pe) {
+        throw pe;
+      }
+      catch (Throwable t) {
+        throw new ProcessingException(t.getMessage(), t);
+      }
       finally {
         m_table.setTableChanging(false);
       }

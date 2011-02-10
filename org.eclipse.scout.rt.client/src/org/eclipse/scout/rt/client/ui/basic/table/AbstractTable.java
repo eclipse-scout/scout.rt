@@ -902,18 +902,48 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     else {
+      // all calls to further methods are wrapped into a try-catch block so that the change counters are adjusted correctly
       if (m_tableChanging > 0) {
+        Throwable saveEx = null;
         if (m_tableChanging == 1) {
-          //will be going to zero, but process decorations here, so events are added to the event buffer
-          processDecorationBuffer();
-          if (!m_sortValid) {
-            sort();
+          try {
+            //will be going to zero, but process decorations here, so events are added to the event buffer
+            processDecorationBuffer();
+            if (!m_sortValid) {
+              sort();
+            }
+          }
+          catch (Throwable t) {
+            saveEx = t;
           }
         }
         m_tableChanging--;
         if (m_tableChanging == 0) {
-          processEventBuffer();
-          propertySupport.setPropertiesChanging(false);
+          try {
+            processEventBuffer();
+          }
+          catch (Throwable t) {
+            if (saveEx == null) {
+              saveEx = t;
+            }
+          }
+          try {
+            propertySupport.setPropertiesChanging(false);
+          }
+          catch (Throwable t) {
+            if (saveEx == null) {
+              saveEx = t;
+            }
+          }
+        }
+        if (saveEx == null) {
+          return;
+        }
+        else if (saveEx instanceof RuntimeException) {
+          throw (RuntimeException) saveEx;
+        }
+        else if (saveEx instanceof Error) {
+          throw (Error) saveEx;
         }
       }
     }

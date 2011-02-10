@@ -184,3 +184,8 @@ Solution:
 - Change of SwingTableModel#isCellEditable() --> synchronization with model thread not neccessary anymore as property can be evaluated thread safe. (Java bean property)
 - Change of SwingScoutTable#prepareRenderer() --> synchronization with model thread for querying editable state not neccessary anymore as property can be evaluated thread safe. (Java bean property)
 Migration: None
+
+10.02.2011 abr
+bsi ticket 98'890
+fixed model change counters running out of sync if unchecked exceptions are thrown.
+Migration: None
