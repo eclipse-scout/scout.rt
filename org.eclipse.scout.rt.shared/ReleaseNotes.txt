@@ -18,3 +18,7 @@ ComposerUtility -> DataModelUtility
 IComposerAttribute -> IDataModelAttribute
 IComposerOp -> IDataModelAttributeOp
 IComposerEntity -> IDataModelEntity
+
+10.02.2011 abr
+Ticket 98'889
+AbstractPropertyData.isValueSet() was not taken into account when importing a form data.
