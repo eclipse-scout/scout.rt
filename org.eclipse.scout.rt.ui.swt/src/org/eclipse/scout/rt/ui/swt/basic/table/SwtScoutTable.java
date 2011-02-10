@@ -696,7 +696,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
          * imo, 04.06.2009: added swt-side optimistic lock check Method
          * autoSizeColumns indirectly calls this code by setting the width on a
          * table column if this code calls scout using synchronizer it may
-         * invoke pending swing jobs while waiting, which can execute a dispose
+         * invoke pending swt jobs while waiting, which can execute a dispose
          * form job. After that job all columns are disposed. This results in
          * WidgetDisposed exceptions on line with entry.getKey().setWidth(...)
          */
