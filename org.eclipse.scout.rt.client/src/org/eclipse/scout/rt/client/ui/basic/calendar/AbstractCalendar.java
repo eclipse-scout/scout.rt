@@ -245,8 +245,12 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       if (m_calendarChanging > 0) {
         m_calendarChanging--;
         if (m_calendarChanging == 0) {
-          processChangeBuffer();
-          propertySupport.setPropertiesChanging(false);
+          try {
+            processChangeBuffer();
+          }
+          finally {
+            propertySupport.setPropertiesChanging(false);
+          }
         }
       }
     }

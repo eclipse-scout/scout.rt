@@ -759,9 +759,13 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
         m_tableChanging--;
         if (m_tableChanging == 0) {
           // 1 --> 0
-          validateTimeScale();
-          processChangeBuffer();
-          propertySupport.setPropertiesChanging(false);
+          try {
+            validateTimeScale();
+            processChangeBuffer();
+          }
+          finally {
+            propertySupport.setPropertiesChanging(false);
+          }
         }
       }
     }

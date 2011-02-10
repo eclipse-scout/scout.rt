@@ -656,8 +656,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       if (m_treeChanging > 0) {
         m_treeChanging--;
         if (m_treeChanging == 0) {
-          processChangeBuffer();
-          propertySupport.setPropertiesChanging(false);
+          try {
+            processChangeBuffer();
+          }
+          finally {
+            propertySupport.setPropertiesChanging(false);
+          }
         }
       }
     }

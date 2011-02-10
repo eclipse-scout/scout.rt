@@ -196,3 +196,8 @@ Change in Scout-Client:
 - new Property on IForm: PROP_PERSPECTIVE_ID. This is used from SWT to ensure a form is opend in a chosen perspective. No use in Swing.
 
 Migration: Swing-Gui: none / SWT-Gui: if application uses more than one perspective, changes may be necessary. Please consult with me (s.leicht@bsiag.com / 947)
+
+10.02.2011 abr
+bsi ticket 98'890
+fixed model change counters running out of sync if unchecked exceptions are thrown.
+Migration: None
