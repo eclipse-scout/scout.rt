@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.commons.MailUtility;
+import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.osgi.framework.Bundle;
 
@@ -39,6 +39,7 @@ import org.osgi.framework.Bundle;
  * base-name: same as war-path
  */
 public class ResourceServlet extends HttpServletEx {
+
   private static final long serialVersionUID = 1L;
   private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   private static final String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
@@ -88,7 +89,7 @@ public class ResourceServlet extends HttpServletEx {
   protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
     String pathInfo = req.getPathInfo();
     if (pathInfo == null || pathInfo.equals("")) {
-      res.sendRedirect("/");
+      res.sendRedirect(req.getRequestURI() + "/");
     }
     else {
       if (!writeStaticResource(req, res)) {
@@ -136,7 +137,7 @@ public class ResourceServlet extends HttpServletEx {
     contentLength = connection.getContentLength();
     if (contentType == null) {
       String[] a = pathInfo.split("[.]");
-      contentType = MailUtility.getContentTypeForExtension(a[a.length - 1]);
+      contentType = FileUtility.getContentTypeForExtension(a[a.length - 1]);
     }
     InputStream is = null;
     try {
