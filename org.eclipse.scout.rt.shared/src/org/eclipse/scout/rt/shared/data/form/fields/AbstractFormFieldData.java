@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -90,7 +90,7 @@ public abstract class AbstractFormFieldData implements Serializable {
 
   public AbstractPropertyData getPropertyById(String id) {
     for (AbstractPropertyData p : m_propertyMap.values()) {
-      if (p.getClass().getSimpleName().equalsIgnoreCase(id)) {
+      if (p.getPropertyId().equalsIgnoreCase(id)) {
         return p;
       }
     }
