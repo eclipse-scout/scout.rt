@@ -412,7 +412,6 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
       public void run() {
         getScoutObject().getUIFacade().fireGuiDetached();
         getScoutObject().getUIFacade().fireDesktopClosingFromUI();
-
       }
     };
 

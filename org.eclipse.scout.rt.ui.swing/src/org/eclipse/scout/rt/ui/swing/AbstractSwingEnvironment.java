@@ -460,8 +460,8 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       new ClientSyncJob("Desktop opened", session) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          desktop.getUIFacade().fireGuiAttached();
           desktop.getUIFacade().fireDesktopOpenedFromUI();
+          desktop.getUIFacade().fireGuiAttached();
         }
       }.schedule();
     }

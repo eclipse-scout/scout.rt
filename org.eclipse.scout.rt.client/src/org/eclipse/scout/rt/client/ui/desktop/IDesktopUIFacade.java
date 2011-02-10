@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,12 +32,6 @@ public interface IDesktopUIFacade {
    * displayed
    */
   void fireDesktopOpenedFromUI();
-
-  /**
-   * GUI fires this event when it is in the process of reseting the workbench /
-   * application
-   */
-  void fireDesktopResetFromUI();
 
   /**
    * GUI fires this event when it is in the process of closing the workbench /

@@ -543,6 +543,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     propertySupport.setPropertyString(PROP_ICON_ID, iconId);
   }
 
+  public String getPerspectiveId() {
+    return propertySupport.getPropertyString(PROP_PERSPECTIVE_ID);
+  }
+
+  public void setPerspectiveId(String perspectiveId) {
+    propertySupport.setPropertyString(PROP_PERSPECTIVE_ID, perspectiveId);
+  }
+
   /**
    * Register a {@link DataChangeListener} on the desktop for these dataTypes<br>
    * Example:
@@ -707,7 +715,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   public void waitFor() throws ProcessingException {
     // check if the desktop is observing this process
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-    if (desktop == null || !desktop.isGuiAvailable()) {
+    if (desktop == null || !desktop.isOpened()) {
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui", null, WAIT_FOR_ERROR_CODE);
     }
     // wait

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.ui.swt.keystroke.IKeyStrokeManager;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStrokeFilter;
 import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
+import org.eclipse.scout.rt.ui.swt.window.desktop.editor.AbstractScoutEditorPart;
 import org.eclipse.scout.rt.ui.swt.window.desktop.tray.ISwtScoutTray;
 import org.eclipse.scout.rt.ui.swt.window.desktop.view.AbstractScoutView;
 import org.eclipse.swt.SWT;
@@ -42,6 +43,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.IEditorInput;
 
 public interface ISwtEnvironment {
 
@@ -187,6 +189,8 @@ public interface ISwtEnvironment {
 
   AbstractScoutView getViewPart(String viewId);
 
+  AbstractScoutEditorPart getEditorPart(IEditorInput editorInput, String editorId);
+
   boolean acquireActivateViewLock();
 
   boolean isActivateViewLockAcquired();
@@ -240,5 +244,4 @@ public interface ISwtEnvironment {
   Rectangle getPopupOwnerBounds();
 
   void setPopupOwner(Control owner, Rectangle ownerBounds);
-
 }

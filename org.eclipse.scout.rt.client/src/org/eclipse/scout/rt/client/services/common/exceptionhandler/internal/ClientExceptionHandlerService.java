@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -63,7 +63,7 @@ public class ClientExceptionHandlerService extends AbstractService implements IE
           }
           // check if the desktop is observing this process
           IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-          if (desktop != null && desktop.isGuiAvailable()) {
+          if (desktop != null && desktop.isOpened()) {
             new ErrorHandler(pe).showMessageBox();
           }
         }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swt.window.desktop.editor;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.swt.graphics.Image;
@@ -70,7 +71,23 @@ public class ScoutFormEditorInput implements IEditorInput {
       return false;
     }
     ScoutFormEditorInput other = (ScoutFormEditorInput) obj;
-    return this.getScoutObject().equals(other.getScoutObject());
+    IForm form = this.getScoutObject();
+    IForm otherForm = other.getScoutObject();
+    if (form.getClass().getName().equals(otherForm.getClass().getName())
+        && form.getHandler().isOpenExclusive() && otherForm.getHandler().isOpenExclusive()) {
+      try {
+        Object key = form.computeExclusiveKey();
+        Object otherKey = otherForm.computeExclusiveKey();
+        if (key == null || otherKey == null) {
+          return false;
+        }
+        return key.equals(otherKey);
+      }
+      catch (ProcessingException e) {
+        return false;
+      }
+    }
+    return form.equals(otherForm);
   }
 
   @Override

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -99,9 +98,6 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
       m_layoutLock.release();
       getSwtContentPane().setRedraw(true);
       getSwtContentPane().layout(true, true);
-    }
-    if (getViewSite().getPage().getActivePart() == getViewSite().getPart()) {
-      firePartActivatedFromUI();
     }
   }
 
@@ -295,17 +291,6 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
   }
 
   private class P_ViewListener extends PartListener {
-    @Override
-    public void partOpened(IWorkbenchPartReference partRef) {
-      if (!getSwtEnvironment().isInitialized()) {
-        Display.getCurrent().asyncExec(new Runnable() {
-          public void run() {
-            getSwtEnvironment().ensureInitialized();
-          }
-        });
-      }
-    }
-
     @Override
     public void partActivated(IWorkbenchPartReference partRef) {
       if (partRef.getPart(false).equals(getViewSite().getPart())) {

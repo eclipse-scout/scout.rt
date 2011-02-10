@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,87 +32,70 @@ public abstract class AbstractSwtStartup implements IStartup {
   protected abstract ISwtEnvironment getSwtEnvironment();
 
   public void earlyStartup() {
-
     final IWorkbench workbench = PlatformUI.getWorkbench();
-    workbench.getDisplay().asyncExec(new Runnable() {
-      public void run() {
-        boolean perspectiveOpend = false;
-        IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (activeWorkbenchWindow != null) {
-          IWorkbenchPage activePage = activeWorkbenchWindow.getActivePage();
-          if (activePage != null) {
-            if (activePage.getPerspective() != null) {
-              perspectiveOpend = handlePerspectiveOpened(activePage.getPerspective().getId());
-            }
-          }
-          if (!perspectiveOpend) {
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(new P_PerspectiveListener());
-          }
+    workbench.getDisplay().asyncExec(new P_HandleInitWorkbench());
+  }
+
+  private class P_HandleInitWorkbench implements Runnable {
+    public void run() {
+      IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+      if (activeWorkbenchWindow != null) {
+        IWorkbenchPage activePage = activeWorkbenchWindow.getActivePage();
+        if (activePage == null || activePage.getPerspective() == null) {
+          PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(new P_PerspectiveListener());
         }
-        // If the window is not active on startup no active workbenchWindow is
-        // found
         else {
-          PlatformUI.getWorkbench().addWindowListener(new WindowListener() {
-            @Override
-            public void windowActivated(IWorkbenchWindow window) {
-              PlatformUI.getWorkbench().removeWindowListener(this);
-              //
-              PerspectiveAdapter listener = new P_PerspectiveListener();
-              window.addPerspectiveListener(listener);
-              // check if perspective is already open
-              if (window.getActivePage() != null) {
-                for (IPerspectiveDescriptor pd : window.getActivePage().getOpenPerspectives()) {
-                  if (getSwtEnvironment().getPerspectiveId() != null && getSwtEnvironment().getPerspectiveId().equals(pd.getId())) {
-                    listener.perspectiveOpened(window.getActivePage(), pd);
-                    break;
-                  }
-                }
-              }
-            }
-          });
+          handlePerspectiveOpened();
         }
       }
-    });
+
+      //If the window is not active on startup no active workbenchWindow is found
+      else {
+        PlatformUI.getWorkbench().addWindowListener(new WindowListener() {
+          @Override
+          public void windowActivated(IWorkbenchWindow window) {
+            PlatformUI.getWorkbench().removeWindowListener(this);
+            //check if still no perspective open
+            if (window.getActivePage() == null || window.getActivePage().getPerspective() == null) {
+              window.addPerspectiveListener(new P_PerspectiveListener());
+            }
+            else {
+              handlePerspectiveOpened();
+            }
+          }
+        });
+      }
+    }
   }
+
+  protected String getInitWorkbenchTaskText() {
+    return ScoutTexts.get("ScoutStarting");
+  }
+
+  private synchronized void handlePerspectiveOpened() {
+    final P_InitWorkbenchJob j = new P_InitWorkbenchJob(getInitWorkbenchTaskText());
+    j.schedule(10);
+  }
+
+  //
 
   private class P_PerspectiveListener extends PerspectiveAdapter {
     @Override
     public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-      // getSwtEnvironment().ensureInitialized();
-      handlePerspectiveOpened(perspective.getId());
-      PlatformUI.getWorkbench().getActiveWorkbenchWindow().removePerspectiveListener(this);
-    }
+      page.getWorkbenchWindow().removePerspectiveListener(P_PerspectiveListener.this);
 
-    @Override
-    public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-      // getSwtEnvironment().ensureInitialized();
-      handlePerspectiveOpened(perspective.getId());
-      PlatformUI.getWorkbench().getActiveWorkbenchWindow().removePerspectiveListener(this);
+      handlePerspectiveOpened();
     }
   }
 
-  private synchronized boolean handlePerspectiveOpened(String perspectiveId) {
-    // make sure that the desktop is only started once
-    if (getSwtEnvironment().getPerspectiveId().equals(perspectiveId)) {
-      final P_DesktopOpenedJob j = new P_DesktopOpenedJob(getDesktopOpenedTaskText());
-      j.schedule(10);
-      return true;
-    }
-    return false;
-  }
-
-  protected String getDesktopOpenedTaskText() {
-    return ScoutTexts.get("ScoutStarting");
-  }
-
-  private final class P_DesktopOpenedJob extends UIJob {
-    public P_DesktopOpenedJob(String name) {
+  private final class P_InitWorkbenchJob extends UIJob {
+    public P_InitWorkbenchJob(String name) {
       super(name);
     }
 
     @Override
     public IStatus runInUIThread(IProgressMonitor monitor) {
-      monitor.beginTask(getDesktopOpenedTaskText(), IProgressMonitor.UNKNOWN);
+      monitor.beginTask(getInitWorkbenchTaskText(), IProgressMonitor.UNKNOWN);
       getSwtEnvironment().ensureInitialized();
       monitor.done();
       return Status.OK_STATUS;

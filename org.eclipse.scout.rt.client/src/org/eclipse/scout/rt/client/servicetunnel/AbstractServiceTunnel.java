@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -204,7 +204,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
     }
     // session thread sync
     m_notifiedVersionMismatchToUser = true;
-    if (m_clientSession.getDesktop() != null && m_clientSession.getDesktop().isGuiAvailable()) {
+    if (m_clientSession.getDesktop() != null && m_clientSession.getDesktop().isOpened()) {
       ve.consume();
       int response = MessageBox.showYesNoCancelMessage(ScoutTexts.get("VersionMismatchTitle"), ScoutTexts.get("VersionMismatchTextXY", ve.getOldVersion(), ve.getNewVersion()), ScoutTexts.get("VersionMismatchAction"));
       switch (response) {

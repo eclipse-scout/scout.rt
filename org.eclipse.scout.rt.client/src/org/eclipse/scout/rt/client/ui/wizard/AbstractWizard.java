@@ -912,7 +912,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   public void waitFor() throws ProcessingException {
     // check if the desktop is observing this process
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-    if (desktop == null || !desktop.isGuiAvailable()) {
+    if (desktop == null || !desktop.isOpened()) {
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui", null, WAIT_FOR_ERROR_CODE);
     }
     try {

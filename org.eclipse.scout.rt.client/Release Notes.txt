@@ -49,10 +49,10 @@ old:
       ...
     }
 new:
-	protected void execRowClick(ITableRow row) throws ProcessingException {
-	  IColumn col=getContextColumn();
-	  ...
-	}
+  protected void execRowClick(ITableRow row) throws ProcessingException {
+    IColumn col=getContextColumn();
+    ...
+  }
 
 17.07.2010 imo
 Merged Rayo and Scout core widget copies of DateField, TimeField. Created new combined popup window with date/time and a new analog clock.
@@ -184,3 +184,15 @@ Solution:
 - Change of SwingTableModel#isCellEditable() --> synchronization with model thread not neccessary anymore as property can be evaluated thread safe. (Java bean property)
 - Change of SwingScoutTable#prepareRenderer() --> synchronization with model thread for querying editable state not neccessary anymore as property can be evaluated thread safe. (Java bean property)
 Migration: None
+
+10.02.2011 sle
+In SWT Perspective-Handling was never really thought through and tested with more than one perspective and/or more than one scout-application running parallel. This was now done, implemented and tested with Kudi/Bap. (see Visio)
+In general can be said, that now no perspective has to be active/open to run a scout-application. When the Workbench is started the existing scout-application will be started and the model-desktop open. As soon as the perspective is active execGuiAttached will be called on the model-desktop. When the perspective is closed execGuiDettached is called. When a perspective is reset detached/attached is called.
+
+Change in Scout-Client:
+- Everywhere desktop.isGuiAvailable() was called now desktop.isOpened() is called. For Swing there is no change, the two states are changed at the same location.
+- AbstractDesktop.closeInternal goes through all open forms and calls removeForm
+- IDesktopUIFacade has now fireDesktopResetFromUI anymore. This method was used from AbstractSwtEnvironment
+- new Property on IForm: PROP_PERSPECTIVE_ID. This is used from SWT to ensure a form is opend in a chosen perspective. No use in Swing.
+
+Migration: Swing-Gui: none / SWT-Gui: if application uses more than one perspective, changes may be necessary. Please consult with me (s.leicht@bsiag.com / 947)

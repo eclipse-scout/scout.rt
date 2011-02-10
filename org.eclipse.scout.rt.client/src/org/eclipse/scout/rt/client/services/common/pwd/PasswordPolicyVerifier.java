@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -55,7 +55,7 @@ public class PasswordPolicyVerifier {
       LOG.error("desktop is null");
       return false;
     }
-    if (!desktop.isGuiAvailable()) {
+    if (!desktop.isOpened()) {
       LOG.error("desktop is available, but there is not yet a GUI attached. Make sure to calll this verifier at earliest in the Desktop.execGuiAvailable callback");
       return false;
     }

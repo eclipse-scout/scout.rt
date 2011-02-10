@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -59,7 +59,7 @@ public final class DesktopUtility {
 
   public static IAction findToolAction(String qName, ISwtEnvironment environment) {
     IClientSession clientSession = environment.getClientSession();
-    if (clientSession != null) {
+    if (clientSession != null && clientSession.getDesktop() != null) {
       for (IAction a : clientSession.getDesktop().getActions()) {
         IAction found = findActionImplRec(qName, a);
         if (found != null) {

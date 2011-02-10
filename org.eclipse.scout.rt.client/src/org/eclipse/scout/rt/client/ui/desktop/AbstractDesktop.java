@@ -1197,6 +1197,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   public void closeInternal() throws ProcessingException {
+    for (IForm view : getViewStack()) {
+      removeForm(view);
+    }
+    for (IForm dialog : getDialogStack()) {
+      removeForm(dialog);
+    }
     execClosing();
     fireDesktopClosed();
   }
@@ -1274,21 +1280,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
-    public void fireDesktopResetFromUI() {
-      try {
-        setOpenedInternal(false);
-        execClosing();
-        execOpened();
-        setOpenedInternal(true);
-      }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      }
-      catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
-      }
-    }
-
     public void fireDesktopClosingFromUI() {
       setOpenedInternal(false);
       ClientSyncJob.getCurrentSession().stopSession();
@@ -1297,7 +1288,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     public IMenu[] fireTrayPopupFromUI() {
       return fireTrayPopup();
     }
-
   }
 
   private class P_ActiveOutlineListener extends TreeAdapter implements PropertyChangeListener {

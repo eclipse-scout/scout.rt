@@ -20,3 +20,6 @@ new:
           return false;
         }
       });
+
+10.02.2011 sle
+see Release Notes in org.eclipse.scout.rt.client

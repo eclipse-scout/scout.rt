@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.concurrent.BrokenBarrierException;
@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
@@ -137,35 +138,50 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     IDLE, DETECTING, BUSY
   }
 
-  private SwtScoutSynchronizer m_synchronizer;
-  private BusyStatus m_busyStatus;
-  private SwtIconLocator m_iconLocator;
-  private ColorFactory m_colorFactory;
-  private KeyStrokeManager m_keyStrokeManager;
-  private ScoutFormToolkit m_formToolkit;
-  private FormFieldFactory m_formFieldFactory;
-  private EventListenerList m_environmentListeners;
+  private final Bundle m_applicationBundle;
+
   private final String m_perspectiveId;
   private final Class<? extends IClientSession> m_clientSessionClass;
   private IClientSession m_clientSession;
-  private HashMap<String, String> m_scoutPartIdToUiPartId;
-  private P_ScoutDesktopListener m_scoutDesktopListener;
-  private IJobChangeListener m_jobChangeListener;
-  private HashMap<IForm, ISwtScoutPart> m_openForms;
-  private FontRegistry m_fontRegistry;
-  private PropertyChangeSupport m_propertySupport;
+
   private int m_status;
-  private List<ISwtKeyStroke> m_desktopKeyStrokes;
-  private Clipboard m_clipboard;
-  private ISwtScoutTray m_trayComposite;
-  private P_ScoutDesktopPropertyListener m_desktopPropertyListener;
-  private boolean m_startDesktopCalled;
-  private OptimisticLock m_activateViewLock;
-  private final Bundle m_applicationBundle;
+
+  private SwtScoutSynchronizer m_synchronizer;
+  private BusyStatus m_busyStatus;
+
   private final Object m_immediateSwtJobsLock = new Object();
   private final List<Runnable> m_immediateSwtJobs = new ArrayList<Runnable>();
+
+  private Clipboard m_clipboard;
+  private ColorFactory m_colorFactory;
+  private FontRegistry m_fontRegistry;
+  private SwtIconLocator m_iconLocator;
+  private ISwtScoutTray m_trayComposite;
+
+  private List<ISwtKeyStroke> m_desktopKeyStrokes;
+  private KeyStrokeManager m_keyStrokeManager;
+
   private Control m_popupOwner;
   private Rectangle m_popupOwnerBounds;
+
+  private ScoutFormToolkit m_formToolkit;
+  private FormFieldFactory m_formFieldFactory;
+
+  private IJobChangeListener m_jobChangeListener;
+  private PropertyChangeSupport m_propertySupport;
+
+  private boolean m_startDesktopCalled;
+  private boolean m_activateDesktopCalled;
+  private OptimisticLock m_activateViewLock;
+
+  private EventListenerList m_environmentListeners;
+
+  private HashMap<String, String> m_scoutPartIdToUiPartId;
+  private HashMap<IForm, ISwtScoutPart> m_openForms;
+  private P_ScoutDesktopListener m_scoutDesktopListener;
+  private P_ScoutDesktopPropertyListener m_desktopPropertyListener;
+
+  private P_PerspectiveListener m_perspectiveListener;
 
   public AbstractSwtEnvironment(Bundle applicationBundle, String perspectiveId, Class<? extends IClientSession> clientSessionClass) {
     m_applicationBundle = applicationBundle;
@@ -184,9 +200,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   public Bundle getApplicationBundle() {
     return m_applicationBundle;
-  }
-
-  protected void execScoutStarted() {
   }
 
   private void stopScout() throws CoreException {
@@ -215,6 +228,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         m_formToolkit = null;
       }
       detachScoutListeners();
+      detachSWTListeners();
       if (m_jobChangeListener != null) {
         Job.getJobManager().removeJobChangeListener(m_jobChangeListener);
         m_jobChangeListener = null;
@@ -226,6 +240,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
       m_status = SwtEnvironmentEvent.STOPPED;
       fireEnvironmentChanged(new SwtEnvironmentEvent(this, SwtEnvironmentEvent.STOPPED));
+      setStartDesktopCalled(false);
     }
     finally {
       if (m_status != SwtEnvironmentEvent.STOPPED) {
@@ -233,10 +248,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         fireEnvironmentChanged(new SwtEnvironmentEvent(this, SwtEnvironmentEvent.STARTED));
       }
     }
-  }
-
-  protected void execScoutStopped() {
-
   }
 
   /**
@@ -267,8 +278,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     if (partId == null) {
       return "";
     }
-    Set<Entry<String, String>> entrySet = m_scoutPartIdToUiPartId.entrySet();
-    for (Entry<String, String> entry : entrySet) {
+    for (Entry<String, String> entry : m_scoutPartIdToUiPartId.entrySet()) {
       if (entry.getValue().equals(partId)) {
         return entry.getKey();
       }
@@ -288,6 +298,16 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     m_activateViewLock.release();
   }
 
+  public IViewPart findViewPart(String viewId) {
+    if (viewId != null) {
+      IViewDescriptor viewRef = PlatformUI.getWorkbench().getViewRegistry().find(viewId);
+      if (viewRef != null && !viewRef.getAllowMultiple()) {
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(viewId);
+      }
+    }
+    return null;
+  }
+
   public AbstractScoutView getViewPart(String viewId) {
     if (viewId != null) {
       String secondaryId = null;
@@ -298,12 +318,10 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       try {
         IViewPart view = null;
         if (secondaryId == null) {
-          view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(viewId);
+          view = findViewPart(viewId);
+
           if (view == null) {
             view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(viewId);
-          }
-          else {
-            LOG.warn("DUPLICATED VIEW OPEND; viewID:" + viewId);
           }
         }
         else {
@@ -323,12 +341,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return null;
   }
 
-  protected ScoutFormEditorInput getEditorInput(IForm form) {
-    ScoutFormEditorInput editorInput = new ScoutFormEditorInput(form, this);
-    return editorInput;
-  }
-
-  private AbstractScoutEditorPart getEditorPart(IEditorInput editorInput, String editorId) {
+  public AbstractScoutEditorPart getEditorPart(IEditorInput editorInput, String editorId) {
     if (editorInput != null && editorId != null) {
       try {
         IEditorPart editor = null;
@@ -336,9 +349,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
         if (editor == null) {
           editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(editorInput, editorId);
-        }
-        else {
-          LOG.warn("DUPLICATED EDITOR OPEND; viewID:" + editorId);
         }
         if (!(editor instanceof AbstractScoutEditorPart)) {
           LOG.warn("editors used in scout's enviromnent must be extensions of AbstractScoutEditorPart");
@@ -359,8 +369,8 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   public final void ensureInitialized() {
-    if (m_status == SwtEnvironmentEvent.INACTIVE) {
-      m_clipboard = new Clipboard(getDisplay());
+    if (m_status == SwtEnvironmentEvent.INACTIVE
+        || m_status == SwtEnvironmentEvent.STOPPED) {
       try {
         init();
       }
@@ -371,6 +381,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   private synchronized void init() throws CoreException {
+    if (m_status == SwtEnvironmentEvent.STARTING
+        || m_status == SwtEnvironmentEvent.STARTED
+        || m_status == SwtEnvironmentEvent.STOPPING) {
+      return;
+    }
     m_status = SwtEnvironmentEvent.INACTIVE;
     // must be called in display thread
     if (Thread.currentThread() != getDisplay().getThread()) {
@@ -386,7 +401,9 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       for (IWorkbenchPage workbenchPage : workbenchWindow.getPages()) {
         for (IViewReference viewReference : workbenchPage.getViewReferences()) {
           if (m_scoutPartIdToUiPartId.containsValue(viewReference.getId())) {
-            workbenchPage.hideView(viewReference);
+            if (workbenchPage.isPartVisible(viewReference.getPart(false))) {
+              workbenchPage.hideView(viewReference);
+            }
           }
         }
       }
@@ -394,6 +411,9 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     //
     try {
       m_status = SwtEnvironmentEvent.STARTING;
+
+      m_clipboard = new Clipboard(getDisplay());
+
       fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
       IClientSession tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(m_clientSessionClass);
       if (!tempClientSession.isActive()) {
@@ -403,7 +423,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       else {
         m_clientSession = tempClientSession;
       }
-      if (m_clientSession != null && m_synchronizer == null) {
+      if (m_synchronizer == null) {
         m_synchronizer = new SwtScoutSynchronizer(this);
       }
       if (m_jobChangeListener == null) {
@@ -465,58 +485,54 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       m_keyStrokeManager = new KeyStrokeManager(this);
       m_fontRegistry = new FontRegistry(getDisplay());
       m_formToolkit = createScoutFormToolkit(getDisplay());
-      if (m_clientSession != null) {
-        attachScoutListeners();
-        setStatusFromScout();
-        getDisplay().asyncExec(new Runnable() {
-          public void run() {
-            applyScoutState();
-          }
-        });
-      }
-      PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(new P_PerspectiveListener());
-      IPerspectiveDescriptor activePerspective = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getPerspective();
-      if (activePerspective != null) {
-        handlePerspectiveOpened(activePerspective.getId());
-      }
-      if (m_clientSession != null) {
-        // desktop keystokes
-        for (IKeyStroke scoutKeyStroke : getClientSession().getDesktop().getKeyStrokes()) {
-          ISwtKeyStroke[] swtStrokes = SwtUtility.getKeyStrokes(scoutKeyStroke, this);
-          for (ISwtKeyStroke swtStroke : swtStrokes) {
-            m_desktopKeyStrokes.add(swtStroke);
-            addGlobalKeyStroke(swtStroke);
+      attachScoutListeners();
+      attachSWTListeners();
+      IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+      if (activePage != null) {
+        IPerspectiveDescriptor activePerspective = activePage.getPerspective();
+        if (activePerspective != null) {
+          String perspectiveId = activePerspective.getId();
+          if (handlePerspectiveOpened(perspectiveId)) {
+            handlePerspectiveActivated(perspectiveId);
           }
         }
-        // environment shutdownhook
-        PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
-          public boolean preShutdown(IWorkbench workbench, boolean forced) {
-            return true;
-          }
-
-          public void postShutdown(IWorkbench workbench) {
-            Runnable t = new Runnable() {
-              @Override
-              public void run() {
-                getScoutDesktop().getUIFacade().fireGuiDetached();
-                getScoutDesktop().getUIFacade().fireDesktopClosingFromUI();
-              }
-            };
-            JobEx job = invokeScoutLater(t, 0);
-            try {
-              job.join(600000);
-            }
-            catch (InterruptedException e) {
-              //nop
-            }
-          }
-        });
       }
+      // desktop keystokes
+      for (IKeyStroke scoutKeyStroke : getClientSession().getDesktop().getKeyStrokes()) {
+        ISwtKeyStroke[] swtStrokes = SwtUtility.getKeyStrokes(scoutKeyStroke, this);
+        for (ISwtKeyStroke swtStroke : swtStrokes) {
+          m_desktopKeyStrokes.add(swtStroke);
+          addGlobalKeyStroke(swtStroke);
+        }
+      }
+      // environment shutdownhook
+      PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
+        public boolean preShutdown(IWorkbench workbench, boolean forced) {
+          return true;
+        }
+
+        public void postShutdown(IWorkbench workbench) {
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              getScoutDesktop().getUIFacade().fireGuiDetached();
+              getScoutDesktop().getUIFacade().fireDesktopClosingFromUI();
+            }
+          };
+          JobEx job = invokeScoutLater(t, 0);
+          try {
+            job.join(600000);
+          }
+          catch (InterruptedException e) {
+            //nop
+          }
+        }
+      });
       // notify ui available
       Runnable job = new Runnable() {
         @Override
         public void run() {
-          getScoutDesktop().getUIFacade().fireGuiAttached();
+          getScoutDesktop().getUIFacade().fireDesktopOpenedFromUI();
         }
       };
       invokeScoutLater(job, 0);
@@ -540,13 +556,12 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     mbox.open();
   }
 
-  private void fireDesktopOpenedFromUI() {
-    getScoutDesktop().getUIFacade().fireDesktopOpenedFromUI();
-    // hide ScoutViews with no Forms
-    invokeSwtLater(new Runnable() {
-      @Override
-      public void run() {
-        IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+  // hide ScoutViews with no Forms
+  private class P_HideScoutViews implements Runnable {
+
+    public void run() {
+      IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+      if (activePage != null) {
         for (IViewReference viewReference : activePage.getViewReferences()) {
           IViewPart view = viewReference.getView(false);
           if (view != null && view instanceof AbstractScoutView) {
@@ -559,11 +574,26 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           }
         }
       }
-    });
+    }
   }
 
-  private void fireDesktopResetFromUI() {
-    getScoutDesktop().getUIFacade().fireDesktopResetFromUI();
+  private void fireGuiAttachedFromUI() {
+    if (getScoutDesktop() != null) {
+      getScoutDesktop().getUIFacade().fireGuiAttached();
+    }
+    getDisplay().asyncExec(new P_HideScoutViews());
+  }
+
+  private void fireGuiDetachedFromUI() {
+    if (getScoutDesktop() != null) {
+      getScoutDesktop().getUIFacade().fireGuiDetached();
+    }
+  }
+
+  private void fireDesktopActivatedFromUI() {
+    if (getScoutDesktop() != null) {
+      getScoutDesktop().ensureViewStackVisible();
+    }
   }
 
   public boolean isBusy() {
@@ -725,6 +755,20 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
+  protected void attachSWTListeners() {
+    if (m_perspectiveListener == null) {
+      m_perspectiveListener = new P_PerspectiveListener();
+      PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(m_perspectiveListener);
+    }
+  }
+
+  protected void detachSWTListeners() {
+    if (m_perspectiveListener != null && PlatformUI.getWorkbench().getActiveWorkbenchWindow() != null) {
+      PlatformUI.getWorkbench().getActiveWorkbenchWindow().removePerspectiveListener(m_perspectiveListener);
+      m_perspectiveListener = null;
+    }
+  }
+
   protected void applyScoutState() {
     IDesktop desktop = getScoutDesktop();
     // load state of internal frames and dialogs
@@ -778,8 +822,9 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     if (part != null) {
       part.activate();
     }
-
   }
+
+  private Map<String, List<IForm>> openLater = new HashMap<String, List<IForm>>();
 
   public void showStandaloneForm(final IForm form) {
     if (form == null) {
@@ -834,15 +879,41 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       }
       case IForm.DISPLAY_HINT_VIEW: {
         String scoutViewId = form.getDisplayViewId();
-        String uiViewId = m_scoutPartIdToUiPartId.get(scoutViewId);
+        String uiViewId = getSwtPartIdForScoutPartId(scoutViewId);
         if (uiViewId == null) {
           LOG.warn("no view defined for scoutViewId: " + form.getDisplayViewId());
           return;
         }
+        IViewPart existingView = findViewPart(uiViewId);
+
+        String formPerspectiveId = form.getPerspectiveId();
+        if (formPerspectiveId == null) {
+          formPerspectiveId = "";
+        }
+        IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        //open form if formPerspectiveId is empty
+        //       OR if currentPerspectiveId equals perspecitveId set on form
+        if (StringUtility.hasText(formPerspectiveId)
+            && existingView == null
+            && activePage != null
+            && CompareUtility.notEquals(activePage.getPerspective().getId(), formPerspectiveId)) {
+
+          synchronized (openLater) {
+            if (!openLater.containsKey(formPerspectiveId) || !openLater.get(formPerspectiveId).contains(form)) {
+              if (openLater.get(formPerspectiveId) == null) {
+                openLater.put(formPerspectiveId, new ArrayList<IForm>());
+              }
+              openLater.get(formPerspectiveId).add(form);
+            }
+          }
+          return;
+        }
         if (IForm.EDITOR_ID.equals(form.getDisplayViewId()) || IWizard.EDITOR_ID.equals(form.getDisplayViewId())) {
-          ScoutFormEditorInput editorInput = getEditorInput(form);
-          AbstractScoutEditorPart editor = getEditorPart(editorInput, uiViewId);
-          m_openForms.put(form, editor);
+          if (activePage != null) {
+            ScoutFormEditorInput editorInput = new ScoutFormEditorInput(form, this);
+            AbstractScoutEditorPart editor = getEditorPart(editorInput, uiViewId);
+            m_openForms.put(form, editor);
+          }
         }
         else {
           AbstractScoutView view = getViewPart(uiViewId);
@@ -1350,40 +1421,19 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
-  private class P_JobEnsureViewStackVisible extends ClientSyncJob {
-    public P_JobEnsureViewStackVisible(IClientSession session) {
-      super("Ensure view stack visible", session);
-    }
-
-    @Override
-    protected void runVoid(IProgressMonitor monitor) throws Throwable {
-      if (m_clientSession != null) {
-        m_clientSession.getDesktop().ensureViewStackVisible();
-      }
-    }
-  }
-
   private class P_PerspectiveListener extends PerspectiveAdapter {
-    @Override
-    public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-      handlePerspectiveOpened(perspective.getId());
-      if (m_perspectiveId.equals(perspective.getId())) {
-        new P_JobEnsureViewStackVisible(m_clientSession).schedule();
-      }
-    }
 
     @Override
     public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-      handlePerspectiveOpened(perspective.getId());
-      if (m_perspectiveId.equals(perspective.getId())) {
-        m_keyStrokeManager.setGlobalKeyStrokesActivated(true);
+      String perspectiveId = perspective.getId();
+      if (handlePerspectiveOpened(perspectiveId)) {
+        handlePerspectiveActivated(perspectiveId);
       }
     }
 
     @Override
     public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-      // global keystrokes are bound to a perspective so it is necessary to
-      // disable the global keystrokes
+      // global keystrokes are bound to a perspective so it is necessary to disable the global keystrokes
       if (m_perspectiveId.equals(perspective.getId())) {
         m_keyStrokeManager.setGlobalKeyStrokesActivated(false);
       }
@@ -1391,52 +1441,85 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
     @Override
     public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-      // global keystrokes are bound to a perspective so it is necessary to
-      // disable the global keystrokes
-      if (m_perspectiveId.equals(perspective.getId())) {
-        if (m_keyStrokeManager != null) {
-          m_keyStrokeManager.setGlobalKeyStrokesActivated(false);
-        }
-      }
+      handlePerspectiveClosed(perspective.getId());
     }
 
     @Override
     public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId) {
-      // If perspective is resetted make sure that scout views are open
-      if (IWorkbenchPage.CHANGE_RESET.equals(changeId) && m_perspectiveId.equals(perspective.getId())) {
+      String perspectiveId = perspective.getId();
+      //If perspective is resetted make sure that scout views are open
+      if (IWorkbenchPage.CHANGE_RESET.equals(changeId)) {
+        handlePerspectiveClosed(perspectiveId);
       }
-      else if (IWorkbenchPage.CHANGE_RESET_COMPLETE.equals(changeId) && m_perspectiveId.equals(perspective.getId())) {
-        handlePerspectiveReset(perspective.getId());
-        new P_JobEnsureViewStackVisible(m_clientSession).schedule();
+      else if (IWorkbenchPage.CHANGE_RESET_COMPLETE.equals(changeId)) {
+        if (handlePerspectiveOpened(perspectiveId)) {
+          handlePerspectiveActivated(perspectiveId);
+        }
       }
     }
   }
 
   private synchronized boolean handlePerspectiveOpened(String perspectiveId) {
+
+    if (m_perspectiveId.equals(perspectiveId)) {
+      //make sure that the desktop is only started once
+      if (!isStartDesktopCalled()) {
+        final P_PerspecitveOpenedJob j = new P_PerspecitveOpenedJob(getDesktopOpenedTaskText());
+        j.schedule();
+        setStartDesktopCalled(true);
+      }
+
+      m_keyStrokeManager.setGlobalKeyStrokesActivated(true);
+
+      return isStartDesktopCalled();
+    }
+
+    return false;
+  }
+
+  private synchronized boolean handlePerspectiveActivated(String perspectiveId) {
+    if (openLater.containsKey(perspectiveId)) {
+      List<IForm> list;
+      synchronized (openLater) {
+        list = openLater.remove(perspectiveId);
+      }
+      for (IForm form : list) {
+        showStandaloneForm(form);
+      }
+      setActivateDesktopCalled(CompareUtility.notEquals(m_perspectiveId, perspectiveId));
+    }
+
+    if (m_perspectiveId.equals(perspectiveId) && isStartDesktopCalled()) {
+      //make sure that the desktop is only started once
+      if (!isActivateDesktopCalled()) {
+        final P_PerspectiveActivatedJob j = new P_PerspectiveActivatedJob(getDesktopOpenedTaskText());
+        j.schedule();
+        setActivateDesktopCalled(true);
+      }
+
+      m_keyStrokeManager.setGlobalKeyStrokesActivated(true);
+
+      return isActivateDesktopCalled();
+    }
+    return false;
+  }
+
+  private synchronized boolean handlePerspectiveClosed(String perspectiveId) {
     boolean called = false;
 
     // make sure that the desktop is only started once
-    if (m_perspectiveId.equals(perspectiveId) && !isStartDesktopCalled()) {
-      final P_DesktopOpenedJob j = new P_DesktopOpenedJob(getDesktopOpenedTaskText());
-      j.schedule(10);
-      setStartDesktopCalled(true);
-      called = true;
-    }
-
     if (m_perspectiveId.equals(perspectiveId)) {
-      m_keyStrokeManager.setGlobalKeyStrokesActivated(true);
+      final P_PerspectiveClosedJob j = new P_PerspectiveClosedJob(getDesktopClosedTaskText());
+      j.schedule();
+      called = true;
+      setStartDesktopCalled(false);
+      setActivateDesktopCalled(false);
+
+      //global keystrokes are bound to a perspective so it is necessary to disable the global keystrokes
+      m_keyStrokeManager.setGlobalKeyStrokesActivated(false);
     }
 
     return called;
-  }
-
-  private synchronized boolean handlePerspectiveReset(String perspectiveId) {
-    // make sure that the desktop is only started once
-    if (m_perspectiveId.equals(perspectiveId)) {
-      final P_DesktopResetJob j = new P_DesktopResetJob(getDesktopResetTaskText());
-      j.schedule(100);
-    }
-    return true;
   }
 
   protected void handleScoutPrintInSwt(DesktopEvent e) {
@@ -1453,12 +1536,12 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return ScoutTexts.get("ScoutStarting");
   }
 
-  protected String getDesktopResetTaskText() {
-    return ScoutTexts.get("ScoutStarting");
+  protected String getDesktopClosedTaskText() {
+    return ScoutTexts.get("ScoutStoping");
   }
 
-  private final class P_DesktopOpenedJob extends Job {
-    public P_DesktopOpenedJob(String name) {
+  private final class P_PerspecitveOpenedJob extends Job {
+    public P_PerspecitveOpenedJob(String name) {
       super(name);
     }
 
@@ -1470,10 +1553,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         public void run() {
           BusyIndicator.showWhile(getDisplay(), new Runnable() {
             public void run() {
+              applyScoutState();
               Runnable t = new Runnable() {
                 @Override
                 public void run() {
-                  fireDesktopOpenedFromUI();
+                  fireGuiAttachedFromUI();
                   try {
                     barrier.await();
                   }
@@ -1513,15 +1597,39 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
-  private final class P_DesktopResetJob extends Job {
-    public P_DesktopResetJob(String name) {
+  private final class P_PerspectiveActivatedJob extends Job {
+    public P_PerspectiveActivatedJob(String name) {
+      super(name);
+    }
+
+    @Override
+    protected IStatus run(IProgressMonitor monitor) {
+      monitor.beginTask(getDesktopOpenedTaskText(), IProgressMonitor.UNKNOWN);
+      getDisplay().asyncExec(new Runnable() {
+        public void run() {
+          ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), getClientSession()) {
+            @Override
+            protected void runVoid(IProgressMonitor syncMonitor) throws Throwable {
+              fireDesktopActivatedFromUI();
+            }
+          };
+          clienSyncJob.schedule();
+        }
+      });
+      monitor.done();
+      return Status.OK_STATUS;
+    }
+  }
+
+  private final class P_PerspectiveClosedJob extends Job {
+    public P_PerspectiveClosedJob(String name) {
       super(name);
     }
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
       final CyclicBarrier barrier = new CyclicBarrier(2);
-      monitor.beginTask(getDesktopResetTaskText(), IProgressMonitor.UNKNOWN);
+      monitor.beginTask(getDesktopClosedTaskText(), IProgressMonitor.UNKNOWN);
       getDisplay().asyncExec(new Runnable() {
         public void run() {
           BusyIndicator.showWhile(getDisplay(), new Runnable() {
@@ -1529,7 +1637,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
               Runnable t = new Runnable() {
                 @Override
                 public void run() {
-                  fireDesktopResetFromUI();
+                  fireGuiDetachedFromUI();
                   try {
                     barrier.await();
                   }
@@ -1577,8 +1685,12 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     m_startDesktopCalled = startDesktopCalled;
   }
 
-  public PerspectiveAdapter getPerspectiveListener() {
-    return new P_PerspectiveListener();
+  private boolean isActivateDesktopCalled() {
+    return m_activateDesktopCalled;
+  }
+
+  private void setActivateDesktopCalled(boolean activateDesktopCalled) {
+    m_activateDesktopCalled = activateDesktopCalled;
   }
 
   public String getPerspectiveId() {

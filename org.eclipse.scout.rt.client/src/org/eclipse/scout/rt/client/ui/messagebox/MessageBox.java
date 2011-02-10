@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -379,7 +379,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       try {
         // check if the desktop is observing this process
         IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-        if (desktop == null || !desktop.isGuiAvailable()) {
+        if (desktop == null || !desktop.isOpened()) {
           LOG.warn("there is no desktop or the desktop has not yet been opened in the ui, default answer is CANCEL");
           m_answerSet = true;
           m_answer = CANCEL_OPTION;

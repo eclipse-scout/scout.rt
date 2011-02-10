@@ -54,6 +54,7 @@ public interface IForm extends IPropertyObserver {
   String PROP_EMPTY = "empty";
   String PROP_SAVE_NEEDED = "saveNeeded";
   String PROP_ICON_ID = "iconId";
+  String PROP_PERSPECTIVE_ID = "perspectiveId";
 
   /**
    * Standalone window<br>
@@ -161,6 +162,10 @@ public interface IForm extends IPropertyObserver {
   String getIconId();
 
   void setIconId(String s);
+
+  String getPerspectiveId();
+
+  void setPerspectiveId(String s);
 
   /**
    * @return the {@link IWizard} that contains the step that started this form

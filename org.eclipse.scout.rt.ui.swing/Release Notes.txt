@@ -29,3 +29,6 @@ Solution:
 - Change of SwingTableModel#isCellEditable() --> synchronization with model thread not neccessary anymore as property can be evaluated thread safe. (Java bean property)
 - Change of SwingScoutTable#prepareRenderer() --> synchronization with model thread for querying editable state not neccessary anymore as property can be evaluated thread safe. (Java bean property)
 Migration: None
+
+10.02.2011 sle
+see Release Notes in org.eclipse.scout.rt.client

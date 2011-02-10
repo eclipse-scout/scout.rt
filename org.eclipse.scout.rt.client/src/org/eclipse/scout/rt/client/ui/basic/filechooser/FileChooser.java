@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,7 +33,7 @@ public class FileChooser implements IFileChooser {
   private boolean m_multiSelect;
   // result
   private File[] m_files;
-  private BlockingCondition m_blockingCondition = new BlockingCondition(false);
+  private final BlockingCondition m_blockingCondition = new BlockingCondition(false);
 
   public FileChooser() {
   }
@@ -129,7 +129,7 @@ public class FileChooser implements IFileChooser {
   private void waitFor() throws ProcessingException {
     // check if the desktop is observing this process
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-    if (desktop == null || !desktop.isGuiAvailable()) {
+    if (desktop == null || !desktop.isOpened()) {
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui");
     }
     try {
