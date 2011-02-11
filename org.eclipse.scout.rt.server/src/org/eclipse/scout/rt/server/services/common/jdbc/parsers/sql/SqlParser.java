@@ -12,14 +12,18 @@ package org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.services.common.jdbc.parsers.BindModel;
+import org.eclipse.scout.rt.server.services.common.jdbc.parsers.BindParser;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.AndExpr;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.AndOp;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.Atom;
@@ -48,6 +52,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserTok
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.UnaryPrefixExpr;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.UnionToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.Unparsed;
+import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.TextToken;
 
 /**
  * Parser for sql SELECT statements
@@ -68,13 +73,16 @@ import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserTok
  * Atom= (BracketExpr | Statement | OrExpr | FunExpr | Name | Text | BinaryOp['*']) (OuterJoinToken)? (Name[alias])?
  * BracketExpr = OpenBracketToken (Statement | ListExpr) CloseBracketToken
  * FunExpr = Name BracketExpr
+ * Bind = ':' any until whitespace | '#' any '#' | '&' any '&'
+ * Name = nameChar+
+ * nameChar = {a-zA-Z0-9_$.@:?}
  * </code>
  * </pre>
  */
 public class SqlParser {
   private static IScoutLogger logger = ScoutLogManager.getLogger(SqlParser.class);
 
-  private static final String nameChars = "a-zA-Z0-9_$:@.?";
+  private static final String nameChars = "a-zA-Z0-9_$.@:?";
   private static final Pattern COMMENT_PAT = Pattern.compile("(\\{[^\\}]*\\})");
   private static final Pattern APOS_PAT = Pattern.compile("('[^']*')");
   private static final Pattern QUOT_PAT = Pattern.compile("(\"[^\"]*\")");
@@ -98,9 +106,15 @@ public class SqlParser {
    */
   private static class ParseContext {
     private HashSet<ParseStep> m_steps;
+    private HashMap<String, String> m_bindMap;
 
     public ParseContext() {
       m_steps = new HashSet<ParseStep>();
+      m_bindMap = new HashMap<String, String>();
+    }
+
+    public Map<String/*code*/, String/*name*/> getBinds() {
+      return m_bindMap;
     }
 
     /**
@@ -154,16 +168,19 @@ public class SqlParser {
   }
 
   public Statement parse(String s) {
-    List<IToken> list = tokenize(s);
-    Statement stm = parseStatement(list, new ParseContext());
+    ParseContext ctx = new ParseContext();
+    List<IToken> list = tokenize(s, ctx);
+    Statement stm = parseStatement(list, ctx);
     //sometimes sql is wrapped into brackets
     if (stm == null) {
-      list = tokenize(s);
-      BracketExpr be = parseBracketExpr(list, new ParseContext());
+      ctx = new ParseContext();
+      list = tokenize(s, ctx);
+      BracketExpr be = parseBracketExpr(list, ctx);
       if (be != null) {
         for (IToken t : be.getChildren()) {
           if (t instanceof Statement) {
             stm = (Statement) t;
+            break;
           }
         }
       }
@@ -233,6 +250,10 @@ public class SqlParser {
         //ok
       }
       else {
+        //restore incomplete
+        if (pt != null) {
+          list.add(0, pt);
+        }
         return null;
       }
       Part p = new Part();
@@ -288,6 +309,11 @@ public class SqlParser {
         oe.addChild(oo);
         oe.addChild(ae);
       }
+      //remaining?
+      if (oo != null) {
+        oo.addComment(new Comment("/*syntax warning*/"));
+        oe.addChild(oo);
+      }
       return oe;
     }
     finally {
@@ -310,6 +336,11 @@ public class SqlParser {
       while ((ao = removeToken(list, AndOp.class)) != null && (me = parseMathExpr(list, ctx)) != null) {
         ae.addChild(ao);
         ae.addChild(me);
+      }
+      //remaining?
+      if (ao != null) {
+        ao.addComment(new Comment("/*syntax warning*/"));
+        ae.addChild(ao);
       }
       return ae;
     }
@@ -541,7 +572,8 @@ public class SqlParser {
    * 
    * @throws ParseException
    */
-  private List<IToken> tokenize(String s) {
+  private List<IToken> tokenize(String s, ParseContext ctx) {
+    s = encodeBinds(s, ctx);
     s = s.replaceAll("[\\n\\r]+", " ");
     List<IToken> list = new ArrayList<IToken>();
     list.add(new Raw(s));
@@ -621,6 +653,7 @@ public class SqlParser {
         it.remove();
       }
     }
+    decodeBinds(list, ctx);
     return list;
   }
 
@@ -673,6 +706,31 @@ public class SqlParser {
       }
     }
     return newList;
+  }
+
+  private String encodeBinds(String s, ParseContext ctx) {
+    BindModel m = new BindParser(s).parse();
+    for (org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.IToken bindToken : m.getAllTokens()) {
+      if (bindToken instanceof TextToken) {
+        continue;
+      }
+      String code = "___BIND" + ctx.getBinds().size();
+      String name = bindToken.getParsedToken();
+      bindToken.setReplaceToken(code);
+      ctx.getBinds().put(code, name);
+    }
+    return m.getFilteredStatement();
+  }
+
+  private void decodeBinds(List<IToken> list, ParseContext ctx) {
+    for (IToken t : list) {
+      if (t instanceof Name) {
+        String s = ctx.getBinds().get(t.getText());
+        if (s != null) {
+          t.setText(s);
+        }
+      }
+    }
   }
 
   /**
