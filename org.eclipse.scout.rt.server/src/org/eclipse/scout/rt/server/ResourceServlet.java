@@ -22,8 +22,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.osgi.framework.Bundle;
 
@@ -87,15 +89,22 @@ public class ResourceServlet extends HttpServletEx {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-    String pathInfo = req.getPathInfo();
-    if (pathInfo == null || pathInfo.equals("")) {
-      res.sendRedirect(req.getRequestURI() + "/");
-    }
-    else {
-      if (!writeStaticResource(req, res)) {
-        res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    Path p = new Path(req.getRequestURI());
+    String lastSegment = p.lastSegment();
+    if (!StringUtility.isNullOrEmpty(lastSegment)) {
+      if (lastSegment.contains(".") || req.getRequestURI().endsWith("/")) {
+        if (!writeStaticResource(req, res)) {
+          res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+      }
+      else {
+        res.sendRedirect(req.getRequestURI() + "/");
       }
     }
+    else {
+      res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    }
+
   }
 
   @Override
@@ -107,7 +116,7 @@ public class ResourceServlet extends HttpServletEx {
 
   private boolean writeStaticResource(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     String pathInfo = req.getPathInfo();
-    if (pathInfo == null || pathInfo.equals("/") || pathInfo.equals("")) {
+    if (pathInfo == null || pathInfo.endsWith("/") || pathInfo.equals("")) {
       pathInfo = "/index.html";
     }
     URL url = null;
