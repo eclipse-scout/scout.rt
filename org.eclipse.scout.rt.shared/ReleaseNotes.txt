@@ -22,3 +22,6 @@ IComposerEntity -> IDataModelEntity
 10.02.2011 abr
 Ticket 98'889
 AbstractPropertyData.isValueSet() was not taken into account when importing a form data.
+
+11.02.2011 jgu
+New translations inserted for the languages bg,cs,da,el,es,fi,fr_BE,fr,hr,hu,it,nl_BE,nl,no,pl,pt_br,ru,se,sk,sl,sr,tr,zh_TW,zh.
