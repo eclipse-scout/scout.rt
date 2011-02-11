@@ -157,11 +157,11 @@ public class StatementProcessor implements IStatementProcessor {
       }
     }
     catch (ProcessingException e) {
-      e.addContextMessage("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm);
+      e.addContextMessage(createSqlDump(true, false));
       throw e;
     }
     catch (Throwable e) {
-      throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+      throw new ProcessingException(createSqlDump(true, false), e);
     }
   }
 
@@ -229,11 +229,11 @@ public class StatementProcessor implements IStatementProcessor {
       return rows.toArray(new Object[rows.size()][]);
     }
     catch (ProcessingException e) {
-      e.addContextMessage("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm);
+      e.addContextMessage(createSqlDump(true, false));
       throw e;
     }
     catch (Throwable e) {
-      throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+      throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
       if (rs != null) try {
@@ -245,7 +245,7 @@ public class StatementProcessor implements IStatementProcessor {
         cache.releasePreparedStatement(ps);
       }
       catch (SQLException e) {
-        throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+        throw new ProcessingException(createSqlDump(true, false), e);
       }
     }
   }
@@ -281,11 +281,11 @@ public class StatementProcessor implements IStatementProcessor {
       }
     }
     catch (ProcessingException e) {
-      e.addContextMessage("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm);
+      e.addContextMessage(createSqlDump(true, false));
       throw e;
     }
     catch (Throwable e) {
-      throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+      throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
       if (rs != null) try {
@@ -297,7 +297,7 @@ public class StatementProcessor implements IStatementProcessor {
         cache.releasePreparedStatement(ps);
       }
       catch (SQLException e) {
-        throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+        throw new ProcessingException(createSqlDump(true, false), e);
       }
     }
   }
@@ -335,11 +335,11 @@ public class StatementProcessor implements IStatementProcessor {
       handler.finished(conn, ps, rs, rowCount);
     }
     catch (ProcessingException e) {
-      e.addContextMessage("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm);
+      e.addContextMessage(createSqlDump(true, false));
       throw e;
     }
     catch (Throwable e) {
-      throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+      throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
       if (rs != null) try {
@@ -351,7 +351,7 @@ public class StatementProcessor implements IStatementProcessor {
         cache.releasePreparedStatement(ps);
       }
       catch (SQLException e) {
-        throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+        throw new ProcessingException(createSqlDump(true, false), e);
       }
     }
   }
@@ -378,18 +378,18 @@ public class StatementProcessor implements IStatementProcessor {
       return rowCount;
     }
     catch (ProcessingException e) {
-      e.addContextMessage("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm);
+      e.addContextMessage(createSqlDump(true, false));
       throw e;
     }
     catch (Throwable e) {
-      throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+      throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
       try {
         cache.releasePreparedStatement(ps);
       }
       catch (SQLException e) {
-        throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+        throw new ProcessingException(createSqlDump(true, false), e);
       }
     }
   }
@@ -421,18 +421,18 @@ public class StatementProcessor implements IStatementProcessor {
       return status;
     }
     catch (ProcessingException e) {
-      e.addContextMessage("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm);
+      e.addContextMessage(createSqlDump(true, false));
       throw e;
     }
     catch (Throwable e) {
-      throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+      throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
       try {
         cache.releaseCallableStatement(cs);
       }
       catch (SQLException e) {
-        throw new ProcessingException("SQL (original): " + m_originalStm + ", SQL (current): " + m_currentInputStm, e);
+        throw new ProcessingException(createSqlDump(true, false), e);
       }
     }
   }
@@ -568,10 +568,7 @@ public class StatementProcessor implements IStatementProcessor {
     m_currentInputStm = m_bindModel.getFilteredStatement();
   }
 
-  protected void dump() throws ProcessingException {
-    if (!LOG.isInfoEnabled()) {
-      return;
-    }
+  protected String createSqlDump(boolean statementWithBinds, boolean statementPlainText) {
     StringBuffer debugBindBuf = new StringBuffer();
     for (IBindInput in : m_inputList) {
       SqlBind bind = m_currentInputBindMap.get(in.getJdbcBindIndex());
@@ -609,52 +606,59 @@ public class StatementProcessor implements IStatementProcessor {
       debugBindBuf.append("\n");
     }
     StringBuffer buf = new StringBuffer();
-    if (LOG.isInfoEnabled()) {
-      buf.append("\nSQL Log:\n");
+    if (statementWithBinds) {
+      buf.append("SQL with binds:\n");
       buf.append(SqlFormatter.wellform(m_originalStm).trim());
       if (debugBindBuf != null && debugBindBuf.length() > 0) {
         buf.append("\n");
         buf.append(debugBindBuf.toString().trim());
       }
-      if (LOG.isDebugEnabled()) {
-        String p = m_currentInputStm;
-        ArrayList<SqlBind> bindList = new ArrayList<SqlBind>(m_currentInputBindMap.values());
-        int bindIndex = 0;
-        int pos = p.indexOf('?');
-        while (pos >= 0 && bindIndex < bindList.size()) {
-          SqlBind bind = bindList.get(bindIndex);
-          String replacement;
-          switch (bind.getSqlType()) {
-            case Types.BLOB: {
-              replacement = "__BLOB__";
-              break;
-            }
-            case Types.CLOB: {
-              replacement = "__CLOB__";
-              break;
-            }
-            default: {
-              replacement = m_callerService.getSqlStyle().toPlainText(bind.getValue());
-            }
-          }
-          if (replacement == null) {
-            replacement = "NULL";
-          }
-          replacement = replacement.replace('?', ' ');
-          //next
-          p = p.substring(0, pos) + replacement + p.substring(pos + 1);
-          bindIndex++;
-          pos = p.indexOf('?');
-        }
-        buf.append("\nSQL PLAIN Log:\n");
-        buf.append(SqlFormatter.wellform(p).trim());
-      }
     }
+    if (statementPlainText) {
+      String p = m_currentInputStm;
+      ArrayList<SqlBind> bindList = new ArrayList<SqlBind>(m_currentInputBindMap.values());
+      int bindIndex = 0;
+      int pos = p.indexOf('?');
+      while (pos >= 0 && bindIndex < bindList.size()) {
+        SqlBind bind = bindList.get(bindIndex);
+        String replacement;
+        switch (bind.getSqlType()) {
+          case Types.BLOB: {
+            replacement = "__BLOB__";
+            break;
+          }
+          case Types.CLOB: {
+            replacement = "__CLOB__";
+            break;
+          }
+          default: {
+            replacement = m_callerService.getSqlStyle().toPlainText(bind.getValue());
+          }
+        }
+        if (replacement == null) {
+          replacement = "NULL";
+        }
+        replacement = replacement.replace('?', ' ');
+        //next
+        p = p.substring(0, pos) + replacement + p.substring(pos + 1);
+        bindIndex++;
+        pos = p.indexOf('?');
+      }
+      if (buf.length() > 0) {
+        buf.append("\n");
+      }
+      buf.append("SQL PLAIN Log:\n");
+      buf.append(SqlFormatter.wellform(p).trim());
+    }
+    return buf.toString();
+  }
+
+  protected void dump() {
     if (LOG.isDebugEnabled()) {
-      LOG.debug(buf.toString());
+      LOG.debug("\n" + createSqlDump(true, true));
     }
     else if (LOG.isInfoEnabled()) {
-      LOG.info(buf.toString());
+      LOG.info("\n" + createSqlDump(true, false));
     }
   }
 

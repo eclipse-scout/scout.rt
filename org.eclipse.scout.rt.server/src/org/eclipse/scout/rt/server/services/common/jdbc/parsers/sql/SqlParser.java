@@ -169,18 +169,18 @@ public class SqlParser {
 
   public Statement parse(String s) {
     ParseContext ctx = new ParseContext();
-    s = encodeBinds(s, ctx);
-    List<IToken> list = tokenize(s);
-    decodeBinds(list, ctx);
+    List<IToken> list = tokenize(s, ctx);
     Statement stm = parseStatement(list, ctx);
     //sometimes sql is wrapped into brackets
     if (stm == null) {
-      list = tokenize(s);
+      ctx = new ParseContext();
+      list = tokenize(s, ctx);
       BracketExpr be = parseBracketExpr(list, ctx);
       if (be != null) {
         for (IToken t : be.getChildren()) {
           if (t instanceof Statement) {
             stm = (Statement) t;
+            break;
           }
         }
       }
@@ -250,6 +250,10 @@ public class SqlParser {
         //ok
       }
       else {
+        //restore incomplete
+        if (pt != null) {
+          list.add(0, pt);
+        }
         return null;
       }
       Part p = new Part();
@@ -305,6 +309,11 @@ public class SqlParser {
         oe.addChild(oo);
         oe.addChild(ae);
       }
+      //remaining?
+      if (oo != null) {
+        oo.addComment(new Comment("/*syntax warning*/"));
+        oe.addChild(oo);
+      }
       return oe;
     }
     finally {
@@ -327,6 +336,11 @@ public class SqlParser {
       while ((ao = removeToken(list, AndOp.class)) != null && (me = parseMathExpr(list, ctx)) != null) {
         ae.addChild(ao);
         ae.addChild(me);
+      }
+      //remaining?
+      if (ao != null) {
+        ao.addComment(new Comment("/*syntax warning*/"));
+        ae.addChild(ao);
       }
       return ae;
     }
@@ -558,7 +572,8 @@ public class SqlParser {
    * 
    * @throws ParseException
    */
-  private List<IToken> tokenize(String s) {
+  private List<IToken> tokenize(String s, ParseContext ctx) {
+    s = encodeBinds(s, ctx);
     s = s.replaceAll("[\\n\\r]+", " ");
     List<IToken> list = new ArrayList<IToken>();
     list.add(new Raw(s));
@@ -638,6 +653,7 @@ public class SqlParser {
         it.remove();
       }
     }
+    decodeBinds(list, ctx);
     return list;
   }
 

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -34,27 +36,28 @@ public final class TableUtility {
   private TableUtility() {
   }
 
-  public static void resolveLocalLookupCall(Map<LocalLookupCall, LookupRow[]> localLookupCache, ITableRow row, ISmartColumn<?> col, boolean multilineText) {
+  /**
+   * synchronous resolving of lookup values to text
+   * <p>
+   * Note that remote lookup calls are evaluated one by one, no batch processing.
+   */
+  public static void resolveLookupCall(Map<LookupCall, LookupRow[]> lookupCache, ITableRow row, ISmartColumn<?> col, boolean multilineText) {
     try {
       LookupCall call = col.prepareLookupCall(row);
       if (call != null) {
-        //split: local vs remote
-        if (call instanceof LocalLookupCall) {
-          LookupRow[] result = null;
-          //optimize local calls by caching the results
-          result = localLookupCache.get(call);
-          if (verifyLocalLookupCallBeanQuality((LocalLookupCall) call)) {
-            result = localLookupCache.get(call);
-            if (result == null) {
-              result = call.getDataByKey();
-              localLookupCache.put((LocalLookupCall) call, result);
-            }
-          }
-          else {
-            result = call.getDataByKey();
-          }
-          applyLookupResult(row, col, result, multilineText);
+        LookupRow[] result = null;
+        boolean verifiedQuality = verifyLookupCallBeanQuality(call);
+        //optimize local calls by caching the results
+        if (verifiedQuality) {
+          result = lookupCache.get(call);
         }
+        if (result == null) {
+          result = call.getDataByKey();
+          if (verifiedQuality) {
+            lookupCache.put(call, result);
+          }
+        }
+        applyLookupResult(row, col, result, multilineText);
       }
     }
     catch (ProcessingException e) {
@@ -68,20 +71,60 @@ public final class TableUtility {
   }
 
   /**
-   * In order to use caching of results on local lookup calls, it is crucial that the javabean concepts are valid,
-   * especially hashCode and equals.
+   * In order to use caching of results on lookup calls, it is crucial that the javabean concepts are valid,
+   * especially hashCode and equals (when the subclass has additional member fields).
    * <p>
    * Scout tries to help developers to find problems related to this issue and write a warning in development mode on
    * all local lookup call subclasses that do not overwrite hashCode and equals.
    */
-  public static boolean verifyLocalLookupCallBeanQuality(LocalLookupCall call) {
-    if (call.getClass() == LocalLookupCall.class) {
+  public static boolean verifyLookupCallBeanQuality(LookupCall call) {
+    Class<?> clazz = call.getClass();
+    if (LocalLookupCall.class == clazz) {
       return true;
     }
-    if (ConfigurationUtility.isMethodOverwrite(LocalLookupCall.class, "equals", new Class[]{Object.class}, call.getClass())) {
+    if (LookupCall.class == clazz) {
       return true;
     }
-    LOG.warn("" + call.getClass() + " subclasses LocalLookupCall and should override the 'boolean equals(Object obj)' method");
+    if (LocalLookupCall.class.isAssignableFrom(clazz)) {
+      Class<?> tmp = clazz;
+      while (tmp != LocalLookupCall.class) {
+        if (ConfigurationUtility.isMethodOverwrite(LocalLookupCall.class, "equals", new Class[]{Object.class}, tmp)) {
+          return true;
+        }
+        Field[] fields = tmp.getDeclaredFields();
+        if (fields != null && fields.length > 0) {
+          for (int i = 0; i < fields.length; i++) {
+            if ((fields[i].getModifiers() & (Modifier.STATIC | Modifier.FINAL)) == 0) {
+              LOG.warn("" + clazz + " subclasses LocalLookupCall with additional member " + fields[i].getName() + " and should therefore override the 'equals' and 'hashCode' methods");
+              return false;
+            }
+          }
+        }
+        //next
+        tmp = tmp.getSuperclass();
+      }
+      return true;
+    }
+    if (LookupCall.class.isAssignableFrom(clazz)) {
+      Class<?> tmp = clazz;
+      while (tmp != LookupCall.class) {
+        if (ConfigurationUtility.isMethodOverwrite(LookupCall.class, "equals", new Class[]{Object.class}, tmp)) {
+          return true;
+        }
+        Field[] fields = tmp.getDeclaredFields();
+        if (fields != null && fields.length > 0) {
+          for (int i = 0; i < fields.length; i++) {
+            if ((fields[i].getModifiers() & (Modifier.STATIC | Modifier.FINAL)) == 0) {
+              LOG.warn("" + clazz + " subclasses LookupCall with additional member " + fields[i].getName() + " and should therefore override the 'equals' and 'hashCode' methods");
+              return false;
+            }
+          }
+        }
+        //next
+        tmp = tmp.getSuperclass();
+      }
+      return true;
+    }
     return false;
   }
 

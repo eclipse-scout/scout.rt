@@ -130,7 +130,7 @@ public class SqlFormatter {
     Statement stm = new SqlParser().parse(s);
     FormatContext ctx = new FormatContext(tabSize);
     formatStatement(stm, ctx);
-    return ctx.getBuffer();
+    return ctx.getBuffer().trim();
   }
 
   private void formatStatement(Statement stm, FormatContext ctx) {

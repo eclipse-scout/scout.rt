@@ -106,6 +106,12 @@ final class SqlParserToken {
   }
 
   public static class Comment extends AbstractToken {
+    public Comment() {
+    }
+
+    public Comment(String text) {
+      setText(text);
+    }
   }
 
   public static class Text extends AbstractToken {
