@@ -25,8 +25,8 @@ BSI Business Systems Integration AG - initial API and implementation
    </license>
 
    <url>
-      <update label="The Eclipse Project Updates" url="http://download.eclipse.org/eclipse/updates/3.7"/>
-      <discovery label="The Eclipse Project Updates" url="http://download.eclipse.org/eclipse/updates/3.7"/>
+      <update label="The Eclipse Project Updates" url="http://download.eclipse.org/eclipse/updates/3.6"/>
+      <discovery label="The Eclipse Project Updates" url="http://download.eclipse.org/eclipse/updates/3.6"/>
       <discovery label="Orbit" url="http://download.eclipse.org/tools/orbit/downloads/drops/updateSite"/>
    </url>
 
