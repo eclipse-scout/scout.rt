@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -441,8 +441,16 @@ public final class SwtUtility {
     return stateMask;
   }
 
-  public static int getSwtKeyCode(IKeyStroke stroke) {
-    String[] keys = stroke.getKeyStroke().split("-");
+  /**
+   * Converts {@link IKeyStroke} to a swt keycode (This is a bitwise OR
+   * of zero or more SWT key modifier masks (i.e. SWT.CTRL or SWT.ALT) and a
+   * character code).
+   * 
+   * @param stroke
+   * @return
+   */
+  public static int getSwtKeyCode(IKeyStroke keyStroke) {
+    String[] keys = keyStroke.getKeyStroke().split("-");
     int swtKeyCode = SWT.NONE;
 
     if (keys.length > 0) {
@@ -451,7 +459,7 @@ public final class SwtUtility {
     return swtKeyCode;
   }
 
-  private static int scoutToSwtKey(String scoutKey) {
+  public static int scoutToSwtKey(String scoutKey) {
     Integer i = SCOUT_SWT_KEY_MAP.get(scoutKey);
     if (i == null) {
       if (scoutKey.length() != 1) {
