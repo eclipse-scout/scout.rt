@@ -92,7 +92,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private boolean m_initialized;
   private final OptimisticLock m_initLock;
-  protected ColumnSet m_columnSet;
+  private ColumnSet m_columnSet;
   /**
    * synchronized list
    */
