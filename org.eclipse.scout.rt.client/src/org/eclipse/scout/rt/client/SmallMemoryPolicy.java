@@ -49,6 +49,11 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
   }
 
   @Override
+  public void pageSearchFormStarted(IPageWithTable<?> p) throws ProcessingException {
+    //nop
+  }
+
+  @Override
   public void pageCreated(IPage p) throws ProcessingException {
     //nop
   }

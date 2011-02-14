@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 
 /**
  * Handling of various framework aspects regarding memory allocation, caching and lazy-ness
@@ -43,8 +44,17 @@ public interface IMemoryPolicy {
 
   /**
    * This method is called just after a new page was created using {@link IPage#initPage()}.
+   * <p>
+   * Do not access the {@link IPageWithTable#getSearchFormInternal()} since it is lazy created.
+   * <p>
+   * For search form caching use {@link #pageSearchFormStarted(IPageWithTable)} instead.
    */
   void pageCreated(IPage page) throws ProcessingException;
+
+  /**
+   * This method is called just after a search form inside a page was started using {@link ISearchForm#startSearch()}
+   */
+  void pageSearchFormStarted(IPageWithTable<?> page) throws ProcessingException;
 
   /**
    * Whenever a new page is selected this methode is called to give the possibility to release unused pages.

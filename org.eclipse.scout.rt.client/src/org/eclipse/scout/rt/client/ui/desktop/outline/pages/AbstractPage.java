@@ -216,16 +216,6 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
       cell.setIconId(getConfiguredIconId());
     }
     execInitPage();
-    //use memory policy to handle content caching
-    try {
-      IMemoryPolicy policy = ClientSyncJob.getCurrentSession().getMemoryPolicy();
-      if (policy != null) {
-        policy.pageCreated(this);
-      }
-    }
-    catch (Throwable t) {
-      LOG.error("pageCreated " + getClass().getSimpleName(), t);
-    }
   }
 
   @ConfigOperation
@@ -276,6 +266,16 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   public void nodeAddedNotify() {
     try {
       initPage();
+      //notify memory policy
+      try {
+        IMemoryPolicy policy = ClientSyncJob.getCurrentSession().getMemoryPolicy();
+        if (policy != null) {
+          policy.pageCreated(this);
+        }
+      }
+      catch (Throwable t) {
+        LOG.error("pageCreated " + getClass().getSimpleName(), t);
+      }
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
