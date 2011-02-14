@@ -10,6 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.AttributeStrategy;
+import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNodeData;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 
 /**
@@ -24,5 +30,17 @@ public class ComposerAttributePartDefinition extends DataModelAttributePartDefin
 
   public ComposerAttributePartDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, String selectClause, boolean plainBind) {
     super(attributeType, whereClause, selectClause, plainBind);
+  }
+
+  public String createNewInstance(FormDataStatementBuilder builder, ComposerAttributeNodeData attributeNodeData, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
+    return builder.createAttributePartSimple(AttributeStrategy.BuildConstraintOfAttributeWithContext, attributeNodeData.getAggregationType(), getWhereClause(), attributeNodeData.getOperator(), bindNames, bindValues, this.isPlainBind(), parentAliasMap);
+  }
+
+  /**
+   * @deprecated use {@link #getWhereClause() }
+   */
+  @Deprecated
+  public String getSqlAttribute() {
+    return super.getWhereClause();
   }
 }

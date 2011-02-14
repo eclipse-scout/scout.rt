@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
  * Definition of a property-to-sql and valueField-to-sql mapping for {@link AbstractPropertyData} and
  * {@link AbstractValueFieldData}
  */
-public class ValuePartDefinition {
+public class ValuePartDefinition implements DataModelConstants {
   private final ClassIdentifier[] m_valueTypeClassIdentifiers;
   private final String m_sqlAttribute;
   private final int m_operation;
@@ -42,7 +42,7 @@ public class ValuePartDefinition {
    * @param operator
    *          any of the {@link DataModelConstants#OPERATOR_*} values
    */
-  public ValuePartDefinition(Class valueType, String sqlAttribute, int operator) {
+  public ValuePartDefinition(Class<?> valueType, String sqlAttribute, int operator) {
     this(new Class[]{valueType}, sqlAttribute, operator, false);
   }
 
@@ -58,21 +58,21 @@ public class ValuePartDefinition {
   /**
    * see {@link #ValuePartDefinition(Class, String, int)}
    */
-  public ValuePartDefinition(Class valueType, String sqlAttribute) {
+  public ValuePartDefinition(Class<?> valueType, String sqlAttribute) {
     this(new Class[]{valueType}, sqlAttribute, DataModelConstants.OPERATOR_NONE, false);
   }
 
   /**
    * see {@link #ValuePartDefinition(Class, String, int)}
    */
-  public ValuePartDefinition(Class[] valueTypes, String sqlAttribute) {
+  public ValuePartDefinition(Class<?>[] valueTypes, String sqlAttribute) {
     this(valueTypes, sqlAttribute, DataModelConstants.OPERATOR_NONE, false);
   }
 
   /**
    * see {@link #ValuePartDefinition(Class, String, int)}
    */
-  public ValuePartDefinition(Class valueType, String sqlAttribute, int operator, boolean plainBind) {
+  public ValuePartDefinition(Class<?> valueType, String sqlAttribute, int operator, boolean plainBind) {
     this(new Class[]{valueType}, sqlAttribute, operator, plainBind);
   }
 
@@ -86,14 +86,14 @@ public class ValuePartDefinition {
   /**
    * see {@link #ValuePartDefinition(Class, String, int)}
    */
-  public ValuePartDefinition(Class[] valueTypes, String sqlAttribute, int operator) {
+  public ValuePartDefinition(Class<?>[] valueTypes, String sqlAttribute, int operator) {
     this(valueTypes, sqlAttribute, operator, false);
   }
 
   /**
    * see {@link #ValuePartDefinition(Class, String, int)}
    */
-  public ValuePartDefinition(Class[] valueTypes, String sqlAttribute, int operator, boolean plainBind) {
+  public ValuePartDefinition(Class<?>[] valueTypes, String sqlAttribute, int operator, boolean plainBind) {
     this(ClassIdentifier.convertClassArrayToClassIdentifierArray(valueTypes), sqlAttribute, operator, plainBind);
   }
 
@@ -172,15 +172,15 @@ public class ValuePartDefinition {
     if (getValueTypeClassIdentifiers().length > 0) {
       for (ClassIdentifier valueType : getValueTypeClassIdentifiers()) {
         Object dataObject = formData.findFieldByClass(fieldsBreathFirstMap, valueType);
-        if (dataObject instanceof AbstractValueFieldData) {
-          AbstractValueFieldData v = (AbstractValueFieldData) dataObject;
+        if (dataObject instanceof AbstractValueFieldData<?>) {
+          AbstractValueFieldData<?> v = (AbstractValueFieldData<?>) dataObject;
           if (v.isValueSet() && v.getValue() != null) {
             return true;
           }
         }
         dataObject = formData.findPropertyByClass(propertiesBreathFirstMap, valueType);
-        if (dataObject instanceof AbstractPropertyData) {
-          AbstractPropertyData p = (AbstractPropertyData) dataObject;
+        if (dataObject instanceof AbstractPropertyData<?>) {
+          AbstractPropertyData<?> p = (AbstractPropertyData<?>) dataObject;
           if (p.isValueSet() && p.getValue() != null) {
             return true;
           }
@@ -217,7 +217,15 @@ public class ValuePartDefinition {
    *         {@link FormDataStatementBuilder#addBind(String, Object)}
    * @throws ProcessingException
    */
+  public String createInstance(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
+    return createNewInstance(builder, valueDatas, bindNames, bindValues, parentAliasMap);
+  }
+
+  /**
+   * @deprecated use {@link #createInstance(FormDataStatementBuilder, List, List, List, Map)} instead
+   */
+  @Deprecated
   public String createNewInstance(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
-    return builder.createStatementPart(DataModelConstants.AGGREGATION_NONE, getSqlAttribute(), getOperation(), bindNames, bindValues, isPlainBind(), parentAliasMap);
+    return builder.createSqlPart(DataModelConstants.AGGREGATION_NONE, getSqlAttribute(), getOperation(), bindNames, bindValues, isPlainBind(), parentAliasMap);
   }
 }

@@ -32,6 +32,8 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerDisplayTextBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.LegacyComposerStatementBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AttributeNode;
@@ -320,6 +322,22 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   public IDataModelEntity[] getEntities() {
     return m_dataModel.getEntities();
+  }
+
+  /**
+   * @deprecated use {@link #getEntities()} instead
+   */
+  @Deprecated
+  public IComposerEntity[] getComposerEntities() {
+    return (IComposerEntity[]) m_dataModel.getEntities();
+  }
+
+  /**
+   * @deprecated use {@link #getAttributes()} instead
+   */
+  @Deprecated
+  public IComposerAttribute[] getComposerAttributes() {
+    return (IComposerAttribute[]) m_dataModel.getAttributes();
   }
 
   @Override

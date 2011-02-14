@@ -140,9 +140,36 @@ Legacy support: AbstractTimeColumn and AbstractTimeField have setTimeValue/getTi
 
 21.12.2010 imo
 Extracted DataModel with entities and attributes out of AbstractComposerField and moved to org.eclipse.scout.rt.shared.data.model
-Migration: None, sometimes organize imports is necessary.
-Legacy: There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
+Migration:
+rename IComposerOp -> IDataModelAttributeOp
+rename IComposerEntity -> IDataModelEntity
+rename IComposerAttribute -> IDataModelAttribute
+rename AbstractComposerEntity -> AbstractDataModelEntity
+rename AbstractAttributeEntity -> AbstractDataModelAttribute
+rename ComposerAttributeInjector -> DataModelAttributeInjector
+rename ComposerConstants -> DataModelConstants
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IDataModelAttributeOp -> org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IDataModelEntity -> org.eclipse.scout.rt.shared.data.model.IDataModelEntity
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IDataModelAttribute -> org.eclipse.scout.rt.shared.data.model.IDataModelAttribute
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractDataModelEntity -> org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractDataModelAttribute -> org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute
+rename org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.DataModelAttributeInjector -> org.eclipse.scout.rt.shared.data.model.DataModelAttributeInjector
+rename org.eclipse.scout.rt.shared.data.form.fields.composer.DataModelConstants -> org.eclipse.scout.rt.shared.data.model.DataModelConstants
+rename getComposerAttributes()  -> getAttributes()
+rename getComposerEntities()  -> getEntities()
+rename setComposerAttribute(  -> setAttribute(
+Move the composer data model to the shared area:
+extract all entities/attributes from the composer to a new shared DataModel
+In the composer implement execCreateDataModel
+To convert between external entity and attribute ids use DataModelUtility.
+For example: IDataModelEntity e=DataModelUtility.externalIdToEntity(builder.getDataModel(), entityNodeData.getEntityExternalId(), null)
+Legacy:
+There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
 and wrapped in a ComposerFieldDataModel.
+
+21.12.2010 imo
+renamed AbstractComposerAggregationField to AbstractDataModelAggregationField
+renamed AbstractComposerOperatorField to AbstractDataModelOperatorField
 
 27.12.2010 jgu
 Change in field validation: Error status is set to WARN instead of ERROR when an invalid date is entered via date picker.

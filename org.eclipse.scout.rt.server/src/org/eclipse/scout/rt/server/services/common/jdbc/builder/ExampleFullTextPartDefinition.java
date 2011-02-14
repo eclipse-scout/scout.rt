@@ -39,7 +39,7 @@ public class ExampleFullTextPartDefinition extends ValuePartDefinition {
     //generate a search patter from pattern, decorate and replace pattern
     //...
     String sqlAttribute = "CONTAINS(<attribute>" + this.getSqlAttribute() + "</attribute>,'" + pattern + "')>0";
-    return builder.createStatementPart(DataModelConstants.AGGREGATION_NONE, sqlAttribute, getOperation(), null, null, isPlainBind(), parentAliasMap);
+    return builder.createSqlPart(DataModelConstants.AGGREGATION_NONE, sqlAttribute, getOperation(), null, null, isPlainBind(), parentAliasMap);
   }
 
 }
