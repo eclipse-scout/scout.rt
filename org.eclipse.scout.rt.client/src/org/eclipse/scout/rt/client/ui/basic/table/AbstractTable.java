@@ -55,6 +55,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.DefaultTableColum
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
@@ -1625,7 +1626,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     Object[][] a = new Object[nr + (includeLineForColumnNames ? 1 : 0) + (includeLineForColumnTypes ? 1 : 0) + (includeLineForColumnFormats ? 1 : 0)][columns.length];
     for (int c = 0; c < columns.length; c++) {
       IColumn col = columns[c];
-      Class type;
+      Class<?> type;
       boolean byValue;
       String format;
       if (col instanceof IDateColumn) {
@@ -1660,7 +1661,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         byValue = true;
         format = ((IBigDecimalColumn) col).getFormat();
       }
-      else if (col instanceof ISmartColumn) {
+      else if (col instanceof ISmartColumn<?>) {
         type = String.class;
         byValue = false;
         format = null;
@@ -1669,6 +1670,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         type = Date.class;
         byValue = true;
         format = ((ITimeColumn) col).getFormat();
+      }
+      else if (col instanceof IBooleanColumn) {
+        type = Boolean.class;
+        byValue = false;
+        format = null;
       }
       else {
         type = String.class;
@@ -1699,7 +1705,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           }
         }
         else {
-          a[csvRowIndex][c] = columns[c].getDisplayText(rows[r]);
+          String text = columns[c].getDisplayText(rows[r]);
+          //special intercept for boolean
+          if (type == Boolean.class) {
+            Boolean b = TypeCastUtility.castValue(columns[c].getValue(rows[r]), Boolean.class);
+            if (b != null && b.booleanValue()) {
+              //make sure there is a text
+              if (text == null || text.trim().length() == 0) {
+                text = "X";
+              }
+            }
+          }
+          a[csvRowIndex][c] = text;
         }
         csvRowIndex++;
       }
