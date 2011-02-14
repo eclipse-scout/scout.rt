@@ -63,13 +63,14 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
    * Attaches listener on table page search forms
    */
   public void pageCreated(IPage p) throws ProcessingException {
-    if (!(p instanceof IPageWithTable<?>)) {
-      return;
-    }
+  }
+
+  @Override
+  public void pageSearchFormStarted(IPageWithTable<?> p) throws ProcessingException {
     if (p.getOutline() instanceof AbstractPageField.SimpleOutline) {
       return;
     }
-    IForm f = ((IPageWithTable<?>) p).getSearchFormInternal();
+    IForm f = p.getSearchFormInternal();
     if (f != null) {
       String pageFormIdentifier = registerPageForm(p, f);
       if (f.isFormOpen()) {

@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -54,6 +55,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   private T m_table;
   private ISearchForm m_searchForm;
+  private FormListener m_searchFormListener;
   private boolean m_searchRequired;
   private boolean m_searchActive;
   private boolean m_showEmptySpaceMenus;
@@ -161,7 +163,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @ConfigOperation
   @Order(100)
   protected void execPopulateTable() throws ProcessingException {
-    ensureSearchFormStarted();
     if (isSearchActive()) {
       SearchFilter filter = getSearchFilter();
       if (filter.isCompleted() || !isSearchRequired()) {
@@ -255,24 +256,58 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       if (searchFormClass != null) {
         LOG.warn("inner searchforms are deprecated...");
         try {
-          m_searchForm = ConfigurationUtility.newInnerInstance(this, searchFormClass);
+          setSearchForm(ConfigurationUtility.newInnerInstance(this, searchFormClass));
         }
         catch (Exception e) {
           LOG.warn(null, e);
         }
-        initSearchFormInternal();
       }
     }
   }
 
-  private void initSearchFormInternal() {
+  /**
+   * Ensures that the search form is initialized but not started, if one is defined for this table at all. This allows
+   * lazy
+   * initialization of search forms.
+   */
+  protected void ensureSearchFormCreated() {
+    if (m_searchForm == null && getConfiguredSearchForm() != null) {
+      // there is no search form, but should be
+      try {
+        setSearchForm(getConfiguredSearchForm().newInstance());
+      }
+      catch (Exception e) {
+        LOG.warn(null, e);
+      }
+    }
+  }
+
+  /**
+   * Ensures that the search form is started (lazy starting)
+   */
+  protected void ensureSearchFormStarted() {
+    if (m_searchForm != null && !m_searchForm.isFormOpen()) {
+      try {
+        m_searchForm.startSearch();
+        notifyMemoryPolicyOfSearchFormStart();
+      }
+      catch (Exception e) {
+        LOG.warn(null, e);
+      }
+    }
+  }
+
+  private void attachToSearchFormInternal() {
+    if (m_searchForm == null) {
+      return;
+    }
     m_searchForm.setDisplayHint(ISearchForm.DISPLAY_HINT_VIEW);
     if (m_searchForm.getDisplayViewId() == null) {
       m_searchForm.setDisplayViewId(IForm.VIEW_ID_PAGE_SEARCH);
     }
     m_searchForm.setAutoAddRemoveOnDesktop(false);
     // listen for search action
-    m_searchForm.addFormListener(new FormListener() {
+    m_searchFormListener = new FormListener() {
       public void formChanged(FormEvent e) throws ProcessingException {
         switch (e.getType()) {
           case FormEvent.TYPE_STORE_BEFORE: {
@@ -299,12 +334,37 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           }
         }
       }
-    });
+    };
+    m_searchForm.addFormListener(m_searchFormListener);
     try {
       execInitSearchForm();
     }
     catch (Exception e) {
       LOG.warn(null, e);
+    }
+  }
+
+  private void detachFromSearchFormInternal() {
+    if (m_searchForm == null) {
+      return;
+    }
+    // listen for search action
+    if (m_searchFormListener != null) {
+      m_searchForm.removeFormListener(m_searchFormListener);
+      m_searchFormListener = null;
+    }
+  }
+
+  private void notifyMemoryPolicyOfSearchFormStart() {
+    //use memory policy to handle content caching
+    try {
+      IMemoryPolicy policy = ClientSyncJob.getCurrentSession().getMemoryPolicy();
+      if (policy != null) {
+        policy.pageSearchFormStarted(this);
+      }
+    }
+    catch (Throwable t) {
+      LOG.error("pageCreated " + getClass().getSimpleName(), t);
     }
   }
 
@@ -317,29 +377,11 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * If the search form is defined as inner class then this method is called when the page is initialized. Otherwise it
    * is invoked when the search form is used for the first time.
    * 
-   * @see #ensureSearchFormStarted()
+   * @see #ensureSearchFormCreated() and #ensureSearchFormStarted()
    */
   @ConfigOperation
   @Order(120)
   protected void execInitSearchForm() throws ProcessingException {
-  }
-
-  /**
-   * Ensures that the search form is initialized and started, if one is defined for this table at all. This allows lazy
-   * initialization of search forms.
-   */
-  protected void ensureSearchFormStarted() {
-    if (m_searchForm == null && getConfiguredSearchForm() != null) {
-      // there is no search form, but should be
-      try {
-        setSearchForm(getConfiguredSearchForm().newInstance());
-        initSearchFormInternal();
-        m_searchForm.startSearch();
-      }
-      catch (Exception e) {
-        LOG.warn(null, e);
-      }
-    }
   }
 
   public final T getTable() {
@@ -366,16 +408,21 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   public ISearchForm getSearchFormInternal() {
-    ensureSearchFormStarted();
+    ensureSearchFormCreated();
     return m_searchForm;
   }
 
   public void setSearchForm(ISearchForm searchForm) {
+    if (m_searchForm == searchForm) {
+      return;
+    }
+    detachFromSearchFormInternal();
     m_searchForm = searchForm;
-    ensureSearchFormStarted();
+    attachToSearchFormInternal();
   }
 
   public SearchFilter getSearchFilter() {
+    ensureSearchFormCreated();
     ensureSearchFormStarted();
     if (getSearchFormInternal() != null) {
       return getSearchFormInternal().getSearchFilter();
@@ -415,6 +462,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @Override
   public void pageActivatedNotify() {
     ensureInitialized();
+    ensureSearchFormCreated();
     ensureSearchFormStarted();
     super.pageActivatedNotify();
   }
@@ -451,6 +499,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       try {
         m_table.setTableChanging(true);
         //
+        ensureSearchFormCreated();
+        ensureSearchFormStarted();
         execPopulateTable();
       }
       catch (ProcessingException pe) {
