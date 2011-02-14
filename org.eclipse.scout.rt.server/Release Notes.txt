@@ -170,6 +170,6 @@ Migration: None
 
 21.12.2010 imo
 Extracted DataModel with entities and attributes out of AbstractComposerField and moved to org.eclipse.scout.rt.shared.data.model
-Migration: None, sometimes organize imports is necessary.
+Migration: see client release notes for details.
 Legacy: There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
-and wrapped in a ComposerFieldDataModel.
+and wrapped in a ComposerFieldDataModel. Also use LegacyFormDataStatementBuilder instead of FormDataStatementBuilder

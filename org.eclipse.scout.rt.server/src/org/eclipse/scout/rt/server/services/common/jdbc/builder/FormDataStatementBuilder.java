@@ -16,11 +16,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.ClassIdentifier;
+import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.StringUtility.ITagProcessor;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -117,21 +119,40 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  */
 public class FormDataStatementBuilder implements DataModelConstants {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormDataStatementBuilder.class);
-
   private static final Pattern PLAIN_ATTRIBUTE_PATTERN = Pattern.compile("(<attribute>)([a-zA-Z_][a-zA-Z0-9_]*)(</attribute>)");
+
+  public static enum AttributeStrategy {
+    BuildConstraintOfAttribute,
+    BuildConstraintOfContext,
+    BuildConstraintOfAttributeWithContext,
+    BuildQueryOfAttributeAndConstraintOfContext,
+  }
+
+  public static enum EntityStrategy {
+    BuildConstraints,
+    BuildQuery,
+  }
+
+  public static enum AttributeKind {
+    /**
+     * no attribute node
+     */
+    Undefined,
+    NonAggregation,
+    Aggregation,
+    NonAggregationNonZeroTraversing,
+    AggregationNonZeroTraversing,
+  }
 
   private ISqlStyle m_sqlStyle;
   private IDataModel m_dataModel;
   private AliasMapper m_aliasMapper;
-  private Map<Class, DataModelAttributePartDefinition> m_dataModelAttMap;
-  private Map<Class, DataModelEntityPartDefinition> m_dataModelEntMap;
+  private Map<Class<?>, DataModelAttributePartDefinition> m_dataModelAttMap;
+  private Map<Class<?>, DataModelEntityPartDefinition> m_dataModelEntMap;
   private List<ValuePartDefinition> m_valueDefs;
   private Map<String, Object> m_bindMap;
   private AtomicInteger m_sequenceProvider;
   private StringBuffer m_where;
-  //these members are only here until the deprecation is cleared
-  private boolean m_tmpIncludeWherePartTag;
-  private boolean m_tmpIncludeAttributeTag;
 
   /**
    * @param sqlStyle
@@ -140,8 +161,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
     m_sqlStyle = sqlStyle;
     m_aliasMapper = new AliasMapper();
     m_bindMap = new HashMap<String, Object>();
-    m_dataModelAttMap = new HashMap<Class, DataModelAttributePartDefinition>();
-    m_dataModelEntMap = new HashMap<Class, DataModelEntityPartDefinition>();
+    m_dataModelAttMap = new HashMap<Class<?>, DataModelAttributePartDefinition>();
+    m_dataModelEntMap = new HashMap<Class<?>, DataModelEntityPartDefinition>();
     m_valueDefs = new ArrayList<ValuePartDefinition>();
     setSequenceProvider(new AtomicInteger(0));
   }
@@ -182,7 +203,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * <p>
    * The operator and aggregationType are required, unless a {@link ValuePartDefinition} is used.
    */
-  public void setValueDefinition(Class fieldType, String sqlAttribute, int operator) {
+  public void setValueDefinition(Class<?> fieldType, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldType, sqlAttribute, operator));
   }
 
@@ -196,7 +217,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * see {@link #setValueDefinition(Class, String, int)}
    */
-  public void setValueDefinition(Class fieldType, String sqlAttribute, int operator, boolean plainBind) {
+  public void setValueDefinition(Class<?> fieldType, String sqlAttribute, int operator, boolean plainBind) {
     setValueDefinition(new ValuePartDefinition(fieldType, sqlAttribute, operator, plainBind));
   }
 
@@ -210,7 +231,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * see {@link #setValueDefinition(Class, String, int)}
    */
-  public void setValueDefinition(Class[] fieldTypes, String sqlAttribute, int operator) {
+  public void setValueDefinition(Class<?>[] fieldTypes, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldTypes, sqlAttribute, operator, false));
   }
 
@@ -327,6 +348,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     System.out.println(c.toString());
   }
 
+  @SuppressWarnings("cast")
   public String build(AbstractFormData formData) throws ProcessingException {
     m_where = new StringBuffer();
     // get all formData fields and properties defined directly and indirectly by extending template fields, respectively
@@ -344,15 +366,15 @@ public class FormDataStatementBuilder implements DataModelConstants {
             AbstractFormFieldData field = formData.findFieldByClass(fieldsBreathFirstMap, valueTypes[i]);
             valueDatas.add(field);
             bindNames.add("" + (char) (((int) 'a') + i));
-            if (field instanceof AbstractValueFieldData) {
-              bindValues.add(((AbstractValueFieldData) field).getValue());
+            if (field instanceof AbstractValueFieldData<?>) {
+              bindValues.add(((AbstractValueFieldData<?>) field).getValue());
             }
             else {
               bindValues.add(null);
             }
           }
           else if (AbstractPropertyData.class.isAssignableFrom(valueTypes[i].getLastSegment())) {
-            AbstractPropertyData property = formData.findPropertyByClass(propertiesBreathFirstMap, valueTypes[i]);
+            AbstractPropertyData<?> property = formData.findPropertyByClass(propertiesBreathFirstMap, valueTypes[i]);
             valueDatas.add(property);
             bindNames.add("" + (char) (((int) 'a') + i));
             bindValues.add(property.getValue());
@@ -364,7 +386,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
           }
         }
         Map<String, String> parentAliasMap = getAliasMapper().getRootAliases();
-        String s = def.createNewInstance(this, valueDatas, bindNames, bindValues, parentAliasMap);
+        String s = def.createInstance(this, valueDatas, bindNames, bindValues, parentAliasMap);
         if (s != null) {
           addWhere(" AND " + s);
         }
@@ -376,9 +398,21 @@ public class FormDataStatementBuilder implements DataModelConstants {
         if (f.isValueSet()) {
           if (f instanceof AbstractTreeFieldData) {
             // composer tree with entity, attribute
-            String s = buildTreeField((AbstractTreeFieldData) f);
-            if (s != null) {
-              addWhere(" AND " + s);
+            EntityContribution contrib = buildTreeNodes(((AbstractTreeFieldData) f).getRoots(), EntityStrategy.BuildConstraints, AttributeStrategy.BuildConstraintOfAttributeWithContext);
+            // if there are no where parts, do nothing
+            if (contrib.getWhereParts().size() != 0) {
+              String wherePart = ListUtility.format(contrib.getWhereParts(), " AND ");
+
+              if (contrib.getFromParts().size() > 0) {
+                // there are from parts
+                // create an EXISTS (SELECT 1 FROM ... WHERE ...)
+                String fromPart = ListUtility.format(contrib.getFromParts(), ", ");
+                addWhere(" AND EXISTS (SELECT 1 FROM " + fromPart + " WHERE " + wherePart + ")");
+              }
+              else {
+                // no from parts, just use the where parts
+                addWhere(" AND " + wherePart);
+              }
             }
           }
         }
@@ -496,20 +530,16 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return Collections.unmodifiableList(m_valueDefs);
   }
 
-  public Map<Class, DataModelAttributePartDefinition> getDataModelAttributePartDefinitions() {
+  public Map<Class<?>, DataModelAttributePartDefinition> getDataModelAttributePartDefinitions() {
     return Collections.unmodifiableMap(m_dataModelAttMap);
   }
 
-  public Map<Class, DataModelEntityPartDefinition> getDataModelEntityPartDefinitions() {
+  public Map<Class<?>, DataModelEntityPartDefinition> getDataModelEntityPartDefinitions() {
     return Collections.unmodifiableMap(m_dataModelEntMap);
   }
 
   public String getWhereConstraints() {
     return m_where.toString();
-  }
-
-  protected long getNextBindSeqNo() {
-    return m_sequenceProvider.incrementAndGet();
   }
 
   /**
@@ -522,9 +552,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
       String locName = prefix + bindName + getNextBindSeqNo();
       return locName;
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   /**
@@ -538,113 +566,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return stm;
   }
 
-  protected String buildTreeField(AbstractTreeFieldData field) throws ProcessingException {
-    return buildTreeNodes(field.getRoots());
-  }
-
-  /**
-   * @param nodes
-   * @return the complete string of all attribute contributions
-   * @throws ProcessingException
-   */
-  protected String buildTreeNodes(List<TreeNodeData> nodes) throws ProcessingException {
-    return buildTreeNodes(nodes, true, true);
-  }
-
-  /**
-   * @param nodes
-   * @param includeWherePartTag
-   *          applied to attributes only: some attributes in the having section contain wherePart tags that belong to
-   *          the where section and not the having section
-   * @param includeAttributeTag
-   *          applied to attributes only: some attributes in the having section contain wherePart tags that belong to
-   *          the where section and not the having section
-   * @return the complete string of all attribute contributions
-   * @throws ProcessingException
-   */
-  protected String buildTreeNodes(List<TreeNodeData> nodes, boolean includeWherePartTag, boolean includeAttributeTag) throws ProcessingException {
-    StringBuilder buf = new StringBuilder();
-    int count = 0;
-    int i = 0;
-    while (i < nodes.size()) {
-      String s = null;
-      if (nodes.get(i) instanceof ComposerEntityNodeData) {
-        s = buildComposerEntityNode((ComposerEntityNodeData) nodes.get(i));
-        i++;
-      }
-      else if (nodes.get(i) instanceof ComposerAttributeNodeData) {
-        s = buildComposerAttributeNode((ComposerAttributeNodeData) nodes.get(i), includeWherePartTag, includeAttributeTag);
-        i++;
-      }
-      else if (nodes.get(i) instanceof ComposerEitherOrNodeData) {
-        ArrayList<ComposerEitherOrNodeData> orNodes = new ArrayList<ComposerEitherOrNodeData>();
-        orNodes.add((ComposerEitherOrNodeData) nodes.get(i));
-        int k = i;
-        while (k + 1 < nodes.size() && (nodes.get(k + 1) instanceof ComposerEitherOrNodeData) && !((ComposerEitherOrNodeData) nodes.get(k + 1)).isBeginOfEitherOr()) {
-          orNodes.add((ComposerEitherOrNodeData) nodes.get(k + 1));
-          k++;
-        }
-        s = buildComposerOrNodes(orNodes);
-        i = k + 1;
-      }
-      else {
-        s = buildTreeNodes(nodes.get(i).getChildNodes());
-      }
-      //
-      if (s != null) {
-        if (count > 0) {
-          buf.append(" AND ");
-        }
-        buf.append(s);
-        count++;
-      }
-    }
-    if (count > 0) {
-      return buf.toString();
-    }
-    else {
-      return null;
-    }
-  }
-
-  protected String buildComposerOrNodes(List<ComposerEitherOrNodeData> nodes) throws ProcessingException {
-    // check if only one condition
-    StringBuilder buf = new StringBuilder();
-    int count = 0;
-    for (ComposerEitherOrNodeData node : nodes) {
-      String s = buildTreeNodes(node.getChildNodes());
-      if (s != null) {
-        if (count > 0) {
-          buf.append(" OR ");
-          if (node.isNegative()) {
-            buf.append(" NOT ");
-          }
-        }
-        buf.append("(");
-        buf.append(s);
-        buf.append(")");
-        count++;
-      }
-    }
-    if (count > 0) {
-      if (count > 1) {
-        buf.insert(0, "(");
-        buf.append(")");
-        return buf.toString();
-      }
-      else {
-        String s = buf.toString();
-        if (s.matches("\\(.*\\)")) {
-          return s.substring(1, s.length() - 1).trim();
-        }
-        else {
-          return s;
-        }
-      }
-    }
-    else {
-      return null;
-    }
+  protected long getNextBindSeqNo() {
+    return m_sequenceProvider.incrementAndGet();
   }
 
   @SuppressWarnings("unchecked")
@@ -661,7 +584,116 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return null;
   }
 
-  protected String buildComposerEntityNode(ComposerEntityNodeData node) throws ProcessingException {
+  public AttributeKind getAttributeKind(TreeNodeData node) {
+    if (!(node instanceof ComposerAttributeNodeData)) {
+      return AttributeKind.Undefined;
+    }
+    //
+    ComposerAttributeNodeData attributeNode = (ComposerAttributeNodeData) node;
+    Integer agg = attributeNode.getAggregationType();
+    if (agg == null || agg == AGGREGATION_NONE) {
+      if (!isZeroTraversingAttribute(attributeNode.getOperator(), attributeNode.getValues())) {
+        return AttributeKind.NonAggregationNonZeroTraversing;
+      }
+      return AttributeKind.NonAggregation;
+    }
+    //
+    if (!isZeroTraversingAttribute(attributeNode.getOperator(), attributeNode.getValues())) {
+      return AttributeKind.AggregationNonZeroTraversing;
+    }
+    return AttributeKind.Aggregation;
+  }
+
+  /**
+   * @param nodes
+   * @return the complete string of all attribute contributions
+   * @throws ProcessingException
+   */
+  public EntityContribution buildTreeNodes(List<TreeNodeData> nodes, EntityStrategy entityStrategy, AttributeStrategy attributeStrategy) throws ProcessingException {
+    EntityContribution contrib = new EntityContribution();
+    int i = 0;
+    while (i < nodes.size()) {
+      if (nodes.get(i) instanceof ComposerEntityNodeData) {
+        String s = buildComposerEntityNode((ComposerEntityNodeData) nodes.get(i), entityStrategy);
+        if (s != null) {
+          contrib.getWhereParts().add(s);
+        }
+        i++;
+      }
+      else if (nodes.get(i) instanceof ComposerAttributeNodeData) {
+        EntityContribution subContrib = buildComposerAttributeNode((ComposerAttributeNodeData) nodes.get(i), attributeStrategy);
+        if (!subContrib.isEmpty()) {
+          contrib.add(subContrib);
+        }
+        i++;
+      }
+      else if (nodes.get(i) instanceof ComposerEitherOrNodeData) {
+        ArrayList<ComposerEitherOrNodeData> orNodes = new ArrayList<ComposerEitherOrNodeData>();
+        orNodes.add((ComposerEitherOrNodeData) nodes.get(i));
+        int k = i;
+        while (k + 1 < nodes.size() && (nodes.get(k + 1) instanceof ComposerEitherOrNodeData) && !((ComposerEitherOrNodeData) nodes.get(k + 1)).isBeginOfEitherOr()) {
+          orNodes.add((ComposerEitherOrNodeData) nodes.get(k + 1));
+          k++;
+        }
+        EntityContribution subContrib = buildComposerOrNodes(orNodes, entityStrategy, attributeStrategy);
+        if (!subContrib.isEmpty()) {
+          contrib.add(subContrib);
+        }
+        i = k + 1;
+      }
+      else {
+        EntityContribution subContrib = buildTreeNodes(nodes.get(i).getChildNodes(), entityStrategy, attributeStrategy);
+        if (!subContrib.isEmpty()) {
+          contrib.add(subContrib);
+        }
+      }
+    }
+    return contrib;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected EntityContribution buildComposerOrNodes(List<ComposerEitherOrNodeData> nodes, EntityStrategy entityStrategy, AttributeStrategy attributeStrategy) throws ProcessingException {
+    EntityContribution contrib = new EntityContribution();
+    // check if only one condition
+    StringBuilder buf = new StringBuilder();
+    int count = 0;
+    for (ComposerEitherOrNodeData node : nodes) {
+      EntityContribution subContrib = buildTreeNodes(node.getChildNodes(), entityStrategy, attributeStrategy);
+      contrib.getFromParts().addAll(subContrib.getFromParts());
+      if (subContrib.getWhereParts().size() + subContrib.getHavingParts().size() > 0) {
+        if (count > 0) {
+          buf.append(" OR ");
+          if (node.isNegative()) {
+            buf.append(" NOT ");
+          }
+        }
+        buf.append("(");
+        // remove possible outer join signs (+) in where / having constraint
+        // this is necessary because outer joins are not allowed in OR clause
+        // the removal of outer joins does not influence the result set
+        buf.append(ListUtility.format(ListUtility.combine(subContrib.getWhereParts(), subContrib.getHavingParts()), " AND ").replaceAll("\\(\\+\\)", ""));
+        buf.append(")");
+        count++;
+      }
+    }
+    if (count > 0) {
+      if (count > 1) {
+        buf.insert(0, "(");
+        buf.append(")");
+        contrib.getWhereParts().add(buf.toString());
+      }
+      else {
+        String s = buf.toString();
+        if (s.matches("\\(.*\\)")) {
+          s = s.substring(1, s.length() - 1).trim();
+        }
+        contrib.getWhereParts().add(s);
+      }
+    }
+    return contrib;
+  }
+
+  public String buildComposerEntityNode(ComposerEntityNodeData node, EntityStrategy entityStrategy) throws ProcessingException {
     if (getDataModel() == null) {
       throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
     }
@@ -677,16 +709,34 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
     ComposerEntityNodeData parentEntityNode = getParentNodeOfType(node, ComposerEntityNodeData.class);
     Map<String, String> parentAliasMap = (parentEntityNode != null ? m_aliasMapper.getNodeAliases(parentEntityNode) : m_aliasMapper.getRootAliases());
-    String stm = def.createNewInstance(this, node, parentAliasMap);
+    String baseStm;
+    switch (entityStrategy) {
+      case BuildQuery: {
+        baseStm = def.getSelectClause();
+        break;
+      }
+      case BuildConstraints: {
+        baseStm = def.getWhereClause();
+        break;
+      }
+      default: {
+        baseStm = null;
+      }
+    }
+    String stm = null;
+    if (baseStm != null) {
+      stm = def.createInstance(this, node, entityStrategy, baseStm, parentAliasMap);
+    }
     if (stm == null) {
       return null;
     }
     m_aliasMapper.addAllNodeEntitiesFrom(node, stm);
     stm = m_aliasMapper.replaceMarkersByAliases(stm, m_aliasMapper.getNodeAliases(node), parentAliasMap);
-    return buildEntityEitherOrSplit(stm, node.isNegative(), node.getChildNodes());
+    String s = buildComposerEntityEitherOrSplit(entityStrategy, stm, node.isNegative(), node.getChildNodes());
+    return s;
   }
 
-  protected String buildEntityEitherOrSplit(String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
+  protected String buildComposerEntityEitherOrSplit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
     List<List<ComposerEitherOrNodeData>> orBlocks = new ArrayList<List<ComposerEitherOrNodeData>>();
     List<TreeNodeData> otherParts = new ArrayList<TreeNodeData>();
     List<ComposerEitherOrNodeData> currentOrBlock = new ArrayList<ComposerEitherOrNodeData>();
@@ -720,7 +770,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
           ArrayList<TreeNodeData> subList = new ArrayList<TreeNodeData>();
           subList.addAll(otherParts);
           subList.addAll(orData.getChildNodes());
-          String s = buildEntityEitherOrSplit(baseStm, negative ^ orData.isNegative(), subList);
+          String s = buildComposerEntityEitherOrSplit(entityStrategy, baseStm, negative ^ orData.isNegative(), subList);
           if (s != null) {
             if (elemCount > 0) {
               elemBuf.append(" OR ");
@@ -744,121 +794,91 @@ public class FormDataStatementBuilder implements DataModelConstants {
       if (blockCount > 0) {
         return blockBuf.toString();
       }
-      else {
-        return null;
-      }
+      return null;
     }
-    else {
-      return buildEntityZeroTraversingSplit(baseStm, negative, childParts);
-    }
+    return buildComposerEntityZeroTraversingSplit(entityStrategy, baseStm, negative, childParts);
   }
 
-  protected String buildEntityZeroTraversingSplit(String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
-    // get children that have no aggregation type
-    ArrayList<TreeNodeData> wherePartChildren = new ArrayList<TreeNodeData>();
-    ArrayList<TreeNodeData> wherePartChildrenNonZeroTraversing = new ArrayList<TreeNodeData>();
+  protected String buildComposerEntityZeroTraversingSplit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
+    ArrayList<TreeNodeData> nonZeroChildren = new ArrayList<TreeNodeData>(2);
     for (TreeNodeData ch : childParts) {
-      if (ch instanceof ComposerAttributeNodeData) {
-        Integer agg = ((ComposerAttributeNodeData) ch).getAggregationType();
-        if (agg == null || agg == AGGREGATION_NONE) {
-          ComposerAttributeNodeData attributeData = (ComposerAttributeNodeData) ch;
-          wherePartChildren.add(attributeData);
-          if (!isZeroTraversingAttribute(attributeData.getOperator(), attributeData.getValues())) {
-            wherePartChildrenNonZeroTraversing.add(attributeData);
-          }
-        }
-      }
-      else {
-        wherePartChildren.add(ch);
-        wherePartChildrenNonZeroTraversing.add(ch);
-      }
-    }
-    // get children that have an aggregation type
-    ArrayList<TreeNodeData> havingPartChildren = new ArrayList<TreeNodeData>();
-    ArrayList<TreeNodeData> havingPartChildrenNonZeroTraversing = new ArrayList<TreeNodeData>();
-    for (TreeNodeData ch : childParts) {
-      if (ch instanceof ComposerAttributeNodeData) {
-        Integer agg = ((ComposerAttributeNodeData) ch).getAggregationType();
-        if (agg != null && agg != AGGREGATION_NONE) {
-          ComposerAttributeNodeData attributeData = (ComposerAttributeNodeData) ch;
-          havingPartChildren.add(attributeData);
-          if (!isZeroTraversingAttribute(attributeData.getOperator(), attributeData.getValues())) {
-            havingPartChildrenNonZeroTraversing.add(attributeData);
-          }
+      switch (getAttributeKind(ch)) {
+        case Undefined:
+        case NonAggregationNonZeroTraversing:
+        case AggregationNonZeroTraversing: {
+          nonZeroChildren.add(ch);
+          break;
         }
       }
     }
     //
     //create entity part 1
-    String entityPart1 = buildEntityPart(baseStm, negative, wherePartChildren, havingPartChildren);
+    String entityPart1 = buildComposerEntityUnit(entityStrategy, baseStm, negative, childParts);
     //create negated entity part 2
     String entityPart2 = null;
-    if (wherePartChildren.size() + havingPartChildren.size() > wherePartChildrenNonZeroTraversing.size() + havingPartChildrenNonZeroTraversing.size()) {
+    if (nonZeroChildren.size() < childParts.size()) {
       // negated negation
-      entityPart2 = buildEntityPart(baseStm, !negative, wherePartChildrenNonZeroTraversing, havingPartChildrenNonZeroTraversing);
+      entityPart2 = buildComposerEntityUnit(entityStrategy, baseStm, !negative, nonZeroChildren);
     }
     //combine parts
     if (entityPart2 != null) {
       return " ( " + entityPart1 + " OR " + entityPart2 + " ) ";
     }
-    else {
-      return entityPart1;
-    }
+    return entityPart1;
   }
 
-  protected String buildEntityPart(String baseStm, boolean negative, List<TreeNodeData> whereParts, List<TreeNodeData> havingParts) throws ProcessingException {
-    String whereParts1Text = buildTreeNodes(whereParts, true, true);
-    String whereParts2Text = buildTreeNodes(havingParts, true, false);
-    String havingPartsText = buildTreeNodes(havingParts, false, true);
+  protected String buildComposerEntityUnit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
+    EntityContribution contrib = new EntityContribution();
+    switch (entityStrategy) {
+      case BuildConstraints: {
+        ArrayList<TreeNodeData> nonAggregationParts = new ArrayList<TreeNodeData>(childParts.size());
+        ArrayList<TreeNodeData> aggregationParts = new ArrayList<TreeNodeData>(2);
+        for (TreeNodeData ch : childParts) {
+          switch (getAttributeKind(ch)) {
+            case Undefined:
+            case NonAggregation:
+            case NonAggregationNonZeroTraversing: {
+              nonAggregationParts.add(ch);
+              break;
+            }
+            case Aggregation:
+            case AggregationNonZeroTraversing: {
+              aggregationParts.add(ch);
+              break;
+            }
+          }
+        }
+        //
+        EntityContribution subContrib = buildTreeNodes(nonAggregationParts, entityStrategy, AttributeStrategy.BuildConstraintOfAttributeWithContext);
+        contrib.add(subContrib);
+        //
+        subContrib = buildTreeNodes(aggregationParts, entityStrategy, AttributeStrategy.BuildConstraintOfContext);
+        contrib.add(subContrib);
+        //
+        subContrib = buildTreeNodes(aggregationParts, entityStrategy, AttributeStrategy.BuildConstraintOfAttribute);
+        contrib.add(subContrib);
+        break;
+      }
+      case BuildQuery: {
+        EntityContribution subContrib = buildTreeNodes(childParts, entityStrategy, AttributeStrategy.BuildQueryOfAttributeAndConstraintOfContext);
+        contrib.add(subContrib);
+        break;
+      }
+    }
     //
-    String wherePartsText = whereParts1Text;
-    wherePartsText = (whereParts2Text != null ? (wherePartsText != null ? wherePartsText + " AND " + whereParts2Text : whereParts2Text) : wherePartsText);
-    String entityPart = baseStm;
-    // negation
-    if (negative) {
-      entityPart = "NOT " + entityPart;
-    }
-    // add children that have no aggregation type
-    if (wherePartsText != null) {
-      String s = " AND " + wherePartsText;
-      if (entityPart.indexOf("<whereParts/>") >= 0) {
-        entityPart = StringUtility.replace(entityPart, "<whereParts/>", s);
-      }
-      else {
-        entityPart = entityPart + s;
-      }
-    }
-    else {
-      entityPart = StringUtility.replace(entityPart, "<whereParts/>", "");
-    }
-    // add children that have an aggregation type
-    if (havingPartsText != null) {
-      String s = " AND " + havingPartsText;
-      entityPart = StringUtility.removeTagBounds(entityPart, "groupBy");
-      entityPart = StringUtility.replace(entityPart, "<havingParts/>", s);
-    }
-    else {
-      entityPart = StringUtility.removeTag(entityPart, "groupBy");
-    }
+    String entityPart = createEntityPart(baseStm, negative, contrib);
     return entityPart;
   }
 
-  /**
-   * @param includeWherePartTag
-   *          applied to attributes only: some attributes in the having section contain wherePart tags that belong to
-   *          the where section and not the having section
-   * @param includeAttributeTag
-   *          applied to attributes only: some attributes in the having section contain wherePart tags that belong to
-   *          the where section and not the having section
-   */
-  protected String buildComposerAttributeNode(final ComposerAttributeNodeData node, boolean includeWherePartTag, boolean includeAttributeTag) throws ProcessingException {
+  @SuppressWarnings("cast")
+  public EntityContribution buildComposerAttributeNode(final ComposerAttributeNodeData node, AttributeStrategy attributeStrategy) throws ProcessingException {
     if (getDataModel() == null) {
       throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
     }
     IDataModelAttribute attribute = DataModelUtility.externalIdToAttribute(getDataModel(), node.getAttributeExternalId(), null);
     if (attribute == null) {
       LOG.warn("no attribute for external id: " + node.getAttributeExternalId());
-      return null;
+      return new EntityContribution();
     }
     DataModelAttributePartDefinition def = m_dataModelAttMap.get(attribute.getClass());
     if (def == null) {
@@ -869,7 +889,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
     if (def == null) {
       LOG.warn("no PartDefinition for attribute: " + attribute);
-      return null;
+      return new EntityContribution();
     }
     List<Object> bindValues = new ArrayList<Object>();
     if (node.getValues() != null) {
@@ -882,48 +902,152 @@ public class FormDataStatementBuilder implements DataModelConstants {
     AliasMapper aliasMap = getAliasMapper();
     ComposerEntityNodeData parentEntityNode = FormDataStatementBuilder.getParentNodeOfType(node, ComposerEntityNodeData.class);
     Map<String, String> parentAliasMap = parentEntityNode != null ? aliasMap.getNodeAliases(parentEntityNode) : aliasMap.getRootAliases();
-    try {
-      m_tmpIncludeWherePartTag = includeWherePartTag;
-      m_tmpIncludeAttributeTag = includeAttributeTag;
-      return def.createNewInstance(this, node, bindNames, bindValues, parentAliasMap, includeWherePartTag, includeAttributeTag);
+    String stm = null;
+    switch (attributeStrategy) {
+      case BuildConstraintOfAttribute:
+      case BuildConstraintOfContext:
+      case BuildConstraintOfAttributeWithContext: {
+        stm = def.getWhereClause();
+        break;
+      }
+      case BuildQueryOfAttributeAndConstraintOfContext: {
+        stm = def.getSelectClause();
+        break;
+      }
     }
-    finally {
-      m_tmpIncludeWherePartTag = true;
-      m_tmpIncludeAttributeTag = true;
+    EntityContribution contrib = null;
+    if (stm != null) {
+      contrib = def.createInstance(this, node, attributeStrategy, stm, bindNames, bindValues, parentAliasMap);
     }
+    if (contrib == null) {
+      contrib = new EntityContribution();
+    }
+    switch (attributeStrategy) {
+      case BuildQueryOfAttributeAndConstraintOfContext: {
+        if (contrib.getSelectParts().isEmpty()) {
+          contrib.getSelectParts().add("NULL");
+        }
+        break;
+      }
+    }
+    return contrib;
+  }
+
+  public String createEntityPart(String stm, boolean negative, EntityContribution contrib) throws ProcessingException {
+    String entityPart = stm;
+    // extend the select section
+    if (contrib.getSelectParts().size() > 0) {
+      final String s = ListUtility.format(contrib.getSelectParts(), ", ");
+      if (StringUtility.getTag(entityPart, "selectParts") != null) {
+        entityPart = StringUtility.replaceTags(entityPart, "selectParts", new ITagProcessor() {
+          @Override
+          public String processTag(String tagName, String tagContent) {
+            if (tagContent.length() > 0) {
+              return tagContent + ", " + s;
+            }
+            return s;
+          }
+        });
+      }
+      else {
+        throw new IllegalArgumentException("missing <selectParts/> tag");
+      }
+    }
+    entityPart = StringUtility.removeTagBounds(entityPart, "selectParts");
+    // extend the from section
+    TreeSet<String> fromParts = new TreeSet<String>(contrib.getFromParts());
+    if (fromParts.size() > 0) {
+      final String s = ListUtility.format(fromParts, ", ");
+      if (StringUtility.getTag(entityPart, "fromParts") != null) {
+        entityPart = StringUtility.replaceTags(entityPart, "fromParts", new ITagProcessor() {
+          @Override
+          public String processTag(String tagName, String tagContent) {
+            return tagContent + ", " + s;//legacy: always prefix an additional ,
+          }
+        });
+      }
+      else {
+        throw new IllegalArgumentException("missing <fromParts/> tag");
+      }
+    }
+    entityPart = StringUtility.removeTagBounds(entityPart, "fromParts");
+    // extend the where section
+    if (contrib.getWhereParts().size() > 0) {
+      final String s = ListUtility.format(contrib.getWhereParts(), " AND ");
+      if (StringUtility.getTag(entityPart, "whereParts") != null) {
+        entityPart = StringUtility.replaceTags(entityPart, "whereParts", new ITagProcessor() {
+          @Override
+          public String processTag(String tagName, String tagContent) {
+            return " AND " + s;//legacy: always prefix an additional AND
+          }
+        });
+      }
+      else {
+        entityPart = entityPart + " AND " + s;
+      }
+    }
+    entityPart = StringUtility.removeTagBounds(entityPart, "whereParts");
+    // extend the group by / having section
+    int selectGroupByDelta = contrib.getSelectParts().size() - contrib.getGroupByParts().size();
+    if ((selectGroupByDelta > 0 && contrib.getGroupByParts().size() > 0) || contrib.getHavingParts().size() > 0) {
+      entityPart = StringUtility.removeTagBounds(entityPart, "groupBy");
+      if (contrib.getGroupByParts().size() > 0) {
+        final String s = ListUtility.format(contrib.getGroupByParts(), ", ");
+        if (StringUtility.getTag(entityPart, "groupByParts") != null) {
+          entityPart = StringUtility.replaceTags(entityPart, "groupByParts", new ITagProcessor() {
+            @Override
+            public String processTag(String tagName, String tagContent) {
+              if (tagContent.length() > 0) {
+                return tagContent + ", " + s;
+              }
+              return s;
+            }
+          });
+        }
+        else {
+          throw new IllegalArgumentException("missing <groupByParts/> tag");
+        }
+      }
+      entityPart = StringUtility.removeTagBounds(entityPart, "groupByParts");
+      //
+      if (contrib.getHavingParts().size() > 0) {
+        final String s = ListUtility.format(contrib.getHavingParts(), " AND ");
+        if (StringUtility.getTag(entityPart, "havingParts") != null) {
+          entityPart = StringUtility.replaceTags(entityPart, "havingParts", new ITagProcessor() {
+            @Override
+            public String processTag(String tagName, String tagContent) {
+              return tagContent + " AND " + s;//legacy: always prefix an additional AND
+            }
+          });
+        }
+        else {
+          throw new IllegalArgumentException("missing <havingParts/> tag");
+        }
+      }
+      else {
+        entityPart = StringUtility.removeTagBounds(entityPart, "havingParts");
+      }
+    }
+    else {
+      entityPart = StringUtility.removeTag(entityPart, "groupBy");
+    }
+    // negation
+    if (negative) {
+      entityPart = " NOT (" + entityPart + ") ";
+    }
+    return entityPart;
   }
 
   /**
-   * @deprecated use
-   *             {@link #createComposerAttributeStatementPart(Integer, String, int, List, List, boolean, Map, boolean, boolean)}
+   * adding an attribute as an entity contribution
+   * <p>
+   * 
+   * @param stm
+   *          may contain attribute, fromPart and wherePart tags
    */
-  @Deprecated
-  public String createComposerAttributeStatementPart(final Integer aggregationType, String stm, final int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
-    return createComposerAttributeStatementPart(aggregationType, stm, operation, bindNames, bindValues, plainBind, parentAliasMap, m_tmpIncludeWherePartTag, m_tmpIncludeAttributeTag);
-  }
-
-  /**
-   * @param includeWherePartTag
-   *          see
-   *          {@link DataModelAttributePartDefinition#createNewInstance(FormDataStatementBuilder, ComposerAttributeNodeData, List, List, Map, boolean, boolean)}
-   * @param includeAttributeTag
-   *          see
-   *          {@link DataModelAttributePartDefinition#createNewInstance(FormDataStatementBuilder, ComposerAttributeNodeData, List, List, Map, boolean, boolean)}
-   */
-  public String createComposerAttributeStatementPart(Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap, boolean includeWherePartTag, boolean includeAttributeTag) throws ProcessingException {
-    if (!includeWherePartTag) {
-      stm = StringUtility.removeTag(stm, "wherePart");
-    }
-    if (!includeAttributeTag) {
-      stm = StringUtility.removeTag(stm, "attribute");
-      aggregationType = AGGREGATION_NONE;
-      operation = OPERATOR_NONE;
-    }
-    if (stm.endsWith(" AND ")) {
-      stm = stm.substring(0, stm.length() - 4).trim();
-    }
-    if (stm.startsWith(" AND ")) {
-      stm = stm.substring(4).trim();
+  public EntityContribution createAttributePart(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
+    if (stm == null) {
+      return new EntityContribution();
     }
     //convenience: automatically wrap attribute in attribute tags
     if (stm.indexOf("<attribute>") < 0) {
@@ -942,9 +1066,195 @@ public class FormDataStatementBuilder implements DataModelConstants {
         throw new ProcessingException("composer attribute " + stm + " uses no @...@ alias prefix, but parent has more than 1 alias: " + parentAliasMap);
       }
     }
-    //resolve aliases
-    stm = m_aliasMapper.replaceMarkersByAliases(stm, parentAliasMap, parentAliasMap);
-    return createStatementPart(aggregationType, stm, operation, bindNames, bindValues, plainBind, parentAliasMap);
+    boolean isAg = (aggregationType != null && aggregationType != AGGREGATION_NONE);
+    EntityContribution contrib = new EntityContribution();
+    //special handling of NOT: wrap NOT around complete constraint text and not only in attribute operator
+    int positiveOperation;
+    boolean negation;
+    switch (operation) {
+      case OPERATOR_DATE_IS_NOT_TODAY: {
+        positiveOperation = OPERATOR_DATE_IS_TODAY;
+        negation = true;
+        break;
+      }
+      case OPERATOR_DATE_NEQ: {
+        positiveOperation = OPERATOR_DATE_EQ;
+        negation = true;
+        break;
+      }
+      case OPERATOR_DATE_TIME_IS_NOT_NOW: {
+        positiveOperation = OPERATOR_DATE_TIME_IS_NOW;
+        negation = true;
+        break;
+      }
+      case OPERATOR_DATE_TIME_NEQ: {
+        positiveOperation = OPERATOR_DATE_TIME_EQ;
+        negation = true;
+        break;
+      }
+      case OPERATOR_NEQ: {
+        positiveOperation = OPERATOR_EQ;
+        negation = true;
+        break;
+      }
+      case OPERATOR_NOT_CONTAINS: {
+        positiveOperation = OPERATOR_CONTAINS;
+        negation = true;
+        break;
+      }
+      case OPERATOR_NOT_ENDS_WITH: {
+        positiveOperation = OPERATOR_ENDS_WITH;
+        negation = true;
+        break;
+      }
+      case OPERATOR_NOT_IN: {
+        positiveOperation = OPERATOR_IN;
+        negation = true;
+        break;
+      }
+      case OPERATOR_NOT_NULL: {
+        positiveOperation = OPERATOR_NULL;
+        negation = true;
+        break;
+      }
+      case OPERATOR_NOT_STARTS_WITH: {
+        positiveOperation = OPERATOR_STARTS_WITH;
+        negation = true;
+        break;
+      }
+      case OPERATOR_NUMBER_NOT_NULL: {
+        positiveOperation = OPERATOR_NUMBER_NULL;
+        negation = true;
+        break;
+      }
+      case OPERATOR_TIME_IS_NOT_NOW: {
+        positiveOperation = OPERATOR_TIME_IS_NOW;
+        negation = true;
+        break;
+      }
+      default: {
+        positiveOperation = operation;
+        negation = false;
+      }
+    }
+    //
+    String fromPart = StringUtility.getTag(stm, "fromPart");
+    stm = StringUtility.removeTag(stm, "fromPart").trim();
+    String wherePart = StringUtility.getTag(stm, "wherePart");
+    if (wherePart == null) {
+      String tmp = StringUtility.removeTag(stm, "attribute").trim();
+      if (tmp.length() > 0) {
+        wherePart = stm;
+        stm = "";
+      }
+    }
+    stm = StringUtility.removeTag(stm, "wherePart").trim();
+    String attPart = StringUtility.getTag(stm, "attribute");
+    stm = StringUtility.removeTag(stm, "attribute").trim();
+    if (stm.length() > 0) {
+      LOG.warn("attribute part is not well-formed; contains wherePart tag and also other sql text: " + stm);
+    }
+    //
+    //from
+    if (fromPart != null) {
+      //resolve aliases in from
+      // miss-using 'contrib' as a "node" because real node is not accessible
+      m_aliasMapper.addMissingNodeEntitiesFrom(contrib, fromPart);
+      Map<String, String> aliasMap = m_aliasMapper.getNodeAliases(contrib);
+      parentAliasMap.putAll(aliasMap);
+      fromPart = m_aliasMapper.replaceMarkersByAliases(fromPart, parentAliasMap, parentAliasMap);
+      contrib.getFromParts().add(fromPart);
+    }
+    switch (attributeStrategy) {
+      //select ... where
+      case BuildQueryOfAttributeAndConstraintOfContext: {
+        //select
+        if (attPart != null) {
+          String sql = createSqlPart(aggregationType, attPart, OPERATOR_NONE, bindNames, bindValues, plainBind, parentAliasMap);
+          if (sql != null) {
+            contrib.getSelectParts().add(sql);
+            if (!isAg) {
+              contrib.getGroupByParts().add(sql);
+            }
+          }
+        }
+        //where
+        if (wherePart != null) {
+          wherePart = StringUtility.replaceTags(wherePart, "attribute", "1=1").trim();
+          String sql = createSqlPart(wherePart, bindNames, bindValues, plainBind, parentAliasMap);
+          if (sql != null) {
+            contrib.getWhereParts().add(sql);
+          }
+        }
+        break;
+      }
+        //where / having
+      case BuildConstraintOfAttribute: {
+        if (attPart != null) {
+          String sql = createSqlPart(aggregationType, attPart, positiveOperation, bindNames, bindValues, plainBind, parentAliasMap);
+          if (sql != null) {
+            if (negation) {
+              sql = "NOT(" + sql + ")";
+            }
+            if (isAg) {
+              contrib.getHavingParts().add(sql);
+            }
+            else {
+              contrib.getWhereParts().add(sql);
+            }
+          }
+        }
+        break;
+      }
+      case BuildConstraintOfContext: {
+        if (wherePart != null) {
+          wherePart = StringUtility.replaceTags(wherePart, "attribute", "1=1").trim();
+          String sql = createSqlPart(wherePart, bindNames, bindValues, plainBind, parentAliasMap);
+          if (sql != null) {
+            contrib.getWhereParts().add(sql);
+          }
+        }
+        break;
+      }
+      case BuildConstraintOfAttributeWithContext: {
+        String whereAndAttPart = (wherePart != null ? wherePart : "") + (wherePart != null && attPart != null ? " AND " : "") + (attPart != null ? "<attribute>" + attPart + "</attribute>" : "");
+        if (whereAndAttPart.length() > 0) {
+          String sql = createSqlPart(aggregationType, whereAndAttPart, positiveOperation, bindNames, bindValues, plainBind, parentAliasMap);
+          if (sql != null) {
+            if (negation) {
+              sql = "NOT(" + sql + ")";
+            }
+            contrib.getWhereParts().add(sql);
+          }
+        }
+        break;
+      }
+    }
+    return contrib;
+  }
+
+  /**
+   * adding an attribute as an entity contribution
+   * <p>
+   * 
+   * @param stm
+   *          may contain attribute, fromPart and wherePart tags
+   */
+  public String createAttributePartSimple(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
+    EntityContribution contrib = createAttributePart(attributeStrategy, aggregationType, stm, operation, bindNames, bindValues, plainBind, parentAliasMap);
+    if (contrib.isEmpty()) {
+      return null;
+    }
+    return ListUtility.format(contrib.getWhereParts(), " AND ");
+  }
+
+  /**
+   * Create sql text, makes bind names unique, and adds all binds to the bind map
+   * <p>
+   * Convenience for {@link #createSqlPart(AGGREGATION_NONE, String, OPERATOR_NONE, List, List, boolean, Map)}
+   */
+  public String createSqlPart(String sql, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
+    return createSqlPart(AGGREGATION_NONE, sql, OPERATOR_NONE, bindNames, bindValues, plainBind, parentAliasMap);
   }
 
   /**
@@ -955,52 +1265,57 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * <p>
    * To use no aggregation use {@link DataModelConstants#AGGREGATION_NONE}
    */
-  public String createStatementPart(final Integer aggregationType, String stm, final int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
-    if (stm == null) stm = "";
-    if (bindNames == null) bindNames = new ArrayList<String>(0);
-    if (bindValues == null) bindValues = new ArrayList<Object>(0);
-    stm = StringUtility.removeTagBounds(stm, "wherePart");
+  public String createSqlPart(final Integer aggregationType, String sql, final int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
+    if (sql == null) {
+      sql = "";
+    }
+    if (bindNames == null) {
+      bindNames = new ArrayList<String>(0);
+    }
+    if (bindValues == null) {
+      bindValues = new ArrayList<Object>(0);
+    }
     // the attribute was of the form: NAME or
     // <attribute>NAME</attribute>
     // make sure there is an attribute tag in the string, if none enclose all
     // by default
-    if (stm.indexOf("<attribute>") < 0) {
-      stm = "<attribute>" + stm + "</attribute>";
+    if (sql.indexOf("<attribute>") < 0) {
+      sql = "<attribute>" + sql + "</attribute>";
     }
     //convenience: automatically add missing alias on plain attributes, but only if the parent entity has at most 1 alias mapping
-    Matcher m = PLAIN_ATTRIBUTE_PATTERN.matcher(stm);
+    Matcher m = PLAIN_ATTRIBUTE_PATTERN.matcher(sql);
     if (m.find()) {
       if (parentAliasMap.size() == 0) {
         //nop
       }
       else if (parentAliasMap.size() == 1) {
-        stm = m.replaceAll("$1@parent." + parentAliasMap.keySet().iterator().next() + "@.$2$3");
+        sql = m.replaceAll("$1@parent." + parentAliasMap.keySet().iterator().next() + "@.$2$3");
       }
       else {
-        throw new ProcessingException("root attribute with " + stm + " uses no @...@ alias prefix, but parent has more than 1 alias: " + parentAliasMap);
+        throw new ProcessingException("root attribute with " + sql + " uses no @...@ alias prefix, but parent has more than 1 alias: " + parentAliasMap);
       }
     }
     //resolve aliases
-    stm = m_aliasMapper.replaceMarkersByAliases(stm, parentAliasMap, parentAliasMap);
+    sql = m_aliasMapper.replaceMarkersByAliases(sql, parentAliasMap, parentAliasMap);
     // generate unique bind names
     final ArrayList<String> newBindNames = new ArrayList<String>(2);
     for (int i = 0; i < bindNames.size(); i++) {
       String o = bindNames.get(i);
       String n = localizeBindName(o, "__");
       newBindNames.add(n);
-      stm = localizeStatement(stm, o, n);
+      sql = localizeStatement(sql, o, n);
     }
     // part decoration
     final List<Object> valuesFinal = bindValues;
     ITagProcessor processor = new ITagProcessor() {
-      public String processTag(String tagName, String attribute) {
-        return createAttributeOpValuePart(attribute, operation, aggregationType, newBindNames, valuesFinal, plainBind);
+      public String processTag(String tagName, String a) {
+        return createSqlOpValuePart(aggregationType, a, operation, newBindNames, valuesFinal, plainBind);
       }
     };
-    return StringUtility.replaceTags(stm, "attribute", processor);
+    return StringUtility.replaceTags(sql, "attribute", processor);
   }
 
-  protected String createAttributeOpValuePart(String attribute, int operation, Integer aggregationType, List<String> bindNames, List<Object> bindValues, boolean plainBind) {
+  public String createSqlOpValuePart(Integer aggregationType, String sql, int operation, List<String> bindNames, List<Object> bindValues, boolean plainBind) {
     String[] names = (bindNames != null ? bindNames.toArray(new String[bindNames.size()]) : new String[0]);
     Object[] values = (bindValues != null ? bindValues.toArray(new Object[bindValues.size()]) : new Object[0]);
     if (plainBind && operation != OPERATOR_NONE) {
@@ -1013,33 +1328,33 @@ public class FormDataStatementBuilder implements DataModelConstants {
     if (aggregationType != null && aggregationType != AGGREGATION_NONE) {
       switch (aggregationType) {
         case AGGREGATION_COUNT: {
-          attribute = m_sqlStyle.toAggregationCount(attribute);
+          sql = m_sqlStyle.toAggregationCount(sql);
           break;
         }
         case AGGREGATION_MIN: {
-          attribute = m_sqlStyle.toAggregationMin(attribute);
+          sql = m_sqlStyle.toAggregationMin(sql);
           break;
         }
         case AGGREGATION_MAX: {
-          attribute = m_sqlStyle.toAggregationMax(attribute);
+          sql = m_sqlStyle.toAggregationMax(sql);
           break;
         }
         case AGGREGATION_SUM: {
-          attribute = m_sqlStyle.toAggregationSum(attribute);
+          sql = m_sqlStyle.toAggregationSum(sql);
           break;
         }
         case AGGREGATION_AVG: {
-          attribute = m_sqlStyle.toAggregationAvg(attribute);
+          sql = m_sqlStyle.toAggregationAvg(sql);
           break;
         }
         case AGGREGATION_MEDIAN: {
-          attribute = m_sqlStyle.toAggregationMedian(attribute);
+          sql = m_sqlStyle.toAggregationMedian(sql);
           break;
         }
       }
     }
     else if (isZeroTraversingAttribute(operation, values)) {
-      attribute = m_sqlStyle.getNvlToken() + "(" + attribute + ",0)";
+      sql = m_sqlStyle.getNvlToken() + "(" + sql + ",0)";
     }
     //
     switch (operation) {
@@ -1050,7 +1365,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
             for (int i = 0; i < names.length; i++) {
               tokenValue.put(names[i], m_sqlStyle.toPlainText(values[i]));
             }
-            BindModel m = new BindParser(attribute).parse();
+            BindModel m = new BindParser(sql).parse();
             IToken[] tokens = m.getIOTokens();
             if (tokens != null) {
               for (IToken iToken : tokens) {
@@ -1061,348 +1376,373 @@ public class FormDataStatementBuilder implements DataModelConstants {
                 }
               }
             }
-            attribute = m.getFilteredStatement();
+            sql = m.getFilteredStatement();
           }
         }
         else {
           addBinds(names, values);
         }
-        return attribute;
+        return sql;
       }
       case OPERATOR_BETWEEN: {
-        if (!plainBind) addBinds(names, values);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
         if (values[0] == null) {
-          return m_sqlStyle.createLE(attribute, names[1]);
+          return m_sqlStyle.createLE(sql, names[1]);
         }
         else if (values[1] == null) {
-          return m_sqlStyle.createGE(attribute, names[0]);
+          return m_sqlStyle.createGE(sql, names[0]);
         }
         else {
-          return m_sqlStyle.createBetween(attribute, names[0], names[1]);
+          return m_sqlStyle.createBetween(sql, names[0], names[1]);
         }
       }
       case OPERATOR_DATE_BETWEEN: {
-        if (!plainBind) addBinds(names, values);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
         if (values[0] == null) {
-          return m_sqlStyle.createDateLE(attribute, names[1]);
+          return m_sqlStyle.createDateLE(sql, names[1]);
         }
         else if (values[1] == null) {
-          return m_sqlStyle.createDateGE(attribute, names[0]);
+          return m_sqlStyle.createDateGE(sql, names[0]);
         }
         else {
-          return m_sqlStyle.createDateBetween(attribute, names[0], names[1]);
+          return m_sqlStyle.createDateBetween(sql, names[0], names[1]);
         }
       }
       case OPERATOR_DATE_TIME_BETWEEN: {
-        if (!plainBind) addBinds(names, values);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
         if (values[0] == null) {
-          return m_sqlStyle.createDateTimeLE(attribute, names[1]);
+          return m_sqlStyle.createDateTimeLE(sql, names[1]);
         }
         else if (values[1] == null) {
-          return m_sqlStyle.createDateTimeGE(attribute, names[0]);
+          return m_sqlStyle.createDateTimeGE(sql, names[0]);
         }
         else {
-          return m_sqlStyle.createDateTimeBetween(attribute, names[0], names[1]);
+          return m_sqlStyle.createDateTimeBetween(sql, names[0], names[1]);
         }
       }
       case OPERATOR_EQ: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createEQ(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createEQ(sql, names[0]);
       }
       case OPERATOR_DATE_EQ: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateEQ(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateEQ(sql, names[0]);
       }
       case OPERATOR_DATE_TIME_EQ: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateTimeEQ(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateTimeEQ(sql, names[0]);
       }
       case OPERATOR_GE: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createGE(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createGE(sql, names[0]);
       }
       case OPERATOR_DATE_GE: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateGE(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateGE(sql, names[0]);
       }
       case OPERATOR_DATE_TIME_GE: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateTimeGE(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateTimeGE(sql, names[0]);
       }
       case OPERATOR_GT: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createGT(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createGT(sql, names[0]);
       }
       case OPERATOR_DATE_GT: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateGT(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateGT(sql, names[0]);
       }
       case OPERATOR_DATE_TIME_GT: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateTimeGT(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateTimeGT(sql, names[0]);
       }
       case OPERATOR_LE: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createLE(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createLE(sql, names[0]);
       }
       case OPERATOR_DATE_LE: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateLE(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateLE(sql, names[0]);
       }
       case OPERATOR_DATE_TIME_LE: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateTimeLE(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateTimeLE(sql, names[0]);
       }
       case OPERATOR_LT: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createLT(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createLT(sql, names[0]);
       }
       case OPERATOR_DATE_LT: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateLT(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateLT(sql, names[0]);
       }
       case OPERATOR_DATE_TIME_LT: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateTimeLT(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateTimeLT(sql, names[0]);
       }
       case OPERATOR_NEQ: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createNEQ(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createNEQ(sql, names[0]);
       }
       case OPERATOR_DATE_NEQ: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateNEQ(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateNEQ(sql, names[0]);
       }
       case OPERATOR_DATE_TIME_NEQ: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateTimeNEQ(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateTimeNEQ(sql, names[0]);
       }
       case OPERATOR_DATE_IS_IN_DAYS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateIsInDays(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateIsInDays(sql, names[0]);
       }
       case OPERATOR_DATE_IS_IN_GE_DAYS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateIsInGEDays(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateIsInGEDays(sql, names[0]);
       }
       case OPERATOR_DATE_IS_IN_GE_MONTHS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateIsInGEMonths(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateIsInGEMonths(sql, names[0]);
       }
       case OPERATOR_DATE_IS_IN_LE_DAYS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateIsInLEDays(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateIsInLEDays(sql, names[0]);
       }
       case OPERATOR_DATE_IS_IN_LE_MONTHS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateIsInLEMonths(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateIsInLEMonths(sql, names[0]);
       }
       case OPERATOR_DATE_IS_IN_LAST_DAYS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateIsInLastDays(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateIsInLastDays(sql, names[0]);
       }
       case OPERATOR_DATE_IS_IN_LAST_MONTHS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateIsInLastMonths(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateIsInLastMonths(sql, names[0]);
       }
       case OPERATOR_DATE_IS_IN_MONTHS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateIsInMonths(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateIsInMonths(sql, names[0]);
       }
       case OPERATOR_DATE_IS_IN_NEXT_DAYS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateIsInNextDays(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateIsInNextDays(sql, names[0]);
       }
       case OPERATOR_DATE_IS_IN_NEXT_MONTHS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateIsInNextMonths(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateIsInNextMonths(sql, names[0]);
       }
       case OPERATOR_DATE_IS_NOT_TODAY: {
-        return m_sqlStyle.createDateIsNotToday(attribute);
+        return m_sqlStyle.createDateIsNotToday(sql);
       }
       case OPERATOR_DATE_IS_TODAY: {
-        return m_sqlStyle.createDateIsToday(attribute);
+        return m_sqlStyle.createDateIsToday(sql);
       }
       case OPERATOR_DATE_TIME_IS_IN_GE_HOURS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateTimeIsInGEHours(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateTimeIsInGEHours(sql, names[0]);
       }
       case OPERATOR_DATE_TIME_IS_IN_GE_MINUTES: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateTimeIsInGEMinutes(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateTimeIsInGEMinutes(sql, names[0]);
       }
       case OPERATOR_DATE_TIME_IS_IN_LE_HOURS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateTimeIsInLEHours(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateTimeIsInLEHours(sql, names[0]);
       }
       case OPERATOR_DATE_TIME_IS_IN_LE_MINUTES: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createDateTimeIsInLEMinutes(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createDateTimeIsInLEMinutes(sql, names[0]);
       }
       case OPERATOR_DATE_TIME_IS_NOT_NOW: {
-        return m_sqlStyle.createDateTimeIsNotNow(attribute);
+        return m_sqlStyle.createDateTimeIsNotNow(sql);
       }
       case OPERATOR_DATE_TIME_IS_NOW: {
-        return m_sqlStyle.createDateTimeIsNow(attribute);
+        return m_sqlStyle.createDateTimeIsNow(sql);
       }
       case OPERATOR_ENDS_WITH: {
-        if (!plainBind) addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
-        return m_sqlStyle.createEndsWith(attribute, names[0]);
+        if (!plainBind) {
+          addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
+        }
+        return m_sqlStyle.createEndsWith(sql, names[0]);
       }
       case OPERATOR_NOT_ENDS_WITH: {
-        if (!plainBind) addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
-        return m_sqlStyle.createNotEndsWith(attribute, names[0]);
+        if (!plainBind) {
+          addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
+        }
+        return m_sqlStyle.createNotEndsWith(sql, names[0]);
       }
       case OPERATOR_IN: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createIn(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+          return m_sqlStyle.createIn(sql, names[0]);
+        }
+        return m_sqlStyle.createInList(sql, values[0]);
       }
       case OPERATOR_CONTAINS: {
-        if (!plainBind) addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
-        return m_sqlStyle.createContains(attribute, names[0]);
+        if (!plainBind) {
+          addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
+        }
+        return m_sqlStyle.createContains(sql, names[0]);
       }
       case OPERATOR_LIKE: {
-        if (!plainBind) addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
-        return m_sqlStyle.createLike(attribute, names[0]);
+        if (!plainBind) {
+          addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
+        }
+        return m_sqlStyle.createLike(sql, names[0]);
       }
       case OPERATOR_NOT_IN: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createNotIn(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+          return m_sqlStyle.createNotIn(sql, names[0]);
+        }
+        return m_sqlStyle.createNotInList(sql, values[0]);
       }
       case OPERATOR_NOT_CONTAINS: {
-        if (!plainBind) addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
-        return m_sqlStyle.createNotContains(attribute, names[0]);
+        if (!plainBind) {
+          addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
+        }
+        return m_sqlStyle.createNotContains(sql, names[0]);
       }
       case OPERATOR_NOT_NULL: {
-        return m_sqlStyle.createNotNull(attribute);
+        return m_sqlStyle.createNotNull(sql);
       }
       case OPERATOR_NUMBER_NOT_NULL: {
-        return m_sqlStyle.createNumberNotNull(attribute);
+        return m_sqlStyle.createNumberNotNull(sql);
       }
       case OPERATOR_NULL: {
-        return m_sqlStyle.createNull(attribute);
+        return m_sqlStyle.createNull(sql);
       }
       case OPERATOR_NUMBER_NULL: {
-        return m_sqlStyle.createNumberNull(attribute);
+        return m_sqlStyle.createNumberNull(sql);
       }
       case OPERATOR_STARTS_WITH: {
-        if (!plainBind) addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
-        return m_sqlStyle.createStartsWith(attribute, names[0]);
+        if (!plainBind) {
+          addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
+        }
+        return m_sqlStyle.createStartsWith(sql, names[0]);
       }
       case OPERATOR_NOT_STARTS_WITH: {
-        if (!plainBind) addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
-        return m_sqlStyle.createNotStartsWith(attribute, names[0]);
+        if (!plainBind) {
+          addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
+        }
+        return m_sqlStyle.createNotStartsWith(sql, names[0]);
       }
       case OPERATOR_TIME_IS_IN_GE_HOURS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createTimeIsInGEHours(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createTimeIsInGEHours(sql, names[0]);
       }
       case OPERATOR_TIME_IS_IN_GE_MINUTES: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createTimeIsInGEMinutes(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createTimeIsInGEMinutes(sql, names[0]);
       }
       case OPERATOR_TIME_IS_IN_HOURS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createTimeIsInHours(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createTimeIsInHours(sql, names[0]);
       }
       case OPERATOR_TIME_IS_IN_LE_HOURS: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createTimeIsInLEHours(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createTimeIsInLEHours(sql, names[0]);
       }
       case OPERATOR_TIME_IS_IN_LE_MINUTES: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createTimeIsInLEMinutes(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createTimeIsInLEMinutes(sql, names[0]);
       }
       case OPERATOR_TIME_IS_IN_MINUTES: {
-        if (!plainBind) addBinds(names, values);
-        return m_sqlStyle.createTimeIsInMinutes(attribute, names[0]);
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createTimeIsInMinutes(sql, names[0]);
       }
       case OPERATOR_TIME_IS_NOW: {
-        return m_sqlStyle.createTimeIsNow(attribute);
+        return m_sqlStyle.createTimeIsNow(sql);
       }
       case OPERATOR_TIME_IS_NOT_NOW: {
-        return m_sqlStyle.createTimeIsNotNow(attribute);
+        return m_sqlStyle.createTimeIsNotNow(sql);
       }
       default: {
         throw new IllegalArgumentException("invalid operator: " + operation);
       }
     }
   }
-
-  /*
-   * deprecated api
-   */
-
-  /**
-   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String)}
-   */
-  @Deprecated
-  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute) {
-    setDataModelAttributeDefinition(attributeType, sqlAttribute);
-  }
-
-  /**
-   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String, boolean)}
-   */
-  @Deprecated
-  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute, boolean plainBind) {
-    setDataModelAttributeDefinition(attributeType, sqlAttribute, plainBind);
-  }
-
-  /**
-   * @deprecated use {@link #setDataModelAttributeDefinition(Class, String, String, boolean)}
-   */
-  @Deprecated
-  public void setComposerAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String whereClause, String selectClause, boolean plainBind) {
-    setDataModelAttributeDefinition(attributeType, whereClause, selectClause, plainBind);
-  }
-
-  /**
-   * @deprecated use {@link #setDataModelAttributeDefinition(DataModelAttributePartDefinition)}
-   */
-  @Deprecated
-  public void setComposerAttributeDefinition(DataModelAttributePartDefinition def) {
-    setDataModelAttributeDefinition(def);
-  }
-
-  /**
-   * @deprecated use {@link #setDataModelEntityDefinition(Class, String)}
-   */
-  @Deprecated
-  public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause) {
-    setDataModelEntityDefinition(entityType, whereClause);
-  }
-
-  /**
-   * @deprecated use {@link #setDataModelEntityDefinition(Class, String, String)}
-   */
-  @Deprecated
-  public void setComposerEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause, String selectClause) {
-    setDataModelEntityDefinition(entityType, whereClause, selectClause);
-  }
-
-  /**
-   * @deprecated use {@link #setDataModelEntityDefinition(DataModelEntityPartDefinition)}
-   */
-  @Deprecated
-  public void setComposerEntityDefinition(DataModelEntityPartDefinition def) {
-    setDataModelEntityDefinition(def);
-  }
-
-  /**
-   * @deprecated use {@link #getDataModelAttributePartDefinitions()}
-   */
-  @Deprecated
-  public Map<Class, DataModelAttributePartDefinition> getComposerAttributePartDefinitions() {
-    return getDataModelAttributePartDefinitions();
-  }
-
-  /**
-   * @deprecated use {@link #getDataModelEntityPartDefinitions()}
-   */
-  @Deprecated
-  public Map<Class, DataModelEntityPartDefinition> getComposerEntityPartDefinitions() {
-    return getDataModelEntityPartDefinitions();
-  }
-
 }

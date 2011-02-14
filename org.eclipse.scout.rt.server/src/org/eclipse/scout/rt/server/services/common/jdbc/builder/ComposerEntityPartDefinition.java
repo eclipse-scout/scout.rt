@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 
+import java.util.Map;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeData;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 /**
@@ -25,4 +29,9 @@ public class ComposerEntityPartDefinition extends DataModelEntityPartDefinition 
   public ComposerEntityPartDefinition(Class<? extends IDataModelEntity> entityType, String whereClause, String selectClause) {
     super(entityType, whereClause, selectClause);
   }
+
+  public String createNewInstance(FormDataStatementBuilder builder, ComposerEntityNodeData entityNodeData, Map<String, String> parentAliasMap) throws ProcessingException {
+    return getWhereClause();
+  }
+
 }

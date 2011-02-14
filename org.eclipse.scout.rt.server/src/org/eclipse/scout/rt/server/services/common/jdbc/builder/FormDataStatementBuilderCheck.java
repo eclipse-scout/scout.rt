@@ -22,9 +22,6 @@ import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
-/**
- * @author imo
- */
 public class FormDataStatementBuilderCheck {
   protected final FormDataStatementBuilder builder;
   private TreeSet<String> m_imports;
@@ -89,9 +86,7 @@ public class FormDataStatementBuilderCheck {
     if (m_visited.contains(o.getClass())) {
       return;
     }
-    else {
-      m_visited.add(o.getClass());
-    }
+    m_visited.add(o.getClass());
     //
     if (o instanceof AbstractFormData) {
       for (Object f : ((AbstractFormData) o).getFields()) {
@@ -133,9 +128,13 @@ public class FormDataStatementBuilderCheck {
   protected void checkValueField(AbstractValueFieldData<?> v) {
     ValuePartDefinition part = null;
     for (ValuePartDefinition f : builder.getValuePartDefinitions()) {
-      if (part != null) break;
+      if (part != null) {
+        break;
+      }
       for (ClassIdentifier t : f.getValueTypeClassIdentifiers()) {
-        if (part != null) break;
+        if (part != null) {
+          break;
+        }
         if (t.getLastSegment() == v.getClass()) {
           part = f;
         }
