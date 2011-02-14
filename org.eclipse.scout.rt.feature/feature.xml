@@ -25,8 +25,8 @@ BSI Business Systems Integration AG - initial API and implementation
    </license>
 
    <url>
-      <update label="The Eclipse Project Updates" url="http://download.eclipse.org/eclipse/updates/3.6"/>
-      <discovery label="The Eclipse Project Updates" url="http://download.eclipse.org/eclipse/updates/3.6"/>
+      <update label="Indigo" url="http://download.eclipse.org/releases/indigo"/>
+      <discovery label="Indigo" url="http://download.eclipse.org/releases/indigo"/>
       <discovery label="Orbit" url="http://download.eclipse.org/tools/orbit/downloads/drops/updateSite"/>
    </url>
 
@@ -51,6 +51,8 @@ BSI Business Systems Integration AG - initial API and implementation
       <import plugin="org.apache.xml.resolver"/>
       <import plugin="org.apache.xml.serializer"/>
       <import plugin="org.easymock"/>
+      <import feature="org.eclipse.equinox.server.servletbridge"/>
+      <import feature="org.eclipse.equinox.serverside.sdk"/>
    </requires>
 
    <plugin
