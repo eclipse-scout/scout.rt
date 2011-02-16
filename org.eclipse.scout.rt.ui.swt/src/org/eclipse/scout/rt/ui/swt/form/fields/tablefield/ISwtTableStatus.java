@@ -8,15 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swing.form.fields.tablefield;
+package org.eclipse.scout.rt.ui.swt.form.fields.tablefield;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 
 /**
  * Table Status Composite
  */
-public interface ISwingTableStatus {
+public interface ISwtTableStatus {
 
   void setStatus(IProcessingStatus populateStatus, IProcessingStatus selectionStatus);
+
+  void dispose();
 
 }

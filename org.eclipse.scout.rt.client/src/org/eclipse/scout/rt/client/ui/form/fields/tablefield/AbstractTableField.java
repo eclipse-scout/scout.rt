@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,7 +23,9 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
@@ -65,14 +67,11 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   /**
-   * The default implementation calculates the selected and total row count and the sum of all numeric columns;
-   * Then calls {@link #setTableStatus(String)}
+   * @return the selected row count, total row count and the sum of all numeric columns
+   *         <p>
+   *         returns null if no table is contained within this table field
    */
-  @ConfigOperation
-  @Order(195)
-  protected void execUpdateTableStatus() {
-    if (!isTableStatusVisible()) return;
-    //
+  public String createDefaultTableStatus() {
     StringBuilder statusText = new StringBuilder();
     ITable table = getTable();
     if (table != null) {
@@ -90,7 +89,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
       else if (nSel > 1) {
         statusText.append(", " + ScoutTexts.get("XSelected", NumberUtility.format(nSel)));
         // show sums of numeric columns
-        for (IColumn c : table.getColumnSet().getVisibleColumns()) {
+        for (IColumn<?> c : table.getColumnSet().getVisibleColumns()) {
           NumberFormat fmt = null;
           Object sum = null;
           if (c instanceof IBigDecimalColumn) {
@@ -128,12 +127,22 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         }
       }
     }
-    if (statusText.length() > 0) {
-      setTableStatus(statusText.toString());
+    if (statusText.length() == 0) {
+      return null;
     }
-    else {
-      setTableStatus(null);
+    return statusText.toString();
+  }
+
+  /**
+   * The default calls {@link #createDefaultTableStatus()} and calls {@link #setTableStatus(String)}
+   */
+  @ConfigOperation
+  @Order(195)
+  protected void execUpdateTableStatus() {
+    if (!isTableStatusVisible()) {
+      return;
     }
+    setTableStatus(createDefaultTableStatus());
   }
 
   @ConfigOperation
@@ -169,7 +178,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   private Class<? extends ITable> getConfiguredTable() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     Class<? extends ITable>[] f = ConfigurationUtility.filterClasses(dca, ITable.class);
     if (f.length == 1) return f[0];
     else {
@@ -427,11 +436,28 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   public String getTableStatus() {
-    return (String) propertySupport.getProperty(PROP_TABLE_STATUS);
+    IProcessingStatus status = getTableSelectionStatus();
+    return status != null ? status.getMessage() : null;
   }
 
   public void setTableStatus(String status) {
-    propertySupport.setProperty(PROP_TABLE_STATUS, status);
+    setTableSelectionStatus(status != null ? new ProcessingStatus(status, ProcessingStatus.INFO) : null);
+  }
+
+  public IProcessingStatus getTableSelectionStatus() {
+    return (IProcessingStatus) propertySupport.getProperty(PROP_TABLE_SELECTION_STATUS);
+  }
+
+  public void setTableSelectionStatus(IProcessingStatus status) {
+    propertySupport.setProperty(PROP_TABLE_SELECTION_STATUS, status);
+  }
+
+  public IProcessingStatus getTablePopulateStatus() {
+    return (IProcessingStatus) propertySupport.getProperty(PROP_TABLE_POPULATE_STATUS);
+  }
+
+  public void setTablePopulateStatus(IProcessingStatus status) {
+    propertySupport.setProperty(PROP_TABLE_POPULATE_STATUS, status);
   }
 
   public boolean isTableStatusVisible() {
