@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm.MainBox.OutlineTableField;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
  * Default form displaying the current page's table
@@ -108,13 +107,13 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
 
       @Override
       protected void execUpdateTableStatus() {
+        if (!isTableStatusVisible()) {
+          return;
+        }
         IOutline outline = getDesktop().getOutline();
         if (outline != null && outline.getActivePage() instanceof IPageWithTable<?>) {
           IPageWithTable<?> tablePage = (IPageWithTable<?>) outline.getActivePage();
-          if (tablePage.isSearchActive() && tablePage.getSearchFilter() != null && (!tablePage.getSearchFilter().isCompleted()) && tablePage.isSearchRequired()) {
-            setTableStatus(ScoutTexts.get("TooManyRows"));
-            return;
-          }
+          setTablePopulateStatus(tablePage.getTablePopulateStatus());
         }
         super.execUpdateTableStatus();
       }

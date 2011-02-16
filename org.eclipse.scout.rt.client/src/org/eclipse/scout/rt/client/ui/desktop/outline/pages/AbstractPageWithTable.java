@@ -20,7 +20,9 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -42,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ContextMap;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.service.SERVICES;
@@ -54,6 +57,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPageWithTable.class);
 
   private T m_table;
+  private IProcessingStatus m_tablePopulateStatus;
   private ISearchForm m_searchForm;
   private FormListener m_searchFormListener;
   private boolean m_searchRequired;
@@ -177,6 +181,13 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       // searchFilter should never be null
       //do NOT reference the result data object and warp it into a ref, so the processor is allowed to delete the contents to free up memory sooner
       getTable().replaceRowsByMatrix(new AtomicReference<Object>(execLoadTableData(new SearchFilter())));
+    }
+    //update table data status
+    if (isSearchActive() && getSearchFilter() != null && (!getSearchFilter().isCompleted()) && isSearchRequired()) {
+      setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("TooManyRows"), ProcessingStatus.WARNING));
+    }
+    else {
+      setTablePopulateStatus(null);
     }
   }
 
@@ -465,6 +476,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     ensureSearchFormCreated();
     ensureSearchFormStarted();
     super.pageActivatedNotify();
+  }
+
+  public IProcessingStatus getTablePopulateStatus() {
+    return m_tablePopulateStatus;
+  }
+
+  public void setTablePopulateStatus(IProcessingStatus status) {
+    m_tablePopulateStatus = status;
   }
 
   /**

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,18 +13,16 @@ package org.eclipse.scout.rt.ui.swing.form.fields.tablefield;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.BorderUIResource;
 
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTable;
-import org.eclipse.scout.rt.ui.swing.ext.JLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
@@ -54,24 +52,8 @@ public class SwingScoutTableField extends SwingScoutFieldComposite<ITableField<?
 
   protected ISwingTableStatus createSwingTableStatus(JComponent container) {
     if (getScoutObject().isTableStatusVisible()) {
-      JLabelEx label = new JLabelEx();
-      if (!SwingUtility.isSynth()) {
-        label.setBorder(new BorderUIResource(new EmptyBorder(0, 4, 0, 0)));
-      }
-      //set synth name AFTER setting ui border
-      label.setName("Synth.TableStatus");
-      LogicalGridData tableGridData = LogicalGridDataBuilder.createField(getSwingEnvironment(), getScoutObject().getGridData());
-      LogicalGridData gd = new LogicalGridData();
-      gd.gridx = tableGridData.gridx;
-      gd.gridy = tableGridData.gridy + tableGridData.gridh;
-      gd.gridw = tableGridData.gridw;
-      gd.gridh = 1;
-      gd.weightx = tableGridData.weightx;
-      gd.weighty = 0.0;
-      gd.fillHorizontal = true;
-      label.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, gd);
-      container.add(label);
-      return new SwingTableStatus(label);
+      //
+      return new SwingTableStatus(getSwingEnvironment(), container, getScoutObject());
     }
     return null;
   }
@@ -106,8 +88,9 @@ public class SwingScoutTableField extends SwingScoutFieldComposite<ITableField<?
 
   protected void setTableStatusFromScout() {
     if (m_swingTableStatus != null) {
-      String s = getScoutObject().getTableStatus();
-      m_swingTableStatus.setStatusText(s);
+      IProcessingStatus dataStatus = getScoutObject().getTablePopulateStatus();
+      IProcessingStatus selectionStatus = getScoutObject().getTableSelectionStatus();
+      m_swingTableStatus.setStatus(dataStatus, selectionStatus);
     }
   }
 
@@ -160,7 +143,10 @@ public class SwingScoutTableField extends SwingScoutFieldComposite<ITableField<?
     if (name.equals(ITableField.PROP_TABLE)) {
       setTableFromScout();
     }
-    else if (name.equals(ITableField.PROP_TABLE_STATUS)) {
+    else if (name.equals(ITableField.PROP_TABLE_SELECTION_STATUS)) {
+      setTableStatusFromScout();
+    }
+    else if (name.equals(ITableField.PROP_TABLE_POPULATE_STATUS)) {
       setTableStatusFromScout();
     }
   }

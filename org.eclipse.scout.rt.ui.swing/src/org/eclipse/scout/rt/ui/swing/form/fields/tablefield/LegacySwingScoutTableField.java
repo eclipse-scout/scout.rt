@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing.form.fields.tablefield;
 
 import javax.swing.JComponent;
 
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
@@ -28,8 +29,10 @@ public class LegacySwingScoutTableField extends SwingScoutTableField {
     if (getScoutObject().isTableStatusVisible()) {
       return new ISwingTableStatus() {
         @Override
-        public void setStatusText(String s) {
+        public void setStatus(IProcessingStatus dataStatus, IProcessingStatus selectionStatus) {
           ISwingEnvironment env = getSwingEnvironment();
+          IProcessingStatus status = dataStatus != null ? dataStatus : selectionStatus;
+          String s = (status != null ? status.getMessage() : null);
           if (env != null && env.getRootComposite() != null) {
             //bsi ticket 95826: eliminate newlines
             if (s != null) {
@@ -46,7 +49,7 @@ public class LegacySwingScoutTableField extends SwingScoutTableField {
   @Override
   protected void detachScout() {
     if (getSwingTableStatus() != null) {
-      getSwingTableStatus().setStatusText(null);
+      getSwingTableStatus().setStatus(null, null);
     }
     super.detachScout();
   }
