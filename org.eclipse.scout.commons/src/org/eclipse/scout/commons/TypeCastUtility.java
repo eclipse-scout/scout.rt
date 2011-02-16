@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -50,6 +50,7 @@ public final class TypeCastUtility {
   private static final int SQLTIME = 16;
   private static final int SQLTIMESTAMP = 17;
   private static final int TRISTATE = 18;
+  private static final int UTCDATE = 19;
   private static final int VOID = 9999;
 
   @SuppressWarnings("unchecked")
@@ -87,6 +88,7 @@ public final class TypeCastUtility {
     m_typeMap.put(Object.class, new Integer(OBJECT));
     m_typeMap.put(BigInteger.class, new Integer(BIGINTEGER));
     m_typeMap.put(BigDecimal.class, new Integer(BIGDECIMAL));
+    m_typeMap.put(UTCDate.class, new Integer(UTCDATE));
     m_typeMap.put(Date.class, new Integer(DATE));
     m_typeMap.put(Calendar.class, new Integer(CALENDAR));
     m_typeMap.put(GregorianCalendar.class, new Integer(CALENDAR));
@@ -709,6 +711,9 @@ public final class TypeCastUtility {
           case DATE: {
             return txStringToDate((String) o);
           }
+          case UTCDATE: {
+            return txStringToUTCDate((String) o);
+          }
           case CALENDAR: {
             return txStringToCalendar((String) o);
           }
@@ -834,6 +839,9 @@ public final class TypeCastUtility {
           case DATE: {
             return o;
           }
+          case UTCDATE: {
+            return txDateToUTCDate((Date) o);
+          }
           case CALENDAR: {
             return txDateToCalendar((Date) o);
           }
@@ -855,10 +863,42 @@ public final class TypeCastUtility {
         }
         break;
       }
+      case UTCDATE: {
+        switch (toId) {
+          case UTCDATE: {
+            return o;
+          }
+          case DATE: {
+            return txUTCDateToDate((UTCDate) o);
+          }
+          case CALENDAR: {
+            return txUTCDateToCalendar((UTCDate) o);
+          }
+          case SQLDATE: {
+            return txUTCDateToSqlDate((UTCDate) o);
+          }
+          case SQLTIME: {
+            return txUTCDateToSqlTime((UTCDate) o);
+          }
+          case SQLTIMESTAMP: {
+            return txUTCDateToSqlTimestamp((UTCDate) o);
+          }
+          case STRING: {
+            return txUTCDateToString((UTCDate) o);
+          }
+          case OBJECT: {
+            return o;
+          }
+        }
+        break;
+      }
       case CALENDAR: {
         switch (toId) {
           case DATE: {
             return txCalendarToDate((Calendar) o);
+          }
+          case UTCDATE: {
+            return txCalendarToUTCDate((Calendar) o);
           }
           case CALENDAR: {
             return o;
@@ -886,6 +926,9 @@ public final class TypeCastUtility {
           case DATE: {
             return o;
           }
+          case UTCDATE: {
+            return txSqlDateToUTCDate((java.sql.Date) o);
+          }
           case CALENDAR: {
             return txSqlDateToCalendar((java.sql.Date) o);
           }
@@ -912,6 +955,9 @@ public final class TypeCastUtility {
           case DATE: {
             return o;
           }
+          case UTCDATE: {
+            return txSqlTimeToUTCDate((java.sql.Time) o);
+          }
           case CALENDAR: {
             return txSqlTimeToCalendar((java.sql.Time) o);
           }
@@ -937,6 +983,9 @@ public final class TypeCastUtility {
         switch (toId) {
           case DATE: {
             return o;
+          }
+          case UTCDATE: {
+            return txSqlTimestampToUTCDate((java.sql.Timestamp) o);
           }
           case CALENDAR: {
             return txSqlTimestampToCalendar((java.sql.Timestamp) o);
@@ -1387,6 +1436,10 @@ public final class TypeCastUtility {
     return o.getTime();
   }
 
+  private UTCDate txCalendarToUTCDate(Calendar o) {
+    return new UTCDate(o.getTime().getTime());
+  }
+
   private java.sql.Date txCalendarToSqlDate(Calendar o) {
     return new java.sql.Date(o.getTimeInMillis());
   }
@@ -1417,6 +1470,10 @@ public final class TypeCastUtility {
     return cal;
   }
 
+  private UTCDate txDateToUTCDate(Date o) {
+    return new UTCDate(o.getTime());
+  }
+
   private java.sql.Date txDateToSqlDate(Date o) {
     return new java.sql.Date(o.getTime());
   }
@@ -1430,6 +1487,32 @@ public final class TypeCastUtility {
   }
 
   private String txDateToString(Date o) {
+    return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").format(o);
+  }
+
+  private Date txUTCDateToDate(UTCDate o) {
+    return o;
+  }
+
+  private Calendar txUTCDateToCalendar(UTCDate o) {
+    GregorianCalendar cal = new GregorianCalendar();
+    cal.setTime(o);
+    return cal;
+  }
+
+  private java.sql.Date txUTCDateToSqlDate(UTCDate o) {
+    return new java.sql.Date(o.getTime());
+  }
+
+  private java.sql.Time txUTCDateToSqlTime(UTCDate o) {
+    return new java.sql.Time(o.getTime());
+  }
+
+  private java.sql.Timestamp txUTCDateToSqlTimestamp(UTCDate o) {
+    return new java.sql.Timestamp(o.getTime());
+  }
+
+  private String txUTCDateToString(UTCDate o) {
     return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").format(o);
   }
 
@@ -1487,6 +1570,10 @@ public final class TypeCastUtility {
     return new Timestamp(o.getTime());
   }
 
+  private UTCDate txSqlDateToUTCDate(java.sql.Date o) {
+    return new UTCDate(o.getTime());
+  }
+
   private String txSqlDateToString(java.sql.Date o) {
     return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").format(o);
   }
@@ -1503,6 +1590,10 @@ public final class TypeCastUtility {
 
   private java.sql.Time txSqlTimestampToSqlTime(java.sql.Timestamp o) {
     return new java.sql.Time(o.getTime());
+  }
+
+  private UTCDate txSqlTimestampToUTCDate(java.sql.Timestamp o) {
+    return new UTCDate(o.getTime());
   }
 
   private String txSqlTimestampToString(java.sql.Timestamp o) {
@@ -1523,6 +1614,10 @@ public final class TypeCastUtility {
     return new java.sql.Timestamp(o.getTime());
   }
 
+  private UTCDate txSqlTimeToUTCDate(java.sql.Time o) {
+    return new UTCDate(o.getTime());
+  }
+
   private String txSqlTimeToString(java.sql.Time o) {
     return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").format(o);
   }
@@ -1533,6 +1628,16 @@ public final class TypeCastUtility {
     }
     catch (ParseException pe) {
       throw createException(o, String.class, Date.class, 5, pe.getMessage());
+    }
+  }
+
+  private UTCDate txStringToUTCDate(String o) {
+    try {
+      Date d = new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss.sss'Z'").parse(o);
+      return new UTCDate(d.getTime());
+    }
+    catch (ParseException pe) {
+      throw createException(o, String.class, UTCDate.class, 5, pe.getMessage());
     }
   }
 

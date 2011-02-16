@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,11 +14,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 
+import org.eclipse.scout.commons.UTCDate;
 import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
 
 /**
  * Serialization override<br>
  * used partly to make Date's timezone independent using StaticDate class
+ * <p>
+ * {@link UTCDate}s are not converted and pass unchanged.
  */
 public class ServiceTunnelOutputStream extends BundleObjectOutputStream {
 
@@ -28,7 +31,7 @@ public class ServiceTunnelOutputStream extends BundleObjectOutputStream {
 
   @Override
   protected Object replaceObject(Object obj) throws IOException {
-    if (obj instanceof Date) {
+    if (obj instanceof Date && !(obj instanceof UTCDate)) {
       return new StaticDate((Date) obj);
     }
     return super.replaceObject(obj);
