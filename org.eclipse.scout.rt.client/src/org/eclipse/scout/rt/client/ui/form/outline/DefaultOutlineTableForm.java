@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.outline;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -112,10 +113,21 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
         }
         IOutline outline = getDesktop().getOutline();
         if (outline != null && outline.getActivePage() instanceof IPageWithTable<?>) {
+          //popuplate status
           IPageWithTable<?> tablePage = (IPageWithTable<?>) outline.getActivePage();
           setTablePopulateStatus(tablePage.getTablePopulateStatus());
+          //selection status
+          if (tablePage.isSearchActive() && tablePage.getSearchFilter() != null && (!tablePage.getSearchFilter().isCompleted()) && tablePage.isSearchRequired()) {
+            setTableSelectionStatus(null);
+          }
+          else {
+            setTableSelectionStatus(new ProcessingStatus(createDefaultTableStatus(), ProcessingStatus.INFO));
+          }
         }
-        super.execUpdateTableStatus();
+        else {
+          setTablePopulateStatus(null);
+          setTableSelectionStatus(null);
+        }
       }
 
       @Override
