@@ -228,3 +228,6 @@ Migration: Swing-Gui: none / SWT-Gui: if application uses more than one perspect
 bsi ticket 98'890
 fixed model change counters running out of sync if unchecked exceptions are thrown.
 Migration: None
+
+16.02.2011 imo
+Splitted ITableField tableStatus into tablePopulateStatus and tableSelectionStatus
