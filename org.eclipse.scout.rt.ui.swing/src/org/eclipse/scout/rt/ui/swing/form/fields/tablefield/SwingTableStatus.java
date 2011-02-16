@@ -19,7 +19,6 @@ import javax.swing.plaf.BorderUIResource;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -77,13 +76,12 @@ public class SwingTableStatus implements ISwingTableStatus {
   @Override
   public void setStatus(IProcessingStatus populateStatus, IProcessingStatus selectionStatus) {
     setStatusImpl(m_populateLabel, populateStatus, true);
-    setStatusImpl(m_selectionLabel, selectionStatus, false);
+    setStatusImpl(m_selectionLabel, selectionStatus, true);
   }
 
   private void setStatusImpl(JLabel field, IProcessingStatus status, boolean hideWhenNullStatus) {
     if (status == null) {
       field.setText(null);
-      field.setIcon(null);
       if (hideWhenNullStatus) {
         field.setVisible(false);
       }
@@ -100,17 +98,14 @@ public class SwingTableStatus implements ISwingTableStatus {
     switch (status.getSeverity()) {
       case IProcessingStatus.ERROR:
       case IProcessingStatus.FATAL: {
-        field.setIcon(m_env.getIcon(AbstractIcons.StatusError));
         field.setForeground(new Color(0xcc0000));
         break;
       }
       case IProcessingStatus.WARNING: {
-        field.setIcon(m_env.getIcon(AbstractIcons.StatusWarning));
         field.setForeground(new Color(0xfe9a23));
         break;
       }
       default: {
-        field.setIcon(null);
         field.setForeground(null);
       }
     }
