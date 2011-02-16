@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -375,6 +375,38 @@ public final class HTMLUtility {
     catch (BadLocationException e) {
       return "";
     }
+  }
+
+  /**
+   * @return simple and quick conversion of html text to plain text without parsing and building of a html model
+   *         <p>
+   *         Rule based conversion:
+   * 
+   *         <pre>
+   * <xmp>
+   * <br>|<br/>
+   * |
+   * 
+   *         </p>
+   *         |
+   *         <p/>
+   *         |</tr>|</table> create newlines </xmp></pre>
+   */
+  public static String getPlainText(String s) {
+    s = StringUtility.getTag(s, "body");
+    if (s == null || s.length() == 0) {
+      return s;
+    }
+    //newlines
+    s = s.replaceAll("\n", " ");
+    s = s.replaceAll("<br>|<br/>|</p>|<p/>|</tr>|</table>", "\n");
+    //remove tags
+    s = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(s).replaceAll(" ");
+    //remove multiple spaces
+    s = s.replaceAll("[ ]+", " ");
+    s = StringUtility.htmlDecode(s);
+    s = s.trim();
+    return s;
   }
 
   /**
