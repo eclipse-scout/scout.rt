@@ -209,28 +209,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   Object[][] getTableData();
 
   /**
-   * @return matrix[rowCount][columnCount] with cell as CSV cells
-   *         <p>
-   *         The returned csv will be:
-   *         <ul>
-   *         <li>Optional row: column names (Strings)</li>
-   *         <li>Optional row: column types (Classes)</li>
-   *         <li>Optional row: column formats (Strings)</li>
-   *         <li>Data row (Objects)</li>
-   *         <li>Data row (Objects)</li>
-   *         <li>...</li>
-   *         </ul>
-   *         <p>
-   *         valid exported csv types include:
-   *         <ul>
-   *         <li>java.lang.String</li>
-   *         <li>java.lang.Long</li>
-   *         <li>java.lang.Integer</li>
-   *         <li>java.lang.Float</li>
-   *         <li>java.lang.Double</li>
-   *         <li>java.lang.Boolean</li>
-   *         <li>java.util.Date</li>
-   *         </ul>
+   * see {@link TableUtility#exportRowsAsCSV(ITableRow[], IColumn[], boolean, boolean, boolean)}
    */
   Object[][] exportTableRowsAsCSV(ITableRow[] rows, IColumn[] columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormat);
 

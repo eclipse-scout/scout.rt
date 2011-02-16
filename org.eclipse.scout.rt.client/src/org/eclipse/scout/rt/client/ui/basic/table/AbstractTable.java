@@ -11,11 +11,9 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.net.URL;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +30,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
@@ -54,15 +51,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.DefaultTableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ITimeColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.AddCustomColumnMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ModifyCustomColumnMenu;
@@ -1622,106 +1612,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   public Object[][] exportTableRowsAsCSV(ITableRow[] rows, IColumn[] columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormats) {
-    int nr = rows.length;
-    Object[][] a = new Object[nr + (includeLineForColumnNames ? 1 : 0) + (includeLineForColumnTypes ? 1 : 0) + (includeLineForColumnFormats ? 1 : 0)][columns.length];
-    for (int c = 0; c < columns.length; c++) {
-      IColumn col = columns[c];
-      Class<?> type;
-      boolean byValue;
-      String format;
-      if (col instanceof IDateColumn) {
-        if (((IDateColumn) col).isHasTime()) {
-          type = Timestamp.class;
-          byValue = true;
-          format = ((IDateColumn) col).getFormat();
-        }
-        else {
-          type = Date.class;
-          byValue = true;
-          format = ((IDateColumn) col).getFormat();
-        }
-      }
-      else if (col instanceof IDoubleColumn) {
-        type = Double.class;
-        byValue = true;
-        format = ((IDoubleColumn) col).getFormat();
-      }
-      else if (col instanceof IIntegerColumn) {
-        type = Integer.class;
-        byValue = true;
-        format = ((IIntegerColumn) col).getFormat();
-      }
-      else if (col instanceof ILongColumn) {
-        type = Long.class;
-        byValue = true;
-        format = ((ILongColumn) col).getFormat();
-      }
-      else if (col instanceof IBigDecimalColumn) {
-        type = Long.class;
-        byValue = true;
-        format = ((IBigDecimalColumn) col).getFormat();
-      }
-      else if (col instanceof ISmartColumn<?>) {
-        type = String.class;
-        byValue = false;
-        format = null;
-      }
-      else if (col instanceof ITimeColumn) {
-        type = Date.class;
-        byValue = true;
-        format = ((ITimeColumn) col).getFormat();
-      }
-      else if (col instanceof IBooleanColumn) {
-        type = Boolean.class;
-        byValue = false;
-        format = null;
-      }
-      else {
-        type = String.class;
-        byValue = false;
-        format = null;
-      }
-      //
-      int csvRowIndex = 0;
-      if (includeLineForColumnNames) {
-        a[csvRowIndex][c] = columns[c].getHeaderCell().getText();
-        csvRowIndex++;
-      }
-      if (includeLineForColumnTypes) {
-        a[csvRowIndex][c] = type;
-        csvRowIndex++;
-      }
-      if (includeLineForColumnFormats) {
-        a[csvRowIndex][c] = format;
-        csvRowIndex++;
-      }
-      for (int r = 0; r < nr; r++) {
-        if (byValue) {
-          if (type == Timestamp.class) {
-            a[csvRowIndex][c] = TypeCastUtility.castValue(columns[c].getValue(rows[r]), Timestamp.class);
-          }
-          else {
-            a[csvRowIndex][c] = columns[c].getValue(rows[r]);
-          }
-        }
-        else {
-          String text = columns[c].getDisplayText(rows[r]);
-          //special intercept for boolean
-          if (type == Boolean.class) {
-            Boolean b = TypeCastUtility.castValue(columns[c].getValue(rows[r]), Boolean.class);
-            if (b != null && b.booleanValue()) {
-              //make sure there is a text
-              if (text == null || text.trim().length() == 0) {
-                text = "X";
-              }
-            }
-          }
-          a[csvRowIndex][c] = text;
-        }
-        csvRowIndex++;
-      }
-    }
-    return a;
+    return TableUtility.exportRowsAsCSV(rows, columns, includeLineForColumnNames, includeLineForColumnTypes, includeLineForColumnFormats);
   }
 
   public ITableRow[] getRows(int[] rowIndexes) {
