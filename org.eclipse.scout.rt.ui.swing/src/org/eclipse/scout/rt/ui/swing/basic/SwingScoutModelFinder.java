@@ -14,8 +14,6 @@ import java.awt.Component;
 import java.lang.reflect.Field;
 
 import javax.swing.JComponent;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -39,15 +37,6 @@ public class SwingScoutModelFinder {
       return null;
     }
     Object s = null;
-    if (c instanceof JTree) {
-      TreePath path = ((JTree) c).getSelectionPath();
-      if (path != null) {
-        Object x = path.getLastPathComponent();
-        if (x instanceof ITreeNode) {
-          s = x;
-        }
-      }
-    }
     if (s == null) {
       Component tmp = c;
       while (tmp != null) {
