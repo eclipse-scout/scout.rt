@@ -63,14 +63,13 @@ public class BundleObjectInputStream extends ObjectInputStream {
     enableResolveObject(true);
   }
 
+  /**
+   * explicitly made public to allow object replacers to load classes via the input stream
+   */
   @Override
-  protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+  public Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
     return defaultResolveClass(desc.getName());
   }
-
-  /*
-   * Interface IObjectInputStream
-   */
 
   private Class<?> defaultResolveClass(String className) throws ClassNotFoundException, IOException {
     Class c = PRIMITIVE_TYPES.get(className);

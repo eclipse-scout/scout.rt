@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,7 +18,8 @@ import org.osgi.framework.Bundle;
 
 /**
  * Serialization override<br>
- * used partly to make Date's timezone independent using StaticDate class
+ * used to make Date's timezone independent using StaticDate class
+ * and lazy (convenient) permissions loading using {@link LenientPermissionsWrapper}
  */
 public class ServiceTunnelInputStream extends BundleObjectInputStream {
 
@@ -30,6 +31,9 @@ public class ServiceTunnelInputStream extends BundleObjectInputStream {
   protected Object resolveObject(Object obj) throws IOException {
     if (obj instanceof StaticDate) {
       return ((StaticDate) obj).getDate();
+    }
+    if (obj instanceof LenientPermissionsWrapper) {
+      return ((LenientPermissionsWrapper) obj).getPermissions();
     }
     return super.resolveObject(obj);
   }

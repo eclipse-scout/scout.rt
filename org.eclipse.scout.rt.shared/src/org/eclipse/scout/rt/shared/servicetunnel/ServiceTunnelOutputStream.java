@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.Permissions;
 import java.util.Date;
 
 import org.eclipse.scout.commons.UTCDate;
@@ -22,6 +23,8 @@ import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
  * used partly to make Date's timezone independent using StaticDate class
  * <p>
  * {@link UTCDate}s are not converted and pass unchanged.
+ * <p>
+ * converts {@link Permissions} to {@link LenientPermissionsWrapper}
  */
 public class ServiceTunnelOutputStream extends BundleObjectOutputStream {
 
@@ -33,6 +36,9 @@ public class ServiceTunnelOutputStream extends BundleObjectOutputStream {
   protected Object replaceObject(Object obj) throws IOException {
     if (obj instanceof Date && !(obj instanceof UTCDate)) {
       return new StaticDate((Date) obj);
+    }
+    if (obj != null && obj.getClass() == Permissions.class) {
+      return new LenientPermissionsWrapper((Permissions) obj);
     }
     return super.replaceObject(obj);
   }
