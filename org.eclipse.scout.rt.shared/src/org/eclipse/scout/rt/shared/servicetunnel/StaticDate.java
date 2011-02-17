@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Static date representation as string, independent of TimeZone and daylight
@@ -25,7 +26,7 @@ public class StaticDate implements java.io.Serializable {
   private long m_textAsLong;
 
   public StaticDate(Date d) {
-    Calendar cal = Calendar.getInstance();
+    Calendar cal = new GregorianCalendar();
     cal.setTime(d);
     long l = 0;
     l = cal.get(Calendar.YEAR);
@@ -40,7 +41,7 @@ public class StaticDate implements java.io.Serializable {
 
   public Date getDate() {
     try {
-      Calendar cal = Calendar.getInstance();
+      Calendar cal = new GregorianCalendar();
       long l = m_textAsLong;
       cal.set(Calendar.MILLISECOND, (int) (l % 1000));
       l = l / 1000;
