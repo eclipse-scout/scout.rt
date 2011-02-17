@@ -25,3 +25,7 @@ AbstractPropertyData.isValueSet() was not taken into account when importing a fo
 
 11.02.2011 jgu
 New translations inserted for the languages bg,cs,da,el,es,fi,fr_BE,fr,hr,hu,it,nl_BE,nl,no,pl,pt_br,ru,se,sk,sl,sr,tr,zh_TW,zh.
+
+17.02.2011 imo
+added support for safe and lenient permissions transfer via service tunnel overriding serialization of Permissions object to list of serialized objects thus supporting skipping unknown permissions instead of skipping the whole Permissions class
+see ServiceTunnelInputStream, ServiceTunnelOutputStream, LenientPermissionWrapper, LenientPermissionsWrapper
