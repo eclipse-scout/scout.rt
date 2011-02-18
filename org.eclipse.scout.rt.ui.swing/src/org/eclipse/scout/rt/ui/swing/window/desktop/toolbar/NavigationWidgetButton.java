@@ -57,8 +57,6 @@ public class NavigationWidgetButton {
 
   private ButtonName m_name;
 
-//  protected final ISwingEnvironment m_env;
-
   NavigationWidgetButton(ButtonName name, JComponent parent) {
     m_name = name;
     m_parent = parent;

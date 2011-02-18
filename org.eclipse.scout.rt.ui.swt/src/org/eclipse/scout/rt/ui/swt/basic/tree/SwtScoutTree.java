@@ -240,19 +240,6 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     if (getSwtField().isDisposed()) {
       return;
     }
-    /* 06.10.2010, imo asks: why was there a (forced) single selection on the tree
-     * when scout wants to have an empty selection?
-     * Is it a known swt bug to set empty selection on a tree?
-     * Removed the following section, since it makes little sense to me.
-     */
-    /*
-    if (scoutNodes == null || scoutNodes.length < 1) {
-      ITreeNode[] childNodes = getScoutObject().getRootNode().getChildNodes();
-      if (childNodes.length > 0) {
-        scoutNodes = new ITreeNode[]{childNodes[0]};
-      }
-    }
-    */
     getSwtTreeViewer().setSelection(new StructuredSelection(scoutNodes));
     getSwtField().showSelection();
   }
