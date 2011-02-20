@@ -219,3 +219,8 @@ Migration: None
 
 16.02.2011 imo
 Splitted ITableField tableStatus into tablePopulateStatus and tableSelectionStatus
+
+20.02.2011 dwi
+org.eclipse.scout.rt.client
+DefaultWizardStatusHtmlProvider > Bug-Fix: display of step number within wrapping step names
+
