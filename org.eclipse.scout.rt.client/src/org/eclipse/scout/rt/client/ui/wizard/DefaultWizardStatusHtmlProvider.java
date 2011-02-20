@@ -99,7 +99,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     appendHtmlForSpacerLine(buf, spacerCssClass, 7);
     buf.append("<tr class=\"" + cssClass + "\">\n");
     buf.append(" <td width=\"15\"><img src=\"empty.png\" width=\"1\" height=\"30\"></td>\n");
-    buf.append(" <td width=\"24\" class=\"bullet\">" + index + "</td>\n");
+    buf.append(" <td width=\"24\" valign=\"top\" class=\"bullet\" style=\"padding:4px;\">" + index + "</td>\n");
     buf.append(" <td width=\"17\"></td>\n");
     buf.append(" <td style=\"padding-top:2px;\">" + StringUtility.nvl(step.getTitleHtml(), step.getTitle()) + "</td>\n");
     buf.append(" <td width=\"15\"></td>\n");
