@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -69,6 +69,10 @@ public class ToolsViewAndTabsBarSynchronizer {
       }
     });
     m_toolsViewPlaceholder.addComponentListener(new ComponentAdapter() {
+      /**
+       * WORKAROUND careful: swing is inconsistent in handling gui events: all events are sync except component events!
+       * This event is posted after the causing runnable is executed.
+       */
       @Override
       public void componentResized(ComponentEvent e) {
         try {
