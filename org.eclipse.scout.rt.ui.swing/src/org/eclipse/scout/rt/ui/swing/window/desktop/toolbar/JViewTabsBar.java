@@ -63,7 +63,7 @@ public class JViewTabsBar extends AbstractJTabBar {
     setLayout(new Layout());
     setOpaque(true);
     if (!(UIManager.getLookAndFeel() instanceof SynthLookAndFeel)) {
-      setBackground(new Color(0xddebf4));//XXX
+      setBackground(new Color(0xddebf4));//TODO [awe] add to lookandfeel
     }
   }
 
