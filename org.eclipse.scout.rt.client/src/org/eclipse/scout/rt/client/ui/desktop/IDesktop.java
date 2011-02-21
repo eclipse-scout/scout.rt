@@ -84,6 +84,11 @@ public interface IDesktop extends IPropertyObserver {
   <T extends IForm> T findLastActiveForm(Class<T> formType);
 
   /**
+   * @return an available outline of this type ({@link #getAvailableOutlines()}
+   */
+  <T extends IOutline> T findOutline(Class<T> outlineType);
+
+  /**
    * Find a toolButton or a viewButton in the desktop
    */
   <T extends IAction> T findAction(Class<T> actionType);
