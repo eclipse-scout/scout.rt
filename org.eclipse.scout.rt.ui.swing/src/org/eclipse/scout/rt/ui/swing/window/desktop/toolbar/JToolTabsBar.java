@@ -16,7 +16,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Shape;
-import java.awt.event.ComponentAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class JToolTabsBar extends AbstractJTabBar {
     setName("Synth.ToolTabsBar");
     if (!(UIManager.getLookAndFeel() instanceof SynthLookAndFeel)) {
       setOpaque(true);
-      setBackground(new Color(0x67a8ce));//XXX
+      setBackground(new Color(0x67a8ce));//TODO [awe] add to lookandfeel
     }
   }
 
@@ -104,6 +103,9 @@ public class JToolTabsBar extends AbstractJTabBar {
   }
 
   private void collapseBar() {
+    if (isCollapsed()) {
+      return;
+    }
     if (getActiveTab() != null) {
       getActiveTab().setSelected(false);
     }
@@ -129,16 +131,23 @@ public class JToolTabsBar extends AbstractJTabBar {
   }
 
   private void addCollapseButton() {
-    m_collapseButton = new CollapseButton(m_env);
+    m_collapseButton = new CollapseButton(m_env) {
+      private static final long serialVersionUID = 1L;
+
+      /**
+       * WORKAROUND swing is inconsistent in handling gui events: all events are sync except component events!
+       */
+      @SuppressWarnings("deprecation")
+      @Override
+      public void hide() {
+        super.hide();
+        //
+        collapseBar();
+      }
+    };
     if (isCollapsed()) {
       m_collapseButton.setVisible(false);
     }
-    m_collapseButton.addComponentListener(new ComponentAdapter() {
-      @Override
-      public void componentHidden(java.awt.event.ComponentEvent e) {
-        collapseBar();
-      }
-    });
     add(m_collapseButton);
   }
 

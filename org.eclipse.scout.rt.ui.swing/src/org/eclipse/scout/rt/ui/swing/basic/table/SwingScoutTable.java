@@ -1098,7 +1098,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             Font oldf = getFont();
             Font newf = SwingUtility.createFont(cell.getFont(), oldf);
             if (oldf != null) {// only override font style, not size and face
-              c.setFont(new Font(oldf.getName(), newf.getStyle(), oldf.getSize()));
+              c.setFont(new Font(oldf.getName(), newf != null ? newf.getStyle() : oldf.getStyle(), oldf.getSize()));
             }
           }
           // text
@@ -1243,7 +1243,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           }
         }
       }
-      if(fix!=null) fix.mouseReleased(this, e);
+      if (fix != null) fix.mouseReleased(this, e);
     }
 
     @Override
@@ -1329,7 +1329,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       if (e.isPopupTrigger()) {
         handleSwingRowPopup(e);
       }
-      if(fix!=null) fix.mouseReleased(this, e);
+      if (fix != null) fix.mouseReleased(this, e);
     }
 
     @Override
