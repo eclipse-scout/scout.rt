@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -105,7 +105,7 @@ public class SwingTreeCellRenderer implements TreeCellRenderer {
       Font oldf = label.getFont();
       Font newf = SwingUtility.createFont(cell.getFont(), oldf);
       if (oldf != null) {// only override font style, not size and face
-        label.setFont(new Font(oldf.getName(), newf.getStyle(), oldf.getSize()));
+        label.setFont(new Font(oldf.getName(), newf != null ? newf.getStyle() : oldf.getStyle(), oldf.getSize()));
       }
     }
     return label;
