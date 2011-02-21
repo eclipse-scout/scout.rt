@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -325,9 +325,6 @@ public class ComponentSpyAction extends AbstractAction {
       buf.append("<html><head><style type=\"text/css\">td {border-width:1px; border-style:solid; border-color:gray;}</style></head><body>");
       //
       boolean marked = (getParent() instanceof ScoutNode && ((ScoutNode) getParent()).m_markedChild == this);
-      if (marked) {
-//XXX        buf.append("<font color='red'>");
-      }
       //
       buf.append("<table>");
       buf.append("<tr>");
@@ -337,7 +334,13 @@ public class ComponentSpyAction extends AbstractAction {
       String prefix = cname.substring(0, cname.lastIndexOf('.') + 1);
       buf.append(prefix);
       buf.append("<b>");
+      if (marked) {
+        buf.append("<font color='blue'>");
+      }
       buf.append(cname.substring(cname.lastIndexOf('.') + 1));
+      if (marked) {
+        buf.append("</font");
+      }
       buf.append("</b>");
       //
       Class tmp = o.getClass();
@@ -364,10 +367,6 @@ public class ComponentSpyAction extends AbstractAction {
       buf.append("</td>");
       buf.append("</tr>");
       buf.append("</table>");
-      //
-      if (marked) {
-//XXX        buf.append("</font>");
-      }
       buf.append("</body></html>");
       return buf.toString();
     }
@@ -480,9 +479,6 @@ public class ComponentSpyAction extends AbstractAction {
       StringBuffer buf = new StringBuffer();
       buf.append("<html><head><style type=\"text/css\">td {border-width:1px; border-style:solid; border-color:gray;}</style></head><body>");
       boolean marked = (getParent() instanceof SwingNode && ((SwingNode) getParent()).m_markedChild == this);
-      if (marked) {
-        //XXX buf.append("<font color='red'>");
-      }
       //
       buf.append("<table>");
       buf.append("<tr>");
@@ -492,7 +488,13 @@ public class ComponentSpyAction extends AbstractAction {
       String prefix = cname.substring(0, cname.lastIndexOf('.') + 1);
       buf.append(prefix);
       buf.append("<b>");
+      if (marked) {
+        buf.append("<font color='blue'>");
+      }
       buf.append(cname.substring(cname.lastIndexOf('.') + 1));
+      if (marked) {
+        buf.append("</font");
+      }
       buf.append("</b>");
       //
       Class tmp = c.getClass();
@@ -542,9 +544,6 @@ public class ComponentSpyAction extends AbstractAction {
       buf.append("</td>");
       buf.append("</tr>");
       buf.append("</table>");
-      if (marked) {
-        //XXX
-      }
       buf.append("</body></html>");
       return buf.toString();
     }
