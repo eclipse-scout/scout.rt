@@ -441,6 +441,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  public <T extends IOutline> T findOutline(Class<T> outlineType) {
+    for (IOutline o : getAvailableOutlines()) {
+      if (outlineType.isAssignableFrom(o.getClass())) {
+        return (T) o;
+      }
+    }
+    return null;
+  }
+
   public <T extends IAction> T findAction(Class<T> actionType) {
     return new ActionFinder().findAction(getActions(), actionType);
   }

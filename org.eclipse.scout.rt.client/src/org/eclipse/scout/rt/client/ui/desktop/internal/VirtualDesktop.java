@@ -248,6 +248,11 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @Override
+  public <T extends IOutline> T findOutline(Class<T> outlineType) {
+    throw createUnsupportedOperationException();
+  }
+
   public <T extends IAction> T findAction(Class<T> actionType) {
     throw createUnsupportedOperationException();
   }
