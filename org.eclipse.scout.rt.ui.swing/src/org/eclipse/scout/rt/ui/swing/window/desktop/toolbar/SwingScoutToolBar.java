@@ -96,7 +96,7 @@ public class SwingScoutToolBar extends SwingScoutComposite<IDesktop> {
     layout.putConstraint(SpringLayout.EAST, m_viewTabPanel, 0, SpringLayout.WEST, m_toolTabsPanel);
 
     toolBar.setOpaque(true);
-    toolBar.setBackground(new Color(207, 226, 239));//XXX
+    toolBar.setBackground(new Color(207, 226, 239));//TODO [awe] add to lookandfeel
     toolBar.setPreferredSize(new Dimension(-1, HEIGHT));
     toolBar.setBounds(0, 0, toolBar.getWidth(), HEIGHT);
 
