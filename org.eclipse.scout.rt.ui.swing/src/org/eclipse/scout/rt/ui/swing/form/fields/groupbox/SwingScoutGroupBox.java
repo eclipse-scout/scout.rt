@@ -259,7 +259,6 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     }
   }
 
-  //XXX apply refactoring in swt too
   protected void installSwingContainerBorder() {
     containerBorderInstalled = true;
     if (containerBorderVisible) {
