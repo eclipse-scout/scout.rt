@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -130,7 +130,7 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
     out.println("  row-height=" + dump(m_info.height));
     out.println("  col-weightX=" + dump(m_info.weightX));
     out.println("  row-weightY=" + dump(m_info.weightY));
-    Rectangle[][] cellBounds = layoutCellBounds(parent.getSize(), parent.getInsets());
+    Rectangle[][] cellBounds = m_info.layoutCellBounds(parent.getSize(), parent.getInsets());
     if (cellBounds != null) {
       for (int row = 0; row < cellBounds.length; row++) {
         for (int col = 0; col < cellBounds[row].length; col++) {
@@ -191,7 +191,7 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
         dumpLayoutInfo(parent);
       }
       Dimension size = parent.getSize();
-      Rectangle[][] cellBounds = layoutCellBounds(size, parent.getInsets());
+      Rectangle[][] cellBounds = m_info.layoutCellBounds(size, parent.getInsets());
       /*
        * necessary as workaround for awt bug: when component does not change
        * size, its reported minimumSize, preferredSize and maximumSize are
@@ -250,104 +250,6 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
         comp.setBounds(r);
       }
     }
-  }
-
-  /**
-   * calculate grid cells (gaps are not included in the grid cell bounds)
-   */
-  private Rectangle[][] layoutCellBounds(Dimension size, Insets insets) {
-    int[] w = layoutSizes(size.width - insets.left - insets.right - Math.max(0, (m_info.cols - 1) * m_hgap), m_info.width, m_info.weightX);
-    int[] h = layoutSizes(size.height - insets.top - insets.bottom - Math.max(0, (m_info.rows - 1) * m_vgap), m_info.height, m_info.weightY);
-    Rectangle[][] cellBounds = new Rectangle[m_info.rows][m_info.cols];
-    int y = insets.top;
-    for (int r = 0; r < cellBounds.length; r++) {
-      int x = insets.left;
-      for (int c = 0; c < cellBounds[r].length; c++) {
-        cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
-        x += w[c];
-        x += m_hgap;
-      }
-      y += h[r];
-      y += m_vgap;
-    }
-    return cellBounds;
-  }
-
-  private int[] layoutSizes(int targetSize, int[][] sizes, double[] weights) {
-    int[] outSizes = new int[sizes.length];
-    if (targetSize <= 0) {
-      return new int[sizes.length];
-    }
-    int sumSize = 0;
-    float[] tmpWeight = new float[weights.length];
-    float sumWeight = 0;
-    for (int i = 0; i < sizes.length; i++) {
-      outSizes[i] = sizes[i][PREF_SIZE];
-      sumSize += outSizes[i];
-      tmpWeight[i] = (float) weights[i];
-      /**
-       * auto correction: if weight is 0 and min / max sizes are NOT equal then
-       * set weight to 1; if weight<eps set it to 0
-       */
-      if (tmpWeight[i] < EPS) {
-        if (sizes[i][MAX_SIZE] > sizes[i][MIN_SIZE]) {
-          tmpWeight[i] = 1;
-        }
-        else {
-          tmpWeight[i] = 0;
-        }
-      }
-      sumWeight += tmpWeight[i];
-    }
-    // normalize weights
-    if (sumWeight > 0) {
-      for (int i = 0; i < tmpWeight.length; i++) {
-        tmpWeight[i] = tmpWeight[i] / sumWeight;
-      }
-    }
-    int deltaInt = targetSize - sumSize;
-    // expand or shrink
-    if (Math.abs(deltaInt) > 0) {
-      // setup accumulators
-      float[] accWeight = new float[tmpWeight.length];
-      if (deltaInt > 0) {
-        // expand
-        boolean hasTargets = true;
-        while (deltaInt > 0 && hasTargets) {
-          hasTargets = false;
-          for (int i = 0; i < outSizes.length && deltaInt > 0; i++) {
-            if (tmpWeight[i] > 0 && outSizes[i] < sizes[i][MAX_SIZE]) {
-              hasTargets = true;
-              accWeight[i] += tmpWeight[i];
-              if (accWeight[i] > 0) {
-                accWeight[i] -= 1;
-                outSizes[i] += 1;
-                deltaInt -= 1;
-              }
-            }
-          }
-        }
-      }
-      else {// delta<0
-        // shrink
-        boolean hasTargets = true;
-        while (deltaInt < 0 && hasTargets) {
-          hasTargets = false;
-          for (int i = 0; i < outSizes.length && deltaInt < 0; i++) {
-            if (tmpWeight[i] > 0 && outSizes[i] > sizes[i][MIN_SIZE]) {
-              hasTargets = true;
-              accWeight[i] += tmpWeight[i];
-              if (accWeight[i] > 0) {
-                accWeight[i] -= 1;
-                outSizes[i] -= 1;
-                deltaInt += 1;
-              }
-            }
-          }
-        }
-      }
-    }
-    return outSizes;
   }
 
 }

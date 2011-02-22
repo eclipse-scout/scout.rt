@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.swing;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.util.TreeSet;
 
 class LogicalGridLayoutInfo {
@@ -23,9 +25,13 @@ class LogicalGridLayoutInfo {
   int[/* row */][/* min,pref,max */] height;
   double[/* column */] weightX;
   double[/* row */] weightY;
+  private int m_hgap;
+  private int m_vgap;
 
   LogicalGridLayoutInfo(ISwingEnvironment env, Component[] components, LogicalGridData[] cons, int hgap, int vgap) {
     this.components = components;
+    m_hgap = hgap;
+    m_vgap = vgap;
     // create a modifiable copy of the grid datas
     this.gridDatas = new LogicalGridData[cons.length];
     for (int i = 0; i < cons.length; i++) {
@@ -331,6 +337,104 @@ class LogicalGridLayoutInfo {
         weightY[i] = weightY[i] * f;
       }
     }
+  }
+
+  /**
+   * calculate grid cells (gaps are not included in the grid cell bounds)
+   */
+  Rectangle[][] layoutCellBounds(Dimension size, Insets insets) {
+    int[] w = layoutSizes(size.width - insets.left - insets.right - Math.max(0, (cols - 1) * m_hgap), width, weightX);
+    int[] h = layoutSizes(size.height - insets.top - insets.bottom - Math.max(0, (rows - 1) * m_vgap), height, weightY);
+    Rectangle[][] cellBounds = new Rectangle[rows][cols];
+    int y = insets.top;
+    for (int r = 0; r < cellBounds.length; r++) {
+      int x = insets.left;
+      for (int c = 0; c < cellBounds[r].length; c++) {
+        cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
+        x += w[c];
+        x += m_hgap;
+      }
+      y += h[r];
+      y += m_vgap;
+    }
+    return cellBounds;
+  }
+
+  private int[] layoutSizes(int targetSize, int[][] sizes, double[] weights) {
+    int[] outSizes = new int[sizes.length];
+    if (targetSize <= 0) {
+      return new int[sizes.length];
+    }
+    int sumSize = 0;
+    float[] tmpWeight = new float[weights.length];
+    float sumWeight = 0;
+    for (int i = 0; i < sizes.length; i++) {
+      outSizes[i] = sizes[i][LogicalGridLayout.PREF_SIZE];
+      sumSize += outSizes[i];
+      tmpWeight[i] = (float) weights[i];
+      /**
+       * auto correction: if weight is 0 and min / max sizes are NOT equal then
+       * set weight to 1; if weight<eps set it to 0
+       */
+      if (tmpWeight[i] < LogicalGridLayout.EPS) {
+        if (sizes[i][LogicalGridLayout.MAX_SIZE] > sizes[i][LogicalGridLayout.MIN_SIZE]) {
+          tmpWeight[i] = 1;
+        }
+        else {
+          tmpWeight[i] = 0;
+        }
+      }
+      sumWeight += tmpWeight[i];
+    }
+    // normalize weights
+    if (sumWeight > 0) {
+      for (int i = 0; i < tmpWeight.length; i++) {
+        tmpWeight[i] = tmpWeight[i] / sumWeight;
+      }
+    }
+    int deltaInt = targetSize - sumSize;
+    // expand or shrink
+    if (Math.abs(deltaInt) > 0) {
+      // setup accumulators
+      float[] accWeight = new float[tmpWeight.length];
+      if (deltaInt > 0) {
+        // expand
+        boolean hasTargets = true;
+        while (deltaInt > 0 && hasTargets) {
+          hasTargets = false;
+          for (int i = 0; i < outSizes.length && deltaInt > 0; i++) {
+            if (tmpWeight[i] > 0 && outSizes[i] < sizes[i][LogicalGridLayout.MAX_SIZE]) {
+              hasTargets = true;
+              accWeight[i] += tmpWeight[i];
+              if (accWeight[i] > 0) {
+                accWeight[i] -= 1;
+                outSizes[i] += 1;
+                deltaInt -= 1;
+              }
+            }
+          }
+        }
+      }
+      else {// delta<0
+        // shrink
+        boolean hasTargets = true;
+        while (deltaInt < 0 && hasTargets) {
+          hasTargets = false;
+          for (int i = 0; i < outSizes.length && deltaInt < 0; i++) {
+            if (tmpWeight[i] > 0 && outSizes[i] > sizes[i][LogicalGridLayout.MIN_SIZE]) {
+              hasTargets = true;
+              accWeight[i] += tmpWeight[i];
+              if (accWeight[i] > 0) {
+                accWeight[i] -= 1;
+                outSizes[i] -= 1;
+                deltaInt += 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    return outSizes;
   }
 
   private static int logicalWidthInPixel(ISwingEnvironment env, LogicalGridData cons) {
