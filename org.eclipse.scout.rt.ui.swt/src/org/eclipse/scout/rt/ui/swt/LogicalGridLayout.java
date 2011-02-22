@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -64,7 +64,10 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
   }
 
   public Point computeSize(Composite composite, boolean changed, int wHint, int hHint, int sizeFlag) {
-    validateLayout(composite);
+    if (wHint <= 0) {
+      wHint = SWT.DEFAULT;
+    }
+    validateLayout(composite, wHint);
 
     Point min = new Point(0, 0);
     Point pref = new Point(0, 0);
@@ -131,10 +134,10 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
 
   @Override
   protected void layout(Composite parent, boolean flushCache) {
-    validateLayout(parent);
+    validateLayout(parent, parent.getSize().x);
     Rectangle clientArea = parent.getClientArea();
     Point size = new Point(clientArea.width, clientArea.height);
-    Rectangle[][] cellBounds = layoutCellBounds(size);
+    Rectangle[][] cellBounds = m_info.layoutCellBounds(size);
     if (m_debug || LOG.isDebugEnabled()) {
       dumpLayoutInfo(parent);
     }
@@ -154,7 +157,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
         // ok
       }
       else {
-        Point d = comp.computeSize(SWT.DEFAULT, SWT.DEFAULT);// getPreferredSize();
+        Point d = comp.computeSize(m_info.getWidthHint(data), SWT.DEFAULT);
         if (!data.fillHorizontal) {
           if (d.x < r.width) {
             int delta = r.width - d.x;
@@ -200,7 +203,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
 
   public void dumpLayoutInfo(Composite parent, PrintWriter out) {
     Point parentSize = parent.getSize();
-    Rectangle[][] cellBounds = layoutCellBounds(parentSize);
+    Rectangle[][] cellBounds = m_info.layoutCellBounds(parentSize);
     Object field = SwtScoutComposite.getScoutModelOnWidget(parent);
     String className = "undefined (PROP_SCOUT_OBJECT not set!)";
     if (field != null) {
@@ -235,7 +238,15 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
     out.flush();
   }
 
+  /**
+   * @deprecated use {@link #validateLayout(Composite, int)}
+   */
+  @Deprecated
   protected void validateLayout(Composite parent) {
+    validateLayout(parent, SWT.DEFAULT);
+  }
+
+  protected void validateLayout(Composite parent, int wHint) {
     ArrayList<Control> visibleComps = new ArrayList<Control>();
     ArrayList<LogicalGridData> visibleCons = new ArrayList<LogicalGridData>();
     for (Control comp : parent.getChildren()) {
@@ -246,105 +257,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
         visibleCons.add(cons);
       }
     }
-    m_info = new LogicalGridLayoutInfo(visibleComps.toArray(new Control[visibleComps.size()]), visibleCons.toArray(new LogicalGridData[visibleCons.size()]), m_hgap, m_vgap);
-  }
-
-  /**
-   * calculate grid cells (gaps are not included in the grid cell bounds)
-   */
-  private Rectangle[][] layoutCellBounds(Point size) {
-    int[] w = layoutSizes(size.x - Math.max(0, (m_info.cols - 1) * m_hgap), m_info.width, m_info.weightX);
-    int[] h = layoutSizes(size.y - Math.max(0, (m_info.rows - 1) * m_vgap), m_info.height, m_info.weightY);
-    Rectangle[][] cellBounds = new Rectangle[m_info.rows][m_info.cols];
-    int y = 0;
-    for (int r = 0; r < cellBounds.length; r++) {
-      int x = 0;
-      for (int c = 0; c < cellBounds[r].length; c++) {
-        cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
-        x += w[c];
-        x += m_hgap;
-      }
-      y += h[r];
-      y += m_vgap;
-    }
-    return cellBounds;
-  }
-
-  private int[] layoutSizes(int targetSize, int[][] sizes, double[] weights) {
-    int[] outSizes = new int[sizes.length];
-    if (targetSize <= 0) {
-      return new int[sizes.length];
-    }
-    int sumSize = 0;
-    float[] tmpWeight = new float[weights.length];
-    float sumWeight = 0;
-    for (int i = 0; i < sizes.length; i++) {
-      outSizes[i] = sizes[i][PREF];
-      sumSize += outSizes[i];
-      tmpWeight[i] = (float) weights[i];
-      /**
-       * auto correction: if weight is 0 and min / max sizes are NOT equal then
-       * set weight to 1; if weight<eps set it to 0
-       */
-      if (tmpWeight[i] < EPS) {
-        if (sizes[i][MAX] > sizes[i][MIN]) {
-          tmpWeight[i] = 1;
-        }
-        else {
-          tmpWeight[i] = 0;
-        }
-      }
-      sumWeight += tmpWeight[i];
-    }
-    // normalize weights
-    if (sumWeight > 0) {
-      for (int i = 0; i < tmpWeight.length; i++) {
-        tmpWeight[i] = tmpWeight[i] / sumWeight;
-      }
-    }
-    int deltaInt = targetSize - sumSize;
-    // expand or shrink
-    if (Math.abs(deltaInt) > 0) {
-      // setup accumulators
-      float[] accWeight = new float[tmpWeight.length];
-      if (deltaInt > 0) {
-        // expand
-        boolean hasTargets = true;
-        while (deltaInt > 0 && hasTargets) {
-          hasTargets = false;
-          for (int i = 0; i < outSizes.length && deltaInt > 0; i++) {
-            if (tmpWeight[i] > 0 && outSizes[i] < sizes[i][MAX]) {
-              hasTargets = true;
-              accWeight[i] += tmpWeight[i];
-              if (accWeight[i] > 0) {
-                accWeight[i] -= 1;
-                outSizes[i] += 1;
-                deltaInt -= 1;
-              }
-            }
-          }
-        }
-      }
-      else {// delta<0
-        // shrink
-        boolean hasTargets = true;
-        while (deltaInt < 0 && hasTargets) {
-          hasTargets = false;
-          for (int i = 0; i < outSizes.length && deltaInt < 0; i++) {
-            if (tmpWeight[i] > 0 && outSizes[i] > sizes[i][MIN]) {
-              hasTargets = true;
-              accWeight[i] += tmpWeight[i];
-              if (accWeight[i] > 0) {
-                accWeight[i] -= 1;
-                outSizes[i] -= 1;
-                deltaInt += 1;
-              }
-            }
-          }
-        }
-      }
-    }
-    return outSizes;
+    m_info = new LogicalGridLayoutInfo(visibleComps.toArray(new Control[visibleComps.size()]), visibleCons.toArray(new LogicalGridData[visibleCons.size()]), m_hgap, m_vgap, wHint);
   }
 
 }

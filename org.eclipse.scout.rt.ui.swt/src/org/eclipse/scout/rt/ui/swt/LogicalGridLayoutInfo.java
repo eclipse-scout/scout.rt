@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,20 +16,26 @@ import org.eclipse.scout.rt.ui.swt.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 
 class LogicalGridLayoutInfo {
   LogicalGridData[/* component count */] gridDatas;
   Control[/* component count */] components;
+  private int m_hgap;
+  private int m_vgap;
   int cols; /* number of cells horizontally */
   int rows; /* number of cells vertically */
   int[/* column */][/* min,pref,max */] width;
   int[/* row */][/* min,pref,max */] height;
+  int[/*column*/] widthHints;
   double[/* column */] weightX;
   double[/* row */] weightY;
 
-  LogicalGridLayoutInfo(Control[] components, LogicalGridData[] cons, int hgap, int vgap) {
+  LogicalGridLayoutInfo(Control[] components, LogicalGridData[] cons, int hgap, int vgap, int wHint) {
     this.components = components;
+    m_hgap = hgap;
+    m_vgap = vgap;
     // create a modifiable copy of the grid datas
     this.gridDatas = new LogicalGridData[cons.length];
     for (int i = 0; i < cons.length; i++) {
@@ -100,24 +106,15 @@ class LogicalGridLayoutInfo {
     this.height = new int[rows][3];
     this.weightX = new double[cols];
     this.weightY = new double[rows];
-    initializeInfo(hgap, vgap);
+    initializeInfo(hgap, vgap, wHint);
   }
 
-  private void initializeInfo(int hgap, int vgap) {
+  private void initializeInfo(int hgap, int vgap, int wHint) {
     int compCount = components.length;
-    Point[] compSize = new Point[compCount];
-    // cache component sizes and cleanup constraints
+    int[] compSize = new int[compCount];
+    //cleanup constraints
     for (int i = 0; i < compCount; i++) {
-      Control comp = components[i];
       LogicalGridData cons = gridDatas[i];
-      Point d = uiSizeInPixel(comp);
-      if (cons.widthHint > 0) {
-        d.x = cons.widthHint;
-      }
-      if (cons.heightHint > 0) {
-        d.y = cons.heightHint;
-      }
-      compSize[i] = d;
       if (cons.gridx < 0) {
         cons.gridx = 0;
       }
@@ -143,11 +140,39 @@ class LogicalGridLayoutInfo {
         cons.gridh = rows - cons.gridy;
       }
     }
+    //pass 1 only computes widths
+    for (int i = 0; i < compCount; i++) {
+      Control comp = components[i];
+      LogicalGridData cons = gridDatas[i];
+      if (cons.widthHint > 0) {
+        compSize[i] = cons.widthHint;
+      }
+      else {
+        compSize[i] = uiSizeInPixel(comp, SWT.DEFAULT).x;
+      }
+    }
     initializeColumns(compSize, hgap);
+    //pass 2 computes heights based on with hints (use pref width when hint is empty)
+    if (wHint == SWT.DEFAULT) {
+      widthHints = null;
+    }
+    else {
+      widthHints = layoutSizes(wHint - Math.max(0, (cols - 1) * hgap), width, weightX);
+    }
+    for (int i = 0; i < compCount; i++) {
+      Control comp = components[i];
+      LogicalGridData cons = gridDatas[i];
+      if (cons.heightHint > 0) {
+        compSize[i] = cons.heightHint;
+      }
+      else {
+        compSize[i] = uiSizeInPixel(comp, getWidthHint(cons)).y;
+      }
+    }
     initializeRows(compSize, vgap);
   }
 
-  private void initializeColumns(Point[] compSize, int hgap) {
+  private void initializeColumns(int[] compSize, int hgap) {
     int compCount = compSize.length;
     int[] prefWidths = new int[cols];
     boolean[] fixedWidths = new boolean[cols];
@@ -159,7 +184,7 @@ class LogicalGridLayoutInfo {
           prefw = cons.widthHint;
         }
         else if (cons.useUiWidth) {
-          prefw = compSize[i].x;
+          prefw = compSize[i];
         }
         else {
           prefw = logicalWidthInPixel(cons);
@@ -189,7 +214,7 @@ class LogicalGridLayoutInfo {
           distWidth = cons.widthHint - spanWidth - (hSpan - 1) * hgap;
         }
         else if (cons.useUiWidth) {
-          distWidth = compSize[i].x - spanWidth - (hSpan - 1) * hgap;
+          distWidth = compSize[i] - spanWidth - (hSpan - 1) * hgap;
         }
         else {
           distWidth = logicalWidthInPixel(cons) - spanWidth - (hSpan - 1) * hgap;
@@ -258,7 +283,7 @@ class LogicalGridLayoutInfo {
     }
   }
 
-  private void initializeRows(Point[] compSize, int vgap) {
+  private void initializeRows(int[] compSize, int vgap) {
     int compCount = compSize.length;
     int[] prefHeights = new int[rows];
     boolean[] fixedHeights = new boolean[rows];
@@ -270,7 +295,7 @@ class LogicalGridLayoutInfo {
           prefh = cons.heightHint;
         }
         else if (cons.useUiHeight) {
-          prefh = compSize[i].y;
+          prefh = compSize[i];
         }
         else {
           prefh = logicalHeightInPixel(cons);
@@ -298,7 +323,7 @@ class LogicalGridLayoutInfo {
           distHeight = cons.heightHint - spanHeight - (vspan - 1) * vgap;
         }
         else if (cons.useUiHeight) {
-          distHeight = compSize[i].y - spanHeight - (vspan - 1) * vgap;
+          distHeight = compSize[i] - spanHeight - (vspan - 1) * vgap;
         }
         else {
           distHeight = logicalHeightInPixel(cons) - spanHeight - (vspan - 1) * vgap;
@@ -361,6 +386,117 @@ class LogicalGridLayoutInfo {
     }
   }
 
+  /**
+   * calculate grid cells (gaps are not included in the grid cell bounds)
+   */
+  Rectangle[][] layoutCellBounds(Point size) {
+    int[] w = layoutSizes(size.x - Math.max(0, (cols - 1) * m_hgap), width, weightX);
+    int[] h = layoutSizes(size.y - Math.max(0, (rows - 1) * m_vgap), height, weightY);
+    Rectangle[][] cellBounds = new Rectangle[rows][cols];
+    int y = 0;
+    for (int r = 0; r < cellBounds.length; r++) {
+      int x = 0;
+      for (int c = 0; c < cellBounds[r].length; c++) {
+        cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
+        x += w[c];
+        x += m_hgap;
+      }
+      y += h[r];
+      y += m_vgap;
+    }
+    return cellBounds;
+  }
+
+  private int[] layoutSizes(int targetSize, int[][] sizes, double[] weights) {
+    int[] outSizes = new int[sizes.length];
+    if (targetSize <= 0) {
+      return new int[sizes.length];
+    }
+    int sumSize = 0;
+    float[] tmpWeight = new float[weights.length];
+    float sumWeight = 0;
+    for (int i = 0; i < sizes.length; i++) {
+      outSizes[i] = sizes[i][LogicalGridLayout.PREF];
+      sumSize += outSizes[i];
+      tmpWeight[i] = (float) weights[i];
+      /**
+       * auto correction: if weight is 0 and min / max sizes are NOT equal then
+       * set weight to 1; if weight<eps set it to 0
+       */
+      if (tmpWeight[i] < LogicalGridLayout.EPS) {
+        if (sizes[i][LogicalGridLayout.MAX] > sizes[i][LogicalGridLayout.MIN]) {
+          tmpWeight[i] = 1;
+        }
+        else {
+          tmpWeight[i] = 0;
+        }
+      }
+      sumWeight += tmpWeight[i];
+    }
+    // normalize weights
+    if (sumWeight > 0) {
+      for (int i = 0; i < tmpWeight.length; i++) {
+        tmpWeight[i] = tmpWeight[i] / sumWeight;
+      }
+    }
+    int deltaInt = targetSize - sumSize;
+    // expand or shrink
+    if (Math.abs(deltaInt) > 0) {
+      // setup accumulators
+      float[] accWeight = new float[tmpWeight.length];
+      if (deltaInt > 0) {
+        // expand
+        boolean hasTargets = true;
+        while (deltaInt > 0 && hasTargets) {
+          hasTargets = false;
+          for (int i = 0; i < outSizes.length && deltaInt > 0; i++) {
+            if (tmpWeight[i] > 0 && outSizes[i] < sizes[i][LogicalGridLayout.MAX]) {
+              hasTargets = true;
+              accWeight[i] += tmpWeight[i];
+              if (accWeight[i] > 0) {
+                accWeight[i] -= 1;
+                outSizes[i] += 1;
+                deltaInt -= 1;
+              }
+            }
+          }
+        }
+      }
+      else {// delta<0
+        // shrink
+        boolean hasTargets = true;
+        while (deltaInt < 0 && hasTargets) {
+          hasTargets = false;
+          for (int i = 0; i < outSizes.length && deltaInt < 0; i++) {
+            if (tmpWeight[i] > 0 && outSizes[i] > sizes[i][LogicalGridLayout.MIN]) {
+              hasTargets = true;
+              accWeight[i] += tmpWeight[i];
+              if (accWeight[i] > 0) {
+                accWeight[i] -= 1;
+                outSizes[i] -= 1;
+                deltaInt += 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    return outSizes;
+  }
+
+  int getWidthHint(LogicalGridData cons) {
+    if (widthHints == null || cons == null) {
+      return SWT.DEFAULT;
+    }
+    int tmp = (cons.gridw - 1) * m_hgap;
+    for (int k = cons.gridx; k < cons.gridx + cons.gridw; k++) {
+      if (k >= 0 && k < widthHints.length) {
+        tmp += widthHints[k];
+      }
+    }
+    return tmp;
+  }
+
   private static int logicalWidthInPixel(LogicalGridData cons) {
     int gridW = cons.gridw;
     IUiDecoration deco = UiDecorationExtensionPoint.getLookAndFeel();
@@ -373,8 +509,7 @@ class LogicalGridLayoutInfo {
     return gridH * deco.getLogicalGridLayoutRowHeight() + Math.max(0, gridH - 1) * deco.getLogicalGridLayoutVerticalGap();
   }
 
-  private static Point uiSizeInPixel(Control c) {
-    return c.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+  private static Point uiSizeInPixel(Control c, int wHint) {
+    return c.computeSize(wHint, SWT.DEFAULT);
   }
-
 }
