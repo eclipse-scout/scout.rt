@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -147,23 +147,37 @@ public final class ConfigIniUtility {
       try {
         URL url = null;
         resolvedPath = path.replaceAll("\\\\(.)", "$1");
-        if (resolvedPath.matches("\\$\\{.*\\}")) {
-          String variable = resolvedPath.substring(2, resolvedPath.length() - 1);
+        if (resolvedPath.matches("\\$\\{.*\\}.*")) {
+          String tail = resolvedPath.replaceAll("\\$\\{.*\\}", "");
+          String variable = resolvedPath.replaceAll(tail, "");
+          variable = variable.substring(2, variable.length() - 1);
           resolvedPath = System.getProperty(variable, null);
           if (resolvedPath == null) {
             resolvedPath = System.getenv(variable);
           }
+          resolvedPath += tail;
         }
         if (resolvedPath == null) {
           continue;
         }
         resolvedPath = resolvedPath.replace("@user.home", System.getProperty("user.home"));
         resolvedPath = resolvedPath.replace("@user.dir", System.getProperty("user.dir"));
-        if (new File(resolvedPath).exists()) {
-          url = new File(resolvedPath, "config.ini").toURI().toURL();
+        File f1 = new File(resolvedPath);
+        if (f1.exists()) {
+          if (f1.isFile()) {
+            url = f1.toURI().toURL();
+          }
+          else {
+            url = new File(resolvedPath, "config.ini").toURI().toURL();
+          }
         }
         else {
-          url = new URL(new URL(resolvedPath), "config.ini");
+          if (resolvedPath.toLowerCase().endsWith(".ini") || resolvedPath.toLowerCase().endsWith(".properties")) {
+            url = new URL(resolvedPath);
+          }
+          else {
+            url = new URL(new URL(resolvedPath), "config.ini");
+          }
         }
         in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
         String line;
