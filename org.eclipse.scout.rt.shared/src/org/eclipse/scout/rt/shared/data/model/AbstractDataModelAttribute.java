@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.io.Serializable;
 import java.security.Permission;
 import java.util.Map;
 
@@ -27,8 +28,9 @@ import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, DataModelConstants {
+public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, DataModelConstants, Serializable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModelAttribute.class);
+  private static final long serialVersionUID = 1L;
 
   private String m_id;
   private String m_text;

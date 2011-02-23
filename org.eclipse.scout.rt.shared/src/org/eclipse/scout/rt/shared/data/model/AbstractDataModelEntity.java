@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.io.Serializable;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity {
+public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity, Serializable {
+  private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModelEntity.class);
 
   private String m_id;

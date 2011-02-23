@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,7 +18,8 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
-public abstract class AbstractDataModel implements IDataModel {
+public abstract class AbstractDataModel implements IDataModel, Serializable {
+  private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModel.class);
 
   private boolean m_calledInitializer;
