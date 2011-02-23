@@ -799,7 +799,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Note that this is not a java bean method and thus not thread-safe
    */
   public boolean isCellEditable(ITableRow row, IColumn column) {
-    return row != null & column != null && column.isCellEditable(row);
+    return row != null && column != null && column.isCellEditable(row);
   }
 
   public boolean isCheckable() {
