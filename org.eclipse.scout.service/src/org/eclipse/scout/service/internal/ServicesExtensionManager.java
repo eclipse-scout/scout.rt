@@ -34,12 +34,37 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 public class ServicesExtensionManager implements Listener {
+  public static final String PROP_DEFAULT_PROXY_SERVICE_RANKING = ServicesExtensionManager.class.getName() + ".defaultProxyServiceRanking";
+  public static final String PROP_DEFAULT_SERVICE_RANKING = ServicesExtensionManager.class.getName() + ".defaultServiceRanking";
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServicesExtensionManager.class);
 
   private final HashMap<IExtension, List<ServiceRegistration>> m_serviceRegistrations = new HashMap<IExtension, List<ServiceRegistration>>();
   private ExtensionPointTracker m_tracker;
+  private int m_defaultProxyServiceRanking;
+  private int m_defaultServiceRanking;
 
   public ServicesExtensionManager(IExtensionRegistry registry, String extensionPointId) {
+    BundleContext bundleContext = Activator.getDefault().getBundle().getBundleContext();
+    m_defaultProxyServiceRanking = -2;
+    String defaultProxyRankingString = bundleContext.getProperty(PROP_DEFAULT_PROXY_SERVICE_RANKING);
+    if (!StringUtility.isNullOrEmpty(defaultProxyRankingString)) {
+      try {
+        m_defaultProxyServiceRanking = Integer.parseInt(defaultProxyRankingString);
+      }
+      catch (Exception e) {
+        LOG.warn("could not parse defaultProxyServiceRanking '" + defaultProxyRankingString + "'.", e);
+      }
+    }
+    m_defaultServiceRanking = 0;
+    String defaultServiceRankingString = bundleContext.getProperty(PROP_DEFAULT_SERVICE_RANKING);
+    if (!StringUtility.isNullOrEmpty(defaultServiceRankingString)) {
+      try {
+        m_defaultServiceRanking = Integer.parseInt(defaultServiceRankingString);
+      }
+      catch (Exception e) {
+        LOG.warn("could not parse defaultServiceRanking '" + defaultServiceRankingString + "'.", e);
+      }
+    }
     m_tracker = new ExtensionPointTracker(registry, extensionPointId, this);
   }
 
@@ -108,7 +133,7 @@ public class ServicesExtensionManager implements Listener {
           }
           // register service
           if (ranking == null) {
-            initParams.put(Constants.SERVICE_RANKING, 0);
+            initParams.put(Constants.SERVICE_RANKING, m_defaultServiceRanking);
           }
           else {
             initParams.put(Constants.SERVICE_RANKING, ranking.intValue());
@@ -130,7 +155,7 @@ public class ServicesExtensionManager implements Listener {
           }
           // register service
           if (ranking == null) {
-            initParams.put(Constants.SERVICE_RANKING, -2);
+            initParams.put(Constants.SERVICE_RANKING, m_defaultProxyServiceRanking);
           }
           else {
             initParams.put(Constants.SERVICE_RANKING, ranking.intValue());
