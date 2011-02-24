@@ -349,7 +349,10 @@ public final class MailUtility {
           folderName = filesFolder.getName();
           for (File file : filesFolder.listFiles()) {
             // exclude Microsoft Word specific directory file. This is only used to edit HTML in Word.
-            if (!file.getName().equalsIgnoreCase("filelist.xml")) {
+            if (!file.getName().equalsIgnoreCase("filelist.xml") &&
+                !file.getName().equalsIgnoreCase("colorschememapping.xml") &&
+                !file.getName().equalsIgnoreCase("themedata.thmx") &&
+                !file.getName().equalsIgnoreCase("editdata.mso")) {
               FileDataSource fds = new FileDataSource(file);
               htmlDataSourceList.add(fds);
             }
@@ -367,9 +370,12 @@ public final class MailUtility {
         // replace directory entry
         // replace all paths to the 'files directory' with the root directory
         htmlMessage = htmlMessage.replaceAll("\"" + folderName + "/", "\"cid:");
-        // remove 'files directory' (filelist.xml) registration
-        Pattern pattern = Pattern.compile("<link rel=File-List[^>].+?>", Pattern.DOTALL | Pattern.MULTILINE);
-        htmlMessage = pattern.matcher(htmlMessage).replaceAll("");
+
+        // remove special/unused files
+        htmlMessage = htmlMessage.replaceAll("<link rel=File-List href=\"cid:filelist.xml\">", "");
+        htmlMessage = htmlMessage.replaceAll("<link rel=colorSchemeMapping href=\"cid:colorschememapping.xml\">", "");
+        htmlMessage = htmlMessage.replaceAll("<link rel=themeData href=\"cid:themedata.thmx\">", "");
+        htmlMessage = htmlMessage.replaceAll("<link rel=Edit-Time-Data href=\"cid:editdata.mso\">", "");
       }
 
       MimeMessage mimeMessage = new CharsetSafeMimeMessage();
