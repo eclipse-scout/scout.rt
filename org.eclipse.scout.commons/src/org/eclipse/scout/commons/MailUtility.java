@@ -332,10 +332,12 @@ public final class MailUtility {
 
       File plainTextFile = new File(tempDir, simpleName + ".txt");
       String plainTextMessage = null;
+      boolean hasPlainText = false;
       if (plainTextFile.exists()) {
         Reader reader = new FileReader(plainTextFile);
         plainTextMessage = IOUtility.getContent(reader);
         reader.close();
+        hasPlainText = StringUtility.hasText(plainTextMessage);
       }
 
       String folderName = null;
@@ -363,6 +365,7 @@ public final class MailUtility {
 
       File htmlFile = new File(tempDir, simpleName + ".html");
       String htmlMessage = null;
+      boolean hasHtml = false;
       if (htmlFile.exists()) {
         Reader reader = new FileReader(htmlFile);
         htmlMessage = IOUtility.getContent(reader);
@@ -376,14 +379,25 @@ public final class MailUtility {
         htmlMessage = htmlMessage.replaceAll("<link rel=colorSchemeMapping href=\"cid:colorschememapping.xml\">", "");
         htmlMessage = htmlMessage.replaceAll("<link rel=themeData href=\"cid:themedata.thmx\">", "");
         htmlMessage = htmlMessage.replaceAll("<link rel=Edit-Time-Data href=\"cid:editdata.mso\">", "");
+        hasHtml = StringUtility.hasText(htmlMessage);
+      }
+
+      if (!hasPlainText && !hasHtml) {
+        throw new ProcessingException("message has no body");
       }
 
       MimeMessage mimeMessage = new CharsetSafeMimeMessage();
-      Multipart multiPart = new MimeMultipart("alternative");
+      Multipart multiPart = null;
+      if (hasPlainText && hasHtml) {
+        multiPart = new MimeMultipart("alternative");
+      }
+      else {
+        multiPart = new MimeMultipart();
+      }
       mimeMessage.setContent(multiPart);
 
       // [<< text body
-      if (1 == 1) {
+      if (hasPlainText) {
         MimeBodyPart bodyPartText = new MimeBodyPart();
         bodyPartText.setText(plainTextMessage, "UTF-8");
         bodyPartText.setHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_PLAIN);
@@ -393,7 +407,7 @@ public final class MailUtility {
       // ]>> text body
 
       // [<< html body
-      if (1 == 1) {
+      if (hasHtml) {
         MimeBodyPart bodyPartHtml = new MimeBodyPart();
         multiPart.addBodyPart(bodyPartHtml);
         Multipart multiPartHtml = new MimeMultipart("related");
