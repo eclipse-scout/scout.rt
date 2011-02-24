@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import javax.activation.CommandMap;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.activation.MailcapCommandMap;
 import javax.activation.MimetypesFileTypeMap;
 import javax.mail.BodyPart;
@@ -311,12 +312,15 @@ public final class MailUtility {
     return plainText;
   }
 
-  public static MimeMessage createMimeMessageFromWordArchieve(File archiveFile, File[] attachments) throws ProcessingException {
-    return instance.createMimeMessageFromWordArchieveInternal(archiveFile, attachments);
+  public static MimeMessage createMimeMessageFromWordArchive(File archiveFile, File[] attachments, boolean markAsUnsent) throws ProcessingException {
+    return instance.createMimeMessageFromWordArchiveInternal(archiveFile, attachments, markAsUnsent);
   }
 
-  @SuppressWarnings("restriction")
-  private MimeMessage createMimeMessageFromWordArchieveInternal(File archiveFile, File[] attachments) throws ProcessingException {
+  public static MimeMessage createMimeMessageFromWordArchive(File archiveFile, File[] attachments) throws ProcessingException {
+    return instance.createMimeMessageFromWordArchiveInternal(archiveFile, attachments, false);
+  }
+
+  private MimeMessage createMimeMessageFromWordArchiveInternal(File archiveFile, File[] attachments, boolean markAsUnsent) throws ProcessingException {
     try {
       File tempDir = IOUtility.createTempDirectory("");
       FileUtility.extractArchive(archiveFile, tempDir);
@@ -334,27 +338,27 @@ public final class MailUtility {
         reader.close();
       }
 
-      File filesFolder = new File(tempDir, simpleName + "_files");
-      List<DataSource> dataSourceList = new ArrayList<DataSource>();
-      if (filesFolder.exists()) {
-        // add all auxilary files as attachment
-        for (File file : filesFolder.listFiles()) {
-          // exclude Microsoft Word specific directory file. This is only used to edit HTML in Word.
-          if (!file.getName().equals("filelist.xml")) {
-            DataSource dataSource = MailUtility.createDataSource(file);
-            dataSourceList.add(dataSource);
+      String folderName = null;
+      List<DataSource> htmlDataSourceList = new ArrayList<DataSource>();
+      for (File filesFolder : tempDir.listFiles()) {
+        // in this archive file, exactly one directory should exist
+        // word names this directory differently depending on the language
+        if (filesFolder.isDirectory() && filesFolder.getName().startsWith(simpleName)) {
+          // we accept the first directory that meets the constraint above
+          // add all auxiliary files as attachment
+          folderName = filesFolder.getName();
+          for (File file : filesFolder.listFiles()) {
+            // exclude Microsoft Word specific directory file. This is only used to edit HTML in Word.
+            if (!file.getName().equalsIgnoreCase("filelist.xml")) {
+              FileDataSource fds = new FileDataSource(file);
+              htmlDataSourceList.add(fds);
+            }
           }
+          break;
         }
       }
 
-      for (File attachment : attachments) {
-        dataSourceList.add(MailUtility.createDataSource(attachment));
-      }
-
       File htmlFile = new File(tempDir, simpleName + ".html");
-      if (!htmlFile.exists()) {
-        htmlFile = new File(tempDir, simpleName + ".htm");
-      }
       String htmlMessage = null;
       if (htmlFile.exists()) {
         Reader reader = new FileReader(htmlFile);
@@ -362,16 +366,63 @@ public final class MailUtility {
         reader.close();
         // replace directory entry
         // replace all paths to the 'files directory' with the root directory
-        htmlMessage = htmlMessage.replaceAll(simpleName + "_files/", "");
-
-        // remove 'files directory' registration
+        htmlMessage = htmlMessage.replaceAll("\"" + folderName + "/", "\"cid:");
+        // remove 'files directory' (filelist.xml) registration
         Pattern pattern = Pattern.compile("<link rel=File-List[^>].+?>", Pattern.DOTALL | Pattern.MULTILINE);
         htmlMessage = pattern.matcher(htmlMessage).replaceAll("");
       }
 
-      MimeMessage mimeMessage = MailUtility.createMimeMessage(plainTextMessage, htmlMessage, dataSourceList.toArray(new DataSource[dataSourceList.size()]));
-      mimeMessage.setFileName(simpleName + ".eml");
-      mimeMessage.setHeader("X-Unsent", "1"); // only supported in Outlook 2010
+      MimeMessage mimeMessage = new CharsetSafeMimeMessage();
+      Multipart multiPart = new MimeMultipart("alternative");
+      mimeMessage.setContent(multiPart);
+
+      // [<< text body
+      if (1 == 1) {
+        MimeBodyPart bodyPartText = new MimeBodyPart();
+        bodyPartText.setText(plainTextMessage, "UTF-8");
+        bodyPartText.setHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_PLAIN);
+        bodyPartText.setHeader("Content-Transfer-Encoding", "quoted-printable");
+        multiPart.addBodyPart(bodyPartText);
+      }
+      // ]>> text body
+
+      // [<< html body
+      if (1 == 1) {
+        MimeBodyPart bodyPartHtml = new MimeBodyPart();
+        multiPart.addBodyPart(bodyPartHtml);
+        Multipart multiPartHtml = new MimeMultipart("related");
+        bodyPartHtml.setContent(multiPartHtml);
+        MimeBodyPart part = new MimeBodyPart();
+        part.setContent(htmlMessage, CONTENT_TYPE_TEXT_HTML);
+        part.setHeader("Content-Transfer-Encoding", "quoted-printable");
+        multiPartHtml.addBodyPart(part);
+        for (DataSource source : htmlDataSourceList) {
+          part = new MimeBodyPart();
+          DataHandler handler = new DataHandler(source);
+          part.setDataHandler(handler);
+          part.setFileName(source.getName());
+          part.addHeader("Content-ID", "<" + source.getName() + ">");
+          multiPartHtml.addBodyPart(part);
+        }
+      }
+      // ]>> html body
+
+      // [<< attachements
+      if (attachments != null) {
+        for (File attachment : attachments) {
+          MimeBodyPart part = new MimeBodyPart();
+          FileDataSource fds = new FileDataSource(attachment);
+          DataHandler handler = new DataHandler(fds);
+          part.setDataHandler(handler);
+          part.setFileName(attachment.getName());
+          multiPart.addBodyPart(part);
+        }
+      }
+      // [>> attachements
+
+      if (markAsUnsent) {
+        mimeMessage.setHeader("X-Unsent", "1"); // only supported in Outlook 2010
+      }
       return mimeMessage;
     }
     catch (IOException e) {
