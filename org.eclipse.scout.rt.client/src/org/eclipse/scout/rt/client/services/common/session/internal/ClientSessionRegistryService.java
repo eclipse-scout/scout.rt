@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -65,6 +65,40 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
           }
         }
         return (T) clientSession;
+      }
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends IClientSession> T newClientSession(Class<T> clazz) {
+    String symbolicName = clazz.getPackage().getName();
+    Bundle bundleLocator = null;
+    while (symbolicName != null) {
+      bundleLocator = Platform.getBundle(symbolicName);
+      int i = symbolicName.lastIndexOf('.');
+      if (bundleLocator != null || i < 0) {
+        break;
+      }
+      symbolicName = symbolicName.substring(0, i);
+    }
+    final Bundle bundle = Platform.getBundle(symbolicName);
+    if (bundle != null) {
+      try {
+        IClientSession clientSession = clazz.newInstance();
+        ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
+          @Override
+          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+            getCurrentSession().startSession(bundle);
+          }
+        };
+        job.schedule();
+        job.join();
+        job.throwOnError();
+        return (T) clientSession;
+      }
+      catch (Throwable t) {
+        LOG.error("could not load session for " + symbolicName, t);
       }
     }
     return null;
