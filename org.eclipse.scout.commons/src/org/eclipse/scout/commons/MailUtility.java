@@ -283,6 +283,34 @@ public final class MailUtility {
     return instance.createMimeMessageInternal(messagePlain, messageHtml, attachements);
   }
 
+  public static String extractPlainTextFromWordArchive(File archiveFile) {
+    return instance.extractPlainTextFromWordArchiveInternal(archiveFile);
+  }
+
+  private String extractPlainTextFromWordArchiveInternal(File archiveFile) {
+    String plainText = null;
+    try {
+      File tempDir = IOUtility.createTempDirectory("");
+      FileUtility.extractArchive(archiveFile, tempDir);
+
+      String simpleName = archiveFile.getName();
+      if (archiveFile.getName().lastIndexOf('.') != -1) {
+        simpleName = archiveFile.getName().substring(0, archiveFile.getName().lastIndexOf('.'));
+      }
+
+      File plainTextFile = new File(tempDir, simpleName + ".txt");
+      if (plainTextFile.exists() && plainTextFile.canRead()) {
+        Reader reader = new FileReader(plainTextFile);
+        plainText = IOUtility.getContent(reader);
+        reader.close();
+      }
+    }
+    catch (Exception e) {
+      LOG.error("Error occured while trying to extract plain text file", e);
+    }
+    return plainText;
+  }
+
   public static MimeMessage createMimeMessageFromWordArchieve(File archiveFile, File[] attachments) throws ProcessingException {
     return instance.createMimeMessageFromWordArchieveInternal(archiveFile, attachments);
   }
