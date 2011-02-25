@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -141,9 +141,14 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
     }
     else {
       try {
-        Subject.doAs(subject, new PrivilegedExceptionAction() {
+        Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
           public Object run() throws Exception {
-            doFilterInternal(req, res, chain);
+            HttpServletRequest secureReq = req;
+            if (!(secureReq instanceof SecureHttpServletRequestWrapper)) {
+              Principal principal = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next();
+              secureReq = new SecureHttpServletRequestWrapper(req, principal, getRealm());
+            }
+            doFilterInternal(secureReq, res, chain);
             return null;
           }
         });
@@ -206,13 +211,7 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
   protected abstract int negotiate(HttpServletRequest req, HttpServletResponse resp, PrincipalHolder holder) throws IOException, ServletException;
 
   private void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-    if (req.getRemoteUser() == null && req.getUserPrincipal() == null) {
-      Principal principal = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next();
-      chain.doFilter(new SecureHttpServletRequestWrapper(req, principal, getRealm()), res);
-    }
-    else {
-      chain.doFilter(req, res);
-    }
+    chain.doFilter(req, res);
   }
 
   public String getRealm() {
