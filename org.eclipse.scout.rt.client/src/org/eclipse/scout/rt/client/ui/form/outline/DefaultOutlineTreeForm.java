@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm.MainBox.OutlineTreeField;
 
@@ -117,6 +118,14 @@ public class DefaultOutlineTreeForm extends AbstractForm implements IOutlineTree
     @Override
     protected int getConfiguredGridColumnCount() {
       return 1;
+    }
+
+    @Order(1)
+    public class StringField extends AbstractStringField {
+      @Override
+      protected String getConfiguredLabel() {
+        return "StringField";
+      }
     }
 
     @Order(10.0f)
