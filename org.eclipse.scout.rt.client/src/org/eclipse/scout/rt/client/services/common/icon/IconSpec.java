@@ -14,14 +14,28 @@ package org.eclipse.scout.rt.client.services.common.icon;
  *
  */
 public class IconSpec {
+  private String m_name;
   private byte[] m_content;
 
   public IconSpec() {
-    this(null);
+    this(null, null);
   }
 
   public IconSpec(byte[] content) {
+    this(null, content);
+  }
+
+  public IconSpec(String name, byte[] content) {
+    m_name = name;
     m_content = content;
+  }
+
+  public String getName() {
+    return m_name;
+  }
+
+  public void setName(String name) {
+    m_name = name;
   }
 
   public byte[] getContent() {

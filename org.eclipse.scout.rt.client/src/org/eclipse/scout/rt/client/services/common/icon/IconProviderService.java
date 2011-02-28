@@ -90,34 +90,47 @@ public class IconProviderService extends AbstractService implements IIconProvide
     if (!name.startsWith(getFolderName())) {
       name = getFolderName() + "/" + iconName;
     }
-    String[] names = new String[getIconExtensionsArray().length + 1];
-    names[0] = name;
-    for (int i = 1; i < names.length; i++) {
-      names[i] = name + "." + getIconExtensionsArray()[i - 1];
+    String[] fqns = new String[getIconExtensionsArray().length + 1];
+    String[] iconNames = new String[getIconExtensionsArray().length + 1];
+    fqns[0] = name;
+    iconNames[0] = iconName;
+    for (int i = 1; i < fqns.length; i++) {
+      fqns[i] = name + "." + getIconExtensionsArray()[i - 1];
+      iconNames[i] = iconName + "." + getIconExtensionsArray()[i - 1];
     }
 
     IconSpec spec = null;
-    spec = findIconSpec(m_hostBundle, names);
+    spec = findIconSpec(m_hostBundle, fqns, iconNames);
     return spec;
 
   }
 
-  public IconSpec findIconSpec(Bundle bundle, String[] iconNames) {
-    for (String fqn : iconNames) {
-      URL[] entries = FileLocator.findEntries(bundle, new Path(fqn));
-      if (entries != null && entries.length > 0) {
-        URL url = entries[entries.length - 1];
-        try {
-          byte[] content = IOUtility.getContent(url.openStream(), true);
-          if (content != null) {
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("find image " + fqn + " in bundle " + bundle.getSymbolicName() + "->" + url);
-            }
-            return new IconSpec(content);
-          }
+  public IconSpec findIconSpec(Bundle bundle, String[] fqns, String[] iconNames) {
+    if (fqns != null && fqns.length > 0) {
+      for (int i = 0; i < fqns.length; i++) {
+        String fqn = fqns[i];
+        String iconName = "";
+        if (iconNames != null && iconNames.length > i) {
+          iconName = iconNames[i];
         }
-        catch (Exception e) {
-          LOG.error("could not read input stream from url '" + url + "'.", e);
+        URL[] entries = FileLocator.findEntries(bundle, new Path(fqn));
+        if (entries != null && entries.length > 0) {
+          URL url = entries[entries.length - 1];
+          try {
+            IconSpec iconSpec = new IconSpec();
+            byte[] content = IOUtility.getContent(url.openStream(), true);
+            if (content != null) {
+              if (LOG.isDebugEnabled()) {
+                LOG.debug("find image " + fqn + " in bundle " + bundle.getSymbolicName() + "->" + url);
+              }
+              iconSpec.setContent(content);
+            }
+            iconSpec.setName(iconName);
+            return iconSpec;
+          }
+          catch (Exception e) {
+            LOG.error("could not read input stream from url '" + url + "'.", e);
+          }
         }
       }
     }
