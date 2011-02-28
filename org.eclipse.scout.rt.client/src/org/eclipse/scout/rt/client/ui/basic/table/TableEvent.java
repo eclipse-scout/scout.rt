@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -119,6 +119,8 @@ public class TableEvent extends java.util.EventObject {
    * valid properties: rows, firstRow, lastRow
    */
   public static final int TYPE_ROW_CLICK = 810;
+
+  public static final int TYPE_TABLE_POPULATED = 820;
 
   private final int m_type;
   private ITableRow[] m_rows = new ITableRow[0];

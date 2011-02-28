@@ -2593,6 +2593,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  public void tablePopulated() {
+    if (m_tableEventBuffer.isEmpty()) {
+      synchronized (m_cachedFilteredRowsLock) {
+        m_cachedFilteredRows = null;
+      }
+      fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_TABLE_POPULATED, null));
+    }
+  }
+
   public ITableRow resolveRow(ITableRow row) {
     if (row == null) {
       return null;

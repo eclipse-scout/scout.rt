@@ -614,6 +614,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    */
   ITableRow[] resolveRows(ITableRow[] rows);
 
+  void tablePopulated();
+
   void sort();
 
   void sort(ITableRow[] rowsInNewOrder);

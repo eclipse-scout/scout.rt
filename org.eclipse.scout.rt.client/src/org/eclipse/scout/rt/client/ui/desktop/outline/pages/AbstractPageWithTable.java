@@ -483,6 +483,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   public void setTablePopulateStatus(IProcessingStatus status) {
+    getTable().tablePopulated();
     m_tablePopulateStatus = status;
   }
 

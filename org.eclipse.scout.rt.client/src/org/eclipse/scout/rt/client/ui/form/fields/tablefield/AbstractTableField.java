@@ -562,7 +562,8 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         case TableEvent.TYPE_ROWS_DELETED:
         case TableEvent.TYPE_ROWS_SELECTED:
         case TableEvent.TYPE_ALL_ROWS_DELETED:
-        case TableEvent.TYPE_ROW_FILTER_CHANGED: {
+        case TableEvent.TYPE_ROW_FILTER_CHANGED:
+        case TableEvent.TYPE_TABLE_POPULATED: {
           updateTableStatus();
           break;
         }
