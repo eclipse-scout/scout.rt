@@ -146,7 +146,7 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
             HttpServletRequest secureReq = req;
             if (!(secureReq instanceof SecureHttpServletRequestWrapper)) {
               Principal principal = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next();
-              secureReq = new SecureHttpServletRequestWrapper(req, principal, getRealm());
+              secureReq = new SecureHttpServletRequestWrapper(req, principal);
             }
             doFilterInternal(secureReq, res, chain);
             return null;
