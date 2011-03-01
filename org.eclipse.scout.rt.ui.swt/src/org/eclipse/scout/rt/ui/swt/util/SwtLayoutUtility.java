@@ -15,6 +15,7 @@ import java.io.StringWriter;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.swt.LayoutValidateManager;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -29,7 +30,12 @@ public final class SwtLayoutUtility {
   private SwtLayoutUtility() {
   }
 
+  private static LayoutValidateManager layoutValidateManager = new LayoutValidateManager();
   private static boolean dumpSizeTreeRunning;
+
+  public static void invalidateLayout(Control c) {
+    layoutValidateManager.invalidate(c);
+  }
 
   public static void dumpSizeTree(Control c) {
     if (!dumpSizeTreeRunning) {
@@ -44,7 +50,7 @@ public final class SwtLayoutUtility {
   }
 
   private static void dumpSizeTreeRec(Control c, String prefix) {
-    Point d = c.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+    Point d = c.computeSize(SWT.DEFAULT, SWT.DEFAULT, false);
     String lay = "null";
     if (c instanceof Composite) {
       Layout lm = ((Composite) c).getLayout();

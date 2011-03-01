@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,11 +18,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
-import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
+import org.eclipse.scout.rt.ui.swt.IValidateRoot;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.SwtScoutForm;
-import org.eclipse.scout.rt.ui.swt.util.AbstractShellPackHandler;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
@@ -75,9 +75,9 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
     //
     m_swtWindow = new Shell(ownerComponent.getShell(), SWT.RESIZE);
     m_swtWindow.setData("extendedStyle", SWT.POP_UP);
-    m_swtWindow.setData(SwtScoutComposite.PROP_SHELL_PACK_HANDLER, new AbstractShellPackHandler(m_swtWindow.getDisplay()) {
+    m_swtWindow.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(m_swtWindow) {
       @Override
-      protected void execSizeCheck() {
+      public void validate() {
         autoAdjustBounds();
       }
     });
@@ -175,11 +175,13 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
 
   public void setBounds(Rectangle bounds) {
     getShell().setBounds(bounds);
-    getShell().layout(true);
+    getShell().layout(true, true);
   }
 
   public void autoAdjustBounds() {
     if (!getShell().isDisposed()) {
+      //invalidate all layouts
+      getShell().layout(true, true);
       Point d = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
       d.x = Math.max(d.x, UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutDefaultColumnWidth());
       d.y = Math.min(d.y, 280);
@@ -192,6 +194,8 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
       // decide based on the preference positionBelowReferenceField
       Rectangle currentView = m_positionBelowReferenceField ? belowView : aboveView;
       Rectangle alternateView = m_positionBelowReferenceField ? aboveView : belowView;
+      System.out.println("currentView: " + currentView);//XXX
+      System.out.println("alternateView: " + alternateView);//XXX
       if (currentView.height >= alternateView.height) {
         getShell().setBounds(currentView);
       }

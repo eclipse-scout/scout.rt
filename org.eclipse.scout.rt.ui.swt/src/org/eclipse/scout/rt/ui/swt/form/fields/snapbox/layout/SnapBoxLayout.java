@@ -23,7 +23,7 @@ public class SnapBoxLayout extends Layout {
   protected Point computeSize(Composite composite, int hint, int hint2, boolean flushCache) {
     Point p = new Point(0, 0);
     for (Control c : composite.getChildren()) {
-      Point bounds = c.computeSize(hint, SWT.DEFAULT);
+      Point bounds = c.computeSize(hint, SWT.DEFAULT, flushCache);
       p.x = Math.max(p.x, bounds.x);
       p.y += bounds.y;
     }
@@ -38,9 +38,9 @@ public class SnapBoxLayout extends Layout {
     Control[] children = composite.getChildren();
 
     children[0].setBounds(clientArea.x, clientArea.y, clientArea.width, clientArea.height - 24);
-    ((Composite) children[0]).layout(true);
+    ((Composite) children[0]).layout(true, true);
     children[1].setBounds(clientArea.x, clientArea.height - 24, clientArea.width, 24);
-    ((Composite) children[1]).layout(true);
+    ((Composite) children[1]).layout(true, true);
 
   }
 

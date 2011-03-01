@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
+import org.eclipse.scout.rt.ui.swt.util.SwtLayoutUtility;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -56,8 +57,7 @@ public class SwtScoutWrappedFormField extends SwtScoutFieldComposite<IWrappedFor
         m_formComposite.getSwtContainer().setLayoutData(null);
       }
       if (isConnectedToScout()) {
-        getSwtContainer().layout(true);
-        setLayoutDirty();
+        SwtLayoutUtility.invalidateLayout(getSwtContainer());
       }
     }
     finally {

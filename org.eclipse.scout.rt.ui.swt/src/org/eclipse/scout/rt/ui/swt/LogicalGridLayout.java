@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -38,12 +39,16 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
   public static final int PREF = 1;
   public static final int MAX = 2;
 
+  public static int hintCount;//XXX
+  public static int noHintCount;//XXX
+
   public static final float EPS = 1E-6f;
 
   private boolean m_debug;
   private int m_hgap;
   private int m_vgap;
   private LogicalGridLayoutInfo m_info;
+  private CompositeObject m_infoCacheKey;
 
   public LogicalGridLayout(int hgap, int vgap) {
     m_hgap = hgap;
@@ -56,6 +61,9 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
 
   @Override
   protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
+    if (flushCache) {
+      //new Exception().printStackTrace(System.out);//XXX
+    }
     return computeSize(composite, flushCache, wHint, hHint, PREF);
   }
 
@@ -64,10 +72,13 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
   }
 
   public Point computeSize(Composite composite, boolean changed, int wHint, int hHint, int sizeFlag) {
+    if (changed) {
+      m_info = null;
+    }
     if (wHint <= 0) {
       wHint = SWT.DEFAULT;
     }
-    validateLayout(composite, wHint);
+    validateLayout(composite, wHint, changed);
 
     Point min = new Point(0, 0);
     Point pref = new Point(0, 0);
@@ -134,7 +145,10 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
 
   @Override
   protected void layout(Composite parent, boolean flushCache) {
-    validateLayout(parent, parent.getSize().x);
+    if (flushCache) {
+      m_info = null;
+    }
+    validateLayout(parent, parent.getSize().x, flushCache);
     Rectangle clientArea = parent.getClientArea();
     Point size = new Point(clientArea.width, clientArea.height);
     Rectangle[][] cellBounds = m_info.layoutCellBounds(size);
@@ -157,7 +171,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
         // ok
       }
       else {
-        Point d = comp.computeSize(m_info.getWidthHint(data), SWT.DEFAULT);
+        Point d = comp.computeSize(m_info.getWidthHint(data), SWT.DEFAULT, false);
         if (!data.fillHorizontal) {
           if (d.x < r.width) {
             int delta = r.width - d.x;
@@ -239,14 +253,25 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
   }
 
   /**
-   * @deprecated use {@link #validateLayout(Composite, int)}
+   * @deprecated use {@link #validateLayout(Composite, int, boolean)}
    */
   @Deprecated
   protected void validateLayout(Composite parent) {
-    validateLayout(parent, SWT.DEFAULT);
+    validateLayout(parent, SWT.DEFAULT, false);
   }
 
-  protected void validateLayout(Composite parent, int wHint) {
+  protected void validateLayout(Composite parent, int wHint, boolean flushCache) {
+    CompositeObject newKey = new CompositeObject(parent.getSize(), wHint == SWT.DEFAULT ? (m_infoCacheKey != null ? m_infoCacheKey.getComponent(1) : wHint) : wHint);
+    //check cache key
+    if (m_info != null) {
+      if (m_infoCacheKey == null || !m_infoCacheKey.equals(newKey)) {
+        m_info = null;
+        m_infoCacheKey = null;
+      }
+    }
+    if (m_info != null && m_infoCacheKey != null) {
+      return;
+    }
     ArrayList<Control> visibleComps = new ArrayList<Control>();
     ArrayList<LogicalGridData> visibleCons = new ArrayList<LogicalGridData>();
     for (Control comp : parent.getChildren()) {
@@ -258,6 +283,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
       }
     }
     m_info = new LogicalGridLayoutInfo(visibleComps.toArray(new Control[visibleComps.size()]), visibleCons.toArray(new LogicalGridData[visibleCons.size()]), m_hgap, m_vgap, wHint);
+    m_infoCacheKey = newKey;
   }
 
 }

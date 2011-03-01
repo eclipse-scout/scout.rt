@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -120,14 +120,14 @@ public class SwtScoutGroupBoxButtonbar implements ISwtScoutGroupBoxButtonbar {
     }
     ((GridData) m_rightPart.getLayoutData()).exclude = excludeRight;
     if (!excludeLeft || !excludeRight) {
-      m_swtContainer.layout();
+      m_swtContainer.layout(true, true);
     }
     if (!excludeLeft) {
-      m_leftPart.layout();
+      m_leftPart.layout(true, true);
       m_leftPart.pack();
     }
     if (!excludeRight) {
-      m_leftPart.layout();
+      m_leftPart.layout(true, true);
       m_rightPart.pack();
     }
     ((GridData) getSwtContainer().getLayoutData()).exclude = excludeLeft && excludeRight;

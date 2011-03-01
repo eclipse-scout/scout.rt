@@ -59,7 +59,7 @@ public class SwtScoutTreeField extends SwtScoutFieldComposite<ITreeField> implem
       m_treeComposite.getSwtField().setLayoutData(LogicalGridDataBuilder.createField(getScoutObject().getGridData()));
       setSwtField(m_treeComposite.getSwtField());
     }
-    getSwtContainer().layout(true);
+    getSwtContainer().layout(true, true);
   }
 
   /**

@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.ext.ILabelComposite;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
+import org.eclipse.scout.rt.ui.swt.util.SwtLayoutUtility;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -55,7 +56,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
   protected void setErrorStatusFromScout(IProcessingStatus s) {
     if (getSwtLabel() != null) {
       getSwtLabel().setStatus(s);
-      getSwtContainer().layout(true);
+      getSwtContainer().layout(true, true);
     }
   }
 
@@ -101,10 +102,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       getSwtField().setVisible(b);
     }
     if (updateLayout && isConnectedToScout()) {
-      if (getSwtContainer() != null) {
-        getSwtContainer().layout(true);
-      }
-      setLayoutDirty();
+      SwtLayoutUtility.invalidateLayout(getSwtContainer());
     }
   }
 
@@ -134,10 +132,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       }
     }
     if (updateLayout && isConnectedToScout()) {
-      if (getSwtContainer() != null) {
-        getSwtContainer().layout(true);
-      }
-      setLayoutDirty();
+      SwtLayoutUtility.invalidateLayout(getSwtContainer());
     }
   }
 
@@ -169,10 +164,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     if (getSwtLabel() != null) {
       if (getSwtLabel().setMandadatory(b)) {
         if (isConnectedToScout()) {
-          if (getSwtContainer() != null) {
-            getSwtContainer().layout(true);
-          }
-          setLayoutDirty();
+          SwtLayoutUtility.invalidateLayout(getSwtContainer());
         }
       }
     }
@@ -231,7 +223,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     if (m_swtLabel != null && b != m_swtLabel.getVisible()) {
       m_swtLabel.setVisible(b);
       if (getSwtContainer() != null && isConnectedToScout()) {
-        getSwtContainer().layout(true);
+        getSwtContainer().layout(true, true);
       }
     }
   }
@@ -293,10 +285,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       }
     }
     if (isConnectedToScout()) {
-      if (getSwtContainer() != null) {
-        getSwtContainer().layout(true);
-      }
-      setLayoutDirty();
+      SwtLayoutUtility.invalidateLayout(getSwtContainer());
     }
   }
 
@@ -387,10 +376,6 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     }
     else if (name.equals(IFormField.PROP_VISIBLE)) {
       setVisibleFromScout(((Boolean) newValue).booleanValue());
-      // enforce the layout
-      if (getSwtField() != null) {
-        getSwtField().getParent().layout(true);
-      }
     }
     else if (name.equals(IFormField.PROP_MANDATORY)) {
       setMandatoryFromScout(((Boolean) newValue).booleanValue());

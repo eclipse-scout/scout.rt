@@ -134,7 +134,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
           break;
       }
       updateText();
-      layout(true);
+      layout(true, true);
       updateLayout = true;
     }
     return updateLayout;
@@ -236,7 +236,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
       m_statusLabel.setToolTipText(buf.toString());
       ((GridData) m_statusLabel.getLayoutData()).exclude = false;
     }
-    layout(true);
+    layout(true, true);
   }
 
   @Override

@@ -70,7 +70,7 @@ public class SnapBoxMaximizedLayout extends Layout {
       SnapBoxLayoutData layoutData = (SnapBoxLayoutData) child.getLayoutData();
       if (!layoutData.exclude && child.getVisible()) {
         visibleChildren++;
-        Point prefSize = child.computeSize(wHint, SWT.DEFAULT);
+        Point prefSize = child.computeSize(wHint, SWT.DEFAULT, false);
         maxChildWidth = Math.max(prefSize.x, maxChildWidth);
         maxChildHeight = Math.max(prefSize.y, maxChildHeight);
       }

@@ -40,7 +40,7 @@ public class ButtonBarLayout extends Layout {
     Point size = new Point(0, 0);
     for (Control c : composite.getChildren()) {
       if (c.getVisible()) {
-        Point cSize = c.computeSize(SWT.DEFAULT, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight());
+        Point cSize = c.computeSize(SWT.DEFAULT, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight(), flushCache);
         cSize.x += 15;
         cSize.x = Math.max(cSize.x, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonMinWidth());
         cSize.y = UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight();
@@ -91,7 +91,7 @@ public class ButtonBarLayout extends Layout {
         if (layoutData.fillHorizontal) {
           fillCount++;
         }
-        Point prefSize = children[i].computeSize(SWT.DEFAULT, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight());
+        Point prefSize = children[i].computeSize(SWT.DEFAULT, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight(), false);
         prefSize.x += 15;
         int width = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonMinWidth(), prefSize.x);
         if (i > 0) {
@@ -106,7 +106,7 @@ public class ButtonBarLayout extends Layout {
     for (int i = children.length - 1; i >= 0; i--) {
       if (children[i].getVisible()) {
         ButtonBarLayoutData layoutData = getLayoutData(children[i]);
-        Point prefSize = children[i].computeSize(SWT.DEFAULT, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight());
+        Point prefSize = children[i].computeSize(SWT.DEFAULT, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight(), false);
         prefSize.x += 15;
         int width = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonMinWidth(), prefSize.x);
         int height = UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight();
@@ -136,7 +136,7 @@ public class ButtonBarLayout extends Layout {
         if (layoutData.fillHorizontal) {
           fillCount++;
         }
-        Point prefSize = children[i].computeSize(SWT.DEFAULT, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight());
+        Point prefSize = children[i].computeSize(SWT.DEFAULT, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight(), false);
         prefSize.x += 15;
         int width = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonMinWidth(), prefSize.x);
         if (i > 0) {
@@ -148,10 +148,10 @@ public class ButtonBarLayout extends Layout {
     //
     int x = clientArea.x;
     int y = clientArea.y;
-    for (int i = 0; i < children.length; i++) {
-      if (children[i].getVisible()) {
-        ButtonBarLayoutData layoutData = getLayoutData(children[i]);
-        Point prefSize = children[i].computeSize(SWT.DEFAULT, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight());
+    for (Control element : children) {
+      if (element.getVisible()) {
+        ButtonBarLayoutData layoutData = getLayoutData(element);
+        Point prefSize = element.computeSize(SWT.DEFAULT, UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight(), false);
         prefSize.x += 15;
         int width = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonMinWidth(), prefSize.x);
         int height = UiDecorationExtensionPoint.getLookAndFeel().getProcessButtonHeight();
@@ -163,7 +163,7 @@ public class ButtonBarLayout extends Layout {
             fillCount--;
           }
         }
-        children[i].setBounds(x + layoutData.insetLeft, y + layoutData.insetTop, width, height);
+        element.setBounds(x + layoutData.insetLeft, y + layoutData.insetTop, width, height);
         x += (width + horizontalGap + layoutData.insetLeft + layoutData.insetRight);
       }
     }

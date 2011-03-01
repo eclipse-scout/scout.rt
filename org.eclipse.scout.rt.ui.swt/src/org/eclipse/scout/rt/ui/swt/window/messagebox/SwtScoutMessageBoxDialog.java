@@ -168,7 +168,7 @@ public class SwtScoutMessageBoxDialog extends Dialog {
       GridData gridData = ((GridData) m_actionText.getLayoutData());
       if (gridData.exclude != exclude) {
         gridData.exclude = exclude;
-        getShell().layout(true);
+        getShell().layout(true, true);
         m_actionText.getParent().getParent().layout(true, true);
       }
     }
@@ -322,7 +322,7 @@ public class SwtScoutMessageBoxDialog extends Dialog {
     Point buttonBarSize = getButtonBar().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 
     // get the preferred height of the control
-    Point initialSize = getShell().computeSize(UiDecorationExtensionPoint.getLookAndFeel().getMessageBoxMinWidth(), SWT.DEFAULT);
+    Point initialSize = getShell().computeSize(UiDecorationExtensionPoint.getLookAndFeel().getMessageBoxMinWidth(), SWT.DEFAULT, true);
 
     // The width and height of the messageBox is defined in the lookAndFeel extension point.
     // If we have a lot of big buttons we would like to scale the dialog in order to show every button. In this case the width of the button bar is used.

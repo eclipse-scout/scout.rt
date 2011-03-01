@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -181,7 +181,7 @@ public class SnippetForTableEditor {
         System.out.println("row: " + cell.getElement() + ", col: " + cell.getColumnIndex());
         Text text = new Text(m_container, SWT.BORDER);
         text.setText("abc");
-        m_container.layout();
+        m_container.layout(true, true);
         m_container.setVisible(true);
       }
     }

@@ -81,7 +81,7 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
       return;
     }
     getSwtField().setText(s);
-    getSwtContainer().layout(true);
+    getSwtContainer().layout(true, true);
   }
 
   protected void setTextWrapFromScout(boolean booleanValue) {

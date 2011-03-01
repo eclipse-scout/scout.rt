@@ -179,7 +179,7 @@ public class StyledTextEx extends StyledText {
 
   protected void updateVerticalScrollbarVisibility() {
     Rectangle clientArea = getClientArea();
-    Point size = computeSize(clientArea.width, SWT.DEFAULT);
+    Point size = computeSize(clientArea.width, SWT.DEFAULT, false);
     ScrollBar vBar = getVerticalBar();
     if (vBar != null && !vBar.isDisposed()) {
       vBar.setVisible(size.y > clientArea.height);

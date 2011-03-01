@@ -15,8 +15,9 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
+import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
+import org.eclipse.scout.rt.ui.swt.IValidateRoot;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
-import org.eclipse.scout.rt.ui.swt.util.AbstractShellPackHandler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
@@ -37,16 +38,7 @@ public class SwtScoutSplitBox extends SwtScoutFieldComposite<ISplitBox> implemen
   @Override
   protected void initializeSwt(Composite parent) {
     SashForm container = getEnvironment().getFormToolkit().createSashForm(parent, getScoutObject().isSplitHorizontal() ? SWT.HORIZONTAL : SWT.VERTICAL);
-    container.setData(PROP_SHELL_PACK_HANDLER, new AbstractShellPackHandler(container.getDisplay()) {
-      @Override
-      protected void execSizeCheck() {
-        if (!getSwtContainer().isDisposed()) {
-          getSwtContainer().layout(true, true);
-          setLayoutDirty();
-        }
-      }
-    });
-
+    container.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(container));
     container.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
     for (IFormField scoutField : getScoutObject().getFields()) {
       getEnvironment().createFormField(container, scoutField);

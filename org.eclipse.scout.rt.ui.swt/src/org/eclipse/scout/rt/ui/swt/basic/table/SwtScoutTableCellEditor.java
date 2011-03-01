@@ -334,7 +334,7 @@ public class SwtScoutTableCellEditor {
           @SuppressWarnings("unused")
           Control control = getEditorControl(m_container, scoutRow, scoutCol);
         }
-        m_container.layout();
+        m_container.layout(true, true);
         m_container.setVisible(true);
       }
     }

@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
+import org.eclipse.scout.rt.ui.swt.util.SwtLayoutUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -88,7 +89,7 @@ public class SwtScoutTableField extends SwtScoutFieldComposite<ITableField<? ext
       setSwtField(m_tableComposite.getSwtField());
     }
     if (!getSwtContainer().isDisposed()) {
-      getSwtContainer().layout(true);
+      getSwtContainer().layout(true, true);
     }
   }
 
@@ -114,7 +115,7 @@ public class SwtScoutTableField extends SwtScoutFieldComposite<ITableField<? ext
     if (name.equals(ITableField.PROP_TABLE)) {
       setTableFromScout((ITable) newValue);
       if (isConnectedToScout()) {
-        setLayoutDirty();
+        SwtLayoutUtility.invalidateLayout(getSwtContainer());
       }
     }
     else if (name.equals(ITableField.PROP_TABLE_SELECTION_STATUS)) {

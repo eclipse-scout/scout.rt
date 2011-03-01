@@ -74,7 +74,7 @@ public class SwtTableStatus implements ISwtTableStatus {
     setStatusImpl(m_selectionLabel, selectionStatus, false);
     if (m_layoutNeeded) {
       m_layoutNeeded = false;
-      m_container.layout(true);
+      m_container.layout(true, true);
     }
   }
 

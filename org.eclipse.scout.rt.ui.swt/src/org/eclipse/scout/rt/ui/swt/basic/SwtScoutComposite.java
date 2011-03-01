@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStrokeFilter;
-import org.eclipse.scout.rt.ui.swt.util.AbstractShellPackHandler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -230,26 +229,6 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
 
   public T getScoutObject() {
     return m_scoutObject;
-  }
-
-  protected void setLayoutDirty() {
-    AbstractShellPackHandler handler = getShellPackHandlerReq(getSwtContainer());
-    if (handler != null) {
-      handler.enqueueSizeCheck();
-    }
-  }
-
-  private AbstractShellPackHandler getShellPackHandlerReq(Control c) {
-    if (c == null) {
-      return null;
-    }
-    AbstractShellPackHandler h = (AbstractShellPackHandler) c.getData(PROP_SHELL_PACK_HANDLER);
-    if (h != null) {
-      return h;
-    }
-    else {
-      return getShellPackHandlerReq(c.getParent());
-    }
   }
 
   public boolean isConnectedToScout() {

@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swt.ext.SnapButtonMaximized;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
+import org.eclipse.scout.rt.ui.swt.util.SwtLayoutUtility;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -77,7 +78,7 @@ public class SwtScoutSnapBoxMaximizedButton extends SwtScoutFieldComposite<IButt
   protected void setVisibleFromScout(boolean b) {
     if (getSwtField().getVisible() != b) {
       getSwtField().setVisible(b);
-      setLayoutDirty();
+      SwtLayoutUtility.invalidateLayout(getSwtContainer());
     }
   }
 

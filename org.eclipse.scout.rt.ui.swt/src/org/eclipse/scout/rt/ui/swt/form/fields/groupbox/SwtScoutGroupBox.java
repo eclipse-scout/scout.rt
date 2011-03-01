@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,8 +15,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
+import org.eclipse.scout.rt.ui.swt.IValidateRoot;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.ext.ScrolledFormEx;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.extension.IUiDecoration;
@@ -24,7 +25,6 @@ import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFormFieldGridData;
-import org.eclipse.scout.rt.ui.swt.util.AbstractShellPackHandler;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -77,7 +77,17 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
       bodyData.verticalIndent = 0;
       m_swtBodyPart.setLayoutData(bodyData);
     }
-    m_swtBodyPart.setData(SwtScoutComposite.PROP_SHELL_PACK_HANDLER, new P_ShellResizeHandler());
+    m_swtBodyPart.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(m_swtBodyPart) {
+      @Override
+      public void validate() {
+        super.validate();
+        if (m_scrolledForm != null) {
+          if (!m_scrolledForm.isDisposed()) {
+            m_scrolledForm.reflow(true);
+          }
+        }
+      }
+    });
     createButtonbar(rootPane);
 
     IUiDecoration deco = UiDecorationExtensionPoint.getLookAndFeel();
@@ -275,7 +285,7 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
     if (getSwtContainer() instanceof Section) {
       Section section = (Section) getSwtContainer();
       section.setText(s);
-      section.layout();
+      section.layout(true, true);
     }
     if (getSwtContainer() instanceof Group) {
       ((Group) getSwtContainer()).setText(s);
@@ -335,28 +345,6 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
     getEnvironment().invokeScoutLater(t, 0);
     //end notify
   }
-
-  private class P_ShellResizeHandler extends AbstractShellPackHandler {
-    public P_ShellResizeHandler() {
-      super(m_swtBodyPart.getDisplay());
-    }
-
-    @Override
-    protected void execSizeCheck() {
-      if (m_scrolledForm != null) {
-        if (!m_scrolledForm.isDisposed()) {
-          m_scrolledForm.reflow(true);
-          setLayoutDirty();
-        }
-      }
-      else {
-        if (!m_swtBodyPart.isDisposed()) {
-          m_swtBodyPart.layout(true, true);
-          setLayoutDirty();
-        }
-      }
-    }
-  } // end class P_ShellResizeHandler
 
   private class P_ExpansionListener extends ExpansionAdapter {
     @Override

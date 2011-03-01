@@ -133,7 +133,7 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
     if (m_labelPlaceholder != null && b != m_labelPlaceholder.getVisible()) {
       m_labelPlaceholder.setVisible(b);
       if (getSwtContainer() != null && isConnectedToScout()) {
-        getSwtContainer().layout(true);
+        getSwtContainer().layout(true, true);
       }
     }
   }

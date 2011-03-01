@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -114,6 +114,8 @@ public class SwtScoutPopup implements ISwtScoutPart {
 
   public void autoAdjustBounds() {
     if (!getShell().isDisposed()) {
+      //invalidate all layouts
+      getShell().layout(true, true);
       Point d = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
       d.x = Math.max(d.x, UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutDefaultColumnWidth());
       d.y = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight(), d.y);
@@ -136,7 +138,7 @@ public class SwtScoutPopup implements ISwtScoutPart {
       }
       if (!newView.equals(getShell().getBounds())) {
         getShell().setBounds(newView);
-        getShell().layout(true);
+        getShell().layout(true, true);
       }
     }
   }

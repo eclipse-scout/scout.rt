@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,12 +16,13 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
+import org.eclipse.scout.rt.ui.swt.IValidateRoot;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.WidgetPrinter;
-import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFormFieldGridData;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
-import org.eclipse.scout.rt.ui.swt.util.AbstractShellPackHandler;
+import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFormFieldGridData;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -44,16 +45,7 @@ public class SwtScoutForm extends SwtScoutComposite<IForm> implements ISwtScoutF
     SwtScoutFormFieldGridData layoutData = new SwtScoutFormFieldGridData(getScoutObject().getRootGroupBox());
     getSwtField().setLayoutData(layoutData);
     container.setLayout(new LogicalGridLayout(0, 0));
-
-    container.setData(PROP_SHELL_PACK_HANDLER, new AbstractShellPackHandler(parent.getDisplay()) {
-      @Override
-      protected void execSizeCheck() {
-        if (!getSwtContainer().isDisposed()) {
-          getSwtContainer().layout(true);
-          setLayoutDirty();
-        }
-      }
-    });
+    container.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(parent));
   }
 
   @Override
