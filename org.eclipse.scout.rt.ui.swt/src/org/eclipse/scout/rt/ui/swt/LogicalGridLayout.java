@@ -39,9 +39,6 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
   public static final int PREF = 1;
   public static final int MAX = 2;
 
-  public static int hintCount;//XXX
-  public static int noHintCount;//XXX
-
   public static final float EPS = 1E-6f;
 
   private boolean m_debug;

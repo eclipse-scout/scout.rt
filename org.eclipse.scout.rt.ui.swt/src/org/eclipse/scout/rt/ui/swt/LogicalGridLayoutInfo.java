@@ -148,7 +148,7 @@ class LogicalGridLayoutInfo {
         compSize[i] = cons.widthHint;
       }
       else {
-        compSize[i] = uiSizeInPixel(comp, SWT.DEFAULT, false).x;
+        compSize[i] = uiSizeInPixel(comp, SWT.DEFAULT).x;
       }
     }
     initializeColumns(compSize, hgap);
@@ -166,7 +166,7 @@ class LogicalGridLayoutInfo {
         compSize[i] = cons.heightHint;
       }
       else {
-        compSize[i] = uiSizeInPixel(comp, getWidthHint(cons), false).y;
+        compSize[i] = uiSizeInPixel(comp, getWidthHint(cons)).y;
       }
     }
     initializeRows(compSize, vgap);
@@ -509,13 +509,7 @@ class LogicalGridLayoutInfo {
     return gridH * deco.getLogicalGridLayoutRowHeight() + Math.max(0, gridH - 1) * deco.getLogicalGridLayoutVerticalGap();
   }
 
-  private static Point uiSizeInPixel(Control c, int wHint, boolean flushCache) {
-    if (wHint == SWT.DEFAULT) {
-      LogicalGridLayout.noHintCount++;
-    }
-    else {
-      LogicalGridLayout.hintCount++;
-    }
-    return c.computeSize(wHint, SWT.DEFAULT, flushCache);
+  private static Point uiSizeInPixel(Control c, int wHint) {
+    return c.computeSize(wHint, SWT.DEFAULT, false);
   }
 }
