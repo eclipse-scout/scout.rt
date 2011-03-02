@@ -4,13 +4,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields.labelfield;
-
-import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
 
@@ -30,8 +28,6 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   private static final long serialVersionUID = 1L;
 
   private JPanelEx m_fieldPanel;
-  // cache
-  private MouseListener m_linkTrigger;
 
   @Override
   protected void initializeSwing() {
