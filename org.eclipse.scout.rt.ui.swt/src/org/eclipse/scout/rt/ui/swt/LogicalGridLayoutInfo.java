@@ -22,6 +22,8 @@ import org.eclipse.swt.widgets.Control;
 class LogicalGridLayoutInfo {
   LogicalGridData[/* component count */] gridDatas;
   Control[/* component count */] components;
+  int[/* component count */] componentWidths;
+  int[/* component count */] componentHeights;
   private int m_hgap;
   private int m_vgap;
   int cols; /* number of cells horizontally */
@@ -100,6 +102,8 @@ class LogicalGridLayoutInfo {
       }
     }
     //
+    this.componentWidths = new int[this.components.length];
+    this.componentHeights = new int[this.components.length];
     this.cols = usedCols.size();
     this.rows = usedRows.size();
     this.width = new int[cols][3];
@@ -111,7 +115,6 @@ class LogicalGridLayoutInfo {
 
   private void initializeInfo(int hgap, int vgap, int wHint) {
     int compCount = components.length;
-    int[] compSize = new int[compCount];
     //cleanup constraints
     for (int i = 0; i < compCount; i++) {
       LogicalGridData cons = gridDatas[i];
@@ -140,18 +143,19 @@ class LogicalGridLayoutInfo {
         cons.gridh = rows - cons.gridy;
       }
     }
+    //layout first the widths then the heights
     //pass 1 only computes widths
     for (int i = 0; i < compCount; i++) {
       Control comp = components[i];
       LogicalGridData cons = gridDatas[i];
       if (cons.widthHint > 0) {
-        compSize[i] = cons.widthHint;
+        componentWidths[i] = cons.widthHint;
       }
       else {
-        compSize[i] = uiSizeInPixel(comp, SWT.DEFAULT).x;
+        componentWidths[i] = uiSizeInPixel(comp, SWT.DEFAULT).x;
       }
     }
-    initializeColumns(compSize, hgap);
+    initializeColumns(componentWidths, hgap);
     //pass 2 computes heights based on with hints (use pref width when hint is empty)
     if (wHint == SWT.DEFAULT) {
       widthHints = null;
@@ -163,13 +167,13 @@ class LogicalGridLayoutInfo {
       Control comp = components[i];
       LogicalGridData cons = gridDatas[i];
       if (cons.heightHint > 0) {
-        compSize[i] = cons.heightHint;
+        componentHeights[i] = cons.heightHint;
       }
       else {
-        compSize[i] = uiSizeInPixel(comp, getWidthHint(cons)).y;
+        componentHeights[i] = uiSizeInPixel(comp, getWidthHint(cons)).y;
       }
     }
-    initializeRows(compSize, vgap);
+    initializeRows(componentHeights, vgap);
   }
 
   private void initializeColumns(int[] compSize, int hgap) {
@@ -484,7 +488,7 @@ class LogicalGridLayoutInfo {
     return outSizes;
   }
 
-  int getWidthHint(LogicalGridData cons) {
+  private int getWidthHint(LogicalGridData cons) {
     if (widthHints == null || cons == null) {
       return SWT.DEFAULT;
     }

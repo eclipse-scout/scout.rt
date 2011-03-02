@@ -58,9 +58,6 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
 
   @Override
   protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
-    if (flushCache) {
-      //new Exception().printStackTrace(System.out);//XXX
-    }
     return computeSize(composite, flushCache, wHint, hHint, PREF);
   }
 
@@ -168,7 +165,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
         // ok
       }
       else {
-        Point d = comp.computeSize(m_info.getWidthHint(data), SWT.DEFAULT, false);
+        Point d = new Point(m_info.componentWidths[i], m_info.componentHeights[i]);
         if (!data.fillHorizontal) {
           if (d.x < r.width) {
             int delta = r.width - d.x;
