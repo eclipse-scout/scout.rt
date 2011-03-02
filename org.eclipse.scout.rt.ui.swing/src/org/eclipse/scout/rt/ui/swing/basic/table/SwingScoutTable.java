@@ -917,10 +917,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void handleKeyboardNavigationFromSwing(int rowIndex) {
-    if (getScoutObject().isCheckable()) {
-      //nop
-      return;
-    }
     ListSelectionModel selectionModel = getSwingTable().getSelectionModel();
     selectionModel.setSelectionInterval(rowIndex, rowIndex);
     scrollToSelection();
