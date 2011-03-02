@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,10 +32,12 @@ import org.eclipse.scout.rt.ui.swing.dnd.TransferHandlerEx;
 
 /**
  * Various enhancements and fixes to JTree
- * - DnD handling using {@link TransferHandlerEx} and {@link DefaultDropTarget} - Support for
- * getPreferredContentSize
- * - Support for setPreferredScrollableViewportSize
- * - fixed setTooltipText that constantly removed tooltip manager registration
+ * <ul>
+ * <li>DnD handling using {@link TransferHandlerEx} and {@link DefaultDropTarget}</li>
+ * <li>Support for getPreferredContentSize</li>
+ * <li>Support for setPreferredScrollableViewportSize</li>
+ * <li>fixed setTooltipText that constantly removed tooltip manager registration</li>
+ * </ul>
  */
 public class JTreeEx extends JTree {
   private static final long serialVersionUID = 1L;
