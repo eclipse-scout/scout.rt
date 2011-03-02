@@ -231,3 +231,7 @@ Migration: None
 
 16.02.2011 imo
 Splitted ITableField tableStatus into tablePopulateStatus and tableSelectionStatus
+
+01.03.2011 pba
+#94708 added new Event public static final int TYPE_TABLE_POPULATED = 820;
+to handle the case, when no rows are returned for the first select
