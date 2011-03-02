@@ -35,3 +35,6 @@ see Release Notes in org.eclipse.scout.rt.client
 
 02.03.2011 pba
 #97045 removed the NOP-Switch in SwingScoutTable:handleKeyboardNavigationFromSwing. if the keyboardnavigation is undesired, do it via SwingScoutTable:setKeyboardNavigationFromScout
+
+02.03.2011 pba
+#98515 horizontal scrollbar is no longer missing for group boxes, if the getConfiguredScrollable is enabled
