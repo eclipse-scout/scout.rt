@@ -32,3 +32,6 @@ Migration: None
 
 10.02.2011 sle
 see Release Notes in org.eclipse.scout.rt.client
+
+02.03.2011 pba
+#97045 removed the NOP-Switch in SwingScoutTable:handleKeyboardNavigationFromSwing. if the keyboardnavigation is undesired, do it via SwingScoutTable:setKeyboardNavigationFromScout
