@@ -35,14 +35,14 @@ public class IconLocator implements IIconLocator {
     TreeSet<IIconProviderService> services = new TreeSet<IIconProviderService>(new P_ServiceComparator());
     IIconProviderService[] registeredServices = SERVICES.getServices(IIconProviderService.class);
     services.addAll(Arrays.asList(registeredServices));
-    boolean conatinsClientBundle = false;
+    boolean containsClientBundle = false;
     for (IIconProviderService service : registeredServices) {
       if (CompareUtility.equals(service.getHostBundle(), clientBundle)) {
-        conatinsClientBundle = true;
+        containsClientBundle = true;
         break;
       }
     }
-    if (!conatinsClientBundle) {
+    if (!containsClientBundle) {
       services.add(new P_ClientIconProviderService(clientBundle));
     }
     m_iconProviderServices = services.toArray(new IIconProviderService[services.size()]);
