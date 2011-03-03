@@ -499,6 +499,9 @@ public final class FileUtility {
     zOut.closeEntry();
   }
 
+  /**
+   * @return the mime type for the specified extension
+   */
   public static String getContentTypeForExtension(String ext) {
     if (ext == null) return null;
     if (ext.startsWith(".")) ext = ext.substring(1);
