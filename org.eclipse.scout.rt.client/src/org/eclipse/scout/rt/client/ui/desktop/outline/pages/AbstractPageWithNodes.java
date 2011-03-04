@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -316,6 +316,13 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
             }
             catch (ProcessingException ex) {
               SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+            }
+          }
+          else if (node instanceof IPageWithNodes) {
+            IPageWithNodes nodePage = (IPageWithNodes) node;
+            IMenu[] menus = nodePage.getMenus();
+            if (menus != null) {
+              e.addPopupMenus(menus);
             }
           }
           break;
