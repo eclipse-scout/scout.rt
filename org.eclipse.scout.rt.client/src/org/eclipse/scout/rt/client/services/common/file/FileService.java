@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -161,7 +161,8 @@ public class FileService extends AbstractService implements IFileService {
     RemoteFile[] existingFileInfoOnClient = new RemoteFile[realFiles.length];
     for (int i = 0; i < realFiles.length; i++) {
       RemoteFile rf = new RemoteFile(realFiles[i][0], realFiles[i][1], 0);
-      File f = getFileLocation(realFiles[i][0], realFiles[i][1], false);
+      String dir = m_rootPath == null ? realFiles[i][0] : "";
+      File f = getFileLocation(dir, realFiles[i][1], false);
       if (f.exists()) {
         rf.setLastModified(f.lastModified());
       }

@@ -235,3 +235,7 @@ Splitted ITableField tableStatus into tablePopulateStatus and tableSelectionStat
 01.03.2011 pba
 #94708 added new Event public static final int TYPE_TABLE_POPULATED = 820;
 to handle the case, when no rows are returned for the first select
+
+03.03.2011 pba
+bsi ticket #93948
+if the Fileservice has a rootpath set, take it and not the relative one, otherwise it is impossible to give a target path independent of the workbench
