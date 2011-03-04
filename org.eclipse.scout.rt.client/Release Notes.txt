@@ -224,3 +224,7 @@ Splitted ITableField tableStatus into tablePopulateStatus and tableSelectionStat
 org.eclipse.scout.rt.client
 DefaultWizardStatusHtmlProvider > Bug-Fix: display of step number within wrapping step names
 
+
+04.03.2011 pba
+bsi ticket #99533
+add a reasonable default implementation for getBookmarkIdentifier() in AbstractPage to avoid caching bugs
