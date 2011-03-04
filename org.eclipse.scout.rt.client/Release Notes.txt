@@ -240,6 +240,11 @@ to handle the case, when no rows are returned for the first select
 bsi ticket #93948
 if the Fileservice has a rootpath set, take it and not the relative one, otherwise it is impossible to give a target path independent of the workbench
 
-03.03.2011 pba
+04.03.2011 pba
 bsi ticket #99504
 Add menus in outline also for node-, not only table pages
+
+04.03.2011 pba
+bsi ticket #99533
+add a reasonable default implementation for getBookmarkIdentifier() in AbstractPage to avoid caching bugs
+

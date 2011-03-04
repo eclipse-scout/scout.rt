@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -221,7 +223,23 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @ConfigOperation
   @Order(95)
   public String getBookmarkIdentifier() {
-    return null;
+    // assemble some default key
+    String s = null;
+    for (Field f : this.getClass().getDeclaredFields()) {
+      if (Modifier.isPrivate(f.getModifiers()) && !Modifier.isStatic(f.getModifiers()) && !Modifier.isFinal(f.getModifiers()) && f.getName().startsWith("m_")) {
+        try {
+          f.setAccessible(true);
+          Object o = f.get(this);
+          f.setAccessible(false);
+          if (o != null) {
+            s = (s == null ? "" : s) + o;
+          }
+        }
+        catch (Exception e) {
+        }
+      }
+    }
+    return s;
   }
 
   public IOutline getOutline() {
