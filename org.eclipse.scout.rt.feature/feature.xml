@@ -51,8 +51,10 @@ BSI Business Systems Integration AG - initial API and implementation
       <import plugin="org.apache.xml.resolver"/>
       <import plugin="org.apache.xml.serializer"/>
       <import plugin="org.easymock"/>
-      <import feature="org.eclipse.equinox.server.servletbridge"/>
-      <import feature="org.eclipse.equinox.serverside.sdk"/>
+      <import plugin="org.eclipse.equinox.http.servlet"/>
+      <import plugin="org.eclipse.equinox.http.servletbridge"/>
+      <import plugin="org.eclipse.equinox.http.registry"/>
+      <import plugin="org.eclipse.equinox.servletbridge"/>
    </requires>
 
    <plugin
