@@ -228,3 +228,8 @@ DefaultWizardStatusHtmlProvider > Bug-Fix: display of step number within wrappin
 04.03.2011 pba
 bsi ticket #99533
 add a reasonable default implementation for getBookmarkIdentifier() in AbstractPage to avoid caching bugs
+
+07.03.2011 pba
+bsi ticket #99628
+apply date format for a value newly set in a date(time) field in order to remove undesired seconds and milliseconds
+
