@@ -246,6 +246,14 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
     Date validValue = null;
     rawValue = super.validateValueInternal(rawValue);
+    try {
+      // apply format
+      DateFormat df = getDateFormat();
+      rawValue = df.parse(df.format(rawValue));
+    }
+    catch (Throwable t) {
+      // nop, take raw value
+    }
     validValue = rawValue;
     return validValue;
   }
