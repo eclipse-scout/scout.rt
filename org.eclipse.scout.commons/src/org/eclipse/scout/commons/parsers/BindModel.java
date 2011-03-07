@@ -4,18 +4,18 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.jdbc.parsers;
+package org.eclipse.scout.commons.parsers;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.FunctionInputToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.IToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.ValueInputToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.ValueOutputToken;
+import org.eclipse.scout.commons.parsers.token.FunctionInputToken;
+import org.eclipse.scout.commons.parsers.token.IToken;
+import org.eclipse.scout.commons.parsers.token.ValueInputToken;
+import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 
 public class BindModel {
   private IToken[] m_allTokens;

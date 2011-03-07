@@ -8,35 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql;
+package org.eclipse.scout.commons.parsers.sql;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.AndExpr;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.AndOp;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.Atom;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.BracketExpr;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.CloseBracketToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.Comment;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.FunExpr;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.IToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.ListExpr;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.ListSeparator;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.MathExpr;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.MathOp;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.MinusExpr;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.Name;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.OpenBracketToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.OrExpr;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.OrOp;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.Part;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.PartToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.SingleStatement;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.Statement;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.UnaryPrefix;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.UnaryPrefixExpr;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.UnionToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql.SqlParserToken.Unparsed;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.AndExpr;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.AndOp;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.Atom;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.BracketExpr;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.CloseBracketToken;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.Comment;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.FunExpr;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.IToken;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.ListExpr;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.ListSeparator;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.MathExpr;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.MathOp;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.MinusExpr;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.Name;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.OpenBracketToken;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.OrExpr;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.OrOp;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.Part;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.PartToken;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.SingleStatement;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.Statement;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.UnaryPrefix;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.UnaryPrefixExpr;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.UnionToken;
+import org.eclipse.scout.commons.parsers.sql.SqlParserToken.Unparsed;
 
 /**
  * see {@link SqlParser}

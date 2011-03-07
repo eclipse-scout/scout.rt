@@ -4,21 +4,28 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.jdbc.parsers.token;
+package org.eclipse.scout.commons.parsers;
 
-public interface IToken {
+import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 
-  String getParsedToken();
+public class IntoModel {
+  String m_filteredStatement;
+  private ValueOutputToken[] m_intoTokens;
 
-  String getReplaceToken();
+  public IntoModel(String filteredStatement, ValueOutputToken[] intoTokens) {
+    m_filteredStatement = filteredStatement;
+    m_intoTokens = intoTokens;
+  }
 
-  void setReplaceToken(String s);
+  public ValueOutputToken[] getOutputTokens() {
+    return m_intoTokens;
+  }
 
-  boolean isInput();
-
-  boolean isOutput();
+  public String getFilteredStatement() {
+    return m_filteredStatement;
+  }
 }

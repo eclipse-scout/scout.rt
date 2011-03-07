@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -214,7 +215,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class ListBoxField extends AbstractListBox<Object> implements IComposerValueField {
 
     @Override
@@ -288,7 +289,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class TreeBoxField extends AbstractTreeBox<Object> implements IComposerValueField {
 
     @Override
@@ -363,7 +364,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class DateField extends AbstractDateField implements IComposerValueField {
     public void addValueChangeListenerToTarget(PropertyChangeListener listener) {
       this.addPropertyChangeListener(listener);
@@ -407,7 +408,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class TimeField extends AbstractTimeField implements IComposerValueField {
     public void addValueChangeListenerToTarget(PropertyChangeListener listener) {
       this.addPropertyChangeListener(listener);
@@ -459,7 +460,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class DateTimeField extends AbstractDateField implements IComposerValueField {
 
     @Override
@@ -509,7 +510,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class IntegerField extends AbstractIntegerField implements IComposerValueField {
     public void addValueChangeListenerToTarget(PropertyChangeListener listener) {
       this.addPropertyChangeListener(listener);
@@ -563,7 +564,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class LongField extends AbstractLongField implements IComposerValueField {
     public void addValueChangeListenerToTarget(PropertyChangeListener listener) {
       this.addPropertyChangeListener(listener);
@@ -617,7 +618,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class DoubleField extends AbstractDoubleField implements IComposerValueField {
     public void addValueChangeListenerToTarget(PropertyChangeListener listener) {
       this.addPropertyChangeListener(listener);
@@ -678,7 +679,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class StringField extends AbstractStringField implements IComposerValueField {
     public void addValueChangeListenerToTarget(PropertyChangeListener listener) {
       this.addPropertyChangeListener(listener);
@@ -722,7 +723,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class SmartField extends AbstractSmartField<Object> implements IComposerValueField {
 
     @Override
@@ -786,7 +787,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   //XXXXXXXXXXXXXXXXXXXXXXX
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenDateField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
     public class FromField extends AbstractDateField {
@@ -850,7 +851,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenTimeField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
     public class FromField extends AbstractTimeField {
@@ -920,7 +921,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenDateTimeField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
     public class FromField extends AbstractDateField {
@@ -992,7 +993,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenIntegerField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
     public class FromField extends AbstractIntegerField {
@@ -1056,7 +1057,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenLongField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
     public class FromField extends AbstractLongField {
@@ -1120,7 +1121,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   }
 
   @Order(10)
-  @FormData("IGNORE")
+  @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenDoubleField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
     public class FromField extends AbstractDoubleField {

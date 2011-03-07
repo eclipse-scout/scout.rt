@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql;
+package org.eclipse.scout.commons.parsers.sql;
 
 import java.util.ArrayList;
 import java.util.Collections;

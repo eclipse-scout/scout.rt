@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -49,6 +49,10 @@ public @interface ConfigProperty {
    * e.g. arial,bold,11
    */
   String FONT = "FONT";
+
+  String FORM_DATA = "FORM_DATA";
+
+  String ABSTRACT_FORM_DATA = "ABSTRACT_FORM_DATA";
 
   /**
    * HEX COLOR e.g. FFFFFF

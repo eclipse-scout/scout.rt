@@ -8,19 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.jdbc.parsers.sql;
+package org.eclipse.scout.commons.annotations;
 
-import java.io.FileReader;
+import java.util.zip.Adler32;
 
-import org.eclipse.scout.commons.IOUtility;
+/**
+ * The {@link Adler32} checksum of the resource the form data has been created for.
+ * This annotation is used to determ a form data has to be created new or is still valid.
+ */
+public @interface FormDataChecksum {
 
-public class TestSqlFormatter {
-
-  public static void main(String[] args) throws Exception {
-    String s = IOUtility.getContent(new FileReader("D:/TEMP/imo/a.sql"));
-    //
-    String w = SqlFormatter.wellform(s);
-    System.out.println(w);
-    System.exit(0);
-  }
+  long value() default 0l;
 }

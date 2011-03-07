@@ -8,19 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.jdbc.parsers;
+package org.eclipse.scout.commons.parsers;
 
 import java.text.ParsePosition;
 import java.util.ArrayList;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.DatabaseSpecificToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.FunctionInputToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.IToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.TextToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.ValueInputToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.ValueOutputToken;
+import org.eclipse.scout.commons.parsers.token.DatabaseSpecificToken;
+import org.eclipse.scout.commons.parsers.token.FunctionInputToken;
+import org.eclipse.scout.commons.parsers.token.IToken;
+import org.eclipse.scout.commons.parsers.token.TextToken;
+import org.eclipse.scout.commons.parsers.token.ValueInputToken;
+import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 
 /**
  * Parser for bind variables in arbitrary sql staments

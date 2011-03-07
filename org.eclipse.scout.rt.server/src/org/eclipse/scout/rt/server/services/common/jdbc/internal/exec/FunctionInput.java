@@ -4,18 +4,18 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.parsers.token.FunctionInputToken;
+import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.FunctionInputToken;
-import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.IToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 
 class FunctionInput implements IBindInput {

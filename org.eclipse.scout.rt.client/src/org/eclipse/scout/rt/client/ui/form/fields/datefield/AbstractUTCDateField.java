@@ -14,11 +14,13 @@ import java.util.Date;
 
 import org.eclipse.scout.commons.UTCDate;
 import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractUTCFieldData;
 
 /**
  * Date field with override on {@link #getHolderType()} to {@link UTCDate}
  */
-@FormData("USING org.eclipse.scout.rt.shared.data.form.fields.AbstractUTCFieldData")
+@FormData(value = AbstractUTCFieldData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractUTCDateField extends AbstractDateField implements IUTCDateField {
 
   @Override
