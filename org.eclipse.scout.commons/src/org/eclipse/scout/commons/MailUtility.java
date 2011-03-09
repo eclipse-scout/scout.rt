@@ -312,15 +312,15 @@ public final class MailUtility {
     return plainText;
   }
 
-  public static MimeMessage createMimeMessageFromWordArchive(File archiveFile, File[] attachments, boolean markAsUnsent) throws ProcessingException {
-    return instance.createMimeMessageFromWordArchiveInternal(archiveFile, attachments, markAsUnsent);
+  public static MimeMessage createMimeMessageFromWordArchiveDirectory(File archiveDir, String simpleName, File[] attachments, boolean markAsUnsent) throws ProcessingException {
+    return instance.createMimeMessageFromWordArchiveInternal(archiveDir, simpleName, attachments, markAsUnsent);
   }
 
   public static MimeMessage createMimeMessageFromWordArchive(File archiveFile, File[] attachments) throws ProcessingException {
-    return instance.createMimeMessageFromWordArchiveInternal(archiveFile, attachments, false);
+    return createMimeMessageFromWordArchive(archiveFile, attachments, false);
   }
 
-  private MimeMessage createMimeMessageFromWordArchiveInternal(File archiveFile, File[] attachments, boolean markAsUnsent) throws ProcessingException {
+  public static MimeMessage createMimeMessageFromWordArchive(File archiveFile, File[] attachments, boolean markAsUnsent) throws ProcessingException {
     try {
       File tempDir = IOUtility.createTempDirectory("");
       FileUtility.extractArchive(archiveFile, tempDir);
@@ -329,8 +329,19 @@ public final class MailUtility {
       if (archiveFile.getName().lastIndexOf('.') != -1) {
         simpleName = archiveFile.getName().substring(0, archiveFile.getName().lastIndexOf('.'));
       }
+      return instance.createMimeMessageFromWordArchiveInternal(tempDir, simpleName, attachments, markAsUnsent);
+    }
+    catch (ProcessingException pe) {
+      throw (ProcessingException) pe;
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error occured while accessing files", e);
+    }
+  }
 
-      File plainTextFile = new File(tempDir, simpleName + ".txt");
+  private MimeMessage createMimeMessageFromWordArchiveInternal(File archiveDir, String simpleName, File[] attachments, boolean markAsUnsent) throws ProcessingException {
+    try {
+      File plainTextFile = new File(archiveDir, simpleName + ".txt");
       String plainTextMessage = null;
       boolean hasPlainText = false;
       if (plainTextFile.exists()) {
@@ -342,7 +353,7 @@ public final class MailUtility {
 
       String folderName = null;
       List<DataSource> htmlDataSourceList = new ArrayList<DataSource>();
-      for (File filesFolder : tempDir.listFiles()) {
+      for (File filesFolder : archiveDir.listFiles()) {
         // in this archive file, exactly one directory should exist
         // word names this directory differently depending on the language
         if (filesFolder.isDirectory() && filesFolder.getName().startsWith(simpleName)) {
@@ -363,7 +374,7 @@ public final class MailUtility {
         }
       }
 
-      File htmlFile = new File(tempDir, simpleName + ".html");
+      File htmlFile = new File(archiveDir, simpleName + ".html");
       String htmlMessage = null;
       boolean hasHtml = false;
       if (htmlFile.exists()) {
