@@ -1821,11 +1821,22 @@ public final class TypeCastUtility {
    */
   @SuppressWarnings("unchecked")
   public static Class getGenericsParameterClass(Class queryClass, Class genericsOwnerClass) {
-    return instance.getGenericsParameterClassImpl(queryClass, genericsOwnerClass);
+    return instance.getGenericsParameterClassImpl(queryClass, genericsOwnerClass, 0);
+  }
+
+  /**
+   * @return the actual (declared) class of the genericsParameterIndex-nt generics parameter The
+   *         generics parameter is defined on the genericsOwnerClass The actual
+   *         type must be declared on type Example:
+   *         genericsOwnerClass=IHolder.class, type=LongArrayHolder, returns
+   *         Long[]
+   */
+  public static Class getGenericsParameterClass(Class queryClass, Class genericsOwnerClass, int genericsParameterIndex) {
+    return instance.getGenericsParameterClassImpl(queryClass, genericsOwnerClass, genericsParameterIndex);
   }
 
   @SuppressWarnings("unchecked")
-  private synchronized Class getGenericsParameterClassImpl(Class queryClass, Class genericsOwnerClass) {
+  private synchronized Class getGenericsParameterClassImpl(Class queryClass, Class genericsOwnerClass, int genericsParameterIndex) {
     GPCKey key = new GPCKey(queryClass, genericsOwnerClass);
     Class result = m_genericsParameterClassCache.get(key);
     if (result != null) {
@@ -1834,7 +1845,7 @@ public final class TypeCastUtility {
     //
     TypeDesc desc = new TypeDesc();
     HashSet<Type> loopDetector = new HashSet<Type>();
-    visitGenericsHierarchy(queryClass, genericsOwnerClass, desc, loopDetector);
+    visitGenericsHierarchy(queryClass, genericsOwnerClass, desc, loopDetector, genericsParameterIndex);
     if (desc.type == null) {
       String s = desc.typeVarName;
       for (int i = 0; i < desc.arrayDim; i++) {
@@ -1853,7 +1864,7 @@ public final class TypeCastUtility {
   }
 
   @SuppressWarnings("unchecked")
-  private boolean/* found */visitGenericsHierarchy(Type type, Class stopType, TypeDesc desc, HashSet<Type> loopDetector) {
+  private boolean/* found */visitGenericsHierarchy(Type type, Class stopType, TypeDesc desc, HashSet<Type> loopDetector, int genericsParameterIndex) {
     if (loopDetector.contains(type)) {
       return false;
     }
@@ -1865,7 +1876,7 @@ public final class TypeCastUtility {
           Type a = c.getGenericSuperclass();
           if (a != null) {
             loopDetector.add(type);
-            found = visitGenericsHierarchy(a, stopType, desc, loopDetector);
+            found = visitGenericsHierarchy(a, stopType, desc, loopDetector, genericsParameterIndex);
             loopDetector.remove(type);
           }
         }
@@ -1875,7 +1886,7 @@ public final class TypeCastUtility {
         if (a.length > 0) {
           for (int i = 0; i < a.length; i++) {
             loopDetector.add(type);
-            found = visitGenericsHierarchy(a[i], stopType, desc, loopDetector);
+            found = visitGenericsHierarchy(a[i], stopType, desc, loopDetector, genericsParameterIndex);
             loopDetector.remove(type);
             if (found) break;
           }
@@ -1886,7 +1897,7 @@ public final class TypeCastUtility {
     else if (type instanceof ParameterizedType) {
       ParameterizedType pt = (ParameterizedType) type;
       loopDetector.add(pt);
-      boolean found = visitGenericsHierarchy((pt).getRawType(), stopType, desc, loopDetector);
+      boolean found = visitGenericsHierarchy((pt).getRawType(), stopType, desc, loopDetector, genericsParameterIndex);
       loopDetector.remove(pt);
       if (found) {
         if (desc.type == null) {
@@ -1895,14 +1906,16 @@ public final class TypeCastUtility {
             TypeVariable[] tvars = c.getTypeParameters();
             Type[] targs = pt.getActualTypeArguments();
             Type relevantTarg = null;
-            for (int i = 0; i < tvars.length && i < targs.length && relevantTarg == null; i++) {
-              Type targ = targs[i];
-              if (desc.typeVarName == null) {
-                desc.typeVarName = tvars[i].getName();
-                relevantTarg = targs[i];
-              }
-              else if (desc.typeVarName.equals(tvars[i].getName())) {
-                relevantTarg = targs[i];
+            if (tvars.length > genericsParameterIndex) {
+              for (int i = genericsParameterIndex; i < tvars.length && i < targs.length && relevantTarg == null; i++) {
+                Type targ = targs[i];
+                if (desc.typeVarName == null) {
+                  desc.typeVarName = tvars[i].getName();
+                  relevantTarg = targs[i];
+                }
+                else if (desc.typeVarName.equals(tvars[i].getName())) {
+                  relevantTarg = targs[i];
+                }
               }
             }
             if (relevantTarg != null) {
