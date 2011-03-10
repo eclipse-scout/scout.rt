@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -23,10 +22,12 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 /**
  * LookupCall for cases where no backend service exists.<br>
  * Data is directly provided by {@link #execCreateLookupRows()}
+ * <p>
+ * Does not implements serializable, since this special subclass is not intended to be exchanged between gui and server.
  * 
  * @see LookupCall
  */
-public class LocalLookupCall extends LookupCall implements Serializable {
+public class LocalLookupCall extends LookupCall {
   private static final long serialVersionUID = 0L;
 
   public LocalLookupCall() {
