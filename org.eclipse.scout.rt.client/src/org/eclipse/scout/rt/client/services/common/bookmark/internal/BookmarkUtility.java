@@ -213,6 +213,9 @@ public final class BookmarkUtility {
     if (outline == null) {
       throw new ProcessingException("outline '" + bm.getOutlineClassName() + "' was not found");
     }
+    if (!(outline.isVisible() && outline.isEnabled())) {
+      throw new ProcessingException("activate outline " + outline.getTitle() + " denied");
+    }
     desktop.setOutline(outline);
     try {
       outline.setTreeChanging(true);

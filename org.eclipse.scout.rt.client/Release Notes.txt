@@ -244,3 +244,7 @@ BookmarkUtiliy ensures, that a search form is started as soon as the table page 
 10.03.2011 hmu
 bsi ticket #99'785
 remove all custom columns implemented. Instead o implementing ITableCustomizer extends AbstractTableCustomizer, this class contains an empty implementation of the interface
+
+10.03.2011 imo
+bsi ticket 96627
+do not activate disabled or invisible outlines when activating bookmark
