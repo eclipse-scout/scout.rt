@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,4 +42,9 @@ public interface ITableCustomizer {
    * Remove an existing custom column, asks with a message box before deleting
    */
   void removeColumn(ICustomColumn<?> col) throws ProcessingException;
+
+  /**
+   * Remove all existing custom columns, asks with a message box before deleting
+   */
+  void removeAllColumns() throws ProcessingException;
 }
