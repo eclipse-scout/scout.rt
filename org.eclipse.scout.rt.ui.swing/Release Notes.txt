@@ -38,3 +38,11 @@ see Release Notes in org.eclipse.scout.rt.client
 
 02.03.2011 pba
 #98515 horizontal scrollbar is no longer missing for group boxes, if the getConfiguredScrollable is enabled
+
+10.03.2011 imo
+bsi ticket 99212
+added support for the config.ini/eclipse.ini property "app.zone" in AbstractSwingEnvironment.decorateAppZone(Window w).
+app.zone=prod | production (paints no special border around all dialogs and frames, this is the default)
+app.zone=int | integration (paints a yellow border around all dialogs and frames)
+app.zone=test (paints an orange border around all dialogs and frames)
+app.zone=dev | development (paints a red border around all dialogs and frames)

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Image;
@@ -36,6 +37,7 @@ import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -601,6 +603,9 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       ((JFrameEx) rootFrame).getRootPane().setName("Synth.Frame");
       ((JFrameEx) rootFrame).setAutoCorrectSize(false);
     }
+    if (rootFrame instanceof RootPaneContainer) {
+      decorateAppZone((RootPaneContainer) rootFrame);
+    }
     return rootFrame;
   }
 
@@ -613,6 +618,32 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   protected void decorate(Object scoutObject, Object swingScoutComposite) {
 
+  }
+
+  /**
+   * decorateAppZone is called after a frame or dialog is created
+   * 
+   * <pre>
+   * app.zone=prod | production (paints no special border around all dialogs and frames, this is the default)
+   * app.zone=int | integration (paints a yellow border around all dialogs and frames)
+   * app.zone=test (paints an orange border around all dialogs and frames)
+   * app.zone=dev | development (paints a red border around all dialogs and frames)
+   * </pre>
+   */
+  protected void decorateAppZone(RootPaneContainer root) {
+    String zone = Activator.getDefault().getBundle().getBundleContext().getProperty("app.zone");
+    if (zone == null) {
+      //production
+    }
+    else if (zone.equals("int") || zone.equals("integration")) {
+      root.getRootPane().setBorder(new LineBorder(Color.yellow, 3));
+    }
+    else if (zone.equals("test")) {
+      root.getRootPane().setBorder(new LineBorder(Color.orange, 3));
+    }
+    else if (zone.equals("dev") || zone.equals("development")) {
+      root.getRootPane().setBorder(new LineBorder(Color.red, 3));
+    }
   }
 
   public ISwingScoutDesktop createDesktop(Window owner, IDesktop desktop) {
@@ -887,6 +918,9 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       setWindowIcon(w);
     }
     decorate(form, ui);
+    if (w instanceof RootPaneContainer) {
+      decorateAppZone((RootPaneContainer) w);
+    }
     return ui;
   }
 
@@ -902,6 +936,9 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       setWindowIcon(w);
     }
     decorate(form, ui);
+    if (w instanceof RootPaneContainer) {
+      decorateAppZone((RootPaneContainer) w);
+    }
     return ui;
   }
 
