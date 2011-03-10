@@ -233,3 +233,7 @@ add a reasonable default implementation for getBookmarkIdentifier() in AbstractP
 bsi ticket #99628
 apply date format for a value newly set in a date(time) field in order to remove undesired seconds and milliseconds
 
+10.03.2011 pba
+bsi ticket #97852
+replace rows in tables: if the new row is shorter than the row to be replaced, then text & value of the old row will be set to null for the cells, where no new cell is available
+

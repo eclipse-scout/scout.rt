@@ -1216,6 +1216,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               if (columnIndex < newRow.getCellCount()) {
                 oldRow.getCellForUpdate(columnIndex).updateFrom(newRow.getCell(columnIndex));
               }
+              else {
+                // reset the visible values
+                oldRow.getCellForUpdate(columnIndex).setText(null);
+                oldRow.getCellForUpdate(columnIndex).setValue(null);
+              }
             }
           }
           finally {
