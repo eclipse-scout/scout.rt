@@ -248,3 +248,6 @@ Add menus in outline also for node-, not only table pages
 bsi ticket #99533
 add a reasonable default implementation for getBookmarkIdentifier() in AbstractPage to avoid caching bugs
 
+10.03.2011 imo
+bsi ticket 96627
+do not activate disabled or invisible outlines when activating bookmark
