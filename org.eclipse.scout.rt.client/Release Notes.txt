@@ -237,3 +237,7 @@ apply date format for a value newly set in a date(time) field in order to remove
 bsi ticket #97852
 replace rows in tables: if the new row is shorter than the row to be replaced, then text & value of the old row will be set to null for the cells, where no new cell is available
 
+10.03.2011 pba
+bsi ticket #99562
+BookmarkUtiliy ensures, that a search form is started as soon as the table page is accessed
+

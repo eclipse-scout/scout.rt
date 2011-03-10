@@ -389,6 +389,8 @@ public final class BookmarkUtility {
   @SuppressWarnings({"unchecked", "deprecation"})
   private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean loadChildren) throws ProcessingException {
     ITable table = tablePage.getTable();
+    // starts search form
+    tablePage.getSearchFilter();
     ColumnSet cs = table.getColumnSet();
     // setup table
     try {
