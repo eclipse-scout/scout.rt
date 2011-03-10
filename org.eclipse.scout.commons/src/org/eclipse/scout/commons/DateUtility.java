@@ -288,7 +288,7 @@ public final class DateUtility {
    * @return true if d is in the date range [minDate,maxDate]
    */
   public static boolean isInDateRange(Date minDate, Date d, Date maxDate) {
-    return isInRange(truncDate(minDate), d, truncDate(nextDay(maxDate)));
+    return isInRange(truncDate(minDate), truncDate(d), truncDate(maxDate));
   }
 
   public static Date nextDay(Date d) {
