@@ -348,7 +348,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   /**
    * The hyperlink's table row is the selected row and the column is the context column {@link #getContextColumn()}
-   * 
+   *
    * @param url
    * @param path
    *          {@link URL#getPath()}
@@ -509,7 +509,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Override this internal method only in order to make use of dynamic fields<br>
    * Used to manage column list and add/remove columns
-   * 
+   *
    * @param columnList
    *          live and mutable list of configured columns, not yet initialized
    */
@@ -523,7 +523,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -1215,6 +1215,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             for (int columnIndex = 0; columnIndex < getColumnCount(); columnIndex++) {
               if (columnIndex < newRow.getCellCount()) {
                 oldRow.getCellForUpdate(columnIndex).updateFrom(newRow.getCell(columnIndex));
+              }
+              else {
+                // reset the visible values
+                oldRow.getCellForUpdate(columnIndex).setText(null);
+                oldRow.getCellForUpdate(columnIndex).setValue(null);
               }
             }
           }
