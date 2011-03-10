@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.view.AbstractViewButton;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -93,6 +94,18 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
     if (isSelected()) {
       if (desktop != null && desktop.getOutline() != null && desktop.getOutline() == m_outline) {
+        //determine new selection
+        ITreeNode newSelectedNode;
+        if (m_outline.isRootNodeVisible()) {
+          newSelectedNode = m_outline.getRootPage();
+        }
+        else {
+          newSelectedNode = m_outline.getSelectedNode();
+          while (newSelectedNode != null && newSelectedNode.getParentNode() != m_outline.getRootPage()) {
+            newSelectedNode = newSelectedNode.getParentNode();
+          }
+        }
+        m_outline.selectNode(newSelectedNode);
         // collapse outline
         if (m_outline.isRootNodeVisible()) {
           m_outline.collapseAll(m_outline.getRootPage());
