@@ -46,3 +46,9 @@ app.zone=prod | production (paints no special border around all dialogs and fram
 app.zone=int | integration (paints a yellow border around all dialogs and frames)
 app.zone=test (paints an orange border around all dialogs and frames)
 app.zone=dev | development (paints a red border around all dialogs and frames)
+
+11.03.2011 bsh
+- ColorUtility: Added a method to "multiply" two colors (instead of merging them). See JavaDoc for details.
+- ColorUtility: All methods are now null-safe.
+- SwingScoutTable: Fixed calculation of resulting foreground and background color when a row is selected (merge -> multiply).
+Migration: None
