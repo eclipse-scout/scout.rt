@@ -165,11 +165,13 @@ public class SqlFormatter {
   }
 
   private void formatPart(Part stm, FormatContext ctx) {
+    boolean hasList = false;
     for (IToken t : stm.getChildren()) {
       if (t instanceof PartToken) {
         formatDefault(t, ctx);
       }
       else if (t instanceof ListExpr) {
+        hasList = true;
         ctx.in();
         formatListExpr((ListExpr) t, true, ctx);
         ctx.out();
@@ -177,6 +179,11 @@ public class SqlFormatter {
       else {
         formatDefault(t, ctx);
       }
+    }
+    if (!hasList) {
+      ctx.in();
+      ctx.print(" ");
+      ctx.out();
     }
   }
 

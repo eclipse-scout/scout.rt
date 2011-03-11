@@ -61,7 +61,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.parsers.token.TextToken;
  * <pre>
  * <code>
  * Statement = SingleStatement (UnionToken SingleStatement)* (Unparsed)?
- * SingleStatement = Part+
+ * SingleStatement = Part+ {with first part being a statement root part such as SELECT, INSERT, WITH, ...}
  * Part = PartToken ListExpr
  * ListExpr = OrExpr (ListSeparator OrExpr)*
  * OrExpr = AndExpr (OrOp AndExpr)*
@@ -86,9 +86,9 @@ public class SqlParser {
   private static final Pattern COMMENT_PAT = Pattern.compile("(\\{[^\\}]*\\})");
   private static final Pattern APOS_PAT = Pattern.compile("('[^']*')");
   private static final Pattern QUOT_PAT = Pattern.compile("(\"[^\"]*\")");
-  //make all uppercase and single space
+  //make all uppercase and single space (order of tokens matters!)
   private static final Pattern UNION_PAT = Pattern.compile("[^" + nameChars + "](UNION ALL|INTERSECT|MINUS|UNION)[^" + nameChars + "]");
-  private static final Pattern PART_PAT = Pattern.compile("[^" + nameChars + "](WITH|AS|SELECT|FROM|LEFT JOIN|OUTER JOIN|INNER JOIN|JOIN|ON|WHERE|GROUP BY|HAVING|ORDER BY|INSERT INTO|INSERT|INTO|CONNECT BY|START WITH|UPDATE|DELETE FROM|DELETE|SET|VALUES)[^" + nameChars + "]");
+  private static final Pattern PART_PAT = Pattern.compile("[^" + nameChars + "](WITH|AS|SELECT|FROM|LEFT JOIN|OUTER JOIN|INNER JOIN|JOIN|ON|WHERE|GROUP BY|HAVING|ORDER BY|INSERT INTO|INSERT|INTO|CONNECT BY|START WITH|UPDATE|DELETE FROM|DELETE|SET|VALUES|CASE|ELSE|END|THEN|WHEN)[^" + nameChars + "]");
   private static final Pattern OUTER_JOIN_PAT = Pattern.compile("(\\(\\+\\))");
   private static final Pattern OR_OP_PAT = Pattern.compile("[^" + nameChars + "](OR)[^" + nameChars + "]");
   private static final Pattern AND_OP_PAT = Pattern.compile("[^" + nameChars + "](AND)[^" + nameChars + "]");
@@ -226,7 +226,14 @@ public class SqlParser {
     try {
       Part p;
       SingleStatement ss = new SingleStatement();
-      while ((p = parsePart(list, ctx)) != null) {
+      if ((p = parsePart(list, ctx, true)) != null) {
+        //ok
+        ss.addChild(p);
+      }
+      else {
+        return null;
+      }
+      while ((p = parsePart(list, ctx, false)) != null) {
         ss.addChild(p);
       }
       if (ss.getChildren().size() == 0) {
@@ -239,15 +246,16 @@ public class SqlParser {
     }
   }
 
-  private Part parsePart(List<IToken> list, ParseContext ctx) {
+  private Part parsePart(List<IToken> list, ParseContext ctx, boolean rootPart) {
     //PartToken ListExpr
     ParseStep lock = ctx.checkAndAdd("Part", list);
     if (lock == null) return null;
     try {
       PartToken pt;
       ListExpr le;
-      if ((pt = removeToken(list, PartToken.class)) != null && (le = parseListExpr(list, ctx)) != null) {
+      if ((pt = removeToken(list, PartToken.class)) != null && (!rootPart || isRootPartToken(pt))) {
         //ok
+        le = parseListExpr(list, ctx);
       }
       else {
         //restore incomplete
@@ -258,12 +266,34 @@ public class SqlParser {
       }
       Part p = new Part();
       p.addChild(pt);
-      p.addChild(le);
+      if (le != null) {
+        p.addChild(le);
+      }
       return p;
     }
     finally {
       ctx.remove(lock);
     }
+  }
+
+  private boolean isRootPartToken(PartToken pt) {
+    String s = pt.getText();
+    if (s.equals("SELECT")) {
+      return true;
+    }
+    if (s.equals("WITH")) {
+      return true;
+    }
+    if (s.equals("INSERT")) {
+      return true;
+    }
+    if (s.equals("UPDATE")) {
+      return true;
+    }
+    if (s.equals("DELETE")) {
+      return true;
+    }
+    return false;
   }
 
   private ListExpr parseListExpr(List<IToken> list, ParseContext ctx) {
@@ -669,7 +699,7 @@ public class SqlParser {
         s = " " + s + " ";
         Matcher m = p.matcher(s);
         int lastEnd = 0;
-        while (m.find()) {
+        while (lastEnd < s.length() && m.find(lastEnd)) {
           String r = s.substring(lastEnd, m.start(1));
           if (transcodeDelimiters) {
             r = decodeDelimiters(r);
