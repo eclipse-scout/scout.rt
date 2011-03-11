@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.parsers.token.FunctionInputToken;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
@@ -90,6 +91,12 @@ class FunctionInput implements IBindInput {
     else {
       value = m_value;
     }
+    Class<?> nullType = null;
+    if (value instanceof IHolder<?>) {
+      IHolder h = (IHolder<?>) value;
+      value = h.getValue();
+      nullType = h.getHolderType();
+    }
     //
     if (m_target.isPlainToken()) {
       m_target.setReplaceToken(m_target.getParsedToken());
@@ -105,7 +112,7 @@ class FunctionInput implements IBindInput {
     }
     else {
       m_target.setReplaceToken("?");
-      return sqlStyle.buildBindFor(value, null);
+      return sqlStyle.buildBindFor(value, nullType);
     }
   }
 

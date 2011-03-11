@@ -28,6 +28,9 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.commons.holders.LongHolder;
+import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.DynamicNls;
@@ -308,6 +311,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
    * ::code(MainAddressCode)<br>
    * <br>
    * ::text(SalutationMr)
+   * <p>
+   * 
+   * @return a plain object value or in case of a null value preferrably a {@link IHolder} of the correct value type
    */
   @ConfigOperation
   @Order(40)
@@ -324,7 +330,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       }
       Class permissionClass = loadBundleClassLenient(m_permissionNameToDescriptor, permissionClassName);
       IAccessControlService accessControlService = SERVICES.getService(IAccessControlService.class);
-      return tryGetPermissionLevel(permissionClass, levelField, accessControlService);
+      Object ret = tryGetPermissionLevel(permissionClass, levelField, accessControlService);
+      return ret != null ? ret : new LongHolder();
     }
     else if (functionName.equals("code")) {
       if (args.length != 1) throw new IllegalArgumentException("expected 1 argument for function '" + functionName + "'");
@@ -334,7 +341,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         throw new ProcessingException("cannot find class for code '" + args[0] + "'");
       }
       try {
-        return codeClass.getField("ID").get(null);
+        Object ret = codeClass.getField("ID").get(null);
+        return ret != null ? ret : new LongHolder();
       }
       catch (Throwable t) {
         throw new ProcessingException("ID of code '" + args[0] + "'", t);
@@ -350,7 +358,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       }
       try {
         Method m = getNlsProvider().getMethod("get", new Class[]{String.class, String[].class});
-        return m.invoke(null, (Object[]) args);
+        Object ret = m.invoke(null, (Object[]) args);
+        return ret != null ? ret : new StringHolder();
       }
       catch (Throwable t) {
         throw new ProcessingException("unknown function in DynamicNls, check 'getConfiguredNlsProvider' / 'getNlsProvider': get", t);
