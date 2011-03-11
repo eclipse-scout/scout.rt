@@ -29,9 +29,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+
 public final class TypeCastUtility {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TypeCastUtility.class);
+
   // singleton
   private static TypeCastUtility instance = new TypeCastUtility();
+
   private static final int CHARACTER = 1;
   private static final int BYTE = 2;
   private static final int BOOLEAN = 3;
@@ -59,6 +65,10 @@ public final class TypeCastUtility {
   }
 
   // instance
+  /**
+   * fast access to debug flag
+   */
+  private boolean m_debugEnabled;
   private HashMap<Class, Class> m_wrapperTypeMap = new HashMap<Class, Class>();
   private HashMap<Class, Integer> m_typeMap = new HashMap<Class, Integer>();
   private HashMap<Class, Integer> m_primitiveTypeMap = new HashMap<Class, Integer>();
@@ -1780,8 +1790,9 @@ public final class TypeCastUtility {
   }
 
   private static class TypeDesc {
-    String typeVarName;
-    Class type;
+    int parameterizedTypeIndex;
+    TypeVariable<?> typeVariable;
+    Class resolvedClazz;
     int arrayDim;
   }
 
@@ -1789,17 +1800,19 @@ public final class TypeCastUtility {
    * key for GenericsParameterClass with weak references so to allow for class unloading
    */
   private static class GPCKey {
-    private Class<?> m_queryClass;
-    private Class<?> m_genericsOwnerClass;
+    private final Class<?> m_queryClass;
+    private final Class<?> m_genericsOwnerClass;
+    private final int m_genericsParameterIndex;
 
-    public GPCKey(Class queryClass, Class genericsOwnerClass) {
+    public GPCKey(Class queryClass, Class genericsOwnerClass, int genericsParameterIndex) {
       m_queryClass = queryClass;
       m_genericsOwnerClass = genericsOwnerClass;
+      m_genericsParameterIndex = genericsParameterIndex;
     }
 
     @Override
     public int hashCode() {
-      return (m_queryClass != null ? m_queryClass.hashCode() : 0) ^ (m_genericsOwnerClass != null ? m_genericsOwnerClass.hashCode() : 0);
+      return (m_queryClass != null ? m_queryClass.hashCode() : 0) ^ (m_genericsOwnerClass != null ? m_genericsOwnerClass.hashCode() : 0) ^ m_genericsParameterIndex;
     }
 
     @Override
@@ -1808,16 +1821,12 @@ public final class TypeCastUtility {
         return false;
       }
       GPCKey o = (GPCKey) obj;
-      return (this.m_queryClass == o.m_queryClass) && (this.m_genericsOwnerClass == o.m_genericsOwnerClass);
+      return (this.m_queryClass == o.m_queryClass) && (this.m_genericsOwnerClass == o.m_genericsOwnerClass) && (this.m_genericsParameterIndex == o.m_genericsParameterIndex);
     }
   }
 
   /**
-   * @return the actual (declared) class of the first generics parameter The
-   *         generics parameter is defined on the genericsOwnerClass The actual
-   *         type must be declared on type Example:
-   *         genericsOwnerClass=IHolder.class, type=LongArrayHolder, returns
-   *         Long[]
+   * {@link TypeCastUtility#getGenericsParameterClass(Class, Class, int)}
    */
   @SuppressWarnings("unchecked")
   public static Class getGenericsParameterClass(Class queryClass, Class genericsOwnerClass) {
@@ -1825,11 +1834,15 @@ public final class TypeCastUtility {
   }
 
   /**
-   * @return the actual (declared) class of the genericsParameterIndex-nt generics parameter The
-   *         generics parameter is defined on the genericsOwnerClass The actual
-   *         type must be declared on type Example:
-   *         genericsOwnerClass=IHolder.class, type=LongArrayHolder, returns
-   *         Long[]
+   * @return the actual (declared) type of the generics parameter with index genericsParameterIndex on
+   *         genericsOwnerClass.
+   *         <p>
+   *         The generics parameter is defined on the genericsOwnerClass
+   *         <p>
+   *         The actual type must be declared on the queryClass
+   *         <p>
+   *         Example: queryType=LongArrayHolder, genericsOwnerClass=IHolder.class, genericsParameterIndex=0 since
+   *         IHolder has only one, returns Long[].class
    */
   public static Class getGenericsParameterClass(Class queryClass, Class genericsOwnerClass, int genericsParameterIndex) {
     return instance.getGenericsParameterClassImpl(queryClass, genericsOwnerClass, genericsParameterIndex);
@@ -1837,119 +1850,136 @@ public final class TypeCastUtility {
 
   @SuppressWarnings("unchecked")
   private synchronized Class getGenericsParameterClassImpl(Class queryClass, Class genericsOwnerClass, int genericsParameterIndex) {
-    GPCKey key = new GPCKey(queryClass, genericsOwnerClass);
+    GPCKey key = new GPCKey(queryClass, genericsOwnerClass, genericsParameterIndex);
     Class result = m_genericsParameterClassCache.get(key);
     if (result != null) {
       return result;
     }
     //
+    m_debugEnabled = LOG.isDebugEnabled();
+    if (m_debugEnabled) LOG.debug("queryClass=" + queryClass + ", genericsOwnerClass=" + genericsOwnerClass + ", genericsParameterIndex=" + genericsParameterIndex);
     TypeDesc desc = new TypeDesc();
     HashSet<Type> loopDetector = new HashSet<Type>();
-    visitGenericsHierarchy(queryClass, genericsOwnerClass, desc, loopDetector, genericsParameterIndex);
-    if (desc.type == null) {
-      String s = desc.typeVarName;
+    visitGenericsHierarchy(queryClass, genericsOwnerClass, genericsParameterIndex, desc, loopDetector);
+    if (desc.resolvedClazz == null) {
+      String s = (desc.typeVariable != null ? desc.typeVariable.getName() : "null");
       for (int i = 0; i < desc.arrayDim; i++) {
         s += "[]";
       }
       throw new IllegalArgumentException("cannot resolve " + s + " to a 'Class' type on " + queryClass);
     }
     if (desc.arrayDim > 0) {
-      result = Array.newInstance(desc.type, new int[desc.arrayDim]).getClass();
+      result = Array.newInstance(desc.resolvedClazz, new int[desc.arrayDim]).getClass();
     }
     else {
-      result = desc.type;
+      result = desc.resolvedClazz;
     }
     m_genericsParameterClassCache.put(key, result);
     return result;
   }
 
   @SuppressWarnings("unchecked")
-  private boolean/* found */visitGenericsHierarchy(Type type, Class stopType, TypeDesc desc, HashSet<Type> loopDetector, int genericsParameterIndex) {
+  private boolean/* foundStopType */visitGenericsHierarchy(Type type, Class<?> stopType, int stopTypeGenericsParameterIndex, TypeDesc desc, HashSet<Type> loopDetector) {
     if (loopDetector.contains(type)) {
       return false;
     }
     if (type instanceof Class) {
       Class c = (Class) type;
-      boolean found = (c == stopType);
-      if (!found) {
+      if (c == stopType) {
+        //stop class, set generics index
+        desc.parameterizedTypeIndex = stopTypeGenericsParameterIndex;
+        if (m_debugEnabled) LOG.debug("foundStopClass " + c + ", using generics index " + desc.parameterizedTypeIndex);
+        return true;
+      }
+      boolean foundStopClass = false;
+      if (!foundStopClass) {
         if (!c.isInterface()) {
           Type a = c.getGenericSuperclass();
           if (a != null) {
-            loopDetector.add(type);
-            found = visitGenericsHierarchy(a, stopType, desc, loopDetector, genericsParameterIndex);
-            loopDetector.remove(type);
+            try {
+              loopDetector.add(type);
+              foundStopClass = visitGenericsHierarchy(a, stopType, stopTypeGenericsParameterIndex, desc, loopDetector);
+            }
+            finally {
+              loopDetector.remove(type);
+            }
           }
         }
       }
-      if (!found) {
+      if (!foundStopClass) {
         Type[] a = c.getGenericInterfaces();
         if (a.length > 0) {
-          for (int i = 0; i < a.length; i++) {
-            loopDetector.add(type);
-            found = visitGenericsHierarchy(a[i], stopType, desc, loopDetector, genericsParameterIndex);
-            loopDetector.remove(type);
-            if (found) break;
+          for (int i = 0; i < a.length && !foundStopClass; i++) {
+            try {
+              loopDetector.add(type);
+              foundStopClass = visitGenericsHierarchy(a[i], stopType, stopTypeGenericsParameterIndex, desc, loopDetector);
+            }
+            finally {
+              loopDetector.remove(type);
+            }
           }
         }
       }
-      return found;
-    }
-    else if (type instanceof ParameterizedType) {
-      ParameterizedType pt = (ParameterizedType) type;
-      loopDetector.add(pt);
-      boolean found = visitGenericsHierarchy((pt).getRawType(), stopType, desc, loopDetector, genericsParameterIndex);
-      loopDetector.remove(pt);
-      if (found) {
-        if (desc.type == null) {
-          if (pt.getRawType() instanceof Class) {
-            Class c = (Class) pt.getRawType();
-            TypeVariable[] tvars = c.getTypeParameters();
-            Type[] targs = pt.getActualTypeArguments();
-            Type relevantTarg = null;
-            if (tvars.length > genericsParameterIndex) {
-              for (int i = genericsParameterIndex; i < tvars.length && i < targs.length && relevantTarg == null; i++) {
-                Type targ = targs[i];
-                if (desc.typeVarName == null) {
-                  desc.typeVarName = tvars[i].getName();
-                  relevantTarg = targs[i];
-                }
-                else if (desc.typeVarName.equals(tvars[i].getName())) {
-                  relevantTarg = targs[i];
-                }
-              }
+      if (foundStopClass) {
+        if (m_debugEnabled) LOG.debug("visit " + VerboseUtility.dumpGenerics(c));
+        if (desc.resolvedClazz == null) {
+          //find the index of the typeParameter
+          desc.parameterizedTypeIndex = 0;
+          TypeVariable<?>[] vars = c.getTypeParameters();
+          for (int i = 0; i < vars.length; i++) {
+            if (vars[i] == desc.typeVariable) {
+              if (m_debugEnabled) LOG.debug(desc.typeVariable + " has index " + i);
+              desc.parameterizedTypeIndex = i;
+              break;
             }
-            if (relevantTarg != null) {
-              while (relevantTarg instanceof GenericArrayType) {
-                relevantTarg = ((GenericArrayType) relevantTarg).getGenericComponentType();
-                desc.arrayDim++;
-              }
-              if (relevantTarg instanceof Class) {
-                desc.type = (Class) relevantTarg;
-              }
-              else if (relevantTarg instanceof ParameterizedType) {
-                desc.type = (Class) ((ParameterizedType) relevantTarg).getRawType();
-              }
-              else if (relevantTarg instanceof TypeVariable) {
-                desc.typeVarName = ((TypeVariable) relevantTarg).getName();
-              }
-              else {
-                throw new IllegalArgumentException("expected Class, ParameterizedType or TypeVariable when encountered " + relevantTarg + " on " + pt);
-              }
-            }
-            else {
-              throw new IllegalArgumentException("expected actual type argument for " + desc.typeVarName + " on " + pt);
-            }
-          }
-          else {
-            throw new IllegalArgumentException("expected raw type of type 'Class' on " + pt);
           }
         }
+        return true;
       }
-      return found;
-    }
-    else {
       return false;
     }
+    //
+    if (type instanceof ParameterizedType) {
+      ParameterizedType pt = (ParameterizedType) type;
+      Type rawType = pt.getRawType();
+      try {
+        loopDetector.add(pt);
+        boolean b = visitGenericsHierarchy(rawType, stopType, stopTypeGenericsParameterIndex, desc, loopDetector);
+        if (!b) {
+          return false;
+        }
+      }
+      finally {
+        loopDetector.remove(pt);
+      }
+      //found path to stopClass
+      if (m_debugEnabled) LOG.debug("visit " + VerboseUtility.dumpGenerics(pt));
+      if (desc.resolvedClazz == null) {
+        //find next type variable
+        Type actualArg = pt.getActualTypeArguments()[desc.parameterizedTypeIndex];
+        if (m_debugEnabled) LOG.debug("index " + desc.parameterizedTypeIndex + " matches to " + actualArg);
+        while (actualArg instanceof GenericArrayType) {
+          //it is something like <T[]>
+          actualArg = ((GenericArrayType) actualArg).getGenericComponentType();
+          desc.arrayDim++;
+        }
+        if (actualArg instanceof ParameterizedType) {
+          //it is something like <Map<String,String>>
+          actualArg = ((ParameterizedType) actualArg).getRawType();
+        }
+        if (actualArg instanceof Class) {
+          desc.resolvedClazz = (Class) actualArg;
+        }
+        else if (actualArg instanceof TypeVariable) {
+          desc.typeVariable = (TypeVariable) actualArg;
+        }
+        else {
+          if (m_debugEnabled) LOG.debug("failed with " + actualArg);
+          throw new IllegalArgumentException("expected ParameterizedType with actual argument of type Class or TypeVariable when encountered " + VerboseUtility.dumpGenerics(type));
+        }
+      }
+      return true;
+    }
+    return false;
   }
-
 }
