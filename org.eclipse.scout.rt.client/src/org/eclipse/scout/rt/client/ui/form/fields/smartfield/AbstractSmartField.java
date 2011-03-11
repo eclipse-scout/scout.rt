@@ -671,7 +671,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    * returns the Smartfields proposal form
    * <p>
    * overwrite this method to return custom proposal forms
-   * 
+   *
    * @return {@link#ISmartFieldProposalForm}
    * @throws ProcessingException
    */
@@ -860,6 +860,9 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   public void acceptProposal(LookupRow row) {
     m_currentLookupRow = row;
     setValue((T) row.getKey());
+    setTooltipText(row.getTooltipText() != null ? row.getTooltipText() : getConfiguredTooltipText());
+    setFont(row.getFont() != null ? row.getFont() : FontSpec.parse(getConfiguredFont()));
+    setBackgroundColor(row.getBackgroundColor() != null ? row.getBackgroundColor() : getConfiguredBackgroundColor());
   }
 
   public ISmartFieldUIFacade getUIFacade() {
@@ -1455,7 +1458,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
         }
       }
     }
-    
+
     public void unregisterProposalFormFromUI(ISmartFieldProposalForm form) {
       unregisterProposalFormInternal(form);
     }
