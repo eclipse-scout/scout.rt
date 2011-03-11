@@ -39,7 +39,6 @@ public final class SERVICES {
   /**
    * @return the service with the highest ranking
    */
-  @SuppressWarnings("unchecked")
   public static <T extends Object> T getService(Class<T> serviceInterfaceClass) {
     return getService(serviceInterfaceClass, null);
   }
@@ -47,7 +46,6 @@ public final class SERVICES {
   /**
    * @return the service with the highest ranking
    */
-  @SuppressWarnings("unchecked")
   public static <T extends Object> T getService(Class<T> serviceInterfaceClass, String filter) {
     Activator a = Activator.getDefault();
     if (a == null || serviceInterfaceClass == null) return null;
@@ -55,6 +53,20 @@ public final class SERVICES {
     a.getServicesExtensionManager().start();
     BundleContext context = a.getBundle().getBundleContext();
     if (context == null) return null;
+
+    ServiceReference serviceReference = null;
+    if (filter == null) {
+      //If no filter is specified directly get the serviceReference with the highest ranking
+      serviceReference = context.getServiceReference(serviceInterfaceClass.getName());
+
+      if (serviceReference != null) {
+        T service = resolveService(serviceInterfaceClass, context, serviceReference);
+        if (service != null) {
+          return service;
+        }
+      }
+    }
+
     ServiceReference[] refs = null;
     try {
       refs = context.getAllServiceReferences(serviceInterfaceClass.getName(), filter);
@@ -62,19 +74,36 @@ public final class SERVICES {
     catch (InvalidSyntaxException e) {
       // nop
     }
+
     if (refs != null) {
       for (ServiceReference ref : refs) {
-        try {
-          Object s = safeGetService(context, ref);
-          if (s != null && serviceInterfaceClass.isAssignableFrom(s.getClass())) {
-            return (T) s;
-          }
+        T service = resolveService(serviceInterfaceClass, context, ref);
+        if (service != null) {
+          return service;
         }
-        finally {
-          context.ungetService(ref);
-        }
+
+      }
+
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T extends Object> T resolveService(Class<T> serviceInterfaceClass, BundleContext context, ServiceReference ref) {
+    if (ref == null) {
+      return null;
+    }
+
+    try {
+      Object s = safeGetService(context, ref);
+      if (s != null && serviceInterfaceClass.isAssignableFrom(s.getClass())) {
+        return (T) s;
       }
     }
+    finally {
+      context.ungetService(ref);
+    }
+
     return null;
   }
 
