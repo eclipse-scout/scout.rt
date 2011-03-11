@@ -29,3 +29,9 @@ Solution:
 - Change of SwingTableModel#isCellEditable() --> synchronization with model thread not neccessary anymore as property can be evaluated thread safe. (Java bean property)
 - Change of SwingScoutTable#prepareRenderer() --> synchronization with model thread for querying editable state not neccessary anymore as property can be evaluated thread safe. (Java bean property)
 Migration: None
+
+11.03.2011 bsh
+- ColorUtility: Added a method to "multiply" two colors (instead of merging them). See JavaDoc for details.
+- ColorUtility: All methods are now null-safe.
+- SwingScoutTable: Fixed calculation of resulting foreground and background color when a row is selected (merge -> multiply).
+Migration: None

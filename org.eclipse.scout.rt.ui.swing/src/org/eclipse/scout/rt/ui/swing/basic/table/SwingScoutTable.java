@@ -1088,7 +1088,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           if (cell.getForegroundColor() != null) {
             Color color = SwingUtility.createColor(cell.getForegroundColor());
             if (isSelected) {
-              color = color.brighter();
+              Color selectionColor = SwingUtility.createColor(cell.getBackgroundColor());
+              color = ColorUtility.multiplyColors(selectionColor, color);
             }
             c.setForeground(color);
           }
@@ -1137,7 +1138,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             if (isSelected) {
               if (c.getBackground() != null) {
                 // bsh 2010-10-08: if possible, merge colors instead of just using a darker version
-                color = ColorUtility.mergeColors(c.getBackground(), 0.5f, color, 0.5f);
+                color = ColorUtility.multiplyColors(c.getBackground(), color);
               }
               else {
                 color = color.darker();
@@ -1150,7 +1151,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             if (swingTable.getBackground() != null && isSelected) {
               Color color = swingTable.getBackground();
               if (c.getBackground() != null) {
-                color = ColorUtility.mergeColors(c.getBackground(), 0.5f, color, 0.5f);
+                color = ColorUtility.multiplyColors(c.getBackground(), color);
               }
               else {
                 color = color.darker();
