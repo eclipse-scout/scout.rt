@@ -32,6 +32,7 @@ import java.util.Date;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -147,20 +148,29 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
   }
 
   public SqlBind buildBindFor(Object o, Class nullType) {
-    Class c;
     if (o instanceof IHolder) {
       IHolder h = (IHolder) o;
-      c = h.getHolderType();
       o = h.getValue();
+      nullType = h.getHolderType();
     }
-    else if (o != null) {
+    //
+    Class c;
+    if (o != null) {
       c = o.getClass();
     }
     else {
+      if (nullType != null && IHolder.class.isAssignableFrom(nullType)) {
+        try {
+          nullType = TypeCastUtility.getGenericsParameterClass(nullType, IHolder.class);
+        }
+        catch (Throwable t) {
+          nullType = null;
+        }
+      }
       c = nullType;
     }
     //
-    if (o == null && nullType == null) {
+    if (o == null && c == null) {
       return new SqlBind(Types.NULL, o);
     }
     //

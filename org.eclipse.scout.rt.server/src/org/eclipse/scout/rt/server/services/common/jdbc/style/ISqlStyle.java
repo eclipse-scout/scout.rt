@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 
 /**
@@ -92,9 +93,10 @@ public interface ISqlStyle extends Serializable {
    * bind factory see {@link #isBlobEnabled()}, {@link #isClobEnabled()} and {@link #isLargeString(String)}
    * 
    * @param o
-   *          the value to be bound
+   *          the value to be bound. If the value is a {@link IHolder} then its content value is used
    * @param nullType
-   *          only used in case o is null. Ignored otherwise.
+   *          only used in case o is null. If the type is a {@link IHolder} type then its component type is used
+   *          Ignored otherwise.
    */
   SqlBind buildBindFor(Object o, Class nullType);
 
