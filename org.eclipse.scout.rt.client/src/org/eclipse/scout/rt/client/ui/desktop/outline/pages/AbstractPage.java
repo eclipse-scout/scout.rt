@@ -44,6 +44,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   private ContextMap m_contextMap;
   private boolean m_tableVisible;
   private DataChangeListener m_internalDataChangeListener;
+  private/*final*/String m_defaultBookmarkIdentifier;
 
   public AbstractPage() {
   }
@@ -202,6 +203,24 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
 
   @Override
   protected void initConfig() {
+    //build default bookmarkIdentifier
+    String s = null;
+    for (Field f : this.getClass().getDeclaredFields()) {
+      if (Modifier.isPrivate(f.getModifiers()) && !Modifier.isStatic(f.getModifiers()) && !Modifier.isFinal(f.getModifiers()) && f.getName().startsWith("m_")) {
+        try {
+          f.setAccessible(true);
+          Object o = f.get(this);
+          f.setAccessible(false);
+          if (o != null) {
+            s = (s == null ? "" : s) + o;
+          }
+        }
+        catch (Exception e) {
+        }
+      }
+    }
+    m_defaultBookmarkIdentifier = s;
+    //
     setTableVisible(getConfiguredTableVisible());
     super.initConfig();
   }
@@ -223,23 +242,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @ConfigOperation
   @Order(95)
   public String getBookmarkIdentifier() {
-    // assemble some default key
-    String s = null;
-    for (Field f : this.getClass().getDeclaredFields()) {
-      if (Modifier.isPrivate(f.getModifiers()) && !Modifier.isStatic(f.getModifiers()) && !Modifier.isFinal(f.getModifiers()) && f.getName().startsWith("m_")) {
-        try {
-          f.setAccessible(true);
-          Object o = f.get(this);
-          f.setAccessible(false);
-          if (o != null) {
-            s = (s == null ? "" : s) + o;
-          }
-        }
-        catch (Exception e) {
-        }
-      }
-    }
-    return s;
+    return m_defaultBookmarkIdentifier;
   }
 
   public IOutline getOutline() {
