@@ -33,8 +33,15 @@ public class ContextFinderBasedObjectInputStream extends ObjectInputStream {
     });
   }
 
+  private ClassLoader m_primaryClassLoader;
+
   public ContextFinderBasedObjectInputStream(InputStream in) throws IOException {
+    this(in, null);
+  }
+
+  public ContextFinderBasedObjectInputStream(InputStream in, ClassLoader primaryClassLoader) throws IOException {
     super(in);
+    m_primaryClassLoader = primaryClassLoader;
     enableResolveObject(true);
   }
 
@@ -55,6 +62,15 @@ public class ContextFinderBasedObjectInputStream extends ObjectInputStream {
   }
 
   private Class<?> pass2ResolveClass(String className) throws ClassNotFoundException, IOException {
+    if (m_primaryClassLoader != null) {
+      try {
+        return m_primaryClassLoader.loadClass(className);
+      }
+      catch (Throwable t) {
+        //nop
+      }
+    }
+    //
     Class[] cc = ccAccessor.getClassContext();
     ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
     ClassLoader lastLoader = null;

@@ -358,19 +358,23 @@ public class SimpleXmlElement {
     }
   }
 
+  public Object getObjectAttribute(String name, Object defaultValue) throws IOException, ClassNotFoundException {
+    return getObjectAttribute(name, defaultValue, null);
+  }
+
   /**
    * @return a serialized object attribute from base64 serialized data using {@link ContextFinderBasedObjectInputStream}
    *         that tries
    *         to find the class using default osgi class loading and in a
    *         second stage using the caller classes class loaders.
    */
-  public Object getObjectAttribute(String name, Object defaultValue) throws IOException, ClassNotFoundException {
+  public Object getObjectAttribute(String name, Object defaultValue, ClassLoader primaryLoader) throws IOException, ClassNotFoundException {
     String base64 = getStringAttribute(name, "");
     if (base64.length() <= 0) {
       return defaultValue;
     }
     byte[] raw = Base64Utility.decode(base64);
-    ContextFinderBasedObjectInputStream oi = new ContextFinderBasedObjectInputStream(new ByteArrayInputStream(raw));
+    ContextFinderBasedObjectInputStream oi = new ContextFinderBasedObjectInputStream(new ByteArrayInputStream(raw), primaryLoader);
     Object o = oi.readObject();
     if (o == null) {
       o = defaultValue;

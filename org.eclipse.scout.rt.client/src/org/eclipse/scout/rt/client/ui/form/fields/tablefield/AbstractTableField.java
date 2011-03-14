@@ -318,14 +318,14 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     if (m_table != null) {
       int[] selectedRowIndices = null;
       try {
-        selectedRowIndices = (int[]) x.getObjectAttribute("selectedRowIndices", null);
+        selectedRowIndices = (int[]) x.getObjectAttribute("selectedRowIndices", null, getClass().getClassLoader());
       }
       catch (Exception e) {
         LOG.warn("reading attribute 'selectedRowIndices'", e);
       }
       Object[][] dataMatrix = null;
       try {
-        dataMatrix = (Object[][]) x.getObjectAttribute("rows", null);
+        dataMatrix = (Object[][]) x.getObjectAttribute("rows", null, getClass().getClassLoader());
       }
       catch (Exception e) {
         LOG.warn("reading attribute 'rows'", e);
