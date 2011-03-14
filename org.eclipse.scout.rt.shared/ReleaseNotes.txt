@@ -29,3 +29,8 @@ New translations inserted for the languages bg,cs,da,el,es,fi,fr_BE,fr,hr,hu,it,
 17.02.2011 imo
 added support for safe and lenient permissions transfer via service tunnel overriding serialization of Permissions object to list of serialized objects thus supporting skipping unknown permissions instead of skipping the whole Permissions class
 see ServiceTunnelInputStream, ServiceTunnelOutputStream, LenientPermissionWrapper, LenientPermissionsWrapper
+
+14.03.2011 dwi
+org.eclipse.scout.rt.shared
+- AbstractDataModelEntity
+  Bug-Fix: Initialization of child entities

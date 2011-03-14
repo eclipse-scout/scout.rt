@@ -43,6 +43,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   private ArrayList<IDataModelEntity> m_entities;
   private IDataModelEntity m_parentEntity;
   private boolean m_initializedChildEntities;
+  private boolean m_initialized;
 
   public AbstractDataModelEntity() {
     m_attributes = new ArrayList<IDataModelAttribute>();
@@ -123,6 +124,10 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    */
 
   public final void initEntity() throws ProcessingException {
+    if (m_initialized) {
+      return;
+    }
+
     try {
       execInitEntity();
     }
@@ -135,6 +140,15 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
       }
       catch (Throwable t) {
         LOG.error("attribute " + this + "/" + a, t);
+      }
+    }
+    m_initialized = true;
+    for (IDataModelEntity e : getEntities()) {
+      try {
+        e.initEntity();
+      }
+      catch (Throwable t) {
+        LOG.error("entity " + this + "/" + e, t);
       }
     }
   }
