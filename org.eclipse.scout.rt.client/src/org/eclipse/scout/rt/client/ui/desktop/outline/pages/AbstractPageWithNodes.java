@@ -54,14 +54,23 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   private P_ChildNodeListener m_childNodeListener;
 
   public AbstractPageWithNodes() {
+    this(true, null, null);
   }
 
   public AbstractPageWithNodes(boolean callInitializer) {
-    super(callInitializer);
+    this(callInitializer, null, null);
   }
 
   public AbstractPageWithNodes(ContextMap contextMap) {
-    super(contextMap);
+    this(true, contextMap, null);
+  }
+
+  public AbstractPageWithNodes(String userPreferenceContext) {
+    this(true, null, userPreferenceContext);
+  }
+
+  public AbstractPageWithNodes(boolean callInitializer, ContextMap contextMap, String userPreferenceContext) {
+    super(callInitializer, contextMap, userPreferenceContext);
   }
 
   /*

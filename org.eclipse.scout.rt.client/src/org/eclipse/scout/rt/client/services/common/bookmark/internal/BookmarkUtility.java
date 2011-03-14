@@ -110,7 +110,7 @@ public final class BookmarkUtility {
       else if (p.getClass().getSimpleName().equalsIgnoreCase(simpleClassName)) {
         i1 = -1;
       }
-      if (bookmarkIdentifier == null || bookmarkIdentifier.equalsIgnoreCase(p.getBookmarkIdentifier())) {
+      if (bookmarkIdentifier == null || bookmarkIdentifier.equalsIgnoreCase(p.getUserPreferenceContext())) {
         i2 = -1;
       }
       sortMap.put(new CompositeObject(i1, i2, index), p);
@@ -547,7 +547,7 @@ public final class BookmarkUtility {
     ColumnSet cs = table.getColumnSet();
     TablePageState state = new TablePageState();
     state.setPageClassName(page.getClass().getName());
-    state.setBookmarkIdentifier(page.getBookmarkIdentifier());
+    state.setBookmarkIdentifier(page.getUserPreferenceContext());
     state.setLabel(page.getCell().getText());
     state.setExpanded(page.isExpanded());
     IForm searchForm = page.getSearchFormInternal();
@@ -598,7 +598,7 @@ public final class BookmarkUtility {
   private static NodePageState bmStoreNodePage(IPageWithNodes page) throws ProcessingException {
     NodePageState state = new NodePageState();
     state.setPageClassName(page.getClass().getName());
-    state.setBookmarkIdentifier(page.getBookmarkIdentifier());
+    state.setBookmarkIdentifier(page.getUserPreferenceContext());
     state.setLabel(page.getCell().getText());
     state.setExpanded(page.isExpanded());
     return state;

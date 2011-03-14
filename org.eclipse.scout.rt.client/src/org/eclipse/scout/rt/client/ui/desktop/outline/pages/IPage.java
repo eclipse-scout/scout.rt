@@ -34,16 +34,20 @@ public abstract interface IPage extends ITreeNode {
   void initPage() throws ProcessingException;
 
   /**
+   * @deprecated use {@link #getUserPreferenceContext()} instead
+   */
+  @Deprecated
+  String getBookmarkIdentifier();
+
+  /**
    * This method is used to override the bookmark identifier used for this page
    * in case multiple instances of this page are used in the same child list<br>
    * By default this returns null.
    * <p>
-   * Note that the value of this id should be final and <b>not</b> dynamic to prevent some unexpected behaviours due to
-   * id changes during lifetime of the page. Such as persistent store of search context, table width, column order etc.
-   * <p>
-   * !BE CAREFUL WHEN OVERRIDING THIS METHOD WITH DYNAMIC VALUES!
+   * Note that the value of this id is final and <b>not</b> dynamic to prevent some unexpected behaviours due to id
+   * changes during lifetime of the page. Such as persistent store of search context, table width, column order etc.
    */
-  String getBookmarkIdentifier();
+  String getUserPreferenceContext();
 
   IOutline getOutline();
 

@@ -133,6 +133,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   /**
    * Set the context in which the table and column settings (order, width,
    * visible,...) are loaded and stored from the {@link ClientUIPreferences}
+   * <p>
+   * Be very careful when changing this property during runtime and when the table is initialized. Use the constructor
+   * argument instead.
    */
   void setUserPreferenceContext(String context);
 

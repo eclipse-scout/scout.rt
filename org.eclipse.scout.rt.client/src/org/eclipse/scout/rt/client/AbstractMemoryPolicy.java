@@ -83,7 +83,7 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
    * @return the identifier for the page form
    */
   protected String registerPageForm(IPage p, IForm f) {
-    String id = p.getClass().getName() + (p.getBookmarkIdentifier() != null ? "/" + p.getBookmarkIdentifier() : "") + "/" + f.getClass().getName();
+    String id = p.getClass().getName() + (p.getUserPreferenceContext() != null ? "/" + p.getUserPreferenceContext() : "") + "/" + f.getClass().getName();
     m_formToIdentifierMap.put(f, id);
     f.removeFormListener(m_formListener);
     f.addFormListener(m_formListener);
