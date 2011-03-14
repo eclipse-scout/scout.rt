@@ -97,6 +97,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     this(callInitializer, contextMap, null);
   }
 
+  public AbstractPageWithTable(boolean callInitializer, String userPreferenceContext) {
+    this(callInitializer, null, userPreferenceContext);
+  }
+
   public AbstractPageWithTable(boolean callInitializer, ContextMap contextMap, String userPreferenceContext) {
     super(callInitializer, contextMap, userPreferenceContext);
     if (!callInitializer) {
