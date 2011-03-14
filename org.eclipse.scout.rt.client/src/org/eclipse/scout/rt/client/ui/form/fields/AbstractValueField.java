@@ -139,7 +139,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   public void loadXML(SimpleXmlElement x) throws ProcessingException {
     super.loadXML(x);
     try {
-      T value = TypeCastUtility.castValue(x.getObjectAttribute("value", null), getHolderType());
+      T value = TypeCastUtility.castValue(x.getObjectAttribute("value", null, getClass().getClassLoader()), getHolderType());
       setValue(value);
     }
     catch (Exception e) {

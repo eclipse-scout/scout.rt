@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
  * No specific restrictions, cache all table page search form contents and check memory limits after page reload.
@@ -26,18 +27,23 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LargeMemoryPolicy.class);
 
   //cache all search form contents
-  private final HashMap<String/*pageFormIdentifier*/, String/*formXml*/> m_searchFormCache;
+  private final HashMap<String/*pageFormIdentifier*/, SearchFormState> m_searchFormCache;
 
   public LargeMemoryPolicy() {
-    m_searchFormCache = new HashMap<String, String>();
+    m_searchFormCache = new HashMap<String, SearchFormState>();
   }
 
   @Override
   protected void loadSearchFormState(IForm f, String pageFormIdentifier) throws ProcessingException {
     //check if there is stored search form data
-    String xml = m_searchFormCache.get(pageFormIdentifier);
-    if (xml != null) {
-      f.setXML(xml);
+    SearchFormState state = m_searchFormCache.get(pageFormIdentifier);
+    if (state != null) {
+      if (state.formContentXml != null) {
+        f.setXML(state.formContentXml);
+      }
+      if (state.searchFilter != null) {
+        f.setSearchFilter(state.searchFilter);
+      }
     }
   }
 
@@ -49,7 +55,8 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
     }
     else {
       String xml = f.getXML("UTF-8");
-      m_searchFormCache.put(pageFormIdentifier, xml);
+      SearchFilter filter = f.getSearchFilter();
+      m_searchFormCache.put(pageFormIdentifier, new SearchFormState(xml, filter));
     }
   }
 

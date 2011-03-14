@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
  * cache only last 5 table page search form contents, releaseUnusedPages after every page reload and force gc do free
@@ -35,18 +36,23 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
 
   private boolean m_release = false;
   //cache last 5 search form contents
-  private final LRUCache<String/*pageFormIdentifier*/, String/*formXml*/> m_searchFormCache;
+  private final LRUCache<String/*pageFormIdentifier*/, SearchFormState> m_searchFormCache;
 
   public MediumMemoryPolicy() {
-    m_searchFormCache = new LRUCache<String, String>(5, 0L);
+    m_searchFormCache = new LRUCache<String, SearchFormState>(5, 0L);
   }
 
   @Override
   protected void loadSearchFormState(IForm f, String pageFormIdentifier) throws ProcessingException {
     //check if there is stored search form data
-    String xml = m_searchFormCache.get(pageFormIdentifier);
-    if (xml != null) {
-      f.setXML(xml);
+    SearchFormState state = m_searchFormCache.get(pageFormIdentifier);
+    if (state != null) {
+      if (state.formContentXml != null) {
+        f.setXML(state.formContentXml);
+      }
+      if (state.searchFilter != null) {
+        f.setSearchFilter(state.searchFilter);
+      }
     }
   }
 
@@ -58,7 +64,8 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
     }
     else {
       String xml = f.getXML("UTF-8");
-      m_searchFormCache.put(pageFormIdentifier, xml);
+      SearchFilter filter = f.getSearchFilter();
+      m_searchFormCache.put(pageFormIdentifier, new SearchFormState(xml, filter));
     }
   }
 
