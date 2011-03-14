@@ -22,9 +22,20 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.pagefield.AbstractPageField;
+import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 public class AbstractMemoryPolicy implements IMemoryPolicy {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMemoryPolicy.class);
+
+  public static class SearchFormState {
+    final String formContentXml;
+    final SearchFilter searchFilter;
+
+    public SearchFormState(String xml, SearchFilter filter) {
+      formContentXml = xml;
+      searchFilter = filter;
+    }
+  }
 
   private boolean m_active;
   private final WeakHashMap<IForm, String> m_formToIdentifierMap;
