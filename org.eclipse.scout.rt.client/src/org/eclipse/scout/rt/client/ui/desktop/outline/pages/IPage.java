@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -36,7 +36,12 @@ public abstract interface IPage extends ITreeNode {
   /**
    * This method is used to override the bookmark identifier used for this page
    * in case multiple instances of this page are used in the same child list<br>
-   * By default this returns null
+   * By default this returns null.
+   * <p>
+   * Note that the value of this id should be final and <b>not</b> dynamic to prevent some unexpected behaviours due to
+   * id changes during lifetime of the page. Such as persistent store of search context, table width, column order etc.
+   * <p>
+   * !BE CAREFUL WHEN OVERRIDING THIS METHOD WITH DYNAMIC VALUES!
    */
   String getBookmarkIdentifier();
 
