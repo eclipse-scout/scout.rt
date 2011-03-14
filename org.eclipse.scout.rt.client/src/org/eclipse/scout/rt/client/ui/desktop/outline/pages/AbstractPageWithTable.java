@@ -70,6 +70,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private P_ChildNodeListener m_childNodeListener;
 
   public AbstractPageWithTable() {
+    this(true, null, null);
   }
 
   /**
@@ -81,18 +82,23 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @param callInitializer
    */
   public AbstractPageWithTable(boolean callInitializer) {
-    super(callInitializer);
-    if (!callInitializer) {
-      callMinimalInitializer();
-    }
+    this(callInitializer, null, null);
   }
 
   public AbstractPageWithTable(ContextMap contextMap) {
-    super(contextMap);
+    this(true, contextMap, null);
+  }
+
+  public AbstractPageWithTable(String userPreferenceContext) {
+    this(true, null, userPreferenceContext);
   }
 
   public AbstractPageWithTable(boolean callInitializer, ContextMap contextMap) {
-    super(callInitializer, contextMap);
+    this(callInitializer, contextMap, null);
+  }
+
+  public AbstractPageWithTable(boolean callInitializer, ContextMap contextMap, String userPreferenceContext) {
+    super(callInitializer, contextMap, userPreferenceContext);
     if (!callInitializer) {
       callMinimalInitializer();
     }

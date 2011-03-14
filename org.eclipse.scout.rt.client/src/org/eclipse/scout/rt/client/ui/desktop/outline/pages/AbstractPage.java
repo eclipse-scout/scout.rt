@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -41,27 +40,63 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPage.class);
 
   private IForm m_detailForm;
-  private ContextMap m_contextMap;
+  private final ContextMap m_contextMap;
   private boolean m_tableVisible;
   private DataChangeListener m_internalDataChangeListener;
-  private/*final*/String m_defaultBookmarkIdentifier;
+  private final String m_userPreferenceContext;
+
+  /**
+   * use this static method to create a string based on the vargs that can be used as userPreferenceContext
+   */
+  public static String createUserPreferenceContext(Object... vargs) {
+    StringBuffer buf = new StringBuffer();
+    if (vargs != null) {
+      for (Object o : vargs) {
+        if (buf.length() > 0) {
+          buf.append(",");
+        }
+        if (o == null) {
+          buf.append("null");
+        }
+        else if (o instanceof Object[]) {
+          buf.append(Arrays.toString((Object[]) o));
+        }
+        else {
+          buf.append(o.toString());
+        }
+      }
+    }
+    return buf.toString();
+  }
 
   public AbstractPage() {
+    this(true);
+  }
+
+  public AbstractPage(String userPreferenceContext) {
+    this(true, null, userPreferenceContext);
   }
 
   public AbstractPage(boolean callInitializer) {
-    super(callInitializer);
+    this(callInitializer, null, null);
   }
 
   public AbstractPage(ContextMap contextMap) {
-    super(false);
-    m_contextMap = contextMap;
-    callInitializer();
+    this(true, contextMap, null);
+  }
+
+  public AbstractPage(boolean callInitializer, String userPreferenceContext) {
+    this(callInitializer, null, userPreferenceContext);
   }
 
   public AbstractPage(boolean callInitializer, ContextMap contextMap) {
+    this(callInitializer, contextMap, null);
+  }
+
+  public AbstractPage(boolean callInitializer, ContextMap contextMap, String userPreferenceContext) {
     super(false);
     m_contextMap = contextMap;
+    m_userPreferenceContext = userPreferenceContext;
     if (callInitializer) {
       callInitializer();
     }
@@ -203,24 +238,6 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
 
   @Override
   protected void initConfig() {
-    //build default bookmarkIdentifier
-    String s = null;
-    for (Field f : this.getClass().getDeclaredFields()) {
-      if (Modifier.isPrivate(f.getModifiers()) && !Modifier.isStatic(f.getModifiers()) && !Modifier.isFinal(f.getModifiers()) && f.getName().startsWith("m_")) {
-        try {
-          f.setAccessible(true);
-          Object o = f.get(this);
-          f.setAccessible(false);
-          if (o != null) {
-            s = (s == null ? "" : s) + o;
-          }
-        }
-        catch (Exception e) {
-        }
-      }
-    }
-    m_defaultBookmarkIdentifier = s;
-    //
     setTableVisible(getConfiguredTableVisible());
     super.initConfig();
   }
@@ -239,10 +256,11 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     execInitPage();
   }
 
+  //TODO imo will be final in next release
   @ConfigOperation
   @Order(95)
   public String getBookmarkIdentifier() {
-    return m_defaultBookmarkIdentifier;
+    return m_userPreferenceContext;
   }
 
   public IOutline getOutline() {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -54,14 +54,23 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   private P_ChildNodeListener m_childNodeListener;
 
   public AbstractPageWithNodes() {
+    this(true, null, null);
   }
 
   public AbstractPageWithNodes(boolean callInitializer) {
-    super(callInitializer);
+    this(callInitializer, null, null);
   }
 
   public AbstractPageWithNodes(ContextMap contextMap) {
-    super(contextMap);
+    this(true, contextMap, null);
+  }
+
+  public AbstractPageWithNodes(String userPreferenceContext) {
+    this(true, null, userPreferenceContext);
+  }
+
+  public AbstractPageWithNodes(boolean callInitializer, ContextMap contextMap, String userPreferenceContext) {
+    super(callInitializer, contextMap, userPreferenceContext);
   }
 
   /*
