@@ -671,7 +671,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    * returns the Smartfields proposal form
    * <p>
    * overwrite this method to return custom proposal forms
-   *
+   * 
    * @return {@link#ISmartFieldProposalForm}
    * @throws ProcessingException
    */
@@ -860,9 +860,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   public void acceptProposal(LookupRow row) {
     m_currentLookupRow = row;
     setValue((T) row.getKey());
-    setTooltipText(row.getTooltipText() != null ? row.getTooltipText() : getConfiguredTooltipText());
-    setFont(row.getFont() != null ? row.getFont() : FontSpec.parse(getConfiguredFont()));
-    setBackgroundColor(row.getBackgroundColor() != null ? row.getBackgroundColor() : getConfiguredBackgroundColor());
   }
 
   public ISmartFieldUIFacade getUIFacade() {
@@ -915,15 +912,43 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
-  // override: ensure that (async loading) lookup context has been set
-  @Override
-  public String getDisplayText() {
-    if (ClientSyncJob.getCurrentSession() != null) {
-      if (m_currentGetLookupRowByKeyJob != null) {
+  public void applyLazyStyles() {
+    // override: ensure that (async loading) lookup context has been set
+    if (m_currentGetLookupRowByKeyJob != null) {
+      if (m_currentGetLookupRowByKeyJob.getClientSession() == ClientSyncJob.getCurrentSession()) {
         m_currentGetLookupRowByKeyJob.runNow(new NullProgressMonitor());
       }
     }
+  }
+
+  @Override
+  public String getDisplayText() {
+    applyLazyStyles();
     return super.getDisplayText();
+  }
+
+  @Override
+  public String getTooltipText() {
+    applyLazyStyles();
+    return super.getTooltipText();
+  }
+
+  @Override
+  public String getBackgroundColor() {
+    applyLazyStyles();
+    return super.getBackgroundColor();
+  }
+
+  @Override
+  public String getForegroundColor() {
+    applyLazyStyles();
+    return super.getForegroundColor();
+  }
+
+  @Override
+  public FontSpec getFont() {
+    applyLazyStyles();
+    return super.getFont();
   }
 
   public void prepareKeyLookup(LookupCall call, T key) throws ProcessingException {

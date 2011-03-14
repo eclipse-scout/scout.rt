@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -93,6 +93,15 @@ public interface ISmartField<T> extends IValueField<T> {
   String getIconId();
 
   void setIconId(String s);
+
+  /**
+   * For performance optimization, style loading is done lazily.
+   * However, sometimes it is useful to apply these changes immediately.
+   * <p>
+   * This method is called automatically by {@link #getDisplayText()}, {@link #getTooltipText()},
+   * {@link #getBackgroundColor()}, {@link #getForegroundColor()} and {@link #getFont()}
+   */
+  void applyLazyStyles();
 
   boolean isBrowseAutoExpandAll();
 
