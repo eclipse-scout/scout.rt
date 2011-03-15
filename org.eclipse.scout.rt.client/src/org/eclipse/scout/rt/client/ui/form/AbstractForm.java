@@ -38,6 +38,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
@@ -86,7 +87,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
-@FormData(AbstractFormData.class)
+@FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractForm extends AbstractPropertyObserver implements IForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractForm.class);
 
