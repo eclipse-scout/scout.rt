@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.testing.ui.swt;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.testing.shared.ScoutJUnitPluginTestExecutor;
@@ -34,11 +34,11 @@ import org.eclipse.ui.PlatformUI;
  *   }
  * </pre></code>
  */
-public class JUnitSWTJob extends Job {
+public class JUnitSWTJob extends ClientAsyncJob {
   private final ISwtEnvironment m_environment;
 
   public JUnitSWTJob(ISwtEnvironment environment) {
-    super("JUnit SWT Runner");
+    super("JUnit SWT Runner", environment.getClientSession());
     m_environment = environment;
   }
 
