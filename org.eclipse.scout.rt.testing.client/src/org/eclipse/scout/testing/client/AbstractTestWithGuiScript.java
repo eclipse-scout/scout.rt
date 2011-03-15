@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,10 +17,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientRule;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm;
@@ -118,7 +118,8 @@ public abstract class AbstractTestWithGuiScript {
    */
   @Test
   public final void test() throws Throwable {
-    clientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(getSessionClass());
+    clientSession = ClientAsyncJob.getCurrentSession();
+//    clientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(getSessionClass());
     final IGuiMock gui = SERVICES.getService(IGuiMockService.class).createMock(clientSession);
     //
     final ClientSyncJob runModelJob = new ClientSyncJob("Run", clientSession) {
