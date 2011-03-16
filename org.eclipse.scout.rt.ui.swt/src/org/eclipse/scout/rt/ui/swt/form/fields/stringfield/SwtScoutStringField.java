@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,13 +22,17 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
+import org.eclipse.scout.rt.ui.swt.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.AbstractSwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.swt.internal.StyledTextFieldUndoRedoSupport;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -55,6 +59,7 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
   private boolean m_validateOnAnyKey;
   private boolean m_linkDecoration;
   private TextFieldEditableSupport m_editableSupport;
+  private StyledTextFieldUndoRedoSupport m_undoRedoSupport;
 
   public SwtScoutStringField() {
   }
@@ -86,12 +91,23 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
     }
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, style);
     //
+    textField.addDisposeListener(new DisposeListener() {
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        if (m_undoRedoSupport != null && !m_undoRedoSupport.isDisposed()) {
+          m_undoRedoSupport.dispose();
+        }
+      }
+    });
 
     setSwtContainer(container);
     setSwtLabel(label);
     setSwtField(textField);
 
     addDefaultUiListeners(textField);
+    if (m_undoRedoSupport == null) {
+      m_undoRedoSupport = new StyledTextFieldUndoRedoSupport(getSwtField());
+    }
 
     // layout
     LogicalGridLayout layout = new LogicalGridLayout(1, 0);
@@ -118,11 +134,13 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
     // dnd support
     new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
 
+    //@16.03.11 sle: clear undo/redo stack. It must not be possible to undo the initial value in field
+    m_undoRedoSupport.clearStacks();
   }
 
   @Override
-  public StyledText getSwtField() {
-    return (StyledText) super.getSwtField();
+  public StyledTextEx getSwtField() {
+    return (StyledTextEx) super.getSwtField();
   }
 
   @Override
@@ -388,6 +406,7 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
   }
 
   private class P_TextVerifyListener implements VerifyListener {
+    @Override
     public void verifyText(VerifyEvent e) {
       switch (m_characterType) {
         case UPPER_CASE:
@@ -401,6 +420,7 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
   } // end class P_TextVerifyListener
 
   private class P_SwtTextListener implements ModifyListener {
+    @Override
     public void modifyText(ModifyEvent e) {
       if (m_validateOnAnyKey) {
         handleSwtInputVerifier();

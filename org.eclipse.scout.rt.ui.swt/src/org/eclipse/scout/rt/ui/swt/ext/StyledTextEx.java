@@ -60,13 +60,15 @@ public class StyledTextEx extends StyledText {
     m_copyPasteMenu = new Menu(getShell(), SWT.POP_UP);
 
     m_copyPasteMenu.addMenuListener(new MenuListener() {
+      @Override
       public void menuHidden(MenuEvent e) {
       }
 
+      @Override
       public void menuShown(MenuEvent e) {
         if (isEnabled()) {
-          m_cutItem.setEnabled(StringUtility.hasText(getSelectionText()));
-          m_copyItem.setEnabled(StringUtility.hasText(getSelectionText()));
+          m_cutItem.setEnabled(StringUtility.hasText(getSelectionText()) && getEditable());
+          m_pasteItem.setEnabled(getEditable());
         }
       }
     });
@@ -111,6 +113,23 @@ public class StyledTextEx extends StyledText {
       }
     });
     m_pasteItem.setText(ScoutTexts.get("Paste"));
+
+//@19.01.11 sle: not used, provided by org.eclipse.ui-Extension
+//    addKeyListener(new KeyAdapter() {
+//      @Override
+//      public void keyPressed(KeyEvent e) {
+//        if ((e.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
+//          switch (e.keyCode) {
+//            case 'a':
+//            case 'A':
+//              selectAll();
+//              break;
+//            default:
+//              //ignore everything else
+//          }
+//        }
+//      }
+//    });
 
     // DND
     P_DndListener dndListener = new P_DndListener();
@@ -189,6 +208,7 @@ public class StyledTextEx extends StyledText {
   private class P_TraverseHandlingListener implements Listener {
     private long m_timestamp;
 
+    @Override
     public void handleEvent(Event event) {
       if (isDisposed()) {
         return;
