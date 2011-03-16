@@ -69,6 +69,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private HashSet<ITreeNode> m_selectedNodes = new HashSet<ITreeNode>();
   private final ArrayList<ITreeNodeFilter> m_nodeFilters;
   private final int m_uiProcessorCount = 0;
+  private IKeyStroke[] m_baseKeyStrokes;
 
   public AbstractTree() {
     if (DesktopProfiler.getInstance().isEnabled()) {
@@ -308,6 +309,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
             }
             break;
           }
+          case TreeEvent.TYPE_NODES_SELECTED: {
+            rebuildKeyStrokesInternal();
+            break;
+          }
         }
       }
     });
@@ -333,7 +338,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         }
       });
     }
-    setKeyStrokes(ksList.toArray(new IKeyStroke[0]));
+    m_baseKeyStrokes = ksList.toArray(new IKeyStroke[ksList.size()]);
+    setKeyStrokesInternal(m_baseKeyStrokes);
     // menus
     ArrayList<IMenu> menuList = new ArrayList<IMenu>();
     Class<? extends IMenu>[] ma = getConfiguredMenus();
@@ -572,6 +578,31 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   private void rebuildTitleInternal() {
     setTitle(getPathText(getSelectedNode()));
+  }
+
+  private void rebuildKeyStrokesInternal() {
+    //Get the menus for the selected nodes
+    IMenu[] menus;
+    try {
+      ITreeNode[] nodes = resolveVirtualNodes(getSelectedNodes());
+      menus = fetchMenusForNodes(nodes);
+    }
+    catch (ProcessingException e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      menus = new IMenu[0];
+    }
+
+    //Compute the Keystrokes: base + keyStroke for the current Menus.
+    ArrayList<IKeyStroke> ksList = new ArrayList<IKeyStroke>(Arrays.asList(m_baseKeyStrokes));
+    for (IMenu menu : menus) {
+      if (menu.getKeyStroke() != null) {
+        IKeyStroke ks = new KeyStroke(menu.getKeyStroke(), menu);
+        ksList.add(ks);
+      }
+    }
+
+    //Set KeyStrokes:
+    setKeyStrokesInternal(ksList.toArray(new IKeyStroke[ksList.size()]));
   }
 
   public ITreeNode findNode(Object primaryKey) {
@@ -929,6 +960,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   public void setKeyStrokes(IKeyStroke[] keyStrokes) {
+    m_baseKeyStrokes = keyStrokes;
+    rebuildKeyStrokesInternal();
+  }
+
+  private void setKeyStrokesInternal(IKeyStroke[] keyStrokes) {
     propertySupport.setProperty(PROP_KEY_STROKES, keyStrokes);
   }
 
@@ -1638,7 +1674,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
-  private IMenu[] fireNodePopup(ITreeNode[] nodes) {
+  private IMenu[] fetchMenusForNodes(ITreeNode[] nodes) {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_POPUP, nodes);
     // single observer for tree-owned menus
     addLocalPopupMenus(e);
@@ -2122,7 +2158,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         pushUIProcessor();
         //
         ITreeNode[] nodes = resolveVirtualNodes(getSelectedNodes());
-        return fireNodePopup(nodes);
+        return fetchMenusForNodes(nodes);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -2137,7 +2173,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       try {
         pushUIProcessor();
         //
-        return fireNodePopup(new ITreeNode[0]);
+        return fetchMenusForNodes(new ITreeNode[0]);
       }
       finally {
         popUIProcessor();
