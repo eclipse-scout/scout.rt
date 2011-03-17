@@ -72,7 +72,6 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     //
     if (getScoutObject().isScrollable()) {
       JScrollPane scrollPane = new JScrollPaneEx(m_swingBodyPart);
-      scrollPane.setHorizontalScrollBar(null);
       scrollPane.setBorder(null);
       swingBox.add(scrollPane, BorderLayoutEx.CENTER);
     }

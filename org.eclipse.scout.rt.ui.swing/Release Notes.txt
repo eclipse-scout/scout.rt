@@ -35,3 +35,7 @@ Migration: None
 - ColorUtility: All methods are now null-safe.
 - SwingScoutTable: Fixed calculation of resulting foreground and background color when a row is selected (merge -> multiply).
 Migration: None
+
+17.3. 2011
+fix for bsi ticket #98515
+Migration: None
