@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
@@ -101,6 +102,11 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   @Override
   protected void applySearchInternal(SearchFilter search) {
+    ISearchFilterService sfs = SERVICES.getService(ISearchFilterService.class);
+    if (sfs != null) {
+      sfs.applySearchDelegate(this, search, true);
+      return;
+    }
     if (getValue() != null) {
       search.addDisplayText(getLabel() + " " + ScoutTexts.get("LogicLike") + " " + getDisplayText());
     }

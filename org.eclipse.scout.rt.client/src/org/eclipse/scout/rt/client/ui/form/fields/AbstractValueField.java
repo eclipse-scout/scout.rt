@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -160,6 +161,11 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   @Override
   protected void applySearchInternal(SearchFilter search) {
+    ISearchFilterService sfs = SERVICES.getService(ISearchFilterService.class);
+    if (sfs != null) {
+      sfs.applySearchDelegate(this, search, true);
+      return;
+    }
     if (getValue() != null) {
       String label = getLabel();
       if (getParentField() instanceof ISequenceBox) {

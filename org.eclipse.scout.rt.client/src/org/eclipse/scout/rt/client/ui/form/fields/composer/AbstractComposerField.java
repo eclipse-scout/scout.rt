@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
+import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -56,6 +57,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.eclipse.scout.service.SERVICES;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractComposerField extends AbstractFormField implements IComposerField {
@@ -262,6 +264,11 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   protected void applySearchInternal(SearchFilter search) {
+    ISearchFilterService sfs = SERVICES.getService(ISearchFilterService.class);
+    if (sfs != null) {
+      sfs.applySearchDelegate(this, search, true);
+      return;
+    }
     ITreeNode rootNode = getTree().getRootNode();
     if (rootNode != null) {
       StringBuffer buf = new StringBuffer();
@@ -654,7 +661,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         EntityNode enode = (EntityNode) node;
         String externalId = DataModelUtility.entityToExternalId(enode.getEntity());
         if (externalId == null) {
-          LOG.warn("could not find entity data for: " + enode.getEntity());
+          if (LOG.isInfoEnabled()) LOG.info("could not find entity data for: " + enode.getEntity());
           return null;
         }
         ComposerEntityNodeData data = new ComposerEntityNodeData();
@@ -666,7 +673,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         AttributeNode anode = (AttributeNode) node;
         String externalId = DataModelUtility.attributeToExternalId(anode.getAttribute());
         if (externalId == null) {
-          LOG.warn("could not find attribute data for: " + anode.getAttribute());
+          if (LOG.isInfoEnabled()) LOG.info("could not find attribute data for: " + anode.getAttribute());
           return null;
         }
         ComposerAttributeNodeData data = new ComposerAttributeNodeData();

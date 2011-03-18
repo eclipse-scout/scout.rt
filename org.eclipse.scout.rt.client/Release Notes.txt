@@ -248,3 +248,9 @@ remove all custom columns implemented. Instead o implementing ITableCustomizer e
 10.03.2011 imo
 bsi ticket 96627
 do not activate disabled or invisible outlines when activating bookmark
+
+18.03.2011 imo
+Migration of legacy: moving remaining legacy logic from client to server
+Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
+Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
+Migration: None

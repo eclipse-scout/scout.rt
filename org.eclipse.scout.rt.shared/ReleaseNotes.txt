@@ -30,7 +30,7 @@ org.eclipse.scout.rt.shared
 Migration: NONE
 
 18.03.2011 imo
-Migration VDB /SPI, moving remaining legacy logic from client to server
+Migration of legacy: moving remaining legacy logic from client to server
 Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
 Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
-Migration: NONE
+Migration: None

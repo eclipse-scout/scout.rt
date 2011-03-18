@@ -173,3 +173,9 @@ Extracted DataModel with entities and attributes out of AbstractComposerField an
 Migration: see client release notes for details.
 Legacy: There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
 and wrapped in a ComposerFieldDataModel. Also use LegacyFormDataStatementBuilder instead of FormDataStatementBuilder
+
+18.03.2011 imo
+Migration of legacy: moving remaining legacy logic from client to server
+Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
+Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
+Migration: None
