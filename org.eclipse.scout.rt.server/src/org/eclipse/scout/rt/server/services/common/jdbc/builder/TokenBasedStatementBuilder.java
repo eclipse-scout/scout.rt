@@ -48,6 +48,10 @@ public class TokenBasedStatementBuilder {
   private final AtomicLong m_bindSeq = new AtomicLong();
   private final HashMap<String, Object> m_binds = new HashMap<String, Object>();
   private final StringBuffer m_where = new StringBuffer("");
+  /**
+   * speed-up due to static caching of default mappings
+   */
+  private TokenBasedStatementBuilder m_staticBuilder;
 
   public TokenBasedStatementBuilder() {
     this(null);
@@ -55,6 +59,14 @@ public class TokenBasedStatementBuilder {
 
   public TokenBasedStatementBuilder(ISqlStyle sqlStyle) {
     m_sqlStyle = sqlStyle != null ? sqlStyle : SQL.getSqlStyle();
+  }
+
+  public void setStaticBuilder(TokenBasedStatementBuilder staticBuilder) {
+    m_staticBuilder = staticBuilder;
+  }
+
+  public TokenBasedStatementBuilder getStaticBuilder() {
+    return m_staticBuilder;
   }
 
   public ISqlStyle getSqlStyle() {
@@ -89,11 +101,25 @@ public class TokenBasedStatementBuilder {
   }
 
   public String getTokenMapping(int key) {
-    return m_tokenMappings.get(key);
+    String s = m_tokenMappings.get(key);
+    if (s != null) {
+      return s;
+    }
+    if (m_staticBuilder != null) {
+      return m_staticBuilder.getTokenMapping(key);
+    }
+    return null;
   }
 
   public boolean hasTokenMapping(int key) {
-    return m_tokenMappings.containsKey(key);
+    boolean b = m_tokenMappings.containsKey(key);
+    if (b) {
+      return b;
+    }
+    if (m_staticBuilder != null) {
+      return m_staticBuilder.hasTokenMapping(key);
+    }
+    return false;
   }
 
   /**
