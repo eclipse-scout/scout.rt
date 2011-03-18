@@ -34,10 +34,14 @@ public class ServiceTunnelRequest implements Serializable {
   }
 
   public ServiceTunnelRequest(String version, Class serviceInterfaceClass, Method operation, Object[] args) {
+    this(version, serviceInterfaceClass.getName(), operation.getName(), operation.getParameterTypes(), args);
+  }
+
+  public ServiceTunnelRequest(String version, String serviceInterfaceName, String op, Class[] parameterTypes, Object[] args) {
     m_version = version;
-    m_serviceInterfaceClassName = serviceInterfaceClass.getName();
-    m_operation = operation.getName();
-    m_parameterTypes = operation.getParameterTypes();
+    m_serviceInterfaceClassName = serviceInterfaceName;
+    m_operation = op;
+    m_parameterTypes = parameterTypes;
     m_args = args;
     if (m_args == null) m_args = new Object[0];
     m_nlsLocale = NlsLocale.getDefault().getLocale();
