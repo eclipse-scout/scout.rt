@@ -50,6 +50,7 @@ import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.BlockingCondition;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -927,7 +928,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   public void resetSearchFilter() {
     if (m_searchFilter == null) {
-      m_searchFilter = new SearchFilter();
+      SearchFilter filter;
+      ISearchFilterService sfs = SERVICES.getService(ISearchFilterService.class);
+      if (sfs != null) {
+        filter = sfs.createNewSearchFilter();
+      }
+      else {
+        filter = new SearchFilter();
+      }
+      m_searchFilter = filter;
     }
     try {
       execResetSearchFilter(m_searchFilter);

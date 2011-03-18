@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
+import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -190,7 +191,15 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     else {
       // searchFilter should never be null
       //do NOT reference the result data object and warp it into a ref, so the processor is allowed to delete the contents to free up memory sooner
-      getTable().replaceRowsByMatrix(new AtomicReference<Object>(execLoadTableData(new SearchFilter())));
+      SearchFilter filter;
+      ISearchFilterService sfs = SERVICES.getService(ISearchFilterService.class);
+      if (sfs != null) {
+        filter = sfs.createNewSearchFilter();
+      }
+      else {
+        filter = new SearchFilter();
+      }
+      getTable().replaceRowsByMatrix(new AtomicReference<Object>(execLoadTableData(filter)));
     }
     //update table data status
     if (isSearchActive() && getSearchFilter() != null && (!getSearchFilter().isCompleted()) && isSearchRequired()) {
@@ -449,7 +458,15 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       return getSearchFormInternal().getSearchFilter();
     }
     else {
-      return new SearchFilter();
+      SearchFilter filter;
+      ISearchFilterService sfs = SERVICES.getService(ISearchFilterService.class);
+      if (sfs != null) {
+        filter = sfs.createNewSearchFilter();
+      }
+      else {
+        filter = new SearchFilter();
+      }
+      return filter;
     }
   }
 
