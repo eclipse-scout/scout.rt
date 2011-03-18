@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,7 +15,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 public abstract class AbstractBooleanField extends AbstractValueField<Boolean> implements IBooleanField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBooleanField.class);
@@ -23,13 +22,6 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   private IBooleanFieldUIFacade m_uiFacade;
 
   public AbstractBooleanField() {
-  }
-
-  @Override
-  protected void applySearchInternal(SearchFilter search) {
-    if (getValue() != null && getValue()) {
-      super.applySearchInternal(search);
-    }
   }
 
   @Override

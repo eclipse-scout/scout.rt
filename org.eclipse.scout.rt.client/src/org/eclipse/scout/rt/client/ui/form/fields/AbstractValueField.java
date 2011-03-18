@@ -33,16 +33,12 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
-import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.service.SERVICES;
 
-@SuppressWarnings("deprecation")
 @FormData(value = AbstractValueFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE, genericOrdinal = 0)
 public abstract class AbstractValueField<T> extends AbstractFormField implements IValueField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractValueField.class);
@@ -159,26 +155,6 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
     if (isAutoDisplayText()) {
       String t = execFormatValue(getValue());
       setDisplayText(t);
-    }
-  }
-
-  @Override
-  protected void applySearchInternal(SearchFilter search) {
-    if (getValue() != null) {
-      String label = getLabel();
-      if (getParentField() instanceof ISequenceBox) {
-        AbstractFormField range = (AbstractFormField) getParentField();
-        if (range.getConfiguredLabel() != null) {
-          label = range.getConfiguredLabel() + " " + label;
-        }
-      }
-      search.addDisplayText(label + " " + ScoutTexts.get("LogicEQ") + " " + getDisplayText());
-    }
-    if (search instanceof LegacySearchFilter) {
-      LegacySearchFilter l = (LegacySearchFilter) search;
-      if (getValue() != null && getConfiguredSearchTerm() != null) {
-        l.addWhereToken(getConfiguredSearchTerm(), getValue());
-      }
     }
   }
 

@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -131,6 +132,11 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Deprecated
   protected String getConfiguredSearchTerm() {
     return null;
+  }
+
+  @Deprecated
+  public final String getLegacySearchTerm() {
+    return getConfiguredSearchTerm();
   }
 
   /*
@@ -479,10 +485,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * override this method to apply new default handling
    */
   protected void applySearchInternal(final SearchFilter search) {
-    if (this instanceof ICompositeField) {
-      for (IFormField f : ((ICompositeField) this).getFields()) {
-        f.applySearch(search);
-      }
+    ISearchFilterService sfs = SERVICES.getService(ISearchFilterService.class);
+    if (sfs != null) {
+      sfs.applySearchDelegate(this, search, true);
     }
   }
 

@@ -26,10 +26,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.AbstractDocumentField;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
-import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -97,13 +95,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     m_htmlEditor = getConfiguredHtmlEditor();
     m_scrollBarEnabled = getConfiguredScrollBarEnabled();
     setMaxLength(getConfiguredMaxLength());
-  }
-
-  @Override
-  protected void applySearchInternal(SearchFilter search) {
-    if (getValue() != null) {
-      search.addDisplayText(getLabel() + " " + ScoutTexts.get("LogicLike") + " " + getDisplayText());
-    }
   }
 
   public int getMaxLength() {

@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
+import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -449,7 +450,13 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       return getSearchFormInternal().getSearchFilter();
     }
     else {
-      return new SearchFilter();
+      ISearchFilterService sfs = SERVICES.getService(ISearchFilterService.class);
+      if (sfs != null) {
+        return sfs.createNewSearchFilter();
+      }
+      else {
+        return new SearchFilter();
+      }
     }
   }
 

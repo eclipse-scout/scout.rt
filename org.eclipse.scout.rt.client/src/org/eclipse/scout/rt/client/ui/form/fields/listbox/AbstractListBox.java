@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -52,14 +52,11 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
-import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
-@SuppressWarnings("deprecation")
 public abstract class AbstractListBox<T> extends AbstractValueField<T[]> implements IListBox<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractListBox.class);
 
@@ -368,25 +365,8 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return m_uiFacade;
   }
 
-  /*
-   * Runtime
-   */
-
   public final ITable getTable() {
     return m_table;
-  }
-
-  @Override
-  protected void applySearchInternal(SearchFilter search) {
-    if (getValue() != null) {
-      search.addDisplayText(getLabel() + " " + ScoutTexts.get("LogicIn") + " " + getDisplayText());
-    }
-    if (search instanceof LegacySearchFilter) {
-      LegacySearchFilter l = (LegacySearchFilter) search;
-      if (getValue() != null && getConfiguredSearchTerm() != null) {
-        l.addWhereToken(getConfiguredSearchTerm(), getValue());
-      }
-    }
   }
 
   public boolean isFilterCheckedRows() {

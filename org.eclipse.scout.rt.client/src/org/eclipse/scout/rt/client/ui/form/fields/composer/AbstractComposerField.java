@@ -37,8 +37,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerDisplayTextBuilder;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.LegacyComposerStatementBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AttributeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EntityNode;
@@ -58,8 +56,6 @@ import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
-import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
-import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 @SuppressWarnings("deprecation")
 @FormData(value = AbstractComposerData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
@@ -263,33 +259,6 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
     getTree().disposeTree();
-  }
-
-  @Override
-  protected void applySearchInternal(SearchFilter search) {
-    ITreeNode rootNode = getTree().getRootNode();
-    if (rootNode != null) {
-      StringBuffer buf = new StringBuffer();
-      new ComposerDisplayTextBuilder().build(rootNode, buf, "");
-      String s = buf.toString();
-      if (s.trim().length() > 0) {
-        search.addDisplayText(s);
-      }
-    }
-    if (search instanceof LegacySearchFilter) {
-      LegacySearchFilter l = (LegacySearchFilter) search;
-      if (rootNode != null) {
-        Object specialConstraint = new LegacyComposerStatementBuilder(l.getBindMap()).build(rootNode);
-        if (specialConstraint != null) {
-          try {
-            l.addSpecialWhereToken(specialConstraint);
-          }
-          catch (ProcessingException e) {
-            LOG.error("adding legacy search filter", e);
-          }
-        }
-      }
-    }
   }
 
   public final ITree getTree() {
@@ -659,7 +628,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         EntityNode enode = (EntityNode) node;
         String externalId = DataModelUtility.entityToExternalId(enode.getEntity());
         if (externalId == null) {
-          LOG.warn("could not find entity data for: " + enode.getEntity());
+          if (LOG.isInfoEnabled()) LOG.info("could not find entity data for: " + enode.getEntity());
           return null;
         }
         ComposerEntityNodeData data = new ComposerEntityNodeData();
@@ -671,7 +640,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         AttributeNode anode = (AttributeNode) node;
         String externalId = DataModelUtility.attributeToExternalId(anode.getAttribute());
         if (externalId == null) {
-          LOG.warn("could not find attribute data for: " + anode.getAttribute());
+          if (LOG.isInfoEnabled()) LOG.info("could not find attribute data for: " + anode.getAttribute());
           return null;
         }
         ComposerAttributeNodeData data = new ComposerAttributeNodeData();

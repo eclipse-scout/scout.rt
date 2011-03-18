@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,15 +21,10 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
-import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-@SuppressWarnings("deprecation")
 public abstract class AbstractStringField extends AbstractValueField<String> implements IStringField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStringField.class);
 
@@ -192,32 +187,6 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
       configuredDropType = 0;
     }
     setDropType(configuredDropType);
-  }
-
-  /*
-   * Runtime
-   */
-
-  @Override
-  protected void applySearchInternal(SearchFilter search) {
-    String value = getValue();
-    if (value != null) {
-      search.addDisplayText(getLabel() + " " + ScoutTexts.get("LogicLike") + " " + getDisplayText());
-    }
-    if (search instanceof LegacySearchFilter) {
-      LegacySearchFilter l = (LegacySearchFilter) search;
-      if (value != null && getConfiguredSearchTerm() != null) {
-        if (ClientJob.getCurrentSession().getDesktop().isAutoPrefixWildcardForTextSearch()) {
-          value = "*" + value;
-        }
-        try {
-          l.addSpecialWhereToken(new LegacySearchFilter.StringLikeConstraint(getConfiguredSearchTerm(), value));
-        }
-        catch (ProcessingException e) {
-          LOG.error("adding legacy search filter", e);
-        }
-      }
-    }
   }
 
   public void setMaxLength(int len) {
