@@ -135,8 +135,14 @@ public class SqlFormatter {
 
   private void formatStatement(Statement stm, FormatContext ctx) {
     for (IToken t : stm.getChildren()) {
-      if (t instanceof SingleStatement) {
+      if (t instanceof Statement) {
+        formatStatement((Statement) t, ctx);
+      }
+      else if (t instanceof SingleStatement) {
         formatSingleStatement((SingleStatement) t, ctx);
+      }
+      else if (t instanceof BracketExpr) {
+        formatBracketExpr((BracketExpr) t, ctx);
       }
       else if (t instanceof UnionToken) {
         formatDefault(t, ctx);
@@ -170,6 +176,11 @@ public class SqlFormatter {
       if (t instanceof PartToken) {
         formatDefault(t, ctx);
       }
+      else if (t instanceof Part) {
+        ctx.in();
+        formatPart((Part) t, ctx);
+        ctx.out();
+      }
       else if (t instanceof ListExpr) {
         hasList = true;
         ctx.in();
@@ -196,6 +207,9 @@ public class SqlFormatter {
         formatDefault(t, ctx);
         if (multiline) {
           ctx.println();
+        }
+        else {
+          ctx.print(" ");
         }
       }
       else {
@@ -306,6 +320,9 @@ public class SqlFormatter {
       else if (t instanceof Statement) {
         formatStatement((Statement) t, ctx);
       }
+      else if (t instanceof Part) {
+        formatPart((Part) t, ctx);
+      }
       else if (t instanceof OrExpr) {
         formatOrExpr((OrExpr) t, ctx);
       }
@@ -343,6 +360,9 @@ public class SqlFormatter {
       }
       else if (t instanceof Statement) {
         formatStatement((Statement) t, ctx);
+      }
+      else if (t instanceof SingleStatement) {
+        formatSingleStatement((SingleStatement) t, ctx);
       }
       else if (t instanceof ListExpr) {
         formatListExpr((ListExpr) t, multiline, ctx);

@@ -208,9 +208,14 @@ public class SqlParser {
       Statement s = new Statement();
       s.addChild(ss);
       UnionToken u;
-      while ((u = removeToken(list, UnionToken.class)) != null && (ss = parseSingleStatement(list, ctx)) != null) {
+      IToken nexts = null;
+      while ((u = removeToken(list, UnionToken.class)) != null && ((nexts = parseSingleStatement(list, ctx)) != null || (nexts = parseBracketExpr(list, ctx)) != null)) {
         s.addChild(u);
-        s.addChild(ss);
+        s.addChild(nexts);
+      }
+      //restore incomplete
+      if (u != null && nexts == null) {
+        list.add(0, u);
       }
       return s;
     }
@@ -281,7 +286,7 @@ public class SqlParser {
     if (s.equals("SELECT")) {
       return true;
     }
-    if (s.equals("WITH")) {
+    if (s.equals("INSERT INTO")) {
       return true;
     }
     if (s.equals("INSERT")) {
@@ -290,7 +295,16 @@ public class SqlParser {
     if (s.equals("UPDATE")) {
       return true;
     }
+    if (s.equals("DELETE FROM")) {
+      return true;
+    }
     if (s.equals("DELETE")) {
+      return true;
+    }
+    if (s.equals("CASE")) {
+      return true;
+    }
+    if (s.equals("WITH")) {
       return true;
     }
     return false;
@@ -394,6 +408,10 @@ public class SqlParser {
       while ((mo = removeToken(list, MathOp.class)) != null && (se = parseSimpleExpr(list, ctx)) != null) {
         me.addChild(mo);
         me.addChild(se);
+      }
+      //restore incomplete
+      if (mo != null && se == null) {
+        list.add(0, mo);
       }
       return me;
     }
