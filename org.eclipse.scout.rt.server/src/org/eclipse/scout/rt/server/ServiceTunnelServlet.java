@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -308,11 +308,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
       // send error response
       try {
         // rewrite exception to avoid class not found exception in client, mostly due to unknown classes in the throwable's or statuse's getCause()
-        Throwable saveEx = PlaceholderException.transformException(t);
-        if (!(saveEx instanceof ProcessingException)) {
-          saveEx = new ProcessingException(saveEx.getMessage(), saveEx.getCause());
+        Throwable remotableSafeEx = PlaceholderException.transformException(t);
+        if (!(remotableSafeEx instanceof ProcessingException)) {
+          remotableSafeEx = new ProcessingException(remotableSafeEx.getMessage(), remotableSafeEx.getCause());
         }
-        ServiceTunnelResponse hres = new ServiceTunnelResponse(null, null, saveEx);
+        ServiceTunnelResponse hres = new ServiceTunnelResponse(null, null, remotableSafeEx);
         Long t1 = (Long) req.getAttribute(ServiceTunnelServlet.class.getName() + ".requestStart");
         if (t1 != null) {
           hres.setProcessingDuration((System.nanoTime() - t1) / 1000000L);
@@ -358,6 +358,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * either a filter or directly above
    */
   protected void handleSoapServiceCall(HttpServletRequest httpRequest, HttpServletResponse httpResponse, ServiceTunnelRequest serviceReq) throws Throwable {
+    String soapOperation = ServiceTunnelRequest.toSoapOperation(serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation());
     IServerSession serverSession = ThreadContext.get(IServerSession.class);
     String authenticatedUser = serverSession.getUserId();
     if (LOG.isDebugEnabled()) LOG.debug("request started " + httpRequest.getRemoteAddr() + "/" + authenticatedUser + " at " + new Date());
@@ -421,6 +422,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       Object data = ServiceUtility.invoke(serviceOp, service, serviceReq.getArgs());
       Object[] outParameters = ServiceUtility.extractHolderArguments(serviceReq.getArgs());
       serviceRes = new ServiceTunnelResponse(data, outParameters, null);
+      serviceRes.setSoapOperation(soapOperation);
       // add performance data
       Long t1 = (Long) httpRequest.getAttribute(ServiceTunnelServlet.class.getName() + ".requestStart");
       if (t1 != null) {

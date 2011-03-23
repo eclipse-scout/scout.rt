@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,6 +18,7 @@ public class ServiceTunnelResponse implements java.io.Serializable {
   private static final long serialVersionUID = 0L;
 
   private transient int m_httpCode;
+  private transient String m_soapOperation;
   private Object m_data;
   private Object[] m_outVars = new Object[0];
   private Throwable m_exception;
@@ -41,6 +42,14 @@ public class ServiceTunnelResponse implements java.io.Serializable {
       m_outVars = outVars;
     }
     m_exception = t;
+  }
+
+  public String getSoapOperation() {
+    return m_soapOperation;
+  }
+
+  public void setSoapOperation(String soapOperation) {
+    m_soapOperation = soapOperation;
   }
 
   /**
