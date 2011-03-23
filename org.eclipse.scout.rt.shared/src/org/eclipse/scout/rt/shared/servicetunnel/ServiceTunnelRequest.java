@@ -96,4 +96,37 @@ public class ServiceTunnelRequest implements Serializable {
     }
     return buf.toString();
   }
+
+  /**
+   * @return a single string with all package parts reduced to their first character, 
+   * except the last package fragment. All is concatenated together with _ instead of '.' and the method name is appended with '__'
+   * <p>
+   * Example for IPingService is "oesrssc_ping_IPingService__ping"
+   */
+  public static String toSoapOperation(String className, String methodName) {
+    if (className == null || methodName == null) {
+      return null;
+    }
+    int i = className.lastIndexOf('.');
+    if (i < 0) {
+      return className + "__" + methodName;
+    }
+    String simpleName = className.substring(i + 1);
+    String packageName = className.substring(0, i);
+    i = packageName.lastIndexOf('.');
+    if (i < 0) {
+      return packageName + "_" + simpleName + "__" + methodName;
+    }
+    StringBuilder buf = new StringBuilder();
+    for (String s : packageName.substring(0, i).split("[.]")) {
+      buf.append(s.charAt(0));
+    }
+    buf.append("_");
+    buf.append(packageName.substring(i + 1));
+    buf.append("_");
+    buf.append(simpleName);
+    buf.append("__");
+    buf.append(methodName);
+    return buf.toString();
+  }
 }

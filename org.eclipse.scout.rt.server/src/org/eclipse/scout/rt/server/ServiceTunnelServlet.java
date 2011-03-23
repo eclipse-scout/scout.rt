@@ -358,6 +358,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * either a filter or directly above
    */
   protected void handleSoapServiceCall(HttpServletRequest httpRequest, HttpServletResponse httpResponse, ServiceTunnelRequest serviceReq) throws Throwable {
+    String soapOperation = ServiceTunnelRequest.toSoapOperation(serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation());
     IServerSession serverSession = ThreadContext.get(IServerSession.class);
     String authenticatedUser = serverSession.getUserId();
     if (LOG.isDebugEnabled()) LOG.debug("request started " + httpRequest.getRemoteAddr() + "/" + authenticatedUser + " at " + new Date());
@@ -421,6 +422,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       Object data = ServiceUtility.invoke(serviceOp, service, serviceReq.getArgs());
       Object[] outParameters = ServiceUtility.extractHolderArguments(serviceReq.getArgs());
       serviceRes = new ServiceTunnelResponse(data, outParameters, null);
+      serviceRes.setSoapOperation(soapOperation);
       // add performance data
       Long t1 = (Long) httpRequest.getAttribute(ServiceTunnelServlet.class.getName() + ".requestStart");
       if (t1 != null) {
