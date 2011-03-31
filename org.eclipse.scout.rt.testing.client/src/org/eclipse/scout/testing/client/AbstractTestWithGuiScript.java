@@ -119,7 +119,6 @@ public abstract class AbstractTestWithGuiScript {
   @Test
   public final void test() throws Throwable {
     clientSession = ClientAsyncJob.getCurrentSession();
-//    clientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(getSessionClass());
     final IGuiMock gui = SERVICES.getService(IGuiMockService.class).createMock(clientSession);
     //
     final ClientSyncJob runModelJob = new ClientSyncJob("Run", clientSession) {

@@ -26,7 +26,8 @@ public interface IGuiMock {
   enum GuiStrategy {
     Swt,
     Swing,
-    Vaadin
+    Vaadin,
+    Rap
   }
 
   enum Key {
