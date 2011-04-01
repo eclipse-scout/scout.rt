@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 
+import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -169,8 +170,13 @@ public class ScoutInfoForm extends AbstractForm {
   }
 
   protected void createHtmlBody(StringBuffer buf) {
-    String title = Platform.getProduct().getName();
-    Version v = Version.parseVersion("" + Platform.getProduct().getDefiningBundle().getHeaders().get("Bundle-Version"));
+    String title = "unknown";
+    Version v = Version.emptyVersion;
+    IProduct product = Platform.getProduct();
+    if (product != null) {
+      title = product.getName();
+      v = Version.parseVersion("" + product.getDefiningBundle().getHeaders().get("Bundle-Version"));
+    }
     buf.append("<head>\n");
     buf.append("<style type=\"text/css\">\n");
     buf.append("h1 {font-family: sans-serif}\n");
