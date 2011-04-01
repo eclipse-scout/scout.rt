@@ -277,13 +277,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
       @Override
       public void run() {
         if (m_scoutForm != null) {
-          getSwtEnvironment().acquireActivateViewLock();
-          try {
-            m_scoutForm.getUIFacade().fireFormActivatedFromUI();
-          }
-          finally {
-            getSwtEnvironment().releaseActivateViewLock();
-          }
+          m_scoutForm.getUIFacade().fireFormActivatedFromUI();
         }
       }
     };

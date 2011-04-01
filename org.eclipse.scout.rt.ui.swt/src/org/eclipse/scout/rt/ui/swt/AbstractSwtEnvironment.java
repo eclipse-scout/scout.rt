@@ -18,12 +18,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,7 +33,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -45,6 +40,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -89,7 +85,6 @@ import org.eclipse.scout.rt.ui.swt.window.messagebox.SwtScoutMessageBoxDialog;
 import org.eclipse.scout.rt.ui.swt.window.popup.SwtScoutPopup;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
@@ -172,7 +167,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   private boolean m_startDesktopCalled;
   private boolean m_activateDesktopCalled;
-  private OptimisticLock m_activateViewLock;
 
   private EventListenerList m_environmentListeners;
 
@@ -195,7 +189,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     m_status = SwtEnvironmentEvent.INACTIVE;
     m_desktopKeyStrokes = new ArrayList<ISwtKeyStroke>();
     m_startDesktopCalled = false;
-    m_activateViewLock = new OptimisticLock();
   }
 
   public Bundle getApplicationBundle() {
@@ -284,18 +277,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       }
     }
     return "";
-  }
-
-  public boolean acquireActivateViewLock() {
-    return m_activateViewLock.acquire();
-  }
-
-  public boolean isActivateViewLockAcquired() {
-    return m_activateViewLock.isAcquired();
-  }
-
-  public void releaseActivateViewLock() {
-    m_activateViewLock.release();
   }
 
   public IViewPart findViewPart(String viewId) {
@@ -1138,12 +1119,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
               showStandaloneForm(e.getForm());
             }
           };
-          if (isActivateViewLockAcquired()) {
-            getDisplay().asyncExec(t);
-          }
-          else {
-            invokeSwtLater(t);
-          }
+          invokeSwtLater(t);
           break;
         }
         case DesktopEvent.TYPE_FORM_REMOVED: {
@@ -1153,12 +1129,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
               hideStandaloneForm(e.getForm());
             }
           };
-          if (isActivateViewLockAcquired()) {
-            getDisplay().asyncExec(t);
-          }
-          else {
-            invokeSwtLater(t);
-          }
+          invokeSwtLater(t);
           break;
         }
         case DesktopEvent.TYPE_FORM_ENSURE_VISIBLE: {
@@ -1422,7 +1393,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   private class P_PerspectiveListener extends PerspectiveAdapter {
-
     @Override
     public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
       String perspectiveId = perspective.getId();
@@ -1464,7 +1434,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     if (m_perspectiveId.equals(perspectiveId)) {
       //make sure that the desktop is only started once
       if (!isStartDesktopCalled()) {
-        final P_PerspecitveOpenedJob j = new P_PerspecitveOpenedJob(getDesktopOpenedTaskText());
+        final P_PerspecitveOpenedJob j = new P_PerspecitveOpenedJob(getDesktopOpenedTaskText(), getClientSession());
         j.schedule();
         setStartDesktopCalled(true);
       }
@@ -1492,7 +1462,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     if (m_perspectiveId.equals(perspectiveId) && isStartDesktopCalled()) {
       //make sure that the desktop is only started once
       if (!isActivateDesktopCalled()) {
-        final P_PerspectiveActivatedJob j = new P_PerspectiveActivatedJob(getDesktopOpenedTaskText());
+        final P_PerspectiveActivatedJob j = new P_PerspectiveActivatedJob(getDesktopOpenedTaskText(), getClientSession());
         j.schedule();
         setActivateDesktopCalled(true);
       }
@@ -1509,7 +1479,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
     // make sure that the desktop is only started once
     if (m_perspectiveId.equals(perspectiveId)) {
-      final P_PerspectiveClosedJob j = new P_PerspectiveClosedJob(getDesktopClosedTaskText());
+      final P_PerspectiveClosedJob j = new P_PerspectiveClosedJob(getDesktopClosedTaskText(), getClientSession());
       j.schedule();
       called = true;
       setStartDesktopCalled(false);
@@ -1540,140 +1510,59 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return ScoutTexts.get("ScoutStoping");
   }
 
-  private final class P_PerspecitveOpenedJob extends Job {
-    public P_PerspecitveOpenedJob(String name) {
-      super(name);
+  private final class P_PerspecitveOpenedJob extends ClientAsyncJob {
+    public P_PerspecitveOpenedJob(String name, IClientSession session) {
+      super(name, session);
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      final CyclicBarrier barrier = new CyclicBarrier(2);
-      monitor.beginTask(getDesktopOpenedTaskText(), IProgressMonitor.UNKNOWN);
-      getDisplay().asyncExec(new Runnable() {
+    protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      getDisplay().syncExec(new Runnable() {
         public void run() {
-          BusyIndicator.showWhile(getDisplay(), new Runnable() {
-            public void run() {
-              applyScoutState();
-              Runnable t = new Runnable() {
-                @Override
-                public void run() {
-                  fireGuiAttachedFromUI();
-                  try {
-                    barrier.await();
-                  }
-                  catch (InterruptedException e) {
-                    LOG.warn("CyclicBarrier interrupted", e);
-                  }
-                  catch (BrokenBarrierException e) {
-                    LOG.warn("CyclicBarrier broken", e);
-                  }
-                }
-              };
-              JobEx job = invokeScoutLater(t, 0);
-              try {
-                job.join(120000);
-              }
-              catch (InterruptedException e) {
-                //nop
-              }
-            }
-          });
+          applyScoutState();
         }
       });
-      try {
-        barrier.await(60, TimeUnit.SECONDS);
-      }
-      catch (TimeoutException e) {
-        cancel();
-      }
-      catch (InterruptedException e) {
-        LOG.warn("CyclicBarrier interrupted", e);
-      }
-      catch (BrokenBarrierException e) {
-        LOG.warn("CyclicBarrier broken", e);
-      }
-      monitor.done();
-      return Status.OK_STATUS;
+      ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), getClientSession()) {
+        @Override
+        protected void runVoid(IProgressMonitor syncMonitor) throws Throwable {
+          fireGuiAttachedFromUI();
+        }
+      };
+      clienSyncJob.schedule();
     }
   }
 
-  private final class P_PerspectiveActivatedJob extends Job {
-    public P_PerspectiveActivatedJob(String name) {
-      super(name);
+  private final class P_PerspectiveActivatedJob extends ClientAsyncJob {
+    public P_PerspectiveActivatedJob(String name, IClientSession session) {
+      super(name, session);
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      monitor.beginTask(getDesktopOpenedTaskText(), IProgressMonitor.UNKNOWN);
-      getDisplay().asyncExec(new Runnable() {
-        public void run() {
-          ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), getClientSession()) {
-            @Override
-            protected void runVoid(IProgressMonitor syncMonitor) throws Throwable {
-              fireDesktopActivatedFromUI();
-            }
-          };
-          clienSyncJob.schedule();
+    protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), getClientSession()) {
+        @Override
+        protected void runVoid(IProgressMonitor syncMonitor) throws Throwable {
+          fireDesktopActivatedFromUI();
         }
-      });
-      monitor.done();
-      return Status.OK_STATUS;
+      };
+      clienSyncJob.schedule();
     }
   }
 
-  private final class P_PerspectiveClosedJob extends Job {
-    public P_PerspectiveClosedJob(String name) {
-      super(name);
+  private final class P_PerspectiveClosedJob extends ClientAsyncJob {
+    public P_PerspectiveClosedJob(String name, IClientSession session) {
+      super(name, session);
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      final CyclicBarrier barrier = new CyclicBarrier(2);
-      monitor.beginTask(getDesktopClosedTaskText(), IProgressMonitor.UNKNOWN);
-      getDisplay().asyncExec(new Runnable() {
-        public void run() {
-          BusyIndicator.showWhile(getDisplay(), new Runnable() {
-            public void run() {
-              Runnable t = new Runnable() {
-                @Override
-                public void run() {
-                  fireGuiDetachedFromUI();
-                  try {
-                    barrier.await();
-                  }
-                  catch (InterruptedException e) {
-                    LOG.warn("CyclicBarrier interrupted", e);
-                  }
-                  catch (BrokenBarrierException e) {
-                    LOG.warn("CyclicBarrier broken", e);
-                  }
-                }
-              };
-              JobEx job = invokeScoutLater(t, 0);
-              try {
-                job.join(120000);
-              }
-              catch (InterruptedException e) {
-                //nop
-              }
-            }
-          });
+    protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), getClientSession()) {
+        @Override
+        protected void runVoid(IProgressMonitor syncMonitor) throws Throwable {
+          fireGuiDetachedFromUI();
         }
-      });
-      try {
-        barrier.await(60, TimeUnit.SECONDS);
-      }
-      catch (TimeoutException e) {
-        cancel();
-      }
-      catch (InterruptedException e) {
-        LOG.warn("CyclicBarrier interrupted", e);
-      }
-      catch (BrokenBarrierException e) {
-        LOG.warn("CyclicBarrier broken", e);
-      }
-      monitor.done();
-      return Status.OK_STATUS;
+      };
+      clienSyncJob.schedule();
     }
   }
 

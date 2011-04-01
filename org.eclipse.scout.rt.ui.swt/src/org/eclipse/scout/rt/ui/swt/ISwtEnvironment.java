@@ -191,12 +191,6 @@ public interface ISwtEnvironment {
 
   AbstractScoutEditorPart getEditorPart(IEditorInput editorInput, String editorId);
 
-  boolean acquireActivateViewLock();
-
-  boolean isActivateViewLockAcquired();
-
-  void releaseActivateViewLock();
-
   String[] getAllPartIds();
 
   String getSwtPartIdForScoutPartId(String scoutViewLocation);
