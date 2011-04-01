@@ -56,6 +56,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
   private boolean m_ignoreLabel;
   // cache
   private SwingScoutDropDownPopup m_proposalPopup;
+  private String m_displayText;
 
   public void setIgnoreLabel(boolean ignoreLabel) {
     m_ignoreLabel = ignoreLabel;
@@ -156,16 +157,21 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
   @Override
   protected void setDisplayTextFromScout(String s) {
     IDateField f = getScoutObject();
+    if (f.getErrorStatus() != null) {
+      return;
+    }
     Date value = f.getValue();
     JTextComponent dateField = getSwingDateField();
     if (value == null || !f.isHasTime()) {
       //only date field
-      dateField.setText(s);
+      m_displayText = s;
+      dateField.setText(m_displayText);
       dateField.setCaretPosition(0);
       return;
     }
     DateFormat format = f.getIsolatedDateFormat();
-    dateField.setText(format.format(value));
+    m_displayText = format.format(value);
+    dateField.setText(m_displayText);
     dateField.setCaretPosition(0);
   }
 
@@ -173,7 +179,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
   protected boolean handleSwingInputVerifier() {
     final String text = getSwingDateField().getText();
     // only handle if text has changed
-    if (CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
+    if (CompareUtility.equals(text, m_displayText)) {
       return true;
     }
     final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
@@ -339,7 +345,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
           @Override
           public void run() {
             // store current (possibly changed) value
-            if (!CompareUtility.equals(newDisplayText, getScoutObject().getDisplayText())) {
+            if (!CompareUtility.equals(newDisplayText, m_displayText)) {
               getScoutObject().getUIFacade().setDateTextFromUI(newDisplayText);
             }
             getScoutObject().getUIFacade().fireDateShiftActionFromUI(m_level, m_value);

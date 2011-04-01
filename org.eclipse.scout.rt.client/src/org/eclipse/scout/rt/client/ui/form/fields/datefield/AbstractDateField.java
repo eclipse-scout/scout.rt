@@ -794,8 +794,17 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       if (newTime == null) {
         newTime = getIsolatedTimeFormat().format(currentValue != null ? currentValue : new Date());
       }
-      String currentDate = getIsolatedDateFormat().format(currentValue != null ? currentValue : new Date());
-      return parseValue(currentDate + " " + newTime);
+      try {
+      // check if the new time is valid in some way,
+      // we do not want getting a new date while the text is invalid
+        parseTimeInternal(newTime);
+        String currentDate = getIsolatedDateFormat().format(currentValue != null ? currentValue : new Date());
+        return parseValue(currentDate + " " + newTime);
+      }
+      catch (ProcessingException e) {
+        // invalid time in text
+        return parseValue(currentValue + " " + newTime);
+      }
     }
 
     public boolean setDateTimeTextFromUI(String newText) {
