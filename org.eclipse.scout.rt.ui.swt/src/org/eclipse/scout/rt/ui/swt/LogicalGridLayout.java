@@ -52,6 +52,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
     m_vgap = vgap;
   }
 
+  @Override
   public int computeMinimumWidth(Composite parent, boolean changed) {
     return computeSize(parent, changed, SWT.DEFAULT, SWT.DEFAULT, MIN).x;
   }
@@ -61,6 +62,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
     return computeSize(composite, flushCache, wHint, hHint, PREF);
   }
 
+  @Override
   public int computeMaximumWidth(Composite parent, boolean changed) {
     return computeSize(parent, changed, SWT.DEFAULT, SWT.DEFAULT, MAX).x;
   }
@@ -276,7 +278,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
         visibleCons.add(cons);
       }
     }
-    m_info = new LogicalGridLayoutInfo(visibleComps.toArray(new Control[visibleComps.size()]), visibleCons.toArray(new LogicalGridData[visibleCons.size()]), m_hgap, m_vgap, wHint);
+    m_info = new LogicalGridLayoutInfo(visibleComps.toArray(new Control[visibleComps.size()]), visibleCons.toArray(new LogicalGridData[visibleCons.size()]), m_hgap, m_vgap, wHint, flushCache);
     m_infoCacheKey = newKey;
   }
 

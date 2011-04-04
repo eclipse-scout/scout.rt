@@ -138,7 +138,7 @@ public class StyledTextFieldUndoRedoSupport {
       m_styledText.removeExtendedModifyListener(m_modifyListener);
       m_styledText.removeKeyListener(m_keyAdapter);
 
-      if (!m_styledText.getMenu().isDisposed()) {
+      if (m_styledText.getMenu() != null && !m_styledText.getMenu().isDisposed()) {
         m_styledText.getMenu().removeMenuListener(m_menuListener);
       }
     }

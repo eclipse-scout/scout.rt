@@ -14,6 +14,7 @@ import java.util.TreeSet;
 
 import org.eclipse.scout.rt.ui.swt.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
+import org.eclipse.scout.rt.ui.swt.util.SwtLayoutUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -26,6 +27,7 @@ class LogicalGridLayoutInfo {
   int[/* component count */] componentHeights;
   private int m_hgap;
   private int m_vgap;
+  private boolean m_flushCache;
   int cols; /* number of cells horizontally */
   int rows; /* number of cells vertically */
   int[/* column */][/* min,pref,max */] width;
@@ -34,10 +36,11 @@ class LogicalGridLayoutInfo {
   double[/* column */] weightX;
   double[/* row */] weightY;
 
-  LogicalGridLayoutInfo(Control[] components, LogicalGridData[] cons, int hgap, int vgap, int wHint) {
+  LogicalGridLayoutInfo(Control[] components, LogicalGridData[] cons, int hgap, int vgap, int wHint, boolean flushCache) {
     this.components = components;
     m_hgap = hgap;
     m_vgap = vgap;
+    m_flushCache = flushCache;
     // create a modifiable copy of the grid datas
     this.gridDatas = new LogicalGridData[cons.length];
     for (int i = 0; i < cons.length; i++) {
@@ -152,7 +155,7 @@ class LogicalGridLayoutInfo {
         componentWidths[i] = cons.widthHint;
       }
       else {
-        componentWidths[i] = uiSizeInPixel(comp, SWT.DEFAULT).x;
+        componentWidths[i] = uiSizeInPixel(comp, SWT.DEFAULT, m_flushCache).x;
       }
     }
     initializeColumns(componentWidths, hgap);
@@ -170,7 +173,7 @@ class LogicalGridLayoutInfo {
         componentHeights[i] = cons.heightHint;
       }
       else {
-        componentHeights[i] = uiSizeInPixel(comp, getWidthHint(cons)).y;
+        componentHeights[i] = uiSizeInPixel(comp, getWidthHint(cons), false).y;
       }
     }
     initializeRows(componentHeights, vgap);
@@ -513,7 +516,7 @@ class LogicalGridLayoutInfo {
     return gridH * deco.getLogicalGridLayoutRowHeight() + Math.max(0, gridH - 1) * deco.getLogicalGridLayoutVerticalGap();
   }
 
-  private static Point uiSizeInPixel(Control c, int wHint) {
-    return c.computeSize(wHint, SWT.DEFAULT, false);
+  private static Point uiSizeInPixel(Control c, int wHint, boolean flushCache) {
+    return SwtLayoutUtility.computeSizeEx(c, wHint, SWT.DEFAULT, flushCache);
   }
 }
