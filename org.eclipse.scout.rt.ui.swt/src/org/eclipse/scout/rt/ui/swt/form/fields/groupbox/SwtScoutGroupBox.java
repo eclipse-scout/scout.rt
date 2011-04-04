@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 
 /**
@@ -48,6 +47,8 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
   private ScrolledFormEx m_scrolledForm;
   private Composite m_swtBodyPart;
   private SwtScoutGroupBoxButtonbar m_swtButtonbar;
+  private Section m_swtSection;
+  private Group m_swtGroup;
   // cache
   private boolean m_containerBorderEnabled;
   private String m_containerBorderDecorationResolved;
@@ -142,22 +143,21 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
     if (m_containerBorderEnabled) {
       if (IGroupBox.BORDER_DECORATION_SECTION.equals(m_containerBorderDecorationResolved)) {
         // section
-        int style = Section.EXPANDED | Section.TITLE_BAR;
+        int style = (getScoutObject().isExpanded() ? Section.EXPANDED : 0) | Section.TITLE_BAR;
         if (getScoutObject().isExpandable()) {
           style |= Section.TWISTIE;
         }
-        Section section = getEnvironment().getFormToolkit().createSection(parent, style);
+        m_swtSection = getEnvironment().getFormToolkit().createSection(parent, style);
         String label = getScoutObject().getLabel();
         if (label == null) {
           label = "";
         }
-        section.setText(label);
-        section.addExpansionListener(new P_ExpansionListener());
+        m_swtSection.setText(label);
+        m_swtSection.addExpansionListener(new P_ExpansionListener());
 
-        rootPane = getEnvironment().getFormToolkit().createComposite(section);
-        section.setClient(rootPane);
-        setSwtField(section);
-        setSwtContainer(section);
+        rootPane = getEnvironment().getFormToolkit().createComposite(m_swtSection);
+        m_swtSection.setClient(rootPane);
+        setSwtContainer(m_swtSection);
         //
         layout.horizontalSpacing = 4;
         layout.verticalSpacing = 4;
@@ -170,9 +170,9 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
         rootPane.setLayout(layout);
       }
       else if (IGroupBox.BORDER_DECORATION_LINE.equals(m_containerBorderDecorationResolved)) {
-        rootPane = getEnvironment().getFormToolkit().createGroup(parent, SWT.SHADOW_ETCHED_IN);
-        setSwtContainer(rootPane);
-        setSwtField(rootPane);
+        m_swtGroup = getEnvironment().getFormToolkit().createGroup(parent, SWT.SHADOW_ETCHED_IN);
+        rootPane = m_swtGroup;
+        setSwtContainer(m_swtGroup);
         //
         layout.horizontalSpacing = 4;
         layout.verticalSpacing = 4;
@@ -188,7 +188,6 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
         // none
         rootPane = getEnvironment().getFormToolkit().createComposite(parent);
         setSwtContainer(rootPane);
-        setSwtField(rootPane);
         //
         layout.horizontalSpacing = 4;
         layout.verticalSpacing = 4;
@@ -204,7 +203,6 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
     else {
       rootPane = getEnvironment().getFormToolkit().createComposite(parent);
       setSwtContainer(rootPane);
-      setSwtField(rootPane);
       //
       layout.horizontalSpacing = 0;
       layout.verticalSpacing = 0;
@@ -222,14 +220,6 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
   @Override
   public StatusLabelEx getSwtLabel() {
     return null;
-  }
-
-  public Composite getSwtGroupBox() {
-    return (Composite) getSwtField();
-  }
-
-  public Composite getSwtBodyPart() {
-    return m_swtBodyPart;
   }
 
   @Override
@@ -254,9 +244,11 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
 
   protected void setExpandedFromScout() {
     if (getScoutObject().isExpandable()) {
-      Composite c = getSwtContainer();
-      if (c instanceof ExpandableComposite) {
-        ((ExpandableComposite) c).setExpanded(getScoutObject().isExpanded());
+      if (m_swtSection != null) {
+        //only if necessary
+        if (m_swtSection.isExpanded() != getScoutObject().isExpanded()) {
+          m_swtSection.setExpanded(getScoutObject().isExpanded());
+        }
       }
     }
   }
@@ -272,13 +264,12 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
     if (s == null) {
       s = "";
     }
-    if (getSwtContainer() instanceof Section) {
-      Section section = (Section) getSwtContainer();
-      section.setText(s);
-      section.layout();
+    if (m_swtSection != null) {
+      m_swtSection.setText(s);
+      m_swtSection.layout(true, true);
     }
-    if (getSwtContainer() instanceof Group) {
-      ((Group) getSwtContainer()).setText(s);
+    if (m_swtGroup != null) {
+      m_swtGroup.setText(s);
     }
   }
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Scrollable;
 
 public final class SwtLayoutUtility {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtLayoutUtility.class);
@@ -30,6 +31,29 @@ public final class SwtLayoutUtility {
   }
 
   private static boolean dumpSizeTreeRunning;
+
+  public static Point computeSizeEx(Control control, int wHint, int hHint, boolean flushCache) {
+    Point size = null;
+    if (wHint == SWT.DEFAULT && hHint == SWT.DEFAULT) {
+      size = control.computeSize(wHint, hHint, flushCache);
+    }
+    else {
+      //WORKAROUND until swt components such as scrollables are correctly calculating their own scroll bars in
+      int trimW, trimH;
+      if (control instanceof Scrollable) {
+        Rectangle rect = ((Scrollable) control).computeTrim(0, 0, 0, 0);
+        trimW = rect.width;
+        trimH = rect.height;
+      }
+      else {
+        trimW = trimH = control.getBorderWidth() * 2;
+      }
+      int wHintFixed = wHint == SWT.DEFAULT ? wHint : Math.max(0, wHint - trimW);
+      int hHintFixed = hHint == SWT.DEFAULT ? hHint : Math.max(0, hHint - trimH);
+      size = control.computeSize(wHintFixed, hHintFixed, flushCache);
+    }
+    return size;
+  }
 
   public static void dumpSizeTree(Control c) {
     if (!dumpSizeTreeRunning) {

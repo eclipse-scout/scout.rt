@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -49,6 +49,10 @@ public class ButtonBarLayout extends Layout {
         size.y = Math.max(cSize.y, size.y);
       }
     }
+    //WORKAROUND for bug in swt composite setting size to 64x64 when 0,0
+    if (size.x <= 0) size.x = 1;
+    if (size.y <= 0) size.y = 1;
+    //end
     return size;
   }
 

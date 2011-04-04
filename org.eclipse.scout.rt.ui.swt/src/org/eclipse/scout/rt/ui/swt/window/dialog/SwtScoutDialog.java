@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -228,9 +228,6 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   @Override
   protected Control createContents(Composite parent) {
     m_rootForm = getEnvironment().getFormToolkit().createForm(parent);
-    // m_rootForm.setData(SwtScoutComposite.PROP_SHELL_PACK_HANDLER, new
-    // P_ShellResizeHandler());
-
     m_contentPane = m_rootForm.getBody();
     GridLayout gridLayout = new GridLayout();
     gridLayout.horizontalSpacing = 0;
@@ -240,14 +237,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     m_contentPane.setLayout(gridLayout);
     GridData d = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
     m_rootForm.setLayoutData(d);
-    return m_contentPane;
-  }
-
-  private void updateLayoutInternal() {
-    getShell().setMinimumSize(new Point(1, 1));
-    getShell().pack();
-    getShell().setMinimumSize(getShell().getSize());
-
+    return m_rootForm;
   }
 
   public ISwtEnvironment getEnvironment() {
