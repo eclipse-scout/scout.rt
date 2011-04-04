@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -99,7 +99,7 @@ public class SwtScoutTabItem extends SwtScoutGroupBox implements ISwtScoutTabIte
       label = "";
     }
     try {
-      gc = new GC(getSwtField());
+      gc = new GC(getSwtContainer());
       gc.setFont(getEnvironment().getFont(getScoutObject().getFont(), getTabItem().getFont()));
       Point stringSize = gc.stringExtent(label);
       imageSize.x = stringSize.x + 10;
@@ -116,11 +116,11 @@ public class SwtScoutTabItem extends SwtScoutGroupBox implements ISwtScoutTabIte
     try {
       gc = new GC(img);
       gc.setAdvanced(true);
-      gc.setBackground(getSwtField().getDisplay().getSystemColor(SWT.COLOR_WHITE));
+      gc.setBackground(getSwtContainer().getDisplay().getSystemColor(SWT.COLOR_WHITE));
       gc.fillRectangle(0, 0, imageSize.x, imageSize.y);
       // focus handling
       if (m_uiFocus) {
-        gc.setBackground(getSwtField().getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+        gc.setBackground(getSwtContainer().getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
         gc.setLineDash(new int[]{2, 1});
         gc.drawRoundRectangle(0, 0, imageSize.x - 1, imageSize.y - 1, 2, 2);
       }
@@ -133,13 +133,13 @@ public class SwtScoutTabItem extends SwtScoutGroupBox implements ISwtScoutTabIte
         isUnderline = true;
       }
       if (isUnderline) {
-        gc.setForeground(getSwtField().getDisplay().getSystemColor(SWT.COLOR_WHITE));
-        gc.setBackground(getSwtField().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
+        gc.setForeground(getSwtContainer().getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        gc.setBackground(getSwtContainer().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
         gc.fillGradientRectangle(4, imageSize.y - 5, imageSize.x - 8, imageSize.y, true);
       }
       // text
       gc.setFont(getEnvironment().getFont(getScoutObject().getFont(), getTabItem().getFont()));
-      gc.setForeground(getSwtField().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+      gc.setForeground(getSwtContainer().getDisplay().getSystemColor(SWT.COLOR_BLACK));
       gc.drawText(label, 5, 0, true);
 
     }
