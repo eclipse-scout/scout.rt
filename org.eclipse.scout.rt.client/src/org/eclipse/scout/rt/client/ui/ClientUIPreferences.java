@@ -234,7 +234,7 @@ public class ClientUIPreferences {
       m_env.put(key, "true");
     }
     else {
-      m_env.remove(key);
+      m_env.put(key, "false");
     }
     //
     flush();
