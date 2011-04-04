@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.ui.swt.basic.table;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -460,9 +460,9 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     getSwtField().setHeaderVisible(headerVisible);
   }
 
+  @Override
   public void setEnabledFromScout(boolean enabledFromScout) {
     getSwtField().setReadOnly(!enabledFromScout);
-
   }
 
   protected void setColumnsAutoResizeFromScout(boolean autoResizeColumns) {
