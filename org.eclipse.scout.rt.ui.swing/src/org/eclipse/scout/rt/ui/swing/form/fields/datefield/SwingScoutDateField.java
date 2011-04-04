@@ -57,6 +57,9 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
   // cache
   private SwingScoutDropDownPopup m_proposalPopup;
   private String m_displayText;
+  // if a date is picked within the popup-ui or with the cursor-up/down keys, the date should
+  // be rendered even in case of "errors" (due business constraints)
+  private boolean m_setValueFromUI;
 
   public void setIgnoreLabel(boolean ignoreLabel) {
     m_ignoreLabel = ignoreLabel;
@@ -119,6 +122,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
     setSwingField(dateField);
     // layout
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
+    m_setValueFromUI = false;
   }
 
   /**
@@ -157,7 +161,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
   @Override
   protected void setDisplayTextFromScout(String s) {
     IDateField f = getScoutObject();
-    if (f.getErrorStatus() != null) {
+    if (f.getErrorStatus() != null && !m_setValueFromUI) {
       return;
     }
     Date value = f.getValue();
@@ -167,12 +171,14 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
       m_displayText = s;
       dateField.setText(m_displayText);
       dateField.setCaretPosition(0);
+      m_setValueFromUI = false;
       return;
     }
     DateFormat format = f.getIsolatedDateFormat();
     m_displayText = format.format(value);
     dateField.setText(m_displayText);
     dateField.setCaretPosition(0);
+    m_setValueFromUI = false;
   }
 
   @Override
@@ -221,6 +227,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
       Runnable t = new Runnable() {
         @Override
         public void run() {
+          m_setValueFromUI = true;
           getScoutObject().getUIFacade().setDateFromUI(newDate);
         }
       };
@@ -339,15 +346,11 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
     public void actionPerformed(ActionEvent e) {
       closePopup();
       if (getSwingDateField().isVisible() && getSwingDateField().isEditable()) {
-        final String newDisplayText = getSwingDateField().getText();
         // notify Scout
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            // store current (possibly changed) value
-            if (!CompareUtility.equals(newDisplayText, m_displayText)) {
-              getScoutObject().getUIFacade().setDateTextFromUI(newDisplayText);
-            }
+            m_setValueFromUI = true;
             getScoutObject().getUIFacade().fireDateShiftActionFromUI(m_level, m_value);
           }
         };
