@@ -60,6 +60,9 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
   // cache
   private SwingScoutDropDownPopup m_proposalPopup;
   private String m_displayText;
+  // if a date is picked within the popup-ui or with the cursor-up/down keys, the date should
+  // be rendered even in case of "errors" (due business constraints)
+  private boolean m_setValueFromUI;
 
   public void setIgnoreLabel(boolean ignoreLabel) {
     m_ignoreLabel = ignoreLabel;
@@ -118,6 +121,7 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
     setSwingField(timeField);
     // layout
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
+    m_setValueFromUI = false;
   }
 
   /**
@@ -156,7 +160,7 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
   @Override
   protected void setDisplayTextFromScout(String s) {
     IDateField f = getScoutObject();
-    if (f.getErrorStatus() != null) {
+    if (f.getErrorStatus() != null && !m_setValueFromUI) {
       return;
     }
     Date value = f.getValue();
@@ -165,6 +169,7 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
       m_displayText = s;
       textField.setText(m_displayText);
       textField.setCaretPosition(0);
+      m_setValueFromUI = false;
       return;
     }
     DateFormat format = f.getIsolatedTimeFormat();
@@ -172,7 +177,9 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
       m_displayText = format.format(value);
       textField.setText(m_displayText);
       textField.setCaretPosition(0);
+      m_setValueFromUI = false;
     }
+    m_setValueFromUI = false;
   }
 
   @Override
@@ -221,6 +228,7 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
       Runnable t = new Runnable() {
         @Override
         public void run() {
+          m_setValueFromUI = true;
           getScoutObject().getUIFacade().setTimeFromUI(newDate);
         }
       };
@@ -339,15 +347,11 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
     public void actionPerformed(ActionEvent e) {
       closePopup();
       if (getSwingTimeField().isVisible() && getSwingTimeField().isEditable()) {
-        final String newDisplayText = getSwingTimeField().getText();
         // notify Scout
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            // store current (possibly changed) value
-            if (!CompareUtility.equals(newDisplayText, m_displayText)) {
-              getScoutObject().getUIFacade().setTimeTextFromUI(newDisplayText);
-            }
+            m_setValueFromUI = true;
             getScoutObject().getUIFacade().fireTimeShiftActionFromUI(m_level, m_value);
           }
         };
