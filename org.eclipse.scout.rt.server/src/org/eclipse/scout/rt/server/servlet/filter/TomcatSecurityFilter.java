@@ -95,7 +95,7 @@ public class TomcatSecurityFilter implements Filter {
                 HttpServletRequest secureReq = req;
                 if (!(secureReq instanceof SecureHttpServletRequestWrapper)) {
                   Principal principal = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next();
-                  secureReq = new SecureHttpServletRequestWrapper(req, principal, "SPNEGO");
+                  secureReq = new SecureHttpServletRequestWrapper(req, principal, null);
                 }
                 doFilterInternal(secureReq, res, chain);
                 return null;

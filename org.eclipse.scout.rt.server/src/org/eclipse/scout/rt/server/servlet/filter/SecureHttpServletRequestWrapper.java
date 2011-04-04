@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 public class SecureHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
-  private static List<String> AUTH_TYPES = Arrays.asList(new String[]{"BASIC_AUTH", "FORM_AUTH", "CLIENT_CERT_AUTH", "DIGEST_AUTH", "NTLM", "SPNEGO"});
+  private static List<String> AUTH_TYPES = Arrays.asList(new String[]{"BASIC_AUTH", "FORM_AUTH", "CLIENT_CERT_AUTH", "DIGEST_AUTH", "NTLM"});
 
   private final Principal m_principal;
   private final String m_authType;
