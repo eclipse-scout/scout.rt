@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -229,7 +229,7 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
       return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
     }
     final Object backgroundLock = new Object();
-    HttpBackgroundJob backgroundJob = new HttpBackgroundJob("Tunneling " + req.getServiceInterfaceClassName() + "." + req.getOperation(), req, backgroundLock, this);
+    HttpBackgroundJob backgroundJob = new HttpBackgroundJob(ScoutTexts.get("ServerCallProcessing"), req, backgroundLock, this);
     decorateBackgroundJob(req, backgroundJob);
     // wait until done
     ServiceTunnelResponse res = null;
