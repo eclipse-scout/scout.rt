@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -88,10 +88,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     StatusLabelEx label = new StatusLabelEx(container, labelStyle, getEnvironment());
     getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
-    m_browseButton = new DropDownButton(container, SWT.DROP_DOWN);// getEnvironment().getFormToolkit().createButtonEx(container,
-    // SWT.DROP_DOWN
-    // | SWT.PUSH |
-    // SWT.LEFT);
+    m_browseButton = new DropDownButton(container, SWT.DROP_DOWN);
     // to ensure the text is validated on a context menu call this mouse
     // listener is used.
     m_browseButton.addMouseListener(new MouseAdapter() {

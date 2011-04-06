@@ -194,8 +194,6 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
       // decide based on the preference positionBelowReferenceField
       Rectangle currentView = m_positionBelowReferenceField ? belowView : aboveView;
       Rectangle alternateView = m_positionBelowReferenceField ? aboveView : belowView;
-      System.out.println("currentView: " + currentView);//XXX
-      System.out.println("alternateView: " + alternateView);//XXX
       if (currentView.height >= alternateView.height) {
         getShell().setBounds(currentView);
       }
