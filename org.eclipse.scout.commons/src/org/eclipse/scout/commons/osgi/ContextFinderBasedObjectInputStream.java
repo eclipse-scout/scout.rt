@@ -64,7 +64,7 @@ public class ContextFinderBasedObjectInputStream extends ObjectInputStream {
   private Class<?> pass2ResolveClass(String className) throws ClassNotFoundException, IOException {
     if (m_primaryClassLoader != null) {
       try {
-        return m_primaryClassLoader.loadClass(className);
+        return Class.forName(className, false, m_primaryClassLoader);
       }
       catch (Throwable t) {
         //nop
@@ -79,6 +79,9 @@ public class ContextFinderBasedObjectInputStream extends ObjectInputStream {
       if (cl == null) {
         continue;
       }
+      if (cl == m_primaryClassLoader) {
+        continue;
+      }
       if (cl == contextLoader) {
         continue;
       }
@@ -87,7 +90,7 @@ public class ContextFinderBasedObjectInputStream extends ObjectInputStream {
       }
       lastLoader = cl;
       try {
-        return cl.loadClass(className);
+        return Class.forName(className, false, cl);
       }
       catch (Throwable t) {
         //nop
