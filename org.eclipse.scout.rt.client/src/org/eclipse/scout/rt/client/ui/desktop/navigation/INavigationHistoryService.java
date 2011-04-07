@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,10 +16,11 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.service.IService2;
 
 @Priority(-3)
-public interface INavigationHistoryService extends IService {
+public interface INavigationHistoryService extends IService2 {
+  public static final String NAVIGATION_HISTORY_USER_OBJECT = "navigationHistoryUserObject";
 
   /**
    * add a navigation savepoint

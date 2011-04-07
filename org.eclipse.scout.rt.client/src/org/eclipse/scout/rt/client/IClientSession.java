@@ -121,4 +121,8 @@ public interface IClientSession {
    */
   IIconLocator getIconLocator();
 
+  Object getData(String key);
+
+  void setData(String key, Object data);
+
 }

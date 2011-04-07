@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client;
 
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -65,8 +66,10 @@ public abstract class AbstractClientSession implements IClientSession {
   private boolean m_webSession;
   private IMemoryPolicy m_memoryPolicy;
   private IIconLocator m_iconLocator;
+  private final HashMap<String, Object> m_clientSessionData;
 
   public AbstractClientSession(boolean autoInitConfig) {
+    m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
     m_sharedVariableMap = new SharedVariableMap();
     if (autoInitConfig) {
@@ -340,6 +343,21 @@ public abstract class AbstractClientSession implements IClientSession {
 
   public IIconLocator getIconLocator() {
     return m_iconLocator;
+  }
+
+  @Override
+  public void setData(String key, Object data) {
+    if (data == null) {
+      m_clientSessionData.remove(key);
+    }
+    else {
+      m_clientSessionData.put(key, data);
+    }
+  }
+
+  @Override
+  public Object getData(String key) {
+    return m_clientSessionData.get(key);
   }
 
 }

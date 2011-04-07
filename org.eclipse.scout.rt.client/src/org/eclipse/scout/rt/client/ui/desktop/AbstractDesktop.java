@@ -1307,6 +1307,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         case TreeEvent.TYPE_BEFORE_NODES_SELECTED: {
           IPage page = m_outline.getActivePage();
           if (page != null) {
+
             SERVICES.getService(INavigationHistoryService.class).addStep(0, page.getCell().getText(), page.getCell().getIconId());
           }
           break;
