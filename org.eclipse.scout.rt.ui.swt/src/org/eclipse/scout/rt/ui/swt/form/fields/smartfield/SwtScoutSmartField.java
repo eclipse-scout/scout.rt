@@ -256,13 +256,13 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         public void partChanged(SwtScoutPartEvent e) {
           switch (e.getType()) {
             case SwtScoutPartEvent.TYPE_CLOSED:
-                        if (m_proposalPopup != null) {
-                          m_proposalPopup = null;
-                          getSwtField().removeListener(SWT.Verify, m_popupDelegateListener);
-                          getSwtField().removeListener(SWT.Traverse, m_popupDelegateListener);
-                        }
-                        break;
-                      case SwtScoutPartEvent.TYPE_CLOSING:
+          if (m_proposalPopup != null) {
+            m_proposalPopup = null;
+            getSwtField().removeListener(SWT.Verify, m_popupDelegateListener);
+            getSwtField().removeListener(SWT.Traverse, m_popupDelegateListener);
+          }
+          break;
+        case SwtScoutPartEvent.TYPE_CLOSING:
                         hideProposalPopup();
                         break;
                     }

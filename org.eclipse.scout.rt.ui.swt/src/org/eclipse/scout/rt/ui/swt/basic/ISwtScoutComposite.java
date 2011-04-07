@@ -15,6 +15,11 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+/**
+ * <h3>ISwtScoutComposite</h3> ...
+ * 
+ * @author Andreas Hoegger
+ */
 public interface ISwtScoutComposite<T extends IPropertyObserver> {
   String PROP_SWT_SCOUT_COMPOSITE = "ISwtScoutComposite";
 

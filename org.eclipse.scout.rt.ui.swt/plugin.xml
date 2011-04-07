@@ -245,6 +245,14 @@
                class="org.eclipse.scout.rt.ui.swt.form.fields.composer.SwtScoutComposerField">
          </uiClass>
       </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField"
+            name="Calendar Field">
+         <uiClass
+               class="org.eclipse.scout.rt.ui.swt.form.fields.calendar.SwtScoutCalendarField">
+         </uiClass>
+      </formField>
    </extension>
    <extension
          point="org.eclipse.scout.rt.ui.swt.lookAndFeel">

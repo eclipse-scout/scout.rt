@@ -8,16 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt;
+package org.eclipse.scout.rt.ui.swt.form.fields.calendar;
 
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
+import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
+import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 
-public interface IValidateRoot {
-
-  String VALIDATE_ROOT_DATA = "LayoutValidateManager.validateRoot";
-
-  void validate();
-
-  Composite getComposite();
+public interface ISwtScoutCalendarField extends ISwtScoutFormField<ICalendarField<ICalendar>> {
 
 }

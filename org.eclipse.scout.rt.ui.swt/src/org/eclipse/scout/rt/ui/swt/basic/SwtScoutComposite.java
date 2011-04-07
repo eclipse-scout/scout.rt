@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Widget;
  * <h3>SwtScoutComposite</h3> ...
  * 
  * @since 1.0.0 28.03.2008
+ * @author Andreas Hoegger
  */
 public abstract class SwtScoutComposite<T extends IPropertyObserver> implements ISwtScoutComposite<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutComposite.class);

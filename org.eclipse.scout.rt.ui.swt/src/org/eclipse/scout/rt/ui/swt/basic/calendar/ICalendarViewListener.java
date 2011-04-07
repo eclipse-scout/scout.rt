@@ -8,16 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt;
+package org.eclipse.scout.rt.ui.swt.basic.calendar;
 
-import org.eclipse.swt.widgets.Composite;
+import java.util.EventListener;
 
-public interface IValidateRoot {
-
-  String VALIDATE_ROOT_DATA = "LayoutValidateManager.validateRoot";
-
-  void validate();
-
-  Composite getComposite();
-
+public interface ICalendarViewListener extends EventListener{
+	void viewChanged(CalendarViewEvent e);
 }
