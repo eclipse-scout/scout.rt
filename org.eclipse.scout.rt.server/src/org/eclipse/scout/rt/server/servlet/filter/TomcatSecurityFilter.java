@@ -91,11 +91,12 @@ public class TomcatSecurityFilter implements Filter {
         Subject.doAs(
             subject,
             new PrivilegedExceptionAction<Object>() {
+              @Override
               public Object run() throws Exception {
                 HttpServletRequest secureReq = req;
                 if (!(secureReq instanceof SecureHttpServletRequestWrapper)) {
                   Principal principal = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next();
-                  secureReq = new SecureHttpServletRequestWrapper(req, principal, null);
+                  secureReq = new SecureHttpServletRequestWrapper(req, principal, "BASIC_AUTH");
                 }
                 doFilterInternal(secureReq, res, chain);
                 return null;
