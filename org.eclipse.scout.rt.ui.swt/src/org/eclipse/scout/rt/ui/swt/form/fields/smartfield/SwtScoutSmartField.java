@@ -256,17 +256,17 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         public void partChanged(SwtScoutPartEvent e) {
           switch (e.getType()) {
             case SwtScoutPartEvent.TYPE_CLOSED:
-          if (m_proposalPopup != null) {
-            m_proposalPopup = null;
-            getSwtField().removeListener(SWT.Verify, m_popupDelegateListener);
-            getSwtField().removeListener(SWT.Traverse, m_popupDelegateListener);
+              if (m_proposalPopup != null) {
+                m_proposalPopup = null;
+                getSwtField().removeListener(SWT.Verify, m_popupDelegateListener);
+                getSwtField().removeListener(SWT.Traverse, m_popupDelegateListener);
+              }
+              break;
+            case SwtScoutPartEvent.TYPE_CLOSING:
+              hideProposalPopup();
+              break;
           }
-          break;
-        case SwtScoutPartEvent.TYPE_CLOSING:
-                        hideProposalPopup();
-                        break;
-                    }
-                  }
+        }
       });
       m_proposalPopup.getShell().addShellListener(new ShellAdapter() {
         @Override
@@ -283,22 +283,22 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
           public void formChanged(FormEvent e) throws ProcessingException {
             switch (e.getType()) {
               case FormEvent.TYPE_STRUCTURE_CHANGED:
-                            Runnable job = new Runnable() {
-                              @Override
-                              public void run() {
-                                if (m_proposalPopup != null) {
-                                  m_proposalPopup.autoAdjustBounds();
-                                }
-                              }
-                            };
-                            getEnvironment().invokeSwtLater(job);
+                Runnable job = new Runnable() {
+                  @Override
+                  public void run() {
+                    if (m_proposalPopup != null) {
+                      m_proposalPopup.autoAdjustBounds();
+                    }
+                  }
+                };
+                getEnvironment().invokeSwtLater(job);
 
-                            break;
+                break;
 
-                          default:
-                            break;
-                        }
-                      }
+              default:
+                break;
+            }
+          }
         });
       }
       catch (ProcessingException e1) {
