@@ -647,6 +647,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     //
     if (getScoutObject() != null) {
       TreePath path = getSwingTree().getPathForLocation(e.getX(), e.getY());
+      // XXX imo
       final ITreeNode node = path != null ? (ITreeNode) path.getLastPathComponent() : null;
       // notify Scout
       Runnable t = new Runnable() {
@@ -922,7 +923,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
           handleSwingHyperlinkAction(detector.getTreePath(), detector.getHyperlink());
         }
       }
-      if(fix!=null) fix.mouseReleased(this, e);
+      if (fix != null) fix.mouseReleased(this, e);
     }
 
     @Override

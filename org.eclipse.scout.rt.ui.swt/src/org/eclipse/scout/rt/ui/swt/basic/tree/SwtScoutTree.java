@@ -51,18 +51,19 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Tree;
 
 /**
  * <h3>SwtScoutTree</h3> ...
  * 
  * @since 1.0.0 23.07.2008
+ * @author Andreas Hoegger
  */
 public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutTree {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutTree.class);
@@ -92,7 +93,6 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     viewer.addDoubleClickListener(new P_SwtDoubleClickListener());
 
     P_SwtTreeListener swtTreeListener = new P_SwtTreeListener();
-    viewer.getTree().addListener(SWT.MouseDown, swtTreeListener);
     viewer.getTree().addListener(SWT.MouseUp, swtTreeListener);
     viewer.getTree().addListener(SWT.KeyUp, swtTreeListener);
     viewer.getTree().addKeyListener(new P_SwtKeyReturnAvoidDoubleClickListener());
@@ -110,12 +110,6 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     style |= SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL;
     TreeEx tree = getEnvironment().getFormToolkit().createTree(parent, style);
     tree.setLayoutDeferred(true);
-    // Measure item call ends up in a layout error on windows 2000
-    // tree.addListener(SWT.MeasureItem, new Listener(){
-    // public void handleEvent(Event event) {
-    // // event.height = (int)(event.gc.getFontMetrics().getHeight() *1.5);
-    // }
-    // });
     TreeViewer viewer = new TreeViewer(tree);
     viewer.setUseHashlookup(true);
     return viewer;
@@ -149,6 +143,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
 
   protected void setSwtTreeViewer(TreeViewer viewer) {
     m_treeViewer = viewer;
+
   }
 
   public TreeViewer getSwtTreeViewer() {
@@ -160,8 +155,8 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   }
 
   @Override
-  public Tree getSwtField() {
-    return (Tree) super.getSwtField();
+  public TreeEx getSwtField() {
+    return (TreeEx) super.getSwtField();
   }
 
   @Override
@@ -430,17 +425,15 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
 
   protected void handleSwtNodeAction(final ITreeNode node) {
     if (getScoutObject() != null) {
-      if (!getScoutObject().isCheckable() && node != null) {
-        // notify Scout
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            getScoutObject().getUIFacade().fireNodeActionFromUI(node);
-          }
-        };
-        getEnvironment().invokeScoutLater(t, 0);
-        // end notify
-      }
+      // notify Scout
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().fireNodeActionFromUI(node);
+        }
+      };
+      getEnvironment().invokeScoutLater(t, 400);
+      // end notify
     }
   }
 
@@ -579,26 +572,25 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   } // end class P_SwtSelectionListener
 
   private class P_SwtTreeListener implements Listener {
-    @SuppressWarnings("unchecked")
+    @Override
     public void handleEvent(Event e) {
       switch (e.type) {
-        case SWT.MouseDown: {
-          ViewerCell cell = getSwtTreeViewer().getCell(new Point(e.x, e.y));
-          Object elem = cell != null ? cell.getElement() : null;
-          if (elem == null) {
-            getSwtTreeViewer().setSelection(null);
-            setSelectionFromSwt(null);
-          }
-          break;
-        }
         case SWT.MouseUp: {
           //missing single-click listener on tree viewer, add on tree itself (ticket 87693)
           if (e.count == 1) {
             ViewerCell cell = getSwtTreeViewer().getCell(new Point(e.x, e.y));
-            Object elem = cell != null ? cell.getElement() : null;
-            if (elem instanceof ITreeNode) {
-              ITreeNode node = (ITreeNode) elem;
-              handleSwtNodeClick(node);
+            if (cell != null && cell.getElement() instanceof ITreeNode) {
+              ITreeNode nodeToClick = (ITreeNode) cell.getElement();
+              if (getScoutObject().isCheckable()) {
+                // find checkbox area
+                Rectangle imgBounds = cell.getImageBounds();
+                if (imgBounds != null && e.x >= (imgBounds.x) && e.x <= (imgBounds.x + imgBounds.width)) {
+                  handleSwtNodeClick(nodeToClick);
+                }
+              }
+              else {
+                handleSwtNodeClick(nodeToClick);
+              }
             }
           }
           break;
@@ -608,8 +600,8 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
             if (e.stateMask == 0) {
               switch (e.keyCode) {
                 case ' ':
-                case SWT.CR:
                   StructuredSelection sel = (StructuredSelection) getSwtTreeViewer().getSelection();
+                  @SuppressWarnings("unchecked")
                   ITreeNode[] nodes = (ITreeNode[]) sel.toList().toArray(new ITreeNode[sel.size()]);
                   if (nodes != null && nodes.length > 0) {
                     handleSwtNodeClick(nodes[0]);
@@ -626,10 +618,12 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   }
 
   private class P_SwtExpansionListener implements ITreeViewerListener {
+    @Override
     public void treeCollapsed(TreeExpansionEvent event) {
       setExpansionFromSwt((ITreeNode) event.getElement(), false);
     }
 
+    @Override
     public void treeExpanded(TreeExpansionEvent event) {
       setExpansionFromSwt((ITreeNode) event.getElement(), true);
     }
@@ -662,12 +656,15 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
         ITreeNode[] nodes = (ITreeNode[]) sel.toList().toArray(new ITreeNode[sel.size()]);
         if (nodes != null && nodes.length == 1) {
           // if not leaf expand collapse
-          if (nodes[0].getChildNodeCount() > 0) {
+          if (!nodes[0].isLeaf()) {
             // invert expansion
-            getSwtTreeViewer().setExpandedState(nodes[0], !getSwtTreeViewer().getExpandedState(nodes[0]));
+            setExpansionFromSwt(nodes[0], !getSwtTreeViewer().getExpandedState(nodes[0]));
           }
           else {
             handleSwtNodeAction(nodes[0]);
+            if (getScoutObject().isCheckable()) {
+              handleSwtNodeClick(nodes[0]);
+            }
           }
         }
       }
@@ -686,12 +683,19 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
           disposeMenuItem(item);
         }
       }
+      // XXX clean this code with context node
       if (getScoutObject() != null && isEnabledFromScout()) {
+        final boolean emptySpace = (getSwtField().getContextItem() == null);
         final Holder<IMenu[]> menusHolder = new Holder<IMenu[]>(IMenu[].class);
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            menusHolder.setValue(getScoutObject().getUIFacade().fireNodePopupFromUI());
+            if (emptySpace) {
+              menusHolder.setValue(getScoutObject().getUIFacade().fireEmptySpacePopupFromUI());
+            }
+            else {
+              menusHolder.setValue(getScoutObject().getUIFacade().fireNodePopupFromUI());
+            }
           }
         };
         JobEx job = getEnvironment().invokeScoutLater(t, 1200);

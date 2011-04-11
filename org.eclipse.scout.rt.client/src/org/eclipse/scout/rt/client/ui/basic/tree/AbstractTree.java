@@ -1716,6 +1716,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   private void fireNodeAction(ITreeNode node) {
     if (node != null) {
+      // XXX why only leaf
       if (node.isLeaf()) {
         try {
           execNodeAction(node);
