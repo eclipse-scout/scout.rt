@@ -131,6 +131,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     f.setInputMasked(isInputMasked());
     boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
     f.setMultilineText(multi);
+    f.setWrapText(true); //Avoid to have an horizontal scroll bar
     GridData gd = f.getGridData();
     gd.h = 4;
     f.setGridDataInternal(gd);
