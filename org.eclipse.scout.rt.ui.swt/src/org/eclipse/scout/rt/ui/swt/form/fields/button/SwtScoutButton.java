@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt.form.fields.button;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -147,7 +148,6 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
       getScoutObject().removeButtonListener(m_scoutButtonListener);
       m_scoutButtonListener = null;
     }
-
   }
 
   @Override
@@ -186,11 +186,13 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
     Control comp = getSwtField();
     if (comp instanceof Button) {
       Button b = (Button) comp;
-      b.setText(s != null ? s : "");
+      String label = s;
+      b.setText(label == null ? "" : label);
     }
     else if (comp instanceof Hyperlink) {
       Hyperlink t = (Hyperlink) comp;
-      t.setText(s != null ? s : "");
+      String label = StringUtility.removeMnemonic(s);
+      t.setText(label == null ? "" : label);
     }
   }
 
