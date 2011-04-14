@@ -56,6 +56,7 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
     setSwtField(imgViewer);
 
     imgViewer.addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         freeResources();
       }

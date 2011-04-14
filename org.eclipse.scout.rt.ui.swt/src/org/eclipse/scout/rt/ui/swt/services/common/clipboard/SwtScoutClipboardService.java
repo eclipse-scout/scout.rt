@@ -41,10 +41,12 @@ public class SwtScoutClipboardService extends AbstractService implements IClipbo
 
   private Clipboard m_clipboard;
 
+  @Override
   public void consumeContents(final IClipboardConsumer clipboardConsumer, final TransferObjectRequest... requests) throws ProcessingException {
     final IClientSession clientSession = ClientSyncJob.getCurrentSession();
     try {
       getDisplay().asyncExec(new Runnable() {
+        @Override
         public void run() {
           try {
             final TransferObject[] transferObjects = createScoutTransferables(requests);
@@ -67,6 +69,7 @@ public class SwtScoutClipboardService extends AbstractService implements IClipbo
     }
   }
 
+  @Override
   public void setContents(final TransferObject transferObject) throws ProcessingException {
     try {
       if (transferObject == null) {
@@ -77,6 +80,7 @@ public class SwtScoutClipboardService extends AbstractService implements IClipbo
         throw new IllegalArgumentException("unsupported transfer object type: " + transferObject);
       }
       getDisplay().asyncExec(new Runnable() {
+        @Override
         public void run() {
           try {
             Object contents = SwtUtility.createSwtTransferable(transferObject);
@@ -95,6 +99,7 @@ public class SwtScoutClipboardService extends AbstractService implements IClipbo
     }
   }
 
+  @Override
   public void setTextContents(String textContents) throws ProcessingException {
     setContents(new TextTransferObject(textContents));
   }

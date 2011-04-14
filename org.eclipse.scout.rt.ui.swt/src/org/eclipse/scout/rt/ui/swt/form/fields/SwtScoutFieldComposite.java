@@ -38,6 +38,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
   private Color m_mandatoryFieldBackgroundColor;
   private OnFieldLabelDecorator m_onFieldLabelDecorator;
 
+  @Override
   public ILabelComposite getSwtLabel() {
     return m_swtLabel;
   }

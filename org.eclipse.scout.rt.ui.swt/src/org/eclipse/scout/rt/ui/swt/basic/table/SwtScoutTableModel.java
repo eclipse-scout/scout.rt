@@ -65,6 +65,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     return m_multiline;
   }
 
+  @Override
   public Object[] getElements(Object inputElement) {
     if (m_table != null) {
       return m_table.getFilteredRows();
@@ -74,6 +75,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     }
   }
 
+  @Override
   public Color getBackground(Object element, int columnIndex) {
 
     if (columnIndex > 0) {
@@ -82,6 +84,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     return null;
   }
 
+  @Override
   public Color getForeground(Object element, int columnIndex) {
     if (columnIndex > 0) {
       ITableRow scoutRow = (ITableRow) element;
@@ -97,6 +100,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     return null;
   }
 
+  @Override
   public Image getColumnImage(Object element, int columnIndex) {
     int[] columnOrder = m_swtTable.getSwtField().getColumnOrder();
     if (columnOrder.length > 1) {
@@ -132,6 +136,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     return null;
   }
 
+  @Override
   public String getColumnText(Object element, int columnIndex) {
     if (columnIndex > 0) {
       String text = getCell(element, columnIndex).getText();
@@ -143,6 +148,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     return "";
   }
 
+  @Override
   public Font getFont(Object element, int columnIndex) {
     if (columnIndex > 0) {
       return m_environment.getFont(getCell(element, columnIndex).getFont(), m_swtTable.getSwtField().getFont());
@@ -150,10 +156,12 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     return null;
   }
 
+  @Override
   public boolean isLabelProperty(Object element, String property) {
     return false;
   }
 
+  @Override
   public void addListener(ILabelProviderListener listener) {
     if (listenerList == null) {
       listenerList = new ListenerList(ListenerList.IDENTITY);
@@ -161,6 +169,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     listenerList.add(listener);
   }
 
+  @Override
   public void removeListener(ILabelProviderListener listener) {
     if (listenerList != null) {
       listenerList.remove(listener);
@@ -179,6 +188,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     return list.getListeners();
   }
 
+  @Override
   public void dispose() {
     if (listenerList != null) {
       listenerList.clear();
@@ -190,6 +200,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     for (int i = 0; i < listeners.length; ++i) {
       final ILabelProviderListener l = (ILabelProviderListener) listeners[i];
       SafeRunnable.run(new SafeRunnable() {
+        @Override
         public void run() {
           l.labelProviderChanged(event);
         }
@@ -198,6 +209,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     }
   }
 
+  @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
 

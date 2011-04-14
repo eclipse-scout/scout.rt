@@ -61,6 +61,7 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
     m_highlightFont = getEnvironment().getFont(new FontSpec(null, FontSpec.STYLE_BOLD, -1), JFaceResources.getDefaultFont());
   }
 
+  @Override
   public void dispose() {
   }
 
@@ -119,14 +120,17 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
     return m_monthYearFormat.format(m_navigationDate);
   }
 
+  @Override
   public Object[] getElements(Object inputElement) {
     return m_rows.toArray();
   }
 
+  @Override
   public Image getColumnImage(Object element, int columnIndex) {
     return null;
   }
 
+  @Override
   public String getColumnText(Object element, int columnIndex) {
     Calendar c = Calendar.getInstance();
     c.setTime(((DateRow) element).getDate(columnIndex - 1));
@@ -134,6 +138,7 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
     return "" + dayOfMonth;
   }
 
+  @Override
   public Color getBackground(Object element, int columnIndex) {
 
     Date date = ((DateRow) element).getDate(columnIndex - 1);
@@ -147,6 +152,7 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
     return m_highlightForeground;
   }
 
+  @Override
   public Color getForeground(Object element, int columnIndex) {
     Date date = ((DateRow) element).getDate(columnIndex - 1);
     // check hightlight
@@ -160,6 +166,7 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
     return null;
   }
 
+  @Override
   public Font getFont(Object element, int columnIndex) {
     Date date = ((DateRow) element).getDate(columnIndex - 1);
     // check hightlight
@@ -169,16 +176,20 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
     return null;
   }
 
+  @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
 
+  @Override
   public void addListener(ILabelProviderListener listener) {
   }
 
+  @Override
   public boolean isLabelProperty(Object element, String property) {
     return false;
   }
 
+  @Override
   public void removeListener(ILabelProviderListener listener) {
   }
 

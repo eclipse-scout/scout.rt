@@ -250,23 +250,28 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
    *          the id of the {@link IViewPart} registered in the plugin.xml as a
    *          view extension.
    */
+  @Override
   public void registerPart(String scoutPartLocation, String uiPartId) {
     m_scoutPartIdToUiPartId.put(scoutPartLocation, uiPartId);
   }
 
+  @Override
   public void unregisterPart(String scoutPartLocation) {
     m_scoutPartIdToUiPartId.remove(scoutPartLocation);
   }
 
+  @Override
   public final String[] getAllPartIds() {
     HashSet<String> partIds = new HashSet<String>(m_scoutPartIdToUiPartId.values());
     return partIds.toArray(new String[partIds.size()]);
   }
 
+  @Override
   public final String getSwtPartIdForScoutPartId(String scoutPartLocation) {
     return m_scoutPartIdToUiPartId.get(scoutPartLocation);
   }
 
+  @Override
   public final String getScoutPartIdForSwtPartId(String partId) {
     if (partId == null) {
       return "";
@@ -289,6 +294,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return null;
   }
 
+  @Override
   public AbstractScoutView getViewPart(String viewId) {
     if (viewId != null) {
       String secondaryId = null;
@@ -322,6 +328,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return null;
   }
 
+  @Override
   public AbstractScoutEditorPart getEditorPart(IEditorInput editorInput, String editorId) {
     if (editorInput != null && editorId != null) {
       try {
@@ -345,10 +352,12 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return null;
   }
 
+  @Override
   public boolean isInitialized() {
     return m_status == SwtEnvironmentEvent.STARTED;
   }
 
+  @Override
   public final void ensureInitialized() {
     if (m_status == SwtEnvironmentEvent.INACTIVE
         || m_status == SwtEnvironmentEvent.STOPPED) {
@@ -445,6 +454,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
                   }
                   if (m_busyStatus == BusyStatus.BUSY || m_busyStatus == BusyStatus.DETECTING) {
                     getDisplay().asyncExec(new Runnable() {
+                      @Override
                       public void run() {
                         setBusyInternal(BusyStatus.IDLE);
                       }
@@ -488,10 +498,12 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       }
       // environment shutdownhook
       PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
+        @Override
         public boolean preShutdown(IWorkbench workbench, boolean forced) {
           return true;
         }
 
+        @Override
         public void postShutdown(IWorkbench workbench) {
           Runnable t = new Runnable() {
             @Override
@@ -540,6 +552,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   // hide ScoutViews with no Forms
   private class P_HideScoutViews implements Runnable {
 
+    @Override
     public void run() {
       IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
       if (activePage != null) {
@@ -577,10 +590,12 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
+  @Override
   public boolean isBusy() {
     return m_busyStatus == BusyStatus.BUSY;
   }
 
+  @Override
   public void setBusyFromSwt(boolean b) {
     checkThread();
     if (b) {
@@ -595,6 +610,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           getDisplay().asyncExec(new Runnable() {
+            @Override
             public void run() {
               if (m_busyStatus == BusyStatus.DETECTING) {
                 setBusyInternal(BusyStatus.BUSY);
@@ -618,6 +634,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
+  @Override
   public void setClipboardText(String text) {
     m_clipboard.setContents(new Object[]{text}, new Transfer[]{TextTransfer.getInstance()});
   }
@@ -632,10 +649,12 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     m_propertySupport.removePropertyChangeListener(listener);
   }
 
+  @Override
   public final void addEnvironmentListener(ISwtEnvironmentListener listener) {
     m_environmentListeners.add(ISwtEnvironmentListener.class, listener);
   }
 
+  @Override
   public final void removeEnvironmentListener(ISwtEnvironmentListener listener) {
     m_environmentListeners.remove(ISwtEnvironmentListener.class, listener);
   }
@@ -647,61 +666,74 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   // icon handling
+  @Override
   public Image getIcon(String name) {
     return m_iconLocator.getIcon(name);
   }
 
+  @Override
   public ImageDescriptor getImageDescriptor(String iconId) {
 
     return m_iconLocator.getImageDescriptor(iconId);
   }
 
   // key stoke handling
+  @Override
   public void addGlobalKeyStroke(ISwtKeyStroke stroke) {
     m_keyStrokeManager.addGlobalKeyStroke(stroke);
   }
 
+  @Override
   public boolean removeGlobalKeyStroke(ISwtKeyStroke stroke) {
     return m_keyStrokeManager.removeGlobalKeyStroke(stroke);
   }
 
+  @Override
   public void addKeyStroke(Widget widget, ISwtKeyStroke stoke) {
     m_keyStrokeManager.addKeyStroke(widget, stoke);
   }
 
+  @Override
   public boolean removeKeyStroke(Widget widget, ISwtKeyStroke stoke) {
     return m_keyStrokeManager.removeKeyStroke(widget, stoke);
   }
 
+  @Override
   public void addKeyStrokeFilter(Widget c, ISwtKeyStrokeFilter filter) {
     m_keyStrokeManager.addKeyStrokeFilter(c, filter);
   }
 
+  @Override
   public boolean removeKeyStrokeFilter(Widget c, ISwtKeyStrokeFilter filter) {
     return m_keyStrokeManager.removeKeyStrokeFilter(c, filter);
   }
 
   // color handling
+  @Override
   public Color getColor(String scoutColor) {
     return m_colorFactory.getColor(scoutColor);
   }
 
+  @Override
   public Color getColor(RGB rgb) {
     return m_colorFactory.getColor(rgb);
   }
 
   // font handling
+  @Override
   public Font getFont(FontSpec scoutFont, Font templateFont) {
 
     return m_fontRegistry.getFont(scoutFont, templateFont);
   }
 
   // form toolkit handling
+  @Override
   public ScoutFormToolkit getFormToolkit() {
     return m_formToolkit;
   }
 
   // desktop handling
+  @Override
   public final IDesktop getScoutDesktop() {
     if (m_clientSession != null) {
       return m_clientSession.getDesktop();
@@ -787,17 +819,20 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return null;
   }
 
+  @Override
   public void showFileChooserFromScout(IFileChooser fileChooser) {
     SwtScoutFileChooser sfc = new SwtScoutFileChooser(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS), fileChooser, this);
     sfc.showFileChooser();
   }
 
+  @Override
   public void showMessageBoxFromScout(IMessageBox messageBox) {
     SwtScoutMessageBoxDialog box = new SwtScoutMessageBoxDialog(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS), messageBox, this);
     box.open();
 
   }
 
+  @Override
   public void ensureStandaloneFormVisible(IForm form) {
     ISwtScoutPart part = m_openForms.get(form);
     if (part != null) {
@@ -807,6 +842,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   private Map<String, List<IForm>> openLater = new HashMap<String, List<IForm>>();
 
+  @Override
   public void showStandaloneForm(final IForm form) {
     if (form == null) {
       return;
@@ -973,6 +1009,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
     final SwtScoutPopup popup = new SwtScoutPopup(this, owner, ownerBounds);
     popup.addSwtScoutPartListener(new SwtScoutPartListener() {
+      @Override
       public void partChanged(SwtScoutPartEvent e) {
         switch (e.getType()) {
           case SwtScoutPartEvent.TYPE_CLOSED: {
@@ -1005,19 +1042,23 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return popup;
   }
 
+  @Override
   public Control getPopupOwner() {
     return m_popupOwner;
   }
 
+  @Override
   public Rectangle getPopupOwnerBounds() {
     return m_popupOwnerBounds != null ? new Rectangle(m_popupOwnerBounds.x, m_popupOwnerBounds.y, m_popupOwnerBounds.width, m_popupOwnerBounds.height) : null;
   }
 
+  @Override
   public void setPopupOwner(Control owner, Rectangle ownerBounds) {
     m_popupOwner = owner;
     m_popupOwnerBounds = ownerBounds;
   }
 
+  @Override
   public void hideStandaloneForm(IForm form) {
     if (form == null) {
       return;
@@ -1098,6 +1139,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   private class P_ScoutDesktopPropertyListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent evt) {
       Runnable job = new Runnable() {
         @Override
@@ -1110,6 +1152,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   } // end class P_ScoutDesktopPropertyListener
 
   private class P_ScoutDesktopListener implements DesktopListener {
+    @Override
     public void desktopChanged(final DesktopEvent e) {
       switch (e.getType()) {
         case DesktopEvent.TYPE_FORM_ADDED: {
@@ -1244,6 +1287,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
+  @Override
   public JobEx invokeScoutLater(Runnable job, long cancelTimeout) {
     synchronized (m_immediateSwtJobsLock) {
       m_immediateSwtJobs.clear();
@@ -1257,6 +1301,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
+  @Override
   public void invokeSwtLater(Runnable job) {
     if (m_synchronizer != null) {
       m_synchronizer.invokeSwtLater(job);
@@ -1266,6 +1311,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
+  @Override
   public Display getDisplay() {
     if (PlatformUI.isWorkbenchRunning()) {
       return PlatformUI.getWorkbench().getDisplay();
@@ -1283,6 +1329,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   /**
    * {@inheritDoc}
    */
+  @Override
   public Shell getParentShellIgnoringPopups(int modalities) {
     Shell shell = getDisplay().getActiveShell();
     if (shell == null) {
@@ -1347,6 +1394,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
+  @Override
   public IClientSession getClientSession() {
     return m_clientSession;
   }
@@ -1372,12 +1420,14 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return ui;
   }
 
+  @Override
   public ISwtScoutForm createForm(Composite parent, IForm scoutForm) {
     SwtScoutForm uiForm = new SwtScoutForm();
     uiForm.createField(parent, scoutForm, this);
     return uiForm;
   }
 
+  @Override
   public ISwtScoutFormField createFormField(Composite parent, IFormField model) {
     if (m_formFieldFactory == null) {
       m_formFieldFactory = new FormFieldFactory(m_applicationBundle);
@@ -1386,6 +1436,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return uiField;
   }
 
+  @Override
   public void checkThread() {
     if (!(getDisplay().getThread() == Thread.currentThread())) {
       throw new IllegalStateException("Must be called in swt thread");
@@ -1518,6 +1569,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     @Override
     protected void runVoid(IProgressMonitor monitor) throws Throwable {
       getDisplay().syncExec(new Runnable() {
+        @Override
         public void run() {
           applyScoutState();
         }
@@ -1582,6 +1634,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     m_activateDesktopCalled = activateDesktopCalled;
   }
 
+  @Override
   public String getPerspectiveId() {
     return m_perspectiveId;
   }

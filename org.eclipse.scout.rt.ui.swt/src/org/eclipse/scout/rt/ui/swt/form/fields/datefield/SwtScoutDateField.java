@@ -80,6 +80,7 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
     timeChooserButton.setLayoutData(LogicalGridDataBuilder.createButton2());
   }
 
+  @Override
   public ButtonEx getDateChooserButton() {
     return m_dateChooserButton;
   }
@@ -88,6 +89,7 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
     m_dateChooserButton = dateChooserButton;
   }
 
+  @Override
   public ButtonEx getTimeChooserButton() {
     return m_timeChooserButton;
   }
@@ -217,6 +219,7 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
       m_buttonId = buttonId;
     }
 
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case ButtonEx.SELECTION_ACTION:
@@ -301,6 +304,7 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
       super(SWT.F2);
     }
 
+    @Override
     public void handleSwtAction(Event e) {
       handleSwtDateChooserAction();
     }
@@ -311,6 +315,7 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
       super(SWT.F2, SWT.SHIFT);
     }
 
+    @Override
     public void handleSwtAction(Event e) {
       handleSwtTimeChooserAction();
     }

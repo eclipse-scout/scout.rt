@@ -47,21 +47,25 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
   }
 
+  @Override
   public Object[] getChildren(Object parentElement) {
     ITreeNode scoutNode = (ITreeNode) parentElement;
     return scoutNode.getFilteredChildNodes();
   }
 
+  @Override
   public Object getParent(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
     return scoutNode.getParentNode();
   }
 
+  @Override
   public boolean hasChildren(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
     return !scoutNode.isLeaf();
   }
 
+  @Override
   public Object[] getElements(Object inputElement) {
     if (m_tree != null) {
       if (m_tree.isRootNodeVisible()) {
@@ -100,6 +104,7 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     return scoutNode.getCell().getText();
   }
 
+  @Override
   public Font getFont(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
     if (scoutNode.getCell().getFont() != null) {
@@ -108,6 +113,7 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     return null;
   }
 
+  @Override
   public Color getForeground(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
     ICell scoutCell = scoutNode.getCell();
@@ -120,6 +126,7 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     return col;
   }
 
+  @Override
   public Color getBackground(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
     if (scoutNode.getCell().getBackgroundColor() != null) {
@@ -128,6 +135,7 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     return null;
   }
 
+  @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
 

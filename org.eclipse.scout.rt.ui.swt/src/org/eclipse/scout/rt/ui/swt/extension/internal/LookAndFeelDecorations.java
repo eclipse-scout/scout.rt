@@ -21,6 +21,7 @@ public class LookAndFeelDecorations implements ILookAndFeelDecorations {
   private String m_mandatoryLabelTextColor;
   private boolean m_enabledAsReadOnly;
 
+  @Override
   public int getScope() {
     return m_scope;
   }
@@ -29,6 +30,7 @@ public class LookAndFeelDecorations implements ILookAndFeelDecorations {
     m_scope = scope;
   }
 
+  @Override
   public int getStarMarkerPosition() {
     return m_starMarkerPosition;
   }
@@ -37,6 +39,7 @@ public class LookAndFeelDecorations implements ILookAndFeelDecorations {
     m_starMarkerPosition = starMarkerPosition;
   }
 
+  @Override
   public FontSpec getMandatoryLabelFont() {
     return m_mandatoryLabelFont;
   }
@@ -45,6 +48,7 @@ public class LookAndFeelDecorations implements ILookAndFeelDecorations {
     m_mandatoryLabelFont = mandatoryLabelFont;
   }
 
+  @Override
   public String getMandatoryFieldBackgroundColor() {
     return m_mandatoryFieldBackgroundColor;
   }
@@ -53,6 +57,7 @@ public class LookAndFeelDecorations implements ILookAndFeelDecorations {
     m_mandatoryFieldBackgroundColor = mandatoryFieldBackgroundColor;
   }
 
+  @Override
   public String getMandatoryLabelTextColor() {
     return m_mandatoryLabelTextColor;
   }
@@ -65,6 +70,7 @@ public class LookAndFeelDecorations implements ILookAndFeelDecorations {
     m_enabledAsReadOnly = equals;
   }
 
+  @Override
   public boolean isEnableAsReadOnly() {
     return m_enabledAsReadOnly;
   }

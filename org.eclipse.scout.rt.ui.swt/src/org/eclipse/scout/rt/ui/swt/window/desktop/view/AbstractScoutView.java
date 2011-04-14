@@ -101,6 +101,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
     }
   }
 
+  @Override
   public void closePart() throws ProcessingException {
     try {
       m_closeFromModel.acquire();
@@ -123,6 +124,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
     }
   }
 
+  @Override
   public IForm getForm() {
     return m_scoutForm;
   }
@@ -250,20 +252,24 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
    */
   protected abstract ISwtEnvironment getSwtEnvironment();
 
+  @Override
   public boolean isVisible() {
     return getSite().getPage().isPartVisible(getSite().getPart());
   }
 
+  @Override
   public void activate() {
     if (getSite().getPage().getViewStack(this) != null) {
       getSite().getPage().activate(getSite().getPart());
     }
   }
 
+  @Override
   public boolean isActive() {
     return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == getSite().getPage();
   }
 
+  @Override
   public void setStatus(IProcessingStatus newValue) {
     String message = "";
     if (newValue != null) {
@@ -319,6 +325,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
     }
   }
 
+  @Override
   public int promptToSaveOnClose() {
     if (m_scoutForm == null) {
       return ISaveablePart2.NO;
@@ -337,12 +344,15 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
     return ISaveablePart2.YES;
   }
 
+  @Override
   public void doSave(IProgressMonitor monitor) {
   }
 
+  @Override
   public void doSaveAs() {
   }
 
+  @Override
   public boolean isDirty() {
     if (m_scoutForm != null && m_scoutForm.isAskIfNeedSave()) {
       boolean saveNeeded = m_scoutForm.isSaveNeeded();
@@ -353,10 +363,12 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
     }
   }
 
+  @Override
   public boolean isSaveAsAllowed() {
     return false;
   }
 
+  @Override
   public boolean isSaveOnCloseNeeded() {
     Control focusControl = m_rootArea.getDisplay().getFocusControl();
     if (focusControl != null && !focusControl.isDisposed()) {
@@ -387,6 +399,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
   }
 
   private class P_ScoutPropertyChangeListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent e) {
       Runnable t = new Runnable() {
         @Override

@@ -20,5 +20,6 @@ import org.eclipse.swt.custom.SashForm;
  * @since 1.0.9 17.07.2008
  */
 public interface ISwtScoutSplitBox extends ISwtScoutFormField<ISplitBox> {
+  @Override
   SashForm getSwtContainer();
 }

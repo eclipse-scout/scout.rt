@@ -150,6 +150,7 @@ public class DateChooserDialog extends Dialog {
         Date date = ((DateRow) cursor.getRow().getData()).getDate(cursor.getColumn() - 1);
         m_returnDate = date;
         getShell().getDisplay().asyncExec(new Runnable() {
+          @Override
           public void run() {
             close();
           }

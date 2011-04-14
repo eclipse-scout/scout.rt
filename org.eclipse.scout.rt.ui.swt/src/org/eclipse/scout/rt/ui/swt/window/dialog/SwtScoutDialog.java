@@ -84,6 +84,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     }
   }
 
+  @Override
   public void closePart() throws ProcessingException {
     if (m_scoutForm != null) {
       detachScout(m_scoutForm);
@@ -91,6 +92,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     super.close();
   }
 
+  @Override
   public IForm getForm() {
     return m_scoutForm;
   }
@@ -246,18 +248,22 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
 
   // // scout part methods
 
+  @Override
   public void activate() {
     super.getShell().setActive();
   }
 
+  @Override
   public boolean isActive() {
     return getShell() == getEnvironment().getDisplay().getActiveShell();
   }
 
+  @Override
   public boolean isVisible() {
     return getShell().isVisible();
   }
 
+  @Override
   public void setStatus(IProcessingStatus newValue) {
     // void here
   }
@@ -284,6 +290,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   }
 
   private class P_ScoutPropertyChangeListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent e) {
       Runnable t = new Runnable() {
         @Override

@@ -79,6 +79,7 @@ public abstract class AbstractSwtMenuContributionItem extends CompoundContributi
   }
 
   protected class SwtEnvironmentListener implements ISwtEnvironmentListener {
+    @Override
     public void environmentChanged(SwtEnvironmentEvent e) {
       if (e.getType() == SwtEnvironmentEvent.STARTED) {
 

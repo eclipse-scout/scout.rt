@@ -19,12 +19,14 @@ public class DefaultValidateRoot implements IValidateRoot {
     m_root = root;
   }
 
+  @Override
   public void validate() {
     if (m_root != null && !m_root.isDisposed()) {
       m_root.layout(true, true);
     }
   }
 
+  @Override
   public Composite getComposite() {
     return m_root;
   }

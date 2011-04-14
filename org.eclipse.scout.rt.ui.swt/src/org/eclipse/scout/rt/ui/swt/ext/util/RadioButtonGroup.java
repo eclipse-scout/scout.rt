@@ -57,6 +57,7 @@ public class RadioButtonGroup {
   }
 
   private class P_RadioBehaviourListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Dispose:

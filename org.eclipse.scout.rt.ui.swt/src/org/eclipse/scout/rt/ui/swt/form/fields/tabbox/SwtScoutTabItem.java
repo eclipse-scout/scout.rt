@@ -43,6 +43,7 @@ public class SwtScoutTabItem extends SwtScoutGroupBox implements ISwtScoutTabIte
     folder.setLayout(new FillLayout());
     m_tabItem = new CTabItem(folder, SWT.NONE);
     m_tabItem.addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         freeResources();
       }

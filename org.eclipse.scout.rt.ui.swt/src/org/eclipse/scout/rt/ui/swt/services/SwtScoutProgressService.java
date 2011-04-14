@@ -57,6 +57,7 @@ public class SwtScoutProgressService extends AbstractService {
           final Shell[] shells = display.getShells();
           final AtomicInteger busyId = new AtomicInteger(Integer.MIN_VALUE);
           BusyIndicator.showWhile(display, new Runnable() {
+            @Override
             public void run() {
               int max = Integer.MIN_VALUE;
               for (Shell shell : shells) {

@@ -154,6 +154,7 @@ public class SwtScoutGroupBoxButtonbar implements ISwtScoutGroupBoxButtonbar {
   }
 
   private class P_ScoutButtonVisiblePropertyListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
       Runnable job = new Runnable() {
         @Override

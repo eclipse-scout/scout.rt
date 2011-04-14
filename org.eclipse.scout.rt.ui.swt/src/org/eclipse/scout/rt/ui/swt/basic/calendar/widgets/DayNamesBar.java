@@ -120,7 +120,8 @@ public class DayNamesBar extends Composite implements PaintListener {
 		addPaintListener(this);
 	}
 
-	public void paintControl (PaintEvent e) {
+	@Override
+  public void paintControl (PaintEvent e) {
 		setBackground(SwtColors.getInstance().white);
 		setForeground(SwtColors.getInstance().gray);
 

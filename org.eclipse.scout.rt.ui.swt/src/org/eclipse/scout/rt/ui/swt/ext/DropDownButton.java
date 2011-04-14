@@ -54,11 +54,13 @@ public class DropDownButton extends Canvas {
   public DropDownButton(Composite parent, int style) {
     super(parent, style | SWT.DOUBLE_BUFFERED);
     addPaintListener(new PaintListener() {
+      @Override
       public void paintControl(PaintEvent e) {
         paintInternal(e.gc);
       }
     });
     addListener(SWT.Traverse, new Listener() {
+      @Override
       public void handleEvent(Event e) {
         switch (e.detail) {
           /* Do tab group traversal */
@@ -74,6 +76,7 @@ public class DropDownButton extends Canvas {
               }
     });
     addListener(SWT.KeyDown, new Listener() {
+      @Override
       public void handleEvent(Event e) {
         handleKeyEvent(e);
       }
@@ -123,6 +126,7 @@ public class DropDownButton extends Canvas {
     });
 
     addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         freeResources();
       }

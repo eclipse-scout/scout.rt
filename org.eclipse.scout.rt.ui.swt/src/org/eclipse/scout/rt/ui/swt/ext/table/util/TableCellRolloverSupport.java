@@ -49,6 +49,7 @@ public class TableCellRolloverSupport {
     getTable().addMouseMoveListener(m_trackListener);
     getTable().addMouseTrackListener(m_trackListener);
     getTable().addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         dettachListeners();
         m_mouseHoverBackground.dispose();
@@ -87,6 +88,7 @@ public class TableCellRolloverSupport {
 
   private void asyncRedraw(final int x, final int y, final int width, final int height) {
     getTable().getDisplay().asyncExec(new Runnable() {
+      @Override
       public void run() {
         if (getTable() != null && !getTable().isDisposed()) {
           getTable().redraw(x, y, width, height, true);
@@ -97,6 +99,7 @@ public class TableCellRolloverSupport {
 
   private class P_RowMouseTrackListener extends MouseTrackAdapter implements MouseMoveListener {
 
+    @Override
     public void mouseMove(org.eclipse.swt.events.MouseEvent e) {
       Point p = new Point(e.x, e.y);
       int index = getColumnIndex(e.x);

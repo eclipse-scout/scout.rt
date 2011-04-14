@@ -396,6 +396,7 @@ public class SwtScoutMessageBoxDialog extends Dialog {
    * other observers
    */
   private class P_ScoutMessageBoxListener implements MessageBoxListener {
+    @Override
     public void messageBoxChanged(final MessageBoxEvent e) {
       switch (e.getType()) {
         case MessageBoxEvent.TYPE_CLOSED: {

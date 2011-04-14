@@ -55,11 +55,13 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
       @Override
       public void run() {
         display.addFilter(SWT.MouseMove, new Listener() {
+          @Override
           public void handleEvent(Event event) {
             userBusy();
           }
         });
         display.addFilter(SWT.KeyDown, new Listener() {
+          @Override
           public void handleEvent(Event event) {
             userBusy();
           }
@@ -68,10 +70,12 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
     });
   }
 
+  @Override
   public void initializeService() {
     // nop
   }
 
+  @Override
   public boolean isActive() {
     return propertySupport.getPropertyBool(PROP_ACTIVE);
   }

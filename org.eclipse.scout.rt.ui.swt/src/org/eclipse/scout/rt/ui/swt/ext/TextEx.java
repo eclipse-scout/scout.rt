@@ -40,9 +40,11 @@ public class TextEx extends Text {
     m_copyPasteMenu = new Menu(getShell(), SWT.POP_UP);
 
     m_copyPasteMenu.addMenuListener(new MenuListener() {
+      @Override
       public void menuHidden(MenuEvent e) {
       }
 
+      @Override
       public void menuShown(MenuEvent e) {
         if (isEnabled()) {
           m_cutItem.setEnabled(StringUtility.hasText(getSelectionText()));

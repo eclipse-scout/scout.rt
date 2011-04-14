@@ -46,6 +46,7 @@ public class UiDecoration implements IUiDecoration {
    */
   private int m_formFieldLabelAlignment = SWT.RIGHT;
 
+  @Override
   public int getDialogMinWidth() {
     return m_dialogMinWidth;
   }
@@ -54,6 +55,7 @@ public class UiDecoration implements IUiDecoration {
     m_dialogMinWidth = dialogMinWidth;
   }
 
+  @Override
   public int getDialogMinHeight() {
     return m_dialogMinHeight;
   }
@@ -62,6 +64,7 @@ public class UiDecoration implements IUiDecoration {
     m_dialogMinHeight = dialogMinHeight;
   }
 
+  @Override
   public int getProcessButtonHeight() {
     return m_processButtonHeight;
   }
@@ -70,6 +73,7 @@ public class UiDecoration implements IUiDecoration {
     m_processButtonHeight = processButtonHeight;
   }
 
+  @Override
   public int getProcessButtonMinWidth() {
     return m_processButtonMinWidth;
   }
@@ -78,6 +82,7 @@ public class UiDecoration implements IUiDecoration {
     m_processButtonMinWidth = processButtonMinWidth;
   }
 
+  @Override
   public int getProcessButtonMaxWidth() {
     return m_processButtonMaxWidth;
   }
@@ -86,6 +91,7 @@ public class UiDecoration implements IUiDecoration {
     m_processButtonMaxWidth = processButtonMaxWidth;
   }
 
+  @Override
   public int getFormFieldActivationButtonHeight() {
     return m_formFieldActivationButtonHeight;
   }
@@ -94,6 +100,7 @@ public class UiDecoration implements IUiDecoration {
     m_formFieldActivationButtonHeight = formFieldActivationButtonHeight;
   }
 
+  @Override
   public int getFormFieldActivationButtonWidth() {
     return m_formFieldActivationButtonWidth;
   }
@@ -102,6 +109,7 @@ public class UiDecoration implements IUiDecoration {
     m_formFieldActivationButtonWidth = formFieldActivationButtonWidth;
   }
 
+  @Override
   public int getFormFieldActivationButtonWithMenuWidth() {
     return m_formFieldActivationButtonWithMenuWidth;
   }
@@ -110,6 +118,7 @@ public class UiDecoration implements IUiDecoration {
     m_formFieldActivationButtonWithMenuWidth = formFieldActivationButtonWithMenuWidth;
   }
 
+  @Override
   public String getMandatoryFieldBackgroundColor() {
     return m_mandatoryFieldBackgroundColor;
   }
@@ -118,6 +127,7 @@ public class UiDecoration implements IUiDecoration {
     m_mandatoryFieldBackgroundColor = mandatoryFieldBackgroundColor;
   }
 
+  @Override
   public int getMandatoryStarMarkerPosition() {
     return m_mandatoryStarMarkerPosition;
   }
@@ -126,6 +136,7 @@ public class UiDecoration implements IUiDecoration {
     m_mandatoryStarMarkerPosition = mandatoryStarMarkerPosition;
   }
 
+  @Override
   public String getMandatoryLabelTextColor() {
     return m_mandatoryLabelTextColor;
   }
@@ -134,6 +145,7 @@ public class UiDecoration implements IUiDecoration {
     m_mandatoryLabelTextColor = mandatoryLabelTextColor;
   }
 
+  @Override
   public FontSpec getMandatoryLabelFont() {
     return m_mandatoryLabelFont;
   }
@@ -142,6 +154,7 @@ public class UiDecoration implements IUiDecoration {
     m_mandatoryLabelFont = mandatoryLabelFont;
   }
 
+  @Override
   public int getFormFieldLabelWidth() {
     return m_formFieldLabelWidth;
   }
@@ -150,6 +163,7 @@ public class UiDecoration implements IUiDecoration {
     m_formFieldLabelWidth = formFieldLabelWidth;
   }
 
+  @Override
   public int getLogicalGridLayoutDefaultColumnWidth() {
     return m_logicalGridLayoutDefaultColumnWidth;
   }
@@ -158,6 +172,7 @@ public class UiDecoration implements IUiDecoration {
     m_logicalGridLayoutDefaultColumnWidth = logicalGridLayoutDefaultColumnWidth;
   }
 
+  @Override
   public int getLogicalGridLayoutHorizontalGap() {
     return m_logicalGridLayoutHorizontalGap;
   }
@@ -166,6 +181,7 @@ public class UiDecoration implements IUiDecoration {
     m_logicalGridLayoutHorizontalGap = logicalGridLayoutHorizontalGap;
   }
 
+  @Override
   public int getLogicalGridLayoutVerticalGap() {
     return m_logicalGridLayoutVerticalGap;
   }
@@ -174,6 +190,7 @@ public class UiDecoration implements IUiDecoration {
     m_logicalGridLayoutVerticalGap = logicalGridLayoutVerticalGap;
   }
 
+  @Override
   public int getLogicalGridLayoutRowHeight() {
     return m_logicalGridLayoutRowHeight;
   }
@@ -182,6 +199,7 @@ public class UiDecoration implements IUiDecoration {
     m_logicalGridLayoutRowHeight = logicalGridLayoutRowHeight;
   }
 
+  @Override
   public String getColorForegroundDisabled() {
     return m_colorForegroundDisabled;
   }
@@ -190,6 +208,7 @@ public class UiDecoration implements IUiDecoration {
     m_colorForegroundDisabled = colorForegroundDisabled;
   }
 
+  @Override
   public int getFormFieldLabelAlignment() {
     return m_formFieldLabelAlignment;
   }
@@ -203,10 +222,12 @@ public class UiDecoration implements IUiDecoration {
     m_enabledAsReadOnly = enabledAsReadOnly;
   }
 
+  @Override
   public boolean isEnabledAsReadOnly() {
     return m_enabledAsReadOnly;
   }
 
+  @Override
   public int getMessageBoxMinWidth() {
     return m_messageBoxMinWidth;
   }
@@ -215,6 +236,7 @@ public class UiDecoration implements IUiDecoration {
     m_messageBoxMinWidth = messageBoxMinWidth;
   }
 
+  @Override
   public int getMessageBoxMinHeight() {
     return m_messageBoxMinHeight;
   }

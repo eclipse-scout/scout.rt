@@ -21,5 +21,6 @@ import org.eclipse.swt.widgets.Text;
  */
 public interface ISwtScoutDecimalField extends ISwtScoutFormField<IDecimalField<?>> {
 
+  @Override
   Text getSwtField();
 }

@@ -52,6 +52,7 @@ public final class SnippetForTableHeaderMenu {
     itemName.setText(column.getText());
     itemName.setSelection(column.getResizable());
     itemName.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(Event event) {
         if (itemName.getSelection()) {
           column.setWidth(150);
@@ -117,6 +118,7 @@ public final class SnippetForTableHeaderMenu {
     item.setText("Delete");
 
     table.addListener(SWT.MenuDetect, new Listener() {
+      @Override
       public void handleEvent(Event event) {
         System.out.println("" + event.x + "," + event.y);
         Point pt = display.map(null, table, new Point(event.x, event.y));
@@ -128,6 +130,7 @@ public final class SnippetForTableHeaderMenu {
 
     /* IMPORTANT: Dispose the menus (only the current menu, set with setMenu(), will be automatically disposed) */
     table.addListener(SWT.Dispose, new Listener() {
+      @Override
       public void handleEvent(Event event) {
         headerMenu.dispose();
         tableMenu.dispose();

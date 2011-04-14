@@ -206,6 +206,7 @@ public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements I
   private class P_SwtFocusListener implements Listener {
     private SwtScoutTabItem m_focusedItem;
 
+    @Override
     public void handleEvent(Event event) {
       SwtScoutTabItem item = m_tabs.get(getSwtField().getSelection());
       switch (event.type) {
@@ -244,6 +245,7 @@ public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements I
   }
 
   private class P_TabListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
       if (evt.getPropertyName().equals(IGroupBox.PROP_VISIBLE)) {
         try {

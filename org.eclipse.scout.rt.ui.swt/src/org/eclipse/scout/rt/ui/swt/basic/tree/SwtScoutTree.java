@@ -501,6 +501,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
    * private inner classes
    */
   private class P_ScoutTreeListener implements TreeListener {
+    @Override
     public void treeChanged(final TreeEvent e) {
       if (isHandleScoutTreeEvent(new TreeEvent[]{e})) {
         if (isIgnoredScoutEvent(TreeEvent.class, "" + e.getType())) {
@@ -523,6 +524,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       }
     }
 
+    @Override
     public void treeChangedBatch(final TreeEvent[] a) {
       if (isHandleScoutTreeEvent(a)) {
         final ArrayList<TreeEvent> filteredList = new ArrayList<TreeEvent>();
@@ -561,6 +563,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   }// end private class
 
   private class P_SwtSelectionListener implements ISelectionChangedListener {
+    @Override
     @SuppressWarnings("unchecked")
     public void selectionChanged(SelectionChangedEvent event) {
       if (isEnabledFromScout()) {
@@ -649,6 +652,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   } // end class P_SwtKeyReturnAvoidDoubleClickListener
 
   private class P_SwtDoubleClickListener implements IDoubleClickListener {
+    @Override
     @SuppressWarnings("unchecked")
     public void doubleClick(DoubleClickEvent event) {
       if (event.getSelection() instanceof StructuredSelection) {

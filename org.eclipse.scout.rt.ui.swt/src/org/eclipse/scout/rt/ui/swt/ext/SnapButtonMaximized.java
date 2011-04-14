@@ -58,6 +58,7 @@ public class SnapButtonMaximized extends Canvas {
     m_selectedBackground = new Color(this.getDisplay(), 200, 212, 249);
     setCursor(getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         freeResources();
       }
@@ -153,6 +154,7 @@ public class SnapButtonMaximized extends Canvas {
   }
 
   private class P_ControlListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.FocusIn:
@@ -177,6 +179,7 @@ public class SnapButtonMaximized extends Canvas {
   }
 
   private class P_PaintListener implements PaintListener {
+    @Override
     public void paintControl(PaintEvent e) {
       Rectangle bounds = getClientArea();
       GC gc = e.gc;

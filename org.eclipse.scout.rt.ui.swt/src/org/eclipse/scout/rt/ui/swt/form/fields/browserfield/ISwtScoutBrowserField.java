@@ -21,5 +21,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public interface ISwtScoutBrowserField extends ISwtScoutFormField<IBrowserField> {
 
+  @Override
   Composite getSwtField();
 }

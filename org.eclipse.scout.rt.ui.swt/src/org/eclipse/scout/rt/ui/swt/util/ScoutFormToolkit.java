@@ -178,6 +178,7 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
   }
 
   private class P_HyperlinkKeyListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       if (event.type == SWT.KeyDown) {
         switch (event.keyCode) {

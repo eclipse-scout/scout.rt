@@ -123,6 +123,7 @@ public class TimeChooserDialog extends Dialog {
       public void dateChanged(DateSelectionEvent e) {
         m_returnDate = (Date) e.getData();
         getShell().getDisplay().asyncExec(new Runnable() {
+          @Override
           public void run() {
             close();
           }

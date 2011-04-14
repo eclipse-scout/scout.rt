@@ -103,7 +103,8 @@ public class CentralPanel extends Composite {
 
 		// to make this composite focusable
 		addListener(SWT.KeyDown, new Listener () {
-			public void handleEvent(Event e) {}
+			@Override
+      public void handleEvent(Event e) {}
 		});
 	}
 
@@ -253,7 +254,8 @@ public class CentralPanel extends Composite {
 		//
 		// to make this composite focusable
 		m_cells.addListener(SWT.KeyDown, new Listener () {
-			public void handleEvent(Event e) {}
+			@Override
+      public void handleEvent(Event e) {}
 		});
 
 		// which month is the viewdate?

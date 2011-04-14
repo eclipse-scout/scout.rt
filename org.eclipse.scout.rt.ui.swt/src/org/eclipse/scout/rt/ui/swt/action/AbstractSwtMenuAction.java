@@ -207,6 +207,7 @@ public class AbstractSwtMenuAction {
   }
 
   private class P_ScoutPropertyChangeListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent e) {
       if (isHandleScoutPropertyChange(e.getPropertyName(), e.getNewValue())) {
         Runnable t = new Runnable() {

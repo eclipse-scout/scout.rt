@@ -156,6 +156,7 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
     return Integer.valueOf(m_item.hashCode());
   }
 
+  @Override
   public int compareTo(Object o) {
     if (m_item instanceof Comparable) {
       return ((Comparable<Object>) m_item).compareTo(((CalendarItemContainer) o).getItem());

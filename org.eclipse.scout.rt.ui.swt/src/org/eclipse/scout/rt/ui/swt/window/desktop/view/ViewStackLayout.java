@@ -23,6 +23,7 @@ public class ViewStackLayout extends Layout implements ILayoutExtension {
   public ViewStackLayout() {
   }
 
+  @Override
   public int computeMinimumWidth(Composite parent, boolean changed) {
     Control lastChild = getLastChild(parent);
     if (lastChild != null) {
@@ -36,6 +37,7 @@ public class ViewStackLayout extends Layout implements ILayoutExtension {
     return computeSize(parent, 0, SWT.DEFAULT, changed).x;
   }
 
+  @Override
   public int computeMaximumWidth(Composite parent, boolean changed) {
     Control lastChild = getLastChild(parent);
     if (lastChild != null) {

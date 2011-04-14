@@ -27,10 +27,12 @@ public abstract class SwtKeyStroke implements ISwtKeyStroke {
 
   }
 
+  @Override
   public int getStateMask() {
     return m_stateMask;
   }
 
+  @Override
   public int getKeyCode() {
     return m_keyCode;
   }

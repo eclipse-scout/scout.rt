@@ -33,6 +33,7 @@ public class SwtScoutKeyStroke extends SwtKeyStroke {
     m_environment = environment;
   }
 
+  @Override
   public void handleSwtAction(Event e) {
     if (getScoutKeyStroke().isEnabled() && getScoutKeyStroke().isVisible()) {
       if (!m_handleActionPending) {

@@ -129,6 +129,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
     return b;
   }
 
+  @Override
   public void createField(Composite parent, T scoutObject, ISwtEnvironment environment) {
     m_scoutObject = scoutObject;
     m_environment = environment;
@@ -167,6 +168,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
     return m_initialized;
   }
 
+  @Override
   public Composite getSwtContainer() {
     return m_swtContainer;
   }
@@ -186,6 +188,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
   protected void initializeSwt(Composite parent) {
   }
 
+  @Override
   public Control getSwtField() {
     return m_swtField;
   }
@@ -200,6 +203,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
 
       // on CR validate input first
       getEnvironment().addKeyStrokeFilter(swtField, new ISwtKeyStrokeFilter() {
+        @Override
         public boolean accept(Event e, ISwtEnvironment environment) {
           if (getEnvironment() != null && getEnvironment().equals(environment)) {
             return filterKeyEvent(e);
@@ -228,6 +232,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
     return true;
   }
 
+  @Override
   public T getScoutObject() {
     return m_scoutObject;
   }
@@ -252,6 +257,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
     }
   }
 
+  @Override
   public final void dispose() {
     if (getSwtField() != null) {
       getSwtField().dispose();
@@ -350,6 +356,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
     disconnectFromScout();
   }
 
+  @Override
   public ISwtEnvironment getEnvironment() {
     return m_environment;
   }
@@ -357,6 +364,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
   private class P_SwtFieldListener implements Listener {
     private long m_timestamp;
 
+    @Override
     public void handleEvent(Event event) {
       if (!event.doit) {
         return;
@@ -418,6 +426,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
   }
 
   private class P_SwtContainerListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Dispose:
@@ -432,6 +441,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
   }
 
   private class P_ScoutPropertyChangeListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent e) {
       debugHandlePropertyChanged(e);
       if (isIgnoredScoutEvent(PropertyChangeEvent.class, e.getPropertyName())) {

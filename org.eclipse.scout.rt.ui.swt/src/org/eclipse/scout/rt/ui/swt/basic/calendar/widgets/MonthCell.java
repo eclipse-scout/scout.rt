@@ -52,7 +52,8 @@ public class MonthCell extends AbstractCell
 
 	// TODO: need this?
 	// TraverseListener
-	public void keyTraversed(TraverseEvent e) {}
+	@Override
+  public void keyTraversed(TraverseEvent e) {}
 
 	protected void createControls () {
 

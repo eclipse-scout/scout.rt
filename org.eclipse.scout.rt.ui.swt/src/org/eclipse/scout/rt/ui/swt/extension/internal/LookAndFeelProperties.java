@@ -20,6 +20,7 @@ public class LookAndFeelProperties implements ILookAndFeelProperties {
 
   HashMap<String, Object> m_values = new HashMap<String, Object>();
 
+  @Override
   public int getScope() {
     return m_scope;
   }
@@ -32,6 +33,7 @@ public class LookAndFeelProperties implements ILookAndFeelProperties {
     m_values.put(name, value);
   }
 
+  @Override
   public int getPropertyInt(String name) {
     Object object = m_values.get(name);
     if (object != null) {
@@ -44,6 +46,7 @@ public class LookAndFeelProperties implements ILookAndFeelProperties {
     m_values.put(name, value);
   }
 
+  @Override
   public String getPropertyString(String name) {
     Object object = m_values.get(name);
     if (object != null) {

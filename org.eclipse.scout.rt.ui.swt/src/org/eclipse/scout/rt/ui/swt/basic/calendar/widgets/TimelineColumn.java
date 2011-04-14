@@ -61,6 +61,7 @@ public class TimelineColumn extends Composite implements PaintListener {
     setBackground(SwtColors.getInstance().white);
   }
 
+  @Override
   public void paintControl(PaintEvent e) {
     // set drawing color
     e.gc.setForeground(SwtColors.getInstance().gray);

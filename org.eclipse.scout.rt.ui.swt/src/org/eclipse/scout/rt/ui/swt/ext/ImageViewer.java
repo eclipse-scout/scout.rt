@@ -34,11 +34,13 @@ public class ImageViewer extends Canvas {
   public ImageViewer(Composite parent) {
     super(parent, SWT.NONE);
     addPaintListener(new PaintListener() {
+      @Override
       public void paintControl(PaintEvent e) {
         handleSwtPaintEvent(e.gc);
       }
     });
     addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         freeResources();
       }

@@ -32,6 +32,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_name = name;
   }
 
+  @Override
   public String getContibuterBundleId() {
     return m_contibuterBundleId;
   }
@@ -40,6 +41,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_contibuterBundleId = contibuterBundleId;
   }
 
+  @Override
   public String getName() {
     return m_name;
   }
@@ -48,6 +50,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_name = name;
   }
 
+  @Override
   public boolean isActive() {
     return m_active;
   }
@@ -56,6 +59,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_active = active;
   }
 
+  @Override
   public int getScope() {
     return m_scope;
   }
@@ -64,6 +68,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_scope = scope;
   }
 
+  @Override
   public String getModelClassName() {
     return m_modelClassName;
   }
@@ -72,6 +77,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_modelClassName = modelClassName;
   }
 
+  @Override
   public String getUiClassName() {
     return m_uiClassName;
   }
@@ -80,6 +86,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_uiClassName = uiClassName;
   }
 
+  @Override
   public String getFactoryClassName() {
     return m_factoryClassName;
   }

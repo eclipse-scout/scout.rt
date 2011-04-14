@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ButtonFieldFactory implements IFormFieldFactory {
 
+  @Override
   public ISwtScoutFormField<?> createFormField(Composite parent, IFormField model, ISwtEnvironment environment) {
     IButton button = (IButton) model;
     ISwtScoutButton field = null;

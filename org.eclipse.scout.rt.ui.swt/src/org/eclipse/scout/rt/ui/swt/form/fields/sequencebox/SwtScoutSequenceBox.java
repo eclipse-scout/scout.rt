@@ -104,6 +104,7 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
     super.attachScout();
     // add mandatory change listener on children to decorate my label same as any mandatory child
     m_scoutMandatoryChangeListener = new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         Runnable j = new Runnable() {
           @Override

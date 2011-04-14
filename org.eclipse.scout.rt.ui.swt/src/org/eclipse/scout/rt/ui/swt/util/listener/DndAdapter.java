@@ -22,30 +22,39 @@ import org.eclipse.swt.dnd.DropTargetListener;
  */
 public abstract class DndAdapter implements DragSourceListener, DropTargetListener {
 
+  @Override
   public void dragFinished(DragSourceEvent event) {
   }
 
+  @Override
   public void dragSetData(DragSourceEvent event) {
   }
 
+  @Override
   public void dragStart(DragSourceEvent event) {
   }
 
+  @Override
   public void dragEnter(DropTargetEvent event) {
   }
 
+  @Override
   public void dragLeave(DropTargetEvent event) {
   }
 
+  @Override
   public void dragOperationChanged(DropTargetEvent event) {
   }
 
+  @Override
   public void dragOver(DropTargetEvent event) {
   }
 
+  @Override
   public void drop(DropTargetEvent event) {
   }
 
+  @Override
   public void dropAccept(DropTargetEvent event) {
   }
 

@@ -64,6 +64,7 @@ public class SwtScoutCalendar extends SwtCalendar {
 
     // to make this composite focusable
     addListener(SWT.KeyDown, new Listener() {
+      @Override
       public void handleEvent(Event e) {
       }
     });
@@ -286,6 +287,7 @@ public class SwtScoutCalendar extends SwtCalendar {
    */
 
   protected class P_ScoutCalendarPropertyListener implements PropertyChangeListener, WeakEventListener {
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       RunnableWithData r = new RunnableWithData() {
         @Override
@@ -320,45 +322,54 @@ public class SwtScoutCalendar extends SwtCalendar {
       }
     }
 
+    @Override
     public Collection<CalendarComponent> getItemsAt(Date dateTruncatedToDay) {
       return m_dayMap.get(dateTruncatedToDay);
     }
 
+    @Override
     public String getTooltip(Object item, Date d) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.getTooltip(d);
     }
 
+    @Override
     public String getLabel(Object item, Date d) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.getLabel(d);
     }
 
+    @Override
     public Date getFromDate(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.getFromDate();
     }
 
+    @Override
     public Date getToDate(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.getToDate();
     }
 
+    @Override
     public Color getColor(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
       return SwtColors.getInstance().getColor(comp.getCell().getBackgroundColor());
     }
 
+    @Override
     public boolean isFullDay(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.isFullDay();
     }
 
+    @Override
     public boolean isDraggable(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.isDraggable();
     }
 
+    @Override
     public void moveItem(Object item, Date newDate) {
       CalendarComponent comp = (CalendarComponent) item;
       m_field.getScoutObject().getCalendar().getUIFacade().fireComponentMovedFromUI(comp, newDate);
@@ -366,6 +377,7 @@ public class SwtScoutCalendar extends SwtCalendar {
   }//end class
 
   private class P_SwtCalendarListener implements ICalendarViewListener {
+    @Override
     public void viewChanged(final CalendarViewEvent e) {
       switch (e.getType()) {
         case CalendarViewEvent.TYPE_SELECTION_CHANGED: {

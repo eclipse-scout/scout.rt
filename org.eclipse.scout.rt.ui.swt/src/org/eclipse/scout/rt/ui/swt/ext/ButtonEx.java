@@ -48,6 +48,7 @@ public class ButtonEx extends Button {
 
   private P_DropDownPaintListener m_dropDownPaintListener;
   private Listener m_paintListener = new Listener() {
+    @Override
     public void handleEvent(Event event) {
       redraw();
     }
@@ -72,6 +73,7 @@ public class ButtonEx extends Button {
     }
     super.addListener(SWT.Selection, delegateListener);
     addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         freeResources();
       }
@@ -230,6 +232,7 @@ public class ButtonEx extends Button {
   private class P_DelegateSelectionListener implements Listener {
     private long timeLastEvent = 0L;
 
+    @Override
     public void handleEvent(Event event) {
 
       switch (event.type) {
@@ -272,6 +275,7 @@ public class ButtonEx extends Button {
   }
 
   private class P_DropDownPaintListener implements PaintListener {
+    @Override
     public void paintControl(PaintEvent e) {
       GC gc = e.gc;
       gc.setAdvanced(true);

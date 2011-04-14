@@ -125,6 +125,7 @@ public class TableEx extends Table {
     private TableItem m_mouseHoverItem;
 
     // case 1: mouse hover an item
+    @Override
     public void mouseMove(MouseEvent e) {
       TableItem item = getItem(new Point(e.x, e.y));
       // another item under the mouse?
@@ -157,6 +158,7 @@ public class TableEx extends Table {
     // asynchronous redraw
     private void redrawInternal(final Rectangle b) {
       getDisplay().asyncExec(new Runnable() {
+        @Override
         public void run() {
           if (!isDisposed()) {
             redraw(b.x, b.y, b.width, b.height, false);
@@ -168,6 +170,7 @@ public class TableEx extends Table {
 
   private class P_MultilineListener implements Listener {
 
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.MeasureItem:

@@ -44,6 +44,7 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     m_globalKeyStrokeListLock = new Object();
     m_globalKeyStrokes = new ArrayList<ISwtKeyStroke>();
     m_keyListener = new Listener() {
+      @Override
       public void handleEvent(Event event) {
         handleKeyEvent(event);
       }
@@ -63,12 +64,14 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     return keyStrokes;
   }
 
+  @Override
   public void addGlobalKeyStroke(ISwtKeyStroke stroke) {
     synchronized (m_globalKeyStrokeListLock) {
       m_globalKeyStrokes.add(stroke);
     }
   }
 
+  @Override
   public boolean removeGlobalKeyStroke(ISwtKeyStroke stroke) {
     synchronized (m_globalKeyStrokeListLock) {
       return m_globalKeyStrokes.remove(stroke);
@@ -81,6 +84,7 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     }
   }
 
+  @Override
   public void addKeyStroke(Widget widget, ISwtKeyStroke stroke) {
     ISwtKeyStroke[] keyStrokes = (ISwtKeyStroke[]) widget.getData(DATA_KEY_STROKES);
     if (keyStrokes == null) {
@@ -91,6 +95,7 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     widget.setData(DATA_KEY_STROKES, list.toArray(new ISwtKeyStroke[list.size()]));
   }
 
+  @Override
   public boolean removeKeyStroke(Widget widget, ISwtKeyStroke stroke) {
     boolean retVal = false;
     ISwtKeyStroke[] keyStrokes = (ISwtKeyStroke[]) widget.getData(DATA_KEY_STROKES);
@@ -110,6 +115,7 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     return keyStrokeFilters;
   }
 
+  @Override
   public void addKeyStrokeFilter(Widget widget, ISwtKeyStrokeFilter stroke) {
     ISwtKeyStrokeFilter[] keyStrokeFilters = (ISwtKeyStrokeFilter[]) widget.getData(DATA_KEY_STROKE_FILTERS);
     if (keyStrokeFilters == null) {
@@ -120,6 +126,7 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     widget.setData(DATA_KEY_STROKE_FILTERS, list.toArray(new ISwtKeyStrokeFilter[list.size()]));
   }
 
+  @Override
   public boolean removeKeyStrokeFilter(Widget widget, ISwtKeyStrokeFilter stroke) {
     boolean retVal = false;
     ISwtKeyStrokeFilter[] keyStrokeFilters = (ISwtKeyStrokeFilter[]) widget.getData(DATA_KEY_STROKE_FILTERS);

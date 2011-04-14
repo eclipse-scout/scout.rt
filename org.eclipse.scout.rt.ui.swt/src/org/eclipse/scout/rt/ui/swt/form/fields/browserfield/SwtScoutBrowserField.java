@@ -52,6 +52,7 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
     getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
     Browser browser = getEnvironment().getFormToolkit().createBrowser(container, SWT.NONE);
     browser.addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         if (m_tempDir != null) {
           deleteCache(m_tempDir);

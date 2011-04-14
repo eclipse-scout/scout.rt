@@ -26,5 +26,6 @@ public interface ISwtScoutDateField extends ISwtScoutFormField<IDateField> {
 
   ButtonEx getTimeChooserButton();
 
+  @Override
   StyledText getSwtField();
 }

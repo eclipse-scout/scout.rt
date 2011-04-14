@@ -66,6 +66,7 @@ public class SwtScoutForm extends SwtScoutComposite<IForm> implements ISwtScoutF
     }
   }
 
+  @Override
   public Composite getSwtFormPane() {
     return (Composite) getSwtField();
   }
@@ -75,11 +76,13 @@ public class SwtScoutForm extends SwtScoutComposite<IForm> implements ISwtScoutF
     return super.getScoutObject();
   }
 
+  @Override
   public void setInitialFocus() {
     // void
   }
 
   private class P_ScoutFormListener implements FormListener {
+    @Override
     public void formChanged(final FormEvent e) {
       switch (e.getType()) {
         case FormEvent.TYPE_PRINT: {

@@ -17,6 +17,7 @@ import org.eclipse.ui.IEditorReference;
 
 public class ScoutEditorMatchingStrategy implements IEditorMatchingStrategy {
 
+  @Override
   public boolean matches(IEditorReference editorRef, IEditorInput input) {
     if (!(editorRef.getEditor(false) instanceof AbstractScoutEditorPart)) {
       return false;

@@ -39,6 +39,7 @@ public class TableRolloverSupport {
     getTable().addMouseMoveListener(m_mouseHoverListener);
     getTable().addMouseTrackListener(m_mouseHoverListener);
     getTable().addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         detachUiListeners();
       }
@@ -54,6 +55,7 @@ public class TableRolloverSupport {
     private TableItem m_mouseHoverItem;
 
     // case 1: mouse hover an item
+    @Override
     public void mouseMove(MouseEvent e) {
       Table table = getTable();
       TableItem item = table.getItem(new Point(e.x, e.y));
@@ -87,6 +89,7 @@ public class TableRolloverSupport {
     // asynchronous redraw
     private void redraw(final Rectangle b, final Table table) {
       getTable().getDisplay().asyncExec(new Runnable() {
+        @Override
         public void run() {
           if (table != null && !table.isDisposed()) {
             table.redraw(b.x, b.y, b.width, b.height, false);

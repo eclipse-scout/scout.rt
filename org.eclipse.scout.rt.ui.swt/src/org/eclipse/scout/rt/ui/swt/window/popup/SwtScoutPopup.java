@@ -95,6 +95,7 @@ public class SwtScoutPopup implements ISwtScoutPart {
 
   }
 
+  @Override
   public void closePart() {
     m_opened = false;
     try {
@@ -108,6 +109,7 @@ public class SwtScoutPopup implements ISwtScoutPart {
     }
   }
 
+  @Override
   public IForm getForm() {
     return m_scoutForm;
   }
@@ -171,19 +173,23 @@ public class SwtScoutPopup implements ISwtScoutPart {
     }
   }
 
+  @Override
   public boolean isVisible() {
     return m_swtWindow != null && m_swtWindow.getVisible();
 
   }
 
+  @Override
   public void activate() {
     m_swtWindow.getShell().setActive();
   }
 
+  @Override
   public boolean isActive() {
     return m_swtWindow != null && m_swtWindow.getDisplay().getActiveShell() == m_swtWindow;
   }
 
+  @Override
   public void setStatus(IProcessingStatus newValue) {
     // void
   }
@@ -205,6 +211,7 @@ public class SwtScoutPopup implements ISwtScoutPart {
   }
 
   private class P_SwtWindowDisposeListener implements DisposeListener {
+    @Override
     public void widgetDisposed(DisposeEvent e) {
       handleSwtWindowClosed();
     }

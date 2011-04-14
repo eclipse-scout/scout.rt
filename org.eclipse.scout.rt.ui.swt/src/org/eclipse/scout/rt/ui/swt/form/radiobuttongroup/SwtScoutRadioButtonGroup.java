@@ -92,6 +92,7 @@ public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadio
   }
 
   private class P_SwtButtonListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Selection:

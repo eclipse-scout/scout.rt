@@ -79,6 +79,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
     return m_environment;
   }
 
+  @Override
   public void setLayoutWidthHint(int w) {
     Object o = getLayoutData();
     if (o instanceof LogicalGridData) {
@@ -91,6 +92,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
    * @param b
    * @return if the layout has to be updated up to the top container.
    */
+  @Override
   public boolean setMandadatory(boolean b) {
     boolean updateLayout = false;
     FontSpec labelFontString = UiDecorationExtensionPoint.getLookAndFeel().getMandatoryLabelFont();
@@ -179,10 +181,12 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
     m_label.setForeground(color);
   }
 
+  @Override
   public String getText() {
     return m_text;
   }
 
+  @Override
   public void setText(String text) {
     m_text = text;
     updateText();
@@ -196,6 +200,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
     m_label.setText(m_preMarker + text + m_postMarker);
   }
 
+  @Override
   public void setStatus(IProcessingStatus status) {
     m_status = status;
     if (m_status == null) {

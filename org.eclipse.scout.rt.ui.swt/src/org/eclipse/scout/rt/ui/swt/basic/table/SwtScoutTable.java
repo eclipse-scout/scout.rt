@@ -116,6 +116,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     table.setHeaderVisible(true);
     new TableRolloverSupport(table);
     table.addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         if (m_headerMenu != null && !m_headerMenu.isDisposed()) {
           m_headerMenu.dispose();
@@ -152,9 +153,11 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     table.addListener(SWT.KeyUp, swtTableListener);
 
     m_autoResizeColumnsListener = new Listener() {
+      @Override
       public void handleEvent(Event event) {
         if (getSwtField() != null && !getSwtField().isDisposed()) {
           getSwtField().getDisplay().asyncExec(new Runnable() {
+            @Override
             public void run() {
               if (getSwtField() != null && !getSwtField().isDisposed()) {
                 handleAutoSizeColumns();
@@ -280,6 +283,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     return (TableEx) super.getSwtField();
   }
 
+  @Override
   public TableViewer getSwtTableViewer() {
     return m_viewer;
   }
@@ -771,6 +775,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   }
 
   private class P_ScoutTableListener implements TableListener {
+    @Override
     public void tableChanged(final TableEvent e) {
       if (isHandleScoutTableEvent(new TableEvent[]{e})) {
         if (isIgnoredScoutEvent(TableEvent.class, "" + e.getType())) {
@@ -793,6 +798,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       }
     }
 
+    @Override
     public void tableChangedBatch(final TableEvent[] a) {
       if (isHandleScoutTableEvent(a)) {
         final ArrayList<TableEvent> filteredList = new ArrayList<TableEvent>();
@@ -834,6 +840,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   }// end P_ScoutTableListener
 
   private class P_SwtTableListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.MouseDown: {
@@ -895,6 +902,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   }
 
   public class P_SwtSelectionListener implements ISelectionChangedListener {
+    @Override
     public void selectionChanged(SelectionChangedEvent event) {
       setSelectionFromSwt((StructuredSelection) event.getSelection());
     }
@@ -902,6 +910,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   } // end class P_SwtSelectionListener
 
   private class P_TableColumnListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Move:

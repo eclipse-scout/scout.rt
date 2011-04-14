@@ -58,6 +58,7 @@ public class OnFieldLabelDecorator implements PaintListener, FocusListener {
    * Implementation
    */
 
+  @Override
   public void paintControl(PaintEvent e) {
     if (m_text == null) {
       return;
@@ -96,12 +97,14 @@ public class OnFieldLabelDecorator implements PaintListener, FocusListener {
     e.gc.drawString(s, x, y);
   }
 
+  @Override
   public void focusGained(FocusEvent e) {
     if (e.widget instanceof Control) {
       ((Control) e.widget).redraw();
     }
   }
 
+  @Override
   public void focusLost(FocusEvent e) {
     if (e.widget instanceof Control) {
       ((Control) e.widget).redraw();

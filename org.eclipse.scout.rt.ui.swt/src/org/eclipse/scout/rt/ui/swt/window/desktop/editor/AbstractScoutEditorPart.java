@@ -102,6 +102,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
     }
   }
 
+  @Override
   public void closePart() throws ProcessingException {
     try {
       m_closeFromModel.acquire();
@@ -211,6 +212,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
     }
   }
 
+  @Override
   public IForm getForm() {
     return ((ScoutFormEditorInput) getEditorInput()).getScoutObject();
   }
@@ -219,6 +221,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
     return m_rootForm;
   }
 
+  @Override
   public int promptToSaveOnClose() {
     if (getForm() == null) {
       return ISaveablePart2.NO;
@@ -311,18 +314,22 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
     getSwtEnvironment().invokeScoutLater(job, 0);
   }
 
+  @Override
   public void activate() {
     getSite().getPage().activate(getSite().getPart());
   }
 
+  @Override
   public boolean isActive() {
     return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == getSite().getPage();
   }
 
+  @Override
   public boolean isVisible() {
     return getSite().getPage().isPartVisible(getSite().getPart());
   }
 
+  @Override
   public void setStatus(IProcessingStatus newValue) {
     String message = "";
     if (newValue != null) {
@@ -356,6 +363,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   }
 
   private class P_ScoutPropertyChangeListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent e) {
       Runnable t = new Runnable() {
         @Override

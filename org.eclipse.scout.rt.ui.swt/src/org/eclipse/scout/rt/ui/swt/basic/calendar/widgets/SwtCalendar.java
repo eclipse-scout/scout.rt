@@ -353,6 +353,7 @@ public class SwtCalendar extends Composite implements PaintListener {
   public void showItemContextMenu(IMenuManager manager, Object item) {
   }
 
+  @Override
   public void paintControl(PaintEvent e) {
     setBackground(SwtColors.getInstance().white);
     setForeground(SwtColors.getInstance().darkgray);

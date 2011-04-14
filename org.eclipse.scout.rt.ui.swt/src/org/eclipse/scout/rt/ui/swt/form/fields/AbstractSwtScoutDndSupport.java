@@ -58,6 +58,7 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
     m_environment = environment;
     attachScout();
     m_control.addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         detachScout();
       }
@@ -243,6 +244,7 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
   } // end class P_SwtDragSourceListener
 
   private class P_ScoutObjectPropertyListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent evt) {
       Runnable job = new Runnable() {
         @Override

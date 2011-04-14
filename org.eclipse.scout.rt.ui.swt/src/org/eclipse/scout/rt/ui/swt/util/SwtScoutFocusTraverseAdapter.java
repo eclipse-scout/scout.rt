@@ -31,6 +31,7 @@ public abstract class SwtScoutFocusTraverseAdapter implements FocusListener, Tra
     m_control = control;
   }
 
+  @Override
   public final void focusLost(FocusEvent e) {
     if (m_control.getShell() != m_control.getDisplay().getActiveShell()) {
       temporaryFocusLost(e);
@@ -57,9 +58,11 @@ public abstract class SwtScoutFocusTraverseAdapter implements FocusListener, Tra
   public void permanentFocusLost(FocusEvent e) {
   }
 
+  @Override
   public void focusGained(FocusEvent e) {
   }
 
+  @Override
   public void keyTraversed(TraverseEvent e) {
   }
 

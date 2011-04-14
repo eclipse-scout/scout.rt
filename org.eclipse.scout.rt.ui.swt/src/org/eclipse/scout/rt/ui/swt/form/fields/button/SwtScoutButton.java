@@ -300,6 +300,7 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
   }
 
   private class P_SwtSelectionListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case ButtonEx.SELECTION_ACTION: {
@@ -321,6 +322,7 @@ public class SwtScoutButton extends SwtScoutFieldComposite<IButton> implements I
   }// end private class
 
   private class P_ScoutButtonListener implements ButtonListener, WeakEventListener {
+    @Override
     public void buttonChanged(ButtonEvent e) {
       switch (e.getType()) {
         case ButtonEvent.TYPE_DISARM: {

@@ -42,11 +42,13 @@ public class WizardStatusButton extends Canvas {
     super(parent, style);
     initResources();
     addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         freeResources();
       }
     });
     addPaintListener(new PaintListener() {
+      @Override
       public void paintControl(PaintEvent e) {
         paint(e.gc);
       }

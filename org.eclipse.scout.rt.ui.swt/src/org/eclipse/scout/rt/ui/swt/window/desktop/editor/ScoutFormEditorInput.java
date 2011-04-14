@@ -37,27 +37,33 @@ public class ScoutFormEditorInput implements IEditorInput {
     return m_scoutObject;
   }
 
+  @Override
   public boolean exists() {
     return true;
   }
 
+  @Override
   public ImageDescriptor getImageDescriptor() {
     final Image icon = getEnvironment().getIcon(getScoutObject().getIconId());
     return ImageDescriptor.createFromImage(icon);
   }
 
+  @Override
   public String getName() {
     return StringUtility.nvl(getScoutObject().getTitle(), "");
   }
 
+  @Override
   public IPersistableElement getPersistable() {
     return null;
   }
 
+  @Override
   public String getToolTipText() {
     return StringUtility.nvl(getScoutObject().getSubTitle(), "");
   }
 
+  @Override
   public Object getAdapter(Class adapter) {
     return null;
   }

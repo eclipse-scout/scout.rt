@@ -46,6 +46,7 @@ public abstract class AbstractSwtScoutCommandHandler extends AbstractHandler {
 
   protected abstract IAction findAction();
 
+  @Override
   public Object execute(ExecutionEvent arg0) throws ExecutionException {
     if (getScoutAction() != null) {
       Runnable job = new Runnable() {
@@ -90,6 +91,7 @@ public abstract class AbstractSwtScoutCommandHandler extends AbstractHandler {
   }
 
   private class P_EnvironmentListener implements ISwtEnvironmentListener {
+    @Override
     public void environmentChanged(final SwtEnvironmentEvent e) {
       Runnable job = new Runnable() {
         @Override
@@ -131,6 +133,7 @@ public abstract class AbstractSwtScoutCommandHandler extends AbstractHandler {
   }
 
   private class P_ActionPropertyListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent evt) {
       Runnable job = new Runnable() {
         @Override

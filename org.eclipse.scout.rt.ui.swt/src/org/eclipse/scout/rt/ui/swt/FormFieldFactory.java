@@ -138,6 +138,7 @@ public class FormFieldFactory implements IFormFieldFactory {
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public ISwtScoutFormField<IFormField> createFormField(Composite parent, IFormField model, ISwtEnvironment environment) {
     ISwtScoutFormField<IFormField> uiField = (ISwtScoutFormField<IFormField>) createFormFieldByExtension(parent, model, environment);
@@ -177,6 +178,7 @@ public class FormFieldFactory implements IFormFieldFactory {
       m_uiClazz = uiClazz;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public ISwtScoutFormField<?> createFormField(Composite parent, IFormField model, ISwtEnvironment environment) {
       try {

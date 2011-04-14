@@ -96,6 +96,7 @@ public class LoginDialog extends Dialog {
       user.setText(m_status.getUsername());
     }
     user.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_status.setUsername(user.getText());
         updateOkButton();
@@ -117,6 +118,7 @@ public class LoginDialog extends Dialog {
       pass.setText(m_status.getPassword());
     }
     pass.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_status.setPassword(pass.getText());
         updateOkButton();

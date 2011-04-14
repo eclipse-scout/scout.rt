@@ -31,12 +31,14 @@ public abstract class AbstractSwtStartup implements IStartup {
 
   protected abstract ISwtEnvironment getSwtEnvironment();
 
+  @Override
   public void earlyStartup() {
     final IWorkbench workbench = PlatformUI.getWorkbench();
     workbench.getDisplay().asyncExec(new P_HandleInitWorkbench());
   }
 
   private class P_HandleInitWorkbench implements Runnable {
+    @Override
     public void run() {
       IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
       if (activeWorkbenchWindow != null) {

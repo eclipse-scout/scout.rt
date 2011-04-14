@@ -19,5 +19,6 @@ public interface ISwtScoutFileChooserField extends ISwtScoutFormField<IFileChoos
 
   DropDownButton getSwtFileChooserButton();
 
+  @Override
   StyledText getSwtField();
 }

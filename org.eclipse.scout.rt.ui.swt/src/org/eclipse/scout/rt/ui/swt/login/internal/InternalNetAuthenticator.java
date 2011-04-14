@@ -103,6 +103,7 @@ public class InternalNetAuthenticator extends Authenticator {
       try {
         display.syncExec(
             new Runnable() {
+              @Override
               public void run() {
                 try {
                   showModalDialog(status, display);

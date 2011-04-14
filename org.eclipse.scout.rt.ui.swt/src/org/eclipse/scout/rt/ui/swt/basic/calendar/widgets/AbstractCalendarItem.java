@@ -65,6 +65,7 @@ public abstract class AbstractCalendarItem extends Composite implements Calendar
 
     // menu listener for context menu
     m_menuManager.addMenuListener(new IMenuListener() {
+      @Override
       public void menuAboutToShow(IMenuManager manager) {
         m_cell.getCalendar().showItemContextMenu(manager, m_item.getItem());
       }
@@ -86,18 +87,22 @@ public abstract class AbstractCalendarItem extends Composite implements Calendar
   // -- PaintListener
 
   /** needs to be overriden */
+  @Override
   public void paintControl(PaintEvent e) {
   }
 
   // -- MouseTrackListener
 
+  @Override
   public void mouseHover(MouseEvent e) {
     setToolTipText(m_cell.getCalendar().getModel().getTooltip(m_item.getItem(), m_cell.getDate().getTime()));
   }
 
+  @Override
   public void mouseEnter(MouseEvent e) {
   }
 
+  @Override
   public void mouseExit(MouseEvent e) {
     setToolTipText("");
   }

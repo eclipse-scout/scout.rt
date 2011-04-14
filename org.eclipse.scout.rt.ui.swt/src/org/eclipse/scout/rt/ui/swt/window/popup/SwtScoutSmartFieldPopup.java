@@ -114,6 +114,7 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
 
   }
 
+  @Override
   public void closePart() throws ProcessingException {
     m_opened = false;
     if (!m_swtWindow.isDisposed()) {
@@ -122,6 +123,7 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
     }
   }
 
+  @Override
   public IForm getForm() {
     return m_scoutForm;
   }
@@ -233,19 +235,23 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
     }
   }
 
+  @Override
   public boolean isVisible() {
     return m_swtWindow != null && m_swtWindow.getVisible();
 
   }
 
+  @Override
   public void activate() {
     m_swtWindow.getShell().setActive();
   }
 
+  @Override
   public boolean isActive() {
     return m_swtWindow != null && m_swtWindow.getDisplay().getActiveShell() == m_swtWindow;
   }
 
+  @Override
   public void setStatus(IProcessingStatus newValue) {
     // void
   }
@@ -267,6 +273,7 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
           public void focusLost(FocusEvent e) {
             // defer decision until it is known who is new focus owner
             m_swtWindow.getDisplay().asyncExec(new Runnable() {
+              @Override
               public void run() {
                 if (!m_swtWindow.isDisposed()) {
                   if (m_swtWindow == m_swtWindow.getDisplay().getActiveShell()) {
@@ -355,6 +362,7 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
   }
 
   private class P_SwtWindowDisposeListener implements DisposeListener {
+    @Override
     public void widgetDisposed(DisposeEvent e) {
       handleSwtWindowClosed();
     }
@@ -367,6 +375,7 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
    * @since 1.0.9 13.08.2008
    */
   private class P_ScrollBarListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       try {
         closePart();

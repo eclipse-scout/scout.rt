@@ -22,14 +22,23 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
  *
  */
 public class EmptyCalendarModel implements CalendarModel{
-	public Collection<CalendarComponent> getItemsAt(Date dateTruncatedToDay){return null;}
-	public String getTooltip(Object item,Date d){return null;}
-	public String getLabel(Object item,Date d){return null;}
-	public Date getFromDate(Object item){return null;}
-	public Date getToDate(Object item){return null;}
-	public Color getColor(Object item){return null;}
-	public boolean isFullDay(Object item){return false;}
-	public boolean isDraggable(Object item){return false;}
+	@Override
+  public Collection<CalendarComponent> getItemsAt(Date dateTruncatedToDay){return null;}
+	@Override
+  public String getTooltip(Object item,Date d){return null;}
+	@Override
+  public String getLabel(Object item,Date d){return null;}
+	@Override
+  public Date getFromDate(Object item){return null;}
+	@Override
+  public Date getToDate(Object item){return null;}
+	@Override
+  public Color getColor(Object item){return null;}
+	@Override
+  public boolean isFullDay(Object item){return false;}
+	@Override
+  public boolean isDraggable(Object item){return false;}
 	public void updateItem(Object item, double delta) {}
+  @Override
   public void moveItem(Object item, Date newDate){}
 }

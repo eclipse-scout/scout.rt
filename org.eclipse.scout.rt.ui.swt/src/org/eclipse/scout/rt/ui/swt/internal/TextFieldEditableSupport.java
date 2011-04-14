@@ -87,6 +87,7 @@ public class TextFieldEditableSupport {
   }
 
   private class P_ReadOnlyListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       synchronized (m_lock) {
 

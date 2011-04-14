@@ -58,6 +58,7 @@ public class SwtScoutTableCellEditor {
   public SwtScoutTableCellEditor(ISwtScoutTable tableComposite) {
     m_tableComposite = tableComposite;
     m_rowHeightListener = new Listener() {
+      @Override
       public void handleEvent(Event event) {
         event.height = UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight();
       }
@@ -303,6 +304,7 @@ public class SwtScoutTableCellEditor {
       Control focusControl = m_container.getDisplay().getFocusControl();
       if (focusControl != null) {
         focusControl.addTraverseListener(new TraverseListener() {
+          @Override
           public void keyTraversed(TraverseEvent e) {
             if (e.detail == SWT.TRAVERSE_ESCAPE || e.detail == SWT.TRAVERSE_RETURN) {
               e.doit = false;

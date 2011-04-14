@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Button;
  */
 public interface ISwtScoutCheckbox extends ISwtScoutFormField<IBooleanField> {
 
+  @Override
   Button getSwtField();
 
 }

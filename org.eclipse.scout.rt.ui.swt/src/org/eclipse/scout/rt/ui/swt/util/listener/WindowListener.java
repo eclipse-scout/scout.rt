@@ -17,15 +17,19 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 public class WindowListener implements IWindowListener, EventListener {
 
+  @Override
   public void windowActivated(IWorkbenchWindow window) {
   }
 
+  @Override
   public void windowClosed(IWorkbenchWindow window) {
   }
 
+  @Override
   public void windowDeactivated(IWorkbenchWindow window) {
   }
 
+  @Override
   public void windowOpened(IWorkbenchWindow window) {
   }
 

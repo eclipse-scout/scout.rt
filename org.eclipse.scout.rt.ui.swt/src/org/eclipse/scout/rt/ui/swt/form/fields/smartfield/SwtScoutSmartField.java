@@ -130,6 +130,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     m_browseButton.setLayoutData(LogicalGridDataBuilder.createSmartButton());
   }
 
+  @Override
   public DropDownButton getSwtBrowseButton() {
     return m_browseButton;
   }
@@ -253,6 +254,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     if (getSwtField().isFocusControl()) {
       m_proposalPopup = new SwtScoutSmartFieldPopup(getEnvironment(), getSwtField(), getSwtField());
       m_proposalPopup.addSwtScoutPartListener(new SwtScoutPartListener() {
+        @Override
         public void partChanged(SwtScoutPartEvent e) {
           switch (e.getType()) {
             case SwtScoutPartEvent.TYPE_CLOSED:
@@ -280,6 +282,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         getSwtField().addListener(SWT.Traverse, m_popupDelegateListener);
         getSwtField().addListener(SWT.Verify, m_popupDelegateListener);
         form.addFormListener(new FormListener() {
+          @Override
           public void formChanged(FormEvent e) throws ProcessingException {
             switch (e.getType()) {
               case FormEvent.TYPE_STRUCTURE_CHANGED:
@@ -438,6 +441,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
   }
 
   private class P_SwtTextModifiedListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       if (getSwtField().isEnabled() && getSwtField().getEditable() && getSwtField().isVisible()) {
         switch (event.type) {
@@ -538,6 +542,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
   }// end private class
 
   private class P_PopupDelegateListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Traverse: {
@@ -607,6 +612,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       super(SWT.F2);
     }
 
+    @Override
     public void handleSwtAction(Event e) {
       handleSwtBrowseAction();
     }

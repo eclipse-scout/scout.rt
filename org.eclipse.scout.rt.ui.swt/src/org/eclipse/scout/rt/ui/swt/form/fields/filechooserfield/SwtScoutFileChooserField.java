@@ -85,6 +85,7 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
     m_fileChooserButton.setLayoutData(LogicalGridDataBuilder.createSmartButton());
   }
 
+  @Override
   public DropDownButton getSwtFileChooserButton() {
     return m_fileChooserButton;
   }

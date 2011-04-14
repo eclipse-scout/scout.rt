@@ -21,5 +21,6 @@ import org.eclipse.swt.widgets.Control;
  */
 public interface ISwtScoutButton extends ISwtScoutFormField<IButton> {
 
+  @Override
   Control getSwtField();
 }

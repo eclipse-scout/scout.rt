@@ -204,6 +204,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
   }
 
   /** method getting called by the PaintListener */
+  @Override
   public void paintControl(PaintEvent e) {
 
     setBackground(background);
@@ -287,6 +288,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
 
     // menu listener for context menu
     m_menuManager.addMenuListener(new IMenuListener() {
+      @Override
       public void menuAboutToShow(IMenuManager manager) {
         m_calendar.showGeneralContextMenu(manager);
       }
@@ -294,6 +296,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
 
     // tab traversal of cells
     this.addTraverseListener(new TraverseListener() {
+      @Override
       public void keyTraversed(TraverseEvent e) {
 //        System.out.println(toString() + " got event " + e);
         switch (e.detail) {
@@ -326,6 +329,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
     });
     // to make this cell focusable
     addListener(SWT.KeyDown, new Listener() {
+      @Override
       public void handleEvent(Event e) {
       }
     });
