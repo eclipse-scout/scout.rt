@@ -334,11 +334,15 @@ public final class SwingUtility {
     else if (scoutT instanceof ImageTransferObject) {
       ImageTransferObject imgTransferObject = (ImageTransferObject) scoutT;
       Image img = null;
-      if (imgTransferObject.getImage() instanceof Image) {
-        img = (Image) imgTransferObject.getImage();
+      Object image = imgTransferObject.getImage();
+      if (image == null) {
+        return null;
       }
-      else if (imgTransferObject.getImage() instanceof byte[]) {
-        img = Toolkit.getDefaultToolkit().createImage((byte[]) imgTransferObject.getImage());
+      else if (image instanceof Image) {
+        img = (Image) image;
+      }
+      else if (image instanceof byte[]) {
+        img = Toolkit.getDefaultToolkit().createImage((byte[]) image);
       }
       if (img != null) {
         return new AwtImageTransferable(img);
