@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -101,7 +101,8 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
       getSwtField().setImage(m_image);
     }
     else if (!StringUtility.isNullOrEmpty(getScoutObject().getImageId())) {
-      getSwtField().setImage(getEnvironment().getIcon(getScoutObject().getImageId()));
+      m_image = getEnvironment().getIcon(getScoutObject().getImageId());
+      getSwtField().setImage(m_image);
     }
     getSwtField().redraw();
   }
