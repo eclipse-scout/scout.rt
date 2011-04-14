@@ -48,10 +48,12 @@ public class SwingScoutTreeField extends SwingScoutFieldComposite<ITreeField> im
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public JScrollPane getSwingScrollPane() {
     return m_treeComposite != null ? m_treeComposite.getSwingScrollPane() : null;
   }
 
+  @Override
   public JTreeEx getSwingTree() {
     return m_treeComposite != null ? m_treeComposite.getSwingTree() : null;
   }

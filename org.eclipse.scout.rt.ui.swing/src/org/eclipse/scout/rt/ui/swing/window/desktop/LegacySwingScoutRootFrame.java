@@ -187,10 +187,12 @@ public class LegacySwingScoutRootFrame extends SwingScoutComposite<IDesktop> imp
     }
   }
 
+  @Override
   public Frame getSwingFrame() {
     return m_swingFrame;
   }
 
+  @Override
   public ISwingScoutDesktop getDesktopComposite() {
     return m_desktopComposite;
   }
@@ -199,6 +201,7 @@ public class LegacySwingScoutRootFrame extends SwingScoutComposite<IDesktop> imp
    * start GUI process by presenting a desktop frame use this method to show the
    * dialog, not getSwingFrame().setVisible()
    */
+  @Override
   public void showSwingFrame() {
     m_swingFrame.setVisible(true);
   }
@@ -356,6 +359,7 @@ public class LegacySwingScoutRootFrame extends SwingScoutComposite<IDesktop> imp
    * other observers
    */
   private class P_ScoutDesktopListener implements DesktopListener {
+    @Override
     public void desktopChanged(final DesktopEvent e) {
       switch (e.getType()) {
         case DesktopEvent.TYPE_PRINT:
@@ -383,6 +387,7 @@ public class LegacySwingScoutRootFrame extends SwingScoutComposite<IDesktop> imp
   }// end private class
 
   private class P_SwingScoutRootListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
         boolean busy = ((Boolean) e.getNewValue()).booleanValue();

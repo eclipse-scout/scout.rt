@@ -53,6 +53,7 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     m_swingContainer = swingContainer;
   }
 
+  @Override
   public JStatusLabelEx getSwingLabel() {
     return m_swingStatusLabel;
   }

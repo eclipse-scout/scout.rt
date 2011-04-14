@@ -26,6 +26,7 @@ public class BeveledButtonIcon implements Icon {
     m_raised = raised;
   }
 
+  @Override
   public void paintIcon(Component c, Graphics g, int x, int y) {
     Icon basicIcon = m_button.getIcon();
     if (basicIcon != null) {
@@ -40,6 +41,7 @@ public class BeveledButtonIcon implements Icon {
     }
   }
 
+  @Override
   public int getIconWidth() {
     Icon basicIcon = m_button.getIcon();
     if (basicIcon != null) {
@@ -50,6 +52,7 @@ public class BeveledButtonIcon implements Icon {
     }
   }
 
+  @Override
   public int getIconHeight() {
     Icon basicIcon = m_button.getIcon();
     if (basicIcon != null) {

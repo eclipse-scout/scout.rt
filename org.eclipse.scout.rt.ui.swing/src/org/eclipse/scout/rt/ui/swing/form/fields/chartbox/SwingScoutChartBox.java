@@ -55,6 +55,7 @@ public class SwingScoutChartBox extends SwingScoutFieldComposite<IChartBox> impl
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public JPanel getSwingChartPanel() {
     return (JPanel) getSwingField();
   }
@@ -139,6 +140,7 @@ public class SwingScoutChartBox extends SwingScoutFieldComposite<IChartBox> impl
   }
 
   private class P_ScoutChartBoxListener implements ChartBoxListener, WeakEventListener {
+    @Override
     public void chartBoxChanged(final ChartBoxEvent e) {
       Runnable t = new Runnable() {
         @Override

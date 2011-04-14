@@ -89,6 +89,7 @@ public class SwingScoutGroupBoxButtonbar implements ISwingScoutGroupBoxButtonbar
     return m_environment;
   }
 
+  @Override
   public JPanel getSwingContainer() {
     return m_swingContainer;
   }

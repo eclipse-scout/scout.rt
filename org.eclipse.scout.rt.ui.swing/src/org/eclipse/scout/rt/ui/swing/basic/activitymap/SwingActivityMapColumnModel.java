@@ -22,10 +22,12 @@ public class SwingActivityMapColumnModel implements ActivityMapColumnModel {
     m_scale = scale;
   }
 
+  @Override
   public Object[] getMajorColumns() {
     return m_scale.getMajorTimeColumns();
   }
 
+  @Override
   public String getMajorColumnText(Object column, int size) {
     MajorTimeColumn m = (MajorTimeColumn) column;
     switch (size) {
@@ -42,20 +44,24 @@ public class SwingActivityMapColumnModel implements ActivityMapColumnModel {
     return null;
   }
 
+  @Override
   public String getMajorColumnTooltipText(Object column) {
     MajorTimeColumn m = (MajorTimeColumn) column;
     return m.getTooltipText();
   }
 
+  @Override
   public double[] getMajorColumnRange(Object majorColumn) {
     return m_scale.getRangeOf((MajorTimeColumn) majorColumn);
   }
 
+  @Override
   public Object[] getMinorColumns(Object majorColumn) {
     MajorTimeColumn m = (MajorTimeColumn) majorColumn;
     return m.getMinorTimeColumns();
   }
 
+  @Override
   public String getMinorColumnText(Object column, int size) {
     MinorTimeColumn m = (MinorTimeColumn) column;
     switch (size) {
@@ -72,15 +78,18 @@ public class SwingActivityMapColumnModel implements ActivityMapColumnModel {
     return null;
   }
 
+  @Override
   public String getMinorColumnTooltipText(Object column) {
     MinorTimeColumn m = (MinorTimeColumn) column;
     return m.getTooltipText();
   }
 
+  @Override
   public double[] getMinorColumnRange(Object minorColumn) {
     return m_scale.getRangeOf((MinorTimeColumn) minorColumn);
   }
 
+  @Override
   public double[] snapRange(double d) {
     return m_scale.snapRange(d);
   }

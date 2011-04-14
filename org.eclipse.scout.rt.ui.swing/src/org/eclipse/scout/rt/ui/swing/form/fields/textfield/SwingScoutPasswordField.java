@@ -38,6 +38,7 @@ public class SwingScoutPasswordField extends SwingScoutTextFieldComposite<IStrin
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public JPasswordFieldEx getSwingPasswordField() {
     return (JPasswordFieldEx) getSwingTextComponent();
   }

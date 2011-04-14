@@ -194,45 +194,54 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
       }
     }
 
+    @Override
     public Collection<Object> getItemsAt(Date dateTruncatedToDay) {
       return m_dayMap.get(dateTruncatedToDay);
     }
 
+    @Override
     public String getTooltip(Object item, Date d) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.getTooltip(d);
     }
 
+    @Override
     public String getLabel(Object item, Date d) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.getLabel(d);
     }
 
+    @Override
     public Date getFromDate(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.getFromDate();
     }
 
+    @Override
     public Date getToDate(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.getToDate();
     }
 
+    @Override
     public Color getColor(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
       return SwingUtility.createColor(comp.getCell().getBackgroundColor());
     }
 
+    @Override
     public boolean isFullDay(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.isFullDay();
     }
 
+    @Override
     public boolean isDraggable(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.isDraggable();
     }
 
+    @Override
     public void moveItem(final Object item, final Date newDate) {
       // notify Scout
       Runnable t = new Runnable() {
@@ -250,6 +259,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
   private class P_SwingRefreshAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       if (getUpdateSwingFromScoutLock().isAcquired()) return;
       //
@@ -295,6 +305,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
   }// end class
 
   private class P_SwingCalendarListener implements CalendarViewListener {
+    @Override
     public void viewChanged(CalendarViewEvent e) {
       switch (e.getType()) {
         case CalendarViewEvent.TYPE_SELECTION_CHANGED: {

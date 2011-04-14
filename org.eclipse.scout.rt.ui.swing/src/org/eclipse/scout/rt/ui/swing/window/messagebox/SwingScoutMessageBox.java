@@ -176,6 +176,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     return getScoutObject();
   }
 
+  @Override
   public JDialog getSwingDialog() {
     return m_swingDialog;
   }
@@ -200,6 +201,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
    * start GUI process by presenting a dialog use this method to show the
    * dialog, not m_swingDialog().setVisible()
    */
+  @Override
   public void showSwingMessageBox() {
     setOptimizedDialogBounds();
     if (m_swingDialog.isModal()) {
@@ -215,6 +217,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
       b.setIcon(icon);
     }
     b.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         handleSwingButtonAction(b);
       }
@@ -316,6 +319,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     // end notify
   }
 
+  @Override
   public void setName(String name) {
     m_swingDialog.getRootPane().setName(name);
   }
@@ -324,6 +328,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
    * other observers
    */
   private class P_ScoutMessageBoxListener implements MessageBoxListener {
+    @Override
     public void messageBoxChanged(final MessageBoxEvent e) {
       switch (e.getType()) {
         case MessageBoxEvent.TYPE_CLOSED: {
@@ -354,14 +359,17 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
 
   private class P_TopSeparatorBorder implements Border {
 
+    @Override
     public Insets getBorderInsets(Component c) {
       return new Insets(2, 0, 0, 0);
     }
 
+    @Override
     public boolean isBorderOpaque() {
       return false;
     }
 
+    @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
       // top
       g.setColor(Color.lightGray);

@@ -117,10 +117,12 @@ public class NullCaret implements Caret, FocusListener, MouseListener {
    *          the focus event
    * @see FocusListener#focusLost
    */
+  @Override
   public void focusLost(FocusEvent e) {
     setVisible(false);
   }
 
+  @Override
   public void focusGained(FocusEvent e) {
     if (component.isEnabled()) {
       if (component.isEditable()) {

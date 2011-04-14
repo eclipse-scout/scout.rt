@@ -146,6 +146,7 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
     // swing listener
     getSwingEnvironment().addPropertyChangeListener(
         new PropertyChangeListener() {
+          @Override
           public void propertyChange(PropertyChangeEvent e) {
             if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
               m_busyCached = (Boolean) e.getNewValue();
@@ -158,6 +159,7 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
     if (perf != null) {
       perf.addPropertyChangeListener(
           new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent e) {
               if (IPerformanceAnalyzerService.PROP_NETWORK_LATENCY.equals(e.getPropertyName())) {
                 handleNetworkLatencyChanged((Long) e.getNewValue());
@@ -222,6 +224,7 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
       final Icon iconf = icon;
       SwingUtilities.invokeLater(
           new Runnable() {
+            @Override
             public void run() {
               m_swingNetworkLatency.setToolTipText(ScoutTexts.get("NetworkLatency") + " " + value + "ms");
               if (iconf != m_swingNetworkLatency.getIcon()) {

@@ -24,6 +24,7 @@ public class SimulatorAction extends AbstractAction {
     m_cmd = cmd;
   }
 
+  @Override
   public void actionPerformed(ActionEvent a) {
     switch (m_cmd) {
       case 'R': {

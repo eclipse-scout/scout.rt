@@ -42,6 +42,7 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public JTextFieldEx getSwingTextField() {
     return (JTextFieldEx) getSwingTextComponent();
   }

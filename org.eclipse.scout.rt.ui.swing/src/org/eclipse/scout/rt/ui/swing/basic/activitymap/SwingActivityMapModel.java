@@ -38,10 +38,12 @@ public class SwingActivityMapModel implements ActivityMapModel {
     m_components = list.toArray(new SwingActivityComponent[list.size()]);
   }
 
+  @Override
   public int getRowCount() {
     return m_metricsTable.getRowCount();
   }
 
+  @Override
   public int getRowHeight(int rowIndex) {
     if (rowIndex >= 0 && rowIndex < m_metricsTable.getRowCount()) {
       return m_metricsTable.getRowHeight(rowIndex);
@@ -51,6 +53,7 @@ public class SwingActivityMapModel implements ActivityMapModel {
     }
   }
 
+  @Override
   public int getRowLocation(int rowIndex) {
     if (rowIndex >= 0 && rowIndex < m_metricsTable.getRowCount()) {
       return m_metricsTable.getCellRect(rowIndex, 0, true).y;
@@ -60,6 +63,7 @@ public class SwingActivityMapModel implements ActivityMapModel {
     }
   }
 
+  @Override
   public int getRowAtLocation(int y) {
     int i = m_metricsTable.rowAtPoint(new Point(1, y));
     if (i < 0 && y > 0) {
@@ -68,6 +72,7 @@ public class SwingActivityMapModel implements ActivityMapModel {
     return i;
   }
 
+  @Override
   public int getHeaderHeight() {
     if (m_metricsTable.getTableHeader() != null) {
       return m_metricsTable.getTableHeader().getHeight();
@@ -77,10 +82,12 @@ public class SwingActivityMapModel implements ActivityMapModel {
     }
   }
 
+  @Override
   public ActivityComponent[] getActivities() {
     return m_components;
   }
 
+  @Override
   public double[] getActivityRange(ActivityComponent a) {
     SwingActivityComponent sa = (SwingActivityComponent) a;
     ActivityCell cell = sa.getScoutActivityCell();

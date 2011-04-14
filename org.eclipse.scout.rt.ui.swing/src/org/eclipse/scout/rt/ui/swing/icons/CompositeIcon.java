@@ -41,14 +41,17 @@ public class CompositeIcon implements Icon {
     }
   }
 
+  @Override
   public int getIconWidth() {
     return w;
   }
 
+  @Override
   public int getIconHeight() {
     return h;
   }
 
+  @Override
   public void paintIcon(Component c, Graphics g, int x, int y) {
     m_paintedX = x;
     int offsetX = 0;

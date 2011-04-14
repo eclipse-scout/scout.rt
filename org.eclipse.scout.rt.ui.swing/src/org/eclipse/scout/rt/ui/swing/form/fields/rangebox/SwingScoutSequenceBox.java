@@ -100,6 +100,7 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
     setChildMandatoryFromScout();
   }
 
+  @Override
   public JPanel getSwingRangeBox() {
     return (JPanel) getSwingField();
   }
@@ -144,6 +145,7 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
     super.attachScout();
     // add mandatory change listener on children to decorate my label same as any mandatory child
     m_scoutMandatoryChangeListener = new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         Runnable j = new Runnable() {
           @Override
@@ -160,6 +162,7 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
     }
     // add errror status change listener on children to decorate my label same as any child with an error status
     m_scoutErrorStatusChangeListener = new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         Runnable j = new Runnable() {
           @Override

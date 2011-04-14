@@ -79,10 +79,12 @@ public class JDialogEx extends JDialog implements IWaitSupport {
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
   }
 
+  @Override
   public boolean isWaitCursor() {
     return m_waitCursor;
   }
 
+  @Override
   public void setWaitCursor(boolean b) {
     if (b != m_waitCursor) {
       m_waitCursor = b;

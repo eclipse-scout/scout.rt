@@ -87,14 +87,17 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     }
     doc.addDocumentListener(
         new DocumentListener() {
+          @Override
           public void changedUpdate(DocumentEvent e) {
             handleSwingDocumentChanged(e);
           }
 
+          @Override
           public void insertUpdate(DocumentEvent e) {
             handleSwingDocumentChanged(e);
           }
 
+          @Override
           public void removeUpdate(DocumentEvent e) {
             handleSwingDocumentChanged(e);
           }
@@ -113,6 +116,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     actionMap.put(
         "smartChooser",
         new AbstractAction() {
+          @Override
           public void actionPerformed(ActionEvent e) {
             handleSwingSmartChooserAction(0);
           }
@@ -141,6 +145,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
         handleSwingSmartChooserAction(0);
       }
 
+      @Override
       public void menuClicked(Object source) {
         handleSwingPopup((JComponent) source);
       }
@@ -148,6 +153,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     return textField;
   }
 
+  @Override
   public JTextComponent getSwingTextField() {
     return (JTextComponent) getSwingField();
   }
@@ -249,6 +255,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     textField.getActionMap().put(name, new AbstractAction() {
       private static final long serialVersionUID = 1L;
 
+      @Override
       public void actionPerformed(ActionEvent e) {
         if (getSwingTextField().isVisible() && getSwingTextField().isEditable()) {
           if (m_proposalPopup == null) {
@@ -334,6 +341,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     getSwingTextField().getActionMap().put("enter", new AbstractAction() {
       private static final long serialVersionUID = 1L;
 
+      @Override
       public void actionPerformed(ActionEvent e) {
         acceptProposalFromSwing();
       }
@@ -342,6 +350,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     getSwingTextField().getActionMap().put("escape", new AbstractAction() {
       private static final long serialVersionUID = 1L;
 
+      @Override
       public void actionPerformed(ActionEvent e) {
         if (m_proposalPopup != null) {
           m_proposalPopup.closeView();
@@ -358,6 +367,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     if (proposalTree != null || proposalTable != null) {
       form.addFormListener(
           new FormListener() {
+            @Override
             public void formChanged(FormEvent e) throws ProcessingException {
               switch (e.getType()) {
                 case FormEvent.TYPE_STRUCTURE_CHANGED: {

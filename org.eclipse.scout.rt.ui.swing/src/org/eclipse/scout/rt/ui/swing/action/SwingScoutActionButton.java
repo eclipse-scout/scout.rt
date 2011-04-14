@@ -188,12 +188,14 @@ public class SwingScoutActionButton<T extends IAction> extends SwingScoutComposi
    * Listeners
    */
   private class P_SwingActionListener implements ActionListener {
+    @Override
     public void actionPerformed(ActionEvent e) {
       handleSwingAction(e);
     }
   }// end class
 
   private class P_SwingSelectionListener implements ItemListener {
+    @Override
     public void itemStateChanged(ItemEvent e) {
       setSelectionFromSwing(getSwingField().isSelected());
     }

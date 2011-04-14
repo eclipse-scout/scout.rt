@@ -154,6 +154,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     table.getSelectionModel().addListSelectionListener(new P_SwingSelectionListener());
     // re-attach observer when selection model changes
     table.addPropertyChangeListener("selectionModel", new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent evt) {
         getSwingTable().getSelectionModel().addListSelectionListener(new P_SwingSelectionListener());
       }
@@ -224,6 +225,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     });
   }
 
+  @Override
   public JTableEx getSwingTable() {
     return (JTableEx) getSwingField();
   }
@@ -240,6 +242,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     return (ListSelectionModel) getSwingTable().getSelectionModel();
   }
 
+  @Override
   public JScrollPane getSwingScrollPane() {
     return m_swingScrollPane;
   }
@@ -1368,6 +1371,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }// end private class
 
   private class P_ScoutTableListener implements TableListener {
+    @Override
     public void tableChanged(final TableEvent e) {
       if (isHandleScoutTableEvent(new TableEvent[]{e})) {
         if (isIgnoredScoutEvent(TableEvent.class, "" + e.getType())) return;
@@ -1389,6 +1393,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       }
     }
 
+    @Override
     public void tableChangedBatch(final TableEvent[] a) {
       if (isHandleScoutTableEvent(a)) {
         final ArrayList<TableEvent> filteredList = new ArrayList<TableEvent>();
@@ -1493,6 +1498,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   } // end class P_KeyboardNavigationSupport
 
   private class P_SwingSelectionListener implements ListSelectionListener {
+    @Override
     public void valueChanged(ListSelectionEvent e) {
       if (!getSwingTable().getSelectionModel().getValueIsAdjusting()) {
         int[] swingRows = getSwingTable().getSelectedRows();

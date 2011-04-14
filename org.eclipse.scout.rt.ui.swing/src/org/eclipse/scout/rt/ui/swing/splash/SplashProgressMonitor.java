@@ -59,6 +59,7 @@ public class SplashProgressMonitor extends NullProgressMonitor {
     }
     SwingUtilities.invokeLater(
         new Runnable() {
+          @Override
           public void run() {
             if (m_splash != null) {
               m_splash.setStatusText(m_displayText);
@@ -76,6 +77,7 @@ public class SplashProgressMonitor extends NullProgressMonitor {
   public void showSplash() {
     SwingUtilities.invokeLater(
         new Runnable() {
+          @Override
           public void run() {
             showSplashInSwingThread();
           }
@@ -99,6 +101,7 @@ public class SplashProgressMonitor extends NullProgressMonitor {
   public void hideSplash() {
     SwingUtilities.invokeLater(
         new Runnable() {
+          @Override
           public void run() {
             hideSplashInSwingThread();
           }

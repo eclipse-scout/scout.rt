@@ -59,10 +59,12 @@ public class JHyperlink extends JLabelEx {
     });
     //
     addFocusListener(new FocusListener() {
+      @Override
       public void focusGained(FocusEvent e) {
         repaint();
       }
 
+      @Override
       public void focusLost(FocusEvent e) {
         repaint();
       }

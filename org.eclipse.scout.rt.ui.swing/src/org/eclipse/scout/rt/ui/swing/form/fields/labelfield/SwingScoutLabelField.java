@@ -51,6 +51,7 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
     getSwingContainer().setLayout(layout);
   }
 
+  @Override
   public JLabelEx getSwingLabelField() {
     return (JLabelEx) getSwingField();
   }

@@ -45,10 +45,12 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
     });
   }
 
+  @Override
   public void initializeService() {
     // nop
   }
 
+  @Override
   public boolean isActive() {
     return propertySupport.getPropertyBool(PROP_ACTIVE);
   }

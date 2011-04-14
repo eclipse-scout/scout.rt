@@ -103,6 +103,7 @@ public class WidgetPrinter {
   }
 
   private class DefaultPrintable implements Printable, ImageObserver {
+    @Override
     public int print(Graphics g, PageFormat pageFormat, int pageIndex) throws PrinterException {
       if (pageIndex > 0) {
         return NO_SUCH_PAGE;
@@ -124,6 +125,7 @@ public class WidgetPrinter {
       return PAGE_EXISTS;
     }
 
+    @Override
     public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
       return ((infoflags & (ImageObserver.ALLBITS | ImageObserver.FRAMEBITS)) != 0);
     }

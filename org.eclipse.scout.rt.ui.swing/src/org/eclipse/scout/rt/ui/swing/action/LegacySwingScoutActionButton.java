@@ -211,12 +211,14 @@ public class LegacySwingScoutActionButton<T extends IAction> extends SwingScoutC
    * Listeners
    */
   private class P_SwingActionListener implements ActionListener {
+    @Override
     public void actionPerformed(ActionEvent e) {
       handleSwingAction(e);
     }
   }// end class
 
   private class P_SwingSelectionListener implements ItemListener {
+    @Override
     public void itemStateChanged(ItemEvent e) {
       setSelectionFromSwing(getSwingField().isSelected());
     }

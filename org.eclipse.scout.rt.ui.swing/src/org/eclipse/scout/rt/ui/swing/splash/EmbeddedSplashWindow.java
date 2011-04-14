@@ -52,6 +52,7 @@ public class EmbeddedSplashWindow implements ISplashWindow {
     m_versionText = v.getMajor() + "." + v.getMinor() + "." + v.getMicro();
   }
 
+  @Override
   public void showSplash() {
     Icon imgIcon = UIManager.getIcon("Splash.icon");
     if (imgIcon == null) {
@@ -102,6 +103,7 @@ public class EmbeddedSplashWindow implements ISplashWindow {
     t.start();
   }
 
+  @Override
   public void disposeSplash() {
     m_splash = null;
     m_owner.getContentPane().removeAll();
@@ -112,6 +114,7 @@ public class EmbeddedSplashWindow implements ISplashWindow {
     glass.setVisible(false);
   }
 
+  @Override
   public void setStatusText(String s) {
     if (m_splash != null) {
       if (s == null) s = "";
@@ -128,6 +131,7 @@ public class EmbeddedSplashWindow implements ISplashWindow {
       m_splashIcon = splashIcon;
     }
 
+    @Override
     public void paintIcon(Component c, Graphics g, int x, int y) {
       FontMetrics fm = g.getFontMetrics();
       int w = c.getWidth();
@@ -151,10 +155,12 @@ public class EmbeddedSplashWindow implements ISplashWindow {
       }
     }
 
+    @Override
     public int getIconHeight() {
       return m_splashIcon.getIconHeight();
     }
 
+    @Override
     public int getIconWidth() {
       return m_splashIcon.getIconWidth();
     }
@@ -165,6 +171,7 @@ public class EmbeddedSplashWindow implements ISplashWindow {
     public P_EmptyIcon() {
     }
 
+    @Override
     public void paintIcon(Component c, Graphics g, int x, int y) {
       Graphics2D g2d = (Graphics2D) g;
       Color c1 = new Color(0xffcccccc, true);
@@ -173,10 +180,12 @@ public class EmbeddedSplashWindow implements ISplashWindow {
       g2d.fillRect(0, 0, getIconWidth(), getIconHeight());
     }
 
+    @Override
     public int getIconWidth() {
       return 360;
     }
 
+    @Override
     public int getIconHeight() {
       return 280;
     }

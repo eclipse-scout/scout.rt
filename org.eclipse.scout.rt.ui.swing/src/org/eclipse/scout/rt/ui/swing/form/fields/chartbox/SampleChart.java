@@ -23,10 +23,12 @@ public class SampleChart extends JComponent implements ISwingChartProvider {
   public SampleChart() {
   }
 
+  @Override
   public JComponent createChart(ISwingScoutChartBox swingParent) {
     return this;
   }
 
+  @Override
   public JComponent refreshChart(JComponent chartPane) {
     // nop
     return this;

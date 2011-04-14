@@ -36,10 +36,12 @@ public class SwingTableModel extends AbstractTableModel {
     m_rowCount = table != null ? table.getFilteredRowCount() : 0;
   }
 
+  @Override
   public int getRowCount() {
     return m_rowCount;
   }
 
+  @Override
   public int getColumnCount() {
     ITable table = m_swingScoutTable.getScoutObject();
     return table != null ? table.getVisibleColumnCount() : 0;
@@ -50,6 +52,7 @@ public class SwingTableModel extends AbstractTableModel {
     return null;
   }
 
+  @Override
   public Object getValueAt(int row, int col) {
     ITable table = m_swingScoutTable.getScoutObject();
     if (table != null) {

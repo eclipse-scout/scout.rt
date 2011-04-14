@@ -101,6 +101,7 @@ public class InternalNetAuthenticator extends Authenticator {
       try {
         SwingUtilities.invokeAndWait(
             new Runnable() {
+              @Override
               public void run() {
                 try {
                   showModalDialog(status);

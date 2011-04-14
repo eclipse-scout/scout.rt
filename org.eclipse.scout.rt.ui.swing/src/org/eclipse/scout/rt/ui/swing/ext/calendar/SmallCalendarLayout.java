@@ -35,38 +35,48 @@ public class SmallCalendarLayout implements LayoutManager2 {
     m_cellSize = getGridCellSize();
   }
 
+  @Override
   public void addLayoutComponent(String name, Component comp) {
   }
 
+  @Override
   public void addLayoutComponent(Component comp, Object constraints) {
   }
 
+  @Override
   public void removeLayoutComponent(Component comp) {
   }
 
+  @Override
   public void invalidateLayout(Container target) {
   }
 
+  @Override
   public float getLayoutAlignmentX(Container target) {
     return Component.CENTER_ALIGNMENT;
   }
 
+  @Override
   public float getLayoutAlignmentY(Container target) {
     return Component.CENTER_ALIGNMENT;
   }
 
+  @Override
   public Dimension minimumLayoutSize(Container parent) {
     return new Dimension(m_prefSize);
   }
 
+  @Override
   public Dimension maximumLayoutSize(Container target) {
     return new Dimension(m_prefSize);
   }
 
+  @Override
   public Dimension preferredLayoutSize(Container parent) {
     return new Dimension(m_prefSize);
   }
 
+  @Override
   public void layoutContainer(Container parent) {
     int x = 0;
     int y = 0;

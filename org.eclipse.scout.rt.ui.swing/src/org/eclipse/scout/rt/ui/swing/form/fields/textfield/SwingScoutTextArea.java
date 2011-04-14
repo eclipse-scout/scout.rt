@@ -51,10 +51,12 @@ public class SwingScoutTextArea extends SwingScoutTextFieldComposite<IStringFiel
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public JScrollPane getSwingScrollPane() {
     return m_swingScrollPane;
   }
 
+  @Override
   public JTextAreaEx getSwingTextArea() {
     return (JTextAreaEx) getSwingTextComponent();
   }

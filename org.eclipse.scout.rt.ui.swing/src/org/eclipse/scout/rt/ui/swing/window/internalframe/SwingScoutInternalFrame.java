@@ -132,14 +132,17 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     }
   }
 
+  @Override
   public JComponent getSwingContentPane() {
     return (JComponent) m_swingView.getContentPane();
   }
 
+  @Override
   public void addSwingScoutViewListener(SwingScoutViewListener listener) {
     m_listenerList.add(SwingScoutViewListener.class, listener);
   }
 
+  @Override
   public void removeSwingScoutViewListener(SwingScoutViewListener listener) {
     m_listenerList.remove(SwingScoutViewListener.class, listener);
   }
@@ -158,10 +161,12 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     }
   }
 
+  @Override
   public boolean isVisible() {
     return m_addedToDesktop;
   }
 
+  @Override
   public boolean isActive() {
     return m_swingView != null && m_swingView.isSelected();
   }
@@ -170,6 +175,7 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     m_boundsProvider = boundsProvider;
   }
 
+  @Override
   public void openView() {
     m_env.getRootComposite().getDesktopComposite().addView(m_swingView, m_viewConstraints);
     if (m_boundsProvider != null) {
@@ -182,6 +188,7 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     m_addedToDesktop = true;
   }
 
+  @Override
   public void closeView() {
     if (m_boundsProvider != null) {
       m_boundsProvider.storeBounds(m_swingView.getBounds());
@@ -194,6 +201,7 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     m_env.getRootComposite().getDesktopComposite().removeView(m_swingView);
   }
 
+  @Override
   public void setTitle(String s) {
     if (s == null) {
       s = "";
@@ -204,18 +212,22 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     }
   }
 
+  @Override
   public void setCloseEnabled(boolean b) {
     m_swingView.setClosable(b);
   }
 
+  @Override
   public void setMaximizeEnabled(boolean b) {
     m_swingView.setMaximizable(b);
   }
 
+  @Override
   public void setMinimizeEnabled(boolean b) {
     m_swingView.setIconifiable(b);
   }
 
+  @Override
   public void setMinimized(boolean on) {
     try {
       m_swingView.setIcon(on);
@@ -225,6 +237,7 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     }
   }
 
+  @Override
   public void setMaximized(boolean on) {
     m_maximized = on;
     try {
@@ -235,11 +248,13 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     }
   }
 
+  @Override
   public void setName(String name) {
     m_swingView.setName(name);
   }
 
   private class P_SwingScoutRootListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
         boolean busy = ((Boolean) e.getNewValue()).booleanValue();
@@ -249,6 +264,7 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
   }// end private class
 
   private class P_SwingWindowListener implements InternalFrameListener {
+    @Override
     public void internalFrameOpened(InternalFrameEvent e) {
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutInternalFrame.this, SwingScoutViewEvent.TYPE_OPENED));
       //
@@ -272,10 +288,12 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
       });
     }
 
+    @Override
     public void internalFrameActivated(InternalFrameEvent e) {
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutInternalFrame.this, SwingScoutViewEvent.TYPE_ACTIVATED));
     }
 
+    @Override
     public void internalFrameClosing(InternalFrameEvent e) {
       Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
       if (focusOwner != null && focusOwner instanceof JComponent && ((JComponent) focusOwner).getInputVerifier() != null) {
@@ -287,6 +305,7 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutInternalFrame.this, SwingScoutViewEvent.TYPE_CLOSING));
     }
 
+    @Override
     public void internalFrameClosed(InternalFrameEvent e) {
       Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
       if (focusOwner != null && focusOwner instanceof JComponent && ((JComponent) focusOwner).getInputVerifier() != null) {
@@ -295,12 +314,15 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutInternalFrame.this, SwingScoutViewEvent.TYPE_CLOSED));
     }
 
+    @Override
     public void internalFrameDeactivated(InternalFrameEvent e) {
     }
 
+    @Override
     public void internalFrameDeiconified(InternalFrameEvent e) {
     }
 
+    @Override
     public void internalFrameIconified(InternalFrameEvent e) {
     }
   }// end private class

@@ -69,6 +69,7 @@ public class SwingScoutDecimalField extends SwingScoutValueFieldComposite<IDecim
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public JTextField getSwingTextField() {
     return (JTextField) getSwingField();
   }

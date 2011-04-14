@@ -130,6 +130,7 @@ public class SwingScoutTableCellEditor {
             if (((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) && e.getComponent().isShowing()) {
               SwingUtilities.invokeLater(
                   new Runnable() {
+                    @Override
                     public void run() {
                       e.getComponent().requestFocus();
                     }
@@ -310,6 +311,7 @@ public class SwingScoutTableCellEditor {
       return m_clickCountToStart;
     }
 
+    @Override
     public Object getCellEditorValue() {
       return null;
     }
@@ -322,6 +324,7 @@ public class SwingScoutTableCellEditor {
       return true;
     }
 
+    @Override
     public Component getTableCellEditorComponent(final JTable table, Object value, boolean isSelected, final int row, final int column) {
       m_container.removeAll();
       Component c = getCachedEditorComposite(row, column);

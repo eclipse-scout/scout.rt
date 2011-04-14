@@ -124,6 +124,7 @@ public class JButtonEx extends JButton {
               catch (InterruptedException ie) {
               }
               Runnable t = new Runnable() {
+                @Override
                 public void run() {
                   ButtonModel m = getModel();
                   if (m != null && m.isPressed()) {

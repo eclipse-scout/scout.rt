@@ -59,6 +59,7 @@ public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanFi
     return checkBox;
   }
 
+  @Override
   public JCheckBoxEx getSwingCheckBox() {
     return (JCheckBoxEx) getSwingField();
   }
@@ -133,6 +134,7 @@ public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanFi
    * Listeners
    */
   private class P_SwingActionListener implements ActionListener {
+    @Override
     public void actionPerformed(ActionEvent e) {
       handleSwingAction(e);
     }

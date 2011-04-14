@@ -77,10 +77,12 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public IImageField getScoutImageField() {
     return getScoutObject();
   }
 
+  @Override
   public SwingImageViewer getSwingImageViewer() {
     return (SwingImageViewer) getSwingField();
   }
@@ -333,12 +335,14 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
   }// end private class
 
   private class P_SwingTransformListener implements ImageTransformListener {
+    @Override
     public void transformChanged(ImageTransformEvent e) {
       handleSwingImageTransform(e);
     }
   }// end private class
 
   private class P_ScoutImageFieldListener implements ImageFieldListener {
+    @Override
     public void imageFieldChanged(final ImageFieldEvent e) {
       if (isIgnoredScoutEvent(ImageFieldEvent.class, "" + e.getType())) return;
       //
@@ -355,29 +359,35 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
   }// end private class
 
   private class P_DropTargetListener implements DropTargetListener {
+    @Override
     public void dragEnter(DropTargetDragEvent dtde) {
       // void
     }
 
+    @Override
     public void dragExit(DropTargetEvent dte) {
       // void
     }
 
+    @Override
     public void dragOver(DropTargetDragEvent dtde) {
       // void
     }
 
+    @Override
     public void drop(DropTargetDropEvent dtde) {
       dtde.acceptDrop(DnDConstants.ACTION_COPY);
       handleSwingDropAction(dtde.getTransferable());
     }
 
+    @Override
     public void dropActionChanged(DropTargetDragEvent dtde) {
       // void
     }
   } // end class P_DropTargetListener
 
   private class P_DragGestureListener implements DragGestureListener {
+    @Override
     public void dragGestureRecognized(DragGestureEvent dge) {
       Transferable to = handleSwingDragRequest();
       if (to != null) {

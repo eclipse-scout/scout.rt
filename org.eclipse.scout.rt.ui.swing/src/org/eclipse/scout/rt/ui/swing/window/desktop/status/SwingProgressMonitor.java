@@ -35,6 +35,7 @@ public class SwingProgressMonitor extends AbstractPropertyObserver implements IP
   private double m_internalTotalWork;
   private double m_internalWorked;
 
+  @Override
   public void beginTask(String name, int totalWork) {
     propertySupport.setPropertyString(PROP_SUB_TASK_NAME, null);
     propertySupport.setPropertyString(PROP_TASK_NAME, name);
@@ -43,6 +44,7 @@ public class SwingProgressMonitor extends AbstractPropertyObserver implements IP
     setWorked(0);
   }
 
+  @Override
   public void done() {
     m_internalWorked = m_internalTotalWork;
     setWorked(1);
@@ -56,6 +58,7 @@ public class SwingProgressMonitor extends AbstractPropertyObserver implements IP
     return propertySupport.getPropertyDouble(PROP_WORKED);
   }
 
+  @Override
   public void internalWorked(double work) {
     m_internalWorked += work;
     if (m_internalTotalWork > 0) {
@@ -66,14 +69,17 @@ public class SwingProgressMonitor extends AbstractPropertyObserver implements IP
     }
   }
 
+  @Override
   public boolean isCanceled() {
     return propertySupport.getPropertyBool(PROP_CANCELLED);
   }
 
+  @Override
   public void setCanceled(boolean cancelled) {
     propertySupport.setPropertyBool(PROP_CANCELLED, cancelled);
   }
 
+  @Override
   public void setTaskName(String name) {
     propertySupport.setPropertyString(PROP_TASK_NAME, name);
   }
@@ -82,6 +88,7 @@ public class SwingProgressMonitor extends AbstractPropertyObserver implements IP
     return propertySupport.getPropertyString(PROP_TASK_NAME);
   }
 
+  @Override
   public void subTask(String name) {
     propertySupport.setPropertyString(PROP_SUB_TASK_NAME, name);
   }
@@ -90,13 +97,16 @@ public class SwingProgressMonitor extends AbstractPropertyObserver implements IP
     return propertySupport.getPropertyString(PROP_SUB_TASK_NAME);
   }
 
+  @Override
   public void worked(int work) {
     internalWorked(work);
   }
 
+  @Override
   public void clearBlocked() {
   }
 
+  @Override
   public void setBlocked(IStatus reason) {
   }
 }

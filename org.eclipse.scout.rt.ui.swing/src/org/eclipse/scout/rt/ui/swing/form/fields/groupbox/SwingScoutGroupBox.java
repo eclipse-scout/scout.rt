@@ -119,14 +119,17 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     return swingScoutGroupBoxButtonbar.getSwingContainer();
   }
 
+  @Override
   public JPanel getSwingGroupBox() {
     return (JPanel) getSwingField();
   }
 
+  @Override
   public JPanel getSwingBodyPart() {
     return m_swingBodyPart;
   }
 
+  @Override
   public JPanel getSwingButtonBarPart() {
     return m_swingButtonBarPart;
   }

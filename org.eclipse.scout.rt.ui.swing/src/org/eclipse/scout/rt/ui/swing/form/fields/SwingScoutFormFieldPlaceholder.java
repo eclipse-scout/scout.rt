@@ -41,10 +41,12 @@ public class SwingScoutFormFieldPlaceholder implements ISwingScoutFormField<IFor
     m_swingContainer.add(BorderLayoutEx.CENTER, m_swingStatusLabel);
   }
 
+  @Override
   public JComponent getSwingContainer() {
     return m_swingContainer;
   }
 
+  @Override
   public JStatusLabelEx getSwingLabel() {
     return m_swingStatusLabel;
   }
@@ -53,14 +55,17 @@ public class SwingScoutFormFieldPlaceholder implements ISwingScoutFormField<IFor
     return null;
   }
 
+  @Override
   public JComponent getSwingField() {
     return null;
   }
 
+  @Override
   public IFormField getScoutObject() {
     return m_scoutObject;
   }
 
+  @Override
   public ISwingEnvironment getSwingEnvironment() {
     return m_env;
   }

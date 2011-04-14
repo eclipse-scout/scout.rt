@@ -96,6 +96,7 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
     container.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(SwingUtility.createKeystroke("F5"), "refresh");
     container.getActionMap().put("refresh",
         new AbstractAction() {
+          @Override
           public void actionPerformed(ActionEvent e) {
             // notify Scout
             Runnable t = new Runnable() {
@@ -120,10 +121,12 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
     setMiniCalendarCountFromScout(getScoutObject().getMiniCalendarCount());
   }
 
+  @Override
   public ISwingScoutTable getResourceTableComposite() {
     return m_resourceTableComposite;
   }
 
+  @Override
   public SwingScoutActivityMap getActivityMapComposite() {
     return m_activityMapComposite;
   }
@@ -194,6 +197,7 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
       m_bar2 = bar2;
     }
 
+    @Override
     public void adjustmentValueChanged(AdjustmentEvent e) {
       try {
         if (m_syncLock.acquire()) {
@@ -212,6 +216,7 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
   }// end private class
 
   private class P_SwingMiniCalendarChangeListener implements CalendarViewListener {
+    @Override
     public void viewChanged(CalendarViewEvent e) {
       switch (e.getType()) {
         case CalendarViewEvent.TYPE_SELECTION_CHANGED: {
@@ -239,6 +244,7 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
    * property changes
    */
   private class P_ScoutActivityMapPropertyChangeListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent e) {
       if (e.getPropertyName().equals(IActivityMap.PROP_WORK_DAY_COUNT)) {
         Runnable t = new Runnable() {

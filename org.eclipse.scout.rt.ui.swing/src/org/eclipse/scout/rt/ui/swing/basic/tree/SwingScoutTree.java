@@ -146,6 +146,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     });
   }
 
+  @Override
   public JTreeEx getSwingTree() {
     return (JTreeEx) getSwingField();
   }
@@ -154,6 +155,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     return (TreeSelectionModel) getSwingTree().getSelectionModel();
   }
 
+  @Override
   public JScrollPane getSwingScrollPane() {
     return m_swingScrollPane;
   }
@@ -778,6 +780,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
    * private inner classes
    */
   private class P_ScoutTreeListener implements TreeListener {
+    @Override
     public void treeChanged(final TreeEvent e) {
       if (isHandleScoutTreeEvent(new TreeEvent[]{e})) {
         if (isIgnoredScoutEvent(TreeEvent.class, "" + e.getType())) return;
@@ -799,6 +802,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       }
     }
 
+    @Override
     public void treeChangedBatch(final TreeEvent[] a) {
       //
       if (isHandleScoutTreeEvent(a)) {
@@ -869,12 +873,14 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }// end private class
 
   private class P_SwingSelectionListener implements TreeSelectionListener {
+    @Override
     public void valueChanged(TreeSelectionEvent e) {
       setSelectionFromSwing(getSwingTree().getSelectionPaths());
     }
   }// end private class
 
   private class P_SwingExpansionListener implements TreeExpansionListener {
+    @Override
     public void treeCollapsed(TreeExpansionEvent e) {
       TreePath path = e.getPath();
       if (path != null) {
@@ -882,6 +888,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       }
     }
 
+    @Override
     public void treeExpanded(TreeExpansionEvent e) {
       TreePath path = e.getPath();
       if (path != null) {

@@ -159,14 +159,17 @@ public class SwingScoutPopup implements ISwingScoutView {
     return m_ownerComponent;
   }
 
+  @Override
   public JComponent getSwingContentPane() {
     return (JComponent) m_swingWindow.getContentPane();
   }
 
+  @Override
   public void addSwingScoutViewListener(SwingScoutViewListener listener) {
     m_listenerList.add(SwingScoutViewListener.class, listener);
   }
 
+  @Override
   public void removeSwingScoutViewListener(SwingScoutViewListener listener) {
     m_listenerList.remove(SwingScoutViewListener.class, listener);
   }
@@ -214,14 +217,17 @@ public class SwingScoutPopup implements ISwingScoutView {
     fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutPopup.this, SwingScoutViewEvent.TYPE_CLOSED));
   }
 
+  @Override
   public boolean isVisible() {
     return m_swingWindow != null && m_swingWindow.isVisible();
   }
 
+  @Override
   public boolean isActive() {
     return m_swingWindow != null && m_swingWindow.isActive();
   }
 
+  @Override
   public void openView() {
     m_opened = true;
     autoAdjustBounds();
@@ -230,6 +236,7 @@ public class SwingScoutPopup implements ISwingScoutView {
     }
   }
 
+  @Override
   public void closeView() {
     if (m_opened) {
       m_opened = false;
@@ -241,22 +248,28 @@ public class SwingScoutPopup implements ISwingScoutView {
     }
   }
 
+  @Override
   public void setTitle(String s) {
     // nop
   }
 
+  @Override
   public void setCloseEnabled(boolean b) {
   }
 
+  @Override
   public void setMaximizeEnabled(boolean b) {
   }
 
+  @Override
   public void setMinimizeEnabled(boolean b) {
   }
 
+  @Override
   public void setMinimized(boolean on) {
   }
 
+  @Override
   public void setMaximized(boolean on) {
     m_maximized = on;
     if (on) {
@@ -288,12 +301,14 @@ public class SwingScoutPopup implements ISwingScoutView {
     }
   }
 
+  @Override
   public void setName(String name) {
     m_swingWindow.setName(name);
     m_swingWindow.getRootPane().setName(name);
   }
 
   private class P_SwingScoutRootListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
         boolean busy = ((Boolean) e.getNewValue()).booleanValue();

@@ -131,6 +131,7 @@ public class DefaultDropTarget extends DropTarget implements UIResource {
       return mask != DnDConstants.ACTION_NONE;
     }
 
+    @Override
     public void dragEnter(DropTargetDragEvent evt) {
       DataFlavor[] currentFlavors = evt.getCurrentDataFlavors();
       JComponent jcomponent = (JComponent) evt.getDropTargetContext().getComponent();
@@ -150,6 +151,7 @@ public class DefaultDropTarget extends DropTarget implements UIResource {
       }
     }
 
+    @Override
     public void dragOver(DropTargetDragEvent evt) {
       int eventDropAction = evt.getDropAction();
       if (m_canImport && actionSupported(eventDropAction)) {
@@ -160,10 +162,12 @@ public class DefaultDropTarget extends DropTarget implements UIResource {
       }
     }
 
+    @Override
     public void dragExit(DropTargetEvent evt) {
       //nop
     }
 
+    @Override
     public void drop(DropTargetDropEvent evt) {
       int eventDropAction = evt.getDropAction();
       JComponent jcomp = (JComponent) evt.getDropTargetContext().getComponent();
@@ -188,6 +192,7 @@ public class DefaultDropTarget extends DropTarget implements UIResource {
       }
     }
 
+    @Override
     public void dropActionChanged(DropTargetDragEvent evt) {
       int eventDropAction = evt.getDropAction();
       if (m_canImport && actionSupported(eventDropAction)) {

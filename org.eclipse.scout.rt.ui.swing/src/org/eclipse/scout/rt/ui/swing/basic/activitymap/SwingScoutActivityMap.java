@@ -60,6 +60,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
     // listeners
     activityMap.addActivityMapSelectionListener(
         new ActivityMapSelectionListener() {
+          @Override
           public void selectionChanged(ActivityMapSelectionEvent e) {
             setSelectionFromSwing(e.getRows(), e.getRange());
           }
@@ -170,6 +171,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
     super.attachScout();
     if (m_scoutListener == null) {
       m_scoutListener = new ActivityMapListener() {
+        @Override
         public void activityMapChanged(final ActivityMapEvent e) {
           if (isIgnoredScoutEvent(ActivityMapEvent.class, "" + e.getType())) return;
           //

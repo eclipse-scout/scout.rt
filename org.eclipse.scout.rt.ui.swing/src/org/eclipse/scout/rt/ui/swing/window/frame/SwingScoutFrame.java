@@ -110,14 +110,17 @@ public class SwingScoutFrame implements ISwingScoutView {
     }
   }
 
+  @Override
   public JComponent getSwingContentPane() {
     return (JComponent) m_swingFrame.getContentPane();
   }
 
+  @Override
   public void addSwingScoutViewListener(SwingScoutViewListener listener) {
     m_listenerList.add(SwingScoutViewListener.class, listener);
   }
 
+  @Override
   public void removeSwingScoutViewListener(SwingScoutViewListener listener) {
     m_listenerList.remove(SwingScoutViewListener.class, listener);
   }
@@ -136,10 +139,12 @@ public class SwingScoutFrame implements ISwingScoutView {
     }
   }
 
+  @Override
   public boolean isVisible() {
     return m_swingFrame != null && m_swingFrame.isVisible();
   }
 
+  @Override
   public boolean isActive() {
     return m_swingFrame != null && m_swingFrame.isActive();
   }
@@ -148,6 +153,7 @@ public class SwingScoutFrame implements ISwingScoutView {
     m_boundsProvider = boundsProvider;
   }
 
+  @Override
   public void openView() {
     m_opened = true;
     m_swingFrame.pack();
@@ -178,6 +184,7 @@ public class SwingScoutFrame implements ISwingScoutView {
     }
   }
 
+  @Override
   public void closeView() {
     m_opened = false;
     if (m_boundsProvider != null) {
@@ -190,6 +197,7 @@ public class SwingScoutFrame implements ISwingScoutView {
     new DependentCloseListener(m_swingFrame).close();
   }
 
+  @Override
   public void setTitle(String s) {
     if (s == null) {
       s = "";
@@ -197,15 +205,19 @@ public class SwingScoutFrame implements ISwingScoutView {
     m_swingFrame.setTitle(s);
   }
 
+  @Override
   public void setCloseEnabled(boolean b) {
   }
 
+  @Override
   public void setMaximizeEnabled(boolean b) {
   }
 
+  @Override
   public void setMinimizeEnabled(boolean b) {
   }
 
+  @Override
   public void setMinimized(boolean on) {
     if (on) {
       int state = (m_swingFrame.getExtendedState() & (0xffffffff - JFrame.MAXIMIZED_BOTH)) | JFrame.ICONIFIED;
@@ -216,6 +228,7 @@ public class SwingScoutFrame implements ISwingScoutView {
     }
   }
 
+  @Override
   public void setMaximized(boolean on) {
     m_maximized = on;
     if (on) {
@@ -227,11 +240,13 @@ public class SwingScoutFrame implements ISwingScoutView {
     }
   }
 
+  @Override
   public void setName(String name) {
     m_swingFrame.getRootPane().setName(name);
   }
 
   private class P_SwingScoutRootListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
         boolean busy = ((Boolean) e.getNewValue()).booleanValue();

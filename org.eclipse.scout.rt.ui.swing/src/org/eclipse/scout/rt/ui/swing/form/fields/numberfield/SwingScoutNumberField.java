@@ -69,6 +69,7 @@ public class SwingScoutNumberField extends SwingScoutValueFieldComposite<INumber
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public JTextField getSwingTextField() {
     return (JTextField) getSwingField();
   }

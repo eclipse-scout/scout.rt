@@ -262,10 +262,12 @@ public class JInternalFrameEx extends JInternalFrame implements IWaitSupport {
     }
   }
 
+  @Override
   public boolean isWaitCursor() {
     return m_waitCursor;
   }
 
+  @Override
   public void setWaitCursor(boolean b) {
     if (b != m_waitCursor) {
       m_waitCursor = b;

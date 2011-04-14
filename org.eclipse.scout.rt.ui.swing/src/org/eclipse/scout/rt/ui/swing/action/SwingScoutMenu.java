@@ -37,6 +37,7 @@ public class SwingScoutMenu<T extends IActionNode<?>> extends SwingScoutComposit
      */
     swingMenu.setVisible(getScoutObject().isVisible());
     m_actionComposite.getSwingAction().addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         if ("visible".equals(e.getPropertyName())) {
           JComponent c = getSwingField();

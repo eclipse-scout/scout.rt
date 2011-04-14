@@ -86,6 +86,7 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     m_htmlView.setMargin(null);
     m_htmlView.setCaretPosition(0);
     m_htmlView.addHyperlinkListener(new HyperlinkListener() {
+      @Override
       public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == EventType.ACTIVATED) {
           fireHyperlinkActionFromSwing(e.getURL());
@@ -112,6 +113,7 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public JTextPane getSwingHtmlField() {
     return m_htmlView;
   }

@@ -27,14 +27,17 @@ public class SortIcon implements Icon {
     m_asc = asc;
   }
 
+  @Override
   public int getIconWidth() {
     return W + insets.left + insets.right;
   }
 
+  @Override
   public int getIconHeight() {
     return H + insets.top + insets.bottom;
   }
 
+  @Override
   public void paintIcon(Component c, Graphics g, int x0, int y0) {
     g.setColor(Color.gray);
     g.translate(x0 + insets.left, y0 + insets.top);

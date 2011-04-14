@@ -44,6 +44,7 @@ public final class UndoableEditObserver implements FocusListener, UndoableEditLi
     c.addFocusListener(this);
     // re-attach when document changes
     c.addPropertyChangeListener("document", new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         Document old = (Document) e.getOldValue();
         Document doc = (Document) e.getNewValue();
@@ -60,12 +61,14 @@ public final class UndoableEditObserver implements FocusListener, UndoableEditLi
   /**
    * Implementation of FocusListener
    */
+  @Override
   public void focusGained(FocusEvent f) {
     if (!f.isTemporary()) {
       createUndoMananger();
     }
   }
 
+  @Override
   public void focusLost(FocusEvent f) {
     if (!f.isTemporary()) {
       removeUndoMananger();
@@ -75,6 +78,7 @@ public final class UndoableEditObserver implements FocusListener, UndoableEditLi
   /**
    * Implementation of UndoableEditListener
    */
+  @Override
   public void undoableEditHappened(UndoableEditEvent e) {
     if (m_undoManager != null) {
       m_undoManager.addEdit(e.getEdit());
@@ -84,12 +88,15 @@ public final class UndoableEditObserver implements FocusListener, UndoableEditLi
   /**
    * Implementation of KeyListener
    */
+  @Override
   public void keyReleased(KeyEvent e) {
   }
 
+  @Override
   public void keyTyped(KeyEvent e) {
   }
 
+  @Override
   public void keyPressed(KeyEvent e) {
     // Ctrl-Z
     if ((e.getKeyCode() == KeyEvent.VK_Z) && (e.isControlDown()) && (!e.isConsumed())) {

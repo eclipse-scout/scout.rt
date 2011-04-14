@@ -38,6 +38,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
     m_useAWT = useAWT;
   }
 
+  @Override
   public void showFileChooser() {
     File[] files = null;
     try {
@@ -219,6 +220,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
         dlg.setFile(extBuf.toString());
       }
       dlg.setFilenameFilter(new FilenameFilter() {
+        @Override
         public boolean accept(File dir, String name) {
           for (int i = 0; i < extArrayF.length; i++) {
             if (name.toLowerCase().endsWith("." + extArrayF[i])) {

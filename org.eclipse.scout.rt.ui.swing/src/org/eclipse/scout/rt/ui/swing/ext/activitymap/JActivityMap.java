@@ -233,6 +233,7 @@ public class JActivityMap extends JComponent implements Scrollable {
     m_activityProxyMouseListener = new MouseInputListener() {
       MouseClickedBugFix fix;
 
+      @Override
       public void mouseEntered(MouseEvent e) {
         EventListener[] listeners = m_listeners.getListeners(MouseListener.class);
         for (EventListener listener : listeners) {
@@ -240,6 +241,7 @@ public class JActivityMap extends JComponent implements Scrollable {
         }
       }
 
+      @Override
       public void mouseExited(MouseEvent e) {
         EventListener[] listeners = m_listeners.getListeners(MouseListener.class);
         for (EventListener listener : listeners) {
@@ -247,6 +249,7 @@ public class JActivityMap extends JComponent implements Scrollable {
         }
       }
 
+      @Override
       public void mousePressed(MouseEvent e) {
         fix = new MouseClickedBugFix(e);
         EventListener[] listeners = m_listeners.getListeners(MouseListener.class);
@@ -260,6 +263,7 @@ public class JActivityMap extends JComponent implements Scrollable {
         }
       }
 
+      @Override
       public void mouseReleased(MouseEvent e) {
         EventListener[] listeners = m_listeners.getListeners(MouseListener.class);
         for (EventListener listener : listeners) {
@@ -272,6 +276,7 @@ public class JActivityMap extends JComponent implements Scrollable {
         if(fix!=null) fix.mouseReleased(this, e);
       }
 
+      @Override
       public void mouseClicked(MouseEvent e) {
         if (fix.mouseClicked()) return;
         EventListener[] listeners = m_listeners.getListeners(MouseListener.class);
@@ -285,6 +290,7 @@ public class JActivityMap extends JComponent implements Scrollable {
         }
       }
 
+      @Override
       public void mouseDragged(MouseEvent e) {
         // only send down to map when button1
         if (isButton1(e)) {
@@ -292,6 +298,7 @@ public class JActivityMap extends JComponent implements Scrollable {
         }
       }
 
+      @Override
       public void mouseMoved(MouseEvent e) {
         // only send down to map when button1
         if (isButton1(e)) {
@@ -301,6 +308,7 @@ public class JActivityMap extends JComponent implements Scrollable {
     };
     // activity proxy focus listener
     m_activityProxyFocusListener = new FocusListener() {
+      @Override
       public void focusGained(FocusEvent e) {
         EventListener[] listeners = m_listeners.getListeners(FocusListener.class);
         for (EventListener listener : listeners) {
@@ -308,6 +316,7 @@ public class JActivityMap extends JComponent implements Scrollable {
         }
       }
 
+      @Override
       public void focusLost(FocusEvent e) {
         EventListener[] listeners = m_listeners.getListeners(FocusListener.class);
         for (EventListener listener : listeners) {
@@ -317,14 +326,17 @@ public class JActivityMap extends JComponent implements Scrollable {
     };
     // set models
     setModel(new ActivityMapModel() {
+      @Override
       public int getRowCount() {
         return 0;
       }
 
+      @Override
       public int getRowHeight(int rowIndex) {
         return 0;
       }
 
+      @Override
       public int getRowLocation(int rowIndex) {
         return 0;
       }
@@ -334,51 +346,63 @@ public class JActivityMap extends JComponent implements Scrollable {
         return -1;
       }
 
+      @Override
       public int getHeaderHeight() {
         return 0;
       }
 
+      @Override
       public ActivityComponent[] getActivities() {
         return new ActivityComponent[0];
       }
 
+      @Override
       public double[] getActivityRange(ActivityComponent a) {
         return null;
       }
     });
     setColumnModel(new ActivityMapColumnModel() {
+      @Override
       public double[] getMajorColumnRange(Object majorColumn) {
         return new double[2];
       }
 
+      @Override
       public String getMajorColumnText(Object column, int size) {
         return null;
       }
 
+      @Override
       public Object[] getMajorColumns() {
         return new Object[0];
       }
 
+      @Override
       public double[] getMinorColumnRange(Object mainorColumn) {
         return new double[2];
       }
 
+      @Override
       public String getMinorColumnText(Object column, int size) {
         return null;
       }
 
+      @Override
       public Object[] getMinorColumns(Object majorColumn) {
         return new Object[0];
       }
 
+      @Override
       public double[] snapRange(double d) {
         return new double[]{0, 0};
       }
 
+      @Override
       public String getMajorColumnTooltipText(Object column) {
         return null;
       }
 
+      @Override
       public String getMinorColumnTooltipText(Object column) {
         return null;
       }
@@ -731,10 +755,12 @@ public class JActivityMap extends JComponent implements Scrollable {
    * Implementation of Scrollable
    */
 
+  @Override
   public Dimension getPreferredScrollableViewportSize() {
     return new Dimension(10240, 10240);
   }
 
+  @Override
   public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
     if (direction == SwingConstants.HORIZONTAL) {
       return 100;
@@ -749,6 +775,7 @@ public class JActivityMap extends JComponent implements Scrollable {
     }
   }
 
+  @Override
   public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
     if (direction == SwingConstants.HORIZONTAL) {
       return visibleRect.width;
@@ -758,10 +785,12 @@ public class JActivityMap extends JComponent implements Scrollable {
     }
   }
 
+  @Override
   public boolean getScrollableTracksViewportWidth() {
     return true;
   }
 
+  @Override
   public boolean getScrollableTracksViewportHeight() {
     return false;
   }

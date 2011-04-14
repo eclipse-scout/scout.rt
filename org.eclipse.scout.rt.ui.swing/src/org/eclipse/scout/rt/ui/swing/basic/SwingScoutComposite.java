@@ -112,6 +112,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
     return b;
   }
 
+  @Override
   public void createField(T scoutObject, ISwingEnvironment environment) {
     m_scoutObject = scoutObject;
     m_env = environment;
@@ -145,6 +146,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
     }
   }
 
+  @Override
   public ISwingEnvironment getSwingEnvironment() {
     return m_env;
   }
@@ -178,10 +180,12 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
     }
   }
 
+  @Override
   public JComponent getSwingField() {
     return m_swingField;
   }
 
+  @Override
   public JComponent getSwingContainer() {
     return m_swingField;
   }
@@ -220,10 +224,12 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
     }
   }
 
+  @Override
   public T getScoutObject() {
     return m_scoutObject;
   }
 
+  @Override
   public final void connectToScout() {
     if (!m_connectedToScout) {
       //avoid reentrancy
@@ -264,6 +270,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
     }
   }
 
+  @Override
   public final void disconnectFromScout() {
     if (m_connectedToScout) {
       //avoid reentrancy
@@ -485,6 +492,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
   }// end private class
 
   private class P_SwingShowingListener implements HierarchyListener {
+    @Override
     public void hierarchyChanged(HierarchyEvent e) {
       if (e.getID() == HierarchyEvent.HIERARCHY_CHANGED) {
         if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
@@ -511,6 +519,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
    * composites depend on the use of this weak listener concept
    */
   private class P_ScoutPropertyChangeListener implements PropertyChangeListener, WeakEventListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent e) {
       if (isIgnoredScoutEvent(PropertyChangeEvent.class, e.getPropertyName())) return;
       //

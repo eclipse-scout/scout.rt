@@ -21,14 +21,17 @@ public class MissingIcon implements Icon {
   public MissingIcon() {
   }
 
+  @Override
   public int getIconWidth() {
     return 16;
   }
 
+  @Override
   public int getIconHeight() {
     return 16;
   }
 
+  @Override
   public void paintIcon(Component c, Graphics g, int x, int y) {
     g.setColor(Color.lightGray);
   }

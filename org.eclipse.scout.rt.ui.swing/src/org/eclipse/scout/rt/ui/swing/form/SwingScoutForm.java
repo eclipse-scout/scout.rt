@@ -85,6 +85,7 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     }
   }
 
+  @Override
   public JComponent getSwingFormPane() {
     return getSwingField();
   }
@@ -93,6 +94,7 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     return getScoutObject();
   }
 
+  @Override
   public void detachSwingView() {
     if (m_viewComposite != null) {
       if (m_swingScoutViewListener != null) {
@@ -143,6 +145,7 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     }
   }
 
+  @Override
   public ISwingScoutView getView() {
     return m_viewComposite;
   }
@@ -220,6 +223,7 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     }
   }
 
+  @Override
   public void setInitialFocus() {
     JComponent comp = getDefaultFocusOwner();
     if (comp != null) {
@@ -232,6 +236,7 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
 
   private class P_SwingScoutViewListener implements SwingScoutViewListener {
 
+    @Override
     public void viewChanged(SwingScoutViewEvent e) {
       switch (e.getType()) {
         case SwingScoutViewEvent.TYPE_OPENED: {
@@ -284,6 +289,7 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     private Object m_structureChangeRunnableLock = new Object();
     private Runnable m_structureChangeRunnable;
 
+    @Override
     public void formChanged(final FormEvent e) {
       switch (e.getType()) {
         case FormEvent.TYPE_PRINT: {
@@ -322,6 +328,7 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
           synchronized (m_structureChangeRunnableLock) {
             if (m_structureChangeRunnable == null) {
               m_structureChangeRunnable = new Runnable() {
+                @Override
                 public void run() {
                   synchronized (m_structureChangeRunnableLock) {
                     m_structureChangeRunnable = null;

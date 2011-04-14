@@ -73,6 +73,7 @@ public class SwingScoutAction<T extends IAction> extends SwingScoutComposite<T> 
     disconnectFromScout();
   }
 
+  @Override
   public Action getSwingAction() {
     return m_swingAction;
   }
@@ -191,6 +192,7 @@ public class SwingScoutAction<T extends IAction> extends SwingScoutComposite<T> 
       registerCompositeOnAction(this, SwingScoutAction.this);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       handleSwingAction();
     }

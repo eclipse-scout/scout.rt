@@ -126,14 +126,17 @@ public class SwingScoutDialog implements ISwingScoutView {
     }
   }
 
+  @Override
   public JComponent getSwingContentPane() {
     return (JComponent) m_swingDialog.getContentPane();
   }
 
+  @Override
   public void addSwingScoutViewListener(SwingScoutViewListener listener) {
     m_listenerList.add(SwingScoutViewListener.class, listener);
   }
 
+  @Override
   public void removeSwingScoutViewListener(SwingScoutViewListener listener) {
     m_listenerList.remove(SwingScoutViewListener.class, listener);
   }
@@ -152,6 +155,7 @@ public class SwingScoutDialog implements ISwingScoutView {
     }
   }
 
+  @Override
   public void closeView() {
     m_opened = false;
     if (m_boundsProvider != null && m_swingDialog != null && m_swingDialog.isVisible()) {
@@ -164,10 +168,12 @@ public class SwingScoutDialog implements ISwingScoutView {
     new DependentCloseListener(m_swingDialog).close();
   }
 
+  @Override
   public boolean isVisible() {
     return m_swingDialog != null && m_swingDialog.isVisible();
   }
 
+  @Override
   public boolean isActive() {
     return m_swingDialog != null && m_swingDialog.isActive();
   }
@@ -176,6 +182,7 @@ public class SwingScoutDialog implements ISwingScoutView {
     m_boundsProvider = boundsProvider;
   }
 
+  @Override
   public void openView() {
     m_opened = true;
     try {
@@ -218,6 +225,7 @@ public class SwingScoutDialog implements ISwingScoutView {
     }
   }
 
+  @Override
   public void setTitle(String s) {
     if (s == null) {
       s = "";
@@ -225,18 +233,23 @@ public class SwingScoutDialog implements ISwingScoutView {
     m_swingDialog.setTitle(s);
   }
 
+  @Override
   public void setCloseEnabled(boolean b) {
   }
 
+  @Override
   public void setMaximizeEnabled(boolean b) {
   }
 
+  @Override
   public void setMinimizeEnabled(boolean b) {
   }
 
+  @Override
   public void setMinimized(boolean on) {
   }
 
+  @Override
   public void setMaximized(boolean on) {
     m_maximized = on;
     if (on) {
@@ -268,11 +281,13 @@ public class SwingScoutDialog implements ISwingScoutView {
     }
   }
 
+  @Override
   public void setName(String name) {
     m_swingDialog.getRootPane().setName(name);
   }
 
   private class P_SwingScoutRootListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
         boolean busy = ((Boolean) e.getNewValue()).booleanValue();

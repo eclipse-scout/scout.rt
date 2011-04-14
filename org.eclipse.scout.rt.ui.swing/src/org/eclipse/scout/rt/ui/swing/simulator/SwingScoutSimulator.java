@@ -174,6 +174,7 @@ public final class SwingScoutSimulator {
    * private classes
    */
   private class P_AWTEventListener implements AWTEventListener {
+    @Override
     public void eventDispatched(AWTEvent e) {
       if (e instanceof MouseEvent) {
         if (m_recordingScript != null) {
@@ -243,6 +244,7 @@ public final class SwingScoutSimulator {
       return m_timeOffset;
     }
 
+    @Override
     public void run() {
       Window w = getActiveWindow();
       if (w != null) {
@@ -280,6 +282,7 @@ public final class SwingScoutSimulator {
       return m_timeOffset;
     }
 
+    @Override
     public void run() {
       Window w = getActiveWindow();
       if (w != null) {

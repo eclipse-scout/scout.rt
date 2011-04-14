@@ -18,31 +18,39 @@ import java.awt.Rectangle;
 
 public class ActivityMapLayout implements LayoutManager2 {
 
+  @Override
   public void addLayoutComponent(String name, Component comp) {
     addLayoutComponent(comp, name);
   }
 
+  @Override
   public void addLayoutComponent(Component comp, Object constraints) {
   }
 
+  @Override
   public void removeLayoutComponent(Component comp) {
   }
 
+  @Override
   public float getLayoutAlignmentX(Container target) {
     return 0;
   }
 
+  @Override
   public float getLayoutAlignmentY(Container target) {
     return 0;
   }
 
+  @Override
   public void invalidateLayout(Container target) {
   }
 
+  @Override
   public Dimension minimumLayoutSize(Container parent) {
     return new Dimension(20, 20);
   }
 
+  @Override
   public Dimension preferredLayoutSize(Container parent) {
     synchronized (parent.getTreeLock()) {
       JActivityMap map = (JActivityMap) parent;
@@ -53,10 +61,12 @@ public class ActivityMapLayout implements LayoutManager2 {
     }
   }
 
+  @Override
   public Dimension maximumLayoutSize(Container target) {
     return new Dimension(10240, 10240);
   }
 
+  @Override
   public void layoutContainer(Container parent) {
     synchronized (parent.getTreeLock()) {
       JActivityMap map = (JActivityMap) parent;

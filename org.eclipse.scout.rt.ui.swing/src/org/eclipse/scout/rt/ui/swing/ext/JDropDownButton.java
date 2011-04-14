@@ -95,6 +95,7 @@ public class JDropDownButton extends JComponent {
 
     Color arrowColor = Color.black;
 
+    @Override
     public void paintIcon(Component c, Graphics g, int x, int y) {
       g.setColor(arrowColor);
       g.drawLine(x, y, x + 4, y);
@@ -102,10 +103,12 @@ public class JDropDownButton extends JComponent {
       g.drawLine(x + 2, y + 2, x + 2, y + 2);
     }
 
+    @Override
     public int getIconWidth() {
       return 6;
     }
 
+    @Override
     public int getIconHeight() {
       return 4;
     }

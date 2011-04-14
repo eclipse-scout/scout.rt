@@ -58,6 +58,7 @@ public class SwingScoutRadioButtonGroup extends SwingScoutValueFieldComposite<IR
     container.setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public JPanel getSwingRadioButtonPanel() {
     return (JPanel) getSwingField();
   }

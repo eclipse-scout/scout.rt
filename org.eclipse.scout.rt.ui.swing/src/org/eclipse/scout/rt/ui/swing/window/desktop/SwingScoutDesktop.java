@@ -72,6 +72,7 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
     SwingUtility.installDevelopmentShortcuts(getSwingDesktopPane());
   }
 
+  @Override
   public JDesktopPane getSwingDesktopPane() {
     return (JDesktopPane) getSwingField();
   }
@@ -110,6 +111,7 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
     }
   }
 
+  @Override
   public void addView(JInternalFrameEx f, Object constraints) {
     MultiSplitLayoutConstraints mc = (MultiSplitLayoutConstraints) constraints;
     f.setTabIndex(mc.tabIndex);
@@ -129,6 +131,7 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
     getSwingDesktopPane().repaint();
   }
 
+  @Override
   public void removeView(JInternalFrameEx f) {
     m_toolsViewPlaceholder.removeFrame(f);
     getSwingDesktopPane().getDesktopManager().closeFrame(f);
@@ -157,6 +160,7 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
       m_delta = delta;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       handleSwingTabAction(m_delta);
     }

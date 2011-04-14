@@ -59,6 +59,7 @@ public class SwingScoutTabItem extends SwingScoutComposite<IGroupBox> implements
     return new SwingTabIcon();
   }
 
+  @Override
   public Icon getSwingTabIcon() {
     return m_swingTabIcon;
   }
@@ -171,6 +172,7 @@ public class SwingScoutTabItem extends SwingScoutComposite<IGroupBox> implements
       m_selected = selected;
     }
 
+    @Override
     public int getIconWidth() {
       Font f = getSwingContainer().getFont();
       if (f != null) {
@@ -185,6 +187,7 @@ public class SwingScoutTabItem extends SwingScoutComposite<IGroupBox> implements
       }
     }
 
+    @Override
     public int getIconHeight() {
       Font f = getSwingContainer().getFont();
       if (f != null) {
@@ -195,6 +198,7 @@ public class SwingScoutTabItem extends SwingScoutComposite<IGroupBox> implements
       }
     }
 
+    @Override
     public void paintIcon(Component c, Graphics g, int x, int y) {
       Font f = getSwingContainer().getFont();
       FontMetrics fm = getSwingContainer().getFontMetrics(f);

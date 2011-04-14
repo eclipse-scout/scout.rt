@@ -50,10 +50,12 @@ public class DefaultActivityComponent extends JComponent implements ActivityComp
     });
   }
 
+  @Override
   public void focusGained(FocusEvent e) {
     repaint();
   }
 
+  @Override
   public void focusLost(FocusEvent e) {
     repaint();
   }
@@ -67,6 +69,7 @@ public class DefaultActivityComponent extends JComponent implements ActivityComp
     repaint();
   }
 
+  @Override
   public int getRowIndex() {
     return m_rowIndex;
   }

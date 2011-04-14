@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -74,6 +74,7 @@ public abstract class AbstractSwingApplication implements IApplication {
     try {
       SwingUtilities.invokeAndWait(
           new Runnable() {
+            @Override
             public void run() {
               m_env = createSwingEnvironment();
             }
@@ -88,7 +89,7 @@ public abstract class AbstractSwingApplication implements IApplication {
     // register progress as osgi service
     if (Platform.getProduct() != null && Platform.getProduct().getDefiningBundle() != null) {
       BundleContext ctx = Platform.getProduct().getDefiningBundle().getBundleContext();
-      m_monitorReg = ctx.registerService(IProgressMonitor.class.getName(), m_monitor, new Hashtable());
+      m_monitorReg = ctx.registerService(IProgressMonitor.class.getName(), m_monitor, new Hashtable<String, Object>());
     }
     m_monitor.showSplash();
   }
@@ -119,6 +120,7 @@ public abstract class AbstractSwingApplication implements IApplication {
    * <p>
    * Normally {@link #startInSubject(IApplicationContext)} is overrided
    */
+  @Override
   public Object start(final IApplicationContext context) throws Exception {
     execInitLocale();
     if (Subject.getSubject(AccessController.getContext()) != null) {
@@ -129,6 +131,7 @@ public abstract class AbstractSwingApplication implements IApplication {
       Subject subject = new Subject();
       subject.getPrincipals().add(new SimplePrincipal(System.getProperty("user.name")));
       return Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
+        @Override
         public Object run() throws Exception {
           return exit(startInSubject(context));
         }
@@ -177,6 +180,7 @@ public abstract class AbstractSwingApplication implements IApplication {
     try {
       SwingUtilities.invokeAndWait(
           new Runnable() {
+            @Override
             public void run() {
               m_env.showGUI(clientSession);
               execSwingStarted(clientSession);
@@ -220,6 +224,7 @@ public abstract class AbstractSwingApplication implements IApplication {
   protected void execSwingStarted(IClientSession clientSession) {
   }
 
+  @Override
   public void stop() {
     getClientSession().stopSession();
   }

@@ -58,14 +58,17 @@ public class SwingScoutTableField extends SwingScoutFieldComposite<ITableField<?
     return null;
   }
 
+  @Override
   public JScrollPane getSwingScrollPane() {
     return m_tableComposite != null ? m_tableComposite.getSwingScrollPane() : null;
   }
 
+  @Override
   public JTableEx getSwingTable() {
     return m_tableComposite != null ? m_tableComposite.getSwingTable() : null;
   }
 
+  @Override
   public ISwingTableStatus getSwingTableStatus() {
     return m_swingTableStatus;
   }

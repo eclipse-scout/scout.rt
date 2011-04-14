@@ -304,6 +304,7 @@ public class SwingScoutToolBar extends SwingScoutComposite<IDesktop> {
   private class P_BackAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       handleNavigationBackFromSwing();
     }

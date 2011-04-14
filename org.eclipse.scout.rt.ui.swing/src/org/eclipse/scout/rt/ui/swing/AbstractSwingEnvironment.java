@@ -130,6 +130,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     init();
   }
 
+  @Override
   public void init() {
     checkThread();
     if (!m_initialized) {
@@ -212,10 +213,12 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     new InitLookAndFeelInjector().inject(initProperties);
   }
 
+  @Override
   public Icon getIcon(String name) {
     return m_iconLocator.getIcon(name);
   }
 
+  @Override
   public Image getImage(String name) {
     return m_iconLocator.getImage(name);
   }
@@ -268,10 +271,12 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public ISwingScoutTray getTrayComposite() {
     return m_trayComposite;
   }
 
+  @Override
   public int getFormColumnWidth() {
     return 360;
   }
@@ -281,6 +286,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return 12;
   }
 
+  @Override
   public int getFormRowHeight() {
     return 23;
   }
@@ -290,6 +296,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return 6;
   }
 
+  @Override
   public int getFieldLabelWidth() {
     return 130;
   }
@@ -299,23 +306,28 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return 28;
   }
 
+  @Override
   public int getIconButtonSize() {
     return 23;
   }
 
+  @Override
   public int getDropDownButtonWidth() {
     return 35;
   }
 
+  @Override
   public void interceptUIDefaults(UIDefaults defaults) {
     new UIDefaultsInjector().inject(defaults);
   }
 
+  @Override
   public Frame getRootFrame() {
     checkThread();
     return m_rootFrame;
   }
 
+  @Override
   public ISwingScoutRootFrame getRootComposite() {
     return m_rootComposite;
   }
@@ -331,6 +343,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return true;
   }
 
+  @Override
   public void showGUI(IClientSession session) {
     checkThread();
     m_scoutSession = session;
@@ -351,6 +364,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     final IDesktop desktop = m_scoutSession.getDesktop();
     if (desktop != null) {
       m_scoutSession.getDesktop().addDesktopListener(new DesktopListener() {
+        @Override
         public void desktopChanged(final DesktopEvent e) {
           switch (e.getType()) {
             case DesktopEvent.TYPE_FORM_ADDED: {
@@ -469,22 +483,27 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     }
   }
 
+  @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     m_propertySupport.addPropertyChangeListener(listener);
   }
 
+  @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     m_propertySupport.removePropertyChangeListener(listener);
   }
 
+  @Override
   public IClientSession getScoutSession() {
     return m_scoutSession;
   }
 
+  @Override
   public boolean isBusy() {
     return m_busyStatus == BusyStatus.BUSY;
   }
 
+  @Override
   public void setBusyFromSwing(boolean b) {
     checkThread();
     if (b) {
@@ -545,6 +564,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     }
   }
 
+  @Override
   public JobEx invokeScoutLater(Runnable j, long cancelTimeout) {
     synchronized (m_immediateSwingJobsLock) {
       m_immediateSwingJobs.clear();
@@ -552,6 +572,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return m_synchronizer.invokeScoutLater(j, cancelTimeout);
   }
 
+  @Override
   public void invokeSwingLater(Runnable j) {
     m_synchronizer.invokeSwingLater(j);
   }
@@ -609,6 +630,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return rootFrame;
   }
 
+  @Override
   public ISwingScoutRootFrame createRootComposite(Frame rootFrame, IDesktop desktop) {
     ISwingScoutRootFrame ui = new SwingScoutRootFrame(rootFrame);
     ui.createField(desktop, this);
@@ -646,6 +668,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     }
   }
 
+  @Override
   public ISwingScoutDesktop createDesktop(Window owner, IDesktop desktop) {
     ISwingScoutDesktop ui = new SwingScoutDesktop();
     ui.createField(desktop, this);
@@ -653,6 +676,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public void showStandaloneForm(Component parent, IForm f) {
     if (f == null) {
       return;
@@ -721,6 +745,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     }
   }
 
+  @Override
   public void hideStandaloneForm(IForm f) {
     if (f != null) {
       ISwingScoutForm formComposite = m_standaloneFormComposites.remove(f);
@@ -734,6 +759,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     }
   }
 
+  @Override
   public ISwingScoutForm[] getStandaloneFormComposites() {
     ArrayList<ISwingScoutForm> list = new ArrayList<ISwingScoutForm>();
     for (ISwingScoutForm f : m_standaloneFormComposites.values()) {
@@ -744,6 +770,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return list.toArray(new ISwingScoutForm[list.size()]);
   }
 
+  @Override
   public ISwingScoutForm getStandaloneFormComposite(IForm f) {
     if (f != null) {
       ISwingScoutForm formComposite = m_standaloneFormComposites.get(f);
@@ -752,6 +779,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return null;
   }
 
+  @Override
   public void activateStandaloneForm(IForm f) {
     if (f != null) {
       ISwingScoutForm formComposite = m_standaloneFormComposites.get(f);
@@ -771,11 +799,13 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     }
   }
 
+  @Override
   public Object getViewLayoutConstraintsFor(IForm f) {
     String viewId = f.getDisplayViewId();
     return getViewLayoutConstraintsFor(viewId);
   }
 
+  @Override
   public Object getViewLayoutConstraintsFor(String viewId) {
     // begin mapping
     if (IForm.VIEW_ID_OUTLINE_SELECTOR.equalsIgnoreCase(viewId)) {
@@ -830,6 +860,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     }
   }
 
+  @Override
   public IFormField findFocusOwnerField() {
     Component comp = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     while (comp instanceof JComponent) {
@@ -843,6 +874,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return null;
   }
 
+  @Override
   public void showMessageBox(Component parent, IMessageBox mb) {
     Window w = null;
     if (w == null) {
@@ -863,6 +895,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     mbox.showSwingMessageBox();
   }
 
+  @Override
   public ISwingScoutMessageBox createMessageBox(Window w, IMessageBox mb) {
     ISwingScoutMessageBox ui = new SwingScoutMessageBox(w);
     ui.createField(mb, this);
@@ -871,6 +904,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public void showFileChooser(Component parent, IFileChooser fc) {
     Window w = null;
     if (w == null) {
@@ -891,12 +925,14 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     sfc.showFileChooser();
   }
 
+  @Override
   public ISwingScoutFileChooser createFileChooser(Window w, IFileChooser fc) {
     ISwingScoutFileChooser ui = new SwingScoutFileChooser(this, fc, w, true);
     decorate(fc, ui);
     return ui;
   }
 
+  @Override
   public ISwingScoutFormField createFormField(JComponent parent, IFormField field) {
     if (m_formFieldFactory == null) {
       m_formFieldFactory = new FormFieldFactory();
@@ -906,6 +942,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public ISwingScoutView createDialog(Window owner, IForm form) {
     ISwingScoutBoundsProvider boundsProvider = null;
     if (form.isCacheBounds()) {
@@ -924,6 +961,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public ISwingScoutView createFrame(Window owner, IForm form) {
     ISwingScoutBoundsProvider boundsProvider = null;
     if (form.isCacheBounds()) {
@@ -942,6 +980,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public ISwingScoutView createPopupDialog(Window parentWindow, IForm form) {
     Component owner = getPopupOwner();
     if (owner == null) {
@@ -975,6 +1014,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public ISwingScoutView createPopupWindow(Window parentWindow, IForm form) {
     Component owner = getPopupOwner();
     if (owner == null) {
@@ -1017,6 +1057,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public ISwingScoutView createView(Object viewConstraints, IForm form) {
     ISwingScoutBoundsProvider boundsProvider = null;
     if (form.isCacheBounds()) {
@@ -1028,6 +1069,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public ISwingScoutForm createForm(JComponent parent, IForm model) {
     ISwingScoutForm ui = new SwingScoutForm(this, model);
     ui.createField(model, this);
@@ -1035,6 +1077,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public ISwingScoutForm createForm(ISwingScoutView targetViewComposite, IForm model) {
     ISwingScoutForm ui = new SwingScoutForm(this, targetViewComposite, model);
     ui.createField(model, this);
@@ -1042,6 +1085,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public ISwingScoutTabItem createTabItem(JComponent parent, IGroupBox field) {
     SwingScoutTabItem ui = new SwingScoutTabItem();
     ui.createField(field, this);
@@ -1049,10 +1093,12 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return ui;
   }
 
+  @Override
   public void appendActions(JComponent parent, List<? extends IAction> actions) {
     new AppendActionsInjector().inject(this, parent, actions);
   }
 
+  @Override
   public ISwingScoutAction createAction(JComponent parent, IAction action) {
     ISwingScoutAction ui = new CreateActionInjector().inject(this, parent, action);
     decorate(action, ui);
@@ -1062,6 +1108,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   /**
    * @return true if component can realistically gain focus
    */
+  @Override
   @SuppressWarnings("deprecation")
   public boolean acceptAsFocusTarget(Component comp) {
     checkThread();

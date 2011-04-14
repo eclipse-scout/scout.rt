@@ -59,23 +59,29 @@ public abstract class AbstractLayoutManager2 implements LayoutManager2 {
     }
   }
 
+  @Override
   public void addLayoutComponent(String name, Component comp) {
   }
 
+  @Override
   public void addLayoutComponent(Component comp, Object constraints) {
   }
 
+  @Override
   public void removeLayoutComponent(Component comp) {
   }
 
+  @Override
   public float getLayoutAlignmentX(Container parent) {
     return 0;
   }
 
+  @Override
   public float getLayoutAlignmentY(Container parent) {
     return 0;
   }
 
+  @Override
   public void invalidateLayout(Container parent) {
     m_valid = false;
   }
@@ -99,6 +105,7 @@ public abstract class AbstractLayoutManager2 implements LayoutManager2 {
    */
   protected abstract void validateLayout(Container parent);
 
+  @Override
   public Dimension minimumLayoutSize(Container parent) {
     verifyLayout(parent);
     synchronized (parent.getTreeLock()) {
@@ -106,6 +113,7 @@ public abstract class AbstractLayoutManager2 implements LayoutManager2 {
     }
   }
 
+  @Override
   public Dimension preferredLayoutSize(Container parent) {
     verifyLayout(parent);
     synchronized (parent.getTreeLock()) {
@@ -113,6 +121,7 @@ public abstract class AbstractLayoutManager2 implements LayoutManager2 {
     }
   }
 
+  @Override
   public Dimension maximumLayoutSize(Container parent) {
     verifyLayout(parent);
     synchronized (parent.getTreeLock()) {
@@ -128,5 +137,6 @@ public abstract class AbstractLayoutManager2 implements LayoutManager2 {
   /**
    * get tree lock here, the lock has not yet been acquired
    */
+  @Override
   public abstract void layoutContainer(Container parent);
 }

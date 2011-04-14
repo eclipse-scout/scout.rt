@@ -171,6 +171,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     m_htmlView.setMargin(null);
     m_htmlView.setCaretPosition(0);
     m_htmlView.addHyperlinkListener(new HyperlinkListener() {
+      @Override
       public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == EventType.ACTIVATED) {
           fireHyperlinkActionFromSwing(e.getURL());

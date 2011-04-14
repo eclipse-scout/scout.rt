@@ -262,6 +262,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
       final DateChooser dateChooser = new DateChooser();
       dateChooser.setDate(d);
       dateChooser.addChangeListener(new ChangeListener() {
+        @Override
         public void stateChanged(ChangeEvent e) {
           acceptProposalFromSwing(dateChooser.getDate());
         }
@@ -281,6 +282,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
       Action escAction = new AbstractAction() {
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void actionPerformed(ActionEvent e) {
           closePopup();
         }
@@ -300,6 +302,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
       m_proposalPopup = new SwingScoutDropDownPopup(getSwingEnvironment(), textField, textField);
       m_proposalPopup.makeNonFocusable();
       m_proposalPopup.addSwingScoutViewListener(new SwingScoutViewListener() {
+        @Override
         public void viewChanged(SwingScoutViewEvent e) {
           if (e.getType() == SwingScoutViewEvent.TYPE_CLOSED) {
             closePopup();
@@ -327,6 +330,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
   private class P_SwingDateChooserAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       handleSwingDateChooserAction();
     }
@@ -343,6 +347,7 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
       m_value = value;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       closePopup();
       if (getSwingDateField().isVisible() && getSwingDateField().isEditable()) {

@@ -70,10 +70,12 @@ public class SwingScoutListBox extends SwingScoutValueFieldComposite<IListBox<?>
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
+  @Override
   public JScrollPane getSwingScrollPane() {
     return m_tableComposite.getSwingScrollPane();
   }
 
+  @Override
   public JTableEx getSwingTable() {
     return m_tableComposite.getSwingTable();
   }

@@ -47,6 +47,7 @@ public class JRootPaneEx extends JRootPane {
     try {
       if (m_opLock.acquire()) {
         SwingUtilities.invokeLater(new Runnable() {
+          @Override
           public void run() {
             try {
               if (m_opLock.acquire()) {

@@ -309,6 +309,7 @@ public class JTableEx extends JTable {
    * height
    */
   private class P_TableModelListener implements TableModelListener {
+    @Override
     public void tableChanged(TableModelEvent e) {
       // headers
       JTableHeader header = getTableHeader();
@@ -330,12 +331,15 @@ public class JTableEx extends JTable {
    * variable row heights
    */
   private class P_TableColumnModelListener implements TableColumnModelListener {
+    @Override
     public void columnRemoved(TableColumnModelEvent e) {
     }
 
+    @Override
     public void columnMoved(TableColumnModelEvent e) {
     }
 
+    @Override
     public void columnMarginChanged(ChangeEvent e) {
       // headers
       JTableHeader header = getTableHeader();
@@ -351,9 +355,11 @@ public class JTableEx extends JTable {
       }
     }
 
+    @Override
     public void columnSelectionChanged(ListSelectionEvent e) {
     }
 
+    @Override
     public void columnAdded(TableColumnModelEvent e) {
     }
   }

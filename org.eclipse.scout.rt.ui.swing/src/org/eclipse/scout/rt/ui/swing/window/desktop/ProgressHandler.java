@@ -113,6 +113,7 @@ public class ProgressHandler {
   private class P_SwingStopButtonAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void actionPerformed(ActionEvent a) {
       Job[] jobs = Job.getJobManager().find(ClientJob.class);
       if (jobs != null) {

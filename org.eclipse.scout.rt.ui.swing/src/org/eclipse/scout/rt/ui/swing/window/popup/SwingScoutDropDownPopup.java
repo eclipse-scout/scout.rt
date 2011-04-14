@@ -80,6 +80,7 @@ public class SwingScoutDropDownPopup extends SwingScoutPopup {
     // add listener to close popup
     if (m_awtListener == null) {
       m_awtListener = new AWTEventListener() {
+        @Override
         public void eventDispatched(AWTEvent event) {
           if (event.getID() == MouseEvent.MOUSE_PRESSED) {
             MouseEvent me = (MouseEvent) event;
@@ -95,6 +96,7 @@ public class SwingScoutDropDownPopup extends SwingScoutPopup {
               if (!getSwingOwnerComponent().contains(p)) {
                 // close window later (let potential field verifier run first)
                 SwingUtilities.invokeLater(new Runnable() {
+                  @Override
                   public void run() {
                     if (getSwingWindow().isVisible()) {
                       closeView();

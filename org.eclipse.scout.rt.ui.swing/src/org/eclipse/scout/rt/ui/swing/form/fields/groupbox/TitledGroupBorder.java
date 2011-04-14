@@ -70,6 +70,7 @@ public class TitledGroupBorder implements Border {
     return f;
   }
 
+  @Override
   public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
     Border border = getBorder();
     Font backupFont = g.getFont();
@@ -122,6 +123,7 @@ public class TitledGroupBorder implements Border {
     }
   }
 
+  @Override
   public Insets getBorderInsets(Component c) {
     FontMetrics fm;
     int descent = 0;
@@ -155,6 +157,7 @@ public class TitledGroupBorder implements Border {
     return insets;
   }
 
+  @Override
   public boolean isBorderOpaque() {
     return false;
   }

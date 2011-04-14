@@ -104,6 +104,7 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
     return textField;
   }
 
+  @Override
   public JTextComponent getSwingTextField() {
     return (JTextComponent) getSwingField();
   }
@@ -258,6 +259,7 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
   private class P_SwingFileChooserAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       handleSwingFileChooserAction();
     }

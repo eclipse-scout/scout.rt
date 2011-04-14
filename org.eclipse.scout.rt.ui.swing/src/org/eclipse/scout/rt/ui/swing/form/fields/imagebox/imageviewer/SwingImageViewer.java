@@ -408,6 +408,7 @@ public class SwingImageViewer extends JComponent {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       doFitImage();
     }

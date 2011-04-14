@@ -37,6 +37,7 @@ public class DefaultCalendarModel implements CalendarModel {
     }
   }
 
+  @Override
   public void moveItem(Object item, Date newDate) {
 
   }
@@ -46,40 +47,48 @@ public class DefaultCalendarModel implements CalendarModel {
     return DateChooser.truncDate(d);
   }
 
+  @Override
   public Collection<Object> getItemsAt(Date dateTruncatedToDay) {
     return m_map.get(dateTruncatedToDay);
   }
 
+  @Override
   public String getTooltip(Object item, Date d) {
     SimpleCalendarItem ci = (SimpleCalendarItem) item;
     return ci.getTooltipText();
   }
 
+  @Override
   public String getLabel(Object item, Date d) {
     SimpleCalendarItem ci = (SimpleCalendarItem) item;
     return ci.getLabel();
   }
 
+  @Override
   public Date getFromDate(Object item) {
     SimpleCalendarItem ci = (SimpleCalendarItem) item;
     return ci.getFromDate();
   }
 
+  @Override
   public Date getToDate(Object item) {
     SimpleCalendarItem ci = (SimpleCalendarItem) item;
     return ci.getToDate();
   }
 
+  @Override
   public Color getColor(Object item) {
     SimpleCalendarItem ci = (SimpleCalendarItem) item;
     return ci.getColor();
   }
 
+  @Override
   public boolean isFullDay(Object item) {
     SimpleCalendarItem ci = (SimpleCalendarItem) item;
     return ci.isFullDay();
   }
 
+  @Override
   public boolean isDraggable(Object item) {
     SimpleCalendarItem ci = (SimpleCalendarItem) item;
     return ci.isDraggable();

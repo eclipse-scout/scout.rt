@@ -55,6 +55,7 @@ public class JTabbedPaneEx extends JTabbedPane implements ChangeListener {
   /**
    * Implementation of ChangeListener sets all non-active tabs to non-focusable
    */
+  @Override
   public void stateChanged(ChangeEvent e) {
     Component selectedTab = getSelectedComponent();
     for (int i = 0, n = getTabCount(); i < n; i++) {

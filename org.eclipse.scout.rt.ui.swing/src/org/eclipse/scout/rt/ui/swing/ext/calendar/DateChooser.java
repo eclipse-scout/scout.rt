@@ -228,6 +228,7 @@ public class DateChooser {
     // <<,<,>,>>
     JButton b = createIconButton(new ArrowIcon(-2));
     b.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         if (m_displayMode == DISPLAY_MODE_MONTH) prevYear();
         else if (m_displayMode == DISPLAY_MODE_WEEK) prevMonth();
@@ -239,6 +240,7 @@ public class DateChooser {
     //
     b = createIconButton(new ArrowIcon(-1));
     b.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         if (m_displayMode == DISPLAY_MODE_MONTH) prevMonth();
         else if (m_displayMode == DISPLAY_MODE_WEEK) prevWeek();
@@ -261,6 +263,7 @@ public class DateChooser {
     //
     b = createIconButton(new ArrowIcon(1));
     b.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         if (m_displayMode == DISPLAY_MODE_MONTH) nextMonth();
         else if (m_displayMode == DISPLAY_MODE_WEEK) nextWeek();
@@ -272,6 +275,7 @@ public class DateChooser {
     //
     b = createIconButton(new ArrowIcon(2));
     b.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         if (m_displayMode == DISPLAY_MODE_MONTH) nextYear();
         else if (m_displayMode == DISPLAY_MODE_WEEK) nextMonth();
@@ -290,6 +294,7 @@ public class DateChooser {
     m_linkDay = new JHyperlink();
     m_linkDay.setText(UIManager.getString("Calendar.dayText"));
     m_linkDay.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         setDisplayMode(DISPLAY_MODE_DAY);
       }
@@ -299,6 +304,7 @@ public class DateChooser {
     m_linkWorkWeek = new JHyperlink();
     m_linkWorkWeek.setText(UIManager.getString("Calendar.workWeekText"));
     m_linkWorkWeek.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         setDisplayMode(DISPLAY_MODE_WORKWEEK);
       }
@@ -308,6 +314,7 @@ public class DateChooser {
     m_linkWeek = new JHyperlink();
     m_linkWeek.setText(UIManager.getString("Calendar.weekText"));
     m_linkWeek.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         setDisplayMode(DISPLAY_MODE_WEEK);
       }
@@ -317,6 +324,7 @@ public class DateChooser {
     m_linkMonth = new JHyperlink();
     m_linkMonth.setText(UIManager.getString("Calendar.monthText"));
     m_linkMonth.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         setDisplayMode(DISPLAY_MODE_MONTH);
       }
@@ -1163,6 +1171,7 @@ public class DateChooser {
       m_steps = steps;
     }
 
+    @Override
     public void paintIcon(Component c, Graphics g, int x, int y) {
       g.translate(x, y);
       g.setColor(c.getForeground());
@@ -1189,48 +1198,59 @@ public class DateChooser {
       g.translate(-x, -y);
     }
 
+    @Override
     public int getIconWidth() {
       return 7;
     }
 
+    @Override
     public int getIconHeight() {
       return 7;
     }
   }// end class
 
   private class EmptyCalendarModel implements CalendarModel {
+    @Override
     public Collection<Object> getItemsAt(Date dateTruncatedToDay) {
       return null;
     }
 
+    @Override
     public String getTooltip(Object item, Date d) {
       return null;
     }
 
+    @Override
     public String getLabel(Object item, Date d) {
       return null;
     }
 
+    @Override
     public Date getFromDate(Object item) {
       return null;
     }
 
+    @Override
     public Date getToDate(Object item) {
       return null;
     }
 
+    @Override
     public Color getColor(Object item) {
       return null;
     }
 
+    @Override
     public boolean isFullDay(Object item) {
       return false;
     }
 
+    @Override
     public boolean isDraggable(Object item) {
       return false;
     }
 
+    @Override
     public void moveItem(Object item, Date newDate) {
     }
   }

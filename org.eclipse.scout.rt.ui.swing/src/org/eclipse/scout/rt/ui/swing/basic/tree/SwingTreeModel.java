@@ -67,11 +67,13 @@ public class SwingTreeModel implements TreeModel {
     fireStructureChanged((ITreeNode) getRoot());
   }
 
+  @Override
   public boolean isLeaf(Object node) {
     ITreeNode scoutNode = (ITreeNode) node;
     return scoutNode.isLeaf();
   }
 
+  @Override
   public Object getRoot() {
     Object root = null;
     if (m_swingScoutTree.getScoutObject() != null) {
@@ -80,10 +82,12 @@ public class SwingTreeModel implements TreeModel {
     return root;
   }
 
+  @Override
   public int getChildCount(Object parent) {
     return getCachedChildren(parent).length;
   }
 
+  @Override
   public Object getChild(Object parent, int index) {
     Object[] cachedChildren = getCachedChildren(parent);
     if (cachedChildren != null && cachedChildren.length > index) {
@@ -92,18 +96,22 @@ public class SwingTreeModel implements TreeModel {
     return null;
   }
 
+  @Override
   public void valueForPathChanged(TreePath path, Object newValue) {
     // void
   }
 
+  @Override
   public int getIndexOfChild(Object parent, Object child) {
     return getCachedChildIndex(parent, child);
   }
 
+  @Override
   public void addTreeModelListener(TreeModelListener l) {
     m_listenerList.add(TreeModelListener.class, l);
   }
 
+  @Override
   public void removeTreeModelListener(TreeModelListener l) {
     m_listenerList.remove(TreeModelListener.class, l);
   }

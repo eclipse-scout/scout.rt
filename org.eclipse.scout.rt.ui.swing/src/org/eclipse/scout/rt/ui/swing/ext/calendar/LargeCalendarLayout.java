@@ -33,38 +33,48 @@ public class LargeCalendarLayout implements LayoutManager2 {
     m_maxDim = new Dimension(4000, 3000);
   }
 
+  @Override
   public void addLayoutComponent(String name, Component comp) {
   }
 
+  @Override
   public void addLayoutComponent(Component comp, Object constraints) {
   }
 
+  @Override
   public void removeLayoutComponent(Component comp) {
   }
 
+  @Override
   public void invalidateLayout(Container target) {
   }
 
+  @Override
   public float getLayoutAlignmentX(Container target) {
     return Component.CENTER_ALIGNMENT;
   }
 
+  @Override
   public float getLayoutAlignmentY(Container target) {
     return Component.CENTER_ALIGNMENT;
   }
 
+  @Override
   public Dimension minimumLayoutSize(Container parent) {
     return new Dimension(m_minDim);
   }
 
+  @Override
   public Dimension maximumLayoutSize(Container target) {
     return new Dimension(m_maxDim);
   }
 
+  @Override
   public Dimension preferredLayoutSize(Container parent) {
     return new Dimension(m_prefDim);
   }
 
+  @Override
   public void layoutContainer(Container parent) {
     JPanel headerPanel = m_dateChooser.getHeaderPanel();
     JPanel daysPanel = m_dateChooser.getDaysPanel();

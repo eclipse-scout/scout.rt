@@ -1075,6 +1075,7 @@ public final class SwingUtility {
         JMenuItem cutItem = new JMenuItem(ScoutTexts.get("Cut"));
         cutItem.setEnabled(StringUtility.hasText(m_comp.getSelectedText()));
         cutItem.addActionListener(new ActionListener() {
+          @Override
           public void actionPerformed(ActionEvent event) {
             m_comp.cut();
           }
@@ -1087,6 +1088,7 @@ public final class SwingUtility {
         copyItem.setEnabled(StringUtility.hasText(m_comp.getSelectedText()));
       }
       copyItem.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(ActionEvent event) {
           if (m_comp.isEnabled() && m_comp.isEditable()) {
             m_comp.copy();
@@ -1110,6 +1112,7 @@ public final class SwingUtility {
       if (pasteEnabled) {
         JMenuItem pasteItem = new JMenuItem(ScoutTexts.get("Paste"));
         pasteItem.addActionListener(new ActionListener() {
+          @Override
           public void actionPerformed(ActionEvent event) {
             m_comp.paste();
           }
@@ -1121,10 +1124,12 @@ public final class SwingUtility {
       pop.show(m_comp, e.getX(), e.getY());
     }
 
+    @Override
     public void focusGained(FocusEvent e) {
       m_comp.setComponentPopupMenu(null);
     }
 
+    @Override
     public void focusLost(FocusEvent e) {
       m_comp.setComponentPopupMenu(null);
 

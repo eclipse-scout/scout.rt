@@ -32,10 +32,12 @@ public class JCheckBoxEx extends JCheckBox implements FocusListener {
     SwingUtility.installDefaultFocusHandling(this);
   }
 
+  @Override
   public void focusGained(FocusEvent e) {
     repaint();
   }
 
+  @Override
   public void focusLost(FocusEvent e) {
     repaint();
   }

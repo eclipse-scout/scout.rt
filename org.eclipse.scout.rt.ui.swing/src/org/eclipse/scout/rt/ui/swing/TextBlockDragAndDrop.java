@@ -44,6 +44,7 @@ public final class TextBlockDragAndDrop {
       dragSource.createDefaultDragGestureRecognizer(c, DnDConstants.ACTION_COPY_OR_MOVE, this);
     }
 
+    @Override
     public void dragGestureRecognized(DragGestureEvent e) {
       JTextComponent textComp = (JTextComponent) e.getComponent();
       if (!textComp.isEnabled()) {
@@ -65,18 +66,23 @@ public final class TextBlockDragAndDrop {
       }
     }
 
+    @Override
     public void dragDropEnd(DragSourceDropEvent e) {
     }
 
+    @Override
     public void dragEnter(DragSourceDragEvent e) {
     }
 
+    @Override
     public void dragExit(DragSourceEvent e) {
     }
 
+    @Override
     public void dragOver(DragSourceDragEvent e) {
     }
 
+    @Override
     public void dropActionChanged(DragSourceDragEvent e) {
     }
   }// end class

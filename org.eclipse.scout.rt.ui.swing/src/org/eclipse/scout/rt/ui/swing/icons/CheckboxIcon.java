@@ -46,14 +46,17 @@ public class CheckboxIcon implements Icon {
     m_enabled = on;
   }
 
+  @Override
   public int getIconWidth() {
     return m_iconSize;
   }
 
+  @Override
   public int getIconHeight() {
     return m_iconSize;
   }
 
+  @Override
   public void paintIcon(Component c, Graphics g, int x, int y) {
     int dx = x + 3;
     int dy = y + 3;

@@ -141,6 +141,7 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
     return getScoutObject();
   }
 
+  @Override
   public AbstractButton getSwingButton() {
     return (AbstractButton) getSwingField();
   }
@@ -334,12 +335,14 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
    * Listeners
    */
   private class P_SwingActionListener implements ActionListener {
+    @Override
     public void actionPerformed(ActionEvent e) {
       handleSwingAction();
     }
   }// end class
 
   private class P_SwingSelectionListener implements ItemListener {
+    @Override
     public void itemStateChanged(ItemEvent e) {
 
       setSelectionFromSwing((getSwingButton()).isSelected());
@@ -347,6 +350,7 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
   }// end private class
 
   private class P_ScoutButtonListener implements ButtonListener, WeakEventListener {
+    @Override
     public void buttonChanged(ButtonEvent e) {
       if (isIgnoredScoutEvent(ButtonEvent.class, "" + e.getType())) return;
       //

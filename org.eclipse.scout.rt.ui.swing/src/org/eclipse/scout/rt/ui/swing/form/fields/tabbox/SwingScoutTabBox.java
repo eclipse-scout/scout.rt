@@ -62,6 +62,7 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
     setTabItemSelected(0, true);
     //
     swingPane.addChangeListener(new ChangeListener() {
+      @Override
       public void stateChanged(ChangeEvent e) {
         setSelectedTabFromSwing();
       }
@@ -106,6 +107,7 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
     }
   }
 
+  @Override
   public JTabbedPane getSwingTabbedPane() {
     return (JTabbedPane) getSwingField();
   }
@@ -116,6 +118,7 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
     applyTopMarginIfTabBoxIsNotOnTop();
     if (m_scoutVisiblePropertyListener == null) {
       m_scoutVisiblePropertyListener = new PropertyChangeListener() {
+        @Override
         public void propertyChange(final PropertyChangeEvent e) {
           getSwingEnvironment().invokeSwingLater(new Runnable() {
             @Override

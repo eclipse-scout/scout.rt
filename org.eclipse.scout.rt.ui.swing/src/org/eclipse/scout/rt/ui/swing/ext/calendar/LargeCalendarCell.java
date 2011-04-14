@@ -732,6 +732,7 @@ public class LargeCalendarCell extends AbstractCalendarCell {
       return new Integer(m_item.hashCode());
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public int compareTo(ItemWrapper o) {
       if (m_item instanceof Comparable) {
@@ -796,6 +797,7 @@ public class LargeCalendarCell extends AbstractCalendarCell {
 
   private class CellDropTargetAdapter extends DropTargetAdapter {
 
+    @Override
     public void drop(DropTargetDropEvent e) {
       ItemWrapper itemWrapper;
       Transferable tr = e.getTransferable();
@@ -821,6 +823,7 @@ public class LargeCalendarCell extends AbstractCalendarCell {
 
   private class ItemDragGestureListener implements DragGestureListener {
 
+    @Override
     public void dragGestureRecognized(DragGestureEvent e) {
       Object item = getItemAt(e.getDragOrigin());
       if (item == null) return;

@@ -93,6 +93,7 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
     setLocation((screenSize.width - paneSize.width) / 2, (screenSize.height - paneSize.height) / 2);
   }
 
+  @Override
   public void showSplash() {
     setVisible(true);
     // start repaint timer
@@ -121,10 +122,12 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
     t.start();
   }
 
+  @Override
   public void disposeSplash() {
     dispose();
   }
 
+  @Override
   public void setStatusText(String s) {
     if (s == null) s = "";
     m_statusText = s;
@@ -143,6 +146,7 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
       m_statusTextLocation = (Point) UIManager.get("Splash.statusTextLocation");
     }
 
+    @Override
     public void paintIcon(Component c, Graphics g, int x, int y) {
       FontMetrics fm = g.getFontMetrics();
       int w = getWidth();
@@ -181,10 +185,12 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
       }
     }
 
+    @Override
     public int getIconHeight() {
       return m_splashIcon.getIconHeight();
     }
 
+    @Override
     public int getIconWidth() {
       return m_splashIcon.getIconWidth();
     }
@@ -195,6 +201,7 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
     public P_EmptyIcon() {
     }
 
+    @Override
     public void paintIcon(Component c, Graphics g, int x, int y) {
       Graphics2D g2d = (Graphics2D) g;
       Color c1 = new Color(0xffcccccc, true);
@@ -203,10 +210,12 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
       g2d.fillRect(0, 0, getIconWidth(), getIconHeight());
     }
 
+    @Override
     public int getIconWidth() {
       return 360;
     }
 
+    @Override
     public int getIconHeight() {
       return 280;
     }

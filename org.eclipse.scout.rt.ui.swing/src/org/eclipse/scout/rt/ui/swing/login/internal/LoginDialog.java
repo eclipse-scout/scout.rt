@@ -82,16 +82,19 @@ public class LoginDialog extends JDialogEx {
       m_userField.setText(m_status.getUsername());
     }
     m_userField.getDocument().addDocumentListener(new DocumentListener() {
+      @Override
       public void changedUpdate(DocumentEvent e) {
         m_status.setUsername(m_userField.getText());
         updateOkButton();
       }
 
+      @Override
       public void insertUpdate(DocumentEvent e) {
         m_status.setUsername(m_userField.getText());
         updateOkButton();
       }
 
+      @Override
       public void removeUpdate(DocumentEvent e) {
         m_status.setUsername(m_userField.getText());
         updateOkButton();
@@ -115,16 +118,19 @@ public class LoginDialog extends JDialogEx {
       m_passField.setText(new String(m_status.getPassword()));
     }
     m_passField.getDocument().addDocumentListener(new DocumentListener() {
+      @Override
       public void changedUpdate(DocumentEvent e) {
         m_status.setPassword(new String(m_passField.getPassword()));
         updateOkButton();
       }
 
+      @Override
       public void insertUpdate(DocumentEvent e) {
         m_status.setPassword(new String(m_passField.getPassword()));
         updateOkButton();
       }
 
+      @Override
       public void removeUpdate(DocumentEvent e) {
         m_status.setPassword(new String(m_passField.getPassword()));
         updateOkButton();
@@ -156,6 +162,7 @@ public class LoginDialog extends JDialogEx {
     m_okButton.setText(ScoutTexts.get("Ok"));
     m_okButton.setEnabled(false);
     m_okButton.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         // accept
         doOk();
@@ -166,6 +173,7 @@ public class LoginDialog extends JDialogEx {
     buttonPanel.add(cancel);
     cancel.setText(ScoutTexts.get("Cancel"));
     cancel.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         m_status.setUsername(null);
         m_status.setPassword(null);
