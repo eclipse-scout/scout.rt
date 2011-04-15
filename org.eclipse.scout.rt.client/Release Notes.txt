@@ -259,3 +259,11 @@ Migration: None
 [contributed by oca]
 Problem:
 Sometimes, not all calendar items supposed to be loaded into a calendar by an AbstractCalendarItemProvider (package org.eclipse.scout.rt.client.ui.basic.calendar.provider) are actually shown in the calendar due to race conditions.
+Analysis:
+During initialization of an AbstractCalendarItemProvider in its constructor, loadItemsAsyncInternal() is invoked twice:
+- once via initConfig() -> setRefreshIntervalMillis()
+- once via ensureItemsLoadedInternal()
+If the asynchronous loading of the first invocation of loadItemsAsyncInternal() has not completed while the second invocation is taking place, the first invocation is canceled. However, the first invocation will try to reschedule another job. This will cause the second invocation to be canceled as well. If no m_minDateLoaded, m_maxDateLoaded were set yet, no other jobs are scheduled and the current instance will never provide any calendar items again.
+Solution:
+Rescheduling (and cancelling a currently running job) should only happen, if a previous job actually succeeded in loading the calendar items.
+Migration: None
