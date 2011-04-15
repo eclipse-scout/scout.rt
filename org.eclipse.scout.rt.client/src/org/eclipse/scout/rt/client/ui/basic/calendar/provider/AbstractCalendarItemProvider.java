@@ -402,7 +402,10 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         }.schedule();
         // re-schedule
         long n = getRefreshIntervalMillis();
-        if (n > 0) {
+        if (n > 0 && m_minDateLoaded != null && m_maxDateLoaded != null) {
+          //m_minDateLoaded and m_maxDateLoaded might not have been set yet.
+          //-> Rescheduling (and cancelling a currently running job) should only happen,
+          //   if a previous job actually succeeded in loading the calendar items.
           loadItemsAsyncInternal(ClientSyncJob.getCurrentSession(), m_minDateLoaded, m_maxDateLoaded, n);
         }
       }
