@@ -254,3 +254,8 @@ Migration of legacy: moving remaining legacy logic from client to server
 Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
 Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
 Migration: None
+
+15.04.2011 dwi
+[contributed by oca]
+Problem:
+Sometimes, not all calendar items supposed to be loaded into a calendar by an AbstractCalendarItemProvider (package org.eclipse.scout.rt.client.ui.basic.calendar.provider) are actually shown in the calendar due to race conditions.
