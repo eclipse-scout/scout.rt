@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.checkbox;
 
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
@@ -144,6 +145,11 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
     updateLabel();
   }
 
+  @Override
+  protected void setValueFromScout() {
+	setSelectionFromScout(BooleanUtility.nvl(getScoutObject() == null ? null : getScoutObject().getValue()));
+  }
+
   protected void setSelectionFromScout(boolean selection) {
     getSwtField().setSelection(selection);
   }
@@ -169,6 +175,23 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
           public void run() {
             try {
               getScoutObject().getUIFacade().setSelectedFromUI(b);
+              //check if value was really set
+              if (b != getScoutObject().isChecked()) {
+                Runnable revertJob = new Runnable() {
+                  @Override
+                  public void run() {
+                    try {
+                      getUpdateSwtFromScoutLock().acquire();
+                      //
+                      setValueFromScout();
+                    }
+                    finally {
+                      getUpdateSwtFromScoutLock().release();
+                    }
+                  }
+                };
+                getEnvironment().invokeSwtLater(revertJob);
+              }
             }
             finally {
               m_handleActionPending = false;
