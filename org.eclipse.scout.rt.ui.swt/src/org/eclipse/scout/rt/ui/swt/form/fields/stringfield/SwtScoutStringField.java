@@ -227,6 +227,10 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
 
   @Override
   protected void setDisplayTextFromScout(String s) {
+    //loop detection
+    if (m_validateOnAnyKey && getSwtField().isFocusControl()) {
+      return;
+    }
     StyledText swtField = getSwtField();
     String oldText = swtField.getText();
     if (s == null) {
@@ -422,11 +426,31 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
   } // end class P_TextVerifyListener
 
   private class P_SwtTextListener implements ModifyListener {
+    /*
+     * Do not call handleSwingInputVerifier(), this can lead to endless loops.
+     */
     @Override
     public void modifyText(ModifyEvent e) {
       if (m_validateOnAnyKey) {
-        handleSwtInputVerifier();
+        if (getUpdateSwtFromScoutLock().isReleased()) {
+          sendVerifyToScoutAndIgnoreResponses();
+        }
       }
+    }
+
+    /*
+     * Do not call handleSwingInputVerifier(), this can lead to endless loops.
+     */
+    private void sendVerifyToScoutAndIgnoreResponses() {
+      final String text = getSwtField().getText();
+      // notify Scout
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().setTextFromUI(text);
+        }
+      };
+      getEnvironment().invokeScoutLater(t, 0);
     }
   } // end class P_SwtTextListener
 
