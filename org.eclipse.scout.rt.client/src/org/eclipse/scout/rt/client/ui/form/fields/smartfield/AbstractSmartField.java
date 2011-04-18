@@ -329,6 +329,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   protected void execFilterRecLookupResult(LookupCall call, List<LookupRow> result) throws ProcessingException {
   }
 
+  @Override
   public boolean acceptBrowseHierarchySelection(T value, int level, boolean leaf) {
     return true;
   }
@@ -428,10 +429,12 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public IMenu[] getMenus() {
     return m_menus.toArray(new IMenu[0]);
   }
 
+  @Override
   public boolean hasMenus() {
     return m_menus.size() > 0;
   }
@@ -439,10 +442,12 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   /**
    * Model Observer
    */
+  @Override
   public void addSmartFieldListener(SmartFieldListener listener) {
     m_listenerList.add(SmartFieldListener.class, listener);
   }
 
+  @Override
   public void removeSmartFieldListener(SmartFieldListener listener) {
     m_listenerList.remove(SmartFieldListener.class, listener);
   }
@@ -457,18 +462,22 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public boolean isActiveFilterEnabled() {
     return m_activeFilterEnabled;
   }
 
+  @Override
   public void setActiveFilterEnabled(boolean b) {
     m_activeFilterEnabled = b;
   }
 
+  @Override
   public TriState getActiveFilter() {
     return m_activeFilter;
   }
 
+  @Override
   public void setActiveFilter(TriState t) {
     if (isActiveFilterEnabled()) {
       if (t == null) t = TriState.TRUE;
@@ -480,6 +489,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
    * see {@link AbstractSmartField#execBrowseNew(String)}
    */
   @SuppressWarnings("unchecked")
+  @Override
   public void doBrowseNew(String newText) {
     if (getBrowseNewText() != null) {
       try {
@@ -503,74 +513,92 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public String getBrowseIconId() {
     return propertySupport.getPropertyString(PROP_BROWSE_ICON_ID);
   }
 
+  @Override
   public void setBrowseIconId(String s) {
     propertySupport.setPropertyString(PROP_BROWSE_ICON_ID, s);
   }
 
+  @Override
   public String getIconId() {
     return propertySupport.getPropertyString(PROP_ICON_ID);
   }
 
+  @Override
   public void setIconId(String s) {
     propertySupport.setPropertyString(PROP_ICON_ID, s);
   }
 
+  @Override
   public boolean isBrowseAutoExpandAll() {
     return m_browseAutoExpandAll;
   }
 
+  @Override
   public void setBrowseAutoExpandAll(boolean b) {
     m_browseAutoExpandAll = b;
   }
 
+  @Override
   public boolean isBrowseLoadIncremental() {
     return m_loadIncremental;
   }
 
+  @Override
   public void setBrowseLoadIncremental(boolean b) {
     m_loadIncremental = b;
   }
 
+  @Override
   public boolean isBrowseHierarchy() {
     return m_browseHierarchy;
   }
 
+  @Override
   public void setBrowseHierarchy(boolean b) {
     m_browseHierarchy = b;
   }
 
+  @Override
   public int getBrowseMaxRowCount() {
     return m_maxRowCount;
   }
 
+  @Override
   public void setBrowseMaxRowCount(int n) {
     m_maxRowCount = n;
   }
 
+  @Override
   public String getBrowseNewText() {
     return m_browseNewText;
   }
 
+  @Override
   public void setBrowseNewText(String s) {
     m_browseNewText = s;
   }
 
+  @Override
   public boolean isAllowCustomText() {
     return m_allowCustomText;
   }
 
+  @Override
   public void setAllowCustomText(boolean b) {
     m_allowCustomText = b;
   }
 
+  @Override
   public Class<? extends ICodeType> getCodeTypeClass() {
     return m_codeTypeClass;
   }
 
+  @Override
   public void setCodeTypeClass(Class<? extends ICodeType> codeType) {
     m_codeTypeClass = codeType;
     // create lookup service call
@@ -586,16 +614,20 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public LookupCall getLookupCall() {
     return m_lookupCall;
   }
 
+  @Override
   public void setLookupCall(LookupCall call) {
     m_lookupCall = call;
   }
 
+  @Override
   public void setUniquelyDefinedValue(boolean background) throws ProcessingException {
     ILookupCallFetcher fetcher = new ILookupCallFetcher() {
+      @Override
       @SuppressWarnings("unchecked")
       public void dataFetched(LookupRow[] rows, ProcessingException failed) {
         if (failed == null) {
@@ -614,6 +646,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public ISmartFieldProposalForm getProposalForm() {
     return (ISmartFieldProposalForm) propertySupport.getProperty(PROP_PROPOSAL_FORM);
   }
@@ -852,16 +885,19 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public void revertValue() {
     setValue(getValue());
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void acceptProposal(LookupRow row) {
     m_currentLookupRow = row;
     setValue((T) row.getKey());
   }
 
+  @Override
   public ISmartFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -951,6 +987,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     return super.getFont();
   }
 
+  @Override
   public void prepareKeyLookup(LookupCall call, T key) throws ProcessingException {
     call.setKey(key);
     call.setText(null);
@@ -965,6 +1002,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     execPrepareKeyLookup(call, key);
   }
 
+  @Override
   public void prepareTextLookup(LookupCall call, String text) throws ProcessingException {
     String textPattern = text;
     if (textPattern == null) textPattern = "";
@@ -989,6 +1027,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     execPrepareTextLookup(call, text);
   }
 
+  @Override
   public void prepareBrowseLookup(LookupCall call, String browseHint, TriState activeState) throws ProcessingException {
     call.setKey(null);
     call.setText(null);
@@ -1003,6 +1042,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     execPrepareBrowseLookup(call, browseHint);
   }
 
+  @Override
   public void prepareRecLookup(LookupCall call, T parentKey, TriState activeState) throws ProcessingException {
     call.setKey(null);
     call.setText(null);
@@ -1046,6 +1086,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     execFilterRecLookupResult(call, result);
   }
 
+  @Override
   public LookupRow[] callKeyLookup(T key) throws ProcessingException {
     LookupRow[] data = null;
     LookupCall call = getLookupCall();
@@ -1065,6 +1106,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     return cleanupResultList(result);
   }
 
+  @Override
   public LookupRow[] callTextLookup(String text, int maxRowCount) throws ProcessingException {
     final Holder<LookupRow[]> rowsHolder = new Holder<LookupRow[]>(LookupRow[].class);
     final Holder<ProcessingException> failedHolder = new Holder<ProcessingException>(ProcessingException.class, new ProcessingException("callback was not invoked"));
@@ -1082,6 +1124,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public void callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher fetcher) {
     callTextLookupInternal(text, maxRowCount, fetcher, true);
   }
@@ -1149,10 +1192,12 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public LookupRow[] callBrowseLookup(String browseHint, int maxRowCount) throws ProcessingException {
     return callBrowseLookup(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
   }
 
+  @Override
   public LookupRow[] callBrowseLookup(String browseHint, int maxRowCount, TriState activeState) throws ProcessingException {
     final Holder<LookupRow[]> rowsHolder = new Holder<LookupRow[]>(LookupRow[].class);
     final Holder<ProcessingException> failedHolder = new Holder<ProcessingException>(ProcessingException.class, new ProcessingException("callback was not invoked"));
@@ -1170,10 +1215,12 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public void callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher fetcher) {
     callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, fetcher);
   }
 
+  @Override
   public void callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher fetcher) {
     callBrowseLookupInternal(browseHint, maxRowCount, activeState, fetcher, true);
   }
@@ -1241,10 +1288,12 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public LookupRow[] callSubTreeLookup(T parentKey) throws ProcessingException {
     return callSubTreeLookup(parentKey, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
   }
 
+  @Override
   public LookupRow[] callSubTreeLookup(T parentKey, TriState activeState) throws ProcessingException {
     LookupRow[] data = null;
     LookupCall call = getLookupCall();
@@ -1386,6 +1435,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
       return filteredMenus.toArray(new IMenu[0]);
     }
 
+    @Override
     public void openProposalFromUI(String newText, boolean selectCurrentValue) {
       if (newText == null) {
         newText = BROWSE_ALL_TEXT;
@@ -1414,18 +1464,35 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
       }
     }
 
-    public void acceptProposalFromUI() {
+    @Override
+    public boolean acceptProposalFromUI() {
       try {
         ISmartFieldProposalForm smartForm = getProposalForm();
         if (smartForm != null) {
-          smartForm.doOk();
+          if (smartForm.getAcceptedProposal() != null) {
+            smartForm.doOk();
+            return true;
+          }
+          else {
+            // allow with null text traverse
+            if (StringUtility.isNullOrEmpty(getDisplayText())) {
+              return true;
+            }
+            else {
+              // select first
+              smartForm.forceProposalSelection();
+              return false;
+            }
+          }
         }
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
+      return false;
     }
 
+    @Override
     public boolean setTextFromUI(String text) {
       String currentValidText = (m_currentLookupRow != null ? m_currentLookupRow.getText() : null);
       ISmartFieldProposalForm smartForm = getProposalForm();
@@ -1435,8 +1502,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
         try {
           if (smartForm.getAcceptedProposal() != null) {
             // a proposal was selected
-            acceptProposalFromUI();
-            return true;
+            return acceptProposalFromUI();
           }
           /*
            * empty text means null

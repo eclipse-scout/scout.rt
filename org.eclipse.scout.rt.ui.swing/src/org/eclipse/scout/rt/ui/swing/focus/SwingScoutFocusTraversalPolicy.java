@@ -46,7 +46,7 @@ public class SwingScoutFocusTraversalPolicy extends InternalFrameFocusTraversalP
     if (aComponent != null) {
       boolean accept = SwingUtility.runInputVerifier(aComponent);
       if (!accept) {
-        return null;
+        return aComponent;
       }
     }
     return getComponentAfterV(focusCycleRoot, aComponent);
@@ -79,7 +79,7 @@ public class SwingScoutFocusTraversalPolicy extends InternalFrameFocusTraversalP
     if (aComponent != null) {
       boolean accept = SwingUtility.runInputVerifier(aComponent);
       if (!accept) {
-        return null;
+        return aComponent;
       }
     }
     return getComponentBeforeV(focusCycleRoot, aComponent);

@@ -35,8 +35,12 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
@@ -186,14 +190,16 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
   @Override
   protected void setDisplayTextFromScout(String s) {
     JTextComponent swingField = getSwingTextField();
-    swingField.setText(s);
-    // ticket 77424
-    if (swingField.hasFocus() && swingField.getDocument().getLength() > 0) {
-      swingField.setCaretPosition(swingField.getDocument().getLength());
-      swingField.moveCaretPosition(0);
-    }
-    else {
-      swingField.setCaretPosition(0);
+    if (!CompareUtility.equals(swingField.getText(), s)) {
+      swingField.setText(s);
+      // ticket 77424
+      if (swingField.hasFocus() && swingField.getDocument().getLength() > 0) {
+        swingField.setCaretPosition(swingField.getDocument().getLength());
+        swingField.moveCaretPosition(0);
+      }
+      else {
+        swingField.setCaretPosition(0);
+      }
     }
   }
 
@@ -280,30 +286,42 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
 
   private void requestProposalSupportFromSwing(String text, boolean selectCurrentValue, long initialDelay) {
     synchronized (m_pendingProposalJobLock) {
-      boolean created = false;
       if (m_pendingProposalJob == null) {
         m_pendingProposalJob = new P_PendingProposalJob();
-        created = true;
+      }
+      else {
+        m_pendingProposalJob.cancel();
       }
       m_pendingProposalJob.update(text, selectCurrentValue);
-      if (created) {
-        m_pendingProposalJob.startTimer(initialDelay);
-      }
+      m_pendingProposalJob.schedule(400);
     }
   }
 
-  private void acceptProposalFromSwing() {
+  private boolean acceptProposalFromSwing() {
     synchronized (m_pendingProposalJobLock) {
-      m_pendingProposalJob = null;
+      if (m_pendingProposalJob != null) {
+        m_pendingProposalJob.cancel();
+        m_pendingProposalJob = null;
+      }
     }
+
     // notify Scout
+    final BooleanHolder resultHolder = new BooleanHolder(false);
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().acceptProposalFromUI();
+        resultHolder.setValue(getScoutObject().getUIFacade().acceptProposalFromUI());
       }
     };
-    getSwingEnvironment().invokeScoutLater(t, 0);
+    JobEx job = getSwingEnvironment().invokeScoutLater(t, 0);
+    try {
+      job.join(2345);
+    }
+    catch (InterruptedException e) {
+      // void
+    }
+    return resultHolder.getValue();
+
     // end notify
   }
 
@@ -454,11 +472,13 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
   @Override
   protected boolean handleSwingInputVerifier() {
     synchronized (m_pendingProposalJobLock) {
-      m_pendingProposalJob = null;
+      if (m_pendingProposalJob != null) {
+        m_pendingProposalJob.cancel();
+        m_pendingProposalJob = null;
+      }
     }
     final String text = getSwingTextField().getText();
-    final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, true);
-    //
+    final BooleanHolder result = new BooleanHolder(true);
     // notify Scout
     Runnable t = new Runnable() {
       @Override
@@ -551,23 +571,25 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     }
   }
 
-  /*
-   * Text change timer
-   */
-  private class P_PendingProposalJob implements Runnable {
+  private class P_PendingProposalJob extends JobEx implements Runnable {
+
     private String m_text;
     private boolean m_selectCurrentValue;
-    private long m_lastChanged = System.currentTimeMillis();
 
-    public void update(String text, boolean selectCurrentValue) {
-      m_text = text;
-      m_selectCurrentValue = selectCurrentValue;
-      m_lastChanged = System.currentTimeMillis();
+    public P_PendingProposalJob() {
+      super("");
+      setSystem(true);
     }
 
-    /*
-     * this runnable runs in swing
-     */
+    @Override
+    protected IStatus run(IProgressMonitor monitor) {
+      if (monitor.isCanceled()) {
+        return Status.CANCEL_STATUS;
+      }
+      SwingUtilities.invokeLater(this);
+      return Status.OK_STATUS;
+    }
+
     @Override
     public void run() {
       synchronized (m_pendingProposalJobLock) {
@@ -579,60 +601,43 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
         }
       }
       if (getSwingField().isFocusOwner()) {
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
-          }
-        };
-        getSwingEnvironment().invokeScoutLater(t, 0);
+        runAndWait(0);
       }
     }
 
-    /*
-     * Timer that waits first the initialDelay and then 400ms for further typed
-     * keys before sending to scout
-     */
-    public void startTimer(final long initialDelay) {
-      if (initialDelay <= 0) {
-        SwingUtilities.invokeLater(P_PendingProposalJob.this);
+    public void runAndWait(long millis) {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
+        }
+      };
+      JobEx job = getSwingEnvironment().invokeScoutLater(t, 0);
+      try {
+        job.join(millis);
       }
-      else {
-        Thread t = new Thread() {
-          /*
-           * this runnable runs in timer thread
-           */
-          @Override
-          public void run() {
-            long delay = initialDelay;
-            while (m_pendingProposalJob == P_PendingProposalJob.this) {
-              long dt = m_lastChanged + delay - System.currentTimeMillis();
-              if (dt > 0) {
-                try {
-                  sleep(dt);
-                }
-                catch (InterruptedException ie) {
-                }
-                delay = 400;
-              }
-              else {
-                break;
-              }
-            }
-            synchronized (m_pendingProposalJobLock) {
-              if (m_pendingProposalJob == P_PendingProposalJob.this) {
-                // notify Scout
-                SwingUtilities.invokeLater(P_PendingProposalJob.this);
-                // end notify
-              }
-            }
-          }
-        };
-        t.setDaemon(true);
-        t.start();
+      catch (InterruptedException e) {
+        // void
       }
+
     }
 
-  }// end private class
+    public void update(String text, boolean selectCurrentValue) {
+      m_text = text;
+      m_selectCurrentValue = selectCurrentValue;
+    }
+  }
+
+  private String getLinesOfStackTrace(StackTraceElement[] elements, int lines) {
+    StringBuilder b = new StringBuilder();
+    int lineCount = Math.min(lines, elements.length);
+    for (int i = 0; i < lineCount; i++) {
+      b.append("  " + elements[i].toString());
+      if (i < lineCount - 1) {
+        b.append("\n");
+      }
+    }
+    return b.toString();
+  }
 
 }

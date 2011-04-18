@@ -139,11 +139,17 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   @Override
   public String getColumnText(Object element, int columnIndex) {
     if (columnIndex > 0) {
-      String text = getCell(element, columnIndex).getText();
-      if (!isMultiline()) {
-        text = StringUtility.replace(text, "\n", " ");
+      ICell cell = getCell(element, columnIndex);
+      if (cell == null) {
+        return "";
       }
-      return text;
+      else {
+        String text = cell.getText();
+        if (!isMultiline()) {
+          text = StringUtility.replace(text, "\n", " ");
+        }
+        return text;
+      }
     }
     return "";
   }
@@ -169,7 +175,6 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     listenerList.add(listener);
   }
 
-  @Override
   public void removeListener(ILabelProviderListener listener) {
     if (listenerList != null) {
       listenerList.remove(listener);
