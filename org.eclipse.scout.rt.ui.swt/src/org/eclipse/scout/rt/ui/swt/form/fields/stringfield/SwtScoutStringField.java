@@ -135,7 +135,9 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
     new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
 
     //@16.03.11 sle: clear undo/redo stack. It must not be possible to undo the initial value in field
-    m_undoRedoSupport.clearStacks();
+    if (m_undoRedoSupport != null) {
+      m_undoRedoSupport.clearStacks();
+    }
   }
 
   @Override
