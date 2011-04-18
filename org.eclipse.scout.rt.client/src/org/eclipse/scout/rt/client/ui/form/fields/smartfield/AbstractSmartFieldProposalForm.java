@@ -40,14 +40,17 @@ public abstract class AbstractSmartFieldProposalForm extends AbstractForm implem
     return DISPLAY_HINT_VIEW;
   }
 
+  @Override
   public ISmartField<? extends Object> getSmartField() {
     return m_smartField;
   }
 
+  @Override
   public String getSearchText() {
     return propertySupport.getPropertyString(PROP_SEARCH_TEXT);
   }
 
+  @Override
   public void setSearchText(String text) {
     propertySupport.setPropertyString(PROP_SEARCH_TEXT, text);
   }

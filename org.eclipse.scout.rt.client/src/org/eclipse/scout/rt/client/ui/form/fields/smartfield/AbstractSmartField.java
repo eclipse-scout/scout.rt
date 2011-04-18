@@ -1386,16 +1386,31 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
       }
     }
 
-    public void acceptProposalFromUI() {
+    public boolean acceptProposalFromUI() {
       try {
         ISmartFieldProposalForm smartForm = getProposalForm();
         if (smartForm != null) {
-          smartForm.doOk();
+          if (smartForm.getAcceptedProposal() != null) {
+            smartForm.doOk();
+            return true;
+          }
+          else {
+            // allow with null text traverse
+            if (StringUtility.isNullOrEmpty(getDisplayText())) {
+              return true;
+            }
+            else {
+              // select first
+              smartForm.forceProposalSelection();
+              return false;
+            }
+          }
         }
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
+      return false;
     }
 
     public boolean setTextFromUI(String text) {
@@ -1407,8 +1422,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
         try {
           if (smartForm.getAcceptedProposal() != null) {
             // a proposal was selected
-            acceptProposalFromUI();
-            return true;
+            return acceptProposalFromUI();
           }
           /*
            * empty text means null
@@ -1455,7 +1469,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
         }
       }
     }
-    
+
     public void unregisterProposalFormFromUI(ISmartFieldProposalForm form) {
       unregisterProposalFormInternal(form);
     }

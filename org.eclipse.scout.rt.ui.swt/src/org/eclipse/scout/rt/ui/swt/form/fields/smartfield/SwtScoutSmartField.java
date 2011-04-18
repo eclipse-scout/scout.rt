@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,7 +12,12 @@ package org.eclipse.scout.rt.ui.swt.form.fields.smartfield;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -71,14 +76,11 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
   // popup
   private SwtScoutSmartFieldPopup m_proposalPopup;
   private final Object m_popupLock = new Object();
-  private Listener m_popupDelegateListener;
-  // private Composite m_buttonArea;
   private Menu m_contextMenu;
   private TextFieldEditableSupport m_editableSupport;
 
   public SwtScoutSmartField() {
     m_pendingProposalJobLock = new Object();
-    m_popupDelegateListener = new P_PopupDelegateListener();
   }
 
   @Override
@@ -88,10 +90,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     StatusLabelEx label = new StatusLabelEx(container, labelStyle, getEnvironment());
     getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
-    m_browseButton = new DropDownButton(container, SWT.DROP_DOWN);// getEnvironment().getFormToolkit().createButtonEx(container,
-    // SWT.DROP_DOWN
-    // | SWT.PUSH |
-    // SWT.LEFT);
+    m_browseButton = new DropDownButton(container, SWT.DROP_DOWN);
     // to ensure the text is validated on a context menu call this mouse
     // listener is used.
     m_browseButton.addMouseListener(new MouseAdapter() {
@@ -100,18 +99,18 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         handleSwtInputVerifier();
       }
     });
+    setSwtContainer(container);
+    setSwtLabel(label);
+    setSwtField(textField);
+
+    // prevent the button from grabbing focus
+    container.setTabList(new Control[]{textField});
     m_browseButton.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(FocusEvent e) {
         getSwtField().setFocus();
       }
     });
-    setSwtContainer(container);
-
-    setSwtLabel(label);
-    setSwtField(textField);
-    // prevent the button from grabbing focus
-    container.setTabList(new Control[]{textField});
 
     // context menu
     m_contextMenu = new Menu(m_browseButton.getShell(), SWT.POP_UP);
@@ -122,9 +121,11 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     getEnvironment().addKeyStroke(getSwtContainer(), new P_F2KeyStroke());
 
     // listeners
-    P_SwtTextModifiedListener swtTextFieldListener = new P_SwtTextModifiedListener();
-    getSwtField().addListener(SWT.KeyDown, swtTextFieldListener);
-    getSwtField().addListener(SWT.Modify, swtTextFieldListener);
+    P_UiFieldListener listener = new P_UiFieldListener();
+    getSwtField().addListener(SWT.KeyDown, listener);
+    getSwtField().addListener(SWT.Modify, listener);
+    getSwtField().addListener(SWT.Traverse, listener);
+
     P_SwtBrowseButtonListener swtBrowseButtonListener = new P_SwtBrowseButtonListener();
     getSwtBrowseButton().addSelectionListener(swtBrowseButtonListener);
 
@@ -133,6 +134,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     m_browseButton.setLayoutData(LogicalGridDataBuilder.createSmartButton());
   }
 
+  @Override
   public DropDownButton getSwtBrowseButton() {
     return m_browseButton;
   }
@@ -158,13 +160,15 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected void setDisplayTextFromScout(String s) {
-    getSwtBrowseButton().setDropdownEnabled(getScoutObject().hasMenus());
-    if (s == null) {
-      s = "";
+    if (!CompareUtility.equals(s, getSwtField().getText())) {
+      getSwtBrowseButton().setDropdownEnabled(getScoutObject().hasMenus());
+      if (s == null) {
+        s = "";
+      }
+      StyledText swtField = getSwtField();
+      swtField.setText(s);
+      swtField.setCaretOffset(0);
     }
-    StyledText swtField = getSwtField();
-    swtField.setText(s);
-    swtField.setCaretOffset(0);
   }
 
   @Override
@@ -209,27 +213,12 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  protected void handleSwtDocumentChanged() {
-    if (getUpdateSwtFromScoutLock().isAcquired()) {
-      return;
-    }
-    if (getSwtField().isVisible() && getSwtField().isFocusControl()) {
-      String text = getSwtField().getText();
-      if (text == null || text.length() == 0) {
-        // allow empty field without proposal
-        if (m_proposalPopup != null) {
-          requestProposalSupportFromSwt(text, false);
-        }
-      }
-      else {
-        requestProposalSupportFromSwt(text, false);
-      }
-    }
-  }
-
   protected void setProposalFormFromScout(ISmartFieldProposalForm form) {
     synchronized (m_pendingProposalJobLock) {
-      m_pendingProposalJob = null;
+      if (m_pendingProposalJob != null) {
+        m_pendingProposalJob.cancel();
+        m_pendingProposalJob = null;
+      }
     }
     if (form != null) {
       showProposalPopup(form);
@@ -253,23 +242,22 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       m_proposalPopup = null;
     }
     // show new
-    if (getSwtField().isFocusControl()) {
+    if (getSwtField().isFocusControl() && form != null) {
       m_proposalPopup = new SwtScoutSmartFieldPopup(getEnvironment(), getSwtField(), getSwtField());
       m_proposalPopup.addSwtScoutPartListener(new SwtScoutPartListener() {
+        @Override
         public void partChanged(SwtScoutPartEvent e) {
           switch (e.getType()) {
             case SwtScoutPartEvent.TYPE_CLOSED:
-                        if (m_proposalPopup != null) {
-                          m_proposalPopup = null;
-                          getSwtField().removeListener(SWT.Verify, m_popupDelegateListener);
-                          getSwtField().removeListener(SWT.Traverse, m_popupDelegateListener);
-                        }
-                        break;
-                      case SwtScoutPartEvent.TYPE_CLOSING:
-                        hideProposalPopup();
-                        break;
-                    }
-                  }
+              if (m_proposalPopup != null) {
+                m_proposalPopup = null;
+              }
+              break;
+            case SwtScoutPartEvent.TYPE_CLOSING:
+              hideProposalPopup();
+              break;
+          }
+        }
       });
       m_proposalPopup.getShell().addShellListener(new ShellAdapter() {
         @Override
@@ -280,28 +268,27 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       m_proposalPopup.makeNonFocusable();
       try {
         m_proposalPopup.showForm(form);
-        getSwtField().addListener(SWT.Traverse, m_popupDelegateListener);
-        getSwtField().addListener(SWT.Verify, m_popupDelegateListener);
         form.addFormListener(new FormListener() {
+          @Override
           public void formChanged(FormEvent e) throws ProcessingException {
             switch (e.getType()) {
               case FormEvent.TYPE_STRUCTURE_CHANGED:
-                            Runnable job = new Runnable() {
-                              @Override
-                              public void run() {
-                                if (m_proposalPopup != null) {
-                                  m_proposalPopup.autoAdjustBounds();
-                                }
-                              }
-                            };
-                            getEnvironment().invokeSwtLater(job);
+                Runnable job = new Runnable() {
+                  @Override
+                  public void run() {
+                    if (m_proposalPopup != null) {
+                      m_proposalPopup.autoAdjustBounds();
+                    }
+                  }
+                };
+                getEnvironment().invokeSwtLater(job);
 
-                            break;
+                break;
 
-                          default:
-                            break;
-                        }
-                      }
+              default:
+                break;
+            }
+          }
         });
       }
       catch (ProcessingException e1) {
@@ -312,46 +299,55 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
 
   protected void hideProposalPopup() {
     synchronized (m_popupLock) {
-      if (m_proposalPopup != null) {
+      if (m_proposalPopup != null && m_proposalPopup.isVisible()) {
         try {
           m_proposalPopup.closePart();
         }
         catch (ProcessingException e) {
           LOG.warn("could not close popup.", e);
         }
-        getSwtField().removeListener(SWT.Traverse, m_popupDelegateListener);
-        getSwtField().removeListener(SWT.Verify, m_popupDelegateListener);
-        m_proposalPopup = null;
       }
+      m_proposalPopup = null;
     }
   }
 
   protected void requestProposalSupportFromSwt(String text, boolean selectCurrentValue) {
     synchronized (m_pendingProposalJobLock) {
-      boolean created = false;
       if (m_pendingProposalJob == null) {
         m_pendingProposalJob = new P_PendingProposalJob();
-        created = true;
+      }
+      else {
+        m_pendingProposalJob.cancel();
       }
       m_pendingProposalJob.update(text, selectCurrentValue);
-      if (created) {
-        m_pendingProposalJob.startTimer();
-      }
+      m_pendingProposalJob.schedule(400);
     }
   }
 
-  protected void acceptProposalFromSwt() {
+  protected boolean acceptProposalFromSwt() {
     synchronized (m_pendingProposalJobLock) {
-      m_pendingProposalJob = null;
+      if (m_pendingProposalJob != null) {
+        m_pendingProposalJob.cancel();
+        m_pendingProposalJob = null;
+      }
     }
     // notify Scout
+    final BooleanHolder resultHolder = new BooleanHolder(false);
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().acceptProposalFromUI();
+        resultHolder.setValue(getScoutObject().getUIFacade().acceptProposalFromUI());
       }
     };
-    getEnvironment().invokeScoutLater(t, 0);
+    JobEx job = getEnvironment().invokeScoutLater(t, 0);
+    try {
+      job.join(2345);
+    }
+    catch (InterruptedException e) {
+      // void
+    }
+    return resultHolder.getValue();
+
     // end notify
   }
 
@@ -372,12 +368,19 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected boolean handleSwtInputVerifier() {
+    // void since handle swt input verifier works with focus and not traverse events
+    return true;
+  }
+
+  protected boolean handleSwtTraverseVerifier() {
     synchronized (m_pendingProposalJobLock) {
-      m_pendingProposalJob = null;
+      if (m_pendingProposalJob != null) {
+        m_pendingProposalJob.cancel();
+        m_pendingProposalJob = null;
+      }
     }
     final String text = getSwtField().getText();
     final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, true);
-    //
     // notify Scout
     Runnable t = new Runnable() {
       @Override
@@ -393,11 +396,10 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     catch (InterruptedException e) {
       //nop
     }
-    getEnvironment().dispatchImmediateSwtJobs();
     boolean processed = job.getState() == JobEx.NONE;
     // end notify
-    // open popup
-    if (processed && !result.getValue()) {
+    getEnvironment().dispatchImmediateSwtJobs();
+    if (processed && (!result.getValue())) {
       // keep focus
       return false;
     }
@@ -424,65 +426,108 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  protected void delegateSwtProposalPopupKey(int keyCode) {
-    if (m_proposalPopup == null) {
-      requestProposalSupportFromSwt(ISmartField.BROWSE_ALL_TEXT, true);
+  protected void handleTextModifiedFromUi(Event event) {
+    if (getUpdateSwtFromScoutLock().isAcquired()) {
+      return;
     }
-    else {
-      Widget c = null;
-      if (c == null) {
-        c = SwtUtility.findChildComponent(m_proposalPopup.getSwtContentPane(), Table.class);
+    if (getSwtField().isVisible() && getSwtField().isFocusControl()) {
+      String text = getSwtField().getText();
+      if (text == null || text.length() == 0) {
+        // allow empty field without proposal
+        if (m_proposalPopup != null) {
+          requestProposalSupportFromSwt(text, false);
+        }
       }
-      if (c == null) {
-        c = SwtUtility.findChildComponent(m_proposalPopup.getSwtContentPane(), Tree.class);
+      else {
+        requestProposalSupportFromSwt(text, false);
       }
-      SwtUtility.handleNavigationKey(c, keyCode);
     }
   }
 
-  private class P_SwtTextModifiedListener implements Listener {
-    public void handleEvent(Event event) {
-      if (getSwtField().isEnabled() && getSwtField().getEditable() && getSwtField().isVisible()) {
-        switch (event.type) {
-          case SWT.KeyDown: {
-            switch (event.keyCode) {
-              case SWT.ARROW_DOWN:
-                delegateSwtProposalPopupKey(event.keyCode);
-                break;
-              case SWT.ARROW_UP:
-                delegateSwtProposalPopupKey(event.keyCode);
-                break;
-              case SWT.PAGE_DOWN:
-                delegateSwtProposalPopupKey(event.keyCode);
-                break;
-              case SWT.PAGE_UP:
-                delegateSwtProposalPopupKey(event.keyCode);
-                break;
-            }
-            break;
-          }
-          case SWT.Modify: {
-            handleSwtDocumentChanged();
-          }
+  protected void handleKeyDownFromUI(Event event) {
+    switch (event.keyCode) {
+      case SWT.ARROW_DOWN:
+      case SWT.ARROW_UP:
+      case SWT.PAGE_DOWN:
+      case SWT.PAGE_UP:
+        if (m_proposalPopup == null) {
+          requestProposalSupportFromSwt(ISmartField.BROWSE_ALL_TEXT, true);
         }
+        else {
+          Widget c = null;
+          if (c == null) {
+            c = SwtUtility.findChildComponent(m_proposalPopup.getSwtContentPane(), Table.class);
+          }
+          if (c == null) {
+            c = SwtUtility.findChildComponent(m_proposalPopup.getSwtContentPane(), Tree.class);
+          }
+          SwtUtility.handleNavigationKey(c, event.keyCode);
+        }
+        break;
+    }
+  }
+
+  protected void handleTraverseFromUi(Event event) {
+    switch (event.keyCode) {
+      case SWT.ARROW_DOWN:
+      case SWT.ARROW_UP:
+      case SWT.ARROW_LEFT:
+      case SWT.ARROW_RIGHT:
+      case SWT.HOME:
+      case SWT.END:
+      case SWT.PAGE_DOWN:
+      case SWT.PAGE_UP:
+      case SWT.CR:
+        // void break
+        break;
+      case SWT.ESC:
+        if (m_proposalPopup != null) {
+          event.doit = false;
+        }
+        break;
+      default:
+        event.doit = handleSwtTraverseVerifier();
+
+    }
+
+  }
+
+  private class P_UiFieldListener implements Listener {
+    @Override
+    public void handleEvent(Event event) {
+      switch (event.type) {
+        case SWT.Modify:
+          handleTextModifiedFromUi(event);
+          break;
+        case SWT.KeyDown:
+          handleKeyDownFromUI(event);
+          break;
+        case SWT.Traverse:
+          handleTraverseFromUi(event);
+          break;
       }
     }
-  } // P_SwtTextModifiedListener
+  }
 
-  private class P_PendingProposalJob implements Runnable {
+  private class P_PendingProposalJob extends JobEx implements Runnable {
+
     private String m_text;
     private boolean m_selectCurrentValue;
-    private long m_lastChanged = System.currentTimeMillis();
 
-    public void update(String text, boolean selectCurrentValue) {
-      m_text = text;
-      m_selectCurrentValue = selectCurrentValue;
-      m_lastChanged = System.currentTimeMillis();
+    public P_PendingProposalJob() {
+      super("");
+      setSystem(true);
     }
 
-    /*
-     * this runnable runs in swt
-     */
+    @Override
+    protected IStatus run(IProgressMonitor monitor) {
+      if (monitor.isCanceled()) {
+        return Status.CANCEL_STATUS;
+      }
+      getEnvironment().getDisplay().asyncExec(this);
+      return Status.OK_STATUS;
+    }
+
     @Override
     public void run() {
       synchronized (m_pendingProposalJobLock) {
@@ -494,67 +539,32 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         }
       }
       if (getSwtField().isFocusControl()) {
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
-          }
-        };
-        getEnvironment().invokeScoutLater(t, 0);
+        runAndWait(0);
       }
     }
 
-    /*
-     * Timer that waits 400ms for further typed keys before sending to scout
-     */
-    public void startTimer() {
-      final long delay = 400;
-      Thread t = new Thread() {
-        /*
-         * this runnable runs in timer thread
-         */
+    public void runAndWait(long millis) {
+      Runnable t = new Runnable() {
         @Override
         public void run() {
-          while (m_pendingProposalJob == P_PendingProposalJob.this) {
-            long dt = m_lastChanged + delay - System.currentTimeMillis();
-            if (dt > 0) {
-              try {
-                sleep(dt);
-              }
-              catch (InterruptedException ie) {
-              }
-            }
-            else {
-              break;
-            }
-          }
-          synchronized (m_pendingProposalJobLock) {
-            if (m_pendingProposalJob == P_PendingProposalJob.this) {
-              getEnvironment().getDisplay().asyncExec(P_PendingProposalJob.this);
-            }
-          }
+          getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
         }
       };
-      t.setDaemon(true);
-      t.start();
-    }
-  }// end private class
-
-  private class P_PopupDelegateListener implements Listener {
-    public void handleEvent(Event event) {
-      switch (event.type) {
-        case SWT.Traverse: {
-          switch (event.keyCode) {
-            // avoid closing on escape
-            case SWT.ESC:
-              event.doit = false;
-              return;
-          }
-          break;
-        }
+      JobEx job = getEnvironment().invokeScoutLater(t, 0);
+      try {
+        job.join(millis);
       }
+      catch (InterruptedException e) {
+        // void
+      }
+
     }
-  } // end class P_PopupDelegateListener
+
+    public void update(String text, boolean selectCurrentValue) {
+      m_text = text;
+      m_selectCurrentValue = selectCurrentValue;
+    }
+  }
 
   private class P_ContextMenuListener extends MenuAdapter {
     @Override
@@ -610,6 +620,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       super(SWT.F2);
     }
 
+    @Override
     public void handleSwtAction(Event e) {
       handleSwtBrowseAction();
     }

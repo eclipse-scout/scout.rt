@@ -48,6 +48,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     table.selectNextRow();
   }
 
+  @Override
   public void update(boolean selectCurrentValue) throws ProcessingException {
     String text = getSearchText();
     if (text == null) {
@@ -90,21 +91,21 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
       }
       try {
         table.setTableChanging(true);
-        //
-        //backup selection
-        LookupRow selectedRow = table.getKeyColumn().getSelectedValue();
-        if (selectedRow != null) {
-          m_lastSelectedKey = selectedRow.getKey();
-        }
-        else if (selectCurrentValue) {
-          m_lastSelectedKey = getSmartField().getValue();
-        }
         table.discardAllRows();
         table.addRows(tableRows);
         //restore selection
-        if (m_lastSelectedKey != null) {
+        Object keyToSelect = null;
+        if (selectCurrentValue) {
+          m_lastSelectedKey = getSmartField().getValue();
+          keyToSelect = m_lastSelectedKey;
+        }
+        else if (table.getRowCount() == 1) {
+          // select first
+          keyToSelect = table.getKeyColumn().getValue(0).getKey();
+        }
+        if (keyToSelect != null) {
           for (ITableRow row : table.getRows()) {
-            if (CompareUtility.equals(m_lastSelectedKey, table.getKeyColumn().getValue(row).getKey())) {
+            if (CompareUtility.equals(keyToSelect, table.getKeyColumn().getValue(row).getKey())) {
               table.selectRow(row);
               break;
             }
@@ -164,7 +165,6 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     else {
       return getSingleMatch();
     }
-
   }
 
   /*

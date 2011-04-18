@@ -134,11 +134,17 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
 
   public String getColumnText(Object element, int columnIndex) {
     if (columnIndex > 0) {
-      String text = getCell(element, columnIndex).getText();
-      if (!isMultiline()) {
-        text = StringUtility.replace(text, "\n", " ");
+      ICell cell = getCell(element, columnIndex);
+      if (cell == null) {
+        return "";
       }
-      return text;
+      else {
+        String text = cell.getText();
+        if (!isMultiline()) {
+          text = StringUtility.replace(text, "\n", " ");
+        }
+        return text;
+      }
     }
     return "";
   }

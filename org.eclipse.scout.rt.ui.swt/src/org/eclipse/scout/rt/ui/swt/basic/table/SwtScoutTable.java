@@ -497,7 +497,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   }
 
   protected void setContextColumnFromSwt(TableColumn swtColumn) {
-    if (getScoutObject() != null) {
+    if (getScoutObject() != null && swtColumn != null) {
       //try to find correct location, since TableColumn has NO x,y and is not a Control!
       Point pDisp = getSwtField().toDisplay(-getSwtField().getHorizontalBar().getSelection(), 0);
       for (TableColumn c : getSwtField().getColumns()) {
