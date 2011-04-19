@@ -126,6 +126,13 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     return null;
   }
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(60)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredDoc() {
+    return null;
+  }
+
   /**
    * After the page has been added to the outline tree<br>
    * Normally this method simply sets a detail pane or checks some parameters

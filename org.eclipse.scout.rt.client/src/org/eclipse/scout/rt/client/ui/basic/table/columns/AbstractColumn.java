@@ -207,6 +207,13 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return -1;
   }
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(190)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredDoc() {
+    return null;
+  }
+
   @ConfigOperation
   @Order(10)
   protected void execInitColumn() throws ProcessingException {

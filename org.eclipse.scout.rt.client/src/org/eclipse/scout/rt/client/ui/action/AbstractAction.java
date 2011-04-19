@@ -171,6 +171,13 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(110)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredDoc() {
+    return null;
+  }
+
   /**
    * called by constructor<br>
    * this way a menu can for example add/remove custom child menus
