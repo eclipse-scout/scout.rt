@@ -102,8 +102,7 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
       getSwtField().setImage(m_image);
     }
     else if (!StringUtility.isNullOrEmpty(getScoutObject().getImageId())) {
-      m_image = getEnvironment().getIcon(getScoutObject().getImageId());
-      getSwtField().setImage(m_image);
+      getSwtField().setImage(getEnvironment().getIcon(getScoutObject().getImageId()));
     }
     getSwtField().redraw();
   }
