@@ -77,6 +77,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swing.dnd.AwtImageTransferable;
@@ -204,7 +205,7 @@ public final class SwingUtility {
     if (globalTextProvider != null) {
       return globalTextProvider.getText(key, messageArguments);
     }
-    return SwingUtility.getNlsText(key, messageArguments);
+    return ScoutTexts.get(key, messageArguments);
   }
 
   public static String inspectUIResourceType(Object scoutUIResource) {
