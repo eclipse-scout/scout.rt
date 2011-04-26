@@ -22,8 +22,8 @@ import javax.swing.JOptionPane;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
 public class SwingScoutFileChooser implements ISwingScoutFileChooser {
   private ISwingEnvironment m_env;
@@ -136,7 +136,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
         }
         // check if exists
         if ((!openMode) && f != null && f.exists()) {
-          int msgBoxResult = JOptionPane.showConfirmDialog(m_owner, ScoutTexts.get("FileExistsOwerwriteQuestion"), null, JOptionPane.YES_NO_OPTION);
+          int msgBoxResult = JOptionPane.showConfirmDialog(m_owner, SwingUtility.getNlsText("FileExistsOwerwriteQuestion"), null, JOptionPane.YES_NO_OPTION);
           if (msgBoxResult == JOptionPane.YES_OPTION) {
             break;
           }

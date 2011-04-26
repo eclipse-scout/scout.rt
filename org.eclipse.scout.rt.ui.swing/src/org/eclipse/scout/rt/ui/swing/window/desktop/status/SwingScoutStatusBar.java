@@ -39,9 +39,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.FlowLayoutEx;
@@ -223,7 +223,7 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
       SwingUtilities.invokeLater(
           new Runnable() {
             public void run() {
-              m_swingNetworkLatency.setToolTipText(ScoutTexts.get("NetworkLatency") + " " + value + "ms");
+              m_swingNetworkLatency.setToolTipText(SwingUtility.getNlsText("NetworkLatency") + " " + value + "ms");
               if (iconf != m_swingNetworkLatency.getIcon()) {
                 m_swingNetworkLatency.setIcon(iconf);
               }

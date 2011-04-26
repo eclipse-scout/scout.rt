@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,7 +29,7 @@ public abstract class DynamicNls {
     m_resourceBundles = new ArrayList<NlsResourceBundleCache>();
   }
 
-  protected final void registerResourceBundle(String resourceBundleName, Class<?> wrapperClass) {
+  protected void registerResourceBundle(String resourceBundleName, Class<?> wrapperClass) {
     m_resourceBundles.add(0, new NlsResourceBundleCache(resourceBundleName, wrapperClass));
     NlsUtility.dynamicBindFields(wrapperClass);
   }
@@ -80,7 +80,7 @@ public abstract class DynamicNls {
     return NlsLocale.getDefault().getLocale();
   }
 
-  private String getTextInternal(Locale locale, String key) {
+  protected String getTextInternal(Locale locale, String key) {
     if (locale == null) {
       locale = getDefaultLocale();
     }
@@ -120,4 +120,5 @@ public abstract class DynamicNls {
     }
     return map;
   }
+
 }

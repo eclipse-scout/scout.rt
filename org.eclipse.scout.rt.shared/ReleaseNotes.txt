@@ -34,3 +34,37 @@ Migration of legacy: moving remaining legacy logic from client to server
 Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
 Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
 Migration: None
+
+26.04.2011 imo
+bugzilla 331535
+bsi ticket 96886
+bsi ticket 100749
+
+Evaluated various solution variants:
+1) service: not quite flexible since osgi services are either global or scoped on scout sessions. However, also gui composites are using ScoutTexts.get(...)
+2) extension point: not valid. since this would merge texts of all scout apps in same workbench together
+3) texts attached to client/server session: good starting point since swing/swt environment knows session.
+
+3) is the solution.
+The session-scoped nls texts (Texts.java) is set as ClientJob/ServerJob.setProperty() value on the Job and is then accessible via currentJob. ScoutTexts is delegating to this scope texts (default to ScoutTexts self)
+ClientSession and ServerSession can override getNlsTexts() method to return their specific Texts.getInstance() object.
+Swing is using the client session texts globally, swt / rwt is using the client session texts via Display.getData() accessor.
+
+Migration: optionally add the following overrides to the client and server session of the application to support for
+partially overriding existing scout texts
+
+public class ClientSession
+...
+  @Override
+  public DynamicNls getNlsTexts() {
+    return Texts.getInstance();
+  }
+
+
+public class ServerSession
+...
+  @Override
+  public DynamicNls getNlsTexts() {
+    return Texts.getInstance();
+  }
+

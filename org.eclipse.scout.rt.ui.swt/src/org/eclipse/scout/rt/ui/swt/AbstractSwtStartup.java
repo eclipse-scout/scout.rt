@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,8 +15,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.listener.WindowListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IWorkbench;
@@ -102,7 +103,7 @@ public abstract class AbstractSwtStartup implements IStartup {
   }
 
   protected String getDesktopOpenedTaskText() {
-    return ScoutTexts.get("ScoutStarting");
+    return SwtUtility.getNlsText(Display.getCurrent(), "ScoutStarting");
   }
 
   private final class P_DesktopOpenedJob extends UIJob {

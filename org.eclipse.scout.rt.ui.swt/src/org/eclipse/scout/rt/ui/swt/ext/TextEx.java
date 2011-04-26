@@ -4,20 +4,21 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.ext;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
@@ -58,7 +59,7 @@ public class TextEx extends Text {
         cut();
       }
     });
-    m_cutItem.setText(ScoutTexts.get("Cut"));
+    m_cutItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Cut"));
 
     m_copyItem = new MenuItem(m_copyPasteMenu, SWT.PUSH);
     m_copyItem.addSelectionListener(new SelectionAdapter() {
@@ -81,7 +82,7 @@ public class TextEx extends Text {
         }
       }
     });
-    m_copyItem.setText(ScoutTexts.get("Copy"));
+    m_copyItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Copy"));
 
     m_pasteItem = new MenuItem(m_copyPasteMenu, SWT.PUSH);
     m_pasteItem.addSelectionListener(new SelectionAdapter() {
@@ -90,7 +91,7 @@ public class TextEx extends Text {
         paste();
       }
     });
-    m_pasteItem.setText(ScoutTexts.get("Paste"));
+    m_pasteItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Paste"));
 
   }
 

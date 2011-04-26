@@ -15,11 +15,11 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.groupbox.layout.ButtonBarLayout;
 import org.eclipse.scout.rt.ui.swt.form.fields.groupbox.layout.ButtonBarLayoutData;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.Clipboard;
@@ -34,6 +34,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
@@ -266,7 +267,7 @@ public class SwtScoutMessageBoxDialog extends Dialog {
       cancelButton.setLayoutData(data);
     }
     if (getScoutObject().getHiddenText() != null) {
-      Button copyButton = createButton(buttonArea, ScoutTexts.get("Copy"), null, -1);
+      Button copyButton = createButton(buttonArea, SwtUtility.getNlsText(Display.getCurrent(), "Copy"), null, -1);
       copyButton.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
