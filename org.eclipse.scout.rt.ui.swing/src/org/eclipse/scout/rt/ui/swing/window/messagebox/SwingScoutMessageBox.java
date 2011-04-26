@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -45,7 +45,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
@@ -162,7 +161,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     }
     // copy/paste button
     if (getScoutMessageBox().getHiddenText() != null) {
-      m_swingButtonCopy = createButton(ScoutTexts.get("Copy"), null);
+      m_swingButtonCopy = createButton(SwingUtility.getNlsText("Copy"), null);
       buttonPanel.add(m_swingButtonCopy);
       addButtonKeyStroke(m_swingButtonCopy, "control C");
     }

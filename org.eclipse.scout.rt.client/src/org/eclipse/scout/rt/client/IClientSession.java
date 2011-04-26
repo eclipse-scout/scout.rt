@@ -14,6 +14,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -43,6 +44,8 @@ public interface IClientSession {
   boolean isLoaded();
 
   Throwable getLoadError();
+
+  DynamicNls getNlsTexts();
 
   /**
    * Start model thread with job queue<br>

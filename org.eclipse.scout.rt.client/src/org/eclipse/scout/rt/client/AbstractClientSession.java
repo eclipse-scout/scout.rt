@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
@@ -86,6 +87,14 @@ public abstract class AbstractClientSession implements IClientSession {
 
   public String getUserId() {
     return getSharedContextVariable("userId", String.class);
+  }
+
+  /**
+   * override this method to set the application specific texts implementation
+   */
+  @Override
+  public DynamicNls getNlsTexts() {
+    return null;
   }
 
   public Subject getOfflineSubject() {

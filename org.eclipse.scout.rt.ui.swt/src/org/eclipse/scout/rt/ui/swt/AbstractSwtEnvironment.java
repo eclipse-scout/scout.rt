@@ -55,7 +55,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swt.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.swt.concurrency.SwtScoutSynchronizer;
@@ -413,6 +412,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       else {
         m_clientSession = tempClientSession;
       }
+      SwtUtility.setNlsTextsOnDisplay(getDisplay(), m_clientSession.getNlsTexts());
       if (m_synchronizer == null) {
         m_synchronizer = new SwtScoutSynchronizer(this);
       }
@@ -1554,11 +1554,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   protected String getDesktopOpenedTaskText() {
-    return ScoutTexts.get("ScoutStarting");
+    return SwtUtility.getNlsText(Display.getCurrent(), "ScoutStarting");
   }
 
   protected String getDesktopClosedTaskText() {
-    return ScoutTexts.get("ScoutStoping");
+    return SwtUtility.getNlsText(Display.getCurrent(), "ScoutStoping");
   }
 
   private final class P_PerspecitveOpenedJob extends ClientAsyncJob {

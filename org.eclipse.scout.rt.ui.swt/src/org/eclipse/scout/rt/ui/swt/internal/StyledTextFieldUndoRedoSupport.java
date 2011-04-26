@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.swt.internal;
 
 import java.util.Stack;
 
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.ext.StyledTextEx;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
@@ -23,6 +23,7 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
 
 public class StyledTextFieldUndoRedoSupport {
@@ -103,7 +104,7 @@ public class StyledTextFieldUndoRedoSupport {
       }
     };
     m_undoItem.addSelectionListener(m_undoSelectionAdapter);
-    m_undoItem.setText(ScoutTexts.get("Undo"));
+    m_undoItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Undo"));
 
     m_redoItem = new MenuItem(m_styledText.getMenu(), SWT.PUSH);
     m_redoSelectionAdapter = new SelectionAdapter() {
@@ -113,7 +114,7 @@ public class StyledTextFieldUndoRedoSupport {
       }
     };
     m_redoItem.addSelectionListener(m_redoSelectionAdapter);
-    m_redoItem.setText(ScoutTexts.get("Redo"));
+    m_redoItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Redo"));
 
     m_keyAdapter = new KeyAdapter() {
       @Override

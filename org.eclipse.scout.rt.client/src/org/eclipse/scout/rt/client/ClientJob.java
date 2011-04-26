@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
  * Job operating on a {@link IClientSession} Job may be sync or async. Sync jobs
@@ -67,6 +68,7 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
     m_listeners = new EventListenerList();
     setUser(false);
     setSystem(system);
+    setProperty(ScoutTexts.JOB_PROPERTY_NAME, m_session.getNlsTexts());
     m_waitForLock = new Object();
     if (sync) {
       setRule(new ClientRule(session));

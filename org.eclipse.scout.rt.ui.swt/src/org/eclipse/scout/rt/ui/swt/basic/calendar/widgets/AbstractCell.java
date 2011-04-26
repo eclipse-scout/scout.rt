@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,9 +27,9 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.DateTimeFormatFactory;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarItemContainer;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.SwtColors;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -41,6 +41,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -363,7 +364,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
 
   protected void setVisualState() {
     // week name
-    String weekName = m_isFirstColumn ? ScoutTexts.get("WeekShort") + " " + m_cellDate.get(Calendar.WEEK_OF_YEAR) : "";
+    String weekName = m_isFirstColumn ? SwtUtility.getNlsText(Display.getCurrent(), "WeekShort") + " " + m_cellDate.get(Calendar.WEEK_OF_YEAR) : "";
 
     // day name (semi condensed form)
     String day = new SimpleDateFormat("dd.MMM", Locale.getDefault()).format(m_cellDate.getTime());

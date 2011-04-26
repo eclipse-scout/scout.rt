@@ -1,13 +1,14 @@
 package org.eclipse.scout.rt.ui.swt.basic.calendar.widgets;
 
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarConstants;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.SwtColors;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Represents a day timeline on the left part of the calendar pane (only for
@@ -109,10 +110,8 @@ public class TimelineColumn extends Composite implements PaintListener {
 
       e.gc.drawLine(0, y, bounds.width - 1, y);
 
-      if (time <= CalendarConstants.DAY_TIMELINE_START_TIME)
-      // TODO: parametrize these strings
-      e.gc.drawText(ScoutTexts.get("Calendar_earlier"), 3, y + 1, true);
-      else if (time >= CalendarConstants.DAY_TIMELINE_END_TIME - 1) e.gc.drawText(ScoutTexts.get("Calendar_later"), 3, y + 1, true);
+      if (time <= CalendarConstants.DAY_TIMELINE_START_TIME) e.gc.drawText(SwtUtility.getNlsText(Display.getCurrent(), "Calendar_earlier"), 3, y + 1, true);
+      else if (time >= CalendarConstants.DAY_TIMELINE_END_TIME - 1) e.gc.drawText(SwtUtility.getNlsText(Display.getCurrent(), "Calendar_later"), 3, y + 1, true);
       else {
         String hours = time < 10 ? "0" + time + ":00" : "" + time + ":00";
         e.gc.drawText(hours, 3, y + 1, true);

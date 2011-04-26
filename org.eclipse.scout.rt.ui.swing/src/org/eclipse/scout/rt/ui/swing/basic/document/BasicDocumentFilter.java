@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,7 +16,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 
@@ -77,7 +76,7 @@ public class BasicDocumentFilter extends DocumentFilter {
   protected String handleStringTooLong(String s, int availableLength) throws BadLocationException {
     //ticket 89148
     if (SwingUtility.isPasteAction() || SwingUtility.isSunDropAction()) {
-      SwingUtility.showMessageDialogSynthCapable(SwingWindowManager.getInstance().getActiveWindow(), ScoutTexts.get("PasteTextTooLongForFieldX", "" + getMaxLength()), ScoutTexts.get("Paste"), JOptionPane.WARNING_MESSAGE);
+      SwingUtility.showMessageDialogSynthCapable(SwingWindowManager.getInstance().getActiveWindow(), SwingUtility.getNlsText("PasteTextTooLongForFieldX", "" + getMaxLength()), SwingUtility.getNlsText("Paste"), JOptionPane.WARNING_MESSAGE);
     }
     s = s.substring(0, availableLength);
     return s;

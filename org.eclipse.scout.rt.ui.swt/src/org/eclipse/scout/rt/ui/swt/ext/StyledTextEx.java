@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.ext;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.listener.DndAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -29,6 +29,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -80,7 +81,7 @@ public class StyledTextEx extends StyledText {
         cut();
       }
     });
-    m_cutItem.setText(ScoutTexts.get("Cut"));
+    m_cutItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Cut"));
 
     m_copyItem = new MenuItem(m_copyPasteMenu, SWT.PUSH);
     m_copyItem.addSelectionListener(new SelectionAdapter() {
@@ -103,7 +104,7 @@ public class StyledTextEx extends StyledText {
         }
       }
     });
-    m_copyItem.setText(ScoutTexts.get("Copy"));
+    m_copyItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Copy"));
 
     m_pasteItem = new MenuItem(m_copyPasteMenu, SWT.PUSH);
     m_pasteItem.addSelectionListener(new SelectionAdapter() {
@@ -112,7 +113,7 @@ public class StyledTextEx extends StyledText {
         paste();
       }
     });
-    m_pasteItem.setText(ScoutTexts.get("Paste"));
+    m_pasteItem.setText(SwtUtility.getNlsText(Display.getCurrent(), "Paste"));
 
 //@19.01.11 sle: not used, provided by org.eclipse.ui-Extension
 //    addKeyListener(new KeyAdapter() {

@@ -27,8 +27,10 @@ import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.keystroke.SwtScoutKeyStroke;
@@ -1314,6 +1316,26 @@ public final class SwtUtility {
     }
     // default
     return null;
+  }
+
+  /**
+   * set the text provider for global swt texts on display
+   */
+  public static void setNlsTextsOnDisplay(Display display, DynamicNls textProvider) {
+    display.setData(ScoutTexts.JOB_PROPERTY_NAME.toString(), textProvider);
+  }
+
+  /**
+   * @return the session scope specific text (maybe an override of the ScoutTexts text)
+   */
+  public static String getNlsText(Display display, String key, String... messageArguments) {
+    if (display != null) {
+      DynamicNls textProvider = (DynamicNls) display.getData(ScoutTexts.JOB_PROPERTY_NAME.toString());
+      if (textProvider != null) {
+        return textProvider.getText(key, messageArguments);
+      }
+    }
+    return ScoutTexts.get(key, messageArguments);
   }
 
   public static TreeItem getLastTreeRow(Tree tree) {

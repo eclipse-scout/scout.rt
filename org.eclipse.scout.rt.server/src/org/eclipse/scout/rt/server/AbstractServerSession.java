@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFilter;
@@ -193,6 +194,14 @@ public abstract class AbstractServerSession implements IServerSession {
     if (l != null) {
       m_locale = l;
     }
+  }
+
+  /**
+   * override this method to set the application specific texts implementation
+   */
+  @Override
+  public DynamicNls getNlsTexts() {
+    return null;
   }
 
   public Object getAttribute(Object key) {

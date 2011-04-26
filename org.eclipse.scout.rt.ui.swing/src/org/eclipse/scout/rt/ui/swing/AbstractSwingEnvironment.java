@@ -139,7 +139,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       // http://java.sun.com/j2se/1.5.0/docs/guide/2d/flags.html#noddraw)
       System.setProperty("sun.java2d.noddraw", "true");
       System.getProperty("sun.java2d.noddraw", "true");// read to make it
-      // only system properties are visible inside javax.swing
+      //only system properties are visible inside javax.swing
       initLookAndFeel(System.getProperties());
       interceptUIDefaults(UIManager.getDefaults());
       CSSPatch.apply();
@@ -347,6 +347,8 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public void showGUI(IClientSession session) {
     checkThread();
     m_scoutSession = session;
+    //set global text provider
+    SwingUtility.setNlsTexts(m_scoutSession.getNlsTexts());
     if (m_rootFrame == null) {
       m_scoutSession.stopSession();
       return;

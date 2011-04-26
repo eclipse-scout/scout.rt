@@ -74,6 +74,7 @@ import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -186,6 +187,25 @@ public final class SwingUtility {
       }
     }
     return s.toLowerCase();
+  }
+
+  private static DynamicNls globalTextProvider;
+
+  /**
+   * set the text provider for global swing texts
+   */
+  public static void setNlsTexts(DynamicNls textProvider) {
+    globalTextProvider = textProvider;
+  }
+
+  /**
+   * @return the session scope specific text (maybe an override of the ScoutTexts text)
+   */
+  public static String getNlsText(String key, String... messageArguments) {
+    if (globalTextProvider != null) {
+      return globalTextProvider.getText(key, messageArguments);
+    }
+    return ScoutTexts.get(key, messageArguments);
   }
 
   public static String inspectUIResourceType(Object scoutUIResource) {
@@ -1072,7 +1092,7 @@ public final class SwingUtility {
       JPopupMenu pop = new JPopupMenu();
 
       if (pasteEnabled) {
-        JMenuItem cutItem = new JMenuItem(ScoutTexts.get("Cut"));
+        JMenuItem cutItem = new JMenuItem(SwingUtility.getNlsText("Cut"));
         cutItem.setEnabled(StringUtility.hasText(m_comp.getSelectedText()));
         cutItem.addActionListener(new ActionListener() {
           @Override
@@ -1083,7 +1103,7 @@ public final class SwingUtility {
         pop.add(cutItem);
       }
 
-      JMenuItem copyItem = new JMenuItem(ScoutTexts.get("Copy"));
+      JMenuItem copyItem = new JMenuItem(SwingUtility.getNlsText("Copy"));
       if (m_comp.isEnabled() && m_comp.isEditable()) {
         copyItem.setEnabled(StringUtility.hasText(m_comp.getSelectedText()));
       }
@@ -1110,7 +1130,7 @@ public final class SwingUtility {
       pop.add(copyItem);
 
       if (pasteEnabled) {
-        JMenuItem pasteItem = new JMenuItem(ScoutTexts.get("Paste"));
+        JMenuItem pasteItem = new JMenuItem(SwingUtility.getNlsText("Paste"));
         pasteItem.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent event) {

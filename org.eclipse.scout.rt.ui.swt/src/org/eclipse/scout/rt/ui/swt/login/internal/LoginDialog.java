@@ -4,13 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.login.internal;
 
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -33,7 +33,7 @@ public class LoginDialog extends Dialog {
 
   public LoginDialog(Shell parent, int style, AuthStatus status) {
     super(parent, style | SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-    setText(ScoutTexts.get("Login"));
+    setText(SwtUtility.getNlsText(parent.getDisplay(), "Login"));
     m_status = status;
   }
 
@@ -82,7 +82,7 @@ public class LoginDialog extends Dialog {
       url.setText(m_status.getUrl().getHost());
     }
     Label userLabel = new Label(shell, SWT.NONE);
-    userLabel.setText(ScoutTexts.get("Username")); //$NON-NLS-1$
+    userLabel.setText(SwtUtility.getNlsText(Display.getCurrent(), "Username")); //$NON-NLS-1$
     data = new GridData(GridData.HORIZONTAL_ALIGN_END);
     data.horizontalSpan = 1;
     userLabel.setLayoutData(data);
@@ -104,7 +104,7 @@ public class LoginDialog extends Dialog {
     });
 
     Label passLabel = new Label(shell, SWT.NONE);
-    passLabel.setText(ScoutTexts.get("Password")); //$NON-NLS-1$
+    passLabel.setText(SwtUtility.getNlsText(Display.getCurrent(), "Password")); //$NON-NLS-1$
     data = new GridData(GridData.HORIZONTAL_ALIGN_END);
     data.horizontalSpan = 1;
     passLabel.setLayoutData(data);
@@ -132,7 +132,7 @@ public class LoginDialog extends Dialog {
       saveLabel.setLayoutData(data);
 
       m_saveCheckbox = new Button(shell, SWT.CHECK);
-      m_saveCheckbox.setText(ScoutTexts.get("SavePassword"));
+      m_saveCheckbox.setText(SwtUtility.getNlsText(Display.getCurrent(), "SavePassword"));
       m_saveCheckbox.setSelection(false);
       m_saveCheckbox.setVisible(m_status.isAllowSavePassword());
       data = new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_BEGINNING);
@@ -142,7 +142,7 @@ public class LoginDialog extends Dialog {
     }
 
     m_okButton = new Button(shell, SWT.PUSH);
-    m_okButton.setText(ScoutTexts.get("Ok")); //$NON-NLS-1$
+    m_okButton.setText(SwtUtility.getNlsText(Display.getCurrent(), "Ok")); //$NON-NLS-1$
     data = new GridData(SWT.FILL | GridData.HORIZONTAL_ALIGN_END);
     data.horizontalSpan = 2;
     data.widthHint = 60;
@@ -161,7 +161,7 @@ public class LoginDialog extends Dialog {
     m_okButton.setEnabled(false);
 
     Button cancel = new Button(shell, SWT.PUSH);
-    cancel.setText(ScoutTexts.get("Cancel")); //$NON-NLS-1$
+    cancel.setText(SwtUtility.getNlsText(Display.getCurrent(), "Cancel")); //$NON-NLS-1$
     data = new GridData(SWT.FILL | GridData.HORIZONTAL_ALIGN_END);
     data.horizontalSpan = 1;
     data.widthHint = 60;

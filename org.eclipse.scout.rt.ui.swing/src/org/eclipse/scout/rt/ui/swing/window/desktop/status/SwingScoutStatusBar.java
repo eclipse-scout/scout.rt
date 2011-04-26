@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -39,9 +39,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.FlowLayoutEx;
@@ -226,7 +226,7 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
           new Runnable() {
             @Override
             public void run() {
-              m_swingNetworkLatency.setToolTipText(ScoutTexts.get("NetworkLatency") + " " + value + "ms");
+              m_swingNetworkLatency.setToolTipText(SwingUtility.getNlsText("NetworkLatency") + " " + value + "ms");
               if (iconf != m_swingNetworkLatency.getIcon()) {
                 m_swingNetworkLatency.setIcon(iconf);
               }

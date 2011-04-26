@@ -15,8 +15,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.listener.WindowListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IWorkbench;
@@ -71,7 +72,7 @@ public abstract class AbstractSwtStartup implements IStartup {
   }
 
   protected String getInitWorkbenchTaskText() {
-    return ScoutTexts.get("ScoutStarting");
+    return SwtUtility.getNlsText(Display.getCurrent(), "ScoutStarting");
   }
 
   private synchronized void handlePerspectiveOpened() {

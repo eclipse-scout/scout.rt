@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,9 +14,9 @@ import java.util.Calendar;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.DisplayMode;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.SwtColors;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -24,6 +24,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Bar to select the calendar type (monthly, weekly, etc.) and condensed mode.
@@ -87,7 +88,7 @@ public class SelectionScopeBar extends Composite {
 
     // create button 1
     m_dayWidget = new Button(this, SWT.RADIO);
-    m_dayWidget.setText(ScoutTexts.get("Day"));
+    m_dayWidget.setText(SwtUtility.getNlsText(Display.getCurrent(), "Day"));
     m_dayWidget.setBackground(SwtColors.getInstance().white);
     gd = new GridData();
     gd.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
@@ -95,7 +96,7 @@ public class SelectionScopeBar extends Composite {
 
     // create button 2
     m_workWeekWidget = new Button(this, SWT.RADIO);
-    m_workWeekWidget.setText(ScoutTexts.get("WorkWeek"));
+    m_workWeekWidget.setText(SwtUtility.getNlsText(Display.getCurrent(), "WorkWeek"));
     m_workWeekWidget.setBackground(SwtColors.getInstance().white);
     gd = new GridData();
     gd.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
@@ -103,7 +104,7 @@ public class SelectionScopeBar extends Composite {
 
     // create button 3
     m_weekWidget = new Button(this, SWT.RADIO);
-    m_weekWidget.setText(ScoutTexts.get("Week"));
+    m_weekWidget.setText(SwtUtility.getNlsText(Display.getCurrent(), "Week"));
     m_weekWidget.setBackground(SwtColors.getInstance().white);
     gd = new GridData();
     gd.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
@@ -111,7 +112,7 @@ public class SelectionScopeBar extends Composite {
 
     // create button 4
     m_monthWidget = new Button(this, SWT.RADIO);
-    m_monthWidget.setText(ScoutTexts.get("Month"));
+    m_monthWidget.setText(SwtUtility.getNlsText(Display.getCurrent(), "Month"));
     m_monthWidget.setBackground(SwtColors.getInstance().white);
     gd = new GridData();
     gd.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
@@ -129,14 +130,14 @@ public class SelectionScopeBar extends Composite {
 //      m_firstDayWidget.comboAdd(s);
 //    m_firstDayWidget.comboSetVisibleItemCount(7);
 //    m_firstDayWidget.comboSelect(Calendar.MONDAY - 1);
-//    m_firstDayWidget.labelSetText(ScoutTexts.get("FirstDayOfWeek") + ":");
+//    m_firstDayWidget.labelSetText(SwtUtility.getNlsText(Display.getCurrent(),"FirstDayOfWeek") + ":");
 //    gd = new GridData();
 //    gd.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
 //    m_firstDayWidget.setLayoutData(gd);
 
     // create button 5
     m_condensedWidget = new Button(this, SWT.CHECK);
-    m_condensedWidget.setText(ScoutTexts.get("Condensed"));
+    m_condensedWidget.setText(SwtUtility.getNlsText(Display.getCurrent(), "Condensed"));
     m_condensedWidget.setBackground(SwtColors.getInstance().white);
     gd = new GridData();
     gd.grabExcessHorizontalSpace = true;

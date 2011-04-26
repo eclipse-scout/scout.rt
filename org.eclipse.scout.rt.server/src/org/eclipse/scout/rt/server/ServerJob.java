@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.transaction.BasicTransaction;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
  * Perform a transaction on a {@link IServerSession}<br>
@@ -66,6 +67,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     if (serverSession == null) throw new IllegalArgumentException("serverSession is null");
     m_serverSession = serverSession;
     m_subject = subject;
+    setProperty(ScoutTexts.JOB_PROPERTY_NAME, m_serverSession.getNlsTexts());
   }
 
   public IServerSession getServerSession() {
