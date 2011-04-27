@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -27,6 +26,7 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.util.listener.PartListener;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.ISaveablePart2;
@@ -213,10 +213,6 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
     // void
   }
 
-  public void setStatusFromScout(IProcessingStatus newValue) {
-    setStatus(newValue);
-  }
-
   @Override
   public void createPartControl(Composite parent) {
     FormToolkit toolkit = new FormToolkit(parent.getDisplay());
@@ -270,12 +266,8 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
   }
 
   @Override
-  public void setStatus(IProcessingStatus newValue) {
-    String message = "";
-    if (newValue != null) {
-      message = newValue.getMessage();
-    }
-    getViewSite().getActionBars().getStatusLineManager().setMessage(message);
+  public void setStatusLineMessage(Image image, String message) {
+    getViewSite().getActionBars().getStatusLineManager().setMessage(image, message);
   }
 
   protected void firePartActivatedFromUI() {

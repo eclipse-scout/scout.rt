@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -264,7 +265,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   }
 
   @Override
-  public void setStatus(IProcessingStatus newValue) {
+  public void setStatusLineMessage(Image image, String message) {
     // void here
   }
 

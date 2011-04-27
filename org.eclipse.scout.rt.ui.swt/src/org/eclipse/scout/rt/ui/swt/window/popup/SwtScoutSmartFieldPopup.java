@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.swt.window.popup;
 import java.util.EventListener;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -35,6 +34,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -252,7 +252,7 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
   }
 
   @Override
-  public void setStatus(IProcessingStatus newValue) {
+  public void setStatusLineMessage(Image image, String message) {
     // void
   }
 

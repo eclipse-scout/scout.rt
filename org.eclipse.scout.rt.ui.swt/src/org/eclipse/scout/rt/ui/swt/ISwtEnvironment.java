@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.ui.swt.keystroke.IKeyStrokeManager;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStrokeFilter;
 import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
+import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.scout.rt.ui.swt.window.desktop.editor.AbstractScoutEditorPart;
 import org.eclipse.scout.rt.ui.swt.window.desktop.tray.ISwtScoutTray;
 import org.eclipse.scout.rt.ui.swt.window.desktop.view.AbstractScoutView;
@@ -238,4 +239,14 @@ public interface ISwtEnvironment {
   Rectangle getPopupOwnerBounds();
 
   void setPopupOwner(Control owner, Rectangle ownerBounds);
+
+  /**
+   * Sets the image and message to be displayed on the status line of every open {@link ISwtScoutPart}.
+   * 
+   * @param image
+   *          the image to use, or <code>null</code> for no image
+   * @param message
+   *          the message, or <code>null</code> for no message
+   */
+  void setStatusLineMessage(Image image, String message);
 }

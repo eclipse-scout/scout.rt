@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -1131,10 +1131,19 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         }
       }
       else {
-        for (ISwtScoutPart part : m_openForms.values()) {
-          part.setStatus(newValue);
+        String message = null;
+        if (newValue != null) {
+          message = newValue.getMessage();
         }
+        setStatusLineMessage(null, message);
       }
+    }
+  }
+
+  @Override
+  public void setStatusLineMessage(Image image, String message) {
+    for (ISwtScoutPart part : m_openForms.values()) {
+      part.setStatusLineMessage(image, message);
     }
   }
 

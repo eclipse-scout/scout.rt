@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.swt.window.popup;
 import java.util.EventListener;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -28,6 +27,7 @@ import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -190,7 +190,7 @@ public class SwtScoutPopup implements ISwtScoutPart {
   }
 
   @Override
-  public void setStatus(IProcessingStatus newValue) {
+  public void setStatusLineMessage(Image image, String message) {
     // void
   }
 

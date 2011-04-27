@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.listener.PartListener;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -330,12 +331,8 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   }
 
   @Override
-  public void setStatus(IProcessingStatus newValue) {
-    String message = "";
-    if (newValue != null) {
-      message = newValue.getMessage();
-    }
-    getEditorSite().getActionBars().getStatusLineManager().setMessage(message);
+  public void setStatusLineMessage(Image image, String message) {
+    getEditorSite().getActionBars().getStatusLineManager().setMessage(image, message);
   }
 
   protected void handleScoutPropertyChange(String name, Object newValue) {

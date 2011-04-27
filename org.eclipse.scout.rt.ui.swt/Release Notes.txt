@@ -23,3 +23,11 @@ new:
 
 10.02.2011 sle
 see Release Notes in org.eclipse.scout.rt.client
+
+26.04.2011 cgu
+[contributed by cgu Guglielmo Claudio, BSI Systems Integration AG, Switzerland]
+Problem:
+The behavior of displaying the status of a table changed sometime in 2010. In order to display the status the “old” way one needs access to the status line of every open view and editor.
+Solution:
+Extended ISwtEnvironment with a method setStatusLineMessage.
+Migration: If you used the method ISwtScoutPart.setStatus you have to adjust your code as following: part.setStatusLineMessage(null, status.getMessage());
