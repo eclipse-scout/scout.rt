@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.logger.internal;
+package org.eclipse.scout.commons.logger.internal.java;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.logger.internal;
+package org.eclipse.scout.commons.logger.internal.java;
 
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.eclipse.scout.commons.logger.JavaLogUtility;
+import org.eclipse.scout.commons.logger.internal.AbstractScoutLogger;
 
 /**
  * This implementation is a wrapper for {@link Logger}

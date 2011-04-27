@@ -10,18 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.logger;
 
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 
 /**
  * This interface can be used via {@link ScoutLogManager#getLogger(Class)}.
  * <p>
- * ScoutLogManager creates a trnsparent wrapper of a java.util.logging.Logger.
+ * ScoutLogManager creates a transparent wrapper of a java.util.logging.Logger or Eclipse Logger.
  * <p>
- * Therefore using this interface or {@link Logger#getLogger(String)} is the absolute same thing. By default
- * {@link Logger} writes log using the {@link ConsoleHandler}.
+ * Therefore using this interface or {@link Logger#getLogger(String)} is the absolute same thing.
  * <p>
- * Change the handling of log by changing the handlers of the root logger Logger.getLogger("")
  */
 public interface IScoutLogger {
   int LEVEL_OFF = 0;

@@ -4,11 +4,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.logger.internal;
+package org.eclipse.scout.commons.logger.internal.eclipse;
 
 import java.util.logging.LogRecord;
 
@@ -16,8 +16,10 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.internal.Activator;
-import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.EclipseLogUtility;
 import org.eclipse.scout.commons.logger.JavaLogUtility;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.logger.internal.AbstractScoutLogger;
 import org.osgi.framework.Bundle;
 
 /**
@@ -28,27 +30,9 @@ public class EclipseLogWrapper extends AbstractScoutLogger {
   private String m_name;
   private int m_level;
 
-  public EclipseLogWrapper(String name) {
+  public EclipseLogWrapper(String name, int level) {
     m_name = name;
-    String levelText = null;
-    levelText = Activator.getDefault().getBundle().getBundleContext().getProperty("org.eclipse.scout.log.level");
-    levelText = levelText != null ? levelText.toUpperCase() : "WARNING";
-    //
-    if ("ERROR".equals(levelText)) {
-      m_level = IScoutLogger.LEVEL_ERROR;
-    }
-    else if ("WARNING".equals(levelText)) {
-      m_level = IScoutLogger.LEVEL_WARN;
-    }
-    else if ("INFO".equals(levelText)) {
-      m_level = IScoutLogger.LEVEL_INFO;
-    }
-    else if ("DEBUG".equals(levelText)) {
-      m_level = IScoutLogger.LEVEL_DEBUG;
-    }
-    else {
-      m_level = IScoutLogger.LEVEL_WARN;
-    }
+    m_level = level;
   }
 
   public String getName() {
@@ -56,6 +40,10 @@ public class EclipseLogWrapper extends AbstractScoutLogger {
   }
 
   public int getLevel() {
+    Integer globalLogLevel = ScoutLogManager.getGlobalLogLevel();
+    if (globalLogLevel != null) {
+      return globalLogLevel;
+    }
     return m_level;
   }
 
@@ -90,30 +78,8 @@ public class EclipseLogWrapper extends AbstractScoutLogger {
       buf.append(record.getLoggerName());
     }
     if (bundle != null) {
-      int severity;
-      switch (JavaLogUtility.javaToScoutLevel(record.getLevel())) {
-        case IScoutLogger.LEVEL_OFF: {
-          severity = Status.ERROR;
-        }
-        case IScoutLogger.LEVEL_ERROR: {
-          severity = Status.ERROR;
-        }
-        case IScoutLogger.LEVEL_WARN: {
-          severity = Status.WARNING;
-        }
-        case IScoutLogger.LEVEL_INFO: {
-          severity = Status.INFO;
-        }
-        case IScoutLogger.LEVEL_DEBUG: {
-          severity = Status.INFO;
-        }
-        case IScoutLogger.LEVEL_TRACE: {
-          severity = Status.INFO;
-        }
-        default: {
-          severity = Status.INFO;
-        }
-      }
+      int scoutLevel = JavaLogUtility.javaToScoutLevel(record.getLevel());
+      int severity = EclipseLogUtility.scoutToEclipseLevel(scoutLevel);
       Status status = new Status(severity, bundle.getSymbolicName(), 0, buf.toString() + " " + record.getMessage(), record.getThrown());
       Platform.getLog(bundle).log(status);
     }
