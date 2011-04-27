@@ -66,3 +66,15 @@ Build Path
     Button "Edit..."
      Button "Add"
       add a new entry with "Accessible" javax/**
+
+27.04.2011 dwi
+Problem:
+There was a need to
+ - set dynamically a global log level
+ - record log messages
+ - add custom log implementations
+Solution:
+- The log level can be set dynamically using IScoutLogManager#setGlobalLogLevel(Integer globalLogLevel)
+- log messages can be recorded by using IScoutLogManager#startRecording() and IScoutLogManager#stopRecording()
+- other logging implementations can be installed by creating a fragment to the host Plug-In 'org.eclipse.scout.commons' with the class 'org.eclipse.scout.commons.logger.CustomLogManager' placed in it.
+Migration: None
