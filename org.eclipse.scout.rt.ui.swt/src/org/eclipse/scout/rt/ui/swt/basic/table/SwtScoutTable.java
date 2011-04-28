@@ -249,7 +249,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     if (getScoutObject() != null) {
       if (m_scoutTableListener == null) {
         m_scoutTableListener = new P_ScoutTableListener();
-        getScoutObject().addPriorityTableListener(m_scoutTableListener);
+        getScoutObject().addUITableListener(m_scoutTableListener);
       }
       // setMultilineTextFromScout(getScoutObject().isMultilineText());
       setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());

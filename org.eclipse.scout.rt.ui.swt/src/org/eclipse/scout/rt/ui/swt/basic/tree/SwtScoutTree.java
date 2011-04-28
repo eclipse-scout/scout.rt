@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
@@ -165,7 +166,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     if (getScoutObject() != null) {
       if (m_scoutTreeListener == null) {
         m_scoutTreeListener = new P_ScoutTreeListener();
-        getScoutObject().addPriorityTreeListener(m_scoutTreeListener);
+        getScoutObject().addUITreeListener(m_scoutTreeListener);
       }
       if (getScoutObject().isRootNodeVisible()) {
         setExpansionFromScout(getScoutObject().getRootNode());
@@ -381,7 +382,13 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
         break;
       }
       case TreeEvent.TYPE_NODES_UPDATED: {
+        //in case a virtual node was resolved, check if selection still valid
+        ISelection oldSelection = getSwtTreeViewer().getSelection();
+        ISelection newSelection = new StructuredSelection(getScoutObject().getSelectedNodes());
         updateTreeStructureAndKeepSelection(e.getCommonParentNode());
+        if (!newSelection.equals(oldSelection)) {
+          getSwtTreeViewer().setSelection(newSelection);
+        }
         setExpansionFromScout(e.getCommonParentNode());
         break;
       }
@@ -528,9 +535,9 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     public void treeChangedBatch(final TreeEvent[] a) {
       if (isHandleScoutTreeEvent(a)) {
         final ArrayList<TreeEvent> filteredList = new ArrayList<TreeEvent>();
-        for (int i = 0; i < a.length; i++) {
-          if (!isIgnoredScoutEvent(TreeEvent.class, "" + a[i].getType())) {
-            filteredList.add(a[i]);
+        for (TreeEvent element : a) {
+          if (!isIgnoredScoutEvent(TreeEvent.class, "" + element.getType())) {
+            filteredList.add(element);
           }
         }
         if (filteredList.size() == 0) {
@@ -678,7 +685,6 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   private class P_ContextMenuListener extends MenuAdapter {
     @Override
     public void menuShown(MenuEvent e) {
-
       // clear all previous
       // Windows BUG: fires menu hide before the selection on the menu item is
       // propagated.
@@ -687,7 +693,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
           disposeMenuItem(item);
         }
       }
-      // XXX clean this code with context node
+      // TODO clean this code with context node
       if (getScoutObject() != null && isEnabledFromScout()) {
         final boolean emptySpace = (getSwtField().getContextItem() == null);
         final Holder<IMenu[]> menusHolder = new Holder<IMenu[]>(IMenu[].class);
