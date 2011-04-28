@@ -114,6 +114,9 @@ public final class ScoutLogManager {
           return (IScoutLogManager) clazz.newInstance();
         }
       }
+      catch (ClassNotFoundException e) {
+        // nop (custom logger is not installed)
+      }
       catch (Exception e) {
         // error cannot be logged by log manager as not installed yet
         e.printStackTrace();
