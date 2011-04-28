@@ -47,6 +47,9 @@ public class EventListenerList implements IEventListenerSource {
     }
   }
 
+  /**
+   * @returns the listener in reverse order in which they were added
+   */
   @SuppressWarnings("unchecked")
   public <T extends EventListener> T[] getListeners(Class<T> t) {
     synchronized (listenerListLock) {
@@ -101,7 +104,10 @@ public class EventListenerList implements IEventListenerSource {
     return count;
   }
 
-  public <T extends EventListener> void insert(Class<T> t, T listener, int index) {
+  /**
+   * Add the listener at the top (front) of the listener list (so it is called as LAST listener).
+   */
+  public <T extends EventListener> void insertAtFront(Class<T> t, T listener) {
     if (listener == null) {
       return;
     }
@@ -118,13 +124,8 @@ public class EventListenerList implements IEventListenerSource {
       }
       else {
         int n = listenerList.length + 2;
-        int k = index * 2;
-        if (k < 0) k = 0;
-        else if (k >= n) k = n - 2;
+        int k = 0;
         Object[] tmp = new Object[n];
-        if (k > 0) {
-          System.arraycopy(listenerList, 0, tmp, 0, k);
-        }
         if (k < n - 2) {
           System.arraycopy(listenerList, k, tmp, k + 2, n - 2 - k);
         }
@@ -136,6 +137,9 @@ public class EventListenerList implements IEventListenerSource {
     }
   }
 
+  /**
+   * The last listener added is the first to be called
+   */
   public <T extends EventListener> void add(Class<T> t, T listener) {
     if (listener == null) {
       return;
