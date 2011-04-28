@@ -411,13 +411,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   void removeTableListener(TableListener listener);
 
   /**
-   * Add the listener at the top (front) of the listener list.
+   * Add the listener at the top (front) of the listener list (so it is called as LAST listener).
    * <p>
    * This method is normally only used by the ui layer to update its state before other listeners handle them
    * <p>
    * Use {@link #addTableListener(TableListener)} in all other cases
    */
-  void addPriorityTableListener(TableListener listener);
+  void addUITableListener(TableListener listener);
 
   /**
    * when performing a batch mutation use this marker like try{

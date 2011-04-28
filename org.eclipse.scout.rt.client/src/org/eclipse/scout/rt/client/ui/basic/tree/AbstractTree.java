@@ -1591,8 +1591,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     m_listenerList.remove(TreeListener.class, listener);
   }
 
-  public void addPriorityTreeListener(TreeListener listener) {
-    m_listenerList.insert(TreeListener.class, listener, 0);
+  public void addUITreeListener(TreeListener listener) {
+    m_listenerList.insertAtFront(TreeListener.class, listener);
   }
 
   private void fireNodesInserted(ITreeNode parent, ITreeNode[] children) {
@@ -1716,7 +1716,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   private void fireNodeAction(ITreeNode node) {
     if (node != null) {
-      // XXX why only leaf
       if (node.isLeaf()) {
         try {
           execNodeAction(node);
@@ -1821,15 +1820,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   // batch handler
   private void fireTreeEventBatchInternal(TreeEvent[] batch) {
-    if (isTreeChanging()) {
-      LOG.error("Illegal State: firing a event batch while tree is changing");
+    if (batch.length == 0) {
+      return;
     }
-    else {
-      EventListener[] listeners = m_listenerList.getListeners(TreeListener.class);
-      if (listeners != null && listeners.length > 0) {
-        for (int i = 0; i < listeners.length; i++) {
-          ((TreeListener) listeners[i]).treeChangedBatch(batch);
-        }
+    EventListener[] listeners = m_listenerList.getListeners(TreeListener.class);
+    if (listeners != null && listeners.length > 0) {
+      for (int i = 0; i < listeners.length; i++) {
+        ((TreeListener) listeners[i]).treeChangedBatch(batch);
       }
     }
   }
@@ -1859,48 +1856,73 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  private int m_processChangeBufferLoopDetection;
+
   /**
    * affects columns with lookup calls or code types<br>
    * cells that have changed values fetch new texts/decorations from the lookup
    * service in one single batch call lookup (performance optimization)
    */
   private void processChangeBuffer() {
-    /*
-     * 2. update row decorations
-     */
-    HashSet<ITreeNode> set = m_nodeDecorationBuffer;
-    m_nodeDecorationBuffer = new HashSet<ITreeNode>();
-    for (Iterator<ITreeNode> it = set.iterator(); it.hasNext();) {
-      ITreeNode node = it.next();
-      if (node.getTree() != null) {
+    //loop detection
+    try {
+      m_processChangeBufferLoopDetection++;
+      if (m_processChangeBufferLoopDetection > 100) {
+        LOG.error("LOOP DETECTION in " + getClass() + ". see stack trace for more details.", new Exception("LOOP DETECTION"));
+        return;
+      }
+      //
+      /*
+       * update row decorations
+       */
+      if (m_nodeDecorationBuffer.size() > 0) {
+        HashSet<ITreeNode> set = m_nodeDecorationBuffer;
+        m_nodeDecorationBuffer = new HashSet<ITreeNode>();
+        for (Iterator<ITreeNode> it = set.iterator(); it.hasNext();) {
+          ITreeNode node = it.next();
+          if (node.getTree() != null) {
+            try {
+              execDecorateCell(node, node.getCellForUpdate());
+            }
+            catch (Throwable t) {
+              LOG.warn("node " + node.getClass() + " " + node.getCell().getText(), t);
+            }
+          }
+        }
+      }
+      /*
+       * fire events tree changes are finished now, fire all buffered events
+       * and call lookups
+       */
+      if (m_treeEventBuffer.size() > 0) {
+        ArrayList<TreeEvent> list = m_treeEventBuffer;
+        m_treeEventBuffer = new ArrayList<TreeEvent>();
+        // coalesce selection events
+        boolean foundSelectionEvent = false;
+        for (ListIterator<TreeEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
+          if (it.previous().getType() == TreeEvent.TYPE_NODES_SELECTED) {
+            if (!foundSelectionEvent) {
+              foundSelectionEvent = true;
+            }
+            else {
+              it.remove();
+            }
+          }
+        }
+        // fire the batch and set tree to changing, otherwise a listener might trigger another events that then are processed before all other listeners received that batch
         try {
-          execDecorateCell(node, node.getCellForUpdate());
+          setTreeChanging(true);
+          //
+          fireTreeEventBatchInternal(list.toArray(new TreeEvent[list.size()]));
         }
-        catch (Throwable t) {
-          LOG.warn("node " + node.getClass() + " " + node.getCell().getText(), t);
-        }
-      }
-    }
-    /*
-     * 3. fire events tree changes are finished now, fire all buffered events
-     * and call lookups
-     */
-    ArrayList<TreeEvent> list = m_treeEventBuffer;
-    m_treeEventBuffer = new ArrayList<TreeEvent>();
-    // coalesce selection events
-    boolean foundSelectionEvent = false;
-    for (ListIterator<TreeEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
-      if (it.previous().getType() == TreeEvent.TYPE_NODES_SELECTED) {
-        if (!foundSelectionEvent) {
-          foundSelectionEvent = true;
-        }
-        else {
-          it.remove();
+        finally {
+          setTreeChanging(false);
         }
       }
     }
-    // fire the batch
-    fireTreeEventBatchInternal(list.toArray(new TreeEvent[0]));
+    finally {
+      m_processChangeBufferLoopDetection--;
+    }
   }
 
   public boolean isMultiSelect() {

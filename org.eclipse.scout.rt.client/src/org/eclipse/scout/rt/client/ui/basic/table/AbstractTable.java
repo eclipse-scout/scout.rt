@@ -349,7 +349,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   /**
    * The hyperlink's table row is the selected row and the column is the context column {@link #getContextColumn()}
-   *
+   * 
    * @param url
    * @param path
    *          {@link URL#getPath()}
@@ -510,7 +510,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Override this internal method only in order to make use of dynamic fields<br>
    * Used to manage column list and add/remove columns
-   *
+   * 
    * @param columnList
    *          live and mutable list of configured columns, not yet initialized
    */
@@ -524,7 +524,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   *
+   * 
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -2714,8 +2714,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_listenerList.remove(TableListener.class, listener);
   }
 
-  public void addPriorityTableListener(TableListener listener) {
-    m_listenerList.insert(TableListener.class, listener, 0);
+  public void addUITableListener(TableListener listener) {
+    m_listenerList.insertAtFront(TableListener.class, listener);
   }
 
   private void fireRowsInserted(ITableRow[] rows) {

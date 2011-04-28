@@ -235,13 +235,13 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
   void removeTreeListener(TreeListener listener);
 
   /**
-   * Add the listener at the top (front) of the listener list.
+   * Add the listener at the top (front) of the listener list (so it is called as LAST listener).
    * <p>
    * This method is normally only used by the ui layer to update its state before other listeners handle them
    * <p>
    * Use {@link #addTreeListener(TreeListener)} in all other cases
    */
-  void addPriorityTreeListener(TreeListener listener);
+  void addUITreeListener(TreeListener listener);
 
   /**
    * true if multiple nodes can be selected (default false)
