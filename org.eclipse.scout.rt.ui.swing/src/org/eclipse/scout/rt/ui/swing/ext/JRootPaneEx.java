@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.ext;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -18,7 +19,6 @@ import java.awt.LayoutManager;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
 
 /**
@@ -33,53 +33,63 @@ import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
 public class JRootPaneEx extends JRootPane {
   private static final long serialVersionUID = 1L;
 
-  private OptimisticLock m_opLock = new OptimisticLock();
+  private Runnable m_reflowJob;
 
   @Override
   protected LayoutManager createRootLayout() {
     return new RootLayoutEx();
   }
 
+  /**
+   * calling this method causes the root pane to post {@link SwingUtilities#invokeLater(Runnable)} a job that later
+   * calls {@link #reflow()} on this root pane
+   * 
+   * @param c
+   *          the component that changed visibility
+   */
+  public void notifyVisibleChanged(Component c) {
+    if (m_reflowJob == null) {
+      m_reflowJob = new Runnable() {
+        @Override
+        public void run() {
+          try {
+            evaluateReflow();
+          }
+          finally {
+            m_reflowJob = null;
+          }
+        }
+      };
+      SwingUtilities.invokeLater(m_reflowJob);
+    }
+  }
+
+  protected void evaluateReflow() {
+    if (getParent() == null || !isVisible() || !isShowing()) {
+      return;
+    }
+    // check minSize and maxSize requirements
+    Dimension d = getSize();
+    if (d.width > 0 && d.height > 0) {
+      Dimension[] sizes = SwingLayoutUtility.getValidatedSizes(JRootPaneEx.this);
+      Dimension minMaxSize = new Dimension(
+                        Math.min(Math.max(d.width, sizes[0].width), sizes[2].width),
+                        Math.min(Math.max(d.height, sizes[0].height), sizes[2].height)
+                        );
+      if (minMaxSize.width != d.width || minMaxSize.height != d.height || sizes[1].width != d.width || sizes[1].height != d.height) {
+        correctRootPaneSize(minMaxSize.width - d.width, minMaxSize.height - d.height, sizes[1].width - d.width, sizes[1].height - d.height);
+      }
+    }
+  }
+
   @Override
   public void validate() {
     SwingLayoutUtility.invalidateSubtree(this);
     super.validate();
-    try {
-      if (m_opLock.acquire()) {
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              if (m_opLock.acquire()) {
-                if (getParent() != null && isVisible()) {
-                  // check minSize and maxSize requirements
-                  Dimension d = getSize();
-                  if (d.width > 0 && d.height > 0) {
-                    Dimension[] sizes = SwingLayoutUtility.getValidatedSizes(JRootPaneEx.this);
-                    Dimension minMaxSize = new Dimension(
-                        Math.min(Math.max(d.width, sizes[0].width), sizes[2].width),
-                        Math.min(Math.max(d.height, sizes[0].height), sizes[2].height)
-                        );
-                    if (minMaxSize.width != d.width || minMaxSize.height != d.height || sizes[1].width != d.width || sizes[1].height != d.height) {
-                      correctRootPaneSize(minMaxSize.width - d.width, minMaxSize.height - d.height, sizes[1].width - d.width, sizes[1].height - d.height);
-                    }
-                  }
-                }
-              }
-            }
-            finally {
-              m_opLock.release();
-            }
-          }
-        });
-      }
-    }
-    finally {
-      m_opLock.release();
-    }
   }
 
   /**
+   * @deprecated use {@link #reflow()} instead
    * @param widthDelta
    *          is the width correction (existingWidth+widthDelta=correctWidth) to
    *          meet min/max sizes
@@ -93,7 +103,12 @@ public class JRootPaneEx extends JRootPane {
    *          is the height correction (existingHeight+heightDelta=prefHeight)
    *          to meet preferred size
    */
+  @Deprecated
   protected void correctRootPaneSize(int widthDelta, int heightDelta, int preferredWidthDelta, int preferredHeightDelta) {
+    reflow();
+  }
+
+  protected void reflow() {
   }
 
   protected class RootLayoutEx extends JRootPane.RootLayout {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -66,7 +66,7 @@ public class JFrameEx extends JFrame implements IWaitSupport {
   public void setAutoCorrectSize(boolean b) {
     m_autoCorrectSize = b;
   }
-  
+
   public Rectangle getNonMaximizedBounds() {
     return m_nonMaximizedBounds;
   }
@@ -160,11 +160,9 @@ public class JFrameEx extends JFrame implements IWaitSupport {
       private static final long serialVersionUID = 1L;
 
       @Override
-      protected void correctRootPaneSize(int widthDelta, int heightDelta, int preferredWidthDelta, int preferredHeightDelta) {
+      protected void reflow() {
         if (m_autoCorrectSize) {
-          if (widthDelta != 0 || heightDelta != 0) {
-            JFrameEx.this.pack();
-          }
+          JFrameEx.this.pack();
         }
       }
     };

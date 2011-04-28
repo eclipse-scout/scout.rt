@@ -11,12 +11,14 @@
 package org.eclipse.scout.rt.ui.swing.form.fields;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -29,6 +31,7 @@ import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
+import org.eclipse.scout.rt.ui.swing.ext.JRootPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
 
@@ -100,11 +103,25 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
   }
 
   protected void setVisibleFromScout(boolean b) {
+    Component changedComponent = null;
     if (m_swingContainer != null) {
-      m_swingContainer.setVisible(b);
+      if (m_swingContainer.isVisible() != b) {
+        m_swingContainer.setVisible(b);
+        changedComponent = m_swingContainer;
+      }
     }
     else if (getSwingField() != null) {
-      getSwingField().setVisible(b);
+      if (getSwingField().isVisible() != b) {
+        getSwingField().setVisible(b);
+        changedComponent = getSwingField();
+      }
+    }
+    //
+    if (changedComponent != null) {
+      JRootPaneEx rp = (JRootPaneEx) SwingUtilities.getAncestorOfClass(JRootPaneEx.class, changedComponent);
+      if (rp != null) {
+        rp.notifyVisibleChanged(changedComponent);
+      }
     }
   }
 

@@ -76,12 +76,10 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
           private static final long serialVersionUID = 1L;
 
           @Override
-          protected void correctRootPaneSize(int widthDelta, int heightDelta, int preferredWidthDelta, int preferredHeightDelta) {
+          protected void reflow() {
             if (m_swingView.getParent() != null) {
               if (!m_swingView.isIcon()) {
-                if (widthDelta != 0 || heightDelta != 0) {
-                  ((JComponent) m_swingView.getParent()).revalidate();
-                }
+                ((JComponent) m_swingView.getParent()).revalidate();
               }
             }
           }
