@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,7 +42,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -80,7 +79,7 @@ public class SwtMock implements IGuiMock {
       return;
     }
     //
-    for (int pass = 0; pass < 1; pass++) {
+    for (int pass = 0; pass < 2; pass++) {
       //wait until gui queue is empty
       syncExec(new MockRunnable<Object>() {
         public Object run() throws Throwable {
@@ -330,32 +329,67 @@ public class SwtMock implements IGuiMock {
   }
 
   public void contextMenu(final String... names) {
-    //move to menu
-    for (int i = 0; i < names.length; i++) {
-      String label = names[i];
-      final boolean lastItem = i == names.length - 1;
-      final MenuItem m = waitForMenuItem(label);
-      syncExec(new MockRunnable<Boolean>() {
-        public Boolean run() throws Throwable {
-          //toggle
-          if ((m.getStyle() & (SWT.CHECK | SWT.RADIO)) != 0) {
-            m.setSelection(!m.getSelection());
+    final ArrayList<Integer> indexOfList = new ArrayList<Integer>();
+    final MenuItem mi = waitForMenuItem(names[0]);
+    syncExec(new MockRunnable<Boolean>() {
+      public Boolean run() throws Throwable {
+        indexOfList.add(accessibleMenuIndex(mi));
+        MenuItem parentMenuItem = mi;
+        for (int i = 1; i < names.length; i++) {
+          String label = cleanButtonLabel(names[i]);
+          MenuItem subItem = null;
+          for (MenuItem item : parentMenuItem.getMenu().getItems()) {
+            if (label.equals(cleanButtonLabel(item.getText()))) {
+              subItem = item;
+              break;
+            }
           }
-          //fire selection
-          Event event = new Event();
-          event.display = getDisplay();
-          event.time = (int) System.currentTimeMillis();
-          event.type = SWT.Selection;
-          event.widget = m;
-          m.notifyListeners(event.type, event);
-          if (lastItem) {
-            //nop
+          if (subItem == null) {
+            throw new IllegalStateException("cannot find submenu " + names[i]);
           }
-          return null;
+          indexOfList.add(accessibleMenuIndex(subItem));
+          parentMenuItem = subItem;
         }
-      });
-      waitForIdle();
+        return null;
+      }
+    });
+    //do keyboard actions to navigate to menu, finish up with enter key
+    for (int i = 0; i < indexOfList.size(); i++) {
+      if (i > 0) {
+        typeKey(Key.Right);
+      }
+      int repeat = indexOfList.get(i);
+      //top level is not pre-selected on first item
+      if (i == 0) {
+        repeat++;
+      }
+      while (repeat > 0) {
+        repeat--;
+        typeKey(Key.Down);
+      }
     }
+    typeKey(Key.Enter);
+    waitForIdle();
+  }
+
+  /**
+   * @return the menu index in the parent menu of all enabled and visible menu items
+   */
+  protected int accessibleMenuIndex(MenuItem mi) {
+    Menu m = mi.getParent();
+    int index = 0;
+    for (MenuItem x : m.getItems()) {
+      if (x == mi) {
+        break;
+      }
+      if ((x.getStyle() & SWT.SEPARATOR) != 0) {
+        continue;
+      }
+      if (x.isEnabled()) {
+        index++;
+      }
+    }
+    return index;
   }
 
   public List<String> getTableCells(int tableIndex, final int columnIndex) {
@@ -624,7 +658,9 @@ public class SwtMock implements IGuiMock {
     //
     for (TreeItem item : items) {
       list.add(item.getText(0));
-      addTreeItemsRec(item.getItems(), list);
+      if (item.getExpanded()) {
+        addTreeItemsRec(item.getItems(), list);
+      }
     }
   }
 
