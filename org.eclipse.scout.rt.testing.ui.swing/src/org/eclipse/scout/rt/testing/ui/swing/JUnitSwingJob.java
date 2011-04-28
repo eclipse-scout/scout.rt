@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -43,51 +42,39 @@ public class JUnitSwingJob extends Job {
     m_clientSessionClass = clientSessionClass;
   }
 
+  @Override
   protected IStatus run(IProgressMonitor monitor) {
-    ClientAsyncJob job = new ClientAsyncJob("JUnit Swing Job", SERVICES.getService(IClientSessionRegistryService.class).getClientSession(m_clientSessionClass)) {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        //wait until the application is showing
-        try {
-          TestingUtility.waitUntil(IGuiMock.WAIT_TIMEOUT, new WaitCondition<Object>() {
-            public Object run() {
-              try {
-                IClientSession session = getClientSession();
-                if (session != null) {
-                  IDesktop desktop = session.getDesktop();
-                  if (desktop != null) {
-                    if (desktop.isGuiAvailable() && desktop.isOpened()) {
-                      return true;//non-null
-                    }
-                  }
+    //wait until the application is showing
+    try {
+      TestingUtility.waitUntil(IGuiMock.WAIT_TIMEOUT, new WaitCondition<Object>() {
+        public Object run() {
+          try {
+            IClientSession session = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(m_clientSessionClass);
+            if (session != null) {
+              IDesktop desktop = session.getDesktop();
+              if (desktop != null) {
+                if (desktop.isGuiAvailable() && desktop.isOpened()) {
+                  return true;//non-null
                 }
               }
-              catch (Throwable t) {
-                t.printStackTrace();
-                System.exit(0);
-              }
-              return null;
             }
-          });
+          }
+          catch (Throwable t) {
+            t.printStackTrace();
+            System.exit(0);
+          }
+          return null;
         }
-        catch (Throwable t) {
-          System.err.println("Timeout waiting for SwingApplication to start: " + t);
-          System.exit(0);
-        }
-        //
-        ScoutJUnitPluginTestExecutor scoutJUnitPluginTestExecutor = new ScoutJUnitPluginTestExecutor();
-        final int code = scoutJUnitPluginTestExecutor.runAllTests();
-        System.exit(code);
-        return Status.OK_STATUS;
-      }
-    };
-    job.schedule();
-    try {
-      job.join();
+      });
     }
-    catch (InterruptedException e) {
-      e.printStackTrace();
+    catch (Throwable t) {
+      System.err.println("Timeout waiting for SwingApplication to start: " + t);
+      System.exit(0);
     }
+    //
+    ScoutJUnitPluginTestExecutor scoutJUnitPluginTestExecutor = new ScoutJUnitPluginTestExecutor();
+    final int code = scoutJUnitPluginTestExecutor.runAllTests();
+    System.exit(code);
     return Status.OK_STATUS;
   }
 }

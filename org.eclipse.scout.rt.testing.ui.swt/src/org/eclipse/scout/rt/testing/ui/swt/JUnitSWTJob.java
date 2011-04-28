@@ -13,15 +13,13 @@ package org.eclipse.scout.rt.testing.ui.swt;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.testing.shared.ScoutJUnitPluginTestExecutor;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
-import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.testing.client.IGuiMock;
 import org.eclipse.ui.PlatformUI;
 
@@ -36,11 +34,11 @@ import org.eclipse.ui.PlatformUI;
  *   }
  * </pre></code>
  */
-public class JUnitSWTJob extends ClientAsyncJob {
+public class JUnitSWTJob extends Job {
   private final ISwtEnvironment m_environment;
 
-  public JUnitSWTJob(ISwtEnvironment environment, Class<? extends IClientSession> clientSessionClazz) {
-    super("JUnit SWT Runner", SERVICES.getService(IClientSessionRegistryService.class).getClientSession(clientSessionClazz));
+  public JUnitSWTJob(ISwtEnvironment environment) {
+    super("JUnit SWT Runner");
     m_environment = environment;
   }
 

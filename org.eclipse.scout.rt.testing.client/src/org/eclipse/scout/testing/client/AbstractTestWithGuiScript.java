@@ -17,11 +17,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientRule;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm;
@@ -62,7 +63,6 @@ public abstract class AbstractTestWithGuiScript {
    * This method runs as the model "thread" using sync {@link ClientRule}s
    */
   protected void runModel() throws Throwable {
-
   }
 
   /**
@@ -71,8 +71,12 @@ public abstract class AbstractTestWithGuiScript {
    * This method runs as the model "thread" using sync {@link ClientRule}s
    */
   protected void disposeModel() throws Throwable {
+  }
+
+  protected void resetSession() throws Throwable {
     IDesktop desktop = clientSession.getDesktop();
     desktop.setAvailableOutlines(null);
+    desktop.setOutline((IOutline) null);
     for (IMessageBox m : desktop.getMessageBoxStack()) {
       try {
         m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
@@ -118,12 +122,13 @@ public abstract class AbstractTestWithGuiScript {
    */
   @Test
   public final void test() throws Throwable {
-    clientSession = ClientAsyncJob.getCurrentSession();
+    clientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(getSessionClass());
     final IGuiMock gui = SERVICES.getService(IGuiMockService.class).createMock(clientSession);
     //
     final ClientSyncJob runModelJob = new ClientSyncJob("Run", clientSession) {
       @Override
       protected void runVoid(IProgressMonitor m) throws Throwable {
+        resetSession();
         runModel();
       }
     };
@@ -133,7 +138,12 @@ public abstract class AbstractTestWithGuiScript {
     final ClientSyncJob disposeModelJob = new ClientSyncJob("Dispose", clientSession) {
       @Override
       protected void runVoid(IProgressMonitor m) throws Throwable {
-        disposeModel();
+        try {
+          disposeModel();
+        }
+        finally {
+          resetSession();
+        }
       }
     };
     disposeModelJob.setUser(false);
