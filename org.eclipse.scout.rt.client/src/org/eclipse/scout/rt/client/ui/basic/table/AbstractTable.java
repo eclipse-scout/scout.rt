@@ -2386,98 +2386,120 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return false;
   }
 
+  private int m_processEventBufferLoopDetection;
+
   /**
    * Fire events in form of one batch<br>
    * fire all buffered events<br>
    * coalesce all TableEvents of same type and sort according to their type
    */
   private void processEventBuffer() {
-    ArrayList<TableEvent> list = m_tableEventBuffer;
-    m_tableEventBuffer = new ArrayList<TableEvent>();
-    if (list.size() > 0) {
-      HashMap<Integer, List<TableEvent>> coalesceMap = new HashMap<Integer, List<TableEvent>>();
-      for (TableEvent e : list) {
-        List<TableEvent> subList = coalesceMap.get(e.getType());
-        if (subList == null) {
-          subList = new ArrayList<TableEvent>();
-          coalesceMap.put(e.getType(), subList);
-        }
-        subList.add(e);
+    //loop detection
+    try {
+      m_processEventBufferLoopDetection++;
+      if (m_processEventBufferLoopDetection > 100) {
+        LOG.error("LOOP DETECTION in " + getClass() + ". see stack trace for more details.", new Exception("LOOP DETECTION"));
+        return;
       }
-      TreeMap<Integer, TableEvent> sortedCoalescedMap = new TreeMap<Integer, TableEvent>();
-      for (Map.Entry<Integer, List<TableEvent>> entry : coalesceMap.entrySet()) {
-        int type = entry.getKey();
-        List<TableEvent> subList = entry.getValue();
-        int lastIndex = subList.size() - 1;
-        switch (type) {
-          case TableEvent.TYPE_ALL_ROWS_DELETED: {
-            ArrayList<TableEvent> singleList = new ArrayList<TableEvent>(1);
-            singleList.add(subList.get(lastIndex));// use last
-            sortedCoalescedMap.put(10, coalesceTableEvents(singleList, false, true));
-            break;
+      //
+      ArrayList<TableEvent> list = m_tableEventBuffer;
+      m_tableEventBuffer = new ArrayList<TableEvent>();
+      if (list.size() > 0) {
+        HashMap<Integer, List<TableEvent>> coalesceMap = new HashMap<Integer, List<TableEvent>>();
+        for (TableEvent e : list) {
+          List<TableEvent> subList = coalesceMap.get(e.getType());
+          if (subList == null) {
+            subList = new ArrayList<TableEvent>();
+            coalesceMap.put(e.getType(), subList);
           }
-          case TableEvent.TYPE_ROWS_DELETED: {
-            sortedCoalescedMap.put(20, coalesceTableEvents(subList, false, true));// merge
-            break;
-          }
-          case TableEvent.TYPE_ROWS_INSERTED: {
-            sortedCoalescedMap.put(30, coalesceTableEvents(subList, true, false));// merge
-            break;
-          }
-          case TableEvent.TYPE_ROWS_UPDATED: {
-            sortedCoalescedMap.put(40, coalesceTableEvents(subList, true, false));// merge
-            break;
-          }
-          case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
-            sortedCoalescedMap.put(60, coalesceTableEvents(subList, false, false));// merge
-            break;
-          }
-          case TableEvent.TYPE_COLUMN_ORDER_CHANGED: {
-            sortedCoalescedMap.put(70, coalesceTableEvents(subList, false, false));// merge
-            break;
-          }
-          case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
-            sortedCoalescedMap.put(80, subList.get(lastIndex));// use last
-            break;
-          }
-          case TableEvent.TYPE_ROW_ORDER_CHANGED: {
-            sortedCoalescedMap.put(90, subList.get(lastIndex));// use last
-            break;
-          }
-          case TableEvent.TYPE_ROWS_DRAG_REQUEST: {
-            sortedCoalescedMap.put(100, subList.get(lastIndex));// use last
-            break;
-          }
-          case TableEvent.TYPE_ROW_DROP_ACTION: {
-            sortedCoalescedMap.put(110, subList.get(lastIndex));// use last
-            break;
-          }
-          case TableEvent.TYPE_HEADER_POPUP: {
-            sortedCoalescedMap.put(130, subList.get(lastIndex));// use last
-            break;
-          }
-          case TableEvent.TYPE_EMPTY_SPACE_POPUP: {
-            sortedCoalescedMap.put(140, subList.get(lastIndex));// use last
-            break;
-          }
-          case TableEvent.TYPE_ROW_POPUP: {
-            sortedCoalescedMap.put(150, subList.get(lastIndex));// use last
-            break;
-          }
-          case TableEvent.TYPE_ROW_ACTION: {
-            sortedCoalescedMap.put(160, subList.get(lastIndex));// use last
-            break;
-          }
-          case TableEvent.TYPE_ROWS_SELECTED: {
-            sortedCoalescedMap.put(170, subList.get(lastIndex));// use last
-            break;
-          }
-          default: {
-            sortedCoalescedMap.put(-type, subList.get(lastIndex));// use last
+          subList.add(e);
+        }
+        TreeMap<Integer, TableEvent> sortedCoalescedMap = new TreeMap<Integer, TableEvent>();
+        for (Map.Entry<Integer, List<TableEvent>> entry : coalesceMap.entrySet()) {
+          int type = entry.getKey();
+          List<TableEvent> subList = entry.getValue();
+          int lastIndex = subList.size() - 1;
+          switch (type) {
+            case TableEvent.TYPE_ALL_ROWS_DELETED: {
+              ArrayList<TableEvent> singleList = new ArrayList<TableEvent>(1);
+              singleList.add(subList.get(lastIndex));// use last
+              sortedCoalescedMap.put(10, coalesceTableEvents(singleList, false, true));
+              break;
+            }
+            case TableEvent.TYPE_ROWS_DELETED: {
+              sortedCoalescedMap.put(20, coalesceTableEvents(subList, false, true));// merge
+              break;
+            }
+            case TableEvent.TYPE_ROWS_INSERTED: {
+              sortedCoalescedMap.put(30, coalesceTableEvents(subList, true, false));// merge
+              break;
+            }
+            case TableEvent.TYPE_ROWS_UPDATED: {
+              sortedCoalescedMap.put(40, coalesceTableEvents(subList, true, false));// merge
+              break;
+            }
+            case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
+              sortedCoalescedMap.put(60, coalesceTableEvents(subList, false, false));// merge
+              break;
+            }
+            case TableEvent.TYPE_COLUMN_ORDER_CHANGED: {
+              sortedCoalescedMap.put(70, coalesceTableEvents(subList, false, false));// merge
+              break;
+            }
+            case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
+              sortedCoalescedMap.put(80, subList.get(lastIndex));// use last
+              break;
+            }
+            case TableEvent.TYPE_ROW_ORDER_CHANGED: {
+              sortedCoalescedMap.put(90, subList.get(lastIndex));// use last
+              break;
+            }
+            case TableEvent.TYPE_ROWS_DRAG_REQUEST: {
+              sortedCoalescedMap.put(100, subList.get(lastIndex));// use last
+              break;
+            }
+            case TableEvent.TYPE_ROW_DROP_ACTION: {
+              sortedCoalescedMap.put(110, subList.get(lastIndex));// use last
+              break;
+            }
+            case TableEvent.TYPE_HEADER_POPUP: {
+              sortedCoalescedMap.put(130, subList.get(lastIndex));// use last
+              break;
+            }
+            case TableEvent.TYPE_EMPTY_SPACE_POPUP: {
+              sortedCoalescedMap.put(140, subList.get(lastIndex));// use last
+              break;
+            }
+            case TableEvent.TYPE_ROW_POPUP: {
+              sortedCoalescedMap.put(150, subList.get(lastIndex));// use last
+              break;
+            }
+            case TableEvent.TYPE_ROW_ACTION: {
+              sortedCoalescedMap.put(160, subList.get(lastIndex));// use last
+              break;
+            }
+            case TableEvent.TYPE_ROWS_SELECTED: {
+              sortedCoalescedMap.put(170, subList.get(lastIndex));// use last
+              break;
+            }
+            default: {
+              sortedCoalescedMap.put(-type, subList.get(lastIndex));// use last
+            }
           }
         }
+        // fire the batch and set tree to changing, otherwise a listener might trigger another events that then are processed before all other listeners received that batch
+        try {
+          setTableChanging(true);
+          //
+          fireTableEventBatchInternal(sortedCoalescedMap.values().toArray(new TableEvent[0]));
+        }
+        finally {
+          setTableChanging(false);
+        }
       }
-      fireTableEventBatchInternal(sortedCoalescedMap.values().toArray(new TableEvent[0]));
+    }
+    finally {
+      m_processEventBufferLoopDetection--;
     }
   }
 
@@ -2934,16 +2956,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   // batch handler
   private void fireTableEventBatchInternal(TableEvent[] batch) {
-    if (isTableChanging()) {
-      LOG.error("Illegal State: firing a event batch while table is changing");
+    if (batch.length == 0) {
+      return;
     }
-    else {
-      if (batch.length > 0) {
-        EventListener[] listeners = m_listenerList.getListeners(TableListener.class);
-        if (listeners != null && listeners.length > 0) {
-          for (int i = 0; i < listeners.length; i++) {
-            ((TableListener) listeners[i]).tableChangedBatch(batch);
-          }
+    if (batch.length > 0) {
+      EventListener[] listeners = m_listenerList.getListeners(TableListener.class);
+      if (listeners != null && listeners.length > 0) {
+        for (int i = 0; i < listeners.length; i++) {
+          ((TableListener) listeners[i]).tableChangedBatch(batch);
         }
       }
     }
