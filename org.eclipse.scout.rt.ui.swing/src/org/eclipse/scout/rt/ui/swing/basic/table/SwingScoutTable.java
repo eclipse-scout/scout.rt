@@ -272,7 +272,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     if (getScoutObject() != null) {
       if (m_scoutTableListener == null) {
         m_scoutTableListener = new P_ScoutTableListener();
-        getScoutObject().addPriorityTableListener(m_scoutTableListener);
+        getScoutObject().addUITableListener(m_scoutTableListener);
       }
       setMultiSelectFromScout(getScoutObject().isMultiSelect());
       setMultilineTextFromScout(getScoutObject().isMultilineText());

@@ -175,7 +175,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     if (getScoutObject() != null) {
       if (m_scoutTreeListener == null) {
         m_scoutTreeListener = new P_ScoutTreeListener();
-        getScoutObject().addPriorityTreeListener(m_scoutTreeListener);
+        getScoutObject().addUITreeListener(m_scoutTreeListener);
       }
       setMultiSelectFromScout(getScoutObject().isMultiSelect());
       setRootNodeVisibleFromScout();
