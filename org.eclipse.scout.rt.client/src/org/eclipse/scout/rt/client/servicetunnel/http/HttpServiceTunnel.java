@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.client.servicetunnel.http;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLConnection;
+import java.security.AccessController;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -23,14 +26,11 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
-/**
- * Use the config parameter org.eclipse.scout.rt.client.http.maxSizeForGet=10240
- * to allow for soap GET requests which can speed-up communication by a factor
- * of 4.0
- */
 public class HttpServiceTunnel extends InternalHttpServiceTunnel {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.client.http.debug";
-  public static final String MAX_HTTP_GET_SIZE_PARAM = "org.eclipse.scout.rt.client.http.maxSizeForGet";
+
+  private String m_ajaxSessionId;
+  private String m_ajaxUserId;
 
   public HttpServiceTunnel(IClientSession session, String url) throws ProcessingException {
     super(session, url);
@@ -48,6 +48,30 @@ public class HttpServiceTunnel extends InternalHttpServiceTunnel {
    */
   public HttpServiceTunnel(IClientSession session, String url, String version) throws ProcessingException {
     super(session, url, version);
+  }
+
+  /**
+   * true: The ajaxSessionId is sent with every request as http header "Ajax-SessionId" to the /process servlet.
+   * <p>
+   * This is necessary since the web-gui-servlet is itself a single servlet that is calling the server-servlet /process
+   * with a single cookie and therefore a single http session. When "Ajax-SessionId" is set, the ServiceTunnelServlet
+   * /process recognizes this and is not associating the scout server session with the HttpSession but with a custom
+   * cache associated with this ajax (remote) session id.
+   * <p>
+   * In addition, a "Ajax-UserId" header is added to impersonate the originally calling user (retrieved from the current
+   * {@link Subject}s first principal).
+   */
+  public void setAjaxSessionId(String ajaxSessionId) {
+    m_ajaxSessionId = ajaxSessionId;
+    String userId = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next().getName();
+    m_ajaxUserId = userId;
+  }
+
+  /**
+   * see {@link #setAjaxSessionId(String)}
+   */
+  public String getAjaxSessionId() {
+    return m_ajaxSessionId;
   }
 
   @Override
@@ -83,6 +107,10 @@ public class HttpServiceTunnel extends InternalHttpServiceTunnel {
   @Override
   protected void addCustomHeaders(URLConnection urlConn, String method) throws IOException {
     super.addCustomHeaders(urlConn, method);
+    if (m_ajaxSessionId != null) {
+      urlConn.setRequestProperty("Ajax-SessionId", m_ajaxSessionId);
+      urlConn.setRequestProperty("Ajax-UserId", m_ajaxUserId);
+    }
   }
 
   /**
@@ -104,25 +132,6 @@ public class HttpServiceTunnel extends InternalHttpServiceTunnel {
   @Override
   public void setContentHandler(IServiceTunnelContentHandler e) {
     super.setContentHandler(e);
-  }
-
-  /**
-   * @return maximum size for a HTTP GET request (default is 0)
-   */
-  @Override
-  public int getMaxHttpGetSize() {
-    return super.getMaxHttpGetSize();
-  }
-
-  /**
-   * @param msgEncoder
-   *          that can encode and decode a request / response to and from the
-   *          binary stream. Default is the {@link DefaultServiceTunnelContentHandler} which handles soap
-   *          style messages
-   */
-  @Override
-  public void setMaxHttpGetSize(int size) {
-    super.setMaxHttpGetSize(size);
   }
 
   @Override

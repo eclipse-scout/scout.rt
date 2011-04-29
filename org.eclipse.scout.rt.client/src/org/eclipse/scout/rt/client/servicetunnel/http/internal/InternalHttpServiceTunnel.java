@@ -16,18 +16,15 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.osgi.BundleInspector;
-import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.AbstractServiceTunnel;
-import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
@@ -36,13 +33,9 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
- * Use the config parameter org.eclipse.scout.rt.client.http.maxSizeForGet=10240
- * to allow for soap GET requests which can speed-up communication by a factor
- * of 4.0
  */
 public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
   private IServiceTunnelContentHandler m_contentHandler;
-  private int m_maxHttpGetSize;
   private ClientNotificationPollingJob m_pollingJob;
   private final Object m_pollingJobLock = new Object();
 
@@ -69,13 +62,6 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
     }
     catch (MalformedURLException e) {
       throw new ProcessingException(url, e);
-    }
-    String text = null;
-    if (Activator.getDefault() != null) {
-      text = Activator.getDefault().getBundle().getBundleContext().getProperty(HttpServiceTunnel.MAX_HTTP_GET_SIZE_PARAM);
-    }
-    if (text != null && text.matches("[0-9]+")) {
-      m_maxHttpGetSize = Integer.parseInt(text);
     }
   }
 
@@ -108,43 +94,20 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
       throw new IOException("File connection is not supporting HTTP: " + getServerURL());
     }
     URLConnection urlConn;
-    // GET or POST
-    String httpGetUrlString = null;
-    // fast check of approximate GET length
-    if (getMaxHttpGetSize() > 0 && getServerURL().toExternalForm().length() + callData.length <= getMaxHttpGetSize()) {
-      String s = getServerURL().toExternalForm() + "?msg=" + URLEncoder.encode(new String(callData, "UTF-8"), "UTF-8");
-      if (s.length() <= getMaxHttpGetSize()) {
-        httpGetUrlString = s;
-      }
-    }
-    if (httpGetUrlString != null) {
-      // configure GET with text/xml
-      urlConn = new URL(httpGetUrlString).openConnection();
-      String contentType = "text/xml";
-      urlConn.setRequestProperty("Content-type", contentType);
-      urlConn.setDoOutput(false);
-      urlConn.setDoInput(true);
-      urlConn.setDefaultUseCaches(false);
-      urlConn.setUseCaches(false);
-      addCustomHeaders(urlConn, "GET");
-      return urlConn;
-    }
-    else {
-      // configure POST with text/xml
-      urlConn = getServerURL().openConnection();
-      String contentType = "text/xml";
-      urlConn.setRequestProperty("Content-type", contentType);
-      urlConn.setDoOutput(true);
-      urlConn.setDoInput(true);
-      urlConn.setDefaultUseCaches(false);
-      urlConn.setUseCaches(false);
-      addCustomHeaders(urlConn, "POST");
-      OutputStream httpOut = urlConn.getOutputStream();
-      httpOut.write(callData);
-      httpOut.close();
-      httpOut = null;
-      return urlConn;
-    }
+    // configure POST with text/xml
+    urlConn = getServerURL().openConnection();
+    String contentType = "text/xml";
+    urlConn.setRequestProperty("Content-type", contentType);
+    urlConn.setDoOutput(true);
+    urlConn.setDoInput(true);
+    urlConn.setDefaultUseCaches(false);
+    urlConn.setUseCaches(false);
+    addCustomHeaders(urlConn, "POST");
+    OutputStream httpOut = urlConn.getOutputStream();
+    httpOut.write(callData);
+    httpOut.close();
+    httpOut = null;
+    return urlConn;
   }
 
   /**
@@ -194,23 +157,6 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
    */
   public void setContentHandler(IServiceTunnelContentHandler e) {
     m_contentHandler = e;
-  }
-
-  /**
-   * @return maximum size for a HTTP GET request (default is 0)
-   */
-  public int getMaxHttpGetSize() {
-    return m_maxHttpGetSize;
-  }
-
-  /**
-   * @param msgEncoder
-   *          that can encode and decode a request / response to and from the
-   *          binary stream. Default is the {@link DefaultServiceTunnelContentHandler} which handles soap
-   *          style messages
-   */
-  public void setMaxHttpGetSize(int size) {
-    m_maxHttpGetSize = size;
   }
 
   @Override
