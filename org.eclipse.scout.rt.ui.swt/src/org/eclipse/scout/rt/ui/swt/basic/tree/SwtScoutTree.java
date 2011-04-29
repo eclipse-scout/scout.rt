@@ -330,10 +330,6 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     }
     else if (name.equals(ITree.PROP_SCROLL_TO_SELECTION)) {
       setScrollToSelectionFromScout();
-      //detect true/false switch
-      if (((Boolean) newValue).booleanValue()) {
-        scrollToSelection();
-      }
     }
     super.handleScoutPropertyChange(name, newValue);
   }
@@ -371,7 +367,8 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
         case TreeEvent.TYPE_NODES_DELETED:
         case TreeEvent.TYPE_NODE_FILTER_CHANGED:
         case TreeEvent.TYPE_NODES_SELECTED:
-        case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED: {
+        case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
+        case TreeEvent.TYPE_SCROLL_TO_SELECTION: {
           return true;
         }
       }
@@ -420,6 +417,10 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
       }
       case TreeEvent.TYPE_NODES_SELECTED: {
         setSelectionFromScout(e.getNodes());
+        break;
+      }
+      case TreeEvent.TYPE_SCROLL_TO_SELECTION: {
+        scrollToSelection();
         break;
       }
     }
