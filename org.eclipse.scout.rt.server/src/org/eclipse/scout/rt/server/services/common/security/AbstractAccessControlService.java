@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.services.common.security;
 
 import java.lang.reflect.Method;
+import java.security.AllPermission;
 import java.security.Permission;
 import java.security.Permissions;
 import java.util.ArrayList;
@@ -76,6 +77,13 @@ public class AbstractAccessControlService extends AbstractService implements IAc
       Enumeration<Permission> en = c.elements();
       while (en.hasMoreElements()) {
         Permission grantedPermission = en.nextElement();
+
+        // catch AllPermission
+        if (grantedPermission instanceof AllPermission) {
+          return BasicHierarchyPermission.LEVEL_ALL;
+        }
+
+        // process basic hierarchy permissions
         if (grantedPermission instanceof BasicHierarchyPermission) {
           BasicHierarchyPermission hgrantedPermission = (BasicHierarchyPermission) grantedPermission;
           if (hgrantedPermission.getClass().isAssignableFrom(hp.getClass())) {
