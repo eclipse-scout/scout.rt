@@ -4,13 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.security;
 
 import java.lang.reflect.Method;
+import java.security.AllPermission;
 import java.security.Permission;
 import java.security.Permissions;
 import java.util.Enumeration;
@@ -107,6 +108,13 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
       Enumeration<Permission> en = m_permissions.elements();
       while (en.hasMoreElements()) {
         Permission grantedPermission = en.nextElement();
+
+        // catch AllPermission
+        if (grantedPermission instanceof AllPermission) {
+          return BasicHierarchyPermission.LEVEL_ALL;
+        }
+
+        // process basic hierarchy permissions
         if (grantedPermission instanceof BasicHierarchyPermission) {
           BasicHierarchyPermission hgrantedPermission = (BasicHierarchyPermission) grantedPermission;
           if (hgrantedPermission.getClass().isAssignableFrom(hp.getClass())) {
