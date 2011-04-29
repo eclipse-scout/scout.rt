@@ -150,6 +150,14 @@ public class ColumnSet {
         addSortColumn(col, asc);
       }
     }
+    //restore explicit flag on user sort columns (after sort is built)
+    for (IColumn col : getUserSortColumns()) {
+      Boolean explicit = prefs.getTableColumnSortExplicit(col);
+      if (explicit != null) {
+        HeaderCell cell = (HeaderCell) col.getHeaderCell();
+        cell.setSortExplicit(explicit.booleanValue());
+      }
+    }
     /*
      * ticket 93309
      * sanity check: when there is no visible column at all, reset visibilities to model init defaults

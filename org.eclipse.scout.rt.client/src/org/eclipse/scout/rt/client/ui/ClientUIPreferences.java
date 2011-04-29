@@ -59,6 +59,7 @@ public class ClientUIPreferences {
   private static final String TABLE_COLUMN_VISIBLE = "table.column.visible.";
   private static final String TABLE_COLUMN_SORT_INDEX = "table.column.sortIndex.";
   private static final String TABLE_COLUMN_SORT_ASC = "table.column.sortAsc.";
+  private static final String TABLE_COLUMN_SORT_EXPLICIT = "table.column.sortExplicit.";
   private static final String APPLICATION_WINDOW_MAXIMIZED = "application.window.maximized";
   private static final String APPLICATION_WINDOW_BOUNDS = "application.window.bounds";
   private static final String CALENDAR_DISPLAY_MODE = "calendar.display.mode";
@@ -197,6 +198,7 @@ public class ClientUIPreferences {
     int width = col.getWidth();
     int sortIndex = col.getSortIndex();
     boolean sortUp = col.isSortAscending();
+    boolean sortExplicit = col.isSortExplicit();
     //
     if (viewIndex >= 0) {
       m_env.put(key, "" + viewIndex);
@@ -231,6 +233,14 @@ public class ClientUIPreferences {
     //
     key = TABLE_COLUMN_SORT_ASC + keySuffix;
     if (sortIndex >= 0 && sortUp) {
+      m_env.put(key, "true");
+    }
+    else {
+      m_env.put(key, "false");
+    }
+    //
+    key = TABLE_COLUMN_SORT_EXPLICIT + keySuffix;
+    if (sortExplicit) {
       m_env.put(key, "true");
     }
     else {
@@ -276,6 +286,7 @@ public class ClientUIPreferences {
       if (sorting) {
         m_env.remove(TABLE_COLUMN_SORT_INDEX + keySuffix);
         m_env.remove(TABLE_COLUMN_SORT_ASC + keySuffix);
+        m_env.remove(TABLE_COLUMN_SORT_EXPLICIT + keySuffix);
       }
       if (widths) {
         m_env.remove(TABLE_COLUMN_WIDTH + keySuffix);
@@ -305,6 +316,7 @@ public class ClientUIPreferences {
         if (m_env.get(TABLE_COLUMN_UIINDEX + keySuffix, null) != null) return true;
         if (m_env.get(TABLE_COLUMN_SORT_INDEX + keySuffix, null) != null) return true;
         if (m_env.get(TABLE_COLUMN_SORT_ASC + keySuffix, null) != null) return true;
+        if (m_env.get(TABLE_COLUMN_SORT_EXPLICIT + keySuffix, null) != null) return true;
         if (m_env.get(TABLE_COLUMN_WIDTH + keySuffix, null) != null) return true;
       }
     }
@@ -372,6 +384,16 @@ public class ClientUIPreferences {
       return b != null ? b.booleanValue() : defaultValue;
     }
     return defaultValue;
+  }
+
+  public Boolean getTableColumnSortExplicit(IColumn col) {
+    String keySuffix = getColumnKey(col);
+    String key = TABLE_COLUMN_SORT_EXPLICIT + keySuffix;
+    String value = m_env.get(key, null);
+    if (value != null) {
+      return TypeCastUtility.castValue(value, Boolean.class);
+    }
+    return null;
   }
 
   public void setApplicationWindowPreferences(BoundsSpec r, boolean maximized) {
