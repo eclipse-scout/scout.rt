@@ -119,6 +119,9 @@ public class JavaScoutLogManager implements IScoutLogManager {
       Enumeration<String> loggerNames = LogManager.getLogManager().getLoggerNames();
       while (loggerNames.hasMoreElements()) {
         Logger logger = LogManager.getLogManager().getLogger(loggerNames.nextElement());
+        if (logger == null) {
+          continue; // failsafe in case a logger has been removed in the meantime
+        }
         if (logger.getLevel() != null && logger.getLevel() != javaLogLevel) {
           logger.setLevel(null);
         }
