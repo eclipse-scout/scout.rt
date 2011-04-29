@@ -93,7 +93,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   private Menu m_headerMenu;
   private TableViewer m_viewer;
   private ISwtKeyStroke[] m_keyStrokes;
-  private Listener m_autoResizeColumnsListener;
 
   private TableKeyboardNavigationSupport m_keyboardNavigationSupport;
 
@@ -150,20 +149,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     table.addListener(SWT.MouseDoubleClick, swtTableListener);
     table.addListener(SWT.MenuDetect, swtTableListener);
     table.addListener(SWT.KeyUp, swtTableListener);
-
-    m_autoResizeColumnsListener = new Listener() {
-      public void handleEvent(Event event) {
-        if (getSwtField() != null && !getSwtField().isDisposed()) {
-          getSwtField().getDisplay().asyncExec(new Runnable() {
-            public void run() {
-              if (getSwtField() != null && !getSwtField().isDisposed()) {
-                handleAutoSizeColumns();
-              }
-            }
-          });
-        }
-      }
-    };
+    table.addListener(SWT.Resize, swtTableListener);
 
     // context menu
     Menu contextMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
@@ -250,7 +236,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       }
       // setMultilineTextFromScout(getScoutObject().isMultilineText());
       setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());
-      setColumnsAutoResizeFromScout(getScoutObject().isAutoResizeColumns());
       setSelectionFromScout(getScoutObject().getSelectedRows());
       setKeyStrokeFormScout();
       setMultilineTextFromScout();
@@ -263,10 +248,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   @Override
   protected void detachScout() {
     super.detachScout();
-    if (!isDisposed()
-        && getSwtField().getParent() != null && !getSwtField().getParent().isDisposed()) {
-      getSwtField().getParent().removeListener(SWT.Resize, m_autoResizeColumnsListener);
-    }
     if (getScoutObject() != null) {
       if (m_scoutTableListener != null) {
         getScoutObject().removeTableListener(m_scoutTableListener);
@@ -465,16 +446,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
 
   }
 
-  protected void setColumnsAutoResizeFromScout(boolean autoResizeColumns) {
-    if (autoResizeColumns) {
-      getSwtField().getParent().addListener(SWT.Resize, m_autoResizeColumnsListener);
-      handleAutoSizeColumns();
-    }
-    else {
-      getSwtField().getParent().removeListener(SWT.Resize, m_autoResizeColumnsListener);
-    }
-  }
-
   protected void setSelectionFromScout(ITableRow[] selectedRows) {
     if (getSwtField().isDisposed()) {
       return;
@@ -644,6 +615,10 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     if (getSwtField().getVerticalBar() != null && getSwtField().getVerticalBar().getVisible()) {
 //      totalWidth -= getSwtField().getVerticalBar().getSize().x;
     }
+    if (totalWidth < 32) {
+      //either not showing or not yet layouted
+      return;
+    }
     int totalWeight = 0;
     HashMap<TableColumn, Integer> columnWeights = new HashMap<TableColumn, Integer>();
     for (TableColumn col : getSwtField().getColumns()) {
@@ -670,6 +645,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         int width = (int) (factor * entry.getValue().intValue());
         entry.getKey().setWidth(width);
         totalWidth -= width;
+        i++;
       }
       else {
         entry.getKey().setWidth(totalWidth);
@@ -861,8 +837,18 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           break;
         }
         case SWT.Resize: {
+          //lazy column auto-fit
           if (getScoutObject().isAutoResizeColumns()) {
-            handleAutoSizeColumns();
+            if (getSwtField() != null && !getSwtField().isDisposed()) {
+              getSwtField().getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                  if (getSwtField() != null && !getSwtField().isDisposed()) {
+                    handleAutoSizeColumns();
+                  }
+                }
+              });
+            }
           }
           break;
         }
