@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -258,6 +258,9 @@ public class SwingMock implements IGuiMock {
       @Override
       public Object run() throws Throwable {
         Rectangle r = getTableCellBounds(table, rowIndex, columnIndex);
+        if (!table.getVisibleRect().contains(r.x + r.width / 2, r.y + r.height / 2)) {
+          throw new IllegalStateException("table cell " + rowIndex + "," + columnIndex + " is not visible on screen");
+        }
         Point p = table.getLocationOnScreen();
         gotoPoint(p.x + r.x + r.width / 2, p.y + r.y + r.height / 2);
         return null;
@@ -285,6 +288,9 @@ public class SwingMock implements IGuiMock {
       @Override
       public Object run() throws Throwable {
         Rectangle r = getTreeRowBounds(tree, getTreeRowIndex(tree, nodeText));
+        if (!tree.getVisibleRect().contains(r.x + r.width / 2, r.y + r.height / 2)) {
+          throw new IllegalStateException("tree node " + nodeText + " is not visible on screen");
+        }
         Point p = tree.getLocationOnScreen();
         gotoPoint(p.x + r.x + r.width / 2, p.y + r.y + r.height / 2);
         return null;

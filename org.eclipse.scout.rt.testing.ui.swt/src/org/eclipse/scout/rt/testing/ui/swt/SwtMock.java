@@ -278,6 +278,9 @@ public class SwtMock implements IGuiMock {
         TableItem item = table.getItem(rowIndex);
         //first column is dummy column
         Rectangle cellBounds = item.getBounds(columnIndex + 1);
+        if (!table.getClientArea().contains(cellBounds.x + cellBounds.width / 2, cellBounds.y + cellBounds.height / 2)) {
+          throw new IllegalStateException("table cell " + rowIndex + "," + columnIndex + " is not visible on screen");
+        }
         Point p = table.toDisplay(cellBounds.x + (cellBounds.width / 2), cellBounds.y + (cellBounds.height / 2));
         gotoPoint(p.x, p.y);
         return null;
@@ -321,6 +324,9 @@ public class SwtMock implements IGuiMock {
           throw new IllegalStateException("Cannot find tree item '" + nodeText + "'");
         }
         Rectangle cellBounds = item.getBounds(0);
+        if (!tree.getClientArea().contains(cellBounds.x + cellBounds.width / 2, cellBounds.y + cellBounds.height / 2)) {
+          throw new IllegalStateException("tree node " + nodeText + " is not visible on screen");
+        }
         Point p = tree.toDisplay(cellBounds.x + (cellBounds.width / 2), cellBounds.y + (cellBounds.height / 2));
         gotoPoint(p.x, p.y);
         return null;
