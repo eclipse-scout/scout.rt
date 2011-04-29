@@ -17,10 +17,12 @@ import java.io.InterruptedIOException;
 import java.lang.reflect.Method;
 import java.net.SocketException;
 import java.net.URLDecoder;
+import java.security.PrivilegedAction;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +40,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.PlaceholderException;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -59,6 +62,7 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -81,6 +85,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   private transient IServiceTunnelContentHandler m_msgEncoder;
   private transient Bundle[] m_orderedBundleList;
+  //XXX imo says: use new optimized class TimeoutCache<..>
+  private LRUCache<String, IServerSession> m_ajaxSessionCache = new LRUCache<String, IServerSession>(1000000, 900000L);//15 min timeout
   private Object m_msgEncoderLock = new Boolean(true);
   private Object m_orderedBundleListLock = new Boolean(true);
   private Class<? extends IServerSession> m_serverSessionClass;
@@ -219,22 +225,9 @@ public class ServiceTunnelServlet extends HttpServletEx {
           LocaleThreadLocal.set(serviceTunnelReq.getLocale());
           NlsLocale.setThreadDefault(new NlsLocale(serviceTunnelReq.getNlsLocale()));
         }
-        //
+        //find/create scout session
         try {
-          IServerSession serverSession;
-          // apply locking, this is the session initialization phase
-          synchronized (req.getSession()) {
-            serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
-            if (serverSession == null) {
-              serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, null);
-              req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
-            }
-          }
-          if (serverSession == null) {
-            throw new ServletException("expected a IServerSession in the ThreadContext.");
-          }
-          ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, req, res);
-          IStatus status = job.runNow(new NullProgressMonitor());
+          IStatus status = serviceWithScoutServerSession(req, res, serviceTunnelReq);
           if (!status.isOK()) {
             try {
               ProcessingException p = new ProcessingException(status);
@@ -264,6 +257,42 @@ public class ServiceTunnelServlet extends HttpServletEx {
     finally {
       ThreadContext.restore(backup);
     }
+  }
+
+  protected IStatus serviceWithScoutServerSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq) throws ProcessingException, ServletException {
+    IServerSession serverSession;
+    String ajaxSessionId = req.getHeader("Ajax-SessionId");
+    String ajaxUserId = req.getHeader("Ajax-UserId");
+    if (ajaxSessionId == null) {
+      //external request
+      // apply locking, this is the session initialization phase
+      synchronized (req.getSession()) {
+        serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
+        if (serverSession == null) {
+          serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, null);
+          req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
+        }
+      }
+      ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, req, res);
+      return job.runNow(new NullProgressMonitor());
+    }
+    //ajax client delegate
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal(ajaxUserId));
+    synchronized (m_ajaxSessionCache) {
+      serverSession = m_ajaxSessionCache.get(ajaxSessionId);
+      if (serverSession == null) {
+        serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
+        m_ajaxSessionCache.put(ajaxSessionId, serverSession);
+      }
+    }
+    final ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, req, res);
+    return Subject.doAs(subject, new PrivilegedAction<IStatus>() {
+      @Override
+      public IStatus run() {
+        return job.runNow(new NullProgressMonitor());
+      }
+    });
   }
 
   @Override
