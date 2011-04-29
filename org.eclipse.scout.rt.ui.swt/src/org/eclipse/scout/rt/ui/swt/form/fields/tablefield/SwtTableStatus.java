@@ -36,6 +36,7 @@ public class SwtTableStatus implements ISwtTableStatus {
     LogicalGridData tableGridData = LogicalGridDataBuilder.createField(model.getGridData());
     //Label 1
     m_populateLabel = m_env.getFormToolkit().createLabel(m_container, "", SWT.NONE);
+    m_populateLabel.setVisible(false);
     LogicalGridData gd = new LogicalGridData();
     gd.gridx = tableGridData.gridx;
     gd.gridy = tableGridData.gridy + tableGridData.gridh;
@@ -47,6 +48,7 @@ public class SwtTableStatus implements ISwtTableStatus {
     m_populateLabel.setLayoutData(gd);
     //Label 2
     m_selectionLabel = m_env.getFormToolkit().createLabel(m_container, "", SWT.NONE);
+    m_selectionLabel.setVisible(false);
     gd = new LogicalGridData();
     gd.gridx = tableGridData.gridx;
     gd.gridy = tableGridData.gridy + tableGridData.gridh + 1;
