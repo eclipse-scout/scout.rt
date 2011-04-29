@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -94,7 +94,12 @@ public class TreeEvent extends EventObject {
    * valid attributes are node
    */
   public static final int TYPE_NODE_CLICK = 820;
-  // next 830
+
+  /**
+   * Advise to scroll to selection
+   */
+  public static final int TYPE_SCROLL_TO_SELECTION = 830;
+  // next 840
 
   private final int m_type;
   private ITreeNode m_commonParentNode;

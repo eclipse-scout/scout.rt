@@ -72,6 +72,14 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    */
   void setScrollToSelection(boolean b);
 
+  /**
+   * May be used when {@link #isScrollToSelection()} = false on individual occasion where selection shall be scrolled to
+   * visible, the property scrollToVisible remains untouched.
+   * <p>
+   * This is a one-time scroll advise to the ui
+   */
+  void scrollToSelection();
+
   ITreeNodeFilter[] getNodeFilters();
 
   boolean hasNodeFilters();

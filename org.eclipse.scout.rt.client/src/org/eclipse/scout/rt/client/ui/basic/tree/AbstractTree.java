@@ -172,6 +172,15 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return true;
   }
 
+  /**
+   * Advices the ui to automatically scroll to the selection
+   * <p>
+   * If not used permanent, this feature can also used dynamically at individual occasions using
+   * 
+   * <pre>
+   * {@link #scrollToSelection()}
+   * </pre>
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
   @ConfigPropertyValue("false")
@@ -1542,6 +1551,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     propertySupport.setPropertyBool(PROP_SCROLL_TO_SELECTION, b);
   }
 
+  @Override
+  public void scrollToSelection() {
+    fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_SCROLL_TO_SELECTION));
+  }
+
   private ITreeNode resolveNode(ITreeNode node) {
     if (node instanceof IVirtualTreeNode && ((IVirtualTreeNode) node).getResolvedNode() != null) {
       node = ((IVirtualTreeNode) node).getResolvedNode();
@@ -2115,9 +2129,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
             }
             setNodeExpanded(node, true);
             selectNode(node, false);
-            boolean oldSts = isScrollToSelection();
-            setScrollToSelection(true);
-            setScrollToSelection(oldSts);
+            if (!isScrollToSelection()) {
+              scrollToSelection();
+            }
           }
         }
         finally {

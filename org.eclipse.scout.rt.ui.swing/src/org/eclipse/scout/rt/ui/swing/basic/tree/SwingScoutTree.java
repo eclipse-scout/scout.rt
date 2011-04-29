@@ -442,10 +442,6 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     }
     else if (propName.equals(ITree.PROP_SCROLL_TO_SELECTION)) {
       setScrollToSelectionFromScout();
-      //detect true/false switch
-      if (((Boolean) newValue).booleanValue()) {
-        scrollToSelection();
-      }
     }
   }
 
@@ -463,7 +459,8 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         case TreeEvent.TYPE_NODES_DELETED:
         case TreeEvent.TYPE_NODE_FILTER_CHANGED:
         case TreeEvent.TYPE_NODES_SELECTED:
-        case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED: {
+        case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
+        case TreeEvent.TYPE_SCROLL_TO_SELECTION: {
           return true;
         }
       }
@@ -509,6 +506,10 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       }
       case TreeEvent.TYPE_NODES_SELECTED: {
         setSelectionFromScout(e.getNodes());
+        break;
+      }
+      case TreeEvent.TYPE_SCROLL_TO_SELECTION: {
+        scrollToSelection();
         break;
       }
     }
@@ -557,6 +558,10 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         }
         case TreeEvent.TYPE_NODES_SELECTED: {
           setSelectionFromScout(e.getNodes());
+          break;
+        }
+        case TreeEvent.TYPE_SCROLL_TO_SELECTION: {
+          scrollToSelection();
           break;
         }
       }
