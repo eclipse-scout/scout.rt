@@ -21,7 +21,7 @@ public class TopView extends DefaultView {
   private ServicesView m_servicesView;
   private SessionsView m_sessionsView;
   private CallsView m_callsView;
-  //
+
   private IView m_activeView;
 
   public TopView(AdminSession as) {
@@ -31,7 +31,7 @@ public class TopView extends DefaultView {
     m_servicesView = new ServicesView(as);
     m_sessionsView = new SessionsView(as);
     m_callsView = new CallsView(as);
-    //
+
     m_activeView = m_generalView;
   }
 

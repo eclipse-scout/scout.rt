@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,6 +29,8 @@ import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.server.admin.inspector.ReflectServiceInventory;
 import org.eclipse.scout.rt.server.admin.inspector.ServiceInspector;
 import org.eclipse.scout.rt.server.internal.Activator;
+import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.BundleContext;
@@ -42,6 +44,11 @@ public class ServicesView extends DefaultView {
 
   public ServicesView(AdminSession as) {
     super(as);
+  }
+
+  @Override
+  public boolean isVisible() {
+    return ACCESS.check(new UpdateServiceConfigurationPermission());
   }
 
   @Override

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,11 +16,18 @@ import java.io.StringWriter;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
+import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 public class MessagesView extends DefaultView {
 
   public MessagesView(AdminSession as) {
     super(as);
+  }
+
+  @Override
+  public boolean isVisible() {
+    return ACCESS.check(new UpdateServiceConfigurationPermission());
   }
 
   @Override

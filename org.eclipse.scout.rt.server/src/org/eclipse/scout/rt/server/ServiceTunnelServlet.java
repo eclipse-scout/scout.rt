@@ -57,10 +57,8 @@ import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
@@ -298,10 +296,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
     // get session
-    if (!ACCESS.check(new UpdateServiceConfigurationPermission())) {
-      throw new SecurityException("Access denied, no " + UpdateServiceConfigurationPermission.class.getName() + " found");
-    }
-    //
     HttpSession session = req.getSession();
     String key = AdminSession.class.getName();
     AdminSession as = (AdminSession) session.getAttribute(key);

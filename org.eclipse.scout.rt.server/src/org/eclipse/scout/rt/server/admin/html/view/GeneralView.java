@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,11 +19,15 @@ import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.VerboseUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
+import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 public class GeneralView extends DefaultView {
 
@@ -39,45 +43,8 @@ public class GeneralView extends DefaultView {
   @Override
   public void produceBody(HtmlComponent p) {
     // menu
-    final ProcessInspector inst = ProcessInspector.getDefault();
-    if (inst.isEnabled()) {
-      p.print("Monitor is active with maximum caching of " + (inst.getTimeout() / 1000 / 60) + " minutes [ ");
-      p.linkAction("cache 2 min", new P_SetTimeoutAction(2));
-      p.print(" | ");
-      p.linkAction("cache 15 min", new P_SetTimeoutAction(15));
-      p.print(" | ");
-      p.linkAction("cache 60 min", new P_SetTimeoutAction(60));
-      p.print(" | ");
-      p.linkAction("deactivate", new P_EnableAction(false));
-      p.print(" ]");
-      p.br();
-      if (inst.acceptCall(IPingService.class.getName(), "ping")) {
-        p.linkAction("IPingService.ping (click to toggle)", new AbstractHtmlAction("IPingService.ignore") {
-          public void run() {
-            inst.getIgnoredCallSet().clear();
-            inst.getIgnoredCallSet().add(".*\\.IPingService\\.ping");
-          }
-        });
-      }
-      else {
-        p.startLinkAction(new AbstractHtmlAction("IPingService.accept") {
-          public void run() {
-            inst.getIgnoredCallSet().clear();
-          }
-        });
-        p.raw("<s>");
-        p.printNoBreak("IPingService.ping");
-        p.raw("</s>");
-        p.printNoBreak(" (click to toggle)");
-        p.endLinkAction();
-      }
-    }
-    else {
-      p.print("Monitor is inactive [ ");
-      p.linkAction("activate", new P_EnableAction(true));
-      p.print(" ]");
-    }
-    p.p();
+    String monitoringStatusMessage = createMonitoringQuickLink(p);
+    String loggingStatusMessage = createLoggingQuickLink(p);
 
     // infos
     if (Platform.getProduct() != null) {
@@ -133,9 +100,113 @@ public class GeneralView extends DefaultView {
       p.br();
     }
     p.br();
-    if (inst.isEnabled()) {
-      p.raw("<p><b>Note: Session Activity Monitor is enabled; this might affect performance and memory due to higher resource consumption during analysis.</b><p>");
+    if (monitoringStatusMessage != null) {
+      p.raw(monitoringStatusMessage);
     }
+    if (loggingStatusMessage != null) {
+      p.raw(loggingStatusMessage);
+    }
+  }
+
+  private String createMonitoringQuickLink(HtmlComponent p) {
+    if (!ACCESS.check(new UpdateServiceConfigurationPermission())) {
+      return null;
+    }
+
+    final ProcessInspector inst = ProcessInspector.getDefault();
+    if (inst.isEnabled()) {
+      p.print("Monitor is active with maximum caching of " + (inst.getTimeout() / 1000 / 60) + " minutes [ ");
+      p.linkAction("cache 2 min", new P_SetTimeoutAction(2));
+      p.print(" | ");
+      p.linkAction("cache 15 min", new P_SetTimeoutAction(15));
+      p.print(" | ");
+      p.linkAction("cache 60 min", new P_SetTimeoutAction(60));
+      p.print(" | ");
+      p.linkAction("deactivate", new P_EnableAction(false));
+      p.print(" ]");
+      p.br();
+      if (inst.acceptCall(IPingService.class.getName(), "ping")) {
+        p.linkAction("IPingService.ping (click to toggle)", new AbstractHtmlAction("IPingService.ignore") {
+          public void run() {
+            inst.getIgnoredCallSet().clear();
+            inst.getIgnoredCallSet().add(".*\\.IPingService\\.ping");
+          }
+        });
+      }
+      else {
+        p.startLinkAction(new AbstractHtmlAction("IPingService.accept") {
+          public void run() {
+            inst.getIgnoredCallSet().clear();
+          }
+        });
+        p.raw("<s>");
+        p.printNoBreak("IPingService.ping");
+        p.raw("</s>");
+        p.printNoBreak(" (click to toggle)");
+        p.endLinkAction();
+      }
+    }
+    else {
+      p.print("Monitor is inactive [ ");
+      p.linkAction("activate", new P_EnableAction(true));
+      p.print(" ]");
+    }
+    p.p();
+
+    if (inst.isEnabled()) {
+      return "<p><b>Note: Session Activity Monitor is enabled; this might affect performance and memory due to higher resource consumption during analysis.</b><p>";
+    }
+    return null;
+  }
+
+  private String createLoggingQuickLink(HtmlComponent p) {
+    if (!ACCESS.check(new UpdateServiceConfigurationPermission())) {
+      return null;
+    }
+
+    Integer globalLogLevel = ScoutLogManager.getGlobalLogLevel();
+    if (globalLogLevel != null) {
+      p.print("Global logging is active [ ");
+      p.linkAction("deactivate", new P_ToggleGlobalLoggingAction(false));
+      p.print(" ]");
+
+      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_ERROR, "ERROR");
+      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_WARN, "WARNING");
+      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_INFO, "INFO");
+      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_DEBUG, "DEBUG");
+      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_TRACE, "TRACE");
+      addLogLevelRadioEntry(p, IScoutLogger.LEVEL_OFF, "OFF");
+    }
+    else {
+      p.print("Global logging is inactive [");
+      p.linkAction("activate", new P_ToggleGlobalLoggingAction(true));
+      p.print(" ]");
+    }
+    p.p();
+
+    if (globalLogLevel != null && globalLogLevel > IScoutLogger.LEVEL_WARN) {
+      return "<p><b>Note: Global logging is active with a level finer than WARNING; this might affect performance due to increased log output.</b><p>";
+    }
+    return null;
+  }
+
+  private void addLogLevelRadioEntry(HtmlComponent p, final int logLevel, String logLevelText) {
+    Integer globalLogLevel = ScoutLogManager.getGlobalLogLevel();
+    if (globalLogLevel == null) {
+      globalLogLevel = -1;
+    }
+
+    AbstractHtmlAction action = new AbstractHtmlAction("level=" + logLevel) {
+      public void run() {
+        if (logLevel >= 0 && logLevel <= 5) {
+          ScoutLogManager.setGlobalLogLevel(logLevel);
+        }
+        else {
+          ScoutLogManager.setGlobalLogLevel(null);
+        }
+      }
+    };
+    p.radioBoxOption("globalLogLevel", logLevelText, action, logLevel == globalLogLevel);
   }
 
   private class P_EnableAction extends AbstractHtmlAction {
@@ -149,7 +220,7 @@ public class GeneralView extends DefaultView {
     public void run() {
       ProcessInspector.getDefault().setEnabled(m_enabled);
     }
-  }// end private class
+  }
 
   private class P_SetTimeoutAction extends AbstractHtmlAction {
     private long m_minutes;
@@ -162,6 +233,25 @@ public class GeneralView extends DefaultView {
     public void run() {
       ProcessInspector.getDefault().setTimeout(m_minutes * 60000L);
     }
-  }// end private class
+  }
+
+  private final class P_ToggleGlobalLoggingAction extends AbstractHtmlAction {
+
+    private boolean m_activate;
+
+    public P_ToggleGlobalLoggingAction(boolean activate) {
+      super(P_ToggleGlobalLoggingAction.class.getName() + "." + (activate ? "global" : "default"));
+      m_activate = activate;
+    }
+
+    public void run() {
+      if (m_activate) {
+        ScoutLogManager.setGlobalLogLevel(IScoutLogger.LEVEL_ERROR);
+      }
+      else {
+        ScoutLogManager.setGlobalLogLevel(null);
+      }
+    }
+  }
 
 }

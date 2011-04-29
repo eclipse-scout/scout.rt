@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,6 +26,8 @@ import org.eclipse.scout.rt.server.admin.html.widget.table.SortInfo;
 import org.eclipse.scout.rt.server.admin.html.widget.table.VirtualRow;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
+import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 public class SessionsView extends DefaultView {
   private SessionInspector m_selectedSession;
@@ -42,7 +44,7 @@ public class SessionsView extends DefaultView {
 
   @Override
   public boolean isVisible() {
-    return ProcessInspector.getDefault().isEnabled();
+    return ACCESS.check(new UpdateServiceConfigurationPermission()) && ProcessInspector.getDefault().isEnabled();
   }
 
   @Override

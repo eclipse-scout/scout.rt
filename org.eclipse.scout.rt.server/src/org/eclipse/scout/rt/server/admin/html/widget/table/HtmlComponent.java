@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -128,6 +128,12 @@ public class HtmlComponent {
       out.print(" onchange=\"javascript:window.location.href='" + m_baseURL + "?actionId='+this.value+'#focus';\"");
     }
     out.print(">");
+  }
+
+  public void radioBoxOption(String fieldName, String text, AbstractHtmlAction action, boolean selected) {
+    String actionId = buildActionId(action);
+    m_actionMap.put(actionId, action);
+    out.print("<input type=\"radio\" name=\"" + fieldName + "\" value=\"" + actionId + "\" " + (selected ? " checked=\"checked\" " : "") + " onchange=\"javascript:window.location.href='" + m_baseURL + "?actionId='+this.value+'#focus';\">" + javaToHtml(text) + "</input>");
   }
 
   /**
