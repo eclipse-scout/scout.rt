@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public final class ListUtility {
 
@@ -199,5 +200,32 @@ public final class ListUtility {
       }
     }
     return retVal;
+  }
+
+  /**
+   * @return the length of an array using {@link Array#getLength(Object)}.
+   *         <p>
+   *         Accepts arrays, {@link Collection}s, {@link Map}s, null
+   *         <p>
+   *         if the array has multiple dimensions, returns the first dimension
+   *         <p>
+   *         if the array is null, returns -1
+   *         <p>
+   * @throws {@link IllegalArgumentException} if the argument is neither an array nor null
+   */
+  public static int length(Object array) {
+    if (array == null) {
+      return -1;
+    }
+    if (array.getClass().isArray()) {
+      return Array.getLength(array);
+    }
+    if (array instanceof Collection<?>) {
+      return ((Collection<?>) array).size();
+    }
+    if (array instanceof Map<?, ?>) {
+      return ((Map<?, ?>) array).size();
+    }
+    throw new IllegalArgumentException("expected one of: null, array, collection, map");
   }
 }
