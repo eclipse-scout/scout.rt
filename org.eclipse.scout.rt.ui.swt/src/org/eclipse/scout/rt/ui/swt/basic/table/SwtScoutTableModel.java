@@ -77,9 +77,11 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
 
   @Override
   public Color getBackground(Object element, int columnIndex) {
-
     if (columnIndex > 0) {
-      return m_environment.getColor(getCell(element, columnIndex).getBackgroundColor());
+      ICell cell = getCell(element, columnIndex);
+      if (cell != null) {
+        return m_environment.getColor(cell.getBackgroundColor());
+      }
     }
     return null;
   }
@@ -89,6 +91,9 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     if (columnIndex > 0) {
       ITableRow scoutRow = (ITableRow) element;
       ICell scoutCell = getCell(element, columnIndex);
+      if (scoutCell == null) {
+        return null;
+      }
       Color col = m_environment.getColor(scoutCell.getForegroundColor());
       if (col == null) {
         if (!scoutRow.isEnabled() || !scoutCell.isEnabled()) {
@@ -157,7 +162,10 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   @Override
   public Font getFont(Object element, int columnIndex) {
     if (columnIndex > 0) {
-      return m_environment.getFont(getCell(element, columnIndex).getFont(), m_swtTable.getSwtField().getFont());
+      ICell cell = getCell(element, columnIndex);
+      if (cell != null) {
+        return m_environment.getFont(cell.getFont(), m_swtTable.getSwtField().getFont());
+      }
     }
     return null;
   }

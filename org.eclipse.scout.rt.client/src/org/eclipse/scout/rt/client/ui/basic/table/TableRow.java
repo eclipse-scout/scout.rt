@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -36,7 +36,11 @@ public class TableRow implements ITableRow {
     m_columnSet = columnSet;
     m_enabled = true;
     m_status = STATUS_NON_CHANGED;
-    m_cells = new ArrayList<Cell>();
+    int colCount = columnSet.getColumnCount();
+    m_cells = new ArrayList<Cell>(colCount);
+    for (int i = 0; i < colCount; i++) {
+      m_cells.add(new Cell());
+    }
     if (DesktopProfiler.getInstance().isEnabled()) {
       DesktopProfiler.getInstance().registerTableRow(this);
     }
