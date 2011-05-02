@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -408,6 +408,8 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       if (!tempClientSession.isActive()) {
         showClientSessionLoadError(tempClientSession.getLoadError());
         LOG.error("ClientSession is not active, there must be a problem with loading or starting");
+        m_status = SwtEnvironmentEvent.INACTIVE;
+        return;
       }
       else {
         m_clientSession = tempClientSession;
