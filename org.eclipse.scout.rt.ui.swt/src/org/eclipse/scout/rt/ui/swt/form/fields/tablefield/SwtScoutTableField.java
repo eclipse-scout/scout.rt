@@ -63,7 +63,6 @@ public class SwtScoutTableField extends SwtScoutFieldComposite<ITableField<? ext
   protected void attachScout() {
     setTableFromScout(getScoutObject().getTable());
     super.attachScout();
-    setTableStatusFromScout();
   }
 
   protected void setTableFromScout(ITable table) {
@@ -86,6 +85,7 @@ public class SwtScoutTableField extends SwtScoutFieldComposite<ITableField<? ext
         m_swtTableStatus = createSwtTableStatus();
       }
       setSwtField(m_tableComposite.getSwtField());
+      setTableStatusFromScout();
     }
     if (!getSwtContainer().isDisposed()) {
       getSwtContainer().layout(true);
