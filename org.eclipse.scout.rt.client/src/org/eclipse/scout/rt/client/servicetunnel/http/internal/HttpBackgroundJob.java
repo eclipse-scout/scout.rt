@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -95,7 +96,10 @@ public class HttpBackgroundJob extends JobEx {
       return Status.OK_STATUS;
     }
     catch (Throwable e) {
-      m_res = new ServiceTunnelResponse(null, null, e);
+      //cancel has precedence over failure
+      if (m_res == null) {
+        m_res = new ServiceTunnelResponse(null, null, e);
+      }
       return Status.CANCEL_STATUS;
     }
     finally {
@@ -114,6 +118,8 @@ public class HttpBackgroundJob extends JobEx {
 
   @Override
   protected void canceling() {
+    //cancel has precedence over failure
+    m_res = new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
     Thread t = getThread();
     if (t != null) {
       t.interrupt();
@@ -128,15 +134,11 @@ public class HttpBackgroundJob extends JobEx {
     }
   }
 
-  private void delayForDebug(ServiceTunnelRequest call, long millis) {
+  private void delayForDebug(ServiceTunnelRequest call, long millis) throws InterruptedException {
     if (millis <= 0) return;
     //
     System.out.println("#Delay " + millis + "ms for debugging " + call.getServiceInterfaceClassName() + "." + call.getOperation());
-    try {
-      Thread.sleep(millis);
-    }
-    catch (InterruptedException e) {
-    }
+    Thread.sleep(millis);
   }
 
 }
