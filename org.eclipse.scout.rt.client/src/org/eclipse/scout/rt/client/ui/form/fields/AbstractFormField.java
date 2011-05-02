@@ -419,6 +419,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return true;
   }
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(20)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredDoc() {
+    return null;
+  }
+
   private Class<? extends IKeyStroke>[] getConfiguredKeyStrokes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
