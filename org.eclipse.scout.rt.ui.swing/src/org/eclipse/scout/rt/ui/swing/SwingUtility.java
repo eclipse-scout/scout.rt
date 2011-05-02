@@ -1140,6 +1140,7 @@ public final class SwingUtility {
         pop.add(pasteItem);
       }
 
+      m_comp.requestFocus();
       m_comp.setComponentPopupMenu(pop);
       pop.show(m_comp, e.getX(), e.getY());
     }
