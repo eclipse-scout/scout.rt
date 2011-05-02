@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -324,7 +323,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  protected boolean acceptProposalFromSwt() {
+  private void acceptProposalFromSwt() {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
         m_pendingProposalJob.cancel();
@@ -332,22 +331,13 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       }
     }
     // notify Scout
-    final BooleanHolder resultHolder = new BooleanHolder(false);
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        resultHolder.setValue(getScoutObject().getUIFacade().acceptProposalFromUI());
+        getScoutObject().getUIFacade().acceptProposalFromUI();
       }
     };
-    JobEx job = getEnvironment().invokeScoutLater(t, 0);
-    try {
-      job.join(2345);
-    }
-    catch (InterruptedException e) {
-      // void
-    }
-    return resultHolder.getValue();
-
+    getEnvironment().invokeScoutLater(t, 0);
     // end notify
   }
 
@@ -539,25 +529,14 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         }
       }
       if (getSwtField().isFocusControl()) {
-        runAndWait(0);
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
+          }
+        };
+        getEnvironment().invokeScoutLater(t, 0);
       }
-    }
-
-    public void runAndWait(long millis) {
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
-        }
-      };
-      JobEx job = getEnvironment().invokeScoutLater(t, 0);
-      try {
-        job.join(millis);
-      }
-      catch (InterruptedException e) {
-        // void
-      }
-
     }
 
     public void update(String text, boolean selectCurrentValue) {

@@ -297,7 +297,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     }
   }
 
-  private boolean acceptProposalFromSwing() {
+  private void acceptProposalFromSwing() {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
         m_pendingProposalJob.cancel();
@@ -306,22 +306,13 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     }
 
     // notify Scout
-    final BooleanHolder resultHolder = new BooleanHolder(false);
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        resultHolder.setValue(getScoutObject().getUIFacade().acceptProposalFromUI());
+        getScoutObject().getUIFacade().acceptProposalFromUI();
       }
     };
-    JobEx job = getSwingEnvironment().invokeScoutLater(t, 0);
-    try {
-      job.join(2345);
-    }
-    catch (InterruptedException e) {
-      // void
-    }
-    return resultHolder.getValue();
-
+    getSwingEnvironment().invokeScoutLater(t, 0);
     // end notify
   }
 
@@ -601,25 +592,14 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
         }
       }
       if (getSwingField().isFocusOwner()) {
-        runAndWait(0);
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
+          }
+        };
+        getSwingEnvironment().invokeScoutLater(t, 0);
       }
-    }
-
-    public void runAndWait(long millis) {
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
-        }
-      };
-      JobEx job = getSwingEnvironment().invokeScoutLater(t, 0);
-      try {
-        job.join(millis);
-      }
-      catch (InterruptedException e) {
-        // void
-      }
-
     }
 
     public void update(String text, boolean selectCurrentValue) {
