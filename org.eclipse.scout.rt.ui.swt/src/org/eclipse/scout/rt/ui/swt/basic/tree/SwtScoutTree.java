@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
@@ -396,7 +397,13 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
         break;
       }
       case TreeEvent.TYPE_NODES_UPDATED: {
+        //in case a virtual node was resolved, check if selection still valid
+        ISelection oldSelection = getSwtTreeViewer().getSelection();
+        ISelection newSelection = new StructuredSelection(getScoutObject().getSelectedNodes());
         updateTreeStructureAndKeepSelection(e.getCommonParentNode());
+        if (!newSelection.equals(oldSelection)) {
+          getSwtTreeViewer().setSelection(newSelection);
+        }
         setExpansionFromScout(e.getCommonParentNode());
         break;
       }
