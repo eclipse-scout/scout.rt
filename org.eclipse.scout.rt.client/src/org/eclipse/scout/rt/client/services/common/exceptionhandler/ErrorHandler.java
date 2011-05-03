@@ -33,8 +33,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
 public class ErrorHandler {
   private String m_title;
   private String m_text;
-  private String m_proceed;
-  private String m_okText;
+  private String m_detail;
+  private String m_acceptText;
   private String m_copyPasteText;
   private ProcessingException m_cause;
 
@@ -51,7 +51,7 @@ public class ErrorHandler {
   }
 
   public String getDetail() {
-    return m_proceed;
+    return m_detail;
   }
 
   public String getCopyPasteText() {
@@ -59,7 +59,7 @@ public class ErrorHandler {
   }
 
   public String getAcceptText() {
-    return m_okText;
+    return m_acceptText;
   }
 
   public ProcessingException getCause() {
@@ -74,8 +74,8 @@ public class ErrorHandler {
     MessageBox mbox = new MessageBox(
         m_title,
         m_text,
-        m_proceed,
-        m_okText,
+        m_detail,
+        m_acceptText,
         null,
         null,
         m_copyPasteText,
@@ -100,8 +100,8 @@ public class ErrorHandler {
     if (m_text == null || m_text.length() == 0) {
       m_text = ScoutTexts.get("Error");
     }
-    m_proceed = m_cause.getStatus().getMessage();
-    m_okText = ScoutTexts.get("Ok");
+    m_detail = m_cause.getStatus().getMessage();
+    m_acceptText = ScoutTexts.get("Ok");
     Throwable t = exception;
     while (t != null) {
       String msg = "\n\n" + StringUtility.wrapWord(ScoutTexts.get("OriginalErrorMessageIs", t.getClass().getSimpleName() + " " + t.getLocalizedMessage()), 80);
@@ -117,7 +117,7 @@ public class ErrorHandler {
           default: {
             m_title = ScoutTexts.get("NetErrorTitle");
             m_text = ScoutTexts.get("NetErrorText") + msg;
-            m_proceed = ScoutTexts.get("NetErrorInfo");
+            m_detail = ScoutTexts.get("NetErrorInfo");
           }
         }
         return;
@@ -135,7 +135,7 @@ public class ErrorHandler {
       else if (t instanceof MalformedURLException) {
         m_title = ScoutTexts.get("NetErrorTitle");
         m_text = ScoutTexts.get("NetErrorText") + msg;
-        m_proceed = ScoutTexts.get("NetErrorInfo");
+        m_detail = ScoutTexts.get("NetErrorInfo");
         return;
       }
       else if (t instanceof InterruptedException) {
@@ -146,7 +146,7 @@ public class ErrorHandler {
       else if (t instanceof UnknownHostException) {
         m_title = ScoutTexts.get("NetErrorTitle");
         m_text = ScoutTexts.get("NetErrorText") + msg;
-        m_proceed = ScoutTexts.get("NetErrorInfo");
+        m_detail = ScoutTexts.get("NetErrorInfo");
         return;
       }
       else if (t instanceof FileNotFoundException) {
@@ -157,41 +157,41 @@ public class ErrorHandler {
       else if (t instanceof NoRouteToHostException) {
         m_title = ScoutTexts.get("NetErrorTitle");
         m_text = ScoutTexts.get("NetErrorText") + msg;
-        m_proceed = ScoutTexts.get("NetErrorInfo");
+        m_detail = ScoutTexts.get("NetErrorInfo");
         return;
       }
       else if (t instanceof SocketException) {
         m_title = ScoutTexts.get("NetErrorTitle");
         m_text = ScoutTexts.get("NetErrorText") + msg;
-        m_proceed = ScoutTexts.get("NetErrorInfo");
+        m_detail = ScoutTexts.get("NetErrorInfo");
         return;
       }
       else if (t instanceof UserInterruptedException) {
         m_title = ScoutTexts.get("IOErrorTitle");
         m_text = UserInterruptedException.class.getSimpleName();
-        m_proceed = ScoutTexts.get("IOErrorInfo");
+        m_detail = ScoutTexts.get("IOErrorInfo");
         return;
       }
       else if (t instanceof IOException) {
         m_title = ScoutTexts.get("IOErrorTitle");
         m_text = ScoutTexts.get("IOErrorText") + ": " + t.getLocalizedMessage() + msg;
-        m_proceed = ScoutTexts.get("IOErrorInfo");
+        m_detail = ScoutTexts.get("IOErrorInfo");
         return;
       }
       else if (t instanceof VersionMismatchException) {
         VersionMismatchException ve = (VersionMismatchException) t;
         m_title = ScoutTexts.get("VersionMismatchTitle");
         m_text = ScoutTexts.get("VersionMismatchTextXY", ve.getOldVersion(), ve.getNewVersion());
-        m_proceed = null;
+        m_detail = null;
         return;
       }
       else if (t instanceof VetoException) {
         m_text = ((VetoException) t).getStatus().getTitle();
         if (StringUtility.hasText(((VetoException) t).getStatus().getMessage())) {
-          m_proceed = ((VetoException) t).getStatus().getMessage();
+          m_detail = ((VetoException) t).getStatus().getMessage();
         }
         else {
-          m_proceed = ScoutTexts.get("VetoErrorText") + msg;
+          m_detail = ScoutTexts.get("VetoErrorText") + msg;
         }
         return;
       }
@@ -225,7 +225,7 @@ public class ErrorHandler {
       indent += "  ";
       t = t.getCause();
     }
-    m_proceed = StringUtility.wrapWord(ScoutTexts.get("OriginalErrorMessageIs", buf.toString()), 120);
+    m_detail = StringUtility.wrapWord(ScoutTexts.get("OriginalErrorMessageIs", buf.toString()), 120);
     // copy-paste
     StringWriter logText = new StringWriter();
     logText.append(m_title + "\n");
@@ -234,8 +234,8 @@ public class ErrorHandler {
       logText.append(m_text + "\n");
       logText.append("\n");
     }
-    if (m_proceed != null) {
-      logText.append(m_proceed + "\n");
+    if (m_detail != null) {
+      logText.append(m_detail + "\n");
       logText.append("\n");
     }
     if (m_cause != null) {
