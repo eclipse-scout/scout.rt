@@ -25,11 +25,11 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)
-public class ClientExceptionHandlerService extends AbstractService implements IExceptionHandlerService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientExceptionHandlerService.class);
+public class InternalClientExceptionHandlerService extends AbstractService implements IExceptionHandlerService {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalClientExceptionHandlerService.class);
   private final OptimisticLock m_handlerLock = new OptimisticLock();
 
-  public ClientExceptionHandlerService() {
+  public InternalClientExceptionHandlerService() {
   }
 
   public void handleException(ProcessingException pe) {
@@ -59,12 +59,12 @@ public class ClientExceptionHandlerService extends AbstractService implements IE
                 break;
               }
             }
-            differentiatedLog(ClientExceptionHandlerService.class.getName(), logLevel, logText, logThrowable ? pe : null);
+            differentiatedLog(InternalClientExceptionHandlerService.class.getName(), logLevel, logText, logThrowable ? pe : null);
           }
           // check if the desktop is observing this process
           IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
           if (desktop != null && desktop.isOpened()) {
-            new ErrorHandler(pe).showMessageBox();
+            showExceptionInUI(pe);
           }
         }
       }
@@ -96,5 +96,15 @@ public class ClientExceptionHandlerService extends AbstractService implements IE
         LOG.error(m, t);
         break;
     }
+  }
+
+  /**
+   * To visualize the exception in the UI
+   * 
+   * @param pe
+   *          the exception to be visualized
+   */
+  protected void showExceptionInUI(ProcessingException pe) {
+    new ErrorHandler(pe).showMessageBox();
   }
 }
