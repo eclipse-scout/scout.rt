@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -30,6 +30,7 @@ import org.eclipse.ui.PlatformUI;
 public class SwtScoutProgressService extends AbstractService {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutProgressService.class);
   public static final String BUSYID_NAME = "SWT BusyIndicator";
+  public static final String CURSOR_BACKUP = "CursorBackup";
 
   private Object m_requestorListLock = new Object();
   private HashSet<Object> m_requestorList = new HashSet<Object>();
@@ -53,6 +54,7 @@ public class SwtScoutProgressService extends AbstractService {
     if (oldValue != newValue) {
       Display display = getDisplay();
       if (display != null) {
+        Cursor cursor = display.getSystemCursor(SWT.CURSOR_WAIT);
         if (newValue) {
           final Shell[] shells = display.getShells();
           final AtomicInteger busyId = new AtomicInteger(Integer.MIN_VALUE);
@@ -70,7 +72,7 @@ public class SwtScoutProgressService extends AbstractService {
           });
           if (busyId.get() > Integer.MIN_VALUE) {
             m_currentBusyId = busyId.get();
-            Cursor cursor = display.getSystemCursor(SWT.CURSOR_WAIT);
+
             for (Shell shell : shells) {
               shell.setCursor(cursor);
               shell.setData(BUSYID_NAME, m_currentBusyId);
@@ -85,7 +87,7 @@ public class SwtScoutProgressService extends AbstractService {
             if (id != null && id <= m_currentBusyId) {
               shell.setCursor(null);
               shell.setData(BUSYID_NAME, null);
-              unsetWaitCursorOnCustomFieldsRec(shell.getChildren());
+              unsetWaitCursorOnCustomFieldsRec(shell.getChildren(), cursor);
             }
           }
         }
@@ -102,7 +104,12 @@ public class SwtScoutProgressService extends AbstractService {
         // does not work on browser
       }
       else if (c instanceof StyledText) {
-        ((StyledText) c).setCursor(waitCursor);
+        StyledText text = (StyledText) c;
+        Cursor backupCursor = text.getCursor();
+        if (backupCursor != null) {
+          text.setData(CURSOR_BACKUP, backupCursor);
+        }
+        text.setCursor(waitCursor);
       }
       // next
       if (c instanceof Composite) {
@@ -111,7 +118,7 @@ public class SwtScoutProgressService extends AbstractService {
     }
   }
 
-  private void unsetWaitCursorOnCustomFieldsRec(Control[] items) {
+  private void unsetWaitCursorOnCustomFieldsRec(Control[] items, Cursor waitCursor) {
     if (items == null) {
       return;
     }
@@ -120,11 +127,16 @@ public class SwtScoutProgressService extends AbstractService {
         // does not work on browser
       }
       else if (c instanceof StyledText) {
-        ((StyledText) c).setCursor(null);
+        StyledText text = (StyledText) c;
+        if (text.getCursor() == waitCursor) {
+          Cursor backupCursor = (Cursor) text.getData(CURSOR_BACKUP);
+          text.setData(CURSOR_BACKUP, null);
+          text.setCursor(backupCursor);
+        }
       }
       // next
       if (c instanceof Composite) {
-        unsetWaitCursorOnCustomFieldsRec(((Composite) c).getChildren());
+        unsetWaitCursorOnCustomFieldsRec(((Composite) c).getChildren(), waitCursor);
       }
     }
   }

@@ -60,11 +60,6 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
   }
 
   @Override
-  public void createField(Composite parent, IStringField scoutObject, ISwtEnvironment environment) {
-    super.createField(parent, scoutObject, environment);
-  }
-
-  @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
