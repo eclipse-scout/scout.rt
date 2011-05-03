@@ -31,6 +31,8 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 public class GeneralView extends DefaultView {
 
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GeneralView.class);
+
   public GeneralView(AdminSession as) {
     super(as);
   }
@@ -164,7 +166,16 @@ public class GeneralView extends DefaultView {
       return null;
     }
 
-    Integer globalLogLevel = ScoutLogManager.getGlobalLogLevel();
+    Integer globalLogLevel;
+    try {
+      // check whether global log level is supported by installed log manager
+      globalLogLevel = ScoutLogManager.getGlobalLogLevel();
+    }
+    catch (UnsupportedOperationException e) {
+      LOG.info("Use of global log level is not supported", e);
+      return null;
+    }
+
     if (globalLogLevel != null) {
       p.print("Global logging is active [ ");
       p.linkAction("deactivate", new P_ToggleGlobalLoggingAction(false));
