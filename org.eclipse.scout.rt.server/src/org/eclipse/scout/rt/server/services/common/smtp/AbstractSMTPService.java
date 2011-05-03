@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -285,6 +285,7 @@ public abstract class AbstractSMTPService extends AbstractService implements ISM
   protected Session createSession() {
     Properties props = new Properties();
     props.put("mail.transport.protocol", getProtocol());
+    props.put("mail." + getProtocol() + ".quitwait", false);
     if (!StringUtility.isNullOrEmpty(m_host)) {
       props.put("mail." + getProtocol() + ".host", m_host);
     }
