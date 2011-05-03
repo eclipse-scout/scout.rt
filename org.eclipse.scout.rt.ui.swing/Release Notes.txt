@@ -39,3 +39,8 @@ Migration: None
 17.3. 2011
 fix for bsi ticket #98515
 Migration: None
+
+03.05.2011 dwi
+fixed ticket #92911
+Problem: Fixed that LABEL_POSITION_ON_FIELD has no effect on multiline string fields
+Migration: None
