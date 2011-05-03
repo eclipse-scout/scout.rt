@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
+import org.eclipse.scout.rt.ui.swing.ext.JTextAreaEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
 
 public abstract class SwingScoutFieldComposite<T extends IFormField> extends SwingScoutComposite<T> implements ISwingScoutFormField<T> {
@@ -178,6 +179,18 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
       }
       else {
         tf.setOnFieldLabelHandler(null);
+      }
+    }
+    else if (getSwingField() instanceof JTextAreaEx) {
+      JTextAreaEx taf = (JTextAreaEx) getSwingField();
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
+        if (taf.getOnFieldLabelHandler() == null) {
+          taf.setOnFieldLabelHandler(getSwingEnvironment().createOnFieldLabelDecorator(taf, getScoutObject().isMandatory()));
+        }
+        taf.getOnFieldLabelHandler().setLabel(s);
+      }
+      else {
+        taf.setOnFieldLabelHandler(null);
       }
     }
   }

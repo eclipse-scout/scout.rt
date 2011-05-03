@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing.ext;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -25,6 +26,7 @@ import javax.swing.KeyStroke;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.TextBlockDragAndDrop;
 import org.eclipse.scout.rt.ui.swing.UndoableEditObserver;
+import org.eclipse.scout.rt.ui.swing.form.fields.OnFieldLabelDecorator;
 
 /**
  * Extension class to the {@link JTextArea} that implements a different behavior for disabled password fields.
@@ -36,6 +38,8 @@ public class JTextAreaEx extends JTextArea {
   private static final long serialVersionUID = 1L;
   public static final String ACTION_ENTER_PRESSED = "actionEnterPressed";
   public static final String ACTION_ENTER_RELEASED = "actionEnterReleased";
+
+  private OnFieldLabelDecorator m_onFieldLabelHandler;
 
   public JTextAreaEx() {
     super();
@@ -95,6 +99,26 @@ public class JTextAreaEx extends JTextArea {
       cursor = null;
     }
     super.setCursor(cursor);
+  }
+
+  /**
+   * setter for on-field label handler, since swing knows no paint override or decoration listener
+   */
+  public void setOnFieldLabelHandler(OnFieldLabelDecorator onFieldLabelHandler) {
+    m_onFieldLabelHandler = onFieldLabelHandler;
+    repaint();
+  }
+
+  public OnFieldLabelDecorator getOnFieldLabelHandler() {
+    return m_onFieldLabelHandler;
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    if (m_onFieldLabelHandler != null) {
+      m_onFieldLabelHandler.paintOnFieldLabel(g, this);
+    }
   }
 
   @Override
