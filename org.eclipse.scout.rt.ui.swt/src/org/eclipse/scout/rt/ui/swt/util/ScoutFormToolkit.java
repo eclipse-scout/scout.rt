@@ -82,11 +82,11 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
   }
 
   public StyledText createStyledText(Composite parent, int style) {
-    StyledText label = new StyledTextEx(parent, style);
-    adapt(label, false, false);
+    StyledText text = new StyledTextEx(parent, style);
+    adapt(text, false, false);
     // correction to look like a normal text
-    label.setIndent(2);
-    return label;
+    text.setIndent(2);
+    return text;
   }
 
   public CTabFolder createTabFolder(Composite parent) {
