@@ -285,6 +285,7 @@ public abstract class AbstractSMTPService extends AbstractService implements ISM
   protected Session createSession() {
     Properties props = new Properties();
     props.put("mail.transport.protocol", getProtocol());
+    props.put("mail." + getProtocol() + ".quitwait", false);
     if (!StringUtility.isNullOrEmpty(m_host)) {
       props.put("mail." + getProtocol() + ".host", m_host);
     }
