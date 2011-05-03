@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.radiobuttongroup.layout.RadioButtonGroupLayout;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -88,6 +89,28 @@ public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadio
     Control[] tabList = getSwtField().getTabList();
     if (b && tabList != null && tabList.length > 0) {
       tabList[0].setFocus();
+    }
+  }
+
+  @Override
+  protected void setBackgroundFromScout(String scoutColor) {
+    if (getSwtField() != null) {
+      Control fld = getSwtField();
+      if (fld.getData(CLIENT_PROP_INITIAL_BACKGROUND) == null) {
+        fld.setData(CLIENT_PROP_INITIAL_BACKGROUND, fld.getBackground());
+      }
+      Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_BACKGROUND);
+      Color c = getEnvironment().getColor(scoutColor);
+      if (getMandatoryFieldBackgroundColor() != null) {
+        c = getMandatoryFieldBackgroundColor();
+      }
+      if (c == null) {
+        c = initCol;
+      }
+      fld.setBackground(c);
+      for (Button b : m_swtRadioButtons) {
+        b.setBackground(c);
+      }
     }
   }
 
