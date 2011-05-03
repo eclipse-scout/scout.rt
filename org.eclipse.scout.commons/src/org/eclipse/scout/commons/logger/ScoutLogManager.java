@@ -141,8 +141,10 @@ public final class ScoutLogManager {
    * 
    * @param globalLogLevel
    *          the global log level to set or null to read the initial log configuration
+   * @throws UnsupportedOperationException
+   *           is thrown if the log implementation does not support global log level
    */
-  public static void setGlobalLogLevel(Integer level) {
+  public static void setGlobalLogLevel(Integer level) throws UnsupportedOperationException {
     instance.setGlobalLogLevel(level);
   }
 
@@ -151,8 +153,10 @@ public final class ScoutLogManager {
    * returned.
    * 
    * @return the global log level or null, if no global log level is set
+   * @throws UnsupportedOperationException
+   *           is thrown if the log implementation does not support global log level
    */
-  public static Integer getGlobalLogLevel() {
+  public static Integer getGlobalLogLevel() throws UnsupportedOperationException {
     return instance.getGlobalLogLevel();
   }
 
@@ -163,8 +167,10 @@ public final class ScoutLogManager {
    * @return true if the recording is started or false, if the recording is already in progress.
    * @throws ProcessingException
    *           is thrown if the recording could not be started
+   * @throws UnsupportedOperationException
+   *           is thrown if the log implementation does not support recording of log messages
    */
-  public static boolean startRecording() throws ProcessingException {
+  public static boolean startRecording() throws ProcessingException, UnsupportedOperationException {
     return instance.startRecording();
   }
 
@@ -173,8 +179,10 @@ public final class ScoutLogManager {
    * 
    * @return the log file containing the recorded log messages or null, if no recording was in progress or an error
    *         occured while retrieving the log entries.
+   * @throws UnsupportedOperationException
+   *           is thrown if the log implementation does not support recording of log messages
    */
-  public static File stopRecording() {
+  public static File stopRecording() throws UnsupportedOperationException {
     return instance.stopRecording();
   }
 

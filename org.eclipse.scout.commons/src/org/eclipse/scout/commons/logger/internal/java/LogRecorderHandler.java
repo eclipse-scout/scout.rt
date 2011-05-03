@@ -26,7 +26,7 @@ public class LogRecorderHandler extends FileHandler {
   private String m_logDirectory;
 
   public LogRecorderHandler(String logDirectory, int limit, int count, boolean append) throws SecurityException, IOException {
-    super(logDirectory + "/log_%u%g.log", 1024 * 1024, 1024, false);
+    super(logDirectory + "/log_%u%g.log", limit, count, append);
     m_logDirectory = logDirectory;
   }
 

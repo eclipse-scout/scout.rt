@@ -43,16 +43,20 @@ public interface IScoutLogManager {
    * 
    * @param globalLogLevel
    *          the global log level to set or null to read the initial log configuration
+   * @throws UnsupportedOperationException
+   *           is thrown if the log implementation does not support global log level
    */
-  void setGlobalLogLevel(Integer globalLogLevel);
+  void setGlobalLogLevel(Integer globalLogLevel) throws UnsupportedOperationException;
 
   /**
    * If a global log level is installed by {@link IScoutLogManager#setGlobalLogLevel(Integer)}, this global level is
    * returned.
    * 
    * @return the global log level or null, if no global log level is set
+   * @throws UnsupportedOperationException
+   *           is thrown if the log implementation does not support global log level
    */
-  Integer getGlobalLogLevel();
+  Integer getGlobalLogLevel() throws UnsupportedOperationException;
 
   /**
    * To start recording log messages. If a recording is already in progress by a previous call to this method, this
@@ -61,14 +65,18 @@ public interface IScoutLogManager {
    * @return true if the recording is started or false, if the recording is already in progress.
    * @throws ProcessingException
    *           is thrown if the recording could not be started
+   * @throws UnsupportedOperationException
+   *           is thrown if the log implementation does not support recording of log messages
    */
-  boolean startRecording() throws ProcessingException;
+  boolean startRecording() throws ProcessingException, UnsupportedOperationException;
 
   /**
    * To stop recording log messages. If no recording is in progress, this call has no effect and null is returned.
    * 
    * @return the log file containing the recorded log messages or null, if no recording was in progress or an error
    *         occured while retrieving the log entries.
+   * @throws UnsupportedOperationException
+   *           is thrown if the log implementation does not support recording of log messages
    */
-  File stopRecording();
+  File stopRecording() throws UnsupportedOperationException;
 }

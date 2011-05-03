@@ -186,7 +186,7 @@ public class JavaScoutLogManager implements IScoutLogManager {
   protected LogRecorderHandler createLogRecordingHandler() throws ProcessingException {
     try {
       File tempLogDir = IOUtility.createTempDirectory("log");
-      LogRecorderHandler handler = new LogRecorderHandler(tempLogDir.getAbsolutePath(), 1024 * 1024, 0, false);
+      LogRecorderHandler handler = new LogRecorderHandler(tempLogDir.getAbsolutePath(), 1024 * 1024, 1024, false);
       handler.setLevel(Level.FINEST);
       handler.setFormatter(new JavaLogFormatter());
       handler.setEncoding("UTF-8");
