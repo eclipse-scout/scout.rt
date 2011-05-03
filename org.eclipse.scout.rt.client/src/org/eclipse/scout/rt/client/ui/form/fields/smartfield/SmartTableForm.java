@@ -99,7 +99,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
           m_lastSelectedKey = getSmartField().getValue();
           keyToSelect = m_lastSelectedKey;
         }
-        else if (table.getRowCount() == 1) {
+        else if (table.getRowCount() == 1 && !getSmartField().isAllowCustomText()) {
           // select first
           keyToSelect = table.getKeyColumn().getValue(0).getKey();
         }
