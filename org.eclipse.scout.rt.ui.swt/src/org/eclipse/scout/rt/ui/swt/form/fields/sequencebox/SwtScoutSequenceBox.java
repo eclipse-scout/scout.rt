@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt.form.fields.sequencebox;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
@@ -34,6 +35,7 @@ import org.eclipse.swt.widgets.Composite;
 public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> implements ISwtScoutSequenceBox {
 
   private PropertyChangeListener m_scoutMandatoryChangeListener;
+  private PropertyChangeListener m_scoutErrorStatusChangeListener;
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -99,6 +101,20 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
     setMandatoryFromScout(inheritedMandatory);
   }
 
+  protected void setChildErrorStatusFromScout() {
+    IProcessingStatus inheritedErrorStatus = null;
+    for (IFormField f : getScoutObject().getFields()) {
+      if (f.isVisible()) {
+        if (f instanceof IValueField) {
+          inheritedErrorStatus = ((IValueField) f).getErrorStatus();
+          // bsh 2010-10-01: always break (don't inherit error status from other fields than the first visible field)
+          break;
+        }
+      }
+    }
+    setErrorStatusFromScout(inheritedErrorStatus);
+  }
+
   @Override
   protected void attachScout() {
     super.attachScout();
@@ -119,6 +135,23 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
     for (IFormField f : getScoutObject().getFields()) {
       f.addPropertyChangeListener(IFormField.PROP_MANDATORY, m_scoutMandatoryChangeListener);
     }
+    // add errror status change listener on children to decorate my label same as any child with an error status
+    m_scoutErrorStatusChangeListener = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent e) {
+        Runnable j = new Runnable() {
+          @Override
+          public void run() {
+            setChildErrorStatusFromScout();
+          }
+        };
+        getEnvironment().invokeSwtLater(j);
+      }
+    };
+    for (IFormField f : getScoutObject().getFields()) {
+      f.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, m_scoutErrorStatusChangeListener);
+    }
+
   }
 
   @Override
