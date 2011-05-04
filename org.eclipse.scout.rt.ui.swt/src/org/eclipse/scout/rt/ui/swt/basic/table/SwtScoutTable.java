@@ -719,7 +719,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
             addIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_COLUMN_ORDER_CHANGED);
             addIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
             //
-            getScoutObject().getColumnSet().setVisibleColumns(newOrder);
+            getScoutObject().getUIFacade().fireVisibleColumnsChangedFromUI(newOrder);
           }
           finally {
             removeIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_COLUMN_ORDER_CHANGED);
