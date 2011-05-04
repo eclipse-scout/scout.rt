@@ -124,7 +124,6 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     getSwtField().addListener(SWT.KeyDown, listener);
     getSwtField().addListener(SWT.Modify, listener);
     getSwtField().addListener(SWT.Traverse, listener);
-    getSwtField().addListener(SWT.FocusOut, listener);
 
     P_SwtBrowseButtonListener swtBrowseButtonListener = new P_SwtBrowseButtonListener();
     getSwtBrowseButton().addSelectionListener(swtBrowseButtonListener);
@@ -337,7 +336,11 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         m_pendingProposalJob.cancel();
       }
       m_pendingProposalJob.update(text, selectCurrentValue);
-      m_pendingProposalJob.schedule(400);
+      int delay = 400;
+      if (m_proposalPopup == null) {
+        delay = 0;
+      }
+      m_pendingProposalJob.schedule(delay);
     }
   }
 
@@ -533,7 +536,6 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
   }
 
   private class P_UiFieldListener implements Listener {
-    private int m_traverseEventTime;
 
     @Override
     public void handleEvent(Event event) {
@@ -545,14 +547,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
           handleKeyDownFromUI(event);
           break;
         case SWT.Traverse:
-          m_traverseEventTime = event.time;
           handleTraverseFromUi(event);
-          break;
-        case SWT.FocusOut:
-//          if (m_traverseEventTime == event.time) {
-//            return;
-//          }
-//          handleSwtFocusLostInternal();
           break;
       }
     }
