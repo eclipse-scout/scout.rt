@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -32,11 +33,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.Main
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.StatusField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 public class SmartTableForm extends AbstractSmartFieldProposalForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SmartTableForm.class);
 
+  private JobEx m_dataLoadJob;
   private Object m_lastSelectedKey;
 
   public SmartTableForm(ISmartField<?> smartField) throws ProcessingException {
@@ -49,33 +52,37 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
   }
 
   @Override
-  public void update(boolean selectCurrentValue) throws ProcessingException {
+  public void update(final boolean selectCurrentValue) throws ProcessingException {
     String text = getSearchText();
     if (text == null) {
       text = "";
     }
-    int maxCount = getSmartField().getBrowseMaxRowCount();
+    final String textNonNull = text;
+    final int maxCount = getSmartField().getBrowseMaxRowCount();
     getStatusField().setValue(ScoutTexts.get("searchingProposals"));
     getStatusField().setVisible(true);
-    try {
-      LookupRow[] rows;
-      if (ISmartField.BROWSE_ALL_TEXT.equals(text)) {
-        rows = getSmartField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
-      }
-      else if (text.length() == 0) {
-        rows = getSmartField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
-      }
-      else {
-        rows = getSmartField().callTextLookup(text, maxCount > 0 ? maxCount + 1 : 0);
-      }
-      dataFetched(rows, null, maxCount, selectCurrentValue);
+    //async load of data
+    if (m_dataLoadJob != null) {
+      m_dataLoadJob.cancel();
     }
-    catch (ProcessingException e) {
-      dataFetched(null, e, maxCount, selectCurrentValue);
+    ILookupCallFetcher fetcher = new ILookupCallFetcher() {
+      @Override
+      public void dataFetched(LookupRow[] rows, ProcessingException failed) {
+        dataFetchedDelegate(rows, failed, maxCount, selectCurrentValue);
+      }
+    };
+    if (ISmartField.BROWSE_ALL_TEXT.equals(textNonNull)) {
+      m_dataLoadJob = getSmartField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
+    }
+    else if (textNonNull.length() == 0) {
+      m_dataLoadJob = getSmartField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
+    }
+    else {
+      m_dataLoadJob = getSmartField().callTextLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
     }
   }
 
-  private void dataFetched(LookupRow[] rows, ProcessingException failed, int maxCount, boolean selectCurrentValue) {
+  private void dataFetchedDelegate(LookupRow[] rows, ProcessingException failed, int maxCount, boolean selectCurrentValue) {
     try {
       // populate table
       ResultTableField.Table table = getResultTableField().getTable();
@@ -476,6 +483,13 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     @Override
     protected boolean execValidate() throws ProcessingException {
       return getAcceptedProposal() != null;
+    }
+
+    @Override
+    protected void execFinally() throws ProcessingException {
+      if (m_dataLoadJob != null) {
+        m_dataLoadJob.cancel();
+      }
     }
   }
 

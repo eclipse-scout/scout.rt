@@ -319,7 +319,11 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         m_pendingProposalJob.cancel();
       }
       m_pendingProposalJob.update(text, selectCurrentValue);
-      m_pendingProposalJob.schedule(400);
+      long delay = 400;
+      if (m_proposalPopup == null) {
+        delay = 0;
+      }
+      m_pendingProposalJob.schedule(delay);
     }
   }
 

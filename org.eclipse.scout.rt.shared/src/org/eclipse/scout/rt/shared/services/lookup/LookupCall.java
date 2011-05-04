@@ -4,14 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.io.Serializable;
-import java.lang.reflect.Proxy;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -278,27 +277,32 @@ public class LookupCall implements Cloneable, Serializable {
    * see {@link ILookupCallFetcher}<br> {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called in the background thread
    * <p>
-   * Note: background call is only done when lookup service is a service proxy as defined in
-   * {@link Proxy#isProxyClass(Class)}
+   * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
+   * 
+   * @return the created async job if applicable or null
    */
-  public void getDataByKeyInBackground(final ILookupCallFetcher caller) {
-    final ILookupService svc = getLookupService();
-    if (svc != null && Proxy.isProxyClass(svc.getClass())) {
+  public JobEx getDataByKeyInBackground(final ILookupCallFetcher caller) {
+    if (!(LookupCall.this instanceof LocalLookupCall)) {
       JobEx job = new JobEx(getClass().getSimpleName() + ".getDataByKeyInBackground") {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           try {
-            LookupRow[] rows = svc.getDataByKey(LookupCall.this);
-            caller.dataFetched(rows, null);
+            LookupRow[] rows = getDataByKey();
+            if (!isCurrentJobCanceled()) {
+              caller.dataFetched(rows, null);
+            }
           }
           catch (ProcessingException e) {
-            caller.dataFetched(null, e);
+            if (!isCurrentJobCanceled()) {
+              caller.dataFetched(null, e);
+            }
           }
           return Status.OK_STATUS;
         }
       };
       job.setSystem(true);
       job.schedule();
+      return job;
     }
     else {
       try {
@@ -307,6 +311,7 @@ public class LookupCall implements Cloneable, Serializable {
       catch (ProcessingException e) {
         caller.dataFetched(null, e);
       }
+      return null;
     }
   }
 
@@ -330,27 +335,32 @@ public class LookupCall implements Cloneable, Serializable {
    * see {@link ILookupCallFetcher}<br> {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called in the background thread
    * <p>
-   * Note: background call is only done when lookup service is a service proxy as defined in
-   * {@link Proxy#isProxyClass(Class)}
+   * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
+   * 
+   * @return the created async job if applicable or null
    */
-  public void getDataByTextInBackground(final ILookupCallFetcher caller) {
-    final ILookupService svc = getLookupService();
-    if (svc != null && Proxy.isProxyClass(svc.getClass())) {
+  public JobEx getDataByTextInBackground(final ILookupCallFetcher caller) {
+    if (!(LookupCall.this instanceof LocalLookupCall)) {
       JobEx job = new JobEx(getClass().getSimpleName() + ".getDataByTextInBackground") {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           try {
-            LookupRow[] rows = svc.getDataByText(LookupCall.this);
-            caller.dataFetched(rows, null);
+            LookupRow[] rows = getDataByText();
+            if (!isCurrentJobCanceled()) {
+              caller.dataFetched(rows, null);
+            }
           }
           catch (ProcessingException e) {
-            caller.dataFetched(null, e);
+            if (!isCurrentJobCanceled()) {
+              caller.dataFetched(null, e);
+            }
           }
           return Status.OK_STATUS;
         }
       };
       job.setSystem(true);
       job.schedule();
+      return job;
     }
     else {
       try {
@@ -359,6 +369,7 @@ public class LookupCall implements Cloneable, Serializable {
       catch (ProcessingException e) {
         caller.dataFetched(null, e);
       }
+      return null;
     }
   }
 
@@ -382,27 +393,32 @@ public class LookupCall implements Cloneable, Serializable {
    * see {@link ILookupCallFetcher}<br> {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called in the background thread
    * <p>
-   * Note: background call is only done when lookup service is a service proxy as defined in
-   * {@link Proxy#isProxyClass(Class)}
+   * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
+   * 
+   * @return the created async job if applicable or null
    */
-  public void getDataByAllInBackground(final ILookupCallFetcher caller) {
-    final ILookupService svc = getLookupService();
-    if (svc != null && Proxy.isProxyClass(svc.getClass())) {
+  public JobEx getDataByAllInBackground(final ILookupCallFetcher caller) {
+    if (!(LookupCall.this instanceof LocalLookupCall)) {
       JobEx job = new JobEx(getClass().getSimpleName() + ".getDataByAllInBackground") {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           try {
-            LookupRow[] rows = svc.getDataByAll(LookupCall.this);
-            caller.dataFetched(rows, null);
+            LookupRow[] rows = getDataByAll();
+            if (!isCurrentJobCanceled()) {
+              caller.dataFetched(rows, null);
+            }
           }
           catch (ProcessingException e) {
-            caller.dataFetched(null, e);
+            if (!isCurrentJobCanceled()) {
+              caller.dataFetched(null, e);
+            }
           }
           return Status.OK_STATUS;
         }
       };
       job.setSystem(true);
       job.schedule();
+      return job;
     }
     else {
       try {
@@ -411,6 +427,7 @@ public class LookupCall implements Cloneable, Serializable {
       catch (ProcessingException e) {
         caller.dataFetched(null, e);
       }
+      return null;
     }
   }
 
@@ -433,27 +450,32 @@ public class LookupCall implements Cloneable, Serializable {
    * see {@link ILookupCallFetcher}<br> {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called in the background thread
    * <p>
-   * Note: background call is only done when lookup service is a service proxy as defined in
-   * {@link Proxy#isProxyClass(Class)}
+   * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
+   * 
+   * @return the created async job if applicable or null
    */
-  public void getDataByRecInBackground(final ILookupCallFetcher caller) {
-    final ILookupService svc = getLookupService();
-    if (svc != null && Proxy.isProxyClass(svc.getClass())) {
+  public JobEx getDataByRecInBackground(final ILookupCallFetcher caller) {
+    if (!(LookupCall.this instanceof LocalLookupCall)) {
       JobEx job = new JobEx(getClass().getSimpleName() + ".getDataByRecInBackground") {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           try {
-            LookupRow[] rows = svc.getDataByRec(LookupCall.this);
-            caller.dataFetched(rows, null);
+            LookupRow[] rows = getDataByRec();
+            if (!isCurrentJobCanceled()) {
+              caller.dataFetched(rows, null);
+            }
           }
           catch (ProcessingException e) {
-            caller.dataFetched(null, e);
+            if (!isCurrentJobCanceled()) {
+              caller.dataFetched(null, e);
+            }
           }
           return Status.OK_STATUS;
         }
       };
       job.setSystem(true);
       job.schedule();
+      return job;
     }
     else {
       try {
@@ -462,6 +484,7 @@ public class LookupCall implements Cloneable, Serializable {
       catch (ProcessingException e) {
         caller.dataFetched(null, e);
       }
+      return null;
     }
   }
 
