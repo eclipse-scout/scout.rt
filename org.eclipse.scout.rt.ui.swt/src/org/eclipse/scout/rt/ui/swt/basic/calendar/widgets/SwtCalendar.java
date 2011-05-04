@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,14 +33,18 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * This class represents an SWT calendar widget.<br/>
- * <br/>
- * <b>Date concept regarding this calendar:</b> <li>A SwtCalendar object has a viewDate, which represent the day which
- * we want to visualize (within a certain viewing interval)</li> <li>There is a view date start and view date end
- * (m_viewDateStart, m_viewDateEnd) representing the visualized period</li> <li>We find additionnaly and optionnaly a
- * selected date (m_selectedDate)</li> <li>When a new JCalendar object is created, the view date is set to today</li>
- * <li>If the display mode is changed, the view date start/end is recalculated</li> <li>If the current view date is
- * changed, the view date start/end are also recalculated</li>
+ * This class represents an SWT calendar widget.<br>
+ * <br>
+ * <b>Date concept regarding this calendar:</b>
+ * <ul>
+ * <li>A SwtCalendar object has a viewDate, which represent the day which we want to visualize (within a certain viewing
+ * interval)</li>
+ * <li>There is a view date start and view date end (m_viewDateStart, m_viewDateEnd) representing the visualized period</li>
+ * <li>We find additionnaly and optionnaly a selected date (m_selectedDate)</li>
+ * <li>When a new JCalendar object is created, the view date is set to today</li>
+ * <li>If the display mode is changed, the view date start/end is recalculated</li>
+ * <li>If the current view date is changed, the view date start/end are also recalculated</li>
+ * </ul>
  * 
  * @author Michael Rudolf, Andreas Hoegger
  */
