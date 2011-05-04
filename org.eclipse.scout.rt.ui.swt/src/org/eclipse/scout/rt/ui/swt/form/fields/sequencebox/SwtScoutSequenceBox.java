@@ -116,6 +116,30 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
   }
 
   @Override
+  protected void setEnabledFromScout(boolean b) {
+    boolean updateLayout = false;
+    // only label
+    if (getSwtLabel() != null) {
+      if (getSwtLabel().getEnabled() != b) {
+        updateLayout = true;
+        getSwtLabel().setEnabled(b);
+        if (b) {
+          getSwtLabel().setForeground(null);
+        }
+        else {
+          getSwtLabel().setForeground(getEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled()));
+        }
+      }
+    }
+    if (updateLayout && isConnectedToScout()) {
+      if (getSwtContainer() != null) {
+        getSwtContainer().layout(true);
+      }
+      setLayoutDirty();
+    }
+  }
+
+  @Override
   protected void attachScout() {
     super.attachScout();
     // add mandatory change listener on children to decorate my label same as any mandatory child

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -72,7 +72,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
     }
-    m_fields = fieldList.toArray(new IFormField[0]);
+    m_fields = fieldList.toArray(new IFormField[fieldList.size()]);
     // attach a proxy controller to each child field in the group for: visible, saveNeeded
     for (IFormField f : m_fields) {
       f.addPropertyChangeListener(new P_FieldPropertyChangeListener());
