@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFormFieldGridData;
+import org.eclipse.scout.rt.ui.swt.util.SwtLayoutUtility;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -113,6 +114,27 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
       }
     }
     setErrorStatusFromScout(inheritedErrorStatus);
+  }
+
+  @Override
+  protected void setEnabledFromScout(boolean b) {
+    boolean updateLayout = false;
+    // only label
+    if (getSwtLabel() != null) {
+      if (getSwtLabel().getEnabled() != b) {
+        updateLayout = true;
+        getSwtLabel().setEnabled(b);
+        if (b) {
+          getSwtLabel().setForeground(null);
+        }
+        else {
+          getSwtLabel().setForeground(getEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled()));
+        }
+      }
+    }
+    if (updateLayout && isConnectedToScout()) {
+      SwtLayoutUtility.invalidateLayout(getSwtContainer());
+    }
   }
 
   @Override
