@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -47,9 +47,14 @@ public interface ITableUIFacade {
 
   IMenu[] fireHeaderPopupFromUI();
 
-  void fireColumnMovedFromUI(IColumn c, int toViewIndex);
+  void fireColumnMovedFromUI(IColumn<?> c, int toViewIndex);
 
-  void setColumnWidthFromUI(IColumn c, int newWidth);
+  /**
+   * @param visibleColumns
+   */
+  void fireVisibleColumnsChangedFromUI(IColumn<?>[] visibleColumns);
+
+  void setColumnWidthFromUI(IColumn<?> c, int newWidth);
 
   /**
    * @param column
@@ -60,7 +65,7 @@ public interface ITableUIFacade {
    *          as the (new) primary sort column, if already set it is toggled
    *          between ascending and descending
    */
-  void fireHeaderSortFromUI(IColumn column, boolean multiSort);
+  void fireHeaderSortFromUI(IColumn<?> column, boolean multiSort);
 
   void setSelectedRowsFromUI(ITableRow[] rows);
 
@@ -74,14 +79,14 @@ public interface ITableUIFacade {
   /**
    * Set the column that represents the last ui (mouse click) column context
    */
-  void setContextColumnFromUI(IColumn col);
+  void setContextColumnFromUI(IColumn<?> col);
 
   /**
    * @return the editing field or group box or null if no editing is available right now
    *         <p>
    *         The ui should call {@link #completeCellEditFromUI()} or {@link #cancelCellEditFromUI()} at some time.
    */
-  IFormField prepareCellEditFromUI(ITableRow row, IColumn col);
+  IFormField prepareCellEditFromUI(ITableRow row, IColumn<?> col);
 
   void completeCellEditFromUI();
 
@@ -89,5 +94,6 @@ public interface ITableUIFacade {
 
   boolean fireKeyTypedFromUI(String keyStrokeText, char keyChar);
 
-  void fireHyperlinkActionFromUI(ITableRow row, IColumn column, URL url);
+  void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> column, URL url);
+
 }

@@ -3143,7 +3143,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
-    public void fireColumnMovedFromUI(IColumn c, int toViewIndex) {
+    public void fireVisibleColumnsChangedFromUI(IColumn<?>[] visibleColumns) {
+      try {
+        pushUIProcessor();
+        //
+        getColumnSet().setVisibleColumns(visibleColumns);
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    public void fireColumnMovedFromUI(IColumn<?> c, int toViewIndex) {
       try {
         pushUIProcessor();
         //
@@ -3158,7 +3170,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
-    public void setColumnWidthFromUI(IColumn c, int newWidth) {
+    public void setColumnWidthFromUI(IColumn<?> c, int newWidth) {
       try {
         pushUIProcessor();
         //
@@ -3173,7 +3185,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
-    public void fireHeaderSortFromUI(IColumn c, boolean multiSort) {
+    public void fireHeaderSortFromUI(IColumn<?> c, boolean multiSort) {
       try {
         pushUIProcessor();
         //
@@ -3239,7 +3251,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
-    public void fireHyperlinkActionFromUI(ITableRow row, IColumn col, URL url) {
+    public void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> col, URL url) {
       try {
         pushUIProcessor();
         //
@@ -3253,7 +3265,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
-    public void setContextColumnFromUI(IColumn col) {
+    public void setContextColumnFromUI(IColumn<?> col) {
       try {
         pushUIProcessor();
         //
@@ -3267,7 +3279,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
-    public IFormField prepareCellEditFromUI(ITableRow row, IColumn col) {
+    public IFormField prepareCellEditFromUI(ITableRow row, IColumn<?> col) {
       try {
         pushUIProcessor();
         //
