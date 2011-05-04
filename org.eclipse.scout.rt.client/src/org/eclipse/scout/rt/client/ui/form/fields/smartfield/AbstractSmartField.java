@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
@@ -1125,16 +1126,16 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   }
 
   @Override
-  public void callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher fetcher) {
-    callTextLookupInternal(text, maxRowCount, fetcher, true);
+  public JobEx callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher fetcher) {
+    return callTextLookupInternal(text, maxRowCount, fetcher, true);
   }
 
-  private void callTextLookupInternal(String text, int maxRowCount, final ILookupCallFetcher fetcher, final boolean background) {
+  private JobEx callTextLookupInternal(String text, int maxRowCount, final ILookupCallFetcher fetcher, final boolean background) {
     final LookupCall call = (getLookupCall() != null ? (LookupCall) getLookupCall().clone() : null);
     final IClientSession session = ClientSyncJob.getCurrentSession();
     ILookupCallFetcher internalFetcher = new ILookupCallFetcher() {
       public void dataFetched(final LookupRow[] rows, final ProcessingException failed) {
-        ClientSyncJob scoutJob = new ClientSyncJob("Smartfield text lookup", session) {
+        ClientSyncJob scoutSyncJob = new ClientSyncJob("Smartfield text lookup", session) {
           @Override
           protected void runVoid(IProgressMonitor monitor) throws Throwable {
             if (failed == null) {
@@ -1153,10 +1154,10 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
           }
         };
         if (background) {
-          scoutJob.schedule();
+          scoutSyncJob.schedule();
         }
         else {
-          scoutJob.runNow(new NullProgressMonitor());
+          scoutSyncJob.runNow(new NullProgressMonitor());
         }
       }
     };
@@ -1171,7 +1172,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
       if (background) {
         try {
           prepareTextLookup(call, text);
-          call.getDataByTextInBackground(internalFetcher);
+          return call.getDataByTextInBackground(internalFetcher);
         }
         catch (ProcessingException e1) {
           internalFetcher.dataFetched(null, e1);
@@ -1190,6 +1191,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     else {
       internalFetcher.dataFetched(new LookupRow[0], null);
     }
+    return null;
   }
 
   @Override
@@ -1216,21 +1218,21 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   }
 
   @Override
-  public void callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher fetcher) {
-    callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, fetcher);
+  public JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher fetcher) {
+    return callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, fetcher);
   }
 
   @Override
-  public void callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher fetcher) {
-    callBrowseLookupInternal(browseHint, maxRowCount, activeState, fetcher, true);
+  public JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher fetcher) {
+    return callBrowseLookupInternal(browseHint, maxRowCount, activeState, fetcher, true);
   }
 
-  private void callBrowseLookupInternal(String browseHint, int maxRowCount, TriState activeState, final ILookupCallFetcher fetcher, final boolean background) {
+  private JobEx callBrowseLookupInternal(String browseHint, int maxRowCount, TriState activeState, final ILookupCallFetcher fetcher, final boolean background) {
     final LookupCall call = (getLookupCall() != null ? (LookupCall) getLookupCall().clone() : null);
     final IClientSession session = ClientSyncJob.getCurrentSession();
     ILookupCallFetcher internalFetcher = new ILookupCallFetcher() {
       public void dataFetched(final LookupRow[] rows, final ProcessingException failed) {
-        ClientSyncJob scoutJob = new ClientSyncJob("Smartfield browse lookup", session) {
+        ClientSyncJob scoutSyncJob = new ClientSyncJob("Smartfield browse lookup", session) {
           @Override
           protected void runVoid(IProgressMonitor monitor) throws Throwable {
             if (failed == null) {
@@ -1249,10 +1251,10 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
           }
         };
         if (background) {
-          scoutJob.schedule();
+          scoutSyncJob.schedule();
         }
         else {
-          scoutJob.runNow(new NullProgressMonitor());
+          scoutSyncJob.runNow(new NullProgressMonitor());
         }
       }
     };
@@ -1267,7 +1269,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
       if (background) {
         try {
           prepareBrowseLookup(call, browseHint, activeState);
-          call.getDataByAllInBackground(internalFetcher);
+          return call.getDataByAllInBackground(internalFetcher);
         }
         catch (ProcessingException e1) {
           internalFetcher.dataFetched(null, e1);
@@ -1286,6 +1288,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     else {
       internalFetcher.dataFetched(new LookupRow[0], null);
     }
+    return null;
   }
 
   @Override

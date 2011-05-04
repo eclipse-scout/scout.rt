@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -205,8 +206,11 @@ public interface ISmartField<T> extends IValueField<T> {
    * called back in the model thread. The smartfield is automatically starting
    * an internal background thread and syncs the result back into the model
    * thread.
+   * 
+   * @return the created async job if applicable or null, see
+   *         {@link LookupCall#getDataByTextInBackground(ILookupCallFetcher)}
    */
-  void callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher fetcher);
+  JobEx callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher fetcher);
 
   LookupRow[] callBrowseLookup(String browseHint, int maxRowCount) throws ProcessingException;
 
@@ -217,16 +221,22 @@ public interface ISmartField<T> extends IValueField<T> {
    * called back in the model thread. The smartfield is automatically starting
    * an internal background thread and syncs the result back into the model
    * thread.
+   * 
+   * @return the created async job if applicable or null, see
+   *         {@link LookupCall#getDataByAllInBackground(ILookupCallFetcher)}
    */
-  void callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher fetcher);
+  JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher fetcher);
 
   /**
    * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called back in the model thread. The smartfield is automatically starting
    * an internal background thread and syncs the result back into the model
    * thread.
+   * 
+   * @return the created async job if applicable or null, see
+   *         {@link LookupCall#getDataByAllInBackground(ILookupCallFetcher)}
    */
-  void callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher fetcher);
+  JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher fetcher);
 
   LookupRow[] callSubTreeLookup(T parentKey) throws ProcessingException;
 

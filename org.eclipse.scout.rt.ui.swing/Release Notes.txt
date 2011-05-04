@@ -57,3 +57,7 @@ Migration: None
 fixed ticket #92911 
 Problem: Fixed that LABEL_POSITION_ON_FIELD has no effect on multiline string fields
 Migration: None
+
+04.05.2011 imo
+Added async loading of backend smartfield lookup calls for better performance on slow lookup services
+

@@ -243,11 +243,11 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
         if (text == null || text.length() == 0) {
           // allow empty field without proposal
           if (m_proposalPopup != null) {
-            requestProposalSupportFromSwing(text, false, 400);
+            requestProposalSupportFromSwing(text, false, 0);
           }
         }
         else {
-          requestProposalSupportFromSwing(text, false, 400);
+          requestProposalSupportFromSwing(text, false, m_proposalPopup != null ? 200 : 0);
         }
       }
     }
@@ -293,7 +293,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
         m_pendingProposalJob.cancel();
       }
       m_pendingProposalJob.update(text, selectCurrentValue);
-      m_pendingProposalJob.schedule(400);
+      m_pendingProposalJob.schedule(initialDelay);
     }
   }
 
