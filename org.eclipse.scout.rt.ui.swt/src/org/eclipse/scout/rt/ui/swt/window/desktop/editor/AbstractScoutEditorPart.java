@@ -297,22 +297,23 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   }
 
   protected void handleClosedFromUI() {
-    Runnable job = new Runnable() {
-      @Override
-      public void run() {
-        try {
-          if (m_closeLock.acquire()) {
+    try {
+      if (m_closeLock.acquire()) {
+        Runnable job = new Runnable() {
+          @Override
+          public void run() {
             if (getForm() != null) {
               getForm().getUIFacade().fireFormKilledFromUI();
             }
           }
-        }
-        finally {
-          m_closeLock.release();
-        }
+
+        };
+        getSwtEnvironment().invokeScoutLater(job, 0);
       }
-    };
-    getSwtEnvironment().invokeScoutLater(job, 0);
+    }
+    finally {
+      m_closeLock.release();
+    }
   }
 
   @Override
