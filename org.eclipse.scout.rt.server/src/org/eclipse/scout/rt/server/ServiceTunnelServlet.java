@@ -40,7 +40,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.PlaceholderException;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -74,7 +73,12 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 
 /**
- * Use this servlet together with a {@link ServerJobServletFilter}
+ * Use this servlet to dispatch scout gui service requests using {@link ServiceTunnelRequest},
+ * {@link ServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
+ * <p>
+ * When using RAP (rich ajax platform) as the ui web app then the /ajax servlet alias must be used in order to map
+ * requests to virtual sessions instead of (the unique) http session. The expected headers therefore are
+ * "Ajax-SessionId" and "Ajax-UserId"
  */
 public class ServiceTunnelServlet extends HttpServletEx {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
@@ -83,8 +87,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   private transient IServiceTunnelContentHandler m_msgEncoder;
   private transient Bundle[] m_orderedBundleList;
-  //XXX imo says: use new optimized class TimeoutCache<..>
-  private LRUCache<String, IServerSession> m_ajaxSessionCache = new LRUCache<String, IServerSession>(1000000, 900000L);//15 min timeout
+  private VirtualSessionCache m_ajaxSessionCache = new VirtualSessionCache();
   private Object m_msgEncoderLock = new Boolean(true);
   private Object m_orderedBundleListLock = new Boolean(true);
   private Class<? extends IServerSession> m_serverSessionClass;
@@ -258,30 +261,49 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   protected IStatus serviceWithScoutServerSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq) throws ProcessingException, ServletException {
-    IServerSession serverSession;
+    String servletPath = req.getServletPath();
     String ajaxSessionId = req.getHeader("Ajax-SessionId");
     String ajaxUserId = req.getHeader("Ajax-UserId");
-    if (ajaxSessionId == null) {
-      //external request
-      // apply locking, this is the session initialization phase
-      synchronized (req.getSession()) {
-        serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
-        if (serverSession == null) {
-          serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, null);
-          req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
-        }
-      }
-      ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, req, res);
-      return job.runNow(new NullProgressMonitor());
+    if (servletPath != null && servletPath.endsWith("/ajax")) {
+      if (ajaxSessionId == null) throw new ServletException("servlet " + servletPath + ": missing header 'Ajax-SessionId'");
+      if (ajaxUserId == null) throw new ServletException("servlet " + servletPath + ": missing header 'Ajax-UserId'");
+      return serviceWithScoutServerSessionOnVirtualSession(req, res, serviceTunnelReq, ajaxSessionId, ajaxUserId);
     }
-    //ajax client delegate
+    else {
+      if (ajaxSessionId != null) throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-SessionId'");
+      if (ajaxUserId != null) throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-UserId'");
+      return serviceWithScoutServerSessionOnHttpSession(req, res, serviceTunnelReq);
+    }
+  }
+
+  protected IStatus serviceWithScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq) throws ProcessingException, ServletException {
+    //external request: apply locking, this is the session initialization phase
+    IServerSession serverSession;
+    synchronized (req.getSession()) {
+      serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
+      if (serverSession == null) {
+        serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, null);
+        req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
+      }
+    }
+    ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, req, res);
+    return job.runNow(new NullProgressMonitor());
+  }
+
+  protected IStatus serviceWithScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq, String ajaxSessionId, String ajaxUserId) throws ProcessingException, ServletException {
+    IServerSession serverSession;
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal(ajaxUserId));
     synchronized (m_ajaxSessionCache) {
+      //update session timeout
+      m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(1000L, 1000L * req.getSession().getMaxInactiveInterval()));
       serverSession = m_ajaxSessionCache.get(ajaxSessionId);
       if (serverSession == null) {
         serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
         m_ajaxSessionCache.put(ajaxSessionId, serverSession);
+      }
+      else {
+        m_ajaxSessionCache.touch(ajaxSessionId);
       }
     }
     final ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, req, res);
@@ -554,4 +576,5 @@ public class ServiceTunnelServlet extends HttpServletEx {
       return Status.OK_STATUS;
     }
   }
+
 }
