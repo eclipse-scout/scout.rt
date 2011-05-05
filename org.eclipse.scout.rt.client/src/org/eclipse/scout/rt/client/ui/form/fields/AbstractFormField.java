@@ -22,8 +22,8 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -193,6 +193,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return true;
   }
 
+  /**
+   * affects only the filed itself. in case of a composite field initially the property
+   * does not gets broadcasted.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
   @ConfigPropertyValue("true")
@@ -200,6 +204,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return true;
   }
 
+  /**
+   * affects only the filed itself. in case of a composite field initially the property
+   * does not gets broadcasted.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(40)
   @ConfigPropertyValue("true")
@@ -207,6 +215,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return true;
   }
 
+  /**
+   * affects only the filed itself. in case of a composite field initially the property
+   * does not gets broadcasted.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(45)
   @ConfigPropertyValue("false")

@@ -53,6 +53,11 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   @Override
   protected void initConfig() {
+    /*
+     * call first super initConfig to ensure all properties are applied to the field only.
+     * E.g. setEnabled(getConfiguredEnabled()) would enable/disable all children when called
+     * after field creation. -> all fields would have the enabled state of the MainBox.
+     */
     m_fields = new IFormField[0];
     super.initConfig();
     // add fields
@@ -260,14 +265,16 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
-   * broadcast this change to all children
+   * if initialized broadcast this change to all children.
    */
   @Override
   public void setEnabled(boolean b) {
     super.setEnabled(b);
-    // recursively down all children
-    for (IFormField f : m_fields) {
-      f.setEnabled(b);
+    // recursively down all children only if initialized.
+    if (isInitialized()) {
+      for (IFormField f : m_fields) {
+        f.setEnabled(b);
+      }
     }
   }
 
