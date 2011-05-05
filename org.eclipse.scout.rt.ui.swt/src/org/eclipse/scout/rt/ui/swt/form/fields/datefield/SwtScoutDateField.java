@@ -53,9 +53,9 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
     StatusLabelEx label = new StatusLabelEx(container, labelStyle, getEnvironment());
     getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
-    ButtonEx dateChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH | SWT.NO_FOCUS);
+    ButtonEx dateChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH);
     dateChooserButton.setImage(getEnvironment().getIcon(AbstractIcons.DateFieldDate));
-    ButtonEx timeChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH | SWT.NO_FOCUS);
+    ButtonEx timeChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH);
     timeChooserButton.setImage(getEnvironment().getIcon(AbstractIcons.DateFieldTime));
     timeChooserButton.setVisible(getScoutObject().isHasTime());
     container.setTabList(new Control[]{textField});

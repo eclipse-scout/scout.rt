@@ -80,19 +80,6 @@ public class ButtonEx extends Button {
     });
   }
 
-  /**
-   * since tab list on parent does not work
-   */
-  @Override
-  public boolean forceFocus() {
-    if ((getStyle() & SWT.NO_FOCUS) != 0) {
-      return false;
-    }
-    else {
-      return super.forceFocus();
-    }
-  }
-
   public void freeResources() {
     getParent().getParent().removeListener(SWT.Paint, m_paintListener);
     if (m_dropDownIcon != null && !m_dropDownIcon.isDisposed()) {
