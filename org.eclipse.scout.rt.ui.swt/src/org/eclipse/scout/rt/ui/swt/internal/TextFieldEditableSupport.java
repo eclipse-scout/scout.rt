@@ -74,7 +74,15 @@ public class TextFieldEditableSupport {
   private void setFieldInTabList(boolean inTablist) {
     Control textField = getTextField();
     Composite parent = textField.getParent();
+    Control[] tl = parent.getTabList();
     if (inTablist) {
+      if (tl != null) {
+        for (Control c : tl) {
+          if (c == textField) {
+            return;
+          }
+        }
+      }
       parent.setTabList(m_tabListBackup);
     }
     else {
