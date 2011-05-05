@@ -47,7 +47,11 @@ public class Activator extends Plugin implements SwingIcons {
   }
 
   public static Icon getIcon(String name) {
-    return getDefault().getIconImpl(name);
+    Activator activator = getDefault();
+    if (activator != null) {
+      return activator.getIconImpl(name);
+    }
+    return null;
   }
 
   private Icon getIconImpl(String name) {
