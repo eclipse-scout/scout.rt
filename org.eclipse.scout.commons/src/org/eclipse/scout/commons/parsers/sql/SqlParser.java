@@ -94,7 +94,7 @@ public class SqlParser {
   private static final Pattern AND_OP_PAT = Pattern.compile("[^" + nameChars + "](AND)[^" + nameChars + "]");
   private static final Pattern MATH_OP_PAT1 = Pattern.compile("[^" + nameChars + "](NOT IN|IN|IS NOT|IS|NOT BETWEEN|BETWEEN|NOT LIKE|LIKE)[^" + nameChars + "]");
   private static final Pattern MATH_OP_PAT2 = Pattern.compile("(=|<>|!=|<=|>=|<|>|\\%|\\^|\\+|\\-|\\*|/|\\|\\||\\&\\&)");
-  private static final Pattern UNARY_PREFIX_PAT = Pattern.compile("[^" + nameChars + "](NOT|DISTINCT)[^" + nameChars + "]");
+  private static final Pattern UNARY_PREFIX_PAT = Pattern.compile("[^" + nameChars + "](NOT|DISTINCT|NEW)[^" + nameChars + "]");
   //eliminate all remaining spaces
   private static final Pattern NAME_PAT = Pattern.compile("([" + nameChars + "]+)");
   private static final Pattern OPEN_BRACKET_PAT = Pattern.compile("([(])");
@@ -532,7 +532,7 @@ public class SqlParser {
       IToken t = null;
       IToken close = null;
       ArrayList<IToken> backup = new ArrayList<IToken>(list);
-      if ((open = removeToken(list, OpenBracketToken.class)) != null && ((t = parseStatement(list, ctx)) != null || (t = parseListExpr(list, ctx)) != null) && (close = removeToken(list, CloseBracketToken.class)) != null) {
+      if ((open = removeToken(list, OpenBracketToken.class)) != null && ((t = parseStatement(list, ctx)) != null || (t = parseListExpr(list, ctx)) != null || t == null) && (close = removeToken(list, CloseBracketToken.class)) != null) {
         //ok
       }
       else {
@@ -543,7 +543,9 @@ public class SqlParser {
       }
       BracketExpr e = new BracketExpr();
       e.addChild(open);
-      e.addChild(t);
+      if (t != null) {
+        e.addChild(t);
+      }
       e.addChild(close);
       return e;
     }
