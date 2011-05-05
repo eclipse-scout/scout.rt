@@ -152,7 +152,7 @@ public class BundleBrowser {
             m_set.add(className);
           }
         }
-        else {
+        else if (path.endsWith("/")) {
           if (m_includeSubtree) {
             visit(m_bundle.getEntryPaths(path));
           }
