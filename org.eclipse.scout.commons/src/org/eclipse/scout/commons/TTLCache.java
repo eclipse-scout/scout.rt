@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,9 +16,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
+/**
+ * Default implementation of a time to live cache mechanism using a HashMap. This implementation is thread-safe.
+ * <p>
+ * {@link #setTTL(long)} is the duration the items remain in the cache, after that time entries are discarded.
+ */
 public class TTLCache<K, V> {
   private Map<K, CacheEntryTTL> m_itemMap;
   private long m_ttl;

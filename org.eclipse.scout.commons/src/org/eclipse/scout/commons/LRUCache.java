@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * Default implementation of a last recently used cache mechanism using a HashMap. This implementation is thread-safe.
+ * {@link #setTargetSize(int)} is the number of items remaining in the cache, superfluous items are discarded and
+ * notified by the DisposeListener
+ */
 public class LRUCache<K, V> {
   private long m_nextSecondarySeq = 1;
   private int m_targetSize = 1000;
