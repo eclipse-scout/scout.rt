@@ -270,3 +270,43 @@ If the asynchronous loading of the first invocation of loadItemsAsyncInternal() 
 Solution:
 Rescheduling (and cancelling a currently running job) should only happen, if a previous job actually succeeded in loading the calendar items.
 Migration: None
+
+06.05.2011 imo
+- added IClientSession.getWebSessionId for ajax like apps with gui-backend-to-server-backend communication using virtual sessionId
+- associate state of service with client session instance / client session type for:
+org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkService (Done)
+org.eclipse.scout.rt.client.services.common.clientnotification.internal.ClientNotificationConsumerService (Done)
+org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy (Done)
+org.eclipse.scout.rt.client.services.common.exceptionhandler.internal.InternalClientExceptionHandlerService (Done)
+org.eclipse.scout.rt.client.services.common.security.AccessControlServiceClientProxy (Done)
+org.eclipse.scout.rt.client.services.common.security.PermissionServiceClientProxy (Done)
+org.eclipse.scout.rt.client.services.common.session.internal.ClientSessionRegistryService (Done)
+- added IClientSession.getWebSessionId to support for multi-session web guis such as rap/rwt, wicket, ajax
+Migration: None
+Except: If your project runs as web app (rap/rwt) make sure to refactor state of stateful services to be associated with each individual client session.
+This is normally done as:
+class MyStatefulService{
+  private static final String SESSION_DATA_KEY = "bookmarkServiceState";
+
+  private ServiceState getServiceState() {
+    IClientSession session = ClientJob.getCurrentSession();
+    if (session == null) {
+      LOG.warn("could not find a client session");
+      return null;
+    }
+    ServiceState data = (ServiceState) session.getData(SESSION_DATA_KEY);
+    if (data == null) {
+      data = new ServiceState();
+      session.setData(SESSION_DATA_KEY, data);
+    }
+    return data;
+  }
+
+  ...
+
+  private static class ServiceState {
+    //this was the global state of the service when run in a single-user osgi
+    EventListenerList m_listenerList = new EventListenerList();
+    BookmarkData m_model;
+  }
+}
