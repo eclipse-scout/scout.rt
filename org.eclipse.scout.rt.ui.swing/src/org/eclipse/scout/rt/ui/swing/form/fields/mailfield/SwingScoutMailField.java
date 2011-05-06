@@ -49,8 +49,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent.EventType;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
@@ -65,11 +65,11 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.FlowLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.JLabelEx;
@@ -560,7 +560,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
           handleSwingPopup(((SwingMailAttachmentView) source));
         }
       }
-      if(fix!=null) fix.mouseReleased(this, e);
+      if (fix != null) fix.mouseReleased(this, e);
     }
 
     @Override
@@ -664,7 +664,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("FormStateStoreAs");
+      return SwingUtility.getNlsText("FormStateStoreAs");
     }
 
     @Override
