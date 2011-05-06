@@ -570,6 +570,14 @@ public class StatementProcessor implements IStatementProcessor {
 
   protected String createSqlDump(boolean statementWithBinds, boolean statementPlainText) {
     StringBuffer debugBindBuf = new StringBuffer();
+    if (m_currentInputBindMap == null) {
+      try {
+        prepareInputStatementAndBinds();
+      }
+      catch (ProcessingException e) {
+        return e.getMessage();
+      }
+    }
     for (IBindInput in : m_inputList) {
       SqlBind bind = m_currentInputBindMap.get(in.getJdbcBindIndex());
       if (bind == null) {
