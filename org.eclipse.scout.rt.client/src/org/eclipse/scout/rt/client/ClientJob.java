@@ -122,7 +122,7 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
 
   @Override
   public boolean shouldSchedule() {
-    if (getClientSession() != null && getClientSession().isWebSession()) {
+    if (getClientSession() != null && getClientSession().isSingleThreadSession()) {
       runNow(new NullProgressMonitor());
       return false;
     }

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import java.util.Map;
+
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.FormData;
@@ -26,6 +28,11 @@ public interface IClientSession {
    * Monitor can be used to wait for changes of the states 'active' and 'loaded'
    */
   Object getStateLock();
+
+  /**
+   * @returns the reference to the immutable shared variable map
+   */
+  Map<String, Object> getSharedVariableMap();
 
   /**
    * Shared context variable containing the authenticated userId in lowercase
@@ -115,9 +122,27 @@ public interface IClientSession {
   void goOffline() throws ProcessingException;
 
   /**
-   * @return used to foce sync execution of client jobs
+   * @deprecated, use {@link #isSingleThreadSession()} instead
    */
+  @Deprecated
   boolean isWebSession();
+
+  /**
+   * @return used to force immediate (in-thread) execution of client jobs, see {@link ClientJob#shouldSchedule()}
+   *         <p>
+   *         used in apache wicket type of scout apps, NOT in rwt/rap type apps
+   */
+  boolean isSingleThreadSession();
+
+  /**
+   * @return rap/rwt/ajax session id (this is a uuid) or null if app is not running as web app
+   */
+  String getWebSessionId();
+
+  /**
+   * see {@link #getWebSessionId()}
+   */
+  void setWebSessionId(String sessionId);
 
   /**
    * @return

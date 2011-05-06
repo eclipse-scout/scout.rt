@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client;
 
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +65,8 @@ public abstract class AbstractClientSession implements IClientSession {
   private IServiceTunnel m_serviceTunnel;
   private Subject m_offlineSubject;
   private final SharedVariableMap m_sharedVariableMap;
-  private boolean m_webSession;
+  private boolean m_singleThreadSession;
+  private String m_webSessionId;
   private IMemoryPolicy m_memoryPolicy;
   private IIconLocator m_iconLocator;
   private final HashMap<String, Object> m_clientSessionData;
@@ -78,10 +80,18 @@ public abstract class AbstractClientSession implements IClientSession {
     }
   }
 
+  /**
+   * @deprecated use {@link #getConfiguredSingleThreadSession()} instead
+   */
+  @Deprecated
+  protected boolean getConfiguredWebSession() {
+    return getConfiguredSingleThreadSession();
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   @ConfigPropertyValue("false")
-  protected boolean getConfiguredWebSession() {
+  protected boolean getConfiguredSingleThreadSession() {
     return false;
   }
 
@@ -120,6 +130,11 @@ public abstract class AbstractClientSession implements IClientSession {
     return m_active;
   }
 
+  @Override
+  public Map<String, Object> getSharedVariableMap() {
+    return Collections.unmodifiableMap(m_sharedVariableMap);
+  }
+
   /**
    * do not use this internal method directly
    */
@@ -141,7 +156,7 @@ public abstract class AbstractClientSession implements IClientSession {
    */
 
   protected void initConfig() {
-    m_webSession = getConfiguredWebSession();
+    m_singleThreadSession = getConfiguredWebSession();
     m_virtualDesktop = new VirtualDesktop();
     setMemoryPolicy(new LargeMemoryPolicy());
     // add client notification listener
@@ -342,8 +357,24 @@ public abstract class AbstractClientSession implements IClientSession {
     OfflineState.setOfflineDefault(true);
   }
 
+  @SuppressWarnings("deprecation")
   public boolean isWebSession() {
-    return m_webSession;
+    return isSingleThreadSession();
+  }
+
+  @Override
+  public boolean isSingleThreadSession() {
+    return m_singleThreadSession;
+  }
+
+  @Override
+  public String getWebSessionId() {
+    return m_webSessionId;
+  }
+
+  @Override
+  public void setWebSessionId(String sessionId) {
+    m_webSessionId = sessionId;
   }
 
   protected IIconLocator createIconLocator() {

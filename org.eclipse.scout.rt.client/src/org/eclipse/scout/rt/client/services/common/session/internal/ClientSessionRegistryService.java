@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.services.common.session.internal;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -72,7 +71,7 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends IClientSession> T newClientSession(Class<T> clazz) {
+  public <T extends IClientSession> T newClientSession(Class<T> clazz, String webSessionId) {
     String symbolicName = clazz.getPackage().getName();
     Bundle bundleLocator = null;
     while (symbolicName != null) {
@@ -87,14 +86,17 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
     if (bundle != null) {
       try {
         IClientSession clientSession = clazz.newInstance();
+        if (webSessionId != null) {
+          clientSession.setWebSessionId(webSessionId);
+        }
         ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
           @Override
           protected void runVoid(IProgressMonitor monitor) throws Throwable {
             getCurrentSession().startSession(bundle);
           }
         };
-        //run now to run in calling Subjects context
-        job.runNow(new NullProgressMonitor());
+        job.schedule();
+        job.join();
         job.throwOnError();
         return (T) clientSession;
       }

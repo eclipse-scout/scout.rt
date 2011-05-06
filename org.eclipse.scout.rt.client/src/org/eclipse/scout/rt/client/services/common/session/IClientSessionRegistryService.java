@@ -24,13 +24,27 @@ public interface IClientSessionRegistryService extends IService {
    * @return the cached (if active) client session of type clazz or a new one if
    *         none was cached
    *         <p>
-   *         a new session is created and started once per osgi. It is cached as long as it is active. see
-   *         {@link IClientSession#isActive()} and {@link IClientSession#startSession(org.osgi.framework.Bundle)} Note:
-   *         If the creation of the session requires a special jaas context call it only inside a
+   *         a new such session is created and started once per osgi. It is cached as long as it is active. see
+   *         {@link IClientSession#isActive()} and {@link IClientSession#startSession(org.osgi.framework.Bundle)}
+   *         <p>
+   *         Note: If the creation of the session requires a special jaas context call it only inside a
    *         {@link Subject#doAs(Subject, java.security.PrivilegedAction)} section
+   *         <p>
+   *         Warning: only use this method if the client environment is swt, swing, ... and therefore supports singleton
+   *         user sessions. Don't use it with web apps (rap, rwt, wicket)
    */
   <T extends IClientSession> T getClientSession(Class<T> clazz);
 
-  <T extends IClientSession> T newClientSession(Class<T> clazz);
+  /**
+   * @param clazz
+   * @return a new client session of type clazz
+   *         <p>
+   *         A new session is created and started. see {@link IClientSession#isActive()} and
+   *         {@link IClientSession#startSession(org.osgi.framework.Bundle)}
+   *         <p>
+   *         Note: If the creation of the session requires a special jaas context call it only inside a
+   *         {@link Subject#doAs(Subject, java.security.PrivilegedAction)} section
+   */
+  <T extends IClientSession> T newClientSession(Class<T> clazz, String webSessionId);
 
 }
