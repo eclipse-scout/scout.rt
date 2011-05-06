@@ -18,7 +18,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -27,14 +29,28 @@ import org.eclipse.scout.service.AbstractService;
 @Priority(-1)
 public class InternalClientExceptionHandlerService extends AbstractService implements IExceptionHandlerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalClientExceptionHandlerService.class);
-  private final OptimisticLock m_handlerLock = new OptimisticLock();
+  private static final String SESSION_DATA_KEY = "clientExceptionHandlerServiceState";
 
   public InternalClientExceptionHandlerService() {
   }
 
+  private ServiceState getServiceState() {
+    IClientSession session = ClientJob.getCurrentSession();
+    if (session == null) {
+      throw new IllegalStateException("null client session in current job context");
+    }
+    ServiceState data = (ServiceState) session.getData(SESSION_DATA_KEY);
+    if (data == null) {
+      data = new ServiceState();
+      session.setData(SESSION_DATA_KEY, data);
+    }
+    return data;
+  }
+
   public void handleException(ProcessingException pe) {
+    ServiceState state = getServiceState();
     try {
-      if (m_handlerLock.acquire()) {
+      if (state.m_handlerLock.acquire()) {
         if (!pe.isConsumed()) {
           if (Platform.inDevelopmentMode() || !(pe instanceof VetoException)) {
             IProcessingStatus s = pe.getStatus();
@@ -73,7 +89,7 @@ public class InternalClientExceptionHandlerService extends AbstractService imple
       }
     }
     finally {
-      m_handlerLock.release();
+      state.m_handlerLock.release();
       pe.consume();
     }
   }
@@ -107,4 +123,9 @@ public class InternalClientExceptionHandlerService extends AbstractService imple
   protected void showExceptionInUI(ProcessingException pe) {
     new ErrorHandler(pe).showMessageBox();
   }
+
+  private static class ServiceState {
+    final OptimisticLock m_handlerLock = new OptimisticLock();
+  }
+
 }

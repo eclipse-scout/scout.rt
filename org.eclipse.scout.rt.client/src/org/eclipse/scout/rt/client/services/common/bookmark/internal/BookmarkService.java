@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,7 +19,9 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
@@ -35,20 +37,37 @@ import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * Client side service for bookmark support Uses the server side
- * {@link org.eclipse.scout.rt.client.ui.desktop.bookmark.IBookmarkStorageService} for data persistence
+ * Client side service for bookmark support
+ * <p>
+ * Uses the server side {@link org.eclipse.scout.rt.client.ui.desktop.bookmark.IBookmarkStorageService} for data
+ * persistence
+ * <p>
+ * service state is per {@link IClientSession} instance
  */
 @Priority(-3)
 public class BookmarkService extends AbstractService implements IBookmarkService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BookmarkService.class);
-
-  private final EventListenerList m_listenerList = new EventListenerList();
-  private final BookmarkData m_model;
+  private static final String SESSION_DATA_KEY = "bookmarkServiceState";
 
   public BookmarkService() {
-    m_model = new BookmarkData();
+    ServiceState state = getServiceState();
+    state.m_model = new BookmarkData();
   }
 
+  private ServiceState getServiceState() {
+    IClientSession session = ClientJob.getCurrentSession();
+    if (session == null) {
+      throw new IllegalStateException("null client session in current job context");
+    }
+    ServiceState data = (ServiceState) session.getData(SESSION_DATA_KEY);
+    if (data == null) {
+      data = new ServiceState();
+      session.setData(SESSION_DATA_KEY, data);
+    }
+    return data;
+  }
+
+  @SuppressWarnings("deprecation")
   @Override
   public void initializeService() {
     super.initializeService();
@@ -107,30 +126,35 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   }
 
   public void storeBookmarks() throws ProcessingException {
+    ServiceState state = getServiceState();
     IBookmarkStorageService storageService = SERVICES.getService(IBookmarkStorageService.class);
-    importBookmarks(storageService.storeBookmarkData(m_model));
+    importBookmarks(storageService.storeBookmarkData(state.m_model));
   }
 
   public void setStartBookmark() throws ProcessingException {
+    ServiceState state = getServiceState();
     Bookmark b = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
     b.setKind(Bookmark.USER_BOOKMARK);
-    m_model.getUserBookmarks().setStartupBookmark(b);
+    state.m_model.getUserBookmarks().setStartupBookmark(b);
   }
 
   public void deleteStartBookmark() throws ProcessingException {
-    m_model.getUserBookmarks().setStartupBookmark(null);
+    ServiceState state = getServiceState();
+    state.m_model.getUserBookmarks().setStartupBookmark(null);
   }
 
   public Bookmark getStartBookmark() {
-    Bookmark b = m_model.getUserBookmarks().getStartupBookmark();
+    ServiceState state = getServiceState();
+    Bookmark b = state.m_model.getUserBookmarks().getStartupBookmark();
     if (b == null) {
-      b = m_model.getGlobalBookmarks().getStartupBookmark();
+      b = state.m_model.getGlobalBookmarks().getStartupBookmark();
     }
     return b;
   }
 
   public final BookmarkData getBookmarkData() {
-    return m_model;
+    ServiceState state = getServiceState();
+    return state.m_model;
   }
 
   public void activate(Bookmark b) throws ProcessingException {
@@ -145,11 +169,13 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   }
 
   public void addBookmarkServiceListener(BookmarkServiceListener listener) {
-    m_listenerList.add(BookmarkServiceListener.class, listener);
+    ServiceState state = getServiceState();
+    state.m_listenerList.add(BookmarkServiceListener.class, listener);
   }
 
   public void removeBookmarkServiceListener(BookmarkServiceListener listener) {
-    m_listenerList.remove(BookmarkServiceListener.class, listener);
+    ServiceState state = getServiceState();
+    state.m_listenerList.remove(BookmarkServiceListener.class, listener);
   }
 
   private void fireBookmarksChanged() {
@@ -158,7 +184,8 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   }
 
   private void fireBookmarkSeviceEvent(BookmarkServiceEvent e) {
-    EventListener[] a = m_listenerList.getListeners(BookmarkServiceListener.class);
+    ServiceState state = getServiceState();
+    EventListener[] a = state.m_listenerList.getListeners(BookmarkServiceListener.class);
     if (a != null) {
       for (int i = 0; i < a.length; i++) {
         ((BookmarkServiceListener) a[i]).bookmarksChanged(e);
@@ -167,9 +194,14 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   }
 
   private void importBookmarks(BookmarkData model) throws ProcessingException {
-    m_model.setUserBookmarks(model.getUserBookmarks());
-    m_model.setGlobalBookmarks(model.getGlobalBookmarks());
+    ServiceState state = getServiceState();
+    state.m_model.setUserBookmarks(model.getUserBookmarks());
+    state.m_model.setGlobalBookmarks(model.getGlobalBookmarks());
     fireBookmarksChanged();
   }
 
+  private static class ServiceState {
+    EventListenerList m_listenerList = new EventListenerList();
+    BookmarkData m_model;
+  }
 }

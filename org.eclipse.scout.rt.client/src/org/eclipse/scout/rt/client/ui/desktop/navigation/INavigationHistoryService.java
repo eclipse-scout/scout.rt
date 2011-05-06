@@ -20,7 +20,7 @@ import org.eclipse.scout.service.IService2;
 
 @Priority(-3)
 public interface INavigationHistoryService extends IService2 {
-  public static final String NAVIGATION_HISTORY_USER_OBJECT = "navigationHistoryUserObject";
+  String SERVICE_DATA_KEY = "navigationHistoryServiceData";
 
   /**
    * add a navigation savepoint

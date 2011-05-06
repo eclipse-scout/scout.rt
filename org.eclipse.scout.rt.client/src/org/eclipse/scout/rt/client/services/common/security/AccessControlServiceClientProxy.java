@@ -21,7 +21,9 @@ import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
@@ -34,19 +36,34 @@ import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlCh
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 
+/**
+ * Access control permissions received from backend (JAAS permissions), cached for convenience and performance.
+ * <p>
+ * Service state is per [{@link IClientSession} instance and stored as {@link IClientSession#getData(String)}
+ */
 @Priority(-3)
 public class AccessControlServiceClientProxy extends AbstractService implements IAccessControlService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlServiceClientProxy.class);
-
-  private final Object m_cacheLock = new Object();
-  // permissions cache
-  private Permissions m_permissions;
-  // query cache
-  private TTLCache<String, Boolean> m_checkPermissionCache = new TTLCache<String, Boolean>();
+  private static final String SESSION_DATA_KEY = "accessControlServiceState";
 
   public AccessControlServiceClientProxy() {
   }
 
+  private ServiceState getServiceState() {
+    IClientSession session = ClientJob.getCurrentSession();
+    if (session == null) {
+      LOG.warn("could not find a client session");
+      return null;
+    }
+    ServiceState data = (ServiceState) session.getData(SESSION_DATA_KEY);
+    if (data == null) {
+      data = new ServiceState();
+      session.setData(SESSION_DATA_KEY, data);
+    }
+    return data;
+  }
+
+  @SuppressWarnings("deprecation")
   @Override
   public void initializeService() {
     super.initializeService();
@@ -54,8 +71,9 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
     SERVICES.getService(IClientNotificationConsumerService.class).addClientNotificationConsumerListener(new IClientNotificationConsumerListener() {
       public void handleEvent(ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification().getClass() == AccessControlChangedNotification.class) {
-          synchronized (m_cacheLock) {
-            m_permissions = ((AccessControlChangedNotification) e.getClientNotification()).getPermissions();
+          ServiceState state = getServiceState();
+          synchronized (state.m_cacheLock) {
+            state.m_permissions = ((AccessControlChangedNotification) e.getClientNotification()).getPermissions();
           }
         }
         else if (e.getClientNotification().getClass() == ResetAccessControlChangedNotification.class) {
@@ -66,31 +84,33 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   public boolean checkPermission(Permission p) {
-    ensureCacheLoaded();
+    ServiceState state = getServiceState();
+    ensureCacheLoaded(state);
     if (p == null) {
       return true;
     }
-    if (m_permissions == null) {
+    if (state.m_permissions == null) {
       return true;
     }
     else {
-      Boolean b = m_checkPermissionCache.get(p.getName());
+      Boolean b = state.m_checkPermissionCache.get(p.getName());
       if (b == null) {
         try {
-          b = m_permissions.implies(p);
+          b = state.m_permissions.implies(p);
         }
         catch (FineGrainedAccessCheckRequiredException e) {
           // must be checked online
           b = getRemoteService().checkPermission(p);
         }
-        m_checkPermissionCache.put(p.getName(), b);
+        state.m_checkPermissionCache.put(p.getName(), b);
       }
       return b;
     }
   }
 
   public int getPermissionLevel(Permission p) {
-    ensureCacheLoaded();
+    ServiceState state = getServiceState();
+    ensureCacheLoaded(state);
     if (p == null) {
       return BasicHierarchyPermission.LEVEL_NONE;
     }
@@ -99,13 +119,13 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
       else return BasicHierarchyPermission.LEVEL_NONE;
     }
     BasicHierarchyPermission hp = (BasicHierarchyPermission) p;
-    if (m_permissions == null) {
+    if (state.m_permissions == null) {
       List<Integer> levels = hp.getValidLevels();
       return levels.get(levels.size() - 1);
     }
     else {
       int maxLevel = BasicHierarchyPermission.LEVEL_UNDEFINED;
-      Enumeration<Permission> en = m_permissions.elements();
+      Enumeration<Permission> en = state.m_permissions.elements();
       while (en.hasMoreElements()) {
         Permission grantedPermission = en.nextElement();
 
@@ -130,17 +150,18 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   public Permissions getPermissions() {
-    ensureCacheLoaded();
-    return m_permissions;
+    ServiceState state = getServiceState();
+    ensureCacheLoaded(state);
+    return state.m_permissions;
   }
 
-  private void ensureCacheLoaded() {
-    synchronized (m_cacheLock) {
-      if (m_permissions == null) {
+  private void ensureCacheLoaded(ServiceState state) {
+    synchronized (state.m_cacheLock) {
+      if (state.m_permissions == null) {
         // clear cache
-        m_checkPermissionCache = new TTLCache<String, Boolean>(BasicHierarchyPermission.getCacheTimeoutMillis());
+        state.m_checkPermissionCache = new TTLCache<String, Boolean>(BasicHierarchyPermission.getCacheTimeoutMillis());
         // load permissions from backend
-        m_permissions = getRemoteService().getPermissions();
+        state.m_permissions = getRemoteService().getPermissions();
       }
     }
   }
@@ -150,8 +171,9 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   public void clearCache() {
-    synchronized (m_cacheLock) {
-      m_permissions = null;
+    ServiceState state = getServiceState();
+    synchronized (state.m_cacheLock) {
+      state.m_permissions = null;
     }
   }
 
@@ -168,5 +190,13 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
    */
   public boolean checkServiceTunnelAccess(Class serviceInterface, Method method, Object[] args) {
     return false;
+  }
+
+  private static class ServiceState {
+    final Object m_cacheLock = new Object();
+    // permissions cache
+    Permissions m_permissions;
+    // query cache
+    TTLCache<String, Boolean> m_checkPermissionCache = new TTLCache<String, Boolean>();
   }
 }

@@ -92,17 +92,14 @@ public class NavigationHistoryService extends AbstractService implements INaviga
 
   private UserNavigationHistory getUserNavigationHistory() {
     IClientSession session = ClientJob.getCurrentSession();
-    if (session != null) {
-      Object data = session.getData(NAVIGATION_HISTORY_USER_OBJECT);
-      if (data == null) {
-        data = new UserNavigationHistory();
-        session.setData(NAVIGATION_HISTORY_USER_OBJECT, data);
-      }
-      if (data instanceof UserNavigationHistory) {
-        return (UserNavigationHistory) data;
-      }
+    if (session == null) {
+      throw new IllegalStateException("null client session in current job context");
     }
-    LOG.warn("could not find client session.");
-    return null;
+    UserNavigationHistory data = (UserNavigationHistory) session.getData(SERVICE_DATA_KEY);
+    if (data == null) {
+      data = new UserNavigationHistory();
+      session.setData(SERVICE_DATA_KEY, data);
+    }
+    return data;
   }
 }
