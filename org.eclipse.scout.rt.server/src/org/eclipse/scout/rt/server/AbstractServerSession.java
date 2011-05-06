@@ -81,6 +81,7 @@ public abstract class AbstractServerSession implements IServerSession {
     return false;
   }
 
+  @Override
   public Map<String, Object> getSharedVariableMap() {
     return m_sharedVariableMap;
   }
@@ -129,10 +130,12 @@ public abstract class AbstractServerSession implements IServerSession {
   /**
    * The session is running in its event loop
    */
+  @Override
   public boolean isActive() {
     return m_active;
   }
 
+  @Override
   public final String getUserId() {
     return getSharedContextVariable("userId", String.class);
   }
@@ -176,20 +179,24 @@ public abstract class AbstractServerSession implements IServerSession {
     setUserIdSearchPatterns(a);
   }
 
+  @Override
   public NlsLocale getNlsLocale() {
     return m_nlsLocale;
   }
 
+  @Override
   public void setNlsLocale(NlsLocale l) {
     if (l != null) {
       m_nlsLocale = l;
     }
   }
 
+  @Override
   public Locale getLocale() {
     return m_locale;
   }
 
+  @Override
   public void setLocale(Locale l) {
     if (l != null) {
       m_locale = l;
@@ -204,10 +211,12 @@ public abstract class AbstractServerSession implements IServerSession {
     return null;
   }
 
+  @Override
   public Object getAttribute(Object key) {
     return m_attributes.get(key);
   }
 
+  @Override
   public void setAttribute(Object key, Object value) {
     m_attributes.put(key, value);
   }
@@ -216,6 +225,7 @@ public abstract class AbstractServerSession implements IServerSession {
     m_webSession = getConfiguredWebSession();
     if (!isWebSession()) {
       m_sharedVariableMap.addPropertyChangeListener(new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
           // notify this session
           SERVICES.getService(IClientNotificationService.class).putNotification(new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap)), new SessionFilter(AbstractServerSession.this, 60000L));
@@ -226,10 +236,12 @@ public abstract class AbstractServerSession implements IServerSession {
     m_initialized = true;
   }
 
+  @Override
   public Bundle getBundle() {
     return m_bundle;
   }
 
+  @Override
   public final void loadSession(Bundle bundle) throws ProcessingException {
     if (isActive()) throw new IllegalStateException("session is active");
     if (bundle == null) throw new IllegalArgumentException("bundle must not be null");
@@ -254,6 +266,7 @@ public abstract class AbstractServerSession implements IServerSession {
   protected void execLocaleChanged() throws ProcessingException {
   }
 
+  @Override
   public boolean isWebSession() {
     return m_webSession;
   }
