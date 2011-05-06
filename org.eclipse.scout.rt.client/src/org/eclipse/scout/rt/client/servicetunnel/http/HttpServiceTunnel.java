@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.servicetunnel.http;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLConnection;
-import java.security.AccessController;
 
 import javax.security.auth.Subject;
 
@@ -26,11 +25,21 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
+/**
+ * If {@link IClientSession#getWebSessionId()} is not null then it is sent with every request as http header
+ * "Ajax-SessionId" together with "Ajax-UserId"
+ * to the /ajax servlet.
+ * <p>
+ * This is necessary since the web-gui-servlet is itself a single servlet that is calling the server-servlet /process
+ * with a single cookie and therefore a single http session. When "Ajax-SessionId" is set, the ServiceTunnelServlet
+ * /process recognizes this and is not associating the scout server session with the HttpSession but with a custom cache
+ * associated with this ajax (remote) session id.
+ * <p>
+ * The "Ajax-UserId" header is added to impersonate the originally calling user (retrieved from the current
+ * {@link Subject}s first principal).
+ */
 public class HttpServiceTunnel extends InternalHttpServiceTunnel {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.client.http.debug";
-
-  private String m_ajaxSessionId;
-  private String m_ajaxUserId;
 
   public HttpServiceTunnel(IClientSession session, String url) throws ProcessingException {
     super(session, url);
@@ -48,30 +57,6 @@ public class HttpServiceTunnel extends InternalHttpServiceTunnel {
    */
   public HttpServiceTunnel(IClientSession session, String url, String version) throws ProcessingException {
     super(session, url, version);
-  }
-
-  /**
-   * true: The ajaxSessionId is sent with every request as http header "Ajax-SessionId" to the /process servlet.
-   * <p>
-   * This is necessary since the web-gui-servlet is itself a single servlet that is calling the server-servlet /process
-   * with a single cookie and therefore a single http session. When "Ajax-SessionId" is set, the ServiceTunnelServlet
-   * /process recognizes this and is not associating the scout server session with the HttpSession but with a custom
-   * cache associated with this ajax (remote) session id.
-   * <p>
-   * In addition, a "Ajax-UserId" header is added to impersonate the originally calling user (retrieved from the current
-   * {@link Subject}s first principal).
-   */
-  public void setAjaxSessionId(String ajaxSessionId) {
-    m_ajaxSessionId = ajaxSessionId;
-    String userId = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next().getName();
-    m_ajaxUserId = userId;
-  }
-
-  /**
-   * see {@link #setAjaxSessionId(String)}
-   */
-  public String getAjaxSessionId() {
-    return m_ajaxSessionId;
   }
 
   @Override
@@ -100,6 +85,9 @@ public class HttpServiceTunnel extends InternalHttpServiceTunnel {
     return super.createURLConnection(call, callData);
   }
 
+  private String m_ajaxSessionId;
+  private String m_ajaxUserId;
+
   /**
    * @param method
    *          GET or POST override this method to add custom HTTP headers
@@ -107,10 +95,6 @@ public class HttpServiceTunnel extends InternalHttpServiceTunnel {
   @Override
   protected void addCustomHeaders(URLConnection urlConn, String method) throws IOException {
     super.addCustomHeaders(urlConn, method);
-    if (m_ajaxSessionId != null) {
-      urlConn.setRequestProperty("Ajax-SessionId", m_ajaxSessionId);
-      urlConn.setRequestProperty("Ajax-UserId", m_ajaxUserId);
-    }
   }
 
   /**

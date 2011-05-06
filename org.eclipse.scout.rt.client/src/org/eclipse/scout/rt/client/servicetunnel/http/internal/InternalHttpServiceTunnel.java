@@ -16,6 +16,9 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessController;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -33,11 +36,15 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
+ *
  */
 public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
   private IServiceTunnelContentHandler m_contentHandler;
   private ClientNotificationPollingJob m_pollingJob;
   private final Object m_pollingJobLock = new Object();
+  //
+  private String m_ajaxSessionId;
+  private String m_ajaxUserId;
 
   public InternalHttpServiceTunnel(IClientSession session, String url) throws ProcessingException {
     this(session, url, null);
@@ -62,6 +69,11 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
     }
     catch (MalformedURLException e) {
       throw new ProcessingException(url, e);
+    }
+    if (session.getWebSessionId() != null) {
+      m_ajaxSessionId = session.getWebSessionId();
+      String userId = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next().getName();
+      m_ajaxUserId = userId;
     }
   }
 
@@ -115,7 +127,10 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
    *          GET or POST override this method to add custom HTTP headers
    */
   protected void addCustomHeaders(URLConnection urlConn, String method) throws IOException {
-    // urlConn.setRequestProperty(headerName, headerValue);
+    if (m_ajaxSessionId != null && m_ajaxUserId != null) {
+      urlConn.setRequestProperty("Ajax-SessionId", m_ajaxSessionId);
+      urlConn.setRequestProperty("Ajax-UserId", m_ajaxUserId);
+    }
   }
 
   private void updatePollingJobInternal() {
