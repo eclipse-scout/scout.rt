@@ -2709,6 +2709,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_listenerList.insert(TableListener.class, listener, 0);
   }
 
+  public IMenu[] fetchMenusForRowsInternal(ITableRow[] rows) {
+    TableEvent e;
+    if (rows.length == 0) {
+      e = new TableEvent(this, TableEvent.TYPE_EMPTY_SPACE_POPUP);
+    }
+    else {
+      e = new TableEvent(this, TableEvent.TYPE_ROW_POPUP, rows);
+    }
+    fireTableEventInternal(e);
+    return e.getPopupMenus();
+  }
+
   private void fireRowsInserted(ITableRow[] rows) {
     synchronized (m_cachedFilteredRowsLock) {
       m_cachedFilteredRows = null;

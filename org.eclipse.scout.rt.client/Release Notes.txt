@@ -267,3 +267,17 @@ If the asynchronous loading of the first invocation of loadItemsAsyncInternal() 
 Solution:
 Rescheduling (and cancelling a currently running job) should only happen, if a previous job actually succeeded in loading the calendar items.
 Migration: None
+
+08.05.2011 dwi
+bsi ticket #99504
+Problem:
+On the associated folder table of a AbstractPageWithNodes, there was no popup menu support.
+Solution:
+Added support to have the very same menus on the associated folder table as on the AbstractPageWithNodes itself.
+There was some change necessary on ITable and ITree to obtain the validated menus from within the model
+Methods added:
+- ITree#fetchMenusForNodesInternal (AbstractTree#fetchMenusForNodesInternal)
+- ITable#fetchMenusForRowsInternal (AbstractTable#fetchMenusForRowsInternal)
+Methods changed:
+- AbstractPageWithNodes$P_TableListener#tableChanged
+Migration: None

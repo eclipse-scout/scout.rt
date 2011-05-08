@@ -322,13 +322,27 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
             try {
               node.ensureChildrenLoaded();
               IPageWithTable<?> tablePage = (IPageWithTable<?>) node;
-              IMenu[] menus = tablePage.getTable().getUIFacade().fireEmptySpacePopupFromUI();
+              IMenu[] menus = tablePage.getTable().fetchMenusForRowsInternal(new ITableRow[0]);
               if (menus != null) {
                 e.addPopupMenus(menus);
               }
             }
             catch (ProcessingException ex) {
               SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+            }
+          }
+          else if (node instanceof IPageWithNodes) {
+            IPageWithNodes nodePage = (IPageWithNodes) node;
+            try {
+              ITreeNode treeNode = getTree().resolveVirtualNode(nodePage);
+              IMenu[] menus = getTree().fetchMenusForNodesInternal(new ITreeNode[]{treeNode});
+
+              if (menus != null) {
+                e.addPopupMenus(menus);
+              }
+            }
+            catch (ProcessingException e1) {
+              SERVICES.getService(IExceptionHandlerService.class).handleException(e1);
             }
           }
           break;

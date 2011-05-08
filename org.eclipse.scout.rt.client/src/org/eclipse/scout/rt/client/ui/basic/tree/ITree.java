@@ -392,6 +392,18 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    */
   void importTreeData(AbstractTreeFieldData source) throws ProcessingException;
 
+  /**
+   * To obtain the menus that passed checks such as visibility, empty space action, ... for the given nodes.
+   * Please be cautious as depending on the given nodes, there might be a node mismatch among the selected tree nodes
+   * and the menu context node.
+   * This method is not part of the public API.
+   * 
+   * @param nodes
+   *          the nodes whose menus should be returned
+   * @return
+   */
+  IMenu[] fetchMenusForNodesInternal(ITreeNode[] nodes);
+
   /*
    * UI Processes
    */
