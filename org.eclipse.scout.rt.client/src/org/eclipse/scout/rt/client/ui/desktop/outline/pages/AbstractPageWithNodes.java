@@ -322,7 +322,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
             try {
               node.ensureChildrenLoaded();
               IPageWithTable<?> tablePage = (IPageWithTable<?>) node;
-              IMenu[] menus = tablePage.getTable().getUIFacade().fireEmptySpacePopupFromUI();
+              IMenu[] menus = tablePage.getTable().fetchMenusForRowsInternal(new ITableRow[0]);
               if (menus != null) {
                 e.addPopupMenus(menus);
               }
@@ -333,9 +333,16 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
           }
           else if (node instanceof IPageWithNodes) {
             IPageWithNodes nodePage = (IPageWithNodes) node;
-            IMenu[] menus = nodePage.getMenus();
-            if (menus != null) {
-              e.addPopupMenus(menus);
+            try {
+              ITreeNode treeNode = getTree().resolveVirtualNode(nodePage);
+              IMenu[] menus = getTree().fetchMenusForNodesInternal(new ITreeNode[]{treeNode});
+
+              if (menus != null) {
+                e.addPopupMenus(menus);
+              }
+            }
+            catch (ProcessingException e1) {
+              SERVICES.getService(IExceptionHandlerService.class).handleException(e1);
             }
           }
           break;

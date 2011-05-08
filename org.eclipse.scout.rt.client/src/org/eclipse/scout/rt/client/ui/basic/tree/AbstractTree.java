@@ -594,7 +594,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     IMenu[] menus;
     try {
       ITreeNode[] nodes = resolveVirtualNodes(getSelectedNodes());
-      menus = fetchMenusForNodes(nodes);
+      menus = fetchMenusForNodesInternal(nodes);
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -1688,7 +1688,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
-  private IMenu[] fetchMenusForNodes(ITreeNode[] nodes) {
+  public IMenu[] fetchMenusForNodesInternal(ITreeNode[] nodes) {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_POPUP, nodes);
     // single observer for tree-owned menus
     addLocalPopupMenus(e);
@@ -2195,7 +2195,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         pushUIProcessor();
         //
         ITreeNode[] nodes = resolveVirtualNodes(getSelectedNodes());
-        return fetchMenusForNodes(nodes);
+        return fetchMenusForNodesInternal(nodes);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -2210,7 +2210,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       try {
         pushUIProcessor();
         //
-        return fetchMenusForNodes(new ITreeNode[0]);
+        return fetchMenusForNodesInternal(new ITreeNode[0]);
       }
       finally {
         popUIProcessor();
