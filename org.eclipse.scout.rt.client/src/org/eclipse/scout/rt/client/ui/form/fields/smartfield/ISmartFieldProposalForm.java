@@ -32,8 +32,10 @@ public interface ISmartFieldProposalForm extends IForm {
    * @param selectCurrentValue
    *          select the current smartfield value in the proposal table/tree/custom
    *          If necessary in a tree, load the tree children until the key is found
+   * @param synchronous
+   *          true to execute the lookup call synchronous
    */
-  void update(boolean selectCurrentValue) throws ProcessingException;
+  void update(boolean selectCurrentValue, boolean synchronous) throws ProcessingException;
 
   /**
    * Force a proposal to be selected if possible, this means that for example if there is just one proposal, then select

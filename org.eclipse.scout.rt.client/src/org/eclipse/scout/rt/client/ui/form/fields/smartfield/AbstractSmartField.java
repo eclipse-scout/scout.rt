@@ -752,11 +752,11 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
             smartForm = createProposalForm();
             smartForm.setSearchText(text);
             smartForm.startForm();
-            smartForm.update(false);
+            smartForm.update(false, true);
           }
           else {
             smartForm.setSearchText(text);
-            smartForm.update(false);
+            smartForm.update(false, true);
           }
           acceptedProposalRow = smartForm.getAcceptedProposal();
           if (acceptedProposalRow != null) {
@@ -952,7 +952,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   public void applyLazyStyles() {
     // override: ensure that (async loading) lookup context has been set
     if (m_currentGetLookupRowByKeyJob != null) {
-      if (m_currentGetLookupRowByKeyJob.getClientSession() == ClientSyncJob.getCurrentSession()) {
+      if (m_currentGetLookupRowByKeyJob.getClientSession() == ClientSyncJob.getCurrentSession() && ClientSyncJob.isSyncClientJob()) {
         m_currentGetLookupRowByKeyJob.runNow(new NullProgressMonitor());
       }
     }
@@ -1451,14 +1451,14 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
           smartForm.setSearchText(newText);
           smartForm.startForm();
           if (smartForm.isFormOpen()) {
-            smartForm.update(selectCurrentValue);
+            smartForm.update(selectCurrentValue, false);
             registerProposalFormInternal(smartForm);
           }
         }
         else {
           if (!StringUtility.equalsIgnoreNewLines(smartForm.getSearchText(), newText)) {
             smartForm.setSearchText(newText);
-            smartForm.update(false);
+            smartForm.update(false, false);
           }
         }
       }
