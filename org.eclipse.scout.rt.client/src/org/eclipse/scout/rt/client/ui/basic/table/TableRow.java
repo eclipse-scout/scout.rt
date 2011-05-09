@@ -32,11 +32,15 @@ public class TableRow implements ITableRow {
   private boolean m_rowPropertiesChanged;
   private int m_rowChanging = 0;
 
+  /**
+   * @param columnSet
+   *          may be null
+   */
   public TableRow(ColumnSet columnSet) {
     m_columnSet = columnSet;
     m_enabled = true;
     m_status = STATUS_NON_CHANGED;
-    int colCount = columnSet.getColumnCount();
+    int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
     m_cells = new ArrayList<Cell>(colCount);
     for (int i = 0; i < colCount; i++) {
       m_cells.add(new Cell());
