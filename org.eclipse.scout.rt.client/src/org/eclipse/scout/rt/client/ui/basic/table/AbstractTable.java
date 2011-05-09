@@ -282,7 +282,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @ConfigOperation
   @Order(40)
-  protected void execDecorateCell(Cell view, ITableRow row, IColumn col) throws ProcessingException {
+  protected void execDecorateCell(Cell view, ITableRow row, IColumn<?> col) throws ProcessingException {
   }
 
   /**
@@ -402,7 +402,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     ArrayList<IColumn<?>> colList = new ArrayList<IColumn<?>>();
     for (int i = 0; i < ca.length; i++) {
       try {
-        IColumn column = ConfigurationUtility.newInnerInstance(this, ca[i]);
+        IColumn<?> column = ConfigurationUtility.newInnerInstance(this, ca[i]);
         colList.add(column);
       }
       catch (Exception e) {
@@ -581,7 +581,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   protected void initTableInternal() throws ProcessingException {
-    for (IColumn c : getColumnSet().getColumns()) {
+    for (IColumn<?> c : getColumnSet().getColumns()) {
       c.initColumn();
     }
     getColumnSet().initialize();
@@ -601,12 +601,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   protected void disposeTableInternal() throws ProcessingException {
-    for (IColumn c : getColumnSet().getColumns()) {
+    for (IColumn<?> c : getColumnSet().getColumns()) {
       c.disposeColumn();
     }
   }
 
-  public void doHyperlinkAction(ITableRow row, IColumn col, URL url) throws ProcessingException {
+  public void doHyperlinkAction(ITableRow row, IColumn<?> col, URL url) throws ProcessingException {
     if (row != null && col != null) {
       selectRow(row);
       setContextColumn(col);
@@ -695,7 +695,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return getColumnSet().getColumnCount();
   }
 
-  public IColumn[] getColumns() {
+  public IColumn<?>[] getColumns() {
     return getColumnSet().getColumns();
   }
 
@@ -719,7 +719,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return getHeaderCell(getColumnSet().getColumn(columnIndex));
   }
 
-  public IHeaderCell getHeaderCell(IColumn col) {
+  public IHeaderCell getHeaderCell(IColumn<?> col) {
     return col.getHeaderCell();
   }
 
@@ -740,11 +740,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   public ICell getSummaryCell(ITableRow row) {
-    IColumn[] a = getColumnSet().getSummaryColumns();
+    IColumn<?>[] a = getColumnSet().getSummaryColumns();
     if (a.length == 0) {
-      IColumn col = getColumnSet().getFirstVisibleColumn();
+      IColumn<?> col = getColumnSet().getFirstVisibleColumn();
       if (col != null) {
-        a = new IColumn[]{col};
+        a = new IColumn<?>[]{col};
       }
     }
     if (a.length == 0) {
@@ -765,7 +765,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         cell.setIconId(row.getIconId());
       }
       StringBuilder b = new StringBuilder();
-      for (IColumn c : a) {
+      for (IColumn<?> c : a) {
         if (b.length() > 0) {
           b.append(" ");
         }
@@ -776,7 +776,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  public ICell getCell(ITableRow row, IColumn col) {
+  public ICell getCell(ITableRow row, IColumn<?> col) {
     row = resolveRow(row);
     if (row == null || col == null) return null;
     return row.getCell(col.getColumnIndex());
@@ -799,7 +799,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Note that this is not a java bean method and thus not thread-safe
    */
-  public boolean isCellEditable(ITableRow row, IColumn column) {
+  public boolean isCellEditable(ITableRow row, IColumn<?> column) {
     return row != null && column != null && column.isCellEditable(row);
   }
 
@@ -1495,6 +1495,58 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return list.toArray(new ITableRow[list.size()]);
   }
 
+  public void checkRow(int row, boolean value) {
+    checkRow(getRow(row), value);
+  }
+
+  public void checkRow(ITableRow row, boolean value) {
+    if (!row.isEnabled()) {
+      return;
+    }
+    if (!isMultiCheck() && value && getCheckedRows().length > 0) {
+      uncheckAllRows();
+    }
+    row.setChecked(value);
+  }
+
+  public void checkRows(ITableRow[] rows, boolean value) {
+    rows = resolveRows(rows);
+    // check checked count with multicheck
+    if (rows.length > 1 && !isMultiCheck()) {
+      ITableRow first = rows[0];
+      first.setChecked(value);
+    }
+    else {
+      for (ITableRow row : rows) {
+        checkRow(row, value);
+      }
+    }
+  }
+
+  public void checkAllRows() {
+    try {
+      setTableChanging(true);
+      for (int i = 0; i < getRowCount(); i++) {
+        checkRow(i, true);
+      }
+    }
+    finally {
+      setTableChanging(false);
+    }
+  }
+
+  public void uncheckAllRows() {
+    try {
+      setTableChanging(true);
+      for (int i = 0; i < getRowCount(); i++) {
+        checkRow(i, false);
+      }
+    }
+    finally {
+      setTableChanging(false);
+    }
+  }
+
   public String getDefaultIconId() {
     String iconId = propertySupport.getPropertyString(PROP_DEFAULT_ICON);
     if (iconId != null && iconId.length() == 0) iconId = null;
@@ -1617,7 +1669,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return data;
   }
 
-  public Object[][] exportTableRowsAsCSV(ITableRow[] rows, IColumn[] columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormats) {
+  public Object[][] exportTableRowsAsCSV(ITableRow[] rows, IColumn<?>[] columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormats) {
     return TableUtility.exportRowsAsCSV(rows, columns, includeLineForColumnNames, includeLineForColumnTypes, includeLineForColumnFormats);
   }
 
@@ -2031,16 +2083,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  public void setContextColumn(IColumn col) {
+  public void setContextColumn(IColumn<?> col) {
     propertySupport.setProperty(PROP_CONTEXT_COLUMN, col);
   }
 
-  public IColumn getContextColumn() {
-    return (IColumn) propertySupport.getProperty(PROP_CONTEXT_COLUMN);
+  public IColumn<?> getContextColumn() {
+    return (IColumn<?>) propertySupport.getProperty(PROP_CONTEXT_COLUMN);
   }
 
   public void clearDeletedRows() {
-    for (Iterator it = m_deletedRows.values().iterator(); it.hasNext();) {
+    for (Iterator<ITableRow> it = m_deletedRows.values().iterator(); it.hasNext();) {
       ((InternalTableRow) it.next()).setTableInternal(null);
     }
     m_deletedRows.clear();
@@ -2061,7 +2113,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   public ITableRow findRowByKey(Object[] keys) {
-    IColumn[] keyColumns = getColumnSet().getKeyColumns();
+    IColumn<?>[] keyColumns = getColumnSet().getKeyColumns();
     if (keyColumns.length == 0) {
       keyColumns = getColumnSet().getColumns();
     }
@@ -2109,7 +2161,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public void sort() {
     try {
       if (isSortEnabled()) {
-        IColumn[] sortCols = getColumnSet().getSortColumns();
+        IColumn<?>[] sortCols = getColumnSet().getSortColumns();
         if (sortCols.length > 0) {
           // first make sure decorations and lookups are up-to-date
           processDecorationBuffer();
@@ -2202,37 +2254,37 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private void resetColumnsInternal(boolean visibility, boolean order, boolean sorting, boolean widths) {
     ClientUIPreferences env = ClientUIPreferences.getInstance();
-    for (IColumn col : getColumns()) {
+    for (IColumn<?> col : getColumns()) {
       env.removeTableColumnPreferences(col, visibility, order, sorting, widths);
     }
     //Visibilities
     if (visibility) {
-      ArrayList<IColumn> list = new ArrayList<IColumn>();
-      for (IColumn col : getColumnSet().getAllColumnsInUserOrder()) {
+      ArrayList<IColumn<?>> list = new ArrayList<IColumn<?>>();
+      for (IColumn<?> col : getColumnSet().getAllColumnsInUserOrder()) {
         if (col.isDisplayable()) {
-          boolean configuredVisible = ((AbstractColumn) col).isInitialVisible();
+          boolean configuredVisible = ((AbstractColumn<?>) col).isInitialVisible();
           if (configuredVisible) {
             list.add(col);
           }
         }
       }
-      getColumnSet().setVisibleColumns(list.toArray(new IColumn[list.size()]));
+      getColumnSet().setVisibleColumns(list.toArray(new IColumn<?>[list.size()]));
     }
     //Order
     if (order) {
-      ArrayList<IColumn> list = new ArrayList<IColumn>();
-      for (IColumn col : getColumns()) {
+      ArrayList<IColumn<?>> list = new ArrayList<IColumn<?>>();
+      for (IColumn<?> col : getColumns()) {
         if (col.isDisplayable() && col.isVisible()) {
           list.add(col);
         }
       }
-      getColumnSet().setVisibleColumns(list.toArray(new IColumn[list.size()]));
+      getColumnSet().setVisibleColumns(list.toArray(new IColumn<?>[list.size()]));
     }
     //Sorting
     if (sorting) {
-      TreeMap<CompositeObject, IColumn> sortMap = new TreeMap<CompositeObject, IColumn>();
+      TreeMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<CompositeObject, IColumn<?>>();
       int index = 0;
-      for (IColumn col : getColumns()) {
+      for (IColumn<?> col : getColumns()) {
         if (col.getInitialSortIndex() >= 0) {
           sortMap.put(new CompositeObject(col.getInitialSortIndex(), index), col);
         }
@@ -2242,7 +2294,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       getColumnSet().clearSortColumns();
       getColumnSet().clearPermanentHeadSortColumns();
       getColumnSet().clearPermanentTailSortColumns();
-      for (IColumn col : sortMap.values()) {
+      for (IColumn<?> col : sortMap.values()) {
         if (col.isInitialAlwaysIncludeSortAtBegin()) {
           getColumnSet().addPermanentHeadSortColumn(col, col.isInitialSortAscending());
         }
@@ -2256,7 +2308,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     //Widths
     if (widths) {
-      for (IColumn col : getColumns()) {
+      for (IColumn<?> col : getColumns()) {
         if (col.isDisplayable()) {
           col.setWidth(col.getInitialWidth());
         }
@@ -2522,7 +2574,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           colList.addAll(Arrays.asList(t.getColumns()));
         }
       }
-      ce.setColumns(colList.toArray(new IColumn[0]));
+      ce.setColumns(colList.toArray(new IColumn<?>[0]));
       //rows
       HashSet<ITableRow> rowList = new HashSet<ITableRow>();
       for (TableEvent t : list) {
@@ -2549,10 +2601,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private void enqueueDecorationTasks(ITableRow row) {
     if (row != null) {
       for (int i = 0; i < row.getCellCount(); i++) {
-        IColumn column = getColumnSet().getColumn(i);
+        IColumn<?> column = getColumnSet().getColumn(i);
         // lookups
         if (column instanceof ISmartColumn) {
-          ISmartColumn smartColumn = (ISmartColumn) column;
+          ISmartColumn<?> smartColumn = (ISmartColumn<?>) column;
           if (smartColumn.getLookupCall() != null) {
             m_cellLookupBuffer.add(new P_CellLookup(row, smartColumn));
           }
@@ -2677,7 +2729,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     propertySupport.setPropertyBool(PROP_HEADER_VISIBLE, b);
   }
 
-  public final void decorateCell(ITableRow row, IColumn col) {
+  public final void decorateCell(ITableRow row, IColumn<?> col) {
     Cell cell = row.getCellForUpdate(col.getColumnIndex());
     decorateCellInternal(cell, row, col);
     try {
@@ -2691,7 +2743,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  protected void decorateCellInternal(Cell view, ITableRow row, IColumn col) {
+  protected void decorateCellInternal(Cell view, ITableRow row, IColumn<?> col) {
   }
 
   public final void decorateRow(ITableRow row) {
@@ -3004,16 +3056,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       m_keyStrokeBuffer.append(newText);
       String prefix = m_keyStrokeBuffer.getText();
 
-      IColumn col = getContextColumn();
+      IColumn<?> col = getContextColumn();
       if (col == null) {
-        IColumn[] sortCols = getColumnSet().getSortColumns();
+        IColumn<?>[] sortCols = getColumnSet().getSortColumns();
         if (sortCols.length > 0) {
           col = sortCols[sortCols.length - 1];
         }
         else {
-          TreeMap<CompositeObject, IColumn> sortMap = new TreeMap<CompositeObject, IColumn>();
+          TreeMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<CompositeObject, IColumn<?>>();
           int index = 0;
-          for (IColumn c : getColumnSet().getVisibleColumns()) {
+          for (IColumn<?> c : getColumnSet().getVisibleColumns()) {
             if (c.getDataType() == String.class) {
               sortMap.put(new CompositeObject(1, index), c);
             }
@@ -3358,9 +3410,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private class P_CellLookup {
     private final ITableRow m_row;
-    private final ISmartColumn m_column;
+    private final ISmartColumn<?> m_column;
 
-    public P_CellLookup(ITableRow row, ISmartColumn col) {
+    public P_CellLookup(ITableRow row, ISmartColumn<?> col) {
       m_row = row;
       m_column = col;
     }
@@ -3369,7 +3421,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       return m_row;
     }
 
-    public ISmartColumn getColumn() {
+    public ISmartColumn<?> getColumn() {
       return m_column;
     }
   }// end private class

@@ -98,7 +98,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    * <p>
    * see {@link #setContextColumn(IColumn)}
    */
-  void doHyperlinkAction(ITableRow row, IColumn col, URL url) throws ProcessingException;
+  void doHyperlinkAction(ITableRow row, IColumn<?> col, URL url) throws ProcessingException;
 
   ITableRowFilter[] getRowFilters();
 
@@ -155,7 +155,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   /**
    * short form for getColumnSet().getColumns()
    */
-  IColumn[] getColumns();
+  IColumn<?>[] getColumns();
 
   String[] getColumnNames();
 
@@ -214,7 +214,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   /**
    * see {@link TableUtility#exportRowsAsCSV(ITableRow[], IColumn[], boolean, boolean, boolean)}
    */
-  Object[][] exportTableRowsAsCSV(ITableRow[] rows, IColumn[] columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormat);
+  Object[][] exportTableRowsAsCSV(ITableRow[] rows, IColumn<?>[] columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormat);
 
   int getInsertedRowCount();
 
@@ -289,7 +289,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
 
   IHeaderCell getHeaderCell(int columnIndex);
 
-  IHeaderCell getHeaderCell(IColumn col);
+  IHeaderCell getHeaderCell(IColumn<?> col);
 
   ICell getVisibleCell(ITableRow row, int visibleColumnIndex);
 
@@ -297,7 +297,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
 
   ICell getCell(int rowIndex, int columnIndex);
 
-  ICell getCell(ITableRow row, IColumn column);
+  ICell getCell(ITableRow row, IColumn<?> column);
 
   /**
    * @see #getSummaryCell(ITableRow)
@@ -329,7 +329,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    * Note that this is not a java bean getter and thus not thread-safe.
    * Calls to this method must be inside a {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
    */
-  boolean isCellEditable(ITableRow row, IColumn column);
+  boolean isCellEditable(ITableRow row, IColumn<?> column);
 
   /*
    * Properties observer section
@@ -509,18 +509,28 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
 
   ITableRow[] getCheckedRows();
 
+  void checkRow(int rowIndex, boolean value);
+
+  void checkRow(ITableRow row, boolean value);
+
+  void checkRows(ITableRow[] rows, boolean value);
+
+  void checkAllRows();
+
+  void uncheckAllRows();
+
   /**
    * column that represented the last ui (mouse click) context
    * {@link ITableUIFacade#setContextCellFromUI(ITableRow,IColumn)} see {@link #setContextCell(ITableRow, IColumn)}
    */
-  IColumn getContextColumn();
+  IColumn<?> getContextColumn();
 
   /**
    * Set the column that represents the last ui (mouse click) column context, normally
    * called by {@link ITableUIFacade#setContextColumnFromUI(IColumn)} and not by client code. see
    * {@link #getContextColumn()}
    */
-  void setContextColumn(IColumn col);
+  void setContextColumn(IColumn<?> col);
 
   /**
    * calls {@link #addRow(ITableRow, false)}
@@ -669,7 +679,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
 
   void decorateRow(ITableRow row);
 
-  void decorateCell(ITableRow row, IColumn col);
+  void decorateCell(ITableRow row, IColumn<?> col);
 
   /**
    * To obtain the menus that passed checks such as visibility, empty space action, ... for the given rows.

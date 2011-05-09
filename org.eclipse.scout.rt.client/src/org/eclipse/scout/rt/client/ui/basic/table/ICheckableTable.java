@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,12 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 
+/**
+ * Legacy
+ * 
+ * @deprecated use {@link ITable} with {@link ITable#setCheckable(boolean)}
+ */
+@Deprecated
 public interface ICheckableTable extends ITable {
 
   String PROP_MULTI_CHECKABLE = "multiCheckable";

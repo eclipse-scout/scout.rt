@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -165,11 +165,12 @@ public abstract class AbstractCheckableTable extends AbstractTable implements IC
     return getCheckedRows().length;
   }
 
+  @Override
   public void checkAllRows() {
     try {
       setTableChanging(true);
       for (int i = 0; i < getRowCount(); i++) {
-        checkRow(i, true);
+        checkRow(i, Boolean.TRUE);
       }
     }
     catch (ProcessingException e) {
@@ -180,11 +181,12 @@ public abstract class AbstractCheckableTable extends AbstractTable implements IC
     }
   }
 
+  @Override
   public void uncheckAllRows() {
     try {
       setTableChanging(true);
       for (int i = 0; i < getRowCount(); i++) {
-        checkRow(i, false);
+        checkRow(i, Boolean.FALSE);
       }
     }
     catch (ProcessingException e) {

@@ -262,6 +262,18 @@ public interface IGuiMock {
   Set<String> getSelectedTreeNodes(int treeIndex);
 
   /**
+   * Works only if checked Row is visible
+   * 
+   * @return the sorted set of texts of checked cells
+   */
+  Set<String> getCheckedTableCells(int tableIndex, int columnIndex);
+
+  /**
+   * @return the sorted set of texts of checked nodes
+   */
+//  Set<String> getCheckedTreeNodes(int treeIndex);XXX
+
+  /**
    */
   WindowState getWindowState(String title);
 

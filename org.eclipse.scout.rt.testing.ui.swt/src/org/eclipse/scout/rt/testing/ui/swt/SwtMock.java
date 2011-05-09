@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
@@ -452,6 +453,25 @@ public class SwtMock implements IGuiMock {
           }
         }
         return set;
+      }
+    });
+  }
+
+  public Set<String> getCheckedTableCells(int tableIndex, final int columnIndex) {
+    final Table table = (Table) waitForIndexedField(FieldType.Table, tableIndex);
+    return syncExec(new MockRunnable<Set<String>>() {
+      public Set<String> run() throws Throwable {
+        TreeSet<String> check = new TreeSet<String>();
+        for (int i = 0; i < table.getItemCount(); i++) {
+          TableItem item = table.getItem(i);
+          if (item.getData() instanceof ITableRow) {
+            ITableRow row = (ITableRow) item.getData();
+            if (row.isChecked()) {
+              check.add(item.getText(columnIndex + 1));
+            }
+          }
+        }
+        return check;
       }
     });
   }

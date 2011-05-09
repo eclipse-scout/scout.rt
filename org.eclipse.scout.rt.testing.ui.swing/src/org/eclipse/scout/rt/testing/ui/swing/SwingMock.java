@@ -28,6 +28,7 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -54,6 +55,7 @@ import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
+import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 import org.eclipse.scout.testing.client.IGuiMock;
 import org.eclipse.scout.testing.client.robot.JavaRobot;
 
@@ -361,6 +363,28 @@ public class SwingMock implements IGuiMock {
     });
   }
 
+  /**
+   * Works only if checked Row is visible
+   */
+  public Set<String> getCheckedTableCells(int tableIndex, final int columnIndex) {
+    final JTable table = (JTable) waitForIndexedField(FieldType.Table, tableIndex);
+    return syncExec(new MockRunnable<Set<String>>() {
+      public Set<String> run() throws Throwable {
+        JTable t = table;
+        TreeSet<String> check = new TreeSet<String>();
+        for (int i = 0; i < table.getRowCount(); i++) {
+          Icon icon = getTableCellIcon(table, i);
+          if (icon instanceof CheckboxIcon) {
+            if (((CheckboxIcon) icon).isSelecetd()) {
+              check.add(getTableCellText(table, i, columnIndex));
+            }
+          }
+        }
+        return check;
+      }
+    });
+  }
+
   public Set<String> getSelectedTreeNodes(int treeIndex) {
     final JTree tree = (JTree) waitForIndexedField(FieldType.Tree, treeIndex);
     return syncExec(new MockRunnable<Set<String>>() {
@@ -604,10 +628,20 @@ public class SwingMock implements IGuiMock {
     if (columnIndex < 0 || columnIndex > table.getColumnCount()) {
       throw new IllegalStateException("Table has " + table.getColumnCount() + " columns (accessing " + columnIndex + ")");
     }
-    Component tmp = table.prepareRenderer(table.getCellRenderer(rowIndex, columnIndex), rowIndex, columnIndex);
-    if (tmp instanceof JLabel) {
-      JLabel label = (JLabel) tmp;
-      return label.getText();
+    Component label = table.prepareRenderer(table.getCellRenderer(rowIndex, columnIndex), rowIndex, columnIndex);
+    if (label instanceof JLabel) {
+      return ((JLabel) label).getText();
+    }
+    return null;
+  }
+
+  protected Icon getTableCellIcon(JTable table, int rowIndex) {
+    if (rowIndex < 0 || rowIndex > table.getRowCount()) {
+      throw new IllegalStateException("Table has " + table.getRowCount() + " rows (accessing " + rowIndex + ")");
+    }
+    Component label = table.prepareRenderer(table.getCellRenderer(rowIndex, 0), rowIndex, 0);
+    if (label instanceof JLabel) {
+      return ((JLabel) label).getIcon();
     }
     return null;
   }
@@ -881,8 +915,8 @@ public class SwingMock implements IGuiMock {
   }
 
   protected <T> T syncExec(final MockRunnable<T> r) {
+    final AtomicReference<T> ret = new AtomicReference<T>();
     if (!SwingUtilities.isEventDispatchThread()) {
-      final AtomicReference<T> ret = new AtomicReference<T>();
       final AtomicReference<Throwable> ex = new AtomicReference<Throwable>();
       try {
         SwingUtilities.invokeAndWait(new Runnable() {
