@@ -84,6 +84,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   private P_ScoutTableListener m_scoutTableListener;
   private UiRedrawHandler m_redrawHandler;
 
+  private Listener m_autoResizeColumnListener;
   private Listener m_columnListener = new P_TableColumnListener();
   private SelectionListener m_columnSortListener = new P_ColumnSortListener();
   private TableColumnManager m_columnManager = new TableColumnManager();
@@ -150,7 +151,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     table.addListener(SWT.MouseDoubleClick, swtTableListener);
     table.addListener(SWT.MenuDetect, swtTableListener);
     table.addListener(SWT.KeyUp, swtTableListener);
-    table.addListener(SWT.Resize, swtTableListener);
 
     // context menu
     Menu contextMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
@@ -235,12 +235,12 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         m_scoutTableListener = new P_ScoutTableListener();
         getScoutObject().addUITableListener(m_scoutTableListener);
       }
-      // setMultilineTextFromScout(getScoutObject().isMultilineText());
       setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());
       setSelectionFromScout(getScoutObject().getSelectedRows());
-      setKeyStrokeFormScout();
-      setMultilineTextFromScout();
-      setKeyboardNavigationFromScout();
+      updateKeyStrokeFormScout();
+      updateMultilineTextFromScout();
+      updateKeyboardNavigationFromScout();
+      updateAutoResizeColumnsFromScout();
       // dnd support
       new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
     }
@@ -291,7 +291,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     return sortedRows.toArray(new ITableRow[sortedRows.size()]);
   }
 
-  protected void setKeyStrokeFormScout() {
+  protected void updateKeyStrokeFormScout() {
     // remove old
     if (m_keyStrokes != null) {
       for (ISwtKeyStroke swtKeyStroke : m_keyStrokes) {
@@ -311,14 +311,14 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     m_keyStrokes = newSwtKeyStrokes.toArray(new ISwtKeyStroke[newSwtKeyStrokes.size()]);
   }
 
-  protected void setMultilineTextFromScout() {
+  protected void updateMultilineTextFromScout() {
     boolean multilineText = getScoutObject().isMultilineText();
     getSwtField().setMultiLine(multilineText);
     ((SwtScoutTableModel) getSwtTableViewer().getContentProvider()).setMultiline(multilineText);
     getSwtTableViewer().refresh();
   }
 
-  protected void setKeyboardNavigationFromScout() {
+  protected void updateKeyboardNavigationFromScout() {
     if (getScoutObject().hasKeyboardNavigation()) {
       if (m_keyboardNavigationSupport == null) {
         m_keyboardNavigationSupport = new P_KeyBoardNavigationSupport(getSwtField());
@@ -332,6 +332,24 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
   }
 
+  private void updateAutoResizeColumnsFromScout() {
+    if (getSwtField() != null && !getSwtField().getParent().isDisposed()) {
+      Composite parent = getSwtField().getParent();
+      if (getScoutObject().isAutoResizeColumns()) {
+        if (m_autoResizeColumnListener == null) {
+          m_autoResizeColumnListener = new P_SwtResizeListener();
+          parent.addListener(SWT.Resize, m_autoResizeColumnListener);
+        }
+      }
+      else {
+        if (m_autoResizeColumnListener != null) {
+          parent.removeListener(SWT.Resize, m_autoResizeColumnListener);
+          m_autoResizeColumnListener = null;
+        }
+      }
+    }
+  }
+
   /**
    * scout property observer
    */
@@ -341,13 +359,16 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       setHeaderVisibleFromScout(((Boolean) newValue).booleanValue());
     }
     else if (propName.equals(ITable.PROP_KEY_STROKES)) {
-      setKeyStrokeFormScout();
+      updateKeyStrokeFormScout();
     }
     else if (propName.equals(ITable.PROP_MULTILINE_TEXT)) {
-      setMultilineTextFromScout();
+      updateMultilineTextFromScout();
     }
     else if (propName.equals(ITable.PROP_KEYBOARD_NAVIGATION)) {
-      setKeyboardNavigationFromScout();
+      updateKeyboardNavigationFromScout();
+    }
+    else if (propName.equals(ITable.PROP_AUTO_RESIZE_COLUMNS)) {
+      updateAutoResizeColumnsFromScout();
     }
   }
 
@@ -841,22 +862,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           }
           break;
         }
-        case SWT.Resize: {
-          //lazy column auto-fit
-          if (getScoutObject().isAutoResizeColumns()) {
-            if (getSwtField() != null && !getSwtField().isDisposed()) {
-              getSwtField().getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                  if (getSwtField() != null && !getSwtField().isDisposed()) {
-                    handleAutoSizeColumns();
-                  }
-                }
-              });
-            }
-          }
-          break;
-        }
         case SWT.MenuDetect: {
           Point pt = getSwtField().getDisplay().map(null, getSwtField(), new Point(event.x, event.y));
           Rectangle clientArea = getSwtField().getClientArea();
@@ -884,6 +889,23 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       }
     }
   }
+
+  private class P_SwtResizeListener implements Listener {
+    @Override
+    public void handleEvent(Event event) {
+      //lazy column auto-fit
+      if (getSwtField() != null && !getSwtField().isDisposed()) {
+        getSwtField().getDisplay().asyncExec(new Runnable() {
+          @Override
+          public void run() {
+            if (getSwtField() != null && !getSwtField().isDisposed()) {
+              handleAutoSizeColumns();
+            }
+          }
+        });
+      }
+    }
+  } // end class P_SwtResizeListener
 
   public class P_SwtSelectionListener implements ISelectionChangedListener {
     @Override
