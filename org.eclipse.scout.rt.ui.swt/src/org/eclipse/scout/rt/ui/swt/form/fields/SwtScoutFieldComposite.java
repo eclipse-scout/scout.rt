@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 
 /**
@@ -101,8 +102,16 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       getSwtField().setVisible(b);
     }
     if (updateLayout && isConnectedToScout()) {
-      if (getSwtContainer() != null) {
-        getSwtContainer().layout(true);
+      /*
+       * workaround for bug 344966 $
+       * (http://bugs.eclipse.org/bugs/show_bug.cgi?id=344966)
+       * controls with size 0,0 gets removed from the tab-list.
+       */
+      if (b) {
+        Point size = getSwtContainer().getSize();
+        if (size.x == 0 && size.y == 0) {
+          getSwtContainer().setSize(100, 100);
+        }
       }
       setLayoutDirty();
     }
