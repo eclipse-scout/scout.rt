@@ -249,4 +249,12 @@ public interface ISwtEnvironment {
    *          the message, or <code>null</code> for no message
    */
   void setStatusLineMessage(Image image, String message);
+
+  /**
+   * Use this decorator to complete and style (incomplete) client html text for html and label fields in order to match
+   * current style
+   * sheet settings based on a {@link Control}s font and color
+   */
+  String styleHtmlText(ISwtScoutFormField<?> uiComposite, String rawHtml);
+
 }

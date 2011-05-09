@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.KeyboardFocusManager;
@@ -47,6 +48,7 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.commons.CSSPatch;
+import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -1150,6 +1152,15 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public void setPopupOwner(Component owner, Rectangle ownerBounds) {
     m_popupOwner = owner;
     m_popupOwnerBounds = ownerBounds;
+  }
+
+  @Override
+  public String styleHtmlText(ISwingScoutFormField<?> uiComposite, String rawHtml) {
+    Font f = UIManager.getFont("Label.font");
+    if (f == null) {
+      f = new JLabel().getFont();
+    }
+    return HTMLUtility.formatDocument(HTMLUtility.cleanupDocument(HTMLUtility.parseDocument(rawHtml), f.getFamily(), f.getSize()));
   }
 
   private static void checkThread() {

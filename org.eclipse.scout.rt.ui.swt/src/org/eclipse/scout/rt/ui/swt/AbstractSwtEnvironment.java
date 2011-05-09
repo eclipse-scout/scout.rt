@@ -91,6 +91,7 @@ import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -590,6 +591,65 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     if (getScoutDesktop() != null) {
       getScoutDesktop().ensureViewStackVisible();
     }
+  }
+
+  @Override
+  public String styleHtmlText(ISwtScoutFormField<?> uiComposite, String rawHtml) {
+    if (rawHtml == null) {
+      rawHtml = "";
+    }
+    if (StringUtility.getTag(rawHtml, "style") != null || StringUtility.getTag(rawHtml, "body") != null) {
+      return rawHtml;
+    }
+    String cleanHtml = rawHtml;
+    //remove surrounding html tag
+    cleanHtml = StringUtility.removeTagBounds(cleanHtml, "html");
+    cleanHtml = createHtmlDocument(cleanHtml, createCSS(uiComposite.getSwtField()));
+    return cleanHtml;
+  }
+
+  /**
+   * get style for browser and html fields using inline html documents
+   */
+  protected String createCSS(Control c) {
+    int size = 12;
+    int fg = 0x000000;
+    if (c != null) {
+      FontData[] fa = c.getFont().getFontData();
+      if (fa != null && fa.length > 0) {
+        if (fa[0].getHeight() > 0) {
+          size = fa[0].getHeight();
+        }
+      }
+      Color col = c.getForeground();
+      if (col != null) {
+        fg = col.getRed() * 0x10000 + col.getGreen() * 0x100 + col.getBlue();
+      }
+    }
+    String fgHex = Integer.toHexString(fg);
+    fgHex = "000000".substring(0, 6 - fgHex.length()) + fgHex;
+    return "body,th,td,p{color: #" + fgHex + ";font:" + size + "px sans-serif;}";
+  }
+
+  /**
+   * @return a html document with default style sheet
+   */
+  protected String createHtmlDocument(String bodyContent, String css) {
+    if (bodyContent == null || bodyContent.length() == 0) {
+      return "<html><body></body></html>";
+    }
+    StringBuilder b = new StringBuilder();
+    b.append("<html>");
+    b.append("<head>");
+    b.append("<style type=\"text/css\">");
+    b.append(css);
+    b.append("</style>");
+    b.append("</head>");
+    b.append("<body>");
+    b.append(bodyContent);
+    b.append("</body>");
+    b.append("</html>");
+    return b.toString();
   }
 
   @Override

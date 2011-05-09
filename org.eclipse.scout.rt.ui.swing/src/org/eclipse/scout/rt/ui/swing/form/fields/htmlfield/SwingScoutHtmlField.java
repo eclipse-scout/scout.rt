@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.swing.form.fields.htmlfield;
 /**
  *  Copyright (c) 2001,2004 BSI AG
  */
-import java.awt.Font;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,20 +21,17 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent.EventType;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -184,11 +180,7 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     if (m_originalText.equals(s)) {
       return;
     }
-    Font f = UIManager.getFont("Label.font");
-    if (f == null) {
-      f = new JLabel().getFont();
-    }
-    String wellFormedHtml = HTMLUtility.formatDocument(HTMLUtility.cleanupDocument(HTMLUtility.parseDocument(s), f.getFamily(), f.getSize()));
+    String wellFormedHtml = getSwingEnvironment().styleHtmlText(this, s);
     m_originalText = wellFormedHtml;
     //
     int oldPos = swingField.getCaretPosition();

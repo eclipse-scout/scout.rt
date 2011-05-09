@@ -350,4 +350,10 @@ public interface ISwingEnvironment {
 
   void setPopupOwner(Component owner, Rectangle ownerBounds);
 
+  /**
+   * Use this decorator to complete and style (incomplete) client html text for html and label fields in order to match
+   * current style
+   * sheet settings based on a {@link component}s font and color
+   */
+  String styleHtmlText(ISwingScoutFormField<?> uiComposite, String rawHtml);
 }
