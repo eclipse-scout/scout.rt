@@ -52,7 +52,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
   }
 
   @Override
-  public void update(final boolean selectCurrentValue) throws ProcessingException {
+  public void update(final boolean selectCurrentValue, boolean synchronous) throws ProcessingException {
     String text = getSearchText();
     if (text == null) {
       text = "";
@@ -71,14 +71,36 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
         dataFetchedDelegate(rows, failed, maxCount, selectCurrentValue);
       }
     };
-    if (ISmartField.BROWSE_ALL_TEXT.equals(textNonNull)) {
-      m_dataLoadJob = getSmartField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
-    }
-    else if (textNonNull.length() == 0) {
-      m_dataLoadJob = getSmartField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
+    // go async/sync
+    if (synchronous) {
+      try {
+        LookupRow[] rows;
+        if (ISmartField.BROWSE_ALL_TEXT.equals(text)) {
+          rows = getSmartField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
+        }
+        else if (text.length() == 0) {
+          rows = getSmartField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
+        }
+        else {
+          rows = getSmartField().callTextLookup(text, maxCount > 0 ? maxCount + 1 : 0);
+        }
+        fetcher.dataFetched(rows, null);
+      }
+      catch (ProcessingException e) {
+        fetcher.dataFetched(null, e);
+      }
     }
     else {
-      m_dataLoadJob = getSmartField().callTextLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
+
+      if (ISmartField.BROWSE_ALL_TEXT.equals(textNonNull)) {
+        m_dataLoadJob = getSmartField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
+      }
+      else if (textNonNull.length() == 0) {
+        m_dataLoadJob = getSmartField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
+      }
+      else {
+        m_dataLoadJob = getSmartField().callTextLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
+      }
     }
   }
 
@@ -340,7 +362,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
       protected void execChangedValue() throws ProcessingException {
         if (isVisible() && !isFormLoading()) {
           getSmartField().setActiveFilter(getValue());
-          update(false);
+          update(false, false);
         }
       }
 
