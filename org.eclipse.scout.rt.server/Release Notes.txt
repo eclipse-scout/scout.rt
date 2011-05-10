@@ -179,3 +179,9 @@ Migration of legacy: moving remaining legacy logic from client to server
 Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
 Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
 Migration: None
+
+09.05.2011 bko
+Migration:
+Ensure the following two points regarding the ServerApplication:
+- the plugin „org.eclipse.scout.rt.server“ has to be listed as osgi.bundles in the config.ini of the server, otherwise the ServerApplication won’t be started on server startup
+- when using jetty the plugins „org.eclipse.equinox.http.servletbridge“ and „org.eclipse.equinox.servletbridge“ should not be listed in the product configuration, otherwise the ServerApplication will be started twice

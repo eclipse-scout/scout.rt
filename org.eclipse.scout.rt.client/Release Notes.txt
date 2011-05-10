@@ -324,3 +324,39 @@ Methods added:
 Methods changed:
 - AbstractPageWithNodes$P_TableListener#tableChanged
 Migration: None
+
+06.05.2011 imo
+Bugzilla Ticket 331535
+
+Added possibility to override/complete texts and translations defined by the scout framework.
+To fully enable this feature, the following adaptations are necessary:
+
+0) Add the additional translations and text overrides to the project specific text resources:
+Adapt Texts_*.properties files in your scout project (com.example.myapp.shared/resources/texts) by adding
+the same keys as defined by the scout framework (org.eclipse.scout.rt.shared/resources/texts/ScoutTexts.properties)
+with your own translations.
+
+1) Override method getNlsTexts in ClientSession:
+
+  @Override
+  public DynamicNls getNlsTexts(){
+    return Texts.getInstance();
+  }
+
+2) Override method getNlsTexts in ServerSession:
+
+  @Override
+  public DynamicNls getNlsTexts(){
+    return Texts.getInstance();
+  }
+
+3) Only required for Swing client: override createSwingEnvironment() in class SwingApplication:
+- set the global text provider for Swing with SwingUtility.setNlsTexts
+- call execInitLocale() to initialize the NlsLocale as stored in the UserPreferences
+
+  @Override
+  protected ISwingEnvironment createSwingEnvironment(){
+    execInitLocale();
+    SwingUtility.setNlsTexts(Texts.getInstance());
+    return new SwingEnvironment();
+  }
