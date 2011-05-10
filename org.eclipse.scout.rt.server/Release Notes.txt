@@ -185,3 +185,16 @@ Migration:
 Ensure the following two points regarding the ServerApplication:
 - the plugin „org.eclipse.scout.rt.server“ has to be listed as osgi.bundles in the config.ini of the server, otherwise the ServerApplication won’t be started on server startup
 - when using jetty the plugins „org.eclipse.equinox.http.servletbridge“ and „org.eclipse.equinox.servletbridge“ should not be listed in the product configuration, otherwise the ServerApplication will be started twice
+
+10.05.2011 jgu
+Database fragments removed from public eclipse scout:
+
+org.eclipse.scout.rt.server.jdbc.oracle11g.fragment
+org.eclipse.scout.rt.server.jdbc.mysql517.fragment
+org.eclipse.scout.rt.server.jdbc.db2_97.fragment
+org.eclipse.scout.rt.server.jdbc.oracle9i.fragment
+org.eclipse.scout.rt.server.jdbc.oracle10g.fragment
+org.eclipse.scout.rt.server.jdbc.mssql2005.fragment
+
+Migration: None
+
