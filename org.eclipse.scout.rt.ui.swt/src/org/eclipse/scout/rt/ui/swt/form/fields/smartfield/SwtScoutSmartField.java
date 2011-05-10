@@ -77,7 +77,6 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
   private final Object m_popupLock = new Object();
   private Menu m_contextMenu;
   private TextFieldEditableSupport m_editableSupport;
-  private boolean m_endabled = false;
 
   public SwtScoutSmartField() {
     m_pendingProposalJobLock = new Object();
@@ -173,7 +172,6 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected void setEnabledFromScout(boolean b) {
-    m_endabled = b;
     super.setEnabledFromScout(b);
     m_browseButton.setButtonEnabled(b);
   }
@@ -501,7 +499,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       case SWT.ARROW_UP:
       case SWT.PAGE_DOWN:
       case SWT.PAGE_UP:
-        if (getScoutObject().isEnabled()) {
+        if (getSwtField().isEnabled() && getSwtField().getEditable() && getSwtField().isVisible()) {
           if (m_proposalPopup == null) {
             requestProposalSupportFromSwt(ISmartField.BROWSE_ALL_TEXT, true);
           }
