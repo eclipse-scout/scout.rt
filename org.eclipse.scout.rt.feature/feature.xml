@@ -93,41 +93,6 @@ BSI Business Systems Integration AG - initial API and implementation
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.rt.server.jdbc.mssql2005.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.server.jdbc.mysql517.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.server.jdbc.oracle11g.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.server.jdbc.oracle10g.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.server.jdbc.oracle9i.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
          id="org.eclipse.scout.rt.shared"
          download-size="0"
          install-size="0"
