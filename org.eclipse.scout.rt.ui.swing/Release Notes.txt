@@ -61,3 +61,13 @@ Migration: None
 04.05.2011 imo
 Added async loading of backend smartfield lookup calls for better performance on slow lookup services
 
+10.05.2011 jgu
+Moved the methods in org.eclipse.scout.rt.ui.swing.ext.LookAndFeelUtility provided under LGPL to org.eclipse.scout.rt.ui.swing.laf.rayo.painters.RayoLookAndFeelUtility:
+public static Color darker(Color color, double ratio);
+public static Color lighter(Color color, double ratio);
+public static Color blend(Color color1, Color color2);
+public static Color blend(Color color1, Color color2, double ratio);
+
+Migration:
+If you use any of the above methods, use the RayoLookAndFeelUtility or the original source: http://geosoft.no/software/colorutil/ColorUtil.java.html
+
