@@ -31,6 +31,10 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
@@ -372,7 +376,29 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     m_proposalPopup.makeNonFocusable();
     // adjust size of popup every time the table/tree changes in the model
     final JTableEx proposalTable = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTableEx.class);
+    if (proposalTable != null) {
+      proposalTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+          if (proposalTable.getSelectedRowCount() == 0) {
+            proposalTable.getSelectionModel().setAnchorSelectionIndex(-1);
+            proposalTable.getSelectionModel().setLeadSelectionIndex(-1);
+          }
+        }
+      });
+    }
     final JTreeEx proposalTree = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTreeEx.class);
+    if (proposalTree != null) {
+      proposalTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+        @Override
+        public void valueChanged(TreeSelectionEvent e) {
+          if (proposalTree.getSelectionCount() == 0) {
+            proposalTree.setAnchorSelectionPath(null);
+            proposalTree.setLeadSelectionPath(null);
+          }
+        }
+      });
+    }
     //set size to initial width and default height
     m_proposalPopup.getSwingWindow().setSize(new Dimension(getSwingTextField().getWidth(), 200));
     if (proposalTree != null || proposalTable != null) {
