@@ -88,7 +88,7 @@ public class SwtScoutTableField extends SwtScoutFieldComposite<ITableField<? ext
       setTableStatusFromScout();
     }
     if (!getSwtContainer().isDisposed()) {
-      getSwtContainer().layout(true);
+      getSwtContainer().layout(true,true);
     }
   }
 
