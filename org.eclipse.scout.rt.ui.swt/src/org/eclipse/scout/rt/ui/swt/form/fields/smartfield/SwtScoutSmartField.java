@@ -267,6 +267,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       m_proposalPopup.makeNonFocusable();
       try {
         m_proposalPopup.showForm(form);
+        //add a listener whenever the form changes
         form.addFormListener(new FormListener() {
           @Override
           public void formChanged(FormEvent e) throws ProcessingException {
@@ -281,11 +282,16 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
                   }
                 };
                 getEnvironment().invokeSwtLater(job);
-
                 break;
-
-              default:
-                break;
+            }
+          }
+        });
+        //enqueue a later display job since there may be waiting display tasks in the queue that change the table/tree
+        getSwtField().getDisplay().asyncExec(new Runnable() {
+          @Override
+          public void run() {
+            if (m_proposalPopup != null) {
+              m_proposalPopup.autoAdjustBounds();
             }
           }
         });

@@ -364,7 +364,10 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     // adjust size of popup every time the table/tree changes in the model
     final JTableEx proposalTable = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTableEx.class);
     final JTreeEx proposalTree = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTreeEx.class);
+    //set size to initial width and default height
+    m_proposalPopup.getSwingWindow().setSize(new Dimension(getSwingTextField().getWidth(), 200));
     if (proposalTree != null || proposalTable != null) {
+      //add a listener whenever the form changes
       form.addFormListener(
           new FormListener() {
             public void formChanged(FormEvent e) throws ProcessingException {
@@ -373,9 +376,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
                   Runnable t = new Runnable() {
                     @Override
                     public void run() {
-                      if (m_proposalPopup != null && m_proposalPopup.getSwingWindow().isShowing()) {
-                        optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
-                      }
+                      optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
                     }
                   };
                   getSwingEnvironment().invokeSwingLater(t);
@@ -385,58 +386,68 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
             }
           }
           );
+      //enqueue a later swing job since there may be waiting swing tasks in the queue that change the table
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
+        }
+      });
+      //only if table or tree is already filled up, optimize size, otherwise nop
+      if ((proposalTree != null && proposalTree.getRowCount() > 0) || (proposalTable != null && proposalTable.getRowCount() > 0)) {
+        optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
+      }
     }
-    m_proposalPopup.getSwingWindow().setSize(new Dimension(getSwingTextField().getWidth(), 200));
-    optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
     m_proposalPopup.openView();
   }
 
   private void optimizePopupSize(SwingScoutPopup popup, JTableEx proposalTable, JTreeEx proposalTree) {
     if (proposalTable != null) {
-      if (proposalTable.isVisible()) {
-        JViewport viewPort = (proposalTable.getParent() instanceof JViewport ? (JViewport) proposalTable.getParent() : null);
-        JScrollPane scrollPane = (viewPort != null && viewPort.getParent() instanceof JScrollPane ? (JScrollPane) viewPort.getParent() : null);
-        int scrollbarSize = scrollPane != null ? scrollPane.getVerticalScrollBar().getPreferredSize().width + 2 : 0;
-        Dimension d = proposalTable.getPreferredContentSize(1000);
-        d.width += scrollbarSize;
-        d.width = Math.max(getSwingTextField().getWidth(), Math.min(d.width, 400));
-        d.height = Math.max(getSwingEnvironment().getFormRowHeight(), Math.min(d.height, 280));
-        Insets insets = proposalTable.getInsets();
-        if (insets != null) {
-          d.width += insets.left + insets.right;
-          d.height += insets.top + insets.bottom;
-        }
-        proposalTable.setPreferredScrollableViewportSize(d);
-        Component c = proposalTable;
-        while (c != null && !(c instanceof Window)) {
-          c.invalidate();
-          c = c.getParent();
-        }
+      JViewport viewPort = (proposalTable.getParent() instanceof JViewport ? (JViewport) proposalTable.getParent() : null);
+      JScrollPane scrollPane = (viewPort != null && viewPort.getParent() instanceof JScrollPane ? (JScrollPane) viewPort.getParent() : null);
+      int scrollbarSize = scrollPane != null ? scrollPane.getVerticalScrollBar().getPreferredSize().width + 2 : 0;
+      Dimension d = proposalTable.getPreferredContentSize(1000);
+      d.width += scrollbarSize;
+      d.width = Math.max(getSwingTextField().getWidth(), Math.min(d.width, 400));
+      d.height = Math.max(getSwingEnvironment().getFormRowHeight(), Math.min(d.height, 280));
+      Insets insets = proposalTable.getInsets();
+      if (insets != null) {
+        d.width += insets.left + insets.right;
+        d.height += insets.top + insets.bottom;
+      }
+      proposalTable.setPreferredScrollableViewportSize(d);
+      Component c = proposalTable;
+      while (c != null && !(c instanceof Window)) {
+        c.invalidate();
+        c = c.getParent();
+      }
+      if (popup.isVisible()) {
+        popup.autoAdjustBounds();
       }
     }
     else if (proposalTree != null) {
-      if (proposalTree.isVisible()) {
-        JViewport viewPort = (proposalTree.getParent() instanceof JViewport ? (JViewport) proposalTree.getParent() : null);
-        JScrollPane scrollPane = (viewPort != null && viewPort.getParent() instanceof JScrollPane ? (JScrollPane) viewPort.getParent() : null);
-        int scrollbarSize = scrollPane != null ? scrollPane.getVerticalScrollBar().getPreferredSize().width + 2 : 0;
-        Dimension d = proposalTree.getPreferredContentSize(1000);
-        d.width += scrollbarSize;
-        d.width = Math.max(getSwingTextField().getWidth(), Math.min(d.width, 400));
-        d.height = Math.max(getSwingEnvironment().getFormRowHeight(), Math.min(d.height, 280));
-        Insets insets = proposalTree.getInsets();
-        if (insets != null) {
-          d.width += insets.left + insets.right;
-          d.height += insets.top + insets.bottom;
-        }
-        proposalTree.setPreferredScrollableViewportSize(d);
-        Component c = proposalTree;
-        while (c != null && !(c instanceof Window)) {
-          c.invalidate();
-          c = c.getParent();
-        }
+      JViewport viewPort = (proposalTree.getParent() instanceof JViewport ? (JViewport) proposalTree.getParent() : null);
+      JScrollPane scrollPane = (viewPort != null && viewPort.getParent() instanceof JScrollPane ? (JScrollPane) viewPort.getParent() : null);
+      int scrollbarSize = scrollPane != null ? scrollPane.getVerticalScrollBar().getPreferredSize().width + 2 : 0;
+      Dimension d = proposalTree.getPreferredContentSize(1000);
+      d.width += scrollbarSize;
+      d.width = Math.max(getSwingTextField().getWidth(), Math.min(d.width, 400));
+      d.height = Math.max(getSwingEnvironment().getFormRowHeight(), Math.min(d.height, 280));
+      Insets insets = proposalTree.getInsets();
+      if (insets != null) {
+        d.width += insets.left + insets.right;
+        d.height += insets.top + insets.bottom;
+      }
+      proposalTree.setPreferredScrollableViewportSize(d);
+      Component c = proposalTree;
+      while (c != null && !(c instanceof Window)) {
+        c.invalidate();
+        c = c.getParent();
+      }
+      if (popup != null && popup.getSwingWindow() != null && popup.getSwingWindow().isShowing()) {
+        popup.autoAdjustBounds();
       }
     }
-    popup.autoAdjustBounds();
   }
 
   private void hideProposalPopup() {
