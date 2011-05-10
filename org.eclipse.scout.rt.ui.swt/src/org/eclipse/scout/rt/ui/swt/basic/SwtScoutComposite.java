@@ -389,13 +389,9 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
             case SWT.CR:
               return;
           }
-          //XXX needed?
-          /*
-          if (getSwtInputVerifierLock().isReleased()) {
-            m_timestamp = event.time;
-            event.doit = handleSwtInputVerifier();
-          }
-          */
+
+          m_timestamp = event.time;
+          event.doit = handleSwtInputVerifier();
           break;
         case SWT.FocusIn:
           handleSwtFocusGained();
