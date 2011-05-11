@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -507,17 +508,21 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
 
   void deselectAllEnabledRows();
 
+  void setCheckableColumn(IBooleanColumn checkboxColumn);
+
+  IBooleanColumn getCheckableColumn();
+
   ITableRow[] getCheckedRows();
 
-  void checkRow(int rowIndex, boolean value);
+  void checkRow(int rowIndex, boolean value) throws ProcessingException;
 
-  void checkRow(ITableRow row, boolean value);
+  void checkRow(ITableRow row, boolean value) throws ProcessingException;
 
-  void checkRows(ITableRow[] rows, boolean value);
+  void checkRows(ITableRow[] rows, boolean value) throws ProcessingException;
 
-  void checkAllRows();
+  void checkAllRows() throws ProcessingException;
 
-  void uncheckAllRows();
+  void uncheckAllRows() throws ProcessingException;
 
   /**
    * column that represented the last ui (mouse click) context

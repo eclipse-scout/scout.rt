@@ -50,7 +50,9 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.DefaultTableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.AddCustomColumnMenu;
@@ -111,6 +113,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private final EventListenerList m_listenerList = new EventListenerList();
   //cell editing
   private P_CellEditorContext m_editContext;
+  //checkable table
+  private IBooleanColumn m_checkableColumn;
   //auto filter
   private final Object m_cachedFilteredRowsLock;
   private ITableRow[] m_cachedFilteredRows;
@@ -233,6 +237,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @ConfigPropertyValue("false")
   protected boolean getConfiguredCheckable() {
     return false;
+  }
+
+  @ConfigProperty(ConfigProperty.TABLE_COLUMN)
+  @Order(100)
+  @ConfigPropertyValue("false")
+  protected Class<? extends AbstractBooleanColumn> getConfiguredCheckableColumn() {
+    return null;
   }
 
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
@@ -419,6 +430,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     ArrayList<IColumn> completeList = new ArrayList<IColumn>();
     completeList.addAll(colList);
     m_columnSet = new ColumnSet(this, completeList);
+
+    if (getConfiguredCheckableColumn() != null) {
+      AbstractBooleanColumn checkableColumn = getColumnSet().getColumnByClass(getConfiguredCheckableColumn());
+      setCheckableColumn(checkableColumn);
+    }
     // menus
     ArrayList<IMenu> menuList = new ArrayList<IMenu>();
     Class<? extends IMenu>[] ma = getConfiguredMenus();
@@ -865,6 +881,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   public void setMultiCheck(boolean b) {
     propertySupport.setPropertyBool(PROP_MULTI_CHECK, b);
+  }
+
+  public IBooleanColumn getCheckableColumn() {
+    return m_checkableColumn;
+  }
+
+  public void setCheckableColumn(IBooleanColumn checkableColumn) {
+    m_checkableColumn = checkableColumn;
   }
 
   public boolean isAutoDiscardOnDelete() {
@@ -1495,11 +1519,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return list.toArray(new ITableRow[list.size()]);
   }
 
-  public void checkRow(int row, boolean value) {
+  public void checkRow(int row, boolean value) throws ProcessingException {
     checkRow(getRow(row), value);
   }
 
-  public void checkRow(ITableRow row, boolean value) {
+  public void checkRow(ITableRow row, boolean value) throws ProcessingException {
     if (!row.isEnabled()) {
       return;
     }
@@ -1507,9 +1531,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       uncheckAllRows();
     }
     row.setChecked(value);
+    if (getCheckableColumn() != null) {
+      getCheckableColumn().setValue(row, value);
+    }
   }
 
-  public void checkRows(ITableRow[] rows, boolean value) {
+  public void checkRows(ITableRow[] rows, boolean value) throws ProcessingException {
     rows = resolveRows(rows);
     // check checked count with multicheck
     if (rows.length > 1 && !isMultiCheck()) {
@@ -1523,7 +1550,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  public void checkAllRows() {
+  public void checkAllRows() throws ProcessingException {
     try {
       setTableChanging(true);
       for (int i = 0; i < getRowCount(); i++) {
@@ -1535,7 +1562,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  public void uncheckAllRows() {
+  public void uncheckAllRows() throws ProcessingException {
     try {
       setTableChanging(true);
       for (int i = 0; i < getRowCount(); i++) {

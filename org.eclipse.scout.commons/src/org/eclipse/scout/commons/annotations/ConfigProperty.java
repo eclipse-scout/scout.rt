@@ -145,6 +145,10 @@ public @interface ConfigProperty {
    */
   String SQL_STYLE = "SQL_STYLE";
   /**
+   * Class&lt;? extends IColumn&gt;
+   */
+  String TABLE_COLUMN = "TABLE_COLUMN";
+  /**
    * an String representing an SQL statement
    */
   String SQL = "SQL";

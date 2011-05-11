@@ -360,3 +360,22 @@ with your own translations.
     SwingUtility.setNlsTexts(Texts.getInstance());
     return new SwingEnvironment();
   }
+
+11.05.2011 sle
+bsi ticket #101160
+Added convenience methods to ITable as known from deprecated ICheckableTable. Also added know possibility to configure
+a invisible "checkbox-column" for data-transportation to server via formData.
+Methods added:
+ITable:
+- void checkRow(int rowIndex, boolean value) throws ProcessingException;
+- void checkRow(ITableRow row, boolean value) throws ProcessingException;
+- void checkRows(ITableRow[] rows, boolean value) throws ProcessingException;
+- void checkAllRows() throws ProcessingException;
+- void uncheckAllRows() throws ProcessingException;
+
+- void setCheckableColumn(IBooleanColumn checkboxColumn); (for internal use)
+- IBooleanColumn getCheckableColumn(); (for internal use)
+
+AbstractTable:
+- protected Class<? extends AbstractBooleanColumn> getConfiguredCheckableColumn();
+Migration: None

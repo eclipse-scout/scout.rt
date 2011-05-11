@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -175,6 +175,14 @@ public class InternalTableRow implements ITableRow, ICellObserver {
         //uncheck others in single-check mode
         ITable table = getTable();
         if (table != null) {
+          if (table.getCheckableColumn() != null) {
+            try {
+              table.getCheckableColumn().setValue(this, b);
+            }
+            catch (ProcessingException e) {
+              LOG.warn("Value could not be set on CheckableColumn", e);
+            }
+          }
           if (b && !table.isMultiCheck()) {
             for (ITableRow cr : table.getCheckedRows()) {
               if (cr != this) {
