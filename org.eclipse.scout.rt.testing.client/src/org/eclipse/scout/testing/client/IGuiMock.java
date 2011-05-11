@@ -19,6 +19,9 @@ import java.util.Set;
  * Therefore swt and swing gui tests can be programmed just once in the client and run with both guis.
  * <p>
  * The term "window" is used for frames, dialogs, swt views, swt editors, swing internal frames.
+ * <p>
+ * The config.ini property "IGuiMock.treeNodeToExpandIconGap" defines the gap between a tree node and its
+ * expand/collapse icon and is used in {@link #gotoTreeExpandIcon(int, String)}
  */
 public interface IGuiMock {
   long WAIT_TIMEOUT = 10000L;
@@ -233,6 +236,13 @@ public interface IGuiMock {
    * The index is searched in the active window (popup, dialog, frame)
    */
   void gotoTree(int treeIndex, String nodeText);
+
+  /**
+   * place the mouse over the expand/collapse area of a tree node
+   * <p>
+   * The index is searched in the active window (popup, dialog, frame)
+   */
+  void gotoTreeExpandIcon(int treeIndex, String nodeText);
 
   /**
    * Assumes that a context menu is showing and clicks on the popup menu with the name

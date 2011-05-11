@@ -21,6 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -60,11 +62,14 @@ import org.eclipse.ui.PlatformUI;
  * Uses SwtBot
  */
 public class SwtMock implements IGuiMock {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtMock.class);
+
   static interface MockRunnable<T> extends WaitCondition<T> {
   }
 
   private final IClientSession m_session;
   private final JavaRobot m_bot;
+  private int m_treeNodeToExpandIconGap;
 
   public SwtMock(IClientSession session) {
     m_session = session;
@@ -73,6 +78,22 @@ public class SwtMock implements IGuiMock {
 
   public GuiStrategy getStrategy() {
     return GuiStrategy.Swt;
+  }
+
+  public int getTreeNodeToExpandIconGap() {
+    if (m_treeNodeToExpandIconGap <= 0) {
+      String s = Activator.getDefault().getBundle().getBundleContext().getProperty("IGuiMock.treeNodeToExpandIconGap");
+      if (s == null) {
+        LOG.warn("Missing config.ini property 'IGuiMock.treeNodeToExpandIconGap'; using default value of 4");
+        s = "4";
+      }
+      m_treeNodeToExpandIconGap = Integer.parseInt(s);
+    }
+    return m_treeNodeToExpandIconGap;
+  }
+
+  public void setTreeNodeToExpandIconGap(int treeNodeToExpandIconGap) {
+    m_treeNodeToExpandIconGap = treeNodeToExpandIconGap;
   }
 
   public void waitForIdle() {
@@ -329,6 +350,26 @@ public class SwtMock implements IGuiMock {
           throw new IllegalStateException("tree node " + nodeText + " is not visible on screen");
         }
         Point p = tree.toDisplay(cellBounds.x + (cellBounds.width / 2), cellBounds.y + (cellBounds.height / 2));
+        gotoPoint(p.x, p.y);
+        return null;
+      }
+    });
+  }
+
+  @Override
+  public void gotoTreeExpandIcon(int treeIndex, final String nodeText) {
+    final Tree tree = (Tree) waitForIndexedField(FieldType.Tree, treeIndex);
+    syncExec(new MockRunnable<Object>() {
+      public Object run() throws Throwable {
+        TreeItem item = findTreeItemRec(tree.getItems(), nodeText);
+        if (item == null) {
+          throw new IllegalStateException("Cannot find tree item '" + nodeText + "'");
+        }
+        Rectangle cellBounds = item.getBounds(0);
+        if (!tree.getClientArea().contains(cellBounds.x + cellBounds.width / 2, cellBounds.y + cellBounds.height / 2)) {
+          throw new IllegalStateException("tree node " + nodeText + " is not visible on screen");
+        }
+        Point p = tree.toDisplay(cellBounds.x - getTreeNodeToExpandIconGap() - 2, cellBounds.y + (cellBounds.height / 2));
         gotoPoint(p.x, p.y);
         return null;
       }

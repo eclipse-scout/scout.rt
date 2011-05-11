@@ -49,6 +49,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -61,9 +63,9 @@ import org.eclipse.scout.testing.client.robot.JavaRobot;
 
 /**
  * Uses {@link Robot}
- * <p>
  */
 public class SwingMock implements IGuiMock {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingMock.class);
 
   static interface MockRunnable<T> {
     T run() throws Throwable;
@@ -71,6 +73,7 @@ public class SwingMock implements IGuiMock {
 
   private final IClientSession m_session;
   private final JavaRobot m_bot;
+  private int m_treeNodeToExpandIconGap;
 
   public SwingMock(IClientSession session) {
     m_session = session;
@@ -80,6 +83,22 @@ public class SwingMock implements IGuiMock {
   @Override
   public GuiStrategy getStrategy() {
     return GuiStrategy.Swing;
+  }
+
+  public int getTreeNodeToExpandIconGap() {
+    if (m_treeNodeToExpandIconGap <= 0) {
+      String s = Activator.getDefault().getBundle().getBundleContext().getProperty("IGuiMock.treeNodeToExpandIconGap");
+      if (s == null) {
+        LOG.warn("Missing config.ini property 'IGuiMock.treeNodeToExpandIconGap'; using default value of 4");
+        s = "4";
+      }
+      m_treeNodeToExpandIconGap = Integer.parseInt(s);
+    }
+    return m_treeNodeToExpandIconGap;
+  }
+
+  public void setTreeNodeToExpandIconGap(int treeNodeToExpandIconGap) {
+    m_treeNodeToExpandIconGap = treeNodeToExpandIconGap;
   }
 
   public void waitForIdle() {
@@ -295,6 +314,23 @@ public class SwingMock implements IGuiMock {
         }
         Point p = tree.getLocationOnScreen();
         gotoPoint(p.x + r.x + r.width / 2, p.y + r.y + r.height / 2);
+        return null;
+      }
+    });
+  }
+
+  @Override
+  public void gotoTreeExpandIcon(int treeIndex, final String nodeText) {
+    final JTree tree = (JTree) waitForIndexedField(FieldType.Tree, treeIndex);
+    syncExec(new MockRunnable<Object>() {
+      @Override
+      public Object run() throws Throwable {
+        Rectangle r = getTreeRowBounds(tree, getTreeRowIndex(tree, nodeText));
+        if (!tree.getVisibleRect().contains(r.x + r.width / 2, r.y + r.height / 2)) {
+          throw new IllegalStateException("tree node " + nodeText + " is not visible on screen");
+        }
+        Point p = tree.getLocationOnScreen();
+        gotoPoint(p.x + r.x - getTreeNodeToExpandIconGap() - 2, p.y + r.y + r.height / 2);
         return null;
       }
     });
