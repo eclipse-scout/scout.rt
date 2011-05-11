@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,6 +18,12 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 
+/**
+ * Tree node used in {@link ITree}.
+ * <p>
+ * Note that a {@link IVirtualTreeNode} is equal to its resolved node {@link IVirtualTreeNode#getResolvedNode()} with
+ * regard to {@link #equals(Object)} and {@link #hashCode()}
+ */
 public interface ITreeNode {
   int STATUS_NON_CHANGED = 0;
   int STATUS_INSERTED = 1;
@@ -54,8 +60,7 @@ public interface ITreeNode {
   void setExpandedInternal(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeExpanded(this,
-   * boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeExpanded(this, boolean)}
    */
   void setExpanded(boolean b);
 
@@ -65,8 +70,7 @@ public interface ITreeNode {
   void setEnabledPermissionInternal(Permission p);
 
   /**
-   * Note: this method is a Convenience for {@link
-   * ITree#setNodeEnabledPermission(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeEnabledPermission(this, boolean)}
    */
   void setEnabledPermission(Permission p);
 
@@ -76,8 +80,7 @@ public interface ITreeNode {
   void setEnabledGrantedInternal(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link
-   * ITree#setNodeEnabledGranted(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeEnabledGranted(this, boolean)}
    */
   void setEnabledGranted(boolean b);
 
@@ -87,8 +90,7 @@ public interface ITreeNode {
   void setEnabledInternal(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeEnabled(this,
-   * boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeEnabled(this, boolean)}
    */
   void setEnabled(boolean b);
 
@@ -98,8 +100,7 @@ public interface ITreeNode {
   void setVisiblePermissionInternal(Permission p);
 
   /**
-   * Note: this method is a Convenience for {@link
-   * ITree#setNodeVisiblePermission(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeVisiblePermission(this, boolean)}
    */
   void setVisiblePermission(Permission p);
 
@@ -109,8 +110,7 @@ public interface ITreeNode {
   void setVisibleGrantedInternal(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link
-   * ITree#setNodeVisibleGranted(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeVisibleGranted(this, boolean)}
    */
   void setVisibleGranted(boolean b);
 
@@ -120,8 +120,7 @@ public interface ITreeNode {
   void setVisibleInternal(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeVisible(this,
-   * boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeVisible(this, boolean)}
    */
   void setVisible(boolean b);
 
@@ -136,8 +135,7 @@ public interface ITreeNode {
   void setCheckedInternal(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeLeaf(this,
-   * boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeLeaf(this, boolean)}
    */
   void setLeaf(boolean b);
 
@@ -154,8 +152,7 @@ public interface ITreeNode {
   void setStatusInternal(int status);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeStatus(this,
-   * int)}
+   * Note: this method is a Convenience for {@link ITree#setNodeStatus(this, int)}
    */
   void setStatus(int status);
 

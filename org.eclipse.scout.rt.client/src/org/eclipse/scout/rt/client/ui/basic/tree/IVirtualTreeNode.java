@@ -18,6 +18,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.VirtualPage;
  * A virtual node is a marker tree node used to optimize performance in large trees.
  * <p>
  * It is used mainly in the {@link IPage}, {@link IOutline} area with {@link VirtualPage}s
+ * <p>
+ * Note that a {@link IVirtualTreeNode} is equal to its resolved node with regard to {@link #equals(Object)} and
+ * {@link #hashCode()}
  */
 public interface IVirtualTreeNode extends ITreeNode {
   /**

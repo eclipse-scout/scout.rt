@@ -34,6 +34,19 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
     m_cell = new Cell(this);
   }
 
+  @Override
+  public int hashCode() {
+    return 3;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj != null && obj == m_resolvedNode) {
+      return true;
+    }
+    return super.equals(obj);
+  }
+
   public void initTreeNode() {
   }
 

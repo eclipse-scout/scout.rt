@@ -181,6 +181,19 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
   protected void injectMenusInternal(List<IMenu> menuList) {
   }
 
+  @Override
+  public int hashCode() {
+    return 3;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof IVirtualTreeNode && ((IVirtualTreeNode) obj).getResolvedNode() == this) {
+      return true;
+    }
+    return super.equals(obj);
+  }
+
   /*
    * Runtime
    */
