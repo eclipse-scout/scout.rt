@@ -39,6 +39,7 @@ public class JUnitSWTJob extends Job {
 
   public JUnitSWTJob(ISwtEnvironment environment) {
     super("JUnit SWT Runner");
+    setSystem(true);
     m_environment = environment;
   }
 

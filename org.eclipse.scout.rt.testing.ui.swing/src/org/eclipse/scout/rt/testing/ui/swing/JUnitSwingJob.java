@@ -39,6 +39,7 @@ public class JUnitSwingJob extends Job {
 
   public JUnitSwingJob(Class<? extends IClientSession> clientSessionClass) {
     super("JUnit Swing Job");
+    setSystem(true);
     m_clientSessionClass = clientSessionClass;
   }
 
