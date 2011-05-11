@@ -54,7 +54,7 @@ app.zone=dev | development (paints a red border around all dialogs and frames)
 Migration: None
 
 03.05.2011 dwi
-fixed ticket #92911 
+fixed ticket #92911
 Problem: Fixed that LABEL_POSITION_ON_FIELD has no effect on multiline string fields
 Migration: None
 
@@ -70,4 +70,13 @@ public static Color blend(Color color1, Color color2, double ratio);
 
 Migration:
 If you use any of the above methods, use the RayoLookAndFeelUtility or the original source: http://geosoft.no/software/colorutil/ColorUtil.java.html
+
+11.05.2011 jgu
+bsi ticket 102027
+RayoLookAndFeelUtility removed again and added lighter/darker to org.eclipse.scout.rt.ui.swing.basic.ColorUtility to avoid duplicate code (suggested by bsh).
+public static Color lighter(Color color, float ratio);
+public static Color darker(Color color, float ratio)
+
+Migration:
+If you use any of the deleted methods in LookAndFeelUtility, use the ColorUtility or the original source: http://geosoft.no/software/colorutil/ColorUtil.java.html
 

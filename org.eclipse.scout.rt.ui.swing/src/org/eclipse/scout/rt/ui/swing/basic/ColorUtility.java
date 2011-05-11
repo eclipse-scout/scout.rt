@@ -18,6 +18,32 @@ public final class ColorUtility {
   }
 
   /**
+   * Make a color darker.
+   * 
+   * @param color
+   *          Color to mix with black.
+   * @param ratio
+   *          Black ratio (1.0 = complete black, 0.0 = color).
+   * @return Darker color.
+   */
+  public static Color darker(Color color, float ratio) {
+    return mergeColors(Color.BLACK, ratio, color, 1 - ratio);
+  }
+
+  /**
+   * Make a color lighter.
+   * 
+   * @param color
+   *          Color to mix with white.
+   * @param ratio
+   *          White ratio (1.0 = complete white, 0.0 = color).
+   * @return Lighter color.
+   */
+  public static Color lighter(Color color, float ratio) {
+    return mergeColors(Color.WHITE, ratio, color, 1 - ratio);
+  }
+
+  /**
    * Merges two colors. The two floating point arguments specify "how much" of the corresponding color is added to the
    * resulting color. Both arguments should (but don't have to) add to <code>1.0</code>.
    * <p>

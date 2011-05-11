@@ -18,7 +18,6 @@ import java.awt.Stroke;
 
 /**
  * Provides utility methods which may be used by a L&F and the Swing ext components.
- * This code is free software from http://geosoft.no/software/colorutil/ColorUtil.java.html
  */
 public final class LookAndFeelUtility {
 
