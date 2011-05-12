@@ -66,28 +66,35 @@ public class SwtScoutTableField extends SwtScoutFieldComposite<ITableField<? ext
     super.attachScout();
   }
 
-  protected void setTableFromScout(ITable table) {
-    if (m_tableComposite != null && !m_tableComposite.isDisposed()) {
-      m_tableComposite.dispose();
-    }
-    if (m_swtTableStatus != null) {
-      m_swtTableStatus.dispose();
-    }
-    m_tableComposite = null;
-    m_swtTableStatus = null;
-    if (table != null) {
-      //table
-      LogicalGridData tableGridData = LogicalGridDataBuilder.createField(getScoutObject().getGridData());
-      m_tableComposite = createSwtScoutTable();
-      m_tableComposite.createField(getSwtContainer(), getScoutObject().getTable(), getEnvironment());
-      m_tableComposite.getSwtField().setLayoutData(tableGridData);
-      //table status
-      if (getScoutObject().isTableStatusVisible()) {
-        m_swtTableStatus = createSwtTableStatus();
+  protected synchronized void setTableFromScout(ITable table) {
+    try {
+      getSwtContainer().setRedraw(false);
+      if (m_tableComposite != null && !m_tableComposite.isDisposed()) {
+        m_tableComposite.dispose();
       }
-      setSwtField(m_tableComposite.getSwtField());
-      setTableStatusFromScout();
+      if (m_swtTableStatus != null) {
+        m_swtTableStatus.dispose();
+      }
+      m_tableComposite = null;
+      m_swtTableStatus = null;
+      if (table != null) {
+        //table
+        LogicalGridData tableGridData = LogicalGridDataBuilder.createField(getScoutObject().getGridData());
+        m_tableComposite = createSwtScoutTable();
+        m_tableComposite.createField(getSwtContainer(), getScoutObject().getTable(), getEnvironment());
+        m_tableComposite.getSwtField().setLayoutData(tableGridData);
+        //table status
+        if (getScoutObject().isTableStatusVisible()) {
+          m_swtTableStatus = createSwtTableStatus();
+        }
+        setSwtField(m_tableComposite.getSwtField());
+        setTableStatusFromScout();
+      }
     }
+    finally {
+      getSwtContainer().setRedraw(true);
+    }
+
     if (!getSwtContainer().isDisposed()) {
       getSwtContainer().layout(true, true);
     }

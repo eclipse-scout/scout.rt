@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.ext.table;
 
-import java.lang.reflect.Method;
-
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.swt.SWT;
@@ -29,15 +27,21 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 public class TableEx extends Table {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableEx.class);
   private static final int TEXT_MARGIN = 3;
   private P_MouseHoverListener m_mouseHoverListener = new P_MouseHoverListener();
   private boolean m_readOnly;
   private boolean m_multiline;
-  private P_MultilineListener m_multilineListener;
 
-  public TableEx(Composite parent, int style) {
+  public TableEx(Composite parent, int style, boolean multiline) {
     super(parent, style);
+    if (multiline) {
+      Listener multilineListener = new P_MultilineListener();
+      addListener(SWT.MeasureItem, multilineListener);
+      addListener(SWT.EraseItem, multilineListener);
+      addListener(SWT.PaintItem, multilineListener);
+    }
   }
 
   @Override
@@ -81,44 +85,6 @@ public class TableEx extends Table {
     else {
       setForeground(getDisplay().getSystemColor(SWT.COLOR_GRAY));
     }
-  }
-
-  public void setMultiLine(boolean multiLine) {
-    if (multiLine != m_multiline) {
-      Method setHeightMethod;
-      try {
-        setHeightMethod = Table.class.getDeclaredMethod("setItemHeight", Integer.TYPE);
-        setHeightMethod.setAccessible(true);
-        setHeightMethod.invoke(this, new Integer(-1));
-      }
-      catch (Exception e) {
-        LOG.warn("could not access setItemHeight method on Table class.", e);
-      }
-      m_multiline = multiLine;
-      if (m_multiline) {
-        if (m_multilineListener == null) {
-          m_multilineListener = new P_MultilineListener();
-        }
-        addListener(SWT.MeasureItem, m_multilineListener);
-        addListener(SWT.EraseItem, m_multilineListener);
-        addListener(SWT.PaintItem, m_multilineListener);
-      }
-      else {
-        if (m_multilineListener != null) {
-
-          // meassure can not be removed due tu caching in the Table class
-          removeListener(SWT.MeasureItem, m_multilineListener);
-          removeListener(SWT.EraseItem, m_multilineListener);
-          removeListener(SWT.PaintItem, m_multilineListener);
-        }
-      }
-      redraw();
-    }
-
-  }
-
-  public boolean isMultiLine() {
-    return m_multiline;
   }
 
   private class P_MouseHoverListener extends MouseTrackAdapter implements MouseMoveListener {

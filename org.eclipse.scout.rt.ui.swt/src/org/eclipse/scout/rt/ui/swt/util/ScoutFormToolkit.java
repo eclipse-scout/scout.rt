@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -75,7 +75,11 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
 
   @Override
   public TableEx createTable(Composite parent, int style) {
-    TableEx table = new TableEx(parent, style);
+    return createTable(parent, style, false);
+  }
+
+  public TableEx createTable(Composite parent, int style, boolean multilineText) {
+    TableEx table = new TableEx(parent, style, multilineText);
     adapt(table, false, false);
     return table;
 

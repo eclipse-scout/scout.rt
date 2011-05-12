@@ -111,7 +111,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       style = SWT.SINGLE;
     }
     style |= SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.BORDER;
-    TableEx table = getEnvironment().getFormToolkit().createTable(parent, style);
+    TableEx table = getEnvironment().getFormToolkit().createTable(parent, style, getScoutObject().isMultilineText());
     table.setLinesVisible(false);
     table.setHeaderVisible(true);
     new TableRolloverSupport(table);
@@ -238,7 +238,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());
       setSelectionFromScout(getScoutObject().getSelectedRows());
       updateKeyStrokeFormScout();
-      updateMultilineTextFromScout();
       updateKeyboardNavigationFromScout();
       updateAutoResizeColumnsFromScout();
       // dnd support
@@ -311,13 +310,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     m_keyStrokes = newSwtKeyStrokes.toArray(new ISwtKeyStroke[newSwtKeyStrokes.size()]);
   }
 
-  protected void updateMultilineTextFromScout() {
-    boolean multilineText = getScoutObject().isMultilineText();
-    getSwtField().setMultiLine(multilineText);
-    ((SwtScoutTableModel) getSwtTableViewer().getContentProvider()).setMultiline(multilineText);
-    getSwtTableViewer().refresh();
-  }
-
   protected void updateKeyboardNavigationFromScout() {
     if (getScoutObject().hasKeyboardNavigation()) {
       if (m_keyboardNavigationSupport == null) {
@@ -360,9 +352,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
     else if (propName.equals(ITable.PROP_KEY_STROKES)) {
       updateKeyStrokeFormScout();
-    }
-    else if (propName.equals(ITable.PROP_MULTILINE_TEXT)) {
-      updateMultilineTextFromScout();
     }
     else if (propName.equals(ITable.PROP_KEYBOARD_NAVIGATION)) {
       updateKeyboardNavigationFromScout();
