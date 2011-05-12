@@ -80,6 +80,13 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return 0;
   }
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(110)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredDoc() {
+    return null;
+  }
+
   /**
    * @param pageList
    *          is used to add pages to the tree. All these pages are roots of the

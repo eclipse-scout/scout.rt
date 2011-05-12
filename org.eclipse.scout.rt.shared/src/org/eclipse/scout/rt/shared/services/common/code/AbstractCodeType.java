@@ -85,6 +85,13 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
     return null;
   }
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(110)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredDoc() {
+    return null;
+  }
+
   /**
    * This method is called on server side to load codes <br>
    * Sample for sql call:
