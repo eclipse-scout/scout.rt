@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,11 +28,15 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
     super.initConfig();
   }
 
+  @Override
   public int getRowCount() {
     return m_rowList.size();
   }
 
-  public abstract int getColumnCount();
+  @Override
+  public int getColumnCount() {
+    return 0;
+  }
 
   /**
    * Configurator will add column-named getters and setters for value access<br>
@@ -42,7 +46,10 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
   /**
    * The configurator will delegate this getter to one of the above getters
    */
-  public abstract Object getValueAt(int row, int column);
+  @Override
+  public Object getValueAt(int row, int column) {
+    return null;
+  }
 
   protected Object getValueInternal(int row, int column) {
     Object[] a = m_rowList.get(row);
@@ -52,7 +59,9 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
   /**
    * The configurator will delegate this setter to one of the above setters
    */
-  public abstract void setValueAt(int row, int column, Object value);
+  @Override
+  public void setValueAt(int row, int column, Object value) {
+  }
 
   protected void setValueInternal(int row, int column, Object value) {
     Object[] a = m_rowList.get(row);
