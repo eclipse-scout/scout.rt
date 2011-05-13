@@ -15,8 +15,10 @@ import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.EventListener;
@@ -1654,7 +1656,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       SimpleXmlElement e = storeXML();
       ByteArrayOutputStream bo = new ByteArrayOutputStream();
       e.writeDocument(bo, null, encoding);
-      return new String(bo.toByteArray());
+      return new String(bo.toByteArray(), Charset.forName(encoding));
     }
     catch (Throwable e) {
       if (e instanceof ProcessingException) {
@@ -1803,7 +1805,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       }
       // export search parameters
       try {
-        storeXML().writeDocument(new FileWriter(path), null, "UTF-8");
+        storeXML().writeDocument(new OutputStreamWriter(new FileOutputStream(path), "UTF-8"), null, "UTF-8");
         if (path != null) {
           m_lastXmlFileForStorage = path;
         }
