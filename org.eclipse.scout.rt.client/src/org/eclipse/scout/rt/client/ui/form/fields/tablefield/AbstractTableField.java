@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.HashMap;
 
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -23,9 +24,9 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
@@ -308,6 +309,12 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
           if (!valueChangeTriggersEnabled) setValueChangeTriggerEnabled(false);
           //
           m_table.updateTable(tableFieldData);
+          if (m_table.isCheckable()
+              && m_table.getCheckableColumn() != null) {
+            for (ITableRow row : m_table.getRows()) {
+              row.setChecked(BooleanUtility.nvl(m_table.getCheckableColumn().getValue(row)));
+            }
+          }
         }
         finally {
           if (!valueChangeTriggersEnabled) setValueChangeTriggerEnabled(true);
