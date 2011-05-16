@@ -94,7 +94,7 @@ public class SwtCalendar extends Composite implements PaintListener {
     createControls();
     addPaintListener(this);
     // set date to now + refresh layout
-    setViewDate();
+    setToday();
 
   }
 
@@ -476,7 +476,7 @@ public class SwtCalendar extends Composite implements PaintListener {
   }
 
   /** set view date to the truncated date of now */
-  public void setViewDate() {
+  public void setToday() {
     // set view date to now
     m_viewDate = truncDate(Calendar.getInstance());
 
@@ -584,10 +584,12 @@ public class SwtCalendar extends Composite implements PaintListener {
 
   /** set selection to the given date c */
   public void setSelectedDate(Calendar c) {
-
     c = truncDate(c);
     if (c != null) m_selectedDate = c;
+  }
 
+  public void setSelectedDateFromUI(Calendar c) {
+    setSelectedDate(c);
   }
 
   /** update selection with the set selected date */

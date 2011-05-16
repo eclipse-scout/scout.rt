@@ -75,7 +75,7 @@ public abstract class AbstractCalendarItem extends Composite implements Calendar
     addMouseListener(new MouseAdapter() {
       @Override
       public void mouseDown(MouseEvent e) {
-        m_cell.getCalendar().setSelectedDate(m_cell.getDate());
+        m_cell.getCalendar().setSelectedDateFromUI(m_cell.getDate());
         m_cell.getCalendar().setSelectedItem(m_item.getItem());
       }
     });

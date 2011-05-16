@@ -273,7 +273,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
 
     // report selection to main calendar
     m_calendar.setSelectedItem(null);
-    m_calendar.setSelectedDate(m_cellDate);
+    m_calendar.setSelectedDateFromUI(m_cellDate);
   }
 
   /** setup listeners */

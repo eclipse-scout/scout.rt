@@ -182,8 +182,8 @@ public class SwtScoutCalendar extends SwtCalendar {
   }
 
   @Override
-  public void setSelectedDate(final Calendar c) {
-    super.setSelectedDate(c);
+  public void setSelectedDateFromUI(final Calendar c) {
+    super.setSelectedDateFromUI(c);
     if (m_scoutCalendarModel != null) {
       //notify Scout
       Runnable r = new Runnable() {
@@ -195,6 +195,10 @@ public class SwtScoutCalendar extends SwtCalendar {
       m_field.getEnvironment().invokeScoutLater(r, 0);
       //end notify
     }
+  }
+
+  private void setSelectedDateFromScout(final Calendar c) {
+    super.setSelectedDate(c);
   }
 
   @Override
@@ -237,7 +241,7 @@ public class SwtScoutCalendar extends SwtCalendar {
         else if (name.equals(ICalendar.PROP_SELECTED_DATE)) {
           final Calendar cal = Calendar.getInstance();
           cal.setTime((Date) newValue);
-          setSelectedDate(cal);
+          setSelectedDateFromScout(cal);
           setViewDate(cal);
           fireViewDateChanged();
           refreshLayout();
