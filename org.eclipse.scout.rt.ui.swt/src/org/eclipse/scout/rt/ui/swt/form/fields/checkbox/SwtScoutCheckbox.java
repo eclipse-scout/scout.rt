@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.swt.form.fields.checkbox;
 
 import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
@@ -71,7 +70,6 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
   @Override
   protected void attachScout() {
     super.attachScout();
-    setSelectionFromScout((getScoutObject().getValue()).booleanValue());
     if (m_swtButtonListener == null) {
       m_swtButtonListener = new P_SwtButtonListener();
     }
@@ -147,21 +145,7 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
 
   @Override
   protected void setValueFromScout() {
-	setSelectionFromScout(BooleanUtility.nvl(getScoutObject() == null ? null : getScoutObject().getValue()));
-  }
-
-  protected void setSelectionFromScout(boolean selection) {
-    getSwtField().setSelection(selection);
-  }
-
-  @Override
-  protected void handleScoutPropertyChange(String name, Object newValue) {
-    if (name.equals(IValueField.PROP_VALUE)) {
-      setSelectionFromScout(((Boolean) newValue).booleanValue());
-    }
-    else {
-      super.handleScoutPropertyChange(name, newValue);
-    }
+    getSwtField().setSelection(BooleanUtility.nvl(getScoutObject() == null ? null : getScoutObject().getValue()));
   }
 
   protected void handleSwtAction() {
@@ -175,23 +159,6 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
           public void run() {
             try {
               getScoutObject().getUIFacade().setSelectedFromUI(b);
-              //check if value was really set
-              if (b != getScoutObject().isChecked()) {
-                Runnable revertJob = new Runnable() {
-                  @Override
-                  public void run() {
-                    try {
-                      getUpdateSwtFromScoutLock().acquire();
-                      //
-                      setValueFromScout();
-                    }
-                    finally {
-                      getUpdateSwtFromScoutLock().release();
-                    }
-                  }
-                };
-                getEnvironment().invokeSwtLater(revertJob);
-              }
             }
             finally {
               m_handleActionPending = false;

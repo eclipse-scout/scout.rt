@@ -101,23 +101,6 @@ public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanFi
           public void run() {
             try {
               getScoutObject().getUIFacade().setSelectedFromUI(b);
-              //check if value was really set
-              if (b != getScoutObject().isChecked()) {
-                Runnable revertJob = new Runnable() {
-                  @Override
-                  public void run() {
-                    try {
-                      getUpdateSwingFromScoutLock().acquire();
-                      //
-                      setValueFromScout(getScoutObject().getValue());
-                    }
-                    finally {
-                      getUpdateSwingFromScoutLock().release();
-                    }
-                  }
-                };
-                getSwingEnvironment().invokeSwingLater(revertJob);
-              }
             }
             finally {
               m_handleActionPending = false;

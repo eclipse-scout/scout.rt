@@ -80,3 +80,9 @@ public static Color darker(Color color, float ratio)
 Migration:
 If you use any of the deleted methods in LookAndFeelUtility, use the ColorUtility or the original source: http://geosoft.no/software/colorutil/ColorUtil.java.html
 
+16.05.2011 sle
+bsi ticket 101'225
+When the value of an checkbox is changed in the ui and the model throws an VetoException, the exclamation mark and the error status is set on the checkbox. The Checkbox
+is also set back to its original state. Problem: The user cannot unset/correct the error status.
+
+Change: The value on the ui is kept on its state set from the user, so the user can correct it according to its error status/exclamation mark.
