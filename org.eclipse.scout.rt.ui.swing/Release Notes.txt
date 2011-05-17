@@ -44,3 +44,12 @@ Migration: None
 fixed ticket #92911
 Problem: Fixed that LABEL_POSITION_ON_FIELD has no effect on multiline string fields
 Migration: None
+
+17.05.2011 imo
+bsi ticket 102'175, contributed by Beat Schwarzentrub BSI AG
+When a user double-clicks on a row in a TablePage, the tree is automatically expanded, the corresponding node is selected, and the tree is scrolled, such that the selected node and as many as possible of its sub nodes are visible.
+This behaviour is confusing when browsing trees with nodes that have long labels. The current implementation tries to move as much as possible of the target nodes rectangle to the visible area. For nodes that are on deeper levels, this means, that the tree is scrolled horizontally and the node is drawn on the left side of the tree border (Figures 1, 2). When the user wants to get back to the parent node, it might not be recognizable anymore.
+The same applies, when getConfiguredScrollToSelection() is true, or the method scrollToSelection() is called manually.
+The tree should only automatically scroll horizontally when the node would be completely off the right side of the tree's border. To prevent the tree from "jumping" too much around, only a small part of the node's label should be guaranteed to be drawn. The proposed patch (currently only for Swing, there might be better approaches...) uses a maximum of 30 pixels or 25% of the node's width. The result is more like what the user would expect.
+Change: as proposer
+Migration: None

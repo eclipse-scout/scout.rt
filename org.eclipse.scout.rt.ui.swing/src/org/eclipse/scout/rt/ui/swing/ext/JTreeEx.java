@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,6 +24,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -147,4 +148,26 @@ public class JTreeEx extends JTree {
     m_preferredScrollableViewportSize = d;
   }
 
+  /**
+   * Custom implementation that tries to prevent unnecessary horizontal
+   * scrolling of the tree. It's a copy of the default implementation,
+   * with the only difference that it limits the width of the visible
+   * rect of the target node to <i>max(30 Pixels, 25% of total width)</i>.
+   */
+  @Override
+  public void scrollPathToVisible(TreePath treePath) {
+    if (treePath != null) {
+      makeVisible(treePath);
+      Rectangle pathBounds = getPathBounds(treePath);
+      if (pathBounds != null) {
+        // <NoHorizontalScrollPatch>
+        pathBounds.width = Math.max(30, (int) (0.25 * pathBounds.width));
+        // </NoHorizontalScrollPatch>
+        scrollRectToVisible(pathBounds);
+        if (accessibleContext != null) {
+          ((AccessibleJTree) accessibleContext).fireVisibleDataPropertyChange();
+        }
+      }
+    }
+  }
 }
