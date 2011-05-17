@@ -50,8 +50,6 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   private static final String SESSION_DATA_KEY = "bookmarkServiceState";
 
   public BookmarkService() {
-    ServiceState state = getServiceState();
-    state.m_model = new BookmarkData();
   }
 
   private ServiceState getServiceState() {
@@ -62,6 +60,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
     ServiceState data = (ServiceState) session.getData(SESSION_DATA_KEY);
     if (data == null) {
       data = new ServiceState();
+      data.m_model = new BookmarkData();
       session.setData(SESSION_DATA_KEY, data);
     }
     return data;
