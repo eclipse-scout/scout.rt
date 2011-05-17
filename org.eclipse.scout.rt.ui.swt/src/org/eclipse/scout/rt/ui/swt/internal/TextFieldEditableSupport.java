@@ -26,11 +26,13 @@ public class TextFieldEditableSupport {
   private StyledText m_styledText;
   private Text m_text;
   private Control[] m_tabListBackup;
-  private Listener m_readOnlyListener = new P_ReadOnlyListener();
+  private Listener m_readOnlyListener;
   private final Object m_lock = new Object();
+  private boolean m_editable;
 
   public TextFieldEditableSupport(StyledText styledText) {
     m_styledText = styledText;
+    m_editable = true;
   }
 
   public TextFieldEditableSupport(Text text) {
@@ -47,18 +49,35 @@ public class TextFieldEditableSupport {
     throw new IllegalStateException("StyledText and Text is null");
   }
 
+  /**
+   * @return the editable
+   */
+  public boolean isEditable() {
+    return m_editable;
+  }
+
   public void setEditable(boolean editable) {
     synchronized (m_lock) {
-      if (editable) {
-        getTextField().removeListener(SWT.FocusIn, m_readOnlyListener);
-        getTextField().removeListener(SWT.FocusOut, m_readOnlyListener);
+      if (m_editable != editable) {
+        if (editable) {
+          if (m_readOnlyListener == null) {
+            m_readOnlyListener = new P_ReadOnlyListener();
+            getTextField().removeListener(SWT.FocusIn, m_readOnlyListener);
+            getTextField().removeListener(SWT.FocusOut, m_readOnlyListener);
+          }
+        }
+        else {
+          if (m_readOnlyListener != null) {
+            getTextField().addListener(SWT.FocusIn, m_readOnlyListener);
+            getTextField().addListener(SWT.FocusOut, m_readOnlyListener);
+            m_readOnlyListener = null;
+          }
+        }
+        setEditableInternal(editable);
+        setFieldInTabList(editable);
+        m_editable = editable;
       }
-      else {
-        getTextField().addListener(SWT.FocusIn, m_readOnlyListener);
-        getTextField().addListener(SWT.FocusOut, m_readOnlyListener);
-      }
-      setEditableInternal(editable);
-      setFieldInTabList(editable);
+
     }
   }
 
@@ -74,18 +93,17 @@ public class TextFieldEditableSupport {
   private void setFieldInTabList(boolean inTablist) {
     Control textField = getTextField();
     Composite parent = textField.getParent();
-    Control[] tl = parent.getTabList();
     if (inTablist) {
-      if (tl != null) {
-        for (Control c : tl) {
-          if (c == textField) {
-            return;
-          }
-        }
+      if (m_tabListBackup == null) {
+        return;
       }
       parent.setTabList(m_tabListBackup);
+      m_tabListBackup = null;
     }
     else {
+      if (m_tabListBackup != null) {
+        return;
+      }
       m_tabListBackup = parent.getTabList();
       ArrayList<Control> tabList = new ArrayList<Control>(Arrays.asList(m_tabListBackup));
       if (tabList.remove(textField)) {
