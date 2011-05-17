@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
+import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +18,7 @@ import java.util.Locale;
 
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -24,6 +26,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.CloseButton;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.GroupBox.HtmlField;
@@ -83,19 +86,21 @@ public class ScoutInfoForm extends AbstractForm {
   @Order(10.0f)
   public class MainBox extends AbstractGroupBox {
 
-    @Override
-    protected int getConfiguredGridColumnCount() {
-      return 1;
+    private Boolean m_isSwing = null;
+
+    private boolean isSwing() {
+      if (m_isSwing == null) {
+        m_isSwing = (Platform.getBundle("org.eclipse.scout.rt.ui.swing") != null);
+      }
+      return BooleanUtility.nvl(m_isSwing);
     }
 
     @Override
     protected boolean getConfiguredGridUseUiWidth() {
-      return true;
-    }
-
-    @Override
-    protected boolean getConfiguredGridUseUiHeight() {
-      return true;
+      if (isSwing()) {
+        return true;
+      }
+      return false;
     }
 
     @Order(10.0f)
@@ -103,16 +108,15 @@ public class ScoutInfoForm extends AbstractForm {
 
       @Override
       protected boolean getConfiguredGridUseUiWidth() {
-        return true;
-      }
-
-      @Override
-      protected boolean getConfiguredGridUseUiHeight() {
-        return true;
+        if (isSwing()) {
+          return true;
+        }
+        return false;
       }
 
       @Order(10.0f)
       public class HtmlField extends AbstractHtmlField {
+
         @Override
         protected boolean getConfiguredLabelVisible() {
           return false;
@@ -124,13 +128,40 @@ public class ScoutInfoForm extends AbstractForm {
         }
 
         @Override
+        protected boolean getConfiguredScrollBarEnabled() {
+          return false;
+        }
+
+        @Override
         protected boolean getConfiguredGridUseUiWidth() {
-          return true;
+          if (isSwing()) {
+            return true;
+          }
+          return false;
         }
 
         @Override
         protected boolean getConfiguredGridUseUiHeight() {
-          return true;
+          if (isSwing()) {
+            return true;
+          }
+          return false;
+        }
+
+        @Override
+        protected int getConfiguredGridW() {
+          if (isSwing()) {
+            return 1;
+          }
+          return 2;
+        }
+
+        @Override
+        protected int getConfiguredGridH() {
+          if (isSwing()) {
+            return 1;
+          }
+          return 20;
         }
 
         @Override
@@ -140,7 +171,6 @@ public class ScoutInfoForm extends AbstractForm {
           }
         }
       }
-
     }
 
     @Order(20.0f)
@@ -157,7 +187,11 @@ public class ScoutInfoForm extends AbstractForm {
     if (f != null && !f.hasContent()) {
       // try to load bundle resource
       try {
-        f.readData(org.eclipse.scout.rt.shared.Activator.getDefault().getBundle().getResource("resources/icons/application_logo_large.png").openStream());
+        IClientSession clientSession = ClientSyncJob.getCurrentSession();
+        IconSpec iconSpec = clientSession.getIconLocator().getIconSpec("application_logo_large.png");
+        ByteArrayInputStream is = new ByteArrayInputStream(iconSpec.getContent());
+        f.readData(is);
+        is.close();
       }
       catch (Exception ex2) {
         LOG.info(null, ex2);

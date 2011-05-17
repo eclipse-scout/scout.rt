@@ -379,3 +379,19 @@ ITable:
 AbstractTable:
 - protected Class<? extends AbstractBooleanColumn> getConfiguredCheckableColumn();
 Migration: None
+
+17.05.2011 sle
+bsi ticket 102'010: ScoutInfoForm looks ugly (in SWT)
+Problem: 
+a) ScoutInfoForm does not look nice in SWT
+b) ... does not have a Default-Logo
+c) ... has a quirky way of getting the logo.
+
+Solution: 
+a) In Swing the GridData is different than for the other ui-layers.
+b) The Bundle org.eclipse.scout.rt.client has now a Default-Logo.
+c) The Logo is searched with th IconLocator.
+
+Migration:
+If ScoutInfoForm is overwritten to be able to get the correct logo this is not necessary anymore. Just the IIconProviderService 
+has to be registered and an Icon with the name application_logo_large.png must be in a bundle. 
