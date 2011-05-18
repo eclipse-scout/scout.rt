@@ -516,6 +516,15 @@ public class SwingMock implements IGuiMock {
     waitForIdle();
   }
 
+  public void pressLeft() {
+    m_bot.pressLeft();
+  }
+
+  public void releaseLeft() {
+    m_bot.releaseLeft();
+    waitForIdle();
+  }
+
   public void drag(int x1, int y1, int x2, int y2) {
     gotoPoint(x1, y1);
     m_bot.pressLeft();

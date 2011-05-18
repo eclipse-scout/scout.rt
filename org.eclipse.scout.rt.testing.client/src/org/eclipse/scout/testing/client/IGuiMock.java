@@ -185,6 +185,16 @@ public interface IGuiMock {
   void clickRight();
 
   /**
+   * Press left mouse button (without releasing it)
+   */
+  void pressLeft();
+
+  /**
+   * Release left mouse button (must be called after {@link IGuiMock#pressLeft()}
+   */
+  public void releaseLeft();
+
+  /**
    * Drag the mouse
    */
   void drag(int x1, int y1, int x2, int y2);
