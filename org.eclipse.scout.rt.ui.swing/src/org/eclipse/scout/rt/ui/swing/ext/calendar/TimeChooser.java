@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.ext.calendar;
 
-import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -21,14 +20,11 @@ import java.util.Date;
 import java.util.EventListener;
 
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
@@ -37,7 +33,7 @@ import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
 
 /**
- * New analog/digital clock version of the time chooser widget.
+ * Tabular listing of times of every half hour
  * 
  * @author imo
  */
@@ -54,38 +50,33 @@ public class TimeChooser {
     m_table = new JTableEx();
     m_table.setAutoResizeMode(JTableEx.AUTO_RESIZE_ALL_COLUMNS);
     m_table.setTableHeader(null);
-    m_table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+    m_table.setModel(new P_TableModel());
+    m_table.setDefaultRenderer(Date.class, new DefaultTableCellRenderer() {
       private static final long serialVersionUID = 1L;
 
       @Override
-      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        String text = m_timeFormat.format((Date) value);
-        return super.getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
+      protected void setValue(Object value) {
+        if (value != null) {
+          setText(m_timeFormat.format((Date) value));
+        }
+        else {
+          setText("n/a");
+        }
       }
     });
-    m_table.setModel(new DefaultTableModel(createTableData(), new Object[]{"Time"}));
+
     //fire change when selection was chosen
     m_table.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-          if (e.getClickCount() == 1) {
-            int row = m_table.rowAtPoint(e.getPoint());
-            if (row >= 0 && !m_table.isRowSelected(row)) {
-              m_table.setRowSelectionInterval(row, row);
-            }
+          if (m_table.getSelectedRow() >= 0) {
+            fireChangedEvent();
           }
         }
       }
     });
-    m_table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-      @Override
-      public void valueChanged(ListSelectionEvent e) {
-        if (m_table.getSelectedRowCount() > 0) {
-          fireChangedEvent();
-        }
-      }
-    });
+
     //container
     JScrollPaneEx sp = new JScrollPaneEx(m_table);
     m_container = new JPanelEx(new SingleLayout());
@@ -184,5 +175,41 @@ public class TimeChooser {
       cal.add(Calendar.MINUTE, 30);
     }
     return data;
+  }
+
+  private class P_TableModel extends AbstractTableModel {
+
+    private static final long serialVersionUID = 1L;
+
+    private Object[][] m_data;
+
+    public P_TableModel() {
+      m_data = createTableData();
+    }
+
+    @Override
+    public int getRowCount() {
+      return m_data.length;
+    }
+
+    @Override
+    public int getColumnCount() {
+      return 1;
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+      return Date.class;
+    }
+
+    @Override
+    public String getColumnName(int column) {
+      return "Time";
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+      return m_data[rowIndex][columnIndex];
+    }
   }
 }

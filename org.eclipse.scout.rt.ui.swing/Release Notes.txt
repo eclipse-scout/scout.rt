@@ -53,3 +53,13 @@ The same applies, when getConfiguredScrollToSelection() is true, or the method s
 The tree should only automatically scroll horizontally when the node would be completely off the right side of the tree's border. To prevent the tree from "jumping" too much around, only a small part of the node's label should be guaranteed to be drawn. The proposed patch (currently only for Swing, there might be better approaches...) uses a maximum of 30 pixels or 25% of the node's width. The result is more like what the user would expect.
 Change: as proposer
 Migration: None
+
+18.05.2011 dwi
+bsi ticket 100'036 / 100'037
+When a user double-clicks on an entry on the time chooser popup field, the table cell switches into edit mode and the user cannot select the same entry again.
+Solution:
+- Swing table model of popup table changed to be not editable anymore and to have a typed date column
+- changed behavior of time entry selection (in popup) to be the same as date entry selection on DateField.
+  That implies that popup does not close, if user still holds the left mouse button pressed. Scout model is only updated and popup closed after releasing the mouse button.
+  By holding the mouse button pressed, the user can now scroll across the time entry list for ease of usability.
+Migration: None

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -178,6 +178,16 @@ public interface IGuiMock {
    * Click right mouse button
    */
   void clickRight();
+
+  /**
+   * Press left mouse button (without releasing it)
+   */
+  void pressLeft();
+
+  /**
+   * Release left mouse button (must be called after {@link IGuiMock#pressLeft()}
+   */
+  public void releaseLeft();
 
   /**
    * Drag the mouse
