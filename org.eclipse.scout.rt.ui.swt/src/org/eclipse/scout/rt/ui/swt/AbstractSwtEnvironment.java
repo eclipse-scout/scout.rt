@@ -958,6 +958,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       }
       case IForm.DISPLAY_HINT_VIEW: {
         String scoutViewId = form.getDisplayViewId();
+        if (scoutViewId == null) {
+          LOG.error("The property displayViewId must not be null if the property displayHint is set to IForm.DISPLAY_HINT_VIEW.");
+          return;
+        }
+
         String uiViewId = getSwtPartIdForScoutPartId(scoutViewId);
         if (uiViewId == null) {
           LOG.warn("no view defined for scoutViewId: " + form.getDisplayViewId());
@@ -987,7 +992,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           }
           return;
         }
-        if (IForm.EDITOR_ID.equals(form.getDisplayViewId()) || IWizard.EDITOR_ID.equals(form.getDisplayViewId())) {
+
+        //Check if an editor or a view should be opened.
+        //An editor is opened if the scoutViewId starts with IForm.EDITOR_ID or IWizard.EDITOR_ID.
+        //Compared to equals the check with startsWith enables the possibility to link different editors with the forms.
+        if (scoutViewId.startsWith(IForm.EDITOR_ID) || scoutViewId.startsWith(IWizard.EDITOR_ID)) {
           if (activePage != null) {
             ScoutFormEditorInput editorInput = new ScoutFormEditorInput(form, this);
             AbstractScoutEditorPart editor = getEditorPart(editorInput, uiViewId);
