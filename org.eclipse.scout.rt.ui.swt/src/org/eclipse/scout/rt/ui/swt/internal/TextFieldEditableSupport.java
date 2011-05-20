@@ -60,17 +60,17 @@ public class TextFieldEditableSupport {
     synchronized (m_lock) {
       if (m_editable != editable) {
         if (editable) {
-          if (m_readOnlyListener == null) {
-            m_readOnlyListener = new P_ReadOnlyListener();
+          if (m_readOnlyListener != null) {
             getTextField().removeListener(SWT.FocusIn, m_readOnlyListener);
             getTextField().removeListener(SWT.FocusOut, m_readOnlyListener);
+            m_readOnlyListener = null;
           }
         }
         else {
-          if (m_readOnlyListener != null) {
+          if (m_readOnlyListener == null) {
+            m_readOnlyListener = new P_ReadOnlyListener();
             getTextField().addListener(SWT.FocusIn, m_readOnlyListener);
             getTextField().addListener(SWT.FocusOut, m_readOnlyListener);
-            m_readOnlyListener = null;
           }
         }
         setEditableInternal(editable);
