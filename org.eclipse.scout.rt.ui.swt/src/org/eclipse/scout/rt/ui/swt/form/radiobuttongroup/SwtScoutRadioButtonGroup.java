@@ -101,9 +101,6 @@ public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadio
       }
       Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_BACKGROUND);
       Color c = getEnvironment().getColor(scoutColor);
-      if (getMandatoryFieldBackgroundColor() != null) {
-        c = getMandatoryFieldBackgroundColor();
-      }
       if (c == null) {
         c = initCol;
       }
