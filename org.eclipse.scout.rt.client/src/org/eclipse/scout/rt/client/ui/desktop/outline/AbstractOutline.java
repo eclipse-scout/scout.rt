@@ -348,9 +348,9 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     try {
       if (m_contextPageOptimisticLock.acquire()) {
         clearContextPage();
-        boolean detailFormSet = false;
-        boolean detailTableSet = false;
-        boolean detailSearchFormSet = false;
+        IForm detailForm = null;
+        ITable detailTable = null;
+        ISearchForm searchForm = null;
         // new active page
         makeActivePageToContextPage();
         IPage activePage = getActivePage();
@@ -363,36 +363,42 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
           }
           if (activePage instanceof IPageWithTable) {
             IPageWithTable tablePage = (IPageWithTable) activePage;
-            detailFormSet = true;
-            setDetailForm(activePage.getDetailForm());
+            detailForm = activePage.getDetailForm();
             if (activePage.isTableVisible()) {
-              detailTableSet = true;
-              setDetailTable(tablePage.getTable());
+              detailTable = tablePage.getTable();
             }
             if (tablePage.isSearchActive()) {
-              detailSearchFormSet = true;
-              setSearchForm(tablePage.getSearchFormInternal());
+              searchForm = tablePage.getSearchFormInternal();
             }
           }
           else if (activePage instanceof IPageWithNodes) {
             IPageWithNodes nodePage = (IPageWithNodes) activePage;
-            detailFormSet = true;
-            setDetailForm(activePage.getDetailForm());
+            detailForm = activePage.getDetailForm();
             if (activePage.isTableVisible()) {
-              detailTableSet = true;
-              setDetailTable(nodePage.getInternalTable());
+              detailTable = nodePage.getInternalTable();
             }
           }
         }
-        //
-        if (!detailFormSet) {
+
+        // remove first
+        if (detailForm == null) {
           setDetailForm(null);
         }
-        if (!detailTableSet) {
+        if (detailTable == null) {
           setDetailTable(null);
         }
-        if (!detailSearchFormSet) {
+        if (searchForm == null) {
           setSearchForm(null);
+        }
+        // add new
+        if (detailForm != null) {
+          setDetailForm(detailForm);
+        }
+        if (detailTable != null) {
+          setDetailTable(detailTable);
+        }
+        if (searchForm != null) {
+          setSearchForm(searchForm);
         }
       }
     }

@@ -1135,7 +1135,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       return;
     }
     ISwtScoutPart part = m_openForms.remove(form);
-    if (part != null) {
+    if (part != null && part.getForm().equals(form)) {
       try {
         part.closePart();
       }
