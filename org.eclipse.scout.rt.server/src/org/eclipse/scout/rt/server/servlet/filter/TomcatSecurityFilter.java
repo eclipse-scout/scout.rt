@@ -26,6 +26,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.http.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
 
@@ -61,60 +62,74 @@ public class TomcatSecurityFilter implements Filter {
       chain.doFilter(in, out);
       return;
     }
-    //
-    final HttpServletRequest req = (HttpServletRequest) in;
-    final HttpServletResponse res = (HttpServletResponse) out;
+
+    HttpServletRequest req = (HttpServletRequest) in;
+    HttpServletResponse res = (HttpServletResponse) out;
+
     // touch the session so it is effectively used
     req.getSession();
-    // check if we are already authenticated
+
+    // check if subject that has one principal at minimum is available
     Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null) {
-      Principal principal = req.getUserPrincipal();
-      if (principal == null || principal.getName() == null || principal.getName().trim().length() == 0) {
-        principal = null;
-        String name = req.getRemoteUser();
-        if (name != null && name.trim().length() > 0) {
-          principal = new SimplePrincipal(name);
-        }
-      }
-      if (principal != null) {
-        subject = new Subject();
-        subject.getPrincipals().add(principal);
-      }
-    }
-    // run in subject
-    if (Subject.getSubject(AccessController.getContext()) != null) {
+    if (subject != null && subject.getPrincipals().size() > 0) {
       doFilterInternal(req, res, chain);
     }
     else {
-      try {
-        Subject.doAs(
-            subject,
-            new PrivilegedExceptionAction<Object>() {
-              @Override
-              public Object run() throws Exception {
-                HttpServletRequest secureReq = req;
-                if (!(secureReq instanceof SecureHttpServletRequestWrapper)) {
-                  Principal principal = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next();
-                  secureReq = new SecureHttpServletRequestWrapper(req, principal, "BASIC_AUTH");
-                }
-                doFilterInternal(secureReq, res, chain);
-                return null;
-              }
-            }
-            );
+      // create subject if necessary
+      if (subject == null || subject.isReadOnly()) {
+        subject = new Subject();
       }
-      catch (PrivilegedActionException e) {
-        Throwable t = e.getCause();
-        if (t instanceof IOException) {
-          throw (IOException) t;
+
+      // create principal if necessary
+      Principal principal = req.getUserPrincipal();
+      if (principal == null || !StringUtility.hasText(principal.getName())) {
+        principal = null;
+        String name = req.getRemoteUser();
+        if (StringUtility.hasText(name)) {
+          principal = new SimplePrincipal(name);
         }
-        else if (t instanceof ServletException) {
-          throw (ServletException) t;
-        }
-        else {
-          throw new ServletException(t);
-        }
+      }
+      if (principal == null) {
+        // no principal provided, abort chain
+        res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
+      }
+
+      subject.getPrincipals().add(principal);
+      subject.setReadOnly();
+
+      continueChainWithPrincipal(subject, req, res, chain);
+    }
+  }
+
+  private void continueChainWithPrincipal(Subject subject, final HttpServletRequest req, final HttpServletResponse res, final FilterChain chain) throws IOException, ServletException {
+    try {
+      Subject.doAs(
+          subject,
+          new PrivilegedExceptionAction<Object>() {
+            @Override
+            public Object run() throws Exception {
+              HttpServletRequest secureReq = req;
+              if (!(secureReq instanceof SecureHttpServletRequestWrapper)) {
+                Principal principal = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next();
+                secureReq = new SecureHttpServletRequestWrapper(req, principal);
+              }
+              doFilterInternal(secureReq, res, chain);
+              return null;
+            }
+          }
+          );
+    }
+    catch (PrivilegedActionException e) {
+      Throwable t = e.getCause();
+      if (t instanceof IOException) {
+        throw (IOException) t;
+      }
+      else if (t instanceof ServletException) {
+        throw (ServletException) t;
+      }
+      else {
+        throw new ServletException(t);
       }
     }
   }
