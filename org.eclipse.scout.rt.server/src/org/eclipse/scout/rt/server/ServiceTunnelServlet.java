@@ -17,7 +17,8 @@ import java.io.InterruptedIOException;
 import java.lang.reflect.Method;
 import java.net.SocketException;
 import java.net.URLDecoder;
-import java.security.PrivilegedAction;
+import java.security.AccessController;
+import java.security.Principal;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -279,14 +280,35 @@ public class ServiceTunnelServlet extends HttpServletEx {
   protected IStatus serviceWithScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq) throws ProcessingException, ServletException {
     //external request: apply locking, this is the session initialization phase
     IServerSession serverSession;
+    Subject subject;
     synchronized (req.getSession()) {
+      //determine subject
+      subject = Subject.getSubject(AccessController.getContext());
+      if (subject == null) {
+        Principal principal = req.getUserPrincipal();
+        if (principal == null || principal.getName() == null || principal.getName().trim().length() == 0) {
+          principal = null;
+          String name = req.getRemoteUser();
+          if (name != null && name.trim().length() > 0) {
+            principal = new SimplePrincipal(name);
+          }
+        }
+        if (principal != null) {
+          subject = new Subject();
+          subject.getPrincipals().add(principal);
+        }
+      }
+      if (subject == null) {
+        throw new SecurityException("request contains neither remoteUser nor userPrincipal nor a subject with a principal");
+      }
+      //
       serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
       if (serverSession == null) {
-        serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, null);
+        serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
         req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
       }
     }
-    ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, req, res);
+    ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, subject, req, res);
     return job.runNow(new NullProgressMonitor());
   }
 
@@ -306,13 +328,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
         m_ajaxSessionCache.touch(ajaxSessionId);
       }
     }
-    final ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, req, res);
-    return Subject.doAs(subject, new PrivilegedAction<IStatus>() {
-      @Override
-      public IStatus run() {
-        return job.runNow(new NullProgressMonitor());
-      }
-    });
+    ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, subject, req, res);
+    return job.runNow(new NullProgressMonitor());
   }
 
   @Override
@@ -548,8 +565,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return bundle;
   }
 
-  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, ServiceTunnelRequest serviceTunnelRequest, HttpServletRequest request, HttpServletResponse response) {
-    return new ServiceTunnelServiceJob(serverSession, serviceTunnelRequest, request, response);
+  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, ServiceTunnelRequest serviceTunnelRequest, Subject subject, HttpServletRequest request, HttpServletResponse response) {
+    return new ServiceTunnelServiceJob(serverSession, serviceTunnelRequest, subject, request, response);
   }
 
   protected class ServiceTunnelServiceJob extends ServerJob {
@@ -558,8 +575,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
     protected HttpServletRequest m_request;
     protected HttpServletResponse m_response;
 
-    public ServiceTunnelServiceJob(IServerSession serverSession, ServiceTunnelRequest serviceTunnelRequest, HttpServletRequest request, HttpServletResponse response) {
-      super("ServiceTunnel", serverSession);
+    public ServiceTunnelServiceJob(IServerSession serverSession, ServiceTunnelRequest serviceTunnelRequest, Subject subject, HttpServletRequest request, HttpServletResponse response) {
+      super("ServiceTunnel", serverSession, subject);
       m_serviceTunnelRequest = serviceTunnelRequest;
       m_request = request;
       m_response = response;
