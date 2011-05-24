@@ -78,3 +78,14 @@ Solution:
 - log messages can be recorded by using IScoutLogManager#startRecording() and IScoutLogManager#stopRecording()
 - other logging implementations can be installed by creating a fragment to the host Plug-In 'org.eclipse.scout.commons' with the class 'org.eclipse.scout.commons.logger.CustomLogManager' placed in it.
 Migration: None
+
+24.05.2011 hmu
+Ticket: 102'394
+Bugzilla – Bug 346619
+Bugzilla – Bug 346190
+Problem: Sending of MimeMessages with LotusNotes failed
+Solution:
+- MailUtility.createMimeMessageFromWordArchiveInternal changed
+- MailUtility.writeHtmlBody added
+- MailUtility.writePlainBody added
+Migration: None
