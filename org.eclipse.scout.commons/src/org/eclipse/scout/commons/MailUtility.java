@@ -364,6 +364,7 @@ public final class MailUtility {
             if (!file.getName().equalsIgnoreCase("filelist.xml") &&
                 !file.getName().equalsIgnoreCase("colorschememapping.xml") &&
                 !file.getName().equalsIgnoreCase("themedata.thmx") &&
+                !file.getName().equalsIgnoreCase("header.html") &&
                 !file.getName().equalsIgnoreCase("editdata.mso")) {
               FileDataSource fds = new FileDataSource(file);
               htmlDataSourceList.add(fds);
@@ -397,48 +398,15 @@ public final class MailUtility {
       }
 
       MimeMessage mimeMessage = new CharsetSafeMimeMessage();
-      Multipart multiPart = null;
-      if (hasPlainText && hasHtml) {
-        multiPart = new MimeMultipart("alternative");
-      }
-      else {
-        multiPart = new MimeMultipart();
-      }
-      mimeMessage.setContent(multiPart);
-
-      // [<< text body
-      if (hasPlainText) {
-        MimeBodyPart bodyPartText = new MimeBodyPart();
-        bodyPartText.setText(plainTextMessage, "UTF-8");
-        bodyPartText.setHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_PLAIN);
-        bodyPartText.setHeader("Content-Transfer-Encoding", "quoted-printable");
-        multiPart.addBodyPart(bodyPartText);
-      }
-      // ]>> text body
-
-      // [<< html body
-      if (hasHtml) {
-        MimeBodyPart bodyPartHtml = new MimeBodyPart();
-        multiPart.addBodyPart(bodyPartHtml);
-        Multipart multiPartHtml = new MimeMultipart("related");
-        bodyPartHtml.setContent(multiPartHtml);
-        MimeBodyPart part = new MimeBodyPart();
-        part.setContent(htmlMessage, CONTENT_TYPE_TEXT_HTML);
-        part.setHeader("Content-Transfer-Encoding", "quoted-printable");
-        multiPartHtml.addBodyPart(part);
-        for (DataSource source : htmlDataSourceList) {
-          part = new MimeBodyPart();
-          DataHandler handler = new DataHandler(source);
-          part.setDataHandler(handler);
-          part.setFileName(source.getName());
-          part.addHeader("Content-ID", "<" + source.getName() + ">");
-          multiPartHtml.addBodyPart(part);
-        }
-      }
-      // ]>> html body
-
-      // [<< attachements
-      if (attachments != null) {
+      MimePart bodyPart = null;
+      if (attachments != null && attachments.length > 0) {
+        MimeMultipart multiPart = new MimeMultipart(); //mixed
+        mimeMessage.setContent(multiPart);
+        //add a holder for the body text
+        MimeBodyPart multiPartBody = new MimeBodyPart();
+        multiPart.addBodyPart(multiPartBody);
+        bodyPart = multiPartBody;
+        //add the attachments
         for (File attachment : attachments) {
           MimeBodyPart part = new MimeBodyPart();
           FileDataSource fds = new FileDataSource(attachment);
@@ -448,7 +416,27 @@ public final class MailUtility {
           multiPart.addBodyPart(part);
         }
       }
-      // [>> attachements
+      else {
+        //no attachments -> no need for multipart/mixed element
+        bodyPart = mimeMessage;
+      }
+
+      if (hasPlainText && hasHtml) {
+        MimeMultipart alternativePart = new MimeMultipart("alternative");
+        bodyPart.setContent(alternativePart);
+        MimeBodyPart plainBodyPart = new MimeBodyPart();
+        alternativePart.addBodyPart(plainBodyPart);
+        writePlainBody(plainBodyPart, plainTextMessage);
+        MimeBodyPart htmlBodyPart = new MimeBodyPart();
+        alternativePart.addBodyPart(htmlBodyPart);
+        writeHtmlBody(htmlBodyPart, htmlMessage, htmlDataSourceList);
+      }
+      else if (hasPlainText) { //plain text only
+        writePlainBody(bodyPart, plainTextMessage);
+      }
+      else { //html only
+        writeHtmlBody(bodyPart, htmlMessage, htmlDataSourceList);
+      }
 
       if (markAsUnsent) {
         mimeMessage.setHeader("X-Unsent", "1"); // only supported in Outlook 2010
@@ -461,6 +449,29 @@ public final class MailUtility {
     catch (MessagingException e) {
       throw new ProcessingException("Error occured while creating MIME-message", e);
     }
+  }
+
+  private static void writeHtmlBody(MimePart htmlBodyPart, String htmlMessage, List<DataSource> htmlDataSourceList) throws MessagingException {
+    Multipart multiPartHtml = new MimeMultipart("related");
+    htmlBodyPart.setContent(multiPartHtml);
+    MimeBodyPart part = new MimeBodyPart();
+    part.setContent(htmlMessage, CONTENT_TYPE_TEXT_HTML);
+    part.setHeader("Content-Transfer-Encoding", "quoted-printable");
+    multiPartHtml.addBodyPart(part);
+    for (DataSource source : htmlDataSourceList) {
+      part = new MimeBodyPart();
+      DataHandler handler = new DataHandler(source);
+      part.setDataHandler(handler);
+      part.setFileName(source.getName());
+      part.addHeader("Content-ID", "<" + source.getName() + ">");
+      multiPartHtml.addBodyPart(part);
+    }
+  }
+
+  private static void writePlainBody(MimePart plainBodyPart, String plainTextMessage) throws MessagingException {
+    plainBodyPart.setText(plainTextMessage, "UTF-8");
+    plainBodyPart.setHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_PLAIN);
+    plainBodyPart.setHeader("Content-Transfer-Encoding", "quoted-printable");
   }
 
   private MimeMessage createMimeMessageInternal(String bodyTextPlain, String bodyTextHtml, DataSource[] attachements) throws ProcessingException {
