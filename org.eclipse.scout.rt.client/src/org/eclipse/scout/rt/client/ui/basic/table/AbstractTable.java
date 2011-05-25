@@ -232,6 +232,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return false;
   }
 
+  /**
+   * This is a hint for the UI to set the table height to a fixed pixel height
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(92)
+  @ConfigPropertyValue("-1")
+  protected int getConfiguredRowHeightHint() {
+    return -1;
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   @ConfigPropertyValue("false")
@@ -240,7 +250,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @ConfigProperty(ConfigProperty.TABLE_COLUMN)
-  @Order(100)
+  @Order(102)
   @ConfigPropertyValue("false")
   protected Class<? extends AbstractBooleanColumn> getConfiguredCheckableColumn() {
     return null;
@@ -401,6 +411,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setMultiSelect(getConfiguredMultiSelect());
     setInitialMultilineText(getConfiguredMultilineText());
     setMultilineText(getConfiguredMultilineText());
+    setRowHeightHint(getConfiguredRowHeightHint());
     setKeyboardNavigation(getConfiguredKeyboardNavigation());
     setDragType(getConfiguredDragType());
     setDropType(getConfiguredDropType());
@@ -849,6 +860,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   public void setMultilineText(boolean on) {
     propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, on);
+  }
+
+  public int getRowHeightHint() {
+    return propertySupport.getPropertyInt(PROP_ROW_HEIGHT_HINT);
+  }
+
+  public void setRowHeightHint(int h) {
+    propertySupport.setPropertyInt(PROP_ROW_HEIGHT_HINT, h);
   }
 
   public boolean isInitialMultilineText() {

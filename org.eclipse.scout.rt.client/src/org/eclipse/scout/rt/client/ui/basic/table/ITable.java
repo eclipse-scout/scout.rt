@@ -62,6 +62,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    */
   String PROP_MULTILINE_TEXT = "multilineText";
   /**
+   * Integer default -1
+   */
+  String PROP_ROW_HEIGHT_HINT = "rowHeightHint";
+
+  /**
    * Boolean
    */
   String PROP_CHECKABLE = "checkable";
@@ -347,6 +352,16 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   boolean isMultilineText();
 
   void setMultilineText(boolean on);
+
+  /**
+   * @return a hint for the UI to set the table height to a fixed pixel height, default is -1
+   */
+  int getRowHeightHint();
+
+  /**
+   * set a hint for the UI to set the table height to a fixed pixel height, default is -1
+   */
+  void setRowHeightHint(int h);
 
   /**
    * other than isMultilineText this property reflects the default multiLine state of the table that is used when
