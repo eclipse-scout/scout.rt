@@ -110,7 +110,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     else {
       style = SWT.SINGLE;
     }
-    style |= SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION;
+    style |= SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.BORDER;
     TableEx table = getEnvironment().getFormToolkit().createTable(parent, style, getScoutObject().isMultilineText());
     table.setLinesVisible(false);
     table.setHeaderVisible(true);
