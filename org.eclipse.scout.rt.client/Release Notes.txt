@@ -382,16 +382,28 @@ Migration: None
 
 17.05.2011 sle
 bsi ticket 102'010: ScoutInfoForm looks ugly (in SWT)
-Problem: 
+Problem:
 a) ScoutInfoForm does not look nice in SWT
 b) ... does not have a Default-Logo
 c) ... has a quirky way of getting the logo.
 
-Solution: 
+Solution:
 a) In Swing the GridData is different than for the other ui-layers.
 b) The Bundle org.eclipse.scout.rt.client has now a Default-Logo.
 c) The Logo is searched with th IconLocator.
 
 Migration:
-If ScoutInfoForm is overwritten to be able to get the correct logo this is not necessary anymore. Just the IIconProviderService 
-has to be registered and an Icon with the name application_logo_large.png must be in a bundle. 
+If ScoutInfoForm is overwritten to be able to get the correct logo this is not necessary anymore. Just the IIconProviderService
+has to be registered and an Icon with the name application_logo_large.png must be in a bundle.
+
+25.05.2011 dwi
+bsi ticket 102'437: support for adding child entities on entity nodes of extended search
+Problem:
+Child entities do no appear on popup menu when being on an entity node
+Solution:
+changed AbstractComposerField#execCreateAttributeNode
+changed AbtractComposerNode#attachAddEntityMenus
+changed constructor of AttributeNode
+changed constructor of EntityNode
+Migration:
+None

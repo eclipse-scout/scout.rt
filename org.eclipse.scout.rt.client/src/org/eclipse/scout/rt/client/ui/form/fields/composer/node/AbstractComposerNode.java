@@ -90,17 +90,16 @@ public abstract class AbstractComposerNode extends AbstractTreeNode {
       }
       n = n.getParentNode();
     }
+
+    IDataModelEntity[] childEntitites;
     if (eNode != null) {
-      // nop
-      /*
-       * for(IComposerEntity e: eNode.getEntity().getComposerEntities()){
-       * menus.add(new AddEntityMenu(getComposerField(),this,e)); }
-       */
+      childEntitites = eNode.getEntity().getEntities();
     }
     else {
-      for (IDataModelEntity e : getComposerField().getEntities()) {
-        menus.add(new AddEntityMenu(getComposerField(), this, e));
-      }
+      childEntitites = getComposerField().getEntities();
+    }
+    for (IDataModelEntity e : childEntitites) {
+      menus.add(new AddEntityMenu(getComposerField(), this, e));
     }
   }
 

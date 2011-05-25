@@ -31,8 +31,10 @@ public class EntityNode extends AbstractComposerNode {
   private Object[] m_values;
   private String[] m_texts;
 
-  public EntityNode(IComposerField composerField) {
-    super(composerField, true);
+  public EntityNode(IComposerField composerField, IDataModelEntity entity) {
+    super(composerField, false);
+    m_entity = entity;
+    callInitializer();
   }
 
   @Override

@@ -30,8 +30,9 @@ public class AttributeNode extends AbstractComposerNode {
   private Object[] m_values;
   private String[] m_texts;
 
-  public AttributeNode(IComposerField composerField) {
+  public AttributeNode(IComposerField composerField, IDataModelAttribute attrbiute) {
     super(composerField, false);
+    m_attribute = attrbiute;
     callInitializer();
   }
 

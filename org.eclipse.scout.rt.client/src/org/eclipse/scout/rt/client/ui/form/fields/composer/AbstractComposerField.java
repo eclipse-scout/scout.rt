@@ -18,9 +18,9 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -133,8 +133,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   @ConfigOperation
   @Order(110)
   protected EntityNode execCreateEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, Object[] values, String[] texts) {
-    EntityNode node = new EntityNode(this);
-    node.setEntity(e);
+    EntityNode node = new EntityNode(this, e);
     node.setValues(values);
     node.setTexts(texts);
     node.setNegative(negated);
@@ -156,8 +155,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     if (aggregationType != null && aggregationType == DataModelConstants.AGGREGATION_NONE) {
       aggregationType = null;
     }
-    AttributeNode node = new AttributeNode(this);
-    node.setAttribute(a);
+    AttributeNode node = new AttributeNode(this, a);
     node.setAggregationType(aggregationType);
     node.setOp(op);
     node.setValues(values);
