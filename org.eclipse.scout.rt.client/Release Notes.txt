@@ -399,7 +399,7 @@ has to be registered and an Icon with the name application_logo_large.png must b
 25.05.2011 dwi
 bsi ticket 102'437: support for adding child entities on entity nodes of extended search
 Problem:
-Child entities do no appear on popup menu when being on an entity node
+Child entities do not appear on popup menu when being on an entity node
 Solution:
 changed AbstractComposerField#execCreateAttributeNode
 changed AbtractComposerNode#attachAddEntityMenus
