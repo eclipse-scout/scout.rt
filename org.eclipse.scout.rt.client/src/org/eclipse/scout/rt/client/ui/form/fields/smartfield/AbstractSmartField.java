@@ -1501,16 +1501,16 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
       ISmartFieldProposalForm smartForm = getProposalForm();
       // accept proposal form if either input text matches search text or
       // existing display text is valid
-      if (smartForm != null && (StringUtility.equalsIgnoreNewLines(text, smartForm.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
-        try {
-          if (smartForm.getAcceptedProposal() != null) {
-            // a proposal was selected
-            return acceptProposalFromUI();
-          }
+      try {
+        if (smartForm != null && smartForm.getAcceptedProposal() != null) {
+          // a proposal was selected
+          return acceptProposalFromUI();
+        }
+        if (smartForm != null && (StringUtility.equalsIgnoreNewLines(text, smartForm.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
           /*
            * empty text means null
            */
-          else if (text == null || text.length() == 0) {
+          if (text == null || text.length() == 0) {
             boolean b = parseValue(text);
             return b;
           }
@@ -1533,23 +1533,24 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
               return true;
             }
           }
-        }
-        catch (ProcessingException e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-          return true;
-        }
-      }
-      else {
-        /*
-         * ticket 88359
-         * check if changed at all
-         */
-        if (CompareUtility.equals(text, currentValidText)) {
-          return true;
+
         }
         else {
-          return parseValue(text);
+          /*
+           * ticket 88359
+           * check if changed at all
+           */
+          if (CompareUtility.equals(text, currentValidText)) {
+            return true;
+          }
+          else {
+            return parseValue(text);
+          }
         }
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        return true;
       }
     }
 
