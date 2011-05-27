@@ -370,13 +370,16 @@ public final class StringUtility {
     if (text == null) return null;
     TagBounds a;
     int b;
-    while ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
+    int startPos = 0;
+    while (startPos < text.length() && (a = getStartTag(text, tagName, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
           text.substring(0, a.begin) +
               start +
               text.substring(a.end, b) +
               end +
               text.substring(b + tagName.length() + 3);
+      //next
+      startPos = a.begin + start.length();
     }
     return text;
   }
