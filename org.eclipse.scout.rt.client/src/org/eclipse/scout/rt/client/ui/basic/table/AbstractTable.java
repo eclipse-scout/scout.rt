@@ -634,11 +634,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   public void doHyperlinkAction(ITableRow row, IColumn<?> col, URL url) throws ProcessingException {
-    if (row != null && col != null) {
+    if (row != null) {
       selectRow(row);
-      setContextColumn(col);
-      execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
     }
+    if (col != null) {
+      setContextColumn(col);
+    }
+    execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
   }
 
   public ITableRowFilter[] getRowFilters() {
