@@ -2840,6 +2840,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void addLocalPopupMenus(TableEvent e) {
+    boolean singleSelect = getSelectedRowCount() == 1;
     boolean multiSelect = getSelectedRowCount() >= 2;
     boolean allRowsEnabled = true;
     for (ITableRow row : getSelectedRows()) {
@@ -2855,27 +2856,28 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         case TableEvent.TYPE_HEADER_POPUP:
         case TableEvent.TYPE_EMPTY_SPACE_POPUP: {
           if (menu.isEmptySpaceAction()) {
-            validMenu = menu;
+            if ((!menu.isInheritAccessibility()) || (isEnabled())) {
+              validMenu = menu;
+            }
           }
           break;
         }
         case TableEvent.TYPE_ROW_POPUP: {
           if (multiSelect) {
             if (menu.isMultiSelectionAction()) {
-              validMenu = menu;
+              if ((!menu.isInheritAccessibility()) || (isEnabled() && allRowsEnabled)) {
+                validMenu = menu;
+              }
             }
           }
-          else {
+          else if (singleSelect) {
             if (menu.isSingleSelectionAction()) {
-              validMenu = menu;
+              if ((!menu.isInheritAccessibility()) || (isEnabled() && allRowsEnabled)) {
+                validMenu = menu;
+              }
             }
           }
           break;
-        }
-      }
-      if (validMenu != null && validMenu.isInheritAccessibility()) {
-        if (!isEnabled() || !allRowsEnabled) {
-          validMenu = null;
         }
       }
       if (validMenu != null) {
