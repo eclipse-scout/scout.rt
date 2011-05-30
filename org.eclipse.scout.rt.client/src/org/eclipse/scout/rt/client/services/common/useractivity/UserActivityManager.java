@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -81,7 +81,7 @@ public class UserActivityManager {
       }
     }
     // add client notification listener
-    SERVICES.getService(IClientNotificationConsumerService.class).addClientNotificationConsumerListener(m_clientNotificationConsumerListener);
+    SERVICES.getService(IClientNotificationConsumerService.class).addClientNotificationConsumerListener(m_clientSession, m_clientNotificationConsumerListener);
     // add provider listener
     try {
       m_provider = SERVICES.getService(IUserActivityProvider.class);
@@ -102,7 +102,7 @@ public class UserActivityManager {
     }
     m_started = false;
     // detach
-    SERVICES.getService(IClientNotificationConsumerService.class).removeClientNotificationConsumerListener(m_clientNotificationConsumerListener);
+    SERVICES.getService(IClientNotificationConsumerService.class).removeClientNotificationConsumerListener(m_clientSession, m_clientNotificationConsumerListener);
     if (m_provider != null) {
       m_provider.removePropertyChangeListener(IUserActivityProvider.PROP_ACTIVE, m_userActivityProviderListener);
     }
