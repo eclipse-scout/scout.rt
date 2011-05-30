@@ -414,3 +414,10 @@ See javadoc for more details.
 Migration:
 Review deprecated usages of IClientNotificationConsumerService.addClientNotificationConsumerListener and IClientNotificationConsumerService.addClientNotificationConsumerListener.
 Default simply adds "ClientJob.getCurrentSession()" as first argument.
+
+30.05.2011 imo
+bsi ticket 100940
+A menu opened in empty space should not consider any selection on a row.
+Thus the menu should open anyway (not querying the selection status of any row).
+Migration:
+None
