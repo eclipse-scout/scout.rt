@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.services.common.session.internal;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -95,8 +96,8 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
             getCurrentSession().startSession(bundle);
           }
         };
-        job.schedule();
-        job.join();
+        //must run now to use correct jaas and subject context of calling thread
+        job.runNow(new NullProgressMonitor());
         job.throwOnError();
         return (T) clientSession;
       }
