@@ -162,7 +162,7 @@ public abstract class AbstractClientSession implements IClientSession {
     // add client notification listener
     IClientNotificationConsumerService clientNotificationConsumerService = SERVICES.getService(IClientNotificationConsumerService.class);
     if (clientNotificationConsumerService != null) {
-      clientNotificationConsumerService.addClientNotificationConsumerListener(new IClientNotificationConsumerListener() {
+      clientNotificationConsumerService.addClientNotificationConsumerListener(this, new IClientNotificationConsumerListener() {
         public void handleEvent(final ClientNotificationConsumerEvent e, boolean sync) {
           if (e.getClientNotification().getClass() == SharedContextChangedNotification.class) {
             if (sync) {

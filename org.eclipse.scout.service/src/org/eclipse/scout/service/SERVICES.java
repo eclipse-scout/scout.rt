@@ -88,22 +88,25 @@ public final class SERVICES {
     return null;
   }
 
+  /**
+   * safely get and immediately unget the service in an atomic section using the service reference as lock
+   */
   @SuppressWarnings("unchecked")
   private static <T extends Object> T resolveService(Class<T> serviceInterfaceClass, BundleContext context, ServiceReference ref) {
     if (ref == null) {
       return null;
     }
-
-    try {
-      Object s = safeGetService(context, ref);
-      if (s != null && serviceInterfaceClass.isAssignableFrom(s.getClass())) {
-        return (T) s;
+    synchronized (ref) {
+      try {
+        Object s = safeGetService(context, ref);
+        if (s != null && serviceInterfaceClass.isAssignableFrom(s.getClass())) {
+          return (T) s;
+        }
+      }
+      finally {
+        context.ungetService(ref);
       }
     }
-    finally {
-      context.ungetService(ref);
-    }
-
     return null;
   }
 
@@ -134,21 +137,14 @@ public final class SERVICES {
       // nop
     }
     if (refs != null) {
-      try {
-        ArrayList<T> list = new ArrayList<T>(refs.length);
-        for (ServiceReference ref : refs) {
-          Object s = safeGetService(context, ref);
-          if (s != null && serviceInterfaceClass.isAssignableFrom(s.getClass())) {
-            list.add((T) s);
-          }
-        }
-        return list.toArray((T[]) Array.newInstance(serviceInterfaceClass, list.size()));
-      }
-      finally {
-        for (ServiceReference ref : refs) {
-          context.ungetService(ref);
+      ArrayList<T> list = new ArrayList<T>(refs.length);
+      for (ServiceReference ref : refs) {
+        T s = resolveService(serviceInterfaceClass, context, ref);
+        if (s != null) {
+          list.add((T) s);
         }
       }
+      return list.toArray((T[]) Array.newInstance(serviceInterfaceClass, list.size()));
     }
     return (T[]) Array.newInstance(serviceInterfaceClass, 0);
   }

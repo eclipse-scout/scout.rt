@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -328,8 +328,8 @@ public class BookmarkViewForm extends AbstractForm {
       //add listeners
       IClientNotificationConsumerService cncService = SERVICES.getService(IClientNotificationConsumerService.class);
       if (cncService != null) {
-        cncService.removeClientNotificationConsumerListener(m_cncListener);
-        cncService.addClientNotificationConsumerListener(m_cncListener);
+        cncService.removeClientNotificationConsumerListener(ClientSyncJob.getCurrentSession(), m_cncListener);
+        cncService.addClientNotificationConsumerListener(ClientSyncJob.getCurrentSession(), m_cncListener);
       }
       IBookmarkService bmService = SERVICES.getService(IBookmarkService.class);
       if (bmService != null) {
@@ -347,7 +347,7 @@ public class BookmarkViewForm extends AbstractForm {
         bmService.removeBookmarkServiceListener(m_bmListener);
       }
       if (cncService != null) {
-        cncService.removeClientNotificationConsumerListener(m_cncListener);
+        cncService.removeClientNotificationConsumerListener(ClientSyncJob.getCurrentSession(), m_cncListener);
       }
     }
   }

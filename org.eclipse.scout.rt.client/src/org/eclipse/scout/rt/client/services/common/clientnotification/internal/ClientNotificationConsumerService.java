@@ -25,22 +25,36 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-3)
+@SuppressWarnings("deprecation")
 public class ClientNotificationConsumerService extends AbstractService implements IClientNotificationConsumerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationConsumerService.class);
+  private static final String SESSION_DATA_KEY = "clientNotificationConsumerServiceState";
 
-  private final EventListenerList m_listenerList = new EventListenerList();
+  private final EventListenerList m_globalListenerList = new EventListenerList();
 
   public ClientNotificationConsumerService() {
   }
 
-  public void dispatchClientNotifications(final IClientNotification[] notifications, IClientSession session) {
+  private ServiceState getServiceState(IClientSession session) {
+    if (session == null) {
+      throw new IllegalStateException("session is null");
+    }
+    ServiceState data = (ServiceState) session.getData(SESSION_DATA_KEY);
+    if (data == null) {
+      data = new ServiceState();
+      session.setData(SESSION_DATA_KEY, data);
+    }
+    return data;
+  }
+
+  public void dispatchClientNotifications(final IClientNotification[] notifications, final IClientSession session) {
     if (notifications == null || notifications.length == 0) {
       return;
     }
     if (ClientJob.getCurrentSession() == session) {
       // we are sync
       for (IClientNotification n : notifications) {
-        fireEvent(n, true);
+        fireEvent(session, n, true);
       }
     }
     else {
@@ -49,25 +63,58 @@ public class ClientNotificationConsumerService extends AbstractService implement
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
           for (IClientNotification n : notifications) {
-            fireEvent(n, false);
+            fireEvent(session, n, false);
           }
         }
       }.schedule();
     }
   }
 
+  @Deprecated
   public void addClientNotificationConsumerListener(IClientNotificationConsumerListener listener) {
-    m_listenerList.add(IClientNotificationConsumerListener.class, listener);
+    addClientNotificationConsumerListener(ClientJob.getCurrentSession(), listener);
   }
 
+  @Deprecated
   public void removeClientNotificationConsumerListener(IClientNotificationConsumerListener listener) {
-    m_listenerList.remove(IClientNotificationConsumerListener.class, listener);
+    removeClientNotificationConsumerListener(ClientJob.getCurrentSession(), listener);
   }
 
-  private void fireEvent(IClientNotification notification, boolean sync) {
-    IClientNotificationConsumerListener[] listeners = m_listenerList.getListeners(IClientNotificationConsumerListener.class);
+  @Override
+  public void addClientNotificationConsumerListener(IClientSession session, IClientNotificationConsumerListener listener) {
+    getServiceState(session).m_listenerList.add(IClientNotificationConsumerListener.class, listener);
+  }
+
+  @Override
+  public void removeClientNotificationConsumerListener(IClientSession session, IClientNotificationConsumerListener listener) {
+    getServiceState(session).m_listenerList.remove(IClientNotificationConsumerListener.class, listener);
+  }
+
+  @Override
+  public void addGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener listener) {
+    m_globalListenerList.add(IClientNotificationConsumerListener.class, listener);
+  }
+
+  @Override
+  public void removeGlobalClientNotificationConsumerListener(IClientNotificationConsumerListener listener) {
+    m_globalListenerList.remove(IClientNotificationConsumerListener.class, listener);
+  }
+
+  private void fireEvent(IClientSession session, IClientNotification notification, boolean sync) {
+    ClientNotificationConsumerEvent e = new ClientNotificationConsumerEvent(this, notification);
+    IClientNotificationConsumerListener[] globalListeners = m_globalListenerList.getListeners(IClientNotificationConsumerListener.class);
+    IClientNotificationConsumerListener[] listeners = getServiceState(session).m_listenerList.getListeners(IClientNotificationConsumerListener.class);
+    if (globalListeners != null) {
+      for (IClientNotificationConsumerListener listener : globalListeners) {
+        try {
+          listener.handleEvent(e, sync);
+        }
+        catch (Throwable t) {
+          LOG.error("Listener " + listener.getClass().getName() + " on event " + notification, t);
+        }
+      }
+    }
     if (listeners != null) {
-      ClientNotificationConsumerEvent e = new ClientNotificationConsumerEvent(this, notification);
       for (IClientNotificationConsumerListener listener : listeners) {
         try {
           listener.handleEvent(e, sync);
@@ -77,6 +124,10 @@ public class ClientNotificationConsumerService extends AbstractService implement
         }
       }
     }
+  }
+
+  private static class ServiceState {
+    EventListenerList m_listenerList = new EventListenerList();
   }
 
 }

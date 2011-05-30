@@ -68,7 +68,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   public void initializeService() {
     super.initializeService();
     // add client notification listener
-    SERVICES.getService(IClientNotificationConsumerService.class).addClientNotificationConsumerListener(new IClientNotificationConsumerListener() {
+    SERVICES.getService(IClientNotificationConsumerService.class).addGlobalClientNotificationConsumerListener(new IClientNotificationConsumerListener() {
       public void handleEvent(ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification().getClass() == AccessControlChangedNotification.class) {
           ServiceState state = getServiceState();

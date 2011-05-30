@@ -12,6 +12,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.matrixfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
+/**
+ * @deprecated use {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField} instead
+ */
+@Deprecated
 public interface IMatrixField extends IFormField {
 
 }
