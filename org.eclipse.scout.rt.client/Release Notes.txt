@@ -407,3 +407,17 @@ changed constructor of AttributeNode
 changed constructor of EntityNode
 Migration:
 None
+
+30.05.2011 imo
+Added explicit instead of implicit session argument to IClientNotificationConsumerService observer, added possibility to add global observer.
+See javadoc for more details.
+Migration:
+Review deprecated usages of IClientNotificationConsumerService.addClientNotificationConsumerListener and IClientNotificationConsumerService.addClientNotificationConsumerListener.
+Default simply adds "ClientJob.getCurrentSession()" as first argument.
+
+30.05.2011 imo
+bsi ticket 102381: ServiceUse of osgi is re-used unless unget service is called.
+This is bad for ad-hoc proxy services that must be created every time when needed (especially on multiple parall threads)
+Fixed by adding service ref lock in SERVICES helper.
+Migration:
+None
