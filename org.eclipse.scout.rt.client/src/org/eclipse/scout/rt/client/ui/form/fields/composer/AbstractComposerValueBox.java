@@ -19,8 +19,8 @@ import java.util.Map;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -75,6 +75,9 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     return 1;
   }
 
+  /**
+   * This callback is invoked whenever the active value field changed its value.
+   */
   @ConfigOperation
   @Order(50)
   protected void execChangedValue() throws ProcessingException {

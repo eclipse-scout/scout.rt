@@ -79,8 +79,8 @@ public abstract class AbstractAddAttributeMenu extends AbstractMenu {
     if (form.isFormStored()) {
       IDataModelAttribute a = form.getSelectedAttribute();
       IDataModelAttributeOp op = form.getSelectedOp();
-      Object[] values = new Object[]{form.getSelectedValue()};
-      String[] displayValues = new String[]{form.getSelectedDisplayValue()};
+      Object[] values = form.getSelectedValues();
+      String[] displayValues = form.getSelectedDisplayValues();
       m_field.addAttributeNode(m_parentNode, a, null, op, values, displayValues);
     }
   }

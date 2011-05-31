@@ -145,15 +145,15 @@ public class AttributeNode extends AbstractComposerNode {
       }
       form.setSelectedAttribute(getAttribute());
       form.setSelectedOp(getOp());
-      form.setSelectedValue(getValues() != null && getValues().length > 0 ? getValues()[0] : null);
-      form.setSelectedDisplayValue(getTexts() != null && getTexts().length > 0 ? getTexts()[0] : null);
+      form.setSelectedValues(getValues());
+      form.setSelectedDisplayValues(getTexts());
       form.startModify();
       form.waitFor();
       if (form.isFormStored()) {
         setAttribute(form.getSelectedAttribute());
         setOp(form.getSelectedOp());
-        setValues(new Object[]{form.getSelectedValue()});
-        setTexts(new String[]{form.getSelectedDisplayValue()});
+        setValues(form.getSelectedValues());
+        setTexts(form.getSelectedDisplayValues());
         if (!isStatusInserted()) {
           setStatusInternal(ITreeNode.STATUS_UPDATED);
         }

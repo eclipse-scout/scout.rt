@@ -11,59 +11,31 @@
 package org.eclipse.scout.rt.client.ui.form.fields.composer.internal;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerValueBox;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.CancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.OkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.AttributeField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.DateField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.DateTimeField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.DoubleField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.DummyField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.IntegerField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.ListBoxField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.LongField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.OperatorField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.PercentField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.PlainDoubleField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.PlainIntegerField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.PlainLongField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.SmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.StringField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.TimeField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.TreeBoxField;
-import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
-import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractTimeField;
-import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm.MainBox.SequenceBox.ValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
-import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
-import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
-import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
@@ -72,13 +44,13 @@ public class ComposerAttributeForm extends AbstractForm {
 
   private IDataModelAttribute[] m_validAttributes;
   /**
-   * result value
+   * result values
    */
-  private Object m_selectedValue;
+  private Object[] m_selectedValues;
   /**
-   * result display value
+   * result display values
    */
-  private String m_selectedDisplayValue;
+  private String[] m_selectedDisplayValues;
 
   public ComposerAttributeForm() throws ProcessingException {
     super();
@@ -100,30 +72,30 @@ public class ComposerAttributeForm extends AbstractForm {
   /**
    * form properties
    */
-  public Object getSelectedValue() {
-    return m_selectedValue;
+  public Object[] getSelectedValues() {
+    return m_selectedValues;
   }
 
-  public void setSelectedValue(Object o) {
-    setSelectedValueInternal(o);
+  public void setSelectedValues(Object[] o) {
+    setSelectedValuesInternal(o);
     // single observer
     activateValueField();
   }
 
-  private void setSelectedValueInternal(Object o) {
-    m_selectedValue = o;
+  private void setSelectedValuesInternal(Object[] o) {
+    m_selectedValues = o;
   }
 
-  public String getSelectedDisplayValue() {
-    return m_selectedDisplayValue;
+  public String[] getSelectedDisplayValues() {
+    return m_selectedDisplayValues;
   }
 
-  public void setSelectedDisplayValue(String s) {
-    setSelectedDisplayValueInternal(s);
+  public void setSelectedDisplayValues(String[] s) {
+    setSelectedDisplayValuesInternal(s);
   }
 
-  private void setSelectedDisplayValueInternal(String s) {
-    m_selectedDisplayValue = s;
+  private void setSelectedDisplayValuesInternal(String[] s) {
+    m_selectedDisplayValues = s;
   }
 
   public IDataModelAttribute getSelectedAttribute() {
@@ -151,131 +123,16 @@ public class ComposerAttributeForm extends AbstractForm {
   /**
    * activate value field function
    */
-  @SuppressWarnings("unchecked")
   private void activateValueField() {
     IDataModelAttribute att = getAttributeField().getCheckedKey();
     IDataModelAttributeOp op = getOperatorField().getCheckedKey();
-    HashMap<Integer, IValueField> map = new HashMap<Integer, IValueField>();
-    map.put(DataModelConstants.TYPE_DATE, getDateField());
-    map.put(DataModelConstants.TYPE_DATE_TIME, getDateTimeField());
-    map.put(DataModelConstants.TYPE_DOUBLE, getDoubleField());
-    map.put(DataModelConstants.TYPE_INTEGER, getIntegerField());
-    map.put(DataModelConstants.TYPE_AGGREGATE_COUNT, getLongField());
-    map.put(DataModelConstants.TYPE_NUMBER_LIST, getListBoxField());
-    map.put(DataModelConstants.TYPE_NUMBER_TREE, getTreeBoxField());
-    map.put(DataModelConstants.TYPE_CODE_LIST, getListBoxField());
-    map.put(DataModelConstants.TYPE_CODE_TREE, getTreeBoxField());
-    map.put(DataModelConstants.TYPE_LONG, getLongField());
-    map.put(DataModelConstants.TYPE_PERCENT, getPercentField());
-    map.put(DataModelConstants.TYPE_PLAIN_DOUBLE, getPlainDoubleField());
-    map.put(DataModelConstants.TYPE_PLAIN_INTEGER, getPlainIntegerField());
-    map.put(DataModelConstants.TYPE_PLAIN_LONG, getPlainLongField());
-    map.put(DataModelConstants.TYPE_STRING, getStringField());
-    map.put(DataModelConstants.TYPE_FULL_TEXT, getStringField());
-    map.put(DataModelConstants.TYPE_SMART, getSmartField());
-    map.put(DataModelConstants.TYPE_TIME, getTimeField());
-    map.put(DataModelConstants.TYPE_NONE, getDummyField());
+    Object[] newValues = getSelectedValues();
     //
-    int type = DataModelConstants.TYPE_NONE;
-    if (op != null) {
-      type = op.getType();
+    if (att == null) {
+      getValueField().clearSelectionContext();
     }
-    if (type == DataModelConstants.TYPE_INHERITED) {
-      if (att != null) {
-        type = att.getType();
-      }
-    }
-    IValueField targetField = map.get(type);
-    if (targetField == null) {
-      targetField = getDummyField();
-    }
-    for (IValueField f : map.values()) {
-      if (f == targetField) {
-        if (f == getDummyField()) {
-          f.setVisible(true);
-          f.setMandatory(false);
-        }
-        else {
-          Object o = getSelectedValue();
-          Object singleValue = null;
-          Object arrayValue = null;
-          if (o != null && o.getClass().isArray()) {
-            arrayValue = o;
-          }
-          else {
-            singleValue = o;
-          }
-          //
-          if (f instanceof IListBox) {
-            LookupCall newCall = (att != null ? att.getLookupCall() : null);
-            IListBox listBox = (IListBox) f;
-            if (listBox.getLookupCall() != newCall) {
-              listBox.setLookupCall(att != null ? att.getLookupCall() : null);
-              try {
-                listBox.loadListBoxData();
-              }
-              catch (Exception e) {
-                LOG.warn(null, e);
-                // nop
-              }
-            }
-            try {
-              f.setValue(arrayValue);
-            }
-            catch (Exception e) {
-              // nop
-            }
-          }
-          else if (f instanceof ITreeBox) {
-            LookupCall newCall = (att != null ? att.getLookupCall() : null);
-            ITreeBox treeBox = (ITreeBox) f;
-            if (treeBox.getLookupCall() != newCall) {
-              treeBox.setLookupCall(newCall);
-              try {
-                treeBox.loadRootNode();
-                treeBox.getTree().setNodeExpanded(treeBox.getTree().getRootNode(), true);
-              }
-              catch (Exception e) {
-                LOG.warn(null, e);
-                // nop
-              }
-            }
-            try {
-              f.setValue(arrayValue);
-            }
-            catch (Exception e) {
-              // nop
-            }
-          }
-          else if (f instanceof ISmartField) {
-            LookupCall newCall = (att != null ? att.getLookupCall() : null);
-            ISmartField smartField = (ISmartField) f;
-            if (smartField.getLookupCall() != newCall) {
-              smartField.setLookupCall(newCall);
-            }
-            try {
-              f.setValue(singleValue);
-            }
-            catch (Exception e) {
-              // nop
-            }
-          }
-          else {
-            try {
-              f.setValue(singleValue);
-            }
-            catch (Exception e) {
-              // nop
-            }
-          }
-          f.setMandatory(true);
-          f.setVisible(true);
-        }
-      }
-      else {
-        f.setMandatory(false);
-        f.setVisible(false);
-      }
+    else {
+      getValueField().setSelectionContext(att, op, newValues);
     }
   }
 
@@ -291,64 +148,8 @@ public class ComposerAttributeForm extends AbstractForm {
     return getRootGroupBox().getFieldByClass(OperatorField.class);
   }
 
-  public DateField getDateField() {
-    return getRootGroupBox().getFieldByClass(DateField.class);
-  }
-
-  public DateTimeField getDateTimeField() {
-    return getRootGroupBox().getFieldByClass(DateTimeField.class);
-  }
-
-  public DoubleField getDoubleField() {
-    return getRootGroupBox().getFieldByClass(DoubleField.class);
-  }
-
-  public IntegerField getIntegerField() {
-    return getRootGroupBox().getFieldByClass(IntegerField.class);
-  }
-
-  public ListBoxField getListBoxField() {
-    return getRootGroupBox().getFieldByClass(ListBoxField.class);
-  }
-
-  public TreeBoxField getTreeBoxField() {
-    return getRootGroupBox().getFieldByClass(TreeBoxField.class);
-  }
-
-  public LongField getLongField() {
-    return getRootGroupBox().getFieldByClass(LongField.class);
-  }
-
-  public PercentField getPercentField() {
-    return getRootGroupBox().getFieldByClass(PercentField.class);
-  }
-
-  public PlainDoubleField getPlainDoubleField() {
-    return getRootGroupBox().getFieldByClass(PlainDoubleField.class);
-  }
-
-  public PlainIntegerField getPlainIntegerField() {
-    return getRootGroupBox().getFieldByClass(PlainIntegerField.class);
-  }
-
-  public PlainLongField getPlainLongField() {
-    return getRootGroupBox().getFieldByClass(PlainLongField.class);
-  }
-
-  public StringField getStringField() {
-    return getRootGroupBox().getFieldByClass(StringField.class);
-  }
-
-  public SmartField getSmartField() {
-    return getRootGroupBox().getFieldByClass(SmartField.class);
-  }
-
-  public DummyField getDummyField() {
-    return getRootGroupBox().getFieldByClass(DummyField.class);
-  }
-
-  public TimeField getTimeField() {
-    return getRootGroupBox().getFieldByClass(TimeField.class);
+  public ValueField getValueField() {
+    return getRootGroupBox().getFieldByClass(ValueField.class);
   }
 
   public OkButton getOkButton() {
@@ -530,7 +331,7 @@ public class ComposerAttributeForm extends AbstractForm {
       }
 
       @Order(3)
-      public class ListBoxField extends AbstractListBox<Object> {
+      public class ValueField extends AbstractComposerValueBox {
         @Override
         protected String getConfiguredLabel() {
           return ScoutTexts.get("Value");
@@ -538,11 +339,6 @@ public class ComposerAttributeForm extends AbstractForm {
 
         @Override
         protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
           return false;
         }
 
@@ -552,421 +348,16 @@ public class ComposerAttributeForm extends AbstractForm {
         }
 
         @Override
-        protected boolean getConfiguredAutoLoad() {
-          return false;
-        }
-
-        @Override
-        protected void execPrepareLookup(LookupCall call) throws ProcessingException {
-          IDataModelAttribute att = getAttributeField().getCheckedKey();
-          if (att != null) {
-            att.prepareLookup(call);
+        protected void execChangedValue() throws ProcessingException {
+          IComposerValueField f = getSelectedField();
+          if (f == null) {
+            setSelectedValuesInternal(null);
+            setSelectedDisplayValuesInternal(null);
           }
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getCheckedKeys());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(3.5)
-      public class TreeBoxField extends AbstractTreeBox<Object> {
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected int getConfiguredGridH() {
-          return 12;
-        }
-
-        @Override
-        protected boolean getConfiguredAutoLoad() {
-          return false;
-        }
-
-        @Override
-        protected void execPrepareLookup(LookupCall call, ITreeNode parent) throws ProcessingException {
-          IDataModelAttribute att = getAttributeField().getCheckedKey();
-          if (att != null) {
-            att.prepareLookup(call);
+          else {
+            setSelectedValuesInternal(f.getValues());
+            setSelectedDisplayValuesInternal(f.getTexts());
           }
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getCheckedKeys());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(4)
-      public class DateField extends AbstractDateField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(5)
-      public class TimeField extends AbstractTimeField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(6)
-      public class DateTimeField extends AbstractDateField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredHasTime() {
-          return true;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(7)
-      public class IntegerField extends AbstractIntegerField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(8)
-      public class PlainIntegerField extends AbstractIntegerField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredGroupingUsed() {
-          return false;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(9)
-      public class LongField extends AbstractLongField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(10)
-      public class PlainLongField extends AbstractLongField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredGroupingUsed() {
-          return false;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(13)
-      public class DoubleField extends AbstractDoubleField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(14)
-      public class PlainDoubleField extends AbstractDoubleField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredGroupingUsed() {
-          return false;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(15)
-      public class PercentField extends AbstractDoubleField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredPercent() {
-          return true;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(16)
-      public class StringField extends AbstractStringField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-      }
-
-      @Order(17)
-      public class SmartField extends AbstractSmartField<Long> {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          setSelectedValueInternal(getValue());
-          setSelectedDisplayValueInternal(getDisplayText());
-        }
-
-        @Override
-        public void execPrepareLookup(LookupCall call) throws ProcessingException {
-          IDataModelAttribute att = getAttributeField().getCheckedKey();
-          if (att != null) {
-            att.prepareLookup(call);
-          }
-        }
-      }
-
-      @Order(18)
-      public class DummyField extends AbstractStringField {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("Value");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredEnabled() {
-          return false;
         }
       }
     }
