@@ -10,17 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
-import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.Principal;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -40,9 +36,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
-import org.eclipse.scout.commons.exception.PlaceholderException;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -50,24 +44,14 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
-import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
-import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
-import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.internal.Activator;
-import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
 import org.eclipse.scout.service.SERVICES;
-import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -88,9 +72,9 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   private transient IServiceTunnelContentHandler m_msgEncoder;
   private transient Bundle[] m_orderedBundleList;
+  private Object m_orderedBundleListLock = new Boolean(true);
   private VirtualSessionCache m_ajaxSessionCache = new VirtualSessionCache();
   private Object m_msgEncoderLock = new Boolean(true);
-  private Object m_orderedBundleListLock = new Boolean(true);
   private Class<? extends IServerSession> m_serverSessionClass;
   private Version m_requestMinVersion;
   private boolean m_debug;
@@ -197,87 +181,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_orderedBundleList;
   }
 
-  @Override
-  protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-    lazyInit(req, res);
-    Map<Class, Object> backup = ThreadContext.backup();
-    try {
-      ThreadContext.put(req);
-      ThreadContext.put(res);
-
-      try {
-        ServiceTunnelRequest serviceTunnelReq = null;
-        if ("POST".equalsIgnoreCase(req.getMethod())) {
-          serviceTunnelReq = deserializeInput(req.getInputStream());
-        }
-        else {
-          String q = req.getQueryString();
-          if (q != null) {
-            for (String s : q.split("[&]")) {
-              if (s.startsWith("msg=")) {
-                String msg = URLDecoder.decode(s.substring(4), "UTF-8");
-                serviceTunnelReq = deserializeInput(new ByteArrayInputStream(msg.getBytes("UTF-8")));
-              }
-            }
-          }
-
-        }
-        if (serviceTunnelReq != null) {
-          req.setAttribute(ServiceTunnelRequest.class.getName(), serviceTunnelReq);
-          LocaleThreadLocal.set(serviceTunnelReq.getLocale());
-          NlsLocale.setThreadDefault(new NlsLocale(serviceTunnelReq.getNlsLocale()));
-        }
-        //find/create scout session
-        try {
-          IStatus status = serviceWithScoutServerSession(req, res, serviceTunnelReq);
-          if (!status.isOK()) {
-            try {
-              ProcessingException p = new ProcessingException(status);
-              p.addContextMessage("Client=" + req.getRemoteUser() + "@" + req.getRemoteAddr() + "/" + req.getRemoteHost());
-              SERVICES.getService(IExceptionHandlerService.class).handleException(p);
-            }
-            catch (Throwable fatal) {
-              // nop
-            }
-          }
-        }
-        catch (ProcessingException pe) {
-          if (pe.getCause() != null) throw pe.getCause();
-          else throw pe;
-        }
-      }
-      catch (IOException e) {
-        throw e;
-      }
-      catch (ServletException e) {
-        throw e;
-      }
-      catch (Throwable e) {
-        throw new ServletException("Client=" + req.getRemoteUser() + "@" + req.getRemoteAddr() + "/" + req.getRemoteHost(), e);
-      }
-    }
-    finally {
-      ThreadContext.restore(backup);
-    }
-  }
-
-  protected IStatus serviceWithScoutServerSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq) throws ProcessingException, ServletException {
-    String servletPath = req.getServletPath();
-    String ajaxSessionId = req.getHeader("Ajax-SessionId");
-    String ajaxUserId = req.getHeader("Ajax-UserId");
-    if (servletPath != null && servletPath.endsWith("/ajax")) {
-      if (ajaxSessionId == null) throw new ServletException("servlet " + servletPath + ": missing header 'Ajax-SessionId'");
-      if (ajaxUserId == null) throw new ServletException("servlet " + servletPath + ": missing header 'Ajax-UserId'");
-      return serviceWithScoutServerSessionOnVirtualSession(req, res, serviceTunnelReq, ajaxSessionId, ajaxUserId);
-    }
-    else {
-      if (ajaxSessionId != null) throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-SessionId'");
-      if (ajaxUserId != null) throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-UserId'");
-      return serviceWithScoutServerSessionOnHttpSession(req, res, serviceTunnelReq);
-    }
-  }
-
-  protected IStatus serviceWithScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq) throws ProcessingException, ServletException {
+  private void serviceWithScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq) throws ProcessingException, ServletException {
     //external request: apply locking, this is the session initialization phase
     IServerSession serverSession;
     Subject subject;
@@ -309,10 +213,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
       }
     }
     ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, subject, req, res);
-    return job.runNow(new NullProgressMonitor());
+    job.runNow(new NullProgressMonitor());
+    job.throwOnError();
   }
 
-  protected IStatus serviceWithScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq, String ajaxSessionId, String ajaxUserId) throws ProcessingException, ServletException {
+  private void serviceWithScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq, String ajaxSessionId, String ajaxUserId) throws ProcessingException, ServletException {
     IServerSession serverSession;
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal(ajaxUserId));
@@ -329,7 +234,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
       }
     }
     ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, subject, req, res);
-    return job.runNow(new NullProgressMonitor());
+    job.runNow(new NullProgressMonitor());
+    job.throwOnError();
   }
 
   @Override
@@ -346,177 +252,80 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   @Override
-  protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
     try {
-      // store start time millis
-      req.setAttribute(ServiceTunnelServlet.class.getName() + ".requestStart", System.nanoTime());
-      // process service request
-      long time1 = 0, time2 = 0;
-      if (m_debug) time1 = System.nanoTime();
+      lazyInit(req, res);
+      ServiceTunnelRequest serviceTunnelReq = deserializeInput(req.getInputStream());
       //
-      ServiceTunnelRequest serviceReq = (ServiceTunnelRequest) req.getAttribute(ServiceTunnelRequest.class.getName());
-      handleSoapServiceCall(req, resp, serviceReq);
-      if (m_debug) {
-        time2 = System.nanoTime();
-        LOG.debug("TIME " + serviceReq.getServiceInterfaceClassName() + "." + serviceReq.getOperation() + " " + (time2 - time1) / 1000000L + "ms");
+      String servletPath = req.getServletPath();
+      String ajaxSessionId = req.getHeader("Ajax-SessionId");
+      String ajaxUserId = req.getHeader("Ajax-UserId");
+      boolean isVirtualImpersonatedRequest = (ajaxUserId != null && ajaxSessionId != null);
+      if (isVirtualImpersonatedRequest) {
+        if (!checkAjaxDelegateAccess(req, res)) {
+          return;
+        }
+      }
+      else {
+        if (ajaxSessionId != null) throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-SessionId'");
+        if (ajaxUserId != null) throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-UserId'");
+      }
+      //invoke
+      Map<Class, Object> backup = ThreadContext.backup();
+      try {
+        //legacy, deprecated, do not use servlet request/response in scout code
+        ThreadContext.put(req);
+        ThreadContext.put(res);
+        //
+        LocaleThreadLocal.set(serviceTunnelReq.getLocale());
+        NlsLocale.setThreadDefault(new NlsLocale(serviceTunnelReq.getNlsLocale()));
+        if (isVirtualImpersonatedRequest) {
+          serviceWithScoutServerSessionOnVirtualSession(req, res, serviceTunnelReq, ajaxSessionId, ajaxUserId);
+        }
+        else {
+          serviceWithScoutServerSessionOnHttpSession(req, res, serviceTunnelReq);
+        }
+      }
+      finally {
+        ThreadContext.restore(backup);
       }
     }
     catch (Throwable t) {
-      // cancel tx
-      ITransaction transaction = ThreadContext.get(ITransaction.class);
-      if (transaction != null) {
-        transaction.addFailure(t);
-      }
-      // send error response
-      try {
-        // rewrite exception to avoid class not found exception in client, mostly due to unknown classes in the throwable's or statuse's getCause()
-        Throwable remotableSafeEx = PlaceholderException.transformException(t);
-        if (!(remotableSafeEx instanceof ProcessingException)) {
-          remotableSafeEx = new ProcessingException(remotableSafeEx.getMessage(), remotableSafeEx.getCause());
-        }
-        ServiceTunnelResponse hres = new ServiceTunnelResponse(null, null, remotableSafeEx);
-        Long t1 = (Long) req.getAttribute(ServiceTunnelServlet.class.getName() + ".requestStart");
-        if (t1 != null) {
-          hres.setProcessingDuration((System.nanoTime() - t1) / 1000000L);
-        }
-        serializeOutput(resp, hres);
-      }
-      catch (Throwable ex) {
-        // nop
-      }
-      // handle error
-      boolean needsLog = true;
+      //ignore disconnect errors
       Throwable cause = t;
-      while (cause != null && needsLog) {
+      while (cause != null) {
         if (cause instanceof SocketException && cause.getMessage().equals("Connection reset by peer: socket write error")) {
           // we don't want to throw an exception, if the client closed the connection
-          needsLog = false;
+          return;
         }
         else if (cause instanceof InterruptedIOException) {
-          needsLog = false;
+          return;
         }
         // next
         cause = cause.getCause();
       }
-      // on info log level show all exceptions in log file
-      if (LOG.isInfoEnabled() || LOG.isDebugEnabled()) {
-        needsLog = true;
-      }
-      if (needsLog) {
-        try {
-          ProcessingException pe = (t instanceof ProcessingException) ? (ProcessingException) t : new ProcessingException("servletHandler", t);
-          pe.addContextMessage("Client=" + req.getRemoteUser() + "@" + req.getRemoteAddr() + "/" + req.getRemoteHost());
-          SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
-        }
-        catch (Throwable fatal) {
-          // nop
-        }
-      }
+      LOG.error("Session=" + req.getSession().getId() + ", Client=" + req.getRemoteUser() + "@" + req.getRemoteAddr() + "/" + req.getRemoteHost(), t);
+      res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
 
   /**
-   * this method is executed within a IServerSession context that is provided by
-   * either a filter or directly above
+   * This default only grants access to remote caller on same localhost
    */
-  protected void handleSoapServiceCall(HttpServletRequest httpRequest, HttpServletResponse httpResponse, ServiceTunnelRequest serviceReq) throws Throwable {
-    String soapOperation = ServiceTunnelRequest.toSoapOperation(serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation());
-    IServerSession serverSession = ThreadContext.get(IServerSession.class);
-    String authenticatedUser = serverSession.getUserId();
-    if (LOG.isDebugEnabled()) LOG.debug("request started " + httpRequest.getRemoteAddr() + "/" + authenticatedUser + " at " + new Date());
-    // version check of request
-    if (m_requestMinVersion != null) {
-      String v = serviceReq.getVersion();
-      if (v == null) {
-        v = "0.0.0";
-      }
-      Version requestVersion = Version.parseVersion(v);
-      if (requestVersion.compareTo(m_requestMinVersion) < 0) {
-        ServiceTunnelResponse serviceRes = new ServiceTunnelResponse(null, null, new VersionMismatchException(requestVersion.toString(), m_requestMinVersion.toString()));
-        serializeOutput(httpResponse, serviceRes);
-        return;
-      }
+  protected boolean checkAjaxDelegateAccess(HttpServletRequest req, final HttpServletResponse res) throws IOException, ServletException {
+    InetAddress remotehost = InetAddress.getByName(req.getRemoteHost());
+    //check access: local only
+    InetAddress localhost = InetAddress.getByAddress(new byte[]{127, 0, 0, 1});
+    if (localhost.equals(remotehost)) {
+      return true;
     }
-    CallInspector callInspector = null;
-    SessionInspector sessionInspector = ProcessInspector.getDefault().getSessionInspector(serverSession, true);
-    if (sessionInspector != null) {
-      callInspector = sessionInspector.requestCallInspector(serviceReq);
+    //be lenient if localhost is a named host instead of loop-back
+    localhost = InetAddress.getLocalHost();
+    if (localhost.equals(remotehost)) {
+      return true;
     }
-    ServiceTunnelResponse serviceRes = null;
-    try {
-      // check if locales changed
-      Locale userLocale = LocaleThreadLocal.get();
-      NlsLocale userNlsLocale = NlsLocale.getDefault();
-      if (CompareUtility.equals(userLocale, serverSession.getLocale()) && CompareUtility.equals(userNlsLocale, serverSession.getNlsLocale())) {
-        // ok
-      }
-      else {
-        serverSession.setLocale(userLocale);
-        serverSession.setNlsLocale(userNlsLocale);
-        if (serverSession instanceof AbstractServerSession) {
-          ((AbstractServerSession) serverSession).execLocaleChanged();
-        }
-      }
-      //
-      Class<?> serviceInterfaceClass = null;
-      for (Bundle b : getOrderedBundleList()) {
-        try {
-          serviceInterfaceClass = b.loadClass(serviceReq.getServiceInterfaceClassName());
-          break;
-        }
-        catch (ClassNotFoundException e) {
-          // nop
-        }
-      }
-      if (serviceInterfaceClass == null) {
-        throw new ClassNotFoundException(serviceReq.getServiceInterfaceClassName());
-      }
-      //check access level 1: service registration property
-      Object service = SERVICES.getService(serviceInterfaceClass);
-      if (service == null) {
-        throw new ProcessingException("service registry does not contain a service of type " + serviceReq.getServiceInterfaceClassName());
-      }
-      Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
-      IAccessControlService acs = SERVICES.getService(IAccessControlService.class);
-      if (acs != null && !acs.checkServiceTunnelAccess(serviceInterfaceClass, serviceOp, serviceReq.getArgs())) {
-        throw new ProcessingException("access denied to " + serviceReq.getServiceInterfaceClassName() + "#" + serviceOp.getName(), new SecurityException("Access denied"));
-      }
-      Object data = ServiceUtility.invoke(serviceOp, service, serviceReq.getArgs());
-      Object[] outParameters = ServiceUtility.extractHolderArguments(serviceReq.getArgs());
-      serviceRes = new ServiceTunnelResponse(data, outParameters, null);
-      serviceRes.setSoapOperation(soapOperation);
-      // add performance data
-      Long t1 = (Long) httpRequest.getAttribute(ServiceTunnelServlet.class.getName() + ".requestStart");
-      if (t1 != null) {
-        serviceRes.setProcessingDuration((System.nanoTime() - t1) / 1000000L);
-      }
-      // add accumulated client notifications as side-payload
-      IClientNotification[] na = SERVICES.getService(IClientNotificationService.class).getNextNotifications(0);
-      serviceRes.setClientNotifications(na);
-      serializeOutput(httpResponse, serviceRes);
-    }
-    finally {
-      if (callInspector != null) {
-        try {
-          callInspector.update();
-        }
-        catch (Throwable t) {
-          LOG.warn(null, t);
-        }
-        try {
-          callInspector.close(serviceRes);
-        }
-        catch (Throwable t) {
-          LOG.warn(null, t);
-        }
-        try {
-          callInspector.getSessionInspector().update();
-        }
-        catch (Throwable t) {
-          LOG.warn(null, t);
-        }
-      }
-    }
+    res.sendError(HttpServletResponse.SC_FORBIDDEN);
+    return false;
   }
 
   protected ServiceTunnelRequest deserializeInput(InputStream in) throws Exception {
@@ -569,7 +378,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return new ServiceTunnelServiceJob(serverSession, serviceTunnelRequest, subject, request, response);
   }
 
-  protected class ServiceTunnelServiceJob extends ServerJob {
+  private class ServiceTunnelServiceJob extends ServerJob {
 
     protected ServiceTunnelRequest m_serviceTunnelRequest;
     protected HttpServletRequest m_request;
@@ -584,12 +393,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
     @Override
     protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      if (m_serviceTunnelRequest != null) {
-        ServiceTunnelServlet.this.doPost(m_request, m_response);
-      }
-      else {
-        ServiceTunnelServlet.super.service(m_request, m_response);
-      }
+      ServiceTunnelResponse serviceRes = new BusinessOperationDispatcher(getOrderedBundleList(), m_requestMinVersion, m_debug).invoke(m_serviceTunnelRequest);
+      serializeOutput(m_response, serviceRes);
       return Status.OK_STATUS;
     }
   }

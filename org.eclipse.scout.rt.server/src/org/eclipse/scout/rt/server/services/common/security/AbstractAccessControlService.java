@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.security.internal.AccessControlStore;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -34,8 +35,14 @@ public class AbstractAccessControlService extends AbstractService implements IAc
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAccessControlService.class);
 
   private AccessControlStore m_accessControlStore;
+  //this property will be true by default in a future release
+  private boolean m_remoteAccessPolicyEnabled = false;
 
   public AbstractAccessControlService() {
+    String s = Activator.getDefault().getBundle().getBundleContext().getProperty(PROPERTY_POLICY_ENABLED);
+    if (s != null) {
+      m_remoteAccessPolicyEnabled = ("true".equals(s));
+    }
   }
 
   @SuppressWarnings("deprecation")
@@ -151,24 +158,33 @@ public class AbstractAccessControlService extends AbstractService implements IAc
 
   public boolean checkServiceTunnelAccess(Class serviceInterfaceClass, Method method, Object[] args) {
     try {
-      //check 1: must be a IService
-      if (!IService.class.isAssignableFrom(serviceInterfaceClass)) {
-        throw new SecurityException("tunnel acess to non-IService type: " + serviceInterfaceClass);
+      //check: must be an interface
+      if (!serviceInterfaceClass.isInterface()) {
+        throw new SecurityException("access to " + serviceInterfaceClass + " denied.");
       }
-      //check 2: is method defined on service interface
+      //check: must be a subclass of IService
+      if (!IService.class.isAssignableFrom(serviceInterfaceClass)) {
+        throw new SecurityException("remote acess to non-IService type: " + serviceInterfaceClass);
+      }
+      //check: method is defined on service interface itself
       Method verifyMethod = serviceInterfaceClass.getMethod(method.getName(), method.getParameterTypes());
-      //check 3: method annotations
+      //check: method annotation exception
       if (verifyMethod.getAnnotation(ServiceTunnelAccessDenied.class) != null) {
-        throw new SecurityException("ServiceTunnelAccessDenied");
+        throw new SecurityException("ServiceTunnelAccessDenied by annotation ServiceTunnelAccessDenied");
       }
       if (method.getAnnotation(ServiceTunnelAccessDenied.class) != null) {
-        throw new SecurityException("ServiceTunnelAccessDenied");
+        throw new SecurityException("ServiceTunnelAccessDenied by annotation ServiceTunnelAccessDenied");
       }
-      return true;
+      //check: explicitly granted service interfaces
+      //XXX
     }
     catch (Throwable t) {
       LOG.warn("illegal service tunnel access to " + serviceInterfaceClass + "#" + method.getName() + " with arguments " + VerboseUtility.dumpObject(args), t);
     }
-    return false;
+    //default
+    if (!m_remoteAccessPolicyEnabled) {
+      return true;
+    }
+    throw new SecurityException("ServiceTunnelAccessDenied by annotation ServiceTunnelAccessDenied");
   }
 }

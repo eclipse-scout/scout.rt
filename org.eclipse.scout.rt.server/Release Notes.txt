@@ -198,3 +198,9 @@ org.eclipse.scout.rt.server.jdbc.mssql2005.fragment
 
 Migration: None
 
+01.06.2011 imo
+Internal security audit
+- server stack traces must not be sent to client
+- server log must contain all exceptions (except intended business logic exceptions)
+- enhanced access control on gui remote service calls: see enahncements on IAccessControlService.checkServiceTunnelAccess
+Migration: None

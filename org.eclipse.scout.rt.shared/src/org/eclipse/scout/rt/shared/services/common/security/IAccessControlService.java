@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,6 +28,11 @@ import org.eclipse.scout.service.IService;
  */
 @Priority(-3)
 public interface IAccessControlService extends IService {
+
+  /**
+   * see also {@link ServiceTunnelAccessDenied} and {@link #checkServiceTunnelAccess(Class, Method, Object[])}
+   */
+  String PROPERTY_POLICY_ENABLED = "org.eclipse.scout.service.security";
 
   boolean checkPermission(Permission p);
 
@@ -69,8 +74,10 @@ public interface IAccessControlService extends IService {
   /**
    * Service tunnel access control facility
    * Known consumers are: ServiceTunnelServlet, OfflineDispatcherService
+   * <p>
+   * see note on {@link #PROPERTY_POLICY_ENABLED}
    * 
-   * @return true if tunnel access to the service operation is granted
+   * @return true if tunnel access to the service operation is granted, throws an exception in all other cases
    *         <p>
    *         Default accepts only interface methods on subclasses of {@link IService} with no
    *         {@link ServiceTunnelAccessDenied} annotation.
