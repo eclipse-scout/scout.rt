@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -253,9 +253,11 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     }
     String canonicalRoot;
     String canonicalFolder;
+    String canonicalSimpleName;
     try {
-      canonicalFolder = folder.getCanonicalPath();
       canonicalRoot = root.getCanonicalPath();
+      canonicalFolder = folder.getCanonicalPath();
+      canonicalSimpleName = new File(canonicalFolder, spec.getName()).getName();
     }
     catch (IOException e) {
       throw new ProcessingException("invalid or unaccessible path: '" + spec.getDirectory() + "'", e);
@@ -263,9 +265,13 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     if (canonicalFolder == null || !canonicalFolder.startsWith(canonicalRoot)) {
       throw new SecurityException("invalid or unaccessible path: path outside root-path");
     }
+    if (canonicalSimpleName == null || !canonicalSimpleName.equals(spec.getName())) {
+      throw new SecurityException("invalid or unaccessible path: name contains path separators");
+    }
+    //
 
-    String filename = spec.getName();
-    if (spec.getLocale() != null && filename != null && filename.lastIndexOf(".") != -1) {
+    String filename = canonicalSimpleName;
+    if (spec.getLocale() != null && filename.lastIndexOf(".") != -1) {
       String language = spec.getLocale().toString().replaceAll("__", "_");
       String prefix = filename.substring(0, filename.lastIndexOf("."));
       String suffix = filename.substring(filename.lastIndexOf("."));
@@ -282,19 +288,19 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
         prefix = prefix + "_";
       }
       filename = prefix + language + suffix;
-      File test = new File(folder, filename);
+      File test = new File(canonicalFolder, filename);
       while (!test.exists()) {
         if (language.indexOf("_") == -1) {
-          filename = spec.getName();
+          filename = canonicalSimpleName;
           break;
         }
         language = language.substring(0, language.lastIndexOf("_"));
         filename = prefix + language + suffix;
-        test = new File(folder, filename);
+        test = new File(canonicalFolder, filename);
       }
     }
 
-    File file = new File(folder, filename);
+    File file = new File(canonicalFolder, filename);
     return file;
   }
 
