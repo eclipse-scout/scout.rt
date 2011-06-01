@@ -15,6 +15,7 @@
     <proxy class="org.eclipse.scout.rt.client.services.lookup.BatchLookupServiceClientProxy" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.client.services.common.security.PermissionServiceClientProxy" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.ping.IPingService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
+    <proxy class="org.eclipse.scout.rt.shared.services.common.security.ILogoutService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.calendar.IHolidayCalendarService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>

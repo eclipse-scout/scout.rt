@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
+import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
@@ -300,6 +301,12 @@ public abstract class AbstractClientSession implements IClientSession {
         LOG.error("close desktop", t);
       }
       m_desktop = null;
+    }
+    try {
+      SERVICES.getService(ILogoutService.class).logout();
+    }
+    catch (Throwable t) {
+      LOG.info("logout on server", t);
     }
     setActive(false);
     if (LOG.isInfoEnabled()) LOG.info("end session event loop");

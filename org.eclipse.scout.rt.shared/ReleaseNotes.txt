@@ -46,4 +46,5 @@ Internal security audit
 - server stack traces must not be sent to client
 - server log must contain all exceptions (except intended business logic exceptions)
 - enhanced access control on gui remote service calls: see enahncements on IAccessControlService.checkServiceTunnelAccess
+- adding logout service and calling it from IClientSession.stop();
 Migration: None
