@@ -108,11 +108,6 @@ public class FileService extends AbstractService implements IFileService {
     return f;
   }
 
-  public void putRemoteFile(RemoteFile f) throws ProcessingException {
-    IRemoteFileService svc = SERVICES.getService(IRemoteFileService.class);
-    svc.putRemoteFile(f);
-  }
-
   private String[][] getFiles(String folderBase, FilenameFilter filter, boolean useServerFolderStructureOnClient) throws ProcessingException {
     File path = getFileLocation(useServerFolderStructureOnClient ? folderBase : "", null, false);
     ArrayList<String> dirList = new ArrayList<String>();
