@@ -202,5 +202,6 @@ Migration: None
 Internal security audit
 - server stack traces must not be sent to client
 - server log must contain all exceptions (except intended business logic exceptions)
-- enhanced access control on gui remote service calls: see enahncements on IAccessControlService.checkServiceTunnelAccess
+- enhanced access control on gui remote service calls: see IAccessControlService#checkServiceTunnelAccess
+- enhanced security checks on RemoteFileService
 Migration: None
