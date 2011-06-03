@@ -78,10 +78,7 @@ public class BusinessOperationDispatcher {
       else {
         LOG.error("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation(), t);
       }
-      // do not send back error details such as stack trace (security audit).
-      ProcessingException p = new ProcessingException(t.getMessage());
-      p.setStackTrace(new StackTraceElement[0]);
-      response = new ServiceTunnelResponse(null, null, p);
+      response = new ServiceTunnelResponse(null, null, t);
     }
     finally {
       if (m_debug) {

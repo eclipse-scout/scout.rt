@@ -334,15 +334,16 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   protected void serializeOutput(HttpServletResponse httpResponse, ServiceTunnelResponse res) throws Exception {
-    try {
-      httpResponse.setDateHeader("Expires", -1);
-      httpResponse.setHeader("Cache-Control", "no-cache");
-      httpResponse.setHeader("pragma", "no-cache");
-      httpResponse.setContentType("text/xml");
-      getServiceTunnelContentHandler().writeResponse(httpResponse.getOutputStream(), res);
+    // security: do not send back error stack trace
+    if (res.getException() != null) {
+      res.getException().setStackTrace(new StackTraceElement[0]);
     }
-    finally {
-    }
+    //
+    httpResponse.setDateHeader("Expires", -1);
+    httpResponse.setHeader("Cache-Control", "no-cache");
+    httpResponse.setHeader("pragma", "no-cache");
+    httpResponse.setContentType("text/xml");
+    getServiceTunnelContentHandler().writeResponse(httpResponse.getOutputStream(), res);
   }
 
   private Bundle findServletContributor(String alias) throws CoreException {
