@@ -28,8 +28,6 @@ public class LogoutService extends AbstractService implements ILogoutService {
 
   @Override
   public void logout() {
-    //basically do nothing, the scout servlet dispatcher detects this call and releases the session
-    //double-check and close the session in case above failed
     try {
       HttpSession session = ThreadContext.getHttpServletRequest().getSession();
       session.invalidate();
