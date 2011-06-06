@@ -268,7 +268,8 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     if (canonicalFolder == null || !canonicalFolder.startsWith(canonicalRoot)) {
       throw new SecurityException("invalid or unaccessible path");
     }
-    if (canonicalSimpleName == null || !canonicalSimpleName.equals(spec.getName())) {
+    // if the remote file is requested from the RemoteFileServlet, spec.getName() will start with an "/"
+    if (canonicalSimpleName == null || !canonicalSimpleName.equals(spec.getName().startsWith("/") ? spec.getName().substring(1) : spec.getName())) {
       throw new SecurityException("invalid or unaccessible path");
     }
     //
