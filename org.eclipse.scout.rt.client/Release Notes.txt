@@ -256,7 +256,24 @@ do not activate disabled or invisible outlines when activating bookmark
 Migration of legacy: moving remaining legacy logic from client to server
 Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
 Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
-Migration: None
+Migration: None ( legacy search can still be used)
+Continuous Migration:
+1) Create an annotation for already migrated search forms: MigratedSearchForm
+2) in every search form (or if using a custom base class) add:
+  @Override
+  protected void execResetSearchFilter(SearchFilter searchFilter) throws ProcessingException {
+    if (getClass().isAnnotationPresent(MigratedSearchForm.class)) {
+      // Migrated SearchForm
+      setSearchFilter(new SearchFilter());
+    }
+    else {
+      // Legacy SearchForm
+      searchFilter = new LegacySearchFilter();
+      setSearchFilter(searchFilter);
+    }
+    super.execResetSearchFilter(getSearchFilter());
+  }
+
 
 15.04.2011 dwi
 [contributed by oca]
