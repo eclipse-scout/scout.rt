@@ -204,4 +204,5 @@ Internal security audit
 - server log must contain all exceptions (except intended business logic exceptions)
 - enhanced access control on gui remote service calls: see IAccessControlService#checkServiceTunnelAccess
 - enhanced security checks on RemoteFileService
+- ServiceTunnelServlet: renamed delegate for transaction dispatching from handleSoapServiceCall to runServerJobTransaction
 Migration: None
