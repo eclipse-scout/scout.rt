@@ -156,7 +156,20 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return version;
   }
 
+  /**
+   * @deprecated use {@link #createContentHandler(Class)}
+   */
+  @Deprecated
   protected IServiceTunnelContentHandler createMessageEncoder(Class<? extends IServerSession> sessionClass) {
+    return createContentHandler(sessionClass);
+  }
+
+  /**
+   * create the (reusable) content handler (soap, xml, binary) for marshalling scout/osgi remote service calls
+   * <p>
+   * This method is part of the protected api and can be overridden.
+   */
+  protected IServiceTunnelContentHandler createContentHandler(Class<? extends IServerSession> sessionClass) {
     DefaultServiceTunnelContentHandler e = new DefaultServiceTunnelContentHandler();
     e.initialize(getOrderedBundleList(), sessionClass.getClassLoader());
     return e;
@@ -311,6 +324,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   /**
    * This default only grants access to remote caller on same localhost
+   * <p>
+   * This method is part of the protected api and can be overridden.
    */
   protected boolean checkAjaxDelegateAccess(HttpServletRequest req, final HttpServletResponse res) throws IOException, ServletException {
     InetAddress remotehost = InetAddress.getByName(req.getRemoteHost());
@@ -375,8 +390,22 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return bundle;
   }
 
+  /**
+   * Create the {@link ServerJob} that runs the request as a single atomic transaction
+   * <p>
+   * This method is part of the protected api and can be overridden.
+   */
   protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, ServiceTunnelRequest serviceTunnelRequest, Subject subject, HttpServletRequest request, HttpServletResponse response) {
     return new ServiceTunnelServiceJob(serverSession, serviceTunnelRequest, subject, request, response);
+  }
+
+  /**
+   * runnable content of the {@link ServerJob}, thzis is the atomic transaction
+   * <p>
+   * This method is part of the protected api and can be overridden.
+   */
+  protected ServiceTunnelResponse runServerJobTransaction(ServiceTunnelRequest req) throws Exception {
+    return new BusinessOperationDispatcher(getOrderedBundleList(), m_requestMinVersion, m_debug).invoke(req);
   }
 
   private class ServiceTunnelServiceJob extends ServerJob {
@@ -394,7 +423,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
     @Override
     protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      ServiceTunnelResponse serviceRes = new BusinessOperationDispatcher(getOrderedBundleList(), m_requestMinVersion, m_debug).invoke(m_serviceTunnelRequest);
+      ServiceTunnelResponse serviceRes = runServerJobTransaction(m_serviceTunnelRequest);
       serializeOutput(m_response, serviceRes);
       return Status.OK_STATUS;
     }
