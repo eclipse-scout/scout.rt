@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.BorderUIResource;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
@@ -41,7 +42,12 @@ public class SwingTableStatus implements ISwingTableStatus {
       m_populateLabel.setBorder(new BorderUIResource(new EmptyBorder(0, 4, 0, 0)));
     }
     //set synth name AFTER setting ui border
-    m_populateLabel.setName("Synth.TableStatus");
+    if (model.getForm() != null && IForm.VIEW_ID_PAGE_TABLE.equals(model.getForm().getDisplayViewId())) {
+      m_populateLabel.setName("Synth.WideTableStatus");
+    }
+    else {
+      m_populateLabel.setName("Synth.TableStatus");
+    }
     LogicalGridData tableGridData = LogicalGridDataBuilder.createField(m_env, model.getGridData());
     LogicalGridData gd = new LogicalGridData();
     gd.gridx = tableGridData.gridx;
@@ -59,7 +65,12 @@ public class SwingTableStatus implements ISwingTableStatus {
       m_selectionLabel.setBorder(new BorderUIResource(new EmptyBorder(0, 4, 0, 0)));
     }
     //set synth name AFTER setting ui border
-    m_selectionLabel.setName("Synth.TableStatus");
+    if (model.getForm() != null && IForm.VIEW_ID_PAGE_TABLE.equals(model.getForm().getDisplayViewId())) {
+      m_selectionLabel.setName("Synth.WideTableStatus");
+    }
+    else {
+      m_selectionLabel.setName("Synth.TableStatus");
+    }
     tableGridData = LogicalGridDataBuilder.createField(m_env, model.getGridData());
     gd = new LogicalGridData();
     gd.gridx = tableGridData.gridx;

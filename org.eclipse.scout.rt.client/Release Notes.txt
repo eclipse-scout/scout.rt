@@ -438,3 +438,10 @@ A menu opened in empty space should not consider any selection on a row.
 Thus the menu should open anyway (not querying the selection status of any row).
 Migration:
 None
+
+06.06.211 sle
+bugzilla 348678
+bsi ticket 102'728
+Smartfield Warn-Text: When a Smartfield-Proposal opens with more than the aloud rows a Warning apears. This is to close to the left border and the color is not styleable.
+Solution: The SmartTableForm had a Label under the table. This label was removed and instead we use the existing TableStatus.
+Migration: None

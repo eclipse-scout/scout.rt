@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -25,12 +26,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.ActiveStateRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.NewButton;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.ResultTableField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.StatusField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
@@ -59,8 +58,8 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     }
     final String textNonNull = text;
     final int maxCount = getSmartField().getBrowseMaxRowCount();
-    getStatusField().setValue(ScoutTexts.get("searchingProposals"));
-    getStatusField().setVisible(true);
+    getResultTableField().setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("searchingProposals"), ProcessingStatus.WARNING));
+    getResultTableField().setTablePopulateStatus(null);
     //async load of data
     if (m_dataLoadJob != null) {
       m_dataLoadJob.cancel();
@@ -145,17 +144,25 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
         table.setTableChanging(false);
       }
       String statusText = null;
+      int severity = ProcessingStatus.INFO;
       if (failed != null) {
         statusText = failed.getStatus().getMessage();
+        severity = ProcessingStatus.ERROR;
       }
       else if (rows.length <= 0) {
         statusText = ScoutTexts.get("SmartFieldCannotComplete", getSearchText());
+        severity = ProcessingStatus.WARNING;
       }
       else if (rows.length > getSmartField().getBrowseMaxRowCount()) {
         statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + getSmartField().getBrowseMaxRowCount());
+        severity = ProcessingStatus.INFO;
       }
-      getStatusField().setValue(statusText);
-      getStatusField().setVisible(statusText != null);
+      if (statusText != null) {
+        getResultTableField().setTablePopulateStatus(new ProcessingStatus(statusText, severity));
+      }
+      else {
+        getResultTableField().setTablePopulateStatus(null);
+      }
       if (getNewButton().isEnabled()) {
         getNewButton().setVisible(table.getRowCount() <= 0);
       }
@@ -218,10 +225,6 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
   /*
    * Fields
    */
-  public StatusField getStatusField() {
-    return getFieldByClass(StatusField.class);
-  }
-
   public NewButton getNewButton() {
     return getFieldByClass(NewButton.class);
   }
@@ -273,6 +276,16 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
       @Override
       protected boolean getConfiguredGridUseUiHeight() {
         return true;
+      }
+
+      @Override
+      protected boolean getConfiguredTableStatusVisible() {
+        return true;
+      }
+
+      @Override
+      protected void execUpdateTableStatus() {
+        //nop
       }
 
       /*
@@ -460,30 +473,6 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
       protected void execClickAction() throws ProcessingException {
         getSmartField().doBrowseNew(getSearchText());
       }
-    }// end field
-
-    @Order(50)
-    public class StatusField extends AbstractLabelField {
-      @Override
-      protected boolean getConfiguredLabelVisible() {
-        return false;
-      }
-
-      @Override
-      protected int getConfiguredGridH() {
-        return 1;
-      }
-
-      @Override
-      protected String getConfiguredForegroundColor() {
-        return "FF0000";
-      }
-
-      @Override
-      protected double getConfiguredGridWeightY() {
-        return 0;
-      }
-
     }// end field
 
   }// end main box
