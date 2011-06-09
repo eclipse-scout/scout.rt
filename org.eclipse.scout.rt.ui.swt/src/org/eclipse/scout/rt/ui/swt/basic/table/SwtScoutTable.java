@@ -859,7 +859,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           break;
         }
         case SWT.KeyUp: {
-          if (getScoutObject().isCheckable()) {
+          if (event.doit && getScoutObject().isCheckable()) {
             if (event.stateMask == 0) {
               switch (event.keyCode) {
                 case ' ':
