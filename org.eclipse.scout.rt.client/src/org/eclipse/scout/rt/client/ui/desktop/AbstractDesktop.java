@@ -724,7 +724,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             else {
               ITreeNode[] children = m_outline.getRootNode().getChildNodes();
               if (children.length > 0) {
-                m_outline.selectNode(children[0], false);
+                for (ITreeNode node : children) {
+                  if (node.isVisible() && node.isEnabled()) {
+                    m_outline.selectNode(node, false);
+                    break;
+                  }
+                }
               }
             }
             newActivePage = m_outline.getActivePage();
