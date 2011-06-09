@@ -93,6 +93,13 @@ public class LookupCall implements Cloneable, Serializable {
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(30)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredDoc() {
+    return null;
+  }
+
   public ILookupService getLookupService() {
     if (m_serviceCached == null) {
       m_serviceCached = createLookupService();
