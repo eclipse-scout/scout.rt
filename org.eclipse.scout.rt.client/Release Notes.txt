@@ -438,3 +438,8 @@ A menu opened in empty space should not consider any selection on a row.
 Thus the menu should open anyway (not querying the selection status of any row).
 Migration:
 None
+
+09.06.2011 imo
+bsi ticket 102823
+do not activate disabled tree nodes when setting new outline on desktop
+Migration: None
