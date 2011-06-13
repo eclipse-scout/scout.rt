@@ -188,6 +188,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   /**
    * no service tunnel access on client side
    */
+  @SuppressWarnings("deprecation")
   public boolean checkServiceTunnelAccess(Class serviceInterface, Method method, Object[] args) {
     return false;
   }

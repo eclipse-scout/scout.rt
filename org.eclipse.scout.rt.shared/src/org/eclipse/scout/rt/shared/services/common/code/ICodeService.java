@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelAccessDenied;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.IService;
 
 @Priority(-3)
@@ -62,9 +62,9 @@ public interface ICodeService extends IService {
    */
   BundleClassDescriptor[] getAllCodeTypeClasses(String classPrefix);
 
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   ICodeType[] getAllCodeTypes(String classPrefix);
 
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   ICodeType[] getAllCodeTypes(String classPrefix, Long partitionId);
 }

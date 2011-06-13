@@ -574,44 +574,51 @@ public class StatementProcessor implements IStatementProcessor {
       try {
         prepareInputStatementAndBinds();
       }
-      catch (ProcessingException e) {
-        return e.getMessage();
+      catch (Throwable t) {
+        return t.getMessage();
       }
     }
-    for (IBindInput in : m_inputList) {
-      SqlBind bind = m_currentInputBindMap.get(in.getJdbcBindIndex());
-      if (bind == null) {
-        continue;
-      }
-      debugBindBuf.append("IN  ");
-      debugBindBuf.append(in.getToken().getParsedToken());
-      debugBindBuf.append(" => ");
-      debugBindBuf.append(in.getToken().getReplaceToken());
-      debugBindBuf.append(" [");
-      debugBindBuf.append(SqlBind.decodeJdbcType(bind.getSqlType()));
-      switch (bind.getSqlType()) {
-        case Types.BLOB:
-        case Types.CLOB: {
-          //nop
-          break;
-        }
-        default: {
-          debugBindBuf.append(" ");
-          debugBindBuf.append(bind.getValue());
-        }
-      }
-      debugBindBuf.append("]");
-      debugBindBuf.append("\n");
+    if (m_currentInputBindMap == null) {
+      return "";
     }
-    for (IBindOutput out : m_outputList) {
-      debugBindBuf.append("OUT ");
-      debugBindBuf.append(out.getToken().getParsedToken());
-      debugBindBuf.append(" => ");
-      debugBindBuf.append(out.getToken().getReplaceToken());
-      debugBindBuf.append(" [");
-      debugBindBuf.append(out.getBindType().getSimpleName());
-      debugBindBuf.append("]");
-      debugBindBuf.append("\n");
+    if (m_inputList != null) {
+      for (IBindInput in : m_inputList) {
+        SqlBind bind = m_currentInputBindMap.get(in.getJdbcBindIndex());
+        if (bind == null) {
+          continue;
+        }
+        debugBindBuf.append("IN  ");
+        debugBindBuf.append(in.getToken().getParsedToken());
+        debugBindBuf.append(" => ");
+        debugBindBuf.append(in.getToken().getReplaceToken());
+        debugBindBuf.append(" [");
+        debugBindBuf.append(SqlBind.decodeJdbcType(bind.getSqlType()));
+        switch (bind.getSqlType()) {
+          case Types.BLOB:
+          case Types.CLOB: {
+            //nop
+            break;
+          }
+          default: {
+            debugBindBuf.append(" ");
+            debugBindBuf.append(bind.getValue());
+          }
+        }
+        debugBindBuf.append("]");
+        debugBindBuf.append("\n");
+      }
+    }
+    if (m_outputList != null) {
+      for (IBindOutput out : m_outputList) {
+        debugBindBuf.append("OUT ");
+        debugBindBuf.append(out.getToken().getParsedToken());
+        debugBindBuf.append(" => ");
+        debugBindBuf.append(out.getToken().getReplaceToken());
+        debugBindBuf.append(" [");
+        debugBindBuf.append(out.getBindType().getSimpleName());
+        debugBindBuf.append("]");
+        debugBindBuf.append("\n");
+      }
     }
     StringBuffer buf = new StringBuffer();
     if (statementWithBinds) {
@@ -623,7 +630,7 @@ public class StatementProcessor implements IStatementProcessor {
       }
     }
     if (statementPlainText) {
-      String p = m_currentInputStm;
+      String p = "" + m_currentInputStm;
       ArrayList<SqlBind> bindList = new ArrayList<SqlBind>(m_currentInputBindMap.values());
       int bindIndex = 0;
       int pos = p.indexOf('?');

@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationQueueListener;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelAccessDenied;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 
 public class ClientNotificationService extends AbstractService implements IClientNotificationService {
@@ -32,17 +32,17 @@ public class ClientNotificationService extends AbstractService implements IClien
     return m_clientNotificationQueue.getNextNotifications(blockingTimeout);
   }
 
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   public void putNotification(IClientNotification notification, IClientNotificationFilter filter) {
     m_clientNotificationQueue.putNotification(notification, filter);
   }
 
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   public void addClientNotificationQueueListener(IClientNotificationQueueListener listener) {
     m_clientNotificationQueue.addClientNotificationQueueListener(listener);
   }
 
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   public void removeClientNotificationQueueListener(IClientNotificationQueueListener listener) {
     m_clientNotificationQueue.removeClientNotificationQueueListener(listener);
   }

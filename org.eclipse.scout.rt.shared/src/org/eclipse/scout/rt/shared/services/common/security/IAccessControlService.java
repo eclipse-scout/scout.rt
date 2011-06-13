@@ -16,7 +16,7 @@ import java.security.Permissions;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelAccessDenied;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -28,11 +28,6 @@ import org.eclipse.scout.service.IService;
  */
 @Priority(-3)
 public interface IAccessControlService extends IService {
-
-  /**
-   * see also {@link ServiceTunnelAccessDenied} and {@link #checkServiceTunnelAccess(Class, Method, Object[])}
-   */
-  String PROPERTY_POLICY_ENABLED = "org.eclipse.scout.service.security";
 
   boolean checkPermission(Permission p);
 
@@ -57,7 +52,7 @@ public interface IAccessControlService extends IService {
   /**
    * Clear all caches. This can be useful when some permissions and/or user-role mappings have changed.
    */
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   void clearCache();
 
   /**
@@ -68,19 +63,12 @@ public interface IAccessControlService extends IService {
    * the principalName matches the name in the store or
    * the name in the store ends with "\principalName"
    */
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   void clearCacheOfPrincipals(String... principalNames);
 
   /**
-   * Service tunnel access control facility
-   * Known consumers are: ServiceTunnelServlet, OfflineDispatcherService
-   * <p>
-   * see note on {@link #PROPERTY_POLICY_ENABLED}
-   * 
-   * @return true if tunnel access to the service operation is granted, throws an exception in all other cases
-   *         <p>
-   *         Default accepts only interface methods on subclasses of {@link IService} with no
-   *         {@link ServiceTunnelAccessDenied} annotation.
+   * @deprecated
    */
+  @Deprecated
   boolean checkServiceTunnelAccess(Class serviceInterfaceClass, Method method, Object[] args);
 }

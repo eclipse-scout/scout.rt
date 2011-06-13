@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelAccessDenied;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)
@@ -227,7 +227,7 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     return retVal;
   }
 
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   public void putRemoteFile(RemoteFile spec) throws ProcessingException {
     File file = getFileInternal(spec);
     try {

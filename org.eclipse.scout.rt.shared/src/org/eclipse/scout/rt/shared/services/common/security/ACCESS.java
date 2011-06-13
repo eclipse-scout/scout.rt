@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,6 +26,7 @@ import org.eclipse.scout.service.ServiceUtility;
  * @version 3.x
  */
 
+@SuppressWarnings("deprecation")
 public final class ACCESS {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ACCESS.class);
 
@@ -50,9 +51,9 @@ public final class ACCESS {
   }
 
   /**
-   * Convenience function to check service operation access This implementation
-   * checks for all interfaces the service is implementing
+   * @deprecated never used
    */
+  @Deprecated
   public static void checkService(Object service, String operation) throws ProcessingException {
     IAccessControlService acs = SERVICES.getService(IAccessControlService.class);
     if (acs != null) {

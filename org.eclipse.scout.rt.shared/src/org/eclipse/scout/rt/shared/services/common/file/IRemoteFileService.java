@@ -15,7 +15,7 @@ import java.io.OutputStream;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelAccessDenied;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.IService;
 
 @Priority(-3)
@@ -49,7 +49,7 @@ public interface IRemoteFileService extends IService {
    */
   RemoteFile getRemoteFileHeader(RemoteFile spec) throws ProcessingException;
 
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   void putRemoteFile(RemoteFile spec) throws ProcessingException;
 
   /**

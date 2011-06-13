@@ -15,11 +15,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
+
 /**
- * @deprecated use {@link RemoteServiceAccessDenied}
+ * By default remote service access is denied.
+ * <p>
+ * In some cases it is useful to grant remote access to a service with the exception of one or two methods. Then this
+ * annotation is used.
+ * <p>
+ * This annotation finally disables access to the method (all methods if placed on the type level) and ignores any
+ * present {@link RemoteServiceAccessPermission}s.
  */
-@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
-public @interface ServiceTunnelAccessDenied {
+public @interface RemoteServiceAccessDenied {
 }

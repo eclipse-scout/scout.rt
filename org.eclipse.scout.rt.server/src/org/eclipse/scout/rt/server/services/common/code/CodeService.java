@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelAccessDenied;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
 
@@ -149,7 +149,7 @@ public class CodeService extends AbstractService implements ICodeService {
     }
   }
 
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   public ICodeType[] getAllCodeTypes(String classPrefix) {
     ArrayList<Class> list = new ArrayList<Class>();
     for (BundleClassDescriptor d : getAllCodeTypeClasses(classPrefix)) {
@@ -164,7 +164,7 @@ public class CodeService extends AbstractService implements ICodeService {
     return getCodeTypes(list.toArray(new Class[list.size()]));
   }
 
-  @ServiceTunnelAccessDenied
+  @RemoteServiceAccessDenied
   public ICodeType[] getAllCodeTypes(String classPrefix, Long partitionId) {
     return getAllCodeTypes(classPrefix);
   }
