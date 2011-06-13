@@ -89,3 +89,16 @@ Solution:
 - MailUtility.writeHtmlBody added
 - MailUtility.writePlainBody added
 Migration: None
+
+10.06.2011 imo
+Internal BSI security audit
+The legacy functionality of using &...& sql binds (instead of :abc or #abc#) can lead to sql injection if not used carefully.
+Added warning whenever such code is used.
+Support is eliminated in future release.
+To disable warnings (not recommended) set the server-side config.ini property org.eclipse.scout.commons.sqlplainbind=true
+To enable strict mode (recommended) set the server-side config.ini property org.eclipse.scout.commons.sqlplainbind=false
+Strict mode throws an exception on usages of &..&
+Migration:
+Remove all occurrences and usages of &...& binds.
+Use regex "&[\{\[]*[a-zA-Z]+[a-zA-Z0-9._\[\]\{\}]*&" to find occurrences.
+When statement part composition is really needed, use string concatenation instead.

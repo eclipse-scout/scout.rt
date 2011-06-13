@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.parsers;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 
+import org.eclipse.scout.commons.internal.Activator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.token.DatabaseSpecificToken;
@@ -25,25 +26,27 @@ import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 /**
  * Parser for bind variables in arbitrary sql staments
  * The bind is (possibly) parsed together with its left operator (for better =ANY vs. IN handlings)
+ * <p>
  * Bind Possibilities are
- * :abc
- * :[OUT]abc
- * #abc#
- * #[OUT]abc#
- * &abc&
- * &[OUT]abc&
+ * <ul>
+ * <li>:abc</li>
+ * <li>:[OUT]abc</li>
+ * <li>#abc#</li>
+ * <li>#[OUT]abc#</li>
+ * </ul>
+ * <p>
  * Syntax (EBNF):
+ * <pre>
  * statement      = S? token-list .
  * token-list     = token (S? token)* .
  * token          = text | extended-bind | char .
  * extended-bind  = (attribute S?)? (op S?)? bind .
  * attribute      = name . //but not op
  * op             = '=' | '<>' | '!=' | '<=' | '>=' | '<' | '>' | 'IN' | 'NOT' S 'IN' .
- * bind           = plain-value-bind | plain-sql-bind | std-bind .
- * plain-value-bind='#' name '#' .
- * plain-sql-bind = '&' name '&' .
- * std-bind       = ':' name .
- * function-bind  = ( '::' | '&&' | '##' ) name S? '(' S? function-arg-list? S? ')' .
+ * bind           = escaped-value-bind | plain-sql-bind | jdbc-bind .
+ * escaped-value-bind='#' name '#' .
+ * jdbc-bind       = ':' name .
+ * function-bind  = ( '::' | '##' ) name S? '(' S? function-arg-list? S? ')' .
  * function-arg-list= function-arg (S? ',' S? function-arg)* .
  * function-arg   = text | name | number.
  * database-specific-token = '$$' name .
@@ -55,16 +58,33 @@ import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
  * text-char      = [^'] | `''` .
  * char           = [.] .
  * S              = ([ \n\t\r])+  .
+ * </pre>
+ * <p>
+ * The legacy functionality supporting &...& binds - which can lead to sql injection if not carefully used - will be eliminated in future releases.
+ * To avoid unexpected usages, a warning is thrown on every usage. Using the server-side config.ini property <b>org.eclipse.scout.commons.sqlplainbind=true|false</b>
+ * true means activating the legacy functionality (which will be removed in future releases) and false throws an exception when using &...& binds.
  */
-
 public class BindParser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BindParser.class);
+
+  private static final String PLAIN_SQL_BIND_PROPERTY_NAME = "org.eclipse.scout.commons.sqlplainbind";
+  private static final Boolean PLAIN_SQL_BIND_ENABLED;
 
   private static final String S_MAP;
   private static final String NAME_MAP;
   static {
     S_MAP = " \n\t\r";
     NAME_MAP = "_.0123456789{}[]ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    String s = Activator.getDefault() != null ? Activator.getDefault().getBundle().getBundleContext().getProperty(PLAIN_SQL_BIND_PROPERTY_NAME) : System.getProperty(PLAIN_SQL_BIND_PROPERTY_NAME);
+    if ("true".equalsIgnoreCase(s)) {
+      PLAIN_SQL_BIND_ENABLED = Boolean.TRUE;
+    }
+    else if ("false".equalsIgnoreCase(s)) {
+      PLAIN_SQL_BIND_ENABLED = Boolean.FALSE;
+    }
+    else {
+      PLAIN_SQL_BIND_ENABLED = null;
+    }
   }
 
   private String m_str;
@@ -313,11 +333,24 @@ public class BindParser {
     return null;
   }
 
+  /**
+   * @deprecated will be completely eliminated, potential sql injections
+   */
+  @Deprecated
   private IToken parsePlainSqlBind() {
     if (LOG.isTraceEnabled()) trace("parsePlainSqlBind");
     int index = m_pos.getIndex();
     String name;
     if (matches("&") && (name = parseName()) != null && matches("&")) {
+      if (PLAIN_SQL_BIND_ENABLED == null) {
+        LOG.warn("using plain sql bind can cause sql injections: &" + name + "&. Set property " + PLAIN_SQL_BIND_PROPERTY_NAME + "=true when legacy logic is necessarily being used");
+      }
+      else if (PLAIN_SQL_BIND_ENABLED == Boolean.FALSE) {
+        String msg = "using plain sql bind: &" + name + "&. Property " + PLAIN_SQL_BIND_PROPERTY_NAME + " is set to false which causes this error";
+        LOG.error(msg);
+        throw new IllegalArgumentException(msg);
+      }
+      //
       if (name.startsWith("[OUT]")) {
         return new ValueOutputToken(m_str.substring(index, m_pos.getIndex()), name.substring(5), false);
       }
@@ -332,13 +365,12 @@ public class BindParser {
   private IToken parseFunctionBind() {
     if (LOG.isTraceEnabled()) trace("parseFunctionBind");
     int index = m_pos.getIndex();
-    if (matches("::") || matches("&&") || matches("##")) {
+    if (matches("::") || matches("##")) {
       boolean plainValue = m_str.substring(index, index + 2).equals("##");
-      boolean plainSql = m_str.substring(index, index + 2).equals("&&");
       String name;
       ArrayList<String> args;
       if ((name = parseName()) != null && parseWhitespace(0) && matches("(") && parseWhitespace(0) && (args = parseFunctionArgList()).size() > 0 && parseWhitespace(0) && matches(")")) {
-        return new FunctionInputToken(m_str.substring(index, m_pos.getIndex()), name, args.toArray(new String[0]), plainValue, plainSql);
+        return new FunctionInputToken(m_str.substring(index, m_pos.getIndex()), name, args.toArray(new String[0]), plainValue, false);
       }
     }
     m_pos.setIndex(index);
