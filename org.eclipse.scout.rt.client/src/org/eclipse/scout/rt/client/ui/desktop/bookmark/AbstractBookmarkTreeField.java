@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -593,7 +593,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             final AtomicReference<ITreeNode> newContainerNode = new AtomicReference<ITreeNode>(getTree().getRootNode());
             tree.visitTree(new ITreeVisitor() {
               public boolean visit(ITreeNode n) {
-                if (isFolderNode(n) && n.getCell().getValue() == newBmFolder) {
+                if (isFolderNode(n) && newBmFolder.equals(n.getCell().getValue())) {
                   newContainerNode.set(n);
                   return false;
                 }
