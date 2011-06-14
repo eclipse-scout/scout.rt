@@ -136,9 +136,9 @@ public class AttributeNode extends AbstractComposerNode {
     @Override
     protected void execAction() throws ProcessingException {
       ComposerAttributeForm form = new ComposerAttributeForm();
-      ITreeNode parent = getParentNode();
-      if (parent instanceof EntityNode) {
-        form.setAvailableAttributes(((EntityNode) parent).getEntity().getAttributes());
+      ITreeNode parentEntity = findParentNode(EntityNode.class);
+      if (parentEntity != null) {
+        form.setAvailableAttributes(((EntityNode) parentEntity).getEntity().getAttributes());
       }
       else {
         form.setAvailableAttributes(getComposerField().getAttributes());
