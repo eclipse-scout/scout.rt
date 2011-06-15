@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,8 @@ import org.osgi.framework.Bundle;
 /**
  * This is the content handler that defines the format in which data is
  * exchanged through a service tunnel.
+ * <p>
+ * Most implementations also implement {@link IServiceTunnelContentObserver}
  */
 public interface IServiceTunnelContentHandler {
 

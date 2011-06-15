@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -49,6 +50,9 @@ import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistr
 import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentObserver;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentObserver.IInboundListener;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentObserver.IOutboundListener;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.service.SERVICES;
@@ -61,16 +65,19 @@ import org.osgi.framework.Version;
  * Use this servlet to dispatch scout gui service requests using {@link ServiceTunnelRequest},
  * {@link ServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
  * <p>
+ * Override the methods {@link #filterInbound(Object)} and {@link #filterOutbound(Object)} to do central input/output
+ * validation.
+ * <p>
  * When using RAP (rich ajax platform) as the ui web app then the /ajax servlet alias must be used in order to map
  * requests to virtual sessions instead of (the unique) http session. The expected headers therefore are
  * "Ajax-SessionId" and "Ajax-UserId"
  */
-public class ServiceTunnelServlet extends HttpServletEx {
+public class ServiceTunnelServlet extends HttpServletEx implements IInboundListener, IOutboundListener {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
 
-  private transient IServiceTunnelContentHandler m_msgEncoder;
+  private transient IServiceTunnelContentHandler m_contentHandler;
   private transient Bundle[] m_orderedBundleList;
   private Object m_orderedBundleListLock = new Boolean(true);
   private VirtualSessionCache m_ajaxSessionCache = new VirtualSessionCache();
@@ -177,11 +184,19 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   private IServiceTunnelContentHandler getServiceTunnelContentHandler() {
     synchronized (m_msgEncoderLock) {
-      if (m_msgEncoder == null) {
-        m_msgEncoder = createMessageEncoder(m_serverSessionClass);
+      if (m_contentHandler == null) {
+        m_contentHandler = createMessageEncoder(m_serverSessionClass);
+        //attach input validation iff there is a method override
+        if (ConfigurationUtility.isMethodOverwrite(ServiceTunnelServlet.class, "filterInbound", new Class[]{Object.class}, getClass())) {
+          ((IServiceTunnelContentObserver) m_contentHandler).addInboundListener(this);
+        }
+        //attach output validation iff there is a method override
+        if (ConfigurationUtility.isMethodOverwrite(ServiceTunnelServlet.class, "filterOutbound", new Class[]{Object.class}, getClass())) {
+          ((IServiceTunnelContentObserver) m_contentHandler).addOutboundListener(this);
+        }
       }
     }
-    return m_msgEncoder;
+    return m_contentHandler;
   }
 
   private Bundle[] getOrderedBundleList() {
@@ -194,7 +209,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_orderedBundleList;
   }
 
-  private void serviceWithScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq) throws ProcessingException, ServletException {
+  private void serviceWithScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res) throws ProcessingException, ServletException {
     //external request: apply locking, this is the session initialization phase
     IServerSession serverSession;
     Subject subject;
@@ -225,12 +240,12 @@ public class ServiceTunnelServlet extends HttpServletEx {
         req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
       }
     }
-    ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, subject, req, res);
+    ServerJob job = createServiceTunnelServerJob(serverSession, null, subject, req, res);
     job.runNow(new NullProgressMonitor());
     job.throwOnError();
   }
 
-  private void serviceWithScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, ServiceTunnelRequest serviceTunnelReq, String ajaxSessionId, String ajaxUserId) throws ProcessingException, ServletException {
+  private void serviceWithScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxSessionId, String ajaxUserId) throws ProcessingException, ServletException {
     IServerSession serverSession;
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal(ajaxUserId));
@@ -246,7 +261,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
         m_ajaxSessionCache.touch(ajaxSessionId);
       }
     }
-    ServerJob job = createServiceTunnelServerJob(serverSession, serviceTunnelReq, subject, req, res);
+    ServerJob job = createServiceTunnelServerJob(serverSession, null, subject, req, res);
     job.runNow(new NullProgressMonitor());
     job.throwOnError();
   }
@@ -268,7 +283,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
   protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
     try {
       lazyInit(req, res);
-      ServiceTunnelRequest serviceTunnelReq = deserializeInput(req.getInputStream());
       //
       String servletPath = req.getServletPath();
       String ajaxSessionId = req.getHeader("Ajax-SessionId");
@@ -290,13 +304,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
         ThreadContext.put(req);
         ThreadContext.put(res);
         //
-        LocaleThreadLocal.set(serviceTunnelReq.getLocale());
-        NlsLocale.setThreadDefault(new NlsLocale(serviceTunnelReq.getNlsLocale()));
         if (isVirtualImpersonatedRequest) {
-          serviceWithScoutServerSessionOnVirtualSession(req, res, serviceTunnelReq, ajaxSessionId, ajaxUserId);
+          serviceWithScoutServerSessionOnVirtualSession(req, res, ajaxSessionId, ajaxUserId);
         }
         else {
-          serviceWithScoutServerSessionOnHttpSession(req, res, serviceTunnelReq);
+          serviceWithScoutServerSessionOnHttpSession(req, res);
         }
       }
       finally {
@@ -391,12 +403,41 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   /**
+   * @deprecated use
+   *             {@link #createServiceTunnelServerJob(IServerSession, Subject, HttpServletRequest, HttpServletResponse)}
+   */
+  @Deprecated
+  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, ServiceTunnelRequest serviceTunnelRequest, Subject subject, HttpServletRequest request, HttpServletResponse response) {
+    return createServiceTunnelServerJob(serverSession, subject, request, response);
+  }
+
+  /**
    * Create the {@link ServerJob} that runs the request as a single atomic transaction
    * <p>
    * This method is part of the protected api and can be overridden.
    */
-  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, ServiceTunnelRequest serviceTunnelRequest, Subject subject, HttpServletRequest request, HttpServletResponse response) {
-    return new ServiceTunnelServiceJob(serverSession, serviceTunnelRequest, subject, request, response);
+  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, Subject subject, HttpServletRequest request, HttpServletResponse response) {
+    return new ServiceTunnelServiceJob(serverSession, subject, request, response);
+  }
+
+  /**
+   * Validate inbound data by traversing the complete object structure.
+   * Override this method to do central input validation inside the transaction context.
+   * <p>
+   * This method is part of the protected api and can be overridden.
+   */
+  @Override
+  public void filterInbound(Object o) throws Exception {
+  }
+
+  /**
+   * Validate outbound data by traversing the complete object structure.
+   * Override this method to do central output validation inside the transaction context.
+   * <p>
+   * This method is part of the protected api and can be overridden.
+   */
+  @Override
+  public void filterOutbound(Object o) throws Exception {
   }
 
   /**
@@ -410,20 +451,23 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   private class ServiceTunnelServiceJob extends ServerJob {
 
-    protected ServiceTunnelRequest m_serviceTunnelRequest;
     protected HttpServletRequest m_request;
     protected HttpServletResponse m_response;
 
-    public ServiceTunnelServiceJob(IServerSession serverSession, ServiceTunnelRequest serviceTunnelRequest, Subject subject, HttpServletRequest request, HttpServletResponse response) {
+    public ServiceTunnelServiceJob(IServerSession serverSession, Subject subject, HttpServletRequest request, HttpServletResponse response) {
       super("ServiceTunnel", serverSession, subject);
-      m_serviceTunnelRequest = serviceTunnelRequest;
       m_request = request;
       m_response = response;
     }
 
     @Override
     protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      ServiceTunnelResponse serviceRes = runServerJobTransaction(m_serviceTunnelRequest);
+      ServiceTunnelRequest serviceReq = deserializeInput(m_request.getInputStream());
+      LocaleThreadLocal.set(serviceReq.getLocale());
+      NlsLocale.setThreadDefault(new NlsLocale(serviceReq.getNlsLocale()));
+      //
+      ServiceTunnelResponse serviceRes = runServerJobTransaction(serviceReq);
+      //
       serializeOutput(m_response, serviceRes);
       return Status.OK_STATUS;
     }
