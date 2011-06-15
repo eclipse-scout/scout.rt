@@ -317,10 +317,13 @@ public class ServiceTunnelServlet extends HttpServletEx implements IInboundListe
     }
     catch (Throwable t) {
       //ignore disconnect errors
+      // we don't want to throw an exception, if the client closed the connection
       Throwable cause = t;
       while (cause != null) {
-        if (cause instanceof SocketException && cause.getMessage().equals("Connection reset by peer: socket write error")) {
-          // we don't want to throw an exception, if the client closed the connection
+        if (cause instanceof SocketException) {
+          return;
+        }
+        else if (cause.getClass().getSimpleName().equalsIgnoreCase("EofException")) {
           return;
         }
         else if (cause instanceof InterruptedIOException) {
