@@ -14,12 +14,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CloneUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
-public abstract class AbstractFormFieldData implements Serializable {
+public abstract class AbstractFormFieldData implements Serializable, Cloneable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFormFieldData.class);
   private static final long serialVersionUID = 1L;
 
@@ -29,6 +30,43 @@ public abstract class AbstractFormFieldData implements Serializable {
 
   public AbstractFormFieldData() {
     initConfig();
+  }
+
+  @Override
+  public Object clone() {
+    try {
+      AbstractFormFieldData copy = (AbstractFormFieldData) super.clone();
+      if (this.m_fieldMap != null) {
+        copy.m_fieldMap = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>();
+        for (Map.Entry<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> e : this.m_fieldMap.entrySet()) {
+          AbstractFormFieldData member = (AbstractFormFieldData) e.getValue().clone();
+          try {
+            CloneUtility.adaptSyntheticMembershipFields(this, copy, member);
+          }
+          catch (Exception ex) {
+            throw new IllegalArgumentException(ex);
+          }
+          copy.m_fieldMap.put(e.getKey(), member);
+        }
+      }
+      if (this.m_propertyMap != null) {
+        copy.m_propertyMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>();
+        for (Map.Entry<Class<? extends AbstractPropertyData>, AbstractPropertyData> e : this.m_propertyMap.entrySet()) {
+          AbstractPropertyData member = (AbstractPropertyData) e.getValue().clone();
+          try {
+            CloneUtility.adaptSyntheticMembershipFields(this, copy, member);
+          }
+          catch (Exception ex) {
+            throw new IllegalArgumentException(ex);
+          }
+          copy.m_propertyMap.put(e.getKey(), member);
+        }
+      }
+      return copy;
+    }
+    catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private Class<? extends AbstractPropertyData>[] getConfiguredPropertyDatas() {
@@ -55,7 +93,7 @@ public abstract class AbstractFormFieldData implements Serializable {
         LOG.warn(null, e);
       }
     }// end for
-    // add fields
+     // add fields
     HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> map = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>();
     Class<? extends AbstractFormFieldData>[] fieldArray = getConfiguredFieldDatas();
     for (int i = 0; i < fieldArray.length; i++) {

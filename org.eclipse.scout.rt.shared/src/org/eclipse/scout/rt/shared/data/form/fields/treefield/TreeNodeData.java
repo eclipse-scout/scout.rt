@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Transfer object representing a node in a tree, used with a {@link AbstractTreeFieldData}
  */
-public class TreeNodeData implements Serializable {
+public class TreeNodeData implements Serializable, Cloneable {
   private static final long serialVersionUID = 1L;
 
   private TreeNodeData m_parentNode;
@@ -27,6 +27,23 @@ public class TreeNodeData implements Serializable {
 
   public TreeNodeData() {
     m_childNodes = new ArrayList<TreeNodeData>(2);
+  }
+
+  @Override
+  public Object clone() {
+    try {
+      TreeNodeData copy = (TreeNodeData) super.clone();
+      if (this.m_childNodes != null) {
+        copy.m_childNodes = new ArrayList<TreeNodeData>(this.m_childNodes.size());
+        for (TreeNodeData n : this.m_childNodes) {
+          copy.m_childNodes.add((TreeNodeData) n.clone());
+        }
+      }
+      return copy;
+    }
+    catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public TreeNodeData getParentNode() {

@@ -24,6 +24,23 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
   }
 
   @Override
+  public Object clone() {
+    AbstractTableFieldData copy = (AbstractTableFieldData) super.clone();
+    if (this.m_rowList != null) {
+      copy.m_rowList = new ArrayList<Object[]>(this.m_rowList.size());
+      for (Object[] row : this.m_rowList) {
+        Object[] copyRow = null;
+        if (row != null) {
+          copyRow = new Object[row.length];
+          System.arraycopy(row, 0, copyRow, 0, row.length);
+        }
+        copy.m_rowList.add(copyRow);
+      }
+    }
+    return copy;
+  }
+
+  @Override
   protected void initConfig() {
     super.initConfig();
   }

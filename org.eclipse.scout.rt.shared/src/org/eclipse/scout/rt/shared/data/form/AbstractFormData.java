@@ -13,10 +13,11 @@ package org.eclipse.scout.rt.shared.data.form;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.eclipse.scout.commons.ClassIdentifier;
+import org.eclipse.scout.commons.CloneUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -59,7 +60,7 @@ public abstract class AbstractFormData implements Serializable, Cloneable {
         LOG.warn(null, e);
       }
     }// end for
-    // add fields
+     // add fields
     m_fieldMap = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>();
     Class<? extends AbstractFormFieldData>[] fieldArray = getConfiguredFieldDatas();
     for (int i = 0; i < fieldArray.length; i++) {
@@ -292,10 +293,30 @@ public abstract class AbstractFormData implements Serializable, Cloneable {
     try {
       AbstractFormData copy = (AbstractFormData) super.clone();
       if (this.m_fieldMap != null) {
-        copy.m_fieldMap = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>(this.m_fieldMap);
+        copy.m_fieldMap = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>();
+        for (Map.Entry<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> e : this.m_fieldMap.entrySet()) {
+          AbstractFormFieldData member = (AbstractFormFieldData) e.getValue().clone();
+          try {
+            CloneUtility.adaptSyntheticMembershipFields(this, copy, member);
+          }
+          catch (Exception ex) {
+            throw new IllegalArgumentException(ex);
+          }
+          copy.m_fieldMap.put(e.getKey(), member);
+        }
       }
       if (this.m_propertyMap != null) {
-        copy.m_propertyMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>(this.m_propertyMap);
+        copy.m_propertyMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>();
+        for (Map.Entry<Class<? extends AbstractPropertyData>, AbstractPropertyData> e : this.m_propertyMap.entrySet()) {
+          AbstractPropertyData member = (AbstractPropertyData) e.getValue().clone();
+          try {
+            CloneUtility.adaptSyntheticMembershipFields(this, copy, member);
+          }
+          catch (Exception ex) {
+            throw new IllegalArgumentException(ex);
+          }
+          copy.m_propertyMap.put(e.getKey(), member);
+        }
       }
       return copy;
     }
