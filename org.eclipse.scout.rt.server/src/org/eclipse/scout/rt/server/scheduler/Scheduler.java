@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -305,13 +305,20 @@ public class Scheduler implements IScheduler {
   }
 
   public void handleJobExecution(final ISchedulerJob job, final TickSignal signal) throws ProcessingException {
-    new ServerJob("Scheduler", m_serverSession, m_subject) {
+    ServerJob serverJob = new ServerJob("Scheduler", m_serverSession, m_subject) {
       @Override
       protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
         job.run(Scheduler.this, signal);
         return Status.OK_STATUS;
       }
-    }.schedule();
+    };
+    serverJob.schedule();
+    try {
+      serverJob.join();
+    }
+    catch (InterruptedException ie) {
+      throw new ProcessingException("Interrupted", ie);
+    }
   }
 
   /**
