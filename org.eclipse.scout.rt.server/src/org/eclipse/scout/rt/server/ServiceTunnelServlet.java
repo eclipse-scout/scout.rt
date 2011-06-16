@@ -209,50 +209,51 @@ public class ServiceTunnelServlet extends HttpServletEx implements IInboundListe
     return m_orderedBundleList;
   }
 
-  private void serviceWithScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res) throws ProcessingException, ServletException {
+  private Subject lookupSubjectOnHttpSession(HttpServletRequest req, HttpServletResponse res) throws ProcessingException, ServletException {
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null) {
+      Principal principal = req.getUserPrincipal();
+      if (principal == null || principal.getName() == null || principal.getName().trim().length() == 0) {
+        principal = null;
+        String name = req.getRemoteUser();
+        if (name != null && name.trim().length() > 0) {
+          principal = new SimplePrincipal(name);
+        }
+      }
+      if (principal != null) {
+        subject = new Subject();
+        subject.getPrincipals().add(principal);
+      }
+    }
+    if (subject == null) {
+      throw new SecurityException("request contains neither remoteUser nor userPrincipal nor a subject with a principal");
+    }
+    return subject;
+  }
+
+  private Subject lookupSubjectOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxUserId) throws ProcessingException, ServletException {
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal(ajaxUserId));
+    return subject;
+  }
+
+  private IServerSession lookupScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, Subject subject) throws ProcessingException, ServletException {
     //external request: apply locking, this is the session initialization phase
-    IServerSession serverSession;
-    Subject subject;
     synchronized (req.getSession()) {
-      //determine subject
-      subject = Subject.getSubject(AccessController.getContext());
-      if (subject == null) {
-        Principal principal = req.getUserPrincipal();
-        if (principal == null || principal.getName() == null || principal.getName().trim().length() == 0) {
-          principal = null;
-          String name = req.getRemoteUser();
-          if (name != null && name.trim().length() > 0) {
-            principal = new SimplePrincipal(name);
-          }
-        }
-        if (principal != null) {
-          subject = new Subject();
-          subject.getPrincipals().add(principal);
-        }
-      }
-      if (subject == null) {
-        throw new SecurityException("request contains neither remoteUser nor userPrincipal nor a subject with a principal");
-      }
-      //
-      serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
+      IServerSession serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
       if (serverSession == null) {
         serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
         req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
       }
+      return serverSession;
     }
-    ServerJob job = createServiceTunnelServerJob(serverSession, null, subject, req, res);
-    job.runNow(new NullProgressMonitor());
-    job.throwOnError();
   }
 
-  private void serviceWithScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxSessionId, String ajaxUserId) throws ProcessingException, ServletException {
-    IServerSession serverSession;
-    Subject subject = new Subject();
-    subject.getPrincipals().add(new SimplePrincipal(ajaxUserId));
+  private IServerSession lookupScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxSessionId, Subject subject) throws ProcessingException, ServletException {
     synchronized (m_ajaxSessionCache) {
       //update session timeout
       m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(1000L, 1000L * req.getSession().getMaxInactiveInterval()));
-      serverSession = m_ajaxSessionCache.get(ajaxSessionId);
+      IServerSession serverSession = m_ajaxSessionCache.get(ajaxSessionId);
       if (serverSession == null) {
         serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
         m_ajaxSessionCache.put(ajaxSessionId, serverSession);
@@ -260,23 +261,34 @@ public class ServiceTunnelServlet extends HttpServletEx implements IInboundListe
       else {
         m_ajaxSessionCache.touch(ajaxSessionId);
       }
+      return serverSession;
     }
-    ServerJob job = createServiceTunnelServerJob(serverSession, null, subject, req, res);
-    job.runNow(new NullProgressMonitor());
-    job.throwOnError();
   }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
-    // get session
-    HttpSession session = req.getSession();
-    String key = AdminSession.class.getName();
-    AdminSession as = (AdminSession) session.getAttribute(key);
-    if (as == null) {
-      as = new AdminSession();
-      session.setAttribute(key, as);
+    //invoke
+    Map<Class, Object> backup = ThreadContext.backup();
+    try {
+      lazyInit(req, res);
+      //
+      //legacy, deprecated, do not use servlet request/response in scout code
+      ThreadContext.put(req);
+      ThreadContext.put(res);
+      //
+      Subject subject = lookupSubjectOnHttpSession(req, res);
+      IServerSession serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject);
+      //
+      ServerJob job = new AdminServiceJob(serverSession, subject, req, res);
+      job.runNow(new NullProgressMonitor());
+      job.throwOnError();
     }
-    as.serviceRequest(req, res);
+    catch (ProcessingException e) {
+      throw new ServletException(e);
+    }
+    finally {
+      ThreadContext.restore(backup);
+    }
   }
 
   @Override
@@ -304,12 +316,19 @@ public class ServiceTunnelServlet extends HttpServletEx implements IInboundListe
         ThreadContext.put(req);
         ThreadContext.put(res);
         //
+        IServerSession serverSession;
+        Subject subject;
         if (isVirtualImpersonatedRequest) {
-          serviceWithScoutServerSessionOnVirtualSession(req, res, ajaxSessionId, ajaxUserId);
+          subject = lookupSubjectOnVirtualSession(req, res, ajaxUserId);
+          serverSession = lookupScoutServerSessionOnVirtualSession(req, res, ajaxSessionId, subject);
         }
         else {
-          serviceWithScoutServerSessionOnHttpSession(req, res);
+          subject = lookupSubjectOnHttpSession(req, res);
+          serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject);
         }
+        ServerJob job = createServiceTunnelServerJob(serverSession, null, subject, req, res);
+        job.runNow(new NullProgressMonitor());
+        job.throwOnError();
       }
       finally {
         ThreadContext.restore(backup);
@@ -420,7 +439,7 @@ public class ServiceTunnelServlet extends HttpServletEx implements IInboundListe
    * This method is part of the protected api and can be overridden.
    */
   protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, Subject subject, HttpServletRequest request, HttpServletResponse response) {
-    return new ServiceTunnelServiceJob(serverSession, subject, request, response);
+    return new RemoteServiceJob(serverSession, subject, request, response);
   }
 
   /**
@@ -452,13 +471,13 @@ public class ServiceTunnelServlet extends HttpServletEx implements IInboundListe
     return new BusinessOperationDispatcher(getOrderedBundleList(), m_requestMinVersion, m_debug).invoke(req);
   }
 
-  private class ServiceTunnelServiceJob extends ServerJob {
+  private class RemoteServiceJob extends ServerJob {
 
     protected HttpServletRequest m_request;
     protected HttpServletResponse m_response;
 
-    public ServiceTunnelServiceJob(IServerSession serverSession, Subject subject, HttpServletRequest request, HttpServletResponse response) {
-      super("ServiceTunnel", serverSession, subject);
+    public RemoteServiceJob(IServerSession serverSession, Subject subject, HttpServletRequest request, HttpServletResponse response) {
+      super("RemoteServiceCall", serverSession, subject);
       m_request = request;
       m_response = response;
     }
@@ -472,6 +491,32 @@ public class ServiceTunnelServlet extends HttpServletEx implements IInboundListe
       ServiceTunnelResponse serviceRes = runServerJobTransaction(serviceReq);
       //
       serializeOutput(m_response, serviceRes);
+      return Status.OK_STATUS;
+    }
+  }
+
+  private class AdminServiceJob extends ServerJob {
+
+    protected HttpServletRequest m_request;
+    protected HttpServletResponse m_response;
+
+    public AdminServiceJob(IServerSession serverSession, Subject subject, HttpServletRequest request, HttpServletResponse response) {
+      super("AdminServiceCall", serverSession, subject);
+      m_request = request;
+      m_response = response;
+    }
+
+    @Override
+    protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+      // get session
+      HttpSession session = m_request.getSession();
+      String key = AdminSession.class.getName();
+      AdminSession as = (AdminSession) session.getAttribute(key);
+      if (as == null) {
+        as = new AdminSession();
+        session.setAttribute(key, as);
+      }
+      as.serviceRequest(m_request, m_response);
       return Status.OK_STATUS;
     }
   }
