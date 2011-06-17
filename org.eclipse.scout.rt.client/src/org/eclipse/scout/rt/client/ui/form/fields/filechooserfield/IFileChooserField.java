@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 public interface IFileChooserField extends IValueField<String> {
 
   String PROP_FILE_ICON_ID = "fileIconId";
+
+  String PROP_MAX_LENGTH = "maxLength";
 
   void setFolderMode(boolean b);
 
@@ -51,6 +53,10 @@ public interface IFileChooserField extends IValueField<String> {
   void setFileIconId(String s);
 
   String getFileIconId();
+
+  void setMaxLength(int len);
+
+  int getMaxLength();
 
   IMenu[] getMenus();
 

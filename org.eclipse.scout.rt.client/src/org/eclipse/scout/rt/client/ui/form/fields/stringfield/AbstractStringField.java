@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 public abstract class AbstractStringField extends AbstractValueField<String> implements IStringField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStringField.class);
@@ -70,6 +71,7 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(290)
   @ConfigPropertyValue("4000")
+  @ValidationRule(ValidationRule.MAX_LENGTH)
   protected int getConfiguredMaxLength() {
     return 4000;
   }

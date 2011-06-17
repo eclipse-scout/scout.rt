@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDecimal> implements IBigDecimalField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBigDecimalField.class);
@@ -37,6 +38,7 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(300)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.MIN_VALUE)
   protected Double getConfiguredMinValue() {
     return null;
   }
@@ -44,6 +46,7 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(310)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.MAX_VALUE)
   protected Double getConfiguredMaxValue() {
     return null;
   }

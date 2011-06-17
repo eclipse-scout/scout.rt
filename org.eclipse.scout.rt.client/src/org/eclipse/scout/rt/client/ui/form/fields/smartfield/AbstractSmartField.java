@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -180,6 +181,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(260)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType<?>> getConfiguredCodeType() {
     return null;
   }
@@ -193,6 +195,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(250)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends LookupCall> getConfiguredLookupCall() {
     return null;
   }

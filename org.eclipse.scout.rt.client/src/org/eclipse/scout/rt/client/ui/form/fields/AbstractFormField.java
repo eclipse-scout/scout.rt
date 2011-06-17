@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -222,6 +223,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(45)
   @ConfigPropertyValue("false")
+  @ValidationRule(ValidationRule.MANDATORY)
   protected boolean getConfiguredMandatory() {
     return false;
   }

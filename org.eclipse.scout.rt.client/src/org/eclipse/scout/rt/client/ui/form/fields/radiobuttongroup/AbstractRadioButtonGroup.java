@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.internal.RadioButtonGroupGrid;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -83,6 +84,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends LookupCall> getConfiguredLookupCall() {
     return null;
   }
@@ -96,6 +98,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType> getConfiguredCodeType() {
     return null;
   }
