@@ -73,6 +73,15 @@ public abstract class AbstractFormFieldData implements Serializable {
     }
   }
 
+  public Map<String, Object> getValidationRules() {
+    HashMap<String, Object> ruleMap = new HashMap<String, Object>();
+    initValidationRules(ruleMap);
+    return ruleMap;
+  }
+
+  protected void initValidationRules(Map<String, Object> ruleMap) {
+  }
+
   public String getFieldId() {
     String s = getClass().getName();
     int i = Math.max(s.lastIndexOf('$'), s.lastIndexOf('.'));

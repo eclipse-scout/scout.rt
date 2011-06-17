@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
-import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -38,13 +35,13 @@ public class DefaultFormDataValidator {
   public void validate() throws Exception {
     for (Map<String, AbstractPropertyData<?>> map : getFormData().getAllPropertiesRec().values()) {
       for (AbstractPropertyData<?> prop : map.values()) {
-        Map<String, Object> ruleMap = fetchRules(prop);
+        Map<String, Object> ruleMap = prop.getValidationRules();
         validateProperty(prop, ruleMap);
       }
     }
     for (Map<String, AbstractFormFieldData> map : getFormData().getAllFieldsRec().values()) {
       for (AbstractFormFieldData field : map.values()) {
-        Map<String, Object> ruleMap = fetchRules(field);
+        Map<String, Object> ruleMap = field.getValidationRules();
         if (field instanceof AbstractValueFieldData<?>) {
           validateValueField((AbstractValueFieldData<?>) field, ruleMap);
         }
@@ -62,38 +59,6 @@ public class DefaultFormDataValidator {
   }
 
   protected void validateValueField(AbstractValueFieldData<?> field, Map<String, Object> ruleMap) throws Exception {
-  }
-
-  /**
-   * @return the map of all the rules of the object's class and all its super classes according to
-   *         {@link ValidationRule}
-   */
-  protected Map<String, Object> fetchRules(Object obj) throws Exception {
-    if (obj == null) {
-      return Collections.emptyMap();
-    }
-    HashMap<String, Object> ruleMap = new HashMap<String, Object>();
-    Class c = obj.getClass();
-    while (c != null) {
-      try {
-        Field f = c.getField("validationRules");
-        @SuppressWarnings("unchecked")
-        Map<String, Object> staticMap = (Map<String, Object>) f.get(null);
-        if (staticMap != null) {
-          for (Map.Entry<String, Object> entry : staticMap.entrySet()) {
-            if (!ruleMap.containsKey(entry.getKey())) {
-              ruleMap.put(entry.getKey(), entry.getValue());
-            }
-          }
-        }
-      }
-      catch (NoSuchFieldException e) {
-        //nop
-      }
-      //super class
-      c = c.getSuperclass();
-    }
-    return ruleMap;
   }
 
 }
