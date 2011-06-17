@@ -24,18 +24,6 @@ public abstract class AbstractTreeFieldData extends AbstractFormFieldData {
   }
 
   @Override
-  public Object clone() {
-    AbstractTreeFieldData copy = (AbstractTreeFieldData) super.clone();
-    if (this.m_rootList != null) {
-      copy.m_rootList = new ArrayList<TreeNodeData>(this.m_rootList.size());
-      for (TreeNodeData n : this.m_rootList) {
-        copy.m_rootList.add((TreeNodeData) n.clone());
-      }
-    }
-    return copy;
-  }
-
-  @Override
   protected void initConfig() {
     super.initConfig();
   }

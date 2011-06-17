@@ -17,7 +17,7 @@ import java.io.Serializable;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.holders.IHolder;
 
-public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializable, Cloneable {
+public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializable {
   private static final long serialVersionUID = 1L;
 
   private T m_value;
@@ -25,16 +25,6 @@ public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializabl
 
   public AbstractPropertyData() {
     super();
-  }
-
-  @Override
-  public Object clone() {
-    try {
-      return super.clone();
-    }
-    catch (CloneNotSupportedException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   public T getValue() {
@@ -73,6 +63,9 @@ public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializabl
   private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
     s.defaultReadObject();
     //verify if valueSet and the type of the value are valid and consistent
+    if (!m_valueSet) {
+      m_value = null;
+    }
     if (m_value == null) {
       return;
     }

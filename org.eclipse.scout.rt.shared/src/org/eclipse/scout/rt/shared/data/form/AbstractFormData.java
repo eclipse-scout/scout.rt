@@ -291,36 +291,9 @@ public abstract class AbstractFormData implements Serializable, Cloneable {
   @Override
   public Object clone() {
     try {
-      AbstractFormData copy = (AbstractFormData) super.clone();
-      if (this.m_fieldMap != null) {
-        copy.m_fieldMap = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>();
-        for (Map.Entry<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> e : this.m_fieldMap.entrySet()) {
-          AbstractFormFieldData member = (AbstractFormFieldData) e.getValue().clone();
-          try {
-            CloneUtility.adaptSyntheticMembershipFields(this, copy, member);
-          }
-          catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
-          }
-          copy.m_fieldMap.put(e.getKey(), member);
-        }
-      }
-      if (this.m_propertyMap != null) {
-        copy.m_propertyMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>();
-        for (Map.Entry<Class<? extends AbstractPropertyData>, AbstractPropertyData> e : this.m_propertyMap.entrySet()) {
-          AbstractPropertyData member = (AbstractPropertyData) e.getValue().clone();
-          try {
-            CloneUtility.adaptSyntheticMembershipFields(this, copy, member);
-          }
-          catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
-          }
-          copy.m_propertyMap.put(e.getKey(), member);
-        }
-      }
-      return copy;
+      return CloneUtility.createDeepCopyBySerializing(this);
     }
-    catch (CloneNotSupportedException e) {
+    catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
