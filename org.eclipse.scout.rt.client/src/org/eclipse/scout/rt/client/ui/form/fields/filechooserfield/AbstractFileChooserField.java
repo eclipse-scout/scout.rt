@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 public abstract class AbstractFileChooserField extends AbstractValueField<String> implements IFileChooserField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFileChooserField.class);
@@ -103,8 +104,16 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     return AbstractIcons.FileChooserFieldFile;
   }
 
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(310)
+  @ConfigPropertyValue("4000")
+  @ValidationRule(ValidationRule.MAX_LENGTH)
+  protected int getConfiguredMaxLength() {
+    return 4000;
+  }
+
   private Class<? extends IMenu>[] getConfiguredMenus() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
   }
 
@@ -122,6 +131,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
       setDirectory(new File(getConfiguredDirectory()));
     }
     setFileIconId(getConfiguredFileIconId());
+    setMaxLength(getConfiguredMaxLength());
     m_menus = new ArrayList<IMenu>();
     Class<? extends IMenu>[] a = getConfiguredMenus();
     for (int i = 0; i < a.length; i++) {
@@ -221,6 +231,21 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   public String getFileIconId() {
     return propertySupport.getPropertyString(PROP_FILE_ICON_ID);
+  }
+
+  public void setMaxLength(int len) {
+    if (len > 0) propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
+    if (isInitialized()) {
+      setValue(getValue());
+    }
+  }
+
+  public int getMaxLength() {
+    int len = propertySupport.getPropertyInt(PROP_MAX_LENGTH);
+    if (len <= 0) {
+      len = 200;
+    }
+    return len;
   }
 
   public IMenu[] getMenus() {
@@ -363,6 +388,14 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   @Override
   protected String validateValueInternal(String text) throws ProcessingException {
+    if (text != null && text.length() == 0) {
+      text = null;
+    }
+    if (text != null) {
+      if (text.length() > getMaxLength()) {
+        text = text.substring(0, getMaxLength());
+      }
+    }
     return text;
   }
 
@@ -370,8 +403,8 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
     public IMenu[] firePopupFromUI() {
       ArrayList<IMenu> menus = new ArrayList<IMenu>();
-      for (Iterator it = m_menus.iterator(); it.hasNext();) {
-        IMenu menu = (IMenu) it.next();
+      for (Iterator<IMenu> it = m_menus.iterator(); it.hasNext();) {
+        IMenu menu = it.next();
         menu.prepareAction();
         if (menu.isVisible()) {
           menus.add(menu);

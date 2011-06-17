@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
@@ -110,6 +111,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.LOOKUP_CALL)
   protected Class<? extends LookupCall> getConfiguredLookupCall() {
     return null;
   }
@@ -117,6 +119,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.CODE_TYPE)
   protected Class<? extends ICodeType> getConfiguredCodeType() {
     return null;
   }

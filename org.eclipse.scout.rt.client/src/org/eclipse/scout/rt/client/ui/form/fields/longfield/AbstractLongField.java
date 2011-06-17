@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 public abstract class AbstractLongField extends AbstractNumberField<Long> implements ILongField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractLongField.class);
@@ -33,6 +34,7 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   @ConfigProperty(ConfigProperty.LONG)
   @Order(250)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.MIN_VALUE)
   protected Long getConfiguredMinimumValue() {
     return null;
   }
@@ -40,6 +42,7 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   @ConfigProperty(ConfigProperty.LONG)
   @Order(260)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.MAX_VALUE)
   protected Long getConfiguredMaximumValue() {
     return null;
   }
