@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,10 +18,11 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 public abstract class AbstractSchedulerJob implements ISchedulerJob {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSchedulerJob.class);
-  private String m_groupId;
-  private String m_jobId;
-  private boolean m_disposed;
-  private boolean m_interrupted;
+
+  private final String m_groupId;
+  private final String m_jobId;
+  private volatile boolean m_disposed;
+  private volatile boolean m_interrupted;
 
   public AbstractSchedulerJob(String groupId, String jobId) {
     m_groupId = groupId;
