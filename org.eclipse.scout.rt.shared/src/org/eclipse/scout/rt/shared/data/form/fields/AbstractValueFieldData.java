@@ -46,6 +46,9 @@ public abstract class AbstractValueFieldData<T> extends AbstractFormFieldData im
   private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
     s.defaultReadObject();
     //verify if valueSet and the type of the value are valid and consistent
+    if (!isValueSet()) {
+      m_value = null;
+    }
     if (m_value == null) {
       return;
     }
