@@ -31,9 +31,6 @@ public class LogExceptionHandlerService extends AbstractService implements IExce
     if (pe instanceof VetoException) {
       logLevel = IScoutLogger.LEVEL_INFO;
     }
-    else if (pe.getCause() == null) {
-      logLevel = IScoutLogger.LEVEL_INFO;
-    }
     else {
       switch (s.getSeverity()) {
         case IProcessingStatus.INFO: {
