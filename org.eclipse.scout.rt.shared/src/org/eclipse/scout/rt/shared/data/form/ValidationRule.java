@@ -63,7 +63,8 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
  * <p>
  * Custom validation rule names can freely be used (it's a String or a string constant).
  * <p>
- * Validation is implemented by subclassing ServiceTunnelServlet and implementing the filterInbound method.
+ * Validation is implemented by overriding ServiceTunnelServlet#runServerJobTransaction with an own
+ * BusinessOperationDispatcher subclass) that overrides the filterInbound() method.
  * <p>
  * When the sdk fails to create a rule for an annotated (directly or implicit by superclass) method to the created form
  * data it adds a javadoc entry specifying the fully qualified source method name and the keyword

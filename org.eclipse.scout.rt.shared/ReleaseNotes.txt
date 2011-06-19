@@ -48,3 +48,29 @@ Internal security audit
 - enhanced access control on gui remote service calls: see enahncements on IAccessControlService.checkServiceTunnelAccess
 - adding logout service and calling it from IClientSession.stop();
 Migration: None
+
+19.06.2011 imo
+Internal security audit
+added RemoteServiceAccessPermission
+remote service calls are denied if any of the following
+- the service is not an interface
+- the service is not a IService subtype
+- the method is not defined on the service interface itself
+- the method is on IService (IService2)
+- there is no RemoteServiceAccessPermission for that "service.method" (*)
+- there is an explicit RemoteServiceAccessDenied annotation on the service type or method (general overrule of any existing permission)
+Service policy is centrally applied in BusinessOperationDispatcher
+Migration:
+To support legacy, (*) shows a warning if none RemoteServiceAccessPermission is granted and automatically adds a default *.shared.* permission.
+For 'intranet use' add in your AccessControlService.execLoadPermissions:
+ ...
+ Permissions p = AccessControlUtility.createPermissions(permissionData);
+ p.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
+ return p;
+
+For 'internet/extranet use' add in your AccessControlService.execLoadPermissions a more restrictive list:
+ ...
+ Permissions p = AccessControlUtility.createPermissions(permissionData);
+ p.add(new RemoteServiceAccessPermission("com.mycompany.myproduct.shared.services.*", "*"));
+ ...
+ return p;

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.Locale;
@@ -25,20 +26,32 @@ import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.data.DefaultInboundValidator;
+import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
+import org.eclipse.scout.service.IService;
+import org.eclipse.scout.service.IService2;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /**
- * delegate for scout dynamic business op invocation
+ * Delegate for scout dynamic business op invocation
+ * <p>
+ * Subclass this type to change/add invocation checks and rules.
+ * <p>
+ * Override {@link #filterInbound(Object, Method, Object[])} and/or
+ * {@link #filterOutbound(Object, Method, Object, Object[])} to add central input validation.
  */
+@SuppressWarnings("deprecation")
 public class BusinessOperationDispatcher {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BusinessOperationDispatcher.class);
 
@@ -136,18 +149,14 @@ public class BusinessOperationDispatcher {
       }
       //check access: service proxy allowed
       Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
-      IAccessControlService acs = SERVICES.getService(IAccessControlService.class);
-      if (acs == null) {
-        throw new SecurityException("access to " + serviceReq.getServiceInterfaceClassName() + "#" + serviceOp.getName() + " denied, no access controller available");
-      }
-      if (!acs.checkServiceTunnelAccess(serviceInterfaceClass, serviceOp, serviceReq.getArgs())) {
-        throw new SecurityException("access to " + serviceReq.getServiceInterfaceClassName() + "#" + serviceOp.getName() + " denied");
-      }
-      //check access level 4: service impl exists
+      checkRemoteServiceAccessByInterface(serviceInterfaceClass, serviceOp, serviceReq.getArgs());
+      //check access: service impl exists
       Object service = SERVICES.getService(serviceInterfaceClass);
       if (service == null) {
         throw new SecurityException("service registry does not contain a service of type " + serviceReq.getServiceInterfaceClassName());
       }
+      checkRemoteServiceAccessByAnnotations(serviceInterfaceClass, service.getClass(), serviceOp, serviceReq.getArgs());
+      checkRemoteServiceAccessByPermission(serviceInterfaceClass, service.getClass(), serviceOp, serviceReq.getArgs());
       //all checks done
       //
       // check if locales changed
@@ -164,8 +173,10 @@ public class BusinessOperationDispatcher {
         }
       }
       //
+      filterInbound(service, serviceOp, serviceReq.getArgs());
       Object data = ServiceUtility.invoke(serviceOp, service, serviceReq.getArgs());
       Object[] outParameters = ServiceUtility.extractHolderArguments(serviceReq.getArgs());
+      filterOutbound(service, serviceOp, data, outParameters);
       serviceRes = new ServiceTunnelResponse(data, outParameters, null);
       serviceRes.setSoapOperation(soapOperation);
       // add accumulated client notifications as side-payload
@@ -195,6 +206,117 @@ public class BusinessOperationDispatcher {
         }
       }
     }
+  }
+
+  /**
+   * Check pass 1 on type
+   */
+  protected void checkRemoteServiceAccessByInterface(Class<?> interfaceClass, Method interfaceMethod, Object[] args) {
+    //check: must be an interface
+    if (!interfaceClass.isInterface()) {
+      throw new SecurityException("access denied (code 1a).");
+    }
+    //check: must be a subclass of IService
+    if (!IService.class.isAssignableFrom(interfaceClass)) {
+      throw new SecurityException("access denied (code 1b).");
+    }
+    //check: method is defined on service interface itself
+    Method verifyMethod;
+    try {
+      verifyMethod = interfaceClass.getMethod(interfaceMethod.getName(), interfaceMethod.getParameterTypes());
+    }
+    catch (Throwable t) {
+      throw new SecurityException("access denied (code 1c).");
+    }
+    //exists
+    if (verifyMethod.getDeclaringClass() == IService.class || verifyMethod.getDeclaringClass() == IService2.class) {
+      throw new SecurityException("access denied (code 1d).");
+    }
+  }
+
+  /**
+   * Check pass 2 on instance
+   */
+  protected void checkRemoteServiceAccessByAnnotations(Class<?> interfaceClass, Class<?> implClass, Method interfaceMethod, Object[] args) {
+    //check: grant/deny annotation (type level is base, method level is finegrained)
+    Class<?> c = implClass;
+    while (c != null) {
+      //method level
+      Method m = null;
+      try {
+        m = c.getMethod(interfaceMethod.getName(), interfaceMethod.getParameterTypes());
+      }
+      catch (Throwable t) {
+        //nop
+      }
+      if (m != null) {
+        for (Annotation ann : m.getAnnotations()) {
+          //legacy
+          if (ann.annotationType() == ServiceTunnelAccessDenied.class) {
+            throw new SecurityException("access denied (code 2a).");
+          }
+          if (ann.annotationType() == RemoteServiceAccessDenied.class) {
+            throw new SecurityException("access denied (code 2b).");
+          }
+        }
+      }
+      //type level
+      for (Annotation ann : c.getAnnotations()) {
+        if (ann.annotationType() == RemoteServiceAccessDenied.class) {
+          throw new SecurityException("access denied (code 2c).");
+        }
+      }
+      //next
+      if (c == interfaceClass) {
+        break;
+      }
+      c = c.getSuperclass();
+      if (c == Object.class) {
+        //use interface at last
+        c = interfaceClass;
+      }
+    }
+    //implicit ok
+  }
+
+  /**
+   * Check {@link RemoteServiceAccessPermission} if a client (gui) is allowed to call this service from remote using a
+   * remote service proxy.
+   * <p>
+   * Deny access by default.
+   * <p>
+   * Accepts when a {@link RemoteServiceAccessPermission} was implied.
+   */
+  protected void checkRemoteServiceAccessByPermission(Class<?> interfaceClass, Class<?> implClass, Method interfaceMethod, Object[] args) {
+    if (ACCESS.check(new RemoteServiceAccessPermission(interfaceClass.getName(), interfaceMethod.getName()))) {
+      return;
+    }
+    throw new SecurityException("access denied (code 3a).");
+  }
+
+  /**
+   * Validate inbound data. Default does nothing. Called by {@link #invokeImpl(ServiceTunnelRequest)}.
+   * <p>
+   * For default handling use
+   * 
+   * <pre>
+   * new {@link DefaultInboundValidator#DefaultInboundValidator(Object[])}.validate()
+   * </pre>
+   * <p>
+   * Override this method to do central input validation inside the transaction context.
+   * <p>
+   * This method is part of the protected api and can be overridden.
+   */
+  protected void filterInbound(Object service, Method op, Object[] args) throws Exception {
+  }
+
+  /**
+   * Validate outbound data. Default does nothing. Called by {@link #invokeImpl(ServiceTunnelRequest)}.
+   * Override this method to do central output validation inside the transaction context.
+   * <p>
+   * This method is part of the protected api and can be overridden.
+   */
+  protected void filterOutbound(Object service, Method op, Object returnValue, Object[] outArgs) throws Exception {
   }
 
 }

@@ -25,10 +25,13 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.security.internal.AccessControlStore;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
+import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
+import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
+import org.eclipse.scout.service.SERVICES;
 
 @Priority(-1)
 public class AbstractAccessControlService extends AbstractService implements IAccessControlService {
@@ -126,6 +129,26 @@ public class AbstractAccessControlService extends AbstractService implements IAc
   }
 
   private void setPermissions(Permissions p) {
+    //legacy support: if there are no remote service permissions available, warn and add default rule to allow shared interfaces
+    //to support legacy functionality, this default also accepts other so far valid requests but generates a warning.
+    //a future release will throw a {@link SecurityException} when no permission is granted.
+    if (p != null) {
+      if (!p.implies(new RemoteServiceAccessPermission(IPingService.class.getName(), "ping"))) {
+        boolean existsAny = false;
+        for (Enumeration<Permission> en = p.elements(); en.hasMoreElements();) {
+          Permission perm = en.nextElement();
+          if (perm instanceof RemoteServiceAccessPermission) {
+            existsAny = true;
+            break;
+          }
+        }
+        if (!existsAny) {
+          LOG.warn("Legacy security hint: missing any RemoteServiceAccessPermissions in AccessController. Please verify the " + SERVICES.getService(IAccessControlService.class).getClass() + " to include such permissions for accessing services using client proxies. Adding default rule to allow services of pattern '*'; Check to use at least the rule '*.shared.*'");
+          p.add(new RemoteServiceAccessPermission("*", "*"));
+        }
+      }
+    }
+    //end legacy
     m_accessControlStore.setPermissionsOfCurrentSubject(p);
   }
 

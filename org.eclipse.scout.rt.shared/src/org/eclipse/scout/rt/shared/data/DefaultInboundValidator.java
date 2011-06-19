@@ -16,7 +16,6 @@ import java.io.OutputStream;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.DefaultFormDataValidator;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 
 /**
  * Does input/output validation of arbitrary serializable data.
@@ -27,18 +26,18 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
  * This default delegates {@link AbstractFormData} to a {@link DefaultFormDataValidator} and does nothing otherwise.
  */
 public class DefaultInboundValidator {
-  private final ServiceTunnelRequest m_req;
+  private final Object[] m_args;
 
-  public DefaultInboundValidator(ServiceTunnelRequest req) {
-    m_req = req;
+  public DefaultInboundValidator(Object[] args) {
+    m_args = args;
   }
 
-  public ServiceTunnelRequest getServiceTunnelRequest() {
-    return m_req;
+  public Object[] getArgs() {
+    return m_args;
   }
 
   public void validate() throws Exception {
-    Object[] args = getServiceTunnelRequest().getArgs();
+    Object[] args = getArgs();
     if (args == null || args.length == 0) {
       return;
     }

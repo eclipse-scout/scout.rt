@@ -46,7 +46,6 @@ import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
-import org.eclipse.scout.rt.shared.data.DefaultInboundValidator;
 import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -432,35 +431,16 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   /**
-   * Validate inbound data. Default does nothing. For most cases use
-   * 
-   * <pre>
-   * new {@link DefaultInboundValidator}(req).validate()
-   * </pre>
-   * <p>
-   * Override this method to do central input validation inside the transaction context.
-   * <p>
-   * This method is part of the protected api and can be overridden.
-   */
-  protected void filterInbound(ServiceTunnelRequest req) throws Exception {
-  }
-
-  /**
-   * Validate outbound data. Default does nothing.
-   * Override this method to do central output validation inside the transaction context.
-   * <p>
-   * This method is part of the protected api and can be overridden.
-   */
-  protected void filterOutbound(ServiceTunnelResponse res) throws Exception {
-  }
-
-  /**
    * runnable content of the {@link ServerJob}, thzis is the atomic transaction
    * <p>
    * This method is part of the protected api and can be overridden.
    */
   protected ServiceTunnelResponse runServerJobTransaction(ServiceTunnelRequest req) throws Exception {
-    return new BusinessOperationDispatcher(getOrderedBundleList(), m_requestMinVersion, m_debug).invoke(req);
+    return runServerJobTransactionWithDispatcher(req, getOrderedBundleList(), m_requestMinVersion, m_debug);
+  }
+
+  protected ServiceTunnelResponse runServerJobTransactionWithDispatcher(ServiceTunnelRequest req, Bundle[] loaderBundles, Version requestMinVersion, boolean debug) throws Exception {
+    return new BusinessOperationDispatcher(loaderBundles, requestMinVersion, debug).invoke(req);
   }
 
   private class RemoteServiceJob extends ServerJob {
@@ -479,10 +459,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
       ServiceTunnelRequest serviceReq = deserializeInput(m_request.getInputStream());
       LocaleThreadLocal.set(serviceReq.getLocale());
       NlsLocale.setThreadDefault(new NlsLocale(serviceReq.getNlsLocale()));
-      //central input/output validation
-      filterInbound(serviceReq);
+      //
       ServiceTunnelResponse serviceRes = runServerJobTransaction(serviceReq);
-      filterOutbound(serviceRes);
       //
       serializeOutput(m_response, serviceRes);
       return Status.OK_STATUS;
