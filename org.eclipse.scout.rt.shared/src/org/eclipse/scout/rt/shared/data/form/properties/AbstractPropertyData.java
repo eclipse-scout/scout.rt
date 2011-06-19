@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.shared.data.form.properties;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.holders.IHolder;
@@ -27,15 +25,6 @@ public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializabl
 
   public AbstractPropertyData() {
     super();
-  }
-
-  public Map<String, Object> getValidationRules() {
-    HashMap<String, Object> ruleMap = new HashMap<String, Object>();
-    initValidationRules(ruleMap);
-    return ruleMap;
-  }
-
-  protected void initValidationRules(Map<String, Object> ruleMap) {
   }
 
   public T getValue() {

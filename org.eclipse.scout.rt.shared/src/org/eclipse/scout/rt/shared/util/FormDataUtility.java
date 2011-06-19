@@ -11,12 +11,13 @@
 package org.eclipse.scout.rt.shared.util;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
 /**
  * Does basic input value validation on form data fields.
@@ -32,276 +33,109 @@ public final class FormDataUtility {
     }
   }
 
-  /**
-   * Validate a string.
-   * <p>
-   * No check is performed if {@link AbstractPropertyData#isValueSet()}=false
-   * <p>
-   * When the field type is not string a validation exception is thrown
-   * <p>
-   * When the field value is not valid a validation exception is thrown
-   * <p>
-   * see {@link #validateStringValue(String, boolean, Integer)}
-   */
-  public static void validateStringProperty(AbstractPropertyData<?> field, boolean required, Integer maxLength) throws ProcessingException {
-    if (field == null || (!required && !field.isValueSet())) {
+  public static void checkMinLength(String displayName, Object value, Object minLength) throws ProcessingException {
+    if (value == null || minLength == null) {
       return;
     }
-    validateStringValue(field.getClass().getSimpleName(), (String) field.getValue(), required, maxLength);
-  }
-
-  /**
-   * Validate a string.
-   * <p>
-   * No check is performed if {@link AbstractValueFieldData<?>#isValueSet()}=false
-   * <p>
-   * When the field type is not string a validation exception is thrown
-   * <p>
-   * When the field value is not valid a validation exception is thrown
-   * <p>
-   * see {@link #validateStringValue(String, boolean, Integer)}
-   */
-  public static void validateStringField(AbstractValueFieldData<?> field, boolean required, Integer maxLength) throws ProcessingException {
-    if (field == null || (!required && !field.isValueSet())) {
-      return;
+    int min = ((Number) minLength).intValue();
+    if (value instanceof String) {
+      if (((String) value).length() < min) throw new ProcessingException(displayName + " is too short");
     }
-    validateStringValue(field.getClass().getSimpleName(), (String) field.getValue(), required, maxLength);
-  }
-
-  /**
-   * Validate a string.
-   * <p>
-   * When the value is not valid a validation exception is thrown
-   */
-  public static void validateStringValue(String displayName, String value, boolean required, Integer maxLength) throws ProcessingException {
-    if (required) {
-      checkRequired(displayName, value);
+    else if (value.getClass().isArray()) {
+      if (Array.getLength(value) < min) throw new ProcessingException(displayName + " is too short");
     }
-    if (value == null) {
-      return;
+    else if (value instanceof Collection<?>) {
+      if (((Collection<?>) value).size() < min) throw new ProcessingException(displayName + " is too short");
     }
-    if (maxLength != null && value.length() > maxLength) {
-      throw new ProcessingException(displayName + " is too long");
+    else if (value instanceof Map<?, ?>) {
+      if (((Map<?, ?>) value).size() < min) throw new ProcessingException(displayName + " is too short");
+    }
+    else {
+      if (value.toString().length() < min) throw new ProcessingException(displayName + " is too short");
     }
   }
 
-  /**
-   * Validate the number.
-   * <p>
-   * No check is performed if {@link AbstractPropertyData#isValueSet()}=false
-   * <p>
-   * When the field type is not a numeric type, a validation exception is thrown
-   * <p>
-   * When the field value is not valid a validation exception is thrown
-   * <p>
-   * see {@link #validateLongValue(Long, boolean, Long, Long)}
-   */
-  public static void validateLongProperty(AbstractPropertyData<?> field, boolean required, Long min, Long max) throws ProcessingException {
-    if (field == null || (!required && !field.isValueSet())) {
+  public static void checkMaxLength(String displayName, Object value, Object maxLength) throws ProcessingException {
+    if (value == null || maxLength == null) {
       return;
     }
-    validateLongValue(field.getClass().getSimpleName(), (Long) field.getValue(), required, min, max);
-  }
-
-  /**
-   * Validate the number.
-   * <p>
-   * No check is performed if {@link AbstractValueFieldData<?>#isValueSet()}=false
-   * <p>
-   * When the field type is not a numeric type, a validation exception is thrown
-   * <p>
-   * When the field value is not valid a validation exception is thrown
-   * <p>
-   * see {@link #validateLongValue(Long, boolean, Long, Long)}
-   */
-  public static void validateLongField(AbstractValueFieldData<?> field, boolean required, Long min, Long max) throws ProcessingException {
-    if (field == null || (!required && !field.isValueSet())) {
-      return;
+    int max = ((Number) maxLength).intValue();
+    if (value instanceof String) {
+      if (((String) value).length() > max) throw new ProcessingException(displayName + " is too long");
     }
-    validateLongValue(field.getClass().getSimpleName(), (Long) field.getValue(), required, min, max);
-  }
-
-  /**
-   * Validate the number.
-   * <p>
-   * When the value is not valid a validation exception is thrown
-   */
-  public static void validateLongValue(String displayName, Long value, boolean required, Long min, Long max) throws ProcessingException {
-    if (required) {
-      checkRequired(displayName, value);
+    else if (value.getClass().isArray()) {
+      if (Array.getLength(value) > max) throw new ProcessingException(displayName + " is too long");
     }
-    if (value == null) {
-      return;
+    else if (value instanceof Collection<?>) {
+      if (((Collection<?>) value).size() > max) throw new ProcessingException(displayName + " is too long");
     }
-    if (min != null && value < min) {
-      throw new ProcessingException(displayName + " " + value + " is outside range");
+    else if (value instanceof Map<?, ?>) {
+      if (((Map<?, ?>) value).size() > max) throw new ProcessingException(displayName + " is too long");
     }
-    if (max != null && value > max) {
-      throw new ProcessingException(displayName + " " + value + " is outside range");
+    else {
+      if (value.toString().length() > max) throw new ProcessingException(displayName + " is too long");
     }
   }
 
-  /**
-   * Validate the value.
-   * <p>
-   * No check is performed if {@link AbstractPropertyData#isValueSet()}=false
-   * <p>
-   * When the field type is not a numeric type, then a validation exception is thrown
-   * <p>
-   * When the field value is not valid a validation exception is thrown
-   * <p>
-   * see {@link #validateDoubleValue(Double, boolean, Double, Double)}
-   */
-  public static void validateDoubleProperty(AbstractPropertyData<?> field, boolean required, Double min, Double max) throws ProcessingException {
-    if (field == null || (!required && !field.isValueSet())) {
+  @SuppressWarnings("unchecked")
+  public static void checkMinValue(String displayName, Object value, Object minValue) throws ProcessingException {
+    if (value == null || minValue == null) {
       return;
     }
-    validateDoubleValue(field.getClass().getSimpleName(), (Double) field.getValue(), required, min, max);
-  }
-
-  /**
-   * Validate the value.
-   * <p>
-   * No check is performed if {@link AbstractValueFieldData<?>#isValueSet()}=false
-   * <p>
-   * When the field type is not a numeric type, then a validation exception is thrown
-   * <p>
-   * When the field value is not valid a validation exception is thrown
-   * <p>
-   * see {@link #validateDoubleValue(Double, boolean, Double, Double)}
-   */
-  public static void validateDoubleField(AbstractValueFieldData<?> field, boolean required, Double min, Double max) throws ProcessingException {
-    if (field == null || (!required && !field.isValueSet())) {
-      return;
+    Comparable<? extends Object> min = ((Comparable<?>) minValue);
+    if (value instanceof Comparable<?>) {
+      if (((Comparable<Object>) value).compareTo(min) < 0) throw new ProcessingException(displayName + " is too small");
     }
-    validateDoubleValue(field.getClass().getSimpleName(), (Double) field.getValue(), required, min, max);
-  }
-
-  /**
-   * Validate the value.
-   * <p>
-   * When the value is not valid a validation exception is thrown
-   */
-  public static void validateDoubleValue(String displayName, Double value, boolean required, Double min, Double max) throws ProcessingException {
-    if (required) {
-      checkRequired(displayName, value);
-    }
-    if (value == null) {
-      return;
-    }
-    if (min != null && value < min) {
-      throw new ProcessingException(displayName + " " + value + " is outside range");
-    }
-    if (max != null && value > max) {
-      throw new ProcessingException(displayName + " " + value + " is outside range");
+    else {
+      throw new ProcessingException(displayName + " is not comparable");
     }
   }
 
-  /**
-   * Validate the code key.
-   * <p>
-   * No check is performed if {@link AbstractPropertyData#isValueSet()}=false
-   * <p>
-   * When the field value is not valid a validation exception is thrown
-   * <p>
-   * see {@link #validateCodeValue(Object, boolean, Class)}
-   */
-  public static void validateCodeProperty(AbstractPropertyData<?> field, boolean required, Class<? extends ICodeType> codeTypeClass) throws ProcessingException {
-    if (field == null || (!required && !field.isValueSet())) {
+  @SuppressWarnings("unchecked")
+  public static void checkMaxValue(String displayName, Object value, Object maxValue) throws ProcessingException {
+    if (value == null || maxValue == null) {
       return;
     }
-    validateCodeValue(field.getClass().getSimpleName(), field.getValue(), required, codeTypeClass);
-  }
-
-  /**
-   * Validate the code key.
-   * <p>
-   * No check is performed if {@link AbstractValueFieldData<?>#isValueSet()}=false
-   * <p>
-   * When the field value is not valid a validation exception is thrown
-   * <p>
-   * see {@link #validateCodeValue(Object, boolean, Class)}
-   */
-  public static void validateCodeField(AbstractValueFieldData<?> field, boolean required, Class<? extends ICodeType> codeTypeClass) throws ProcessingException {
-    if (field == null || (!required && !field.isValueSet())) {
-      return;
+    Comparable<? extends Object> max = ((Comparable<?>) maxValue);
+    if (value instanceof Comparable<?>) {
+      if (((Comparable<Object>) value).compareTo(max) > 0) throw new ProcessingException(displayName + " is too large");
     }
-    validateCodeValue(field.getClass().getSimpleName(), field.getValue(), required, codeTypeClass);
-  }
-
-  /**
-   * Validate the code key.
-   * <p>
-   * When the value is not valid a validation exception is thrown
-   */
-  public static void validateCodeValue(String displayName, Object key, boolean required, Class<? extends ICodeType> codeTypeClass) throws ProcessingException {
-    if (required) {
-      checkRequired(displayName, key);
-    }
-    if (key == null) {
-      return;
-    }
-    if (codeTypeClass != null) {
-      ICodeType<?> codeType = CODES.getCodeType(codeTypeClass);
-      if (codeType.getCode(key) == null) {
-        throw new ProcessingException(displayName + " " + key + " is illegal");
-      }
+    else {
+      throw new ProcessingException(displayName + " is not comparable");
     }
   }
 
-  /**
-   * Validate an array and its length.
-   * <p>
-   * No check is performed if {@link AbstractPropertyData#isValueSet()}=false
-   * <p>
-   * When the field type is not an array validation exception is thrown
-   * <p>
-   * When the field value is not valid a validation exception is thrown
-   * <p>
-   * see {@link #validateStringValue(String, boolean, Integer)}
-   */
-  public static void validateArrayProperty(AbstractPropertyData<?> field, boolean required, Integer maxLength) throws ProcessingException {
-    if (field == null || (!required && !field.isValueSet())) {
+  @SuppressWarnings("unchecked")
+  public static void checkCodeType(String displayName, Object codeKey, Object codeTypeClass) throws ProcessingException {
+    if (codeKey == null || codeTypeClass == null) {
       return;
     }
-    validateArrayValue(field.getClass().getSimpleName(), field.getValue(), required, maxLength);
+    Class<? extends ICodeType<?>> cls = (Class<? extends ICodeType<?>>) codeTypeClass;
+    ICodeType<?> codeType = CODES.getCodeType(cls);
+    if (codeType == null) {
+      throw new ProcessingException(displayName + " codeType " + cls.getSimpleName() + " does not exist");
+    }
+    if (codeType.getCode(codeKey) == null) {
+      throw new ProcessingException(displayName + " " + codeKey + " is illegal for " + cls.getSimpleName());
+    }
   }
 
-  /**
-   * Validate an array and its length.
-   * <p>
-   * No check is performed if {@link AbstractValueFieldData<?>#isValueSet()}=false
-   * <p>
-   * When the field type is not an array a validation exception is thrown
-   * <p>
-   * When the field value is not valid a validation exception is thrown
-   * <p>
-   * see {@link #validateStringValue(String, boolean, Integer)}
-   */
-  public static void validateArrayField(AbstractValueFieldData<?> field, boolean required, Integer maxLength) throws ProcessingException {
-    if (field == null || (!required && !field.isValueSet())) {
+  @SuppressWarnings("unchecked")
+  public static void checkLookupCall(String displayName, Object lookupKey, Object lookupCallClass) throws ProcessingException {
+    if (lookupKey == null || lookupCallClass == null) {
       return;
     }
-    validateArrayValue(field.getClass().getSimpleName(), field.getValue(), required, maxLength);
-  }
-
-  /**
-   * Validate an array and its length.
-   * <p>
-   * When the value is not valid a validation exception is thrown
-   */
-  public static void validateArrayValue(String displayName, Object value, boolean required, Integer maxLength) throws ProcessingException {
-    if (required) {
-      checkRequired(displayName, value);
+    Class<? extends LookupCall> cls = (Class<? extends LookupCall>) lookupCallClass;
+    LookupCall call;
+    try {
+      call = cls.newInstance();
     }
-    if (value == null) {
-      return;
+    catch (Throwable t) {
+      throw new ProcessingException(displayName + " can not verify " + cls.getSimpleName());
     }
-    if (!value.getClass().isArray()) {
-      throw new ProcessingException(displayName + " is not an array");
-    }
-    if (maxLength != null && Array.getLength(value) > maxLength) {
-      throw new ProcessingException(displayName + " is too long");
+    call.setKey(lookupKey);
+    if (call.getDataByKey().length == 0) {
+      throw new ProcessingException(displayName + " " + lookupKey + " is illegal for " + cls.getSimpleName());
     }
   }
 }
