@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.data.DefaultInboundValidator;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -43,7 +44,12 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /**
- * delegate for scout dynamic business op invocation
+ * Delegate for scout dynamic business op invocation
+ * <p>
+ * Subclass this type to change/add invocation checks and rules.
+ * <p>
+ * Override {@link #filterInbound(Object, Method, Object[])} and/or
+ * {@link #filterOutbound(Object, Method, Object, Object[])} to add central input validation.
  */
 @SuppressWarnings("deprecation")
 public class BusinessOperationDispatcher {
@@ -167,8 +173,10 @@ public class BusinessOperationDispatcher {
         }
       }
       //
+      filterInbound(service, serviceOp, serviceReq.getArgs());
       Object data = ServiceUtility.invoke(serviceOp, service, serviceReq.getArgs());
       Object[] outParameters = ServiceUtility.extractHolderArguments(serviceReq.getArgs());
+      filterOutbound(service, serviceOp, data, outParameters);
       serviceRes = new ServiceTunnelResponse(data, outParameters, null);
       serviceRes.setSoapOperation(soapOperation);
       // add accumulated client notifications as side-payload
@@ -284,6 +292,31 @@ public class BusinessOperationDispatcher {
       return;
     }
     throw new SecurityException("access denied (code 3a).");
+  }
+
+  /**
+   * Validate inbound data. Default does nothing. Called by {@link #invokeImpl(ServiceTunnelRequest)}.
+   * <p>
+   * For default handling use
+   * 
+   * <pre>
+   * new {@link DefaultInboundValidator#DefaultInboundValidator(Object[])}.validate()
+   * </pre>
+   * <p>
+   * Override this method to do central input validation inside the transaction context.
+   * <p>
+   * This method is part of the protected api and can be overridden.
+   */
+  protected void filterInbound(Object service, Method op, Object[] args) throws Exception {
+  }
+
+  /**
+   * Validate outbound data. Default does nothing. Called by {@link #invokeImpl(ServiceTunnelRequest)}.
+   * Override this method to do central output validation inside the transaction context.
+   * <p>
+   * This method is part of the protected api and can be overridden.
+   */
+  protected void filterOutbound(Object service, Method op, Object returnValue, Object[] outArgs) throws Exception {
   }
 
 }
