@@ -16,6 +16,8 @@ import java.io.OutputStream;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.DefaultFormDataValidator;
+import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
+import org.eclipse.scout.rt.shared.util.ValidationUtility;
 
 /**
  * Does input/output validation of arbitrary serializable data.
@@ -25,10 +27,12 @@ import org.eclipse.scout.rt.shared.data.form.DefaultFormDataValidator;
  * <p>
  * This default delegates {@link AbstractFormData} to a {@link DefaultFormDataValidator} and does nothing otherwise.
  */
-public class DefaultInboundValidator {
+public class DefaultValidator {
+  private int m_validationStrategy;
   private final Object[] m_args;
 
-  public DefaultInboundValidator(Object[] args) {
+  public DefaultValidator(int validationStrategy, Object[] args) {
+    m_validationStrategy = validationStrategy;
     m_args = args;
   }
 
@@ -36,22 +40,60 @@ public class DefaultInboundValidator {
     return m_args;
   }
 
+  public int getValidationStrategy() {
+    return m_validationStrategy;
+  }
+
+  public void setValidationStrategy(int strategy) {
+    m_validationStrategy = strategy;
+  }
+
   public void validate() throws Exception {
+    if (getValidationStrategy() == ValidationStrategy.NO_CHECK) {
+      return;
+    }
     Object[] args = getArgs();
     if (args == null || args.length == 0) {
       return;
     }
+    for (int i = 0; i < args.length; i++) {
+      validateRootObject(i, args[i]);
+    }
     new ObjectTreeVisitor() {
       @Override
       void visitObject(Object obj) throws Exception {
-        validateObject(obj);
+        validateSubTreeObject(obj);
       }
     }.writeObject(args);
   }
 
-  protected void validateObject(Object obj) throws Exception {
+  /**
+   * validate an argument of the service
+   * <p>
+   * The default does a max length check on string (250 chars) and array (50MB)
+   */
+  protected void validateRootObject(int index, Object value) throws Exception {
+    //maxLength check
+    if (value == null) {
+      return;
+    }
+    if (value instanceof String) {
+      ValidationUtility.checkMaxLength(null, value, 250);
+    }
+    else if (value.getClass().isArray()) {
+      //50MB
+      ValidationUtility.checkMaxLength(null, value, 50000000);
+    }
+  }
+
+  /**
+   * validate an object in the arguments object hierarchy tree
+   * <p>
+   * The default delegates form data objects to {@link DefaultFormDataValidator}
+   */
+  protected void validateSubTreeObject(Object obj) throws Exception {
     if (obj instanceof AbstractFormData) {
-      new DefaultFormDataValidator((AbstractFormData) obj).validate();
+      new DefaultFormDataValidator(getValidationStrategy(), (AbstractFormData) obj).validate();
     }
   }
 

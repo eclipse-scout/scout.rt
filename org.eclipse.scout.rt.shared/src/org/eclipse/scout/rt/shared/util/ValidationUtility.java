@@ -22,13 +22,29 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 /**
  * Does basic input value validation on form data fields.
  */
-public final class FormDataUtility {
+public final class ValidationUtility {
 
-  private FormDataUtility() {
+  private ValidationUtility() {
   }
 
-  public static void checkRequired(String displayName, Object value) throws ProcessingException {
+  /**
+   * check if value is an array
+   */
+  public static void checkArray(String displayName, Object array) throws ProcessingException {
+    if (array == null || !array.getClass().isArray()) {
+      throw new ProcessingException(displayName + " is no array");
+    }
+  }
+
+  public static void checkMandatoryValue(String displayName, Object value) throws ProcessingException {
     if (value == null) {
+      throw new ProcessingException(displayName + " is required");
+    }
+  }
+
+  public static void checkMandatoryArray(String displayName, Object array) throws ProcessingException {
+    checkArray(displayName, array);
+    if (Array.getLength(array) == 0) {
       throw new ProcessingException(displayName + " is required");
     }
   }
@@ -106,7 +122,7 @@ public final class FormDataUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static void checkCodeType(String displayName, Object codeKey, Object codeTypeClass) throws ProcessingException {
+  public static void checkCodeTypeValue(String displayName, Object codeKey, Object codeTypeClass) throws ProcessingException {
     if (codeKey == null || codeTypeClass == null) {
       return;
     }
@@ -121,7 +137,30 @@ public final class FormDataUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static void checkLookupCall(String displayName, Object lookupKey, Object lookupCallClass) throws ProcessingException {
+  public static void checkCodeTypeArray(String displayName, Object codeKeyArray, Object codeTypeClass) throws ProcessingException {
+    if (codeKeyArray == null || codeTypeClass == null) {
+      return;
+    }
+    checkArray(displayName, codeKeyArray);
+    int len = Array.getLength(codeKeyArray);
+    if (len == 0) {
+      return;
+    }
+    Class<? extends ICodeType<?>> cls = (Class<? extends ICodeType<?>>) codeTypeClass;
+    ICodeType<?> codeType = CODES.getCodeType(cls);
+    if (codeType == null) {
+      throw new ProcessingException(displayName + " codeType " + cls.getSimpleName() + " does not exist");
+    }
+    for (int i = 0; i < len; i++) {
+      Object codeKey = Array.get(codeKeyArray, i);
+      if (codeType.getCode(codeKey) == null) {
+        throw new ProcessingException(displayName + " " + codeKey + " is illegal for " + cls.getSimpleName());
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void checkLookupCallValue(String displayName, Object lookupKey, Object lookupCallClass) throws ProcessingException {
     if (lookupKey == null || lookupCallClass == null) {
       return;
     }
@@ -136,6 +175,33 @@ public final class FormDataUtility {
     call.setKey(lookupKey);
     if (call.getDataByKey().length == 0) {
       throw new ProcessingException(displayName + " " + lookupKey + " is illegal for " + cls.getSimpleName());
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void checkLookupCallArray(String displayName, Object lookupKeyArray, Object lookupCallClass) throws ProcessingException {
+    if (lookupKeyArray == null || lookupCallClass == null) {
+      return;
+    }
+    checkArray(displayName, lookupKeyArray);
+    int len = Array.getLength(lookupKeyArray);
+    if (len == 0) {
+      return;
+    }
+    Class<? extends LookupCall> cls = (Class<? extends LookupCall>) lookupCallClass;
+    LookupCall call;
+    try {
+      call = cls.newInstance();
+    }
+    catch (Throwable t) {
+      throw new ProcessingException(displayName + " can not verify " + cls.getSimpleName());
+    }
+    for (int i = 0; i < len; i++) {
+      Object lookupKey = Array.get(lookupKeyArray, i);
+      call.setKey(lookupKey);
+      if (call.getDataByKey().length == 0) {
+        throw new ProcessingException(displayName + " " + lookupKey + " is illegal for " + cls.getSimpleName());
+      }
     }
   }
 }

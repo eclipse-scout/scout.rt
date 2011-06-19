@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
 /**
- * Type annotation on a form field used in scout sdk in order to generate the validation rule map on the
+ * Method annotation on a client form field used in scout sdk in order to generate the validation rule map on the
  * FormData.
  * <p>
  * Scout SDK writes the value of every annotated method into the static map "validationRules" of the corresponding
@@ -63,8 +63,9 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
  * <p>
  * Custom validation rule names can freely be used (it's a String or a string constant).
  * <p>
- * Validation is implemented by overriding ServiceTunnelServlet#runServerJobTransaction with an own
- * BusinessOperationDispatcher subclass) that overrides the filterInbound() method.
+ * Validation is implemented by either (a) overriding ServiceTunnelServlet#runServerJobTransactionWithDelegate with an
+ * own DefaultTransactionDelegate subclass) that overrides the filterInput() method or (b) annotating service operation
+ * methods with {@link InputValidation} and (optionally) {@link OutputValidation}.
  * <p>
  * When the sdk fails to create a rule for an annotated (directly or implicit by superclass) method to the created form
  * data it adds a javadoc entry specifying the fully qualified source method name and the keyword

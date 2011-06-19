@@ -436,11 +436,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * This method is part of the protected api and can be overridden.
    */
   protected ServiceTunnelResponse runServerJobTransaction(ServiceTunnelRequest req) throws Exception {
-    return runServerJobTransactionWithDispatcher(req, getOrderedBundleList(), m_requestMinVersion, m_debug);
+    return runServerJobTransactionWithDelegate(req, getOrderedBundleList(), m_requestMinVersion, m_debug);
   }
 
-  protected ServiceTunnelResponse runServerJobTransactionWithDispatcher(ServiceTunnelRequest req, Bundle[] loaderBundles, Version requestMinVersion, boolean debug) throws Exception {
-    return new BusinessOperationDispatcher(loaderBundles, requestMinVersion, debug).invoke(req);
+  protected ServiceTunnelResponse runServerJobTransactionWithDelegate(ServiceTunnelRequest req, Bundle[] loaderBundles, Version requestMinVersion, boolean debug) throws Exception {
+    return new DefaultTransactionDelegate(loaderBundles, requestMinVersion, debug).invoke(req);
   }
 
   private class RemoteServiceJob extends ServerJob {
