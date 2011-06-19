@@ -9,6 +9,7 @@ Require-Bundle: org.eclipse.scout.service;visibility:=reexport,
  org.eclipse.scout.commons;visibility:=reexport,
  org.eclipse.core.runtime
 Export-Package: org.eclipse.scout.rt.shared,
+ org.eclipse.scout.rt.shared.data,
  org.eclipse.scout.rt.shared.data.basic,
  org.eclipse.scout.rt.shared.data.basic.table,
  org.eclipse.scout.rt.shared.data.form,

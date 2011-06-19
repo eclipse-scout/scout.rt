@@ -104,7 +104,7 @@ import org.osgi.framework.Bundle;
  * <code>scout.log.level.org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler=4</code>
  * <p>
  */
-public class DefaultServiceTunnelContentHandler implements IServiceTunnelContentHandler, IServiceTunnelContentObserver {
+public class DefaultServiceTunnelContentHandler implements IServiceTunnelContentHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultServiceTunnelContentHandler.class);
   private static final Pattern BEGIN_DATA_TAG = Pattern.compile("[<]([a-zA-Z0-9]+:)?data\\s*>");
   private static final Pattern END_DATA_TAG = Pattern.compile("[<][/]([a-zA-Z0-9]+:)?data\\s*>");
@@ -133,9 +133,6 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   private Boolean m_sendCompressed;
   private Boolean m_receivedCompressed;
   private final EventListenerList m_listeners;
-  //cache
-  private IInboundListener[] m_cachedInListeners;
-  private IOutboundListener[] m_cachedOutListeners;
 
   public DefaultServiceTunnelContentHandler() {
     m_listeners = new EventListenerList();
@@ -261,27 +258,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       if (compressed) {
         deflater = new Deflater(Deflater.BEST_SPEED);
         DeflaterOutputStream deflaterStream = new DeflaterOutputStream(bos, deflater);
-        serialout = new ServiceTunnelOutputStream(deflaterStream) {
-          @Override
-          protected Object replaceObject(Object obj) throws IOException {
-            IOutboundListener[] listeners = m_cachedOutListeners;
-            if (listeners != null) {
-              try {
-                for (IOutboundListener listener : listeners) {
-                  listener.filterOutbound(obj);
-                }
-              }
-              catch (IOException e) {
-                throw e;
-              }
-              catch (Exception e) {
-                throw new IOException(e.getMessage());
-              }
-            }
-            obj = super.replaceObject(obj);
-            return obj;
-          }
-        };
+        serialout = new ServiceTunnelOutputStream(deflaterStream);
         serialout.writeObject(msg);
         serialout.flush();
         deflaterStream.finish();
@@ -289,27 +266,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
         serialout = null;
       }
       else {
-        serialout = new ServiceTunnelOutputStream(bos) {
-          @Override
-          protected Object replaceObject(Object obj) throws IOException {
-            IOutboundListener[] listeners = m_cachedOutListeners;
-            if (listeners != null) {
-              try {
-                for (IOutboundListener listener : listeners) {
-                  listener.filterOutbound(obj);
-                }
-              }
-              catch (IOException e) {
-                throw e;
-              }
-              catch (Exception e) {
-                throw new IOException(e.getMessage());
-              }
-            }
-            obj = super.replaceObject(obj);
-            return obj;
-          }
-        };
+        serialout = new ServiceTunnelOutputStream(bos);
         serialout.writeObject(msg);
         serialout.flush();
         serialout.close();
@@ -401,52 +358,12 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       if (compressed) {
         inflater = new Inflater();
         InflaterInputStream inflaterStream = new InflaterInputStream(new ByteArrayInputStream(Base64Utility.decode(base64Data)), inflater);
-        serialin = new ServiceTunnelInputStream(inflaterStream, m_bundleList) {
-          @Override
-          protected Object resolveObject(Object obj) throws IOException {
-            obj = super.resolveObject(obj);
-            IInboundListener[] listeners = m_cachedInListeners;
-            if (listeners != null) {
-              try {
-                for (IInboundListener listener : listeners) {
-                  listener.filterInbound(obj);
-                }
-              }
-              catch (IOException e) {
-                throw e;
-              }
-              catch (Exception e) {
-                throw new IOException(e.getMessage());
-              }
-            }
-            return obj;
-          }
-        };
+        serialin = new ServiceTunnelInputStream(inflaterStream, m_bundleList);
         return serialin.readObject();
       }
       else {
         InputStream in = new ByteArrayInputStream(Base64Utility.decode(base64Data));
-        serialin = new ServiceTunnelInputStream(in, m_bundleList) {
-          @Override
-          protected Object resolveObject(Object obj) throws IOException {
-            obj = super.resolveObject(obj);
-            IInboundListener[] listeners = m_cachedInListeners;
-            if (listeners != null) {
-              try {
-                for (IInboundListener listener : listeners) {
-                  listener.filterInbound(obj);
-                }
-              }
-              catch (IOException e) {
-                throw e;
-              }
-              catch (Exception e) {
-                throw new IOException(e.getMessage());
-              }
-            }
-            return obj;
-          }
-        };
+        serialin = new ServiceTunnelInputStream(in, m_bundleList);
         return serialin.readObject();
       }
     }
@@ -472,41 +389,6 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       return m_receivedCompressed;
     }
     return true;
-  }
-
-  @Override
-  public void addInboundListener(IInboundListener listener) {
-    m_listeners.add(IInboundListener.class, listener);
-    updateCache();
-  }
-
-  @Override
-  public void removeInboundListener(IInboundListener listener) {
-    m_listeners.remove(IInboundListener.class, listener);
-    updateCache();
-  }
-
-  @Override
-  public void addOutboundListener(IOutboundListener listener) {
-    m_listeners.add(IOutboundListener.class, listener);
-    updateCache();
-  }
-
-  @Override
-  public void removeOutboundListener(IOutboundListener listener) {
-    m_listeners.remove(IOutboundListener.class, listener);
-    updateCache();
-  }
-
-  private synchronized void updateCache() {
-    m_cachedInListeners = m_listeners.getListeners(IInboundListener.class);
-    if (m_cachedInListeners != null && m_cachedInListeners.length == 0) {
-      m_cachedInListeners = null;
-    }
-    m_cachedOutListeners = m_listeners.getListeners(IOutboundListener.class);
-    if (m_cachedOutListeners != null && m_cachedOutListeners.length == 0) {
-      m_cachedOutListeners = null;
-    }
   }
 
 }
