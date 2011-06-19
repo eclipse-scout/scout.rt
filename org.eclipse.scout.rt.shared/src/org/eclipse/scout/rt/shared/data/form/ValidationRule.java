@@ -15,12 +15,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+
 /**
  * Type annotation on a form field used in scout sdk in order to generate the validation rule map on the
  * FormData.
  * <p>
  * Scout SDK writes the value of every annotated method into the static map "validationRules" of the corresponding
  * FormFielData.
+ * <p>
+ * This annotation is only processed when a form data is autmatically managed by the scout sdk using the
+ * {@link FormData} annotation.
  * <p>
  * Example for the form data field generated for a string field inside a form
  * 
@@ -55,20 +61,100 @@ import java.lang.annotation.Target;
  * The scout server (runtime) checks all inbound form datas and form fields according to their validationRules defined
  * in these shared classes (central input validation concept).
  * <p>
- * Custom validation can be added by subclassing ServiceTunnelServlet and implementing the filterInbound method.
+ * There are two special rules: Ignored
+ * <p>
+ * Custom validation rule names can freely be used (it's a String or a string constant).
+ * <p>
+ * Validation must be explicitly enabled by subclassing ServiceTunnelServlet and implementing the filterInbound method.
+ * Default code there is:
+ * 
+ * <pre>
+ * if (obj instanceof AbstractFormData) {
+ *   new DefaultFormDataValidator((AbstractFormData) obj).validate();
+ * }
+ * </pre>
+ * <p>
+ * When the sdk fails to create a rule for an annotated (directly or implicit by superclass) method to the created form
+ * data it adds a javadoc entry specifying the fully qualified source method name and the keyword
+ * "ValidationRule.NotProcessed" that can be searched in the source code.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface ValidationRule {
+  /**
+   * the name of the rule, either any of the ValidationRule constants or a custom constant
+   */
   String value();
 
   /**
-   * rules packaged with scout
+   * When setting this annotation property, the scout sdk will not generate the validation rule value based on the
+   * method return value but
+   * use exactly this string as generated source code.
+   * <p>
+   * Example:
+   * 
+   * <pre>
+   * @ValidationRule(value=ValidationRule.CODE_TYPE, generatedSourceCode="com.myproject.shared.services.code.StatusCodeType.class")
+   * Class <? extends {@link ICodeType}> getConfiguredCodeType(){
+   *   return ClientSpecificStatusCodeType.class;
+   * }
+   * </pre>
+   */
+  String generatedSourceCode() default "";
+
+  /**
+   * When setting skip to true, the scout sdk will not generate code for this validation rule at all.
+   * Example:
+   * 
+   * <pre>
+   * @ValidationRule(value=ValidationRule.CODE_TYPE, skip=true)
+   * Class <? extends {@link ICodeType}> getConfiguredCodeType(){
+   *   return ClientSpecificStatusCodeType.class;
+   * }
+   * </pre>
+   */
+  boolean skip() default false;
+
+  /**
+   * rule value type is {@link Boolean}
+   * <p>
+   * default rule packaged with scout
    */
   String MANDATORY = "mandatory";
+  /**
+   * rule value type is {@link Number}
+   * <p>
+   * default rule packaged with scout
+   */
   String MIN_VALUE = "minValue";
+  /**
+   * rule value type is {@link Number}
+   * <p>
+   * default rule packaged with scout
+   */
   String MAX_VALUE = "maxValue";
+  /**
+   * rule value type is {@link Integer}
+   * <p>
+   * default rule packaged with scout
+   */
+  String MIN_LENGTH = "minLength";
+  /**
+   * rule value type is {@link Integer}
+   * <p>
+   * default rule packaged with scout
+   */
   String MAX_LENGTH = "maxLength";
+  /**
+   * rule value type is {@link Class}
+   * <p>
+   * default rule packaged with scout
+   */
   String CODE_TYPE = "codeType";
+  /**
+   * rule value type is {@link Class}
+   * <p>
+   * default rule packaged with scout
+   */
   String LOOKUP_CALL = "lookupCall";
 }
