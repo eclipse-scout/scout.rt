@@ -36,7 +36,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -47,12 +46,10 @@ import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
+import org.eclipse.scout.rt.shared.data.DefaultInboundValidator;
 import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentObserver;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentObserver.IInboundListener;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentObserver.IOutboundListener;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.service.SERVICES;
@@ -72,7 +69,7 @@ import org.osgi.framework.Version;
  * requests to virtual sessions instead of (the unique) http session. The expected headers therefore are
  * "Ajax-SessionId" and "Ajax-UserId"
  */
-public class ServiceTunnelServlet extends HttpServletEx implements IInboundListener, IOutboundListener {
+public class ServiceTunnelServlet extends HttpServletEx {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
@@ -186,14 +183,6 @@ public class ServiceTunnelServlet extends HttpServletEx implements IInboundListe
     synchronized (m_msgEncoderLock) {
       if (m_contentHandler == null) {
         m_contentHandler = createMessageEncoder(m_serverSessionClass);
-        //attach input validation iff there is a method override
-        if (ConfigurationUtility.isMethodOverwrite(ServiceTunnelServlet.class, "filterInbound", new Class[]{Object.class}, getClass())) {
-          ((IServiceTunnelContentObserver) m_contentHandler).addInboundListener(this);
-        }
-        //attach output validation iff there is a method override
-        if (ConfigurationUtility.isMethodOverwrite(ServiceTunnelServlet.class, "filterOutbound", new Class[]{Object.class}, getClass())) {
-          ((IServiceTunnelContentObserver) m_contentHandler).addOutboundListener(this);
-        }
       }
     }
     return m_contentHandler;
@@ -443,23 +432,26 @@ public class ServiceTunnelServlet extends HttpServletEx implements IInboundListe
   }
 
   /**
-   * Validate inbound data by traversing the complete object structure.
+   * Validate inbound data. Default does nothing. For most cases use
+   * 
+   * <pre>
+   * new {@link DefaultInboundValidator}(req).validate()
+   * </pre>
+   * <p>
    * Override this method to do central input validation inside the transaction context.
    * <p>
    * This method is part of the protected api and can be overridden.
    */
-  @Override
-  public void filterInbound(Object o) throws Exception {
+  protected void filterInbound(ServiceTunnelRequest req) throws Exception {
   }
 
   /**
-   * Validate outbound data by traversing the complete object structure.
+   * Validate outbound data. Default does nothing.
    * Override this method to do central output validation inside the transaction context.
    * <p>
    * This method is part of the protected api and can be overridden.
    */
-  @Override
-  public void filterOutbound(Object o) throws Exception {
+  protected void filterOutbound(ServiceTunnelResponse res) throws Exception {
   }
 
   /**
@@ -487,8 +479,10 @@ public class ServiceTunnelServlet extends HttpServletEx implements IInboundListe
       ServiceTunnelRequest serviceReq = deserializeInput(m_request.getInputStream());
       LocaleThreadLocal.set(serviceReq.getLocale());
       NlsLocale.setThreadDefault(new NlsLocale(serviceReq.getNlsLocale()));
-      //
+      //central input/output validation
+      filterInbound(serviceReq);
       ServiceTunnelResponse serviceRes = runServerJobTransaction(serviceReq);
+      filterOutbound(serviceRes);
       //
       serializeOutput(m_response, serviceRes);
       return Status.OK_STATUS;

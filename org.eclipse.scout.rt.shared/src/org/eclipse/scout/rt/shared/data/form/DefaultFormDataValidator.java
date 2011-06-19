@@ -20,7 +20,8 @@ import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.util.FormDataUtility;
 
 /**
- * Does input validation and static rule checks on a form data.
+ * Does input/output validation and rule checks on a form data with {@link AbstractFormFieldData#getValidationRules()},
+ * see {@link ValidationRule}.
  * <p>
  * Business rules include configured maxlength, required, min, max and code/lookup value validation.
  */
