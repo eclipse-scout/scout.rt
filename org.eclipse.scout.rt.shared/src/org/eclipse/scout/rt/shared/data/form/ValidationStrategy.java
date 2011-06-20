@@ -19,7 +19,8 @@ package org.eclipse.scout.rt.shared.data.form;
 public abstract interface ValidationStrategy {
 
   /**
-   * Perform no checks on arguments of the annotated method
+   * Perform no checks on arguments of the annotated method. Use this annotation on a service if you check the arguments
+   * yourself.
    */
   int NO_CHECK = 10;
   /**
