@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  * DefaultTransactionDelegate to perform central output validation.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.METHOD})
 public @interface OutputValidation {
 
   int value();
