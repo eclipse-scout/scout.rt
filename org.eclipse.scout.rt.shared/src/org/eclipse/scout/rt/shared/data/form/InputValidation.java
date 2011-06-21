@@ -25,6 +25,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface InputValidation {
 
+  /**
+   * Any of the {@link ValidationStrategy} values or a custom value
+   */
   int value();
 
 }

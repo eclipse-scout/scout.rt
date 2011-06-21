@@ -14,8 +14,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.rt.shared.data.IValidator;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.util.ValidationUtility;
 
@@ -114,14 +117,18 @@ public class DefaultFormDataValidator {
     DEFAULT_VALUE_CHECKS = Collections.unmodifiableMap(map);
   }
 
-  private final AbstractFormData m_formData;
+  private final IValidator m_baseValidator;
   private Map<String, IValueCheck> m_valueChecks;
   private int m_validationStrategy;
 
-  public DefaultFormDataValidator(int validationStrategy, AbstractFormData formData) {
+  public DefaultFormDataValidator(IValidator baseValidator, int validationStrategy) {
+    m_baseValidator = baseValidator;
     m_validationStrategy = validationStrategy;
-    m_formData = formData;
     m_valueChecks = DEFAULT_VALUE_CHECKS;
+  }
+
+  public IValidator getBaseValidator() {
+    return m_baseValidator;
   }
 
   public int getValidationStrategy() {
@@ -132,10 +139,6 @@ public class DefaultFormDataValidator {
     m_validationStrategy = strategy;
   }
 
-  public AbstractFormData getFormData() {
-    return m_formData;
-  }
-
   public Map<String/*rule name*/, IValueCheck> getValueChecks() {
     return m_valueChecks;
   }
@@ -144,22 +147,22 @@ public class DefaultFormDataValidator {
     m_valueChecks = valueChecks;
   }
 
-  public void validate() throws Exception {
+  public void validate(AbstractFormData formData) throws Exception {
     if (getValidationStrategy() == ValidationStrategy.NO_CHECK) {
       return;
     }
-    for (Map<String, AbstractPropertyData<?>> map : getFormData().getAllPropertiesRec().values()) {
+    for (Map<String, AbstractPropertyData<?>> map : formData.getAllPropertiesRec().values()) {
       for (AbstractPropertyData<?> prop : map.values()) {
         Map<String, Object> ruleMap = new HashMap<String, Object>();
         preprocessRuleMap(ruleMap);
-        validateProperty(prop, ruleMap);
+        visitProperty(prop, ruleMap);
       }
     }
-    for (Map<String, AbstractFormFieldData> map : getFormData().getAllFieldsRec().values()) {
+    for (Map<String, AbstractFormFieldData> map : formData.getAllFieldsRec().values()) {
       for (AbstractFormFieldData field : map.values()) {
         Map<String, Object> ruleMap = field.getValidationRules();
         preprocessRuleMap(ruleMap);
-        validateField(field, ruleMap);
+        visitField(field, ruleMap);
       }
     }
   }
@@ -183,7 +186,7 @@ public class DefaultFormDataValidator {
    * <p>
    * No check is performed if {@link AbstractPropertyData#isValueSet()}=false
    */
-  protected void validateProperty(AbstractPropertyData<?> prop, Map<String/*rule name*/, Object/*rule value*/> ruleMap) throws Exception {
+  protected void visitProperty(AbstractPropertyData<?> prop, Map<String/*rule name*/, Object/*rule value*/> ruleMap) throws Exception {
     if (!prop.isValueSet()) {
       return;
     }
@@ -202,23 +205,15 @@ public class DefaultFormDataValidator {
           displayName = prop.getClass().getSimpleName();
         }
         if (valueType == null || value == null) {
-          valueType = ((AbstractPropertyData<?>) prop).getHolderType();
-          value = ((AbstractPropertyData<?>) prop).getValue();
+          valueType = prop.getHolderType();
+          value = prop.getValue();
         }
         check.check(e.getKey(), e.getValue(), displayName, valueType, value);
       }
     }
     //add default maxLength check
-    if (!ruleMap.containsKey(ValidationRule.MAX_LENGTH)) {
-      if (prop.getHolderType() == String.class) {
-        ValidationUtility.checkMaxLength(prop.getClass().getSimpleName(), prop.getValue(), 250);
-        return;
-      }
-      else if (prop.getHolderType().isArray()) {
-        //50MB
-        ValidationUtility.checkMaxLength(prop.getClass().getSimpleName(), prop.getValue(), 50000000);
-        return;
-      }
+    if (getBaseValidator() != null && !ruleMap.containsKey(ValidationRule.MAX_LENGTH)) {
+      getBaseValidator().checkMaxLenghtDefault(prop.getValue());
     }
   }
 
@@ -227,7 +222,7 @@ public class DefaultFormDataValidator {
    * <p>
    * No check is performed if {@link AbstractFormFieldData#isValueSet()}=false
    */
-  protected void validateField(AbstractFormFieldData field, Map<String/*rule name*/, Object/*rule value*/> ruleMap) throws Exception {
+  protected void visitField(AbstractFormFieldData field, Map<String/*rule name*/, Object/*rule value*/> ruleMap) throws Exception {
     if (!field.isValueSet()) {
       return;
     }
@@ -254,19 +249,19 @@ public class DefaultFormDataValidator {
         check.check(e.getKey(), e.getValue(), displayName, valueType, value);
       }
     }
-    //add default maxLength check
-    if (!ruleMap.containsKey(ValidationRule.MAX_LENGTH)) {
+    //subtree checks
+    if (getBaseValidator() != null && !ruleMap.containsKey(ValidationRule.MAX_LENGTH)) {
       if (field instanceof AbstractValueFieldData<?>) {
-        AbstractValueFieldData<?> valueField = (AbstractValueFieldData<?>) field;
-        if (valueField.getHolderType() == String.class) {
-          ValidationUtility.checkMaxLength(valueField.getClass().getSimpleName(), valueField.getValue(), 250);
-          return;
+        //add default maxLength check
+        if (!ruleMap.containsKey(ValidationRule.MAX_LENGTH)) {
+          getBaseValidator().checkMaxLenghtDefault(((AbstractValueFieldData<?>) field).getValue());
         }
-        else if (valueField.getHolderType().isArray()) {
-          //50MB
-          ValidationUtility.checkMaxLength(valueField.getClass().getSimpleName(), valueField.getValue(), 50000000);
-          return;
-        }
+      }
+      else if (field instanceof AbstractTreeFieldData) {
+        getBaseValidator().validate(field);
+      }
+      else if (field instanceof AbstractTableFieldData) {
+        getBaseValidator().validate(field);
       }
     }
   }
