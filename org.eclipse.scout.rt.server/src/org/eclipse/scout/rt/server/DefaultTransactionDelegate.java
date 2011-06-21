@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.data.DefaultValidator;
 import org.eclipse.scout.rt.shared.data.form.InputValidation;
 import org.eclipse.scout.rt.shared.data.form.OutputValidation;
 import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
@@ -326,7 +327,7 @@ public class DefaultTransactionDelegate {
    * For default handling use
    * 
    * <pre>
-   * new {@link DefaultInputValidator#DefaultInputValidator(CheckStrategy, Object[])}.validate()
+   * new {@link DefaultValidator#DefaultValidator(int, Object[])}.validate()
    * </pre>
    * <p>
    * Override this method to do central input validation inside the transaction context.

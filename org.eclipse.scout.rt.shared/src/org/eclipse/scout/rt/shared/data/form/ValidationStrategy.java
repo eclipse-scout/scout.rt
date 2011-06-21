@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
+import org.eclipse.scout.rt.shared.util.ValidationUtility;
+
 /**
  * Extendable enum (therefore it is an interface). This enum is read by DefaultInputValidator and DefaultOutputValidator
  * in the
@@ -19,8 +21,10 @@ package org.eclipse.scout.rt.shared.data.form;
 public abstract interface ValidationStrategy {
 
   /**
-   * Perform no checks on arguments of the annotated method. Use this annotation on a service if you check the arguments
-   * yourself.
+   * Perform no checks on arguments of the annotated method.
+   * Use this annotation on a service if you check the arguments yourself.
+   * <p>
+   * see {@link ValidationUtility}
    */
   int NO_CHECK = 10;
   /**

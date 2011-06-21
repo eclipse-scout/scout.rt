@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.util;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
@@ -204,4 +207,45 @@ public final class ValidationUtility {
       }
     }
   }
+
+  /**
+   * Traverse all objects by writing the object to a
+   * void stream and calling {@link #visitObject(Object)} on every traversed Object in the hierarchy.
+   */
+  public static abstract class ObjectTreeVisitor extends ObjectOutputStream {
+    public ObjectTreeVisitor() throws IOException {
+      super(new OutputStream() {
+        @Override
+        public void write(int b) throws IOException {
+          //nop
+        }
+      });
+      enableReplaceObject(true);
+    }
+
+    @Override
+    protected Object replaceObject(Object obj) throws IOException {
+      try {
+        boolean goOn = visitObject(obj);
+        if (!goOn) {
+          return null;
+        }
+      }
+      catch (IOException ioe) {
+        throw ioe;
+      }
+      catch (Exception e) {
+        throw new IOException(e);
+      }
+      return obj;
+    }
+
+    /**
+     * @return true to continue visiting the subtree of this object or false to skip visiting the suptree of this
+     *         object.
+     */
+    protected abstract boolean visitObject(Object obj) throws Exception;
+
+  }
+
 }
