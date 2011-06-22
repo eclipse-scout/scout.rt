@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.DefaultValidator;
 import org.eclipse.scout.rt.shared.data.form.InputValidation;
 import org.eclipse.scout.rt.shared.data.form.OutputValidation;
@@ -94,7 +95,10 @@ public class DefaultTransactionDelegate {
       else {
         LOG.error("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation(), t);
       }
-      response = new ServiceTunnelResponse(null, null, t);
+      // security: do not send back error stack trace and details
+      ProcessingException p = new ProcessingException(ScoutTexts.get("RequestProblem"));
+      p.setStackTrace(new StackTraceElement[0]);
+      response = new ServiceTunnelResponse(null, null, p);
     }
     finally {
       if (m_debug) {
