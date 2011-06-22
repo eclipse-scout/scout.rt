@@ -150,4 +150,13 @@ public @interface ValidationRule {
    * default rule packaged with scout
    */
   String LOOKUP_CALL = "lookupCall";
+  /**
+   * rule value type is {@link String}
+   * <p>
+   * Server checks if the string value (if not null) matches the regex Use {@link #generatedSourceCode()} attribute to
+   * specify explicit regex
+   * <p>
+   * default rule packaged with scout
+   */
+  String REGEX = "regex";
 }

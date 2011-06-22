@@ -103,6 +103,18 @@ public class DefaultFormDataValidator {
     }
   };
 
+  public static final IValueCheck DEFAULT_REGEX_CHECK = new IValueCheck() {
+    @Override
+    public void check(String ruleName, Object ruleValue, String fieldName, Class<?> fieldType, Object fieldValue) throws Exception {
+      if (fieldType.isArray()) {
+        ValidationUtility.checkArrayMatchesRegex(fieldName, fieldValue, ruleValue);
+      }
+      else {
+        ValidationUtility.checkValueMatchesRegex(fieldName, fieldValue, ruleValue);
+      }
+    }
+  };
+
   public static final Map<String, IValueCheck> DEFAULT_VALUE_CHECKS;
 
   static {
@@ -114,6 +126,7 @@ public class DefaultFormDataValidator {
     map.put(ValidationRule.MAX_VALUE, DEFAULT_MAX_VALUE_CHECK);
     map.put(ValidationRule.CODE_TYPE, DEFAULT_CODE_TYPE_CHECK);
     map.put(ValidationRule.LOOKUP_CALL, DEFAULT_LOOKUP_CALL_CHECK);
+    map.put(ValidationRule.REGEX, DEFAULT_REGEX_CHECK);
     DEFAULT_VALUE_CHECKS = Collections.unmodifiableMap(map);
   }
 

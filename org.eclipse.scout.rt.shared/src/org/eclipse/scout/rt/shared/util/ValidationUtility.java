@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
@@ -204,6 +205,45 @@ public final class ValidationUtility {
       call.setKey(lookupKey);
       if (call.getDataByKey().length == 0) {
         throw new ProcessingException(displayName + " " + lookupKey + " is illegal for " + cls.getSimpleName());
+      }
+    }
+  }
+
+  public static void checkValueMatchesRegex(String displayName, Object value, Object regex) throws ProcessingException {
+    if (value == null || regex == null) {
+      return;
+    }
+    if (!(value instanceof String)) {
+      throw new ProcessingException(displayName + " value is no string");
+    }
+    if (!(regex instanceof String)) {
+      throw new ProcessingException(displayName + " value is no string");
+    }
+    if (!Pattern.matches((String) regex, (String) value)) {
+      throw new ProcessingException(displayName + " is not valid");
+    }
+  }
+
+  public static void checkArrayMatchesRegex(String displayName, Object arrayOfStrings, Object regex) throws ProcessingException {
+    if (arrayOfStrings == null || regex == null) {
+      return;
+    }
+    checkArray(displayName, arrayOfStrings);
+    int len = Array.getLength(arrayOfStrings);
+    if (len == 0) {
+      return;
+    }
+    if (!(regex instanceof String)) {
+      throw new ProcessingException(displayName + " value is no string");
+    }
+    Pattern p = Pattern.compile((String) regex);
+    for (int i = 0; i < len; i++) {
+      Object value = Array.get(arrayOfStrings, i);
+      if (!(value instanceof String)) {
+        throw new ProcessingException(displayName + " value is no string");
+      }
+      if (!p.matcher((String) value).matches()) {
+        throw new ProcessingException(displayName + " is not valid");
       }
     }
   }
