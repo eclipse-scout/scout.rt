@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -211,10 +211,8 @@ public class ErrorHandler {
         s = t.getMessage();
       }
       buf.append(indent);
-      if (index == 0) buf.append("encountered ");
-      else buf.append("cause: ");
       if (s != null) {
-        buf.append(t.getClass().getSimpleName() + " on " + s);
+        buf.append(s + (t.getClass() != ProcessingException.class ? " (" + t.getClass().getSimpleName() + ")" : ""));
       }
       else {
         buf.append(t.getClass().getSimpleName());
