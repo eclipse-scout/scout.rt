@@ -1160,7 +1160,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     if (f == null) {
       f = new JLabel().getFont();
     }
-    return HTMLUtility.formatDocument(HTMLUtility.cleanupDocument(HTMLUtility.parseDocument(rawHtml), f.getFamily(), f.getSize()));
+    return HTMLUtility.formatDocument(HTMLUtility.cleanupDocument(HTMLUtility.parseDocument(rawHtml), f.getFamily(), f.getSize(), "pt"));
   }
 
   private static void checkThread() {

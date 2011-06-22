@@ -401,7 +401,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     if (f == null) {
       f = new JLabel().getFont();
     }
-    HTMLDocument doc = HTMLUtility.cleanupDocument(HTMLUtility.parseDocument(buf.toString()), f.getFamily(), f.getSize());
+    HTMLDocument doc = HTMLUtility.cleanupDocument(HTMLUtility.parseDocument(buf.toString()), f.getFamily(), f.getSize(), "pt");
     HTMLUtility.formatDocument(doc);
     HashMap<String, URL> cidMap = new HashMap<String, URL>();
     for (SwingMailAttachment a : m_attachments) {

@@ -122,8 +122,19 @@ public final class HTMLUtility {
   /**
    * HTML has several troubles with some CSS and tag style concepts This method
    * tries to correct the most needed ones see {@link #wellformDocument(HTMLDocument, String, int)} for further options
+   * 
+   * @deprecated use {@link #cleanupDocument(HTMLDocument, String, int, String)}
    */
+  @Deprecated
   public static HTMLDocument cleanupDocument(HTMLDocument htmlDoc, String defaultFontFamily, int defaultFontSize) {
+    return cleanupDocument(htmlDoc, defaultFontFamily, defaultFontSize, "pt");
+  }
+
+  /**
+   * HTML has several troubles with some CSS and tag style concepts This method
+   * tries to correct the most needed ones see {@link #wellformDocument(HTMLDocument, String, int)} for further options
+   */
+  public static HTMLDocument cleanupDocument(HTMLDocument htmlDoc, String defaultFontFamily, int defaultFontSize, String fontSizeUnit) {
     if (htmlDoc == null) return htmlDoc;
     MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc;
     StyleSheet styleSheet = doc.getStyleSheet();
@@ -171,11 +182,11 @@ public final class HTMLUtility {
     }
     // default fonts
     if (defaultFontFamily != null && defaultFontSize > 0) {
-      setDefaultFont(styleSheet, "body", defaultFontFamily, defaultFontSize);
-      setDefaultFont(styleSheet, "p", defaultFontFamily, defaultFontSize);
-      setDefaultFont(styleSheet, "span", defaultFontFamily, defaultFontSize);
-      setDefaultFont(styleSheet, "th", defaultFontFamily, defaultFontSize);
-      setDefaultFont(styleSheet, "td", defaultFontFamily, defaultFontSize);
+      setDefaultFont(styleSheet, "body", defaultFontFamily, defaultFontSize, fontSizeUnit);
+      setDefaultFont(styleSheet, "p", defaultFontFamily, defaultFontSize, fontSizeUnit);
+      setDefaultFont(styleSheet, "span", defaultFontFamily, defaultFontSize, fontSizeUnit);
+      setDefaultFont(styleSheet, "th", defaultFontFamily, defaultFontSize, fontSizeUnit);
+      setDefaultFont(styleSheet, "td", defaultFontFamily, defaultFontSize, fontSizeUnit);
     }
     // eliminate vertical scrollbar
     doc.writeLockEx();
@@ -212,10 +223,10 @@ public final class HTMLUtility {
    * tries to auto-correct, wellform and fix all known issues of a html document
    * for usage in swing's JTextPane
    */
-  public static HTMLDocument wellformDocument(HTMLDocument htmlDoc, String defaultFontFamily, int defaultFontSize) {
+  public static HTMLDocument wellformDocument(HTMLDocument htmlDoc, String defaultFontFamily, int defaultFontSize, String fontSizeUnit) {
     if (htmlDoc == null) return htmlDoc;
     //
-    cleanupDocument(htmlDoc, defaultFontFamily, defaultFontSize);
+    cleanupDocument(htmlDoc, defaultFontFamily, defaultFontSize, fontSizeUnit);
     //
     MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc;
     StyleSheet styleSheet = doc.getStyleSheet();
@@ -452,7 +463,7 @@ public final class HTMLUtility {
     }
   }
 
-  private static void setDefaultFont(StyleSheet styleSheet, String styleName, String defaultFontFamily, int defaultFontSize) {
+  private static void setDefaultFont(StyleSheet styleSheet, String styleName, String defaultFontFamily, int defaultFontSize, String fontSizeUnit) {
     Style style = styleSheet.getStyle(styleName);
     if (style == null) {
       style = styleSheet.addStyle(styleName, null);
@@ -461,7 +472,7 @@ public final class HTMLUtility {
       styleSheet.addCSSAttribute(style, CSS.Attribute.FONT_FAMILY, defaultFontFamily);
     }
     if (style.getAttribute(CSS.Attribute.FONT_SIZE) == null) {
-      styleSheet.addCSSAttribute(style, CSS.Attribute.FONT_SIZE, defaultFontSize + "pt");
+      styleSheet.addCSSAttribute(style, CSS.Attribute.FONT_SIZE, defaultFontSize + fontSizeUnit);
     }
   }
 
