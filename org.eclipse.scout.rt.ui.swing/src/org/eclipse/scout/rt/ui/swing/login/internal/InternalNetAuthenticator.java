@@ -30,7 +30,7 @@ public class InternalNetAuthenticator extends Authenticator {
 
   static {
     String s = Activator.getDefault().getBundle().getBundleContext().getProperty("java.net.authenticate.cache.enabled");
-    NET_AUTHENTICATION_CACHE_ENABLED = s != null ? s.equals("true") : true;
+    NET_AUTHENTICATION_CACHE_ENABLED = s != null ? s.equals("true") : false;
   }
 
   private HashSet<String> m_visitedKeys;
