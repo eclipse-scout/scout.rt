@@ -15,6 +15,8 @@ import java.security.Permission;
 import java.security.Permissions;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.shared.data.form.InputValidation;
+import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelAccessDenied;
 import org.eclipse.scout.service.IService;
@@ -27,6 +29,7 @@ import org.eclipse.scout.service.IService;
  * in webservice environments.
  */
 @Priority(-3)
+@InputValidation(ValidationStrategy.PROCESS)
 public interface IAccessControlService extends IService {
 
   /**

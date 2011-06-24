@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
+import org.eclipse.scout.rt.shared.data.DefaultValidator;
 import org.eclipse.scout.rt.shared.util.ValidationUtility;
 
 /**
- * Extendable enum (therefore it is an interface). This enum is read by DefaultInputValidator and DefaultOutputValidator
- * in the
+ * Extendable enum (therefore it is an interface). This enum is read by {@link DefaultValidator} in the
  * DefaultTransactionDelegate
  * to perform central input/output validation.
  */

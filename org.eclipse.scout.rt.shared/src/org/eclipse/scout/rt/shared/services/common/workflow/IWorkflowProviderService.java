@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.shared.services.common.workflow;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.data.form.InputValidation;
+import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.service.IService;
 
@@ -25,6 +27,7 @@ import org.eclipse.scout.service.IService;
  * This interface is not intended to be implemented by third party
  */
 @Priority(-3)
+@InputValidation(ValidationStrategy.PROCESS)
 public interface IWorkflowProviderService extends IService {
 
   /**
@@ -32,6 +35,7 @@ public interface IWorkflowProviderService extends IService {
    *          Standard sql searchFilter
    * @return specs for all available workflow types that can be used in {@link #create(T)} and {@link #resume(Long)}
    */
+  @InputValidation(ValidationStrategy.QUERY)
   AbstractWorkflowData[] getAvailableWorkflowTypes(SearchFilter filter) throws ProcessingException;
 
   /**
@@ -39,6 +43,7 @@ public interface IWorkflowProviderService extends IService {
    *          Standard sql searchFilter
    * @return filtered workflows accessible in the current user session
    */
+  @InputValidation(ValidationStrategy.QUERY)
   AbstractWorkflowData[] getFilteredWorkflows(SearchFilter filter) throws ProcessingException;
 
   /**
