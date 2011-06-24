@@ -11,25 +11,17 @@
 package org.eclipse.scout.rt.server.services.common.ping;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.form.InputValidation;
 import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
-import org.eclipse.scout.rt.shared.util.ValidationUtility;
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)
 public class PingService extends AbstractService implements IPingService {
 
   @Override
-  @InputValidation(ValidationStrategy.NO_CHECK)
+  @InputValidation(ValidationStrategy.QUERY)
   public String ping(String s) {
-    try {
-      ValidationUtility.checkMaxLength("ping", s, 2000);
-    }
-    catch (ProcessingException e) {
-      throw new IllegalArgumentException(e.getMessage());
-    }
     return s;
   }
 
