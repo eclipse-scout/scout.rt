@@ -34,6 +34,11 @@ public class BundleBrowser {
   private HashSet<String> m_set;
   private String m_prefix;
   private int m_prefixLen;
+  /**
+   * fix: when running in dev mode, all classes are spidered twice, but even worse
+   * if the prefix is /bin/ then the enum returns paths such as bin/... without the leading /
+   * The double-check verifies this fact.
+   */
   private boolean m_doubleCheckPrefix;
   boolean m_includeInnerTypes;
   boolean m_includeSubtree;
@@ -66,12 +71,10 @@ public class BundleBrowser {
       Enumeration<String> en = getResourcesEnumeration(m_bundle, m_prefix + path);
       if (en == null) {
         m_prefix = "/classes/";
-        m_doubleCheckPrefix = true;
         en = getResourcesEnumeration(m_bundle, m_prefix + path);
       }
       if (en == null) {
         m_prefix = "/";
-        m_doubleCheckPrefix = false;
         en = getResourcesEnumeration(m_bundle, m_prefix + path);
       }
       m_prefixLen = m_prefix.length();
@@ -130,11 +133,6 @@ public class BundleBrowser {
       while (en.hasMoreElements()) {
         String path = en.nextElement();
         if (path.endsWith(".class")) {
-          /*
-           * fix: when running in dev mode, all classes are spidered twice, but even worse
-           * if the prefix is /bin/ then the enum returns paths such as bin/... without the leading /
-           * The double-check verifies this fact.
-           */
           String className;
           if (m_doubleCheckPrefix) {
             if (path.startsWith(m_prefix)) {
