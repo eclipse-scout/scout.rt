@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -58,6 +59,9 @@ import org.osgi.framework.Version;
 @SuppressWarnings("deprecation")
 public class DefaultTransactionDelegate {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultTransactionDelegate.class);
+
+  public static final Pattern DEFAULT_QUERY_NAMES_PATTERN = Pattern.compile("(get|is|has|load|read|find|select)([A-Z].*)?");
+  public static final Pattern DEFAULT_PROCESS_NAMES_PATTERN = Pattern.compile("(set|put|add|remove|store|write|create|insert|update|delete)([A-Z].*)?");
 
   private final Version m_requestMinVersion;
   private final boolean m_debug;
@@ -393,24 +397,27 @@ public class DefaultTransactionDelegate {
   }
 
   /**
-   * Pass 2 decides the strategy by op naming
-   * <p>
-   * Default handles java bean naming
+   * Pass 2 decides the strategy by java bean, collections framework and business process naming
+   * 
+   * <pre>
+   * <i>Java bean naming</i>
+   * {@link ValidationStrategy#QUERY}: get*, is*
+   * {@link ValidationStrategy#PROCESS}: set*
+   * <p/>
+   * <i>Collections framework naming</i>
+   * {@link ValidationStrategy#QUERY}: get*
+   * {@link ValidationStrategy#PROCESS}: put*, add*, remove*
+   * <p/>
+   * <i>Business process naming</i>
+   * {@link ValidationStrategy#QUERY}: load*, read*, find*, has*, select*
+   * {@link ValidationStrategy#PROCESS}: store*, write*, create*, insert*, update*, delete*
+   * </pre>
    */
   protected Integer findInputValidationStrategyByPolicy(Object serviceImpl, Method op) {
-    if (op.getName().startsWith("get")) {
+    if (DEFAULT_QUERY_NAMES_PATTERN.matcher(op.getName()).matches()) {
       return ValidationStrategy.QUERY;
     }
-    if (op.getName().startsWith("is")) {
-      return ValidationStrategy.QUERY;
-    }
-    if (op.getName().startsWith("set")) {
-      return ValidationStrategy.PROCESS;
-    }
-    if (op.getName().startsWith("load")) {
-      return ValidationStrategy.QUERY;
-    }
-    if (op.getName().startsWith("store")) {
+    if (DEFAULT_PROCESS_NAMES_PATTERN.matcher(op.getName()).matches()) {
       return ValidationStrategy.PROCESS;
     }
     //

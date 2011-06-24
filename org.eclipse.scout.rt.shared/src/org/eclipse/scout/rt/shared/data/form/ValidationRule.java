@@ -14,9 +14,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.util.ValidationUtility;
 
 /**
  * Method annotation on a client form field used in scout sdk in order to generate the validation rule map on the
@@ -154,7 +156,10 @@ public @interface ValidationRule {
    * rule value type is {@link String}
    * <p>
    * Server checks if the string value (if not null) matches the regex Use {@link #generatedSourceCode()} attribute to
-   * specify explicit regex
+   * specify explicit regex. The regex is case insensitive {@link Pattern#CASE_INSENSITIVE} and scans full-text over
+   * multiple lines {@link Pattern#DOTALL}.
+   * <p>
+   * see {@link ValidationUtility#checkValueMatchesRegex(String, Object, Object)}
    * <p>
    * default rule packaged with scout
    */

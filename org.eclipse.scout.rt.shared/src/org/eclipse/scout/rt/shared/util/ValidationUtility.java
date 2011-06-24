@@ -209,6 +209,16 @@ public final class ValidationUtility {
     }
   }
 
+  /**
+   * Checks if the string value (if not null) matches the regex.
+   * If the regex is a string, the pattern created uses case insensitive {@link Pattern#CASE_INSENSITIVE} and
+   * full-text-scan {@link Pattern#DOTALL}.
+   * 
+   * @param displayName
+   * @param value
+   * @param regex
+   *          either a string or a prepared {@link Pattern}
+   */
   public static void checkValueMatchesRegex(String displayName, Object value, Object regex) throws ProcessingException {
     if (value == null || regex == null) {
       return;
@@ -216,14 +226,25 @@ public final class ValidationUtility {
     if (!(value instanceof String)) {
       throw new ProcessingException(displayName + " value is no string");
     }
-    if (!(regex instanceof String)) {
-      throw new ProcessingException(displayName + " value is no string");
+    Pattern p;
+    if (regex instanceof String) {
+      p = Pattern.compile((String) regex, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
     }
-    if (!Pattern.matches((String) regex, (String) value)) {
+    else if (regex instanceof Pattern) {
+      p = (Pattern) regex;
+    }
+    else {
+      throw new ProcessingException(displayName + " regex is neither String nor Pattern");
+    }
+    //
+    if (!p.matcher((String) value).matches()) {
       throw new ProcessingException(displayName + " is not valid");
     }
   }
 
+  /**
+   * see {@link #checkValueMatchesRegex(String, Object, Object)}
+   */
   public static void checkArrayMatchesRegex(String displayName, Object arrayOfStrings, Object regex) throws ProcessingException {
     if (arrayOfStrings == null || regex == null) {
       return;
@@ -233,10 +254,17 @@ public final class ValidationUtility {
     if (len == 0) {
       return;
     }
-    if (!(regex instanceof String)) {
-      throw new ProcessingException(displayName + " value is no string");
+    Pattern p;
+    if (regex instanceof String) {
+      p = Pattern.compile((String) regex, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
     }
-    Pattern p = Pattern.compile((String) regex);
+    else if (regex instanceof Pattern) {
+      p = (Pattern) regex;
+    }
+    else {
+      throw new ProcessingException(displayName + " regex is neither String nor Pattern");
+    }
+    //
     for (int i = 0; i < len; i++) {
       Object value = Array.get(arrayOfStrings, i);
       if (!(value instanceof String)) {
