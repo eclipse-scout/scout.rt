@@ -69,7 +69,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
  * <p>
  * When the sdk fails to create a rule for an annotated (directly or implicit by superclass) method to the created form
  * data it adds a javadoc entry specifying the fully qualified source method name and the keyword
- * "xxx ValidationRule.NotProcessed" that can be searched in the source code.
+ * "not processed ValidationRule" that can be searched in the source code or in the task list as upper case xxx.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
