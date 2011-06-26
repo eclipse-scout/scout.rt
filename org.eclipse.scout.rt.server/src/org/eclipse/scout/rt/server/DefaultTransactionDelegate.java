@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -94,14 +95,13 @@ public class DefaultTransactionDelegate {
       }
       //log it
       if (t instanceof ProcessingException) {
+        ((ProcessingException) t).addContextMessage("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation());
         SERVICES.getService(IExceptionHandlerService.class).handleException((ProcessingException) t);
       }
       else {
         LOG.error("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation(), t);
       }
-      // security: do not send back error stack trace and details
-      ProcessingException p = new ProcessingException(ScoutTexts.get("RequestProblem"));
-      p.setStackTrace(new StackTraceElement[0]);
+      Throwable p = replaceOutboundException(t);
       response = new ServiceTunnelResponse(null, null, p);
     }
     finally {
@@ -112,6 +112,23 @@ public class DefaultTransactionDelegate {
     m_requestEnd = System.nanoTime();
     response.setProcessingDuration((m_requestEnd - m_requestStart) / 1000000L);
     return response;
+  }
+
+  /**
+   * security: do not send back original error and stack trace with details
+   * <p>
+   * default returns an empty exception or in case of a {@link VetoException} only the message
+   */
+  protected Throwable replaceOutboundException(Throwable t) {
+    Throwable p;
+    if (t instanceof VetoException) {
+      p = new VetoException(((VetoException) t).getMessage());
+    }
+    else {
+      p = new ProcessingException(ScoutTexts.get("RequestProblem"));
+    }
+    p.setStackTrace(new StackTraceElement[0]);
+    return p;
   }
 
   /**
