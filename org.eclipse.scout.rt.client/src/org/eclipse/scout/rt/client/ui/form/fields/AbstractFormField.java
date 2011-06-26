@@ -415,6 +415,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @ConfigProperty(ConfigProperty.MASTER_FIELD)
   @Order(170)
   @ConfigPropertyValue("null")
+  @ValidationRule(ValidationRule.MASTER_VALUE_FIELD)
   protected Class<? extends IValueField> getConfiguredMasterField() {
     return null;
   }
@@ -422,6 +423,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(180)
   @ConfigPropertyValue("false")
+  @ValidationRule(ValidationRule.MASTER_VALUE_REQUIRED)
   protected boolean getConfiguredMasterRequired() {
     return false;
   }

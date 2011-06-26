@@ -101,7 +101,7 @@ public class DefaultValidator implements IValidator {
       ValidationUtility.ObjectTreeVisitor v = new ValidationUtility.ObjectTreeVisitor() {
         @Override
         protected boolean visitObject(Object o) throws Exception {
-          return visitObject(o);
+          return DefaultValidator.this.visitObject(o);
         }
       };
       v.writeObject(obj);
@@ -126,7 +126,7 @@ public class DefaultValidator implements IValidator {
       return false;
     }
     if (obj instanceof AbstractFormData) {
-      new DefaultFormDataValidator(this, getValidationStrategy()).validate((AbstractFormData) obj);
+      new DefaultFormDataValidator(this, getValidationStrategy(), DefaultFormDataValidator.DEFAULT_VALUE_CHECKS).validate((AbstractFormData) obj);
       //form data may do deeper checks by its own decision and by calling this.validate() again
       return false;
     }

@@ -10,138 +10,261 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form;
 
+import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.IValidator;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.rt.shared.services.common.code.CODES;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.util.ValidationUtility;
 
 /**
- * Does input/output validation and rule checks on a form data with {@link AbstractFormFieldData#getValidationRules()},
- * see {@link ValidationRule}.
+ * Does input/output validation and rule checks on a form data with {@link AbstractFormFieldData#getValidationRules()}
  * <p>
- * Business rules include configured maxlength, required, min, max and code/lookup value validation.
+ * Business rules include checks of configured properties (see {@link ValidationRule})
  * <p>
- * All elements with no maxLength limit are limited to 250 characters (String) resp. 50MB (arrays)
+ * In {@link ValidationStrategy#QUERY} the following properties are checked (see {@link #preprocessRuleMap(Map)}:
+ * <ul>
+ * <li>max length</li>
+ * <li>code type value</li>
+ * <li>lookup call value (incl. master value)</li>
+ * <li>regex</li>
+ * </ul>
+ * <p>
+ * In {@link ValidationStrategy#PROCESS} all properties are checked:
+ * <ul>
+ * <li>required/mandatory</li>
+ * <li>min length</li>
+ * <li>max length</li>
+ * <li>min value</li>
+ * <li>max value</li>
+ * <li>code type value</li>
+ * <li>lookup call value (incl. master value)</li>
+ * <li>regex</li>
+ * <li>master required</li>
+ * </ul>
+ * <p>
+ * All elements with no specified maxLength are checked by {@link IValidator#checkMaxLenghtDefault(Object)}
  */
 public class DefaultFormDataValidator {
 
-  public static interface IValueCheck {
-    void check(String ruleName, Object ruleValue, String fieldName, Class<?> fieldType, Object fieldValue) throws Exception;
+  public static class ValueCheckContext {
+    public AbstractFormData formData;
+    public Map<String, Object> ruleMap;
+    public String ruleName;
+    public Object ruleValue;
+    public String fieldName;
+    public Class<?> fieldType;
+    public Object fieldValue;
   }
 
-  public static final IValueCheck DEFAULT_MANDATORY_CHECK = new IValueCheck() {
+  public static interface IValueCheck {
+    void check(ValueCheckContext ctx) throws Exception;
+  }
+
+  public static class DefaultMandatoryCheck implements IValueCheck {
     @Override
-    public void check(String ruleName, Object ruleValue, String fieldName, Class<?> fieldType, Object fieldValue) throws Exception {
-      if (!Boolean.TRUE.equals(ruleValue)) {
+    public void check(ValueCheckContext ctx) throws Exception {
+      if (!Boolean.TRUE.equals(ctx.ruleValue)) {
         return;
       }
-      if (fieldType.isArray()) {
-        ValidationUtility.checkMandatoryArray(fieldName, fieldValue);
+      if (ctx.fieldType.isArray()) {
+        ValidationUtility.checkMandatoryArray(ctx.fieldName, ctx.fieldValue);
       }
       else {
-        ValidationUtility.checkMandatoryValue(fieldName, fieldValue);
+        ValidationUtility.checkMandatoryValue(ctx.fieldName, ctx.fieldValue);
       }
     }
-  };
+  }
 
-  public static final IValueCheck DEFAULT_MIN_LENGTH_CHECK = new IValueCheck() {
+  public static class DefaultMinLengthCheck implements IValueCheck {
     @Override
-    public void check(String ruleName, Object ruleValue, String fieldName, Class<?> fieldType, Object fieldValue) throws Exception {
-      ValidationUtility.checkMinLength(fieldName, fieldValue, ruleValue);
+    public void check(ValueCheckContext ctx) throws Exception {
+      ValidationUtility.checkMinLength(ctx.fieldName, ctx.fieldValue, ctx.ruleValue);
     }
-  };
+  }
 
-  public static final IValueCheck DEFAULT_MAX_LENGTH_CHECK = new IValueCheck() {
+  public static class DefaultMaxLengthCheck implements IValueCheck {
     @Override
-    public void check(String ruleName, Object ruleValue, String fieldName, Class<?> fieldType, Object fieldValue) throws Exception {
-      ValidationUtility.checkMaxLength(fieldName, fieldValue, ruleValue);
+    public void check(ValueCheckContext ctx) throws Exception {
+      ValidationUtility.checkMaxLength(ctx.fieldName, ctx.fieldValue, ctx.ruleValue);
     }
-  };
+  }
 
-  public static final IValueCheck DEFAULT_MIN_VALUE_CHECK = new IValueCheck() {
+  public static class DefaultMinValueCheck implements IValueCheck {
     @Override
-    public void check(String ruleName, Object ruleValue, String fieldName, Class<?> fieldType, Object fieldValue) throws Exception {
-      ValidationUtility.checkMinValue(fieldName, fieldValue, ruleValue);
+    public void check(ValueCheckContext ctx) throws Exception {
+      ValidationUtility.checkMinValue(ctx.fieldName, ctx.fieldValue, ctx.ruleValue);
     }
-  };
+  }
 
-  public static final IValueCheck DEFAULT_MAX_VALUE_CHECK = new IValueCheck() {
+  public static class DefaultMaxValueCheck implements IValueCheck {
     @Override
-    public void check(String ruleName, Object ruleValue, String fieldName, Class<?> fieldType, Object fieldValue) throws Exception {
-      ValidationUtility.checkMaxValue(fieldName, fieldValue, ruleValue);
+    public void check(ValueCheckContext ctx) throws Exception {
+      ValidationUtility.checkMaxValue(ctx.fieldName, ctx.fieldValue, ctx.ruleValue);
     }
-  };
+  }
 
-  public static final IValueCheck DEFAULT_CODE_TYPE_CHECK = new IValueCheck() {
+  public static class DefaultCodeTypeCheck implements IValueCheck {
     @Override
-    public void check(String ruleName, Object ruleValue, String fieldName, Class<?> fieldType, Object fieldValue) throws Exception {
-      if (fieldType.isArray()) {
-        ValidationUtility.checkCodeTypeArray(fieldName, fieldValue, ruleValue);
-      }
-      else {
-        ValidationUtility.checkCodeTypeValue(fieldName, fieldValue, ruleValue);
-      }
-    }
-  };
-
-  public static final IValueCheck DEFAULT_LOOKUP_CALL_CHECK = new IValueCheck() {
-    @Override
-    public void check(String ruleName, Object ruleValue, String fieldName, Class<?> fieldType, Object fieldValue) throws Exception {
-      if (fieldType.isArray()) {
-        ValidationUtility.checkLookupCallArray(fieldName, fieldValue, ruleValue);
+    public void check(ValueCheckContext ctx) throws Exception {
+      if (ctx.fieldType.isArray()) {
+        if (ctx.fieldValue != null && Array.getLength(ctx.fieldValue) > 0) {
+          ValidationUtility.checkCodeTypeArray(ctx.fieldName, ctx.fieldValue, createCodeType(ctx));
+        }
       }
       else {
-        ValidationUtility.checkLookupCallValue(fieldName, fieldValue, ruleValue);
+        if (ctx.fieldValue != null) {
+          ValidationUtility.checkCodeTypeValue(ctx.fieldName, ctx.fieldValue, createCodeType(ctx));
+        }
       }
     }
-  };
 
-  public static final IValueCheck DEFAULT_REGEX_CHECK = new IValueCheck() {
+    @SuppressWarnings("unchecked")
+    protected ICodeType<?> createCodeType(ValueCheckContext ctx) throws ProcessingException {
+      Class<? extends ICodeType<?>> cls = (Class<? extends ICodeType<?>>) ctx.ruleValue;
+      ICodeType<?> codeType = CODES.getCodeType(cls);
+      if (codeType == null) {
+        throw new ProcessingException(ctx.fieldName + " codeType " + cls.getSimpleName() + " does not exist");
+      }
+      return codeType;
+    }
+
+  }
+
+  public static class DefaultLookupCallCheck implements IValueCheck {
     @Override
-    public void check(String ruleName, Object ruleValue, String fieldName, Class<?> fieldType, Object fieldValue) throws Exception {
-      if (fieldType.isArray()) {
-        ValidationUtility.checkArrayMatchesRegex(fieldName, fieldValue, ruleValue);
+    public void check(ValueCheckContext ctx) throws Exception {
+      if (ctx.fieldType.isArray()) {
+        if (ctx.fieldValue != null && Array.getLength(ctx.fieldValue) > 0) {
+          ValidationUtility.checkLookupCallArray(ctx.fieldName, ctx.fieldValue, createLookupCall(ctx));
+        }
       }
       else {
-        ValidationUtility.checkValueMatchesRegex(fieldName, fieldValue, ruleValue);
+        if (ctx.fieldValue != null) {
+          ValidationUtility.checkLookupCallValue(ctx.fieldName, ctx.fieldValue, createLookupCall(ctx));
+        }
       }
     }
-  };
+
+    @SuppressWarnings("unchecked")
+    protected LookupCall createLookupCall(ValueCheckContext ctx) throws ProcessingException {
+      Class<? extends LookupCall> cls = (Class<? extends LookupCall>) ctx.ruleValue;
+      LookupCall call;
+      try {
+        call = cls.newInstance();
+      }
+      catch (Throwable t) {
+        throw new ProcessingException(ctx.fieldName + " can not verify " + cls.getSimpleName());
+      }
+      //does a master value exist?
+      if (ctx.ruleMap.containsKey(ValidationRule.MASTER_VALUE_FIELD)) {
+        Class<? extends AbstractValueFieldData<?>> masterFieldClass = (Class<? extends AbstractValueFieldData<?>>) ctx.ruleMap.get(ValidationRule.MASTER_VALUE_FIELD);
+        if (masterFieldClass == null) {
+          throw new ProcessingException(ctx.fieldName + " missing master field");
+        }
+        AbstractValueFieldData<?> masterField = (AbstractValueFieldData<?>) ctx.formData.getFieldByClass(masterFieldClass);
+        if (masterField == null) {
+          throw new ProcessingException(ctx.fieldName + " missing master field " + masterFieldClass.getSimpleName());
+        }
+        call.setMaster(masterField.getValue());
+      }
+      return call;
+    }
+  }
+
+  public static class DefaultRegexCheck implements IValueCheck {
+    @Override
+    public void check(ValueCheckContext ctx) throws Exception {
+      if (ctx.fieldType.isArray()) {
+        ValidationUtility.checkArrayMatchesRegex(ctx.fieldName, ctx.fieldValue, ctx.ruleValue);
+      }
+      else {
+        ValidationUtility.checkValueMatchesRegex(ctx.fieldName, ctx.fieldValue, ctx.ruleValue);
+      }
+    }
+  }
+
+  public static class DefaultMasterValueRequiredCheck implements IValueCheck {
+    @Override
+    public void check(ValueCheckContext ctx) throws Exception {
+      //if slave value is null, no rule applies
+      Object slaveValue = ctx.fieldValue;
+      if (slaveValue == null || (slaveValue.getClass().isArray() && Array.getLength(slaveValue) == 0)) {
+        return;
+      }
+      //slave is set and not null
+      //is a master value necessary?
+      if (!Boolean.TRUE.equals(ctx.ruleMap.get(ValidationRule.MASTER_VALUE_REQUIRED))) {
+        return;
+      }
+      @SuppressWarnings("unchecked")
+      Class<? extends AbstractValueFieldData<?>> masterFieldClass = (Class<? extends AbstractValueFieldData<?>>) ctx.ruleMap.get(ValidationRule.MASTER_VALUE_FIELD);
+      if (masterFieldClass == null) {
+        throw new ProcessingException(ctx.fieldName + " missing master field");
+      }
+      AbstractValueFieldData<?> masterField = (AbstractValueFieldData<?>) ctx.formData.getFieldByClass(masterFieldClass);
+      if (masterField == null) {
+        throw new ProcessingException(ctx.fieldName + " missing master field " + masterFieldClass.getSimpleName());
+      }
+      Object masterValue = masterField.getValue();
+      //if master value is null, then fail
+      if (masterValue == null || (masterValue.getClass().isArray() && Array.getLength(masterValue) == 0)) {
+        throw new ProcessingException(ctx.fieldName + " slave is set but master is null: " + masterFieldClass.getSimpleName() + " -> " + ctx.fieldName);
+      }
+    }
+  }
 
   public static final Map<String, IValueCheck> DEFAULT_VALUE_CHECKS;
 
   static {
     HashMap<String, DefaultFormDataValidator.IValueCheck> map = new HashMap<String, DefaultFormDataValidator.IValueCheck>();
-    map.put(ValidationRule.MANDATORY, DEFAULT_MANDATORY_CHECK);
-    map.put(ValidationRule.MIN_LENGTH, DEFAULT_MIN_LENGTH_CHECK);
-    map.put(ValidationRule.MAX_LENGTH, DEFAULT_MAX_LENGTH_CHECK);
-    map.put(ValidationRule.MIN_VALUE, DEFAULT_MIN_VALUE_CHECK);
-    map.put(ValidationRule.MAX_VALUE, DEFAULT_MAX_VALUE_CHECK);
-    map.put(ValidationRule.CODE_TYPE, DEFAULT_CODE_TYPE_CHECK);
-    map.put(ValidationRule.LOOKUP_CALL, DEFAULT_LOOKUP_CALL_CHECK);
-    map.put(ValidationRule.REGEX, DEFAULT_REGEX_CHECK);
+    map.put(ValidationRule.MANDATORY, new DefaultMandatoryCheck());
+    map.put(ValidationRule.MIN_LENGTH, new DefaultMinLengthCheck());
+    map.put(ValidationRule.MAX_LENGTH, new DefaultMaxLengthCheck());
+    map.put(ValidationRule.MIN_VALUE, new DefaultMinValueCheck());
+    map.put(ValidationRule.MAX_VALUE, new DefaultMaxValueCheck());
+    map.put(ValidationRule.CODE_TYPE, new DefaultCodeTypeCheck());
+    map.put(ValidationRule.LOOKUP_CALL, new DefaultLookupCallCheck());
+    map.put(ValidationRule.REGEX, new DefaultRegexCheck());
+    map.put(ValidationRule.MASTER_VALUE_REQUIRED, new DefaultMasterValueRequiredCheck());
     DEFAULT_VALUE_CHECKS = Collections.unmodifiableMap(map);
   }
 
   private final IValidator m_baseValidator;
+  private AbstractFormData m_formData;
   private Map<String, IValueCheck> m_valueChecks;
   private int m_validationStrategy;
 
   public DefaultFormDataValidator(IValidator baseValidator, int validationStrategy) {
+    this(baseValidator, validationStrategy, DEFAULT_VALUE_CHECKS);
+  }
+
+  public DefaultFormDataValidator(IValidator baseValidator, int validationStrategy, Map<String, IValueCheck> defaultValueChecks) {
     m_baseValidator = baseValidator;
     m_validationStrategy = validationStrategy;
-    m_valueChecks = DEFAULT_VALUE_CHECKS;
+    m_valueChecks = defaultValueChecks;
   }
 
   public IValidator getBaseValidator() {
     return m_baseValidator;
+  }
+
+  public AbstractFormData getFormData() {
+    return m_formData;
+  }
+
+  protected void setFormData(AbstractFormData formData) {
+    m_formData = formData;
   }
 
   public int getValidationStrategy() {
@@ -161,6 +284,7 @@ public class DefaultFormDataValidator {
   }
 
   public void validate(AbstractFormData formData) throws Exception {
+    setFormData(formData);
     if (getValidationStrategy() == ValidationStrategy.NO_CHECK) {
       return;
     }
@@ -182,8 +306,6 @@ public class DefaultFormDataValidator {
 
   /**
    * Preprocess rule map to adapt to check strategy.
-   * <p>
-   * In case of {@link ValidationStrategy#Query} the default removes mandatory, minLength, minValue, maxValue checks.
    */
   protected void preprocessRuleMap(Map<String, Object> ruleMap) {
     if (getValidationStrategy() == ValidationStrategy.QUERY) {
@@ -191,6 +313,7 @@ public class DefaultFormDataValidator {
       ruleMap.remove(ValidationRule.MIN_LENGTH);
       ruleMap.remove(ValidationRule.MIN_VALUE);
       ruleMap.remove(ValidationRule.MAX_VALUE);
+      ruleMap.remove(ValidationRule.MASTER_VALUE_REQUIRED);
     }
   }
 
@@ -206,22 +329,23 @@ public class DefaultFormDataValidator {
     if (ruleMap.size() == 0) {
       return;
     }
-    String displayName = null;
-    Class<?> valueType = null;
-    Object value = null;
+    ValueCheckContext ctx = null;
     //apply rules
     for (Map.Entry<String, Object> e : ruleMap.entrySet()) {
       IValueCheck check = getValueChecks().get(e.getKey());
       if (check != null) {
         //lazy create
-        if (displayName == null) {
-          displayName = prop.getClass().getSimpleName();
+        if (ctx == null) {
+          ctx = new ValueCheckContext();
+          ctx.formData = getFormData();
+          ctx.fieldName = prop.getClass().getSimpleName();
+          ctx.fieldType = prop.getHolderType();
+          ctx.fieldValue = prop.getValue();
+          ctx.ruleMap = ruleMap;
         }
-        if (valueType == null || value == null) {
-          valueType = prop.getHolderType();
-          value = prop.getValue();
-        }
-        check.check(e.getKey(), e.getValue(), displayName, valueType, value);
+        ctx.ruleName = e.getKey();
+        ctx.ruleValue = e.getValue();
+        check.check(ctx);
       }
     }
     //add default maxLength check
@@ -242,24 +366,25 @@ public class DefaultFormDataValidator {
     if (ruleMap.size() == 0) {
       return;
     }
-    String displayName = null;
-    Class<?> valueType = null;
-    Object value = null;
+    ValueCheckContext ctx = null;
     //apply rules
     for (Map.Entry<String, Object> e : ruleMap.entrySet()) {
       IValueCheck check = getValueChecks().get(e.getKey());
       if (check != null) {
         //lazy create
-        if (displayName == null) {
-          displayName = field.getClass().getSimpleName();
-        }
-        if (valueType == null || value == null) {
+        if (ctx == null) {
+          ctx = new ValueCheckContext();
+          ctx.formData = getFormData();
+          ctx.fieldName = field.getClass().getSimpleName();
           if (field instanceof AbstractValueFieldData<?>) {
-            valueType = ((AbstractValueFieldData<?>) field).getHolderType();
-            value = ((AbstractValueFieldData<?>) field).getValue();
+            ctx.fieldType = ((AbstractValueFieldData<?>) field).getHolderType();
+            ctx.fieldValue = ((AbstractValueFieldData<?>) field).getValue();
           }
+          ctx.ruleMap = ruleMap;
         }
-        check.check(e.getKey(), e.getValue(), displayName, valueType, value);
+        ctx.ruleName = e.getKey();
+        ctx.ruleValue = e.getValue();
+        check.check(ctx);
       }
     }
     //subtree checks

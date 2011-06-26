@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
@@ -125,24 +124,17 @@ public final class ValidationUtility {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public static void checkCodeTypeValue(String displayName, Object codeKey, Object codeTypeClass) throws ProcessingException {
-    if (codeKey == null || codeTypeClass == null) {
+  public static void checkCodeTypeValue(String displayName, Object codeKey, ICodeType<?> codeType) throws ProcessingException {
+    if (codeKey == null || codeType == null) {
       return;
     }
-    Class<? extends ICodeType<?>> cls = (Class<? extends ICodeType<?>>) codeTypeClass;
-    ICodeType<?> codeType = CODES.getCodeType(cls);
-    if (codeType == null) {
-      throw new ProcessingException(displayName + " codeType " + cls.getSimpleName() + " does not exist");
-    }
     if (codeType.getCode(codeKey) == null) {
-      throw new ProcessingException(displayName + " " + codeKey + " is illegal for " + cls.getSimpleName());
+      throw new ProcessingException(displayName + " " + codeKey + " is illegal for " + codeType.getClass().getSimpleName());
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public static void checkCodeTypeArray(String displayName, Object codeKeyArray, Object codeTypeClass) throws ProcessingException {
-    if (codeKeyArray == null || codeTypeClass == null) {
+  public static void checkCodeTypeArray(String displayName, Object codeKeyArray, ICodeType<?> codeType) throws ProcessingException {
+    if (codeKeyArray == null || codeType == null) {
       return;
     }
     checkArray(displayName, codeKeyArray);
@@ -150,41 +142,26 @@ public final class ValidationUtility {
     if (len == 0) {
       return;
     }
-    Class<? extends ICodeType<?>> cls = (Class<? extends ICodeType<?>>) codeTypeClass;
-    ICodeType<?> codeType = CODES.getCodeType(cls);
-    if (codeType == null) {
-      throw new ProcessingException(displayName + " codeType " + cls.getSimpleName() + " does not exist");
-    }
     for (int i = 0; i < len; i++) {
       Object codeKey = Array.get(codeKeyArray, i);
       if (codeType.getCode(codeKey) == null) {
-        throw new ProcessingException(displayName + " " + codeKey + " is illegal for " + cls.getSimpleName());
+        throw new ProcessingException(displayName + " " + codeKey + " is illegal for " + codeType.getClass().getSimpleName());
       }
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public static void checkLookupCallValue(String displayName, Object lookupKey, Object lookupCallClass) throws ProcessingException {
-    if (lookupKey == null || lookupCallClass == null) {
+  public static void checkLookupCallValue(String displayName, Object lookupKey, LookupCall call) throws ProcessingException {
+    if (lookupKey == null || call == null) {
       return;
-    }
-    Class<? extends LookupCall> cls = (Class<? extends LookupCall>) lookupCallClass;
-    LookupCall call;
-    try {
-      call = cls.newInstance();
-    }
-    catch (Throwable t) {
-      throw new ProcessingException(displayName + " can not verify " + cls.getSimpleName());
     }
     call.setKey(lookupKey);
     if (call.getDataByKey().length == 0) {
-      throw new ProcessingException(displayName + " " + lookupKey + " is illegal for " + cls.getSimpleName());
+      throw new ProcessingException(displayName + " " + lookupKey + " is illegal for " + call.getClass().getSimpleName());
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public static void checkLookupCallArray(String displayName, Object lookupKeyArray, Object lookupCallClass) throws ProcessingException {
-    if (lookupKeyArray == null || lookupCallClass == null) {
+  public static void checkLookupCallArray(String displayName, Object lookupKeyArray, LookupCall call) throws ProcessingException {
+    if (lookupKeyArray == null || call == null) {
       return;
     }
     checkArray(displayName, lookupKeyArray);
@@ -192,19 +169,11 @@ public final class ValidationUtility {
     if (len == 0) {
       return;
     }
-    Class<? extends LookupCall> cls = (Class<? extends LookupCall>) lookupCallClass;
-    LookupCall call;
-    try {
-      call = cls.newInstance();
-    }
-    catch (Throwable t) {
-      throw new ProcessingException(displayName + " can not verify " + cls.getSimpleName());
-    }
     for (int i = 0; i < len; i++) {
       Object lookupKey = Array.get(lookupKeyArray, i);
       call.setKey(lookupKey);
       if (call.getDataByKey().length == 0) {
-        throw new ProcessingException(displayName + " " + lookupKey + " is illegal for " + cls.getSimpleName());
+        throw new ProcessingException(displayName + " " + lookupKey + " is illegal for " + call.getClass().getSimpleName());
       }
     }
   }
@@ -313,7 +282,6 @@ public final class ValidationUtility {
      *         object.
      */
     protected abstract boolean visitObject(Object obj) throws Exception;
-
   }
 
 }

@@ -17,7 +17,9 @@ import java.lang.annotation.Target;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.util.ValidationUtility;
 
 /**
@@ -164,4 +166,21 @@ public @interface ValidationRule {
    * default rule packaged with scout
    */
   String REGEX = "regex";
+  /**
+   * rule value type is Class<? extends {@link AbstractFormFieldData}> that is translated by the sdk from its
+   * corresponding form field type
+   * <p>
+   * The master field of this field, often used as part of {@link LookupCall#setMaster(Object)} using the value
+   * <p>
+   * default rule packaged with scout
+   */
+  String MASTER_VALUE_FIELD = "masterValueField";
+  /**
+   * rule value type is {@link Boolean}
+   * <p>
+   * If the master field is required and null and this field is not null, this is a fault
+   * <p>
+   * default rule packaged with scout
+   */
+  String MASTER_VALUE_REQUIRED = "masterValueRequired";
 }
