@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestResult;
@@ -26,6 +27,7 @@ import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;
 import org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 
@@ -40,19 +42,43 @@ public class ScoutJUnitPluginTestExecutor {
   private static final String DUMMY_TESTSUITE_NAME = "FRAMEWORK.INIT";
 
   public static final String JUNIT_REPORTS_DIR_ARG_NAME = "junitReportsDir";
+  public static final String FAIL_ON_ERROR_ARG_NAME = "failOnError";
+  public static final String HALT_ON_FAILURE_ARG_NAME = "haltOnFailure";
+  public static final String BUNDLE_NAME_INCLUDE_FILTER_ARG_NAME = "bundleNameIncludeFilter";
+  public static final String BUNDLE_NAME_EXCLUDE_FILTER_ARG_NAME = "bundleNameExcludeFilter";
+  public static final String CLASS_NAME_INCLUDE_FILTER_ARG_NAME = "classNameIncludeFilter";
+  public static final String CLASS_NAME_EXCLUDE_FILTER_ARG_NAME = "classNameExcludeFilter";
 
   public static final Integer EXIT_CODE_OK = IApplication.EXIT_OK;
   public static final Integer EXIT_CODE_TESTS_FAILED = 1;
   public static final Integer EXIT_CODE_ERRORS_OCCURRED = 2;
 
   private final String m_reportsDir;
+  private final boolean m_failOnError;
+  private final boolean m_haltOnFailure;
+  private final Pattern[] m_bundleNameIncludePatterns;
+  private final Pattern[] m_bundleNameExcludePatterns;
+  private final Pattern[] m_classNameIncludePatterns;
+  private final Pattern[] m_classNameExcludePatterns;
   private String m_launchingProductId;
 
   public ScoutJUnitPluginTestExecutor() {
-    this(findReportsDir());
+    this(getReportsDirConfigParameter(), getFailOnErrorConfigParameter(), getHaltOnFailureConfigParameter(),
+        getBundleNameIncludePatternsConfigParameter(), getBundleNameExcludePatternsConfigParameter(),
+        getClassNameIncludePatternsConfigParameter(), getClassNameExcludePatternsConfigParameter());
   }
 
-  public ScoutJUnitPluginTestExecutor(String reportsDir) {
+  public ScoutJUnitPluginTestExecutor(String reportsDir, boolean failOnError, boolean haltOnFailure,
+      Pattern[] bundleNameIncludePatterns, Pattern[] bundleNameExcludePatterns,
+      Pattern[] classNameIncludePatterns, Pattern[] classNameExcludePatterns) {
+
+    m_failOnError = failOnError;
+    m_haltOnFailure = haltOnFailure;
+    m_bundleNameIncludePatterns = bundleNameIncludePatterns;
+    m_bundleNameExcludePatterns = bundleNameExcludePatterns;
+    m_classNameIncludePatterns = classNameIncludePatterns;
+    m_classNameExcludePatterns = classNameExcludePatterns;
+
     if (reportsDir == null) {
       if (Platform.inDevelopmentMode()) {
         String s = System.getenv("APPDATA");
@@ -66,6 +92,7 @@ public class ScoutJUnitPluginTestExecutor {
         throw new IllegalArgumentException(JUNIT_REPORTS_DIR_ARG_NAME + " must not be null; check if argument '" + JUNIT_REPORTS_DIR_ARG_NAME + "' is set");
       }
     }
+
     m_reportsDir = reportsDir;
     checkAndCreateReportsDir(m_reportsDir);
     if (Platform.getProduct() != null) {
@@ -74,30 +101,35 @@ public class ScoutJUnitPluginTestExecutor {
   }
 
   /**
+   * Returns the configuration value for the given parameter that is either configured as
+   * command line argument or as system property.
+   * 
+   * @param parameterName
+   * @return
+   */
+  private static String getConfigParameter(String parameterName) {
+    String commandLineArgumentName = "-" + parameterName + "=";
+    for (String arg : Platform.getCommandLineArgs()) {
+      if (arg != null && arg.startsWith(commandLineArgumentName)) {
+        return arg.substring(commandLineArgumentName.length());
+      }
+    }
+    return System.getProperty(parameterName);
+  }
+
+  /**
    * Returns the directory where JUnit reports are written to. This default implementation uses the following sources:
    * <ol>
    * <li>Plaltform's command line argument <code>-junitReportsDir=&lt;dir&gt;</code> (e.g.
    * <code>-reportsDir=C:\temp\junitreports</code>)</li>
    * <li>System property with name <code>reportsDir</code> (e.g. <code>-DjunitReportsDir=C:\temp\junitreports</code>)</li>
-   * <li>Java temp dir</li>
    * </ol>
    * 
    * @param context
    * @return
    */
-  private static String findReportsDir() {
-    String reportsDir = null;
-    for (String arg : Platform.getCommandLineArgs()) {
-      String reportsDirCommandLineArgumentName = "-" + JUNIT_REPORTS_DIR_ARG_NAME + "=";
-      if (arg != null && arg.startsWith(reportsDirCommandLineArgumentName)) {
-        reportsDir = arg.substring(reportsDirCommandLineArgumentName.length());
-        break;
-      }
-    }
-    if (reportsDir == null) {
-      reportsDir = System.getProperty(JUNIT_REPORTS_DIR_ARG_NAME);
-    }
-    return reportsDir;
+  private static String getReportsDirConfigParameter() {
+    return getConfigParameter(JUNIT_REPORTS_DIR_ARG_NAME);
   }
 
   private static void checkAndCreateReportsDir(String reportsDir) {
@@ -108,6 +140,54 @@ public class ScoutJUnitPluginTestExecutor {
     repDir.mkdirs();
   }
 
+  /**
+   * @return Returns an array with the configured bundle name patterns to include.
+   * @see JUnitTestClassBrowser#parseFilterPatterns(String)
+   */
+  private static Pattern[] getBundleNameIncludePatternsConfigParameter() {
+    return JUnitTestClassBrowser.parseFilterPatterns(getConfigParameter(BUNDLE_NAME_INCLUDE_FILTER_ARG_NAME));
+  }
+
+  /**
+   * @return Returns an array with the configured bundle name patterns to exclude.
+   * @see JUnitTestClassBrowser#parseFilterPatterns(String)
+   */
+  private static Pattern[] getBundleNameExcludePatternsConfigParameter() {
+    return JUnitTestClassBrowser.parseFilterPatterns(getConfigParameter(BUNDLE_NAME_EXCLUDE_FILTER_ARG_NAME));
+  }
+
+  /**
+   * @return Returns an array with the configured class name patterns to include.
+   * @see JUnitTestClassBrowser#parseFilterPatterns(String)
+   */
+  private static Pattern[] getClassNameIncludePatternsConfigParameter() {
+    return JUnitTestClassBrowser.parseFilterPatterns(getConfigParameter(CLASS_NAME_INCLUDE_FILTER_ARG_NAME));
+  }
+
+  /**
+   * @return Returns an array with the configured class name patterns to exclude.
+   * @see JUnitTestClassBrowser#parseFilterPatterns(String)
+   */
+  private static Pattern[] getClassNameExcludePatternsConfigParameter() {
+    return JUnitTestClassBrowser.parseFilterPatterns(getConfigParameter(CLASS_NAME_EXCLUDE_FILTER_ARG_NAME));
+  }
+
+  private static boolean getFailOnErrorConfigParameter() {
+    return TypeCastUtility.castValue(getConfigParameter(FAIL_ON_ERROR_ARG_NAME), boolean.class);
+  }
+
+  private static boolean getHaltOnFailureConfigParameter() {
+    return TypeCastUtility.castValue(getConfigParameter(HALT_ON_FAILURE_ARG_NAME), boolean.class);
+  }
+
+  public boolean isFailOnError() {
+    return m_failOnError;
+  }
+
+  public boolean isHaltOnFailure() {
+    return m_haltOnFailure;
+  }
+
   public String getReportsDir() {
     return m_reportsDir;
   }
@@ -116,9 +196,16 @@ public class ScoutJUnitPluginTestExecutor {
     int exitCode = EXIT_CODE_OK;
     try {
       JUnitTestClassBrowser browser = new JUnitTestClassBrowser();
+      browser.setBundleNameIncludePatterns(m_bundleNameIncludePatterns);
+      browser.setBundleNameExcludePatterns(m_bundleNameExcludePatterns);
+      browser.setClassNameIncludePatterns(m_classNameIncludePatterns);
+      browser.setClassNameExcludePatterns(m_classNameExcludePatterns);
       for (Class<?> test : browser.collectAllJUnitTestClasses()) {
-        int textResultCode = runTest(test);
-        exitCode = Math.max(exitCode, textResultCode);
+        int testResultCode = runTest(test);
+        exitCode = Math.max(exitCode, testResultCode);
+        if (isHaltOnFailure() && exitCode != EXIT_CODE_OK) {
+          break;
+        }
       }
     }
     catch (Throwable t) {
@@ -135,7 +222,10 @@ public class ScoutJUnitPluginTestExecutor {
       }
       exitCode = EXIT_CODE_ERRORS_OCCURRED;
     }
-    return exitCode;
+    if (isFailOnError()) {
+      return exitCode;
+    }
+    return EXIT_CODE_OK;
   }
 
   public int runTest(Class<?> testClass) throws FileNotFoundException {
@@ -273,7 +363,9 @@ public class ScoutJUnitPluginTestExecutor {
         catch (Throwable t) {
           System.out.println("ERROR: " + t);
         }
-        System.exit(0);
+        if (isHaltOnFailure()) {
+          System.exit(exitCode);
+        }
       }
     }
   }
