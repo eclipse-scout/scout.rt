@@ -91,6 +91,37 @@ public class BundleObjectInputStream extends ObjectInputStream {
         c = Array.newInstance(c, dimensions).getClass();
       }
       else {
+        //1. try activated bundles
+        for (Bundle b : m_bundleList) {
+          if (b.getState() == Bundle.ACTIVE) {
+            try {
+              c = b.loadClass(className);
+              break;
+            }
+            catch (ClassNotFoundException e) {
+              // nop
+            }
+          }
+        }
+        if (c != null) {
+          return c;
+        }
+        //2. try resolved bundles which prefix the class
+        for (Bundle b : m_bundleList) {
+          if (b.getState() == Bundle.RESOLVED && className.startsWith(b.getSymbolicName())) {
+            try {
+              c = b.loadClass(className);
+              break;
+            }
+            catch (ClassNotFoundException e) {
+              // nop
+            }
+          }
+        }
+        if (c != null) {
+          return c;
+        }
+        //3. try all bundles
         for (Bundle b : m_bundleList) {
           try {
             c = b.loadClass(className);
@@ -100,15 +131,16 @@ public class BundleObjectInputStream extends ObjectInputStream {
             // nop
           }
         }
-        if (c == null) {
-          if (Activator.getDefault() == null) {
-            //outside osgi
-            c = Class.forName(className);
-          }
-          else {
-            throw new ClassNotFoundException(className);
-          }
+        if (c != null) {
+          return c;
         }
+        //
+        if (Activator.getDefault() == null) {
+          //outside osgi
+          c = Class.forName(className);
+          return c;
+        }
+        throw new ClassNotFoundException(className);
       }
       return c;
     }
