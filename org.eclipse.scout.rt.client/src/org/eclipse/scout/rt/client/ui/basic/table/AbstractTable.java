@@ -3020,10 +3020,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  private IMenu[] fireHeaderPopup() {
-    TableEvent e = new TableEvent(this, TableEvent.TYPE_HEADER_POPUP);
-    fireTableEventInternal(e);
-    // single observer for column organization menus
+  /**
+   * single observer for column organization menus
+   */
+  @ConfigOperation
+  @Order(100)
+  protected void execAddHeaderMenus(TableEvent e) throws ProcessingException {
     if (getTableCustomizer() != null) {
       if (e.getPopupMenuCount() > 0) {
         e.addPopupMenu(new MenuSeparator());
@@ -3043,6 +3045,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       if (m.isVisible()) {
         e.addPopupMenu(m);
       }
+    }
+  }
+  
+  private IMenu[] fireHeaderPopup() {
+    TableEvent e = new TableEvent(this, TableEvent.TYPE_HEADER_POPUP);
+    fireTableEventInternal(e);
+    try {
+      execAddHeaderMenus(e);
+    }
+    catch (ProcessingException ex) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
     }
     return e.getPopupMenus();
   }
