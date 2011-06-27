@@ -29,6 +29,7 @@ import org.osgi.framework.Bundle;
 public class ServerSessionRegistryService extends AbstractService implements IServerSessionRegistryService {
   public static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerSessionRegistryService.class);
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject) throws ProcessingException {
     IServerSession serverSession;
