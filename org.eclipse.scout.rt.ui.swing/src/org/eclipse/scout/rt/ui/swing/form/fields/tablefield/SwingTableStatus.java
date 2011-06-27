@@ -117,7 +117,7 @@ public class SwingTableStatus implements ISwingTableStatus {
         break;
       }
       default: {
-        field.setForeground(null);
+        field.setForeground(new Color(0x264159));
       }
     }
   }
