@@ -63,4 +63,11 @@ public final class WebClientState {
   public static void setWebClientInCurrentThread(Boolean b) {
     THREAD_LOCAL.set(b);
   }
+
+  public static String getFontSizeUnit() {
+    if (isWebClientInCurrentThread()) {
+      return "px";
+    }
+    return "pt";
+  }
 }

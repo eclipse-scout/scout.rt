@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.Activator;
+import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.osgi.framework.Bundle;
 
@@ -62,12 +63,13 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
         }
       }
       int index = 1;
-      for (IWizardStep step : w.getSteps()) {
+      for (IWizardStep<?> step : w.getSteps()) {
         String s = createHtmlForStep(step, index, (step == w.getActiveStep()));
         listPart.append(s);
         index++;
       }
     }
+    html = html.replace("#FONT_SIZE_UNIT#", WebClientState.getFontSizeUnit());
     html = html.replace("#TOP#", topPart);
     html = html.replace("#LIST#", listPart.toString());
     html = html.replace("#BOTTOM#", bottomPart);
@@ -83,7 +85,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
    * @param index
    * @param step
    */
-  protected String createHtmlForStep(IWizardStep step, int index, boolean selected) {
+  protected String createHtmlForStep(IWizardStep<?> step, int index, boolean selected) {
     String cssClass;
     if (selected) {
       cssClass = "selected";
