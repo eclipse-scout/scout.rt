@@ -123,12 +123,14 @@ public class SwingScoutTableField extends SwingScoutFieldComposite<ITableField<?
         }
 
         newTableComposite.getSwingScrollPane().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, LogicalGridDataBuilder.createField(getSwingEnvironment(), getScoutObject().getGridData()));
-        // top level table in form has no border
-        JScrollPane scrollPane = newTableComposite.getSwingScrollPane();
-        if (getScoutObject().getParentField() instanceof IGroupBox) {
-          IGroupBox g = (IGroupBox) getScoutObject().getParentField();
-          if (g.isMainBox() && !g.isBorderVisible()) {
-            scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+        // top level table in top-level form has no border
+        if (getScoutObject().getForm().getOuterForm() == null) {
+          if (getScoutObject().getParentField() instanceof IGroupBox) {
+            IGroupBox g = (IGroupBox) getScoutObject().getParentField();
+            if (g.isMainBox() && !g.isBorderVisible()) {
+              JScrollPane scrollPane = newTableComposite.getSwingScrollPane();
+              scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+            }
           }
         }
         m_tableComposite = newTableComposite;
