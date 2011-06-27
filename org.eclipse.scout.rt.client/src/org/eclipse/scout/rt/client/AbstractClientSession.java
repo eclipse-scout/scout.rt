@@ -306,7 +306,9 @@ public abstract class AbstractClientSession implements IClientSession {
       SERVICES.getService(ILogoutService.class).logout();
     }
     catch (Throwable t) {
-      LOG.info("logout on server", t);
+      if (getServiceTunnel() != null) {
+        LOG.info("logout on server", t);
+      }
     }
     setActive(false);
     if (LOG.isInfoEnabled()) LOG.info("end session event loop");
