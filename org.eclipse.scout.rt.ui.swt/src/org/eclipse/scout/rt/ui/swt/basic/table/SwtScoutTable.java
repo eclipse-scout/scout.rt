@@ -206,7 +206,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         swtCol.setData(KEY_SCOUT_COLUMN, scoutColumn);
         swtCol.setMoveable(true);
         swtCol.setToolTipText(cell.getTooltipText());
-        swtCol.setText(cell.getText() == null ? "" : cell.getText());
+        updateHeaderText(swtCol, scoutColumn);
         swtCol.setWidth(scoutColumn.getWidth());
         if (cell.isSortActive()) {
           getSwtField().setSortColumn(swtCol);
@@ -437,16 +437,44 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
     // refresh selection, indexes might have changed
     switch (e.getType()) {
+      case TableEvent.TYPE_ROW_FILTER_CHANGED:
+        // Update column title if filter changed (mark column as filtered)
+        for (TableColumn swtCol : getSwtField().getColumns()) {
+          updateHeaderText(swtCol);
+        }
+        setSelectionFromScout(e.getTable().getSelectedRows());
+        break;
       case TableEvent.TYPE_ROWS_INSERTED:
       case TableEvent.TYPE_ROWS_UPDATED:
       case TableEvent.TYPE_ROWS_DELETED:
       case TableEvent.TYPE_ALL_ROWS_DELETED:
-      case TableEvent.TYPE_ROW_FILTER_CHANGED:
       case TableEvent.TYPE_ROW_ORDER_CHANGED: {
         setSelectionFromScout(e.getTable().getSelectedRows());
         break;
       }
     }
+  }
+
+  private void updateHeaderText(TableColumn swtCol) {
+    if (swtCol == null) {
+      return;
+    }
+    Object data = swtCol.getData(KEY_SCOUT_COLUMN);
+    if (data instanceof IColumn<?>) {
+      updateHeaderText(swtCol, (IColumn<?>) data);
+    }
+  }
+
+  private void updateHeaderText(TableColumn swtCol, IColumn<?> scoutCol) {
+    IHeaderCell cell = scoutCol.getHeaderCell();
+    String text = cell.getText();
+    if (text == null) {
+      text = "";
+    }
+    if (scoutCol.isColumnFilterActive()) {
+      text = "((" + text + "))";
+    }
+    swtCol.setText(text);
   }
 
   protected void setHeaderVisibleFromScout(boolean headerVisible) {
