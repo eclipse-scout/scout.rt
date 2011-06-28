@@ -303,12 +303,12 @@ public abstract class AbstractClientSession implements IClientSession {
       m_desktop = null;
     }
     try {
-      SERVICES.getService(ILogoutService.class).logout();
+      if (getServiceTunnel() != null) {
+        SERVICES.getService(ILogoutService.class).logout();
+      }
     }
     catch (Throwable t) {
-      if (getServiceTunnel() != null) {
-        LOG.info("logout on server", t);
-      }
+      LOG.info("logout on server", t);
     }
     setActive(false);
     if (LOG.isInfoEnabled()) LOG.info("end session event loop");
