@@ -357,15 +357,15 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         m_pendingProposalJob = null;
       }
     }
+    final String text = getSwtField().getText();
     // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().acceptProposalFromUI();
+        getScoutObject().getUIFacade().setTextFromUI(text);
       }
     };
     getEnvironment().invokeScoutLater(t, 0);
-    // end notify
   }
 
   @Override
@@ -470,27 +470,6 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         requestProposalSupportFromSwt(text, false);
       }
     }
-  }
-
-  private void handleSwtFocusLostInternal() {
-    synchronized (m_pendingProposalJobLock) {
-      if (m_pendingProposalJob != null) {
-        m_pendingProposalJob.cancel();
-        m_pendingProposalJob = null;
-      }
-    }
-    final String text = getSwtField().getText();
-    final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, true);
-    // notify Scout
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        boolean b = getScoutObject().getUIFacade().setTextFromUI(text);
-        result.setValue(b);
-      }
-    };
-    getEnvironment().invokeScoutLater(t, 0);
-    System.out.println("text set");
   }
 
   protected void handleKeyDownFromUI(Event event) {
