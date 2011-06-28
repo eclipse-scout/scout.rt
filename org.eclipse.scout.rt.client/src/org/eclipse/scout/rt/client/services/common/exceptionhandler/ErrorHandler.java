@@ -225,22 +225,25 @@ public class ErrorHandler {
     }
     m_detail = StringUtility.wrapWord(ScoutTexts.get("OriginalErrorMessageIs", buf.toString()), 120);
     // copy-paste
+    m_copyPasteText = createCopyPasteText(m_text, m_detail, m_cause);
+  }
+
+  private String createCopyPasteText(String text, String detail, Throwable cause) {
     StringWriter logText = new StringWriter();
     logText.append(m_title + "\n");
     logText.append("\n");
-    if (m_text != null) {
-      logText.append(m_text + "\n");
+    if (text != null) {
+      logText.append(text + "\n");
       logText.append("\n");
     }
-    if (m_detail != null) {
-      logText.append(m_detail + "\n");
+    if (detail != null) {
+      logText.append(detail + "\n");
       logText.append("\n");
     }
-    if (m_cause != null) {
-      m_cause.printStackTrace(new PrintWriter(logText, true));
+    if (cause != null) {
+      cause.printStackTrace(new PrintWriter(logText, true));
       logText.append("\n");
     }
-    m_copyPasteText = logText.toString();
+    return logText.toString();
   }
-
 }
