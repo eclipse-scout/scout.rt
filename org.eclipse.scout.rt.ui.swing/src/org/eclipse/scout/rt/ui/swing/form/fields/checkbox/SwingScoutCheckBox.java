@@ -18,6 +18,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JCheckBoxEx;
@@ -49,6 +50,10 @@ public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanFi
     setSwingLabel(label);
     setSwingField(swingCheckBox);
     setSwingContainer(container);
+    //bsi ticket 101344: modify the layout constraint for the checkbox, so it is only as wide as its label.
+    //this avoids that clicking in white space area toggles the value
+    LogicalGridData gd = (LogicalGridData) swingCheckBox.getClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME);
+    gd.fillHorizontal = false;
     // layout
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }

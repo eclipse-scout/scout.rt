@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -116,13 +116,21 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
     container.setName(getScoutButton().getClass().getSimpleName() + ".container");
     setSwingLabel(null);
     setSwingField(swingFieldAsButton);
-    //in case the button is inside a dropdowncomposite, copy the griddata to the drop down composite
     LogicalGridData gd = (LogicalGridData) swingFieldAsButton.getClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME);
     if (getScoutObject().isProcessButton() && !gd.useUiHeight) {
       //set default button height
       gd.useUiHeight = true;
       gd.heightHint = getSwingEnvironment().getProcessButtonHeight();
     }
+    //bsi ticket 101344: modify the layout constraint for the checkbox, so it is only as wide as its label.
+    //this avoids that clicking in white space area toggles the value
+    switch (getScoutButton().getDisplayStyle()) {
+      case IButton.DISPLAY_STYLE_RADIO: {
+        gd.fillHorizontal = false;
+        break;
+      }
+    }
+    //in case the button is inside a dropdowncomposite, copy the griddata to the drop down composite
     ((JComponent) container.getComponent(0)).putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, gd);
     setSwingContainer(container);
     container.setLayout(new LogicalGridLayout(getSwingEnvironment(), 0, 0));
