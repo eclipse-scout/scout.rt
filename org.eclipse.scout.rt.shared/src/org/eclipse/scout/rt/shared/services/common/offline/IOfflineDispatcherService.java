@@ -33,5 +33,5 @@ public interface IOfflineDispatcherService extends IService {
 
   void setServerSessionClass(String className);
 
-  ServiceTunnelResponse dispatch(final ServiceTunnelRequest request, final IProgressMonitor prog);
+  ServiceTunnelResponse dispatch(final ServiceTunnelRequest request, final IProgressMonitor monitor);
 }
