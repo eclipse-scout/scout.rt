@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistr
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
+import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.service.AbstractService;
@@ -87,7 +88,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   }
 
   @SuppressWarnings("unchecked")
-  public ServiceTunnelResponse dispatch(final ServiceTunnelRequest request, final IProgressMonitor prog) {
+  public ServiceTunnelResponse dispatch(final ServiceTunnelRequest request, final IProgressMonitor monitor) {
     final Subject subject = Subject.getSubject(AccessController.getContext());
     if (m_serverSessionClass == null) {
       String className = Platform.getProduct().getDefiningBundle().getSymbolicName();
@@ -121,7 +122,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     // create a job and run inside the server dispatcher thread
     final Object waitLock = new Object();
     final Holder<ServiceTunnelResponse> responseHolder = new Holder<ServiceTunnelResponse>(ServiceTunnelResponse.class);
-    if ((!currentThread.isInterrupted()) && (prog == null || !prog.isCanceled())) {
+    if ((!currentThread.isInterrupted()) && (monitor == null || !monitor.isCanceled())) {
       Runnable job = new Runnable() {
         public void run() {
           try {
@@ -138,7 +139,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       enqueueJob(job);
       // wait until done
       synchronized (waitLock) {
-        while (responseHolder.getValue() == null && (!currentThread.isInterrupted()) && (!(prog != null && prog.isCanceled()))) {
+        while (responseHolder.getValue() == null && (!currentThread.isInterrupted()) && (!(monitor != null && monitor.isCanceled()))) {
           try {
             waitLock.wait(2000);
           }
@@ -148,6 +149,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
         }
       }
     }
+
     if (responseHolder.getValue() != null) {
       return responseHolder.getValue();
     }
@@ -233,5 +235,4 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       }
     }
   }
-
 }
