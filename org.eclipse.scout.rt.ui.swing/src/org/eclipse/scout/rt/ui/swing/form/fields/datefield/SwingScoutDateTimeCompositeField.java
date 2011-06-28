@@ -35,11 +35,13 @@ public class SwingScoutDateTimeCompositeField extends SwingScoutFieldComposite<I
     container.add(label);
     m_dateField = new SwingScoutDateField();
     m_dateField.setIgnoreLabel(true);
+    m_dateField.setDateTimeCompositeMember(true);
     m_dateField.createField(getScoutObject(), getSwingEnvironment());
     m_dateField.getSwingContainer().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, createDateFieldGridData());
     container.add(m_dateField.getSwingContainer());
     m_timeField = new SwingScoutTimeField();
     m_timeField.setIgnoreLabel(true);
+    m_timeField.setDateTimeCompositeMember(true);
     m_timeField.createField(getScoutObject(), getSwingEnvironment());
     m_timeField.getSwingContainer().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, createTimeFieldGridData());
     container.add(m_timeField.getSwingContainer());

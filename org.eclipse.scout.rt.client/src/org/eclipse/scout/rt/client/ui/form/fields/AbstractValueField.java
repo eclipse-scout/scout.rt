@@ -22,9 +22,9 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
@@ -452,11 +452,6 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       }
       ParsingFailedStatus internalStatus = new ParsingFailedStatus(e.getStatus());
       setErrorStatus(internalStatus);
-      /**
-       * @rn imo, 08.05.2008, in case a field offers a proposal which is refused
-       *     in validation, then the display text is accepted, but not the value
-       */
-      setDisplayText(text);
       return false;
     }
     finally {

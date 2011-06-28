@@ -54,19 +54,25 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutDateField.class);
 
   private boolean m_ignoreLabel;
+  private boolean m_dateTimeCompositeMember;
+  private String m_displayTextToVerify;
   // cache
   private SwingScoutDropDownPopup m_proposalPopup;
-  private String m_displayText;
-  // if a date is picked within the popup-ui or with the cursor-up/down keys, the date should
-  // be rendered even in case of "errors" (due business constraints)
-  private boolean m_setValueFromUI;
+
+  public boolean isIgnoreLabel() {
+    return m_ignoreLabel;
+  }
 
   public void setIgnoreLabel(boolean ignoreLabel) {
     m_ignoreLabel = ignoreLabel;
   }
 
-  public boolean isIgnoreLabel() {
-    return m_ignoreLabel;
+  public boolean isDateTimeCompositeMember() {
+    return m_dateTimeCompositeMember;
+  }
+
+  public void setDateTimeCompositeMember(boolean dateTimeCompositeMember) {
+    m_dateTimeCompositeMember = dateTimeCompositeMember;
   }
 
   @Override
@@ -122,7 +128,6 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
     setSwingField(dateField);
     // layout
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
-    m_setValueFromUI = false;
   }
 
   /**
@@ -160,34 +165,30 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
 
   @Override
   protected void setDisplayTextFromScout(String s) {
+    m_displayTextToVerify = s;
     IDateField f = getScoutObject();
-    if (f.getErrorStatus() != null && !m_setValueFromUI) {
-      return;
-    }
     Date value = f.getValue();
     JTextComponent dateField = getSwingDateField();
     if (value == null || !f.isHasTime()) {
       //only date field
-      m_displayText = s;
-      dateField.setText(m_displayText);
+      dateField.setText(m_displayTextToVerify);
       dateField.setCaretPosition(0);
-      m_setValueFromUI = false;
       return;
     }
     DateFormat format = f.getIsolatedDateFormat();
-    m_displayText = format.format(value);
-    dateField.setText(m_displayText);
+    m_displayTextToVerify = format.format(value);
+    dateField.setText(m_displayTextToVerify);
     dateField.setCaretPosition(0);
-    m_setValueFromUI = false;
   }
 
   @Override
   protected boolean handleSwingInputVerifier() {
     final String text = getSwingDateField().getText();
     // only handle if text has changed
-    if (CompareUtility.equals(text, m_displayText)) {
+    if (CompareUtility.equals(text, m_displayTextToVerify) && (isDateTimeCompositeMember() || getScoutObject().getErrorStatus() == null)) {
       return true;
     }
+    m_displayTextToVerify = text;
     final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
     // notify Scout
     Runnable t = new Runnable() {
@@ -227,7 +228,6 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          m_setValueFromUI = true;
           getScoutObject().getUIFacade().setDateFromUI(newDate);
         }
       };
@@ -355,7 +355,6 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            m_setValueFromUI = true;
             getScoutObject().getUIFacade().fireDateShiftActionFromUI(m_level, m_value);
           }
         };
