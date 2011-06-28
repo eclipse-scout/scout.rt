@@ -70,6 +70,18 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     setProperty(ScoutTexts.JOB_PROPERTY_NAME, m_serverSession.getNlsTexts());
   }
 
+  /**
+   * {@link ServerJob}s belong to the family of type {@link ServerJob}.class
+   */
+  @Override
+  public boolean belongsTo(Object family) {
+    if (family == ServerJob.class) {
+      return true;
+    }
+    return false;
+  }
+
+  @Override
   public IServerSession getServerSession() {
     return m_serverSession;
   }

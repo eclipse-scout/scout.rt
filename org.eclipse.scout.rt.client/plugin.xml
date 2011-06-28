@@ -22,6 +22,7 @@
     <proxy class="org.eclipse.scout.rt.shared.services.common.workflow.IWorkflowProviderService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <service class="org.eclipse.scout.rt.client.services.common.shell.DefaultShellService" createImmediately="false"/>
     <service class="org.eclipse.scout.rt.client.services.common.icon.IconProviderService" createImmediately="false" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory" ranking="-100"/>
+    <proxy class="org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <service
           class="org.eclipse.scout.rt.client.services.common.search.DefaultSearchFilterService"
           createImmediately="false"

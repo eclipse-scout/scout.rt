@@ -450,3 +450,23 @@ Migration: None
 bsi ticket 102823
 do not activate disabled tree nodes when setting new outline on desktop
 Migration: None
+
+28.06.2011 dwi
+bsi ticket #99'948 / #100'755
+Problem:
+If user cancels current running jobs, associated running SQL statements should also be killed.
+Solution:
+Added support to kill associated running JDBC statements if client job gets canceled.
+In StatementProcessor, statements to be executed are registered in RunningStatementStore on behalf of the current session.
+If a ClientJob gets canceled, a subsequent fire-and-forget cancel request is triggered to cancel registered statements.
+Resources changed:
+org.eclipse.scout.rt.client
+- InternalHttpServiceTunnel changed (cancel support for online servermode)
+- plugin.xml changed (registration of cancel processing service)
+com.bsiag.scout.shared
+- IServerProcessingCancelService added (service interface of cancel processing service)
+org.eclipse.scout.rt.server
+- ServerProcessingCancelService added (service implementation of cancel processing service)
+- RunningStatementStore added (store to hold currently running statements)
+- StatementProcessor changed to register / unregister currently running statements
+Migration: None

@@ -85,8 +85,10 @@ public class HttpServiceTunnel extends InternalHttpServiceTunnel {
     return super.createURLConnection(call, callData);
   }
 
-  private String m_ajaxSessionId;
-  private String m_ajaxUserId;
+  @Override
+  protected void sendCancelRequest() {
+    super.sendCancelRequest();
+  }
 
   /**
    * @param method

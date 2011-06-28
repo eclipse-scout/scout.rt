@@ -24,12 +24,15 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
+import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -39,6 +42,9 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
  *
  */
 public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalHttpServiceTunnel.class);
+
   private IServiceTunnelContentHandler m_contentHandler;
   private ClientNotificationPollingJob m_pollingJob;
   private final Object m_pollingJobLock = new Object();
@@ -219,12 +225,32 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
         }
       }
     }
+
+    IProgressMonitor mon = backgroundJob.getMonitor();
+    if (JobEx.isCurrentJobCanceled() || (mon != null && mon.isCanceled())) {
+      sendCancelRequest();
+    }
+
     if (res == null) {
       backgroundJob.cancel();
       return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
     }
     else {
       return res;
+    }
+  }
+
+  /**
+   * Signals the server to cancel processing jobs for the current session.
+   */
+  protected void sendCancelRequest() {
+    try {
+      ServiceTunnelRequest cancelHttpRequest = new ServiceTunnelRequest(getVersion(), IServerProcessingCancelService.class, IServerProcessingCancelService.class.getMethod("cancel"), new Object[0]);
+      HttpBackgroundJob cancelHttpJob = new HttpBackgroundJob(ScoutTexts.get("ServerCallCancelProcessing"), cancelHttpRequest, new Object(), this);
+      cancelHttpJob.schedule();
+    }
+    catch (Throwable e) {
+      LOG.warn("failed to cancel server processing", e);
     }
   }
 

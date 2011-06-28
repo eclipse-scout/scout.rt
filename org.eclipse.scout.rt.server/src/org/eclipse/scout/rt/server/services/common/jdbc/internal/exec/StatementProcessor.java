@@ -215,12 +215,18 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        rs = ps.executeQuery();
-        for (Object[] row : processResultRows(rs, m_maxRowCount)) {
-          rows.add(row);
-          nextOutputBatch();
-          consumeSelectIntoRow(row);
+        RunningStatementStore.register(ps);
+        try {
+          rs = ps.executeQuery();
+          for (Object[] row : processResultRows(rs, m_maxRowCount)) {
+            rows.add(row);
+            nextOutputBatch();
+            consumeSelectIntoRow(row);
+          }
         }
+        finally {
+          RunningStatementStore.unregister(ps);
+        }       
       }
       finishOutputBatch();
       if (monitor != null) {
@@ -268,12 +274,18 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        rs = ps.executeQuery();
-        for (Object[] row : processResultRows(rs, m_maxRowCount)) {
-          nextOutputBatch();
-          consumeSelectIntoRow(row);
-          rowCount++;
+        RunningStatementStore.register(ps);
+        try {
+          rs = ps.executeQuery();
+          for (Object[] row : processResultRows(rs, m_maxRowCount)) {
+            nextOutputBatch();
+            consumeSelectIntoRow(row);
+            rowCount++;
+          }
         }
+        finally {
+          RunningStatementStore.unregister(ps);
+        }     
       }
       finishOutputBatch();
       if (monitor != null) {
@@ -314,21 +326,28 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        rs = ps.executeQuery();
-        ResultSetMetaData meta = rs.getMetaData();
-        int colCount = meta.getColumnCount();
-        while (rs.next()) {
-          ArrayList<SqlBind> row = new ArrayList<SqlBind>(colCount);
-          for (int i = 0; i < colCount; i++) {
-            int type = meta.getColumnType(i + 1);
-            Object value = sqlStyle.readBind(rs, meta, type, i + 1);
-            row.add(new SqlBind(type, value));
+        RunningStatementStore.register(ps);
+        try {
+          rs = ps.executeQuery();
+
+          ResultSetMetaData meta = rs.getMetaData();
+          int colCount = meta.getColumnCount();
+          while (rs.next()) {
+            ArrayList<SqlBind> row = new ArrayList<SqlBind>(colCount);
+            for (int i = 0; i < colCount; i++) {
+              int type = meta.getColumnType(i + 1);
+              Object value = sqlStyle.readBind(rs, meta, type, i + 1);
+              row.add(new SqlBind(type, value));
+            }
+            handler.handleRow(conn, ps, rs, rowCount, row);
+            rowCount++;
+            if (m_maxRowCount > 0 && rowCount >= m_maxRowCount) {
+              break;
+            }
           }
-          handler.handleRow(conn, ps, rs, rowCount, row);
-          rowCount++;
-          if (m_maxRowCount > 0 && rowCount >= m_maxRowCount) {
-            break;
-          }
+        }
+        finally {
+          RunningStatementStore.unregister(ps);
         }
       }
       finishOutputBatch();
@@ -373,7 +392,13 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        rowCount = rowCount + ps.executeUpdate();
+        RunningStatementStore.register(ps);
+        try {
+          rowCount = rowCount + ps.executeUpdate();
+        }
+        finally {
+          RunningStatementStore.unregister(ps);
+        }
       }
       return rowCount;
     }
@@ -412,7 +437,13 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         cs = cache.getCallableStatement(conn, m_currentInputStm);
         bindBatch(cs);
-        status = status && cs.execute();
+        RunningStatementStore.register(cs);
+        try {
+          status = status && cs.execute();
+        }
+        finally {
+          RunningStatementStore.unregister(cs);
+        }
         nextOutputBatch();
         consumeOutputRow(cs);
         batchCount++;

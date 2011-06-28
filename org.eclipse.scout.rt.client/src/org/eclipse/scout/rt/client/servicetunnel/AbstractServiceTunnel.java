@@ -20,11 +20,13 @@ import javax.security.auth.Subject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
@@ -226,17 +228,26 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    * Default for offline handling
    */
   protected ServiceTunnelResponse tunnelOffline(final ServiceTunnelRequest call) {
+    final IProgressMonitor monitor;
+    Job job = Job.getJobManager().currentJob();
+    if (job instanceof ClientJob) {
+      monitor = ((ClientJob) job).getMonitor();
+    }
+    else {
+      monitor = new NullProgressMonitor();
+    }
+
     IClientSession clientSession = ClientSyncJob.getCurrentSession();
     if (clientSession != null && clientSession.getOfflineSubject() != null) {
       Object response = Subject.doAs(clientSession.getOfflineSubject(), new PrivilegedAction<ServiceTunnelResponse>() {
         public ServiceTunnelResponse run() {
-          return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call, new NullProgressMonitor());
+          return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call, monitor);
         }
       });
       return (ServiceTunnelResponse) response;
     }
     else {
-      return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call, new NullProgressMonitor());
+      return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call, monitor);
     }
   }
 
