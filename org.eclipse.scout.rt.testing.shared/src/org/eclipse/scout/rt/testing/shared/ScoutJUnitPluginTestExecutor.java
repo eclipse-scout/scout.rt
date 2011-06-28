@@ -27,6 +27,7 @@ import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;
 import org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
@@ -48,6 +49,7 @@ public class ScoutJUnitPluginTestExecutor {
   public static final String BUNDLE_NAME_EXCLUDE_FILTER_ARG_NAME = "bundleNameExcludeFilter";
   public static final String CLASS_NAME_INCLUDE_FILTER_ARG_NAME = "classNameIncludeFilter";
   public static final String CLASS_NAME_EXCLUDE_FILTER_ARG_NAME = "classNameExcludeFilter";
+  public static final String TEST_NAME_PREFIX = "junitTestNamePrefix";
 
   public static final Integer EXIT_CODE_OK = IApplication.EXIT_OK;
   public static final Integer EXIT_CODE_TESTS_FAILED = 1;
@@ -60,20 +62,24 @@ public class ScoutJUnitPluginTestExecutor {
   private final Pattern[] m_bundleNameExcludePatterns;
   private final Pattern[] m_classNameIncludePatterns;
   private final Pattern[] m_classNameExcludePatterns;
-  private String m_launchingProductId;
+  private final String m_testNamePrefix;
+  private final String m_launchingProductId;
 
   public ScoutJUnitPluginTestExecutor() {
     this(getReportsDirConfigParameter(), getFailOnErrorConfigParameter(), getHaltOnFailureConfigParameter(),
         getBundleNameIncludePatternsConfigParameter(), getBundleNameExcludePatternsConfigParameter(),
-        getClassNameIncludePatternsConfigParameter(), getClassNameExcludePatternsConfigParameter());
+        getClassNameIncludePatternsConfigParameter(), getClassNameExcludePatternsConfigParameter(),
+        getTestNamePrefixConfigParameter());
   }
 
   public ScoutJUnitPluginTestExecutor(String reportsDir, boolean failOnError, boolean haltOnFailure,
       Pattern[] bundleNameIncludePatterns, Pattern[] bundleNameExcludePatterns,
-      Pattern[] classNameIncludePatterns, Pattern[] classNameExcludePatterns) {
+      Pattern[] classNameIncludePatterns, Pattern[] classNameExcludePatterns,
+      String testNamePrefix) {
 
     m_failOnError = failOnError;
     m_haltOnFailure = haltOnFailure;
+    m_testNamePrefix = testNamePrefix;
     m_bundleNameIncludePatterns = bundleNameIncludePatterns;
     m_bundleNameExcludePatterns = bundleNameExcludePatterns;
     m_classNameIncludePatterns = classNameIncludePatterns;
@@ -95,9 +101,11 @@ public class ScoutJUnitPluginTestExecutor {
 
     m_reportsDir = reportsDir;
     checkAndCreateReportsDir(m_reportsDir);
+    String productId = null;
     if (Platform.getProduct() != null) {
-      m_launchingProductId = Platform.getProduct().getId();
+      productId = Platform.getProduct().getId();
     }
+    m_launchingProductId = productId;
   }
 
   /**
@@ -180,6 +188,10 @@ public class ScoutJUnitPluginTestExecutor {
     return TypeCastUtility.castValue(getConfigParameter(HALT_ON_FAILURE_ARG_NAME), boolean.class);
   }
 
+  private static String getTestNamePrefixConfigParameter() {
+    return getConfigParameter(TEST_NAME_PREFIX);
+  }
+
   public boolean isFailOnError() {
     return m_failOnError;
   }
@@ -190,6 +202,10 @@ public class ScoutJUnitPluginTestExecutor {
 
   public String getReportsDir() {
     return m_reportsDir;
+  }
+
+  public String getTestNamePrefix() {
+    return m_testNamePrefix;
   }
 
   public int runAllTests() {
@@ -317,7 +333,11 @@ public class ScoutJUnitPluginTestExecutor {
    * @return
    */
   private JUnitTest createJUnitTest(String testName) {
-    JUnitTest junitTest = new JUnitTest(testName);
+    String name = testName;
+    if (StringUtility.hasText(getTestNamePrefix())) {
+      name = getTestNamePrefix() + testName;
+    }
+    JUnitTest junitTest = new JUnitTest(name);
     Properties props = new Properties();
     props.putAll(System.getProperties());
     junitTest.setProperties(props);
