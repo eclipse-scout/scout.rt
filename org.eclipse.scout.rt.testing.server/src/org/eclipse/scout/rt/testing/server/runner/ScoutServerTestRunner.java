@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,7 +14,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.security.Principal;
 import java.util.ArrayList;
 
 import javax.security.auth.Subject;
@@ -38,7 +37,7 @@ import org.junit.runners.model.Statement;
 public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
 
   private IServerSession m_serverSession;
-  private Principal m_principal;
+  private Subject m_subject;
 
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.TYPE)
@@ -84,6 +83,7 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
       Subject subject = new Subject();
       subject.getPrincipals().add(new SimplePrincipal(getPrincipalName(klass)));
       m_serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(getServerSessionClass(klass), subject);
+      m_subject = subject;
     }
     catch (ProcessingException e) {
       ArrayList<Throwable> exceptions = new ArrayList<Throwable>(1);
@@ -95,7 +95,7 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
     // wrap the methods of a class into a statements, that creates a Scout client job.
-    return new ScoutServerJobWrapperStatement(m_serverSession, m_principal, super.classBlock(notifier));
+    return new ScoutServerJobWrapperStatement(m_serverSession, m_subject, super.classBlock(notifier));
   }
 
   @Override
