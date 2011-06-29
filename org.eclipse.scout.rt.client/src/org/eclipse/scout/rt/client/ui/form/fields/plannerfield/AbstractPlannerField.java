@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -172,47 +172,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
       LOG.warn("there is no inner class of type IActivityMap in " + getClass());
     }
     // add mediator between resource table and activitymap table
-    m_resourceTable.addTableListener(
-        new TableAdapter() {
-          @Override
-          public void tableChanged(TableEvent e) {
-            switch (e.getType()) {
-              case TableEvent.TYPE_ALL_ROWS_DELETED:
-                  case TableEvent.TYPE_ROWS_DELETED: {
-                  m_activityMap.setResourceIds(getResourceIdColumnInternal().getValues());
-                  break;
-                }
-                case TableEvent.TYPE_ROWS_INSERTED: {
-                  m_activityMap.setResourceIds(getResourceIdColumnInternal().getValues());
-                  try {
-                    loadActivityMapDataInternal(e.getRows());
-                  }
-                  catch (ProcessingException ex) {
-                    SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
-                  }
-                  break;
-                }
-                case TableEvent.TYPE_ROWS_UPDATED: {
-                  try {
-                    loadActivityMapDataInternal(e.getRows());
-                  }
-                  catch (ProcessingException ex) {
-                    SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
-                  }
-                  break;
-                }
-                case TableEvent.TYPE_ROW_ORDER_CHANGED: {
-                  m_activityMap.setResourceIds(getResourceIdColumnInternal().getValues());
-                  break;
-                }
-                case TableEvent.TYPE_ROWS_SELECTED: {
-                  syncSelectionFromResourceToActivity();
-                  break;
-                }
-              }
-            }
-        }
-        );
+    m_resourceTable.addTableListener(new P_ResourceTableListener());
     m_activityMap.addPropertyChangeListener(
         new PropertyChangeListener() {
           public void propertyChange(PropertyChangeEvent e) {
@@ -355,6 +315,56 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
       }
     }
 
+  }
+
+  private class P_ResourceTableListener extends TableAdapter {
+    @Override
+    public void tableChanged(TableEvent e) {
+      //reset resourceId mappings
+      switch (e.getType()) {
+        case TableEvent.TYPE_ALL_ROWS_DELETED:
+        case TableEvent.TYPE_ROWS_DELETED:
+        case TableEvent.TYPE_ROWS_INSERTED:
+        case TableEvent.TYPE_ROW_FILTER_CHANGED:
+        case TableEvent.TYPE_ROW_ORDER_CHANGED: {
+          m_activityMap.setResourceIds(getResourceIdColumnInternal().getValues(getResourceTable().getFilteredRows()));
+          break;
+        }
+      }
+      //load additional data
+      switch (e.getType()) {
+        case TableEvent.TYPE_ROW_FILTER_CHANGED: {
+          try {
+            loadActivityMapDataInternal(getResourceTable().getFilteredRows());
+          }
+          catch (ProcessingException ex) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+          }
+        }
+        case TableEvent.TYPE_ROWS_INSERTED: {
+          try {
+            loadActivityMapDataInternal(e.getRows());
+          }
+          catch (ProcessingException ex) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+          }
+          break;
+        }
+        case TableEvent.TYPE_ROWS_UPDATED: {
+          try {
+            loadActivityMapDataInternal(e.getRows());
+          }
+          catch (ProcessingException ex) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+          }
+          break;
+        }
+        case TableEvent.TYPE_ROWS_SELECTED: {
+          syncSelectionFromResourceToActivity();
+          break;
+        }
+      }
+    }
   }
 
 }
