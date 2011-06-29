@@ -38,6 +38,12 @@ import org.eclipse.scout.service.SERVICES;
 public abstract class AbstractDateField extends AbstractValueField<Date> implements IDateField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDateField.class);
 
+  private static enum ParseContext {
+    Date, Time
+  }
+
+  private static final ThreadLocal<ParseContext> PARSE_CONTEXT = new ThreadLocal<AbstractDateField.ParseContext>();
+
   private IDateFieldUIFacade m_uiFacade;
   private String m_format;
   private long m_autoTimeMillis;
@@ -269,7 +275,25 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
     Date d = null;
     if (isHasDate() && isHasTime()) {
-      d = parseDateTimeInternal(text);
+      ParseContext pctx = PARSE_CONTEXT.get();
+      if (pctx == null) {
+        d = parseDateTimeInternal(text);
+      }
+      else if (pctx == ParseContext.Date) {
+        d = parseDateInternal(text);
+        Date currentValue = getValue();
+        if (currentValue != null) {
+          d = DateUtility.createDateTime(d, currentValue);
+        }
+      }
+      else if (pctx == ParseContext.Time) {
+        d = parseTimeInternal(text);
+        Date currentValue = getValue();
+        if (currentValue == null) {
+          currentValue = new Date();
+        }
+        d = DateUtility.createDateTime(currentValue, d);
+      }
     }
     else if (isHasDate() && !isHasTime()) {
       d = parseDateInternal(text);
@@ -765,14 +789,14 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       if (newDate == null) {
         return parseValue(null);
       }
-      //date and time
-      //add existing time
-      Date currentValue = getValue();
-      if (currentValue == null) {
-        currentValue = applyAutoTime(new Date());
+      //date part only
+      try {
+        PARSE_CONTEXT.set(ParseContext.Date);
+        return parseValue(newDate);
       }
-      String currentTime = getIsolatedTimeFormat().format(currentValue);
-      return parseValue(newDate + " " + currentTime);
+      finally {
+        PARSE_CONTEXT.set(null);
+      }
     }
 
     public boolean setTimeTextFromUI(String newTime) {
@@ -786,24 +810,13 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       if (!isHasDate()) {
         return parseValue(newTime);
       }
-      //date and time
-      Date currentValue = getValue();
-      if (newTime == null && currentValue == null) {
-        return parseValue(null);
-      }
-      if (newTime == null) {
-        newTime = getIsolatedTimeFormat().format(currentValue != null ? currentValue : new Date());
-      }
+      //time part
       try {
-      // check if the new time is valid in some way,
-      // we do not want getting a new date while the text is invalid
-        parseTimeInternal(newTime);
-        String currentDate = getIsolatedDateFormat().format(currentValue != null ? currentValue : new Date());
-        return parseValue(currentDate + " " + newTime);
+        PARSE_CONTEXT.set(ParseContext.Time);
+        return parseValue(newTime);
       }
-      catch (ProcessingException e) {
-        // invalid time in text
-        return parseValue(currentValue + " " + newTime);
+      finally {
+        PARSE_CONTEXT.set(null);
       }
     }
 
