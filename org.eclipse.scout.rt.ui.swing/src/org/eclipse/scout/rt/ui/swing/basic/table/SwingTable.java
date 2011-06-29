@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,40 +33,48 @@ class SwingTable extends JTableEx {
    * Stores the optimial width of each column in the property "preferredWidth"
    */
   public void setOptimalColumnWidths() {
-    int dw = getIntercellSpacing().width;
-    Insets is = new Insets(0, 0, 0, 0);
     TableColumnModel tcm = getColumnModel();
     for (int c = 0, nc = getColumnCount(); c < nc; c++) {
       TableColumn tc = tcm.getColumn(c);
-      Component hcomp = getTableHeader().getDefaultRenderer().getTableCellRendererComponent(this, tc.getHeaderValue(), false, false, 0, c);
-      int wmax = SwingLayoutUtility.getSize(hcomp, SwingLayoutUtility.PREF).width;
+      setOptimalColumnWidth(tc);
+    }
+  }
+
+  public void setOptimalColumnWidth(TableColumn tc) {
+    int modelIndex = tc.getModelIndex();
+    int dw = getIntercellSpacing().width;
+    Insets is = new Insets(0, 0, 0, 0);
+    int wmax = 16;
+    if (getTableHeader() != null) {
+      Component hcomp = getTableHeader().getDefaultRenderer().getTableCellRendererComponent(this, tc.getHeaderValue(), false, false, 0, modelIndex);
+      wmax = SwingLayoutUtility.getSize(hcomp, SwingLayoutUtility.PREF).width;
       if (hcomp instanceof JComponent) {
         ((JComponent) hcomp).getInsets(is);
         wmax += is.left + is.right;
       }
-      if (isDynamicRowHeight() && isColumnWrapped(tc)) {
-        int w = getConfiguredWidth(tc);
+    }
+    if (isDynamicRowHeight() && isColumnWrapped(tc)) {
+      int w = getConfiguredWidth(tc);
+      if (w > wmax) {
+        wmax = w;
+      }
+    }
+    for (int r = 0, nr = getRowCount(); r < nr; r++) {
+      TableCellRenderer renderer = getCellRenderer(r, modelIndex);
+      if (renderer != null) {
+        JComponent comp = (JComponent) prepareRenderer(renderer, r, modelIndex);
+        int w = SwingLayoutUtility.getSize(comp, SwingLayoutUtility.PREF).width;
+        if (comp instanceof JComponent) {
+          (comp).getInsets(is);
+          w += is.left + is.right;
+        }
         if (w > wmax) {
           wmax = w;
         }
       }
-      for (int r = 0, nr = getRowCount(); r < nr; r++) {
-        TableCellRenderer renderer = getCellRenderer(r, c);
-        if (renderer != null) {
-          JComponent comp = (JComponent) prepareRenderer(renderer, r, c);
-          int w = SwingLayoutUtility.getSize(comp, SwingLayoutUtility.PREF).width;
-          if (comp instanceof JComponent) {
-            (comp).getInsets(is);
-            w += is.left + is.right;
-          }
-          if (w > wmax) {
-            wmax = w;
-          }
-        }
-      }
-      // resize column
-      getColumnModel().getColumn(c).setPreferredWidth(wmax + dw);
     }
+    // resize column
+    tc.setPreferredWidth(wmax + dw);
   }
 
   private boolean isColumnWrapped(TableColumn tc) {

@@ -56,6 +56,10 @@ public interface IColumn<T> extends IPropertyObserver {
    * type int
    */
   String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+  /**
+   * type boolean
+   */
+  String PROP_AUTO_OPTIMIZE_WIDTH = "autoOptimizeWidth";
 
   void initColumn() throws ProcessingException;
 
@@ -333,5 +337,21 @@ public interface IColumn<T> extends IPropertyObserver {
   void decorateCell(ITableRow row);
 
   void decorateHeaderCell();
+
+  /**
+   * true: Whenever table content changes, automatically calculate optimized column width so that all column content is
+   * displayed without
+   * cropping.
+   * <p>
+   * This may display a horizontal scroll bar on the table.
+   * <p>
+   * This feature is not supported in SWT and RWT since SWT does not offer such an api method.
+   */
+  boolean isAutoOptimizeWidth();
+
+  /**
+   * see {@link #isAutoOptimizeWidth()}
+   */
+  void setAutoOptimizeWidth(boolean optimize);
 
 }

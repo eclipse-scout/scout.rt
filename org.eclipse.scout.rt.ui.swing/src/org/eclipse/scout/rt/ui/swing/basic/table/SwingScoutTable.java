@@ -55,10 +55,12 @@ import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -103,6 +105,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   private JScrollPane m_swingScrollPane;
   private HtmlViewCache m_htmlViewCache;
   private ClientSyncJob m_storeColumnWidthsJob;
+  private Job m_swingAutoOptimizeColumnWidthsJob;
 
   // cache
   private IKeyStroke[] m_installedScoutKs;
@@ -296,6 +299,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         });
       }
     }
+    enqueueAutoOptimizeColumnWidths();
   }
 
   @Override
@@ -690,6 +694,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         break;
       }
     }
+    //recover selection
     switch (e.getType()) {
       case TableEvent.TYPE_ALL_ROWS_DELETED:
       case TableEvent.TYPE_ROWS_INSERTED:
@@ -706,6 +711,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         break;
       }
     }
+    //refresh html view cache
     switch (e.getType()) {
       case TableEvent.TYPE_ALL_ROWS_DELETED:
       case TableEvent.TYPE_ROWS_INSERTED:
@@ -715,6 +721,31 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         break;
       }
     }
+    //auto optimize column sizes
+    switch (e.getType()) {
+      case TableEvent.TYPE_ALL_ROWS_DELETED:
+      case TableEvent.TYPE_ROWS_INSERTED:
+      case TableEvent.TYPE_ROWS_UPDATED:
+      case TableEvent.TYPE_ROWS_DELETED:
+      case TableEvent.TYPE_ROW_FILTER_CHANGED:
+      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
+        for (IColumn<?> c : getScoutObject().getColumns()) {
+          if (c.isAutoOptimizeWidth()) {
+            enqueueAutoOptimizeColumnWidths();
+            break;
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  private void enqueueAutoOptimizeColumnWidths() {
+    if (m_swingAutoOptimizeColumnWidthsJob != null) {
+      m_swingAutoOptimizeColumnWidthsJob.cancel();
+    }
+    m_swingAutoOptimizeColumnWidthsJob = new P_SwingAutoOptimizeColumnWidthsJob();
+    m_swingAutoOptimizeColumnWidthsJob.schedule(200);
   }
 
   protected void handleSwingEmptySpacePopup(final MouseEvent e) {
@@ -1513,4 +1544,36 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     }
   }// end private class
 
+  private class P_SwingAutoOptimizeColumnWidthsJob extends Job {
+    /**
+     * @param name
+     */
+    public P_SwingAutoOptimizeColumnWidthsJob() {
+      super("Swing:AutoOptimizeColumnWidths");
+    }
+
+    @Override
+    protected IStatus run(IProgressMonitor monitor) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          if (getSwingTable() == null) {
+            return;
+          }
+          TableColumnModel tcm = getSwingTableColumnModel();
+          if (tcm == null) {
+            return;
+          }
+          int tcCount = tcm.getColumnCount();
+          for (int i = 0; i < tcCount; i++) {
+            TableColumn tc = tcm.getColumn(i);
+            if (tc instanceof SwingTableColumn && ((SwingTableColumn) tc).getScoutColumn().isAutoOptimizeWidth()) {
+              ((P_SwingTable) getSwingTable()).setOptimalColumnWidth(tc);
+            }
+          }
+        }
+      });
+      return Status.OK_STATUS;
+    }
+  }
 }

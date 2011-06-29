@@ -207,8 +207,24 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return -1;
   }
 
-  @ConfigProperty(ConfigProperty.STRING)
+  /**
+   * true: Whenever table content changes, automatically calculate optimized column width so that all column content is
+   * displayed without
+   * cropping.
+   * <p>
+   * This may display a horizontal scroll bar on the table.
+   * <p>
+   * This feature is not supported in SWT and RWT since SWT does not offer such an api method.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(190)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredAutoOptimizeWidth() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(200)
   @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
     return null;
@@ -327,6 +343,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   }
 
   protected void initConfig() {
+    setAutoOptimizeWidth(getConfiguredAutoOptimizeWidth());
     m_visibleGranted = true;
     m_headerCell.setText(getConfiguredHeaderText());
     if (getConfiguredHeaderTooltipText() != null) {
@@ -961,6 +978,21 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   public void setFont(FontSpec f) {
     propertySupport.setProperty(PROP_FONT, f);
+  }
+
+  /**
+   * true: Whenever table content changes, automatically calculate optimized column width so that all column content is
+   * displayed without
+   * cropping.
+   * <p>
+   * This may display a horizontal scroll bar on the table.
+   */
+  public boolean isAutoOptimizeWidth() {
+    return propertySupport.getPropertyBool(PROP_AUTO_OPTIMIZE_WIDTH);
+  }
+
+  public void setAutoOptimizeWidth(boolean optimize) {
+    propertySupport.setPropertyBool(PROP_AUTO_OPTIMIZE_WIDTH, optimize);
   }
 
   @Override
