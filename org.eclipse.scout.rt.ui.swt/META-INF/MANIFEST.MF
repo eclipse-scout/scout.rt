@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scout UI Swt Plug-in
+Bundle-Name: Scout UI SWT
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.swt;singleton:=true
 Bundle-Version: 3.7.0.qualifier
 Bundle-Activator: org.eclipse.scout.rt.ui.swt.Activator

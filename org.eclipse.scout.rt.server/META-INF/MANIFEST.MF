@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Import-Package: javax.servlet,
  javax.servlet.http
-Bundle-Name: BSI Scout Server Plug-in
+Bundle-Name: Scout Server
 Bundle-SymbolicName: org.eclipse.scout.rt.server;singleton:=true
 Bundle-Version: 3.7.0.qualifier
 Bundle-Activator: org.eclipse.scout.rt.server.internal.Activator

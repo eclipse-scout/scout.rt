@@ -4,7 +4,7 @@ Bundle-Name: Java Net Provider
 Bundle-SymbolicName: org.eclipse.scout.net;singleton:=true
 Bundle-Version: 3.7.0.qualifier
 Bundle-Activator: org.eclipse.scout.net.NetActivator
-Bundle-Vendor: Eclipse Scout Project
+Bundle-Vendor: Scout Java Net Provider
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.scout.net
 Require-Bundle: org.eclipse.core.runtime,

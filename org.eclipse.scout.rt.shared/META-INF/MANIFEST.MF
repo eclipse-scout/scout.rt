@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: BSI Scout Shared Plug-in
+Bundle-Name: Scout Shared
 Bundle-SymbolicName: org.eclipse.scout.rt.shared;singleton:=true
 Bundle-Version: 3.7.0.qualifier
 Bundle-Activator: org.eclipse.scout.rt.shared.Activator
