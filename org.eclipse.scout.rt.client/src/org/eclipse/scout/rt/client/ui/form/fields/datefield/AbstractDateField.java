@@ -274,20 +274,21 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       return null;
     }
     Date d = null;
+    boolean customFormat = (getFormat() != null);
     if (isHasDate() && isHasTime()) {
       ParseContext pctx = PARSE_CONTEXT.get();
       if (pctx == null) {
-        d = parseDateTimeInternal(text);
+        d = parseDateTimeInternal(text, customFormat ? getDateFormat() : null);
       }
       else if (pctx == ParseContext.Date) {
-        d = parseDateInternal(text);
+        d = parseDateInternal(text, customFormat ? getIsolatedDateFormat() : null);
         Date currentValue = getValue();
         if (currentValue != null) {
           d = DateUtility.createDateTime(d, currentValue);
         }
       }
       else if (pctx == ParseContext.Time) {
-        d = parseTimeInternal(text);
+        d = parseTimeInternal(text, customFormat ? getIsolatedTimeFormat() : null);
         Date currentValue = getValue();
         if (currentValue == null) {
           currentValue = new Date();
@@ -296,10 +297,10 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
     else if (isHasDate() && !isHasTime()) {
-      d = parseDateInternal(text);
+      d = parseDateInternal(text, customFormat ? getDateFormat() : null);
     }
     else if (!isHasDate() && isHasTime()) {
-      d = parseTimeInternal(text);
+      d = parseTimeInternal(text, customFormat ? getDateFormat() : null);
     }
     // truncate value
     DateFormat df = getDateFormat();
@@ -414,7 +415,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   /**
    * parse date only
    */
-  private Date parseDateInternal(String text) throws ProcessingException {
+  private Date parseDateInternal(String text, DateFormat defaultFormat) throws ProcessingException {
     Date retVal = null;
     BooleanHolder includesTime = new BooleanHolder(false);
     Matcher verboseDeltaMatcher = Pattern.compile("([+-])([0-9]+)").matcher(text);
@@ -429,7 +430,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       retVal = cal.getTime();
     }
     else {
-      retVal = parseDateFormatsInternal(text, includesTime);
+      retVal = parseDateFormatsInternal(text, defaultFormat, includesTime);
       if (retVal == null) {
         throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text));
       }
@@ -448,7 +449,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   /**
    * parse date and time
    */
-  private Date parseDateTimeInternal(String text) throws ProcessingException {
+  private Date parseDateTimeInternal(String text, DateFormat defaultFormat) throws ProcessingException {
     Date retVal = null;
     if (text != null && text.trim().length() == 0) text = null;
     if (text == null) {
@@ -467,7 +468,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       retVal = cal.getTime();
     }
     else {
-      retVal = parseDateTimeFormatsInternal(text, includesTime);
+      retVal = parseDateTimeFormatsInternal(text, defaultFormat, includesTime);
       if (retVal == null) {
         throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text));
       }
@@ -487,14 +488,14 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   /**
    * parse time only
    */
-  private Date parseTimeInternal(String text) throws ProcessingException {
+  private Date parseTimeInternal(String text, DateFormat defaultFormat) throws ProcessingException {
     Date retVal = null;
     if (text != null && text.trim().length() == 0) text = null;
     if (text == null) {
       return retVal;
     }
     BooleanHolder includesTime = new BooleanHolder(false);
-    retVal = parseTimeFormatsInternal(text, includesTime);
+    retVal = parseTimeFormatsInternal(text, defaultFormat, includesTime);
     if (retVal == null) {
       throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text));
     }
@@ -522,10 +523,10 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     return retVal;
   }
 
-  private Date parseDateFormatsInternal(String text, BooleanHolder includesTime) {
+  private Date parseDateFormatsInternal(String text, DateFormat defaultFormat, BooleanHolder includesTime) {
     Date d;
-    if (getFormat() != null) {
-      d = parseHelper(new SimpleDateFormat(getFormat()), text, includesTime);
+    if (defaultFormat != null) {
+      d = parseHelper(defaultFormat, text, includesTime);
       if (d != null) return d;
     }
     StringBuffer dateFormat = new StringBuffer();
@@ -579,10 +580,10 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       d=parseHelper(df, text, includesTime);
       if(d!=null) return d;
 */
-  private Date parseDateTimeFormatsInternal(String text, BooleanHolder includesTime) {
+  private Date parseDateTimeFormatsInternal(String text, DateFormat defaultFormat, BooleanHolder includesTime) {
     Date d = null;
-    if (getFormat() != null) {
-      d = parseHelper(new SimpleDateFormat(getFormat()), text, includesTime);
+    if (defaultFormat != null) {
+      d = parseHelper(defaultFormat, text, includesTime);
       if (d != null) return d;
     }
     StringBuffer dateFormat = new StringBuffer();
@@ -681,10 +682,10 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     return null;
   }
 
-  private Date parseTimeFormatsInternal(String text, BooleanHolder includesTime) {
+  private Date parseTimeFormatsInternal(String text, DateFormat defaultFormat, BooleanHolder includesTime) {
     Date d = null;
-    if (getFormat() != null) {
-      d = parseHelper(new SimpleDateFormat(getFormat()), text, includesTime);
+    if (defaultFormat != null) {
+      d = parseHelper(defaultFormat, text, includesTime);
       if (d != null) return d;
     }
     //
@@ -697,8 +698,8 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
         text = "00" + text; // "23" -> 23:00 but "30" -> 00:30
       }
     }
-    if (getFormat() != null) {
-      d = parseHelper(new SimpleDateFormat(getFormat()), text, includesTime);
+    if (defaultFormat != null) {
+      d = parseHelper(defaultFormat, text, includesTime);
       if (d != null) return d;
     }
     d = parseHelper(DateFormat.getTimeInstance(DateFormat.SHORT), text, includesTime);
