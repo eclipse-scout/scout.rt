@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Apache Ant JUnit4 Fragment
+Bundle-Name: Scout Apache Ant JUnit4 Fragment
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment
 Bundle-Version: 3.7.0.qualifier
 Fragment-Host: org.apache.ant

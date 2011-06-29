@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Eclipse Scout Runtime Shared Testing
+Bundle-Name: Scout Shared Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.shared;singleton:=true
 Bundle-Version: 3.7.0.qualifier
 Bundle-Activator: org.eclipse.scout.rt.testing.shared.Activator
