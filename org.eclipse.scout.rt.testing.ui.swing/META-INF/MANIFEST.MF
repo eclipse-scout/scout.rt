@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Eclipse Scout Runtime Swing Testing
+Bundle-Name: Scout UI Swing Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.ui.swing;singleton:=true
 Bundle-Version: 3.7.0.qualifier
 Bundle-Activator: org.eclipse.scout.rt.testing.ui.swing.Activator

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Eclipse Scout Runtime Client Testing
+Bundle-Name: Scout Client Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.client
 Bundle-Version: 3.7.0.qualifier
 Bundle-Activator: org.eclipse.scout.testing.client.Activator
