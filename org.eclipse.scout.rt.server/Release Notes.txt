@@ -179,3 +179,25 @@ Migration of legacy: moving remaining legacy logic from client to server
 Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
 Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
 Migration: None
+
+30.06.2011 imo
+Locale mismatch when calling service.
+Whenever the locales sent by the calling client do not match the server session locales then
+1. IServerSession#setLocale and IServerSession#setNlsLocale are called to set the new locale.
+2. The method AbstractServerSession.execLocaleChanged is called. The default does nothing
+So far nothing has changed.
+Migration:
+In case your project overrides this method and wants the SERVER locale to win over the client locale, then most often the code did set some session properties but
+forgot to also change the thread defaults.
+In case you have "server locale wins over client locale" strategy, please verify in your ServerSession.execLocaleChanged if you make the following calls:
+    //override thread defaults, server wins over client
+    NlsLocale newNlsLocale = new NlsLocale(new Locale(languageIso));//optional or or similar code....
+    Locale newLocale = new Locale(formattingIso);//optional or or similar code....
+    ...
+    //set session properties
+    this.setNlsLocale(newNlsLocale);
+    this.setLocale(newLocale);
+    //set thread locales
+    NlsLocale.setThreadDefault(newNlsLocale);
+    LocaleThreadLocal.set(newLocale);
+Otherwise the server session locales and the thread locals will still be the ones sent by the client.

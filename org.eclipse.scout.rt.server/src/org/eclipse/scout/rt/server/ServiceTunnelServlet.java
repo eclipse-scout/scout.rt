@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,7 +18,6 @@ import java.lang.reflect.Method;
 import java.net.SocketException;
 import java.net.URLDecoder;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -37,7 +36,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.PlaceholderException;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -212,10 +210,13 @@ public class ServiceTunnelServlet extends HttpServletEx {
               }
             }
           }
-
         }
         if (serviceTunnelReq != null) {
           req.setAttribute(ServiceTunnelRequest.class.getName(), serviceTunnelReq);
+          /**
+           * set locale as requested by client
+           * if this client locale is not appropriate, the ServerJob will call AbstractServerSession#execLocaleChanged()
+           */
           LocaleThreadLocal.set(serviceTunnelReq.getLocale());
           NlsLocale.setThreadDefault(new NlsLocale(serviceTunnelReq.getNlsLocale()));
         }
@@ -382,20 +383,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
     }
     ServiceTunnelResponse serviceRes = null;
     try {
-      // check if locales changed
-      Locale userLocale = LocaleThreadLocal.get();
-      NlsLocale userNlsLocale = NlsLocale.getDefault();
-      if (CompareUtility.equals(userLocale, serverSession.getLocale()) && CompareUtility.equals(userNlsLocale, serverSession.getNlsLocale())) {
-        // ok
-      }
-      else {
-        serverSession.setLocale(userLocale);
-        serverSession.setNlsLocale(userNlsLocale);
-        if (serverSession instanceof AbstractServerSession) {
-          ((AbstractServerSession) serverSession).execLocaleChanged();
-        }
-      }
-      //
       Class<?> serviceInterfaceClass = null;
       for (Bundle b : getOrderedBundleList()) {
         try {

@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
@@ -170,8 +171,22 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     try {
       ThreadContext.put(m_serverSession);
       ThreadContext.put(transaction);
-      LocaleThreadLocal.set(m_serverSession.getLocale());
-      NlsLocale.setThreadDefault(m_serverSession.getNlsLocale());
+      //check if client locale is different than server locale
+      IServerSession serverSession = getServerSession();
+      Locale clientLocale = LocaleThreadLocal.get();
+      NlsLocale clientNlsLocale = NlsLocale.getDefault();
+      if (CompareUtility.equals(clientLocale, serverSession.getLocale()) && CompareUtility.equals(clientNlsLocale, serverSession.getNlsLocale())) {
+        // locales are same
+      }
+      else {
+        //change the session state
+        serverSession.setNlsLocale(clientNlsLocale);
+        serverSession.setLocale(clientLocale);
+        //notify the session about the change
+        if (serverSession instanceof AbstractServerSession) {
+          ((AbstractServerSession) serverSession).execLocaleChanged();
+        }
+      }
       //
       IStatus status = runTransaction(monitor);
       if (status == null) {
