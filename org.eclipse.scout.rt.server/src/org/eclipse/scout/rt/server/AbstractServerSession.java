@@ -253,18 +253,20 @@ public abstract class AbstractServerSession implements IServerSession {
 
   /**
    * Whenever a server job is run and the client locales {@link LocaleThreadLocal#get()} and
-   * {@link NlsLocale#getDefault()} do not match with the session locales then (1) {@link #setNlsLocale(NlsLocale)} and
-   * {@link #setLocale(Locale)} are called and set to the values sent by the client
-   * and (2) this method is called by the {@link ServerJob}
+   * {@link NlsLocale#getDefault()} do not match with the session locales then
+   * <ol>
+   * <li>{@link #setNlsLocale(NlsLocale)} and {@link #setLocale(Locale)} are called and set to the values sent by the
+   * client</li>
+   * <li>this method is called by the {@link ServerJob}</li>
+   * <li>{@link NlsLocale#setThreadDefault(NlsLocale)} and {@link LocaleThreadLocal#set(Locale)} are set using the (new)
+   * server session values.</li>
+   * </ol>
    * <p>
    * The implementor may override this method to for example let the server win and override the thread locales using
    * {@link LocaleThreadLocal#set(Locale)} and {@link NlsLocale#setThreadDefault(NlsLocale)}
    * <p>
-   * In case your project overrides this method and wants the SERVER locale to win over the client locale, then most
-   * often the code did set some session properties but forgot to also change the thread defaults.
-   * <p>
-   * In case you have "server locale wins over client locale" strategy, please verify in your
-   * ServerSession.execLocaleChanged if you make the following calls:
+   * In case you have "server locale wins over client locale" strategy, please verify in your override if you make the
+   * following calls:
    * 
    * <pre>
    *   //override thread defaults, server wins over client
@@ -274,9 +276,6 @@ public abstract class AbstractServerSession implements IServerSession {
    *   //set session properties
    *   this.setNlsLocale(newNlsLocale);
    *   this.setLocale(newLocale);
-   *   //set thread locales
-   *   NlsLocale.setThreadDefault(newNlsLocale);
-   *   LocaleThreadLocal.set(newLocale);
    * </pre>
    * 
    * Otherwise the server session locales and the thread locals will still be the ones sent by the client.

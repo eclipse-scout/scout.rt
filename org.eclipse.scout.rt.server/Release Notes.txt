@@ -197,7 +197,4 @@ In case you have "server locale wins over client locale" strategy, please verify
     //set session properties
     this.setNlsLocale(newNlsLocale);
     this.setLocale(newLocale);
-    //set thread locales
-    NlsLocale.setThreadDefault(newNlsLocale);
-    LocaleThreadLocal.set(newLocale);
 Otherwise the server session locales and the thread locals will still be the ones sent by the client.

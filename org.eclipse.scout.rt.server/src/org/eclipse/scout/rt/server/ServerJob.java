@@ -172,20 +172,21 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
       ThreadContext.put(m_serverSession);
       ThreadContext.put(transaction);
       //check if client locale is different than server locale
-      IServerSession serverSession = getServerSession();
       Locale clientLocale = LocaleThreadLocal.get();
       NlsLocale clientNlsLocale = NlsLocale.getDefault();
-      if (CompareUtility.equals(clientLocale, serverSession.getLocale()) && CompareUtility.equals(clientNlsLocale, serverSession.getNlsLocale())) {
+      if (CompareUtility.equals(clientLocale, m_serverSession.getLocale()) && CompareUtility.equals(clientNlsLocale, m_serverSession.getNlsLocale())) {
         // locales are same
       }
       else {
         //change the session state
-        serverSession.setNlsLocale(clientNlsLocale);
-        serverSession.setLocale(clientLocale);
+        m_serverSession.setLocale(clientLocale);
+        m_serverSession.setNlsLocale(clientNlsLocale);
         //notify the session about the change
-        if (serverSession instanceof AbstractServerSession) {
-          ((AbstractServerSession) serverSession).execLocaleChanged();
+        if (m_serverSession instanceof AbstractServerSession) {
+          ((AbstractServerSession) m_serverSession).execLocaleChanged();
         }
+        LocaleThreadLocal.set(m_serverSession.getLocale());
+        NlsLocale.setThreadDefault(m_serverSession.getNlsLocale());
       }
       //
       IStatus status = runTransaction(monitor);
