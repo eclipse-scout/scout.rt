@@ -18,6 +18,7 @@ import java.net.SocketException;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
@@ -304,6 +305,10 @@ public class ServiceTunnelServlet extends HttpServletEx {
         ThreadContext.put(req);
         ThreadContext.put(res);
         //
+        ServiceTunnelRequest serviceRequest = deserializeInput(req.getInputStream());
+        LocaleThreadLocal.set(serviceRequest.getLocale());
+        NlsLocale.setThreadDefault(new NlsLocale(serviceRequest.getNlsLocale()));
+        //
         IServerSession serverSession;
         Subject subject;
         if (isVirtualImpersonatedRequest) {
@@ -314,9 +319,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
           subject = lookupSubjectOnHttpSession(req, res);
           serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject);
         }
-        ServerJob job = createServiceTunnelServerJob(serverSession, null, subject, req, res);
+        AtomicReference<ServiceTunnelResponse> serviceResponseHolder = new AtomicReference<ServiceTunnelResponse>();
+        ServerJob job = createServiceTunnelServerJob(serverSession, serviceRequest, serviceResponseHolder, subject);
         job.runNow(new NullProgressMonitor());
         job.throwOnError();
+        serializeOutput(res, serviceResponseHolder.get());
       }
       finally {
         ThreadContext.restore(backup);
@@ -413,21 +420,10 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   /**
-   * @deprecated use
-   *             {@link #createServiceTunnelServerJob(IServerSession, Subject, HttpServletRequest, HttpServletResponse)}
-   */
-  @Deprecated
-  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, ServiceTunnelRequest serviceTunnelRequest, Subject subject, HttpServletRequest request, HttpServletResponse response) {
-    return createServiceTunnelServerJob(serverSession, subject, request, response);
-  }
-
-  /**
    * Create the {@link ServerJob} that runs the request as a single atomic transaction
-   * <p>
-   * This method is part of the protected api and can be overridden.
    */
-  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, Subject subject, HttpServletRequest request, HttpServletResponse response) {
-    return new RemoteServiceJob(serverSession, subject, request, response);
+  private ServerJob createServiceTunnelServerJob(IServerSession serverSession, ServiceTunnelRequest serviceRequest, AtomicReference<ServiceTunnelResponse> serviceResponseHolder, Subject subject) {
+    return new RemoteServiceJob(serverSession, serviceRequest, serviceResponseHolder, subject);
   }
 
   /**
@@ -445,24 +441,27 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   private class RemoteServiceJob extends ServerJob {
 
-    protected HttpServletRequest m_request;
-    protected HttpServletResponse m_response;
+    private final ServiceTunnelRequest m_serviceRequest;
+    private final AtomicReference<ServiceTunnelResponse> m_serviceResponseHolder;
 
-    public RemoteServiceJob(IServerSession serverSession, Subject subject, HttpServletRequest request, HttpServletResponse response) {
+    public RemoteServiceJob(IServerSession serverSession, ServiceTunnelRequest serviceRequest, AtomicReference<ServiceTunnelResponse> serviceResponseHolder, Subject subject) {
       super("RemoteServiceCall", serverSession, subject);
-      m_request = request;
-      m_response = response;
+      m_serviceRequest = serviceRequest;
+      m_serviceResponseHolder = serviceResponseHolder;
+    }
+
+    public ServiceTunnelRequest getServiceRequest() {
+      return m_serviceRequest;
+    }
+
+    public AtomicReference<ServiceTunnelResponse> getServiceResponseHolder() {
+      return m_serviceResponseHolder;
     }
 
     @Override
     protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      ServiceTunnelRequest serviceReq = deserializeInput(m_request.getInputStream());
-      LocaleThreadLocal.set(serviceReq.getLocale());
-      NlsLocale.setThreadDefault(new NlsLocale(serviceReq.getNlsLocale()));
-      //
-      ServiceTunnelResponse serviceRes = runServerJobTransaction(serviceReq);
-      //
-      serializeOutput(m_response, serviceRes);
+      ServiceTunnelResponse serviceRes = runServerJobTransaction(getServiceRequest());
+      getServiceResponseHolder().set(serviceRes);
       return Status.OK_STATUS;
     }
   }
