@@ -50,7 +50,7 @@ public interface IServerSession {
   Map<String, Object> getSharedVariableMap();
 
   /**
-   * The session is running in its event loop
+   * The session is loaded ({@link #loadSession(Bundle)} has been called)
    */
   boolean isActive();
 
