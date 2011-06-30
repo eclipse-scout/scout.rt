@@ -13,16 +13,12 @@ package org.eclipse.scout.rt.server;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Date;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
@@ -187,19 +183,6 @@ public class DefaultTransactionDelegate {
       checkRemoteServiceAccessByPermission(serviceInterfaceClass, service.getClass(), serviceOp, serviceReq.getArgs());
       //all checks done
       //
-      // check if locales changed
-      Locale userLocale = LocaleThreadLocal.get();
-      NlsLocale userNlsLocale = NlsLocale.getDefault();
-      if (CompareUtility.equals(userLocale, serverSession.getLocale()) && CompareUtility.equals(userNlsLocale, serverSession.getNlsLocale())) {
-        // ok
-      }
-      else {
-        serverSession.setLocale(userLocale);
-        serverSession.setNlsLocale(userNlsLocale);
-        if (serverSession instanceof AbstractServerSession) {
-          ((AbstractServerSession) serverSession).execLocaleChanged();
-        }
-      }
       //filter input
       if (serviceReq.getArgs() != null && serviceReq.getArgs().length > 0) {
         Integer inputValidationStrategy = findInputValidationStrategyByAnnotation(service, serviceOp);
