@@ -252,35 +252,9 @@ public abstract class AbstractServerSession implements IServerSession {
   }
 
   /**
-   * Whenever a server job is run and the client locales {@link LocaleThreadLocal#get()} and
-   * {@link NlsLocale#getDefault()} do not match with the session locales then
-   * <ol>
-   * <li>{@link #setNlsLocale(NlsLocale)} and {@link #setLocale(Locale)} are called and set to the values sent by the
-   * client</li>
-   * <li>this method is called by the {@link ServerJob}</li>
-   * <li>{@link NlsLocale#setThreadDefault(NlsLocale)} and {@link LocaleThreadLocal#set(Locale)} are set using the (new)
-   * server session values.</li>
-   * </ol>
-   * <p>
-   * The implementor may override this method to for example let the server win and override the thread locales using
-   * {@link LocaleThreadLocal#set(Locale)} and {@link NlsLocale#setThreadDefault(NlsLocale)}
-   * <p>
-   * In case you have "server locale wins over client locale" strategy, please verify in your override if you make the
-   * following calls:
-   * 
-   * <pre>
-   *   //override thread defaults, server wins over client
-   *   NlsLocale newNlsLocale = new NlsLocale(new Locale(languageIso));//optional or or similar code....
-   *   Locale newLocale = new Locale(formattingIso);//optional or or similar code....
-   *   ...
-   *   //set session properties
-   *   this.setNlsLocale(newNlsLocale);
-   *   this.setLocale(newLocale);
-   * </pre>
-   * 
-   * Otherwise the server session locales and the thread locals will still be the ones sent by the client.
+   * @deprecated never called by the framework
    */
-
+  @Deprecated
   protected void execLocaleChanged() throws ProcessingException {
   }
 

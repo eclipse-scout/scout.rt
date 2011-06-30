@@ -215,7 +215,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
           req.setAttribute(ServiceTunnelRequest.class.getName(), serviceTunnelReq);
           /**
            * set locale as requested by client
-           * if this client locale is not appropriate, the ServerJob will call AbstractServerSession#execLocaleChanged()
            */
           LocaleThreadLocal.set(serviceTunnelReq.getLocale());
           NlsLocale.setThreadDefault(new NlsLocale(serviceTunnelReq.getNlsLocale()));
