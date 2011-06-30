@@ -245,6 +245,7 @@ public abstract class AbstractServerSession implements IServerSession {
     if (isActive()) throw new IllegalStateException("session is active");
     if (bundle == null) throw new IllegalArgumentException("bundle must not be null");
     m_bundle = bundle;
+    m_active = true;
     assignUserId();
     execLoadSession();
   }
@@ -262,6 +263,10 @@ public abstract class AbstractServerSession implements IServerSession {
   protected void execLoadSession() throws ProcessingException {
   }
 
+  /**
+   * @deprecated never called by the framework
+   */
+  @Deprecated
   protected void execLocaleChanged() throws ProcessingException {
   }
 
