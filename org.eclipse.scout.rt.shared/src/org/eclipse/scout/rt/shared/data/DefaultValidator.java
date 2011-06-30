@@ -10,12 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data;
 
-import java.io.IOException;
-
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.DefaultFormDataValidator;
 import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
 import org.eclipse.scout.rt.shared.util.ValidationUtility;
+import org.eclipse.scout.rt.shared.util.ValidationUtility.ObjectTreeVisitorMarkerException;
 
 /**
  * Does input/output validation of arbitrary serializable data.
@@ -106,8 +105,11 @@ public class DefaultValidator implements IValidator {
       };
       v.writeObject(obj);
     }
-    catch (IOException ioe) {
-      throw (Exception) ioe.getCause();
+    catch (ObjectTreeVisitorMarkerException e) {
+      throw (Exception) e.getCause();
+    }
+    catch (Exception e) {
+      throw e;
     }
   }
 

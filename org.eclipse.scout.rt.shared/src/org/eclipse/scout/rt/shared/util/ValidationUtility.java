@@ -268,11 +268,9 @@ public final class ValidationUtility {
           return null;
         }
       }
-      catch (IOException ioe) {
-        throw ioe;
-      }
-      catch (Exception e) {
-        throw new IOException(e);
+      catch (Throwable t) {
+        //java issue throwing an IOException on top level writes an ioexception to the stream, we don't want that
+        throw new ObjectTreeVisitorMarkerException(t);
       }
       return obj;
     }
@@ -282,6 +280,14 @@ public final class ValidationUtility {
      *         object.
      */
     protected abstract boolean visitObject(Object obj) throws Exception;
+  }
+
+  public static final class ObjectTreeVisitorMarkerException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
+    public ObjectTreeVisitorMarkerException(Throwable cause) {
+      super(cause);
+    }
   }
 
 }
