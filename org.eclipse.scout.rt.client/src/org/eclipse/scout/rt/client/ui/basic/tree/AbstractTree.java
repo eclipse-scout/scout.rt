@@ -1325,6 +1325,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   public void selectNodes(ITreeNode[] nodes, boolean append) {
     nodes = resolveNodes(nodes);
+    try {
+      nodes = resolveVirtualNodes(nodes);
+    }
+    catch (ProcessingException e) {
+      LOG.warn("could not resolve virtual nodes.", e);
+    }
     if (nodes == null) {
       nodes = new ITreeNode[0];
     }
@@ -1576,7 +1582,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (nodes == null) return new ITreeNode[0];
     int mismatchCount = 0;
     for (int i = 0; i < nodes.length; i++) {
-      if (nodes[i] != resolveNode(nodes[i])) {
+      if (resolveNode(nodes[i]) == null) {
         mismatchCount++;
       }
     }
@@ -1584,7 +1590,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       ITreeNode[] resolvedNodes = new ITreeNode[nodes.length - mismatchCount];
       int index = 0;
       for (int i = 0; i < nodes.length; i++) {
-        if (nodes[i] == resolveNode(nodes[i])) {
+        if (resolveNode(nodes[i]) != null) {
           resolvedNodes[index] = nodes[i];
           index++;
         }
