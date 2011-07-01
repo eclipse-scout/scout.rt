@@ -47,6 +47,7 @@ import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
+import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -232,6 +233,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       IServerSession serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
       if (serverSession == null) {
         serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
+        WebClientState.setWebClientInCurrentThread(false);
         req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
       }
       return serverSession;
@@ -245,6 +247,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       IServerSession serverSession = m_ajaxSessionCache.get(ajaxSessionId);
       if (serverSession == null) {
         serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
+        WebClientState.setWebClientInCurrentThread(true);
         m_ajaxSessionCache.put(ajaxSessionId, serverSession);
       }
       else {

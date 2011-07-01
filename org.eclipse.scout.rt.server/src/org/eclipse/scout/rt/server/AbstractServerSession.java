@@ -71,7 +71,6 @@ public abstract class AbstractServerSession implements IServerSession {
     if (autoInitConfig) {
       initConfig();
     }
-
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
