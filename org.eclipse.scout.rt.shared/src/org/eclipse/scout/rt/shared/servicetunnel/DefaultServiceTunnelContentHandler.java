@@ -139,6 +139,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     m_listeners = new EventListenerList();
   }
 
+  @Override
   public void initialize(Bundle[] classResolveBundles, ClassLoader rawClassLoader) {
     m_bundleList = classResolveBundles;
     try {
@@ -150,6 +151,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     m_sendCompressed = COMPRESS;
   }
 
+  @Override
   public void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws Exception {
     // build soap message without sax (hi-speed)
     boolean compressed = isUseCompression();
@@ -197,6 +199,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     }
   }
 
+  @Override
   public void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws Exception {
     // build soap message without sax (hi-speed)
     boolean compressed = isUseCompression();
@@ -216,7 +219,9 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       buf.append("/>\n");
     }
     else {
-      buf.append("  <response status=\"ERROR\">\n");
+      buf.append("  <response status=\"ERROR\"");
+      buf.append(" compressed=\"" + compressed + "\"");
+      buf.append(">\n");
       buf.append("    <exception type=\"" + msg.getException().getClass().getSimpleName() + "\">");
       buf.append(msg.getException().getMessage());
       buf.append("</exception>\n");
@@ -290,10 +295,12 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     }
   }
 
+  @Override
   public ServiceTunnelRequest readRequest(InputStream in) throws Exception {
     return (ServiceTunnelRequest) read(in);
   }
 
+  @Override
   public ServiceTunnelResponse readResponse(InputStream in) throws Exception {
     return (ServiceTunnelResponse) read(in);
   }
