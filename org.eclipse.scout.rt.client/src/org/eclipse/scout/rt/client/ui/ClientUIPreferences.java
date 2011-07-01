@@ -581,6 +581,7 @@ public class ClientUIPreferences {
     else {
       m_env.remove(NLS_LOCALE_ISO);
     }
+    flush();
   }
 
   public void setDesktopColumnSplits(int[][] splits) {

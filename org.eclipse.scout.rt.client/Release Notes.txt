@@ -470,3 +470,14 @@ org.eclipse.scout.rt.server
 - RunningStatementStore added (store to hold currently running statements)
 - StatementProcessor changed to register / unregister currently running statements
 Migration: None
+
+01.07.2011 dwi
+bsi ticket: #103'490
+bugzilla ticket: 350661
+Problem:
+When setting a new nls local via ClientUIPreferences, the changed entry is not
+flushed to disk, i.e. causing the old entry to still exits. Other changes made,
+e.g. updateTableColumnOrder, are flushed immediately.
+Solution:
+Changed ClientUiPreferences#setNlsLocale(NlsLocale) to flush value to disk
+Migration: None
