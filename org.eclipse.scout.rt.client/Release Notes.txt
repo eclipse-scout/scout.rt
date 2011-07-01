@@ -454,3 +454,5 @@ e.g. updateTableColumnOrder, are flushed immediately.
 Solution:
 Changed ClientUiPreferences#setNlsLocale(NlsLocale) to flush value to disk
 Migration: None
+
+

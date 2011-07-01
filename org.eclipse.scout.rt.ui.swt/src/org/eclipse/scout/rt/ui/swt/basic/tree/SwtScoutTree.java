@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -270,6 +271,9 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   }
 
   protected void setSelectionFromSwt(final ITreeNode[] nodes) {
+    if (m_ignoreSelectionEventsFromSwtToScout) {
+      return;
+    }
     if (getUpdateSwtFromScoutLock().isAcquired()) {
       return;
     }
@@ -337,6 +341,31 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   }
 
   /**
+   * Workaround for misbehaviour of {@link StructuredViewer#handleSelect} when receiving a selection event due to the
+   * WM_DISPOSE of the selected tree node.
+   * <p>
+   * The WM_DISPOSE of the deleted selected tree node causes windows to send a WM_SELECT of the successor node
+   * (intelligence).
+   * <p>
+   * StructuredViewer ignores this event's item and uses its own getSelection() to create a new SelectionEvent. This
+   * results in a useless empty selection event.
+   * <p>
+   * This flag and the method {@link #ignoreSelectionEventsFromSwtToScoutUntilNextDisplayPost()} works around that
+   * issue.
+   */
+  private boolean m_ignoreSelectionEventsFromSwtToScout;
+
+  private void ignoreSelectionEventsFromSwtToScoutUntilNextDisplayPost() {
+    m_ignoreSelectionEventsFromSwtToScout = true;
+    getSwtField().getDisplay().asyncExec(new Runnable() {
+      @Override
+      public void run() {
+        m_ignoreSelectionEventsFromSwtToScout = false;
+      }
+    });
+  }
+
+  /**
    * model thread: scout table observer
    */
   protected boolean isHandleScoutTreeEvent(TreeEvent[] a) {
@@ -363,6 +392,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     if (isDisposed()) {
       return;
     }
+    ignoreSelectionEventsFromSwtToScoutUntilNextDisplayPost();
     switch (e.getType()) {
       case TreeEvent.TYPE_REQUEST_FOCUS: {
         getSwtField().setFocus();

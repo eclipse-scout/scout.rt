@@ -31,3 +31,11 @@ The behavior of displaying the status of a table changed sometime in 2010. In or
 Solution:
 Extended ISwtEnvironment with a method setStatusLineMessage.
 Migration: If you used the method ISwtScoutPart.setStatus you have to adjust your code as following: part.setStatusLineMessage(null, status.getMessage());
+
+01.07.2011 aho
+Ticket 101'754 focused on some selection problems in the JFace(SWT) tree. The JFace tree forces the selection of the next (null) element when a selected tree item gets removed. This SWT event gets scheduled after the model code is executed.
+The problem was when a tree node gets removed and another node gets selected within the same model method (e.g. execAction on a menu) the selection is not visible in the UI.
+Solution:
+While updating node structures forced by a model event the SWT selection events getting ignored
+Migration:
+None
