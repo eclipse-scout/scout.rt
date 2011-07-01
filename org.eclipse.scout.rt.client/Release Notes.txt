@@ -288,3 +288,14 @@ A menu opened in empty space should not consider any selection on a row.
 Thus the menu should open anyway (not querying the selection status of any row).
 Migration:
 None
+
+01.07.2011 dwi
+bsi ticket: #103'490
+bugzilla ticket: 350661
+Problem:
+When setting a new nls local via ClientUIPreferences, the changed entry is not
+flushed to disk, i.e. causing the old entry to still exits. Other changes made,
+e.g. updateTableColumnOrder, are flushed immediately.
+Solution:
+Changed ClientUiPreferences#setNlsLocale(NlsLocale) to flush value to disk
+Migration: None
