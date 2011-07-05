@@ -177,6 +177,15 @@
      </formField>
      <formField
            active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.svgfield.ISvgField"
+           name="SVG field"
+           scope="default">
+        <uiClass
+              class="org.eclipse.scout.rt.ui.swing.form.fields.svgfield.SwingScoutSvgField">
+        </uiClass>
+     </formField>
+     <formField
+           active="true"
            modelClass="org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox"
            name="Tree box"
            scope="default">
