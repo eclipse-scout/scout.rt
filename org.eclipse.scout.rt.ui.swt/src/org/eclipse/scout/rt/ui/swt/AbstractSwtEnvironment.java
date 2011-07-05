@@ -784,8 +784,12 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   // font handling
   @Override
   public Font getFont(FontSpec scoutFont, Font templateFont) {
-
     return m_fontRegistry.getFont(scoutFont, templateFont);
+  }
+
+  @Override
+  public Font getFont(Font templateFont, String newName, Integer newStyle, Integer newSize) {
+    return m_fontRegistry.getFont(templateFont, newName, newStyle, newSize);
   }
 
   // form toolkit handling

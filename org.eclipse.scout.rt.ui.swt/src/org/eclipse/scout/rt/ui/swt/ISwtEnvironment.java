@@ -173,7 +173,17 @@ public interface ISwtEnvironment {
    */
   boolean removeKeyStrokeFilter(Widget c, ISwtKeyStrokeFilter filter);
 
+  /**
+   * @return a font based on templateFont with style, name and size from scoutFont (if not null).
+   *         The result is cached for re-use. Dispose is done automatically and must not be done by the caller
+   */
   Font getFont(FontSpec scoutFont, Font templateFont);
+
+  /**
+   * @return a font based on templateFont with different style, name and size (if not null).
+   *         The result is cached for re-use. Dispose is done automatically and must not be done by the caller
+   */
+  Font getFont(Font templateFont, String newName, Integer newStyle, Integer newSize);
 
   // properties
   // int getPropertyInt(String propertyName);
