@@ -26,6 +26,10 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
  * html file or a zip file containing a html file (with same name) and additional resources such as images, styles etc.
  * <p>
  * Uses {@link RemoteFile#writeZipContentToDirectory(java.io.File)} to unpack zipped content for viewing
+ * <p>
+ * You can use local urls that call back to the field itself and can be handled by overriding
+ * {@link AbstractBrowserField#execLocationChanged(String, String, boolean)} A local URL is one of the form
+ * http://local/...
  */
 public interface IBrowserField extends IValueField<RemoteFile> {
 
