@@ -59,7 +59,6 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     final String textNonNull = text;
     final int maxCount = getSmartField().getBrowseMaxRowCount();
     getResultTableField().setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("searchingProposals"), ProcessingStatus.WARNING));
-    getResultTableField().setTablePopulateStatus(null);
     //async load of data
     if (m_dataLoadJob != null) {
       m_dataLoadJob.cancel();
