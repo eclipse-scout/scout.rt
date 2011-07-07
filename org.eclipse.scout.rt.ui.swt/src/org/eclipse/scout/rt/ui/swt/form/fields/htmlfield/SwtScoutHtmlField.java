@@ -95,7 +95,6 @@ public class SwtScoutHtmlField extends SwtScoutValueFieldComposite<IHtmlField> i
             handleSwtLinkAction(url);
           }
         }
-
       }
     });
     //
@@ -124,12 +123,7 @@ public class SwtScoutHtmlField extends SwtScoutValueFieldComposite<IHtmlField> i
     Runnable job = new Runnable() {
       @Override
       public void run() {
-        // try {
-
         getScoutObject().getUIFacade().fireHyperlinkActionFromUI(location);
-        // } catch (MalformedURLException e) {
-        // LOG.warn("could not create an URL out of '"+location.toExternalForm()+"'.",e);
-        // }
       }
     };
     getEnvironment().invokeScoutLater(job, 0);
@@ -155,8 +149,9 @@ public class SwtScoutHtmlField extends SwtScoutValueFieldComposite<IHtmlField> i
         }
       }
     }
-    if (rawHtml == null) {
-      rawHtml = "";
+    if (rawHtml == null || rawHtml.length() == 0) {
+      getSwtField().setText("");
+      return;
     }
     String cleanHtml = getEnvironment().styleHtmlText(this, rawHtml);
     try {
@@ -208,18 +203,6 @@ public class SwtScoutHtmlField extends SwtScoutValueFieldComposite<IHtmlField> i
       }
     }
 
-  }
-
-  protected void fireHyperlinkActionFromSwt(final URL url) {
-    // notify Scout
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        getScoutObject().getUIFacade().fireHyperlinkActionFromUI(url);
-      }
-    };
-    getEnvironment().invokeScoutLater(t, 0);
-    // end notify
   }
 
   /**
