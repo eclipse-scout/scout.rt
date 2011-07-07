@@ -4,14 +4,15 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.server.runner;
 
-import java.security.Principal;
 import java.util.List;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -31,12 +32,12 @@ import org.osgi.framework.ServiceRegistration;
 public class ScoutServerJobWrapperStatement extends Statement {
 
   private final IServerSession m_serverSession;
-  private final Principal m_principal;
+  private final Subject m_subject;
   private final Statement m_statement;
 
-  public ScoutServerJobWrapperStatement(IServerSession clientSession, Principal principal, Statement statement) {
+  public ScoutServerJobWrapperStatement(IServerSession clientSession, Subject subject, Statement statement) {
     m_serverSession = clientSession;
-    m_principal = principal;
+    m_subject = subject;
     m_statement = statement;
   }
 
@@ -46,7 +47,7 @@ public class ScoutServerJobWrapperStatement extends Statement {
       doEvaluate();
     }
     else {
-      ServerJob job = new ServerJob("JUnit Server Job Runner", m_serverSession) {
+      ServerJob job = new ServerJob("JUnit Server Job Runner", m_serverSession, m_subject) {
         @Override
         protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
           doEvaluate();

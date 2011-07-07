@@ -1,0 +1,12 @@
+29.06.2011 abr
+Bug 350389: improve Scout RT testing support
+o added support for specifying bundle and classes inclusion and exclusion filters, respectively
+  bundleNameIncludeFilter
+  bundleNameExcludeFilter
+  classNameIncludeFilter
+  classNameExcludeFilter
+  All four properties support wildcard expressions (supports * and ?) as well as regular expressions. The latter must start with 'regex:'.
+o added property failOnError: exit code > 0 if true and a failure or error occurred. Exit code is always 0 if false.
+o added property haltOnFailure: test execution stops on first failure or error if set to true. Otherwise all tests are executed.
+Migration:
+Now failOnError and haltOnFailure both default to false. Was true before.
