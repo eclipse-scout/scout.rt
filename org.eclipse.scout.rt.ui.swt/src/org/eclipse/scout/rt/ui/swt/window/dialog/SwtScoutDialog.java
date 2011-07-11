@@ -51,6 +51,8 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
 
   private PropertyChangeListener m_formPropertyListener;
 
+  private ISwtScoutForm m_uiForm;
+
   public SwtScoutDialog(Shell parentShell, ISwtEnvironment environment) {
     this(parentShell, environment, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MAX | SWT.APPLICATION_MODAL);
   }
@@ -70,9 +72,9 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
       m_scoutForm = scoutForm;
       try {
         m_contentPane.setRedraw(false);
-        ISwtScoutForm swtForm = m_environment.createForm(m_contentPane, scoutForm);
+        m_uiForm = m_environment.createForm(m_contentPane, scoutForm);
         GridData d = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-        swtForm.getSwtContainer().setLayoutData(d);
+        m_uiForm.getSwtContainer().setLayoutData(d);
         attachScout(scoutForm);
       }
       finally {
@@ -96,6 +98,11 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   @Override
   public IForm getForm() {
     return m_scoutForm;
+  }
+
+  @Override
+  public ISwtScoutForm getUiForm() {
+    return m_uiForm;
   }
 
   public Form getRootForm() {

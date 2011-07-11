@@ -39,8 +39,8 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
@@ -1919,6 +1919,16 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     fireFormEvent(new FormEvent(this, FormEvent.TYPE_PRINT, root, device, parameters));
   }
 
+  private void fireFormPrinted(File outputFile) {
+    try {
+      fireFormEvent(new FormEvent(this, FormEvent.TYPE_PRINTED, outputFile));
+    }
+    catch (ProcessingException e) {
+      e.addContextMessage(ScoutTexts.get("FormFirePrinted") + " " + getTitle());
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+    }
+  }
+
   /**
    * send request that form was activated by gui
    */
@@ -2440,6 +2450,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
     public void fireFormKilledFromUI() {
       closeFormInternal(true);
+    }
+
+    @Override
+    public void fireFormPrintedFromUI(File outputFile) {
+      fireFormPrinted(outputFile);
     }
   }// end private class
 

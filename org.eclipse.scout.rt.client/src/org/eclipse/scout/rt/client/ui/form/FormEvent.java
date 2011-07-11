@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.EventObject;
@@ -39,6 +40,7 @@ public class FormEvent extends EventObject {
    * print a form using properties formField, printDevice, printParameters
    */
   public static final int TYPE_PRINT = 4000;
+  public static final int TYPE_PRINTED = 4010;
   /**
    * When the field structure changes Examples: a field changes its "visible"
    * property a {@link IWrappedFormField} changes its inner form a {@link IPageField} changes its table/search/detail a
@@ -53,6 +55,7 @@ public class FormEvent extends EventObject {
   private IFormField m_formField;
   private PrintDevice m_printDevice;
   private Map<String, Object> m_printParameters;
+  private File m_printedFile;
 
   /**
    * A form event is sent whenever a form changes. You can register
@@ -64,6 +67,11 @@ public class FormEvent extends EventObject {
   public FormEvent(IForm form, int type) {
     super(form);
     m_type = type;
+  }
+
+  public FormEvent(IForm form, int type, File printedFile) {
+    this(form, type);
+    m_printedFile = printedFile;
   }
 
   public FormEvent(IForm form, int type, IFormField causingField) {
@@ -94,6 +102,10 @@ public class FormEvent extends EventObject {
 
   public PrintDevice getPrintDevice() {
     return m_printDevice;
+  }
+
+  public File getPrintedFile() {
+    return m_printedFile;
   }
 
   public Map<String, Object> getPrintParameters() {

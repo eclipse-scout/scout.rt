@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.action.print;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,6 +27,8 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
@@ -51,6 +54,8 @@ public class PrintFormsAction extends AbstractAction {
   private Class<?>[] m_formTypes;
   private String m_contentType;
   private File m_destinationFolder;
+  // output files
+  private final List<File> m_printedFiles;
   // printing index
   private int m_formImageIndex;
   // printing statistics
@@ -61,6 +66,7 @@ public class PrintFormsAction extends AbstractAction {
   public PrintFormsAction() {
     super();
     m_contentType = "image/jpg";
+    m_printedFiles = new ArrayList<File>();
   }
 
   public Class<?>[] getFormTypes() {
@@ -107,11 +113,16 @@ public class PrintFormsAction extends AbstractAction {
     m_destinationFolder = folder;
   }
 
+  public File[] getPrintedFiles() {
+    return m_printedFiles.toArray(new File[m_printedFiles.size()]);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   protected void execAction() throws ProcessingException {
     if (getFormTypes() == null) throw new VetoException("formTypes array is null");
     if (getDestinationFolder() == null) throw new VetoException("destinationFolder is null");
+    m_printedFiles.clear();
     m_formCount = 0;
     m_imageCount = 0;
     m_errorCount = 0;
@@ -148,48 +159,76 @@ public class PrintFormsAction extends AbstractAction {
     Method m = AbstractForm.class.getDeclaredMethod("startInternal", IFormHandler.class);
     m.setAccessible(true);
     m.invoke(f, handler);
+    final P_FormListener listener = new P_FormListener();
+    f.addFormListener(listener);
+
     new ClientSyncJob("print " + f.getClass().getSimpleName(), ClientSyncJob.getCurrentSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        try {
-          printForm(f, null);
-          for (IFormField field : f.getAllFields()) {
-            processFormField(f, field);
+        printForm(f, null);
+        // set all tabboxes visible
+        for (IFormField field : f.getAllFields()) {
+          if (field instanceof ITabBox && !field.isVisible()) {
+            field.setVisible(true);
           }
         }
-        catch (Throwable t) {
-          LOG.error(f.getClass().getName(), t);
-        }
-        finally {
-          try {
-            f.doClose();
+        // collect all tabbox tabs and print them
+        for (IFormField field : f.getAllFields()) {
+          if (field instanceof ITabBox && field.isVisible()) {
+            final ITabBox tabBox = (ITabBox) field;
+            IGroupBox selectedTab = null;
+            if (tabBox.isVisible()) {
+              selectedTab = tabBox.getSelectedTab();
+            }
+            if (tabBox.isVisible()) {
+              for (final IGroupBox g : tabBox.getGroupBoxes()) {
+                if (g != selectedTab) {
+                  listener.addRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                      tabBox.setSelectedTab(g);
+                      printFormField(f, tabBox, "_" + g.getClass().getSimpleName());
+                    }
+                  });
+                }
+              }
+            }
           }
-          catch (Throwable t) {
-          }
         }
+        // add form close runnable
+        listener.addRunnable(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              f.doClose();
+            }
+            catch (ProcessingException e) {
+              LOG.error("could not close form '" + f.getClass().getSimpleName() + "'", e);
+            }
+          }
+        });
+
       }
     }.schedule();
     f.waitFor();
   }
 
-  protected void processFormField(IForm form, IFormField f) throws Throwable {
-    if (f instanceof ITabBox) {
-      ITabBox tabBox = (ITabBox) f;
-      IGroupBox selectedTab = null;
-      if (tabBox.isVisible()) {
-        selectedTab = tabBox.getSelectedTab();
-      }
-      else {
-        tabBox.setVisible(true);
-      }
-      if (tabBox.isVisible()) {
-        for (IGroupBox g : tabBox.getGroupBoxes()) {
-          if (g != selectedTab) {
-            tabBox.setSelectedTab(g);
-            printFormField(form, tabBox, "_" + g.getClass().getSimpleName());
-          }
+  private class P_FormListener implements FormListener {
+    List<Runnable> m_runnables = Collections.synchronizedList(new ArrayList<Runnable>());
+
+    @Override
+    public void formChanged(FormEvent e) throws ProcessingException {
+      if (e.getType() == FormEvent.TYPE_PRINTED) {
+        m_printedFiles.add(e.getPrintedFile());
+        if (!m_runnables.isEmpty()) {
+          Runnable r = m_runnables.remove(0);
+          r.run();
         }
       }
+    }
+
+    public void addRunnable(Runnable r) {
+      m_runnables.add(r);
     }
   }
 

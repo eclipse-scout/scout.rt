@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -38,9 +38,14 @@ public class WidgetPrinter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(WidgetPrinter.class);
 
   private Component m_widget;
+  private File m_printedFile;
 
   public WidgetPrinter(Component comp) {
     m_widget = comp;
+  }
+
+  public File getOutputFile() {
+    return m_printedFile;
   }
 
   public void print(PrintDevice device, Map<String, Object> parameters) throws Throwable {
@@ -69,8 +74,8 @@ public class WidgetPrinter {
   }
 
   private void printToFile(Map<String, Object> parameters) throws Throwable {
-    File file = (File) parameters.remove("file");
-    if (file == null) throw new IllegalArgumentException("parameter \"file\" must not be null");
+    m_printedFile = (File) parameters.remove("file");
+    if (m_printedFile == null) throw new IllegalArgumentException("parameter \"file\" must not be null");
     String contentType = (String) parameters.remove("contentType");
     if (contentType == null) contentType = "image/jpg";
     if (!contentType.startsWith("image/")) throw new IllegalArgumentException("only supporting contentTypes image/*");
@@ -78,10 +83,10 @@ public class WidgetPrinter {
       LOG.warn("Unknown parameter: " + n + "=" + parameters.get(n));
     }
     //
-    file.getParentFile().mkdirs();
+    m_printedFile.getParentFile().mkdirs();
     BufferedImage img = createBufferedImage();
     String imageFormat = contentType.substring(contentType.indexOf("/") + 1);
-    boolean ok = ImageIO.write(img, imageFormat, file);
+    boolean ok = ImageIO.write(img, imageFormat, m_printedFile);
     if (!ok) throw new IOException("no appropriate writer was found for imageFormat \"" + imageFormat + "\"");
   }
 

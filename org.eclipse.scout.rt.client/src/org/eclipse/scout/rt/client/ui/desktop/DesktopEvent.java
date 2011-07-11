@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -48,6 +49,10 @@ public class DesktopEvent extends EventObject {
    * print a form using properties printDevice, printParameters
    */
   public static final int TYPE_PRINT = 900;
+  /**
+   *
+   */
+  public static final int TYPE_PRINTED = 901;
   public static final int TYPE_FILE_CHOOSER_ADDED = 910;
   /**
    * Send a broadcast event to find the {@link IFormField} that owns the focus
@@ -70,10 +75,16 @@ public class DesktopEvent extends EventObject {
   private PrintDevice m_printDevice;
   private Map<String, Object> m_printParameters;
   private List<IMenu> m_popupMenus;
+  private File m_printedFile;
 
   public DesktopEvent(IDesktop source, int type) {
     super(source);
     m_type = type;
+  }
+
+  public DesktopEvent(IDesktop source, int type, File printedFile) {
+    this(source, type);
+    m_printedFile = printedFile;
   }
 
   public DesktopEvent(IDesktop source, int type, IForm form) {
@@ -149,6 +160,10 @@ public class DesktopEvent extends EventObject {
 
   public PrintDevice getPrintDevice() {
     return m_printDevice;
+  }
+
+  public File getPrintedFile() {
+    return m_printedFile;
   }
 
   /**

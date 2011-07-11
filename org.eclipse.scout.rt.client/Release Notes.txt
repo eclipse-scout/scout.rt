@@ -481,3 +481,10 @@ e.g. updateTableColumnOrder, are flushed immediately.
 Solution:
 Changed ClientUiPreferences#setNlsLocale(NlsLocale) to flush value to disk
 Migration: None
+
+11.07.2011 aho
+Ticket: 102'194 is about taking screen shots of forms. The problem is since the form is opened async the print event does not get to the form.
+Solution:
+Back event to notify the model once a screen shot is done. Furthermore a PrintApplicationAction is created to take screen shots of the whole application.
+Migration:
+none

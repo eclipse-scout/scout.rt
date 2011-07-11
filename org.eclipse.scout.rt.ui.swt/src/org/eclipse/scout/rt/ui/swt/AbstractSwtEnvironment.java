@@ -14,12 +14,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -51,6 +53,8 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -177,6 +181,10 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   private P_PerspectiveListener m_perspectiveListener;
 
+  // collect print events during forms getting opend async.
+  private Map<IForm, List<FormEvent>> m_pendingEvents;
+  private P_InitializeFormListener m_initializeFormListener;
+
   public AbstractSwtEnvironment(Bundle applicationBundle, String perspectiveId, Class<? extends IClientSession> clientSessionClass) {
     m_applicationBundle = applicationBundle;
     m_perspectiveId = perspectiveId;
@@ -189,6 +197,9 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     m_status = SwtEnvironmentEvent.INACTIVE;
     m_desktopKeyStrokes = new ArrayList<ISwtKeyStroke>();
     m_startDesktopCalled = false;
+    // collect pending print events
+    m_initializeFormListener = new P_InitializeFormListener();
+    m_pendingEvents = Collections.synchronizedMap(new WeakHashMap<IForm, List<FormEvent>>());
   }
 
   public Bundle getApplicationBundle() {
@@ -931,6 +942,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         try {
           m_openForms.put(form, dialog);
           dialog.showForm(form);
+          part = dialog;
         }
         catch (ProcessingException e) {
           LOG.error(e.getMessage(), e);
@@ -946,14 +958,15 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         else {
           parentShell = getParentShellIgnoringPopups(0);
         }
-        SwtScoutDialog dialog = createSwtScoutPopupDialog(parentShell, dialogStyle);
-        if (dialog == null) {
+        SwtScoutDialog popupDialog = createSwtScoutPopupDialog(parentShell, dialogStyle);
+        if (popupDialog == null) {
           LOG.error("showing popup for " + form + ", but there is neither a focus owner nor the property 'ISwtEnvironment.getPopupOwner()'");
           return;
         }
         try {
-          m_openForms.put(form, dialog);
-          dialog.showForm(form);
+          m_openForms.put(form, popupDialog);
+          popupDialog.showForm(form);
+          part = popupDialog;
         }
         catch (Throwable t) {
           LOG.error(t.getMessage(), t);
@@ -1003,15 +1016,16 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         if (scoutViewId.startsWith(IForm.EDITOR_ID) || scoutViewId.startsWith(IWizard.EDITOR_ID)) {
           if (activePage != null) {
             ScoutFormEditorInput editorInput = new ScoutFormEditorInput(form, this);
-            AbstractScoutEditorPart editor = getEditorPart(editorInput, uiViewId);
-            m_openForms.put(form, editor);
+            part = getEditorPart(editorInput, uiViewId);
+            m_openForms.put(form, part);
           }
         }
         else {
-          AbstractScoutView view = getViewPart(uiViewId);
+          AbstractScoutView viewPart = getViewPart(uiViewId);
           try {
-            view.showForm(form);
-            m_openForms.put(form, view);
+            viewPart.showForm(form);
+            part = viewPart;
+            m_openForms.put(form, viewPart);
           }
           catch (ProcessingException e) {
             LOG.error(e.getMessage(), e);
@@ -1020,19 +1034,20 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         break;
       }
       case IForm.DISPLAY_HINT_POPUP_WINDOW: {
-        SwtScoutPopup popup = createSwtScoutPopupWindow();
-        if (popup == null) {
+        SwtScoutPopup popupWindow = createSwtScoutPopupWindow();
+        if (popupWindow == null) {
           LOG.error("showing popup for " + form + ", but there is neither a focus owner nor the property 'ISwtEnvironment.getPopupOwner()'");
           return;
         }
         try {
-          m_openForms.put(form, popup);
-          popup.showForm(form);
+          m_openForms.put(form, popupWindow);
+          popupWindow.showForm(form);
+          part = popupWindow;
         }
         catch (Throwable e1) {
           LOG.error("Failed opening popup for " + form, e1);
           try {
-            popup.showForm(form);
+            popupWindow.showForm(form);
           }
           catch (Throwable t) {
             LOG.error(t.getMessage(), t);
@@ -1240,6 +1255,10 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     public void desktopChanged(final DesktopEvent e) {
       switch (e.getType()) {
         case DesktopEvent.TYPE_FORM_ADDED: {
+          // add listener for print requests during the form is opened async.
+          if (e.getForm() != null) {
+            e.getForm().addFormListener(m_initializeFormListener);
+          }
           Runnable t = new Runnable() {
             @Override
             public void run() {
@@ -1250,6 +1269,10 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           break;
         }
         case DesktopEvent.TYPE_FORM_REMOVED: {
+          // ensure the print request collector is removed when a form closes.
+          if (e.getForm() != null) {
+            e.getForm().removeFormListener(m_initializeFormListener);
+          }
           Runnable t = new Runnable() {
             @Override
             public void run() {
@@ -1628,12 +1651,22 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   protected void handleScoutPrintInSwt(DesktopEvent e) {
-    WidgetPrinter wp = new WidgetPrinter(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS));
+
+    final WidgetPrinter wp = new WidgetPrinter(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());//getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS));
     try {
       wp.print(e.getPrintDevice(), e.getPrintParameters());
     }
     catch (Throwable ex) {
       LOG.error(null, ex);
+    }
+    finally {
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          getScoutDesktop().getUIFacade().fireDesktopPrintedFromUI(wp.getOutputFile());
+        }
+      };
+      invokeScoutLater(r, 0);
     }
   }
 
@@ -1722,4 +1755,28 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   public String getPerspectiveId() {
     return m_perspectiveId;
   }
+
+  @Override
+  public FormEvent[] fetchPendingPrintEvents(IForm form) {
+    List<FormEvent> list = m_pendingEvents.remove(form);
+    form.removeFormListener(m_initializeFormListener);
+    if (list != null) {
+      return list.toArray(new FormEvent[list.size()]);
+    }
+    return new FormEvent[0];
+  }
+
+  private class P_InitializeFormListener implements FormListener {
+    @Override
+    public void formChanged(FormEvent e) throws ProcessingException {
+      if (e.getType() == FormEvent.TYPE_PRINT) {
+        List<FormEvent> events = m_pendingEvents.get(e.getForm());
+        if (events == null) {
+          events = new ArrayList<FormEvent>(3);
+          m_pendingEvents.put(e.getForm(), events);
+        }
+        events.add(e);
+      }
+    }
+  } // end class P_InitializeFormListener
 }

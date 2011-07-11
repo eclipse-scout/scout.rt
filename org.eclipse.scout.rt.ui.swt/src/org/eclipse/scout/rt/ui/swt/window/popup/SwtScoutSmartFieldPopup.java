@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.IValidateRoot;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
-import org.eclipse.scout.rt.ui.swt.form.SwtScoutForm;
+import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
@@ -65,6 +65,7 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
   private IForm m_scoutForm;
   private boolean m_positionBelowReferenceField;
   private boolean m_opened;
+  private ISwtScoutForm m_uiForm;
 
   public SwtScoutSmartFieldPopup(ISwtEnvironment env, Composite ownerComponent, Composite focusComponent) {
     m_env = env;
@@ -97,8 +98,7 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
     m_opened = true;
     if (m_scoutForm == null) {
       m_scoutForm = scoutForm;
-      SwtScoutForm swtForm = new SwtScoutForm();
-      swtForm.createField(getSwtContentPane(), scoutForm, m_env);
+      m_uiForm = m_env.createForm(getSwtContentPane(), scoutForm);
       autoAdjustBounds();
       if (m_opened) {
         m_swtWindow.setVisible(true);
@@ -126,6 +126,11 @@ public class SwtScoutSmartFieldPopup implements ISwtScoutPart {
   @Override
   public IForm getForm() {
     return m_scoutForm;
+  }
+
+  @Override
+  public ISwtScoutForm getUiForm() {
+    return m_uiForm;
   }
 
   private void reqRemoveScrollbarListener(Listener l, Composite comp) {

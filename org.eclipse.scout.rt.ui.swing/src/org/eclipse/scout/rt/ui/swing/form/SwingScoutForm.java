@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,15 +14,18 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.Window;
+import java.io.File;
 
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -157,6 +160,17 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
       m_scoutFormListener = new P_ScoutFormListener();
       getScoutForm().addFormListener(m_scoutFormListener);
     }
+    // process all pending print events
+    ClientSyncJob job = new ClientSyncJob("", getSwingEnvironment().getScoutSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        FormEvent[] pendingEvents = getSwingEnvironment().fetchPendingPrintEvents(getScoutObject());
+        for (FormEvent o : pendingEvents) {
+          handleScoutPrintEvent(o);
+        }
+      }
+    };
+    job.schedule();
   }
 
   @Override
@@ -285,6 +299,56 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     }
   }
 
+  protected void handleScoutPrintEvent(final FormEvent e) {
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        WidgetPrinter wp = null;
+        try {
+          if (m_viewComposite != null) {
+            if (e.getFormField() != null) {
+              for (JComponent c : SwingUtility.findChildComponents(m_viewComposite.getSwingContentPane(), JComponent.class)) {
+                IPropertyObserver scoutModel = SwingScoutComposite.getScoutModelOnWidget(c);
+                if (scoutModel == e.getFormField()) {
+                  wp = new WidgetPrinter(c);
+                  break;
+                }
+              }
+            }
+            if (wp == null) {
+              wp = new WidgetPrinter(SwingUtilities.getWindowAncestor(m_viewComposite.getSwingContentPane()));
+            }
+          }
+          if (wp != null) {
+            try {
+              wp.print(e.getPrintDevice(), e.getPrintParameters());
+            }
+            catch (Throwable ex) {
+              LOG.error(null, ex);
+            }
+          }
+
+        }
+        finally {
+          File outputFile = null;
+          if (wp != null) {
+            outputFile = wp.getOutputFile();
+          }
+          final File outputFileFinal = outputFile;
+          Runnable r = new Runnable() {
+            @Override
+            public void run() {
+              getScoutObject().getUIFacade().fireFormPrintedFromUI(outputFileFinal);
+            }
+          };
+          getSwingEnvironment().invokeScoutLater(r, 0);
+        }
+      }
+
+    };
+    getSwingEnvironment().invokeSwingLater(t);
+  }
+
   private class P_ScoutFormListener implements FormListener {
     private Object m_structureChangeRunnableLock = new Object();
     private Runnable m_structureChangeRunnable;
@@ -293,35 +357,8 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     public void formChanged(final FormEvent e) {
       switch (e.getType()) {
         case FormEvent.TYPE_PRINT: {
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              WidgetPrinter wp = null;
-              if (m_viewComposite != null) {
-                if (e.getFormField() != null) {
-                  for (JComponent c : SwingUtility.findChildComponents(m_viewComposite.getSwingContentPane(), JComponent.class)) {
-                    IPropertyObserver scoutModel = SwingScoutComposite.getScoutModelOnWidget(c);
-                    if (scoutModel == e.getFormField()) {
-                      wp = new WidgetPrinter(c);
-                      break;
-                    }
-                  }
-                }
-                if (wp == null) {
-                  wp = new WidgetPrinter(SwingUtilities.getWindowAncestor(m_viewComposite.getSwingContentPane()));
-                }
-              }
-              if (wp != null) {
-                try {
-                  wp.print(e.getPrintDevice(), e.getPrintParameters());
-                }
-                catch (Throwable ex) {
-                  LOG.error(null, ex);
-                }
-              }
-            }
-          };
-          getSwingEnvironment().invokeSwingLater(t);
+
+          handleScoutPrintEvent(e);
           break;
         }
         case FormEvent.TYPE_STRUCTURE_CHANGED: {
