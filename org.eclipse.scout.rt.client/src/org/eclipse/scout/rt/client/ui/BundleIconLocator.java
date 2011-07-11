@@ -26,6 +26,7 @@ public class BundleIconLocator implements IIconLocator {
     m_iconLocatorService = new P_BundleIconProviderService(bundle);
   }
 
+  @Override
   public IconSpec getIconSpec(String name) {
     if (name == null || AbstractIcons.Null.equals(name)) {
       return null;

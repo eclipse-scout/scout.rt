@@ -207,7 +207,6 @@ public final class ServiceUtility {
   public static Object[] extractHolderArguments(Object[] callerArgs) {
     Object[] holderArgs = new Object[callerArgs.length];
     new AbstractHolderArgumentVisitor() {
-      @SuppressWarnings("unchecked")
       @Override
       public void visitHolder(IHolder input, IHolder output) {
       }

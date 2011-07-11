@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.services.common.jdbc.style;
 
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,40 +18,45 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.AbstractSqlStyle;
 
 /**
  * Note: This class is mostly untested.
- *
  */
-public class DerbySqlStyle extends AbstractSqlStyle{
-  private static final long serialVersionUID=1L;
-
+public class DerbySqlStyle extends AbstractSqlStyle {
+  private static final long serialVersionUID = 1L;
 
   @Override
-  protected int getMaxListSize(){
+  protected int getMaxListSize() {
     return 1000;
   }
 
-  public boolean isLargeString(String s){
+  @Override
+  public boolean isLargeString(String s) {
     return (s.length() > 4000);
   }
 
-  public boolean isBlobEnabled(){
+  @Override
+  public boolean isBlobEnabled() {
     return true;
   }
 
-  public boolean isClobEnabled(){
+  @Override
+  public boolean isClobEnabled() {
     return true;
   }
 
-  public void testConnection(Connection conn) throws SQLException{
-    Statement testStatement=null;
-    try{
-      testStatement=conn.createStatement();
+  @Override
+  public void testConnection(Connection conn) throws SQLException {
+    Statement testStatement = null;
+    try {
+      testStatement = conn.createStatement();
       testStatement.execute("SELECT 1 FROM SYSIBM.SYSDUMMY1"); //same as VALUES(1)
     }
-    finally{
-      if(testStatement != null) try{
-        testStatement.close();
-      }
-      catch(Throwable t){
+    finally {
+      if (testStatement != null) {
+        try {
+          testStatement.close();
+        }
+        catch (Throwable t) {
+          //NOP
+        }
       }
     }
   }
@@ -60,152 +64,151 @@ public class DerbySqlStyle extends AbstractSqlStyle{
   //note: fn timestampadd:
   //You should not put a datetime column inside of a timestamp arithmetic function in WHERE clauses because the optimizer will not use any index on the column.
   @Override
-  public String createDateIsToday(String attribute){
-    return "CAST("+attribute+" AS DATE) >= CURRENT_DATE AND CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE)";
+  public String createDateIsToday(String attribute) {
+    return "CAST(" + attribute + " AS DATE) >= CURRENT_DATE AND CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
-  public String createDateIsInLastDays(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_DAY, :"+bindName+", CURRENT_TIMESTAMP)} AS DATE) AND CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE)";
+  public String createDateIsInLastDays(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_DAY, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
-  public String createDateIsInNextDays(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) >= CURRENT_DATE AND CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, :"+bindName+" + 1, CURRENT_TIMESTAMP)} AS DATE)";
+  public String createDateIsInNextDays(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) >= CURRENT_DATE AND CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, :" + bindName + " + 1, CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
-  public String createDateIsInDays(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_DAY, :"+bindName+", CURRENT_TIMESTAMP)} AS DATE) AND CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, :"+bindName+" + 1, CURRENT_TIMESTAMP)} AS DATE)";
+  public String createDateIsInDays(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_DAY, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, :" + bindName + " + 1, CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
-  public String createDateIsInWeeks(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_WEEK, :"+bindName+", CURRENT_TIMESTAMP)} AS DATE) AND CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_WEEK, :"+bindName+", CURRENT_TIMESTAMP)})} AS DATE)";
+  public String createDateIsInWeeks(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_WEEK, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_WEEK, :" + bindName + ", CURRENT_TIMESTAMP)})} AS DATE)";
   }
 
   @Override
-  public String createDateIsInLastMonths(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_MONTH,(-1)*:"+bindName+", CURRENT_TIMESTAMP)} AS DATE) AND CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE)";
+  public String createDateIsInLastMonths(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_MONTH,(-1)*:" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
-  public String createDateIsInNextMonths(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) >= CURRENT_DATE AND CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_MONTH, :"+bindName+", CURRENT_TIMESTAMP)})} AS DATE)";
+  public String createDateIsInNextMonths(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) >= CURRENT_DATE AND CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_MONTH, :" + bindName + ", CURRENT_TIMESTAMP)})} AS DATE)";
   }
 
   @Override
-  public String createDateIsInMonths(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_MONTH,:"+bindName+", CURRENT_TIMESTAMP)} AS DATE) AND CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_MONTH, :"+bindName+", CURRENT_TIMESTAMP)})} AS DATE)";
+  public String createDateIsInMonths(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_MONTH,:" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_MONTH, :" + bindName + ", CURRENT_TIMESTAMP)})} AS DATE)";
   }
 
   @Override
-  public String createDateIsInLEDays(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY,:"+bindName+" + 1, CURRENT_TIMESTAMP)} AS DATE)";
+  public String createDateIsInLEDays(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY,:" + bindName + " + 1, CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
-  public String createDateIsInLEWeeks(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_WEEK, :"+bindName+", CURRENT_TIMESTAMP)})} AS DATE)";
+  public String createDateIsInLEWeeks(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_WEEK, :" + bindName + ", CURRENT_TIMESTAMP)})} AS DATE)";
   }
 
   @Override
-  public String createDateIsInLEMonths(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_MONTH, :"+bindName+", CURRENT_TIMESTAMP)})} AS DATE)";
+  public String createDateIsInLEMonths(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) < CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_MONTH, :" + bindName + ", CURRENT_TIMESTAMP)})} AS DATE)";
   }
 
   @Override
-  public String createDateIsInGEDays(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_DAY,:"+bindName+", CURRENT_TIMESTAMP)} AS DATE)";
+  public String createDateIsInGEDays(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_DAY,:" + bindName + ", CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
-  public String createDateIsInGEWeeks(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_WEEK, :"+bindName+", CURRENT_TIMESTAMP)} AS DATE)";
+  public String createDateIsInGEWeeks(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_WEEK, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
-  public String createDateIsInGEMonths(String attribute, String bindName){
-    return "CAST("+attribute+" AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_MONTH, :"+bindName+", CURRENT_TIMESTAMP)} AS DATE)";
+  public String createDateIsInGEMonths(String attribute, String bindName) {
+    return "CAST(" + attribute + " AS DATE) >= CAST({FN TIMESTAMPADD(SQL_TSI_MONTH, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
-  public String createDateIsNotToday(String attribute){
-    return "(CAST("+attribute+" AS DATE) < CURRENT_DATE OR " + attribute + ">= CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE))";
+  public String createDateIsNotToday(String attribute) {
+    return "(CAST(" + attribute + " AS DATE) < CURRENT_DATE OR " + attribute + ">= CAST({FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE))";
   }
 
   //attribute has to be of type timestamp. a cast from date/time to timestamp is not supported by derby, but planned to be implemented(?). (These casts are valid according to SQL standard (1999))
   @Override
-  public String createDateTimeIsNow(String attribute){
-    return attribute + " >= {FN TIMESTAMPADD(SQL_TSI_MINUTE, -1, CURRENT_TIMESTAMP)} AND "+attribute+" < {FN TIMESTAMPADD(SQL_TSI_MINUTE, 1, CURRENT_TIMESTAMP)}";
+  public String createDateTimeIsNow(String attribute) {
+    return attribute + " >= {FN TIMESTAMPADD(SQL_TSI_MINUTE, -1, CURRENT_TIMESTAMP)} AND " + attribute + " < {FN TIMESTAMPADD(SQL_TSI_MINUTE, 1, CURRENT_TIMESTAMP)}";
   }
 
   @Override
-  public String createDateTimeIsInLEMinutes(String attribute, String bindName){
-    return attribute + " < {FN TIMESTAMPADD(SQL_TSI_MINUTE, :"+bindName+"+1, CURRENT_TIMESTAMP)}";
+  public String createDateTimeIsInLEMinutes(String attribute, String bindName) {
+    return attribute + " < {FN TIMESTAMPADD(SQL_TSI_MINUTE, :" + bindName + "+1, CURRENT_TIMESTAMP)}";
   }
 
   @Override
-  public String createDateTimeIsInLEHours(String attribute, String bindName){
-    return attribute + " < {FN TIMESTAMPADD(SQL_TSI_HOUR, :"+bindName+"+1, CURRENT_TIMESTAMP)}";
+  public String createDateTimeIsInLEHours(String attribute, String bindName) {
+    return attribute + " < {FN TIMESTAMPADD(SQL_TSI_HOUR, :" + bindName + "+1, CURRENT_TIMESTAMP)}";
   }
 
   @Override
-  public String createDateTimeIsInGEMinutes(String attribute, String bindName){
-    return attribute + " >= {FN TIMESTAMPADD(SQL_TSI_MINUTE, :"+bindName+", CURRENT_TIMESTAMP)}";
+  public String createDateTimeIsInGEMinutes(String attribute, String bindName) {
+    return attribute + " >= {FN TIMESTAMPADD(SQL_TSI_MINUTE, :" + bindName + ", CURRENT_TIMESTAMP)}";
   }
 
   @Override
-  public String createDateTimeIsInGEHours(String attribute, String bindName){
-    return attribute + " >= {FN TIMESTAMPADD(SQL_TSI_HOUR, :"+bindName+", CURRENT_TIMESTAMP)}";
+  public String createDateTimeIsInGEHours(String attribute, String bindName) {
+    return attribute + " >= {FN TIMESTAMPADD(SQL_TSI_HOUR, :" + bindName + ", CURRENT_TIMESTAMP)}";
   }
 
   @Override
-  public String createDateTimeIsNotNow(String attribute){
+  public String createDateTimeIsNotNow(String attribute) {
     return "(" + attribute + " < CURRENT_TIMESTAMP OR " + attribute + " >= {FN TIMESTAMPADD(SQL_TSI_MINUTE, 1, CURRENT_TIMESTAMP)})";
   }
 
   //the time methods below are for derby only
   @Override
-  public String createTimeIsNow(String attribute){
-    return attribute+">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP))/24.0/60 AND "+attribute+"<(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(1/24.0/60))/24.0/60";
+  public String createTimeIsNow(String attribute) {
+    return attribute + ">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP))/24.0/60 AND " + attribute + "<(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(1/24.0/60))/24.0/60";
   }
 
   @Override
-  public String createTimeIsNotNow(String attribute){
-    return attribute+"<(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP))/24.0/60 OR "+attribute+">((HOUR(CURRENT_TIMESTAMP)*60)+MINUTE(CURRENT_TIMESTAMP)+(1/24.0/60))/24.0/60";
+  public String createTimeIsNotNow(String attribute) {
+    return attribute + "<(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP))/24.0/60 OR " + attribute + ">((HOUR(CURRENT_TIMESTAMP)*60)+MINUTE(CURRENT_TIMESTAMP)+(1/24.0/60))/24.0/60";
   }
 
   @Override
-  public String createTimeIsInMinutes(String attribute,String bindName){
-    return attribute+">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:"+bindName+"/24.0/60))/24/60 AND "+attribute+"<((HOUR(CURRENT_TIMESTAMP)*60)+MINUTE(CURRENT_TIMESTAMP)+((:"+bindName+"+1)/24.0/60))/24.0/60";
+  public String createTimeIsInMinutes(String attribute, String bindName) {
+    return attribute + ">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:" + bindName + "/24.0/60))/24/60 AND " + attribute + "<((HOUR(CURRENT_TIMESTAMP)*60)+MINUTE(CURRENT_TIMESTAMP)+((:" + bindName + "+1)/24.0/60))/24.0/60";
   }
 
   @Override
-  public String createTimeIsInHours(String attribute,String bindName){
-    return attribute+">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:"+bindName+"/24.0))/24/60 AND "+attribute+"<((HOUR(CURRENT_TIMESTAMP)*60)+MINUTE(CURRENT_TIMESTAMP)+(:"+bindName+"/24.0)+(1/24.0/60))/24.0/60";
+  public String createTimeIsInHours(String attribute, String bindName) {
+    return attribute + ">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:" + bindName + "/24.0))/24/60 AND " + attribute + "<((HOUR(CURRENT_TIMESTAMP)*60)+MINUTE(CURRENT_TIMESTAMP)+(:" + bindName + "/24.0)+(1/24.0/60))/24.0/60";
   }
 
   @Override
-  public String createTimeIsInLEMinutes(String attribute,String bindName){
-    return attribute+"<(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+((:"+bindName+"+1)/24.0/60))/24/60";
+  public String createTimeIsInLEMinutes(String attribute, String bindName) {
+    return attribute + "<(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+((:" + bindName + "+1)/24.0/60))/24/60";
   }
 
   @Override
-  public String createTimeIsInLEHours(String attribute,String bindName){
-    return attribute+"<(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:"+bindName+"/24.0)+(1/24.0/60))/24/60";
+  public String createTimeIsInLEHours(String attribute, String bindName) {
+    return attribute + "<(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:" + bindName + "/24.0)+(1/24.0/60))/24/60";
   }
 
   @Override
-  public String createTimeIsInGEMinutes(String attribute,String bindName){
-    return attribute+">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:"+bindName+"/24.0/60))/24.0/60";
+  public String createTimeIsInGEMinutes(String attribute, String bindName) {
+    return attribute + ">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:" + bindName + "/24.0/60))/24.0/60";
   }
 
   @Override
-  public String createTimeIsInGEHours(String attribute,String bindName){
-    return attribute+">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:"+bindName+"/24.0))/24.0/60";
+  public String createTimeIsInGEHours(String attribute, String bindName) {
+    return attribute + ">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:" + bindName + "/24.0))/24.0/60";
   }
-
 
   /*
    * Time is currently modeled as a double value. The methods below can be used, if time is modeled as SQL Standard (1999) TIME datatype.

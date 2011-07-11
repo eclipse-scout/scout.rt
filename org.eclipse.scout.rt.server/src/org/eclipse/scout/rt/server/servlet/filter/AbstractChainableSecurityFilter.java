@@ -77,6 +77,7 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
     return this.getClass().getSimpleName();
   }
 
+  @Override
   public void init(FilterConfig config0) throws ServletException {
     m_injection = new FilterConfigInjection(config0, getClass());
     FilterConfigInjection.FilterConfig config = m_injection.getAnyConfig();
@@ -87,10 +88,12 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
     m_realm = realmParam;
   }
 
+  @Override
   public void destroy() {
     m_injection = null;
   }
 
+  @Override
   public final void doFilter(ServletRequest in, ServletResponse out, final FilterChain chain) throws IOException, ServletException {
     //ticket 94794
     FilterConfigInjection.FilterConfig config = m_injection.getConfig(in);
@@ -142,6 +145,7 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
     else {
       try {
         Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
+          @Override
           public Object run() throws Exception {
             HttpServletRequest secureReq = req;
             if (!(secureReq instanceof SecureHttpServletRequestWrapper)) {

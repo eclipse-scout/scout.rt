@@ -30,6 +30,7 @@ public abstract class AbstractOperation extends AbstractNode implements INode {
     return m_rightCmd;
   }
 
+  @Override
   public void format(IFormatVisitor v) {
     m_leftCmd.format(v);
     v.print(" ");
@@ -38,6 +39,7 @@ public abstract class AbstractOperation extends AbstractNode implements INode {
     m_rightCmd.format(v);
   }
 
+  @Override
   public Object eval(IEvalVisitor v) {
     return evalImpl(v, m_leftCmd.eval(v), m_rightCmd.eval(v));
   }

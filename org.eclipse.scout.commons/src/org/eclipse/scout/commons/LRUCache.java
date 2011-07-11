@@ -31,8 +31,8 @@ public class LRUCache<K, V> {
   private int m_overflowSize;
   private long m_timeout = -1;
   private HashMap<K, CacheEntry> m_accessMap;
-  private Object m_accessMapLock = new Object();
-  private EventListenerList m_listenerList = new EventListenerList();
+  private final Object m_accessMapLock = new Object();
+  private final EventListenerList m_listenerList = new EventListenerList();
 
   public LRUCache(int targetSize, long timeout) {
     m_accessMap = new HashMap<K, CacheEntry>();
@@ -224,7 +224,7 @@ public class LRUCache<K, V> {
    * Cache Entry Value Object
    */
   private class CacheEntry {
-    private K m_key;
+    private final K m_key;
     private V m_value;
     private long m_timestamp;
     private Long m_secondarySeq;
@@ -268,7 +268,7 @@ public class LRUCache<K, V> {
 
   private class CacheEntryTimestampComparator implements Comparator<CacheEntry> {
 
-    @SuppressWarnings("unchecked")
+    @Override
     public int compare(CacheEntry ca, CacheEntry cb) {
       if (ca.m_timestamp < cb.m_timestamp) return +1;
       if (ca.m_timestamp > cb.m_timestamp) return -1;

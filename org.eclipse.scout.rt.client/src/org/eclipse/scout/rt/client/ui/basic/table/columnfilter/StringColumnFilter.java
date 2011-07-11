@@ -39,14 +39,17 @@ public class StringColumnFilter implements ITableColumnFilter<String> {
     m_column = column;
   }
 
+  @Override
   public IColumn<String> getColumn() {
     return m_column;
   }
 
+  @Override
   public Set<String> getSelectedValues() {
     return m_selectedValues;
   }
 
+  @Override
   public void setSelectedValues(Set<String> set) {
     m_selectedValues = set;
   }
@@ -60,6 +63,7 @@ public class StringColumnFilter implements ITableColumnFilter<String> {
     m_regexPat = null;
   }
 
+  @Override
   public List<LookupRow> createHistogram() {
     TreeMap<String, LookupRow> hist = new TreeMap<String, LookupRow>();
     HashMap<String, Integer> countMap = new HashMap<String, Integer>();
@@ -87,10 +91,12 @@ public class StringColumnFilter implements ITableColumnFilter<String> {
     return list;
   }
 
+  @Override
   public boolean isEmpty() {
     return (m_selectedValues == null || m_selectedValues.isEmpty()) && m_pattern == null;
   }
 
+  @Override
   public boolean accept(ITableRow row) {
     String value = m_column.getDisplayText(row);
     if (m_pattern != null) {

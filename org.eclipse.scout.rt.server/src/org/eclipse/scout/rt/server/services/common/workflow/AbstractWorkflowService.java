@@ -38,6 +38,7 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     initConfig();
   }
 
+  @Override
   public AbstractWorkflowData[] getAvailableWorkflowTypes(SearchFilter filter) throws ProcessingException {
     AbstractWorkflowData[] a = execCollectAvailableWorkflowTypes(filter);
     if (a == null) {
@@ -46,6 +47,7 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     return a;
   }
 
+  @Override
   public AbstractWorkflowData[] getFilteredWorkflows(SearchFilter filter) throws ProcessingException {
     AbstractWorkflowData[] a = execCollectFilteredWorkflows(filter);
     if (a == null) {
@@ -54,6 +56,7 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     return a;
   }
 
+  @Override
   public T create(T spec) throws ProcessingException {
     T data = execNew(spec);
     if (data != null) {
@@ -62,6 +65,7 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     return data;
   }
 
+  @Override
   public T resume(T spec) throws ProcessingException {
     T data = execLoad(spec);
     if (data != null) {
@@ -70,6 +74,7 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     return data;
   }
 
+  @Override
   public T store(T data) throws ProcessingException {
     if (data != null) {
       execStore(data);
@@ -77,6 +82,7 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     return data;
   }
 
+  @Override
   public T finish(T data) throws ProcessingException {
     if (data != null) {
       try {
@@ -89,6 +95,7 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     return data;
   }
 
+  @Override
   public T discard(T data) throws ProcessingException {
     if (data != null) {
       try {
@@ -101,6 +108,7 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     return data;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T makeStateTransition(T data) throws ProcessingException {
     execValidateState(data);
@@ -161,6 +169,7 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     return data;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <S extends IWorkflowStep> S getStepByClass(Class<S> stepClass) {
     if (stepClass == null) {
@@ -183,10 +192,12 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
     return null;
   }
 
+  @Override
   public IWorkflowStep[] getSteps() {
     return m_stepList.toArray(new IWorkflowStep[m_stepList.size()]);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <S extends IWorkflowStep> S resolveStep(S step) {
     if (step == null) {

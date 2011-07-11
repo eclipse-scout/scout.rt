@@ -952,6 +952,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
   public void applyLazyStyles() {
     // override: ensure that (async loading) lookup context has been set
     if (m_currentGetLookupRowByKeyJob != null) {
@@ -1115,6 +1116,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     final Holder<LookupRow[]> rowsHolder = new Holder<LookupRow[]>(LookupRow[].class);
     final Holder<ProcessingException> failedHolder = new Holder<ProcessingException>(ProcessingException.class, new ProcessingException("callback was not invoked"));
     callTextLookupInternal(text, maxRowCount, new ILookupCallFetcher() {
+      @Override
       public void dataFetched(LookupRow[] rows, ProcessingException failed) {
         rowsHolder.setValue(rows);
         failedHolder.setValue(failed);
@@ -1137,6 +1139,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     final LookupCall call = (getLookupCall() != null ? (LookupCall) getLookupCall().clone() : null);
     final IClientSession session = ClientSyncJob.getCurrentSession();
     ILookupCallFetcher internalFetcher = new ILookupCallFetcher() {
+      @Override
       public void dataFetched(final LookupRow[] rows, final ProcessingException failed) {
         ClientSyncJob scoutSyncJob = new ClientSyncJob("Smartfield text lookup", session) {
           @Override
@@ -1207,6 +1210,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     final Holder<LookupRow[]> rowsHolder = new Holder<LookupRow[]>(LookupRow[].class);
     final Holder<ProcessingException> failedHolder = new Holder<ProcessingException>(ProcessingException.class, new ProcessingException("callback was not invoked"));
     callBrowseLookupInternal(browseHint, maxRowCount, activeState, new ILookupCallFetcher() {
+      @Override
       public void dataFetched(LookupRow[] rows, ProcessingException failed) {
         rowsHolder.setValue(rows);
         failedHolder.setValue(failed);
@@ -1234,6 +1238,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     final LookupCall call = (getLookupCall() != null ? (LookupCall) getLookupCall().clone() : null);
     final IClientSession session = ClientSyncJob.getCurrentSession();
     ILookupCallFetcher internalFetcher = new ILookupCallFetcher() {
+      @Override
       public void dataFetched(final LookupRow[] rows, final ProcessingException failed) {
         ClientSyncJob scoutSyncJob = new ClientSyncJob("Smartfield browse lookup", session) {
           @Override
@@ -1388,6 +1393,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   }// end private class
 
   private class P_ProposalFormListener implements FormListener {
+    @Override
     public void formChanged(FormEvent e) throws ProcessingException {
       switch (e.getType()) {
         case FormEvent.TYPE_CLOSED: {
@@ -1415,6 +1421,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   private class P_UIFacade implements ISmartFieldUIFacade {
     private Map<ICell, LookupRow> m_validProposals;
 
+    @Override
     public IMenu[] firePopupFromUI() {
       T smartValue = getValue();
       ArrayList<IMenu> filteredMenus = new ArrayList<IMenu>();
@@ -1557,6 +1564,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
       }
     }
 
+    @Override
     public void unregisterProposalFormFromUI(ISmartFieldProposalForm form) {
       unregisterProposalFormInternal(form);
     }

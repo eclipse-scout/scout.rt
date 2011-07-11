@@ -154,10 +154,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
       m_operator = operator;
     }
 
+    @Override
     public final int getOperator() {
       return m_operator;
     }
 
+    @Override
     public String getShortText() {
       return getText();
     }
@@ -251,14 +253,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicNEQ");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -273,14 +278,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicLT");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -295,14 +303,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicLE");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -317,14 +328,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicEQ");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -339,14 +353,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicGT");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -361,14 +378,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicGE");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -382,14 +402,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsInDays");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -403,14 +426,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsInGEDays");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -424,14 +450,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsInGEMonths");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -445,14 +474,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsInLEDays");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -466,14 +498,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsInLEMonths");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -487,14 +522,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsInLastDays");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -508,14 +546,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsInLastMonths");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -529,14 +570,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsInMonths");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -550,14 +594,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsInNextDays");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -571,14 +618,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsInNextMonths");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -592,14 +642,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, ScoutTexts.get("LogicDateIsNotToday"));
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsNotToday");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -613,14 +666,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, ScoutTexts.get("LogicDateIsToday"));
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateIsToday");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -634,14 +690,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateTimeIsInGEHours");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -655,14 +714,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateTimeIsInGEMinutes");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -676,14 +738,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateTimeIsInLEHours");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -697,14 +762,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateTimeIsInLEMinutes");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -718,14 +786,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, ScoutTexts.get("LogicDateTimeIsNotNow"));
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateTimeIsNotNow");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -739,14 +810,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, ScoutTexts.get("LogicDateTimeIsNow"));
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicDateTimeIsNow");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -760,14 +834,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicEndsWith");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -781,14 +858,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicNotEndsWith");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -802,14 +882,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicIn");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -823,14 +906,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicLike");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -844,14 +930,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicNotIn");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -865,14 +954,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicNotLike");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -886,14 +978,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, ScoutTexts.get("LogicNotNull"));
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicNotNull");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -910,14 +1005,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, ScoutTexts.get("LogicNotNull"));
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicNotNull");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -931,14 +1029,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, ScoutTexts.get("LogicNull"));
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicNull");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -955,14 +1056,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, ScoutTexts.get("LogicNull"));
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicNull");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -976,14 +1080,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicStartsWith");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -997,14 +1104,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicNotStartsWith");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -1018,14 +1128,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicTimeIsInGEHours");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -1039,14 +1152,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicTimeIsInGEMinutes");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -1060,14 +1176,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicTimeIsInHours");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -1081,14 +1200,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicTimeIsInLEHours");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -1102,14 +1224,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicTimeIsInLEMinutes");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -1123,14 +1248,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicTimeIsInMinutes");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -1144,14 +1272,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, ScoutTexts.get("LogicTimeIsNow"));
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicTimeIsNow");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -1165,14 +1296,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, ScoutTexts.get("LogicTimeIsNotNow"));
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicTimeIsNotNow");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -1192,6 +1326,7 @@ public final class DataModelAttributeOp implements DataModelConstants {
       return ScoutTexts.get("LogicBetweenShort");
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       if (StringUtility.isNullOrEmpty(valueTexts[0])) {
         return buildText(aggregationType, attributeText, ScoutTexts.get("LogicLE"), valueTexts[1]);
@@ -1204,10 +1339,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
       }
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicBetween");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -1221,14 +1358,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
       super(operator);
     }
 
+    @Override
     public String createVerboseText(Integer aggregationType, String attributeText, String[] valueTexts) {
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
+    @Override
     public String getText() {
       return ScoutTexts.get("LogicEQ");
     }
 
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_STRING;
     }

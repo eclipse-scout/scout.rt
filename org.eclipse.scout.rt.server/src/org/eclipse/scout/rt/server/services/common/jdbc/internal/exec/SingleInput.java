@@ -29,22 +29,27 @@ class SingleInput implements IBindInput {
     m_target = target;
   }
 
+  @Override
   public IToken getToken() {
     return m_target;
   }
 
+  @Override
   public boolean isBatch() {
     return m_target.isBatch();
   }
 
+  @Override
   public boolean hasBatch(int i) {
     return i <= 0;
   }
 
+  @Override
   public void setNextBatchIndex(int i) {
     m_batchIndex = i;
   }
 
+  @Override
   public boolean isJdbcBind() {
     if (m_target.isPlainValue()) {
       return false;
@@ -57,14 +62,17 @@ class SingleInput implements IBindInput {
     }
   }
 
+  @Override
   public int getJdbcBindIndex() {
     return m_jdbcBindIndex;
   }
 
+  @Override
   public void setJdbcBindIndex(int index) {
     m_jdbcBindIndex = index;
   }
 
+  @Override
   public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
     Object value = null;
     if ((!isBatch()) || m_batchIndex <= 0) {

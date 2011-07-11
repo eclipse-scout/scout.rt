@@ -30,10 +30,12 @@ public class Holder<T> implements IHolder<T>, Serializable {
     m_clazz = clazz;
   }
 
+  @Override
   public T getValue() {
     return m_value;
   }
 
+  @Override
   public void setValue(T o) {
     synchronized (this) {
       m_value = o;
@@ -41,6 +43,7 @@ public class Holder<T> implements IHolder<T>, Serializable {
     }
   }
 
+  @Override
   public Class<T> getHolderType() {
     return m_clazz;
   }

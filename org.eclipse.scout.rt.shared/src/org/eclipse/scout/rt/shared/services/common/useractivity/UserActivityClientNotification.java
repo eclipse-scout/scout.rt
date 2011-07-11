@@ -22,6 +22,7 @@ public class UserActivityClientNotification extends AbstractClientNotification {
     m_map = map;
   }
 
+  @Override
   public boolean coalesce(IClientNotification existingNotification) {
     return existingNotification.getClass() == getClass();
   }

@@ -32,18 +32,22 @@ public class FunctionInputToken implements IToken {
     m_plainSql = plainSql;
   }
 
+  @Override
   public boolean isInput() {
     return true;
   }
 
+  @Override
   public boolean isOutput() {
     return false;
   }
 
+  @Override
   public String getParsedToken() {
     return m_parsedToken;
   }
 
+  @Override
   public String getReplaceToken() {
     if (m_replaceToken != null) {
       return m_replaceToken;
@@ -53,6 +57,7 @@ public class FunctionInputToken implements IToken {
     }
   }
 
+  @Override
   public void setReplaceToken(String s) {
     m_replaceToken = s;
   }

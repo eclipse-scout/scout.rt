@@ -33,6 +33,7 @@ public class HeaderCell implements IHeaderCell {
   public HeaderCell() {
   }
 
+  @Override
   public int getColumnIndex() {
     return m_columnIndex;
   }
@@ -49,6 +50,7 @@ public class HeaderCell implements IHeaderCell {
     }
   }
 
+  @Override
   public boolean isSortAscending() {
     return m_sortAscending;
   }
@@ -57,6 +59,7 @@ public class HeaderCell implements IHeaderCell {
     m_sortAscending = b;
   }
 
+  @Override
   public String getBackgroundColor() {
     return m_backgroundColor;
   }
@@ -65,6 +68,7 @@ public class HeaderCell implements IHeaderCell {
     m_backgroundColor = c;
   }
 
+  @Override
   public FontSpec getFont() {
     return m_font;
   }
@@ -73,6 +77,7 @@ public class HeaderCell implements IHeaderCell {
     m_font = f;
   }
 
+  @Override
   public String getForegroundColor() {
     return m_foregroundColor;
   }
@@ -81,6 +86,7 @@ public class HeaderCell implements IHeaderCell {
     m_foregroundColor = c;
   }
 
+  @Override
   public int getHorizontalAlignment() {
     return m_horizontalAlignment;
   }
@@ -89,6 +95,7 @@ public class HeaderCell implements IHeaderCell {
     m_horizontalAlignment = a;
   }
 
+  @Override
   public String getIconId() {
     return m_iconId;
   }
@@ -97,6 +104,7 @@ public class HeaderCell implements IHeaderCell {
     m_iconId = id;
   }
 
+  @Override
   public String getText() {
     return m_text;
   }
@@ -109,6 +117,7 @@ public class HeaderCell implements IHeaderCell {
     m_text = s;
   }
 
+  @Override
   public String getTooltipText() {
     return m_tooltip;
   }
@@ -117,6 +126,7 @@ public class HeaderCell implements IHeaderCell {
     m_tooltip = s;
   }
 
+  @Override
   public boolean isSortActive() {
     return m_sortActive;
   }
@@ -125,6 +135,7 @@ public class HeaderCell implements IHeaderCell {
     m_sortActive = b;
   }
 
+  @Override
   public boolean isSortPermanent() {
     return m_sortPermanent;
   }
@@ -133,6 +144,7 @@ public class HeaderCell implements IHeaderCell {
     m_sortPermanent = b;
   }
 
+  @Override
   public boolean isSortExplicit() {
     return m_sortExplicit;
   }

@@ -191,6 +191,7 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
     setDropType(configuredDropType);
   }
 
+  @Override
   public void setMaxLength(int len) {
     if (len > 0) propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
     if (isInitialized()) {
@@ -198,6 +199,7 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
     }
   }
 
+  @Override
   public int getMaxLength() {
     int len = propertySupport.getPropertyInt(PROP_MAX_LENGTH);
     if (len <= 0) {
@@ -234,74 +236,92 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
     return validValue;
   }
 
+  @Override
   public void setInputMasked(boolean b) {
     propertySupport.setPropertyBool(PROP_INPUT_MASKED, b);
   }
 
+  @Override
   public boolean isInputMasked() {
     return propertySupport.getPropertyBool(PROP_INPUT_MASKED);
   }
 
+  @Override
   public void setFormatUpper() {
     setFormat(FORMAT_UPPER);
   }
 
+  @Override
   public boolean isFormatUpper() {
     return FORMAT_UPPER.equals(getFormat());
   }
 
+  @Override
   public void setFormatLower() {
     setFormat(FORMAT_LOWER);
   }
 
+  @Override
   public boolean isFormatLower() {
     return FORMAT_LOWER.equals(getFormat());
   }
 
+  @Override
   public void setDecorationLink(boolean b) {
     propertySupport.setPropertyBool(PROP_DECORATION_LINK, b);
   }
 
+  @Override
   public boolean isDecorationLink() {
     return propertySupport.getPropertyBool(PROP_DECORATION_LINK);
   }
 
+  @Override
   public void setWrapText(boolean b) {
     propertySupport.setPropertyBool(PROP_WRAP_TEXT, b);
   }
 
+  @Override
   public boolean isWrapText() {
     return propertySupport.getPropertyBool(PROP_WRAP_TEXT);
   }
 
+  @Override
   public void setMultilineText(boolean b) {
     propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, b);
   }
 
+  @Override
   public boolean isMultilineText() {
     return propertySupport.getPropertyBool(PROP_MULTILINE_TEXT);
   }
 
+  @Override
   public void insertText(String s) {
     propertySupport.setPropertyAlwaysFire(PROP_INSERT_TEXT, s);
   }
 
+  @Override
   public boolean isSelectAllOnFocus() {
     return propertySupport.getPropertyBool(PROP_SELECT_ALL_ON_FOCUS);
   }
 
+  @Override
   public void setSelectAllOnFocus(boolean b) {
     propertySupport.setPropertyBool(PROP_SELECT_ALL_ON_FOCUS, b);
   }
 
+  @Override
   public void setValidateOnAnyKey(boolean b) {
     propertySupport.setPropertyBool(PROP_VALIDATE_ON_ANY_KEY, b);
   }
 
+  @Override
   public boolean isValidateOnAnyKey() {
     return propertySupport.getPropertyBool(PROP_VALIDATE_ON_ANY_KEY);
   }
 
+  @Override
   public void select(int startIndex, int endIndex) {
     try {
       propertySupport.setPropertiesChanging(true);
@@ -314,18 +334,22 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
     }
   }
 
+  @Override
   public int getSelectionStart() {
     return propertySupport.getPropertyInt(PROP_SELECTION_START);
   }
 
+  @Override
   public int getSelectionEnd() {
     return propertySupport.getPropertyInt(PROP_SELECTION_END);
   }
 
+  @Override
   public IStringFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
+  @Override
   public void setFormat(String s) {
     propertySupport.setPropertyString(PROP_FORMAT, s);
     if (isInitialized()) {
@@ -336,6 +360,7 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
     }
   }
 
+  @Override
   public String getFormat() {
     return propertySupport.getPropertyString(PROP_FORMAT);
   }
@@ -357,24 +382,29 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
   }
 
   // DND
+  @Override
   public void setDragType(int dragType) {
     propertySupport.setPropertyInt(PROP_DRAG_TYPE, dragType);
   }
 
+  @Override
   public int getDragType() {
     return propertySupport.getPropertyInt(PROP_DRAG_TYPE);
   }
 
+  @Override
   public void setDropType(int dropType) {
     propertySupport.setPropertyInt(PROP_DROP_TYPE, dropType);
   }
 
+  @Override
   public int getDropType() {
     return propertySupport.getPropertyInt(PROP_DROP_TYPE);
   }
 
   private class P_UIFacade implements IStringFieldUIFacade {
 
+    @Override
     public boolean setTextFromUI(String newText) {
       if (newText != null && newText.length() == 0) newText = null;
       // parse always, validity might change even if text is same
@@ -387,6 +417,7 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
      * org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringFieldUIFacade
      * #fireLinkActionFromUI(java.lang.String)
      */
+    @Override
     public void fireLinkActionFromUI(String text) {
       URL url = IOUtility.urlTextToUrl(text);
       try {
@@ -397,6 +428,7 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
       }
     }
 
+    @Override
     public void fireKeyTypedFromUI(String newText) {
       String oldText = getDisplayText();
       if (oldText != null && oldText.length() == 0) oldText = null;
@@ -408,14 +440,17 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
       parseValue(newText);
     }
 
+    @Override
     public void setSelectionFromUI(int startOfSelection, int endOfSelection) {
       select(startOfSelection, endOfSelection);
     }
 
+    @Override
     public TransferObject fireDragRequestFromUI() {
       return execDragRequest();
     }
 
+    @Override
     public void fireDropActionFromUi(TransferObject scoutTransferable) {
       execDropRequest(scoutTransferable);
     }
@@ -424,6 +459,7 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
   /**
    * Returns whether this text component is spell checkable.
    */
+  @Override
   public boolean isSpellCheckEnabled() {
     return (!this.isDecorationLink() &&
         !this.isFormatUpper() &&
@@ -438,6 +474,7 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
    * If it is not defined, null is returned, then the application default is
    * used.
    */
+  @Override
   public Boolean isSpellCheckAsYouTypeEnabled() {
     return m_monitorSpelling;
   }
@@ -447,6 +484,7 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
    * background ("check as you type").<br>
    * Use null for application default.
    */
+  @Override
   public void setSpellCheckAsYouTypeEnabled(boolean monitorSpelling) {
     m_monitorSpelling = new Boolean(monitorSpelling);
   }

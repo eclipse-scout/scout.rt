@@ -32,6 +32,7 @@ public class AccessControlChangedNotification extends AbstractClientNotification
     return m_permissions;
   }
 
+  @Override
   public boolean coalesce(IClientNotification existingNotification) {
     return true;
   }

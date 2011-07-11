@@ -33,9 +33,11 @@ public class BundleResourceLocator implements IResourceLocator {
     m_folder = folder;
   }
 
+  @Override
   public void initialize() throws ProcessingException {
   }
 
+  @Override
   public File getFile(String name) throws ProcessingException {
     File f = SERVICES.getService(IFileService.class).getLocalFileLocation(m_folder, name);
     f.delete();

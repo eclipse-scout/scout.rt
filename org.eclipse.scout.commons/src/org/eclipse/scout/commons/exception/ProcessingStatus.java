@@ -139,26 +139,32 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
     }
   }
 
+  @Override
   public IProcessingStatus[] getChildren() {
     return new IProcessingStatus[0];
   }
 
+  @Override
   public boolean isMultiStatus() {
     return false;
   }
 
+  @Override
   public int getCode() {
     return m_code;
   }
 
+  @Override
   public Throwable getCause() {
     return m_cause;
   }
 
+  @Override
   public Throwable getException() {
     return m_cause;
   }
 
+  @Override
   public String getPlugin() {
     return m_plugin;
   }
@@ -167,22 +173,27 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
     m_plugin = plugin;
   }
 
+  @Override
   public String getMessage() {
     return m_message;
   }
 
+  @Override
   public String getTitle() {
     return m_title;
   }
 
+  @Override
   public int getSeverity() {
     return m_severity;
   }
 
+  @Override
   public boolean isOK() {
     return m_severity == OK;
   }
 
+  @Override
   public boolean matches(int severityMask) {
     return (getSeverity() & severityMask) != 0;
   }
@@ -227,6 +238,7 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
     m_message = message;
   }
 
+  @Override
   public void addContextMessage(String message) {
     if (message != null) {
       if (m_contextMessages == null) m_contextMessages = new ArrayList<String>();
@@ -234,6 +246,7 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
     }
   }
 
+  @Override
   public String[] getContextMessages() {
     return m_contextMessages != null ? m_contextMessages.toArray(new String[0]) : new String[0];
   }

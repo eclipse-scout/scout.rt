@@ -42,6 +42,7 @@ public class BookmarkFolderLookupCall extends LocalLookupCall {
     final ArrayList<LookupRow> rows = new ArrayList<LookupRow>();
     if (m_rootFolder != null) {
       m_rootFolder.visit(new IBookmarkVisitor() {
+        @Override
         public boolean visitFolder(List<BookmarkFolder> path) {
           if (path.size() >= 2) {
             BookmarkFolder f = path.get(path.size() - 1);
@@ -58,6 +59,7 @@ public class BookmarkFolderLookupCall extends LocalLookupCall {
           return true;
         }
 
+        @Override
         public boolean visitBookmark(List<BookmarkFolder> path, Bookmark b) {
           return true;
         }

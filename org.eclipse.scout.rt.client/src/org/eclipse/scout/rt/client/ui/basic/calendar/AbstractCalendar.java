@@ -153,6 +153,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     for (final ICalendarItemProvider p : m_providers) {
       p.addPropertyChangeListener(
           new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent e) {
               if (e.getPropertyName().equals(ICalendarItemProvider.PROP_ITEMS)) {
                 updateComponentsInternal(new ICalendarItemProvider[]{p});
@@ -174,6 +175,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
    * This is the init of the runtime model after the table and columns are built
    * and configured
    */
+  @Override
   public void initCalendar() throws ProcessingException {
     execInitCalendar();
     /*
@@ -181,6 +183,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
      * changes
      */
     addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         if (e.getPropertyName().equals(PROP_VIEW_RANGE)) {
           updateComponentsInternal(m_providers);
@@ -201,6 +204,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
   }
 
+  @Override
   public void disposeCalendar() {
     disposeCalendarInternal();
     try {
@@ -211,26 +215,32 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
   }
 
+  @Override
   public String getTitle() {
     return propertySupport.getPropertyString(PROP_TITLE);
   }
 
+  @Override
   public void setTitle(String s) {
     propertySupport.setPropertyString(PROP_TITLE, s);
   }
 
+  @Override
   public boolean isLoadInProgress() {
     return propertySupport.getPropertyBool(PROP_LOAD_IN_PROGRESS);
   }
 
+  @Override
   public void setLoadInProgress(boolean b) {
     propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, b);
   }
 
+  @Override
   public boolean isCalendarChanging() {
     return m_calendarChanging > 0;
   }
 
+  @Override
   public void setCalendarChanging(boolean b) {
     // use a stack counter because setTableChanging might be called in nested
     // loops
@@ -289,22 +299,27 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     return m_menus;
   }
 
+  @Override
   public int getDisplayMode() {
     return propertySupport.getPropertyInt(PROP_DISPLAY_MODE);
   }
 
+  @Override
   public void setDisplayMode(int mode) {
     propertySupport.setPropertyInt(PROP_DISPLAY_MODE, mode);
   }
 
+  @Override
   public boolean isDisplayCondensed() {
     return propertySupport.getPropertyBool(PROP_DISPLAY_CONDENSED);
   }
 
+  @Override
   public void setDisplayCondensed(boolean condensed) {
     propertySupport.setPropertyBool(PROP_DISPLAY_CONDENSED, condensed);
   }
 
+  @Override
   public Date[] getViewRange() {
     Date[] a = (Date[]) propertySupport.getProperty(PROP_VIEW_RANGE);
     if (a == null) {
@@ -313,22 +328,27 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     return a;
   }
 
+  @Override
   public void setViewRange(Date minDate, Date maxDate) {
     propertySupport.setProperty(PROP_VIEW_RANGE, new Date[]{minDate, maxDate});
   }
 
+  @Override
   public Date getSelectedDate() {
     return (Date) propertySupport.getProperty(PROP_SELECTED_DATE);
   }
 
+  @Override
   public void setSelectedDate(Date d) {
     propertySupport.setProperty(PROP_SELECTED_DATE, d);
   }
 
+  @Override
   public CalendarComponent getSelectedComponent() {
     return (CalendarComponent) propertySupport.getProperty(PROP_SELECTED_COMPONENT);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends ICalendarItem> T getSelectedItem(Class<T> c) {
     CalendarComponent comp = getSelectedComponent();
@@ -340,6 +360,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     return null;
   }
 
+  @Override
   public void setSelectedComponent(CalendarComponent comp) {
     comp = resolveComponent(comp);
     propertySupport.setProperty(PROP_SELECTED_COMPONENT, comp);
@@ -349,10 +370,12 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     return comp;
   }
 
+  @Override
   public DateTimeFormatFactory getDateTimeFormatFactory() {
     return m_dateTimeFormatFactory;
   }
 
+  @Override
   public CalendarComponent[] getComponents() {
     CalendarComponent[] a = (CalendarComponent[]) propertySupport.getProperty(PROP_COMPONENTS);
     if (a == null) {
@@ -483,6 +506,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     setLoadInProgress(b);
   }
 
+  @Override
   public void reloadCalendarItems() {
     for (ICalendarItemProvider p : m_providers) {
       p.reloadProvider();
@@ -587,10 +611,12 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   /**
    * Model Observer
    */
+  @Override
   public void addCalendarListener(CalendarListener listener) {
     m_listenerList.add(CalendarListener.class, listener);
   }
 
+  @Override
   public void removeCalendarListener(CalendarListener listener) {
     m_listenerList.remove(CalendarListener.class, listener);
   }
@@ -640,6 +666,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
   }
 
+  @Override
   public ICalendarUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -658,10 +685,12 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       m_uiProcessorCount--;
     }
 
+    @Override
     public boolean isUIProcessing() {
       return m_uiProcessorCount > 0;
     }
 
+    @Override
     public void setSelectionFromUI(Date d, CalendarComponent comp) {
       try {
         pushUIProcessor();
@@ -674,6 +703,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       }
     }
 
+    @Override
     public void setVisibleRangeFromUI(Date minDate, Date maxDate) {
       try {
         pushUIProcessor();
@@ -685,6 +715,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       }
     }
 
+    @Override
     public void fireReloadFromUI() {
       try {
         pushUIProcessor();
@@ -696,6 +727,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       }
     }
 
+    @Override
     public IMenu[] fireComponentPopupFromUI() {
       try {
         pushUIProcessor();
@@ -707,6 +739,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       }
     }
 
+    @Override
     public IMenu[] fireNewPopupFromUI() {
       try {
         pushUIProcessor();
@@ -718,6 +751,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       }
     }
 
+    @Override
     public void fireComponentActionFromUI() {
       try {
         pushUIProcessor();
@@ -729,6 +763,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       }
     }
 
+    @Override
     public void fireComponentMovedFromUI(CalendarComponent comp, Date newDate) {
       try {
         pushUIProcessor();

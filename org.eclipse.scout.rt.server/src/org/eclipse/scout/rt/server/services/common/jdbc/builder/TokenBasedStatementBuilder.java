@@ -378,6 +378,7 @@ public class TokenBasedStatementBuilder {
     }
     // tag replacement
     ITagProcessor processor = new ITagProcessor() {
+      @Override
       public String processTag(String tagName, String attribute) {
         return buildAttributeOpValue(attribute, aNode.getOp(), sValue);
       }

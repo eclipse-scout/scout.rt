@@ -69,12 +69,14 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
     setValueSet(true);
   }
 
+  @Override
   public int getRowState(int row) {
     Number n = (Number) getValueInternal(row, getColumnCount());
     if (n != null) return n.intValue();
     else return STATUS_NON_CHANGED;
   }
 
+  @Override
   public void setRowState(int row, int state) {
     setValueInternal(row, getColumnCount(), new Integer(state));
   }
@@ -88,6 +90,7 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
     }
   }
 
+  @Override
   public int/* newIndex */addRow() {
     return addRow(STATUS_NON_CHANGED);
   }
@@ -113,6 +116,7 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
     return newRowIndex;
   }
 
+  @Override
   public void ensureSize(int size) {
     while (m_rowList.size() < size) {
       addRow();

@@ -20,12 +20,14 @@ public class FormulaRoot extends AbstractNode {
     m_node = node;
   }
 
+  @Override
   public void format(IFormatVisitor v) {
     v.start();
     m_node.format(v);
     v.end();
   }
 
+  @Override
   public Object eval(IEvalVisitor v) {
     return m_node.eval(v);
   }

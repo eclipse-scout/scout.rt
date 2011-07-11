@@ -45,22 +45,27 @@ class TableHolderInput implements IBindInput {
     m_target = target;
   }
 
+  @Override
   public IToken getToken() {
     return m_target;
   }
 
+  @Override
   public boolean isBatch() {
     return true;
   }
 
+  @Override
   public boolean hasBatch(int i) {
     return i < m_filteredRowIndices.length;
   }
 
+  @Override
   public void setNextBatchIndex(int i) {
     m_batchIndex = i;
   }
 
+  @Override
   public boolean isJdbcBind() {
     if (m_target.isPlainValue()) {
       return false;
@@ -73,14 +78,17 @@ class TableHolderInput implements IBindInput {
     }
   }
 
+  @Override
   public int getJdbcBindIndex() {
     return m_jdbcBindIndex;
   }
 
+  @Override
   public void setJdbcBindIndex(int index) {
     m_jdbcBindIndex = index;
   }
 
+  @Override
   public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
     Object value = null;
     if (m_batchIndex < m_filteredRowIndices.length) {

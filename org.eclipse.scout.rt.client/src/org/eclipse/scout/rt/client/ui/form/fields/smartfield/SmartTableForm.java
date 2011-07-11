@@ -45,6 +45,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     super(smartField);
   }
 
+  @Override
   public void forceProposalSelection() throws ProcessingException {
     ResultTableField.Table table = getResultTableField().getTable();
     table.selectNextRow();
@@ -189,6 +190,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     }
   }
 
+  @Override
   public LookupRow getAcceptedProposal() throws ProcessingException {
     LookupRow row = getResultTableField().getTable().getKeyColumn().getSelectedValue();
     if (row != null && row.isEnabled()) {
@@ -205,6 +207,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
   /*
    * Dialog start
    */
+  @Override
   public void startForm() throws ProcessingException {
     startInternal(new FormHandler());
   }

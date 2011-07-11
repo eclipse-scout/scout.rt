@@ -27,15 +27,18 @@ public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializabl
     super();
   }
 
+  @Override
   public T getValue() {
     return m_value;
   }
 
+  @Override
   public void setValue(T o) {
     m_value = o;
     setValueSet(true);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public Class<T> getHolderType() {
     return TypeCastUtility.getGenericsParameterClass(getClass(), IHolder.class);

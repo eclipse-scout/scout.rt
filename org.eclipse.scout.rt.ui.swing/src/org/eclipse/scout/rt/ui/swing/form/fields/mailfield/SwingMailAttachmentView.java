@@ -23,12 +23,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.ext.JLabelEx;
 
-@SuppressWarnings("restriction")
 public class SwingMailAttachmentView extends JPanel {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingMailAttachmentView.class);
 
-  private SwingMailAttachment m_attachment;
+  private final SwingMailAttachment m_attachment;
 
   public SwingMailAttachmentView(SwingMailAttachment attachment) {
     m_attachment = attachment;

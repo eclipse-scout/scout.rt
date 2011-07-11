@@ -414,6 +414,7 @@ public class DrilldownOutlineUnitTest extends AbstractClientTest {
       this.searchForm = searchForm;
     }
 
+    @Override
     public void formChanged(FormEvent e) throws ProcessingException {
       if (e.getType() == FormEvent.TYPE_STORE_AFTER) {
         // TODO fill out searchForm

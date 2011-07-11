@@ -108,6 +108,7 @@ public class ScoutXmlQName implements Comparable {
   /**
    * @since 1.0
    */
+  @Override
   public int compareTo(Object object) {
     if (object != null) return this.toString().compareTo(object.toString());
     else return 0;

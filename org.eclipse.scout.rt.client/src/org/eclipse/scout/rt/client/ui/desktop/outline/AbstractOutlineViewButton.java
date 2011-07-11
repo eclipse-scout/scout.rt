@@ -51,6 +51,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
     // add selection listener
     m_desktop.addDesktopListener(
         new DesktopListener() {
+          @Override
           public void desktopChanged(DesktopEvent e) {
             switch (e.getType()) {
               case DesktopEvent.TYPE_OUTLINE_CHANGED: {
@@ -64,6 +65,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
     // add change listener
     m_outline.addPropertyChangeListener(
         new PropertyChangeListener() {
+          @Override
           public void propertyChange(PropertyChangeEvent e) {
             String n = e.getPropertyName();
             Object v = e.getNewValue();

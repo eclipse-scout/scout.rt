@@ -135,6 +135,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   }
 
   private class P_WizardListener implements WizardListener, PropertyChangeListener, WeakEventListener {
+    @Override
     public void wizardChanged(WizardEvent e) {
       switch (e.getType()) {
         case WizardEvent.TYPE_STATE_CHANGED: {
@@ -149,6 +150,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
       }
     }
 
+    @Override
     public void propertyChange(final PropertyChangeEvent e) {
       if (IWizard.PROP_TITLE.equals(e.getPropertyName()) ||
           IWizard.PROP_TITLE_HTML.equals(e.getPropertyName()) ||
@@ -159,6 +161,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   }// end class P_ScoutWizardListener
 
   private class P_WizardStepListener implements PropertyChangeListener, WeakEventListener {
+    @Override
     public void propertyChange(final PropertyChangeEvent e) {
       if (IWizardStep.PROP_DESCRIPTION_HTML.equals(e.getPropertyName()) ||
           IWizardStep.PROP_TITLE.equals(e.getPropertyName()) ||

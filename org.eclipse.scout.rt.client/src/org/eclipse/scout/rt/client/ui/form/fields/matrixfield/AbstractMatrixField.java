@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 /**
  * @deprecated use {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField} instead
  */
+@SuppressWarnings("deprecation")
 @Deprecated
 public abstract class AbstractMatrixField extends AbstractFormField implements IMatrixField {
 

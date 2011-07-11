@@ -46,10 +46,12 @@ public class PrincipalNameFilter implements IClientNotificationFilter {
     m_validUntil = System.currentTimeMillis() + timeout;
   }
 
+  @Override
   public boolean isActive() {
     return System.currentTimeMillis() <= m_validUntil;
   }
 
+  @Override
   public boolean isMulticast() {
     return true;
   }
@@ -58,6 +60,7 @@ public class PrincipalNameFilter implements IClientNotificationFilter {
     return m_principalName;
   }
 
+  @Override
   public boolean accept() {
     Subject subject = Subject.getSubject(AccessController.getContext());
     if (subject != null) {

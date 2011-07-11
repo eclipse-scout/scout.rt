@@ -125,6 +125,7 @@ public abstract class JobEx extends Job {
       }
       final AtomicBoolean jobDoneLock = new AtomicBoolean();
       JobChangeAdapter listener = new JobChangeAdapter() {
+        @Override
         public void done(IJobChangeEvent event) {
           synchronized (jobDoneLock) {
             jobDoneLock.set(true);

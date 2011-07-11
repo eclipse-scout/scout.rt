@@ -36,14 +36,17 @@ public class ComparableColumnFilter<T extends Comparable<T>> implements ITableCo
     m_column = column;
   }
 
+  @Override
   public IColumn<T> getColumn() {
     return m_column;
   }
 
+  @Override
   public Set<T> getSelectedValues() {
     return m_selectedValues;
   }
 
+  @Override
   public void setSelectedValues(Set<T> set) {
     m_selectedValues = set;
   }
@@ -64,6 +67,7 @@ public class ComparableColumnFilter<T extends Comparable<T>> implements ITableCo
     m_maximumValue = maximumValue;
   }
 
+  @Override
   public List<LookupRow> createHistogram() {
     TreeMap<T, LookupRow> hist = new TreeMap<T, LookupRow>();
     HashMap<T, Integer> countMap = new HashMap<T, Integer>();
@@ -92,10 +96,12 @@ public class ComparableColumnFilter<T extends Comparable<T>> implements ITableCo
     return list;
   }
 
+  @Override
   public boolean isEmpty() {
     return (m_selectedValues == null || m_selectedValues.isEmpty()) && m_minimumValue == null && m_maximumValue == null;
   }
 
+  @Override
   public boolean accept(ITableRow row) {
     T value = m_column.getValue(row);
     if (m_minimumValue != null) {

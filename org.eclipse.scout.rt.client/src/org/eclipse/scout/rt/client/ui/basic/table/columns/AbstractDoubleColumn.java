@@ -104,15 +104,18 @@ public abstract class AbstractDoubleColumn extends AbstractColumn<Double> implem
   /*
    * Runtime
    */
+  @Override
   public void setFormat(String s) {
     m_format = s;
     m_fmt = null;
   }
 
+  @Override
   public String getFormat() {
     return m_format;
   }
 
+  @Override
   public void setMinFractionDigits(int i) {
     if (i > getMaxFractionDigits()) {
       m_maxFractionDigits = i;
@@ -121,10 +124,12 @@ public abstract class AbstractDoubleColumn extends AbstractColumn<Double> implem
     m_fmt = null;
   }
 
+  @Override
   public int getMinFractionDigits() {
     return m_minFractionDigits;
   }
 
+  @Override
   public void setMaxFractionDigits(int i) {
     if (i < getMinFractionDigits()) {
       m_minFractionDigits = i;
@@ -133,33 +138,40 @@ public abstract class AbstractDoubleColumn extends AbstractColumn<Double> implem
     m_fmt = null;
   }
 
+  @Override
   public int getMaxFractionDigits() {
     return m_maxFractionDigits;
   }
 
+  @Override
   public void setGroupingUsed(boolean b) {
     m_groupingUsed = b;
     m_fmt = null;
   }
 
+  @Override
   public boolean isGroupingUsed() {
     return m_groupingUsed;
   }
 
+  @Override
   public void setPercent(boolean b) {
     m_percent = b;
     m_fmt = null;
   }
 
+  @Override
   public boolean isPercent() {
     return m_percent;
   }
 
+  @Override
   public void setMultiplier(int i) {
     m_multiplier = i;
     m_fmt = null;
   }
 
+  @Override
   public int getMultiplier() {
     return m_multiplier;
   }
@@ -206,6 +218,7 @@ public abstract class AbstractDoubleColumn extends AbstractColumn<Double> implem
     }
   }
 
+  @Override
   public NumberFormat getNumberFormat() {
     if (m_fmt == null) {
       if (isPercent()) {

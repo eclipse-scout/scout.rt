@@ -33,10 +33,12 @@ public class HttpServletEx extends HttpServlet {
   @Override
   public final void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
     new ServletFilterDelegate().delegateServiceMethod(req, res, new ServletFilterDelegate.IServiceCallback() {
+      @Override
       public void service(ServletRequest reqInner, ServletResponse resInner) throws ServletException, IOException {
         HttpServletEx.super.service(reqInner, resInner);
       }
 
+      @Override
       public ServletContext getServletContext() {
         return HttpServletEx.this.getServletContext();
       }

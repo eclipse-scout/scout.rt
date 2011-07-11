@@ -103,6 +103,7 @@ public class JmsTransactionMember implements ITransactionMember {
     }
   }
 
+  @Override
   public String getMemberId() {
 
     return new Long(m_config.getCrc()).toString();
@@ -399,14 +400,17 @@ public class JmsTransactionMember implements ITransactionMember {
     }
   }
 
+  @Override
   public boolean needsCommit() {
     return true;
   }
 
+  @Override
   public boolean commitPhase1() {
     return true;
   }
 
+  @Override
   public void commitPhase2() {
     if (m_session != null) {
       try {
@@ -418,6 +422,7 @@ public class JmsTransactionMember implements ITransactionMember {
     }
   }
 
+  @Override
   public void rollback() {
     if (m_session != null) {
       try {
@@ -429,6 +434,7 @@ public class JmsTransactionMember implements ITransactionMember {
     }
   }
 
+  @Override
   public void release() {
     if (m_mc != null) {
       try {

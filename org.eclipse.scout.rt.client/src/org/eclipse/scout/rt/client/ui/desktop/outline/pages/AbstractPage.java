@@ -252,6 +252,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   /*
    * Runtime
    */
+  @Override
   public void initPage() throws ProcessingException {
     Cell cell = getCellForUpdate();
     if (cell.getText() == null && getConfiguredTitle() != null) {
@@ -267,6 +268,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
    * @deprecated
    * @deprecated use {@link #getUserPreferenceContext()} instead
    */
+  @Override
   @SuppressWarnings("deprecation")
   @Deprecated
   @ConfigOperation
@@ -275,20 +277,24 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     return getUserPreferenceContext();
   }
 
+  @Override
   @ConfigOperation
   @Order(95)
   public final String getUserPreferenceContext() {
     return m_userPreferenceContext;
   }
 
+  @Override
   public IOutline getOutline() {
     return (IOutline) getTree();
   }
 
+  @Override
   public IPage getParentPage() {
     return (IPage) getParentNode();
   }
 
+  @Override
   public IPage getChildPage(final int childIndex) {
     ///make it model thread safe
     if (ClientSyncJob.isSyncClientJob()) {
@@ -302,6 +308,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     return (IPage) getChildNode(childIndex);
   }
 
+  @Override
   public IPage[] getChildPages() {
     if (ClientSyncJob.isSyncClientJob()) {
       try {
@@ -362,6 +369,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     }
   }
 
+  @Override
   public void pageActivatedNotify() {
     try {
       execPageActivated();
@@ -372,6 +380,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     }
   }
 
+  @Override
   public void pageDeactivatedNotify() {
     try {
       execPageDeactivated();
@@ -382,10 +391,12 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     }
   }
 
+  @Override
   public IForm getDetailForm() {
     return m_detailForm;
   }
 
+  @Override
   public void setDetailForm(IForm form) {
     if (form != null) {
       if (form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW) {
@@ -413,6 +424,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
       m_internalDataChangeListener = new WeakDataChangeListener() {
+        @Override
         public void dataChanged(Object... innerDataTypes) throws ProcessingException {
           execDataChanged(innerDataTypes);
         }
@@ -425,6 +437,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     desktop.addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
 
+  @Override
   public void dataChanged(Object... dataTypes) {
     try {
       execDataChanged(dataTypes);
@@ -457,6 +470,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     }
   }
 
+  @Override
   public final void reloadPage() throws ProcessingException {
     ITree tree = getTree();
     if (tree != null) {
@@ -474,10 +488,12 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     }
   }
 
+  @Override
   public boolean isTableVisible() {
     return m_tableVisible;
   }
 
+  @Override
   public void setTableVisible(boolean b) {
     m_tableVisible = b;
   }

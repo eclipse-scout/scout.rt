@@ -204,6 +204,7 @@ public class StatementProcessor implements IStatementProcessor {
    * org.eclipse.scout.rt.
    * server.services.common.sql.internal.exec.PreparedStatementCache)
    */
+  @Override
   public Object[][] processSelect(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException {
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -226,7 +227,7 @@ public class StatementProcessor implements IStatementProcessor {
         }
         finally {
           RunningStatementStore.unregister(ps);
-        }       
+        }
       }
       finishOutputBatch();
       if (monitor != null) {
@@ -263,6 +264,7 @@ public class StatementProcessor implements IStatementProcessor {
    * #processSelectInto(java.sql.Connection,org.eclipse.scout.
    * rt.server.services.common.sql.internal.exec.PreparedStatementCache)
    */
+  @Override
   public void processSelectInto(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException {
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -285,7 +287,7 @@ public class StatementProcessor implements IStatementProcessor {
         }
         finally {
           RunningStatementStore.unregister(ps);
-        }     
+        }
       }
       finishOutputBatch();
       if (monitor != null) {
@@ -314,6 +316,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
+  @Override
   public void processSelectStreaming(Connection conn, IStatementCache cache, ISelectStreamHandler handler) throws ProcessingException {
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -382,6 +385,7 @@ public class StatementProcessor implements IStatementProcessor {
    * org.eclipse.scout
    * .rt.server.services.common.sql.internal.exec.PreparedStatementCache)
    */
+  @Override
   public int processModification(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException {
     PreparedStatement ps = null;
     int rowCount = 0;
@@ -426,6 +430,7 @@ public class StatementProcessor implements IStatementProcessor {
    * org.eclipse.
    * scout.rt.server.services.common.sql.internal.exec.PreparedStatementCache)
    */
+  @Override
   public boolean processStoredProcedure(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) throws ProcessingException {
     CallableStatement cs = null;
     boolean status = true;
@@ -473,6 +478,7 @@ public class StatementProcessor implements IStatementProcessor {
    * @seeorg.eclipse.scout.rt.server.services.common.sql.internal.exec.
    * IStatementProcessor#createPlainText()
    */
+  @Override
   public String createPlainText() throws ProcessingException {
     for (IToken t : m_ioTokens) {
       if (t instanceof ValueInputToken) {
@@ -505,6 +511,7 @@ public class StatementProcessor implements IStatementProcessor {
    * @seeorg.eclipse.scout.rt.server.services.common.sql.internal.exec.
    * IStatementProcessor#simulate()
    */
+  @Override
   public void simulate() throws ProcessingException {
     while (hasNextInputBatch()) {
       nextInputBatch();
@@ -866,7 +873,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
     else if (bindBase instanceof IBeanArrayHolder) {
       // handle all terminal cases for BeanArrayHolder
-      IBeanArrayHolder holder = (IBeanArrayHolder) bindBase;
+      IBeanArrayHolder<?> holder = (IBeanArrayHolder) bindBase;
       try {
         Method m = holder.getHolderType().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
         if (m != null) {
@@ -891,7 +898,7 @@ public class StatementProcessor implements IStatementProcessor {
     else if (bindBase instanceof BeanArrayHolderFilter) {
       // handle all terminal cases for table holder filter
       BeanArrayHolderFilter filter = (BeanArrayHolderFilter) bindBase;
-      IBeanArrayHolder holder = filter.getBeanArrayHolder();
+      IBeanArrayHolder<?> holder = filter.getBeanArrayHolder();
       try {
         Method m = holder.getHolderType().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1));
         if (m != null) {

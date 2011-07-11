@@ -28,8 +28,8 @@ import org.osgi.framework.Bundle;
 public class BundleBrowser {
   public static final IScoutLogger LOG = ScoutLogManager.getLogger(BundleBrowser.class);
 
-  private Bundle m_bundle;
-  private String m_packagePath;
+  private final Bundle m_bundle;
+  private final String m_packagePath;
   //context as members (performance)
   private HashSet<String> m_set;
   private String m_prefix;
@@ -59,7 +59,6 @@ public class BundleBrowser {
    *         If the bundle is a binary bundle, simply visits all its classes, otherwise visits the bin/ or the /classes
    *         folder
    */
-  @SuppressWarnings("unchecked")
   public String[] getClasses(boolean includeInnerTypes, boolean includeSubtree) {
     m_includeInnerTypes = includeInnerTypes;
     m_includeSubtree = includeSubtree;

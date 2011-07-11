@@ -36,6 +36,7 @@ public class PlatformService extends AbstractService implements IPlatformService
     return ClientSyncJob.getCurrentSession().getBundle();
   }
 
+  @Override
   public boolean setProperty(String key, String value) {
     if (m_props == null) {
       m_props = new UserScope().getNode(getBundle().getSymbolicName());
@@ -56,6 +57,7 @@ public class PlatformService extends AbstractService implements IPlatformService
     return !CompareUtility.equals(oldValue, value);
   }
 
+  @Override
   public String getProperty(String key, String def) {
     if (m_props == null) {
       m_props = new UserScope().getNode(getBundle().getSymbolicName());
@@ -63,18 +65,22 @@ public class PlatformService extends AbstractService implements IPlatformService
     return m_props.get(key, def);
   }
 
+  @Override
   public String getFile() {
     return getFile(null, true);
   }
 
+  @Override
   public String getFile(String ext, boolean open) {
     return getFile(ext, open, null);
   }
 
+  @Override
   public String getFile(String ext, boolean open, String curPath) {
     return getFile(ext, open, curPath, false);
   }
 
+  @Override
   public String getFile(String ext, boolean open, String curPath, boolean folderMode) {
     if (curPath == null) {
       curPath = FileChooser.getCurrentDirectory();

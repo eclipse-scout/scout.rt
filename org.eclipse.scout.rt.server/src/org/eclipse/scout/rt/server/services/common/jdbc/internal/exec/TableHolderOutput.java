@@ -41,46 +41,57 @@ class TableHolderOutput implements IBindOutput {
     m_source = source;
   }
 
+  @Override
   public IToken getToken() {
     return m_source;
   }
 
+  @Override
   public boolean isJdbcBind() {
     return !m_source.isSelectInto();
   }
 
+  @Override
   public int getJdbcBindIndex() {
     return m_jdbcBindIndex;
   }
 
+  @Override
   public void setJdbcBindIndex(int index) {
     m_jdbcBindIndex = index;
   }
 
+  @Override
   public boolean isBatch() {
     return true;
   }
 
+  @Override
   public boolean isSelectInto() {
     return m_source.isSelectInto();
   }
 
+  @Override
   public Class getBindType() {
     return m_getterMethod.getReturnType();
   }
 
+  @Override
   public void setNextBatchIndex(int i) {
     m_batchIndex = i;
   }
 
+  @Override
   public void finishBatch() {
     m_holder.ensureSize(m_batchIndex + 1);
   }
 
+  @Override
   public void setReplaceToken(ISqlStyle style) {
     m_source.setReplaceToken("?");
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void consumeValue(Object value) throws ProcessingException {
     m_holder.ensureSize(m_batchIndex + 1);

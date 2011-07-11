@@ -52,6 +52,7 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
     return m_value;
   }
 
+  @Override
   public int compareTo(CompositeObject o) {
     Object[] me = this.m_value;
     Object[] other = o.m_value;

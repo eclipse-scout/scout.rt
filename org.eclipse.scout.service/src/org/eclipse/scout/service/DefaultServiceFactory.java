@@ -43,6 +43,7 @@ public class DefaultServiceFactory implements IServiceFactory {
     m_serviceClass = serviceClass;
   }
 
+  @Override
   public void serviceRegistered(final ServiceRegistration registration) throws Throwable {
     Boolean createImmediately = (Boolean) registration.getReference().getProperty(ServiceConstants.SERVICE_CREATE_IMMEDIATELY);
     if (createImmediately != null && createImmediately) {
@@ -59,6 +60,7 @@ public class DefaultServiceFactory implements IServiceFactory {
     }
   }
 
+  @Override
   public Object getService(Bundle bundle, ServiceRegistration registration) {
     updateClassCache(registration);
     updateInstanceCache(registration);
@@ -92,6 +94,7 @@ public class DefaultServiceFactory implements IServiceFactory {
     }
   }
 
+  @Override
   public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
   }
 

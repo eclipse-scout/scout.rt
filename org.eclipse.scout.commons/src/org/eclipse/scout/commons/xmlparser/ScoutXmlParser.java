@@ -348,6 +348,7 @@ public class ScoutXmlParser {
     private Map<String, String> m_namespaceBuffer;
     private StringBuffer m_textBuffer;
 
+    @Override
     public void startDocument() throws SAXException {
       m_ancestor = m_initialElement != null ? m_initialElement.getParent() : null;
       m_current = m_initialElement;
@@ -360,10 +361,12 @@ public class ScoutXmlParser {
       m_xmlDocument.setStrictlyChecking(false);
     }
 
+    @Override
     public void startPrefixMapping(String prefix, String namespaceURI) throws SAXException {
       m_namespaceBuffer.put(prefix, namespaceURI);
     }
 
+    @Override
     public void startElement(String namespaceURI, String localName, String qnamePrefixed, Attributes attributes) throws SAXException {
       String text = m_textBuffer.toString().trim(); // Other wise problems with
       // mixed content
@@ -386,14 +389,17 @@ public class ScoutXmlParser {
       if (attributes.getLength() > 0) m_current.setAttributes(attributes);
     }
 
+    @Override
     public void characters(char[] characters, int start, int length) throws SAXException {
       if (length > 0) m_textBuffer.append(characters, start, length);
     }
 
+    @Override
     public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
       // Ignored
     }
 
+    @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
       String text = m_textBuffer.toString().trim();
       if (text.length() > 0) m_current.addText(text);
@@ -407,10 +413,12 @@ public class ScoutXmlParser {
       }
     }
 
+    @Override
     public void endPrefixMapping(String prefix) throws SAXException {
       // Ignored
     }
 
+    @Override
     public void endDocument() throws SAXException {
       m_ancestor = null;
       m_current = null;
@@ -422,14 +430,17 @@ public class ScoutXmlParser {
       if (m_numberOfIgnoredWarnings > 0) LOG.warn(m_numberOfIgnoredWarnings + " warnings(s) were ignored.");
     }
 
+    @Override
     public void processingInstruction(String target, String data) throws SAXException {
       // Ignored
     }
 
+    @Override
     public void setDocumentLocator(Locator locator) {
       // Ignored
     }
 
+    @Override
     public void skippedEntity(String name) throws SAXException {
       // Ignored
     }
@@ -437,24 +448,29 @@ public class ScoutXmlParser {
 
   private class P_SaxDeclarationHandler implements org.xml.sax.ext.DeclHandler {
 
+    @Override
     public void attributeDecl(String eName, String aName, String type, String valueDefault, String value) throws SAXException {
       // Ignored
     }
 
+    @Override
     public void elementDecl(String name, String model) throws SAXException {
       // Ignored
     }
 
+    @Override
     public void externalEntityDecl(String name, String publicId, String systemId) throws SAXException {
       // Ignored
     }
 
+    @Override
     public void internalEntityDecl(String name, String value) throws SAXException {
       // Ignored
     }
   }
 
   private class P_SaxEntityResolver implements org.xml.sax.EntityResolver {
+    @Override
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException {
       if (ScoutXmlParser.this.isIgnoreExternalEntities()) return new InputSource(new ByteArrayInputStream(new String("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").getBytes()));
       else return null;
@@ -462,15 +478,18 @@ public class ScoutXmlParser {
   }
 
   private class P_SaxErrorHandler implements org.xml.sax.ErrorHandler {
+    @Override
     public void fatalError(SAXParseException exception) throws SAXException {
       throw exception;
     }
 
+    @Override
     public void error(SAXParseException exception) throws SAXException {
       if (ScoutXmlParser.this.isIgnoreSaxErrors()) m_numberOfIgnoredErrors++;
       else throw exception;
     }
 
+    @Override
     public void warning(SAXParseException exception) throws SAXException {
       if (ScoutXmlParser.this.isIgnoreSaxWarnings()) m_numberOfIgnoredWarnings++;
       else LOG.warn(exception.getMessage());
@@ -478,30 +497,37 @@ public class ScoutXmlParser {
   }
 
   private class P_SaxLexicalHandler implements org.xml.sax.ext.LexicalHandler {
+    @Override
     public void comment(char[] ch, int start, int length) throws SAXException {
       // Ignored
     }
 
+    @Override
     public void startCDATA() throws SAXException {
       // Ignored
     }
 
+    @Override
     public void endCDATA() throws SAXException {
       // Ignored
     }
 
+    @Override
     public void startDTD(String name, String publicId, String systemId) throws SAXException {
       m_xmlDocument.setExternalDTD(publicId, systemId);
     }
 
+    @Override
     public void endDTD() throws SAXException {
       // Ignored
     }
 
+    @Override
     public void startEntity(String name) throws SAXException {
       // Ignored
     }
 
+    @Override
     public void endEntity(String name) throws SAXException {
       // Ignored
     }

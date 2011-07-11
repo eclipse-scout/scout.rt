@@ -39,10 +39,12 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     setEnabled(true);
   }
 
+  @Override
   public boolean isEnabled() {
     return m_enabled;
   }
 
+  @Override
   public void setEnabled(boolean enabled) {
     if (m_enabled != enabled) {
       m_enabled = enabled;
@@ -53,11 +55,13 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> ITableColumnFilter<T> getFilter(IColumn<T> col) {
     return m_filterMap.get(col);
   }
 
+  @Override
   public void reset() throws ProcessingException {
     try {
       m_table.setTableChanging(true);
@@ -73,6 +77,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void showFilterForm(IColumn col) throws ProcessingException {
     ITableColumnFilter<?> filter = m_filterMap.get(col);
@@ -110,6 +115,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     }
   }
 
+  @Override
   public boolean accept(ITableRow row) {
     for (ITableColumnFilter f : m_filterMap.values()) {
       if (!f.accept(row)) return false;
@@ -117,6 +123,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     return true;
   }
 
+  @Override
   public List<String> getDisplayTexts() {
     ArrayList<String> list = new ArrayList<String>();
     for (ITableColumnFilter<?> filter : m_filterMap.values()) {

@@ -569,6 +569,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     m_jdbcPoolConnectionBusyTimeout = t;
   }
 
+  @Override
   public Object getAdapter(Class adapter) {
     if (adapter == IServiceInventory.class) {
       if (m_pool != null) {
@@ -586,6 +587,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     m_nlsProvider = nlsProvider;
   }
 
+  @Override
   public ISqlStyle getSqlStyle() {
     return m_sqlStyle;
   }
@@ -660,6 +662,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     return m_pool;
   }
 
+  @Override
   public Connection getConnection() throws ProcessingException {
     return getTransaction();
   }
@@ -705,46 +708,57 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
    * Operations
    */
 
+  @Override
   public Object[][] select(String s, Object... bindBases) throws ProcessingException {
     return createStatementProcessor(s, bindBases, 0).processSelect(getTransaction(), getStatementCache(), null);
   }
 
+  @Override
   public Object[][] selectLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException {
     return createStatementProcessor(s, bindBases, maxRowCount).processSelect(getTransaction(), getStatementCache(), null);
   }
 
+  @Override
   public void selectInto(String s, Object... bindBases) throws ProcessingException {
     createStatementProcessor(s, bindBases, 0).processSelectInto(getTransaction(), getStatementCache(), null);
   }
 
+  @Override
   public void selectIntoLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException {
     createStatementProcessor(s, bindBases, maxRowCount).processSelectInto(getTransaction(), getStatementCache(), null);
   }
 
+  @Override
   public void selectStreaming(String s, ISelectStreamHandler handler, Object... bindBases) throws ProcessingException {
     createStatementProcessor(s, bindBases, 0).processSelectStreaming(getTransaction(), getStatementCache(), handler);
   }
 
+  @Override
   public void selectStreamingLimited(String s, ISelectStreamHandler handler, int maxRowCount, Object... bindBases) throws ProcessingException {
     createStatementProcessor(s, bindBases, maxRowCount).processSelectStreaming(getTransaction(), getStatementCache(), handler);
   }
 
+  @Override
   public int insert(String s, Object... bindBases) throws ProcessingException {
     return createStatementProcessor(s, bindBases, 0).processModification(getTransaction(), getStatementCache(), null);
   }
 
+  @Override
   public int update(String s, Object... bindBases) throws ProcessingException {
     return createStatementProcessor(s, bindBases, 0).processModification(getTransaction(), getStatementCache(), null);
   }
 
+  @Override
   public int delete(String s, Object... bindBases) throws ProcessingException {
     return createStatementProcessor(s, bindBases, 0).processModification(getTransaction(), getStatementCache(), null);
   }
 
+  @Override
   public boolean callStoredProcedure(String s, Object... bindBases) throws ProcessingException {
     return createStatementProcessor(s, bindBases, 0).processStoredProcedure(getTransaction(), getStatementCache(), null);
   }
 
+  @Override
   public void commit() throws ProcessingException {
     try {
       getTransaction().commit();
@@ -754,10 +768,12 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     }
   }
 
+  @Override
   public String createPlainText(String s, Object... bindBases) throws ProcessingException {
     return createStatementProcessor(s, bindBases, 0).createPlainText();
   }
 
+  @Override
   public WhereToken resolveSpecialConstraint(Object specialConstraint) throws ProcessingException {
     if (specialConstraint instanceof LegacySearchFilter.StringLikeConstraint) {
       LegacySearchFilter.StringLikeConstraint c = (LegacySearchFilter.StringLikeConstraint) specialConstraint;
@@ -791,6 +807,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
    * 
    * @see commit
    */
+  @Override
   public void rollback() throws ProcessingException {
     try {
       getTransaction().rollback();
@@ -800,6 +817,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     }
   }
 
+  @Override
   public Long getSequenceNextval(String sequenceName) throws ProcessingException {
     String s = "SELECT " + sequenceName + ".NEXTVAL FROM DUAL ";
     Object[][] ret = createStatementProcessor(s, null, 0).processSelect(getTransaction(), getStatementCache(), null);
@@ -862,6 +880,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       m_conn = conn;
     }
 
+    @Override
     public String getMemberId() {
       return m_transactionMemberId;
     }
@@ -870,14 +889,17 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       return m_conn;
     }
 
+    @Override
     public boolean needsCommit() {
       return true;
     }
 
+    @Override
     public boolean commitPhase1() {
       return true;
     }
 
+    @Override
     public void commitPhase2() {
       try {
         // this is the end of the transaction
@@ -889,6 +911,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       }
     }
 
+    @Override
     public void rollback() {
       try {
         // this is the end of the transaction
@@ -900,6 +923,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       }
     }
 
+    @Override
     public void release() {
       releaseConnection(m_conn);
     }

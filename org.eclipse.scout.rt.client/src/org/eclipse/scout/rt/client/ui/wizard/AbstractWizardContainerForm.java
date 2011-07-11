@@ -142,6 +142,7 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
   }
 
   private class P_WizardPropertyListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
       handleWizardPropertyChanged(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
     }

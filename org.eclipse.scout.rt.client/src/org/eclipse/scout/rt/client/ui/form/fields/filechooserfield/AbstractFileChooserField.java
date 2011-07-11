@@ -145,10 +145,12 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
   }
 
+  @Override
   public IFileChooserFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
+  @Override
   public void setFolderMode(boolean b) {
     m_folderMode = b;
     if (isInitialized()) {
@@ -158,10 +160,12 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
   }
 
+  @Override
   public boolean isFolderMode() {
     return m_folderMode;
   }
 
+  @Override
   public void setShowDirectory(boolean b) {
     m_showDirectory = b;
     if (isInitialized()) {
@@ -171,10 +175,12 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
   }
 
+  @Override
   public boolean isShowDirectory() {
     return m_showDirectory;
   }
 
+  @Override
   public void setShowFileName(boolean b) {
     m_showFileName = b;
     if (isInitialized()) {
@@ -184,10 +190,12 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
   }
 
+  @Override
   public boolean isShowFileName() {
     return m_showFileName;
   }
 
+  @Override
   public void setShowFileExtension(boolean b) {
     m_showFileExtension = b;
     if (isInitialized()) {
@@ -197,42 +205,52 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
   }
 
+  @Override
   public boolean isShowFileExtension() {
     return m_showFileExtension;
   }
 
+  @Override
   public void setTypeLoad(boolean b) {
     m_typeLoad = b;
   }
 
+  @Override
   public boolean isTypeLoad() {
     return m_typeLoad;
   }
 
+  @Override
   public void setFileExtensions(String[] a) {
     m_fileExtensions = a;
   }
 
+  @Override
   public String[] getFileExtensions() {
     return m_fileExtensions;
   }
 
+  @Override
   public void setDirectory(File d) {
     m_directory = d;
   }
 
+  @Override
   public File getDirectory() {
     return m_directory;
   }
 
+  @Override
   public void setFileIconId(String s) {
     propertySupport.setPropertyString(PROP_FILE_ICON_ID, s);
   }
 
+  @Override
   public String getFileIconId() {
     return propertySupport.getPropertyString(PROP_FILE_ICON_ID);
   }
 
+  @Override
   public void setMaxLength(int len) {
     if (len > 0) propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
     if (isInitialized()) {
@@ -240,6 +258,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
   }
 
+  @Override
   public int getMaxLength() {
     int len = propertySupport.getPropertyInt(PROP_MAX_LENGTH);
     if (len <= 0) {
@@ -248,14 +267,17 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     return len;
   }
 
+  @Override
   public IMenu[] getMenus() {
     return m_menus.toArray(new IMenu[0]);
   }
 
+  @Override
   public boolean hasMenus() {
     return m_menus.size() > 0;
   }
 
+  @Override
   public IFileChooser getFileChooser() {
     FileChooser fc = new FileChooser();
     fc.setTypeLoad(isTypeLoad());
@@ -268,12 +290,14 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   }
 
   // Convenience file getter
+  @Override
   public File getValueAsFile() {
     String value = getValue();
     if (value == null) return null;
     else return new File(value);
   }
 
+  @Override
   public String getFileName() {
     File f = getValueAsFile();
     if (f != null) {
@@ -284,6 +308,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
   }
 
+  @Override
   public long getFileSize() {
     File f = getValueAsFile();
     if (f != null) {
@@ -294,6 +319,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
   }
 
+  @Override
   public boolean fileExists() {
     if (getValue() == null) return false;
     return getValueAsFile().exists();
@@ -401,6 +427,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   private class P_UIFacade implements IFileChooserFieldUIFacade {
 
+    @Override
     public IMenu[] firePopupFromUI() {
       ArrayList<IMenu> menus = new ArrayList<IMenu>();
       for (Iterator<IMenu> it = m_menus.iterator(); it.hasNext();) {
@@ -413,6 +440,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
       return menus.toArray(new IMenu[0]);
     }
 
+    @Override
     public boolean setTextFromUI(String newText) {
       if (newText != null && newText.length() == 0) newText = null;
       return parseValue(newText);

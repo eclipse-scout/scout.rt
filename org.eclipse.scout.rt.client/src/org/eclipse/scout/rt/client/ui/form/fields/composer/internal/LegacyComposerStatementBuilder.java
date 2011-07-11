@@ -180,6 +180,7 @@ public class LegacyComposerStatementBuilder {
       }
       // tag replacement
       ITagProcessor processor = new ITagProcessor() {
+        @Override
         public String processTag(String tagName, String attribute) {
           String key = "${attribute" + getNextBindSeqNo() + "}";
           m_attributeRefMap.put(key, new LegacySearchFilter.ComposerAttributeRef(node.getOp().getOperator(), attribute, bindTranslationTable.get("S"), node.getValues() != null && node.getValues().length > 0 ? node.getValues()[0] : null));

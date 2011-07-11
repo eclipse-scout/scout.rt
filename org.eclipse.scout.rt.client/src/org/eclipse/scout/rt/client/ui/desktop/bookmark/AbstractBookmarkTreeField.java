@@ -153,6 +153,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    */
   private void rebuildBookmarkModel() throws ProcessingException {
     getTree().visitTree(new ITreeVisitor() {
+      @Override
       public boolean visit(ITreeNode node) {
         BookmarkFolder bmFolder = null;
         if (node == getTree().getRootNode()) {
@@ -173,6 +174,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             }
           }
           Collections.sort(folderList, new Comparator<BookmarkFolder>() {
+            @Override
             public int compare(BookmarkFolder f1, BookmarkFolder f2) {
               return StringUtility.compareIgnoreCase(f1.getTitle(), f2.getTitle());
             }
@@ -198,6 +200,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    */
   private void refreshBookmarkModel() throws ProcessingException {
     getTree().visitTree(new ITreeVisitor() {
+      @Override
       public boolean visit(ITreeNode node) {
         BookmarkFolder bmFolder = null;
         if (node == getTree().getRootNode()) {
@@ -592,6 +595,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             //find new folder node
             final AtomicReference<ITreeNode> newContainerNode = new AtomicReference<ITreeNode>(getTree().getRootNode());
             tree.visitTree(new ITreeVisitor() {
+              @Override
               public boolean visit(ITreeNode n) {
                 if (isFolderNode(n) && newBmFolder.equals(n.getCell().getValue())) {
                   newContainerNode.set(n);

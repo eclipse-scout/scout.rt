@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  */
 public class ComposerFieldDataModel extends AbstractDataModel {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ComposerFieldDataModel.class);
+  private static final long serialVersionUID = 1L;
 
   private final IComposerField m_field;
 

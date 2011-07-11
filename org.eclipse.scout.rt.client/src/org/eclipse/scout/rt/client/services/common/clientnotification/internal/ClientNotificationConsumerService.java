@@ -47,6 +47,7 @@ public class ClientNotificationConsumerService extends AbstractService implement
     return data;
   }
 
+  @Override
   public void dispatchClientNotifications(final IClientNotification[] notifications, final IClientSession session) {
     if (notifications == null || notifications.length == 0) {
       return;
@@ -70,11 +71,13 @@ public class ClientNotificationConsumerService extends AbstractService implement
     }
   }
 
+  @Override
   @Deprecated
   public void addClientNotificationConsumerListener(IClientNotificationConsumerListener listener) {
     addClientNotificationConsumerListener(ClientJob.getCurrentSession(), listener);
   }
 
+  @Override
   @Deprecated
   public void removeClientNotificationConsumerListener(IClientNotificationConsumerListener listener) {
     removeClientNotificationConsumerListener(ClientJob.getCurrentSession(), listener);

@@ -175,6 +175,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     m_resourceTable.addTableListener(new P_ResourceTableListener());
     m_activityMap.addPropertyChangeListener(
         new PropertyChangeListener() {
+          @Override
           public void propertyChange(PropertyChangeEvent e) {
             if (e.getPropertyName().equals(IActivityMap.PROP_SELECTED_RESOURCE_IDS)) {
               syncSelectionFromActivityToResource();
@@ -206,31 +207,38 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     getActivityMap().disposeActivityMap();
   }
 
+  @Override
   public int getMiniCalendarCount() {
     return propertySupport.getPropertyInt(PROP_MINI_CALENDAR_COUNT);
   }
 
+  @Override
   public void setMiniCalendarCount(int n) {
     if (n < 0 || n > 6) return;// ignore it
     propertySupport.setPropertyInt(PROP_MINI_CALENDAR_COUNT, n);
   }
 
+  @Override
   public final T getResourceTable() {
     return m_resourceTable;
   }
 
+  @Override
   public final P getActivityMap() {
     return m_activityMap;
   }
 
+  @Override
   public void loadResourceTableData() throws ProcessingException {
     execPopulateResourceTable();
   }
 
+  @Override
   public void loadActivityMapData() throws ProcessingException {
     loadActivityMapDataInternal(getResourceTable().getRows());
   }
 
+  @Override
   public void loadActivityMapDataOfSelectedRecources() throws ProcessingException {
     loadActivityMapDataInternal(getResourceTable().getSelectedRows());
   }
@@ -247,6 +255,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     }
   }
 
+  @Override
   public ITableRow activityCellToResourceRow(ActivityCell activityCell) {
     if (activityCell != null) {
       return getResourceIdColumnInternal().findRow(activityCell.getResourceId());
@@ -256,6 +265,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     }
   }
 
+  @Override
   public ITableRow[] activityCellsToResourceRows(ActivityCell[] activityCells) {
     HashSet<ITableRow> resourceRowSet = new HashSet<ITableRow>();
     for (ActivityCell cell : activityCells) {
@@ -267,10 +277,12 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     return resourceRowSet.toArray(new ITableRow[resourceRowSet.size()]);
   }
 
+  @Override
   public ActivityCell[] resourceRowToActivityCells(ITableRow resourceRow) {
     return resourceRowsToActivityCells(new ITableRow[]{resourceRow});
   }
 
+  @Override
   public ActivityCell[] resourceRowsToActivityCells(ITableRow[] resourceRows) {
     return getActivityMap().getActivityCells(getResourceIdColumnInternal().getValues(resourceRows));
   }
@@ -300,12 +312,14 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     }
   }
 
+  @Override
   public IPlannerFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
   private class P_PlannerFieldUIFacade implements IPlannerFieldUIFacade {
 
+    @Override
     public void refreshFromUI() {
       try {
         loadResourceTableData();

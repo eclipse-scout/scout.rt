@@ -24,12 +24,14 @@ public class WrappedToken extends AbstractNode implements INode {
     return m_node;
   }
 
+  @Override
   public void format(IFormatVisitor v) {
     v.print("(");
     m_node.format(v);
     v.print(")");
   }
 
+  @Override
   public Object eval(IEvalVisitor v) {
     return m_node.eval(v);
   }

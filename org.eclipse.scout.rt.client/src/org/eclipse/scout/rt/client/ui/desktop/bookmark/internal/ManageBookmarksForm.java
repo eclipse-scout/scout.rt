@@ -48,6 +48,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
     return ScoutTexts.get("Bookmarks");
   }
 
+  @Override
   public void bookmarksChanged(BookmarkServiceEvent e) {
     getGlobalBookmarkTreeField().setBookmarkRootFolder(e.getBookmarkService().getBookmarkData().getGlobalBookmarks());
     getUserBookmarkTreeField().setBookmarkRootFolder(e.getBookmarkService().getBookmarkData().getUserBookmarks());

@@ -296,6 +296,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
     // local property listener
     addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         if (m_table != null) {
           String name = e.getPropertyName();
@@ -364,42 +365,52 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return new P_ListBoxUIFacade();
   }
 
+  @Override
   public IListBoxUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
+  @Override
   public final ITable getTable() {
     return m_table;
   }
 
+  @Override
   public boolean isFilterCheckedRows() {
     return propertySupport.getPropertyBool(PROP_FILTER_CHECKED_ROWS);
   }
 
+  @Override
   public void setFilterCheckedRows(boolean b) {
     propertySupport.setPropertyBool(PROP_FILTER_CHECKED_ROWS, b);
   }
 
+  @Override
   public boolean getFilterCheckedRowsValue() {
     return propertySupport.getPropertyBool(PROP_FILTER_CHECKED_ROWS_VALUE);
   }
 
+  @Override
   public void setFilterCheckedRowsValue(boolean b) {
     propertySupport.setPropertyBool(PROP_FILTER_CHECKED_ROWS_VALUE, b);
   }
 
+  @Override
   public boolean isFilterActiveRows() {
     return propertySupport.getPropertyBool(PROP_FILTER_ACTIVE_ROWS);
   }
 
+  @Override
   public void setFilterActiveRows(boolean b) {
     propertySupport.setPropertyBool(PROP_FILTER_ACTIVE_ROWS, b);
   }
 
+  @Override
   public TriState getFilterActiveRowsValue() {
     return (TriState) propertySupport.getProperty(PROP_FILTER_ACTIVE_ROWS_VALUE);
   }
 
+  @Override
   public void setFilterActiveRowsValue(TriState t) {
     if (t == null) t = TriState.TRUE;
     propertySupport.setProperty(PROP_FILTER_ACTIVE_ROWS_VALUE, t);
@@ -439,6 +450,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public void loadListBoxData() throws ProcessingException {
     if (getTable() != null) {
       try {
@@ -458,6 +470,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   /**
    * do not use this internal method directly
    */
+  @Override
   public final void prepareLookupCall(LookupCall call) throws ProcessingException {
     prepareLookupCallInternal(call);
     execPrepareLookup(call);
@@ -498,18 +511,22 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public final LookupCall getLookupCall() {
     return m_lookupCall;
   }
 
+  @Override
   public void setLookupCall(LookupCall call) {
     m_lookupCall = call;
   }
 
+  @Override
   public Class<? extends ICodeType> getCodeTypeClass() {
     return m_codeTypeClass;
   }
 
+  @Override
   public void setCodeTypeClass(Class<? extends ICodeType> codeTypeClass) {
     m_codeTypeClass = codeTypeClass;
     // create lookup service call
@@ -560,6 +577,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return validValue;
   }
 
+  @Override
   public T getSingleValue() {
     T[] a = getValue();
     if (a != null && a.length > 0) {
@@ -570,6 +588,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void setSingleValue(T value) {
     if (value == null) {
@@ -582,6 +601,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public int getCheckedKeyCount() {
     T[] keys = getValue();
     if (keys != null) {
@@ -592,6 +612,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public T getCheckedKey() {
     T[] a = getCheckedKeys();
     if (a != null && a.length > 0) {
@@ -602,10 +623,12 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public T[] getCheckedKeys() {
     return getValue();
   }
 
+  @Override
   public LookupRow getCheckedLookupRow() {
     LookupRow[] a = getCheckedLookupRows();
     if (a != null && a.length > 0) {
@@ -616,6 +639,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public LookupRow[] getCheckedLookupRows() {
     LookupRow[] lookupRows = null;
     ITableRow[] tableRows = getTable().getCheckedRows();
@@ -630,6 +654,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return lookupRows;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void checkKey(T key) {
     if (key == null) {
@@ -642,14 +667,17 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public void checkKeys(T[] keys) {
     setValue(keys);
   }
 
+  @Override
   public void uncheckAllKeys() {
     checkKeys(null);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T[] getUncheckedKeys() {
     HashSet<T> set = new HashSet<T>();
@@ -667,14 +695,17 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return a;
   }
 
+  @Override
   public void checkAllKeys() {
     checkKeys(getKeyColumnInternal().getValues());
   }
 
+  @Override
   public void checkAllActiveKeys() {
     checkKeys(getKeyColumnInternal().getValues(getActiveColumnInternal().findRows(true)));
   }
 
+  @Override
   public void uncheckAllInactiveKeys() {
     checkKeys(getKeyColumnInternal().getValues(getActiveColumnInternal().findRows(false)));
   }
@@ -754,10 +785,12 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
    * Implementation of ICompositeField
    */
 
+  @Override
   @SuppressWarnings("unchecked")
   public <F extends IFormField> F getFieldByClass(final Class<F> c) {
     final Holder<IFormField> found = new Holder<IFormField>(IFormField.class);
     IFormFieldVisitor v = new IFormFieldVisitor() {
+      @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (field.getClass() == c) {
           found.setValue(field);
@@ -769,9 +802,11 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return (F) found.getValue();
   }
 
+  @Override
   public IFormField getFieldById(final String id) {
     final Holder<IFormField> found = new Holder<IFormField>(IFormField.class);
     IFormFieldVisitor v = new IFormFieldVisitor() {
+      @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (field.getFieldId().equals(id)) {
           found.setValue(field);
@@ -783,9 +818,11 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return found.getValue();
   }
 
+  @Override
   public <X extends IFormField> X getFieldById(final String id, final Class<X> type) {
     final Holder<X> found = new Holder<X>(type);
     IFormFieldVisitor v = new IFormFieldVisitor() {
+      @Override
       @SuppressWarnings("unchecked")
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (type.isAssignableFrom(field.getClass()) && field.getFieldId().equals(id)) {
@@ -798,10 +835,12 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return found.getValue();
   }
 
+  @Override
   public int getFieldCount() {
     return m_fields.length;
   }
 
+  @Override
   public int getFieldIndex(IFormField f) {
     for (int i = 0; i < m_fields.length; i++) {
       if (m_fields[i] == f) return i;
@@ -809,12 +848,14 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return -1;
   }
 
+  @Override
   public IFormField[] getFields() {
     IFormField[] a = new IFormField[m_fields.length];
     System.arraycopy(m_fields, 0, a, 0, a.length);
     return a;
   }
 
+  @Override
   public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
     // myself
     if (!visitor.visitField(this, startLevel, 0)) return false;
@@ -833,14 +874,17 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     return true;
   }
 
+  @Override
   public final int getGridColumnCount() {
     return 1;
   }
 
+  @Override
   public final int getGridRowCount() {
     return 1;
   }
 
+  @Override
   public void rebuildFieldGrid() {
     GridData gd = getListBoxFilterBox().getGridDataHints();
     gd.x = 0;

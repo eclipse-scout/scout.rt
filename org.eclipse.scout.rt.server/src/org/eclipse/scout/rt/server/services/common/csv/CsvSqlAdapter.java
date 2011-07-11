@@ -215,6 +215,7 @@ public class CsvSqlAdapter {
       try {
         h.exportHeaderRows(w, params.getWriteColumnNames(), params.getWriteColumnTypes());
         ISelectStreamHandler handler = new ISelectStreamHandler() {
+          @Override
           public void handleRow(Connection con, PreparedStatement stm, ResultSet rs, int rowIndex, List<SqlBind> values) throws ProcessingException {
             Object[] row = new Object[values.size()];
             for (int i = 0; i < row.length; i++) {
@@ -223,6 +224,7 @@ public class CsvSqlAdapter {
             h.exportDataRow(row, w, false);
           }
 
+          @Override
           public void finished(Connection con, PreparedStatement stm, ResultSet rs, int rowCount) throws ProcessingException {
           }
         };
@@ -339,6 +341,7 @@ public class CsvSqlAdapter {
       m_useLineNumberColumnName = useLineNumberColumnName;
     }
 
+    @Override
     public void processRow(int lineNr, List<Object> row) throws ProcessingException {
       try {
         ArrayList<Object> bindBase = new ArrayList<Object>();

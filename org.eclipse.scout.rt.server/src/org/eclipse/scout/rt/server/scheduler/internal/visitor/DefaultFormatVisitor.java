@@ -14,19 +14,23 @@ public class DefaultFormatVisitor implements IFormatVisitor {
   private StringBuffer m_buf;
   private String m_text;
 
+  @Override
   public void start() {
     m_buf = new StringBuffer();
   }
 
+  @Override
   public void end() {
     m_text = m_buf.toString();
     m_buf = null;
   }
 
+  @Override
   public void print(String s) {
     m_buf.append(s);
   }
 
+  @Override
   public String getText() {
     return m_text;
   }

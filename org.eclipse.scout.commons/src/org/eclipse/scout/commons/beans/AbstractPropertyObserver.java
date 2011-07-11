@@ -16,18 +16,22 @@ public abstract class AbstractPropertyObserver implements IPropertyObserver {
 
   protected final BasicPropertySupport propertySupport = new BasicPropertySupport(this);
 
+  @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     propertySupport.addPropertyChangeListener(listener);
   }
 
+  @Override
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     propertySupport.addPropertyChangeListener(propertyName, listener);
   }
 
+  @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     propertySupport.removePropertyChangeListener(listener);
   }
 
+  @Override
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     propertySupport.removePropertyChangeListener(propertyName, listener);
   }

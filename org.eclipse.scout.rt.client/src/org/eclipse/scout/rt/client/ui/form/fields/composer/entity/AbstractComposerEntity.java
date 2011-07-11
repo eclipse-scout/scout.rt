@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 @SuppressWarnings("deprecation")
 public abstract class AbstractComposerEntity extends AbstractDataModelEntity implements IComposerEntity {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractComposerEntity.class);
+  private static final long serialVersionUID = 1L;
 
   private String m_id;
 
@@ -47,11 +48,13 @@ public abstract class AbstractComposerEntity extends AbstractDataModelEntity imp
     super.initConfig();
   }
 
+  @Override
   public String getId() {
     if (m_id != null) return m_id;
     else return getClass().getSimpleName();
   }
 
+  @Override
   public void setId(String s) {
     m_id = s;
   }

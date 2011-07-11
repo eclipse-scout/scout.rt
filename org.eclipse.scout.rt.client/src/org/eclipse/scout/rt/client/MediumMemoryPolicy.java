@@ -84,6 +84,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
           p = p.getParentPage();
         }
         ITreeVisitor v = new ITreeVisitor() {
+          @Override
           public boolean visit(ITreeNode node) {
             IPage page = (IPage) node;
             if (preservationSet.contains(page)) {

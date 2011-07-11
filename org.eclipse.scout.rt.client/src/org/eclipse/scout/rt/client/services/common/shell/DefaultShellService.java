@@ -25,6 +25,7 @@ import org.eclipse.scout.service.AbstractService;
 @Priority(0)
 public class DefaultShellService extends AbstractService implements IShellService {
 
+  @Override
   public void shellOpen(String path) throws ProcessingException {
     openWithRuntimeExec(path);
   }

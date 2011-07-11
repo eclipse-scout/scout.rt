@@ -91,6 +91,7 @@ public class TopView extends DefaultView {
           final IView finalV = v;
           p.startLinkAction(
               new AbstractHtmlAction("tab." + v.getClass().getSimpleName()) {
+                @Override
                 public void run() {
                   m_activeView = finalV;
                   if (m_activeView != null) {

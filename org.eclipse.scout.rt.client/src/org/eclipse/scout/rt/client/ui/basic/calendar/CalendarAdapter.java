@@ -16,12 +16,14 @@ package org.eclipse.scout.rt.client.ui.basic.calendar;
  */
 public class CalendarAdapter implements CalendarListener {
 
+  @Override
   public void calendarChangedBatch(CalendarEvent[] batch) {
     for (int i = 0; i < batch.length; i++) {
       calendarChanged(batch[i]);
     }
   }
 
+  @Override
   public void calendarChanged(CalendarEvent e) {
   }
 }

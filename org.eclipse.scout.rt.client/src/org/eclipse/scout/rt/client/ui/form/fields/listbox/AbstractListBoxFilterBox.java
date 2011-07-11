@@ -55,6 +55,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
   protected void execInitField() throws ProcessingException {
     if (m_listBoxPropertyListener == null) {
       m_listBoxPropertyListener = new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
           String name = e.getPropertyName();
           if (IListBox.PROP_FILTER_CHECKED_ROWS.equals(name)) {

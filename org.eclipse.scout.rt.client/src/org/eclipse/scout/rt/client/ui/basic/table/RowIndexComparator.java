@@ -14,6 +14,7 @@ import java.util.Comparator;
 
 public class RowIndexComparator implements Comparator<ITableRow> {
 
+  @Override
   public int compare(ITableRow row1, ITableRow row2) {
     int x1 = row1.getRowIndex();
     int x2 = row2.getRowIndex();

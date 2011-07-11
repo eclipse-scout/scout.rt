@@ -177,6 +177,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     // to own label
     propertySupport.addPropertyChangeListener(
         new PropertyChangeListener() {
+          @Override
           public void propertyChange(PropertyChangeEvent e) {
             if (e.getPropertyName().equals(IFormField.PROP_LABEL_VISIBLE) || e.getPropertyName().equals(IFormField.PROP_LABEL) || e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
               updateLabelComposition();
@@ -189,6 +190,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     for (IFormField field : getFields()) {
       field.addPropertyChangeListener(
           new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent e) {
               if (e.getPropertyName().equals(IFormField.PROP_LABEL_VISIBLE) || e.getPropertyName().equals(IFormField.PROP_LABEL) || e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
                 updateLabelComposition();
@@ -220,6 +222,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
         valueFields[index].addPropertyChangeListener(
             IValueField.PROP_VALUE,
             new PropertyChangeListener() {
+              @Override
               public void propertyChange(PropertyChangeEvent e) {
                 if (getForm() != null && isAutoCheckFromTo()) {
                   checkFromTo(valueFields, index);
@@ -235,10 +238,12 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    * Runtime
    */
 
+  @Override
   public boolean isEqualColumnWidths() {
     return m_equalColumnWidths;
   }
 
+  @Override
   public void setEqualColumnWidths(boolean b) {
     m_equalColumnWidths = b;
   }
@@ -262,18 +267,22 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     }
   }
 
+  @Override
   public final int getGridColumnCount() {
     return m_grid.getGridColumnCount();
   }
 
+  @Override
   public final int getGridRowCount() {
     return m_grid.getGridRowCount();
   }
 
+  @Override
   public boolean isAutoCheckFromTo() {
     return m_autoCheckFromTo;
   }
 
+  @Override
   public void setAutoCheckFromTo(boolean b) {
     m_autoCheckFromTo = b;
   }

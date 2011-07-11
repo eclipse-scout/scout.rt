@@ -75,10 +75,12 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     }
   }
 
+  @Override
   public RemoteFile getRemoteFileHeader(RemoteFile spec) throws ProcessingException {
     return getRemoteFileInternal(spec, false, 0, -1);
   }
 
+  @Override
   public RemoteFile getRemoteFile(RemoteFile spec) throws ProcessingException {
     return getRemoteFileInternal(spec, null, 0, -1);
   }
@@ -87,6 +89,7 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     return getRemoteFileInternal(spec, null, 0, maxBlockSize);
   }
 
+  @Override
   public RemoteFile getRemoteFilePart(RemoteFile spec, long blockNumber) throws ProcessingException {
     return getRemoteFileInternal(spec, null, blockNumber * RemoteFile.DEFAULT_MAX_BLOCK_SIZE, RemoteFile.DEFAULT_MAX_BLOCK_SIZE);
   }
@@ -197,6 +200,7 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     return retVal;
   }
 
+  @Override
   public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) throws ProcessingException {
     return getRemoteFiles(folderPath, filter, existingFileInfoOnClient, "UTF-8");
   }
@@ -227,6 +231,7 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     return retVal;
   }
 
+  @Override
   @RemoteServiceAccessDenied
   public void putRemoteFile(RemoteFile spec) throws ProcessingException {
     File file = getFileInternal(spec);
@@ -311,6 +316,7 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     return file;
   }
 
+  @Override
   public void streamRemoteFile(RemoteFile spec, OutputStream out) throws ProcessingException {
     if (m_rootPath == null) {
       throw new SecurityException("invalid path for file service: path may not be null");

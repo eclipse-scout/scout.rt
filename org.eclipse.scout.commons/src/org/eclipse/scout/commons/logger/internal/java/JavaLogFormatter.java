@@ -29,6 +29,7 @@ public class JavaLogFormatter extends Formatter {
    *          the log record to be formatted.
    * @return a formatted log record
    */
+  @Override
   public synchronized String format(LogRecord record) {
     StringBuffer buf = new StringBuffer();
     //single instance of date to save memory

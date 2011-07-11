@@ -50,6 +50,7 @@ public class HtmlTable extends HtmlComponent {
       sortId = m_tableId + ".sortCol." + columnIndex;
     }
     startLinkAction(new AbstractHtmlAction(sortId) {
+      @Override
       public void run() {
         if (m_sortInfo.getColumnIndex() == columnIndex) {
           m_sortInfo.setAscending(!m_sortInfo.isAscending());

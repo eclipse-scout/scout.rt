@@ -48,10 +48,12 @@ public class KeyStrokeLookupCall extends LocalLookupCall {
     //remove used keyStrokes
     IBookmarkService service = SERVICES.getService(IBookmarkService.class);
     IBookmarkVisitor v = new IBookmarkVisitor() {
+      @Override
       public boolean visitFolder(List<BookmarkFolder> path) {
         return true;
       }
 
+      @Override
       public boolean visitBookmark(List<BookmarkFolder> path, Bookmark b) {
         String keyStroke = b.getKeyStroke();
         if (keyStroke != null) {

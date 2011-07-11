@@ -75,6 +75,7 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
     }
   }
 
+  @Override
   public IClientSession getClientSession() {
     return m_session;
   }
@@ -277,14 +278,17 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
       this.job = job;
     }
 
+    @Override
     public long getDelay() {
       return 0L;
     }
 
+    @Override
     public Job getJob() {
       return job;
     }
 
+    @Override
     public IStatus getResult() {
       return null;
     }

@@ -148,6 +148,7 @@ public final class TriState implements java.io.Serializable, Comparable<TriState
     return false;
   }
 
+  @Override
   public int compareTo(TriState t) {
     Integer a = (value != null ? (value ? 1 : 0) : 2);
     Integer b = (t.value != null ? (t.value ? 1 : 0) : 2);

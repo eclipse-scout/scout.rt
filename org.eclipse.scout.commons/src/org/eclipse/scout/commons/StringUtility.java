@@ -296,6 +296,7 @@ public final class StringUtility {
 
   public static String replaceTags(String text, String tagName, final String replacement) {
     return replaceTags(text, tagName, new ITagProcessor() {
+      @Override
       public String processTag(String tagName, String tagContent) {
         return replacement;
       }

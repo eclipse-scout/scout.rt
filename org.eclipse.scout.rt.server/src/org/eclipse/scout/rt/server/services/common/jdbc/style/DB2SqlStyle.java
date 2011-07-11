@@ -35,18 +35,22 @@ public class DB2SqlStyle extends AbstractSqlStyle {
     return 1000;
   }
 
+  @Override
   public boolean isLargeString(String s) {
     return (s.length() > 4000);
   }
 
+  @Override
   public boolean isBlobEnabled() {
     return true;
   }
 
+  @Override
   public boolean isClobEnabled() {
     return true;
   }
 
+  @Override
   public void testConnection(Connection conn) throws SQLException {
   }
 

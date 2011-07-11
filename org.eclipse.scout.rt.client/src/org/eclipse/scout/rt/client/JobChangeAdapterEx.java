@@ -15,9 +15,11 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
 public class JobChangeAdapterEx extends JobChangeAdapter implements IJobChangeListenerEx {
 
+  @Override
   public void blockingConditionEnd(IJobChangeEvent event) {
   }
 
+  @Override
   public void blockingConditionStart(IJobChangeEvent event) {
   }
 }

@@ -32,6 +32,7 @@ public abstract class AbstractUserActivityStateService extends AbstractService i
   /**
    * Implements this method. This method normally calls {@link #setStatusImpl(long, int)}
    */
+  @Override
   public abstract void setStatus(int status) throws ProcessingException;
 
   protected void setStatusImpl(long userId, int status) throws ProcessingException {
@@ -50,6 +51,7 @@ public abstract class AbstractUserActivityStateService extends AbstractService i
     }
   }
 
+  @Override
   public UserStatusMap getUserStatusMap() {
     return new UserStatusMap(m_users.getEntries());
   }

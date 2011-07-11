@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.scheduler;
 
 public interface ISchedulingFormula {
 
+  @Override
   String toString();
 
   boolean eval(TickSignal signal, Object[] args);

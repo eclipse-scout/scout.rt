@@ -35,8 +35,8 @@ public abstract class AbstractLogFilter implements ILogFilter {
   private static final SimpleDateFormat ECLIPSE_LOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
   private static final SimpleDateFormat SIMPLE_LOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-  private String m_formatPattern;
-  private SimpleDateFormat m_dateFormat;
+  private final String m_formatPattern;
+  private final SimpleDateFormat m_dateFormat;
 
   public AbstractLogFilter() {
     this("[{1}] {2} {3} {4} {5}", "yyyy-MM-dd HH:mm:ss.SSS");
@@ -55,11 +55,13 @@ public abstract class AbstractLogFilter implements ILogFilter {
     m_dateFormat = new SimpleDateFormat(dateFormat);
   }
 
+  @Override
   public boolean isIgnoredLine(String line) {
     if (line.startsWith("PasswordSecurityFilter::")) return true;
     return false;
   }
 
+  @Override
   public boolean isLogEntryStartLine(String line) {
     if (SIMPLE_LOG_PARSE_PATTERN.matcher(line).matches()) return true;
     if (ECLIPSE_LOG_PARSE_PATTERN1.matcher(line).matches()) return true;
@@ -67,6 +69,8 @@ public abstract class AbstractLogFilter implements ILogFilter {
     return false;
   }
 
+  @SuppressWarnings("null")
+  @Override
   public LogEntry parse(List<String> entry) throws Exception {
     LogEntry e = null;
     // try simple log
@@ -155,14 +159,17 @@ public abstract class AbstractLogFilter implements ILogFilter {
     return e;
   }
 
+  @Override
   public LogEntry filter(LogEntry e) {
     return e;
   }
 
+  @Override
   public String formatContext(LogEntry e) {
     return m_dateFormat.format(e.date) + " " + e.thread + " " + e.message;
   }
 
+  @Override
   public String format(LogEntry e) {
     StringBuffer b = new StringBuffer();
     String line = m_formatPattern;

@@ -79,6 +79,7 @@ public class VirtualDesktop implements IDesktop {
     return m_propertyChangeListenerMap;
   }
 
+  @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     EventListenerList list = m_propertyChangeListenerMap.get(null);
     if (list == null) {
@@ -88,6 +89,7 @@ public class VirtualDesktop implements IDesktop {
     list.add(PropertyChangeListener.class, listener);
   }
 
+  @Override
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     EventListenerList list = m_propertyChangeListenerMap.get(propertyName);
     if (list == null) {
@@ -97,6 +99,7 @@ public class VirtualDesktop implements IDesktop {
     list.add(PropertyChangeListener.class, listener);
   }
 
+  @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
       EventListenerList list = it.next();
@@ -107,6 +110,7 @@ public class VirtualDesktop implements IDesktop {
     }
   }
 
+  @Override
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
       EventListenerList list = it.next();
@@ -117,14 +121,17 @@ public class VirtualDesktop implements IDesktop {
     }
   }
 
+  @Override
   public void addDesktopListener(DesktopListener l) {
     m_listenerList.add(DesktopListener.class, l);
   }
 
+  @Override
   public void removeDesktopListener(DesktopListener l) {
     m_listenerList.remove(DesktopListener.class, l);
   }
 
+  @Override
   public void addDataChangeListener(DataChangeListener listener, Object... dataTypes) {
     if (dataTypes == null || dataTypes.length == 0) {
       EventListenerList list = m_dataChangeListenerMap.get(null);
@@ -148,6 +155,7 @@ public class VirtualDesktop implements IDesktop {
     }
   }
 
+  @Override
   public void removeDataChangeListener(DataChangeListener listener, Object... dataTypes) {
     if (dataTypes == null || dataTypes.length == 0) {
       for (Iterator<EventListenerList> it = m_dataChangeListenerMap.values().iterator(); it.hasNext();) {
@@ -181,69 +189,86 @@ public class VirtualDesktop implements IDesktop {
    * Not implemented methods
    */
 
+  @Override
   public boolean isTrayVisible() {
     return false;
   }
 
+  @Override
   public void setTrayVisible(boolean b) {
   }
 
+  @Override
   public boolean isShowing(IForm form) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public boolean isAutoPrefixWildcardForTextSearch() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setAutoPrefixWildcardForTextSearch(boolean b) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void activateBookmark(Bookmark bm, boolean forceReload) throws ProcessingException {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void addFileChooser(IFileChooser fc) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void addForm(IForm form) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void addKeyStrokes(IKeyStroke... keyStrokes) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void addMessageBox(IMessageBox mb) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void closeInternal() throws ProcessingException {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public Bookmark createBookmark() throws ProcessingException {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void dataChanged(Object... dataTypes) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void ensureViewStackVisible() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void ensureVisible(IForm form) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public <T extends IForm> T findForm(Class<T> formType) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public <T extends IForm> T[] findForms(Class<T> formType) {
     throw createUnsupportedOperationException();
   }
@@ -253,195 +278,243 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public <T extends IAction> T findAction(Class<T> actionType) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public <T extends IViewButton> T findViewButton(Class<T> viewButtonType) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public <T extends IToolButton> T findToolButton(Class<T> toolButtonType) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public <T extends IForm> T findLastActiveForm(Class<T> formType) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IOutline[] getAvailableOutlines() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setAvailableOutlines(IOutline[] availableOutlines) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IForm[] getDialogStack() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IFormField getFocusOwner() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IKeyStroke[] getKeyStrokes() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IMenu[] getMenus() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IMessageBox[] getMessageBoxStack() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IOutline getOutline() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IForm getPageSearchForm() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setPageSearchForm(IForm f) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IForm getPageDetailForm() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setPageDetailForm(IForm f) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public ITable getPageDetailTable() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setPageDetailTable(ITable t) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setOutlineTableForm(IOutlineTableForm f) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IOutlineTableForm getOutlineTableForm() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public boolean isOutlineTableFormVisible() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setOutlineTableFormVisible(boolean b) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IForm[] getSimilarViewForms(IForm form) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IProcessingStatus getStatus() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public String getTitle() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IAction[] getActions() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IViewButton[] getViewButtons() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IToolButton[] getToolButtons() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IDesktopUIFacade getUIFacade() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public IForm[] getViewStack() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void initDesktop() throws ProcessingException {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public boolean isOpened() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public boolean isGuiAvailable() {
     throw createUnsupportedOperationException();
 
   }
 
+  @Override
   public void prepareAllMenus() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void printDesktop(PrintDevice device, Map<String, Object> parameters) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void refreshPages(Class... pageTypes) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void releaseUnusedPages() {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void afterTablePageLoaded(IPageWithTable<?> page) throws ProcessingException {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void removeForm(IForm form) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void removeKeyStrokes(IKeyStroke... keyStrokes) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setKeyStrokes(IKeyStroke[] ks) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setOutline(IOutline outline) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setOutline(Class<? extends IOutline> outlineType) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setStatus(IProcessingStatus status) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setStatusText(String s) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void setTitle(String s) {
     throw createUnsupportedOperationException();
   }
 
+  @Override
   public void changeVisibilityAfterOfflineSwitch() {
     return;
   }

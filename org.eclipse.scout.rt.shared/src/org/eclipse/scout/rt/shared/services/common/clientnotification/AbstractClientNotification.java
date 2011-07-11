@@ -14,10 +14,12 @@ public abstract class AbstractClientNotification implements IClientNotification 
   private static final long serialVersionUID = 1L;
   private int m_node;
 
+  @Override
   public int getOriginNode() {
     return m_node;
   }
 
+  @Override
   public void setOriginNode(int node) {
     m_node = node;
   }

@@ -78,6 +78,7 @@ public abstract class AbstractWorkflowStep<T extends AbstractWorkflowStepData> i
   protected void initConfig() {
   }
 
+  @Override
   public void assignDefinitions(T data) {
     if (data != null) {
       data.setDefinitionText(getConfiguredDefinitionText());
@@ -88,10 +89,12 @@ public abstract class AbstractWorkflowStep<T extends AbstractWorkflowStepData> i
     }
   }
 
+  @Override
   public void prepareStep(AbstractWorkflowData data, T stepData, boolean hasNextStep) throws ProcessingException {
     execPrepareStep(data, stepData, hasNextStep);
   }
 
+  @Override
   public void completeStep(AbstractWorkflowData data, T stepData, boolean hasNextStep) throws ProcessingException {
     execCompleteStep(data, stepData, hasNextStep);
   }

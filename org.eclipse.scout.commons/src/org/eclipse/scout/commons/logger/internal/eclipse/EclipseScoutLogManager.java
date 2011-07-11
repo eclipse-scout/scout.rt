@@ -146,6 +146,7 @@ public class EclipseScoutLogManager implements IScoutLogManager {
       }
     }
 
+    @Override
     public void logging(IStatus status, String plugin) {
       int severity = EclipseLogUtility.eclipseToScoutLevel(status.getSeverity());
       Level level = JavaLogUtility.scoutToJavaLevel(severity);

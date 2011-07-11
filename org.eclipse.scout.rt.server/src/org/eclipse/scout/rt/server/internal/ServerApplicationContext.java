@@ -21,37 +21,46 @@ import org.osgi.framework.Bundle;
  */
 public class ServerApplicationContext implements IApplicationContext {
 
+  @Override
   public void applicationRunning() {
   }
 
+  @Override
   public Map getArguments() {
     return null;
   }
 
+  @Override
   public String getBrandingApplication() {
     return null;
   }
 
+  @Override
   public Bundle getBrandingBundle() {
     return null;
   }
 
+  @Override
   public String getBrandingDescription() {
     return null;
   }
 
+  @Override
   public String getBrandingId() {
     return null;
   }
 
+  @Override
   public String getBrandingName() {
     return null;
   }
 
+  @Override
   public String getBrandingProperty(String key) {
     return null;
   }
 
+  @Override
   public void setResult(Object result, IApplication application) {
   }
 

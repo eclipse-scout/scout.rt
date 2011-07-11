@@ -18,6 +18,7 @@ import java.util.Comparator;
  */
 public class PriorityComparator implements Comparator<Object> {
 
+  @Override
   public int compare(Object a, Object b) {
     if (a == b) return 0;
     if (a == null && b == null) return 0;

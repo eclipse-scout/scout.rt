@@ -57,6 +57,7 @@ public class Activator extends Plugin {
     // wait until done and launch product if one exists
     if (Platform.getBundle("org.eclipse.scout.sdk") == null) {
       context.addBundleListener(new SynchronousBundleListener() {
+        @Override
         public void bundleChanged(BundleEvent event) {
           if (event.getType() == BundleEvent.STARTED && event.getBundle().equals(getBundle())) {
             new Job("Product launcher") {

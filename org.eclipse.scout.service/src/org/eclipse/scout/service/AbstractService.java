@@ -27,6 +27,7 @@ public abstract class AbstractService implements IService2 {
    * 
    * @deprecated use {@link AbstractService#initializeService(ServiceRegistration)} instead.
    */
+  @Override
   @Deprecated
   public void initializeService() {
     ServiceUtility.injectConfigProperties(this);
@@ -38,6 +39,7 @@ public abstract class AbstractService implements IService2 {
    * 
    * @see AbstractService#initializeService()
    */
+  @Override
   public void initializeService(ServiceRegistration registration) {
     initializeService();
   }

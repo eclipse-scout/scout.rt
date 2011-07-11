@@ -29,6 +29,7 @@ public class CodeTypeChangedNotification extends AbstractClientNotification {
     m_codeTypes = codeTypes;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public boolean coalesce(IClientNotification existingNotification) {
     CodeTypeChangedNotification n = (CodeTypeChangedNotification) existingNotification;

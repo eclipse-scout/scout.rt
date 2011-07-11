@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
  * @deprecated use {@link ITable} with {@link ITable#setCheckable(boolean)}
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractCheckableTable extends AbstractTable implements ICheckableTable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCheckableTable.class);
 
@@ -75,6 +76,7 @@ public abstract class AbstractCheckableTable extends AbstractTable implements IC
     m_checkboxColumn = checkboxColumn;
   }
 
+  @Override
   public IBooleanColumn getCheckboxColumn() {
     return m_checkboxColumn;
   }
@@ -124,6 +126,7 @@ public abstract class AbstractCheckableTable extends AbstractTable implements IC
     }
   }
 
+  @Override
   public void checkRow(ITableRow row, Boolean value) throws ProcessingException {
     if (!row.isEnabled()) {
       return;
@@ -134,6 +137,7 @@ public abstract class AbstractCheckableTable extends AbstractTable implements IC
     getCheckboxColumn().setValue(row, value);
   }
 
+  @Override
   public void checkRow(int row, Boolean value) throws ProcessingException {
     checkRow(getRow(row), value);
   }
@@ -152,6 +156,7 @@ public abstract class AbstractCheckableTable extends AbstractTable implements IC
     return rows.toArray(new ITableRow[]{});
   }
 
+  @Override
   public ITableRow getCheckedRow() {
     if (getCheckedRowCount() > 0) {
       return getCheckedRows()[0];

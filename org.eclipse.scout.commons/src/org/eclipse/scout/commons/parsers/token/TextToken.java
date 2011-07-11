@@ -17,22 +17,27 @@ public class TextToken implements IToken {
     m_parsedToken = parsedToken;
   }
 
+  @Override
   public boolean isInput() {
     return false;
   }
 
+  @Override
   public boolean isOutput() {
     return false;
   }
 
+  @Override
   public String getParsedToken() {
     return m_parsedToken;
   }
 
+  @Override
   public String getReplaceToken() {
     return m_parsedToken;
   }
 
+  @Override
   public void setReplaceToken(String s) {
     throw new IllegalArgumentException("Cannot replace content of a TextToken");
   }

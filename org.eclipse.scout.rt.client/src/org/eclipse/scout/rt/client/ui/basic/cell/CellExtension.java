@@ -30,40 +30,49 @@ public class CellExtension implements ICellSpecialization {
     m_cellStyle = specialization.getCellStyle();
   }
 
+  @Override
   public ICellSpecialization copy() {
     setCellStyle(getCellStyle().copy());
     return this;
   }
 
+  @Override
   public ICellSpecialization reconcile(CellStyle cellStyle) {
     setCellStyle(cellStyle);
     return this;
   }
 
+  @Override
   public String getTooltipText() {
     return m_tooltipText;
   }
 
+  @Override
   public void setTooltipText(String tooltipText) {
     m_tooltipText = tooltipText;
   }
 
+  @Override
   public boolean isEnabled() {
     return m_enabled;
   }
 
+  @Override
   public void setEnabled(boolean enabled) {
     m_enabled = enabled;
   }
 
+  @Override
   public boolean isEditable() {
     return m_editable;
   }
 
+  @Override
   public void setEditable(boolean editable) {
     m_editable = editable;
   }
 
+  @Override
   public CellStyle getCellStyle() {
     return m_cellStyle;
   }
@@ -72,42 +81,52 @@ public class CellExtension implements ICellSpecialization {
     m_cellStyle = cellStyle;
   }
 
+  @Override
   public String getBackgroundColor() {
     return m_cellStyle.getBackgroundColor();
   }
 
+  @Override
   public FontSpec getFont() {
     return m_cellStyle.getFont();
   }
 
+  @Override
   public String getForegroundColor() {
     return m_cellStyle.getForegroundColor();
   }
 
+  @Override
   public int getHorizontalAlignment() {
     return m_cellStyle.getHorizontalAlignment();
   }
 
+  @Override
   public String getIconId() {
     return m_cellStyle.getIconId();
   }
 
+  @Override
   public void setBackgroundColor(String backgroundColor) {
     m_cellStyle.setBackgroundColor(backgroundColor);
   }
 
+  @Override
   public void setFont(FontSpec font) {
     m_cellStyle.setFont(font);
   }
 
+  @Override
   public void setForegroundColor(String foregroundColor) {
     m_cellStyle.setForegroundColor(foregroundColor);
   }
 
+  @Override
   public void setHorizontalAlignment(int horizontalAlignment) {
     m_cellStyle.setHorizontalAlignment(horizontalAlignment);
   }
 
+  @Override
   public void setIconId(String iconId) {
     m_cellStyle.setIconId(iconId);
   }

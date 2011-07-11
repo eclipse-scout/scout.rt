@@ -27,10 +27,12 @@ public class JavaLogWrapper extends AbstractScoutLogger {
     m_logger = Logger.getLogger(name);
   }
 
+  @Override
   public String getName() {
     return m_logger.getName();
   }
 
+  @Override
   public int getLevel() {
     Logger loggerWithLevel = m_logger;
     while (loggerWithLevel.getLevel() == null && loggerWithLevel.getParent() != null) {
@@ -39,6 +41,7 @@ public class JavaLogWrapper extends AbstractScoutLogger {
     return JavaLogUtility.javaToScoutLevel(loggerWithLevel.getLevel());
   }
 
+  @Override
   public void setLevel(int level) {
     m_logger.setLevel(JavaLogUtility.scoutToJavaLevel(level));
   }

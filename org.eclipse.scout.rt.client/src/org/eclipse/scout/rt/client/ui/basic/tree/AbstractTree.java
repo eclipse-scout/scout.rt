@@ -367,6 +367,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /*
    * Runtime
    */
+  @Override
   public final void initTree() throws ProcessingException {
     initTreeInternal();
     execInitTree();
@@ -375,6 +376,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   protected void initTreeInternal() throws ProcessingException {
   }
 
+  @Override
   public final void disposeTree() {
     disposeTreeInternal();
     try {
@@ -388,26 +390,32 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   protected void disposeTreeInternal() {
   }
 
+  @Override
   public IMenu[] getMenus() {
     return m_menus;
   }
 
+  @Override
   public void setMenus(IMenu[] a) {
     m_menus = a;
   }
 
+  @Override
   public <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException {
     return new ActionFinder().findAction(getMenus(), menuType);
   }
 
+  @Override
   public boolean hasNodeFilters() {
     return m_nodeFilters.size() > 0;
   }
 
+  @Override
   public ITreeNodeFilter[] getNodeFilters() {
     return m_nodeFilters.toArray(new ITreeNodeFilter[m_nodeFilters.size()]);
   }
 
+  @Override
   public void addNodeFilter(ITreeNodeFilter filter) {
     if (filter != null) {
       //avoid duplicate add
@@ -425,6 +433,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void removeNodeFilter(ITreeNodeFilter filter) {
     if (filter != null) {
       m_nodeFilters.remove(filter);
@@ -432,6 +441,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void applyNodeFilters() {
     applyNodeFiltersRecInternal(getRootNode(), true, 0);
     fireNodeFilterChanged();
@@ -464,72 +474,89 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void requestFocus() {
     fireRequestFocus();
   }
 
+  @Override
   public ITreeNode getRootNode() {
     return m_rootNode;
   }
 
+  @Override
   public String getTitle() {
     return propertySupport.getPropertyString(PROP_TITLE);
   }
 
+  @Override
   public void setTitle(String s) {
     propertySupport.setPropertyString(PROP_TITLE, s);
   }
 
+  @Override
   public boolean isAutoTitle() {
     return m_autoTitle;
   }
 
+  @Override
   public void setAutoTitle(boolean b) {
     m_autoTitle = b;
   }
 
+  @Override
   public String getIconId() {
     String iconId = propertySupport.getPropertyString(PROP_ICON_ID);
     if (iconId != null && iconId.length() == 0) iconId = null;
     return iconId;
   }
 
+  @Override
   public void setIconId(String iconId) {
     propertySupport.setPropertyString(PROP_ICON_ID, iconId);
   }
 
+  @Override
   public boolean isCheckable() {
     return propertySupport.getPropertyBool(PROP_CHECKABLE);
   }
 
+  @Override
   public void setCheckable(boolean b) {
     propertySupport.setPropertyBool(PROP_CHECKABLE, b);
   }
 
+  @Override
   public boolean isDragEnabled() {
     return propertySupport.getPropertyBool(PROP_DRAG_ENABLED);
   }
 
+  @Override
   public void setDragEnabled(boolean b) {
     propertySupport.setPropertyBool(PROP_DRAG_ENABLED, b);
   }
 
+  @Override
   public void setDragType(int dragType) {
     propertySupport.setPropertyInt(PROP_DRAG_TYPE, dragType);
   }
 
+  @Override
   public int getDragType() {
     return propertySupport.getPropertyInt(PROP_DRAG_TYPE);
   }
 
+  @Override
   public void setDropType(int dropType) {
     propertySupport.setPropertyInt(PROP_DROP_TYPE, dropType);
   }
 
+  @Override
   public int getDropType() {
     return propertySupport.getPropertyInt(PROP_DROP_TYPE);
   }
 
+  @Override
   public void setEnabledPermission(Permission p) {
     boolean b;
     if (p != null) {
@@ -541,20 +568,24 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setEnabledGranted(b);
   }
 
+  @Override
   public boolean isEnabledGranted() {
     return m_enabledGranted;
   }
 
+  @Override
   public void setEnabledGranted(boolean b) {
     m_enabledGranted = b;
     calculateEnabled();
   }
 
+  @Override
   public void setEnabled(boolean b) {
     m_enabledProperty = b;
     calculateEnabled();
   }
 
+  @Override
   public boolean isEnabled() {
     return propertySupport.getPropertyBool(PROP_ENABLED);
   }
@@ -563,10 +594,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty);
   }
 
+  @Override
   public String getPathText(ITreeNode selectedNode) {
     return getPathText(selectedNode, " - ");
   }
 
+  @Override
   public String getPathText(ITreeNode selectedNode, String delimiter) {
     // construct the path to the data
     ITreeNode root = getRootNode();
@@ -614,6 +647,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setKeyStrokesInternal(ksList.toArray(new IKeyStroke[ksList.size()]));
   }
 
+  @Override
   public ITreeNode findNode(Object primaryKey) {
     ITreeNode[] a = findNodes(new Object[]{primaryKey});
     if (a != null && a.length > 0) {
@@ -624,10 +658,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public ITreeNode[] findNodes(Object[] primaryKeys) {
     if (primaryKeys == null || primaryKeys.length <= 0) return new ITreeNode[0];
     final HashSet<Object> keySet = new HashSet<Object>(Arrays.asList(primaryKeys));
     P_AbstractCollectingTreeVisitor v = new P_AbstractCollectingTreeVisitor() {
+      @Override
       public boolean visit(ITreeNode node) {
         if (keySet.remove(node.getPrimaryKey())) {
           addNodeToList(node);
@@ -639,6 +675,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return v.getNodes();
   }
 
+  @Override
   public void setRootNode(ITreeNode root) {
     if (m_rootNode != null) {
       m_rootNode.setTreeInternal(null, true);
@@ -662,26 +699,32 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public boolean isRootNodeVisible() {
     return propertySupport.getPropertyBool(PROP_ROOT_NODE_VISIBLE);
   }
 
+  @Override
   public void setRootNodeVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_ROOT_NODE_VISIBLE, b);
   }
 
+  @Override
   public boolean isRootHandlesVisible() {
     return propertySupport.getPropertyBool(PROP_ROOT_HANDLES_VISIBLE);
   }
 
+  @Override
   public void setRootHandlesVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_ROOT_HANDLES_VISIBLE, b);
   }
 
+  @Override
   public boolean isTreeChanging() {
     return m_treeChanging > 0;
   }
 
+  @Override
   public void setTreeChanging(boolean b) {
     // use a stack counter because setTableChanging might be called in nested
     // loops
@@ -707,11 +750,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public boolean isNodeExpanded(ITreeNode node) {
     if (node != null) return node.isExpanded();
     else return false;
   }
 
+  @Override
   public void setNodeExpanded(ITreeNode node, boolean b) {
     node = resolveNode(node);
     if (node != null) {
@@ -731,6 +776,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public boolean isAncestorNodeOf(ITreeNode parent, ITreeNode child) {
     ITreeNode t = child;
     while (t != null && t != parent) {
@@ -739,14 +785,17 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return t == parent;
   }
 
+  @Override
   public boolean isAutoDiscardOnDelete() {
     return m_autoDiscardOnDelete;
   }
 
+  @Override
   public void setAutoDiscardOnDelete(boolean on) {
     m_autoDiscardOnDelete = on;
   }
 
+  @Override
   public void setNodeEnabledPermission(ITreeNode node, Permission p) {
     node = resolveNode(node);
     if (node != null) {
@@ -759,16 +808,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public boolean isNodeEnabled(ITreeNode node) {
     if (node != null) return node.isEnabled();
     else return false;
   }
 
+  @Override
   public boolean isNodeEnabledGranted(ITreeNode node) {
     if (node != null) return node.isEnabledGranted();
     else return false;
   }
 
+  @Override
   public void setNodeEnabled(ITreeNode node, boolean b) {
     node = resolveNode(node);
     if (node != null) {
@@ -781,6 +833,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void setNodeEnabledGranted(ITreeNode node, boolean b) {
     node = resolveNode(node);
     if (node != null) {
@@ -793,6 +846,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void setNodeVisiblePermission(ITreeNode node, Permission p) {
     node = resolveNode(node);
     if (node != null) {
@@ -806,16 +860,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public boolean isNodeVisible(ITreeNode node) {
     if (node != null) return node.isVisible();
     else return false;
   }
 
+  @Override
   public boolean isNodeVisibleGranted(ITreeNode node) {
     if (node != null) return node.isVisibleGranted();
     else return false;
   }
 
+  @Override
   public void setNodeVisible(ITreeNode node, boolean b) {
     node = resolveNode(node);
     if (node != null) {
@@ -829,6 +886,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void setNodeVisibleGranted(ITreeNode node, boolean b) {
     node = resolveNode(node);
     if (node != null) {
@@ -842,11 +900,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public boolean isNodeLeaf(ITreeNode node) {
     if (node != null) return node.isLeaf();
     else return false;
   }
 
+  @Override
   public void setNodeLeaf(ITreeNode node, boolean b) {
     node = resolveNode(node);
     if (node != null) {
@@ -857,11 +917,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public boolean isNodeChecked(ITreeNode node) {
     if (node != null) return node.isChecked();
     else return false;
   }
 
+  @Override
   public void setNodeChecked(ITreeNode node, boolean b) {
     node = resolveNode(node);
     if (node != null) {
@@ -883,11 +945,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public int getNodeStatus(ITreeNode node) {
     if (node != null) return node.getStatus();
     else return ITreeNode.STATUS_NON_CHANGED;
   }
 
+  @Override
   public void setNodeStatus(ITreeNode node, int status) {
     node = resolveNode(node);
     if (node != null) {
@@ -907,10 +971,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void ensureVisible(ITreeNode node) {
     fireNodeEnsureVisible(node);
   }
 
+  @Override
   public void expandAll(ITreeNode parent) {
     expandAllRec(parent, 0);
   }
@@ -929,6 +995,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void collapseAll(ITreeNode parent) {
     try {
       setTreeChanging(true);
@@ -960,6 +1027,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public IKeyStroke[] getKeyStrokes() {
     IKeyStroke[] keyStrokes = (IKeyStroke[]) propertySupport.getProperty(PROP_KEY_STROKES);
     if (keyStrokes == null) {
@@ -968,6 +1036,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return keyStrokes;
   }
 
+  @Override
   public void setKeyStrokes(IKeyStroke[] keyStrokes) {
     m_baseKeyStrokes = keyStrokes;
     rebuildKeyStrokesInternal();
@@ -980,22 +1049,26 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /*
    * modifications
    */
+  @Override
   public void addChildNode(ITreeNode parent, ITreeNode child) {
     if (child != null) {
       addChildNodes(parent, new ITreeNode[]{child});
     }
   }
 
+  @Override
   public void addChildNode(int startIndex, ITreeNode parent, ITreeNode child) {
     if (child != null) {
       addChildNodes(startIndex, parent, new ITreeNode[]{child});
     }
   }
 
+  @Override
   public void addChildNodes(ITreeNode parent, ITreeNode[] children) {
     addChildNodes(parent.getChildNodeCount(), parent, children);
   }
 
+  @Override
   public void addChildNodes(int startIndex, ITreeNode parent, ITreeNode[] children) {
     if (children == null || children.length == 0) {
       return;
@@ -1042,10 +1115,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void updateNode(ITreeNode node) {
     updateChildNodes(node.getParentNode(), new ITreeNode[]{node});
   }
 
+  @Override
   public void updateChildNodes(ITreeNode parent, ITreeNode[] children) {
     try {
       setTreeChanging(true);
@@ -1060,6 +1135,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void updateChildNodeOrder(ITreeNode parent, ITreeNode[] newChildren) {
     try {
       setTreeChanging(true);
@@ -1077,16 +1153,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void removeNode(ITreeNode node) {
     ITreeNode parent = node.getParentNode();
     ITreeNode child = node;
     removeChildNode(parent, child);
   }
 
+  @Override
   public void removeChildNode(ITreeNode parent, ITreeNode child) {
     removeChildNodes(parent, new ITreeNode[]{child});
   }
 
+  @Override
   public void removeChildNodes(ITreeNode parent, ITreeNode[] children) {
     if (children == null || children.length == 0) return;
     try {
@@ -1125,12 +1204,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void removeAllChildNodes(ITreeNode parent) {
     if (parent != null) {
       removeChildNodes(parent, parent.getChildNodes());
     }
   }
 
+  @Override
   public void clearDeletedNodes() {
     for (Iterator<ITreeNode> it = m_deletedNodes.values().iterator(); it.hasNext();) {
       (it.next()).setTreeInternal(null, true);
@@ -1138,6 +1219,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     m_deletedNodes.clear();
   }
 
+  @Override
   public ITreeNode[] resolveVirtualNodes(ITreeNode[] nodes) throws ProcessingException {
     if (nodes == null) return new ITreeNode[0];
     try {
@@ -1157,6 +1239,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public ITreeNode resolveVirtualNode(ITreeNode node) throws ProcessingException {
     if (node instanceof IVirtualTreeNode) {
       IVirtualTreeNode vnode = (IVirtualTreeNode) node;
@@ -1184,10 +1267,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return node;
   }
 
+  @Override
   public boolean visitTree(ITreeVisitor v) {
     return visitNodeRec(getRootNode(), v);
   }
 
+  @Override
   public boolean visitNode(ITreeNode node, ITreeVisitor v) {
     return visitNodeRec(node, v);
   }
@@ -1206,6 +1291,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return true;
   }
 
+  @Override
   public boolean visitVisibleTree(ITreeVisitor v) {
     return visitVisibleNodeRec(getRootNode(), v, isRootNodeVisible());
   }
@@ -1231,16 +1317,20 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return true;
   }
 
+  @Override
   public int getDeletedNodeCount() {
     return m_deletedNodes.size();
   }
 
+  @Override
   public ITreeNode[] getDeletedNodes() {
     return m_deletedNodes.values().toArray(new ITreeNode[0]);
   }
 
+  @Override
   public int getInsertedNodeCount() {
     P_AbstractCountingTreeVisitor v = new P_AbstractCountingTreeVisitor() {
+      @Override
       public boolean visit(ITreeNode node) {
         if (node.isStatusInserted()) addCount(1);
         return true;
@@ -1250,8 +1340,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return v.getCount();
   }
 
+  @Override
   public ITreeNode[] getInsertedNodes() {
     P_AbstractCollectingTreeVisitor v = new P_AbstractCollectingTreeVisitor() {
+      @Override
       public boolean visit(ITreeNode node) {
         if (node.isStatusInserted()) addNodeToList(node);
         return true;
@@ -1261,8 +1353,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return v.getNodes();
   }
 
+  @Override
   public int getUpdatedNodeCount() {
     P_AbstractCountingTreeVisitor v = new P_AbstractCountingTreeVisitor() {
+      @Override
       public boolean visit(ITreeNode node) {
         if (node.isStatusUpdated()) addCount(1);
         return true;
@@ -1272,8 +1366,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return v.getCount();
   }
 
+  @Override
   public ITreeNode[] getUpdatedNodes() {
     P_AbstractCollectingTreeVisitor v = new P_AbstractCollectingTreeVisitor() {
+      @Override
       public boolean visit(ITreeNode node) {
         if (node.isStatusUpdated()) addNodeToList(node);
         return true;
@@ -1283,10 +1379,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return v.getNodes();
   }
 
+  @Override
   public int getSelectedNodeCount() {
     return m_selectedNodes.size();
   }
 
+  @Override
   public ITreeNode getSelectedNode() {
     if (m_selectedNodes.size() > 0) {
       return m_selectedNodes.iterator().next();
@@ -1296,10 +1394,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public ITreeNode[] getSelectedNodes() {
     return m_selectedNodes.toArray(new ITreeNode[0]);
   }
 
+  @Override
   public boolean isSelectedNode(ITreeNode node) {
     node = resolveNode(node);
     if (node != null) {
@@ -1310,10 +1410,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void selectNode(ITreeNode node) {
     selectNode(node, false);
   }
 
+  @Override
   public void selectNode(ITreeNode node, boolean append) {
     if (node != null) {
       selectNodes(new ITreeNode[]{node}, append);
@@ -1323,6 +1425,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void selectNodes(ITreeNode[] nodes, boolean append) {
     nodes = resolveNodes(nodes);
     try {
@@ -1359,6 +1462,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void selectNextNode() {
     final ITreeNode current = getSelectedNode();
     if (current != null) {
@@ -1366,6 +1470,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       ITreeVisitor v = new ITreeVisitor() {
         boolean foundCurrent;
 
+        @Override
         public boolean visit(ITreeNode node) {
           if (foundCurrent) {
             if (node.isFilterAccepted()) {
@@ -1391,6 +1496,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void selectPreviousNode() {
     final ITreeNode current = getSelectedNode();
     if (current != null) {
@@ -1398,6 +1504,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       ITreeVisitor v = new ITreeVisitor() {
         boolean foundCurrent;
 
+        @Override
         public boolean visit(ITreeNode node) {
           if (foundCurrent) {
             return false;
@@ -1421,6 +1528,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void selectFirstNode() {
     if (!isRootNodeVisible()) {
       try {
@@ -1432,6 +1540,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
     final Holder<ITreeNode> foundVisited = new Holder<ITreeNode>(ITreeNode.class);
     ITreeVisitor v = new ITreeVisitor() {
+      @Override
       public boolean visit(ITreeNode node) {
         if (foundVisited.getValue() != null) {
           return false;
@@ -1448,6 +1557,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void selectLastNode() {
     if (!isRootNodeVisible()) {
       try {
@@ -1459,6 +1569,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
     final Holder<ITreeNode> foundVisited = new Holder<ITreeNode>(ITreeNode.class);
     ITreeVisitor v = new ITreeVisitor() {
+      @Override
       public boolean visit(ITreeNode node) {
         if (node.isFilterAccepted()) {
           foundVisited.setValue(node);
@@ -1472,6 +1583,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void selectNextChildNode() {
     ITreeNode current = getSelectedNode();
     if (current != null) {
@@ -1480,6 +1592,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     selectNextNode();
   }
 
+  @Override
   public void selectPreviousParentNode() {
     ITreeNode n = getSelectedNode();
     if (n != null) {
@@ -1500,6 +1613,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void deselectNode(ITreeNode node) {
     if (node != null) {
       deselectNodes(new ITreeNode[]{node});
@@ -1509,6 +1623,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void deselectNodes(ITreeNode[] nodes) {
     nodes = resolveNodes(nodes);
     if (nodes != null && nodes.length > 0) {
@@ -1536,9 +1651,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public ITreeNode[] getCheckedNodes() {
     final ArrayList<ITreeNode> list = new ArrayList<ITreeNode>();
     visitTree(new ITreeVisitor() {
+      @Override
       public boolean visit(ITreeNode node) {
         if (node.isChecked()) {
           list.add(node);
@@ -1549,10 +1666,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return list.toArray(new ITreeNode[list.size()]);
   }
 
+  @Override
   public boolean isScrollToSelection() {
     return propertySupport.getPropertyBool(PROP_SCROLL_TO_SELECTION);
   }
 
+  @Override
   public void setScrollToSelection(boolean b) {
     propertySupport.setPropertyBool(PROP_SCROLL_TO_SELECTION, b);
   }
@@ -1603,14 +1722,17 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /*
    * Tree Observer
    */
+  @Override
   public void addTreeListener(TreeListener listener) {
     m_listenerList.add(TreeListener.class, listener);
   }
 
+  @Override
   public void removeTreeListener(TreeListener listener) {
     m_listenerList.remove(TreeListener.class, listener);
   }
 
+  @Override
   public void addUITreeListener(TreeListener listener) {
     m_listenerList.insertAtFront(TreeListener.class, listener);
   }
@@ -1694,6 +1816,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public IMenu[] fetchMenusForNodesInternal(ITreeNode[] nodes) {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_POPUP, nodes);
     // single observer for tree-owned menus
@@ -1945,22 +2068,27 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public boolean isMultiSelect() {
     return propertySupport.getPropertyBool(PROP_MULTI_SELECT);
   }
 
+  @Override
   public void setMultiSelect(boolean b) {
     propertySupport.setPropertyBool(PROP_MULTI_SELECT, b);
   }
 
+  @Override
   public boolean isMultiCheck() {
     return propertySupport.getPropertyBool(PROP_MULTI_CHECK);
   }
 
+  @Override
   public void setMultiCheck(boolean b) {
     propertySupport.setPropertyBool(PROP_MULTI_CHECK, b);
   }
 
+  @Override
   public void unloadNode(ITreeNode node) throws ProcessingException {
     try {
       setTreeChanging(true);
@@ -1974,6 +2102,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void doHyperlinkAction(ITreeNode node, URL url) throws ProcessingException {
     if (node != null) {
       selectNode(node);
@@ -1981,6 +2110,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
   public void exportTreeData(final AbstractTreeFieldData target) throws ProcessingException {
     exportTreeNodeDataRec(getRootNode().getChildNodes(), target, null);
   }
@@ -2010,6 +2140,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return nodeData;
   }
 
+  @Override
   public void importTreeData(AbstractTreeFieldData source) throws ProcessingException {
     if (source.isValueSet()) {
       try {
@@ -2043,6 +2174,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return null;
   }
 
+  @Override
   public ITreeUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -2085,10 +2217,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       m_uiProcessorCount--;
     }
 
+    @Override
     public boolean isUIProcessing() {
       return m_uiProcessorCount > 0;
     }
 
+    @Override
     public void setNodeExpandedFromUI(ITreeNode node, boolean on) {
       try {
         pushUIProcessor();
@@ -2121,6 +2255,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @Override
     public void setNodeSelectedAndExpandedFromUI(ITreeNode node) {
       try {
         pushUIProcessor();
@@ -2153,6 +2288,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @Override
     public void setNodesSelectedFromUI(ITreeNode[] nodes) {
       try {
         pushUIProcessor();
@@ -2196,6 +2332,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @Override
     public IMenu[] fireNodePopupFromUI() {
       try {
         pushUIProcessor();
@@ -2212,6 +2349,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @Override
     public IMenu[] fireEmptySpacePopupFromUI() {
       try {
         pushUIProcessor();
@@ -2223,6 +2361,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @Override
     public void fireNodeClickFromUI(ITreeNode node) {
       try {
         pushUIProcessor();
@@ -2241,6 +2380,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @Override
     public void fireNodeActionFromUI(ITreeNode node) {
       try {
         pushUIProcessor();
@@ -2259,10 +2399,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @Override
     public boolean getNodesDragEnabledFromUI() {
       return isDragEnabled();
     }
 
+    @Override
     public TransferObject fireNodesDragRequestFromUI() {
       try {
         pushUIProcessor();
@@ -2279,6 +2421,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @Override
     public void fireNodeDropActionFromUI(ITreeNode node, TransferObject dropData) {
       try {
         pushUIProcessor();
@@ -2297,6 +2440,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @Override
     public void fireHyperlinkActionFromUI(ITreeNode node, URL url) {
       try {
         pushUIProcessor();

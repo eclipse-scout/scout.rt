@@ -28,20 +28,24 @@ public class ClientNotificationService extends AbstractService implements IClien
     m_clientNotificationQueue = new ClientNotificationQueue();
   }
 
+  @Override
   public IClientNotification[] getNextNotifications(long blockingTimeout) {
     return m_clientNotificationQueue.getNextNotifications(blockingTimeout);
   }
 
+  @Override
   @RemoteServiceAccessDenied
   public void putNotification(IClientNotification notification, IClientNotificationFilter filter) {
     m_clientNotificationQueue.putNotification(notification, filter);
   }
 
+  @Override
   @RemoteServiceAccessDenied
   public void addClientNotificationQueueListener(IClientNotificationQueueListener listener) {
     m_clientNotificationQueue.addClientNotificationQueueListener(listener);
   }
 
+  @Override
   @RemoteServiceAccessDenied
   public void removeClientNotificationQueueListener(IClientNotificationQueueListener listener) {
     m_clientNotificationQueue.removeClientNotificationQueueListener(listener);

@@ -1308,6 +1308,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     // part decoration
     final List<Object> valuesFinal = bindValues;
     ITagProcessor processor = new ITagProcessor() {
+      @Override
       public String processTag(String tagName, String a) {
         return createSqlOpValuePart(aggregationType, a, operation, newBindNames, valuesFinal, plainBind);
       }

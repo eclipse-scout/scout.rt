@@ -74,29 +74,35 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   /*
    * Runtime
    */
+  @Override
   public void setFormat(String s) {
     m_format = s;
     m_fmt = null;
   }
 
+  @Override
   public String getFormat() {
     return m_format;
   }
 
+  @Override
   public void setHasDate(boolean b) {
     m_hasDate = b;
     m_fmt = null;
   }
 
+  @Override
   public void setHasTime(boolean b) {
     m_hasTime = b;
     m_fmt = null;
   }
 
+  @Override
   public boolean isHasDate() {
     return m_hasDate;
   }
 
+  @Override
   public boolean isHasTime() {
     return m_hasTime;
   }

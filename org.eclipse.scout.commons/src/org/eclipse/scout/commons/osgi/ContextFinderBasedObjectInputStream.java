@@ -17,6 +17,7 @@ import java.security.PrivilegedAction;
  */
 public class ContextFinderBasedObjectInputStream extends ObjectInputStream {
   private static final class ClassContextAccessor extends SecurityManager {
+    @Override
     public Class[] getClassContext() {
       return super.getClassContext();
     }
@@ -26,6 +27,7 @@ public class ContextFinderBasedObjectInputStream extends ObjectInputStream {
 
   static {
     AccessController.doPrivileged(new PrivilegedAction<Object>() {
+      @Override
       public Object run() {
         ccAccessor = new ClassContextAccessor();
         return null;

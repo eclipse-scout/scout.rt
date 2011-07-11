@@ -54,6 +54,7 @@ public class CompositeLong implements Comparable, Serializable {
     return compareTo(o) == 0;
   }
 
+  @Override
   public int compareTo(Object o) {
     long[] me = this.m_value;
     long[] other = ((CompositeLong) o).m_value;

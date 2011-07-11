@@ -34,10 +34,12 @@ import org.eclipse.equinox.app.IApplicationContext;
  */
 public class ServerApplication implements IApplication {
 
+  @Override
   public Object start(IApplicationContext context) throws Exception {
     return EXIT_OK;
   }
 
+  @Override
   public void stop() {
   }
 

@@ -391,6 +391,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Runtime
    */
 
+  @Override
   public void initColumn() throws ProcessingException {
     ClientUIPreferences env = ClientUIPreferences.getInstance();
     setVisible(env.getTableColumnVisible(this, m_visibleProperty));
@@ -400,46 +401,57 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     execInitColumn();
   }
 
+  @Override
   public void disposeColumn() throws ProcessingException {
     execDisposeColumn();
   }
 
+  @Override
   public boolean isInitialVisible() {
     return m_initialVisible;
   }
 
+  @Override
   public void setInitialVisible(boolean b) {
     m_initialVisible = b;
   }
 
+  @Override
   public int getInitialSortIndex() {
     return m_initialSortIndex;
   }
 
+  @Override
   public void setInitialSortIndex(int i) {
     m_initialSortIndex = i;
   }
 
+  @Override
   public boolean isInitialSortAscending() {
     return m_initialSortAscending;
   }
 
+  @Override
   public void setInitialSortAscending(boolean b) {
     m_initialSortAscending = b;
   }
 
+  @Override
   public boolean isInitialAlwaysIncludeSortAtBegin() {
     return m_initialAlwaysIncludeSortAtBegin;
   }
 
+  @Override
   public void setInitialAlwaysIncludeSortAtBegin(boolean b) {
     m_initialAlwaysIncludeSortAtBegin = b;
   }
 
+  @Override
   public boolean isInitialAlwaysIncludeSortAtEnd() {
     return m_initialAlwaysIncludeSortAtEnd;
   }
 
+  @Override
   public void setInitialAlwaysIncludeSortAtEnd(boolean b) {
     m_initialAlwaysIncludeSortAtEnd = b;
   }
@@ -447,6 +459,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   /**
    * controls the displayable property of the column
    */
+  @Override
   public void setVisiblePermission(Permission p) {
     boolean b;
     if (p != null) {
@@ -458,15 +471,18 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     setVisibleGranted(b);
   }
 
+  @Override
   public boolean isVisibleGranted() {
     return m_visibleGranted;
   }
 
+  @Override
   public void setVisibleGranted(boolean b) {
     m_visibleGranted = b;
     calculateVisible();
   }
 
+  @Override
   public ITable getTable() {
     return m_table;
   }
@@ -478,10 +494,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     m_table = table;
   }
 
+  @Override
   public int getColumnIndex() {
     return m_headerCell.getColumnIndex();
   }
 
+  @Override
   public String getColumnId() {
     String s = getClass().getSimpleName();
     if (s.endsWith("Column")) {
@@ -491,24 +509,29 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return s;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T getValue(ITableRow r) {
     return (r != null) ? (T) r.getCellValue(getColumnIndex()) : null;
   }
 
+  @Override
   public T getValue(int rowIndex) {
     return getValue(getTable().getRow(rowIndex));
   }
 
+  @Override
   public void setValue(int rowIndex, T rawValue) throws ProcessingException {
     setValue(getTable().getRow(rowIndex), rawValue);
   }
 
+  @Override
   public void setValue(ITableRow r, T rawValue) throws ProcessingException {
     T newValue = validateValue(r, rawValue);
     r.setCellValue(getColumnIndex(), newValue);
   }
 
+  @Override
   public void fill(T rawValue) throws ProcessingException {
     ITableRow[] rows = getTable().getRows();
     for (ITableRow row : rows) {
@@ -516,11 +539,13 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public Class<T> getDataType() {
     return TypeCastUtility.getGenericsParameterClass(getClass(), IColumn.class);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T[] getValues() {
     T[] values = (T[]) Array.newInstance(getDataType(), m_table.getRowCount());
@@ -530,6 +555,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return values;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T[] getValues(ITableRow[] rows) {
     T[] values = (T[]) Array.newInstance(getDataType(), rows.length);
@@ -539,6 +565,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return values;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T[] getSelectedValues() {
     ITableRow[] rows = m_table.getSelectedRows();
@@ -549,16 +576,19 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return values;
   }
 
+  @Override
   public T getSelectedValue() {
     ITableRow row = m_table.getSelectedRow();
     if (row != null) return getValue(row);
     else return null;
   }
 
+  @Override
   public String getDisplayText(ITableRow r) {
     return r.getCell(getColumnIndex()).getText();
   }
 
+  @Override
   public String[] getDisplayTexts() {
     String[] values = new String[m_table.getRowCount()];
     for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
@@ -567,12 +597,14 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return values;
   }
 
+  @Override
   public String getSelectedDisplayText() {
     ITableRow row = m_table.getSelectedRow();
     if (row != null) return getDisplayText(row);
     else return null;
   }
 
+  @Override
   public String[] getSelectedDisplayTexts() {
     ITableRow[] rows = m_table.getSelectedRows();
     String[] values = new String[rows.length];
@@ -582,6 +614,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return values;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T[] getInsertedValues() {
     ITableRow[] rows = m_table.getInsertedRows();
@@ -592,6 +625,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return values;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T[] getUpdatedValues() {
     ITableRow[] rows = m_table.getUpdatedRows();
@@ -602,6 +636,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return values;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T[] getDeletedValues() {
     ITableRow[] rows = m_table.getDeletedRows();
@@ -612,6 +647,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return values;
   }
 
+  @Override
   public ITableRow[] findRows(T[] values) {
     ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
     if (values != null) {
@@ -625,6 +661,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return rowList.toArray(new ITableRow[0]);
   }
 
+  @Override
   public ITableRow[] findRows(T value) {
     ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
     for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
@@ -636,6 +673,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return rowList.toArray(new ITableRow[0]);
   }
 
+  @Override
   public ITableRow findRow(T value) {
     for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
       ITableRow row = m_table.getRow(i);
@@ -646,6 +684,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return null;
   }
 
+  @Override
   public boolean contains(T value) {
     for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
       ITableRow row = m_table.getRow(i);
@@ -656,10 +695,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return false;
   }
 
+  @Override
   public boolean containsDuplicateValues() {
     return new HashSet<T>(Arrays.asList(getValues())).size() < getValues().length;
   }
 
+  @Override
   public boolean isEmpty() {
     if (m_table != null) {
       for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
@@ -676,22 +717,27 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     m_headerCell.setColumnIndexInternal(index);
   }
 
+  @Override
   public boolean isSortActive() {
     return getHeaderCell().isSortActive();
   }
 
+  @Override
   public boolean isSortExplicit() {
     return getHeaderCell().isSortExplicit();
   }
 
+  @Override
   public boolean isSortAscending() {
     return getHeaderCell().isSortAscending();
   }
 
+  @Override
   public boolean isSortPermanent() {
     return getHeaderCell().isSortPermanent();
   }
 
+  @Override
   public int getSortIndex() {
     ITable table = getTable();
     if (table != null) {
@@ -703,6 +749,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return -1;
   }
 
+  @Override
   public boolean isColumnFilterActive() {
     ITable table = getTable();
     if (table != null) {
@@ -718,6 +765,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * sorting of rows based on this column<br>
    * default: compare objects by Comparable interface or use value
    */
+  @Override
   @SuppressWarnings("unchecked")
   public int compareTableRows(ITableRow r1, ITableRow r2) {
     int c;
@@ -741,6 +789,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return c;
   }
 
+  @Override
   public final T/* validValue */parseValue(ITableRow row, Object rawValue) throws ProcessingException {
     T parsedValue = execParseValue(row, rawValue);
     return validateValue(row, parsedValue);
@@ -755,6 +804,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return TypeCastUtility.castValue(rawValue, getDataType());
   }
 
+  @Override
   public T/* validValue */validateValue(ITableRow row, T rawValue) throws ProcessingException {
     return execValidateValue(row, rawValue);
   }
@@ -768,6 +818,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return rawValue;
   }
 
+  @Override
   public final IFormField prepareEdit(ITableRow row) throws ProcessingException {
     ITable table = getTable();
     if (table == null || !table.isCellEditable(row, this)) {
@@ -802,6 +853,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * By default this calls {@link #setValue(ITableRow, Object)} and delegates to
    * {@link #execParseValue(ITableRow, Object)} and {@link #execValidateValue(ITableRow, Object)}.
    */
+  @Override
   public final void completeEdit(ITableRow row, IFormField editingField) throws ProcessingException {
     ITable table = getTable();
     if (table == null || !table.isCellEditable(row, this)) {
@@ -810,6 +862,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     execCompleteEdit(row, editingField);
   }
 
+  @Override
   public void decorateCell(ITableRow row) {
     Cell cell = row.getCellForUpdate(getColumnIndex());
     decorateCellInternal(cell, row);
@@ -841,6 +894,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     cell.setEditableInternal(isCellEditable(row));
   }
 
+  @Override
   public void decorateHeaderCell() {
     HeaderCell cell = m_headerCell;
     decorateHeaderCellInternal(cell);
@@ -861,14 +915,17 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   protected void decorateHeaderCellInternal(HeaderCell cell) {
   }
 
+  @Override
   public IHeaderCell getHeaderCell() {
     return m_headerCell;
   }
 
+  @Override
   public int getVisibleColumnIndexHint() {
     return propertySupport.getPropertyInt(PROP_VIEW_COLUMN_INDEX_HINT);
   }
 
+  @Override
   public void setVisibleColumnIndexHint(int index) {
     int oldIndex = getVisibleColumnIndexHint();
     if (oldIndex != index) {
@@ -876,47 +933,58 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   public int getInitialWidth() {
     return m_initialWidth;
   }
 
+  @Override
   public void setInitialWidth(int w) {
     m_initialWidth = w;
   }
 
+  @Override
   public int getWidth() {
     return propertySupport.getPropertyInt(PROP_WIDTH);
   }
 
+  @Override
   public void setWidth(int w) {
     propertySupport.setPropertyInt(PROP_WIDTH, w);
   }
 
+  @Override
   public void setWidthInternal(int w) {
     propertySupport.setPropertyNoFire(PROP_WIDTH, w);
   }
 
+  @Override
   public void setHorizontalAlignment(int hAglin) {
     propertySupport.setPropertyInt(PROP_HORIZONTAL_ALIGNMENT, hAglin);
   }
 
+  @Override
   public int getHorizontalAlignment() {
     return propertySupport.getPropertyInt(PROP_HORIZONTAL_ALIGNMENT);
   }
 
+  @Override
   public boolean isDisplayable() {
     return propertySupport.getPropertyBool(PROP_DISPLAYABLE);
   }
 
+  @Override
   public void setDisplayable(boolean b) {
     propertySupport.setPropertyBool(PROP_DISPLAYABLE, b);
     calculateVisible();
   }
 
+  @Override
   public boolean isVisible() {
     return propertySupport.getPropertyBool(PROP_VISIBLE);
   }
 
+  @Override
   public void setVisible(boolean b) {
     m_visibleProperty = b;
     calculateVisible();
@@ -926,26 +994,32 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && isDisplayable() && m_visibleProperty);
   }
 
+  @Override
   public boolean isVisibleInternal() {
     return m_visibleProperty;
   }
 
+  @Override
   public boolean isPrimaryKey() {
     return m_primaryKey;
   }
 
+  @Override
   public boolean isSummary() {
     return m_summary;
   }
 
+  @Override
   public boolean isEditable() {
     return m_editable;
   }
 
+  @Override
   public void setEditable(boolean editable) {
     m_editable = editable;
   }
 
+  @Override
   public boolean isCellEditable(ITableRow row) {
     try {
       return execIsEditable(row);
@@ -956,26 +1030,32 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   public String getForegroundColor() {
     return (String) propertySupport.getProperty(PROP_FOREGROUND_COLOR);
   }
 
+  @Override
   public void setForegroundColor(String c) {
     propertySupport.setProperty(PROP_FOREGROUND_COLOR, c);
   }
 
+  @Override
   public String getBackgroundColor() {
     return (String) propertySupport.getProperty(PROP_BACKGROUND_COLOR);
   }
 
+  @Override
   public void setBackgroundColor(String c) {
     propertySupport.setProperty(PROP_BACKGROUND_COLOR, c);
   }
 
+  @Override
   public FontSpec getFont() {
     return (FontSpec) propertySupport.getProperty(PROP_FONT);
   }
 
+  @Override
   public void setFont(FontSpec f) {
     propertySupport.setProperty(PROP_FONT, f);
   }
@@ -987,10 +1067,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * <p>
    * This may display a horizontal scroll bar on the table.
    */
+  @Override
   public boolean isAutoOptimizeWidth() {
     return propertySupport.getPropertyBool(PROP_AUTO_OPTIMIZE_WIDTH);
   }
 
+  @Override
   public void setAutoOptimizeWidth(boolean optimize) {
     propertySupport.setPropertyBool(PROP_AUTO_OPTIMIZE_WIDTH, optimize);
   }

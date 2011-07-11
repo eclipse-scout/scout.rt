@@ -25,6 +25,7 @@ public class LogExceptionHandlerService extends AbstractService implements IExce
   public LogExceptionHandlerService() {
   }
 
+  @Override
   public void handleException(ProcessingException pe) {
     IProcessingStatus s = pe.getStatus();
     int logLevel = IScoutLogger.LEVEL_ERROR;

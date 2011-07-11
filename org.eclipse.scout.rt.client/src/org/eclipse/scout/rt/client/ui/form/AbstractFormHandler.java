@@ -139,14 +139,17 @@ public abstract class AbstractFormHandler implements IFormHandler {
     setOpenExclusive(getConfiguredOpenExclusive());
   }
 
+  @Override
   public void setOpenExclusive(boolean openExclusive) {
     m_openExclusive = openExclusive;
   }
 
+  @Override
   public boolean isOpenExclusive() {
     return m_openExclusive;
   }
 
+  @Override
   public IForm getForm() {
     return m_form;
   }
@@ -154,10 +157,12 @@ public abstract class AbstractFormHandler implements IFormHandler {
   /**
    * do not use this internal method
    */
+  @Override
   public void setFormInternal(IForm form) {
     m_form = form;
   }
 
+  @Override
   public String getHandlerId() {
     String s = getClass().getName();
     int i = Math.max(s.lastIndexOf('$'), s.lastIndexOf('.'));
@@ -165,10 +170,12 @@ public abstract class AbstractFormHandler implements IFormHandler {
     return s;
   }
 
+  @Override
   public boolean isGuiLess() {
     return getConfiguredGuiLess();
   }
 
+  @Override
   public final void onLoad() throws ProcessingException {
     try {
       execLoad();
@@ -181,6 +188,7 @@ public abstract class AbstractFormHandler implements IFormHandler {
     }
   }
 
+  @Override
   public final void onPostLoad() throws ProcessingException {
     try {
       execPostLoad();
@@ -193,6 +201,7 @@ public abstract class AbstractFormHandler implements IFormHandler {
     }
   }
 
+  @Override
   public final boolean onCheckFields() throws ProcessingException {
     try {
       return execCheckFields();
@@ -205,6 +214,7 @@ public abstract class AbstractFormHandler implements IFormHandler {
     }
   }
 
+  @Override
   public final boolean onValidate() throws ProcessingException {
     try {
       return execValidate();
@@ -217,6 +227,7 @@ public abstract class AbstractFormHandler implements IFormHandler {
     }
   }
 
+  @Override
   public final void onStore() throws ProcessingException {
     try {
       execStore();
@@ -229,6 +240,7 @@ public abstract class AbstractFormHandler implements IFormHandler {
     }
   }
 
+  @Override
   public final void onDiscard() throws ProcessingException {
     try {
       execDiscard();
@@ -241,6 +253,7 @@ public abstract class AbstractFormHandler implements IFormHandler {
     }
   }
 
+  @Override
   public final void onFinally() throws ProcessingException {
     try {
       execFinally();

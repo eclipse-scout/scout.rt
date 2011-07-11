@@ -61,66 +61,82 @@ public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Ser
     }
   }
 
+  @Override
   public String getColor() {
     return m_color;
   }
 
+  @Override
   public void setColor(String hex) {
     m_color = hex;
   }
 
+  @Override
   public boolean exists() {
     return m_exists;
   }
 
+  @Override
   public void delete() {
     m_exists = false;
   }
 
+  @Override
   public long getLastModified() {
     return m_lastModified;
   }
 
+  @Override
   public void setLastModified(long b) {
     m_lastModified = b;
   }
 
+  @Override
   public long getId() {
     return m_id;
   }
 
+  @Override
   public void setId(long newId) {
     m_id = newId;
   }
 
+  @Override
   public String getOwner() {
     return m_owner;
   }
 
+  @Override
   public void setOwner(String a) {
     m_owner = a;
   }
 
+  @Override
   public String getSubject() {
     return m_subject;
   }
 
+  @Override
   public void setSubject(String a) {
     m_subject = a;
   }
 
+  @Override
   public String getBody() {
     return m_body;
   }
 
+  @Override
   public void setBody(String a) {
     m_body = a;
   }
 
+  @Override
   public RecurrencePattern getRecurrencePattern() {
     return m_recurrencyPattern;
   }
 
+  @Override
   public void setRecurrencePattern(RecurrencePattern p) {
     m_recurrencyPattern = p;
   }

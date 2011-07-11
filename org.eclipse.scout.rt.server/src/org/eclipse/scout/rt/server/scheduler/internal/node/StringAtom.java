@@ -25,6 +25,7 @@ public class StringAtom extends AbstractNode implements INode {
     return m_value;
   }
 
+  @Override
   public void format(IFormatVisitor v) {
     String escText = "" + m_value;
     escText = escText.replaceAll("\"", "\\\\\"");
@@ -32,6 +33,7 @@ public class StringAtom extends AbstractNode implements INode {
     v.print("\"" + escText + "\"");
   }
 
+  @Override
   public Object eval(IEvalVisitor v) {
     return m_value;
   }

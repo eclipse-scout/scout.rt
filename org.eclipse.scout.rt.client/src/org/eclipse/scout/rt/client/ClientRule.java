@@ -43,6 +43,7 @@ public class ClientRule extends AbstractPropertyObserver implements ISchedulingR
     return obj == this;
   }
 
+  @Override
   public boolean contains(ISchedulingRule rule) {
     if (this == rule) return true;
     //
@@ -53,6 +54,7 @@ public class ClientRule extends AbstractPropertyObserver implements ISchedulingR
     return false;
   }
 
+  @Override
   public boolean isConflicting(ISchedulingRule rule) {
     if (this == rule) return true;
     //

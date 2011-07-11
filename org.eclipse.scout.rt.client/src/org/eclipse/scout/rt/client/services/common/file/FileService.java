@@ -39,18 +39,22 @@ public class FileService extends AbstractService implements IFileService {
     return ClientSyncJob.getCurrentSession().getBundle();
   }
 
+  @Override
   public File getLocalFile(String dir, String simpleName) throws ProcessingException {
     return getFileLocation(dir, simpleName, true);
   }
 
+  @Override
   public File getRemoteFile(String dir, String simpleName) throws ProcessingException {
     return getRemoteFile(dir, simpleName, null);
   }
 
+  @Override
   public File getRemoteFile(String dir, String simpleName, Locale locale) throws ProcessingException {
     return getRemoteFile(dir, simpleName, locale, true);
   }
 
+  @Override
   public File getRemoteFile(String dir, String simpleName, Locale locale, boolean checkCache) throws ProcessingException {
     RemoteFile spec = null;
     File f = null;
@@ -140,12 +144,14 @@ public class FileService extends AbstractService implements IFileService {
     return retVal;
   }
 
+  @Override
   public void syncRemoteFilesToPath(String clientFolderPath, String serverFolderPath, FilenameFilter filter) throws ProcessingException {
     setDirectPath(clientFolderPath);
     syncRemoteFilesInternal(serverFolderPath, filter, false);
     setDirectPath(null);
   }
 
+  @Override
   public void syncRemoteFiles(String serverFolderPath, FilenameFilter filter) throws ProcessingException {
     syncRemoteFilesInternal(serverFolderPath, filter, true);
   }
@@ -229,6 +235,7 @@ public class FileService extends AbstractService implements IFileService {
   /**
    * @since 21.10.2009
    */
+  @Override
   public File getLocalFileLocation(String dir, String name) throws ProcessingException {
     return getFileLocation(dir, name, true);
   }
@@ -236,6 +243,7 @@ public class FileService extends AbstractService implements IFileService {
   /**
    * @since 21.10.2009
    */
+  @Override
   public File getRemoteFileLocation(String dir, String name) throws ProcessingException {
     return getFileLocation(dir, name, false);
   }

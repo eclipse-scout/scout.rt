@@ -144,6 +144,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
           return (IStatus) Subject.doAs(
               m_subject,
               new PrivilegedExceptionAction<IStatus>() {
+                @Override
                 public IStatus run() throws Exception {
                   return runTransactionWrapper(monitor);
                 }

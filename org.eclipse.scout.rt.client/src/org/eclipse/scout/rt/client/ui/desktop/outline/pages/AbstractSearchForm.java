@@ -44,6 +44,7 @@ public abstract class AbstractSearchForm extends AbstractForm implements ISearch
     return ConfigurationUtility.filterClass(dca, IFormHandler.class);
   }
 
+  @Override
   public abstract void startSearch() throws ProcessingException;
 
 }

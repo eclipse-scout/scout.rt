@@ -52,6 +52,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     super(smartField);
   }
 
+  @Override
   public void forceProposalSelection() throws ProcessingException {
     ITree tree = getResultTreeField().getTree();
     tree.selectNextNode();
@@ -76,6 +77,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     });
   }
 
+  @Override
   public void update(boolean selectCurrentValue, boolean synchonous) throws ProcessingException {
     ITree tree = getResultTreeField().getTree();
     try {
@@ -141,6 +143,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     else {
       final ArrayList<LookupRow> foundLeafs = new ArrayList<LookupRow>();
       ITreeVisitor v = new ITreeVisitor() {
+        @Override
         public boolean visit(ITreeNode node) {
           if (node.isEnabled() && node.isLeaf()) {
             LookupRow row = (LookupRow) node.getCell().getValue();
@@ -161,6 +164,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     }
   }
 
+  @Override
   public LookupRow getAcceptedProposal() throws ProcessingException {
     LookupRow row = null;
     ITreeNode node = getResultTreeField().getTree().getSelectedNode();
@@ -181,6 +185,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
   /*
    * Dialog start
    */
+  @Override
   public void startForm() throws ProcessingException {
     startInternal(new FormHandler());
   }
@@ -215,6 +220,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       ITree tree = getResultTreeField().getTree();
       final ArrayList<ITreeNode> matchingNodes = new ArrayList<ITreeNode>();
       tree.visitTree(new ITreeVisitor() {
+        @Override
         public boolean visit(ITreeNode node) {
           Object val = node.getCell().getValue();
           if (val instanceof LookupRow && CompareUtility.equals(selectedKey, ((LookupRow) val).getKey())) {
@@ -555,6 +561,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       m_ts = ts;
     }
 
+    @Override
     public boolean accept(ITreeNode node, int level) {
       if (m_ts.isUndefined()) {
         return true;
@@ -593,6 +600,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       m_searchPattern = Pattern.compile(s, Pattern.DOTALL);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public boolean accept(ITreeNode node, int level) {
       ISmartField<Object> sf = (ISmartField<Object>) getSmartField();

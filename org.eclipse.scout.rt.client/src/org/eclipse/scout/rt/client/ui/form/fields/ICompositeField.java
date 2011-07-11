@@ -58,6 +58,7 @@ public interface ICompositeField extends IFormField {
   /**
    * for recursion
    */
+  @Override
   void setMandatory(boolean b);
 
   /**

@@ -58,18 +58,22 @@ public class Scheduler implements IScheduler {
     m_serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(serverSessionType, subject);
   }
 
+  @Override
   public void setActive(boolean b) {
     m_active = b;
   }
 
+  @Override
   public boolean isActive() {
     return m_active;
   }
 
+  @Override
   public Ticker getTicker() {
     return m_ticker;
   }
 
+  @Override
   public void start() {
     synchronized (m_queueLock) {
       if (m_dispatcher == null) {
@@ -79,6 +83,7 @@ public class Scheduler implements IScheduler {
     }
   }
 
+  @Override
   public void stop() {
     synchronized (m_queueLock) {
       if (m_dispatcher != null) {
@@ -104,6 +109,7 @@ public class Scheduler implements IScheduler {
     return (groupId == null || groupId.equals(job.getGroupId())) && (jobId == null || jobId.equals(job.getJobId()));
   }
 
+  @Override
   public void addJob(ISchedulerJob newJob) {
     if (newJob == null) throw new IllegalArgumentException("job must not be null");
     synchronized (m_queueLock) {
@@ -137,6 +143,7 @@ public class Scheduler implements IScheduler {
   /**
    * convenience for removeJobs(null,null)
    */
+  @Override
   public void removeAllJobs() {
     removeJobs(null, null);
   }
@@ -148,6 +155,7 @@ public class Scheduler implements IScheduler {
    *          filter value or null as wildcard
    * @return the list of removed jobs
    */
+  @Override
   public Collection<ISchedulerJob> removeJobs(String groupId, String jobId) {
     synchronized (m_queueLock) {
       ArrayList<ISchedulerJob> removedJobs = new ArrayList<ISchedulerJob>();
@@ -165,6 +173,7 @@ public class Scheduler implements IScheduler {
   /**
    * convenience for interruptJobs(null,null)
    */
+  @Override
   public void interruptAllJobs() {
     interruptJobs(null, null);
   }
@@ -176,6 +185,7 @@ public class Scheduler implements IScheduler {
    *          filter value or null as wildcard
    * @return the list of interrupted jobs
    */
+  @Override
   public Collection<ISchedulerJob> interruptJobs(String groupId, String jobId) {
     synchronized (m_queueLock) {
       ArrayList<ISchedulerJob> intJobs = new ArrayList<ISchedulerJob>();
@@ -191,12 +201,14 @@ public class Scheduler implements IScheduler {
     }
   }
 
+  @Override
   public int getJobCount() {
     synchronized (m_queueLock) {
       return m_availableJobs.size();
     }
   }
 
+  @Override
   public int getRunningJobCount() {
     synchronized (m_queueLock) {
       return m_runningJobs.size();
@@ -208,6 +220,7 @@ public class Scheduler implements IScheduler {
    * found job with that id even though there might be other jobs with that same
    * id
    */
+  @Override
   public ISchedulerJob getJob(String jobId) {
     Collection<ISchedulerJob> list = getJobs(null, jobId);
     if (list.size() >= 1) {
@@ -221,10 +234,12 @@ public class Scheduler implements IScheduler {
   /**
    * convenience for getJobs(null,null)
    */
+  @Override
   public Collection<ISchedulerJob> getAllJobs() {
     return getJobs(null, null);
   }
 
+  @Override
   public Collection<ISchedulerJob> getJobs(String groupId, String jobId) {
     synchronized (m_queueLock) {
       ArrayList<ISchedulerJob> jobs = new ArrayList<ISchedulerJob>();
@@ -240,10 +255,12 @@ public class Scheduler implements IScheduler {
   /**
    * convenience for getRunningJobs(null,null)
    */
+  @Override
   public Collection<ISchedulerJob> getAllRunningJobs() {
     return getRunningJobs(null, null);
   }
 
+  @Override
   public Collection<ISchedulerJob> getRunningJobs(String groupId, String jobId) {
     synchronized (m_queueLock) {
       ArrayList<ISchedulerJob> jobs = new ArrayList<ISchedulerJob>();
@@ -304,6 +321,7 @@ public class Scheduler implements IScheduler {
     }
   }
 
+  @Override
   public void handleJobExecution(final ISchedulerJob job, final TickSignal signal) throws ProcessingException {
     ServerJob serverJob = new ServerJob("Scheduler", m_serverSession, m_subject) {
       @Override
@@ -341,6 +359,7 @@ public class Scheduler implements IScheduler {
       return m_signal;
     }
 
+    @Override
     public void run() {
       try {
         m_job.setInterrupted(false);

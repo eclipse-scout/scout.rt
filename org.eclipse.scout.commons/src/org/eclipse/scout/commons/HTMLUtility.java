@@ -191,6 +191,7 @@ public final class HTMLUtility {
     // eliminate vertical scrollbar
     doc.writeLockEx();
     visitDocument(doc, new IDocumentVisitor() {
+      @Override
       public void visitElement(Element elem) {
         if ("body".equalsIgnoreCase(elem.getName())) {
           AttributeSet atts = elem.getAttributes();
@@ -209,6 +210,7 @@ public final class HTMLUtility {
         }
       }
 
+      @Override
       public void visitAttribute(Element elem, AttributeSet atts, Object nm, Object value) {
         // nop
       }
@@ -261,10 +263,12 @@ public final class HTMLUtility {
     // clean font tags if any styles are present
     doc.writeLockEx();
     visitDocument(doc, new IDocumentVisitor() {
+      @Override
       public void visitElement(Element elem) {
         // nop
       }
 
+      @Override
       public void visitAttribute(Element elem, AttributeSet atts, Object nm, Object value) {
         if (nm == HTML.Attribute.FACE || nm == HTML.Attribute.SIZE || nm == CSS.Attribute.FONT_FAMILY || nm == CSS.Attribute.FONT_SIZE) {
           if (atts instanceof MutableAttributeSet) {
@@ -312,9 +316,11 @@ public final class HTMLUtility {
     // visit all img tags for occurrences of "cid:" URLs
     doc.writeLockEx();
     visitDocument(doc, new IDocumentVisitor() {
+      @Override
       public void visitElement(Element elem) {
       }
 
+      @Override
       public void visitAttribute(Element elem, AttributeSet atts, Object nm, Object value) {
         if (nm == HTML.Attribute.SRC || nm == HTML.Attribute.HREF) {
           String src = "" + value;
@@ -343,9 +349,11 @@ public final class HTMLUtility {
     // visit all img tags for occurrences of "cid:" URLs
     doc.writeLockEx();
     visitDocument(doc, new IDocumentVisitor() {
+      @Override
       public void visitElement(Element elem) {
       }
 
+      @Override
       public void visitAttribute(Element elem, AttributeSet atts, Object nm, Object value) {
         if (nm == HTML.Attribute.SRC || nm == HTML.Attribute.HREF) {
           String src = "" + value;

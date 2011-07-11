@@ -33,6 +33,7 @@ public class PerformanceAnalyzerService extends AbstractService implements IPerf
     m_serverExecutionTime = new PerformanceSampleSet(10, 100);
   }
 
+  @Override
   public void addNetworkLatencySample(long millis) {
     long oldValue = m_networkLatency.getValue();
     m_networkLatency.addSample(millis);
@@ -45,10 +46,12 @@ public class PerformanceAnalyzerService extends AbstractService implements IPerf
     }
   }
 
+  @Override
   public long getNetworkLatency() {
     return m_networkLatency.getValue();
   }
 
+  @Override
   public void addServerExecutionTimeSample(long millis) {
     long oldValue = m_serverExecutionTime.getValue();
     m_serverExecutionTime.addSample(millis);
@@ -61,22 +64,27 @@ public class PerformanceAnalyzerService extends AbstractService implements IPerf
     }
   }
 
+  @Override
   public long getServerExecutionTime() {
     return m_serverExecutionTime.getValue();
   }
 
+  @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     m_propertySupport.addPropertyChangeListener(listener);
   }
 
+  @Override
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     m_propertySupport.addPropertyChangeListener(propertyName, listener);
   }
 
+  @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     m_propertySupport.removePropertyChangeListener(listener);
   }
 
+  @Override
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     m_propertySupport.removePropertyChangeListener(propertyName, listener);
   }

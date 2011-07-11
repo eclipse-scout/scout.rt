@@ -94,6 +94,7 @@ public class FastPropertyDescriptor {
     this.writeMethod = writeMethod;
   }
 
+  @Override
   public int hashCode() {
     int result = 0;
     result = result ^ getName().hashCode();
@@ -106,6 +107,7 @@ public class FastPropertyDescriptor {
   /**
    * @return true if both <code>FastPropertyDescriptor</code>s have equal read method, write method and property type
    */
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;

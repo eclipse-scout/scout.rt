@@ -38,18 +38,22 @@ public class OracleSqlStyle extends AbstractSqlStyle {
     return 1000;
   }
 
+  @Override
   public boolean isLargeString(String s) {
     return (s.length() > 4000);
   }
 
+  @Override
   public boolean isBlobEnabled() {
     return true;
   }
 
+  @Override
   public boolean isClobEnabled() {
     return true;
   }
 
+  @Override
   public void testConnection(Connection conn) throws SQLException {
     Statement testStatement = null;
     try {
@@ -82,7 +86,7 @@ public class OracleSqlStyle extends AbstractSqlStyle {
            */
           Clob clob;
           try {
-            Class clobClass;
+            Class<?> clobClass;
             clobClass = Class.forName("oracle.sql.CLOB", true, ps.getClass().getClassLoader());
             clob = (Clob) clobClass.getMethod("createTemporary", new Class[]{Connection.class, boolean.class, int.class}).invoke(null, new Object[]{ps.getConnection(), false, clobClass.getField("DURATION_SESSION").get(null)});
           }
@@ -116,7 +120,7 @@ public class OracleSqlStyle extends AbstractSqlStyle {
            */
           Blob blob;
           try {
-            Class blobClass = Class.forName("oracle.sql.BLOB", true, ps.getClass().getClassLoader());
+            Class<?> blobClass = Class.forName("oracle.sql.BLOB", true, ps.getClass().getClassLoader());
             blob = (Blob) blobClass.getMethod("createTemporary", new Class[]{Connection.class, boolean.class, int.class}).invoke(null, new Object[]{ps.getConnection(), false, blobClass.getField("DURATION_SESSION").get(null)});
           }
           catch (Throwable t) {

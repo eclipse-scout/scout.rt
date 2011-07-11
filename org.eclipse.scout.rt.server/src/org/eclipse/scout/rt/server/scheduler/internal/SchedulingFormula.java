@@ -23,6 +23,7 @@ public class SchedulingFormula implements ISchedulingFormula {
     m_root = root;
   }
 
+  @Override
   public boolean eval(TickSignal signal, Object[] args) {
     DefaultEvalVisitor v = new DefaultEvalVisitor(signal, args);
     return v.toBoolean(m_root.eval(v));

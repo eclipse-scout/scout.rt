@@ -24,6 +24,7 @@ public class TableRowComparator implements Comparator<ITableRow> {
     m_columns = columns;
   }
 
+  @Override
   public int compare(ITableRow row1, ITableRow row2) {
     for (int i = 0; i < m_columns.length; i++) {
       int c = m_columns[i].compareTableRows(row1, row2);

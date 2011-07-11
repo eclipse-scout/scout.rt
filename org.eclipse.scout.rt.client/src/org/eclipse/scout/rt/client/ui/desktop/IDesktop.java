@@ -206,15 +206,19 @@ public interface IDesktop extends IPropertyObserver {
   /**
    * add Property Observer
    */
+  @Override
   void addPropertyChangeListener(PropertyChangeListener listener);
 
+  @Override
   void removePropertyChangeListener(PropertyChangeListener listener);
 
   /**
    * add Property Observer
    */
+  @Override
   void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
 
+  @Override
   void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
 
   /**

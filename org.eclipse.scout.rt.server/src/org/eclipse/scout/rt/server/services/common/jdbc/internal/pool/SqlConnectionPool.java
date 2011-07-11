@@ -228,6 +228,7 @@ public final class SqlConnectionPool {
     }
     final String f = buf.toString();
     return new IServiceInventory() {
+      @Override
       public String getInventory() {
         return new String(f);
       }

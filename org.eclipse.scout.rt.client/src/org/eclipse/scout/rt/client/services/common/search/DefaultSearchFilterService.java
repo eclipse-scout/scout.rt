@@ -32,10 +32,12 @@ import org.eclipse.scout.service.AbstractService;
 
 public class DefaultSearchFilterService extends AbstractService implements ISearchFilterService {
 
+  @Override
   public SearchFilter createNewSearchFilter() {
     return new SearchFilter();
   }
 
+  @Override
   public void applySearchDelegate(IFormField field, SearchFilter search, boolean includeChildren) {
     String label = field.getLabel();
     if (field.getParentField() instanceof ISequenceBox && field.getParentField() instanceof AbstractFormField) {

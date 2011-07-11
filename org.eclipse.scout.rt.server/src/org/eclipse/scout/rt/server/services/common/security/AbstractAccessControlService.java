@@ -48,6 +48,7 @@ public class AbstractAccessControlService extends AbstractService implements IAc
     super.initializeService();
   }
 
+  @Override
   public boolean checkPermission(Permission p) {
     if (p == null) {
       return true;
@@ -61,6 +62,7 @@ public class AbstractAccessControlService extends AbstractService implements IAc
     }
   }
 
+  @Override
   public int getPermissionLevel(Permission p) {
     if (p == null) {
       return BasicHierarchyPermission.LEVEL_NONE;
@@ -101,6 +103,7 @@ public class AbstractAccessControlService extends AbstractService implements IAc
     }
   }
 
+  @Override
   public Permissions getPermissions() {
     Permissions permSet = m_accessControlStore.getPermissionsOfCurrentSubject();
 
@@ -146,14 +149,17 @@ public class AbstractAccessControlService extends AbstractService implements IAc
     m_accessControlStore.setPermissionsOfCurrentSubject(p);
   }
 
+  @Override
   public boolean isProxyService() {
     return false;
   }
 
+  @Override
   public void clearCache() {
     m_accessControlStore.clearCache();
   }
 
+  @Override
   public void clearCacheOfPrincipals(String... principalNames) {
     if (principalNames == null) {
       return;

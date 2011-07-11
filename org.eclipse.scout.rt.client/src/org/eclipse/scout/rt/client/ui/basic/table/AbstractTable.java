@@ -566,10 +566,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Runtime
    */
 
+  @Override
   public String getUserPreferenceContext() {
     return m_userPreferenceContext;
   }
 
+  @Override
   public void setUserPreferenceContext(String context) {
     m_userPreferenceContext = context;
     if (isTableInitialized()) {
@@ -587,6 +589,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * This is the init of the runtime model after the table and columns are built
    * and configured
    */
+  @Override
   public final void initTable() throws ProcessingException {
     try {
       if (m_initLock.acquire()) {
@@ -617,6 +620,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public final void disposeTable() {
     try {
       disposeTableInternal();
@@ -633,6 +637,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void doHyperlinkAction(ITableRow row, IColumn<?> col, URL url) throws ProcessingException {
     if (row != null) {
       selectRow(row);
@@ -643,10 +648,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
   }
 
+  @Override
   public ITableRowFilter[] getRowFilters() {
     return m_rowFilters.toArray(new ITableRowFilter[m_rowFilters.size()]);
   }
 
+  @Override
   public void addRowFilter(ITableRowFilter filter) {
     if (filter != null) {
       //avoid duplicate add
@@ -664,6 +671,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void removeRowFilter(ITableRowFilter filter) {
     if (filter != null) {
       m_rowFilters.remove(filter);
@@ -671,6 +679,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void applyRowFilters() {
     applyRowFiltersInternal();
     fireRowFilterChanged();
@@ -700,34 +709,42 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public String getTitle() {
     return propertySupport.getPropertyString(PROP_TITLE);
   }
 
+  @Override
   public void setTitle(String s) {
     propertySupport.setPropertyString(PROP_TITLE, s);
   }
 
+  @Override
   public boolean isAutoResizeColumns() {
     return propertySupport.getPropertyBool(PROP_AUTO_RESIZE_COLUMNS);
   }
 
+  @Override
   public void setAutoResizeColumns(boolean b) {
     propertySupport.setPropertyBool(PROP_AUTO_RESIZE_COLUMNS, b);
   }
 
+  @Override
   public ColumnSet getColumnSet() {
     return m_columnSet;
   }
 
+  @Override
   public int getColumnCount() {
     return getColumnSet().getColumnCount();
   }
 
+  @Override
   public IColumn<?>[] getColumns() {
     return getColumnSet().getColumns();
   }
 
+  @Override
   public String[] getColumnNames() {
     String[] a = new String[getColumnCount()];
     for (int i = 0; i < a.length; i++) {
@@ -736,38 +753,47 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return a;
   }
 
+  @Override
   public int getVisibleColumnCount() {
     return getColumnSet().getVisibleColumnCount();
   }
 
+  @Override
   public IHeaderCell getVisibleHeaderCell(int visibleColumnIndex) {
     return getHeaderCell(getColumnSet().getVisibleColumn(visibleColumnIndex));
   }
 
+  @Override
   public IHeaderCell getHeaderCell(int columnIndex) {
     return getHeaderCell(getColumnSet().getColumn(columnIndex));
   }
 
+  @Override
   public IHeaderCell getHeaderCell(IColumn<?> col) {
     return col.getHeaderCell();
   }
 
+  @Override
   public ICell getVisibleCell(int rowIndex, int visibleColumnIndex) {
     return getVisibleCell(getRow(rowIndex), visibleColumnIndex);
   }
 
+  @Override
   public ICell getVisibleCell(ITableRow row, int visibleColumnIndex) {
     return getCell(row, getColumnSet().getVisibleColumn(visibleColumnIndex));
   }
 
+  @Override
   public ICell getCell(int rowIndex, int columnIndex) {
     return getCell(getRow(rowIndex), getColumnSet().getColumn(columnIndex));
   }
 
+  @Override
   public ICell getSummaryCell(int rowIndex) {
     return getSummaryCell(getRow(rowIndex));
   }
 
+  @Override
   public ICell getSummaryCell(ITableRow row) {
     IColumn<?>[] a = getColumnSet().getSummaryColumns();
     if (a.length == 0) {
@@ -805,6 +831,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public ICell getCell(ITableRow row, IColumn<?> col) {
     row = resolveRow(row);
     if (row == null || col == null) return null;
@@ -814,6 +841,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Note that this is not a java bean method and thus not thread-safe
    */
+  @Override
   public boolean isCellEditable(int rowIndex, int columnIndex) {
     return isCellEditable(getRow(rowIndex), getColumnSet().getColumn(columnIndex));
   }
@@ -821,6 +849,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Note that this is not a java bean method and thus not thread-safe
    */
+  @Override
   public boolean isCellEditable(ITableRow row, int visibleColumnIndex) {
     return isCellEditable(row, getColumnSet().getVisibleColumn(visibleColumnIndex));
   }
@@ -828,106 +857,132 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Note that this is not a java bean method and thus not thread-safe
    */
+  @Override
   public boolean isCellEditable(ITableRow row, IColumn<?> column) {
     return row != null && column != null && column.isCellEditable(row);
   }
 
+  @Override
   public boolean isCheckable() {
     return propertySupport.getPropertyBool(PROP_CHECKABLE);
   }
 
+  @Override
   public void setCheckable(boolean b) {
     propertySupport.setPropertyBool(PROP_CHECKABLE, b);
   }
 
+  @Override
   public void setDragType(int dragType) {
     propertySupport.setPropertyInt(PROP_DRAG_TYPE, dragType);
   }
 
+  @Override
   public int getDragType() {
     return propertySupport.getPropertyInt(PROP_DRAG_TYPE);
   }
 
+  @Override
   public void setDropType(int dropType) {
     propertySupport.setPropertyInt(PROP_DROP_TYPE, dropType);
   }
 
+  @Override
   public int getDropType() {
     return propertySupport.getPropertyInt(PROP_DROP_TYPE);
   }
 
+  @Override
   public boolean isMultilineText() {
     return propertySupport.getPropertyBool(PROP_MULTILINE_TEXT);
   }
 
+  @Override
   public void setMultilineText(boolean on) {
     propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, on);
   }
 
+  @Override
   public int getRowHeightHint() {
     return propertySupport.getPropertyInt(PROP_ROW_HEIGHT_HINT);
   }
 
+  @Override
   public void setRowHeightHint(int h) {
     propertySupport.setPropertyInt(PROP_ROW_HEIGHT_HINT, h);
   }
 
+  @Override
   public boolean isInitialMultilineText() {
     return m_initialMultiLineText;
   }
 
+  @Override
   public void setInitialMultilineText(boolean on) {
     m_initialMultiLineText = on;
   }
 
+  @Override
   public boolean hasKeyboardNavigation() {
     return propertySupport.getPropertyBool(PROP_KEYBOARD_NAVIGATION);
   }
 
+  @Override
   public void setKeyboardNavigation(boolean on) {
     propertySupport.setPropertyBool(PROP_KEYBOARD_NAVIGATION, on);
   }
 
+  @Override
   public boolean isMultiSelect() {
     return propertySupport.getPropertyBool(PROP_MULTI_SELECT);
   }
 
+  @Override
   public void setMultiSelect(boolean b) {
     propertySupport.setPropertyBool(PROP_MULTI_SELECT, b);
   }
 
+  @Override
   public boolean isMultiCheck() {
     return propertySupport.getPropertyBool(PROP_MULTI_CHECK);
   }
 
+  @Override
   public void setMultiCheck(boolean b) {
     propertySupport.setPropertyBool(PROP_MULTI_CHECK, b);
   }
 
+  @Override
   public IBooleanColumn getCheckableColumn() {
     return m_checkableColumn;
   }
 
+  @Override
   public void setCheckableColumn(IBooleanColumn checkableColumn) {
     m_checkableColumn = checkableColumn;
   }
 
+  @Override
   public boolean isAutoDiscardOnDelete() {
     return m_autoDiscardOnDelete;
   }
 
+  @Override
   public void setAutoDiscardOnDelete(boolean on) {
     m_autoDiscardOnDelete = on;
   }
 
+  @Override
   public boolean isTableInitialized() {
     return m_initialized;
   }
 
+  @Override
   public boolean isTableChanging() {
     return m_tableChanging > 0;
   }
 
+  @Override
   public void setTableChanging(boolean b) {
     // use a stack counter because setTableChanging might be called in nested
     // loops
@@ -986,6 +1041,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public IKeyStroke[] getKeyStrokes() {
     IKeyStroke[] keyStrokes = (IKeyStroke[]) propertySupport.getProperty(PROP_KEY_STROKES);
     if (keyStrokes == null) {
@@ -994,14 +1050,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return keyStrokes;
   }
 
+  @Override
   public void setKeyStrokes(IKeyStroke[] keyStrokes) {
     propertySupport.setProperty(PROP_KEY_STROKES, keyStrokes);
   }
 
+  @Override
   public void requestFocus() {
     fireRequestFocus();
   }
 
+  @Override
   public void extractTableData(AbstractTableFieldData target) throws ProcessingException {
     for (int i = 0, ni = getRowCount(); i < ni; i++) {
       ITableRow row = getRow(i);
@@ -1023,6 +1082,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     target.setValueSet(true);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void updateTable(AbstractTableFieldData source) throws ProcessingException {
     if (source.isValueSet()) {
@@ -1078,14 +1138,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public IMenu[] getMenus() {
     return m_menus;
   }
 
+  @Override
   public <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException {
     return new ActionFinder().findAction(getMenus(), menuType);
   }
 
+  @Override
   public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {
     for (IMenu m : getMenus()) {
       if (m.getClass() == menuType) {
@@ -1172,14 +1235,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * AtomicReference<Object>(Object[][])
    * so that the further processing can set the content of the holder to null while processing.
    */
+  @Override
   public void replaceRowsByMatrix(Object dataMatrixOrReference) throws ProcessingException {
     replaceRows(createRowsByMatrix(dataMatrixOrReference));
   }
 
+  @Override
   public void replaceRowsByArray(Object dataArray) throws ProcessingException {
     replaceRows(createRowsByArray(dataArray));
   }
 
+  @Override
   public void replaceRows(ITableRow[] newRows) throws ProcessingException {
     /*
      * There are two ways to replace: (1) Completely replace all rows by
@@ -1306,25 +1372,30 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void updateRow(ITableRow row) {
     if (row != null) {
       updateRows(new ITableRow[]{row});
     }
   }
 
+  @Override
   public void updateAllRows() {
     ITableRow[] rows = getRows();
     updateRows(rows);
   }
 
+  @Override
   public void setRowState(ITableRow row, int rowState) throws ProcessingException {
     setRowState(new ITableRow[]{row}, rowState);
   }
 
+  @Override
   public void setAllRowState(int rowState) throws ProcessingException {
     setRowState(getRows(), rowState);
   }
 
+  @Override
   public void setRowState(ITableRow[] rows, int rowState) throws ProcessingException {
     try {
       setTableChanging(true);
@@ -1338,6 +1409,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void updateRows(ITableRow[] rows) {
     try {
       setTableChanging(true);
@@ -1377,18 +1449,22 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public int getRowCount() {
     return m_rows.size();
   }
 
+  @Override
   public int getDeletedRowCount() {
     return m_deletedRows.size();
   }
 
+  @Override
   public int getSelectedRowCount() {
     return m_selectedRows.size();
   }
 
+  @Override
   public ITableRow getSelectedRow() {
     if (m_selectedRows.size() > 0) {
       return m_selectedRows.first();
@@ -1398,24 +1474,29 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public ITableRow[] getSelectedRows() {
     return m_selectedRows.toArray(new ITableRow[m_selectedRows.size()]);
   }
 
+  @Override
   public boolean isSelectedRow(ITableRow row) {
     row = resolveRow(row);
     if (row == null) return false;
     else return m_selectedRows.contains(row);
   }
 
+  @Override
   public void selectRow(int rowIndex) {
     selectRow(getRow(rowIndex));
   }
 
+  @Override
   public void selectRow(ITableRow row) {
     selectRow(row, false);
   }
 
+  @Override
   public void selectRow(ITableRow row, boolean append) {
     if (row != null) {
       selectRows(new ITableRow[]{row}, append);
@@ -1425,10 +1506,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void selectRows(ITableRow[] rows) {
     selectRows(rows, false);
   }
 
+  @Override
   public void selectRows(ITableRow[] rows, boolean append) {
     rows = resolveRows(rows);
     TreeSet<ITableRow> newSelection = new TreeSet<ITableRow>(new RowIndexComparator());
@@ -1451,10 +1534,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void selectFirstRow() {
     selectRow(getRow(0));
   }
 
+  @Override
   public void selectNextRow() {
     ITableRow row = getSelectedRow();
     if (row != null && row.getRowIndex() + 1 < getRowCount()) {
@@ -1465,6 +1550,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void selectPreviousRow() {
     ITableRow row = getSelectedRow();
     if (row != null && row.getRowIndex() - 1 >= 0) {
@@ -1475,10 +1561,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void selectLastRow() {
     selectRow(getRow(getRowCount() - 1));
   }
 
+  @Override
   public void deselectRow(ITableRow row) {
     if (row != null) {
       deselectRows(new ITableRow[]{row});
@@ -1488,6 +1576,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void deselectRows(ITableRow[] rows) {
     rows = resolveRows(rows);
     if (rows != null && rows.length > 0) {
@@ -1497,14 +1586,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void selectAllRows() {
     selectRows(getRows(), false);
   }
 
+  @Override
   public void deselectAllRows() {
     selectRow(null, false);
   }
 
+  @Override
   public void selectAllEnabledRows() {
     ArrayList<ITableRow> newList = new ArrayList<ITableRow>();
     for (int i = 0, ni = getRowCount(); i < ni; i++) {
@@ -1519,6 +1611,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     selectRows(newList.toArray(new ITableRow[0]), false);
   }
 
+  @Override
   public void deselectAllEnabledRows() {
     ITableRow[] selectedRows = getSelectedRows();
     ArrayList<ITableRow> newList = new ArrayList<ITableRow>();
@@ -1530,6 +1623,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     deselectRows(newList.toArray(new ITableRow[0]));
   }
 
+  @Override
   public ITableRow[] getCheckedRows() {
     final ArrayList<ITableRow> list = new ArrayList<ITableRow>();
     for (ITableRow row : getRows()) {
@@ -1540,10 +1634,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return list.toArray(new ITableRow[list.size()]);
   }
 
+  @Override
   public void checkRow(int row, boolean value) throws ProcessingException {
     checkRow(getRow(row), value);
   }
 
+  @Override
   public void checkRow(ITableRow row, boolean value) throws ProcessingException {
     if (!row.isEnabled()) {
       return;
@@ -1557,6 +1653,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void checkRows(ITableRow[] rows, boolean value) throws ProcessingException {
     rows = resolveRows(rows);
     // check checked count with multicheck
@@ -1571,6 +1668,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void checkAllRows() throws ProcessingException {
     try {
       setTableChanging(true);
@@ -1583,6 +1681,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void uncheckAllRows() throws ProcessingException {
     try {
       setTableChanging(true);
@@ -1595,28 +1694,34 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public String getDefaultIconId() {
     String iconId = propertySupport.getPropertyString(PROP_DEFAULT_ICON);
     if (iconId != null && iconId.length() == 0) iconId = null;
     return iconId;
   }
 
+  @Override
   public void setDefaultIconId(String iconId) {
     propertySupport.setPropertyString(PROP_DEFAULT_ICON, iconId);
   }
 
+  @Override
   public boolean isEnabled() {
     return propertySupport.getPropertyBool(PROP_ENABLED);
   }
 
+  @Override
   public final void setEnabled(boolean b) {
     propertySupport.setPropertyBool(PROP_ENABLED, b);
   }
 
+  @Override
   public boolean isScrollToSelection() {
     return propertySupport.getPropertyBool(PROP_SCROLL_TO_SELECTION);
   }
 
+  @Override
   public void setScrollToSelection(boolean b) {
     propertySupport.setPropertyBool(PROP_SCROLL_TO_SELECTION, b);
   }
@@ -1626,6 +1731,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *         when the row is changed it has to be applied to the table using
    *         modifyRow(row);
    */
+  @Override
   public ITableRow getRow(int rowIndex) {
     ITableRow row = null;
     ITableRow[] rows = getRows();
@@ -1635,6 +1741,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return row;
   }
 
+  @Override
   public ITableRow[] getRows() {
     //lazy create list in getter, make sure to be thread-safe since getters may be called from "wild" threads
     synchronized (m_cachedRowsLock) {
@@ -1646,6 +1753,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public ITableRow[] getFilteredRows() {
     ITableRow[] rows = getRows();
     if (m_rowFilters.size() > 0) {
@@ -1674,6 +1782,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public int getFilteredRowCount() {
     if (m_rowFilters.size() > 0) {
       return getFilteredRows().length;
@@ -1683,6 +1792,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public ITableRow getFilteredRow(int index) {
     if (m_rowFilters.size() > 0) {
       ITableRow row = null;
@@ -1697,6 +1807,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public int getFilteredRowIndex(ITableRow row) {
     ITableRow[] filteredRows = getFilteredRows();
     for (int i = 0; i < filteredRows.length; i++) {
@@ -1707,6 +1818,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return -1;
   }
 
+  @Override
   public Object[][] getTableData() {
     Object[][] data = new Object[getRowCount()][getColumnCount()];
     for (int r = 0; r < getRowCount(); r++) {
@@ -1717,10 +1829,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return data;
   }
 
+  @Override
   public Object[][] exportTableRowsAsCSV(ITableRow[] rows, IColumn<?>[] columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormats) {
     return TableUtility.exportRowsAsCSV(rows, columns, includeLineForColumnNames, includeLineForColumnTypes, includeLineForColumnFormats);
   }
 
+  @Override
   public ITableRow[] getRows(int[] rowIndexes) {
     if (rowIndexes == null) {
       return new ITableRow[0];
@@ -1750,10 +1864,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *         when the row is changed it has to be applied to the table using
    *         modifyRow(row);
    */
+  @Override
   public ITableRow[] getDeletedRows() {
     return m_deletedRows.values().toArray(new ITableRow[0]);
   }
 
+  @Override
   public int getInsertedRowCount() {
     int count = 0;
     ITableRow[] rows = getRows();
@@ -1765,6 +1881,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return count;
   }
 
+  @Override
   public ITableRow[] getInsertedRows() {
     ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
     ITableRow[] rows = getRows();
@@ -1777,6 +1894,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return rowList.toArray(new ITableRow[rowList.size()]);
   }
 
+  @Override
   public int getUpdatedRowCount() {
     int count = 0;
     ITableRow[] rows = getRows();
@@ -1788,6 +1906,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return count;
   }
 
+  @Override
   public ITableRow[] getUpdatedRows() {
     ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
     ITableRow[] rows = getRows();
@@ -1803,6 +1922,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Convenience to add row by data only
    */
+  @Override
   public ITableRow addRowByArray(Object dataArray) throws ProcessingException {
     if (dataArray == null) return null;
     ITableRow[] a = addRowsByMatrix(new Object[]{dataArray});
@@ -1814,26 +1934,32 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public ITableRow[] addRowsByMatrix(Object dataMatrix) throws ProcessingException {
     return addRowsByMatrix(dataMatrix, ITableRow.STATUS_INSERTED);
   }
 
+  @Override
   public ITableRow[] addRowsByMatrix(Object dataMatrix, int rowStatus) throws ProcessingException {
     return addRows(createRowsByMatrix(dataMatrix, rowStatus));
   }
 
+  @Override
   public ITableRow[] addRowsByArray(Object dataArray) throws ProcessingException {
     return addRowsByArray(dataArray, ITableRow.STATUS_INSERTED);
   }
 
+  @Override
   public ITableRow[] addRowsByArray(Object dataArray, int rowStatus) throws ProcessingException {
     return addRows(createRowsByArray(dataArray, rowStatus));
   }
 
+  @Override
   public ITableRow addRow(ITableRow newRow) throws ProcessingException {
     return addRow(newRow, false);
   }
 
+  @Override
   public ITableRow addRow(ITableRow newRow, boolean markAsInserted) throws ProcessingException {
     ITableRow[] addedRows = addRows(new ITableRow[]{newRow}, markAsInserted);
     if (addedRows.length > 0) {
@@ -1844,14 +1970,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public ITableRow[] addRows(ITableRow[] newRows) throws ProcessingException {
     return addRows(newRows, false);
   }
 
+  @Override
   public ITableRow[] addRows(ITableRow[] newRows, boolean markAsInserted) throws ProcessingException {
     return addRows(newRows, markAsInserted, null);
   }
 
+  @Override
   public ITableRow[] addRows(ITableRow[] newRows, boolean markAsInserted, int[] insertIndexes) throws ProcessingException {
     if (newRows == null || newRows.length == 0) return new ITableRow[0];
     try {
@@ -1919,6 +2048,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return newIRow;
   }
 
+  @Override
   public void moveRow(int sourceIndex, int targetIndex) {
     moveRowImpl(sourceIndex, targetIndex);
   }
@@ -1926,6 +2056,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * move the movingRow to the location just before the target row
    */
+  @Override
   public void moveRowBefore(ITableRow movingRow, ITableRow targetRow) {
     movingRow = resolveRow(movingRow);
     targetRow = resolveRow(targetRow);
@@ -1937,6 +2068,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * move the movingRow to the location just after the target row
    */
+  @Override
   public void moveRowAfter(ITableRow movingRow, ITableRow targetRow) {
     movingRow = resolveRow(movingRow);
     targetRow = resolveRow(targetRow);
@@ -1970,10 +2102,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void deleteRow(int rowIndex) {
     deleteRows(new int[]{rowIndex});
   }
 
+  @Override
   public void deleteRows(int[] rowIndexes) {
     ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
     for (int i = 0; i < rowIndexes.length; i++) {
@@ -1985,16 +2119,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     deleteRows(rowList.toArray(new ITableRow[0]));
   }
 
+  @Override
   public void deleteRow(ITableRow row) {
     if (row != null) {
       deleteRows(new ITableRow[]{row});
     }
   }
 
+  @Override
   public void deleteAllRows() {
     deleteRows(getRows());
   }
 
+  @Override
   public void deleteRows(ITableRow[] rows) {
     ITableRow[] existingRows = getRows();
     //peformance quick-check
@@ -2088,10 +2225,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void discardRow(int rowIndex) {
     discardRows(new int[]{rowIndex});
   }
 
+  @Override
   public void discardRows(int[] rowIndexes) {
     ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
     for (int i = 0; i < rowIndexes.length; i++) {
@@ -2103,12 +2242,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     discardRows(rowList.toArray(new ITableRow[0]));
   }
 
+  @Override
   public void discardRow(ITableRow row) {
     if (row != null) {
       discardRows(new ITableRow[]{row});
     }
   }
 
+  @Override
   public void discardAllRows() {
     discardRows(getRows());
   }
@@ -2117,6 +2258,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * discard is the same as delete with the exception that discarded rows are
    * not collected in the deletedRows list
    */
+  @Override
   public void discardRows(ITableRow[] rows) {
     try {
       setTableChanging(true);
@@ -2131,14 +2273,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void setContextColumn(IColumn<?> col) {
     propertySupport.setProperty(PROP_CONTEXT_COLUMN, col);
   }
 
+  @Override
   public IColumn<?> getContextColumn() {
     return (IColumn<?>) propertySupport.getProperty(PROP_CONTEXT_COLUMN);
   }
 
+  @Override
   public void clearDeletedRows() {
     for (Iterator<ITableRow> it = m_deletedRows.values().iterator(); it.hasNext();) {
       ((InternalTableRow) it.next()).setTableInternal(null);
@@ -2146,11 +2291,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_deletedRows.clear();
   }
 
+  @Override
   public Object[] getRowKeys(int rowIndex) {
     ITableRow row = getRow(rowIndex);
     return getRowKeys(row);
   }
 
+  @Override
   public Object[] getRowKeys(ITableRow row) {
     // do not resolve
     Object[] keys = new Object[0];
@@ -2160,6 +2307,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return keys;
   }
 
+  @Override
   public ITableRow findRowByKey(Object[] keys) {
     IColumn<?>[] keyColumns = getColumnSet().getKeyColumns();
     if (keyColumns.length == 0) {
@@ -2182,30 +2330,37 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return null;
   }
 
+  @Override
   public ITableColumnFilterManager getColumnFilterManager() {
     return m_columnFilterManager;
   }
 
+  @Override
   public void setColumnFilterManager(ITableColumnFilterManager m) {
     m_columnFilterManager = m;
   }
 
+  @Override
   public ITableCustomizer getTableCustomizer() {
     return m_tableCustomizer;
   }
 
+  @Override
   public void setTableCustomizer(ITableCustomizer c) {
     m_tableCustomizer = c;
   }
 
+  @Override
   public boolean isSortEnabled() {
     return m_sortEnabled;
   }
 
+  @Override
   public void setSortEnabled(boolean b) {
     m_sortEnabled = b;
   }
 
+  @Override
   public void sort() {
     try {
       if (isSortEnabled()) {
@@ -2224,6 +2379,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void sort(ITableRow[] rowsInNewOrder) {
     ITableRow[] resolvedRows = resolveRows(rowsInNewOrder);
     if (resolvedRows.length == rowsInNewOrder.length) {
@@ -2260,26 +2416,32 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     fireRowOrderChanged();
   }
 
+  @Override
   public void resetColumnVisibilities() {
     resetColumns(true, false, false, false);
   }
 
+  @Override
   public void resetColumnOrder() {
     resetColumns(false, true, false, false);
   }
 
+  @Override
   public void resetColumnSortOrder() {
     resetColumns(false, false, true, false);
   }
 
+  @Override
   public void resetColumnWidths() {
     resetColumns(false, false, false, true);
   }
 
+  @Override
   public void resetDisplayableColumns() {
     resetColumns(true, true, true, true);
   }
 
+  @Override
   public void resetColumns(boolean visibility, boolean order, boolean sorting, boolean widths) {
     try {
       setTableChanging(true);
@@ -2721,6 +2883,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public void tablePopulated() {
     if (m_tableEventBuffer.isEmpty()) {
       synchronized (m_cachedFilteredRowsLock) {
@@ -2730,6 +2893,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public ITableRow resolveRow(ITableRow row) {
     if (row == null) {
       return null;
@@ -2746,6 +2910,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
   public ITableRow[] resolveRows(ITableRow[] rows) {
     if (rows == null) rows = new ITableRow[0];
     int mismatchCount = 0;
@@ -2769,14 +2934,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return rows;
   }
 
+  @Override
   public boolean isHeaderVisible() {
     return propertySupport.getPropertyBool(PROP_HEADER_VISIBLE);
   }
 
+  @Override
   public void setHeaderVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_HEADER_VISIBLE, b);
   }
 
+  @Override
   public final void decorateCell(ITableRow row, IColumn<?> col) {
     Cell cell = row.getCellForUpdate(col.getColumnIndex());
     decorateCellInternal(cell, row, col);
@@ -2794,6 +2962,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void decorateCellInternal(Cell view, ITableRow row, IColumn<?> col) {
   }
 
+  @Override
   public final void decorateRow(ITableRow row) {
     decorateRowInternal(row);
     try {
@@ -2828,18 +2997,22 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Model Observer
    */
+  @Override
   public void addTableListener(TableListener listener) {
     m_listenerList.add(TableListener.class, listener);
   }
 
+  @Override
   public void removeTableListener(TableListener listener) {
     m_listenerList.remove(TableListener.class, listener);
   }
 
+  @Override
   public void addUITableListener(TableListener listener) {
     m_listenerList.insertAtFront(TableListener.class, listener);
   }
 
+  @Override
   public IMenu[] fetchMenusForRowsInternal(ITableRow[] rows) {
     TableEvent e;
     if (rows.length == 0) {
@@ -3047,7 +3220,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
   }
-  
+
   private IMenu[] fireHeaderPopup() {
     TableEvent e = new TableEvent(this, TableEvent.TYPE_HEADER_POPUP);
     fireTableEventInternal(e);
@@ -3176,6 +3349,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return false;
   }
 
+  @Override
   public ITableUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -3194,10 +3368,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       m_uiProcessorCount--;
     }
 
+    @Override
     public boolean isUIProcessing() {
       return m_uiProcessorCount > 0;
     }
 
+    @Override
     public void fireRowClickFromUI(ITableRow row) {
       try {
         pushUIProcessor();
@@ -3212,6 +3388,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public void fireRowActionFromUI(ITableRow row) {
       try {
         pushUIProcessor();
@@ -3226,6 +3403,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public IMenu[] fireRowPopupFromUI() {
       try {
         pushUIProcessor();
@@ -3237,6 +3415,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public IMenu[] fireEmptySpacePopupFromUI() {
       try {
         pushUIProcessor();
@@ -3248,6 +3427,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public IMenu[] fireHeaderPopupFromUI() {
       try {
         pushUIProcessor();
@@ -3259,6 +3439,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public boolean fireKeyTypedFromUI(String keyStrokeText, char keyChar) {
       try {
         pushUIProcessor();
@@ -3270,6 +3451,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public void fireVisibleColumnsChangedFromUI(IColumn<?>[] visibleColumns) {
       try {
         pushUIProcessor();
@@ -3282,6 +3464,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public void fireColumnMovedFromUI(IColumn<?> c, int toViewIndex) {
       try {
         pushUIProcessor();
@@ -3297,6 +3480,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public void setColumnWidthFromUI(IColumn<?> c, int newWidth) {
       try {
         pushUIProcessor();
@@ -3312,6 +3496,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public void fireHeaderSortFromUI(IColumn<?> c, boolean multiSort) {
       try {
         pushUIProcessor();
@@ -3330,6 +3515,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public void setSelectedRowsFromUI(ITableRow[] rows) {
       try {
         pushUIProcessor();
@@ -3355,6 +3541,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public TransferObject fireRowsDragRequestFromUI() {
       try {
         pushUIProcessor();
@@ -3366,6 +3553,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public void fireRowDropActionFromUI(ITableRow row, TransferObject dropData) {
       try {
         pushUIProcessor();
@@ -3378,6 +3566,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> col, URL url) {
       try {
         pushUIProcessor();
@@ -3392,6 +3581,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public void setContextColumnFromUI(IColumn<?> col) {
       try {
         pushUIProcessor();
@@ -3406,6 +3596,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public IFormField prepareCellEditFromUI(ITableRow row, IColumn<?> col) {
       try {
         pushUIProcessor();
@@ -3434,6 +3625,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       return null;
     }
 
+    @Override
     public void completeCellEditFromUI() {
       try {
         pushUIProcessor();
@@ -3458,6 +3650,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
     public void cancelCellEditFromUI() {
       try {
         pushUIProcessor();

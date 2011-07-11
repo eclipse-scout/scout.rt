@@ -96,6 +96,7 @@ public abstract class AbstractClientSession implements IClientSession {
     return false;
   }
 
+  @Override
   public String getUserId() {
     return getSharedContextVariable("userId", String.class);
   }
@@ -108,14 +109,17 @@ public abstract class AbstractClientSession implements IClientSession {
     return null;
   }
 
+  @Override
   public Subject getOfflineSubject() {
     return m_offlineSubject;
   }
 
+  @Override
   public Bundle getBundle() {
     return m_bundle;
   }
 
+  @Override
   public boolean isActive() {
     return m_active;
   }
@@ -127,6 +131,7 @@ public abstract class AbstractClientSession implements IClientSession {
     }
   }
 
+  @Override
   public boolean isLoaded() {
     return m_active;
   }
@@ -144,10 +149,12 @@ public abstract class AbstractClientSession implements IClientSession {
     return TypeCastUtility.castValue(o, type);
   }
 
+  @Override
   public final Throwable getLoadError() {
     return m_loadError;
   }
 
+  @Override
   public final Object getStateLock() {
     return m_stateLock;
   }
@@ -164,6 +171,7 @@ public abstract class AbstractClientSession implements IClientSession {
     IClientNotificationConsumerService clientNotificationConsumerService = SERVICES.getService(IClientNotificationConsumerService.class);
     if (clientNotificationConsumerService != null) {
       clientNotificationConsumerService.addClientNotificationConsumerListener(this, new IClientNotificationConsumerListener() {
+        @Override
         public void handleEvent(final ClientNotificationConsumerEvent e, boolean sync) {
           if (e.getClientNotification().getClass() == SharedContextChangedNotification.class) {
             if (sync) {
@@ -193,6 +201,7 @@ public abstract class AbstractClientSession implements IClientSession {
     m_sharedVariableMap.updateInternal(newMap);
   }
 
+  @Override
   public final void startSession(Bundle bundle) {
     m_bundle = bundle;
     if (isActive()) throw new IllegalStateException("session is active");
@@ -224,14 +233,17 @@ public abstract class AbstractClientSession implements IClientSession {
   protected void execStoreSession() throws ProcessingException {
   }
 
+  @Override
   public IDesktop getVirtualDesktop() {
     return m_desktop != null ? m_desktop : m_virtualDesktop;
   }
 
+  @Override
   public IDesktop getDesktop() {
     return m_desktop;
   }
 
+  @Override
   public void setDesktop(IDesktop a) throws ProcessingException {
     if (a == null) throw new IllegalArgumentException("argument must not be null");
     if (m_desktop != null) throw new IllegalStateException("desktop is active");
@@ -281,10 +293,12 @@ public abstract class AbstractClientSession implements IClientSession {
   /**
    * Close the session
    */
+  @Override
   public void stopSession() {
     stopSession(IApplication.EXIT_OK);
   }
 
+  @Override
   public void stopSession(int exitCode) {
     m_exitCode = exitCode;
     try {
@@ -314,10 +328,12 @@ public abstract class AbstractClientSession implements IClientSession {
     if (LOG.isInfoEnabled()) LOG.info("end session event loop");
   }
 
+  @Override
   public int getExitCode() {
     return m_exitCode;
   }
 
+  @Override
   public IServiceTunnel getServiceTunnel() {
     return m_serviceTunnel;
   }
@@ -326,10 +342,12 @@ public abstract class AbstractClientSession implements IClientSession {
     m_serviceTunnel = tunnel;
   }
 
+  @Override
   public IMemoryPolicy getMemoryPolicy() {
     return m_memoryPolicy;
   }
 
+  @Override
   public void setMemoryPolicy(IMemoryPolicy p) {
     if (m_memoryPolicy != null) {
       m_memoryPolicy.removeNotify();
@@ -346,6 +364,7 @@ public abstract class AbstractClientSession implements IClientSession {
     }
   }
 
+  @Override
   public void goOffline() throws ProcessingException {
     IEclipsePreferences pref = new UserScope().getNode(Activator.PLUGIN_ID);
     if (getUserId() != null) {
@@ -366,6 +385,7 @@ public abstract class AbstractClientSession implements IClientSession {
     OfflineState.setOfflineDefault(true);
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public boolean isWebSession() {
     return isSingleThreadSession();
@@ -390,6 +410,7 @@ public abstract class AbstractClientSession implements IClientSession {
     return new IconLocator(this);
   }
 
+  @Override
   public IIconLocator getIconLocator() {
     return m_iconLocator;
   }

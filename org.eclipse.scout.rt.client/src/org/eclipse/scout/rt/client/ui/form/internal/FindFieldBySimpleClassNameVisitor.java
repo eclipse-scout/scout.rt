@@ -21,6 +21,7 @@ public class FindFieldBySimpleClassNameVisitor implements IFormFieldVisitor {
     m_simpleName = simpleName;
   }
 
+  @Override
   public boolean visitField(IFormField field, int level, int fieldIndex) {
     if (field.getClass().getSimpleName().equalsIgnoreCase(m_simpleName)) {
       m_found = field;

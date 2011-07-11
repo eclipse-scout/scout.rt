@@ -172,6 +172,7 @@ public class ServicesView extends DefaultView {
     p.p(sectionName);
     p.startListBox("listBox", 1, true);
     p.listBoxOption(" ", new AbstractHtmlAction("selectService.choose") {
+      @Override
       public void run() {
       }
     }, false);
@@ -179,6 +180,7 @@ public class ServicesView extends DefaultView {
       boolean selected = m_selectedService != null && (m_selectedService.getService() == serviceInspector.getService());
       final ServiceInspector finalServiceInspector = serviceInspector;
       p.listBoxOption(serviceInspector.getService().getClass().getName(), new AbstractHtmlAction("selectService2." + serviceInspector.getService().getClass().getName()) {
+        @Override
         public void run() {
           m_selectedService = finalServiceInspector;
         }
@@ -204,6 +206,7 @@ public class ServicesView extends DefaultView {
     }
     else {
       p.linkAction(serviceId, new AbstractHtmlAction("selectService." + service.getService().getClass().getName()) {
+        @Override
         public void run() {
           m_selectedService = service;
         }
@@ -309,6 +312,7 @@ public class ServicesView extends DefaultView {
           final PropertyDescriptor finalDesc = desc;
           p.startForm(
               new AbstractHtmlAction("changeProp." + service.getService().getClass().getName() + "." + desc.getName()) {
+                @Override
                 public void run() {
                   String propText = getFormParameter("value", "");
                   if (propText.length() == 0) propText = null;

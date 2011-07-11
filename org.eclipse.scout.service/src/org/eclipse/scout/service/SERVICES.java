@@ -30,7 +30,6 @@ import org.osgi.framework.ServiceReference;
  * see also {@link INullService}
  */
 public final class SERVICES {
-  @SuppressWarnings("unused")
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SERVICES.class);
 
   private SERVICES() {

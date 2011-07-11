@@ -238,6 +238,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     return new P_UIFacade();
   }
 
+  @Override
   public int acceptVisitor(IActionVisitor visitor) {
     switch (visitor.visit(this)) {
       case IActionVisitor.CANCEL:
@@ -271,10 +272,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     propertySupport.removePropertyChangeListener(propName, listener);
   }
 
+  @Override
   public boolean hasProperty(String name) {
     return propertySupport.hasProperty(name);
   }
 
+  @Override
   public String getActionId() {
     String s = getClass().getName();
     int i = Math.max(s.lastIndexOf('$'), s.lastIndexOf('.'));
@@ -282,22 +285,27 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     return s;
   }
 
+  @Override
   public void doAction() throws ProcessingException {
     execAction();
   }
 
+  @Override
   public String getIconId() {
     return propertySupport.getPropertyString(PROP_ICON_ID);
   }
 
+  @Override
   public void setIconId(String iconId) {
     propertySupport.setPropertyString(PROP_ICON_ID, iconId);
   }
 
+  @Override
   public String getText() {
     return propertySupport.getPropertyString(PROP_TEXT);
   }
 
+  @Override
   public void setText(String text) {
     if (text != null) {
       propertySupport.setPropertyString(PROP_TEXT, StringUtility.removeMnemonic(text));
@@ -309,10 +317,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     }
   }
 
+  @Override
   public String getKeyStroke() {
     return propertySupport.getPropertyString(PROP_KEYSTROKE);
   }
 
+  @Override
   public void setKeyStroke(String k) {
     // normalize key stroke format
     if (k != null) {
@@ -343,27 +353,33 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     propertySupport.setPropertyString(PROP_KEYSTROKE, k);
   }
 
+  @Override
   public String getTooltipText() {
     return propertySupport.getPropertyString(PROP_TOOLTIP_TEXT);
   }
 
+  @Override
   public void setTooltipText(String text) {
     propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, text);
   }
 
+  @Override
   public boolean isEnabled() {
     return propertySupport.getPropertyBool(PROP_ENABLED);
   }
 
+  @Override
   public void setEnabled(boolean b) {
     m_enabledProperty = b;
     setEnabledInternal();
   }
 
+  @Override
   public boolean isSelected() {
     return propertySupport.getPropertyBool(PROP_SELECTED);
   }
 
+  @Override
   public void setSelected(boolean b) {
     boolean changed = propertySupport.setPropertyBool(PROP_SELECTED, b);
     if (changed) {
@@ -376,27 +392,33 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     }
   }
 
+  @Override
   public boolean isToggleAction() {
     return m_toggleAction;
   }
 
+  @Override
   public void setToggleAction(boolean b) {
     m_toggleAction = b;
   }
 
+  @Override
   public boolean isVisible() {
     return propertySupport.getPropertyBool(PROP_VISIBLE);
   }
 
+  @Override
   public void setVisible(boolean b) {
     m_visibleProperty = b;
     setVisibleInternal();
   }
 
+  @Override
   public boolean isInheritAccessibility() {
     return m_inheritAccessibility;
   }
 
+  @Override
   public void setInheritAccessibility(boolean b) {
     m_inheritAccessibility = b;
   }
@@ -405,6 +427,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * Access control<br>
    * when false, overrides isEnabled with false
    */
+  @Override
   public void setEnabledPermission(Permission p) {
     boolean b;
     if (p != null) {
@@ -416,6 +439,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     setEnabledGranted(b);
   }
 
+  @Override
   public boolean isEnabledGranted() {
     return m_enabledGranted;
   }
@@ -424,6 +448,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * Access control<br>
    * when false, overrides isEnabled with false
    */
+  @Override
   public void setEnabledGranted(boolean b) {
     m_enabledGranted = b;
     setEnabledInternal();
@@ -433,6 +458,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty);
   }
 
+  @Override
   public void setVisiblePermission(Permission p) {
     boolean b;
     if (p != null) {
@@ -444,10 +470,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     setVisibleGranted(b);
   }
 
+  @Override
   public boolean isVisibleGranted() {
     return m_visibleGranted;
   }
 
+  @Override
   public void setVisibleGranted(boolean b) {
     m_visibleGranted = b;
     setVisibleInternal();
@@ -457,42 +485,52 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty);
   }
 
+  @Override
   public boolean isSeparator() {
     return propertySupport.getPropertyBool(PROP_SEPARATOR);
   }
 
+  @Override
   public void setSeparator(boolean b) {
     propertySupport.setPropertyBool(PROP_SEPARATOR, b);
   }
 
+  @Override
   public boolean isSingleSelectionAction() {
     return m_singleSelectionAction;
   }
 
+  @Override
   public void setSingleSelectionAction(boolean b) {
     m_singleSelectionAction = b;
   }
 
+  @Override
   public boolean isMultiSelectionAction() {
     return m_multiSelectionAction;
   }
 
+  @Override
   public void setMultiSelectionAction(boolean b) {
     m_multiSelectionAction = b;
   }
 
+  @Override
   public boolean isEmptySpaceAction() {
     return m_emptySpaceAction;
   }
 
+  @Override
   public void setEmptySpaceAction(boolean b) {
     m_emptySpaceAction = b;
   }
 
+  @Override
   public char getMnemonic() {
     return (char) propertySupport.getPropertyInt(PROP_MNEMONIC);
   }
 
+  @Override
   public final void prepareAction() {
     try {
       prepareActionInternal();
@@ -503,6 +541,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     }
   }
 
+  @Override
   public IActionUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -514,6 +553,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   protected class P_UIFacade implements IActionUIFacade {
+    @Override
     public void fireActionFromUI() {
       try {
         if (isEnabled() && isVisible()) {
@@ -528,6 +568,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       }
     }
 
+    @Override
     public void setSelectedFromUI(boolean b) {
       setSelected(b);
     }

@@ -219,14 +219,17 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     }
   }
 
+  @Override
   public boolean isMainBox() {
     return m_mainBoxFlag;
   }
 
+  @Override
   public void setMainBox(boolean b) {
     m_mainBoxFlag = b;
   }
 
+  @Override
   public int getGroupBoxIndex(IGroupBox groupBox) {
     for (int i = 0; i < m_groupBoxes.length; i++) {
       if (m_groupBoxes[i] == groupBox) return i;
@@ -234,50 +237,60 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return -1;
   }
 
+  @Override
   public int getCustomProcessButtonCount() {
     return m_customButtons.length;
   }
 
+  @Override
   public int getGroupBoxCount() {
     return m_groupBoxes.length;
   }
 
+  @Override
   public int getSystemProcessButtonCount() {
     return m_systemButtons.length;
   }
 
+  @Override
   public IGroupBox[] getGroupBoxes() {
     IGroupBox[] a = new IGroupBox[m_groupBoxes.length];
     System.arraycopy(m_groupBoxes, 0, a, 0, a.length);
     return a;
   }
 
+  @Override
   public IFormField[] getControlFields() {
     IFormField[] a = new IFormField[m_controlFields.length];
     System.arraycopy(m_controlFields, 0, a, 0, a.length);
     return a;
   }
 
+  @Override
   public IButton[] getCustomProcessButtons() {
     IButton[] a = new IButton[m_customButtons.length];
     System.arraycopy(m_customButtons, 0, a, 0, a.length);
     return a;
   }
 
+  @Override
   public IButton[] getSystemProcessButtons() {
     IButton[] a = new IButton[m_systemButtons.length];
     System.arraycopy(m_systemButtons, 0, a, 0, a.length);
     return a;
   }
 
+  @Override
   public final int getGridColumnCount() {
     return m_bodyGrid.getGridColumnCount();
   }
 
+  @Override
   public final int getGridRowCount() {
     return m_bodyGrid.getGridRowCount();
   }
 
+  @Override
   public void setGridColumnCountHint(int c) {
     m_gridColumnCountHint = c;
     if (isInitialized()) {
@@ -285,14 +298,17 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     }
   }
 
+  @Override
   public int getGridColumnCountHint() {
     return m_gridColumnCountHint;
   }
 
+  @Override
   public boolean isScrollable() {
     return m_scrollable;
   }
 
+  @Override
   public void setScrollable(boolean scrollable) {
     if (m_scrollable != scrollable) {
       m_scrollable = scrollable;
@@ -316,46 +332,57 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     }
   }
 
+  @Override
   public boolean isBorderVisible() {
     return propertySupport.getPropertyBool(PROP_BORDER_VISIBLE);
   }
 
+  @Override
   public void setBorderVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_BORDER_VISIBLE, b);
   }
 
+  @Override
   public String getBorderDecoration() {
     return propertySupport.getPropertyString(PROP_BORDER_DECORATION);
   }
 
+  @Override
   public void setBorderDecoration(String s) {
     propertySupport.setPropertyString(PROP_BORDER_DECORATION, s);
   }
 
+  @Override
   public boolean isExpandable() {
     return propertySupport.getPropertyBool(PROP_EXPANDABLE);
   }
 
+  @Override
   public void setExpandable(boolean b) {
     propertySupport.setPropertyBool(PROP_EXPANDABLE, b);
   }
 
+  @Override
   public boolean isExpanded() {
     return propertySupport.getPropertyBool(PROP_EXPANDED);
   }
 
+  @Override
   public void setExpanded(boolean b) {
     propertySupport.setPropertyBool(PROP_EXPANDED, b);
   }
 
+  @Override
   public IGroupBoxUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
+  @Override
   public void setBackgroundImageName(String imageName) {
     propertySupport.setPropertyString(PROP_BACKGROUND_IMAGE_NAME, imageName);
   }
 
+  @Override
   public String getBackgroundImageName() {
     return propertySupport.getPropertyString(PROP_BACKGROUND_IMAGE_NAME);
   }
@@ -363,6 +390,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   /**
    * @since Build 178
    */
+  @Override
   public void setBackgroundImageVerticalAlignment(int a) {
     propertySupport.setPropertyInt(PROP_BACKGROUND_IMAGE_VERTICAL_ALIGNMENT, a);
   }
@@ -370,6 +398,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   /**
    * @since Build 178
    */
+  @Override
   public int getBackgroundImageVerticalAlignment() {
     return propertySupport.getPropertyInt(PROP_BACKGROUND_IMAGE_VERTICAL_ALIGNMENT);
   }
@@ -377,6 +406,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   /**
    * @since Build 178
    */
+  @Override
   public void setBackgroundImageHorizontalAlignment(int a) {
     propertySupport.setPropertyInt(PROP_BACKGROUND_IMAGE_HORIZONTAL_ALIGNMENT, a);
   }
@@ -384,11 +414,13 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   /**
    * @since Build 178
    */
+  @Override
   public int getBackgroundImageHorizontalAlignment() {
     return propertySupport.getPropertyInt(PROP_BACKGROUND_IMAGE_HORIZONTAL_ALIGNMENT);
   }
 
   private class P_UIFacade implements IGroupBoxUIFacade {
+    @Override
     public void setExpandedFromUI(boolean expanded) {
       setExpanded(expanded);
     }

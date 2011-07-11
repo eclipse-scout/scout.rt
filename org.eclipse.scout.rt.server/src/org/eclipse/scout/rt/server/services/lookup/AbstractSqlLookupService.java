@@ -86,11 +86,13 @@ public abstract class AbstractSqlLookupService extends AbstractLookupService {
     return createLookupRowArray(data, call);
   }
 
+  @Override
   public LookupRow[] getDataByKey(LookupCall call) throws ProcessingException {
     String sql = getConfiguredSqlSelect();
     return execLoadLookupRows(sql, filterSqlByKey(sql), call);
   }
 
+  @Override
   public LookupRow[] getDataByText(LookupCall call) throws ProcessingException {
     // change wildcards * in text to db specific wildcards
     if (call.getText() != null) {
@@ -102,6 +104,7 @@ public abstract class AbstractSqlLookupService extends AbstractLookupService {
     return execLoadLookupRows(sql, filterSqlByText(sql), call);
   }
 
+  @Override
   public LookupRow[] getDataByAll(LookupCall call) throws ProcessingException {
     String sql = getConfiguredSqlSelect();
     if (containsRefusingAllTag(sql)) {
@@ -111,6 +114,7 @@ public abstract class AbstractSqlLookupService extends AbstractLookupService {
     return rows;
   }
 
+  @Override
   public LookupRow[] getDataByRec(LookupCall call) throws ProcessingException {
     String sql = getConfiguredSqlSelect();
     return execLoadLookupRows(sql, filterSqlByRec(sql), call);

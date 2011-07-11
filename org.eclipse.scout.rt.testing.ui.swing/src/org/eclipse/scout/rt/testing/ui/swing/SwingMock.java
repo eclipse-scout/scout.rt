@@ -101,6 +101,7 @@ public class SwingMock implements IGuiMock {
     m_treeNodeToExpandIconGap = treeNodeToExpandIconGap;
   }
 
+  @Override
   public void waitForIdle() {
     if (SwingUtilities.isEventDispatchThread()) {
       return;
@@ -134,6 +135,7 @@ public class SwingMock implements IGuiMock {
   @Override
   public void waitForActiveWindow(final String title) {
     waitUntil(new WaitCondition<Object>() {
+      @Override
       public Object run() {
         if (isWindowActive(title)) return true;
         else return null;
@@ -145,6 +147,7 @@ public class SwingMock implements IGuiMock {
   @Override
   public void waitForOpenWindow(final String title) {
     waitUntil(new WaitCondition<Object>() {
+      @Override
       public Object run() {
         if (isWindowOpen(title)) return true;
         else return null;
@@ -153,18 +156,22 @@ public class SwingMock implements IGuiMock {
     waitForIdle();
   }
 
+  @Override
   public int getSleepDelay() {
     return m_bot.getAutoDelay();
   }
 
+  @Override
   public void setSleepDelay(int sleepDelay) {
     m_bot.setAutoDelay(sleepDelay);
   }
 
+  @Override
   public void sleep() {
     sleep(getSleepDelay());
   }
 
+  @Override
   public void sleep(int millis) {
     //only sleep when NOT in gui thread
     if (SwingUtilities.isEventDispatchThread()) {
@@ -174,6 +181,7 @@ public class SwingMock implements IGuiMock {
     waitForIdle();
   }
 
+  @Override
   public boolean isWindowActive(final String title) {
     return syncExec(new MockRunnable<Boolean>() {
       @Override
@@ -191,6 +199,7 @@ public class SwingMock implements IGuiMock {
     });
   }
 
+  @Override
   public boolean isWindowOpen(final String title) {
     return syncExec(new MockRunnable<Boolean>() {
       @Override
@@ -289,6 +298,7 @@ public class SwingMock implements IGuiMock {
     });
   }
 
+  @Override
   public void gotoTableHeader(int tableIndex, final int columnIndex) {
     final JTable table = (JTable) waitForIndexedField(FieldType.Table, tableIndex);
     syncExec(new MockRunnable<Object>() {
@@ -336,6 +346,7 @@ public class SwingMock implements IGuiMock {
     });
   }
 
+  @Override
   public void contextMenu(final String... names) {
     //move to menu
     for (int i = 0; i < names.length; i++) {
@@ -343,6 +354,7 @@ public class SwingMock implements IGuiMock {
       final boolean lastItem = i == names.length - 1;
       final Component m = waitForContextMenu(label);
       syncExec(new MockRunnable<Boolean>() {
+        @Override
         public Boolean run() throws Throwable {
           Point p = m.getLocationOnScreen();
           gotoPoint(p.x + m.getWidth() / 2, p.y + m.getHeight() / 2);
@@ -357,9 +369,11 @@ public class SwingMock implements IGuiMock {
     }
   }
 
+  @Override
   public List<String> getTableCells(int tableIndex, final int columnIndex) {
     final JTable table = (JTable) waitForIndexedField(FieldType.Table, tableIndex);
     return syncExec(new MockRunnable<List<String>>() {
+      @Override
       public List<String> run() throws Throwable {
         ArrayList<String> list = new ArrayList<String>();
         for (int row = 0; row < table.getRowCount(); row++) {
@@ -370,9 +384,11 @@ public class SwingMock implements IGuiMock {
     });
   }
 
+  @Override
   public List<String> getTreeNodes(int treeIndex) {
     final JTree tree = (JTree) waitForIndexedField(FieldType.Tree, treeIndex);
     return syncExec(new MockRunnable<List<String>>() {
+      @Override
       public List<String> run() throws Throwable {
         ArrayList<String> list = new ArrayList<String>();
         for (int row = 0; row < tree.getRowCount(); row++) {
@@ -383,9 +399,11 @@ public class SwingMock implements IGuiMock {
     });
   }
 
+  @Override
   public Set<String> getSelectedTableCells(int tableIndex, final int columnIndex) {
     final JTable table = (JTable) waitForIndexedField(FieldType.Table, tableIndex);
     return syncExec(new MockRunnable<Set<String>>() {
+      @Override
       public Set<String> run() throws Throwable {
         TreeSet<String> set = new TreeSet<String>();
         int[] sel = table.getSelectedRows();
@@ -402,11 +420,12 @@ public class SwingMock implements IGuiMock {
   /**
    * Works only if checked Row is visible
    */
+  @Override
   public Set<String> getCheckedTableCells(int tableIndex, final int columnIndex) {
     final JTable table = (JTable) waitForIndexedField(FieldType.Table, tableIndex);
     return syncExec(new MockRunnable<Set<String>>() {
+      @Override
       public Set<String> run() throws Throwable {
-        JTable t = table;
         TreeSet<String> check = new TreeSet<String>();
         for (int i = 0; i < table.getRowCount(); i++) {
           Icon icon = getTableCellIcon(table, i);
@@ -421,9 +440,11 @@ public class SwingMock implements IGuiMock {
     });
   }
 
+  @Override
   public Set<String> getSelectedTreeNodes(int treeIndex) {
     final JTree tree = (JTree) waitForIndexedField(FieldType.Tree, treeIndex);
     return syncExec(new MockRunnable<Set<String>>() {
+      @Override
       public Set<String> run() throws Throwable {
         TreeSet<String> set = new TreeSet<String>();
         int[] sel = tree.getSelectionRows();
@@ -437,6 +458,7 @@ public class SwingMock implements IGuiMock {
     });
   }
 
+  @Override
   public FieldState getFocusFieldState() {
     return syncExec(new MockRunnable<FieldState>() {
       @Override
@@ -498,33 +520,40 @@ public class SwingMock implements IGuiMock {
     });
   }
 
+  @Override
   public void gotoPoint(int x, int y) {
     m_bot.moveTo(x, y);
   }
 
+  @Override
   public void move(int deltaX, int deltaY) {
     m_bot.moveDelta(deltaX, deltaY);
   }
 
+  @Override
   public void clickLeft() {
     m_bot.clickLeft();
     waitForIdle();
   }
 
+  @Override
   public void clickRight() {
     m_bot.clickRight();
     waitForIdle();
   }
 
+  @Override
   public void pressLeft() {
     m_bot.pressLeft();
   }
 
+  @Override
   public void releaseLeft() {
     m_bot.releaseLeft();
     waitForIdle();
   }
 
+  @Override
   public void drag(int x1, int y1, int x2, int y2) {
     gotoPoint(x1, y1);
     m_bot.pressLeft();
@@ -533,16 +562,19 @@ public class SwingMock implements IGuiMock {
     waitForIdle();
   }
 
+  @Override
   public void typeText(final String text) {
     m_bot.typeText(text);
     waitForIdle();
   }
 
+  @Override
   public void pressKey(Key key) {
     m_bot.pressKey(key);
     waitForIdle();
   }
 
+  @Override
   public void paste(final String text) {
     Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
     //press paste (ctrl-V)
@@ -551,18 +583,22 @@ public class SwingMock implements IGuiMock {
     m_bot.releaseKey(Key.Control);
   }
 
+  @Override
   public void releaseKey(Key key) {
     m_bot.releaseKey(key);
     waitForIdle();
   }
 
+  @Override
   public void typeKey(Key key) {
     m_bot.typeKey(key);
     waitForIdle();
   }
 
+  @Override
   public WindowState getWindowState(final String title) {
     return syncExec(new MockRunnable<WindowState>() {
+      @Override
       public WindowState run() throws Throwable {
         checkActiveWindow();
         JInternalFrame part = findInternalFrame(title);
@@ -603,6 +639,7 @@ public class SwingMock implements IGuiMock {
     return null;
   }
 
+  @Override
   public Object internal0(final Object o) {
     return null;
   }
@@ -753,8 +790,10 @@ public class SwingMock implements IGuiMock {
   //wait for window containing this button
   protected Component waitForContextMenu(final String text) {
     return waitUntil(new WaitCondition<Component>() {
+      @Override
       public Component run() {
         return syncExec(new MockRunnable<Component>() {
+          @Override
           public Component run() throws Throwable {
             String label = cleanButtonLabel(text);
             //find lightweight popup
@@ -798,8 +837,10 @@ public class SwingMock implements IGuiMock {
 
   protected JComponent waitForPushButtonWithLabel(final String label) {
     return waitUntil(new WaitCondition<JComponent>() {
+      @Override
       public JComponent run() {
         return syncExec(new MockRunnable<JComponent>() {
+          @Override
           public JComponent run() throws Throwable {
             for (Component parent : enumerateParentContainers()) {
               for (Component o : SwingUtility.findChildComponents(parent, Component.class)) {
@@ -817,8 +858,10 @@ public class SwingMock implements IGuiMock {
 
   protected JComponent waitForIndexedField(final FieldType type, final int fieldIndex) {
     return waitUntil(new WaitCondition<JComponent>() {
+      @Override
       public JComponent run() {
         return syncExec(new MockRunnable<JComponent>() {
+          @Override
           public JComponent run() throws Throwable {
             for (Component parent : enumerateParentContainers()) {
               int index = 0;
@@ -840,8 +883,10 @@ public class SwingMock implements IGuiMock {
 
   protected JComponent waitForScoutField(final String name) {
     return waitUntil(new WaitCondition<JComponent>() {
+      @Override
       public JComponent run() {
         return syncExec(new MockRunnable<JComponent>() {
+          @Override
           public JComponent run() throws Throwable {
             JComponent lastSecondaryCandidate = null;
             for (Component parent : enumerateParentContainers()) {
@@ -965,6 +1010,7 @@ public class SwingMock implements IGuiMock {
       final AtomicReference<Throwable> ex = new AtomicReference<Throwable>();
       try {
         SwingUtilities.invokeAndWait(new Runnable() {
+          @Override
           public void run() {
             try {
               ret.set(syncExec(r));

@@ -185,17 +185,20 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
     }
   }
 
+  @Override
   public Message[] getUnreadMessages() throws ProcessingException {
     ReadMailTask task = new ReadMailTask();
     doTask(task);
     return task.getUnreadMessages();
   }
 
+  @Override
   public void deleteAllMessages() throws ProcessingException {
     DeleteMailTask task = new DeleteMailTask(true);
     doTask(task);
   }
 
+  @Override
   public void deleteMessages(Message... toDelete) throws ProcessingException {
     DeleteMailTask task = new DeleteMailTask(false);
     task.setMessagesToDelete(toDelete);

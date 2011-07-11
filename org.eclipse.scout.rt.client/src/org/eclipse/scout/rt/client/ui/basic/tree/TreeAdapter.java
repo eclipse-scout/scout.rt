@@ -16,12 +16,14 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
  */
 public class TreeAdapter implements TreeListener {
 
+  @Override
   public void treeChangedBatch(TreeEvent[] batch) {
     for (int i = 0; i < batch.length; i++) {
       treeChanged(batch[i]);
     }
   }
 
+  @Override
   public void treeChanged(TreeEvent e) {
   }
 }

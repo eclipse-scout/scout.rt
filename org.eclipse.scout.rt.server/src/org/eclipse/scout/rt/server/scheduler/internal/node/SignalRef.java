@@ -40,6 +40,7 @@ public class SignalRef extends AbstractNode implements INode {
     return m_field;
   }
 
+  @Override
   public void format(IFormatVisitor v) {
     switch (m_field) {
       case SECOND: {
@@ -89,6 +90,7 @@ public class SignalRef extends AbstractNode implements INode {
     }
   }
 
+  @Override
   public Object eval(IEvalVisitor v) {
     switch (m_field) {
       case SECOND: {

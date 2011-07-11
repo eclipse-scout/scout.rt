@@ -154,15 +154,18 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public T getId() {
     return (T) m_row.getKey();
   }
 
+  @Override
   public String getText() {
     return m_row.getText();
   }
 
+  @Override
   public boolean isActive() {
     return m_row.isActive();
   }
@@ -176,6 +179,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     m_row.setActive(b);
   }
 
+  @Override
   public boolean isEnabled() {
     return m_row.isEnabled();
   }
@@ -189,6 +193,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     m_row.setEnabled(b);
   }
 
+  @Override
   public String getIconId() {
     String id = m_row.getIconId();
     if (id == null && m_codeType != null) {
@@ -197,42 +202,52 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     return id;
   }
 
+  @Override
   public String getTooltipText() {
     return m_row.getTooltip();
   }
 
+  @Override
   public String getBackgroundColor() {
     return m_row.getBackgroundColor();
   }
 
+  @Override
   public String getForegroundColor() {
     return m_row.getForegroundColor();
   }
 
+  @Override
   public FontSpec getFont() {
     return m_row.getFont();
   }
 
+  @Override
   public ICode getParentCode() {
     return m_parentCode;
   }
 
+  @Override
   public long getPartitionId() {
     return m_row.getPartitionId();
   }
 
+  @Override
   public String getExtKey() {
     return m_row.getExtKey();
   }
 
+  @Override
   public Number getValue() {
     return m_row.getValue();
   }
 
+  @Override
   public ICode[] getChildCodes() {
     return getChildCodes(true);
   }
 
+  @Override
   public ICode[] getChildCodes(boolean activeOnly) {
     if (m_codeList == null) {
       return new ICode[0];
@@ -249,6 +264,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     return list.toArray(new ICode[0]);
   }
 
+  @Override
   public ICode getChildCode(Object id) {
     ICode c = null;
     if (m_codeMap != null) {
@@ -269,6 +285,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     return c;
   }
 
+  @Override
   public ICode getChildCodeByExtKey(Object extKey) {
     if (m_codeList == null) {
       return null;
@@ -289,10 +306,12 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     return c;
   }
 
+  @Override
   public ICodeType getCodeType() {
     return m_codeType;
   }
 
+  @Override
   public void addChildCodeInternal(ICode code) {
     code.setCodeTypeInternal(m_codeType);
     code.setParentCodeInternal(this);
@@ -306,10 +325,12 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     m_codeList.add(code);
   }
 
+  @Override
   public void setParentCodeInternal(ICode c) {
     m_parentCode = c;
   }
 
+  @Override
   public void setCodeTypeInternal(ICodeType type) {
     m_codeType = type;
     if (m_codeList != null) {
@@ -324,6 +345,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     return "Code[id=" + getId() + ", text='" + getText() + "' " + (isActive() ? "active" : "inactive") + "]";
   }
 
+  @Override
   public boolean visit(ICodeVisitor visitor, int level, boolean activeOnly) {
     ICode[] a = getChildCodes(activeOnly);
     for (int i = 0; i < a.length; i++) {
@@ -352,6 +374,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     return this;
   }
 
+  @Override
   public CodeRow toCodeRow() {
     return new CodeRow(m_row);
   }

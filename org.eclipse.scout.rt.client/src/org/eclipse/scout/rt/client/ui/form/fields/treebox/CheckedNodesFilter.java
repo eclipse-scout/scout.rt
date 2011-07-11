@@ -21,6 +21,7 @@ class CheckedNodesFilter implements ITreeNodeFilter {
   public CheckedNodesFilter() {
   }
 
+  @Override
   public boolean accept(ITreeNode node, int level) {
     if (node.isChecked()) {
       return true;

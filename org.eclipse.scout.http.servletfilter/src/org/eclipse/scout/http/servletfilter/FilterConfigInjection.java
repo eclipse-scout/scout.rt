@@ -71,10 +71,10 @@ import org.eclipse.scout.commons.ConfigIniUtility;
  * </code>
  */
 public class FilterConfigInjection {
-  private javax.servlet.FilterConfig m_config;
-  private Class<? extends Filter> m_filterType;
-  private Object m_configCacheLock;
-  private Map<String, Map<String, String>> m_configCache;
+  private final javax.servlet.FilterConfig m_config;
+  private final Class<? extends Filter> m_filterType;
+  private final Object m_configCacheLock;
+  private final Map<String, Map<String, String>> m_configCache;
 
   public FilterConfigInjection(javax.servlet.FilterConfig config, Class<? extends Filter> filterType) {
     m_config = config;
@@ -134,7 +134,7 @@ public class FilterConfigInjection {
   }
 
   public class FilterConfig implements javax.servlet.FilterConfig {
-    private Map<String, String> m_injectedMap;
+    private final Map<String, String> m_injectedMap;
 
     public FilterConfig(Map<String, String> injectedMap) {
       m_injectedMap = injectedMap;
@@ -151,14 +151,17 @@ public class FilterConfigInjection {
       return activeText == null || activeText.equals("true");
     }
 
+    @Override
     public String getFilterName() {
       return m_config.getFilterName();
     }
 
+    @Override
     public ServletContext getServletContext() {
       return m_config.getServletContext();
     }
 
+    @Override
     public String getInitParameter(String name) {
       if (m_injectedMap.containsKey(name)) {
         return m_injectedMap.get(name);
@@ -169,7 +172,7 @@ public class FilterConfigInjection {
       }
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public Enumeration getInitParameterNames() {
       TreeSet<String> names = new TreeSet<String>(m_injectedMap.keySet());
       for (Enumeration en = m_config.getInitParameterNames(); en.hasMoreElements();) {

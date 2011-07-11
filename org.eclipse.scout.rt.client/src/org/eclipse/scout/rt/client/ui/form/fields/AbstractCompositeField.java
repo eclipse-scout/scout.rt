@@ -106,6 +106,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     }
   }
 
+  @Override
   public int getFieldIndex(IFormField f) {
     for (int i = 0; i < m_fields.length; i++) {
       if (m_fields[i] == f) {
@@ -115,13 +116,16 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     return -1;
   }
 
+  @Override
   public int getFieldCount() {
     return m_fields.length;
   }
 
+  @Override
   public IFormField getFieldById(final String id) {
     final Holder<IFormField> found = new Holder<IFormField>(IFormField.class);
     IFormFieldVisitor v = new IFormFieldVisitor() {
+      @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (field.getFieldId().equals(id)) {
           found.setValue(field);
@@ -133,9 +137,11 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     return found.getValue();
   }
 
+  @Override
   public <T extends IFormField> T getFieldById(final String id, final Class<T> type) {
     final Holder<T> found = new Holder<T>(type);
     IFormFieldVisitor v = new IFormFieldVisitor() {
+      @Override
       @SuppressWarnings("unchecked")
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (type.isAssignableFrom(field.getClass()) && field.getFieldId().equals(id)) {
@@ -148,9 +154,11 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     return found.getValue();
   }
 
+  @Override
   public <T extends IFormField> T getFieldByClass(final Class<T> c) {
     final Holder<T> found = new Holder<T>(c);
     IFormFieldVisitor v = new IFormFieldVisitor() {
+      @Override
       @SuppressWarnings("unchecked")
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (field.getClass() == c) {
@@ -163,12 +171,14 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     return found.getValue();
   }
 
+  @Override
   public IFormField[] getFields() {
     IFormField[] a = new IFormField[m_fields.length];
     System.arraycopy(m_fields, 0, a, 0, a.length);
     return a;
   }
 
+  @Override
   public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
     // myself
     if (!visitor.visitField(this, startLevel, 0)) {
@@ -291,6 +301,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     calculateVisibleInternal();
   }
 
+  @Override
   public void rebuildFieldGrid() {
   }
 
@@ -307,6 +318,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * groups)
    */
   private class P_FieldPropertyChangeListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
         // fire group box visibility

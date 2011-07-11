@@ -16,12 +16,14 @@ package org.eclipse.scout.rt.client.ui.basic.table;
  */
 public class TableAdapter implements TableListener {
 
+  @Override
   public void tableChangedBatch(TableEvent[] batch) {
     for (int i = 0; i < batch.length; i++) {
       tableChanged(batch[i]);
     }
   }
 
+  @Override
   public void tableChanged(TableEvent e) {
   }
 }

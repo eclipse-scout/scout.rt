@@ -47,6 +47,7 @@ public class InternalClientExceptionHandlerService extends AbstractService imple
     return data;
   }
 
+  @Override
   public void handleException(ProcessingException pe) {
     ServiceState state = getServiceState();
     try {

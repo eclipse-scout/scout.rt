@@ -67,6 +67,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   protected void execInitAction() {
     SERVICES.getService(IBookmarkService.class).addBookmarkServiceListener(
         new BookmarkServiceListener() {
+          @Override
           public void bookmarksChanged(BookmarkServiceEvent e) {
             handleBookmarksChanged();
           }

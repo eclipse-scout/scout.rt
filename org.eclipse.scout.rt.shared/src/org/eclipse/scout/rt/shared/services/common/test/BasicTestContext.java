@@ -22,14 +22,17 @@ public class BasicTestContext implements ITestContext {
   public BasicTestContext() {
   }
 
+  @Override
   public void begin() {
     m_list = new ArrayList<TestStatus>();
     m_severityCount = new int[IProcessingStatus.FATAL + 1];
   }
 
+  @Override
   public void end() {
   }
 
+  @Override
   public void addStatus(TestStatus s) {
     m_list.add(s);
     m_severityCount[s.getSeverity()]++;
@@ -38,6 +41,7 @@ public class BasicTestContext implements ITestContext {
   /**
    * @return the life list with all test stati
    */
+  @Override
   public List<TestStatus> getStatusList() {
     return m_list;
   }

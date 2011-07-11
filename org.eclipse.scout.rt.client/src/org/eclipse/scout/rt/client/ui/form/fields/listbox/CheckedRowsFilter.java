@@ -21,6 +21,7 @@ class CheckedRowsFilter implements ITableRowFilter {
   public CheckedRowsFilter() {
   }
 
+  @Override
   public boolean accept(ITableRow row) {
     if (row.isChecked()) {
       return true;

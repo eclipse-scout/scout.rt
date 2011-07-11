@@ -40,9 +40,9 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   private HashMap<ITableRow, HashMap<IColumn<?>, ICell>> m_cachedCells;
   private final SwtScoutTable m_swtTable;
   private final TableColumnManager m_columnManager;
-  private Image m_imgCheckboxFalse;
-  private Image m_imgCheckboxTrue;
-  private Color m_disabledForegroundColor;
+  private final Image m_imgCheckboxFalse;
+  private final Image m_imgCheckboxTrue;
+  private final Color m_disabledForegroundColor;
   private boolean m_multiline;
 
   public SwtScoutTableModel(ITable table, SwtScoutTable swtTable, ISwtEnvironment environment, TableColumnManager columnManager) {
@@ -183,6 +183,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     listenerList.add(listener);
   }
 
+  @Override
   public void removeListener(ILabelProviderListener listener) {
     if (listenerList != null) {
       listenerList.remove(listener);

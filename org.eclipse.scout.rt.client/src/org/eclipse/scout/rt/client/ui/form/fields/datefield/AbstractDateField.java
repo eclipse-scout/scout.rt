@@ -149,6 +149,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     setAutoTimeMillis(getConfiguredAutoTimeMillis());
   }
 
+  @Override
   public void setFormat(String s) {
     m_format = s;
     if (isInitialized()) {
@@ -158,14 +159,17 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
   }
 
+  @Override
   public String getFormat() {
     return m_format;
   }
 
+  @Override
   public boolean isHasTime() {
     return propertySupport.getPropertyBool(PROP_HAS_TIME);
   }
 
+  @Override
   public void setHasTime(boolean b) {
     propertySupport.setPropertyBool(PROP_HAS_TIME, b);
     if (isInitialized()) {
@@ -173,10 +177,12 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
   }
 
+  @Override
   public boolean isHasDate() {
     return propertySupport.getPropertyBool(PROP_HAS_DATE);
   }
 
+  @Override
   public void setHasDate(boolean b) {
     propertySupport.setPropertyBool(PROP_HAS_DATE, b);
     if (isInitialized()) {
@@ -184,18 +190,22 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
   }
 
+  @Override
   public void setAutoTimeMillis(long l) {
     m_autoTimeMillis = l;
   }
 
+  @Override
   public void setAutoTimeMillis(int hour, int minute, int second) {
     setAutoTimeMillis(((hour * 60L + minute) * 60L + second) * 1000L);
   }
 
+  @Override
   public long getAutoTimeMillis() {
     return m_autoTimeMillis;
   }
 
+  @Override
   public void adjustDate(int days, int months, int years) {
     Date d = getValue();
     if (d == null) {
@@ -213,6 +223,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     setValue(d);
   }
 
+  @Override
   public void adjustTime(int minutes, int hours, int reserved) {
     Date d = getValue();
     if (d == null) {
@@ -229,6 +240,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     setValue(d);
   }
 
+  @Override
   public IDateFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -320,10 +332,12 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     return d;
   }
 
+  @Override
   public Double getTimeValue() {
     return DateUtility.convertDateToDoubleTime(getValue());
   }
 
+  @Override
   public void setTimeValue(Double d) {
     setValue(DateUtility.convertDoubleTimeToDate(d));
   }
@@ -358,6 +372,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     return d;
   }
 
+  @Override
   public DateFormat getDateFormat() {
     DateFormat df = null;
     if (getFormat() != null) {
@@ -378,6 +393,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     return df;
   }
 
+  @Override
   public DateFormat getIsolatedDateFormat() {
     DateFormat f = getDateFormat();
     if (f instanceof SimpleDateFormat) {
@@ -395,6 +411,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     return f;
   }
 
+  @Override
   public DateFormat getIsolatedTimeFormat() {
     DateFormat f = getDateFormat();
     if (f instanceof SimpleDateFormat) {
@@ -776,6 +793,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
 
   private class P_UIFacade implements IDateFieldUIFacade {
 
+    @Override
     public boolean setDateTextFromUI(String newDate) {
       if (!isHasDate()) {
         //nop
@@ -800,6 +818,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
 
+    @Override
     public boolean setTimeTextFromUI(String newTime) {
       if (!isHasTime()) {
         //nop
@@ -821,6 +840,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
 
+    @Override
     public boolean setDateTimeTextFromUI(String newText) {
       if (newText != null && newText.length() == 0) {
         newText = null;
@@ -829,6 +849,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       return parseValue(newText);
     }
 
+    @Override
     public void setDateFromUI(Date d) {
       try {
         if (d != null) {
@@ -857,6 +878,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
 
+    @Override
     public void setTimeFromUI(Date d) {
       try {
         Date oldDate = getValue();
@@ -883,6 +905,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
 
+    @Override
     public void setDateTimeFromUI(Date d) {
       try {
         setValue(d);
@@ -892,6 +915,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
 
+    @Override
     public void fireDateShiftActionFromUI(int level, int value) {
       try {
         execShiftDate(level, value);
@@ -904,6 +928,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
 
+    @Override
     public void fireTimeShiftActionFromUI(int level, int value) {
       try {
         execShiftTime(level, value);

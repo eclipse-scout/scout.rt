@@ -51,14 +51,17 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
     return validValue;
   }
 
+  @Override
   public void setWrapText(boolean b) {
     propertySupport.setPropertyBool(PROP_WRAP_TEXT, b);
   }
 
+  @Override
   public boolean isWrapText() {
     return propertySupport.getPropertyBool(PROP_WRAP_TEXT);
   }
 
+  @Override
   public ILabelFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }

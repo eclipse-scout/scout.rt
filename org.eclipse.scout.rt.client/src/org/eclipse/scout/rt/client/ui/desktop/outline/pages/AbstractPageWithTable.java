@@ -330,6 +330,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     m_searchForm.setAutoAddRemoveOnDesktop(false);
     // listen for search action
     m_searchFormListener = new FormListener() {
+      @Override
       public void formChanged(FormEvent e) throws ProcessingException {
         switch (e.getType()) {
           case FormEvent.TYPE_STORE_BEFORE: {
@@ -406,6 +407,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   protected void execInitSearchForm() throws ProcessingException {
   }
 
+  @Override
   public final T getTable() {
     if (m_table == null) {
       ensureInitialized();
@@ -429,6 +431,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     m_showTableRowMenus = showTableRowMenus;
   }
 
+  @Override
   public ISearchForm getSearchFormInternal() {
     ensureSearchFormCreated();
     return m_searchForm;
@@ -443,6 +446,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     attachToSearchFormInternal();
   }
 
+  @Override
   public SearchFilter getSearchFilter() {
     ensureSearchFormCreated();
     ensureSearchFormStarted();
@@ -460,10 +464,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
   }
 
+  @Override
   public boolean isSearchRequired() {
     return m_searchRequired;
   }
 
+  @Override
   public void setSearchRequired(boolean b) {
     m_searchRequired = b;
   }
@@ -476,10 +482,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
   }
 
+  @Override
   public boolean isSearchActive() {
     return m_searchActive;
   }
 
+  @Override
   public void setSearchActive(boolean b) {
     m_searchActive = b;
     if (isSelectedNode()) {
@@ -495,10 +503,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     super.pageActivatedNotify();
   }
 
+  @Override
   public IProcessingStatus getTablePopulateStatus() {
     return m_tablePopulateStatus;
   }
 
+  @Override
   public void setTablePopulateStatus(IProcessingStatus status) {
     getTable().tablePopulated();
     m_tablePopulateStatus = status;
@@ -702,6 +712,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return pages;
   }
 
+  @Override
   public ITreeNode getTreeNodeFor(ITableRow tableRow) {
     if (tableRow == null) {
       return null;
@@ -711,10 +722,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
   }
 
+  @Override
   public ITableRow getTableRowFor(ITreeNode childPageNode) {
     return m_pageToTableRowMap.get(childPageNode);
   }
 
+  @Override
   public ITableRow[] getTableRowsFor(ITreeNode[] childPageNodes) {
     ITableRow[] rows = new ITableRow[childPageNodes.length];
     int missingCount = 0;

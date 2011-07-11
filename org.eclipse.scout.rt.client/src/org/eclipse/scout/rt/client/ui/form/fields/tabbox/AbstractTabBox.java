@@ -63,6 +63,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     m_grid = new TabBoxGrid(this);
     super.initConfig();
     addPropertyChangeListener(PROP_SELECTED_TAB, new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         // single observer exec
         try {
@@ -130,14 +131,17 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     }
   }
 
+  @Override
   public final int getGridColumnCount() {
     return m_grid.getGridColumnCount();
   }
 
+  @Override
   public final int getGridRowCount() {
     return m_grid.getGridRowCount();
   }
 
+  @Override
   public IGroupBox[] getGroupBoxes() {
     IGroupBox[] a = new IGroupBox[getFieldCount()];
     if (a.length > 0) {
@@ -146,21 +150,25 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     return a;
   }
 
+  @Override
   public void setSelectedTab(IGroupBox box) {
     if (box.getParentField() == this) {
       propertySupport.setProperty(PROP_SELECTED_TAB, box);
     }
   }
 
+  @Override
   public IGroupBox getSelectedTab() {
     return (IGroupBox) propertySupport.getProperty(PROP_SELECTED_TAB);
   }
 
+  @Override
   public ITabBoxUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
   private class P_UIFacade implements ITabBoxUIFacade {
+    @Override
     public void setSelectedTabFromUI(IGroupBox box) {
       setSelectedTab(box);
     }

@@ -56,6 +56,7 @@ public class CallsView extends DefaultView {
   public void produceBody(HtmlComponent p) {
     final SessionInspector session = getAdminSession().getTopView().getSessionsView().getSelectedSession();
     p.linkAction("Clear calls", new AbstractHtmlAction("clearCalls") {
+      @Override
       public void run() {
         session.clearCallInspectors();
       }
@@ -123,6 +124,7 @@ public class CallsView extends DefaultView {
       p.focusAnchor();
     }
     p.startLinkAction(new AbstractHtmlAction("selectCall." + callKey) {
+      @Override
       public void run() {
         m_selectedCall = call;
       }

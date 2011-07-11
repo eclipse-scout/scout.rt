@@ -303,6 +303,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     }
     // local property listener
     addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         if (m_tree != null) {
           String name = e.getPropertyName();
@@ -366,6 +367,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
   /*
    * Runtime
    */
+  @Override
   public final ITree getTree() {
     return m_tree;
   }
@@ -374,14 +376,17 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     return new P_TreeBoxUIFacade();
   }
 
+  @Override
   public ITreeBoxUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
+  @Override
   public void loadRootNode() throws ProcessingException {
     loadChildNodes(m_tree.getRootNode());
   }
 
+  @Override
   public final void loadChildNodes(ITreeNode parentNode) throws ProcessingException {
     if (m_tree != null) {
       try {
@@ -392,6 +397,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
         // when tree is non-incremental, mark all leaf cadidates as leafs
         if (!isLoadIncremental()) {
           ITreeVisitor v = new ITreeVisitor() {
+            @Override
             public boolean visit(ITreeNode node) {
               if (node.getChildNodeCount() == 0) {
                 node.setLeafInternal(true);
@@ -443,18 +449,22 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public final LookupCall getLookupCall() {
     return m_lookupCall;
   }
 
+  @Override
   public void setLookupCall(LookupCall call) {
     m_lookupCall = call;
   }
 
+  @Override
   public Class<? extends ICodeType> getCodeTypeClass() {
     return m_codeTypeClass;
   }
 
+  @Override
   public void setCodeTypeClass(Class<? extends ICodeType> codeTypeClass) {
     m_codeTypeClass = codeTypeClass;
     // create lookup service call
@@ -464,6 +474,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public ITreeNode[] callChildLookup(ITreeNode parentNode) throws ProcessingException {
     LookupRow[] data = null;
     LookupCall call = getLookupCall();
@@ -481,6 +492,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public ITreeNode[] callCompleteTreeLookup() throws ProcessingException {
     LookupRow[] data = null;
     LookupCall call = getLookupCall();
@@ -554,7 +566,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     return b.toString();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected T[] validateValueInternal(T[] rawValue) {
     T[] validValue = rawValue;
@@ -568,6 +579,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
         //only single value
         if (validValue.length > 1) {
           LOG.warn(getClass().getName() + " only accepts a single value. Got " + Arrays.toString(validValue) + ". Using only first value.");
+          @SuppressWarnings("unchecked")
           T[] newArray = (T[]) Array.newInstance(validValue.getClass().getComponentType(), 1);
           newArray[0] = validValue[0];
           validValue = newArray;
@@ -577,6 +589,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     return validValue;
   }
 
+  @Override
   public T getSingleValue() {
     T[] a = getValue();
     if (a != null && a.length > 0) {
@@ -587,18 +600,20 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public void setSingleValue(T value) {
     if (value == null) {
       setValue(null);
     }
     else {
+      @SuppressWarnings("unchecked")
       T[] array = (T[]) Array.newInstance(getHolderType().getComponentType(), 1);
       array[0] = value;
       setValue(array);
     }
   }
 
+  @Override
   public int getCheckedKeyCount() {
     T[] keys = getValue();
     if (keys != null) {
@@ -609,6 +624,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public T getCheckedKey() {
     T[] a = getCheckedKeys();
     if (a != null && a.length > 0) {
@@ -619,10 +635,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public T[] getCheckedKeys() {
     return getValue();
   }
 
+  @Override
   public LookupRow getCheckedLookupRow() {
     LookupRow[] a = getCheckedLookupRows();
     if (a != null && a.length > 0) {
@@ -633,6 +651,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public LookupRow[] getCheckedLookupRows() {
     LookupRow[] lookupRows = null;
     ITreeNode[] treeNodes = getTree().getCheckedNodes();
@@ -648,27 +667,30 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     return lookupRows;
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public void checkKey(T key) {
     if (key == null) {
       checkKeys(null);
     }
     else {
+      @SuppressWarnings("unchecked")
       T[] array = (T[]) Array.newInstance(getHolderType().getComponentType(), 1);
       array[0] = key;
       checkKeys(array);
     }
   }
 
+  @Override
   public void checkKeys(T[] keys) {
     setValue(keys);
   }
 
+  @Override
   public void uncheckAllKeys() {
     checkKeys(null);
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public T[] getUncheckedKeys() {
     HashSet<T> set = new HashSet<T>();
     T[] a = getInitValue();
@@ -679,16 +701,19 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     if (a != null) {
       set.removeAll(Arrays.asList(a));
     }
+    @SuppressWarnings("unchecked")
     T[] array = (T[]) Array.newInstance(getHolderType().getComponentType(), 0);
     a = set.toArray(array);
     if (a.length == 0) a = null;
     return a;
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public void checkAllKeys() {
     final HashSet<T> keySet = new HashSet<T>();
     ITreeVisitor v = new ITreeVisitor() {
+      @SuppressWarnings("unchecked")
+      @Override
       public boolean visit(ITreeNode node) {
         if (node.getPrimaryKey() != null) {
           keySet.add((T) node.getPrimaryKey());
@@ -697,26 +722,33 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
       }
     };
     m_tree.visitNode(m_tree.getRootNode(), v);
+    @SuppressWarnings("unchecked")
     T[] array = (T[]) Array.newInstance(getHolderType().getComponentType(), 0);
     checkKeys(keySet.toArray(array));
   }
 
+  @Override
   public boolean isLoadIncremental() {
     return m_loadIncremental;
   }
 
+  @Override
   public void setLoadIncremental(boolean b) {
     m_loadIncremental = b;
   }
 
+  @Override
   public boolean isAutoExpandAll() {
     return m_autoExpandAll;
   }
 
+  @Override
   public void setAutoExpandAll(boolean b) {
     m_autoExpandAll = b;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
   public boolean isNodeActive(ITreeNode node) {
     if (node instanceof AbstractTreeBox.P_InternalTreeNode) {
       return ((P_InternalTreeNode) node).isActive();
@@ -726,34 +758,42 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     }
   }
 
+  @Override
   public boolean isFilterActiveNodes() {
     return propertySupport.getPropertyBool(PROP_FILTER_ACTIVE_NODES);
   }
 
+  @Override
   public void setFilterActiveNodes(boolean b) {
     propertySupport.setPropertyBool(PROP_FILTER_ACTIVE_NODES, b);
   }
 
+  @Override
   public boolean getFilterCheckedNodesValue() {
     return propertySupport.getPropertyBool(PROP_FILTER_CHECKED_NODES_VALUE);
   }
 
+  @Override
   public void setFilterCheckedNodesValue(boolean b) {
     propertySupport.setPropertyBool(PROP_FILTER_CHECKED_NODES_VALUE, b);
   }
 
+  @Override
   public boolean isFilterCheckedNodes() {
     return propertySupport.getPropertyBool(PROP_FILTER_CHECKED_NODES);
   }
 
+  @Override
   public void setFilterCheckedNodes(boolean b) {
     propertySupport.setPropertyBool(PROP_FILTER_CHECKED_NODES, b);
   }
 
+  @Override
   public TriState getFilterActiveNodesValue() {
     return (TriState) propertySupport.getProperty(PROP_FILTER_ACTIVE_NODES_VALUE);
   }
 
+  @Override
   public void setFilterActiveNodesValue(TriState t) {
     if (t == null) t = TriState.TRUE;
     propertySupport.setProperty(PROP_FILTER_ACTIVE_NODES_VALUE, t);
@@ -802,6 +842,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
       T[] checkedKeys = getCheckedKeys();
       ITreeNode[] checkedNodes = m_tree.findNodes(checkedKeys);
       getTree().visitTree(new ITreeVisitor() {
+        @Override
         public boolean visit(ITreeNode node) {
           node.setChecked(false);
           return true;
@@ -843,6 +884,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
       if (!getTree().isCheckable()) {
         //checks follow selection
         getTree().visitTree(new ITreeVisitor() {
+          @Override
           public boolean visit(ITreeNode node) {
             node.setChecked(node.isSelectedNode());
             return true;
@@ -866,9 +908,11 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
    */
 
   @SuppressWarnings("unchecked")
+  @Override
   public <F extends IFormField> F getFieldByClass(final Class<F> c) {
     final Holder<IFormField> found = new Holder<IFormField>(IFormField.class);
     IFormFieldVisitor v = new IFormFieldVisitor() {
+      @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (field.getClass() == c) {
           found.setValue(field);
@@ -880,9 +924,11 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     return (F) found.getValue();
   }
 
+  @Override
   public IFormField getFieldById(final String id) {
     final Holder<IFormField> found = new Holder<IFormField>(IFormField.class);
     IFormFieldVisitor v = new IFormFieldVisitor() {
+      @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (field.getFieldId().equals(id)) {
           found.setValue(field);
@@ -894,9 +940,11 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     return found.getValue();
   }
 
+  @Override
   public <X extends IFormField> X getFieldById(final String id, final Class<X> type) {
     final Holder<X> found = new Holder<X>(type);
     IFormFieldVisitor v = new IFormFieldVisitor() {
+      @Override
       @SuppressWarnings("unchecked")
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (type.isAssignableFrom(field.getClass()) && field.getFieldId().equals(id)) {
@@ -909,10 +957,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     return found.getValue();
   }
 
+  @Override
   public int getFieldCount() {
     return m_fields.length;
   }
 
+  @Override
   public int getFieldIndex(IFormField f) {
     for (int i = 0; i < m_fields.length; i++) {
       if (m_fields[i] == f) return i;
@@ -920,12 +970,14 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     return -1;
   }
 
+  @Override
   public IFormField[] getFields() {
     IFormField[] a = new IFormField[m_fields.length];
     System.arraycopy(m_fields, 0, a, 0, a.length);
     return a;
   }
 
+  @Override
   public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
     // myself
     if (!visitor.visitField(this, startLevel, 0)) return false;
@@ -944,14 +996,17 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     return true;
   }
 
+  @Override
   public final int getGridColumnCount() {
     return 1;
   }
 
+  @Override
   public final int getGridRowCount() {
     return 1;
   }
 
+  @Override
   public void rebuildFieldGrid() {
   }
 
@@ -998,6 +1053,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
 
     @Override
     public ITreeNode createTreeNode(LookupRow lookupRow, int nodeStatus, boolean markChildrenLoaded) throws ProcessingException {
+      @SuppressWarnings("unchecked")
       P_InternalTreeNode treeNode = (P_InternalTreeNode) super.createTreeNode(lookupRow, nodeStatus, markChildrenLoaded);
       treeNode.setActive(lookupRow.isActive());
       return treeNode;

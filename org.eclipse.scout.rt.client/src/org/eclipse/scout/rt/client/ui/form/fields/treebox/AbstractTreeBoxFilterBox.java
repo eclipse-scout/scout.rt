@@ -63,6 +63,7 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
   protected void execInitField() throws ProcessingException {
     if (m_treeBoxPropertyListener == null) {
       m_treeBoxPropertyListener = new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
           String name = e.getPropertyName();
           if (ITreeBox.PROP_FILTER_CHECKED_NODES.equals(name)) {

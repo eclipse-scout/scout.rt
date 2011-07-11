@@ -30,14 +30,17 @@ public class SessionFilter implements IClientNotificationFilter {
     m_validUntil = System.currentTimeMillis() + timeout;
   }
 
+  @Override
   public boolean isActive() {
     return m_sessionRef != null && m_sessionRef.get() != null && System.currentTimeMillis() <= m_validUntil;
   }
 
+  @Override
   public boolean isMulticast() {
     return false;
   }
 
+  @Override
   public boolean accept() {
     return m_sessionRef != null && ThreadContext.get(IServerSession.class) == m_sessionRef.get();
   }

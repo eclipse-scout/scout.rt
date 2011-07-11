@@ -23,6 +23,7 @@ import org.eclipse.scout.service.SERVICES;
 @Priority(-1)
 public class WorkflowProviderService extends AbstractService implements IWorkflowProviderService {
 
+  @Override
   public AbstractWorkflowData[] getAvailableWorkflowTypes(SearchFilter filter) throws ProcessingException {
     ArrayList<AbstractWorkflowData> list = new ArrayList<AbstractWorkflowData>();
     for (IWorkflowService s : SERVICES.getServices(IWorkflowService.class)) {
@@ -33,6 +34,7 @@ public class WorkflowProviderService extends AbstractService implements IWorkflo
     return list.toArray(new AbstractWorkflowData[list.size()]);
   }
 
+  @Override
   public AbstractWorkflowData[] getFilteredWorkflows(SearchFilter filter) throws ProcessingException {
     ArrayList<AbstractWorkflowData> list = new ArrayList<AbstractWorkflowData>();
     for (IWorkflowService s : SERVICES.getServices(IWorkflowService.class)) {
@@ -43,26 +45,32 @@ public class WorkflowProviderService extends AbstractService implements IWorkflo
     return list.toArray(new AbstractWorkflowData[list.size()]);
   }
 
+  @Override
   public <T extends AbstractWorkflowData> T create(T spec) throws ProcessingException {
     return findWorkflowService(spec).create(spec);
   }
 
+  @Override
   public <T extends AbstractWorkflowData> T discard(T data) throws ProcessingException {
     return findWorkflowService(data).discard(data);
   }
 
+  @Override
   public <T extends AbstractWorkflowData> T makeStateTransition(T data) throws ProcessingException {
     return findWorkflowService(data).makeStateTransition(data);
   }
 
+  @Override
   public <T extends AbstractWorkflowData> T store(T data) throws ProcessingException {
     return findWorkflowService(data).store(data);
   }
 
+  @Override
   public <T extends AbstractWorkflowData> T finish(T data) throws ProcessingException {
     return findWorkflowService(data).finish(data);
   }
 
+  @Override
   public <T extends AbstractWorkflowData> T resume(T spec) throws ProcessingException {
     return findWorkflowService(spec).resume(spec);
   }

@@ -23,6 +23,7 @@ public class SimplePrincipal implements Principal, Serializable {
     m_name = name;
   }
 
+  @Override
   public String getName() {
     return m_name;
   }

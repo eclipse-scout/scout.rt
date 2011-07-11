@@ -50,10 +50,12 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
     super.initConfig();
   }
 
+  @Override
   public final T getPage() {
     return m_page;
   }
 
+  @Override
   public void setPage(T newPage) {
     setPageInternal(newPage);
   }
@@ -79,6 +81,7 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
       m_outline.selectNode(m_page);
       m_outline.addPropertyChangeListener(
           new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent e) {
               if (e.getPropertyName().equals(IOutline.PROP_DETAIL_FORM)) {
                 getDetailFormField().setInnerForm(((IOutline) e.getSource()).getDetailForm());
@@ -98,14 +101,17 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
     }
   }
 
+  @Override
   public IWrappedFormField<IForm> getDetailFormField() {
     return getFieldByClass(DetailFormField.class);
   }
 
+  @Override
   public ITableField<ITable> getTableField() {
     return getFieldByClass(TableField.class);
   }
 
+  @Override
   public IWrappedFormField<IForm> getSearchFormField() {
     return getFieldByClass(SearchFormField.class);
   }

@@ -69,18 +69,22 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
     m_version = version;
   }
 
+  @Override
   public void setClientNotificationPollInterval(long intervallMillis) {
     m_pollInterval = intervallMillis;
   }
 
+  @Override
   public long getClientNotificationPollInterval() {
     return m_pollInterval;
   }
 
+  @Override
   public boolean isAnalyzeNetworkLatency() {
     return m_analyzeNetworkLatency;
   }
 
+  @Override
   public void setAnalyzeNetworkLatency(boolean b) {
     m_analyzeNetworkLatency = b;
   }
@@ -89,10 +93,12 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
     return m_version;
   }
 
+  @Override
   public URL getServerURL() {
     return m_serverURL;
   }
 
+  @Override
   public void setServerURL(URL url) {
     m_serverURL = url;
   }
@@ -101,6 +107,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
     return m_clientSession;
   }
 
+  @Override
   public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) throws ProcessingException {
     if (getServerURL() == null) {
       throw new ProcessingException("serverURL is null. Check proxyHandler extension. Example value is: http://localhost:8080/myapp/process");
@@ -240,6 +247,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
     IClientSession clientSession = ClientSyncJob.getCurrentSession();
     if (clientSession != null && clientSession.getOfflineSubject() != null) {
       Object response = Subject.doAs(clientSession.getOfflineSubject(), new PrivilegedAction<ServiceTunnelResponse>() {
+        @Override
         public ServiceTunnelResponse run() {
           return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call, monitor);
         }

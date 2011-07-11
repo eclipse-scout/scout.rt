@@ -78,31 +78,38 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   /**
    * Fires a change event
    */
+  @Override
   public void clear() {
     m_variables.clear();
     mapChanged();
   }
 
+  @Override
   public boolean containsKey(Object key) {
     return m_variables.containsKey(key);
   }
 
+  @Override
   public boolean containsValue(Object value) {
     return m_variables.containsValue(value);
   }
 
+  @Override
   public Set<java.util.Map.Entry<String, Object>> entrySet() {
     return Collections.unmodifiableSet(m_variables.entrySet());
   }
 
+  @Override
   public Object get(Object key) {
     return m_variables.get(key);
   }
 
+  @Override
   public boolean isEmpty() {
     return m_variables.isEmpty();
   }
 
+  @Override
   public Set<String> keySet() {
     return Collections.unmodifiableSet(m_variables.keySet());
   }
@@ -110,6 +117,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   /**
    * Fires a change event
    */
+  @Override
   public Object put(String key, Object value) {
     Object o = m_variables.put(key, value);
     mapChanged();
@@ -119,6 +127,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   /**
    * Fires a change event
    */
+  @Override
   public void putAll(Map<? extends String, ? extends Object> m) {
     m_variables.putAll(m);
     mapChanged();
@@ -127,16 +136,19 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   /**
    * Fires a change event
    */
+  @Override
   public Object remove(Object key) {
     Object o = m_variables.remove(key);
     mapChanged();
     return o;
   }
 
+  @Override
   public int size() {
     return m_variables.size();
   }
 
+  @Override
   public Collection<Object> values() {
     return Collections.unmodifiableCollection(m_variables.values());
   }

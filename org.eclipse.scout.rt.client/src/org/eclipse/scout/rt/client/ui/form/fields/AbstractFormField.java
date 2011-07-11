@@ -493,6 +493,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   protected void execDisposeField() throws ProcessingException {
   }
 
+  @Override
   public final void applySearch(SearchFilter search) {
     execAddSearchTerms(search);
   }
@@ -550,12 +551,14 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     setMasterRequired(getConfiguredMasterRequired());
     // private listener for subtree property change events
     addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         fireSubtreePropertyChange(e);
       }
     });
   }
 
+  @Override
   public boolean isInitialized() {
     return m_initialized;
   }
@@ -563,6 +566,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * do not use this method
    */
+  @Override
   public void postInitConfig() throws ProcessingException {
     // key strokes, now all inner fields are built
     updateKeyStrokes();
@@ -577,6 +581,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * This is the init of the runtime model after the form and fields are built
    * and configured
    */
+  @Override
   public final void initField() throws ProcessingException {
     try {
       setValueChangeTriggerEnabled(false);
@@ -594,6 +599,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     checkEmpty();
   }
 
+  @Override
   public final void disposeField() {
     try {
       disposeFieldInternal();
@@ -623,6 +629,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
       m_internalDataChangeListener = new WeakDataChangeListener() {
+        @Override
         public void dataChanged(Object... innerDataTypes) throws ProcessingException {
           execDataChanged(innerDataTypes);
         }
@@ -662,10 +669,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   public IForm getForm() {
     return m_form;
   }
 
+  @Override
   public IGroupBox getParentGroupBox() {
     ICompositeField f = getParentField();
     while (f != null && !(f instanceof IGroupBox)) {
@@ -674,10 +683,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return (IGroupBox) f;
   }
 
+  @Override
   public ICompositeField getParentField() {
     return (ICompositeField) propertySupport.getProperty(PROP_PARENT_FIELD);
   }
 
+  @Override
   public void setParentFieldInternal(ICompositeField f) {
     propertySupport.setProperty(PROP_PARENT_FIELD, f);
   }
@@ -685,6 +696,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * do not use this internal method
    */
+  @Override
   public void setFormInternal(IForm form) {
     m_form = form;
   }
@@ -694,20 +706,24 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return getLabel() + "/" + getFieldId() + " (" + getClass().getName() + ")";
   }
 
+  @Override
   public void printField(PrintDevice device, Map<String, Object> parameters) {
     getForm().printField(this, device, parameters);
   }
 
+  @Override
   public void setView(boolean visible, boolean enabled, boolean mandatory) {
     setVisible(visible);
     setEnabled(enabled);
     setMandatory(mandatory);
   }
 
+  @Override
   public boolean isValueChangeTriggerEnabled() {
     return m_valueChangeTriggerEnabled >= 1;
   }
 
+  @Override
   public void setValueChangeTriggerEnabled(boolean b) {
     if (b) {
       m_valueChangeTriggerEnabled++;
@@ -717,6 +733,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   public void addSubtreePropertyChangeListener(PropertyChangeListener listener) {
     if (listener != null && m_subtreePropertyChangeSupport == null) {
       m_subtreePropertyChangeSupport = new BasicPropertySupport(this);
@@ -724,6 +741,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_subtreePropertyChangeSupport.addPropertyChangeListener(listener);
   }
 
+  @Override
   public void addSubtreePropertyChangeListener(String propName, PropertyChangeListener listener) {
     if (listener != null && m_subtreePropertyChangeSupport == null) {
       m_subtreePropertyChangeSupport = new BasicPropertySupport(this);
@@ -731,30 +749,36 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_subtreePropertyChangeSupport.addPropertyChangeListener(propName, listener);
   }
 
+  @Override
   public void removeSubtreePropertyChangeListener(PropertyChangeListener listener) {
     if (m_subtreePropertyChangeSupport != null) {
       m_subtreePropertyChangeSupport.removePropertyChangeListener(listener);
     }
   }
 
+  @Override
   public void removeSubtreePropertyChangeListener(String propName, PropertyChangeListener listener) {
     if (m_subtreePropertyChangeSupport != null) {
       m_subtreePropertyChangeSupport.removePropertyChangeListener(propName, listener);
     }
   }
 
+  @Override
   public boolean hasProperty(String name) {
     return propertySupport.hasProperty(name);
   }
 
+  @Override
   public boolean isFieldChanging() {
     return propertySupport.isPropertiesChanging();
   }
 
+  @Override
   public void setFieldChanging(boolean b) {
     propertySupport.setPropertiesChanging(b);
   }
 
+  @Override
   public String getFieldId() {
     String s = getClass().getSimpleName();
     if (s.endsWith("Field")) {
@@ -770,22 +794,27 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /*
    * Data i/o
    */
+  @Override
   public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
   }
 
+  @Override
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) throws ProcessingException {
   }
 
   /*
    * XML i/o
    */
+  @Override
   public void storeXML(SimpleXmlElement x) throws ProcessingException {
     x.setAttribute("fieldId", getClass().getSimpleName());
   }
 
+  @Override
   public void loadXML(SimpleXmlElement x) throws ProcessingException {
   }
 
+  @Override
   public final void setXML(String xml) throws ProcessingException {
     if (xml == null) return;
     try {
@@ -798,6 +827,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   public final String getXML() throws ProcessingException {
     SimpleXmlElement x = new SimpleXmlElement("field");
     storeXML(x);
@@ -810,46 +840,57 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return sw.toString();
   }
 
+  @Override
   public String getInitialLabel() {
     return m_initialLabel;
   }
 
+  @Override
   public void setInitialLabel(String name) {
     m_initialLabel = name;
   }
 
+  @Override
   public String getLabel() {
     return propertySupport.getPropertyString(PROP_LABEL);
   }
 
+  @Override
   public void setLabel(String name) {
     propertySupport.setPropertyString(PROP_LABEL, name);
   }
 
+  @Override
   public int getLabelPosition() {
     return m_labelPosition;
   }
 
+  @Override
   public void setLabelPosition(int position) {
     m_labelPosition = position;
   }
 
+  @Override
   public int getLabelWidthInPixel() {
     return m_labelWidthInPixel;
   }
 
+  @Override
   public void setLabelWidthInPixel(int w) {
     m_labelWidthInPixel = w;
   }
 
+  @Override
   public int getLabelHorizontalAlignment() {
     return m_labelHorizontalAlignment;
   }
 
+  @Override
   public void setLabelHorizontalAlignment(int a) {
     m_labelHorizontalAlignment = a;
   }
 
+  @Override
   public String getFullyQualifiedLabel(String separator) {
     StringBuffer b = new StringBuffer();
     IFormField p = getParentField();
@@ -869,10 +910,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return b.toString();
   }
 
+  @Override
   public boolean isLabelVisible() {
     return propertySupport.getPropertyBool(PROP_LABEL_VISIBLE);
   }
 
+  @Override
   public void setLabelVisible(boolean b) {
     m_labelVisible = b;
     calculateLabelVisible();
@@ -882,27 +925,33 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     propertySupport.setPropertyBool(PROP_LABEL_VISIBLE, m_labelVisible && (!m_labelSuppressed));
   }
 
+  @Override
   public boolean isLabelSuppressed() {
     return m_labelSuppressed;
   }
 
+  @Override
   public void setLabelSuppressed(boolean b) {
     m_labelSuppressed = b;
     calculateLabelVisible();
   }
 
+  @Override
   public Object getCustomProperty(String propName) {
     return propertySupport.getProperty(propName);
   }
 
+  @Override
   public void setCustomProperty(String propName, Object o) {
     propertySupport.setProperty(propName, o);
   }
 
+  @Override
   public Permission getEnabledPermission() {
     return m_enabledPermission;
   }
 
+  @Override
   public void setEnabledPermission(Permission p) {
     m_enabledPermission = p;
     boolean b;
@@ -924,19 +973,23 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     setEnabledGranted(b);
   }
 
+  @Override
   public boolean isEnabledGranted() {
     return m_enabledGranted;
   }
 
+  @Override
   public boolean getEnabledProperty() {
     return m_enabledProperty;
   }
 
+  @Override
   public void setEnabledGranted(boolean b) {
     m_enabledGranted = b;
     calculateEnabled();
   }
 
+  @Override
   public void setEnabled(boolean b) {
     m_enabledProperty = b;
     if (b) {
@@ -969,14 +1022,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   public boolean isEnabled() {
     return propertySupport.getPropertyBool(PROP_ENABLED);
   }
 
+  @Override
   public Permission getVisiblePermission() {
     return m_visiblePermission;
   }
 
+  @Override
   public void setVisiblePermission(Permission p) {
     m_visiblePermission = p;
     boolean b;
@@ -1001,6 +1057,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * for thread-safety-reason this method is final
    */
+  @Override
   public final boolean isSaveNeeded() {
     return propertySupport.getPropertyBool(PROP_SAVE_NEEDED);
   }
@@ -1011,6 +1068,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * 
    * @throws ProcessingException
    */
+  @Override
   public final void checkSaveNeeded() {
     if (isInitialized()) {
       try {
@@ -1022,6 +1080,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   public void touch() {
     m_touched = true;
     checkSaveNeeded();
@@ -1030,6 +1089,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * Default implementation does nothing
    */
+  @Override
   public final void markSaved() {
     try {
       m_touched = false;
@@ -1041,6 +1101,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   public final boolean isEmpty() {
     return propertySupport.getPropertyBool(PROP_EMPTY);
   }
@@ -1061,19 +1122,23 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   public boolean isVisibleGranted() {
     return m_visibleGranted;
   }
 
+  @Override
   public void setVisibleGranted(boolean b) {
     m_visibleGranted = b;
     calculateVisibleInternal();
   }
 
+  @Override
   public boolean isVisible() {
     return propertySupport.getPropertyBool(PROP_VISIBLE);
   }
 
+  @Override
   public void setVisible(boolean b) {
     m_visibleProperty = b;
     calculateVisibleInternal();
@@ -1117,30 +1182,37 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
   }
 
+  @Override
   public boolean isMandatory() {
     return propertySupport.getPropertyBool(PROP_MANDATORY);
   }
 
+  @Override
   public void setMandatory(boolean b) {
     propertySupport.setPropertyBool(PROP_MANDATORY, b);
   }
 
+  @Override
   public IProcessingStatus getErrorStatus() {
     return (IProcessingStatus) propertySupport.getProperty(PROP_ERROR_STATUS);
   }
 
+  @Override
   public void setErrorStatus(String message) {
     setErrorStatus(new ProcessingStatus(message, null, 0, IProcessingStatus.ERROR));
   }
 
+  @Override
   public void setErrorStatus(IProcessingStatus status) {
     propertySupport.setProperty(PROP_ERROR_STATUS, status);
   }
 
+  @Override
   public void clearErrorStatus() {
     propertySupport.setProperty(PROP_ERROR_STATUS, null);
   }
 
+  @Override
   public boolean isContentValid() {
     IProcessingStatus errorStatus = getErrorStatus();
     if (errorStatus != null && (errorStatus.getSeverity() == IProcessingStatus.ERROR || errorStatus.getSeverity() == IProcessingStatus.FATAL)) {
@@ -1152,72 +1224,89 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return true;
   }
 
+  @Override
   public void setTooltipText(String text) {
     propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, text);
   }
 
+  @Override
   public String getTooltipText() {
     return propertySupport.getPropertyString(PROP_TOOLTIP_TEXT);
   }
 
+  @Override
   public void setForegroundColor(String c) {
     propertySupport.setProperty(PROP_FOREGROUND_COLOR, c);
   }
 
+  @Override
   public String getForegroundColor() {
     return (String) propertySupport.getProperty(PROP_FOREGROUND_COLOR);
   }
 
+  @Override
   public void setBackgroundColor(String c) {
     propertySupport.setProperty(PROP_BACKGROUND_COLOR, c);
   }
 
+  @Override
   public String getBackgroundColor() {
     return (String) propertySupport.getProperty(PROP_BACKGROUND_COLOR);
   }
 
+  @Override
   public void setFont(FontSpec f) {
     propertySupport.setProperty(PROP_FONT, f);
   }
 
+  @Override
   public FontSpec getFont() {
     return (FontSpec) propertySupport.getProperty(PROP_FONT);
   }
 
+  @Override
   public GridData getGridData() {
     return new GridData(m_gridData);
   }
 
+  @Override
   public void setGridDataInternal(GridData data) {
     m_gridData = new GridData(data);
   }
 
+  @Override
   public GridData getGridDataHints() {
     return new GridData(m_gridDataHints);
   }
 
+  @Override
   public void setGridDataHints(GridData hints) {
     m_gridDataHints = new GridData(hints);
   }
 
+  @Override
   public void requestFocus() {
     propertySupport.setPropertyAlwaysFire(PROP_FOCUS_REQUESTED, true);
   }
 
+  @Override
   public boolean fetchFocusRequested() {
     boolean b = propertySupport.getPropertyBool(PROP_FOCUS_REQUESTED);
     propertySupport.setPropertyNoFire(PROP_FOCUS_REQUESTED, false);
     return b;
   }
 
+  @Override
   public void setFocusable(boolean b) {
     propertySupport.setPropertyBool(PROP_FOCUSABLE, b);
   }
 
+  @Override
   public boolean isFocusable() {
     return propertySupport.getPropertyBool(PROP_FOCUSABLE);
   }
 
+  @Override
   public void setMasterField(IValueField field) {
     IValueField oldMasterField = getMasterField();
     // remove old listener
@@ -1236,11 +1325,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_masterField = field;
   }
 
+  @Override
   public IValueField getMasterField() {
     return m_masterField;
   }
 
   // commodity helper
+  @Override
   public Object getMasterValue() {
     if (getMasterField() != null) {
       return getMasterField().getValue();
@@ -1248,14 +1339,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return null;
   }
 
+  @Override
   public void setMasterRequired(boolean b) {
     m_masterRequired = b;
   }
 
+  @Override
   public boolean isMasterRequired() {
     return m_masterRequired;
   }
 
+  @Override
   public void updateKeyStrokes() {
     HashMap<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
     //
@@ -1279,10 +1373,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     propertySupport.setProperty(PROP_KEY_STROKES, ksMap.values().toArray(new IKeyStroke[ksMap.size()]));
   }
 
+  @Override
   public IKeyStroke[] getContributedKeyStrokes() {
     return null;
   }
 
+  @Override
   public IKeyStroke[] getLocalKeyStrokes() {
     HashMap<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
     Class<? extends IKeyStroke>[] shortcutArray = getConfiguredKeyStrokes();
@@ -1299,6 +1395,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return ksMap.values().toArray(new IKeyStroke[ksMap.size()]);
   }
 
+  @Override
   public IKeyStroke[] getKeyStrokes() {
     IKeyStroke[] keyStrokes = (IKeyStroke[]) propertySupport.getProperty(PROP_KEY_STROKES);
     if (keyStrokes == null) {
@@ -1308,6 +1405,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   private class P_MasterListener implements MasterListener {
+    @Override
     public void masterChanged(Object newMasterValue) {
       // only active if the unique listener itself
       if (this == m_currentMasterListener) {

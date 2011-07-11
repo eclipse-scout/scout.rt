@@ -66,6 +66,7 @@ public class ClientProxyServiceFactory implements IServiceFactory {
     m_serviceClass = serviceClass;
   }
 
+  @Override
   public void serviceRegistered(final ServiceRegistration registration) throws Throwable {
     if (!m_serviceClass.isInterface()) {
       Boolean createImmediately = (Boolean) registration.getReference().getProperty(ServiceConstants.SERVICE_CREATE_IMMEDIATELY);
@@ -84,6 +85,7 @@ public class ClientProxyServiceFactory implements IServiceFactory {
     }
   }
 
+  @Override
   public Object getService(Bundle bundle, ServiceRegistration registration) {
     updateClassCache(registration);
     IClientSession session = ClientJob.getCurrentSession(m_sessionClass);
@@ -102,6 +104,7 @@ public class ClientProxyServiceFactory implements IServiceFactory {
     return ServiceUtility.NULL_SERVICE;
   }
 
+  @Override
   public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
   }
 

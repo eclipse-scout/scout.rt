@@ -35,22 +35,27 @@ class FunctionInput implements IBindInput {
     m_target = target;
   }
 
+  @Override
   public IToken getToken() {
     return m_target;
   }
 
+  @Override
   public boolean isBatch() {
     return false;
   }
 
+  @Override
   public boolean hasBatch(int i) {
     return i <= 0;
   }
 
+  @Override
   public void setNextBatchIndex(int i) {
     m_batchIndex = i;
   }
 
+  @Override
   public boolean isJdbcBind() {
     if (m_target.isPlainToken()) {
       return false;
@@ -66,14 +71,17 @@ class FunctionInput implements IBindInput {
     }
   }
 
+  @Override
   public int getJdbcBindIndex() {
     return m_jdbcBindIndex;
   }
 
+  @Override
   public void setJdbcBindIndex(int index) {
     m_jdbcBindIndex = index;
   }
 
+  @Override
   public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
     if (isBatch() || !m_valueSet) {
       if (m_callerService instanceof AbstractSqlService) {

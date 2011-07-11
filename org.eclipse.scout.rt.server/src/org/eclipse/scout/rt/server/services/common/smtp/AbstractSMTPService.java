@@ -122,62 +122,77 @@ public abstract class AbstractSMTPService extends AbstractService implements ISM
     setSslProtocols(getConfiguredSslProtocols());
   }
 
+  @Override
   public String getHost() {
     return m_host;
   }
 
+  @Override
   public void setHost(String s) {
     m_host = s;
   }
 
+  @Override
   public int getPort() {
     return m_port;
   }
 
+  @Override
   public void setPort(int s) {
     m_port = s;
   }
 
+  @Override
   public boolean isUseAuthentication() {
     return m_useAuthentication;
   }
 
+  @Override
   public void setUseAuthentication(boolean useAuthentication) {
     m_useAuthentication = useAuthentication;
   }
 
+  @Override
   public String getUsername() {
     return m_username;
   }
 
+  @Override
   public void setUsername(String s) {
     m_username = s;
   }
 
+  @Override
   public String getPassword() {
     return m_password;
   }
 
+  @Override
   public void setPassword(String s) {
     m_password = s;
   }
 
+  @Override
   public String getSubjectPrefix() {
     return m_subjectPrefix;
   }
 
+  @Override
   public void setSubjectPrefix(String subjectPrefix) {
     m_subjectPrefix = subjectPrefix;
   }
 
+  @Override
   public String getDefaultFromEmail() {
     return m_defaultFromEmail;
   }
 
+  @Override
   public void setDefaultFromEmail(String defaultFromEmail) {
     m_defaultFromEmail = defaultFromEmail;
   }
 
+  @Override
   public String getDebugReceiverEmail() {
     return m_debugReceiverEmail;
   }
@@ -202,26 +217,32 @@ public abstract class AbstractSMTPService extends AbstractService implements ISM
     return isUseSmtps() ? "smtps" : "smtp";
   }
 
+  @Override
   public boolean isUseSmtps() {
     return m_useSmtps;
   }
 
+  @Override
   public void setUseSmtps(boolean useSmtps) {
     m_useSmtps = useSmtps;
   }
 
+  @Override
   public String getSslProtocols() {
     return m_sslProtocols;
   }
 
+  @Override
   public void setSslProtocols(String sslProtocols) {
     m_sslProtocols = sslProtocols;
   }
 
+  @Override
   public void sendMessage(MimeMessage message) throws ProcessingException {
     sendMessage(message, null);
   }
 
+  @Override
   public void sendMessage(MimeMessage message, Session session) throws ProcessingException {
     Transport transport = null;
     try {

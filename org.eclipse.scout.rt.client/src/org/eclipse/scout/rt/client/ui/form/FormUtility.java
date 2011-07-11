@@ -88,6 +88,7 @@ public final class FormUtility {
   private static class PostInitConfigFieldVisitor implements IFormFieldVisitor {
     private ProcessingException m_firstEx;
 
+    @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       try {
         field.postInitConfig();
@@ -113,6 +114,7 @@ public final class FormUtility {
   private static class RebuildFieldGridVisitor implements IFormFieldVisitor {
     private ProcessingException m_firstEx;
 
+    @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       try {
         if (field instanceof ICompositeField) {
@@ -135,6 +137,7 @@ public final class FormUtility {
   private static class InitFieldVisitor implements IFormFieldVisitor {
     private ProcessingException m_firstEx;
 
+    @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       try {
         field.initField();
@@ -158,6 +161,7 @@ public final class FormUtility {
   }
 
   private static class DisposeFieldVisitor implements IFormFieldVisitor {
+    @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       try {
         field.disposeField();

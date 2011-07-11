@@ -18,6 +18,7 @@ import org.eclipse.scout.net.NetActivator;
 
 public class TestApplication implements IApplication {
 
+  @Override
   public Object start(IApplicationContext context) throws Exception {
     System.out.println("Hello RCP World!");
 
@@ -34,6 +35,7 @@ public class TestApplication implements IApplication {
     return EXIT_OK;
   }
 
+  @Override
   public void stop() {
   }
 }

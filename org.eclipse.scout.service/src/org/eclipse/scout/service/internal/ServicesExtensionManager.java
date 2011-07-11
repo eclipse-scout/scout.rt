@@ -79,6 +79,7 @@ public class ServicesExtensionManager implements Listener {
     m_tracker = null;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void added(IExtension extension) {
     Bundle contributorBundle = Platform.getBundle(extension.getContributor().getName());
@@ -177,6 +178,7 @@ public class ServicesExtensionManager implements Listener {
     m_serviceRegistrations.put(extension, list);
   }
 
+  @Override
   public void removed(IExtension extension) {
     List<ServiceRegistration> list = m_serviceRegistrations.remove(extension);
     if (list != null) {

@@ -98,10 +98,12 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
    * Runtime
    */
 
+  @Override
   public Class<? extends ICodeType> getCodeTypeClass() {
     return m_codeTypeClass;
   }
 
+  @Override
   public void setCodeTypeClass(Class<? extends ICodeType> codeTypeClass) {
     m_codeTypeClass = codeTypeClass;
     // create lookup service call
@@ -111,10 +113,12 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
     }
   }
 
+  @Override
   public LookupCall getLookupCall() {
     return m_lookupCall;
   }
 
+  @Override
   public void setLookupCall(LookupCall call) {
     m_lookupCall = call;
   }
@@ -122,6 +126,7 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean isSortCodesByDisplayText() {
     return m_sortCodesByDisplayText;
   }
@@ -129,10 +134,12 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
   /**
    * {@inheritDoc}
    */
+  @Override
   public void setSortCodesByDisplayText(boolean b) {
     m_sortCodesByDisplayText = b;
   }
 
+  @Override
   public LookupCall prepareLookupCall(ITableRow row) {
     if (getLookupCall() != null) {
       LookupCall call = (LookupCall) getLookupCall().clone();

@@ -159,6 +159,7 @@ public class BookmarkViewForm extends AbstractForm {
           /**
            * Implementation of ITreeNodeFilter
            */
+          @Override
           public boolean accept(ITreeNode node, int level) {
             String text = node.getCell().getText();
             return text == null || m_lowercaseFilterPattern == null || m_lowercaseFilterPattern.matcher(text.toLowerCase()).matches();
@@ -300,6 +301,7 @@ public class BookmarkViewForm extends AbstractForm {
   public class ViewHandler extends AbstractFormHandler {
 
     private final IClientNotificationConsumerListener m_cncListener = new IClientNotificationConsumerListener() {
+      @Override
       public void handleEvent(ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification() instanceof BookmarkChangedClientNotification) {
           new ClientSyncJob("Bookmarks changed", ClientSyncJob.getCurrentSession()) {
@@ -313,6 +315,7 @@ public class BookmarkViewForm extends AbstractForm {
     };
 
     private final BookmarkServiceListener m_bmListener = new BookmarkServiceListener() {
+      @Override
       public void bookmarksChanged(BookmarkServiceEvent e) {
         switch (e.getType()) {
           case BookmarkServiceEvent.TYPE_CHANGED: {

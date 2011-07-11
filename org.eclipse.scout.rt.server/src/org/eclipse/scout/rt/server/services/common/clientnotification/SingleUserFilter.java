@@ -29,14 +29,17 @@ public class SingleUserFilter implements IClientNotificationFilter {
     m_validUntil = System.currentTimeMillis() + timeout;
   }
 
+  @Override
   public boolean isActive() {
     return System.currentTimeMillis() <= m_validUntil;
   }
 
+  @Override
   public boolean isMulticast() {
     return false;
   }
 
+  @Override
   public boolean accept() {
     return m_userId != null && m_userId.equalsIgnoreCase(ThreadContext.get(IServerSession.class).getUserId());
   }

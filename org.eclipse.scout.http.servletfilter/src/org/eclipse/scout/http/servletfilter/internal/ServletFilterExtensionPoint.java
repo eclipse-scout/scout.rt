@@ -37,18 +37,22 @@ public final class ServletFilterExtensionPoint {
         IExtensionRegistry reg = Platform.getExtensionRegistry();
         // add change listener
         reg.addListener(new IRegistryEventListener() {
+          @Override
           public void added(IExtension[] extensions) {
             notifyExtensionPointChanged();
           }
 
+          @Override
           public void removed(IExtension[] extensions) {
             notifyExtensionPointChanged();
           }
 
+          @Override
           public void added(IExtensionPoint[] extensionPoints) {
             notifyExtensionPointChanged();
           }
 
+          @Override
           public void removed(IExtensionPoint[] extensionPoints) {
             notifyExtensionPointChanged();
           }

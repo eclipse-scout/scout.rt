@@ -22,6 +22,7 @@ public class SharedContextChangedNotification extends AbstractClientNotification
     m_sharedVariableMap = sharedVariableMap;
   }
 
+  @Override
   public boolean coalesce(IClientNotification existingNotification) {
     return true;
   }

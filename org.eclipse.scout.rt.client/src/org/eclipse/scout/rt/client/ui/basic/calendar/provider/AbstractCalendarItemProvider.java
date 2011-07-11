@@ -172,6 +172,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   /*
    * Runtime
    */
+  @Override
   public void disposeProvider() {
     P_ReloadJob job = m_reloadJob;
     if (job != null) {
@@ -180,6 +181,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
   }
 
+  @Override
   public final void decorateCell(Cell cell, ICalendarItem item) {
     decorateCellInternal(cell, item);
     try {
@@ -225,6 +227,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     cell.setBackgroundColor((item.getColor()));
   }
 
+  @Override
   public ICalendarItem[] getItems(Date minDate, Date maxDate) {
     ensureItemsLoadedInternal(minDate, maxDate);
     ArrayList<ICalendarItem> list = new ArrayList<ICalendarItem>();
@@ -239,6 +242,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     return list.toArray(new ICalendarItem[list.size()]);
   }
 
+  @Override
   public void reloadProvider() {
     loadItemsAsyncInternal(ClientSyncJob.getCurrentSession(), m_minDateLoaded, m_maxDateLoaded, 250);
   }
@@ -249,30 +253,37 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     propertySupport.setProperty(PROP_ITEMS, items);
   }
 
+  @Override
   public IMenu[] getMenus() {
     return m_menus;
   }
 
+  @Override
   public boolean isMoveItemEnabled() {
     return propertySupport.getPropertyBool(PROP_MOVE_ITEM_ENABLED);
   }
 
+  @Override
   public void setMoveItemEnabled(boolean b) {
     propertySupport.setPropertyBool(PROP_MOVE_ITEM_ENABLED, b);
   }
 
+  @Override
   public boolean isLoadInProgress() {
     return propertySupport.getPropertyBool(PROP_LOAD_IN_PROGRESS);
   }
 
+  @Override
   public void setLoadInProgress(boolean b) {
     propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, b);
   }
 
+  @Override
   public long getRefreshIntervalMillis() {
     return propertySupport.getPropertyLong(PROP_REFRESH_INTERVAL_MILLIS);
   }
 
+  @Override
   public void setRefreshIntervalMillis(long m) {
     propertySupport.setPropertyLong(PROP_REFRESH_INTERVAL_MILLIS, m);
     if (m > 0) {
@@ -280,6 +291,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
   }
 
+  @Override
   public void onItemAction(ICalendarItem item) throws ProcessingException {
     try {
       execItemAction(item);
@@ -292,6 +304,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
   }
 
+  @Override
   public void onItemMoved(ICalendarItem item, Date newDate) throws ProcessingException {
     try {
       execItemMoved(item, newDate);

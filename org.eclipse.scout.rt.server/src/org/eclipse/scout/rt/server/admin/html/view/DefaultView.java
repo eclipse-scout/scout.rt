@@ -25,16 +25,20 @@ public class DefaultView implements IView {
     return m_as;
   }
 
+  @Override
   public boolean isVisible() {
     return true;
   }
 
+  @Override
   public void produceTitle(HtmlComponent p) {
   }
 
+  @Override
   public void produceBody(HtmlComponent p) {
   }
 
+  @Override
   public void activated() {
   }
 

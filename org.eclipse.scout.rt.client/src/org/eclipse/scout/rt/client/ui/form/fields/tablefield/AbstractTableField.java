@@ -76,6 +76,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    *         <p>
    *         returns null if no table is contained within this table field
    */
+  @Override
   public String createDefaultTableStatus() {
     StringBuilder statusText = new StringBuilder();
     ITable table = getTable();
@@ -217,6 +218,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     }
     // local enabled listener
     addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         if (m_table != null) {
           m_table.setEnabled(isEnabled());
@@ -245,10 +247,12 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     }
   }
 
+  @Override
   public final T getTable() {
     return m_table;
   }
 
+  @Override
   public void setTable(T newTable, boolean externallyManaged) {
     m_tableExternallyManaged = externallyManaged;
     setTableInternal(newTable);
@@ -446,35 +450,43 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     return b;
   }
 
+  @Override
   public String getTableStatus() {
     IProcessingStatus status = getTableSelectionStatus();
     return status != null ? status.getMessage() : null;
   }
 
+  @Override
   public void setTableStatus(String status) {
     setTableSelectionStatus(status != null ? new ProcessingStatus(status, ProcessingStatus.INFO) : null);
   }
 
+  @Override
   public IProcessingStatus getTableSelectionStatus() {
     return (IProcessingStatus) propertySupport.getProperty(PROP_TABLE_SELECTION_STATUS);
   }
 
+  @Override
   public void setTableSelectionStatus(IProcessingStatus status) {
     propertySupport.setProperty(PROP_TABLE_SELECTION_STATUS, status);
   }
 
+  @Override
   public IProcessingStatus getTablePopulateStatus() {
     return (IProcessingStatus) propertySupport.getProperty(PROP_TABLE_POPULATE_STATUS);
   }
 
+  @Override
   public void setTablePopulateStatus(IProcessingStatus status) {
     propertySupport.setProperty(PROP_TABLE_POPULATE_STATUS, status);
   }
 
+  @Override
   public boolean isTableStatusVisible() {
     return propertySupport.getPropertyBool(PROP_TABLE_STATUS_VISIBLE);
   }
 
+  @Override
   public void setTableStatusVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_TABLE_STATUS_VISIBLE, b);
     if (b) {
@@ -482,6 +494,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     }
   }
 
+  @Override
   public void updateTableStatus() {
     try {
       execUpdateTableStatus();
@@ -491,6 +504,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     }
   }
 
+  @Override
   public void doSave() throws ProcessingException {
     if (m_table != null && !m_tableExternallyManaged) {
       try {
@@ -528,6 +542,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     markSaved();
   }
 
+  @Override
   public void reloadTableData() throws ProcessingException {
     execReloadTableData();
   }

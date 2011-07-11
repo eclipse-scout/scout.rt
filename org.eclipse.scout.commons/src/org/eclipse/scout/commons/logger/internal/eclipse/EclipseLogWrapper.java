@@ -35,10 +35,12 @@ public class EclipseLogWrapper extends AbstractScoutLogger {
     m_level = level;
   }
 
+  @Override
   public String getName() {
     return m_name;
   }
 
+  @Override
   public int getLevel() {
     Integer globalLogLevel = ScoutLogManager.getGlobalLogLevel();
     if (globalLogLevel != null) {
@@ -47,6 +49,7 @@ public class EclipseLogWrapper extends AbstractScoutLogger {
     return m_level;
   }
 
+  @Override
   public void setLevel(int level) {
     m_level = level;
   }

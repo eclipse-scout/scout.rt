@@ -112,6 +112,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     setMultiplier(getConfiguredMultiplier());
   }
 
+  @Override
   public void setMinFractionDigits(int i) {
     try {
       setFieldChanging(true);
@@ -131,10 +132,12 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     }
   }
 
+  @Override
   public int getMinFractionDigits() {
     return m_minFractionDigits;
   }
 
+  @Override
   public void setMaxFractionDigits(int i) {
     try {
       setFieldChanging(true);
@@ -154,10 +157,12 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     }
   }
 
+  @Override
   public int getMaxFractionDigits() {
     return m_maxFractionDigits;
   }
 
+  @Override
   public void setPercent(boolean b) {
     m_percent = b;
     if (isInitialized()) {
@@ -167,10 +172,12 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     }
   }
 
+  @Override
   public boolean isPercent() {
     return m_percent;
   }
 
+  @Override
   public void setFractionDigits(int i) {
     m_fractionDigits = i;
     if (isInitialized()) {
@@ -178,10 +185,12 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     }
   }
 
+  @Override
   public int getFractionDigits() {
     return m_fractionDigits;
   }
 
+  @Override
   public void setFormat(String s) {
     m_format = s;
     if (isInitialized()) {
@@ -191,10 +200,12 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     }
   }
 
+  @Override
   public String getFormat() {
     return m_format;
   }
 
+  @Override
   public void setGroupingUsed(boolean b) {
     m_groupingUsed = b;
     if (isInitialized()) {
@@ -204,6 +215,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     }
   }
 
+  @Override
   public boolean isGroupingUsed() {
     return m_groupingUsed;
   }
@@ -213,6 +225,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     return CompareUtility.compareTo((Comparable) a, (Comparable) b);
   }
 
+  @Override
   public void setMinValue(T n) {
     try {
       setFieldChanging(true);
@@ -231,10 +244,12 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     }
   }
 
+  @Override
   public T getMinValue() {
     return m_minValue;
   }
 
+  @Override
   public void setMaxValue(T n) {
     try {
       setFieldChanging(true);
@@ -253,10 +268,12 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     }
   }
 
+  @Override
   public T getMaxValue() {
     return m_maxValue;
   }
 
+  @Override
   public void setMultiplier(int i) {
     m_multiplier = i;
     if (isInitialized()) {
@@ -264,10 +281,12 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
     }
   }
 
+  @Override
   public int getMultiplier() {
     return m_multiplier;
   }
 
+  @Override
   public IDecimalFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -322,6 +341,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
   }
 
   private class P_UIFacade implements IDecimalFieldUIFacade {
+    @Override
     public boolean setTextFromUI(String newText) {
       if (newText != null && newText.length() == 0) newText = null;
       // parse always, validity might change even if text is same

@@ -22,6 +22,7 @@ public class ArrayComparator implements Comparator<Object[]> {
     m_sortColumns = sortCols;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public int compare(Object[] a, Object[] b) {
     if (m_sortColumns == null || m_sortColumns.length == 0) return 0;

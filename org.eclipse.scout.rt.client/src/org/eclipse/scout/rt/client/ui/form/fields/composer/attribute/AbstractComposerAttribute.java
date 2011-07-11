@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 @Deprecated
 public abstract class AbstractComposerAttribute extends AbstractDataModelAttribute implements IComposerAttribute {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractComposerAttribute.class);
+  private static final long serialVersionUID = 1L;
 
   private String m_id;
 
@@ -77,11 +78,13 @@ public abstract class AbstractComposerAttribute extends AbstractDataModelAttribu
     }
   }
 
+  @Override
   public String getId() {
     if (m_id != null) return m_id;
     else return getClass().getSimpleName();
   }
 
+  @Override
   public void setId(String s) {
     m_id = s;
   }

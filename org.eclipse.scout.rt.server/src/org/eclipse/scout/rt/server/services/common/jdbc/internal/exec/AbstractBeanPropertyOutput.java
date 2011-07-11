@@ -42,30 +42,37 @@ abstract class AbstractBeanPropertyOutput implements IBindOutput {
     }
   }
 
+  @Override
   public IToken getToken() {
     return m_source;
   }
 
+  @Override
   public boolean isJdbcBind() {
     return !m_source.isSelectInto();
   }
 
+  @Override
   public int getJdbcBindIndex() {
     return m_jdbcBindIndex;
   }
 
+  @Override
   public void setJdbcBindIndex(int index) {
     m_jdbcBindIndex = index;
   }
 
+  @Override
   public boolean isBatch() {
     return m_source.isBatch();
   }
 
+  @Override
   public boolean isSelectInto() {
     return m_source.isSelectInto();
   }
 
+  @Override
   public Class getBindType() {
     return m_propertyType;
   }
@@ -74,6 +81,7 @@ abstract class AbstractBeanPropertyOutput implements IBindOutput {
     return m_batchIndex;
   }
 
+  @Override
   public void setNextBatchIndex(int i) {
     m_batchIndex = i;
   }
@@ -83,6 +91,7 @@ abstract class AbstractBeanPropertyOutput implements IBindOutput {
    */
   protected abstract Object[] getFinalBeanArray();
 
+  @Override
   public void finishBatch() throws ProcessingException {
     FastPropertyDescriptor desc = null;
     Object[] beans = getFinalBeanArray();
@@ -110,10 +119,12 @@ abstract class AbstractBeanPropertyOutput implements IBindOutput {
     }
   }
 
+  @Override
   public void setReplaceToken(ISqlStyle style) {
     m_source.setReplaceToken("?");
   }
 
+  @Override
   public void consumeValue(Object value) {
     m_accumulator.add(value);
   }

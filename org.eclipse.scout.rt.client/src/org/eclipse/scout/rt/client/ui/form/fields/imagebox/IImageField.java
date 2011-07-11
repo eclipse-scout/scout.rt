@@ -52,6 +52,7 @@ public interface IImageField extends IFormField, IDNDSupport {
 
   IMenu[] getMenus();
 
+  @Override
   IKeyStroke[] getKeyStrokes();
 
   boolean isAutoFit();

@@ -23,20 +23,24 @@ public class DefaultEvalVisitor implements IEvalVisitor {
     m_args = args;
   }
 
+  @Override
   public Object[] getArgs() {
     return m_args;
   }
 
+  @Override
   public TickSignal getSignal() {
     return m_signal;
   }
 
+  @Override
   public boolean toBoolean(Object o) {
     Boolean b = TypeCastUtility.castValue(o, Boolean.class);
     if (b == null) b = false;
     return b;
   }
 
+  @Override
   public int toInt(Object o) {
     Integer n = TypeCastUtility.castValue(o, Integer.class);
     if (n == null) n = 0;

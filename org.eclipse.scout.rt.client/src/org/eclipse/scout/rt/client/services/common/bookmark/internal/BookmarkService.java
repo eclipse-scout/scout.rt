@@ -71,6 +71,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   public void initializeService() {
     super.initializeService();
     addBookmarkServiceListener(new BookmarkServiceListener() {
+      @Override
       public void bookmarksChanged(BookmarkServiceEvent e) {
         handleBookmarksChangedInternal(e);
       }
@@ -83,10 +84,12 @@ public class BookmarkService extends AbstractService implements IBookmarkService
         //refresh global keystrokes
         final ArrayList<Bookmark> list = new ArrayList<Bookmark>();
         getBookmarkData().getUserBookmarks().visit(new IBookmarkVisitor() {
+          @Override
           public boolean visitFolder(List<BookmarkFolder> path) {
             return true;
           }
 
+          @Override
           public boolean visitBookmark(List<BookmarkFolder> path, Bookmark b) {
             if (b.getKeyStroke() != null) {
               list.add(b);
@@ -119,17 +122,20 @@ public class BookmarkService extends AbstractService implements IBookmarkService
     }
   }
 
+  @Override
   public void loadBookmarks() throws ProcessingException {
     IBookmarkStorageService storageService = SERVICES.getService(IBookmarkStorageService.class);
     importBookmarks(storageService.getBookmarkData());
   }
 
+  @Override
   public void storeBookmarks() throws ProcessingException {
     ServiceState state = getServiceState();
     IBookmarkStorageService storageService = SERVICES.getService(IBookmarkStorageService.class);
     importBookmarks(storageService.storeBookmarkData(state.m_model));
   }
 
+  @Override
   public void setStartBookmark() throws ProcessingException {
     ServiceState state = getServiceState();
     Bookmark b = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
@@ -137,11 +143,13 @@ public class BookmarkService extends AbstractService implements IBookmarkService
     state.m_model.getUserBookmarks().setStartupBookmark(b);
   }
 
+  @Override
   public void deleteStartBookmark() throws ProcessingException {
     ServiceState state = getServiceState();
     state.m_model.getUserBookmarks().setStartupBookmark(null);
   }
 
+  @Override
   public Bookmark getStartBookmark() {
     ServiceState state = getServiceState();
     Bookmark b = state.m_model.getUserBookmarks().getStartupBookmark();
@@ -151,11 +159,13 @@ public class BookmarkService extends AbstractService implements IBookmarkService
     return b;
   }
 
+  @Override
   public final BookmarkData getBookmarkData() {
     ServiceState state = getServiceState();
     return state.m_model;
   }
 
+  @Override
   public void activate(Bookmark b) throws ProcessingException {
     if (b != null) {
       try {
@@ -167,11 +177,13 @@ public class BookmarkService extends AbstractService implements IBookmarkService
     }
   }
 
+  @Override
   public void addBookmarkServiceListener(BookmarkServiceListener listener) {
     ServiceState state = getServiceState();
     state.m_listenerList.add(BookmarkServiceListener.class, listener);
   }
 
+  @Override
   public void removeBookmarkServiceListener(BookmarkServiceListener listener) {
     ServiceState state = getServiceState();
     state.m_listenerList.remove(BookmarkServiceListener.class, listener);

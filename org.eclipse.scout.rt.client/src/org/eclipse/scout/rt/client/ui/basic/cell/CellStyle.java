@@ -36,78 +36,97 @@ public class CellStyle implements ICellSpecialization {
     setHorizontalAlignment(cell.getHorizontalAlignment());
   }
 
+  @Override
   public CellStyle copy() {
     return new CellStyle(this);
   }
 
+  @Override
   public void setEnabled(boolean enabled) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void setTooltipText(String tooltip) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void setEditable(boolean editable) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public String getTooltipText() {
     return null;
   }
 
+  @Override
   public boolean isEnabled() {
     return true;
   }
 
+  @Override
   public boolean isEditable() {
     return false;
   }
 
+  @Override
   public CellStyle getCellStyle() {
     return this;
   }
 
+  @Override
   public ICellSpecialization reconcile(CellStyle cellStyle) {
     return cellStyle;
   }
 
+  @Override
   public String getIconId() {
     return m_iconId;
   }
 
+  @Override
   public void setIconId(String iconId) {
     m_iconId = iconId;
   }
 
+  @Override
   public String getBackgroundColor() {
     return m_backgroundColor;
   }
 
+  @Override
   public void setBackgroundColor(String backgroundColor) {
     m_backgroundColor = backgroundColor;
   }
 
+  @Override
   public String getForegroundColor() {
     return m_foregroundColor;
   }
 
+  @Override
   public void setForegroundColor(String foregroundColor) {
     m_foregroundColor = foregroundColor;
   }
 
+  @Override
   public FontSpec getFont() {
     return m_fontPattern != null ? FontSpec.parse(m_fontPattern) : null;
   }
 
+  @Override
   public void setFont(FontSpec font) {
     m_fontPattern = font != null ? font.toPattern() : null;
   }
 
+  @Override
   public int getHorizontalAlignment() {
     return m_horizontalAlignment;
   }
 
+  @Override
   public void setHorizontalAlignment(int horizontalAlignment) {
     m_horizontalAlignment = horizontalAlignment;
   }

@@ -33,18 +33,22 @@ public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITabl
     m_column = column;
   }
 
+  @Override
   public IColumn<Boolean> getColumn() {
     return m_column;
   }
 
+  @Override
   public Set<Boolean> getSelectedValues() {
     return m_selectedValues;
   }
 
+  @Override
   public void setSelectedValues(Set<Boolean> set) {
     m_selectedValues = set;
   }
 
+  @Override
   public List<LookupRow> createHistogram() {
     TreeMap<Boolean, LookupRow> hist = new TreeMap<Boolean, LookupRow>();
     HashMap<Boolean, Integer> countMap = new HashMap<Boolean, Integer>();
@@ -70,10 +74,12 @@ public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITabl
     return list;
   }
 
+  @Override
   public boolean isEmpty() {
     return (m_selectedValues == null || m_selectedValues.isEmpty());
   }
 
+  @Override
   public boolean accept(ITableRow row) {
     Boolean value = m_column.getValue(row);
     if (m_selectedValues != null) {

@@ -71,10 +71,12 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     super();
   }
 
+  @Override
   public IDataModel getDataModel() {
     return m_dataModel;
   }
 
+  @Override
   public void setDataModel(IDataModel dm) {
     m_dataModel = dm;
   }
@@ -236,6 +238,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
     // local enabled listener
     addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         if (m_tree != null) {
           m_tree.setEnabled(isEnabled());
@@ -259,6 +262,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     getTree().disposeTree();
   }
 
+  @Override
   public final ITree getTree() {
     return m_tree;
   }
@@ -288,10 +292,12 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
   }
 
+  @Override
   public IDataModelAttribute[] getAttributes() {
     return m_dataModel.getAttributes();
   }
 
+  @Override
   public IDataModelEntity[] getEntities() {
     return m_dataModel.getEntities();
   }
@@ -487,6 +493,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
   }
 
+  @Override
   public void resetValue() {
     if (m_initValue == null) {
       getTree().removeAllChildNodes(getTree().getRootNode());
@@ -505,6 +512,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     checkEmpty();
   }
 
+  @Override
   public EntityNode addEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, Object[] values, String[] texts) {
     EntityNode node = execCreateEntityNode(parentNode, e, negated, values, texts);
     if (node != null) {
@@ -514,6 +522,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     return node;
   }
 
+  @Override
   public EitherOrNode addEitherNode(ITreeNode parentNode, boolean negated) {
     EitherOrNode node = execCreateEitherNode(parentNode, negated);
     if (node != null) {
@@ -523,6 +532,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     return node;
   }
 
+  @Override
   public EitherOrNode addAdditionalOrNode(ITreeNode parentNode, boolean negated) {
     EitherOrNode node = execCreateAdditionalOrNode(parentNode, negated);
     if (node != null) {
@@ -532,6 +542,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     return node;
   }
 
+  @Override
   public AttributeNode addAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, Object[] values, String[] texts) {
     AttributeNode node = execCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
     if (node != null) {
@@ -573,6 +584,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       m_tree.setTreeChanging(true);
       //
       ITreeVisitor v = new ITreeVisitor() {
+        @Override
         public boolean visit(ITreeNode node) {
           if (!node.isStatusNonchanged()) {
             node.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
@@ -599,6 +611,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     return true;
   }
 
+  @Override
   public IComposerFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }

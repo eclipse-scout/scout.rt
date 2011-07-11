@@ -22,6 +22,7 @@ public class ArrayConsumer implements IDataConsumer {
     m_rows = new ArrayList<Object[]>();
   }
 
+  @Override
   public void processRow(int lineNr, List<Object> row) {
     m_rows.add(row.toArray());
   }

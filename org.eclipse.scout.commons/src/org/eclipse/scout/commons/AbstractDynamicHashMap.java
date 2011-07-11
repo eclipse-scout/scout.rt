@@ -83,6 +83,7 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
    */
   protected abstract boolean isEntryValid(DynamicEntry<V> e);
 
+  @Override
   public V get(Object key) {
     synchronized (internalMapLock) {
       beforeAccessToInternalMap();
@@ -94,6 +95,7 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
     }
   }
 
+  @Override
   public V put(K key, V value) {
     synchronized (internalMapLock) {
       beforeAccessToInternalMap();
@@ -127,6 +129,7 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
     }
   }
 
+  @Override
   public boolean containsKey(Object key) {
     synchronized (internalMapLock) {
       beforeAccessToInternalMap();
@@ -152,6 +155,7 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
     }
   }
 
+  @Override
   public V remove(Object key) {
     synchronized (internalMapLock) {
       beforeAccessToInternalMap();
@@ -163,12 +167,14 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
     }
   }
 
+  @Override
   public void clear() {
     synchronized (internalMapLock) {
       internalMap.clear();
     }
   }
 
+  @Override
   public int size() {
     synchronized (internalMapLock) {
       validateInternalMap();
@@ -184,6 +190,7 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
     }
   }
 
+  @Override
   public Set<K> keySet() {
     synchronized (internalMapLock) {
       validateInternalMap();
@@ -191,6 +198,7 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
     }
   }
 
+  @Override
   public Collection<V> values() {
     synchronized (internalMapLock) {
       validateInternalMap();
@@ -202,6 +210,7 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
     }
   }
 
+  @Override
   public Set<Map.Entry<K, V>> entrySet() {
     synchronized (internalMapLock) {
       validateInternalMap();

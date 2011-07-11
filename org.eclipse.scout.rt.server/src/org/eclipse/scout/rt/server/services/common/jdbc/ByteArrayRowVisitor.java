@@ -33,6 +33,7 @@ public class ByteArrayRowVisitor implements ISelectStreamHandler {
     out = new CompressedObjectWriter(INITIAL_BUFFER_SIZE, DEFLATER_BUFFER_SIZE);
   }
 
+  @Override
   public void handleRow(Connection con, PreparedStatement stm, ResultSet rs, int rowIndex, List<SqlBind> values) throws ProcessingException {
     Object[] row = new Object[values.size()];
     for (int i = 0; i < row.length; i++) {
@@ -46,6 +47,7 @@ public class ByteArrayRowVisitor implements ISelectStreamHandler {
     out.resetWrittenObjectCache();
   }
 
+  @Override
   public void finished(Connection con, PreparedStatement stm, ResultSet rs, int rowCount) throws ProcessingException {
   }
 

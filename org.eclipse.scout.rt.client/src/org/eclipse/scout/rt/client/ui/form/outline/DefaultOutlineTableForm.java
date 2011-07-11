@@ -53,10 +53,12 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
     return VIEW_ID_PAGE_TABLE;
   }
 
+  @Override
   public ITable getCurrentTable() {
     return getOutlineTableField().getTable();
   }
 
+  @Override
   public void setCurrentTable(ITable table) {
     getOutlineTableField().installTable(table);
   }

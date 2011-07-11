@@ -154,46 +154,57 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   /*
    * Properties
    */
+  @Override
   public String getIconId() {
     return propertySupport.getPropertyString(PROP_ICON_ID);
   }
 
+  @Override
   public void setIconId(String iconId) {
     propertySupport.setPropertyString(PROP_ICON_ID, iconId);
   }
 
+  @Override
   public Object getImage() {
     return propertySupport.getProperty(PROP_IMAGE);
   }
 
+  @Override
   public void setImage(Object nativeImg) {
     propertySupport.setProperty(PROP_IMAGE, nativeImg);
   }
 
+  @Override
   public int getSystemType() {
     return m_systemType;
   }
 
+  @Override
   public void setSystemType(int systemType) {
     m_systemType = systemType;
   }
 
+  @Override
   public boolean isProcessButton() {
     return m_processButton;
   }
 
+  @Override
   public void setProcessButton(boolean on) {
     m_processButton = on;
   }
 
+  @Override
   public boolean hasMenus() {
     return m_menus.length > 0;
   }
 
+  @Override
   public IMenu[] getMenus() {
     return m_menus;
   }
 
+  @Override
   public void doClick() throws ProcessingException {
     if (isEnabled() && isVisible()) {
       fireButtonClicked();
@@ -204,10 +215,12 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   /*
    * Radio Buttons
    */
+  @Override
   public Object getRadioValue() {
     return m_radioValue;
   }
 
+  @Override
   public void setRadioValue(Object o) {
     m_radioValue = o;
   }
@@ -215,6 +228,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   /**
    * Toggle and Radio Buttons
    */
+  @Override
   public boolean isSelected() {
     return propertySupport.getPropertyBool(PROP_SELECTED);
   }
@@ -222,6 +236,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   /**
    * Toggle and Radio Buttons
    */
+  @Override
   public void setSelected(boolean b) {
     boolean changed = propertySupport.setPropertyBool(PROP_SELECTED, b);
     // single observer for config
@@ -235,22 +250,27 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     }
   }
 
+  @Override
   public void disarm() {
     fireDisarmButton();
   }
 
+  @Override
   public void requestPopup() {
     fireRequestPopup();
   }
 
+  @Override
   public int getDisplayStyle() {
     return m_displayStyle;
   }
 
+  @Override
   public void setDisplayStyleInternal(int i) {
     m_displayStyle = i;
   }
 
+  @Override
   public IButtonUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -258,10 +278,12 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   /**
    * Model Observer
    */
+  @Override
   public void addButtonListener(ButtonListener listener) {
     m_listenerList.add(ButtonListener.class, listener);
   }
 
+  @Override
   public void removeButtonListener(ButtonListener listener) {
     m_listenerList.remove(ButtonListener.class, listener);
   }
@@ -307,6 +329,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * Default implementation for buttons
    */
   private class P_UIFacade implements IButtonUIFacade {
+    @Override
     public void fireButtonClickedFromUI() {
       try {
         if (isEnabled() && isVisible()) {
@@ -318,6 +341,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
       }
     }
 
+    @Override
     public IMenu[] fireButtonPopupFromUI() {
       return fireButtonPopup();
     }
@@ -325,6 +349,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     /**
      * Toggle and Radio Buttons
      */
+    @Override
     public void setSelectedFromUI(boolean b) {
       try {
         /*

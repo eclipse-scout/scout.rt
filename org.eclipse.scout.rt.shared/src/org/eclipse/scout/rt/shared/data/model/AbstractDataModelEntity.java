@@ -123,6 +123,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    * Runtime
    */
 
+  @Override
   public final void initEntity() throws ProcessingException {
     if (m_initialized) {
       return;
@@ -153,10 +154,12 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     }
   }
 
+  @Override
   public Permission getVisiblePermission() {
     return m_visiblePermission;
   }
 
+  @Override
   public void setVisiblePermission(Permission p) {
     m_visiblePermission = p;
     boolean b;
@@ -169,19 +172,23 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     setVisibleGranted(b);
   }
 
+  @Override
   public boolean isVisibleGranted() {
     return m_visibleGranted;
   }
 
+  @Override
   public void setVisibleGranted(boolean b) {
     m_visibleGranted = b;
     calculateVisible();
   }
 
+  @Override
   public boolean isVisible() {
     return m_visible;
   }
 
+  @Override
   public void setVisible(boolean b) {
     m_visibleProperty = b;
     calculateVisible();
@@ -195,30 +202,37 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     m_visible = m_visibleGranted && m_visibleProperty;
   }
 
+  @Override
   public String getIconId() {
     return m_iconId;
   }
 
+  @Override
   public void setIconId(String s) {
     m_iconId = s;
   }
 
+  @Override
   public String getText() {
     return m_text;
   }
 
+  @Override
   public void setText(String s) {
     m_text = s;
   }
 
+  @Override
   public IDataModelAttribute[] getAttributes() {
     return m_attributes.toArray(new IDataModelAttribute[0]);
   }
 
+  @Override
   public IDataModelEntity[] getEntities() {
     return m_entities.toArray(new IDataModelEntity[0]);
   }
 
+  @Override
   public IDataModelAttribute getAttribute(Class<? extends IDataModelAttribute> attributeClazz) {
     for (IDataModelAttribute attribute : m_attributes) {
       if (attribute.getClass() == attributeClazz) {
@@ -228,6 +242,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     return null;
   }
 
+  @Override
   public IDataModelEntity getEntity(Class<? extends IDataModelEntity> entityClazz) {
     for (IDataModelEntity entity : m_entities) {
       if (entity.getClass() == entityClazz) {
@@ -237,14 +252,17 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     return null;
   }
 
+  @Override
   public IDataModelEntity getParentEntity() {
     return m_parentEntity;
   }
 
+  @Override
   public void setParentEntity(IDataModelEntity parent) {
     m_parentEntity = parent;
   }
 
+  @Override
   public void initializeChildEntities(Map<Class<? extends IDataModelEntity>, IDataModelEntity> instanceMap) {
     if (!m_initializedChildEntities) {
       m_initializedChildEntities = true;

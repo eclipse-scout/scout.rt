@@ -48,14 +48,17 @@ class ArrayInput implements IBindInput {
     }
   }
 
+  @Override
   public IToken getToken() {
     return m_target;
   }
 
+  @Override
   public boolean isBatch() {
     return m_target.isBatch();
   }
 
+  @Override
   public boolean hasBatch(int i) {
     if (isBatch()) {
       return i < m_arrayLen;
@@ -65,10 +68,12 @@ class ArrayInput implements IBindInput {
     }
   }
 
+  @Override
   public void setNextBatchIndex(int i) {
     m_batchIndex = i;
   }
 
+  @Override
   public boolean isJdbcBind() {
     if (isBatch()) {
       if (m_target.isPlainValue()) {
@@ -86,14 +91,17 @@ class ArrayInput implements IBindInput {
     }
   }
 
+  @Override
   public int getJdbcBindIndex() {
     return m_jdbcBindIndex;
   }
 
+  @Override
   public void setJdbcBindIndex(int index) {
     m_jdbcBindIndex = index;
   }
 
+  @Override
   public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
     if (isBatch()) {
       Object value = null;

@@ -96,6 +96,7 @@ public class CodeTypeCache {
     ICodeType codeType = getCodeType(declaringCodeTypeClass);
     final Holder<ICode> codeHolder = new Holder<ICode>(ICode.class);
     ICodeVisitor v = new ICodeVisitor() {
+      @Override
       public boolean visit(ICode code, int treeLevel) {
         if (code.getClass() == type) {
           codeHolder.setValue(code);

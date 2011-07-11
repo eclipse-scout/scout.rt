@@ -108,58 +108,72 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
     }
   }
 
+  @Override
   public boolean isIntersecting(Date minDate, Date maxDate) {
     return DateUtility.intersects(m_start, m_end, minDate, maxDate);
   }
 
+  @Override
   public Long getPersonId() {
     return m_personId;
   }
 
+  @Override
   public void setPersonId(Long n) {
     m_personId = n;
   }
 
+  @Override
   public Date getStart() {
     return m_start;
   }
 
+  @Override
   public void setStart(Date a) {
     m_start = a;
   }
 
+  @Override
   public Date getEnd() {
     return m_end;
   }
 
+  @Override
   public void setEnd(Date a) {
     m_end = a;
   }
 
+  @Override
   public boolean isFullDay() {
     return m_fullDay;
   }
 
+  @Override
   public void setFullDay(boolean a) {
     m_fullDay = a;
   }
 
+  @Override
   public String getLocation() {
     return m_location;
   }
 
+  @Override
   public void setLocation(String a) {
     m_location = a;
   }
 
+  @Override
   public int getBusyStatus() {
     return m_busyStatus;
   }
 
+  @Override
   public void setBusyStatus(int a) {
     m_busyStatus = a;
   }
 
+  @Override
   public String[] getRecipientEmail() {
     return m_recipientEmail.toArray(new String[m_recipientEmail.size()]);
   }
@@ -168,10 +182,12 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
     m_recipientEmail.add(recipientEmail);
   }
 
+  @Override
   public void removeRecipientEmail(String recipientEmail) {
     m_recipientEmail.remove(recipientEmail);
   }
 
+  @Override
   public void removeAllRecipientEmail() {
     m_recipientEmail.clear();
   }
@@ -199,10 +215,12 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
     attributes.put("recipientEmail", m_recipientEmail);
   }
 
+  @Override
   public Serializable getExternalKey() {
     return m_externalKey;
   }
 
+  @Override
   public void setExternalKey(Serializable externalKey) {
     m_externalKey = externalKey;
   }

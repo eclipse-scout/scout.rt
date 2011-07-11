@@ -35,18 +35,22 @@ public class SmartColumnFilter<T> implements ITableColumnFilter<T> {
     m_column = column;
   }
 
+  @Override
   public IColumn<T> getColumn() {
     return m_column;
   }
 
+  @Override
   public Set<T> getSelectedValues() {
     return m_selectedValues;
   }
 
+  @Override
   public void setSelectedValues(Set<T> set) {
     m_selectedValues = set;
   }
 
+  @Override
   public List<LookupRow> createHistogram() {
     TreeMap<String, LookupRow> hist = new TreeMap<String, LookupRow>();
     HashMap<String, Integer> countMap = new HashMap<String, Integer>();
@@ -75,10 +79,12 @@ public class SmartColumnFilter<T> implements ITableColumnFilter<T> {
     return list;
   }
 
+  @Override
   public boolean isEmpty() {
     return m_selectedValues == null || m_selectedValues.isEmpty();
   }
 
+  @Override
   public boolean accept(ITableRow row) {
     T value = m_column.getValue(row);
     if (m_selectedValues != null) {

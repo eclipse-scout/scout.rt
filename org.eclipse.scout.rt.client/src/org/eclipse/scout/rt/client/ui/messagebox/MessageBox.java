@@ -216,90 +216,111 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     propertySupport.removePropertyChangeListener(propertyName, listener);
   }
 
+  @Override
   public String getTitle() {
     return m_title;
   }
 
+  @Override
   public void setTitle(String s) {
     m_title = s;
     m_copyPasteTextInternal = null;
   }
 
+  @Override
   public String getIntroText() {
     return m_introText;
   }
 
+  @Override
   public void setIntroText(String s) {
     m_introText = s;
     m_copyPasteTextInternal = null;
   }
 
+  @Override
   public String getActionText() {
     return m_actionText;
   }
 
+  @Override
   public void setActionText(String s) {
     m_actionText = s;
     m_copyPasteTextInternal = null;
   }
 
+  @Override
   public String getHiddenText() {
     return m_hiddenText;
   }
 
+  @Override
   public void setHiddenText(String s) {
     m_hiddenText = s;
     m_copyPasteTextInternal = null;
   }
 
+  @Override
   public String getYesButtonText() {
     return m_yesButtonText;
   }
 
+  @Override
   public void setYesButtonText(String s) {
     m_yesButtonText = s;
   }
 
+  @Override
   public String getNoButtonText() {
     return m_noButtonText;
   }
 
+  @Override
   public void setNoButtonText(String s) {
     m_noButtonText = s;
   }
 
+  @Override
   public String getCancelButtonText() {
     return m_cancelButtonText;
   }
 
+  @Override
   public void setCancelButtonText(String s) {
     m_cancelButtonText = s;
   }
 
+  @Override
   public String getIconId() {
     return m_iconId;
   }
 
+  @Override
   public void setIconId(String iconId) {
     m_iconId = iconId;
   }
 
+  @Override
   public int getSeverity() {
     return m_severity;
   }
 
+  @Override
   public void setSeverity(int severity) {
     m_severity = severity;
   }
 
+  @Override
   public long getAutoCloseMillis() {
     return m_autoCloseMillis;
   }
 
+  @Override
   public void setAutoCloseMillis(long millis) {
     m_autoCloseMillis = millis;
   }
 
+  @Override
   public String getCopyPasteText() {
     if (m_copyPasteText == null) {
       updateCopyPasteTextInternal();
@@ -310,6 +331,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     }
   }
 
+  @Override
   public void setCopyPasteText(String s) {
     m_copyPasteText = s;
   }
@@ -338,10 +360,12 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   /*
    * Model observer
    */
+  @Override
   public void addMessageBoxListener(MessageBoxListener listener) {
     m_listenerList.add(MessageBoxListener.class, listener);
   }
 
+  @Override
   public void removeMessageBoxListener(MessageBoxListener listener) {
     m_listenerList.remove(MessageBoxListener.class, listener);
   }
@@ -359,18 +383,22 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     }
   }
 
+  @Override
   public IMessageBoxUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
+  @Override
   public boolean isOpen() {
     return m_blockingCondition.isBlocking();
   }
 
+  @Override
   public int startMessageBox() {
     return startMessageBox(CANCEL_OPTION);
   }
 
+  @Override
   public int startMessageBox(int defaultResult) {
     m_answerSet = false;
     m_answer = defaultResult;
@@ -437,6 +465,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   private class P_UIFacade implements IMessageBoxUIFacade {
 
+    @Override
     public void setResultFromUI(int option) {
       switch (option) {
         case YES_OPTION:

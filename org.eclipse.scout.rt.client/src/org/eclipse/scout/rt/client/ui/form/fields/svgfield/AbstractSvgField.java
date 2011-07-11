@@ -91,14 +91,17 @@ public abstract class AbstractSvgField extends AbstractValueField<ScoutSVGModel>
     propertySupport.setProperty(PROP_SELECTED_ELEMENT, resolveElement(element));
   }
 
+  @Override
   public void addSvgFieldListener(ISvgFieldListener listener) {
     m_listenerList.add(ISvgFieldListener.class, listener);
   }
 
+  @Override
   public void removeSvgFieldListener(ISvgFieldListener listener) {
     m_listenerList.remove(ISvgFieldListener.class, listener);
   }
 
+  @Override
   public IMenu[] getMenus() {
     return m_menus;
   }
@@ -106,6 +109,7 @@ public abstract class AbstractSvgField extends AbstractValueField<ScoutSVGModel>
   /*
    * UI accessible
    */
+  @Override
   public ISvgFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }

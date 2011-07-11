@@ -54,6 +54,7 @@ public abstract class AbstractOutlineTableField extends AbstractTableField<ITabl
   @Override
   protected void execInitField() throws ProcessingException {
     m_tablePropertyListener = new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         if (e.getPropertyName().equals(ITable.PROP_TITLE)) {
           execTableTitleChanged();

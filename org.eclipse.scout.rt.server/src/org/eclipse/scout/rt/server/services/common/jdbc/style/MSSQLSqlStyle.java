@@ -34,14 +34,17 @@ public class MSSQLSqlStyle extends AbstractSqlStyle {
     return 1000;
   }
 
+  @Override
   public boolean isLargeString(String s) {
     return (s.length() > 4000);
   }
 
+  @Override
   public boolean isBlobEnabled() {
     return true;
   }
 
+  @Override
   public boolean isClobEnabled() {
     return true;
   }
@@ -56,6 +59,7 @@ public class MSSQLSqlStyle extends AbstractSqlStyle {
     return "TRUNC(" + attribute + ", 'MI')!=TRUNC(SYSDATE, 'MI')";
   }
 
+  @Override
   public void testConnection(Connection conn) throws SQLException {
     /*
      * Statement testStatement=null;

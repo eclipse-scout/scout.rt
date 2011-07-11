@@ -57,6 +57,7 @@ public class DefaultOutlineTreeForm extends AbstractForm implements IOutlineTree
   @Override
   protected void execInitForm() throws ProcessingException {
     m_desktopListener = new DesktopListener() {
+      @Override
       public void desktopChanged(DesktopEvent e) {
         switch (e.getType()) {
           case DesktopEvent.TYPE_OUTLINE_CHANGED: {

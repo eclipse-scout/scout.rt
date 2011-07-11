@@ -24,10 +24,12 @@ public class IntegerAtom extends AbstractNode implements INode {
     return m_value;
   }
 
+  @Override
   public void format(IFormatVisitor v) {
     v.print(m_value.toString());
   }
 
+  @Override
   public Object eval(IEvalVisitor v) {
     return m_value;
   }

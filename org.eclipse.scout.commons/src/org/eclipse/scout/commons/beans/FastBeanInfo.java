@@ -159,6 +159,7 @@ public class FastBeanInfo {
     Method[] result = null;
     final Class fc = c;
     result = AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
+      @Override
       public Method[] run() {
         return fc.getDeclaredMethods();
       }

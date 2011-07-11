@@ -17,10 +17,12 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
  */
 public class CreateServiceImmediatelySchedulingRule implements ISchedulingRule {
 
+  @Override
   public boolean contains(ISchedulingRule rule) {
     return rule == this;
   }
 
+  @Override
   public boolean isConflicting(ISchedulingRule rule) {
     return this.equals(rule);
   }

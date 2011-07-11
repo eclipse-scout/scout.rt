@@ -46,10 +46,12 @@ public abstract class AbstractSnapBox extends AbstractCompositeField implements 
     }
   }
 
+  @Override
   public final int getGridColumnCount() {
     return m_grid.getGridColumnCount();
   }
 
+  @Override
   public final int getGridRowCount() {
     return m_grid.getGridRowCount();
   }

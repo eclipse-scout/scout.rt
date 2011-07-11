@@ -35,9 +35,11 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   public VirtualPage() {
   }
 
+  @Override
   public void initPage() throws ProcessingException {
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public String getBookmarkIdentifier() {
     return null;
@@ -48,45 +50,57 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
     return null;
   }
 
+  @Override
   public IOutline getOutline() {
     return (IOutline) getTree();
   }
 
+  @Override
   public IPage getParentPage() {
     return (IPage) getParentNode();
   }
 
+  @Override
   public IPage getChildPage(final int childIndex) {
     return null;
   }
 
+  @Override
   public IPage[] getChildPages() {
     return new IPage[0];
   }
 
+  @Override
   public void pageActivatedNotify() {
   }
 
+  @Override
   public void pageDeactivatedNotify() {
   }
 
+  @Override
   public IForm getDetailForm() {
     return null;
   }
 
+  @Override
   public void setDetailForm(IForm form) {
   }
 
+  @Override
   public void dataChanged(Object... dataTypes) {
   }
 
+  @Override
   public final void reloadPage() throws ProcessingException {
   }
 
+  @Override
   public boolean isTableVisible() {
     return false;
   }
 
+  @Override
   public void setTableVisible(boolean b) {
   }
 

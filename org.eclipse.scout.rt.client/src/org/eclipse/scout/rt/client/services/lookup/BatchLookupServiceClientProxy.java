@@ -26,6 +26,7 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
   public BatchLookupServiceClientProxy() {
   }
 
+  @Override
   public LookupRow[][] getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
@@ -43,6 +44,7 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
     return split.getCombinedResults();
   }
 
+  @Override
   public LookupRow[][] getBatchDataByText(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
@@ -60,6 +62,7 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
     return split.getCombinedResults();
   }
 
+  @Override
   public LookupRow[][] getBatchDataByAll(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
@@ -77,6 +80,7 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
     return split.getCombinedResults();
   }
 
+  @Override
   public LookupRow[][] getBatchDataByRec(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {

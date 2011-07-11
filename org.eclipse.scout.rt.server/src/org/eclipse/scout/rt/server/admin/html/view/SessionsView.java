@@ -55,6 +55,7 @@ public class SessionsView extends DefaultView {
   @Override
   public void produceBody(HtmlComponent p) {
     p.linkAction("Clear sessions", new AbstractHtmlAction("clearSessions") {
+      @Override
       public void run() {
         ProcessInspector.getDefault().clearSessionInspectors();
       }
@@ -111,6 +112,7 @@ public class SessionsView extends DefaultView {
       p.focusAnchor();
     }
     p.startLinkAction(new AbstractHtmlAction("selectSession" + session.getInfo().getSessionId()) {
+      @Override
       public void run() {
         m_selectedSession = session;
       }
@@ -120,6 +122,7 @@ public class SessionsView extends DefaultView {
     p.endTableCell();
     p.startTableCell();
     p.startLinkAction(new AbstractHtmlAction("showServicesOf" + session.getInfo().getSessionId()) {
+      @Override
       public void run() {
         m_selectedSession = session;
         getAdminSession().getTopView().showServices();
@@ -129,6 +132,7 @@ public class SessionsView extends DefaultView {
     p.endLinkAction();
     p.raw("&nbsp;");
     p.startLinkAction(new AbstractHtmlAction("showCallsOf" + session.getInfo().getSessionId()) {
+      @Override
       public void run() {
         m_selectedSession = session;
         getAdminSession().getTopView().showCalls();

@@ -80,6 +80,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     m_table = table;
   }
 
+  @Override
   public int getRowIndex() {
     return m_rowIndex;
   }
@@ -88,10 +89,12 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     m_rowIndex = index;
   }
 
+  @Override
   public int getStatus() {
     return m_status;
   }
 
+  @Override
   public void setStatus(int status) {
     try {
       setRowChanging(true);
@@ -106,42 +109,52 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public boolean isStatusInserted() {
     return m_status == STATUS_INSERTED;
   }
 
+  @Override
   public void setStatusInserted() {
     setStatus(STATUS_INSERTED);
   }
 
+  @Override
   public boolean isStatusUpdated() {
     return m_status == STATUS_UPDATED;
   }
 
+  @Override
   public void setStatusUpdated() {
     setStatus(STATUS_UPDATED);
   }
 
+  @Override
   public boolean isStatusDeleted() {
     return m_status == STATUS_DELETED;
   }
 
+  @Override
   public void setStatusDeleted() {
     setStatus(STATUS_DELETED);
   }
 
+  @Override
   public boolean isStatusNonchanged() {
     return m_status == STATUS_NON_CHANGED;
   }
 
+  @Override
   public void setStatusNonchanged() {
     setStatus(STATUS_NON_CHANGED);
   }
 
+  @Override
   public boolean isEnabled() {
     return m_enabled;
   }
 
+  @Override
   public void setEnabled(boolean b) {
     try {
       setRowChanging(true);
@@ -156,14 +169,17 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public boolean isSelected() {
     return getTable().isSelectedRow(this);
   }
 
+  @Override
   public boolean isChecked() {
     return m_checked;
   }
 
+  @Override
   public void setChecked(boolean b) {
     if (m_checked != b) {
       try {
@@ -198,6 +214,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public boolean isFilterAccepted() {
     return m_filterAccepted;
   }
@@ -209,22 +226,27 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     m_filterAccepted = b;
   }
 
+  @Override
   public int getCellCount() {
     return m_cells.length;
   }
 
+  @Override
   public ICell getCell(IColumn column) {
     return getCell(column.getColumnIndex());
   }
 
+  @Override
   public ICell getCell(int columnIndex) {
     return m_cells[columnIndex];
   }
 
+  @Override
   public void setCell(IColumn column, ICell cell) throws ProcessingException {
     setCell(column.getColumnIndex(), cell);
   }
 
+  @Override
   public void setCell(int columnIndex, ICell cell) throws ProcessingException {
     if (cell != null) {
       try {
@@ -239,18 +261,22 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public Cell getCellForUpdate(IColumn column) {
     return getCellForUpdate(column.getColumnIndex());
   }
 
+  @Override
   public Cell getCellForUpdate(int columnIndex) {
     return m_cells[columnIndex];
   }
 
+  @Override
   public Object getCellValue(int columnIndex) {
     return m_cells[columnIndex].getValue();
   }
 
+  @Override
   public Object[] getKeyValues() {
     int[] keyColumns = getTable().getColumnSet().getKeyColumnIndexes();
     if (keyColumns.length == 0) {
@@ -263,10 +289,12 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     return pk;
   }
 
+  @Override
   public boolean isRowChanging() {
     return m_rowChanging > 0;
   }
 
+  @Override
   public void setRowChanging(boolean b) {
     if (b) {
       m_rowChanging++;
@@ -282,18 +310,22 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public boolean isRowPropertiesChanged() {
     return m_rowPropertiesChanged;
   }
 
+  @Override
   public void setRowPropertiesChanged(boolean b) {
     m_rowPropertiesChanged = b;
   }
 
+  @Override
   public boolean/* changed */setCellValue(int columnIndex, Object value) throws ProcessingException {
     return m_cells[columnIndex].setValue(value);
   }
 
+  @Override
   public boolean setCellValues(Object[] values) throws ProcessingException {
     boolean changed = false;
     for (int i = 0; i < values.length; i++) {
@@ -303,6 +335,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     return changed;
   }
 
+  @Override
   public ITable getTable() {
     return m_table;
   }
@@ -314,6 +347,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     m_table = table;
   }
 
+  @Override
   public void touch() throws ProcessingException {
     try {
       setRowChanging(true);
@@ -325,12 +359,14 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public void delete() throws ProcessingException {
     if (getTable() != null) {
       getTable().deleteRow(this);
     }
   }
 
+  @Override
   public void setBackgroundColor(String c) {
     try {
       setRowChanging(true);
@@ -344,6 +380,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public void setForegroundColor(String c) {
     try {
       setRowChanging(true);
@@ -357,6 +394,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public void setFont(FontSpec f) {
     try {
       setRowChanging(true);
@@ -370,6 +408,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public void setTooltipText(String s) {
     try {
       setRowChanging(true);
@@ -383,6 +422,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public void setIconId(String id) {
     try {
       setRowChanging(true);
@@ -395,28 +435,33 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public String getIconId() {
     return m_iconId;
   }
 
+  @Override
   public void moveToTop() {
     if (getTable() != null) {
       getTable().moveRow(getRowIndex(), 0);
     }
   }
 
+  @Override
   public void moveToBottom() {
     if (getTable() != null) {
       getTable().moveRow(getRowIndex(), getTable().getRowCount());
     }
   }
 
+  @Override
   public void moveUp() {
     if (getTable() != null) {
       getTable().moveRow(getRowIndex(), getRowIndex() - 1);
     }
   }
 
+  @Override
   public void moveDown() {
     if (getTable() != null) {
       getTable().moveRow(getRowIndex(), getRowIndex() + 1);
@@ -426,6 +471,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   /*
    * Implementation of ICellObserver
    */
+  @Override
   public Object validateValue(ICell cell, Object value) throws ProcessingException {
     Object oldValue = cell.getValue();
     if (CompareUtility.equals(oldValue, value)) {
@@ -451,6 +497,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
+  @Override
   public void cellChanged(ICell cell, int changedBit) {
     try {
       setRowChanging(true);

@@ -44,6 +44,7 @@ public class UserActivityManager {
   public UserActivityManager(IClientSession clientSession) {
     m_clientSession = clientSession;
     m_clientNotificationConsumerListener = new IClientNotificationConsumerListener() {
+      @Override
       public void handleEvent(ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification() instanceof UserActivityClientNotification) {
           updateCache(((UserActivityClientNotification) e.getClientNotification()).getUserStatusMap());
@@ -51,6 +52,7 @@ public class UserActivityManager {
       }
     };
     m_userActivityProviderListener = new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         providerStateChanged((Boolean) e.getNewValue() ? IUserActivityStateService.STATUS_ONLINE : IUserActivityStateService.STATUS_IDLE);
       }

@@ -31,6 +31,7 @@ public abstract class AbstractBookmarkStorageService extends AbstractService imp
   public AbstractBookmarkStorageService() {
   }
 
+  @Override
   public BookmarkData getBookmarkData() throws ProcessingException {
     Object userId = getCurrentUserId();
     BookmarkData newData = readBookmarks(userId);
@@ -40,6 +41,7 @@ public abstract class AbstractBookmarkStorageService extends AbstractService imp
     return newData;
   }
 
+  @Override
   public BookmarkData storeBookmarkData(BookmarkData newData) throws ProcessingException {
     Object userId = getCurrentUserId();
     BookmarkFolder existingUserFolder = readUserFolder(userId);
@@ -75,6 +77,7 @@ public abstract class AbstractBookmarkStorageService extends AbstractService imp
     return false;
   }
 
+  @Override
   public void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup) throws ProcessingException {
     //default is empty
   }

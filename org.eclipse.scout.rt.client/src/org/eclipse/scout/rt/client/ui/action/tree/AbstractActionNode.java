@@ -101,18 +101,22 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     return (List<T>) propertySupport.getProperty(PROP_CHILD_ACTIONS);
   }
 
+  @Override
   public boolean hasChildActions() {
     return getChildActionsInternal().size() > 0;
   }
 
+  @Override
   public int getChildActionCount() {
     return getChildActionsInternal().size();
   }
 
+  @Override
   public List<T> getChildActions() {
     return new ArrayList<T>(getChildActionsInternal());
   }
 
+  @Override
   public void setChildActions(List<T> newList) {
     propertySupport.setProperty(PROP_CHILD_ACTIONS, new ArrayList<T>(newList));
   }

@@ -25,10 +25,12 @@ public class DefaultPasswordPolicy implements IPasswordPolicy {
 
   private static final int MIN_PASSWORD_LENGTH = 8;
 
+  @Override
   public String getText() {
     return ScoutTexts.get("DefaultPasswordPolicyText");
   }
 
+  @Override
   @SuppressWarnings("null")
   public void check(String userId, String newPassword, String userName, int historyIndex) throws ProcessingException {
     if (newPassword == null || newPassword.length() < MIN_PASSWORD_LENGTH) {

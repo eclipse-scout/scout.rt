@@ -98,6 +98,7 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
     return new ScoutServerJobWrapperStatement(m_serverSession, m_subject, super.classBlock(notifier));
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
     // unpack wrapped ProcessingExceptions and rethrow them

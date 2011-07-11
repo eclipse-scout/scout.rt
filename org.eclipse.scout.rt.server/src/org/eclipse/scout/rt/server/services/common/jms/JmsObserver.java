@@ -262,6 +262,7 @@ public class JmsObserver {
      * The onMessage Method is called by JMS when a message has arrived for the
      * queue / topic that this listener listens to.
      */
+    @Override
     public final void onMessage(Message msg) {
       try {
         if (msg != null) {

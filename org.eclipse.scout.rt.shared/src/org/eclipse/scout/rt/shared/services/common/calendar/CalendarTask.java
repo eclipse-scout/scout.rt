@@ -101,40 +101,49 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
     }
   }
 
+  @Override
   public boolean isIntersecting(Date minDate, Date maxDate) {
     Date d = m_due;
     if (d == null) d = m_complete;
     return DateUtility.intersects(m_start, d, minDate, maxDate);
   }
 
+  @Override
   public Long getResponsibleId() {
     return m_responsibleId;
   }
 
+  @Override
   public void setResponsibleId(Long n) {
     m_responsibleId = n;
   }
 
+  @Override
   public Date getStart() {
     return m_start;
   }
 
+  @Override
   public void setStart(Date a) {
     m_start = a;
   }
 
+  @Override
   public Date getDue() {
     return m_due;
   }
 
+  @Override
   public void setDue(Date a) {
     m_due = a;
   }
 
+  @Override
   public Date getComplete() {
     return m_complete;
   }
 
+  @Override
   public void setComplete(Date a) {
     m_complete = a;
   }

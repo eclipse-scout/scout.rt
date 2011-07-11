@@ -113,6 +113,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
   public LookupRow[] getDataByText() throws ProcessingException {
     final Pattern pat = getSearchPattern(getText());
     P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
+      @Override
       public boolean visit(ICode code, int treeLevel) {
         if (m_filter != null && !m_filter.visit(CodeLookupCall.this, code, treeLevel)) {
           return true;
@@ -141,6 +142,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
   public LookupRow[] getDataByAll() throws ProcessingException {
     final Pattern pat = getSearchPattern(getAll());
     P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
+      @Override
       public boolean visit(ICode code, int treeLevel) {
         if (m_filter != null && !m_filter.visit(CodeLookupCall.this, code, treeLevel)) {
           return true;
@@ -173,6 +175,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
     }
     final Object key = recValue;
     P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
+      @Override
       public boolean visit(ICode code, int treeLevel) {
         if (m_filter != null && !m_filter.visit(CodeLookupCall.this, code, treeLevel)) {
           return true;

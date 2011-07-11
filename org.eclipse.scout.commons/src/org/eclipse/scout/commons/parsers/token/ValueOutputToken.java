@@ -30,18 +30,22 @@ public class ValueOutputToken implements IToken {
     }
   }
 
+  @Override
   public boolean isInput() {
     return false;
   }
 
+  @Override
   public boolean isOutput() {
     return true;
   }
 
+  @Override
   public String getParsedToken() {
     return m_parsedToken;
   }
 
+  @Override
   public String getReplaceToken() {
     if (m_replaceToken != null) {
       return m_replaceToken;
@@ -51,6 +55,7 @@ public class ValueOutputToken implements IToken {
     }
   }
 
+  @Override
   public void setReplaceToken(String s) {
     m_replaceToken = s;
   }

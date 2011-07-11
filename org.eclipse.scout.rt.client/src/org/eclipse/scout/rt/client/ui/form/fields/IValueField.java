@@ -71,6 +71,7 @@ public interface IValueField<T> extends IFormField, IHolder<T> {
   /**
    * get currently validated value
    */
+  @Override
   T getValue();
 
   /**
@@ -78,6 +79,7 @@ public interface IValueField<T> extends IFormField, IHolder<T> {
    * delegates to execValidateValue after setting the value calls
    * execChangedValue
    */
+  @Override
   void setValue(T o);
 
   /**

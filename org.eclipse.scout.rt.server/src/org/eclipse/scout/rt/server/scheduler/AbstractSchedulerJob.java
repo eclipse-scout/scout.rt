@@ -29,14 +29,17 @@ public abstract class AbstractSchedulerJob implements ISchedulerJob {
     m_jobId = jobId;
   }
 
+  @Override
   public String getGroupId() {
     return m_groupId;
   }
 
+  @Override
   public String getJobId() {
     return m_jobId;
   }
 
+  @Override
   public boolean acceptTick(TickSignal signal) {
     if (LOG.isDebugEnabled()) LOG.debug("task " + getJobId() + " at " + signal);
     int second = signal.getSecond();
@@ -57,6 +60,7 @@ public abstract class AbstractSchedulerJob implements ISchedulerJob {
     return accepted;
   }
 
+  @Override
   @ConfigOperation
   @Order(20)
   public void run(IScheduler scheduler, TickSignal signal) throws ProcessingException {
@@ -68,18 +72,22 @@ public abstract class AbstractSchedulerJob implements ISchedulerJob {
     return false;
   }
 
+  @Override
   public boolean isInterrupted() {
     return m_interrupted;
   }
 
+  @Override
   public void setInterrupted(boolean b) {
     m_interrupted = b;
   }
 
+  @Override
   public boolean isDisposed() {
     return m_disposed;
   }
 
+  @Override
   public void setDisposed(boolean b) {
     m_disposed = b;
   }

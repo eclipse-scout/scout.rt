@@ -129,6 +129,7 @@ public class GeneralView extends DefaultView {
       p.br();
       if (inst.acceptCall(IPingService.class.getName(), "ping")) {
         p.linkAction("IPingService.ping (click to toggle)", new AbstractHtmlAction("IPingService.ignore") {
+          @Override
           public void run() {
             inst.getIgnoredCallSet().clear();
             inst.getIgnoredCallSet().add(".*\\.IPingService\\.ping");
@@ -137,6 +138,7 @@ public class GeneralView extends DefaultView {
       }
       else {
         p.startLinkAction(new AbstractHtmlAction("IPingService.accept") {
+          @Override
           public void run() {
             inst.getIgnoredCallSet().clear();
           }
@@ -208,6 +210,7 @@ public class GeneralView extends DefaultView {
     }
 
     AbstractHtmlAction action = new AbstractHtmlAction("level=" + logLevel) {
+      @Override
       public void run() {
         if (logLevel >= 0 && logLevel <= 5) {
           ScoutLogManager.setGlobalLogLevel(logLevel);
@@ -228,6 +231,7 @@ public class GeneralView extends DefaultView {
       m_enabled = b;
     }
 
+    @Override
     public void run() {
       ProcessInspector.getDefault().setEnabled(m_enabled);
     }
@@ -241,6 +245,7 @@ public class GeneralView extends DefaultView {
       m_minutes = minutes;
     }
 
+    @Override
     public void run() {
       ProcessInspector.getDefault().setTimeout(m_minutes * 60000L);
     }
@@ -255,6 +260,7 @@ public class GeneralView extends DefaultView {
       m_activate = activate;
     }
 
+    @Override
     public void run() {
       if (m_activate) {
         ScoutLogManager.setGlobalLogLevel(IScoutLogger.LEVEL_ERROR);

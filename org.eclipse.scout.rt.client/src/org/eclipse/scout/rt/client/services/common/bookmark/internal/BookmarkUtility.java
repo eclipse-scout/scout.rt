@@ -389,7 +389,7 @@ public final class BookmarkUtility {
     return null;
   }
 
-  @SuppressWarnings({"unchecked", "deprecation"})
+  @SuppressWarnings("deprecation")
   private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean loadChildren) throws ProcessingException {
     ITable table = tablePage.getTable();
     // starts search form

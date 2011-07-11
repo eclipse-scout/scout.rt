@@ -33,6 +33,7 @@ public class SimpleProgressService extends AbstractService implements ISimplePro
   public SimpleProgressService() {
   }
 
+  @Override
   public ISimpleProgress addProgress(String name) {
     final Holder<SimpleProgress> monitorHolder = new Holder<SimpleProgress>(SimpleProgress.class);
     Job job = new Job(name) {
@@ -82,6 +83,7 @@ public class SimpleProgressService extends AbstractService implements ISimplePro
     }
   }
 
+  @Override
   public void removeProgress(ISimpleProgress monitor) {
     if (monitor != null) {
       monitor.done();

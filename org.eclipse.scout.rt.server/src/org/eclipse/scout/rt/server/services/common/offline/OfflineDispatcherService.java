@@ -34,7 +34,6 @@ import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistr
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
-import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.service.AbstractService;
@@ -72,10 +71,12 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     m_dispatcherThread.start();
   }
 
+  @Override
   public String getServerSessionClass() {
     return (m_serverSessionClass != null ? m_serverSessionClass.getName() : null);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void setServerSessionClass(String className) {
     int i = className.lastIndexOf('.');
@@ -87,6 +88,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public ServiceTunnelResponse dispatch(final ServiceTunnelRequest request, final IProgressMonitor monitor) {
     final Subject subject = Subject.getSubject(AccessController.getContext());
@@ -124,6 +126,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     final Holder<ServiceTunnelResponse> responseHolder = new Holder<ServiceTunnelResponse>(ServiceTunnelResponse.class);
     if ((!currentThread.isInterrupted()) && (monitor == null || !monitor.isCanceled())) {
       Runnable job = new Runnable() {
+        @Override
         public void run() {
           try {
             ServiceTunnelResponse res = dispatchInServerThread(request, subject);

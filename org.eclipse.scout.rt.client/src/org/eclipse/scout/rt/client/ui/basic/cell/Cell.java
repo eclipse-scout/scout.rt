@@ -83,6 +83,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public Object getValue() {
     return m_value;
   }
@@ -106,6 +107,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public String getText() {
     return m_text;
   }
@@ -119,6 +121,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public String getIconId() {
     return m_cellSpecialization.getIconId();
   }
@@ -131,6 +134,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public String getTooltipText() {
     return m_cellSpecialization.getTooltipText();
   }
@@ -150,6 +154,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public int getHorizontalAlignment() {
     return m_cellSpecialization.getHorizontalAlignment();
   }
@@ -162,6 +167,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public String getBackgroundColor() {
     return m_cellSpecialization.getBackgroundColor();
   }
@@ -174,6 +180,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public String getForegroundColor() {
     return m_cellSpecialization.getForegroundColor();
   }
@@ -186,6 +193,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public FontSpec getFont() {
     return m_cellSpecialization.getFont();
   }
@@ -200,6 +208,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public boolean isEnabled() {
     return m_cellSpecialization.isEnabled();
   }
@@ -219,6 +228,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public boolean isEditable() {
     return m_cellSpecialization.isEditable();
   }
@@ -242,6 +252,7 @@ public class Cell implements ICell {
     }
   }
 
+  @Override
   public ICellObserver getObserver() {
     return m_observer;
   }

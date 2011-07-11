@@ -29,6 +29,7 @@ public interface ICheckableTable extends ITable {
 
   void checkRow(int row, Boolean value) throws ProcessingException;
 
+  @Override
   ITableRow[] getCheckedRows();
 
   ITableRow getCheckedRow();

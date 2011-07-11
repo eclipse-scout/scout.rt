@@ -37,6 +37,7 @@ public class HolidayCalendarService extends AbstractService implements IHolidayC
 
   // minutes
 
+  @Override
   public ICalendarItem[] getItems(RemoteFile spec, Date minDate, Date maxDate) throws ProcessingException {
     // load new items
     HolidayCalendarItemParser p = null;

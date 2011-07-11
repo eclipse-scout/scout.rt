@@ -32,6 +32,7 @@ public class BeanArrayHolder<T extends Serializable> implements IBeanArrayHolder
     m_clazz = clazz;
   }
 
+  @Override
   public T addBean() {
     T ret = null;
     try {
@@ -48,6 +49,7 @@ public class BeanArrayHolder<T extends Serializable> implements IBeanArrayHolder
     return ret;
   }
 
+  @Override
   public void ensureSize(int size) {
     while (m_list.size() < size) {
       addBean();
@@ -62,10 +64,12 @@ public class BeanArrayHolder<T extends Serializable> implements IBeanArrayHolder
     m_stateList.remove(ret);
   }
 
+  @Override
   public Class<T> getHolderType() {
     return m_clazz;
   }
 
+  @Override
   public int getBeanCount(State... states) {
     if (states == null || states.length == 0) {
       return m_list.size();
@@ -87,6 +91,7 @@ public class BeanArrayHolder<T extends Serializable> implements IBeanArrayHolder
     return ret;
   }
 
+  @Override
   public T[] getBeans(State... states) {
     ArrayList<T> ret = new ArrayList<T>();
     EnumSet<State> state = EnumSet.noneOf(State.class);
@@ -111,10 +116,12 @@ public class BeanArrayHolder<T extends Serializable> implements IBeanArrayHolder
     return result;
   }
 
+  @Override
   public State getRowState(T bean) {
     return m_stateList.get(bean);
   }
 
+  @Override
   public void setRowState(T bean, State state) {
     m_stateList.put(bean, state);
   }

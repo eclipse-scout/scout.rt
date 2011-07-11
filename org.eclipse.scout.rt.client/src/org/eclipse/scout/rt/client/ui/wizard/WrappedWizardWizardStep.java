@@ -36,6 +36,7 @@ public class WrappedWizardWizardStep extends AbstractWizardStep {
   @Override
   protected void execActivate(int stepKind) throws ProcessingException {
     m_childWizard.addWizardListener(new WizardListener() {
+      @Override
       public void wizardChanged(WizardEvent e) {
         switch (e.getType()) {
           case WizardEvent.TYPE_CLOSED: {

@@ -25,14 +25,14 @@ import org.osgi.framework.Bundle;
 
 public class FilterConfigImpl implements FilterConfig {
   private ServletContext m_servletContext;
-  private IConfigurationElement m_serviceElement;
-  private Bundle m_definingBundle;
-  private HashMap<String, String> m_initParams;
-  private String m_alias;
+  private final IConfigurationElement m_serviceElement;
+  private final Bundle m_definingBundle;
+  private final HashMap<String, String> m_initParams;
+  private final String m_alias;
   // cache
   private Filter m_filter;
   private boolean m_destroyed;
-  private String m_equalityCode;
+  private final String m_equalityCode;
 
   public FilterConfigImpl(String alias, IConfigurationElement serviceElement, Bundle definingBundle) {
     m_alias = alias;
@@ -107,20 +107,23 @@ public class FilterConfigImpl implements FilterConfig {
     return this.m_equalityCode.equals(((FilterConfigImpl) o).m_equalityCode);
   }
 
+  @Override
   public String getFilterName() {
     String className = m_serviceElement.getAttribute("class");
     return className;
   }
 
+  @Override
   public String getInitParameter(String name) {
     return m_initParams.get(name);
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public Enumeration getInitParameterNames() {
     return new Vector<String>(m_initParams.keySet()).elements();
   }
 
+  @Override
   public ServletContext getServletContext() {
     return m_servletContext;
   }

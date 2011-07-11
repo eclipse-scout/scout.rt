@@ -163,10 +163,12 @@ public abstract class AbstractImageField extends AbstractFormField implements II
    * model observer
    */
 
+  @Override
   public void addImageFieldListener(ImageFieldListener listener) {
     m_listenerList.add(ImageFieldListener.class, listener);
   }
 
+  @Override
   public void removeImageFieldListener(ImageFieldListener listener) {
     m_listenerList.remove(ImageFieldListener.class, listener);
   }
@@ -203,106 +205,132 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     }
   }
 
+  @Override
   public Object getImage() {
     return propertySupport.getProperty(PROP_IMAGE);
   }
 
+  @Override
   public void setImage(Object imgObj) {
     propertySupport.setProperty(PROP_IMAGE, imgObj);
   }
 
+  @Override
   public String getImageId() {
     return propertySupport.getPropertyString(PROP_IMAGE_ID);
   }
 
+  @Override
   public void setImageId(String imageId) {
     propertySupport.setPropertyString(PROP_IMAGE_ID, imageId);
   }
 
+  @Override
   public IMenu[] getMenus() {
     return m_menus;
   }
 
+  @Override
   public double getZoomDeltaValue() {
     return m_zoomDelta;
   }
 
+  @Override
   public void setZoomDelta(double d) {
     m_zoomDelta = d;
   }
 
+  @Override
   public double getPanDelta() {
     return m_panDelta;
   }
 
+  @Override
   public void setPanDelta(double d) {
     m_panDelta = d;
   }
 
+  @Override
   public double getRotateDelta() {
     return m_rotateDelta;
   }
 
+  @Override
   public void setRotateDelta(double deg) {
     m_rotateDelta = deg;
   }
 
+  @Override
   public void setRotateDeltaInRadians(double rad) {
     setRotateDelta(Math.toDegrees(rad));
   }
 
+  @Override
   public AffineTransformSpec getImageTransform() {
     return new AffineTransformSpec((AffineTransformSpec) propertySupport.getProperty(PROP_IMAGE_TRANSFORM));
   }
 
+  @Override
   public void setImageTransform(AffineTransformSpec t) {
     propertySupport.setProperty(PROP_IMAGE_TRANSFORM, new AffineTransformSpec(t));
   }
 
+  @Override
   public boolean isFocusVisible() {
     return propertySupport.getPropertyBool(PROP_FOCUS_VISIBLE);
   }
 
+  @Override
   public void setFocusVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_FOCUS_VISIBLE, b);
   }
 
+  @Override
   public BoundsSpec getAnalysisRectangle() {
     return (BoundsSpec) propertySupport.getProperty(PROP_ANALYSIS_RECTANGLE);
   }
 
+  @Override
   public void setAnalysisRectangle(BoundsSpec rect) {
     propertySupport.setProperty(PROP_ANALYSIS_RECTANGLE, rect);
   }
 
+  @Override
   public void setAnalysisRectangle(int x, int y, int w, int h) {
     setAnalysisRectangle(new BoundsSpec(x, y, w, h));
   }
 
+  @Override
   public boolean isAutoFit() {
     return propertySupport.getPropertyBool(PROP_AUTO_FIT);
   }
 
+  @Override
   public void setAutoFit(boolean b) {
     propertySupport.setPropertyBool(PROP_AUTO_FIT, b);
   }
 
+  @Override
   public void setDragType(int dragType) {
     propertySupport.setPropertyInt(PROP_DRAG_TYPE, dragType);
   }
 
+  @Override
   public int getDragType() {
     return propertySupport.getPropertyInt(PROP_DRAG_TYPE);
   }
 
+  @Override
   public void setDropType(int dropType) {
     propertySupport.setPropertyInt(PROP_DROP_TYPE, dropType);
   }
 
+  @Override
   public int getDropType() {
     return propertySupport.getPropertyInt(PROP_DROP_TYPE);
   }
 
+  @Override
   public byte[] getByteArrayValue() {
     Object value = getImage();
     byte[] b = null;
@@ -312,14 +340,17 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     return b;
   }
 
+  @Override
   public void doAutoFit() {
     fireAutoFit();
   }
 
+  @Override
   public void doZoomRectangle(int x, int y, int w, int h) {
     fireZoomRectangle(new BoundsSpec(x, y, w, h));
   }
 
+  @Override
   public void doPan(double dx, double dy) {
     AffineTransformSpec t = getImageTransform();
     t.dx = dx;
@@ -327,6 +358,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setImageTransform(t);
   }
 
+  @Override
   public void doRelativePan(double dx, double dy) {
     AffineTransformSpec t = getImageTransform();
     t.dx = t.dx + dx;
@@ -334,6 +366,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setImageTransform(t);
   }
 
+  @Override
   public void doZoom(double fx, double fy) {
     AffineTransformSpec t = getImageTransform();
     t.sx = fx;
@@ -341,6 +374,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setImageTransform(t);
   }
 
+  @Override
   public void doRelativeZoom(double fx, double fy) {
     AffineTransformSpec t = getImageTransform();
     t.sx = t.sx * fx;
@@ -348,12 +382,14 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setImageTransform(t);
   }
 
+  @Override
   public void doRotate(double angle) {
     AffineTransformSpec t = getImageTransform();
     t.angle = angle;
     setImageTransform(t);
   }
 
+  @Override
   public void doRelativeRotate(double angleInDegrees) {
     AffineTransformSpec t = getImageTransform();
     t.angle = t.angle + Math.toRadians(angleInDegrees);
@@ -363,20 +399,24 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   /*
    * UI accessible
    */
+  @Override
   public IImageFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
   private class P_UIFacade implements IImageFieldUIFacade {
 
+    @Override
     public void setImageTransformFromUI(AffineTransformSpec t) {
       setImageTransform(t);
     }
 
+    @Override
     public IMenu[] firePopupFromUI() {
       return firePopup();
     }
 
+    @Override
     public TransferObject fireDragRequestFromUI() {
       TransferObject t = null;
       try {
@@ -388,6 +428,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
       return t;
     }
 
+    @Override
     public void fireDropActionFromUi(TransferObject scoutTransferable) {
       try {
         execDropRequest(scoutTransferable);

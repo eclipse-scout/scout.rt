@@ -31,7 +31,7 @@ import org.junit.runners.model.Statement;
  */
 public class ScoutClientTestRunner extends BlockJUnit4ClassRunner {
 
-  private IClientSession m_clientSession;
+  private final IClientSession m_clientSession;
 
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.TYPE)
@@ -65,6 +65,7 @@ public class ScoutClientTestRunner extends BlockJUnit4ClassRunner {
     return new ScoutClientJobWrapperStatement(m_clientSession, super.classBlock(notifier));
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
     // unpack wrapped ProcessingExceptions and rethrow them

@@ -59,6 +59,7 @@ public class ClientServiceFactory implements IServiceFactory {
     m_serviceClass = serviceClass;
   }
 
+  @Override
   public void serviceRegistered(final ServiceRegistration registration) throws Throwable {
     Boolean createImmediately = (Boolean) registration.getReference().getProperty(ServiceConstants.SERVICE_CREATE_IMMEDIATELY);
     if (createImmediately != null && createImmediately) {
@@ -75,6 +76,7 @@ public class ClientServiceFactory implements IServiceFactory {
     }
   }
 
+  @Override
   public Object getService(Bundle bundle, ServiceRegistration registration) {
     updateClassCache(registration);
     IClientSession session = ClientJob.getCurrentSession(m_sessionClass);
@@ -85,6 +87,7 @@ public class ClientServiceFactory implements IServiceFactory {
     return ServiceUtility.NULL_SERVICE;
   }
 
+  @Override
   public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
   }
 

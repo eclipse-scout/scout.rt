@@ -48,6 +48,7 @@ public class IconLocator implements IIconLocator {
     m_iconProviderServices = services.toArray(new IIconProviderService[services.size()]);
   }
 
+  @Override
   public IconSpec getIconSpec(String name) {
     if (name == null || AbstractIcons.Null.equals(name)) {
       return null;
@@ -63,6 +64,7 @@ public class IconLocator implements IIconLocator {
   }
 
   private class P_ServiceComparator implements Comparator<IIconProviderService> {
+    @Override
     public int compare(IIconProviderService o1, IIconProviderService o2) {
       if (o1 == null) {
         return -1;

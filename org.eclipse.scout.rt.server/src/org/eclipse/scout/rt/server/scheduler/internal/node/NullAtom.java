@@ -18,10 +18,12 @@ public class NullAtom extends AbstractNode implements INode {
   public NullAtom() {
   }
 
+  @Override
   public void format(IFormatVisitor v) {
     v.print("null");
   }
 
+  @Override
   public Object eval(IEvalVisitor v) {
     return null;
   }

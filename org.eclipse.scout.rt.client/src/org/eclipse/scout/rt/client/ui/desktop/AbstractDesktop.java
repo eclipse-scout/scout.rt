@@ -389,6 +389,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Runtime
    */
 
+  @Override
   public void initDesktop() throws ProcessingException {
     if (!m_desktopInited) {
       m_desktopInited = true;
@@ -407,14 +408,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public boolean isTrayVisible() {
     return m_trayVisible;
   }
 
+  @Override
   public void setTrayVisible(boolean b) {
     m_trayVisible = b;
   }
 
+  @Override
   public boolean isShowing(IForm form) {
     for (IForm f : m_viewStack) {
       if (f == form) {
@@ -429,6 +433,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return false;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends IForm> T findForm(Class<T> formType) {
     ArrayList<IForm> list = new ArrayList<IForm>();
@@ -442,6 +447,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return null;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends IOutline> T findOutline(Class<T> outlineType) {
     for (IOutline o : getAvailableOutlines()) {
@@ -452,22 +458,27 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return null;
   }
 
+  @Override
   public <T extends IAction> T findAction(Class<T> actionType) {
     return new ActionFinder().findAction(getActions(), actionType);
   }
 
+  @Override
   public <T extends IToolButton> T findToolButton(Class<T> toolButtonType) {
     return findAction(toolButtonType);
   }
 
+  @Override
   public <T extends IViewButton> T findViewButton(Class<T> viewButtonType) {
     return findAction(viewButtonType);
   }
 
+  @Override
   public IFormField getFocusOwner() {
     return fireFindFocusOwner();
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends IForm> T[] findForms(Class<T> formType) {
     ArrayList<T> resultList = new ArrayList<T>();
@@ -484,6 +495,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return resultList.toArray((T[]) Array.newInstance(formType, resultList.size()));
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends IForm> T findLastActiveForm(Class<T> formType) {
     if (m_lastActiveFormList != null && formType != null) {
@@ -496,14 +508,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return null;
   }
 
+  @Override
   public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
     return new ActionFinder().findAction(getMenus(), searchType);
   }
 
+  @Override
   public IForm[] getViewStack() {
     return m_viewStack.toArray(new IForm[0]);
   }
 
+  @Override
   public IForm[] getDialogStack() {
     return m_dialogStack.toArray(new IForm[0]);
   }
@@ -516,6 +531,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * @param form
    * @return
    */
+  @Override
   public IForm[] getSimilarViewForms(IForm form) {
     ArrayList<IForm> forms = new ArrayList<IForm>(3);
     try {
@@ -547,6 +563,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return forms.toArray(new IForm[forms.size()]);
   }
 
+  @Override
   public void ensureViewStackVisible() {
     IForm[] viewStack = getViewStack();
     for (IForm form : viewStack) {
@@ -554,6 +571,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public void ensureVisible(IForm form) {
     if (form != null) {
       if (m_viewStack.contains(form) || m_dialogStack.contains(form)) {
@@ -562,6 +580,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public void addForm(final IForm form) {
     if (form != null) {
       switch (form.getDisplayHint()) {
@@ -609,6 +628,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public void removeForm(IForm form) {
     if (form != null) {
       form.removeFormListener(m_activatedFormListener);
@@ -620,13 +640,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public IMessageBox[] getMessageBoxStack() {
     return m_messageBoxStack.toArray(new IMessageBox[0]);
   }
 
+  @Override
   public void addMessageBox(final IMessageBox mb) {
     m_messageBoxStack.add(mb);
     mb.addMessageBoxListener(new MessageBoxListener() {
+      @Override
       public void messageBoxChanged(MessageBoxEvent e) {
         switch (e.getType()) {
           case MessageBoxEvent.TYPE_CLOSED: {
@@ -642,19 +665,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_messageBoxStack.remove(mb);
   }
 
+  @Override
   public IOutline[] getAvailableOutlines() {
     return m_availableOutlines;
   }
 
+  @Override
   public void setAvailableOutlines(IOutline[] availableOutlines) {
     setOutline((IOutline) null);
     m_availableOutlines = availableOutlines != null ? availableOutlines : new IOutline[0];
   }
 
+  @Override
   public IOutline getOutline() {
     return m_outline;
   }
 
+  @Override
   public void setOutline(IOutline outline) {
     outline = resolveOutline(outline);
     if (m_outline == outline
@@ -755,6 +782,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return null;
   }
 
+  @Override
   public void setOutline(Class<? extends IOutline> outlineType) {
     for (IOutline o : getAvailableOutlines()) {
       if (o.getClass() == outlineType) {
@@ -764,15 +792,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public IKeyStroke[] getKeyStrokes() {
     return (IKeyStroke[]) propertySupport.getProperty(PROP_KEY_STROKES);
   }
 
+  @Override
   public void setKeyStrokes(IKeyStroke[] ks) {
     if (ks == null) ks = new IKeyStroke[0];
     propertySupport.setProperty(PROP_KEY_STROKES, ks);
   }
 
+  @Override
   public void addKeyStrokes(IKeyStroke... keyStrokes) {
     if (keyStrokes != null && keyStrokes.length > 0) {
       HashMap<String, IKeyStroke> map = new HashMap<String, IKeyStroke>();
@@ -786,6 +817,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public void removeKeyStrokes(IKeyStroke... keyStrokes) {
     if (keyStrokes != null && keyStrokes.length > 0) {
       HashMap<String, IKeyStroke> map = new HashMap<String, IKeyStroke>();
@@ -804,10 +836,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
   }
 
+  @Override
   public IMenu[] getMenus() {
     return m_menus;
   }
 
+  @Override
   public void prepareAllMenus() {
     for (IMenu child : getMenus()) {
       prepareMenuRec(child);
@@ -821,10 +855,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public IAction[] getActions() {
     return m_actions;
   }
 
+  @Override
   public IToolButton[] getToolButtons() {
     ArrayList<IToolButton> list = new ArrayList<IToolButton>(m_actions.length);
     for (IAction a : getActions()) {
@@ -835,6 +871,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return list.toArray(new IToolButton[list.size()]);
   }
 
+  @Override
   public IViewButton[] getViewButtons() {
     ArrayList<IViewButton> list = new ArrayList<IViewButton>(m_actions.length);
     for (IAction a : getActions()) {
@@ -845,10 +882,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return list.toArray(new IViewButton[list.size()]);
   }
 
+  @Override
   public IForm getPageDetailForm() {
     return m_pageDetailForm;
   }
 
+  @Override
   public void setPageDetailForm(IForm f) {
     if (m_pageDetailForm != f) {
       IForm oldForm = m_pageDetailForm;
@@ -862,10 +901,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public IForm getPageSearchForm() {
     return m_pageSearchForm;
   }
 
+  @Override
   public void setPageSearchForm(IForm f) {
     setPageSearchForm(f, false);
   }
@@ -883,10 +924,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public IOutlineTableForm getOutlineTableForm() {
     return m_outlineTableForm;
   }
 
+  @Override
   public void setOutlineTableForm(IOutlineTableForm f) {
     if (f != m_outlineTableForm) {
       if (m_outlineTableForm != null) {
@@ -903,10 +946,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public boolean isOutlineTableFormVisible() {
     return m_outlineTableFormVisible;
   }
 
+  @Override
   public void setOutlineTableFormVisible(boolean b) {
     if (m_outlineTableFormVisible != b) {
       m_outlineTableFormVisible = b;
@@ -921,10 +966,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public ITable getPageDetailTable() {
     return m_pageDetailTable;
   }
 
+  @Override
   public void setPageDetailTable(ITable t) {
     if (m_pageDetailTable != t) {
       ITable oldTable = m_pageDetailTable;
@@ -938,22 +985,27 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public String getTitle() {
     return propertySupport.getPropertyString(PROP_TITLE);
   }
 
+  @Override
   public void setTitle(String s) {
     propertySupport.setPropertyString(PROP_TITLE, s);
   }
 
+  @Override
   public IProcessingStatus getStatus() {
     return (IProcessingStatus) propertySupport.getProperty(PROP_STATUS);
   }
 
+  @Override
   public void setStatus(IProcessingStatus status) {
     propertySupport.setProperty(PROP_STATUS, status);
   }
 
+  @Override
   public void setStatusText(String s) {
     if (s != null) {
       setStatus(new ProcessingStatus(s, null, 0, IProcessingStatus.INFO));
@@ -963,6 +1015,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public void printDesktop(PrintDevice device, Map<String, Object> parameters) {
     try {
       firePrint(device, parameters);
@@ -973,18 +1026,22 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public void addFileChooser(IFileChooser fc) {
     fireFileChooserAdded(fc);
   }
 
+  @Override
   public boolean isAutoPrefixWildcardForTextSearch() {
     return m_autoPrefixWildcardForTextSearch;
   }
 
+  @Override
   public void setAutoPrefixWildcardForTextSearch(boolean b) {
     m_autoPrefixWildcardForTextSearch = b;
   }
 
+  @Override
   public boolean isOpened() {
     return propertySupport.getPropertyBool(PROP_OPENED);
   }
@@ -997,18 +1054,22 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, guiAvailable);
   }
 
+  @Override
   public boolean isGuiAvailable() {
     return propertySupport.getPropertyBool(PROP_GUI_AVAILABLE);
   }
 
+  @Override
   public void addDesktopListener(DesktopListener l) {
     m_listenerList.add(DesktopListener.class, l);
   }
 
+  @Override
   public void removeDesktopListener(DesktopListener l) {
     m_listenerList.remove(DesktopListener.class, l);
   }
 
+  @Override
   public void addDataChangeListener(DataChangeListener listener, Object... dataTypes) {
     if (dataTypes == null || dataTypes.length == 0) {
       EventListenerList list = m_dataChangeListenerList.get(null);
@@ -1032,6 +1093,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public void removeDataChangeListener(DataChangeListener listener, Object... dataTypes) {
     if (dataTypes == null || dataTypes.length == 0) {
       for (Iterator<EventListenerList> it = m_dataChangeListenerList.values().iterator(); it.hasNext();) {
@@ -1057,6 +1119,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public void dataChanged(Object... dataTypes) {
     if (dataTypes != null && dataTypes.length > 0) {
       HashMap<DataChangeListener, Set<Object>> map = new HashMap<DataChangeListener, Set<Object>>();
@@ -1196,30 +1259,36 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public void activateBookmark(Bookmark bm, boolean forceReload) throws ProcessingException {
     BookmarkUtility.activateBookmark(this, bm, forceReload);
   }
 
+  @Override
   public Bookmark createBookmark() throws ProcessingException {
     return BookmarkUtility.createBookmark(this);
   }
 
+  @Override
   public void refreshPages(Class... pageTypes) {
     for (IOutline outline : getAvailableOutlines()) {
       outline.refreshPages(pageTypes);
     }
   }
 
+  @Override
   public void releaseUnusedPages() {
     for (IOutline outline : getAvailableOutlines()) {
       outline.releaseUnusedPages();
     }
   }
 
+  @Override
   public void afterTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
     execTablePageLoaded(tablePage);
   }
 
+  @Override
   public void closeInternal() throws ProcessingException {
     for (IForm view : getViewStack()) {
       removeForm(view);
@@ -1256,6 +1325,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return false;
   }
 
+  @Override
   public IDesktopUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -1265,6 +1335,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   private class P_UIFacade implements IDesktopUIFacade {
 
+    @Override
     public void fireGuiAttached() {
       try {
         setGuiAvailableInternal(true);
@@ -1278,6 +1349,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
+    @Override
     public void fireGuiDetached() {
       try {
         setGuiAvailableInternal(false);
@@ -1291,6 +1363,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
+    @Override
     public void fireDesktopOpenedFromUI() {
       try {
         setOpenedInternal(true);
@@ -1304,11 +1377,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
+    @Override
     public void fireDesktopClosingFromUI() {
       setOpenedInternal(false);
       ClientSyncJob.getCurrentSession().stopSession();
     }
 
+    @Override
     public IMenu[] fireTrayPopupFromUI() {
       return fireTrayPopup();
     }
@@ -1348,6 +1423,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(IOutline.PROP_DETAIL_FORM)) {
         setPageDetailForm(((IOutline) e.getSource()).getDetailForm());
@@ -1362,6 +1438,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   private class P_ActivatedFormListener implements FormListener {
+    @Override
     public void formChanged(FormEvent e) throws ProcessingException {
       if (m_lastActiveFormList == null) {
         m_lastActiveFormList = new LinkedList<WeakReference<IForm>>();
@@ -1385,6 +1462,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @Override
   public void changeVisibilityAfterOfflineSwitch() {
     return;
   }

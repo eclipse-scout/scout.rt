@@ -92,6 +92,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
     }
   }
 
+  @Override
   public void init() {
     //init tree structure
     for (IDataModelEntity e : getEntities()) {
@@ -112,14 +113,17 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
     }
   }
 
+  @Override
   public IDataModelAttribute[] getAttributes() {
     return m_attributes;
   }
 
+  @Override
   public IDataModelEntity[] getEntities() {
     return m_entities;
   }
 
+  @Override
   public IDataModelAttribute getAttribute(Class<? extends IDataModelAttribute> attributeClazz) {
     for (IDataModelAttribute attribute : m_attributes) {
       if (attribute.getClass() == attributeClazz) {
@@ -129,6 +133,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
     return null;
   }
 
+  @Override
   public IDataModelEntity getEntity(Class<? extends IDataModelEntity> entityClazz) {
     for (IDataModelEntity entity : m_entities) {
       if (entity.getClass() == entityClazz) {

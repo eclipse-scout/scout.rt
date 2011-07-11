@@ -44,14 +44,17 @@ public class ServerJobServletFilter implements Filter {
 
   private FilterConfigInjection m_injection;
 
+  @Override
   public void init(FilterConfig config0) throws ServletException {
     m_injection = new FilterConfigInjection(config0, getClass());
   }
 
+  @Override
   public void destroy() {
     m_injection = null;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public void doFilter(ServletRequest sreq, ServletResponse sres, FilterChain chain) throws IOException, ServletException {
     FilterConfigInjection.FilterConfig config = m_injection.getConfig(sreq);

@@ -60,6 +60,7 @@ public class BasicPropertySupport implements IEventListenerSource {
     }
   }
 
+  @Override
   public void dumpListenerList(IEventListenerSnapshot snapshot) {
     synchronized (m_listenerLock) {
       if (m_listeners != null) {

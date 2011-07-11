@@ -44,14 +44,17 @@ final class SqlParserToken {
     public AbstractToken() {
     }
 
+    @Override
     public String getText() {
       return m_text;
     }
 
+    @Override
     public void setText(String text) {
       m_text = text;
     }
 
+    @Override
     public void addChild(IToken child) {
       if (m_children == null) {
         m_children = new ArrayList<IToken>();
@@ -59,6 +62,7 @@ final class SqlParserToken {
       m_children.add(child);
     }
 
+    @Override
     public void addChildren(List<IToken> children) {
       if (m_children == null) {
         m_children = new ArrayList<IToken>();
@@ -66,11 +70,13 @@ final class SqlParserToken {
       m_children.addAll(children);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<IToken> getChildren() {
       return m_children != null ? m_children : Collections.EMPTY_LIST;
     }
 
+    @Override
     public void addComment(Comment c) {
       if (m_comments == null) {
         m_comments = new ArrayList<Comment>();
@@ -78,6 +84,7 @@ final class SqlParserToken {
       m_comments.add(c);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<Comment> getComments() {
       return m_comments != null ? m_comments : Collections.EMPTY_LIST;

@@ -95,7 +95,6 @@ public class JUnitTestClassBrowser {
    *         <li>{@link #acceptClass(Bundle, Class)}</li>
    *         </ol>
    */
-  @SuppressWarnings("restriction")
   public List<Class<?>> collectAllJUnitTestClasses() {
     boolean dev = Platform.inDevelopmentMode();
     if (dev) {

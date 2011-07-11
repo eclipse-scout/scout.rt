@@ -26,16 +26,19 @@ public abstract class AbstractPasswordManagementService extends AbstractService 
     setPasswordPolicy(new DefaultPasswordPolicy());
   }
 
+  @Override
   public void changePassword(String userId, String oldPassword, String newPassword) throws ProcessingException {
     checkAccess(userId, oldPassword);
     resetPassword(userId, newPassword);
   }
 
+  @Override
   public void resetPassword(String userId, String newPassword) throws ProcessingException {
     getPasswordPolicy().check(userId, newPassword, getUsernameFor(userId), getHistoryIndexFor(userId, newPassword));
     resetPasswordInternal(userId, newPassword);
   }
 
+  @Override
   public String getPasswordPolicyText() {
     return getPasswordPolicy().getText();
   }

@@ -44,6 +44,7 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
   private boolean m_active;
   private final WeakHashMap<IForm, String> m_formToIdentifierMap;
   private final FormListener m_formListener = new FormListener() {
+    @Override
     public void formChanged(FormEvent e) throws ProcessingException {
       //auto-detach
       if (!m_active) {
@@ -66,10 +67,12 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
     m_formToIdentifierMap = new WeakHashMap<IForm, String>();
   }
 
+  @Override
   public void addNotify() {
     m_active = true;
   }
 
+  @Override
   public void removeNotify() {
     m_active = false;
   }
@@ -77,6 +80,7 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
   /**
    * Attaches listener on table page search forms
    */
+  @Override
   public void pageCreated(IPage p) throws ProcessingException {
   }
 
@@ -176,12 +180,15 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
     //nop
   }
 
+  @Override
   public void afterOutlineSelectionChanged(final IDesktop desktop) {
   }
 
+  @Override
   public void beforeTablePageLoadData(IPageWithTable<?> page) {
   }
 
+  @Override
   public void afterTablePageLoadData(IPageWithTable<?> page) {
   }
 

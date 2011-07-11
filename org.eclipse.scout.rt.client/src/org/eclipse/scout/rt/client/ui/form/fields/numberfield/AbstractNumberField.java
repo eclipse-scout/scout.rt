@@ -67,6 +67,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractValu
     setGroupingUsed(getConfiguredGroupingUsed());
   }
 
+  @Override
   public void setFormat(String s) {
     m_format = s;
     if (isInitialized()) {
@@ -76,10 +77,12 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractValu
     }
   }
 
+  @Override
   public String getFormat() {
     return m_format;
   }
 
+  @Override
   public void setGroupingUsed(boolean b) {
     m_groupingUsed = b;
     if (isInitialized()) {
@@ -89,10 +92,12 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractValu
     }
   }
 
+  @Override
   public boolean isGroupingUsed() {
     return m_groupingUsed;
   }
 
+  @Override
   public void setMinValue(T n) {
     try {
       setFieldChanging(true);
@@ -111,10 +116,12 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractValu
     }
   }
 
+  @Override
   public T getMinValue() {
     return m_minValue;
   }
 
+  @Override
   public void setMaxValue(T n) {
     try {
       setFieldChanging(true);
@@ -133,6 +140,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractValu
     }
   }
 
+  @Override
   public T getMaxValue() {
     return m_maxValue;
   }
@@ -182,11 +190,13 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractValu
     return fmt;
   }
 
+  @Override
   public INumberFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
   private class P_UIFacade implements INumberFieldUIFacade {
+    @Override
     public boolean setTextFromUI(String newText) {
       if (newText != null && newText.length() == 0) newText = null;
       // parse always, validity might change even if text is same

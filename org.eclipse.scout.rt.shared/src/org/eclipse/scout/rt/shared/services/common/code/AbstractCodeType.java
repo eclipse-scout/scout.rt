@@ -229,24 +229,30 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
    * public T getId(){ return ID; }
    * </pre>
    */
+  @Override
   public abstract T getId();
 
+  @Override
   public String getText() {
     return m_text;
   }
 
+  @Override
   public String getIconId() {
     return m_iconId;
   }
 
+  @Override
   public boolean isHierarchy() {
     return m_hierarchy;
   }
 
+  @Override
   public int getMaxLevel() {
     return m_maxLevel;
   }
 
+  @Override
   public ICode getCode(Object id) {
     ICode c = m_rootCodeMap.get(id);
     if (c == null) {
@@ -261,6 +267,7 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
     return c;
   }
 
+  @Override
   public ICode getCodeByExtKey(Object extKey) {
     ICode c = null;
     for (Iterator<ICode> it = m_rootCodeList.iterator(); it.hasNext();) {
@@ -278,11 +285,13 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
     return c;
   }
 
+  @Override
   public int getCodeIndex(final Object id) {
     final IntegerHolder result = new IntegerHolder(-1);
     ICodeVisitor v = new ICodeVisitor() {
       private int index = 0;
 
+      @Override
       public boolean visit(ICode code, int treeLevel) {
         if (CompareUtility.equals(code.getId(), id)) {
           result.setValue(index);
@@ -297,11 +306,13 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
     return result.getValue();
   }
 
+  @Override
   public int getCodeIndex(final ICode c) {
     final IntegerHolder result = new IntegerHolder(-1);
     ICodeVisitor v = new ICodeVisitor() {
       private int index = 0;
 
+      @Override
       public boolean visit(ICode code, int treeLevel) {
         if (code == c) {
           result.setValue(index);
@@ -316,10 +327,12 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
     return result.getValue();
   }
 
+  @Override
   public ICode[] getCodes() {
     return getCodes(true);
   }
 
+  @Override
   public ICode[] getCodes(boolean activeOnly) {
     ArrayList<ICode> list = new ArrayList<ICode>(m_rootCodeList);
     if (activeOnly) {
@@ -404,6 +417,7 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
     }
     //3 mark all chidren of inactive codes also as inactive
     visit(new ICodeVisitor() {
+      @Override
       public boolean visit(ICode code, int treeLevel) {
         if (code.getParentCode() != null) {
           if (!code.getParentCode().isActive() && code.isActive()) {
@@ -429,10 +443,12 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
     return "CodeType[id=" + getId() + ", label=" + getText() + "]";
   }
 
+  @Override
   public boolean visit(ICodeVisitor visitor) {
     return visit(visitor, true);
   }
 
+  @Override
   public boolean visit(ICodeVisitor visitor, boolean activeOnly) {
     ICode[] a = getCodes(activeOnly);
     for (int i = 0; i < a.length; i++) {

@@ -55,6 +55,7 @@ public class PermissionServiceClientProxy extends AbstractService implements IPe
     }
   }
 
+  @Override
   public BundleClassDescriptor[] getAllPermissionClasses() {
     ServiceState state = getServiceState();
     checkCache(state);

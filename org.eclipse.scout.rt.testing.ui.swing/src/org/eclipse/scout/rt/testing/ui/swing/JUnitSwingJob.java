@@ -48,6 +48,7 @@ public class JUnitSwingJob extends Job {
     //wait until the application is showing
     try {
       TestingUtility.waitUntil(IGuiMock.WAIT_TIMEOUT, new WaitCondition<Object>() {
+        @Override
         public Object run() {
           try {
             IClientSession session = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(m_clientSessionClass);

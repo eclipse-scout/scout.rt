@@ -68,20 +68,24 @@ public abstract class AbstractLongColumn extends AbstractColumn<Long> implements
   /*
    * Runtime
    */
+  @Override
   public void setFormat(String s) {
     m_format = s;
     m_fmt = null;
   }
 
+  @Override
   public String getFormat() {
     return m_format;
   }
 
+  @Override
   public void setGroupingUsed(boolean b) {
     m_groupingUsed = b;
     m_fmt = null;
   }
 
+  @Override
   public boolean isGroupingUsed() {
     return m_groupingUsed;
   }
@@ -124,6 +128,7 @@ public abstract class AbstractLongColumn extends AbstractColumn<Long> implements
     }
   }
 
+  @Override
   public NumberFormat getNumberFormat() {
     if (m_fmt == null) {
       if (getFormat() != null) {

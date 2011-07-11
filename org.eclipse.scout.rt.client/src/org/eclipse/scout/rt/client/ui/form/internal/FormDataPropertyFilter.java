@@ -23,6 +23,7 @@ public class FormDataPropertyFilter implements IPropertyFilter {
   public FormDataPropertyFilter() {
   }
 
+  @Override
   public boolean accept(FastPropertyDescriptor descriptor) {
     Class<?> propertyType = descriptor.getPropertyType();
     if (propertyType == null) {

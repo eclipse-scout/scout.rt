@@ -24,11 +24,13 @@ public class NotToken extends AbstractNode implements INode {
     return m_node;
   }
 
+  @Override
   public void format(IFormatVisitor v) {
     v.print("!");
     m_node.format(v);
   }
 
+  @Override
   public Object eval(IEvalVisitor v) {
     boolean b = v.toBoolean(m_node.eval(v));
     return !b;

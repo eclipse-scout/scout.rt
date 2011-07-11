@@ -104,6 +104,7 @@ public class POP3Adapter {
   public Message[] getUnseenMessages(final Flags.Flag markAfterRead) throws ProcessingException {
     final ArrayList<Message> list = new ArrayList<Message>();
     visitUnseenMessages(getDefaultFolderName(), new IPOP3MessageVisitor() {
+      @Override
       public boolean visit(Message m) throws MessagingException {
         list.add(m);
         m.setFlag(markAfterRead, true);

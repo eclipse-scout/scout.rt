@@ -42,6 +42,7 @@ public abstract class AbstractIconProviderService extends AbstractService implem
     }
   }
 
+  @Override
   public int getRanking() {
     return m_ranking;
   }
@@ -63,6 +64,7 @@ public abstract class AbstractIconProviderService extends AbstractService implem
     return m_iconExtensionsArray;
   }
 
+  @Override
   public IconSpec getIconSpec(String iconName) {
     String name = iconName;
     if (StringUtility.isNullOrEmpty(name)) {

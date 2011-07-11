@@ -284,6 +284,7 @@ public final class BundleInspector {
       this.prefixList = prefixList;
     }
 
+    @Override
     public int compare(Bundle b1, Bundle b2) {
       int b1SortIndex = getBundleSortIndex(b1);
       int b2SortIndex = getBundleSortIndex(b2);
@@ -314,6 +315,7 @@ public final class BundleInspector {
     public BundleComparator() {
     }
 
+    @Override
     public int compare(Bundle b1, Bundle b2) {
       int b1SortIndex = getBundleSortIndex(b1, b1.getSymbolicName());
       int b2SortIndex = getBundleSortIndex(b2, b2.getSymbolicName());

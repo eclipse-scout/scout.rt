@@ -61,6 +61,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
     f.markSaved();
     //automatic save when value changes
     f.addPropertyChangeListener(IBooleanField.PROP_VALUE, new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         try {
           completeEdit(row, f);

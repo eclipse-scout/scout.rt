@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 public class BookmarkChangedClientNotification extends AbstractClientNotification {
   private static final long serialVersionUID = 1L;
 
+  @Override
   public boolean coalesce(IClientNotification existingNotification) {
     return true;
   }

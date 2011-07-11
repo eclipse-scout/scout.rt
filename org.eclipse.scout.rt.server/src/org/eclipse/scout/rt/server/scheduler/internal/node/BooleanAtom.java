@@ -24,10 +24,12 @@ public class BooleanAtom extends AbstractNode implements INode {
     return m_value;
   }
 
+  @Override
   public void format(IFormatVisitor v) {
     v.print(m_value.booleanValue() ? "true" : "false");
   }
 
+  @Override
   public Object eval(IEvalVisitor v) {
     return m_value;
   }

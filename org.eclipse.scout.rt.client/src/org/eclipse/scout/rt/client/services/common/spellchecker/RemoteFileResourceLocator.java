@@ -23,10 +23,12 @@ public class RemoteFileResourceLocator implements IResourceLocator {
     m_remoteFolder = remoteFolder;
   }
 
+  @Override
   public void initialize() throws ProcessingException {
     SERVICES.getService(IFileService.class).syncRemoteFiles(m_remoteFolder, null);
   }
 
+  @Override
   public File getFile(String name) throws ProcessingException {
     return SERVICES.getService(IFileService.class).getRemoteFile(m_remoteFolder, name, null, false);
   }

@@ -37,6 +37,7 @@ public class PermissionService extends AbstractService implements IPermissionSer
   public PermissionService() {
   }
 
+  @Override
   public BundleClassDescriptor[] getAllPermissionClasses() {
     checkCache();
     return m_permissionClasses;

@@ -67,6 +67,7 @@ public class ColumnSet {
     m_permanentHeadSortColumns = new ArrayList<IColumn>();
     m_permanentTailSortColumns = new ArrayList<IColumn>();
     PropertyChangeListener columnListener = new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         IColumn c = (IColumn) e.getSource();
         if (IColumn.PROP_VIEW_COLUMN_INDEX_HINT.equals(e.getPropertyName())) {

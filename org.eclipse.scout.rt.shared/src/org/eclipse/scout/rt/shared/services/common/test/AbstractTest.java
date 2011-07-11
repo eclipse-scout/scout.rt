@@ -86,6 +86,7 @@ public abstract class AbstractTest extends AbstractService implements ITest {
     }
   }
 
+  @Override
   public void setTestContext(ITestContext ctx) {
     m_ctx = ctx;
   }
@@ -219,6 +220,7 @@ public abstract class AbstractTest extends AbstractService implements ITest {
     m_ctx.addStatus(status);
   }
 
+  @Override
   public final String getProduct() {
     return m_product;
   }
@@ -227,6 +229,7 @@ public abstract class AbstractTest extends AbstractService implements ITest {
     m_product = s;
   }
 
+  @Override
   public final String getTitle() {
     return m_title;
   }
@@ -235,6 +238,7 @@ public abstract class AbstractTest extends AbstractService implements ITest {
     m_title = s;
   }
 
+  @Override
   public final String getSubTitle() {
     return m_subTitle;
   }
@@ -243,11 +247,14 @@ public abstract class AbstractTest extends AbstractService implements ITest {
     m_subTitle = s;
   }
 
+  @Override
   public void setUp() throws Throwable {
   }
 
+  @Override
   public abstract void run() throws Throwable;
 
+  @Override
   public void tearDown() throws Throwable {
   }
 

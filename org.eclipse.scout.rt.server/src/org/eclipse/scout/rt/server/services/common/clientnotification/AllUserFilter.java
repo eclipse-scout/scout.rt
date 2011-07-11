@@ -24,14 +24,17 @@ public class AllUserFilter implements IClientNotificationFilter {
     m_validUntil = System.currentTimeMillis() + timeout;
   }
 
+  @Override
   public boolean isActive() {
     return System.currentTimeMillis() <= m_validUntil;
   }
 
+  @Override
   public boolean isMulticast() {
     return true;
   }
 
+  @Override
   public boolean accept() {
     return true;
   }

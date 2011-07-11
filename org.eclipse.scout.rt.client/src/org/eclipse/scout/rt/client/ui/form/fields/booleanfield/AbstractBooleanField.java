@@ -35,10 +35,12 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     propertySupport.setProperty(PROP_DISPLAY_TEXT, execFormatValue(getValue()));
   }
 
+  @Override
   public void setChecked(boolean b) {
     setValue(b);
   }
 
+  @Override
   public boolean isChecked() {
     return getValue() != null && getValue().booleanValue();
   }
@@ -82,11 +84,13 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     return retVal;
   }
 
+  @Override
   public IBooleanFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
   private class P_UIFacade implements IBooleanFieldUIFacade {
+    @Override
     public void setSelectedFromUI(boolean checked) {
       if (isEnabled() && isVisible()) {
         setChecked(checked);

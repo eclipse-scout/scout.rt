@@ -44,10 +44,12 @@ public class SimpleProgress extends ProgressMonitorWrapper implements ISimplePro
     m_worked += work;
   }
 
+  @Override
   public void setProgress(String s) {
     setTaskName(s);
   }
 
+  @Override
   public void setProgress(float f) {
     if (m_worked < 0) {
       beginTask(m_name, 100);
@@ -63,6 +65,7 @@ public class SimpleProgress extends ProgressMonitorWrapper implements ISimplePro
     }
   }
 
+  @Override
   public void setProgress(float f, String s) {
     setTaskName(s);
     //

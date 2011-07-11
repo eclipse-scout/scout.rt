@@ -109,10 +109,12 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     }
   }
 
+  @Override
   public final T getInnerForm() {
     return m_innerForm;
   }
 
+  @Override
   public void setInnerForm(T form) {
     if (m_innerForm == form) {
       return;
@@ -148,6 +150,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     }
   }
 
+  @Override
   public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
     // myself
     if (!visitor.visitField(this, startLevel, 0)) {
@@ -196,6 +199,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
    * groups)
    */
   private class P_InnerFormPropertyChangeListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
         // fire group box visibility
@@ -208,6 +212,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   }// end private class
 
   private class P_InnerFormSubtreePropertyChangeListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       fireSubtreePropertyChange(e);
     }

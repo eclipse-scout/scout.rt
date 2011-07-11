@@ -69,6 +69,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
     super.initializeService();
     // add client notification listener
     SERVICES.getService(IClientNotificationConsumerService.class).addGlobalClientNotificationConsumerListener(new IClientNotificationConsumerListener() {
+      @Override
       public void handleEvent(ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification().getClass() == AccessControlChangedNotification.class) {
           ServiceState state = getServiceState();
@@ -83,6 +84,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
     });
   }
 
+  @Override
   public boolean checkPermission(Permission p) {
     ServiceState state = getServiceState();
     ensureCacheLoaded(state);
@@ -108,6 +110,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
     }
   }
 
+  @Override
   public int getPermissionLevel(Permission p) {
     ServiceState state = getServiceState();
     ensureCacheLoaded(state);
@@ -149,6 +152,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
     }
   }
 
+  @Override
   public Permissions getPermissions() {
     ServiceState state = getServiceState();
     ensureCacheLoaded(state);
@@ -166,10 +170,12 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
     }
   }
 
+  @Override
   public boolean isProxyService() {
     return true;
   }
 
+  @Override
   public void clearCache() {
     ServiceState state = getServiceState();
     synchronized (state.m_cacheLock) {
@@ -177,6 +183,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
     }
   }
 
+  @Override
   public void clearCacheOfPrincipals(String... principalNames) {
     //nop
   }
@@ -188,6 +195,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   /**
    * no service tunnel access on client side
    */
+  @Override
   @SuppressWarnings("deprecation")
   public boolean checkServiceTunnelAccess(Class serviceInterface, Method method, Object[] args) {
     return false;

@@ -29,6 +29,7 @@ public class BasicTransaction implements ITransaction {
     m_memberMapLock = new Object();
   }
 
+  @Override
   public void registerResource(ITransactionMember member) {
     synchronized (m_memberMapLock) {
       String memberId = member.getMemberId();
@@ -44,6 +45,7 @@ public class BasicTransaction implements ITransaction {
     }
   }
 
+  @Override
   public ITransactionMember getMember(String memberId) {
     synchronized (m_memberMapLock) {
       if (m_memberMap == null) m_memberMap = new HashMap<String, Object>();
@@ -53,6 +55,7 @@ public class BasicTransaction implements ITransaction {
     }
   }
 
+  @Override
   public ITransactionMember[] getMembers() {
     synchronized (m_memberMapLock) {
       if (m_memberMap == null) m_memberMap = new HashMap<String, Object>();
@@ -60,6 +63,7 @@ public class BasicTransaction implements ITransaction {
     }
   }
 
+  @Override
   public void unregisterMember(ITransactionMember member) {
     if (member != null) {
       synchronized (m_memberMapLock) {
@@ -75,6 +79,7 @@ public class BasicTransaction implements ITransaction {
     }
   }
 
+  @Override
   public boolean commitPhase1() {
     Collection xaList;
     synchronized (m_memberMapLock) {
@@ -98,6 +103,7 @@ public class BasicTransaction implements ITransaction {
     return allSuccessful && !hasFailures();
   }
 
+  @Override
   public void commitPhase2() {
     Collection xaList;
     synchronized (m_memberMapLock) {
@@ -118,6 +124,7 @@ public class BasicTransaction implements ITransaction {
     }
   }
 
+  @Override
   public void rollback() {
     Collection xaList;
     synchronized (m_memberMapLock) {
@@ -139,6 +146,7 @@ public class BasicTransaction implements ITransaction {
     }
   }
 
+  @Override
   public void release() {
     Collection xaList;
     synchronized (m_memberMapLock) {
@@ -159,14 +167,17 @@ public class BasicTransaction implements ITransaction {
     }
   }
 
+  @Override
   public boolean hasFailures() {
     return m_failures.size() > 0;
   }
 
+  @Override
   public Throwable[] getFailures() {
     return m_failures.toArray(new Throwable[m_failures.size()]);
   }
 
+  @Override
   public void addFailure(Throwable t) {
     m_failures.add(t);
   }

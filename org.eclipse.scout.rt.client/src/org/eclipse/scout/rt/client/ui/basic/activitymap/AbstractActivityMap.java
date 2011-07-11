@@ -206,6 +206,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     m_menus = menuList.toArray(new IMenu[0]);
     // local property observer
     addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         if (e.getPropertyName().equals(PROP_DAYS)) {
           invalidateTimeScale();
@@ -264,6 +265,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
    * Runtime
    */
 
+  @Override
   public final void initActivityMap() throws ProcessingException {
     initActivityMapInternal();
     execInitActivityMap();
@@ -272,6 +274,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   protected void initActivityMapInternal() throws ProcessingException {
   }
 
+  @Override
   public final void disposeActivityMap() {
     disposeActivityMapInternal();
     try {
@@ -296,6 +299,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public void createTimeScale() {
     try {
       TimeScale scale = execCreateTimeScale();
@@ -309,6 +313,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public TimeScale getTimeScale() {
     TimeScale scale = (TimeScale) propertySupport.getProperty(PROP_TIME_SCALE);
     if (scale == null) {
@@ -317,6 +322,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return scale;
   }
 
+  @Override
   public void setTimeScale(TimeScale scale) {
     if (scale == null) {
       scale = new TimeScale();
@@ -327,19 +333,23 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   /*
    * Model Observer
    */
+  @Override
   public void addActivityMapListener(ActivityMapListener listener) {
     m_listenerList.add(ActivityMapListener.class, listener);
   }
 
+  @Override
   public void removeActivityMapListener(ActivityMapListener listener) {
     m_listenerList.remove(ActivityMapListener.class, listener);
   }
 
+  @Override
   public ActivityCell resolveActivityCell(ActivityCell cell) {
     if (cell == null) return cell;
     return m_activities.get(new CompositeLong(cell.getResourceId(), cell.getActivityId()));
   }
 
+  @Override
   public ActivityCell[] resolveActivityCells(ActivityCell[] cells) {
     if (cells == null) cells = new ActivityCell[0];
     int mismatchCount = 0;
@@ -363,10 +373,12 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return cells;
   }
 
+  @Override
   public ActivityCell[] getActivityCells(long resourceId) {
     return getActivityCells(new Long[]{resourceId});
   }
 
+  @Override
   public ActivityCell[] getActivityCells(Long[] resourceIds) {
     ArrayList<ActivityCell> all = new ArrayList<ActivityCell>();
     for (Long resourceId : resourceIds) {
@@ -378,10 +390,12 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return all.toArray(new ActivityCell[all.size()]);
   }
 
+  @Override
   public ActivityCell[] getAllActivityCells() {
     return m_activities.values().toArray(new ActivityCell[m_activities.size()]);
   }
 
+  @Override
   public void addActivityCells(ActivityCell[] cells) {
     ArrayList<ActivityCell> addedCells = new ArrayList<ActivityCell>();
     for (ActivityCell cell : cells) {
@@ -404,11 +418,13 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public void updateActivityCells(ActivityCell[] cells) {
     cells = resolveActivityCells(cells);
     updateActivityCellsInternal(cells);
   }
 
+  @Override
   public void updateActivityCells(Long[] resourceIds) {
     updateActivityCellsInternal(getActivityCells(resourceIds));
   }
@@ -421,11 +437,13 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     fireActivitiesUpdated(cells);
   }
 
+  @Override
   public void removeActivityCells(ActivityCell[] cells) {
     cells = resolveActivityCells(cells);
     removeActivityCellsInternal(cells);
   }
 
+  @Override
   public void removeActivityCells(Long[] resourceIds) {
     removeActivityCellsInternal(getActivityCells(resourceIds));
   }
@@ -445,6 +463,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public void removeAllActivityCells() {
     ActivityCell[] a = getAllActivityCells();
     if (a.length > 0) {
@@ -457,25 +476,30 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public ActivityCell getSelectedActivityCell() {
     return (ActivityCell) propertySupport.getProperty(PROP_SELECTED_ACTIVITY_CELL);
   }
 
+  @Override
   public void setSelectedActivityCell(ActivityCell cell) {
     cell = resolveActivityCell(cell);
     propertySupport.setProperty(PROP_SELECTED_ACTIVITY_CELL, cell);
   }
 
+  @Override
   public boolean isSelectedActivityCell(ActivityCell cell) {
     return getSelectedActivityCell() == cell;
   }
 
+  @Override
   public Long[] getSelectedResourceIds() {
     Long[] a = (Long[]) propertySupport.getProperty(PROP_SELECTED_RESOURCE_IDS);
     if (a == null) a = new Long[0];
     return a;
   }
 
+  @Override
   public void setSelectedResourceIds(Long[] resourceIds) {
     if (resourceIds == null) {
       resourceIds = new Long[0];
@@ -485,6 +509,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     propertySupport.setProperty(PROP_SELECTED_RESOURCE_IDS, resourceIds);
   }
 
+  @Override
   public Long[] getResourceIds() {
     Long[] resourceIds = (Long[]) propertySupport.getProperty(PROP_RESOURCE_IDS);
     if (resourceIds == null) {
@@ -493,6 +518,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return resourceIds;
   }
 
+  @Override
   public void setResourceIds(Long[] resourceIds) {
     if (resourceIds == null) {
       resourceIds = new Long[0];
@@ -513,10 +539,12 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public void isSelectedResourceId(Long resourceId) {
     m_selectedResourceIds.contains(resourceId);
   }
 
+  @Override
   public IMenu[] getMenus() {
     return m_menus;
   }
@@ -740,10 +768,12 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public boolean isActivityMapChanging() {
     return m_tableChanging > 0;
   }
 
+  @Override
   public void setActivityMapChanging(boolean b) {
     // use a stack counter because setActivityMapChanging might be called in
     // nested loops
@@ -771,6 +801,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public Date getBeginTime() {
     Calendar cal = Calendar.getInstance();
     Date[] a = getDays();
@@ -795,6 +826,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return cal.getTime();
   }
 
+  @Override
   public Date getEndTime() {
     Calendar cal = Calendar.getInstance();
     Date[] a = getDays();
@@ -821,6 +853,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return cal.getTime();
   }
 
+  @Override
   public void addDay(Date day) {
     day = DateUtility.truncDate(day);
     if (day != null) {
@@ -831,6 +864,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public void removeDay(Date day) {
     day = DateUtility.truncDate(day);
     if (day != null) {
@@ -841,6 +875,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public void setDay(Date day) {
     day = DateUtility.truncDate(day);
     TreeSet<Date> set = new TreeSet<Date>();
@@ -850,6 +885,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     setDaysInternal(set);
   }
 
+  @Override
   public void setDays(Date[] days) {
     TreeSet<Date> set = new TreeSet<Date>();
     for (Date d : days) {
@@ -862,6 +898,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     propertySupport.setProperty(PROP_DAYS, set.toArray(new Date[set.size()]));
   }
 
+  @Override
   public Date[] getDays() {
     Date[] a = (Date[]) propertySupport.getProperty(PROP_DAYS);
     if (a == null) {
@@ -870,80 +907,99 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return a;
   }
 
+  @Override
   public int getWorkDayCount() {
     return propertySupport.getPropertyInt(PROP_WORK_DAY_COUNT);
   }
 
+  @Override
   public void setWorkDayCount(int n) {
     if (n < 1 || n > 6) return;// ignore it
     propertySupport.setPropertyInt(PROP_WORK_DAY_COUNT, n);
   }
 
+  @Override
   public boolean isWorkDaysOnly() {
     return propertySupport.getPropertyBool(PROP_WORK_DAYS_ONLY);
   }
 
+  @Override
   public void setWorkDaysOnly(boolean b) {
     propertySupport.setPropertyBool(PROP_WORK_DAYS_ONLY, b);
   }
 
+  @Override
   public int getFirstHourOfDay() {
     return propertySupport.getPropertyInt(PROP_FIRST_HOUR_OF_DAY);
   }
 
+  @Override
   public void setFirstHourOfDay(int i) {
     propertySupport.setPropertyInt(PROP_FIRST_HOUR_OF_DAY, i);
   }
 
+  @Override
   public int getLastHourOfDay() {
     return propertySupport.getPropertyInt(PROP_LAST_HOUR_OF_DAY);
   }
 
+  @Override
   public void setLastHourOfDay(int i) {
     propertySupport.setPropertyInt(PROP_LAST_HOUR_OF_DAY, i);
   }
 
+  @Override
   public long getIntradayInterval() {
     return propertySupport.getPropertyInt(PROP_INTRADAY_INTERVAL);
   }
 
+  @Override
   public void setIntradayInterval(long millis) {
     if (millis < 15L * 60000L || millis > 24L * 3600000L) throw new IllegalArgumentException("intradayIntervalMinutes must be between 15 minutes and 24 hours");
     propertySupport.setPropertyLong(PROP_INTRADAY_INTERVAL, millis);
   }
 
+  @Override
   public void setIntradayIntervalInMinutes(long min) {
     setIntradayInterval(min * 60000L);
   }
 
+  @Override
   public long getMinimumActivityDuration() {
     return m_minimumActivityDuration;
   }
 
+  @Override
   public void setMinimumActivityDuration(long minDuration) {
     m_minimumActivityDuration = minDuration;
   }
 
+  @Override
   public void setMinimumActivityDurationInMinutes(long min) {
     setMinimumActivityDuration(min * 60000L);
   }
 
+  @Override
   public int getPlanningMode() {
     return propertySupport.getPropertyInt(PROP_PLANNING_MODE);
   }
 
+  @Override
   public void setPlanningMode(int mode) {
     propertySupport.setPropertyInt(PROP_PLANNING_MODE, mode);
   }
 
+  @Override
   public Date getSelectedBeginTime() {
     return (Date) propertySupport.getProperty(PROP_SELECTED_BEGIN_TIME);
   }
 
+  @Override
   public Date getSelectedEndTime() {
     return (Date) propertySupport.getProperty(PROP_SELECTED_END_TIME);
   }
 
+  @Override
   public void setSelectedTime(Date beginTime, Date endTime) {
     try {
       setActivityMapChanging(true);
@@ -956,6 +1012,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public void decorateActivityCell(ActivityCell cell) {
     try {
       cell.setObserver(null);
@@ -988,6 +1045,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public MultiTimeRange calculateSelectedTimeRanges(Date earliestBeginTime, Date latestEndTime) {
     MultiTimeRange multiRange = new MultiTimeRange();
     Calendar cal = Calendar.getInstance();
@@ -1012,6 +1070,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return multiRange;
   }
 
+  @Override
   public void planActivityForSelectedResources(boolean singleMatch, boolean chooseRandom, Date earliestBeginTime, Date latestEndTime, long preferredDuration) {
     earliestBeginTime = DateUtility.toUtilDate(earliestBeginTime);
     latestEndTime = DateUtility.toUtilDate(latestEndTime);
@@ -1129,6 +1188,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     }
   }
 
+  @Override
   public IActivityMapUIFacade getUIFacade() {
     return m_activityMapUIFacade;
   }
@@ -1138,6 +1198,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
    */
   private class P_ActivityCellObserver implements IActivityCellObserver {
 
+    @Override
     public void cellChanged(ActivityCell cell, int bitPos) {
       fireActivitiesUpdated(new ActivityCell[]{cell});
     }
@@ -1152,6 +1213,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
       setDays(days);
     }
 
+    @Override
     public void setSelectionFromUI(Long[] resourceIds, double[] normalizedRange) {
       try {
         setActivityMapChanging(true);
@@ -1167,22 +1229,27 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
       }
     }
 
+    @Override
     public IMenu[] fireEditActivityPopupFromUI() {
       return fireEditActivityPopup(getSelectedActivityCell());
     }
 
+    @Override
     public IMenu[] fireNewActivityPopupFromUI() {
       return fireNewActivityPopup();
     }
 
+    @Override
     public void setDaysFromUI(Date[] days) {
       setDays(days);
     }
 
+    @Override
     public void setSelectedActivityCellFromUI(ActivityCell cell) {
       setSelectedActivityCell(cell);
     }
 
+    @Override
     public void fireCellActionFromUI(long resourceId, double[] normalizedRange, ActivityCell activityCell) {
       if (activityCell != null) {
         setSelectedActivityCell(activityCell);

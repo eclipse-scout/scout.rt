@@ -41,9 +41,11 @@ public class ExtensionPointTracker {
   }
 
   private static final Listener NULL_LISTENER = new Listener() {
+    @Override
     public void added(IExtension extension) {
     }
 
+    @Override
     public void removed(IExtension extension) {
     }
   };
@@ -160,6 +162,7 @@ public class ExtensionPointTracker {
   }
 
   class RegistryChangeListener implements IRegistryChangeListener {
+    @Override
     public void registryChanged(IRegistryChangeEvent event) {
       IExtensionDelta[] deltas = event.getExtensionDeltas(m_namespace, m_simpleName);
       for (int i = 0; i < deltas.length; ++i) {

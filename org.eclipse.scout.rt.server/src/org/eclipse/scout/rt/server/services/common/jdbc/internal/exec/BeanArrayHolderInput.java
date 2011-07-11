@@ -29,34 +29,42 @@ class BeanArrayHolderInput implements IBindInput {
     m_delegate = new BeanPropertyInput(propertyName, beans, target);
   }
 
+  @Override
   public IToken getToken() {
     return m_delegate.getToken();
   }
 
+  @Override
   public boolean isBatch() {
     return m_delegate.isBatch();
   }
 
+  @Override
   public boolean hasBatch(int i) {
     return m_delegate.hasBatch(i);
   }
 
+  @Override
   public void setNextBatchIndex(int i) {
     m_delegate.setNextBatchIndex(i);
   }
 
+  @Override
   public boolean isJdbcBind() {
     return m_delegate.isJdbcBind();
   }
 
+  @Override
   public int getJdbcBindIndex() {
     return m_delegate.getJdbcBindIndex();
   }
 
+  @Override
   public void setJdbcBindIndex(int index) {
     m_delegate.setJdbcBindIndex(index);
   }
 
+  @Override
   public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
     return m_delegate.produceSqlBindAndSetReplaceToken(sqlStyle);
   }

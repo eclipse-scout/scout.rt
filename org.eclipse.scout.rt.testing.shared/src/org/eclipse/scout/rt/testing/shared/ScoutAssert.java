@@ -55,6 +55,7 @@ public final class ScoutAssert {
     assertOrder(null, expected, actual);
   }
 
+  @SuppressWarnings("null")
   public static void assertOrder(String message, Object[] expected, Object[] actual) {
     if (expected == null && actual == null) {
       return;

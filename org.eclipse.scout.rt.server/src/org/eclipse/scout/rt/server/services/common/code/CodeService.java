@@ -47,52 +47,63 @@ public class CodeService extends AbstractService implements ICodeService {
     m_codeTypeClassDescriptorMap = new HashMap<String, BundleClassDescriptor[]>();
   }
 
+  @Override
   public <T extends ICodeType> T getCodeType(Class<T> type) {
     return getCodeTypeCache().getCodeType(type);
   }
 
+  @Override
   public <T extends ICodeType> T getCodeType(Long partitionId, Class<T> type) {
     return getCodeTypeCache(partitionId).getCodeType(type);
   }
 
+  @Override
   public ICodeType findCodeTypeById(Object id) {
     if (id == null) return null;
     return getCodeTypeCache().findCodeTypeById(id);
   }
 
+  @Override
   public ICodeType findCodeTypeById(Long partitionId, Object id) {
     if (id == null) return null;
     return getCodeTypeCache(partitionId).findCodeTypeById(id);
   }
 
+  @Override
   public ICodeType[] getCodeTypes(Class... types) {
     return getCodeTypeCache().getCodeTypes(types);
   }
 
+  @Override
   public ICodeType[] getCodeTypes(Long partitionId, Class... types) {
     return getCodeTypeCache(partitionId).getCodeTypes(types);
   }
 
+  @Override
   public <T extends ICode> T getCode(final Class<T> type) {
     return getCodeTypeCache().getCode(type);
   }
 
+  @Override
   public <T extends ICode> T getCode(final Long partitionId, final Class<T> type) {
     return getCodeTypeCache(partitionId).getCode(type);
   }
 
+  @Override
   public <T extends ICodeType> T reloadCodeType(Class<T> type) {
     if (type == null) return null;
     m_codeTypeStore.unloadCodeTypeCache(type);
     return getCodeTypeCache().reloadCodeType(type);
   }
 
+  @Override
   public ICodeType[] reloadCodeTypes(Class... types) {
     if (types == null) return null;
     m_codeTypeStore.unloadCodeTypeCache(types);
     return getCodeTypeCache().reloadCodeTypes(types);
   }
 
+  @Override
   public BundleClassDescriptor[] getAllCodeTypeClasses(String classPrefix) {
     if (classPrefix == null) return new BundleClassDescriptor[0];
     synchronized (m_codeTypeClassDescriptorMapLock) {
@@ -149,6 +160,7 @@ public class CodeService extends AbstractService implements ICodeService {
     }
   }
 
+  @Override
   @RemoteServiceAccessDenied
   public ICodeType[] getAllCodeTypes(String classPrefix) {
     ArrayList<Class> list = new ArrayList<Class>();
@@ -164,6 +176,7 @@ public class CodeService extends AbstractService implements ICodeService {
     return getCodeTypes(list.toArray(new Class[list.size()]));
   }
 
+  @Override
   @RemoteServiceAccessDenied
   public ICodeType[] getAllCodeTypes(String classPrefix, Long partitionId) {
     return getAllCodeTypes(classPrefix);

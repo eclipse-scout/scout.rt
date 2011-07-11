@@ -96,6 +96,7 @@ public abstract class AbstractClientJUnitTest extends AbstractTest implements IT
      *          the summary of the test run, including all the tests that failed
      */
 
+    @Override
     public void testRunFinished(Result result) throws Exception {
     }
 

@@ -31,6 +31,7 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
   private final HashMap<String, IClientSession> m_cache = new HashMap<String, IClientSession>();
   private final Object m_cacheLock = new Object();
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends IClientSession> T getClientSession(Class<T> clazz) {
     String symbolicName = clazz.getPackage().getName();
@@ -71,6 +72,7 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
     return null;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends IClientSession> T newClientSession(Class<T> clazz, String webSessionId) {
     String symbolicName = clazz.getPackage().getName();

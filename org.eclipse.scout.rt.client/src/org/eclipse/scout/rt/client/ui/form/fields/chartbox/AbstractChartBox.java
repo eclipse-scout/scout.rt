@@ -51,26 +51,32 @@ public abstract class AbstractChartBox extends AbstractFormField implements ICha
    * Runtime
    */
 
+  @Override
   public String getChartQName() {
     return propertySupport.getPropertyString(PROP_CHART_QNAME);
   }
 
+  @Override
   public void setChartQName(String className) {
     propertySupport.setPropertyString(PROP_CHART_QNAME, className);
   }
 
+  @Override
   public IChartBoxUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
+  @Override
   public void addChartBoxListener(ChartBoxListener listener) {
     m_listenerList.add(ChartBoxListener.class, listener);
   }
 
+  @Override
   public void removeChartBoxListener(ChartBoxListener listener) {
     m_listenerList.remove(ChartBoxListener.class, listener);
   }
 
+  @Override
   public void refreshChart() {
     fireDataChanged();
   }

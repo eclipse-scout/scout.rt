@@ -23,6 +23,7 @@ public class ResetAccessControlChangedNotification extends AbstractClientNotific
   public ResetAccessControlChangedNotification() {
   }
 
+  @Override
   public boolean coalesce(IClientNotification existingNotification) {
     return true;
   }

@@ -54,6 +54,7 @@ public class Activator extends Plugin {
     context.ungetService(ref);
     m_servicesExtensionManager = new ServicesExtensionManager(reg, PLUGIN_ID + ".services");
     context.addBundleListener(new SynchronousBundleListener() {
+      @Override
       public void bundleChanged(BundleEvent event) {
         if (event.getType() == BundleEvent.STARTED && event.getBundle().equals(getBundle())) {
           new Job("Initialize services") {

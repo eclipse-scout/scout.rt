@@ -202,6 +202,7 @@ public class JavaScoutLogManager implements IScoutLogManager {
    */
   private final class P_EclipseToJavaDelegateListener implements ILogListener {
 
+    @Override
     public void logging(IStatus status, String plugin) {
       int scoutLogLevel = EclipseLogUtility.eclipseToScoutLevel(status.getSeverity());
       Level javaLogLevel = JavaLogUtility.scoutToJavaLevel(scoutLogLevel);

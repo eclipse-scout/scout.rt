@@ -59,6 +59,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
          */
         m_calendar.addPropertyChangeListener(
             new PropertyChangeListener() {
+              @Override
               public void propertyChange(PropertyChangeEvent e) {
                 if (e.getPropertyName().equals(ICalendar.PROP_SELECTED_DATE)) {
                   syncCalendarToCalendarField();
@@ -94,6 +95,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
     getCalendar().disposeCalendar();
   }
 
+  @Override
   public final T getCalendar() {
     return m_calendar;
   }
@@ -139,6 +141,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
     }
   }
 
+  @Override
   public void reloadCalendarItems() {
     getCalendar().reloadCalendarItems();
   }

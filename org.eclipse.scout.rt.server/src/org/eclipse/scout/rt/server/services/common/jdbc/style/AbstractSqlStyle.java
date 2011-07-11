@@ -42,20 +42,24 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlStyle.class);
 
+  @Override
   public String getConcatOp() {
     return "||";
   }
 
+  @Override
   public String getLikeWildcard() {
     return "%";
   }
 
+  @Override
   public String toLikePattern(Object value) {
     String s = (value != null ? value.toString() : "");
     s = s.replace("*", getLikeWildcard());
     return s;
   }
 
+  @Override
   public String toPlainText(Object value) {
     if (value instanceof IHolder) {
       value = ((IHolder) value).getValue();
@@ -123,30 +127,37 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     }
   }
 
+  @Override
   public String toAggregationAvg(String attribute) {
     return "AVG(" + attribute + ")";
   }
 
+  @Override
   public String toAggregationCount(String attribute) {
     return "COUNT(" + attribute + ")";
   }
 
+  @Override
   public String toAggregationMax(String attribute) {
     return "MAX(" + attribute + ")";
   }
 
+  @Override
   public String toAggregationMedian(String attribute) {
     return "MEDIAN(" + attribute + ")";
   }
 
+  @Override
   public String toAggregationMin(String attribute) {
     return "MIN(" + attribute + ")";
   }
 
+  @Override
   public String toAggregationSum(String attribute) {
     return "SUM(" + attribute + ")";
   }
 
+  @Override
   public SqlBind buildBindFor(Object o, Class nullType) {
     if (o instanceof IHolder) {
       IHolder h = (IHolder) o;
@@ -296,6 +307,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     }
   }
 
+  @Override
   public void writeBind(PreparedStatement ps, int jdbcBindIndex, SqlBind bind) throws SQLException {
     switch (bind.getSqlType()) {
       case Types.NULL: {
@@ -358,6 +370,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     }
   }
 
+  @Override
   public Object readBind(ResultSet rs, ResultSetMetaData meta, int type, int jdbcBindIndex) throws SQLException {
     Object o = null;
     switch (type) {
@@ -479,6 +492,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     return o;
   }
 
+  @Override
   public void registerOutput(CallableStatement cs, int index, Class c) throws SQLException {
     if (c == null) throw new SQLException("registering output index " + index + " with type null");
     int jdbcType = getJdbcType(c);
@@ -549,272 +563,339 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     return jdbcType;
   }
 
+  @Override
   public String createBetween(String attribute, String bindName1, String bindName2) {
     return attribute + " BETWEEN " + adaptBindName(bindName1) + " AND " + adaptBindName(bindName2);
   }
 
+  @Override
   public String createDateBetween(String attribute, String bindName1, String bindName2) {
     return attribute + " BETWEEN TRUNC(" + adaptBindNameTimeDateOp(bindName1) + ") AND (TRUNC(" + adaptBindNameTimeDateOp(bindName2) + ")+(86399/86400)) ";
   }
 
+  @Override
   public String createDateTimeBetween(String attribute, String bindName1, String bindName2) {
     return attribute + " BETWEEN TRUNC(" + adaptBindNameTimeDateOp(bindName1) + ",'MI') AND (TRUNC(" + adaptBindNameTimeDateOp(bindName2) + ",'MI')+(59/1440)) ";
   }
 
+  @Override
   public String createStartsWith(String attribute, String bindName) {
     return "upper(" + attribute + ") like upper(" + adaptBindName(bindName) + "||'%')";
   }
 
+  @Override
   public String createNotStartsWith(String attribute, String bindName) {
     return "upper(" + attribute + ") not like upper(" + adaptBindName(bindName) + "||'%')";
   }
 
+  @Override
   public String createEndsWith(String attribute, String bindName) {
     return "upper(" + attribute + ") like upper('%'||" + adaptBindName(bindName) + ")";
   }
 
+  @Override
   public String createNotEndsWith(String attribute, String bindName) {
     return "upper(" + attribute + ") not like upper('%'||" + adaptBindName(bindName) + ")";
   }
 
+  @Override
   public String createContains(String attribute, String bindName) {
     return "upper(" + attribute + ") like upper('%'||" + adaptBindName(bindName) + "||'%')";
   }
 
+  @Override
   public String createNotContains(String attribute, String bindName) {
     return "upper(" + attribute + ") not like upper('%'||" + adaptBindName(bindName) + "||'%')";
   }
 
+  @Override
   public String createLike(String attribute, String bindName) {
     return "upper(" + attribute + ") like upper(" + adaptBindName(bindName) + ")";
   }
 
+  @Override
   public String createNotLike(String attribute, String bindName) {
     return "upper(" + attribute + ") not like upper(" + adaptBindName(bindName) + ")";
   }
 
+  @Override
   public String createNull(String attribute) {
     return attribute + " is null";
   }
 
+  @Override
   public String createNotNull(String attribute) {
     return attribute + " is not null";
   }
 
+  @Override
   public String createNumberNull(String attribute) {
     return "nvl(" + attribute + ",0)=0";
   }
 
+  @Override
   public String createNumberNotNull(String attribute) {
     return "nvl(" + attribute + ",0)<>0";
   }
 
+  @Override
   public String createTextNull(String attribute) {
     return "nvl(" + attribute + ",'0')='0'";
   }
 
+  @Override
   public String createTextNotNull(String attribute) {
     return "nvl(" + attribute + ",'0')<>'0'";
   }
 
+  @Override
   public String createIn(String attribute, String bindName) {
     return attribute + "=" + adaptBindName(bindName);
   }
 
+  @Override
   public String createNotIn(String attribute, String bindName) {
     return "NOT(" + attribute + "=" + adaptBindName(bindName) + ")";
   }
 
+  @Override
   public String createDateIsToday(String attribute) {
     return attribute + ">=TRUNC(SYSDATE) AND " + attribute + "<TRUNC(SYSDATE+1)";
   }
 
+  @Override
   public String createDateIsInLastDays(String attribute, String bindName) {
     return attribute + ">=TRUNC(SYSDATE-(" + adaptBindNameTimeDateOp(bindName) + ")) AND " + attribute + "<TRUNC(SYSDATE+1)";
   }
 
+  @Override
   public String createDateIsInNextDays(String attribute, String bindName) {
     return attribute + ">=TRUNC(SYSDATE) AND " + attribute + "<TRUNC(SYSDATE+" + adaptBindNameTimeDateOp(bindName) + "+1)";
   }
 
+  @Override
   public String createDateIsInDays(String attribute, String bindName) {
     return attribute + ">=TRUNC(SYSDATE+" + adaptBindNameTimeDateOp(bindName) + ") AND " + attribute + "<TRUNC(SYSDATE+" + adaptBindNameTimeDateOp(bindName) + "+1)";
   }
 
+  @Override
   public String createDateIsInWeeks(String attribute, String bindName) {
     return attribute + ">=TRUNC(SYSDATE+((" + adaptBindNameTimeDateOp(bindName) + ")*7)) AND " + attribute + "<TRUNC(SYSDATE+((" + adaptBindNameTimeDateOp(bindName) + ")*7)+1)";
   }
 
+  @Override
   public String createDateIsInLastMonths(String attribute, String bindName) {
     return attribute + ">=TRUNC(ADD_MONTHS(SYSDATE,(-1)*(" + adaptBindNameTimeDateOp(bindName) + "))) AND " + attribute + "<TRUNC(SYSDATE+1)";
   }
 
+  @Override
   public String createDateIsInNextMonths(String attribute, String bindName) {
     return attribute + ">=TRUNC(SYSDATE) AND " + attribute + "<TRUNC(ADD_MONTHS(SYSDATE," + adaptBindNameTimeDateOp(bindName) + ")+1)";
   }
 
+  @Override
   public String createDateIsInMonths(String attribute, String bindName) {
     return attribute + ">=TRUNC(ADD_MONTHS(SYSDATE," + adaptBindNameTimeDateOp(bindName) + ")) AND " + attribute + "<TRUNC(ADD_MONTHS(SYSDATE," + adaptBindNameTimeDateOp(bindName) + ")+1)";
   }
 
+  @Override
   public String createDateIsInLEDays(String attribute, String bindName) {
     return attribute + "<TRUNC(SYSDATE+" + adaptBindNameTimeDateOp(bindName) + "+1)";
   }
 
+  @Override
   public String createDateIsInLEWeeks(String attribute, String bindName) {
     return attribute + "<TRUNC(SYSDATE+((" + adaptBindNameTimeDateOp(bindName) + ")*7)+1)";
   }
 
+  @Override
   public String createDateIsInLEMonths(String attribute, String bindName) {
     return attribute + "<TRUNC(ADD_MONTHS(SYSDATE," + adaptBindNameTimeDateOp(bindName) + ")+1)";
   }
 
+  @Override
   public String createDateIsInGEDays(String attribute, String bindName) {
     return attribute + ">=TRUNC(SYSDATE+" + adaptBindNameTimeDateOp(bindName) + ")";
   }
 
+  @Override
   public String createDateIsInGEWeeks(String attribute, String bindName) {
     return attribute + ">=TRUNC(SYSDATE+((" + adaptBindNameTimeDateOp(bindName) + ")*7))";
   }
 
+  @Override
   public String createDateIsInGEMonths(String attribute, String bindName) {
     return attribute + ">=TRUNC(ADD_MONTHS(SYSDATE," + adaptBindNameTimeDateOp(bindName) + "))";
   }
 
+  @Override
   public String createDateIsNotToday(String attribute) {
     return "(" + attribute + "<TRUNC(SYSDATE) OR " + attribute + ">=TRUNC(SYSDATE+1))";
   }
 
+  @Override
   public String createDateTimeIsNow(String attribute) {
     return "(" + attribute + ">=TRUNC(SYSDATE, 'MI') AND " + attribute + "<(TRUNC(SYSDATE, 'MI')+(1/24/60)))";
   }
 
+  @Override
   public String createDateTimeIsInLEMinutes(String attribute, String bindName) {
     return attribute + "<(TRUNC(SYSDATE, 'MI')+((" + adaptBindNameTimeDateOp(bindName) + "+1)/24/60))";
   }
 
+  @Override
   public String createDateTimeIsInLEHours(String attribute, String bindName) {
     return attribute + "<(TRUNC(SYSDATE, 'MI')+((1/24/60)+(" + adaptBindNameTimeDateOp(bindName) + "/24)))";
   }
 
+  @Override
   public String createDateTimeIsInGEMinutes(String attribute, String bindName) {
     return attribute + ">=(TRUNC(SYSDATE, 'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24/60))";
   }
 
+  @Override
   public String createDateTimeIsInGEHours(String attribute, String bindName) {
     return attribute + ">=(TRUNC(SYSDATE, 'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24))";
   }
 
+  @Override
   public String createDateTimeIsNotNow(String attribute) {
     return "(" + attribute + "<TRUNC(SYSDATE, 'MI') OR " + attribute + ">=(TRUNC(SYSDATE, 'MI')+(1/24/60)))";
   }
 
+  @Override
   public String createTimeIsNow(String attribute) {
     return attribute + ">=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI'))/24/60 AND " + attribute + "<((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+(1/24/60))/24/60";
   }
 
+  @Override
   public String createTimeIsNotNow(String attribute) {
     return attribute + "<((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI'))/24/60 OR " + attribute + ">((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+(1/24/60))/24/60";
   }
 
+  @Override
   public String createTimeIsInMinutes(String attribute, String bindName) {
     return attribute + ">=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24/60))/24/60 AND " + attribute + "<((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+((" + adaptBindNameTimeDateOp(bindName) + "+1)/24/60))/24/60";
   }
 
+  @Override
   public String createTimeIsInHours(String attribute, String bindName) {
     return attribute + ">=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24))/24/60 AND " + attribute + "<((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24)+(1/24/60))/24/60";
   }
 
+  @Override
   public String createTimeIsInLEMinutes(String attribute, String bindName) {
     return attribute + "<((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+((" + adaptBindNameTimeDateOp(bindName) + "+1)/24/60))/24/60";
   }
 
+  @Override
   public String createTimeIsInLEHours(String attribute, String bindName) {
     return attribute + "<((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24)+(1/24/60))/24/60";
   }
 
+  @Override
   public String createTimeIsInGEMinutes(String attribute, String bindName) {
     return attribute + ">=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24/60))/24/60";
   }
 
+  @Override
   public String createTimeIsInGEHours(String attribute, String bindName) {
     return attribute + ">=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24))/24/60";
   }
 
+  @Override
   public String createEQ(String attribute, String bindName) {
     return attribute + "=" + adaptBindName(bindName);
   }
 
+  @Override
   public String createDateEQ(String attribute, String bindName) {
     return attribute + "=TRUNC(" + adaptBindName(bindName) + ")";
   }
 
+  @Override
   public String createDateTimeEQ(String attribute, String bindName) {
     return attribute + "=TRUNC(" + adaptBindNameTimeDateOp(bindName) + ",'MI')";
   }
 
+  @Override
   public String createGE(String attribute, String bindName) {
     return attribute + ">=" + adaptBindName(bindName);
   }
 
+  @Override
   public String createDateGE(String attribute, String bindName) {
     return attribute + ">=TRUNC(" + adaptBindName(bindName) + ")";
   }
 
+  @Override
   public String createDateTimeGE(String attribute, String bindName) {
     return attribute + ">=TRUNC(" + adaptBindNameTimeDateOp(bindName) + ",'MI')";
   }
 
+  @Override
   public String createGT(String attribute, String bindName) {
     return attribute + ">" + adaptBindName(bindName);
   }
 
+  @Override
   public String createDateGT(String attribute, String bindName) {
     return attribute + ">TRUNC(" + adaptBindName(bindName) + ")";
   }
 
+  @Override
   public String createDateTimeGT(String attribute, String bindName) {
     return attribute + ">TRUNC(" + adaptBindNameTimeDateOp(bindName) + ",'MI')";
   }
 
+  @Override
   public String createLE(String attribute, String bindName) {
     return attribute + "<=" + adaptBindName(bindName);
   }
 
+  @Override
   public String createDateLE(String attribute, String bindName) {
     return attribute + "<=(TRUNC(" + adaptBindName(bindName) + ")+(86399/86400))";
   }
 
+  @Override
   public String createDateTimeLE(String attribute, String bindName) {
     return attribute + "<=(TRUNC(" + adaptBindNameTimeDateOp(bindName) + ",'MI')+(59/1440))";
   }
 
+  @Override
   public String createLT(String attribute, String bindName) {
     return attribute + "<" + adaptBindName(bindName);
   }
 
+  @Override
   public String createDateLT(String attribute, String bindName) {
     return attribute + "<TRUNC(" + adaptBindName(bindName) + ")";
   }
 
+  @Override
   public String createDateTimeLT(String attribute, String bindName) {
     return attribute + "<TRUNC(" + adaptBindNameTimeDateOp(bindName) + ",'MI')";
   }
 
+  @Override
   public String createNEQ(String attribute, String bindName) {
     return attribute + "<>" + adaptBindName(bindName);
   }
 
+  @Override
   public String createDateNEQ(String attribute, String bindName) {
     return attribute + "<>TRUNC(" + adaptBindName(bindName) + ")";
   }
 
+  @Override
   public String createDateTimeNEQ(String attribute, String bindName) {
     return attribute + "<>TRUNC(" + adaptBindNameTimeDateOp(bindName) + ",'MI')";
   }
 
   protected abstract int getMaxListSize();
 
+  @Override
   public String createInList(String attribute, Object array) {
     Object[] values = toArray(array);
     if (values.length == 0) {
@@ -844,6 +925,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     return buf.toString();
   }
 
+  @Override
   public String createNotInList(String attribute, Object array) {
     Object[] values = toArray(array);
     if (values.length == 0) {
@@ -873,22 +955,27 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     return buf.toString();
   }
 
+  @Override
   public String getSysdateToken() {
     return "SYSDATE";
   }
 
+  @Override
   public String getLowerToken() {
     return "LOWER";
   }
 
+  @Override
   public String getUpperToken() {
     return "UPPER";
   }
 
+  @Override
   public String getTrimToken() {
     return "TRIM";
   }
 
+  @Override
   public String getNvlToken() {
     return "NVL";
   }

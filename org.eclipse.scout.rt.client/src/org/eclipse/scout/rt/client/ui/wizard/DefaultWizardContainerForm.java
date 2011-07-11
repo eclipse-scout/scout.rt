@@ -72,26 +72,32 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
     return getFieldByClass(StatusField.class);
   }
 
+  @Override
   public IButton getWizardCancelButton() {
     return getFieldByClass(WizardCancelButton.class);
   }
 
+  @Override
   public IButton getWizardSuspendButton() {
     return getFieldByClass(WizardSuspendButton.class);
   }
 
+  @Override
   public IButton getWizardResetButton() {
     return getFieldByClass(WizardResetButton.class);
   }
 
+  @Override
   public IButton getWizardPreviousStepButton() {
     return getFieldByClass(WizardPreviousStepButton.class);
   }
 
+  @Override
   public IButton getWizardNextStepButton() {
     return getFieldByClass(WizardNextStepButton.class);
   }
 
+  @Override
   public IButton getWizardFinishButton() {
     return getFieldByClass(WizardFinishButton.class);
   }
@@ -396,6 +402,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
     }
   }
 
+  @Override
   public void startWizard() throws ProcessingException {
     startInternal(new WizardHandler());
   }

@@ -136,6 +136,7 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
    * @param object
    *          {@link Object}
    */
+  @Override
   public void putObject(Object object) throws ProcessingException {
     if (LOG.isInfoEnabled()) LOG.info("obj=" + object);
     getJmsXAResource().putObject(object, true);
@@ -145,6 +146,7 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
    * Retrieve next object from JMS queue / topic.<br>
    * Unlimited wait.
    */
+  @Override
   public Object getObject() throws ProcessingException {
     return getObject(-1);
   }
@@ -156,6 +158,7 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
    * @param timeoutMillis
    *          long
    */
+  @Override
   public Object getObject(long timeoutMillis) throws ProcessingException {
     return getJmsXAResource().getObject(timeoutMillis, true);
   }

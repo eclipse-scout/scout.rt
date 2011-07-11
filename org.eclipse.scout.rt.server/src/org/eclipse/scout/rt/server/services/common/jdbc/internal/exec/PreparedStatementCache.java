@@ -33,6 +33,7 @@ public class PreparedStatementCache implements ITransactionMember, IStatementCac
     m_countCache = new LRUCache<String, Integer>(200, 120000L);
     m_statementCache = new LRUCache<String, PreparedStatement>(statementCacheSize, 3600000L);
     m_statementCache.addDisposeListener(new LRUCache.DisposeListener() {
+      @Override
       public void valueDisposed(Object key, Object value) {
         PreparedStatement ps = (PreparedStatement) value;
         try {
@@ -45,10 +46,12 @@ public class PreparedStatementCache implements ITransactionMember, IStatementCac
     });
   }
 
+  @Override
   public String getMemberId() {
     return TRANSACTION_MEMBER_ID;
   }
 
+  @Override
   public PreparedStatement getPreparedStatement(Connection conn, String s) throws SQLException {
     // a statement must be used at least 2 times within 2 minutes in order to be
     // cached
@@ -70,6 +73,7 @@ public class PreparedStatementCache implements ITransactionMember, IStatementCac
     return ps;
   }
 
+  @Override
   public void releasePreparedStatement(PreparedStatement ps) throws SQLException {
     // close statement when it is not cached
     if (ps != null) {
@@ -79,6 +83,7 @@ public class PreparedStatementCache implements ITransactionMember, IStatementCac
     }
   }
 
+  @Override
   public CallableStatement getCallableStatement(Connection conn, String s) throws SQLException {
     // a statement must be used at least 2 times within 2 minutes in order to be
     // cached
@@ -96,6 +101,7 @@ public class PreparedStatementCache implements ITransactionMember, IStatementCac
     return cs;
   }
 
+  @Override
   public void releaseCallableStatement(CallableStatement cs) throws SQLException {
     // close statement when it is not cached
     if (cs != null) {
@@ -105,20 +111,25 @@ public class PreparedStatementCache implements ITransactionMember, IStatementCac
     }
   }
 
+  @Override
   public boolean needsCommit() {
     return false;
   }
 
+  @Override
   public boolean commitPhase1() {
     return true;
   }
 
+  @Override
   public void commitPhase2() {
   }
 
+  @Override
   public void rollback() {
   }
 
+  @Override
   public void release() {
     m_statementCache.clear();// will call the dispose listener
     m_countCache.clear();

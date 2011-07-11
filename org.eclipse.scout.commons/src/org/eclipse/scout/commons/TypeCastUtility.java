@@ -69,10 +69,10 @@ public final class TypeCastUtility {
    * fast access to debug flag
    */
   private boolean m_debugEnabled;
-  private HashMap<Class, Class> m_wrapperTypeMap = new HashMap<Class, Class>();
-  private HashMap<Class, Integer> m_typeMap = new HashMap<Class, Integer>();
-  private HashMap<Class, Integer> m_primitiveTypeMap = new HashMap<Class, Integer>();
-  private HashMap<GPCKey, Class<?>> m_genericsParameterClassCache = new HashMap<GPCKey, Class<?>>();
+  private final HashMap<Class, Class> m_wrapperTypeMap = new HashMap<Class, Class>();
+  private final HashMap<Class, Integer> m_typeMap = new HashMap<Class, Integer>();
+  private final HashMap<Class, Integer> m_primitiveTypeMap = new HashMap<Class, Integer>();
+  private final HashMap<GPCKey, Class<?>> m_genericsParameterClassCache = new HashMap<GPCKey, Class<?>>();
 
   private TypeCastUtility() {
     m_wrapperTypeMap.put(char.class, Character.class);
@@ -1828,7 +1828,6 @@ public final class TypeCastUtility {
   /**
    * {@link TypeCastUtility#getGenericsParameterClass(Class, Class, int)}
    */
-  @SuppressWarnings("unchecked")
   public static Class getGenericsParameterClass(Class queryClass, Class genericsOwnerClass) {
     return instance.getGenericsParameterClassImpl(queryClass, genericsOwnerClass, 0);
   }
@@ -1848,7 +1847,6 @@ public final class TypeCastUtility {
     return instance.getGenericsParameterClassImpl(queryClass, genericsOwnerClass, genericsParameterIndex);
   }
 
-  @SuppressWarnings("unchecked")
   private synchronized Class getGenericsParameterClassImpl(Class queryClass, Class genericsOwnerClass, int genericsParameterIndex) {
     GPCKey key = new GPCKey(queryClass, genericsOwnerClass, genericsParameterIndex);
     Class result = m_genericsParameterClassCache.get(key);
@@ -1878,7 +1876,6 @@ public final class TypeCastUtility {
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   private boolean/* foundStopType */visitGenericsHierarchy(Type type, Class<?> stopType, int stopTypeGenericsParameterIndex, TypeDesc desc, HashSet<Type> loopDetector) {
     if (loopDetector.contains(type)) {
       return false;

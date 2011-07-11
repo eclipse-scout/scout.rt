@@ -15,12 +15,14 @@ import org.eclipse.equinox.app.IApplicationContext;
 
 public class ScoutJUnitPluginTestApplication implements IApplication {
 
+  @Override
   public Object start(IApplicationContext context) throws Exception {
     ScoutJUnitPluginTestExecutor scoutJUnitPluginTestExecutor = new ScoutJUnitPluginTestExecutor();
     int exitCode = scoutJUnitPluginTestExecutor.runAllTests();
     return exitCode;
   }
 
+  @Override
   public void stop() {
   }
 

@@ -24,6 +24,7 @@ public class BatchLookupService extends AbstractService implements IBatchLookupS
   public BatchLookupService() {
   }
 
+  @Override
   public LookupRow[][] getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
     LookupCall[] calls = batch.getCallBatch();
     LookupRow[][] resultArray = new LookupRow[calls.length][];
@@ -33,6 +34,7 @@ public class BatchLookupService extends AbstractService implements IBatchLookupS
     return resultArray;
   }
 
+  @Override
   public LookupRow[][] getBatchDataByText(BatchLookupCall batch) throws ProcessingException {
     LookupCall[] calls = batch.getCallBatch();
     LookupRow[][] resultArray = new LookupRow[calls.length][];
@@ -42,6 +44,7 @@ public class BatchLookupService extends AbstractService implements IBatchLookupS
     return resultArray;
   }
 
+  @Override
   public LookupRow[][] getBatchDataByAll(BatchLookupCall batch) throws ProcessingException {
     LookupCall[] calls = batch.getCallBatch();
     LookupRow[][] resultArray = new LookupRow[calls.length][];
@@ -51,6 +54,7 @@ public class BatchLookupService extends AbstractService implements IBatchLookupS
     return resultArray;
   }
 
+  @Override
   public LookupRow[][] getBatchDataByRec(BatchLookupCall batch) throws ProcessingException {
     LookupCall[] calls = batch.getCallBatch();
     LookupRow[][] resultArray = new LookupRow[calls.length][];

@@ -22,18 +22,22 @@ public class DatabaseSpecificToken implements IToken {
     m_name = name;
   }
 
+  @Override
   public boolean isInput() {
     return false;
   }
 
+  @Override
   public boolean isOutput() {
     return false;
   }
 
+  @Override
   public String getParsedToken() {
     return m_parsedToken;
   }
 
+  @Override
   public String getReplaceToken() {
     if (m_replaceToken != null) {
       return m_replaceToken;
@@ -43,6 +47,7 @@ public class DatabaseSpecificToken implements IToken {
     }
   }
 
+  @Override
   public void setReplaceToken(String s) {
     m_replaceToken = s;
   }

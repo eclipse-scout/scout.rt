@@ -105,54 +105,67 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     }
   }
 
+  @Override
   public final int getGridColumnCount() {
     return m_grid.getGridColumnCount();
   }
 
+  @Override
   public final int getGridRowCount() {
     return m_grid.getGridRowCount();
   }
 
+  @Override
   public boolean isSplitHorizontal() {
     return propertySupport.getPropertyBool(PROP_SPLIT_HORIZONTAL);
   }
 
+  @Override
   public void setSplitHorizontal(boolean horizontal) {
     propertySupport.setPropertyBool(PROP_SPLIT_HORIZONTAL, horizontal);
   }
 
+  @Override
   public boolean isSplitterEnabled() {
     return propertySupport.getPropertyBool(PROP_SPLITTER_ENABLED);
   }
 
+  @Override
   public void setSpliterEnabled(boolean enabled) {
     propertySupport.setPropertyBool(PROP_SPLITTER_ENABLED, enabled);
   }
 
+  @Override
   public double getSplitterPosition() {
     return propertySupport.getPropertyDouble(PROP_SPLITTER_POSITION);
   }
 
+  @Override
   public void setSplitterPosition(double position) {
     propertySupport.setPropertyAlwaysFire(PROP_SPLITTER_POSITION, position);
   }
 
+  @Override
   public boolean isCacheSplitterPosition() {
     return m_cacheSplitterPosition;
   }
 
+  @Override
   public void setCacheSplitterPosition(boolean b) {
     m_cacheSplitterPosition = b;
   }
 
+  @Override
   public String getCacheSplitterPositionPropertyName() {
     return m_cacheSplitterPositionPropertyName;
   }
 
+  @Override
   public void setCacheSplitterPositionPropertyName(String propName) {
     m_cacheSplitterPositionPropertyName = propName;
   }
 
+  @Override
   public ISplitboxUIFacade getUIFacade() {
     return m_uiFacade;
   }

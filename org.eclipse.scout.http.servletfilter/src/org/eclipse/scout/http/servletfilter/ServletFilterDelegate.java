@@ -30,7 +30,7 @@ public final class ServletFilterDelegate {
     void service(ServletRequest req, ServletResponse res) throws ServletException, IOException;
 
     ServletContext getServletContext();
-  };
+  }
 
   public ServletFilterDelegate() {
   }

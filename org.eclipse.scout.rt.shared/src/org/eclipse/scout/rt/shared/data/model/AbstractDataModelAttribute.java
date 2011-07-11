@@ -131,6 +131,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   protected void execPrepareLookup(LookupCall call) throws ProcessingException {
   }
 
+  @Override
   public Map<String, String> getMetaDataOfAttribute() {
     return null;
   }
@@ -176,50 +177,62 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     new DataModelAttributeInjector().injectAggregationTypes(this);
   }
 
+  @Override
   public final void initAttribute() throws ProcessingException {
     execInitAttribute();
   }
 
+  @Override
   public void prepareLookup(LookupCall call) throws ProcessingException {
     execPrepareLookup(call);
   }
 
+  @Override
   public String getText() {
     return m_text;
   }
 
+  @Override
   public void setText(String s) {
     m_text = s;
   }
 
+  @Override
   public int getType() {
     return m_type;
   }
 
+  @Override
   public void setType(int i) {
     m_type = i;
   }
 
+  @Override
   public String getIconId() {
     return m_iconId;
   }
 
+  @Override
   public void setIconId(String s) {
     m_iconId = s;
   }
 
+  @Override
   public IDataModelAttributeOp[] getOperators() {
     return m_operators;
   }
 
+  @Override
   public void setOperators(IDataModelAttributeOp[] ops) {
     m_operators = ops;
   }
 
+  @Override
   public int[] getAggregationTypes() {
     return m_aggregationTypes != null ? m_aggregationTypes : new int[0];
   }
 
+  @Override
   public void setAggregationTypes(int[] aggregationTypes) {
     m_aggregationTypes = aggregationTypes;
   }
@@ -237,18 +250,22 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     return false;
   }
 
+  @Override
   public boolean isNullOperatorEnabled() {
     return m_allowNullOperator;
   }
 
+  @Override
   public void setNullOperatorEnabled(boolean b) {
     m_allowNullOperator = b;
   }
 
+  @Override
   public boolean isAggregationEnabled() {
     return m_aggregationEnabled;
   }
 
+  @Override
   public void setAggregationEnabled(boolean aggregationEnabled) {
     m_aggregationEnabled = aggregationEnabled;
     if (m_aggregationTypes != null) {
@@ -256,18 +273,22 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     }
   }
 
+  @Override
   public boolean isNotOperatorEnabled() {
     return m_allowNotOperator;
   }
 
+  @Override
   public void setNotOperatorEnabled(boolean b) {
     m_allowNotOperator = b;
   }
 
+  @Override
   public Class<? extends ICodeType> getCodeTypeClass() {
     return m_codeTypeClass;
   }
 
+  @Override
   public void setCodeTypeClass(Class<? extends ICodeType> codeTypeClass) {
     m_codeTypeClass = codeTypeClass;
     // create lookup service call
@@ -277,18 +298,22 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     }
   }
 
+  @Override
   public LookupCall getLookupCall() {
     return m_lookupCall;
   }
 
+  @Override
   public void setLookupCall(LookupCall call) {
     m_lookupCall = call;
   }
 
+  @Override
   public Permission getVisiblePermission() {
     return m_visiblePermission;
   }
 
+  @Override
   public void setVisiblePermission(Permission p) {
     m_visiblePermission = p;
     boolean b;
@@ -301,28 +326,34 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     setVisibleGranted(b);
   }
 
+  @Override
   public boolean isVisibleGranted() {
     return m_visibleGranted;
   }
 
+  @Override
   public void setVisibleGranted(boolean b) {
     m_visibleGranted = b;
     calculateVisible();
   }
 
+  @Override
   public boolean isVisible() {
     return m_visible;
   }
 
+  @Override
   public void setVisible(boolean b) {
     m_visibleProperty = b;
     calculateVisible();
   }
 
+  @Override
   public IDataModelEntity getParentEntity() {
     return m_parentEntity;
   }
 
+  @Override
   public void setParentEntity(IDataModelEntity parent) {
     m_parentEntity = parent;
   }

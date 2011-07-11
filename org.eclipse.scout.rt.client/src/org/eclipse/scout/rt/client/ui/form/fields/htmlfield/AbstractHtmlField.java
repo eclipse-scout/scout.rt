@@ -99,6 +99,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     setMaxLength(getConfiguredMaxLength());
   }
 
+  @Override
   public int getMaxLength() {
     int len = propertySupport.getPropertyInt(PROP_MAX_LENGTH);
     if (len <= 0) {
@@ -107,6 +108,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     return len;
   }
 
+  @Override
   public void setMaxLength(int len) {
     if (len > 0) propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
     if (isInitialized()) {
@@ -114,6 +116,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     }
   }
 
+  @Override
   public void doHyperlinkAction(URL url) throws ProcessingException {
     execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
   }
@@ -135,6 +138,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     }
   }
 
+  @Override
   public String getPlainText() {
     String s = getValue();
     if (s != null) {
@@ -143,6 +147,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     return "";
   }
 
+  @Override
   public boolean isHtmlEditor() {
     return m_htmlEditor;
   }
@@ -163,6 +168,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     return validValue;
   }
 
+  @Override
   public IHtmlFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -174,6 +180,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     return text;
   }
 
+  @Override
   public void insertImage(String imageUrl) {
     if (imageUrl != null) {
       propertySupport.firePropertyChange(PROP_INSERT_IMAGE, null, imageUrl);
@@ -183,20 +190,24 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   /**
    * local images and local resources bound to the html text
    */
+  @Override
   public RemoteFile[] getAttachments() {
     return m_attachments;
   }
 
+  @Override
   public void setAttachments(RemoteFile[] attachments) {
     m_attachments = attachments;
   }
 
+  @Override
   public boolean isScrollBarEnabled() {
     return m_scrollBarEnabled;
   }
 
   private class P_UIFacade implements IHtmlFieldUIFacade {
 
+    @Override
     public boolean setTextFromUI(String htmlText) {
       if (isHtmlEditor()) {
         if (htmlText != null && htmlText.length() == 0) htmlText = null;
@@ -206,10 +217,12 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
       return true;
     }
 
+    @Override
     public void setAttachmentsFromUI(RemoteFile[] attachments) {
       setAttachments(attachments);
     }
 
+    @Override
     public void fireHyperlinkActionFromUI(URL url) {
       try {
         doHyperlinkAction(url);
@@ -223,6 +236,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   /**
    * Returns whether this html component is spell checkable.
    */
+  @Override
   public boolean isSpellCheckEnabled() {
     return (this.isEnabled() && this.isEnabledGranted() && (!(this.getForm() instanceof ISearchForm)));
   }
@@ -233,6 +247,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    * If it is not defined, null is returned, then the application default is
    * used.
    */
+  @Override
   public Boolean isSpellCheckAsYouTypeEnabled() {
     return m_monitorSpelling;
   }

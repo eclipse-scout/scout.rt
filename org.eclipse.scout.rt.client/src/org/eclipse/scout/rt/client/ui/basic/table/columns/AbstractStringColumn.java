@@ -71,26 +71,32 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   /*
    * Runtime
    */
+  @Override
   public void setInputMasked(boolean b) {
     m_inputMasked = b;
   }
 
+  @Override
   public boolean isInputMasked() {
     return m_inputMasked;
   }
 
+  @Override
   public void setDisplayFormat(String s) {
     m_format = s;
   }
 
+  @Override
   public String getDisplayFormat() {
     return m_format;
   }
 
+  @Override
   public void setTextWrap(boolean b) {
     m_wrap = b;
   }
 
+  @Override
   public boolean isTextWrap() {
     return m_wrap;
   }
