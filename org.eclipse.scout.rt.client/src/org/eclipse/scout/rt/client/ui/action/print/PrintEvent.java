@@ -8,27 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt.window;
+package org.eclipse.scout.rt.client.ui.action.print;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
-import org.eclipse.swt.graphics.Image;
+import java.util.EventObject;
 
-public interface ISwtScoutPart {
-  String MARKER_SCOLLED_FORM = "SCROLLED_FORM";
+/**
+ *
+ */
+public class PrintEvent extends EventObject {
 
-  IForm getForm();
+  private static final long serialVersionUID = 1L;
 
-  ISwtScoutForm getUiForm();
+  public static final int TYPE_PRINT_START = 100;
+  public static final int TYPE_PRINT_DONE = 200;
 
-  void closePart() throws ProcessingException;
+  private final int m_type;
 
-  boolean isVisible();
+  public PrintEvent(Object source, int type) {
+    super(source);
+    m_type = type;
+  }
 
-  void activate();
+  public int getType() {
+    return m_type;
+  }
 
-  boolean isActive();
-
-  void setStatusLineMessage(Image image, String message);
 }

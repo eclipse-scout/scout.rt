@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -1104,6 +1105,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return e.getPopupMenus();
   }
 
+  /**
+   * @param printedFile
+   */
+  private void fireDesktopPrinted(File printedFile) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_PRINTED, printedFile);
+    fireDesktopEvent(e);
+  }
+
   private void fireOutlineChanged(IOutline oldOutline, IOutline newOutline) {
     if (oldOutline != newOutline) {
       // single observer callback
@@ -1303,6 +1312,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     public IMenu[] fireTrayPopupFromUI() {
       return fireTrayPopup();
     }
+
+    @Override
+    public void fireDesktopPrintedFromUI(File printedFile) {
+      fireDesktopPrinted(printedFile);
+    }
+
   }
 
   private class P_ActiveOutlineListener extends TreeAdapter implements PropertyChangeListener {

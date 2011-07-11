@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.listener.PartListener;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
@@ -58,6 +59,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
   private IForm m_scoutForm;
 
   private PropertyChangeListener m_formPropertyListener;
+  private ISwtScoutForm m_uiForm;
 
   public AbstractScoutView() {
     m_formPropertyListener = new P_ScoutPropertyChangeListener();
@@ -91,7 +93,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
     try {
       m_layoutLock.acquire();
       getSwtContentPane().setRedraw(false);
-      getSwtEnvironment().createForm(getSwtContentPane(), scoutForm);
+      m_uiForm = getSwtEnvironment().createForm(getSwtContentPane(), scoutForm);
       attachScout(m_scoutForm);
     }
     finally {
@@ -127,6 +129,11 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
   @Override
   public IForm getForm() {
     return m_scoutForm;
+  }
+
+  @Override
+  public ISwtScoutForm getUiForm() {
+    return m_uiForm;
   }
 
   protected void attachScout(IForm form) {

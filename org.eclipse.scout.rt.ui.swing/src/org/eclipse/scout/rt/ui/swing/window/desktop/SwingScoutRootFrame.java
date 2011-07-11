@@ -429,12 +429,21 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
   }
 
   protected void handleScoutPrintInSwing(DesktopEvent e) {
-    WidgetPrinter cp = new WidgetPrinter(getSwingFrame());
+    final WidgetPrinter cp = new WidgetPrinter(getSwingFrame());
     try {
       cp.print(e.getPrintDevice(), e.getPrintParameters());
     }
     catch (Throwable ex) {
       LOG.error(null, ex);
+    }
+    finally {
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().fireDesktopPrintedFromUI(cp.getOutputFile());
+        }
+      };
+      getSwingEnvironment().invokeScoutLater(r, 0);
     }
   }
 

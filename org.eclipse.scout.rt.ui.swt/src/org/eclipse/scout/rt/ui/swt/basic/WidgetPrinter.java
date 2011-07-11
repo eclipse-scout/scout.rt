@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -34,6 +34,8 @@ public class WidgetPrinter {
 
   private Control m_widget;
 
+  private File m_printedFile;
+
   public WidgetPrinter(Control w) {
     m_widget = w;
   }
@@ -47,9 +49,13 @@ public class WidgetPrinter {
     }
   }
 
+  public File getOutputFile() {
+    return m_printedFile;
+  }
+
   private void printToFile(Image image, Map<String, Object> parameters) throws Throwable {
-    File file = (File) parameters.remove("file");
-    if (file == null) throw new IllegalArgumentException("parameter \"file\" must not be null");
+    m_printedFile = (File) parameters.remove("file");
+    if (m_printedFile == null) throw new IllegalArgumentException("parameter \"file\" must not be null");
     String contentType = (String) parameters.remove("contentType");
     if (contentType == null) contentType = "image/jpg";
     if (!contentType.startsWith("image/")) throw new IllegalArgumentException("only supporting contentTypes image/*");
@@ -57,11 +63,11 @@ public class WidgetPrinter {
       LOG.warn("Unknown parameter: " + n + "=" + parameters.get(n));
     }
     //
-    file.getParentFile().mkdirs();
+    m_printedFile.getParentFile().mkdirs();
     //
     ImageLoader imageLoader = new ImageLoader();
     imageLoader.data = new ImageData[]{image.getImageData()};
-    imageLoader.save(file.getAbsolutePath(), SWT.IMAGE_JPEG);
+    imageLoader.save(m_printedFile.getAbsolutePath(), SWT.IMAGE_JPEG);
     image.dispose();
   }
 

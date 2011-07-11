@@ -53,6 +53,8 @@ public class SwtScoutPopup implements ISwtScoutPart {
   private boolean m_positionBelowReferenceField;
   private boolean m_opened;
 
+  private ISwtScoutForm m_uiForm;
+
   public SwtScoutPopup(ISwtEnvironment env, Control ownerComponent, Rectangle ownerBounds) {
     m_env = env;
     m_positionBelowReferenceField = true;
@@ -77,8 +79,7 @@ public class SwtScoutPopup implements ISwtScoutPart {
     m_opened = true;
     if (m_scoutForm == null) {
       m_scoutForm = scoutForm;
-      @SuppressWarnings("unused")
-      ISwtScoutForm swtScoutForm = m_env.createForm(getSwtContentPane(), scoutForm);
+      m_uiForm = m_env.createForm(getSwtContentPane(), scoutForm);
       autoAdjustBounds();
       if (m_opened) {
         //open and activate, do NOT just call setVisible(true)
@@ -112,6 +113,11 @@ public class SwtScoutPopup implements ISwtScoutPart {
   @Override
   public IForm getForm() {
     return m_scoutForm;
+  }
+
+  @Override
+  public ISwtScoutForm getUiForm() {
+    return m_uiForm;
   }
 
   public void autoAdjustBounds() {

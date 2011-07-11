@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -256,5 +257,11 @@ public interface ISwtEnvironment {
    * sheet settings based on a {@link Control}s font and color
    */
   String styleHtmlText(ISwtScoutFormField<?> uiComposite, String rawHtml);
+
+  /**
+   * if a print request is sent to a form during the async open process of a form the event will be cached on the
+   * environment. So the form has to fetch all print event pending for it.
+   */
+  FormEvent[] fetchPendingPrintEvents(IForm form);
 
 }

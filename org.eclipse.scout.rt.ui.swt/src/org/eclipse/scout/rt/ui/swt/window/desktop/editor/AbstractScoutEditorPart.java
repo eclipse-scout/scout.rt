@@ -57,6 +57,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
 
   private PropertyChangeListener m_formPropertyListener;
   private OptimisticLock m_layoutLock;
+  private ISwtScoutForm m_uiForm;
 
   public AbstractScoutEditorPart() {
     m_layoutLock = new OptimisticLock();
@@ -188,9 +189,9 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
     try {
       m_layoutLock.acquire();
       m_rootArea.setRedraw(false);
-      ISwtScoutForm swtForm = getSwtEnvironment().createForm(m_rootArea, getForm());
+      m_uiForm = getSwtEnvironment().createForm(m_rootArea, getForm());
       GridData d = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-      swtForm.getSwtContainer().setLayoutData(d);
+      m_uiForm.getSwtContainer().setLayoutData(d);
       attachScout();
     }
     finally {
@@ -216,6 +217,11 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   @Override
   public IForm getForm() {
     return ((ScoutFormEditorInput) getEditorInput()).getScoutObject();
+  }
+
+  @Override
+  public ISwtScoutForm getUiForm() {
+    return m_uiForm;
   }
 
   public Form getRootForm() {

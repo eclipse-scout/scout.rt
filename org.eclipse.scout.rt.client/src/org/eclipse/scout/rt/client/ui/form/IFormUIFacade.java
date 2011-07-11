@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
+
+import java.io.File;
 
 public interface IFormUIFacade {
 
@@ -27,5 +29,10 @@ public interface IFormUIFacade {
    * model regardless of its state.
    */
   void fireFormKilledFromUI();
+
+  /**
+   * Notification that ui has taken a print screen. The file given to this notification is written and closed.
+   */
+  void fireFormPrintedFromUI(File outputFile);
 
 }

@@ -10,9 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form;
 
+import java.io.File;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -55,6 +59,18 @@ public class SwtScoutForm extends SwtScoutComposite<IForm> implements ISwtScoutF
       m_scoutFormListener = new P_ScoutFormListener();
       getScoutObject().addFormListener(m_scoutFormListener);
     }
+
+    // process all pending print events
+    ClientSyncJob job = new ClientSyncJob("", getEnvironment().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        FormEvent[] pendingEvents = getEnvironment().fetchPendingPrintEvents(getScoutObject());
+        for (FormEvent o : pendingEvents) {
+          handleFormEvent(o);
+        }
+      }
+    };
+    job.schedule();
   }
 
   @Override
@@ -81,92 +97,101 @@ public class SwtScoutForm extends SwtScoutComposite<IForm> implements ISwtScoutF
     // void
   }
 
+  protected void handleScoutPrintEvent(final FormEvent e) {
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        WidgetPrinter wp = null;
+        try {
+          if (getSwtFormPane() != null) {
+            if (e.getFormField() != null) {
+              for (Control c : SwtUtility.findChildComponents(getSwtContainer(), Control.class)) {
+                IPropertyObserver scoutModel = (IPropertyObserver) c.getData(ISwtScoutFormField.CLIENT_PROPERTY_SCOUT_OBJECT);
+                if (scoutModel == e.getFormField()) {
+                  wp = new WidgetPrinter(c);
+                  break;
+                }
+              }
+            }
+            if (wp == null) {
+              wp = new WidgetPrinter(getSwtFormPane().getShell());
+            }
+          }
+          if (wp != null) {
+            try {
+              wp.print(e.getPrintDevice(), e.getPrintParameters());
+            }
+            catch (Throwable ex) {
+              LOG.error(null, ex);
+            }
+          }
+        }
+        finally {
+          File outputFile = null;
+          if (wp != null) {
+            outputFile = wp.getOutputFile();
+          }
+          final File outputFileFinal = outputFile;
+          Runnable r = new Runnable() {
+            @Override
+            public void run() {
+              getScoutObject().getUIFacade().fireFormPrintedFromUI(outputFileFinal);
+            }
+          };
+          getEnvironment().invokeScoutLater(r, 0);
+        }
+      }
+    };
+    getEnvironment().invokeSwtLater(t);
+  }
+
+  public void handleFormEvent(final FormEvent e) {
+    switch (e.getType()) {
+      case FormEvent.TYPE_PRINT: {
+        handleScoutPrintEvent(e);
+        break;
+      }
+      case FormEvent.TYPE_STRUCTURE_CHANGED: {
+        // XXX from imo: check if necessary in swt and implement analogous to swing implementation
+        break;
+      }
+      case FormEvent.TYPE_TO_FRONT: {
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            if (getSwtFormPane() != null) {
+              Shell sh = getSwtFormPane().getShell();
+              if (sh.isVisible()) {
+                // TODO not supported in swt: sh.toFront()
+              }
+            }
+          }
+        };
+        getEnvironment().invokeSwtLater(t);
+        break;
+      }
+      case FormEvent.TYPE_TO_BACK: {
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            if (getSwtFormPane() != null) {
+              Shell sh = getSwtFormPane().getShell();
+              if (sh.isVisible()) {
+                // TODO not supported in swt: sh.toBack()
+              }
+            }
+          }
+        };
+        getEnvironment().invokeSwtLater(t);
+        break;
+      }
+    }
+  }
+
   private class P_ScoutFormListener implements FormListener {
     @Override
     public void formChanged(final FormEvent e) {
-      switch (e.getType()) {
-        case FormEvent.TYPE_PRINT: {
-          final Object lock = new Object();
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              try {
-                WidgetPrinter wp = null;
-                if (getSwtFormPane() != null) {
-                  if (e.getFormField() != null) {
-                    for (Control c : SwtUtility.findChildComponents(getSwtContainer(), Control.class)) {
-                      IPropertyObserver scoutModel = (IPropertyObserver) c.getData(ISwtScoutFormField.CLIENT_PROPERTY_SCOUT_OBJECT);
-                      if (scoutModel == e.getFormField()) {
-                        wp = new WidgetPrinter(c);
-                        break;
-                      }
-                    }
-                  }
-                  if (wp == null) {
-                    wp = new WidgetPrinter(getSwtFormPane().getShell());
-                  }
-                }
-                if (wp != null) {
-                  try {
-                    wp.print(e.getPrintDevice(), e.getPrintParameters());
-                  }
-                  catch (Throwable ex) {
-                    LOG.error(null, ex);
-                  }
-                }
-              }
-              finally {
-                synchronized (lock) {
-                  lock.notifyAll();
-                }
-              }
-            }
-          };
-          synchronized (lock) {
-            getEnvironment().getDisplay().asyncExec(t);
-            try {
-              lock.wait(30000L);
-            }
-            catch (InterruptedException ie) {
-            }
-          }
-          break;
-        }
-        case FormEvent.TYPE_STRUCTURE_CHANGED: {
-          // XXX from imo: check if necessary in swt and implement analogous to swing implementation
-          break;
-        }
-        case FormEvent.TYPE_TO_FRONT: {
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              if (getSwtFormPane() != null) {
-                Shell sh = getSwtFormPane().getShell();
-                if (sh.isVisible()) {
-                  // TODO not supported in swt: sh.toFront()
-                }
-              }
-            }
-          };
-          getEnvironment().invokeSwtLater(t);
-          break;
-        }
-        case FormEvent.TYPE_TO_BACK: {
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              if (getSwtFormPane() != null) {
-                Shell sh = getSwtFormPane().getShell();
-                if (sh.isVisible()) {
-                  // TODO not supported in swt: sh.toBack()
-                }
-              }
-            }
-          };
-          getEnvironment().invokeSwtLater(t);
-          break;
-        }
-      }
+      handleFormEvent(e);
     }
   }// end private class
 }

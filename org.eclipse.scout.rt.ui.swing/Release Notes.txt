@@ -105,3 +105,10 @@ Solution:
   That implies that popup does not close, if user still holds the left mouse button pressed. Scout model is only updated and popup closed after releasing the mouse button.
   By holding the mouse button pressed, the user can now scroll across the time entry list for ease of usability.
 Migration: None
+
+11.07.2011 aho
+Ticket: 102'194 is about taking screen shots of forms. The problem is since the form is opened async the print event does not get to the form.
+Solution:
+Back event to notify the model once a screen shot is done. Furthermore a PrintApplicationAction is created to take screen shots of the whole application.
+Migration:
+none

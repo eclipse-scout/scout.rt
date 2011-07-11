@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
+import java.io.File;
+
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 /**
@@ -53,4 +55,10 @@ public interface IDesktopUIFacade {
    * GUI fires this event to collect the tray popup menus
    */
   IMenu[] fireTrayPopupFromUI();
+
+  /**
+   * @param printedFile
+   *          may be null in case a print device has been given to the print event.
+   */
+  void fireDesktopPrintedFromUI(File printedFile);
 }
