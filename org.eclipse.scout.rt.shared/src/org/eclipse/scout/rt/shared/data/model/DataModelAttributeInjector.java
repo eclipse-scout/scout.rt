@@ -178,12 +178,11 @@ public class DataModelAttributeInjector implements DataModelConstants {
         break;
       }
       case IDataModelAttribute.TYPE_STRING: {
-        opList.add(DataModelAttributeOp.create(OPERATOR_EQ));
+        opList.add(DataModelAttributeOp.create(OPERATOR_LIKE));
         if (attribute.isNotOperatorEnabled()) {
           opList.add(DataModelAttributeOp.create(OPERATOR_NEQ));
         }
         opList.add(DataModelAttributeOp.create(OPERATOR_CONTAINS));
-        opList.add(DataModelAttributeOp.create(OPERATOR_LIKE));
         if (attribute.isNotOperatorEnabled()) {
           opList.add(DataModelAttributeOp.create(OPERATOR_NOT_CONTAINS));
         }
