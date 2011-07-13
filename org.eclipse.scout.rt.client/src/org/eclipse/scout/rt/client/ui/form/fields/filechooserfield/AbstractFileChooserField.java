@@ -377,6 +377,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     if (text != null && text.trim().length() == 0) text = null;
     if (text != null) {
       text = text.trim();
+      text = StringUtility.unquoteText(text);
       File f = new File(text);
       String p = "";
       if (f.isAbsolute()) {
