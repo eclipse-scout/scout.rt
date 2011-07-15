@@ -191,6 +191,10 @@ public class ClientUIPreferences {
   }
 
   public void setTableColumnPreferences(IColumn col) {
+    setTableColumnPreferences(col, true);
+  }
+
+  public void setTableColumnPreferences(IColumn col, boolean flush) {
     String keySuffix = getColumnKey(col);
     String key = TABLE_COLUMN_UIINDEX + keySuffix;
     int viewIndex = col.getVisibleColumnIndexHint();
@@ -246,8 +250,10 @@ public class ClientUIPreferences {
     else {
       m_env.put(key, "false");
     }
-    //
-    flush();
+
+    if (flush) {
+      flush();
+    }
   }
 
   public void updateTableColumnOrder(List<IColumn<?>> columnList, int[] visibleColumnIndexHints) {
@@ -275,6 +281,10 @@ public class ClientUIPreferences {
   }
 
   public void removeTableColumnPreferences(IColumn col, boolean visibility, boolean order, boolean sorting, boolean widths) {
+    removeTableColumnPreferences(col, visibility, order, sorting, widths, true);
+  }
+
+  private void removeTableColumnPreferences(IColumn col, boolean visibility, boolean order, boolean sorting, boolean widths, boolean flush) {
     if (col != null) {
       String keySuffix = getColumnKey(col);
       if (visibility) {
@@ -291,18 +301,37 @@ public class ClientUIPreferences {
       if (widths) {
         m_env.remove(TABLE_COLUMN_WIDTH + keySuffix);
       }
-      flush();
+
+      if (flush) {
+        flush();
+      }
     }
   }
 
+  public void removeAllTableColumnPreferences(ITable table, boolean visibility, boolean order, boolean sorting, boolean widths) {
+    if (table == null) {
+      return;
+    }
+
+    for (IColumn<?> col : table.getColumns()) {
+      removeTableColumnPreferences(col, visibility, order, sorting, widths, false);
+    }
+
+    flush();
+  }
+
   public void setAllTableColumnPreferences(ITable table) {
-    if (table != null) {
-      for (IColumn col : table.getColumns()) {
-        if (col.isDisplayable()) {
-          setTableColumnPreferences(col);
-        }
+    if (table == null) {
+      return;
+    }
+
+    for (IColumn col : table.getColumns()) {
+      if (col.isDisplayable()) {
+        setTableColumnPreferences(col, false);
       }
     }
+
+    flush();
   }
 
   /**
