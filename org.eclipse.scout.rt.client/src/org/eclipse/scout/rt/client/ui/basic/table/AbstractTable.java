@@ -2464,9 +2464,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private void resetColumnsInternal(boolean visibility, boolean order, boolean sorting, boolean widths) {
     ClientUIPreferences env = ClientUIPreferences.getInstance();
-    for (IColumn<?> col : getColumns()) {
-      env.removeTableColumnPreferences(col, visibility, order, sorting, widths);
-    }
+    env.removeAllTableColumnPreferences(this, visibility, order, sorting, widths);
+
     //Visibilities
     if (visibility) {
       ArrayList<IColumn<?>> list = new ArrayList<IColumn<?>>();

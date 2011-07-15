@@ -17,6 +17,9 @@ import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -26,6 +29,7 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -94,6 +98,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   private Menu m_headerMenu;
   private TableViewer m_viewer;
   private ISwtKeyStroke[] m_keyStrokes;
+  private ClientSyncJob m_storeColumnWidthsJob;
 
   private TableKeyboardNavigationSupport m_keyboardNavigationSupport;
 
@@ -708,6 +713,12 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     final IColumn<?> scoutColumn = (IColumn<?>) column.getData(KEY_SCOUT_COLUMN);
     if (scoutColumn != null) {
       if (scoutColumn.getWidth() != width) {
+
+        //Cancel already scheduled resize job to protect the model from too many resize events.
+        if (m_storeColumnWidthsJob != null) {
+          m_storeColumnWidthsJob.cancel();
+        }
+
         /*
          * imo, 04.06.2009: added swt-side optimistic lock check Method
          * autoSizeColumns indirectly calls this code by setting the width on a
@@ -716,9 +727,9 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
          * form job. After that job all columns are disposed. This results in
          * WidgetDisposed exceptions on line with entry.getKey().setWidth(...)
          */
-        Runnable t = new Runnable() {
+        m_storeColumnWidthsJob = new ClientSyncJob("Store column widths", getEnvironment().getClientSession()) {
           @Override
-          public void run() {
+          protected IStatus run(IProgressMonitor monitor) {
             try {
               addIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
               //
@@ -727,9 +738,11 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
             finally {
               removeIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
             }
+
+            return Status.OK_STATUS;
           }
         };
-        getEnvironment().invokeScoutLater(t, 0);
+        m_storeColumnWidthsJob.schedule(400);
       }
     }
   }
