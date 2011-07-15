@@ -105,12 +105,12 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   }
 
   @Override
-  public void closePart() throws ProcessingException {
+  public final void closePart() throws ProcessingException {
     try {
       m_closeFromModel.acquire();
       if (m_closeLock.acquire()) {
         try {
-          getSite().getPage().closeEditor(this, false);
+          execCloseEditor();
         }
         catch (Exception e) {
           throw new ProcessingException("could not close editor '" + getEditorSite().getId() + "'.", e);
@@ -121,6 +121,13 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
       m_closeLock.release();
       m_closeFromModel.release();
     }
+  }
+
+  /**
+   * @return true if the editor was successfully closed, and false if the editor is still open
+   */
+  protected boolean execCloseEditor() throws Exception {
+    return getSite().getPage().closeEditor(this, false);
   }
 
   @Override
