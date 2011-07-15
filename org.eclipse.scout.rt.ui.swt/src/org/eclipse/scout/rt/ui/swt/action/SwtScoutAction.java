@@ -10,11 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.action;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.jface.action.Action;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -31,21 +27,11 @@ import org.eclipse.swt.SWT;
 public class SwtScoutAction {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutAction.class);
 
-  private static final Map<String, String> KEY_STROKE_MAP;
-
   private final IAction m_scoutAction;
   private final Action m_swtAction;
   private final ISwtEnvironment m_environment;
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;
-
-  static {
-    KEY_STROKE_MAP = new HashMap<String, String>(12);
-    //build keyStroke map
-    for (int i = 1; i <= 12; i++) {
-      KEY_STROKE_MAP.put("SHIFT-F" + i, "Shift-F" + i);
-    }
-  }
 
   public SwtScoutAction(IAction scoutAction, ISwtEnvironment environment) {
     this(scoutAction, environment, SWT.PUSH);
@@ -57,13 +43,7 @@ public class SwtScoutAction {
     m_swtAction = new P_SwtAction(style);
     // init
     String keyStroke = m_scoutAction.getKeyStroke();
-    if (StringUtility.hasText(keyStroke)) {
-      // '@' sign is used as delimiter for shortcut text
-      m_swtAction.setText(m_scoutAction.getText() + "@" + lookupKeyStrokeText(keyStroke));
-    }
-    else {
-      m_swtAction.setText(m_scoutAction.getText());
-    }
+    m_swtAction.setText(m_scoutAction.getText());
     m_swtAction.setToolTipText(m_scoutAction.getTooltipText());
     m_swtAction.setImageDescriptor(m_environment.getImageDescriptor(m_scoutAction.getIconId()));
 
@@ -122,7 +102,4 @@ public class SwtScoutAction {
     }
   }
 
-  private String lookupKeyStrokeText(String keyStroke) {
-    return KEY_STROKE_MAP.get(keyStroke.toUpperCase());
-  }
 }

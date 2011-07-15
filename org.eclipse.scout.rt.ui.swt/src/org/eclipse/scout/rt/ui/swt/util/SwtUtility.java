@@ -16,6 +16,7 @@ import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -60,7 +61,6 @@ import org.eclipse.swt.widgets.Widget;
 public final class SwtUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtUtility.class);
   private static final HashMap<String, Integer> SCOUT_SWT_KEY_MAP;
-  private static final HashMap<Integer, String> SWT_SCOUT_KEY_MAP;
 
   private SwtUtility() {
   }
@@ -418,16 +418,13 @@ public final class SwtUtility {
 
   public static ISwtKeyStroke[] getKeyStrokes(IKeyStroke stroke, ISwtEnvironment environment) {
     ArrayList<ISwtKeyStroke> swtKeyStrokes = new ArrayList<ISwtKeyStroke>();
-    int keycode = getSwtKeyCode(stroke);
+    List<Integer> keyCodes = getSwtKeyCodes(stroke);
     int stateMask = getSwtStateMask(stroke);
-    // in case of enter register keypad enter as well
-    if (keycode == SWT.CR) {
-      swtKeyStrokes.add(new SwtScoutKeyStroke(stroke, SWT.CR, stateMask, environment));
-      swtKeyStrokes.add(new SwtScoutKeyStroke(stroke, SWT.KEYPAD_CR, stateMask, environment));
+
+    for (Integer keyCode : keyCodes) {
+      swtKeyStrokes.add(new SwtScoutKeyStroke(stroke, keyCode, stateMask, environment));
     }
-    else {
-      swtKeyStrokes.add(new SwtScoutKeyStroke(stroke, keycode, stateMask, environment));
-    }
+
     return swtKeyStrokes.toArray(new ISwtKeyStroke[swtKeyStrokes.size()]);
   }
 
@@ -452,278 +449,60 @@ public final class SwtUtility {
    * @return
    */
   public static int getSwtKeyCode(IKeyStroke keyStroke) {
+    List<Integer> swtKeyCodes = getSwtKeyCodes(keyStroke);
+    if (swtKeyCodes.isEmpty()) {
+      return SWT.NONE;
+    }
+
+    return swtKeyCodes.get(0);
+  }
+
+  public static List<Integer> getSwtKeyCodes(IKeyStroke keyStroke) {
     String[] keys = keyStroke.getKeyStroke().split("-");
-    int swtKeyCode = SWT.NONE;
+    List<Integer> swtKeyCodes = new LinkedList<Integer>();
 
     if (keys.length > 0) {
-      swtKeyCode = scoutToSwtKey(keys[keys.length - 1]);
+      swtKeyCodes = scoutToSwtKeys(keys[keys.length - 1]);
     }
-    return swtKeyCode;
+
+    return swtKeyCodes;
   }
 
   public static int scoutToSwtKey(String scoutKey) {
-    Integer i = SCOUT_SWT_KEY_MAP.get(scoutKey);
-    if (i == null) {
-      if (scoutKey.length() != 1) {
+    List<Integer> swtKeyCodes = scoutToSwtKeys(scoutKey);
+    if (swtKeyCodes.isEmpty()) {
+      return SWT.NONE;
+    }
+
+    return swtKeyCodes.get(0);
+  }
+
+  public static List<Integer> scoutToSwtKeys(String scoutKey) {
+    List<Integer> swtKeyCodes = new LinkedList<Integer>();
+
+    //If it's a character or a number add its unicode value
+    if (scoutKey.length() == 1) {
+      swtKeyCodes.add(Integer.valueOf(scoutKey.charAt(0)));
+    }
+
+    //Check if there is a mapping defined for this scoutKey.
+    //If yes get the mapped swtKey and add it to the list.
+    Integer mappedKeyCode = SCOUT_SWT_KEY_MAP.get(scoutKey);
+    if (mappedKeyCode == null) {
+      if (swtKeyCodes.isEmpty()) {
         LOG.warn("no key mapping for: " + scoutKey);
-        return SWT.NONE;
-      }
-      else {
-        return scoutKey.charAt(0);
       }
     }
     else {
-      return i.intValue();
-    }
-  }
+      swtKeyCodes.add(mappedKeyCode);
 
-  /**
-   * Keystroke to String
-   */
-  public static String getKeyTextFor(org.eclipse.swt.events.KeyEvent e) {
-    String keyText;
-    if (e.keyCode == 0) {
-      return null;
-    }
-    else {
-      keyText = getKeyTextLower(e.keyCode);
+      // in case of enter register keypad enter as well
+      if (mappedKeyCode == SWT.CR) {
+        swtKeyCodes.add(SWT.KEYPAD_CR);
+      }
     }
 
-    if (keyText == null) {
-      return null;
-    }
-    if (keyText.equals("shift")) {
-      return null;
-    }
-    if (keyText.equals("ctrl")) {
-      return null;
-    }
-    if (keyText.equals("alt")) {
-      return null;
-    }
-    StringBuffer buf = new StringBuffer();
-    if ((e.stateMask & SWT.SHIFT) != 0) {
-      buf.append("shift-");
-    }
-    if ((e.stateMask & SWT.CONTROL) != 0) {
-      buf.append("ctrl-");
-    }
-    if ((e.stateMask & SWT.ALT) != 0) {
-      buf.append("alt-");
-    }
-    buf.append(keyText);
-    return buf.toString();
-  }
-
-  public static String getKeyTextLower(int keyCode) {
-    if (keyCode >= '0' && keyCode <= '9' || keyCode >= 'A' && keyCode <= 'Z') {
-      return String.valueOf(Character.toLowerCase((char) keyCode));
-    }
-    // Check for other ASCII keyCodes.
-    int index = ",./;=[\\]".indexOf(keyCode);
-    if (index >= 0) {
-      return String.valueOf((char) keyCode);
-    }
-    if (keyCode >= SWT.KEYPAD_0 && keyCode <= SWT.KEYPAD_9) {
-      return String.valueOf((char) (keyCode - SWT.KEYPAD_0 + '0'));
-    }
-
-    switch (keyCode) {
-      case SWT.CR:
-        return "enter";
-      case SWT.BS:
-        return "back_space";
-      case SWT.TAB:
-        return "tab";
-        // case SWT.CANCEL: return "cancel";
-        // case KeyEvent.VK_CLEAR: return "clear";
-      case SWT.SHIFT:
-        return "shift";
-      case SWT.CONTROL:
-        return "control";
-      case SWT.ALT:
-        return "alt";
-      case SWT.PAUSE:
-        return "pause";
-      case SWT.CAPS_LOCK:
-        return "caps_lock";
-      case SWT.ESC:
-        return "escape";
-      case ' ':
-        return "space";
-      case SWT.PAGE_UP:
-        return "page_up";
-      case SWT.PAGE_DOWN:
-        return "page_down";
-      case SWT.END:
-        return "end";
-      case SWT.HOME:
-        return "home";
-      case SWT.ARROW_LEFT:
-        return "left";
-      case SWT.ARROW_UP:
-        return "up";
-      case SWT.ARROW_RIGHT:
-        return "right";
-      case SWT.ARROW_DOWN:
-        return "down";
-      case SWT.KEYPAD_MULTIPLY:
-        return "multiply";
-      case SWT.KEYPAD_ADD:
-        return "add";
-      case SWT.KEYPAD_CR:
-        return "separater";
-      case SWT.KEYPAD_SUBTRACT:
-        return "subtract";
-      case SWT.KEYPAD_DECIMAL:
-        return "decimal";
-      case SWT.KEYPAD_DIVIDE:
-        return "divide";
-      case SWT.DEL:
-        return "delete";
-      case SWT.NUM_LOCK:
-        return "num_lock";
-      case SWT.SCROLL_LOCK:
-        return "scroll_lock";
-      case SWT.F1:
-        return "f1";
-      case SWT.F2:
-        return "f2";
-      case SWT.F3:
-        return "f3";
-      case SWT.F4:
-        return "f4";
-      case SWT.F5:
-        return "f5";
-      case SWT.F6:
-        return "f6";
-      case SWT.F7:
-        return "f7";
-      case SWT.F8:
-        return "f8";
-      case SWT.F9:
-        return "f9";
-      case SWT.F10:
-        return "f10";
-      case SWT.F11:
-        return "f11";
-      case SWT.F12:
-        return "f12";
-      case SWT.F13:
-        return "f13";
-      case SWT.F14:
-        return "f14";
-      case SWT.F15:
-        return "f15";
-        // case KeyEvent.VK_F16: return "f16";
-        // case KeyEvent.VK_F17: return "f17";
-        // case KeyEvent.VK_F18: return "f18";
-        // case KeyEvent.VK_F19: return "f19";
-        // case KeyEvent.VK_F20: return "f20";
-        // case KeyEvent.VK_F21: return "f21";
-        // case KeyEvent.VK_F22: return "f22";
-        // case KeyEvent.VK_F23: return "f23";
-        // case KeyEvent.VK_F24: return "f24";
-      case SWT.PRINT_SCREEN:
-        return "printscreen";
-      case SWT.INSERT:
-        return "insert";
-      case SWT.HELP:
-        return "help";
-        // case SWT.: return "meta";
-        // case KeyEvent.VK_BACK_QUOTE: return "back_quote";
-        // case KeyEvent.VK_QUOTE: return "quote";
-        // case KeyEvent.VK_KP_UP: return "kp_up";
-        // case KeyEvent.VK_KP_DOWN: return "kp_down";
-        // case KeyEvent.VK_KP_LEFT: return "kp_left";
-        // case KeyEvent.VK_KP_RIGHT: return "kp_right";
-        // case KeyEvent.VK_DEAD_GRAVE: return "dead_grave";
-        // case KeyEvent.VK_DEAD_ACUTE: return "dead_acute";
-        // case KeyEvent.VK_DEAD_CIRCUMFLEX: return "dead_circumflex";
-        // case KeyEvent.VK_DEAD_TILDE: return "dead_tilde";
-        // case KeyEvent.VK_DEAD_MACRON: return "dead_macron";
-        // case KeyEvent.VK_DEAD_BREVE: return "dead_breve";
-        // case KeyEvent.VK_DEAD_ABOVEDOT: return "dead_abovedot";
-        // case KeyEvent.VK_DEAD_DIAERESIS: return "dead_diaeresis";
-        // case KeyEvent.VK_DEAD_ABOVERING: return "dead_abovering";
-        // case KeyEvent.VK_DEAD_DOUBLEACUTE: return "dead_doubleacute";
-        // case KeyEvent.VK_DEAD_CARON: return "dead_caron";
-        // case KeyEvent.VK_DEAD_CEDILLA: return "dead_cedilla";
-        // case KeyEvent.VK_DEAD_OGONEK: return "dead_ogonek";
-        // case KeyEvent.VK_DEAD_IOTA: return "dead_iota";
-        // case KeyEvent.VK_DEAD_VOICED_SOUND: return "dead_voiced_sound";
-        // case KeyEvent.VK_DEAD_SEMIVOICED_SOUND: return
-        // "dead_semivoiced_sound";
-      case '&':
-        return "ampersand";
-        // case KeyEvent.VK_ASTERISK: return "asterisk";
-        // case KeyEvent.VK_QUOTEDBL: return "quotedbl";
-      case '<':
-        return "less";
-      case '>':
-        return "greater";
-        // case 161: return "braceleft";
-        // case ')': return "braceright";
-      case '@':
-        return "at";
-      case KeyEvent.VK_COLON:
-        return "colon";
-      case '^':
-        return "circumflex";
-      case '$':
-        return "dollar";
-      case 128:
-        return "euro_sign";
-      case '!':
-        return "exclamation_mark";
-      case 161:
-        return "inverted_exclamation_mark";
-      case '(':
-        return "left_parenthesis";
-      case '#':
-        return "number_sign";
-      case '-':
-        return "minus";
-      case '+':
-        return "plus";
-      case ')':
-        return "right_parenthesis";
-      case '_':
-        return "underscore";
-        // case KeyEvent.VK_FINAL: return "final";
-        // case KeyEvent.VK_CONVERT: return "convert";
-        // case KeyEvent.VK_NONCONVERT: return "nonconvert";
-        // case KeyEvent.VK_ACCEPT: return "accept";
-        // case KeyEvent.VK_MODECHANGE: return "modechange";
-        // case KeyEvent.VK_KANA: return "kana";
-        // case KeyEvent.VK_KANJI: return "kanji";
-        // case KeyEvent.VK_ALPHANUMERIC: return "alphanumeric";
-        // case KeyEvent.VK_KATAKANA: return "katakana";
-        // case KeyEvent.VK_HIRAGANA: return "hiragana";
-        // case KeyEvent.VK_FULL_WIDTH: return "full_width";
-        // case KeyEvent.VK_HALF_WIDTH: return "half_width";
-        // case KeyEvent.VK_ROMAN_CHARACTERS: return "roman_characters";
-        // case KeyEvent.VK_ALL_CANDIDATES: return "all_candidates";
-        // case KeyEvent.VK_PREVIOUS_CANDIDATE: return "previous_candidate";
-        // case KeyEvent.VK_CODE_INPUT: return "code_input";
-        // case KeyEvent.VK_JAPANESE_KATAKANA: return "japanese_katakana";
-        // case KeyEvent.VK_JAPANESE_HIRAGANA: return "japanese_hiragana";
-        // case KeyEvent.VK_JAPANESE_ROMAN: return "japanese_roman";
-        // case KeyEvent.VK_KANA_LOCK: return "kana_lock";
-        // case KeyEvent.VK_INPUT_METHOD_ON_OFF: return "input_method_on_off";
-        // case KeyEvent.VK_AGAIN: return "again";
-      case KeyEvent.VK_UNDO:
-        return "undo";
-        // case : return "copy";
-        // case KeyEvent.VK_PASTE: return "paste";
-        // case KeyEvent.VK_CUT: return "cut";
-        // case KeyEvent.VK_FIND: return "find";
-        // case KeyEvent.VK_PROPS: return "props";
-        // case KeyEvent.VK_STOP: return "stop";
-        // case KeyEvent.VK_COMPOSE: return "compose";
-        // case KeyEvent.VK_ALT_GRAPH: return "alt_graph";
-    }
-    return "" + (char) keyCode;
+    return swtKeyCodes;
   }
 
   @SuppressWarnings("unchecked")
@@ -739,7 +518,6 @@ public final class SwtUtility {
 
   static {
     SCOUT_SWT_KEY_MAP = new HashMap<String, Integer>();
-    SWT_SCOUT_KEY_MAP = new HashMap<Integer, String>();
     SCOUT_SWT_KEY_MAP.put("0", SWT.KEYPAD_0);
     SCOUT_SWT_KEY_MAP.put("1", SWT.KEYPAD_1);
     SCOUT_SWT_KEY_MAP.put("2", SWT.KEYPAD_2);
@@ -756,6 +534,7 @@ public final class SwtUtility {
     // SCOUT_SWT_KEY_MAP.put("cancel", SWT.CANCEL);
     // SCOUT_SWT_KEY_MAP.put("clear", KeyEvent.VK_CLEAR);
     SCOUT_SWT_KEY_MAP.put("shift", SWT.SHIFT);
+    SCOUT_SWT_KEY_MAP.put("ctrl", SWT.CONTROL);
     SCOUT_SWT_KEY_MAP.put("control", SWT.CONTROL);
     SCOUT_SWT_KEY_MAP.put("alt", SWT.ALT);
     SCOUT_SWT_KEY_MAP.put("alternate", SWT.ALT);
@@ -897,166 +676,6 @@ public final class SwtUtility {
     // SCOUT_SWT_KEY_MAP.put("stop",(int) KeyEvent.VK_STOP);
     // SCOUT_SWT_KEY_MAP.put("compose",(int) KeyEvent.VK_COMPOSE);
     // SCOUT_SWT_KEY_MAP.put("alt_graph",(int) KeyEvent.VK_ALT_GRAPH);
-
-    // SWT -> Scout
-    SWT_SCOUT_KEY_MAP.put((int) SWT.ESC, "");
-
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_0, "0");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_1, "1");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_2, "2");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_3, "3");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_4, "4");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_5, "5");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_6, "6");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_7, "7");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_8, "8");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_9, "9");
-    SWT_SCOUT_KEY_MAP.put((int) SWT.CR, "enter");
-    SWT_SCOUT_KEY_MAP.put((int) SWT.BS, "back_space");
-    SWT_SCOUT_KEY_MAP.put((int) SWT.TAB, "tab");
-    // SWT_SCOUT_KEY_MAP.put( SWT.CANCEL, "cancel");
-    // SWT_SCOUT_KEY_MAP.put( KeyEvent.VK_CLEAR, "clear");
-    SWT_SCOUT_KEY_MAP.put(SWT.SHIFT, "shift");
-    SWT_SCOUT_KEY_MAP.put(SWT.CONTROL, "control");
-    SWT_SCOUT_KEY_MAP.put(SWT.ALT, "alt");
-    SWT_SCOUT_KEY_MAP.put(SWT.PAUSE, "pause");
-    SWT_SCOUT_KEY_MAP.put(SWT.CAPS_LOCK, "caps_lock");
-    SWT_SCOUT_KEY_MAP.put((int) SWT.ESC, "escape");
-    SWT_SCOUT_KEY_MAP.put((int) ' ', "space");
-    SWT_SCOUT_KEY_MAP.put(SWT.PAGE_UP, "page_up");
-    SWT_SCOUT_KEY_MAP.put(SWT.PAGE_DOWN, "page_down");
-    SWT_SCOUT_KEY_MAP.put(SWT.END, "end");
-    SWT_SCOUT_KEY_MAP.put(SWT.HOME, "home");
-    SWT_SCOUT_KEY_MAP.put(SWT.ARROW_LEFT, "left");
-    SWT_SCOUT_KEY_MAP.put(SWT.ARROW_UP, "up");
-    SWT_SCOUT_KEY_MAP.put(SWT.ARROW_RIGHT, "right");
-    SWT_SCOUT_KEY_MAP.put(SWT.ARROW_DOWN, "down");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_MULTIPLY, "multiply");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_ADD, "add");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_CR, "separater");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_SUBTRACT, "subtract");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_DECIMAL, "decimal");
-    SWT_SCOUT_KEY_MAP.put(SWT.KEYPAD_DIVIDE, "divide");
-    SWT_SCOUT_KEY_MAP.put((int) SWT.DEL, "delete");
-    SWT_SCOUT_KEY_MAP.put(SWT.NUM_LOCK, "num_lock");
-    SWT_SCOUT_KEY_MAP.put(SWT.SCROLL_LOCK, "scroll_lock");
-    SWT_SCOUT_KEY_MAP.put(SWT.F1, "f1");
-    SWT_SCOUT_KEY_MAP.put(SWT.F2, "f2");
-    SWT_SCOUT_KEY_MAP.put(SWT.F3, "f3");
-    SWT_SCOUT_KEY_MAP.put(SWT.F4, "f4");
-    SWT_SCOUT_KEY_MAP.put(SWT.F5, "f5");
-    SWT_SCOUT_KEY_MAP.put(SWT.F6, "f6");
-    SWT_SCOUT_KEY_MAP.put(SWT.F7, "f7");
-    SWT_SCOUT_KEY_MAP.put(SWT.F8, "f8");
-    SWT_SCOUT_KEY_MAP.put(SWT.F9, "f9");
-    SWT_SCOUT_KEY_MAP.put(SWT.F10, "f10");
-    SWT_SCOUT_KEY_MAP.put(SWT.F11, "f11");
-    SWT_SCOUT_KEY_MAP.put(SWT.F12, "f12");
-    SWT_SCOUT_KEY_MAP.put(SWT.F13, "f13");
-    SWT_SCOUT_KEY_MAP.put(SWT.F14, "f14");
-    SWT_SCOUT_KEY_MAP.put(SWT.F15, "f15");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_F16, "f16");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_F17, "f17");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_F18, "f18");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_F19, "f19");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_F20, "f20");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_F21, "f21");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_F22, "f22");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_F23, "f23");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_F24, "f24");
-    SWT_SCOUT_KEY_MAP.put(SWT.PRINT_SCREEN, "printscreen");
-    SWT_SCOUT_KEY_MAP.put(SWT.INSERT, "insert");
-    SWT_SCOUT_KEY_MAP.put(SWT.HELP, "help");
-    // SWT_SCOUT_KEY_MAP.put((int) SWT., "meta");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_BACK_QUOTE, "back_quote");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_QUOTE, "quote");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_KP_UP, "kp_up");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_KP_DOWN, "kp_down");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_KP_LEFT, "kp_left");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_KP_RIGHT, "kp_right");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_DEAD_GRAVE, "dead_grave");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_DEAD_ACUTE, "dead_acute");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_DEAD_CIRCUMFLEX, "dead_circumflex");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_DEAD_TILDE, "dead_tilde");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_DEAD_MACRON, "dead_macron");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_DEAD_BREVE, "dead_breve");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_DEAD_ABOVEDOT, "dead_abovedot");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_DEAD_DIAERESIS, "dead_diaeresis");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_DEAD_ABOVERING, "dead_abovering");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_DEAD_DOUBLEACUTE, "dead_doubleacute");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_DEAD_CARON, "dead_caron");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_DEAD_CEDILLA, "dead_cedilla");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_DEAD_OGONEK, "dead_ogonek");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_DEAD_IOTA, "dead_iota");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_DEAD_VOICED_SOUND, "dead_voiced_sound");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_DEAD_SEMIVOICED_SOUND, "dead_semivoiced_sound");
-    SWT_SCOUT_KEY_MAP.put((int) '&', "ampersand");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_ASTERISK, "asterisk");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_QUOTEDBL, "quotedbl");
-    SWT_SCOUT_KEY_MAP.put((int) '<', "less");
-    SWT_SCOUT_KEY_MAP.put((int) '>', "greater");
-    // SWT_SCOUT_KEY_MAP.put((int) 161, "braceleft");
-    // SCOUT_SWT_KEY_MAP.put("braceright",(int) ')');
-    SWT_SCOUT_KEY_MAP.put((int) '@', "at");
-    SWT_SCOUT_KEY_MAP.put(KeyEvent.VK_COLON, "colon");
-    SWT_SCOUT_KEY_MAP.put((int) '^', "circumflex");
-    SWT_SCOUT_KEY_MAP.put((int) '$', "dollar");
-    SWT_SCOUT_KEY_MAP.put(128, "euro_sign");
-    SWT_SCOUT_KEY_MAP.put((int) '!', "exclamation_mark");
-    SWT_SCOUT_KEY_MAP.put(161, "inverted_exclamation_mark");
-    SWT_SCOUT_KEY_MAP.put((int) '(', "left_parenthesis");
-    SWT_SCOUT_KEY_MAP.put((int) '#', "number_sign");
-    SWT_SCOUT_KEY_MAP.put((int) '-', "minus");
-    SWT_SCOUT_KEY_MAP.put((int) '+', "plus");
-    SCOUT_SWT_KEY_MAP.put("right_parenthesis", (int) ')');
-    SWT_SCOUT_KEY_MAP.put((int) '_', "underscore");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_FINAL, "final");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_CONVERT, "convert");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_NONCONVERT, "nonconvert");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_ACCEPT, "accept");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_MODECHANGE, "modechange");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_KANA, "kana");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_KANJI, "kanji");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_ALPHANUMERIC, "alphanumeric");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_KATAKANA, "katakana");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_HIRAGANA, "hiragana");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_FULL_WIDTH, "full_width");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_HALF_WIDTH, "half_width");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_ROMAN_CHARACTERS, "roman_characters");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_ALL_CANDIDATES, "all_candidates");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_PREVIOUS_CANDIDATE, "previous_candidate");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_CODE_INPUT, "code_input");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_JAPANESE_KATAKANA, "japanese_katakana");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_JAPANESE_HIRAGANA, "japanese_hiragana");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_JAPANESE_ROMAN, "japanese_roman");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_KANA_LOCK, "kana_lock");
-    // SWT_SCOUT_KEY_MAP.put((int)
-    // KeyEvent.VK_INPUT_METHOD_ON_OFF, "input_method_on_off");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_AGAIN, "again");
-    SWT_SCOUT_KEY_MAP.put(KeyEvent.VK_UNDO, "undo");
-    // SWT_SCOUT_KEY_MAP.put((int) , "copy");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_PASTE, "paste");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_CUT, "cut");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_FIND, "find");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_PROPS, "props");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_STOP, "stop");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_COMPOSE, "compose");
-    // SWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_ALT_GRAPH, "alt_graph");
   }
 
   /**

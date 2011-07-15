@@ -64,6 +64,22 @@ public interface IGuiMock {
     End,
     PageUp,
     PageDown,
+    NumPad0,
+    NumPad1,
+    NumPad2,
+    NumPad3,
+    NumPad4,
+    NumPad5,
+    NumPad6,
+    NumPad7,
+    NumPad8,
+    NumPad9,
+    NumPadMultiply,
+    NumPadAdd,
+    NumPadSubtract,
+    NumPadDecimal,
+    NumPadDivide,
+    NumPadSeparator,
   }
 
   enum FieldType {

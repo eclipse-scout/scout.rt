@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -216,6 +216,36 @@ public class JavaRobot {
         return KeyEvent.VK_PAGE_UP;
       case PageDown:
         return KeyEvent.VK_PAGE_DOWN;
+      case NumPad0:
+        return KeyEvent.VK_NUMPAD0;
+      case NumPad1:
+        return KeyEvent.VK_NUMPAD1;
+      case NumPad2:
+        return KeyEvent.VK_NUMPAD2;
+      case NumPad3:
+        return KeyEvent.VK_NUMPAD3;
+      case NumPad4:
+        return KeyEvent.VK_NUMPAD4;
+      case NumPad5:
+        return KeyEvent.VK_NUMPAD5;
+      case NumPad6:
+        return KeyEvent.VK_NUMPAD6;
+      case NumPad7:
+        return KeyEvent.VK_NUMPAD7;
+      case NumPad8:
+        return KeyEvent.VK_NUMPAD8;
+      case NumPadMultiply:
+        return KeyEvent.VK_MULTIPLY;
+      case NumPadDivide:
+        return KeyEvent.VK_DIVIDE;
+      case NumPadAdd:
+        return KeyEvent.VK_ADD;
+      case NumPadSubtract:
+        return KeyEvent.VK_SUBTRACT;
+      case NumPadDecimal:
+        return KeyEvent.VK_DECIMAL;
+      case NumPadSeparator:
+        return KeyEvent.VK_SEPARATOR;
       default:
         throw new IllegalArgumentException("Unknown keyboard key: " + key);
     }
