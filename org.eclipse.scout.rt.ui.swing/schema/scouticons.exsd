@@ -26,7 +26,6 @@
             <element ref="network_latency_green" minOccurs="0" maxOccurs="1"/>
             <element ref="network_latency_red" minOccurs="0" maxOccurs="1"/>
             <element ref="network_latency_yellow" minOccurs="0" maxOccurs="1"/>
-            <element ref="splash" minOccurs="0" maxOccurs="1"/>
             <element ref="status_error" minOccurs="0" maxOccurs="1"/>
             <element ref="status_info" minOccurs="0" maxOccurs="1"/>
             <element ref="status_interrupt" minOccurs="0" maxOccurs="1"/>
@@ -364,28 +363,6 @@
       <annotation>
          <documentation>
             Icon to indicate a &apos;bad network connection&apos; in status bar
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="icon" type="string" use="required">
-            <annotation>
-               <documentation>
-                  Project relative path to the icon resource
-               </documentation>
-               <appInfo>
-                  <meta.attribute kind="resource"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="splash">
-      <annotation>
-         <documentation>
-            Icon to represent the splash screen when the application is started.
-Another way to register a splash screen is to set &apos;osgi.splashPath&apos; in config.ini with the path of the containing Plug-In. In turn, the Plug-In is searched for a file named
-platform:/base/plugins/org.eclipse.scout.rt.test.ui.swing splash.*.
          </documentation>
       </annotation>
       <complexType>
