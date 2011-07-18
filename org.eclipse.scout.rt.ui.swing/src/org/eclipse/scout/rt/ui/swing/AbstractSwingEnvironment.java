@@ -84,8 +84,8 @@ import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.eclipse.scout.rt.ui.swing.form.fields.OnFieldLabelDecorator;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.ISwingScoutTabItem;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.SwingScoutTabItem;
+import org.eclipse.scout.rt.ui.swing.inject.ActionInjector;
 import org.eclipse.scout.rt.ui.swing.inject.AppendActionsInjector;
-import org.eclipse.scout.rt.ui.swing.inject.CreateActionInjector;
 import org.eclipse.scout.rt.ui.swing.inject.InitLookAndFeelInjector;
 import org.eclipse.scout.rt.ui.swing.inject.UIDefaultsInjector;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutBoundsProvider;
@@ -96,6 +96,12 @@ import org.eclipse.scout.rt.ui.swing.window.desktop.ISwingScoutRootFrame;
 import org.eclipse.scout.rt.ui.swing.window.desktop.SwingScoutDesktop;
 import org.eclipse.scout.rt.ui.swing.window.desktop.SwingScoutRootFrame;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitLayoutConstraints;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJNavigationWidget;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJToolTabsBar;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJViewTabsBar;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JNavigationWidget;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JToolTabsBar;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JViewTabsBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.tray.ISwingScoutTray;
 import org.eclipse.scout.rt.ui.swing.window.desktop.tray.SwingScoutTray;
 import org.eclipse.scout.rt.ui.swing.window.dialog.SwingScoutDialog;
@@ -124,15 +130,15 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   private Frame m_rootFrame;
   private FormFieldFactory m_formFieldFactory;
   private ISwingScoutRootFrame m_rootComposite;
-  private PropertyChangeSupport m_propertySupport = new PropertyChangeSupport(this);
-  private WeakHashMap<IForm, ISwingScoutForm> m_standaloneFormComposites;
+  private final PropertyChangeSupport m_propertySupport = new PropertyChangeSupport(this);
+  private final WeakHashMap<IForm, ISwingScoutForm> m_standaloneFormComposites;
   private Component m_popupOwner;
   private Rectangle m_popupOwnerBounds;
   private final Object m_immediateSwingJobsLock = new Object();
   private final List<Runnable> m_immediateSwingJobs = new ArrayList<Runnable>();
   // collect print events during forms getting opend async.
-  private Map<IForm, List<FormEvent>> m_pendingEvents;
-  private P_InitializeFormListener m_initializeFormListener;
+  private final Map<IForm, List<FormEvent>> m_pendingEvents;
+  private final P_InitializeFormListener m_initializeFormListener;
 
   public AbstractSwingEnvironment() {
     checkThread();
@@ -228,12 +234,22 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   @Override
   public Icon getIcon(String name) {
-    return m_iconLocator.getIcon(name);
+    Icon icon = m_iconLocator.getIcon(name);
+    // No application icon could be found. Look for a respective Scout icon.
+    if (icon == null) {
+      icon = Activator.getIcon(name);
+    }
+    return icon;
   }
 
   @Override
   public Image getImage(String name) {
-    return m_iconLocator.getImage(name);
+    Image image = m_iconLocator.getImage(name);
+    // No application image could be found. Look for a respective Scout image.
+    if (image == null) {
+      image = Activator.getImage(name);
+    }
+    return image;
   }
 
   public List<Image> getImages(String... names) {
@@ -259,13 +275,13 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
    */
   protected void setWindowIcon(Window window) {
     // legacy
-    Image legacyIcon = Activator.getImage("window");
+    Image legacyIcon = Activator.getImage(SwingIcons.Window);
     if (legacyIcon != null) {
       window.setIconImage(legacyIcon);
     }
     else {
       ArrayList<Image> icons = new ArrayList<Image>();
-      for (String name : new String[]{"window16", "window32", "window48", "window256"}) {
+      for (String name : new String[]{SwingIcons.Window16, SwingIcons.Window32, SwingIcons.Window48, SwingIcons.Window256}) {
         if (name != null) {
           Image img = Activator.getImage(name);
           if (img != null) {
@@ -1124,7 +1140,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   @Override
   public ISwingScoutAction createAction(JComponent parent, IAction action) {
-    ISwingScoutAction ui = new CreateActionInjector().inject(this, parent, action);
+    ISwingScoutAction ui = new ActionInjector().inject(this, parent, action);
     decorate(action, ui);
     return ui;
   }
@@ -1154,7 +1170,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   @Override
   public JComponent createLogo() {
     JLabel logo = new JLabel();
-    logo.setIcon(getIcon("logo"));
+    logo.setIcon(Activator.getIcon(SwingIcons.Logo));
     return logo;
   }
 
@@ -1237,4 +1253,33 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     }
   }
 
+  @Override
+  public AbstractJNavigationWidget createNavigationWidgetPanel() {
+    return new JNavigationWidget(this);
+  }
+
+  @Override
+  public AbstractJToolTabsBar createToolTabsBar() {
+    return new JToolTabsBar(this);
+  }
+
+  @Override
+  public AbstractJViewTabsBar createViewTabsBar() {
+    return new JViewTabsBar(this);
+  }
+
+  @Override
+  public int getToolBarHeight() {
+    return 30;
+  }
+
+  @Override
+  public int getHeaderPanelHeight() {
+    return 85;
+  }
+
+  @Override
+  public Color getHeaderPanelColor() {
+    return null;
+  }
 }

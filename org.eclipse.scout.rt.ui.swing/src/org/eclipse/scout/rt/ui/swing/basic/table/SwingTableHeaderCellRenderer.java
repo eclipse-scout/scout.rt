@@ -45,7 +45,7 @@ public class SwingTableHeaderCellRenderer implements TableCellRenderer {
     m_swingScoutTable = t;
     m_sortUpIcon = new SortIcon(true);
     m_sortDownIcon = new SortIcon(false);
-    m_filterActiveIcon = Activator.getIcon(SwingIcons.ColumnFilterEnabled);
+    m_filterActiveIcon = Activator.getIcon(SwingIcons.TableColumnFilterActive);
   }
 
   @Override

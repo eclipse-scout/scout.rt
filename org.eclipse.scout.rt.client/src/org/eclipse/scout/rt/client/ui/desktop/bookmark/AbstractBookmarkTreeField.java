@@ -454,7 +454,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         title = ScoutTexts.get("GlobalBookmarks");
       }
       cell.setText(title);
-      cell.setIconId(AbstractIcons.Folder);
+      cell.setIconId(AbstractIcons.TreeNodeClosed);
     }
 
     @Order(30)

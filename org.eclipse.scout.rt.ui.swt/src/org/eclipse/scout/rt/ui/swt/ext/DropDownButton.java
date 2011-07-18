@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swt.ext;
 
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.rt.ui.swt.Activator;
+import org.eclipse.scout.rt.ui.swt.SwtIcons;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -44,7 +45,7 @@ public class DropDownButton extends Canvas {
   private Image m_imageDisabled;
   private Rectangle m_buttonArea = new Rectangle(0, 0, 0, 0);
   private Rectangle m_dropDownArea = new Rectangle(0, 0, 0, 0);
-  private EventListenerList m_eventListeners = new EventListenerList();
+  private final EventListenerList m_eventListeners = new EventListenerList();
 
   private boolean m_mouseHover;
   private Point m_mouseDownPosition;
@@ -267,7 +268,7 @@ public class DropDownButton extends Canvas {
     m_textColorDisabled = getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
     m_focusedHighlightBorderColor = new Color(getDisplay(), 118, 183, 232);
     m_mouseOverHighlightColor = new Color(getDisplay(), 180, 200, 220);
-    m_dropDownIcon = Activator.imageDescriptorFromLocalPlugin(Activator.ICON_ARROW_DOWN).createImage();
+    m_dropDownIcon = Activator.getIcon(SwtIcons.DropDownFieldArrowDown);
     m_dropDownIconDisabled = new Image(getDisplay(), m_dropDownIcon, SWT.IMAGE_DISABLE);
     m_backgroundGradient1 = new Color(getDisplay(), 255, 255, 255);
     m_backgroundGradient2 = new Color(getDisplay(), 220, 220, 220);
@@ -278,7 +279,6 @@ public class DropDownButton extends Canvas {
   }
 
   public void freeResources() {
-    m_dropDownIcon.dispose();
     m_dropDownIconDisabled.dispose();
     m_focusedHighlightBorderColor.dispose();
     m_mouseOverHighlightColor.dispose();

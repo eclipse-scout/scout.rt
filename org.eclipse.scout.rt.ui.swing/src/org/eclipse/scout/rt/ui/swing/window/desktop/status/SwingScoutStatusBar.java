@@ -39,6 +39,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -80,9 +81,9 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
   @Override
   protected void initializeSwing() {
     super.initializeSwing();
-    m_iconNetworkLatencyGreen = getSwingEnvironment().getIcon(SwingIcons.NetworkLatencyGreen);
-    m_iconNetworkLatencyYellow = getSwingEnvironment().getIcon(SwingIcons.NetworkLatencyYellow);
-    m_iconNetworkLatencyRed = getSwingEnvironment().getIcon(SwingIcons.NetworkLatencyRed);
+    m_iconNetworkLatencyGreen = Activator.getIcon(SwingIcons.NetworkLatencyGreen);
+    m_iconNetworkLatencyYellow = Activator.getIcon(SwingIcons.NetworkLatencyYellow);
+    m_iconNetworkLatencyRed = Activator.getIcon(SwingIcons.NetworkLatencyRed);
     //
     m_busyCached = getSwingEnvironment().isBusy();
     m_progressHandler = new ProgressHandler(getSwingEnvironment()) {

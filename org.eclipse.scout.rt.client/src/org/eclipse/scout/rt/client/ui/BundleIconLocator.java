@@ -41,8 +41,8 @@ public class BundleIconLocator implements IIconLocator {
 
   private class P_BundleIconProviderService extends IconProviderService {
 
-    public P_BundleIconProviderService(Bundle clientBundle) {
-      setHostBundle(clientBundle);
+    public P_BundleIconProviderService(Bundle bundle) {
+      setHostBundle(bundle);
     }
 
   }

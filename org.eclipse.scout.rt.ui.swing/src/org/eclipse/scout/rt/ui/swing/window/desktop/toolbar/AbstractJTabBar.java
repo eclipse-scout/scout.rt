@@ -31,7 +31,7 @@ public abstract class AbstractJTabBar extends JPanel {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      if (AbstractJTab.PROP_ACTIVE.equals(evt.getPropertyName())) {
+      if (JTabEx.PROP_ACTIVE.equals(evt.getPropertyName())) {
         AbstractButton tab = (AbstractButton) evt.getSource();
         boolean active = tab.isSelected();
         if (active) {

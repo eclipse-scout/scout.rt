@@ -36,6 +36,7 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -71,10 +72,10 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "ListBox.rowHeight", 20);
     putIfUndefined(defaults, "MenuBar.policy", "menubar");
     putIfUndefined(defaults, "PopupMenu.innerBorder", null);
-    putIfUndefined(defaults, "Splash.icon", getSplashUIResource());
-    putIfUndefined(defaults, "Splash.text", new ColorUIResource(0x0086A6));
-    //putIfUndefined(defaults, "Splash.versionLocation", new Point(0,200));
-    //putIfUndefined(defaults, "Splash.statusTextLocation", new Point(0,180));
+    putIfUndefined(defaults, "SplashScreen.icon", getSplashUIResource());
+    putIfUndefined(defaults, "SplashScreen.text", new ColorUIResource(0x0086A6));
+    //putIfUndefined(defaults, "SplashScreen.versionLocation", new Point(0,200));
+    //putIfUndefined(defaults, "SplashScreen.statusTextLocation", new Point(0,180));
     putIfUndefined(defaults, "StatusBar.StopButton.icon", createIconUIResource(SwingIcons.StatusInterrupt));
     putIfUndefined(defaults, "StatusBar.height", 29);
     putIfUndefined(defaults, "StatusBar.icon", null);
@@ -93,22 +94,21 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "TitledBorder.border", new BorderUIResource(new EmptyBorder(0, 0, 0, 0)));
     putIfUndefined(defaults, "TitledBorder.font", new FontUIResource("Dialog", Font.PLAIN, 12));
     putIfUndefined(defaults, "TitledBorder.titleColor", new ColorUIResource(0x000000));
-    putIfUndefined(defaults, "Tooltip.icon", createIconUIResource(SwingIcons.Tooltip));
-    putIfUndefined(defaults, "Tree.closedIcon", createIconUIResource(SwingIcons.FolderClosed));
-    putIfUndefined(defaults, "Tree.openIcon", createIconUIResource(SwingIcons.FolderOpen));
+    putIfUndefined(defaults, "Tree.closedIcon", createIconUIResource(AbstractIcons.TreeNodeClosed));
+    putIfUndefined(defaults, "Tree.openIcon", createIconUIResource(AbstractIcons.TreeNodeOpen));
     putIfUndefined(defaults, "Tree.rowHeight", 24);
     putIfUndefined(defaults, "TreeBox.rowHeight", 20);
-    Icon icon = Activator.getIcon("window");
+    Icon icon = Activator.getIcon(SwingIcons.Window);
     if (icon != null) { // legacy
       putIfUndefined(defaults, "Window.icon", icon);// must be an ImageIcon, not an IconUIResource
     }
     else {
       // multiple icons for newer versions of Java
       List<Image> icons = new ArrayList<Image>();
-      icons.add(Activator.getImage("window16"));
-      icons.add(Activator.getImage("window32"));
-      icons.add(Activator.getImage("window48"));
-      icons.add(Activator.getImage("window256"));
+      icons.add(Activator.getImage(SwingIcons.Window16));
+      icons.add(Activator.getImage(SwingIcons.Window32));
+      icons.add(Activator.getImage(SwingIcons.Window48));
+      icons.add(Activator.getImage(SwingIcons.Window256));
       putIfUndefined(defaults, "Window.icons", icons);
     }
 
@@ -152,11 +152,11 @@ public class UIDefaultsInjector {
     defaults.put("Planner.involvedPersons", SwingUtility.getNlsText("InvolvedPersons"));
     defaults.put("Planner.displayedTimerange", SwingUtility.getNlsText("DisplayedTimerange"));
     defaults.put("Planner.today", SwingUtility.getNlsText("Today"));
-    //XXX transient, will be moved to synth and custom L&F
-    putIfUndefined(defaults, "Synth.ViewTab.foreground", new ColorUIResource(0x486685));
-    putIfUndefined(defaults, "Synth.ViewTab.foregroundSelected", new ColorUIResource(254, 154, 35));
-    putIfUndefined(defaults, "Synth.ViewTab.font", new FontUIResource("Arial", Font.PLAIN, 12));
-    putIfUndefined(defaults, "Synth.ViewTab.fontSelected", new FontUIResource("Arial", Font.BOLD, 12));
+    defaults.put("Navigation.history", SwingUtility.getNlsText("History"));
+    defaults.put("Navigation.back", SwingUtility.getNlsText("NavigationBackward"));
+    defaults.put("Navigation.forward", SwingUtility.getNlsText("NavigationForward"));
+    defaults.put("Navigation.refresh", SwingUtility.getNlsText("Refresh"));
+    defaults.put("Navigation.cancel", SwingUtility.getNlsText("Cancel"));
   }
 
   /**
@@ -186,8 +186,8 @@ public class UIDefaultsInjector {
     try {
       if (!StringUtility.isNullOrEmpty(splashPathProp)) {
         Path p = new Path(splashPathProp);
-        String bunldeName = p.lastSegment();
-        Bundle splashBundle = Platform.getBundle(bunldeName);
+        String bundleName = p.lastSegment();
+        Bundle splashBundle = Platform.getBundle(bundleName);
         if (splashBundle != null) {
           for (String ext : m_splashExtensions) {
             String imageName = "splash." + ext;
@@ -210,7 +210,7 @@ public class UIDefaultsInjector {
       LOG.error("could not find splash for config.ini property 'osgi.splashPath' -> value '" + splashPathProp + "'.", e);
     }
     if (iconresource == null) {
-      iconresource = createIconUIResource("splash");
+      iconresource = createIconUIResource(SwingIcons.SplashScreen);
     }
     return iconresource;
   }

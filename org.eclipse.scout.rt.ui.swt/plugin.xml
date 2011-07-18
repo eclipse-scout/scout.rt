@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="org.eclipse.scout.rt.ui.swt.formfields" name="Form Fields" schema="schema/formfields.exsd"/>
    <extension-point id="org.eclipse.scout.rt.ui.swt.lookAndFeel" name="lookAndFeel" schema="schema/lookAndFeel.exsd"/>
+   <extension-point id="org.eclipse.scout.rt.ui.swt.scouticons" name="Scout Icons" schema="schema/scouticons.exsd"/>
    <extension
          point="org.eclipse.ui.themes">
       <theme
@@ -325,49 +326,32 @@
          </property>
       </properties>
    </extension>
-   <extension
-         point="org.eclipse.scout.service.services">
-      <service
-            class="org.eclipse.scout.rt.ui.swt.services.SwtScoutProgressService">
+   <extension point="org.eclipse.scout.service.services">
+      <service class="org.eclipse.scout.rt.ui.swt.services.SwtScoutProgressService" />
+      <service class="org.eclipse.scout.rt.ui.swt.services.UserActivityProvider"
+               createImmediately="true">
       </service>
-      <service
-            class="org.eclipse.scout.rt.ui.swt.services.UserActivityProvider"
-            createImmediately="true">
-      </service>
-      <service
-            class="org.eclipse.scout.rt.ui.swt.services.common.clipboard.SwtScoutClipboardService">
-      </service>
-      <service
-            class="org.eclipse.scout.rt.client.services.common.icon.IconProviderService"
-            createImmediately="false"
-            factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
-            ranking="-90">
+      <service class="org.eclipse.scout.rt.ui.swt.services.common.clipboard.SwtScoutClipboardService" />
+      <service class="org.eclipse.scout.rt.ui.swt.services.common.icon.SwtBundleIconProviderService"
+               createImmediately="false"
+               factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+               ranking="-1000">
       </service>
    </extension>
-   <extension
-         point="org.eclipse.ui.activities">
 
-    <activity
-	name="Remove Unused Icons Manager"
-	id="activity.removeUnusedIcons" />
-	<activityPatternBinding
-	activityId="activity.removeUnusedIcons"
-	pattern="org\.eclipse\.ui\.editors/org\.eclipse\.ui\.edit\.text\.gotoLastEditPosition">
-    </activityPatternBinding>
- <activityPatternBinding
-       activityId="activity.removeUnusedIcons"
-       pattern="org.eclipse.ui.editors/org.eclipse.ui.edit.text.*nnotation">
- </activityPatternBinding>
-
+   <extension point="org.eclipse.ui.activities">
+      <activity	name="Remove Unused Icons Manager"
+	              id="activity.removeUnusedIcons" />
+         <activityPatternBinding activityId="activity.removeUnusedIcons"
+                                 pattern="org\.eclipse\.ui\.editors/org\.eclipse\.ui\.edit\.text\.gotoLastEditPosition">
+         </activityPatternBinding>
+         <activityPatternBinding activityId="activity.removeUnusedIcons"
+                                 pattern="org.eclipse.ui.editors/org.eclipse.ui.edit.text.*nnotation">
+         </activityPatternBinding>
    </extension>
-   <extension
-         point="org.eclipse.ui.bindings">
-      <scheme
-            id="org.eclipse.scout.rt.ui.swt.keybindings.scheme"
-            name="Scout SWT Keybindings Scheme">
+   <extension point="org.eclipse.ui.bindings">
+      <scheme id="org.eclipse.scout.rt.ui.swt.keybindings.scheme"
+              name="Scout SWT Keybindings Scheme">
       </scheme>
    </extension>
-
-
-
 </plugin>

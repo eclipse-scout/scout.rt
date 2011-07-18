@@ -16,7 +16,7 @@ import java.util.Hashtable;
 import javax.swing.Icon;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.scout.rt.client.ui.BundleIconLocator;
+import org.eclipse.scout.rt.ui.swing.icons.SwingBundleIconLocator;
 import org.eclipse.scout.rt.ui.swing.login.internal.InternalNetAuthenticator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -25,58 +25,22 @@ import org.osgi.framework.ServiceRegistration;
 public class Activator extends Plugin implements SwingIcons {
   public static final String PLUGIN_ID = "org.eclipse.scout.rt.ui.swing";
 
-  // The shared instance
   private static Activator plugin;
   private SwingIconLocator m_iconLocator;
+  private ServiceRegistration m_netAuthRegistration;
 
-  /**
-   * Returns the shared instance
-   * 
-   * @return the shared instance
-   */
+  public Activator() {
+  }
+
   public static Activator getDefault() {
     return plugin;
   }
 
-  public static Image getImage(String name) {
-    return getDefault().getImageImpl(name);
-  }
-
-  private Image getImageImpl(String name) {
-    return m_iconLocator.getImage(name);
-  }
-
-  public static Icon getIcon(String name) {
-    Activator activator = getDefault();
-    if (activator != null) {
-      return activator.getIconImpl(name);
-    }
-    return null;
-  }
-
-  private Icon getIconImpl(String name) {
-    return m_iconLocator.getIcon(name);
-  }
-
-  private ServiceRegistration m_netAuthRegistration;
-
-  /**
-   * The constructor
-   */
-  public Activator() {
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
-   */
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
     plugin = this;
-    BundleIconLocator iconLocator = new BundleIconLocator(getBundle());
-    iconLocator.getIconLocatorService().setFolderName("resources/icons/internal/");
+    SwingBundleIconLocator iconLocator = new SwingBundleIconLocator();
     m_iconLocator = new SwingIconLocator(iconLocator);
     // register net authenticator ui
     Hashtable<String, Object> map = new Hashtable<String, Object>();
@@ -84,10 +48,6 @@ public class Activator extends Plugin implements SwingIcons {
     m_netAuthRegistration = Activator.getDefault().getBundle().getBundleContext().registerService(java.net.Authenticator.class.getName(), new InternalNetAuthenticator(), map);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
-   */
   @Override
   public void stop(BundleContext context) throws Exception {
     m_iconLocator = null;
@@ -99,4 +59,23 @@ public class Activator extends Plugin implements SwingIcons {
     super.stop(context);
   }
 
+  public static Image getImage(String name) {
+    return getDefault().getImageImpl(name);
+  }
+
+  public static Icon getIcon(String name) {
+    Activator activator = getDefault();
+    if (activator != null) {
+      return activator.getIconImpl(name);
+    }
+    return null;
+  }
+
+  private Image getImageImpl(String name) {
+    return m_iconLocator.getImage(name);
+  }
+
+  private Icon getIconImpl(String name) {
+    return m_iconLocator.getIcon(name);
+  }
 }

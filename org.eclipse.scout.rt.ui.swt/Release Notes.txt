@@ -48,4 +48,40 @@ Migration:
 none
 
 
-
+18.07.2011 dwi
+bugzilla 345184
+bsi ticket 102'074, 101'202, 103'927, 104'140
+Problem:18.07.2011 dwi
+bugzilla 345184
+bsi ticket 102'074, 101'202, 103'927, 104'140
+Problem:
+There is no distinct separation among the different Look And Feels. In practice, if using a L&F other than Rayo or Orson, some widgets (e.g. the header panel) partly look like Rayo, but not like the installed L&F.
+Solution:
+Scout should completely adhere the installed L&F.
+To solve this ticket, some major changes where necessary to the SwingScoutRootFrame, SwingScoutToolBar and its attached controls. Also, all Scout specific icons are moved from the org.eclipse.scout.rt.client Plug-In to the respective UI / L&F Plug-Ins to conform the UI.
+Changes:
+  - Generally, icons in Scout are strongly referenced by their icon identifier defined in SwingIcons#XX, SwtIcons#XX, RwtIcons#XX or AbtractIcons#XX.
+  - Icons are moved from org.eclipse.scout.rt.client to the respective UI Plug-Ins. The Swing and SWT Plug-In only contain OpenSource specific icons whereas L&F fragments L&F specific ones.
+  - org.eclipse.scout.rt.ui.swing does not contain any Rayo / Orson specific UI definitions anymore. Those are outsourced to the respective L&F Plugins.
+  - ISwingEnvironment is extended to install a custom NavigationWidgetPanel, ViewTabsBar and ToolTabsBar specific to the L&F. The default implementation does not draw these elements anymore, but uses native controls instead.
+  - Added extension point *.scouticons to every UI Plug-in to easily replace Scout default icons like window, tray or navigation icons.
+  - Scout icons which cannot be configured in application (by respective getConfigured method) are fetched by the UI Activator, not the environemnt anymore. Now, Swing and SWT behave the same way. Those icons can be replaced by the *.scouticons extension point.
+  - Rayo and Orson have a different JTextWithFieldTransparentIcon to meet L&F specific requirements.
+  - Rayo and Orson have a different DateField / TimeField to meet L&F specific requirements.
+  - Rayo and Orson have a different ActionInjection / UIDefaultsInjector to meet L&F specific requirements.
+  - Moved and renamed legacy UI classes to org.eclipse.scout.rt.ui.swing.orson as they only belong to Orson L&F.
+  - removed icons from org.eclipse.scout.rt.ui.swing.bsi.fragment. The icons are contained in the respective L&F fragment.
+  - added icons for Orson L&F to org.eclipse.scout.rt.ui.swing.laf.orson.fragment
+  - added icons for Orson L&F to org.eclipse.scout.rt.ui.swing.laf.rayo.fragment
+  - created Plug-In org.eclipse.scout.rt.ui.swing.orson to meet Orson specific requirements such as actions, formfields and Swing environment.
+  - moved BSI specific Icons for SWT into org.eclipse.scout.rt.ui.swt.bsi.fragment
+  - removed Plug-In com.bsiag.scout.rt.client.bsi.icons.fragment as not required anymore
+Migration:
+- Icons as CheckboxYes and CheckboxNo were removed from AbstractIcons. If required, add them to your project specific icons in your client Plug-In.
+- Product specific icons were removed from Scout UI Plug-Ins and must be installed in project yourself. Thereto, copy icons attached to this mail (window16.png, window32.png, window48.png, window256.png, tray.gif) into your Swing Plugin, e.g. /resources/icons. If folder does not exist yet, create it and register it in build.properties to be exported for production. Open plugin.xml of Swing Plug-In and register those icons in extension org.eclipse.scout.rt.ui.swing.scouticons.
+- Names of some icons in AbstractIcons were changed to gain consistency in naming: e.g. AbstractIcons.TimeFieldTime -> AbstractIcons.DateFieldTime, AbstractIcons.File -> AbstractIcons.FileChooserFieldFile
+- Remove Plug-In com.bsiag.scout.rt.client.bsi.icons.fragment if used as those icons are located in respective L&F Plug-Ins.
+If using Orson L&F:
+  - create dependency to org.eclipse.scout.rt.ui.swing.orson from your Swing-Plug-In. Also include that Plug-In in the product file.
+  - In SwingApplication, change LegacySwingEnvironment to OrsonSwingEnvironment.
+  - Remove Plug-In com.bsiag.scout.rt.client.bsi.icons.fragment as those icons are contained in com.bsiag.scout.rt.client.bsi.icons.fragment.

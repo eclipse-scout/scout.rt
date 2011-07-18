@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -51,7 +51,7 @@ public class BookmarkFolderLookupCall extends LocalLookupCall {
               if (path.size() >= 3) {
                 parent = path.get(path.size() - 2);
               }
-              LookupRow row = new LookupRow(f, f.getTitle(), f.getIconId() != null ? f.getIconId() : AbstractIcons.Folder);
+              LookupRow row = new LookupRow(f, f.getTitle(), f.getIconId() != null ? f.getIconId() : AbstractIcons.TreeNodeClosed);
               row.setParentKey(parent);
               rows.add(row);
             }

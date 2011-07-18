@@ -10,21 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
+import java.io.ByteArrayInputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.Activator;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
-import org.osgi.framework.Bundle;
 
 /**
  *
  */
 public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvider {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultWizardStatusHtmlProvider.class);
+
   private String m_htmlTemplate;
 
   /**
@@ -125,14 +132,53 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
    * @return
    */
   protected List<RemoteFile> collectAttachments() {
-    Bundle clientBundle = Activator.getDefault().getBundle();
     List<RemoteFile> attachments = new LinkedList<RemoteFile>();
 
-    attachments.add(new RemoteFile(clientBundle.getResource("resources/icons/empty.png"), true));
-    attachments.add(new RemoteFile(clientBundle.getResource("resources/icons/wiz_bullet.png"), true));
-    attachments.add(new RemoteFile(clientBundle.getResource("resources/icons/wiz_bullet_disabled.png"), true));
-    attachments.add(new RemoteFile(clientBundle.getResource("resources/icons/wiz_bullet_selected.png"), true));
+    loadIcon(attachments, AbstractIcons.Empty + ".png");
+    loadIcon(attachments, AbstractIcons.WizardBullet + ".png");
+    loadIcon(attachments, AbstractIcons.WizardBullet + "_disabled.png");
+    loadIcon(attachments, AbstractIcons.WizardBullet + "_selected.png");
 
     return attachments;
+  }
+
+  /**
+   * To load an icon into the given attachments live list
+   * 
+   * @param attachments
+   * @param iconName
+   */
+  protected void loadIcon(List<RemoteFile> attachments, String iconName) {
+    try {
+      // determine file format
+      int index = iconName.lastIndexOf(".");
+      String format = iconName.substring(iconName.lastIndexOf("."));
+      // determine icon name
+      iconName = iconName.substring(0, iconName.lastIndexOf("."));
+      // determine icon base name
+      String baseIconName = iconName;
+      index = iconName.lastIndexOf("_");
+      if (index > 0) {
+        baseIconName = iconName.substring(0, index);
+      }
+
+      // load icon
+      IClientSession clientSession = ClientSyncJob.getCurrentSession();
+      IconSpec iconSpec = clientSession.getIconLocator().getIconSpec(iconName);
+      if (iconSpec == null && !iconName.equals(baseIconName)) {
+        iconSpec = clientSession.getIconLocator().getIconSpec(baseIconName);
+      }
+
+      if (iconSpec != null) {
+        RemoteFile iconFile = new RemoteFile(iconName + format, 0);
+        ByteArrayInputStream is = new ByteArrayInputStream(iconSpec.getContent());
+        iconFile.readData(is);
+        is.close();
+        attachments.add(iconFile);
+      }
+    }
+    catch (Exception e) {
+      LOG.warn("failed to load image for " + AbstractIcons.WizardBullet, e);
+    }
   }
 }

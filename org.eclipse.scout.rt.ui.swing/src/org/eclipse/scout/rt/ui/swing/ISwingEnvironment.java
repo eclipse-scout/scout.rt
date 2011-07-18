@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Image;
@@ -29,7 +30,9 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
@@ -51,6 +54,9 @@ import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.ISwingScoutTabItem;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
 import org.eclipse.scout.rt.ui.swing.window.desktop.ISwingScoutDesktop;
 import org.eclipse.scout.rt.ui.swing.window.desktop.ISwingScoutRootFrame;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJNavigationWidget;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJToolTabsBar;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJViewTabsBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.tray.ISwingScoutTray;
 import org.eclipse.scout.rt.ui.swing.window.filechooser.ISwingScoutFileChooser;
 import org.eclipse.scout.rt.ui.swing.window.messagebox.ISwingScoutMessageBox;
@@ -151,8 +157,8 @@ public interface ISwingEnvironment {
    * <li><b>TabItem custom label/icon</b>
    * TabbedPane.tabAreaInsets (Insets)</li>
    * <li><b>SplashScreen</b>
-   * Splash.icon (Icon)
-   * Splash.text (Color)</li>
+   * SplashScreen.icon (Icon)
+   * SplashScreen.text (Color)</li>
    * <li><b>Status/Progress</b>
    * StatusBar.StopButton.icon (Icon)
    * StatusBar.icon (Icon)
@@ -359,8 +365,53 @@ public interface ISwingEnvironment {
   String styleHtmlText(ISwingScoutFormField<?> uiComposite, String rawHtml);
 
   /**
+   * <p>
+   * To be overwritten to install a custom tool tab bar.
+   * </p>
+   * This bar holds the {@link IToolButton} configured on desktop.
+   * 
+   * @return
+   */
+  AbstractJToolTabsBar createToolTabsBar();
+
+  /**
+   * <p>
+   * To be overwritten to install a custom view tab bar.
+   * </p>
+   * This bar holds the {@link IViewButton} configured on desktop.
+   * 
+   * @return
+   */
+  AbstractJViewTabsBar createViewTabsBar();
+
+  /**
+   * <p>
+   * To be overwritten to install a custom navigation panel.
+   * </p>
+   * This panel holds navigation buttons like 'back', 'forward', 'stop' and 'refresh'.
+   * 
+   * @return
+   */
+  AbstractJNavigationWidget createNavigationWidgetPanel();
+
+  /**
+   * @return the maximum height of the tool bar which contains the view and tool buttons
+   */
+  int getToolBarHeight();
+
+  /**
+   * @return the height of the header panel
+   */
+  int getHeaderPanelHeight();
+
+  /**
+   * @return the color of the header panel
+   */
+  Color getHeaderPanelColor();
+  
+  /**
    * if a print request is sent to a form during the async open process of a form the event will be cached on the
    * environment. So the form has to fetch all print event pending for it.
    */
-  FormEvent[] fetchPendingPrintEvents(IForm form);
+  FormEvent[] fetchPendingPrintEvents(IForm form);  
 }

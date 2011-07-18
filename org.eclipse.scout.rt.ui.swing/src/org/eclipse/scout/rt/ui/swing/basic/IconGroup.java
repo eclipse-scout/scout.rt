@@ -36,69 +36,73 @@ public class IconGroup {
   }
 
   public IconGroup(String iconId) {
-    if (iconId != null) {
-      Icon normal = Activator.getIcon(iconId);
-      Icon rollover = Activator.getIcon(iconId + "_mouse_over");
-      if (rollover == null) {
-        rollover = Activator.getIcon(iconId + "_rollover");
-        if (rollover == null) {
-          rollover = normal;
-        }
-      }
-      Icon selected = Activator.getIcon(iconId + "_active");
+    if (iconId == null) {
+      return;
+    }
+    Icon normal = Activator.getIcon(iconId);
+    Icon rollover = Activator.getIcon(iconId + "_mouse_over");
+    if (rollover == null) {
+      rollover = Activator.getIcon(iconId + "_rollover");
+    }
+
+    Icon selected = Activator.getIcon(iconId + "_active");
+    if (selected == null) {
+      selected = Activator.getIcon(iconId + "_pressed");
       if (selected == null) {
-        selected = Activator.getIcon(iconId + "_pressed");
-        if (selected == null) {
-          selected = Activator.getIcon(iconId + "_selected");
-          if (selected == null) {
-            selected = normal;
-          }
-        }
+        selected = Activator.getIcon(iconId + "_selected");
       }
-      Icon disabled = Activator.getIcon(iconId + "_disabled");
-      if (disabled == null) {
-        disabled = normal;
-      }
-      iconMap.put(IconState.NORMAL, normal);
+    }
+    Icon disabled = Activator.getIcon(iconId + "_disabled");
+
+    iconMap.put(IconState.NORMAL, normal);
+    if (rollover != null) {
       iconMap.put(IconState.ROLLOVER, rollover);
+    }
+    if (selected != null) {
       iconMap.put(IconState.SELECTED, selected);
+    }
+    if (disabled != null) {
       iconMap.put(IconState.DISABLED, disabled);
     }
   }
 
   public IconGroup(ISwingEnvironment env, String iconId) {
-    if (iconId != null) {
-      Icon normal = env.getIcon(iconId);
-      Icon rollover = env.getIcon(iconId + "_mouse_over");
-      if (rollover == null) {
-        rollover = env.getIcon(iconId + "_rollover");
-        if (rollover == null) {
-          rollover = normal;
-        }
-      }
-      Icon selected = env.getIcon(iconId + "_active");
+    if (iconId == null) {
+      return;
+    }
+    Icon normal = env.getIcon(iconId);
+    Icon rollover = env.getIcon(iconId + "_mouse_over");
+    if (rollover == null) {
+      rollover = env.getIcon(iconId + "_rollover");
+    }
+
+    Icon selected = env.getIcon(iconId + "_active");
+    if (selected == null) {
+      selected = env.getIcon(iconId + "_pressed");
       if (selected == null) {
-        selected = env.getIcon(iconId + "_pressed");
-        if (selected == null) {
-          selected = env.getIcon(iconId + "_selected");
-          if (selected == null) {
-            selected = normal;
-          }
-        }
+        selected = env.getIcon(iconId + "_selected");
       }
-      Icon disabled = env.getIcon(iconId + "_disabled");
-      if (disabled == null) {
-        disabled = normal;
-      }
-      iconMap.put(IconState.NORMAL, normal);
+    }
+    Icon disabled = env.getIcon(iconId + "_disabled");
+
+    iconMap.put(IconState.NORMAL, normal);
+    if (rollover != null) {
       iconMap.put(IconState.ROLLOVER, rollover);
+    }
+    if (selected != null) {
       iconMap.put(IconState.SELECTED, selected);
+    }
+    if (disabled != null) {
       iconMap.put(IconState.DISABLED, disabled);
     }
   }
 
   public Icon getIcon(IconState state) {
-    return iconMap.get(state);
+    Icon icon = iconMap.get(state);
+    if (icon == null && state != IconState.NORMAL) {
+      icon = iconMap.get(IconState.NORMAL);
+    }
+    return icon;
   }
 
   public void setIcon(IconState state, Icon icon) {

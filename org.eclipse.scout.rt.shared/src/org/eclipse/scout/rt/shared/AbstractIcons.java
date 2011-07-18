@@ -21,36 +21,42 @@ public abstract class AbstractIcons implements Serializable {
   /**
    * marker icon for 'no icon'
    */
-  public static String Null = "null";
+  public static final String Null = "null";
 
   /**
    * marker icon for an empty (transparent white) icon
    */
-  public static String Bookmark = "bookmark";
-  public static String CheckboxYes = "checkbox_yes";
-  public static String CheckboxNo = "checkbox_no";
-  public static String ComposerFieldAggregation = "composerfield_aggregation";
-  public static String ComposerFieldAttribute = "composerfield_attribute";
-  public static String ComposerFieldEitherOrNode = "composerfield_eitheror";
-  public static String ComposerFieldEntity = "composerfield_entity";
-  public static String ComposerFieldRoot = "composerfield_root";
-  public static String DateFieldDate = "datefield_date";
-  public static String DateFieldTime = "datefield_time";
-  public static String Empty = "empty";
-  public static String File = "file";
-  public static String FileChooserFieldFile = "filechooserfield_file";
-  public static String Folder = "folder";
-  public static String FolderOpen = "folder_open";
-  public static String Gears = "gears";
-  public static String NavigationCurrent = "navigation_current";
-  public static String SmartFieldBrowse = "smartfield_browse";
-  public static String TimeFieldTime = "datefield_time";
-  public static String WizardBackButton = "wizard_back";
-  public static String WizardNextButton = "wizard_next";
-
-  public static String StatusInfo = "status_info";
-  public static String StatusError = "status_error";
-  public static String StatusWarning = "status_warning";
-  public static String StatusInterrupt = "status_interrupt";
+  public static final String ApplicationLogo = "application_logo_large";
+  public static final String Empty = "empty";
+  public static final String Bookmark = "bookmark";
+  public static final String ComposerFieldAggregation = "composerfield_aggregation";
+  public static final String ComposerFieldAttribute = "composerfield_attribute";
+  public static final String ComposerFieldEitherOrNode = "composerfield_eitheror";
+  public static final String ComposerFieldEntity = "composerfield_entity";
+  public static final String ComposerFieldRoot = "composerfield_root";
+  public static final String DateFieldDate = "datefield_date";
+  public static final String DateFieldTime = "datefield_time";
+  public static final String FileChooserFieldFile = "filechooserfield_file";
+  /**
+   * Use {@link AbstractIcons#TreeNodeClosed} instead
+   */
+  @Deprecated
+  public static final String Folder = AbstractIcons.TreeNodeClosed;
+  /**
+   * Use {@link AbstractIcons#TreeNodeOpen} instead
+   */
+  @Deprecated
+  public static final String FolderOpen = AbstractIcons.TreeNodeOpen;
+  public static final String Gears = "gears";
+  public static final String NavigationCurrent = "navigation_current";
+  public static final String SmartFieldBrowse = "smartfield_browse";
+  public static final String StatusError = "status_error";
+  public static final String StatusInfo = "status_info";
+  public static final String StatusWarning = "status_warning";
+  public static final String TreeNodeClosed = "tree_node_closed";
+  public static final String TreeNodeOpen = "tree_node_open";
+  public static final String WizardBackButton = "wizard_back";
+  public static final String WizardBullet = "wizard_bullet";
+  public static final String WizardNextButton = "wizard_next";
 
 }

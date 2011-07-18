@@ -137,8 +137,13 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
    */
   protected JTextField createDateField(JComponent container) {
     JTextFieldWithTransparentIcon textField = new JTextFieldWithTransparentIcon();
-    textField.setIconGroup(new IconGroup(getSwingEnvironment(), AbstractIcons.DateFieldDate));
+    initializeDateField(textField);
     container.add(textField);
+    return textField;
+  }
+
+  protected void initializeDateField(JTextFieldWithTransparentIcon textField) {
+    textField.setIconGroup(new IconGroup(getSwingEnvironment(), AbstractIcons.DateFieldDate));
     textField.addDropDownButtonListener(new IDropDownButtonListener() {
       @Override
       public void iconClicked(Object source) {
@@ -150,7 +155,6 @@ public class SwingScoutDateField extends SwingScoutValueFieldComposite<IDateFiel
       public void menuClicked(Object source) {
       }
     });
-    return textField;
   }
 
   public JTextField getSwingDateField() {

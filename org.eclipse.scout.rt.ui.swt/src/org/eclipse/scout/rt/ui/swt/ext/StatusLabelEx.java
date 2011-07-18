@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.basic.comp.CLabelEx;
@@ -33,9 +34,9 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
   private IProcessingStatus m_status;
   private CLabelEx m_label;
   private Label m_statusLabel;
-  private Image m_infoImg;
-  private Image m_warningImg;
-  private Image m_errorImg;
+  private final Image m_infoImg;
+  private final Image m_warningImg;
+  private final Image m_errorImg;
   private String m_preMarker = "";
   private String m_postMarker = "";
 
@@ -49,9 +50,9 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
   public StatusLabelEx(Composite parent, int style, ISwtEnvironment environment) {
     super(parent, SWT.NONE);
     m_environment = environment;
-    m_infoImg = environment.getIcon(AbstractIcons.StatusWarning);
-    m_warningImg = environment.getIcon(AbstractIcons.StatusWarning);
-    m_errorImg = environment.getIcon(AbstractIcons.StatusError);
+    m_infoImg = Activator.getIcon(AbstractIcons.StatusInfo);
+    m_warningImg = Activator.getIcon(AbstractIcons.StatusWarning);
+    m_errorImg = Activator.getIcon(AbstractIcons.StatusError);
     createContent(this, style);
     GridLayout containerLayout = new GridLayout(2, false);
     containerLayout.horizontalSpacing = 0;

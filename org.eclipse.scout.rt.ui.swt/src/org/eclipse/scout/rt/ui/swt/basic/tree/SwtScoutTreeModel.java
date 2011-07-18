@@ -21,8 +21,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.SwtIcons;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -42,8 +43,8 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     m_tree = tree;
     m_environment = environment;
     m_treeViewer = treeViewer;
-    m_imgCheckboxTrue = m_environment.getIcon(AbstractIcons.CheckboxYes);
-    m_imgCheckboxFalse = m_environment.getIcon(AbstractIcons.CheckboxNo);
+    m_imgCheckboxTrue = Activator.getIcon(SwtIcons.CheckboxYes);
+    m_imgCheckboxFalse = Activator.getIcon(SwtIcons.CheckboxNo);
     m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
   }
 

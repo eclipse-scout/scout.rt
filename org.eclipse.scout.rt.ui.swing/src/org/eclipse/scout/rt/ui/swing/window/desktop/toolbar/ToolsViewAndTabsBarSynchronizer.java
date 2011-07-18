@@ -27,14 +27,14 @@ import org.eclipse.scout.rt.ui.swing.window.desktop.ToolsViewPlaceholder;
 public class ToolsViewAndTabsBarSynchronizer {
 
   private final ToolsViewPlaceholder m_toolsViewPlaceholder;
-  private final JToolTabsBar m_toolTabsBar;
+  private final SwingScoutToolBar m_swingScoutToolBar;
   private final OptimisticLock m_syncLock;
 
-  public ToolsViewAndTabsBarSynchronizer(ToolsViewPlaceholder toolsViewPlaceholder, JToolTabsBar toolTabsBar) {
+  public ToolsViewAndTabsBarSynchronizer(ToolsViewPlaceholder toolsViewPlaceholder, SwingScoutToolBar swingScoutToolBar) {
     m_syncLock = new OptimisticLock();
     m_toolsViewPlaceholder = toolsViewPlaceholder;
-    m_toolTabsBar = toolTabsBar;
-    toolTabsBar.adjustWidthToToolsView(toolsViewPlaceholder.getWidth());
+    m_swingScoutToolBar = swingScoutToolBar;
+    m_swingScoutToolBar.adjustWidthToToolsView(toolsViewPlaceholder.getWidth());
     installListeners();
   }
 
@@ -43,13 +43,15 @@ public class ToolsViewAndTabsBarSynchronizer {
   }
 
   private void installListeners() {
-    m_toolTabsBar.addPropertyChangeListener(new PropertyChangeListener() {
+    AbstractJToolTabsBar toolTabs = (AbstractJToolTabsBar) m_swingScoutToolBar.getSwingToolTabsPanel();
+
+    toolTabs.addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         try {
           m_syncLock.acquire();
           //
-          if (JToolTabsBar.PROP_COLLAPSED.equals(evt.getPropertyName())) {
+          if (AbstractJToolTabsBar.PROP_COLLAPSED.equals(evt.getPropertyName())) {
             boolean collapsed = (Boolean) evt.getNewValue();
             if (collapsed) {
               m_toolsViewPlaceholder.collapseView();
@@ -58,7 +60,7 @@ public class ToolsViewAndTabsBarSynchronizer {
               m_toolsViewPlaceholder.expandView();
             }
           }
-          else if (JToolTabsBar.PROP_MINIMUM_SIZE.equals(evt.getPropertyName())) {
+          else if (AbstractJToolTabsBar.PROP_MINIMUM_SIZE.equals(evt.getPropertyName())) {
             Dimension d = (Dimension) evt.getNewValue();
             m_toolsViewPlaceholder.setMinimumWidth(d.width - 1);//minus 1
           }
@@ -77,7 +79,7 @@ public class ToolsViewAndTabsBarSynchronizer {
       public void componentResized(ComponentEvent e) {
         try {
           if (m_syncLock.acquire()) {
-            m_toolTabsBar.adjustWidthToToolsView(m_toolsViewPlaceholder.getWidth() + 1);//plus 1
+            m_swingScoutToolBar.adjustWidthToToolsView(Math.max(m_toolsViewPlaceholder.getMinimumWidth(), m_toolsViewPlaceholder.getWidth() + 1));//plus 1
           }
         }
         finally {

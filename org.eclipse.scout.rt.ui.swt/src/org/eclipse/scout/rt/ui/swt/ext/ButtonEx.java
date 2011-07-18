@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt.ext;
 import java.util.ArrayList;
 
 import org.eclipse.scout.rt.ui.swt.Activator;
+import org.eclipse.scout.rt.ui.swt.SwtIcons;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -56,7 +57,7 @@ public class ButtonEx extends Button {
 
   public ButtonEx(Composite parent, int style) {
     super(parent, style);
-    m_dropDownIcon = Activator.imageDescriptorFromLocalPlugin(Activator.ICON_ARROW_DOWN).createImage();
+    m_dropDownIcon = Activator.getIcon(SwtIcons.DropDownFieldArrowDown);
     // dopdown
     P_DelegateSelectionListener delegateListener = new P_DelegateSelectionListener();
     if ((style & SWT.DROP_DOWN) != 0) {
@@ -82,10 +83,6 @@ public class ButtonEx extends Button {
 
   public void freeResources() {
     getParent().getParent().removeListener(SWT.Paint, m_paintListener);
-    if (m_dropDownIcon != null && !m_dropDownIcon.isDisposed()) {
-      m_dropDownIcon.dispose();
-      m_dropDownIcon = null;
-    }
   }
 
   @Override

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.ui.swt.Activator;
+import org.eclipse.scout.rt.ui.swt.SwtIcons;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.swt.SWT;
@@ -44,7 +46,7 @@ public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtSco
     Tray tray = getEnvironment().getDisplay().getSystemTray();
     if (tray != null) {
       m_trayIcon = new TrayItem(tray, SWT.NONE);
-      m_trayIcon.setImage(getEnvironment().getIcon("window"));
+      m_trayIcon.setImage(Activator.getIcon(SwtIcons.Window));
       m_trayIcon.addMenuDetectListener(new MenuDetectListener() {
         @Override
         public void menuDetected(MenuDetectEvent e) {

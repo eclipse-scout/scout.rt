@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.window.desktop.toolbar;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.Spring;
 import javax.swing.SpringLayout;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,74 +35,73 @@ import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.window.desktop.ProgressHandler;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JToolTabsBar;
 import org.eclipse.scout.service.SERVICES;
 
 public class SwingScoutToolBar extends SwingScoutComposite<IDesktop> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutToolBar.class);
   private static final long serialVersionUID = 1L;
-  private JNavigationWidget m_navigationWidget;
+  private AbstractJNavigationWidget m_navigationWidget;
   private JLabel m_windowIcons;
-  private static final int HEIGHT = 85;
 
   private int m_topLevelMenuCount;
-  private JViewTabsBar m_viewTabPanel;
-  private JToolTabsBar m_toolTabsPanel;
-  //
+  private AbstractJViewTabsBar m_viewTabPanel;
+  private AbstractJToolTabsBar m_toolTabsPanel;
   private NavigationHistoryListener m_scoutNavListener;
-  private ProgressHandler m_progressHandler;
+
+  private final SpringLayout m_layout;
 
   public SwingScoutToolBar() {
+    m_layout = new SpringLayout();
   }
 
   @Override
   protected void initializeSwing() {
-    SpringLayout layout = new SpringLayout();
-
     m_topLevelMenuCount = getScoutObject().getMenus().length;
-    JPanelEx toolBar = new JPanelEx(layout);
+    JPanelEx toolBar = new JPanelEx(m_layout);
 
-    m_navigationWidget = new JNavigationWidget(getSwingEnvironment());
+    m_navigationWidget = getSwingEnvironment().createNavigationWidgetPanel();
     toolBar.add(m_navigationWidget);
-    layout.putConstraint(SpringLayout.WEST, m_navigationWidget, 9, SpringLayout.WEST, toolBar);
-    layout.putConstraint(SpringLayout.NORTH, m_navigationWidget, 11, SpringLayout.NORTH, toolBar);
+    m_layout.putConstraint(SpringLayout.WEST, m_navigationWidget, 9, SpringLayout.WEST, toolBar);
+    m_layout.putConstraint(SpringLayout.NORTH, m_navigationWidget, 11, SpringLayout.NORTH, toolBar);
 
-    // back
-    m_navigationWidget.getBackButton().setPrimaryAction(new P_BackAction());
-
-    // foward & history menu
-    m_navigationWidget.getForwardButton().setPrimaryAction(new P_ForwardAction());
-    m_navigationWidget.getForwardButton().setSecondaryAction(new P_HistoryAction());
-
-    // refresh & stop
-    m_progressHandler = new ProgressHandler(getSwingEnvironment());
-    m_navigationWidget.getStopRefreshButton().setPrimaryAction(new P_RefreshAction());
-    m_navigationWidget.getStopRefreshButton().setSecondaryAction(m_progressHandler.createStopAction());
+    // navigation buttons
+    m_navigationWidget.setBackAction(new P_BackAction());
+    m_navigationWidget.setForwardAction(new P_ForwardAction());
+    m_navigationWidget.setHistoryAction(new P_HistoryAction());
+    m_navigationWidget.setRefreshAction(new P_RefreshAction());
+    m_navigationWidget.setStopAction(new ProgressHandler(getSwingEnvironment()).createStopAction());
 
     JComponent logo = getSwingEnvironment().createLogo();
     toolBar.add(logo);
-    layout.putConstraint(SpringLayout.NORTH, logo, 0, SpringLayout.NORTH, toolBar);
-    layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, logo, 0, SpringLayout.HORIZONTAL_CENTER, toolBar);
+    m_layout.putConstraint(SpringLayout.NORTH, logo, 0, SpringLayout.NORTH, toolBar);
+    m_layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, logo, 0, SpringLayout.HORIZONTAL_CENTER, toolBar);
 
-    m_viewTabPanel = new JViewTabsBar(getSwingEnvironment());
+    // outline tabs
+    m_viewTabPanel = getSwingEnvironment().createViewTabsBar();
     toolBar.add(m_viewTabPanel);
-    layout.putConstraint(SpringLayout.SOUTH, m_viewTabPanel, 0, SpringLayout.SOUTH, toolBar);
-    layout.putConstraint(SpringLayout.WEST, m_viewTabPanel, 0, SpringLayout.WEST, toolBar);
+    m_layout.putConstraint(SpringLayout.NORTH, m_viewTabPanel, getSwingEnvironment().getToolBarHeight() * -1, SpringLayout.SOUTH, toolBar);
+    m_layout.putConstraint(SpringLayout.SOUTH, m_viewTabPanel, 0, SpringLayout.SOUTH, toolBar);
+    m_layout.putConstraint(SpringLayout.WEST, m_viewTabPanel, 0, SpringLayout.WEST, toolBar);
 
-    m_toolTabsPanel = new JToolTabsBar(getSwingEnvironment());
+    // tool buttons
+    m_toolTabsPanel = getSwingEnvironment().createToolTabsBar();
+    m_toolTabsPanel.setSwingScoutToolBarContainer(this);
     toolBar.add(m_toolTabsPanel);
-    layout.putConstraint(SpringLayout.EAST, m_toolTabsPanel, 0, SpringLayout.EAST, toolBar);
-    layout.putConstraint(SpringLayout.SOUTH, m_toolTabsPanel, 0, SpringLayout.SOUTH, toolBar);
-    layout.putConstraint(SpringLayout.EAST, m_viewTabPanel, 0, SpringLayout.WEST, m_toolTabsPanel);
+    m_layout.putConstraint(SpringLayout.NORTH, m_toolTabsPanel, getSwingEnvironment().getToolBarHeight() * -1, SpringLayout.SOUTH, toolBar);
+    m_layout.putConstraint(SpringLayout.SOUTH, m_toolTabsPanel, 0, SpringLayout.SOUTH, toolBar);
+    m_layout.putConstraint(SpringLayout.EAST, m_toolTabsPanel, 0, SpringLayout.EAST, toolBar);
 
     toolBar.setOpaque(true);
-    toolBar.setBackground(new Color(207, 226, 239));//TODO [awe] add to lookandfeel
-    toolBar.setPreferredSize(new Dimension(-1, HEIGHT));
-    toolBar.setBounds(0, 0, toolBar.getWidth(), HEIGHT);
+    toolBar.setBackground(getSwingEnvironment().getHeaderPanelColor());
+    toolBar.setPreferredSize(new Dimension(-1, getSwingEnvironment().getHeaderPanelHeight()));
+    toolBar.setBounds(0, 0, toolBar.getWidth(), getSwingEnvironment().getHeaderPanelHeight());
 
     setSwingField(toolBar);
     rebuildViewTabs();
     rebuildToolTabs();
+    rebuildNavigationWidget();
   }
 
   @Override
@@ -235,14 +234,14 @@ public class SwingScoutToolBar extends SwingScoutComposite<IDesktop> {
     return getSwingField();
   }
 
-  public JComponent getSwingToolTabsPanel() {
+  public AbstractJToolTabsBar getSwingToolTabsPanel() {
     return m_toolTabsPanel;
   }
 
   private void updateNavigationWidget(boolean backEnabled, boolean forwardEnabled, boolean menuEnabled) {
-    m_navigationWidget.getBackButton().setEnabled(backEnabled);
-    m_navigationWidget.getForwardButton().setEnabled(forwardEnabled);
-    m_navigationWidget.getForwardButton().setHistoryEnabled(menuEnabled);
+    m_navigationWidget.getBackAction().setEnabled(backEnabled);
+    m_navigationWidget.getForwardAction().setEnabled(forwardEnabled);
+    m_navigationWidget.getHistoryAction().setEnabled(menuEnabled);
   }
 
   private void rebuildViewTabs() {
@@ -253,8 +252,32 @@ public class SwingScoutToolBar extends SwingScoutComposite<IDesktop> {
     m_toolTabsPanel.rebuild(getScoutObject());
   }
 
-  public JNavigationWidget getSwingNavigationWidget() {
+  private void rebuildNavigationWidget() {
+    m_navigationWidget.rebuild();
+  }
+
+  public AbstractJNavigationWidget getSwingNavigationWidget() {
     return m_navigationWidget;
+  }
+
+  /**
+   * Update layout of {@link JToolTabsBar} tool button bar to have the very same size as the tool bar itself
+   * 
+   * @param width
+   *          the new width to be set. Thereby, the with is only set if is different to the old width.
+   */
+  public void adjustWidthToToolsView(int width) {
+    Spring constraint = m_layout.getConstraint(SpringLayout.WEST, m_toolTabsPanel);
+    if (width != constraint.getValue()) {
+      // adjust width of tool button bar to be equals to the tool bar width
+      m_layout.putConstraint(SpringLayout.WEST, m_toolTabsPanel, width * -1, SpringLayout.EAST, getSwingField());
+
+      // set maximum width to outline tabs in order to not obscure tool buttons
+      m_layout.putConstraint(SpringLayout.EAST, m_viewTabPanel, width * -1, SpringLayout.EAST, getSwingField());
+
+      // revalidate layout to immediately reflect changed layout
+      getSwingField().revalidate();
+    }
   }
 
   private class P_RefreshAction extends AbstractAction {

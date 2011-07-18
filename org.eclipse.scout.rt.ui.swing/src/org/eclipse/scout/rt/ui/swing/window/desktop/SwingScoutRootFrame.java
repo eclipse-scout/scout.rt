@@ -65,9 +65,9 @@ import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitDesktopManager;
 import org.eclipse.scout.rt.ui.swing.window.desktop.menubar.SwingScoutMenuBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.status.SwingScoutStatusBar;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.JToolTabsBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.SwingScoutToolBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.ToolsViewAndTabsBarSynchronizer;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JToolTabsBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.tray.ISwingScoutTray;
 
 /**
@@ -152,6 +152,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     desktopPane.setCursor(null);
     spacerPanel.add(desktopPane);
     contentPane.add(spacerPanel, BorderLayoutEx.CENTER);
+
     // activity pane
     if (isShowStatusBar()) {
       m_statusBarComposite = new SwingScoutStatusBar(SwingScoutStatusBar.VISIBLE_ALWAYS);
@@ -212,12 +213,16 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
   }
 
   /**
-   *
+   * <ul>
+   * <li>Register listener on {@link JToolTabsBar} to notify {@link ToolsViewPlaceholder} about collapse / expand state.
+   * </li>
+   * <li>Register listener on {@link ToolsViewPlaceholder} to notify layout manager of {@link SwingScoutToolBar} about
+   * resize changes of tool bar.</li>
+   * </ul>
    */
   private void registerListenerOnToolsView() {
-    JToolTabsBar toolTabs = (JToolTabsBar) m_toolBarComposite.getSwingToolTabsPanel();
     ToolsViewPlaceholder toolsViewPlaceholder = ((SwingScoutDesktop) m_desktopComposite).getToolsViewPlaceholder();
-    new ToolsViewAndTabsBarSynchronizer(toolsViewPlaceholder, toolTabs);
+    new ToolsViewAndTabsBarSynchronizer(toolsViewPlaceholder, m_toolBarComposite);
   }
 
   @Override

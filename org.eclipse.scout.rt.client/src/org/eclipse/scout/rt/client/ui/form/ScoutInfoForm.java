@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.GroupBox.HtmlFi
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
@@ -188,7 +189,7 @@ public class ScoutInfoForm extends AbstractForm {
       // try to load bundle resource
       try {
         IClientSession clientSession = ClientSyncJob.getCurrentSession();
-        IconSpec iconSpec = clientSession.getIconLocator().getIconSpec("application_logo_large.png");
+        IconSpec iconSpec = clientSession.getIconLocator().getIconSpec(AbstractIcons.ApplicationLogo);
         ByteArrayInputStream is = new ByteArrayInputStream(iconSpec.getContent());
         f.readData(is);
         is.close();
