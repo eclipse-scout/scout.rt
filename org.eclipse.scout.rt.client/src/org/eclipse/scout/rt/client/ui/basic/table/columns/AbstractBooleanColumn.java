@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
@@ -23,6 +25,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
  * Column holding Boolean
  */
 public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> implements IBooleanColumn {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBooleanColumn.class);
+
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
 
@@ -67,7 +71,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
           completeEdit(row, f);
         }
         catch (ProcessingException e1) {
-          e1.printStackTrace();
+          LOG.error("failed to compelete edit mode", e1);
         }
       }
     });
