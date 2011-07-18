@@ -54,14 +54,14 @@ public class EmbeddedSplashWindow implements ISplashWindow {
 
   @Override
   public void showSplash() {
-    Icon imgIcon = UIManager.getIcon("SplashScreen.icon");
+    Icon imgIcon = UIManager.getIcon("Splash.icon");
     if (imgIcon == null) {
       imgIcon = new P_EmptyIcon();
     }
     m_splash = new JLabel(new P_SplashScreen(imgIcon));
     m_splash.setPreferredSize(new Dimension(imgIcon.getIconWidth(), imgIcon.getIconHeight()));
     m_splash.setVerticalAlignment(JLabel.TOP);
-    Color c = UIManager.getColor("SplashScreen.text");
+    Color c = UIManager.getColor("Splash.text");
     if (c != null) {
       m_splash.setForeground(c);
     }

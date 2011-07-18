@@ -72,10 +72,10 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "ListBox.rowHeight", 20);
     putIfUndefined(defaults, "MenuBar.policy", "menubar");
     putIfUndefined(defaults, "PopupMenu.innerBorder", null);
-    putIfUndefined(defaults, "SplashScreen.icon", getSplashUIResource());
-    putIfUndefined(defaults, "SplashScreen.text", new ColorUIResource(0x0086A6));
-    //putIfUndefined(defaults, "SplashScreen.versionLocation", new Point(0,200));
-    //putIfUndefined(defaults, "SplashScreen.statusTextLocation", new Point(0,180));
+    putIfUndefined(defaults, "Splash.icon", getSplashUIResource());
+    putIfUndefined(defaults, "Splash.text", new ColorUIResource(0x0086A6));
+    //putIfUndefined(defaults, "Splash.versionLocation", new Point(0,200));
+    //putIfUndefined(defaults, "Splash.statusTextLocation", new Point(0,180));
     putIfUndefined(defaults, "StatusBar.StopButton.icon", createIconUIResource(SwingIcons.StatusInterrupt));
     putIfUndefined(defaults, "StatusBar.height", 29);
     putIfUndefined(defaults, "StatusBar.icon", null);
@@ -210,7 +210,7 @@ public class UIDefaultsInjector {
       LOG.error("could not find splash for config.ini property 'osgi.splashPath' -> value '" + splashPathProp + "'.", e);
     }
     if (iconresource == null) {
-      iconresource = createIconUIResource(SwingIcons.SplashScreen);
+      iconresource = createIconUIResource(SwingIcons.Splash);
     }
     return iconresource;
   }

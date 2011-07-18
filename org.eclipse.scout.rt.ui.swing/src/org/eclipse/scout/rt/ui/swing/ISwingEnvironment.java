@@ -157,8 +157,8 @@ public interface ISwingEnvironment {
    * <li><b>TabItem custom label/icon</b>
    * TabbedPane.tabAreaInsets (Insets)</li>
    * <li><b>SplashScreen</b>
-   * SplashScreen.icon (Icon)
-   * SplashScreen.text (Color)</li>
+   * Splash.icon (Icon)
+   * Splash.text (Color)</li>
    * <li><b>Status/Progress</b>
    * StatusBar.StopButton.icon (Icon)
    * StatusBar.icon (Icon)
@@ -408,10 +408,10 @@ public interface ISwingEnvironment {
    * @return the color of the header panel
    */
   Color getHeaderPanelColor();
-  
+
   /**
    * if a print request is sent to a form during the async open process of a form the event will be cached on the
    * environment. So the form has to fetch all print event pending for it.
    */
-  FormEvent[] fetchPendingPrintEvents(IForm form);  
+  FormEvent[] fetchPendingPrintEvents(IForm form);
 }

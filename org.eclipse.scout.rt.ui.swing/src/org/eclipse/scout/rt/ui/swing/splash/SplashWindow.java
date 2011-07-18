@@ -73,7 +73,7 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
     JComponent pane = (JComponent) getContentPane();
     pane.setLayout(new BorderLayout());
 
-    Icon imgIcon = UIManager.getIcon("SplashScreen.icon");
+    Icon imgIcon = UIManager.getIcon("Splash.icon");
     if (imgIcon == null) {
       imgIcon = new P_EmptyIcon();
     }
@@ -82,7 +82,7 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
       iconLabel.setVerticalAlignment(JLabel.TOP);
       pane.add(iconLabel, BorderLayout.CENTER);
     }
-    Color c = UIManager.getColor("SplashScreen.text");
+    Color c = UIManager.getColor("Splash.text");
     if (c != null) {
       setForeground(c);
     }
@@ -142,8 +142,8 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
 
     public P_SplashScreen(Icon splashIcon) {
       m_splashIcon = splashIcon;
-      m_versionLocation = (Point) UIManager.get("SplashScreen.versionLocation");
-      m_statusTextLocation = (Point) UIManager.get("SplashScreen.statusTextLocation");
+      m_versionLocation = (Point) UIManager.get("Splash.versionLocation");
+      m_statusTextLocation = (Point) UIManager.get("Splash.statusTextLocation");
     }
 
     @Override

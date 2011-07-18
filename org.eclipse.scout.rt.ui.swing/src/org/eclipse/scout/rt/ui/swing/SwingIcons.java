@@ -31,7 +31,7 @@ public interface SwingIcons {
   String NavigationStop = "navigation_stop";
   String NavigationHistory = "navigation_history";
 
-  String SplashScreen = "splash_screen";
+  String Splash = "splash";
 
   String StatusInterrupt = "status_interrupt";
 
