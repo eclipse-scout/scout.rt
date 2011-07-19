@@ -112,3 +112,14 @@ Solution:
 Back event to notify the model once a screen shot is done. Furthermore a PrintApplicationAction is created to take screen shots of the whole application.
 Migration:
 none
+
+19.07.2011 dwi
+Ticket: 103'927: Missing icon on datefield / timefield in Orson L&F. Furthermore, icon should become transparent if to less space is available (same behavior as in Rayo L&F)
+        104'140: Navigationbuttons in Orson L&F do not properly hover when being focued with the mouse.
+Solution:
+@103'927: - Orson does not use regular datefield / timefield Swing implementation anymore, but LegacyJTextFieldWithTransparentIcon instead. JTextFieldWithTransparentIcon could not be considered, as it is Rayo specific with different measurement. In next Scout release, JTextFieldWithTransparentIcon is L&F independent with a separate implementation for Rayo and Orson L&F.
+          - Intercepter in OrsonTexstFieldUI installed to draw transparent icon
+          - transparent datefield / timefield icons (datefield_date_selected.png, datefield_time_selected.png) inserted into Plug-In com.bsaig.scout.rt.client.bsi.icons.fragment
+104'140:  - Turned off hover effect of navigation buttons
+Migration:
+none

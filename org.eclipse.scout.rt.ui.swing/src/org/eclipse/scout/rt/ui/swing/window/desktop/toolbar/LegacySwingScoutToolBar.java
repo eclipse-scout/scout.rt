@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
@@ -265,13 +266,16 @@ public class LegacySwingScoutToolBar extends SwingScoutComposite<IDesktop> {
 
   private JButton createNavigationButton(String iconId, Action a) {
     JButtonEx b = new JButtonEx(a);
-    b.setIcon(getSwingEnvironment().getIcon(iconId));
-    b.setDisabledIcon(getSwingEnvironment().getIcon(iconId + "_disabled"));
-    b.setPressedIcon(getSwingEnvironment().getIcon(iconId + "_pressed"));
-    b.setRolloverIcon(getSwingEnvironment().getIcon(iconId + "_rollover"));
+    b.setIcon(Activator.getIcon(iconId));
+    b.setDisabledIcon(Activator.getIcon(iconId + "_disabled"));
+    b.setPressedIcon(Activator.getIcon(iconId + "_pressed"));
+    b.setRolloverIcon(Activator.getIcon(iconId + "_rollover"));
     b.setOpaque(true);
     b.setContentAreaFilled(false);
     b.setBorder(null);
+    // turn off native hover effect
+    b.setBorderPainted(false);
+    b.setFocusPainted(false);
     return b;
   }
 }

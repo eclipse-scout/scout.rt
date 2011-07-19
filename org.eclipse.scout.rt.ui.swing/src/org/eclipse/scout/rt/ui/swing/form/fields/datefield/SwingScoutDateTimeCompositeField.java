@@ -33,13 +33,13 @@ public class SwingScoutDateTimeCompositeField extends SwingScoutFieldComposite<I
     container.setOpaque(false);
     JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
     container.add(label);
-    m_dateField = new SwingScoutDateField();
+    m_dateField = createSwingScoutDateField();
     m_dateField.setIgnoreLabel(true);
     m_dateField.setDateTimeCompositeMember(true);
     m_dateField.createField(getScoutObject(), getSwingEnvironment());
     m_dateField.getSwingContainer().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, createDateFieldGridData());
     container.add(m_dateField.getSwingContainer());
-    m_timeField = new SwingScoutTimeField();
+    m_timeField = createSwingScoutTimeField();
     m_timeField.setIgnoreLabel(true);
     m_timeField.setDateTimeCompositeMember(true);
     m_timeField.createField(getScoutObject(), getSwingEnvironment());
@@ -76,4 +76,11 @@ public class SwingScoutDateTimeCompositeField extends SwingScoutFieldComposite<I
     return data;
   }
 
+  protected SwingScoutDateField createSwingScoutDateField() {
+    return new SwingScoutDateField();
+  }
+
+  protected SwingScoutTimeField createSwingScoutTimeField() {
+    return new SwingScoutTimeField();
+  }
 }

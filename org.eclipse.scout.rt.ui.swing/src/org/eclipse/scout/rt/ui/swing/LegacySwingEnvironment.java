@@ -20,10 +20,17 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.action.LegacySwingScoutActionButton;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
+import org.eclipse.scout.rt.ui.swing.form.fields.datefield.LegacySwingScoutDateField;
+import org.eclipse.scout.rt.ui.swing.form.fields.datefield.LegacySwingScoutDateTimeCompositeField;
+import org.eclipse.scout.rt.ui.swing.form.fields.datefield.LegacySwingScoutTimeField;
+import org.eclipse.scout.rt.ui.swing.form.fields.datefield.SwingScoutDateField;
+import org.eclipse.scout.rt.ui.swing.form.fields.datefield.SwingScoutDateTimeCompositeField;
+import org.eclipse.scout.rt.ui.swing.form.fields.datefield.SwingScoutTimeField;
 import org.eclipse.scout.rt.ui.swing.form.fields.tablefield.ISwingScoutTableField;
 import org.eclipse.scout.rt.ui.swing.form.fields.tablefield.LegacySwingScoutTableField;
 import org.eclipse.scout.rt.ui.swing.window.desktop.ISwingScoutRootFrame;
@@ -48,6 +55,24 @@ public class LegacySwingEnvironment extends AbstractSwingEnvironment {
       ui.createField((ITableField<?>) field, this);
       decorate(field, ui);
       return ui;
+    }
+    else if (field instanceof IDateField) {
+      IDateField d = (IDateField) field;
+      if (d.isHasDate() && d.isHasTime()) {
+        SwingScoutDateTimeCompositeField ui = new LegacySwingScoutDateTimeCompositeField();
+        ui.createField(d, this);
+        return ui;
+      }
+      else if (d.isHasDate()) {
+        SwingScoutDateField ui = new LegacySwingScoutDateField();
+        ui.createField(d, this);
+        return ui;
+      }
+      else {
+        SwingScoutTimeField ui = new LegacySwingScoutTimeField();
+        ui.createField(d, this);
+        return ui;
+      }
     }
     else {
       return super.createFormField(parent, field);

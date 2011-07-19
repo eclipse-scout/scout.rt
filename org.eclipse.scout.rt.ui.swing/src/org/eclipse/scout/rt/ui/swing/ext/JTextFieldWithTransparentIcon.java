@@ -45,45 +45,9 @@ public class JTextFieldWithTransparentIcon extends JTextFieldEx {
 
   private boolean m_mouseOver = false;
 
-  private int m_insetsRight = 3;
-
   private IconGroup m_iconGroup;
 
   private Collection<IDropDownButtonListener> m_listeners = new ArrayList<IDropDownButtonListener>();
-
-  /**
-   * This is more or less a hack used to to draw the text of a JTextField over the icon of the
-   * JTextFieldWithTransparentIcon widget.
-   * This hack is required because SynthTextFieldUI of the Synth L/F paints the background of a text-field and the text
-   * of the JTextField in one step, so it is not possible to draw something "between" text and background (for instance
-   * our icon).
-   * The modified BSI Rayo L/F checks if the client property "onBackgroundPainter" is set, and then calls the
-   * paintIcon() method between the two calls to paint the background and the text. This hack does nothing with L/F
-   * other than BSI Rayo.
-   */
-  private class P_OnBackgroundPainter implements Icon {
-
-    @Override
-    public int getIconHeight() {
-      return 0;
-    }
-
-    @Override
-    public int getIconWidth() {
-      return 0;
-    }
-
-    @Override
-    public void paintIcon(Component c, Graphics g, int x, int y) {
-      Icon icon = getIconForCurrentState();
-      if (icon != null) {
-        x = getWidth() - icon.getIconWidth() - m_insetsRight;
-        y = (getHeight() - icon.getIconHeight()) / 2;
-        icon.paintIcon(c, g, x, y);
-      }
-    }
-
-  }
 
   public JTextFieldWithTransparentIcon() {
     installDocumentListener();
@@ -91,7 +55,7 @@ public class JTextFieldWithTransparentIcon extends JTextFieldEx {
     installMouseListener();
     installComponentListener();
     new HandCursorAdapater(this);
-    putClientProperty("onBackgroundPainter", new P_OnBackgroundPainter());
+    putClientProperty("onBackgroundPainter", createTransparentIcon());
   }
 
   private void installComponentListener() {
@@ -167,7 +131,7 @@ public class JTextFieldWithTransparentIcon extends JTextFieldEx {
       int iconWidth = m_iconGroup.getIcon(IconState.NORMAL).getIconWidth();
       int fieldWidth = getSize().width;
       int insetsLeft = getInsets().left;
-      m_textOverlappingIcon = (textWidth > fieldWidth - iconWidth - insetsLeft - m_insetsRight);
+      m_textOverlappingIcon = (textWidth > fieldWidth - iconWidth - insetsLeft - getInsetsRight());
     }
     if (oldTextOverlappingIcon != m_textOverlappingIcon) {
       repaint();
@@ -186,7 +150,7 @@ public class JTextFieldWithTransparentIcon extends JTextFieldEx {
     return isEnabled() && isEditable();
   }
 
-  private Icon getIconForCurrentState() {
+  protected Icon getIconForCurrentState() {
     Icon icon = m_iconGroup.getIcon(IconState.NORMAL);
     if (!isIconEnabled() && m_iconGroup.hasIcon(IconState.DISABLED)) {
       icon = m_iconGroup.getIcon(IconState.DISABLED);
@@ -218,4 +182,44 @@ public class JTextFieldWithTransparentIcon extends JTextFieldEx {
     m_listeners.remove(l);
   }
 
+  protected Icon createTransparentIcon() {
+    /**
+     * This is more or less a hack used to to draw the text of a JTextField over the icon of the
+     * JTextFieldWithTransparentIcon widget.
+     * This hack is required because SynthTextFieldUI of the Synth L/F paints the background of a text-field and the
+     * text
+     * of the JTextField in one step, so it is not possible to draw something "between" text and background (for
+     * instance
+     * our icon).
+     * The modified BSI Rayo L/F checks if the client property "onBackgroundPainter" is set, and then calls the
+     * paintIcon() method between the two calls to paint the background and the text. This hack does nothing with L/F
+     * other than BSI Rayo.
+     */
+    return new Icon() {
+
+      @Override
+      public int getIconHeight() {
+        return 0;
+      }
+
+      @Override
+      public int getIconWidth() {
+        return 0;
+      }
+
+      @Override
+      public void paintIcon(Component c, Graphics g, int x, int y) {
+        Icon icon = getIconForCurrentState();
+        if (icon != null) {
+          x = getWidth() - icon.getIconWidth() - getInsetsRight();
+          y = (getHeight() - icon.getIconHeight()) / 2;
+          icon.paintIcon(c, g, x, y);
+        }
+      }
+    };
+  }
+
+  protected int getInsetsRight() {
+    return 3;
+  }
 }
