@@ -38,12 +38,12 @@ public abstract class AbstractIcons implements Serializable {
   public static final String DateFieldTime = "datefield_time";
   public static final String FileChooserFieldFile = "filechooserfield_file";
   /**
-   * Use {@link AbstractIcons#TreeNodeClosed} instead
+   * Use {@link AbstractIcons#TreeNode} instead due to icon semantic
    */
   @Deprecated
-  public static final String Folder = AbstractIcons.TreeNodeClosed;
+  public static final String Folder = AbstractIcons.TreeNode;
   /**
-   * Use {@link AbstractIcons#TreeNodeOpen} instead
+   * Use {@link AbstractIcons#TreeNodeOpen} instead due to icon semantic
    */
   @Deprecated
   public static final String FolderOpen = AbstractIcons.TreeNodeOpen;
@@ -53,7 +53,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String StatusError = "status_error";
   public static final String StatusInfo = "status_info";
   public static final String StatusWarning = "status_warning";
-  public static final String TreeNodeClosed = "tree_node_closed";
+  public static final String TreeNode = "tree_node";
   public static final String TreeNodeOpen = "tree_node_open";
   public static final String WizardBackButton = "wizard_back";
   public static final String WizardBullet = "wizard_bullet";

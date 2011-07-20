@@ -51,7 +51,7 @@ public class BookmarkFolderLookupCall extends LocalLookupCall {
               if (path.size() >= 3) {
                 parent = path.get(path.size() - 2);
               }
-              LookupRow row = new LookupRow(f, f.getTitle(), f.getIconId() != null ? f.getIconId() : AbstractIcons.TreeNodeClosed);
+              LookupRow row = new LookupRow(f, f.getTitle(), f.getIconId() != null ? f.getIconId() : AbstractIcons.TreeNode);
               row.setParentKey(parent);
               rows.add(row);
             }

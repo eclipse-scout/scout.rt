@@ -94,7 +94,7 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "TitledBorder.border", new BorderUIResource(new EmptyBorder(0, 0, 0, 0)));
     putIfUndefined(defaults, "TitledBorder.font", new FontUIResource("Dialog", Font.PLAIN, 12));
     putIfUndefined(defaults, "TitledBorder.titleColor", new ColorUIResource(0x000000));
-    putIfUndefined(defaults, "Tree.closedIcon", createIconUIResource(AbstractIcons.TreeNodeClosed));
+    putIfUndefined(defaults, "Tree.closedIcon", createIconUIResource(AbstractIcons.TreeNode));
     putIfUndefined(defaults, "Tree.openIcon", createIconUIResource(AbstractIcons.TreeNodeOpen));
     putIfUndefined(defaults, "Tree.rowHeight", 24);
     putIfUndefined(defaults, "TreeBox.rowHeight", 20);
