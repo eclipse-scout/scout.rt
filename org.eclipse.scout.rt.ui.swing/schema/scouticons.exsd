@@ -32,7 +32,7 @@
             <element ref="status_warning" minOccurs="0" maxOccurs="1"/>
             <element ref="table_column_filter_active" minOccurs="0" maxOccurs="1"/>
             <element ref="mandatory" minOccurs="0" maxOccurs="1"/>
-            <element ref="tree_node_closed" minOccurs="0" maxOccurs="1"/>
+            <element ref="tree_node" minOccurs="0" maxOccurs="1"/>
             <element ref="tree_node_open" minOccurs="0" maxOccurs="1"/>
             <element ref="window" minOccurs="0" maxOccurs="1"/>
             <element ref="window16" minOccurs="0" maxOccurs="1"/>
@@ -529,7 +529,7 @@
       </complexType>
    </element>
 
-   <element name="tree_node_closed">
+   <element name="tree_node">
       <annotation>
          <documentation>
             Icon to indicate the closed state of a tree node (if supported by L&amp;F)
