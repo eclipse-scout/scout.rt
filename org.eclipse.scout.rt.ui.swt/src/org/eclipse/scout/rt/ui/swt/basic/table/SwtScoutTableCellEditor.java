@@ -55,12 +55,12 @@ public class SwtScoutTableCellEditor {
   //cache
   private boolean m_tableIsEditingAndContainsFocus;
 
-  public SwtScoutTableCellEditor(ISwtScoutTable tableComposite) {
+  public SwtScoutTableCellEditor(final ISwtScoutTable tableComposite) {
     m_tableComposite = tableComposite;
     m_rowHeightListener = new Listener() {
       @Override
       public void handleEvent(Event event) {
-        event.height = UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight();
+        event.height = Math.max(event.height, UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight());
       }
     };
   }

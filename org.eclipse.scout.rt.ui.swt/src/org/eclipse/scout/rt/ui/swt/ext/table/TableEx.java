@@ -29,13 +29,17 @@ import org.eclipse.swt.widgets.TableItem;
 public class TableEx extends Table {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableEx.class);
-  private static final int TEXT_MARGIN = 3;
+  private static final int TEXT_MARGIN_Y = 1;
+  private static final int TEXT_MARGIN_X = 6;
+  private static final int IMAGE_TEXT_PADDING = 1;
   private P_MouseHoverListener m_mouseHoverListener = new P_MouseHoverListener();
   private boolean m_readOnly;
   private boolean m_multiline;
 
   public TableEx(Composite parent, int style, boolean multiline) {
     super(parent, style);
+
+    m_multiline = multiline;
     if (multiline) {
       Listener multilineListener = new P_MultilineListener();
       addListener(SWT.MeasureItem, multilineListener);
@@ -146,12 +150,12 @@ public class TableEx extends Table {
           if (img != null) {
             Rectangle imgBounds = img.getBounds();
             mSize.x += imgBounds.width + 2;
-            mSize.y = Math.max(mSize.y, imgBounds.height + 2 * TEXT_MARGIN);
+            mSize.y = Math.max(mSize.y, imgBounds.height + 2 * TEXT_MARGIN_Y);
           }
           String mtext = mitem.getText(event.index);
           Point textSize = m_multiline ? event.gc.textExtent(mtext) : event.gc.stringExtent(mtext);
-          mSize.x += textSize.x + 2 * TEXT_MARGIN;
-          mSize.y = Math.max(mSize.y, textSize.y + 2 * TEXT_MARGIN);
+          mSize.x += textSize.x + 2 * TEXT_MARGIN_X;
+          mSize.y = Math.max(mSize.y, textSize.y + 2 * TEXT_MARGIN_Y);
           event.width = mSize.x;
           event.height = Math.max(event.height, mSize.y);
           break;
@@ -165,35 +169,54 @@ public class TableEx extends Table {
           }
           /* center column 1 vertically */
           Rectangle itemBounds = pitem.getBounds(event.index);
-          int xOffset = itemBounds.x;
-          int yOffset = itemBounds.y + TEXT_MARGIN;
+          int xImageOffset = itemBounds.x;
+          int xTextOffset = xImageOffset + TEXT_MARGIN_X;
+          int yOffset = itemBounds.y + TEXT_MARGIN_Y;
+          Point textExtent = event.gc.stringExtent(ptext);
+
           Image pImg = pitem.getImage(event.index);
+          Rectangle contentBounds = null;
           if (pImg != null) {
-            Rectangle imgBounds = pImg.getBounds();
-            int yAdj = Math.max(0, (getItemHeight() - imgBounds.height) / 2);
-            event.gc.drawImage(pImg, xOffset, yOffset + yAdj);
-            xOffset += 1 + imgBounds.width;
-          }
-          if (align == SWT.RIGHT) {
-            Point extent = event.gc.stringExtent(ptext);
-            int dx = Math.max(TEXT_MARGIN, (itemBounds.x + itemBounds.width - xOffset - extent.x - TEXT_MARGIN));
-            xOffset += dx;
-          }
-          else if (align == SWT.CENTER) {
-            Point extent = event.gc.stringExtent(ptext);
-            int dx = Math.max(TEXT_MARGIN, (itemBounds.x + itemBounds.width - xOffset - extent.x - TEXT_MARGIN) / 2);
-            xOffset += dx;
+            contentBounds = pImg.getBounds();
+            if (textExtent.x > 0) {
+              //Add padding between image and text
+              contentBounds.width = contentBounds.width + IMAGE_TEXT_PADDING;
+              xTextOffset += contentBounds.width;
+            }
           }
           else {
-            xOffset += TEXT_MARGIN;
+            contentBounds = new Rectangle(0, 0, 0, 0);
           }
-          Point psize = event.gc.textExtent(ptext);
-          int yAdj = Math.max(0, (getItemHeight() - psize.y) / 2);
-          event.gc.drawText(ptext, xOffset, yOffset + yAdj, true);
+
+          contentBounds.width += textExtent.x;
+          contentBounds.height += textExtent.y;
+          if (align == SWT.RIGHT) {
+            int dx = Math.max(TEXT_MARGIN_X, (itemBounds.x + itemBounds.width - xImageOffset - contentBounds.width - TEXT_MARGIN_X));
+            xTextOffset += dx;
+
+            //Aligning the image leads to an ugly space when row gets selected...
+//            xImageOffset += dx;
+          }
+          else if (align == SWT.CENTER) {
+            int dx = Math.max(TEXT_MARGIN_X, (itemBounds.x + itemBounds.width - xImageOffset - contentBounds.width - TEXT_MARGIN_X) / 2);
+            xTextOffset += dx;
+
+            //Aligning the image leads to an ugly space when row gets selected...
+//            xImageOffset += dx;
+          }
+
+          if (pImg != null) {
+            event.gc.drawImage(pImg, xImageOffset, yOffset);
+          }
+          event.gc.drawText(ptext, xTextOffset, yOffset, true);
           event.gc.setForeground(event.gc.getDevice().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
-          event.gc.drawLine(itemBounds.x, itemBounds.y + itemBounds.height - 1, itemBounds.x + itemBounds.width, itemBounds.y + itemBounds.height - 1);
           break;
         case SWT.EraseItem:
+          //Focus rectangle looks ugly in Windows XP if there is a column with an image so we just remove the rectangle
+          //In Windows Vista it would look well.
+          event.detail &= ~SWT.FOCUSED;
+
+          //Foreground should not be painted because this is done by ourself with the SWT.PaintItem-Event.
           event.detail &= ~SWT.FOREGROUND;
           break;
       }
