@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -102,7 +103,9 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   @Override
   public String getText(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
-    return scoutNode.getCell().getText();
+    String text = scoutNode.getCell().getText();
+    text = StringUtility.replace(text, "\n", " ");
+    return text;
   }
 
   @Override
