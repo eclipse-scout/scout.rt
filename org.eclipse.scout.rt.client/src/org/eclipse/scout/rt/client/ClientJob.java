@@ -174,14 +174,18 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
   void waitFor() throws InterruptedException {
     final ClientRule rule = (getRule() instanceof ClientRule ? (ClientRule) getRule() : null);
     //
-    if (rule != null) {
-      rule.setEnabled(false);
-      rescheduleWaitingSyncJobs();
-    }
-    m_waitFor = true;
     fireBlockingConditionStart();
-    scheduleDummyJob();
+
+    //Waking up the waiting jobs and wait() must be synchronized to avoid race conditions
+    //which could happen if a waiting job wants to release the lock
     synchronized (m_waitForLock) {
+      if (rule != null) {
+        rule.setEnabled(false);
+        rescheduleWaitingSyncJobs();
+      }
+      m_waitFor = true;
+      scheduleDummyJob();
+
       m_waitForLock.wait();
     }
     m_waitFor = false;
