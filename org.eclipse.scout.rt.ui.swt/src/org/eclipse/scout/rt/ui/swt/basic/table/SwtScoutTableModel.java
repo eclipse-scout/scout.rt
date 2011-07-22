@@ -43,7 +43,6 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   private Image m_imgCheckboxFalse;
   private Image m_imgCheckboxTrue;
   private Color m_disabledForegroundColor;
-  private boolean m_multiline;
 
   public SwtScoutTableModel(ITable table, SwtScoutTable swtTable, ISwtEnvironment environment, TableColumnManager columnManager) {
     m_table = table;
@@ -57,12 +56,12 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
 
   }
 
-  public void setMultiline(boolean multiline) {
-    m_multiline = multiline;
-  }
-
   public boolean isMultiline() {
-    return m_multiline;
+    if (m_table != null) {
+      return m_table.isMultilineText();
+    }
+
+    return false;
   }
 
   @Override
