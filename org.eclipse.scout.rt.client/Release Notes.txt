@@ -488,3 +488,10 @@ Solution:
 Back event to notify the model once a screen shot is done. Furthermore a PrintApplicationAction is created to take screen shots of the whole application.
 Migration:
 none
+
+25.07.2011 dwi
+bugzilla 345184
+bsi ticket 102'074
+Problem:
+- When form tool button is selected, other tool buttons should only be deselected if of the type AbstractFormToolButton
+Migration: None
