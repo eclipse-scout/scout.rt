@@ -112,6 +112,10 @@ public abstract class AbstractClientSession implements IClientSession {
     return m_offlineSubject;
   }
 
+  protected void setOfflineSubject(Subject offlineSubject) {
+    m_offlineSubject = offlineSubject;
+  }
+
   public Bundle getBundle() {
     return m_bundle;
   }
