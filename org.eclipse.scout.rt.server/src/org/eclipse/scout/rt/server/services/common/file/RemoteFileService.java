@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.CompareUtility;
@@ -239,6 +240,8 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     }
   }
 
+  private static final Pattern LOCALE_SECURITY_PATTERN = Pattern.compile("[a-z]+([_][a-z0-9]+)?([_][a-z0-9_]+)?", Pattern.CASE_INSENSITIVE);
+
   private File getFileInternal(RemoteFile spec) throws ProcessingException {
     File root = new File(getRootPath());
     File folder = null;
@@ -253,26 +256,36 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     }
     String canonicalRoot;
     String canonicalFolder;
+    String canonicalSimpleName;
     try {
-      canonicalFolder = folder.getCanonicalPath();
       canonicalRoot = root.getCanonicalPath();
+      canonicalFolder = folder.getCanonicalPath();
+      canonicalSimpleName = new File(canonicalFolder, spec.getName()).getName();
     }
     catch (IOException e) {
-      throw new ProcessingException("invalid or unaccessible path: '" + spec.getDirectory() + "'", e);
+      throw new ProcessingException("invalid or unaccessible path", e);
     }
     if (canonicalFolder == null || !canonicalFolder.startsWith(canonicalRoot)) {
-      throw new SecurityException("invalid or unaccessible path: path outside root-path");
+      throw new SecurityException("invalid or unaccessible path");
     }
-
-    String filename = spec.getName();
-    if (spec.getLocale() != null && filename != null && filename.lastIndexOf(".") != -1) {
-      String language = spec.getLocale().toString().replaceAll("__", "_");
+    // if the remote file is requested from the RemoteFileServlet, spec.getName() will start with an "/"
+    if (canonicalSimpleName == null || !canonicalSimpleName.equals(spec.getName().startsWith("/") ? spec.getName().substring(1) : spec.getName())) {
+      throw new SecurityException("invalid or unaccessible path");
+    }
+    //
+    String filename = canonicalSimpleName;
+    if (spec.getLocale() != null && filename.lastIndexOf(".") != -1) {
+      //check locale string for hacking patterns (only allow
+      String localeText = spec.getLocale().toString().replaceAll("__", "_");
+      if (!LOCALE_SECURITY_PATTERN.matcher(localeText).matches()) {
+        throw new SecurityException("invalid or unaccessible path");
+      }
+      String[] checkedLocaleParts = localeText.split("_", 3);
       String prefix = filename.substring(0, filename.lastIndexOf("."));
       String suffix = filename.substring(filename.lastIndexOf("."));
-      String[] lang = language.split("_");
-      for (int i = lang.length - 1; i >= 0; i--) {
-        if (prefix.toLowerCase().endsWith(lang[i].toLowerCase())) {
-          prefix = prefix.substring(0, prefix.length() - lang[i].length());
+      for (int i = checkedLocaleParts.length - 1; i >= 0; i--) {
+        if (prefix.toLowerCase().endsWith(checkedLocaleParts[i].toLowerCase())) {
+          prefix = prefix.substring(0, prefix.length() - checkedLocaleParts[i].length());
           if (prefix.endsWith("_")) {
             prefix = prefix.substring(0, prefix.length() - 1);
           }
@@ -281,20 +294,20 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
       if (!prefix.endsWith("_")) {
         prefix = prefix + "_";
       }
-      filename = prefix + language + suffix;
-      File test = new File(folder, filename);
+      filename = prefix + localeText + suffix;
+      File test = new File(canonicalFolder, filename);
       while (!test.exists()) {
-        if (language.indexOf("_") == -1) {
-          filename = spec.getName();
+        if (localeText.indexOf("_") == -1) {
+          filename = canonicalSimpleName;
           break;
         }
-        language = language.substring(0, language.lastIndexOf("_"));
-        filename = prefix + language + suffix;
-        test = new File(folder, filename);
+        localeText = localeText.substring(0, localeText.lastIndexOf("_"));
+        filename = prefix + localeText + suffix;
+        test = new File(canonicalFolder, filename);
       }
     }
 
-    File file = new File(folder, filename);
+    File file = new File(canonicalFolder, filename);
     return file;
   }
 
