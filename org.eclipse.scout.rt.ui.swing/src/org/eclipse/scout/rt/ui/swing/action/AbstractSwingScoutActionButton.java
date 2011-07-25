@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.SwingConstants;
 
@@ -24,8 +25,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
+import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.JTabEx;
 
 /**
  * Composition between a scout IButton and a swing
@@ -42,7 +44,7 @@ public abstract class AbstractSwingScoutActionButton<T extends IAction> extends 
 
   @Override
   protected void initializeSwing() {
-    JTabEx swingButton = createButton(getSwingEnvironment());
+    AbstractButton swingButton = createButton(getSwingEnvironment());
     SwingUtility.installDefaultFocusHandling(swingButton);
     swingButton.setHorizontalTextPosition(SwingConstants.RIGHT);
     swingButton.setVerifyInputWhenFocusTarget(true);
@@ -59,8 +61,8 @@ public abstract class AbstractSwingScoutActionButton<T extends IAction> extends 
   }
 
   @Override
-  public JTabEx getSwingField() {
-    return (JTabEx) super.getSwingField();
+  public AbstractButton getSwingField() {
+    return (AbstractButton) super.getSwingField();
   }
 
   @Override
@@ -76,14 +78,30 @@ public abstract class AbstractSwingScoutActionButton<T extends IAction> extends 
   }
 
   protected void setIconIdFromScout(String iconId) {
-    if (iconId != null) {
-      JTabEx b = (JTabEx) getSwingField();
-      b.setIconGroupById(iconId);
+    if (iconId == null) {
+      getSwingField().setIcon(null);
+      getSwingField().setDisabledIcon(null);
+      getSwingField().setPressedIcon(null);
+      getSwingField().setSelectedIcon(null);
+      getSwingField().setRolloverIcon(null);
+    }
+    else {
+      IconGroup iconGroup = new IconGroup(getSwingEnvironment(), iconId);
+      getSwingField().setIcon(iconGroup.getIcon(IconState.NORMAL));
+      if (iconGroup.hasIcon(IconState.DISABLED)) {
+        getSwingField().setDisabledIcon(iconGroup.getIcon(IconState.DISABLED));
+      }
+      if (iconGroup.hasIcon(IconState.SELECTED)) {
+        getSwingField().setPressedIcon(iconGroup.getIcon(IconState.SELECTED));
+      }
+      if (iconGroup.hasIcon(IconState.ROLLOVER)) {
+        getSwingField().setRolloverIcon(iconGroup.getIcon(IconState.ROLLOVER));
+      }
     }
   }
 
   protected void setTextFromScout(String s) {
-    JTabEx b = getSwingField();
+    AbstractButton b = getSwingField();
     String label = StringUtility.removeMnemonic(s);
     b.setText(label);
     if (StringUtility.getMnemonic(s) != 0x0) {
@@ -173,7 +191,7 @@ public abstract class AbstractSwingScoutActionButton<T extends IAction> extends 
     }
   }
 
-  protected abstract JTabEx createButton(ISwingEnvironment env);
+  protected abstract AbstractButton createButton(ISwingEnvironment env);
 
   /*
    * Listeners

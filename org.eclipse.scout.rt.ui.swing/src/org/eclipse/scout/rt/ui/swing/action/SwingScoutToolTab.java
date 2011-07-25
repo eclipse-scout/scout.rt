@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.swing.action;
 
 import java.awt.Insets;
 
+import javax.swing.AbstractButton;
+import javax.swing.JButton;
 import javax.swing.JToggleButton.ToggleButtonModel;
 
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
@@ -21,11 +23,17 @@ import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.JTabEx;
 public class SwingScoutToolTab extends AbstractSwingScoutActionButton<IToolButton> {
 
   @Override
-  protected JTabEx createButton(ISwingEnvironment env) {
-    JTabEx swingButton = new JTabEx(env);
+  protected AbstractButton createButton(ISwingEnvironment env) {
+    AbstractButton swingButton;
+    if (getScoutObject().isToggleAction()) {
+      swingButton = new JTabEx();
+      // replace model to allow deselection of the tool button, meaning that no tool button is activated
+      swingButton.setModel(new ToggleButtonModel());
+    }
+    else {
+      swingButton = new JButton();
+    }
     swingButton.setMargin(new Insets(2, 5, 2, 5));
-    // replace model to allow deselection of the tool button, meaning that no tool button is activated
-    swingButton.setModel(new ToggleButtonModel());
     return swingButton;
   }
 }

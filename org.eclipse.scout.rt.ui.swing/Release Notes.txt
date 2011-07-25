@@ -157,3 +157,15 @@ If using Orson L&F:
   - create dependency to org.eclipse.scout.rt.ui.swing.orson from your Swing-Plug-In. Also include that Plug-In in the product file.
   - In SwingApplication, change LegacySwingEnvironment to OrsonSwingEnvironment.
   - Remove Plug-In com.bsiag.scout.rt.client.bsi.icons.fragment as those icons are contained in com.bsiag.scout.rt.client.bsi.icons.fragment.
+
+25.07.2011 dwi
+bugzilla 345184
+bsi ticket 102'074
+Problem:
+- Support for toolbuttons in OpenSource Swing UI
+- Tool button views may not only be positioned on East position, but also on South position. Therefore, remove collapse button on tool button panel and width synchronization. Move synchronization code into Rayo UI Plug-In.
+- Tool buttons (not FormToolButtons) are not represented by Rayo L&F. Therefore, skip tool buttons which are not instanceof AbstractFormToolButton
+- Factory methods for creating header detail panels are SwingScoutHeaderPanel specific and not of global interest in SwingEnvironment. The same applies to color and panel height settings. Move them to SwingScoutHeaderPanel.
+- Height of Header panel should automatically be calculated based on installed L&F
+Migration:
+NONE

@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.swing.action;
 
 import java.awt.Insets;
 
+import javax.swing.AbstractButton;
+
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.JTabEx;
@@ -19,8 +21,8 @@ import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.JTabEx;
 public class SwingScoutViewTab extends AbstractSwingScoutActionButton<IViewButton> {
 
   @Override
-  protected JTabEx createButton(ISwingEnvironment env) {
-    JTabEx swingButton = new JTabEx(env);
+  protected AbstractButton createButton(ISwingEnvironment env) {
+    JTabEx swingButton = new JTabEx();
     swingButton.setMargin(new Insets(2, 5, 2, 5));
     return swingButton;
   }

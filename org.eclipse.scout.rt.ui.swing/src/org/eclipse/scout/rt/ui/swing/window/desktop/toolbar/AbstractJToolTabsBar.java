@@ -14,12 +14,9 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 public abstract class AbstractJToolTabsBar extends AbstractJTabBar {
 
-  public static final String PROP_COLLAPSED = "collapsed";
-  public static final String PROP_MINIMUM_SIZE = "minimumSize";
-
   private static final long serialVersionUID = 1L;
 
   public abstract void rebuild(IDesktop desktop);
 
-  public abstract void setSwingScoutToolBarContainer(SwingScoutToolBar swingScoutToolBarContainer);
+  public abstract void setSwingScoutHeaderPanel(SwingScoutHeaderPanel swingScoutHeaderPanel);
 }

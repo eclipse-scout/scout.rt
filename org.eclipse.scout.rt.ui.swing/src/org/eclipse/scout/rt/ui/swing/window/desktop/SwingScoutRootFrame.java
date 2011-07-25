@@ -65,9 +65,7 @@ import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitDesktopManager;
 import org.eclipse.scout.rt.ui.swing.window.desktop.menubar.SwingScoutMenuBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.status.SwingScoutStatusBar;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.SwingScoutToolBar;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.ToolsViewAndTabsBarSynchronizer;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JToolTabsBar;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.SwingScoutHeaderPanel;
 import org.eclipse.scout.rt.ui.swing.window.desktop.tray.ISwingScoutTray;
 
 /**
@@ -82,9 +80,9 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
   private JRootPane m_swingRootPane;
   private P_ScoutDesktopListener m_scoutDesktopListener;
   private P_SwingScoutRootListener m_swingScoutRootListener;
-  private ISwingScoutDesktop m_desktopComposite;
+  private ISwingScoutDesktop m_swingScoutDesktop;
   private SwingScoutMenuBar m_menuBarComposite;
-  private SwingScoutToolBar m_toolBarComposite;
+  private SwingScoutHeaderPanel m_swingScoutHeaderPanel;
   private SwingScoutStatusBar m_statusBarComposite;
   // cache
   private String m_title;
@@ -132,12 +130,12 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     Container contentPane = m_swingRootPane.getContentPane();
     contentPane.removeAll();
     contentPane.setLayout(new BorderLayoutEx(0, 0));
-    // toolbar
-    m_toolBarComposite = new SwingScoutToolBar();
-    m_toolBarComposite.createField(getScoutObject(), getSwingEnvironment());
-    if (!m_toolBarComposite.isEmpty()) {
-      JComponent toolBar = m_toolBarComposite.getSwingToolBar();
-      contentPane.add(toolBar, BorderLayoutEx.NORTH);
+    // header panel (navigation, view buttons, tool buttons)
+    m_swingScoutHeaderPanel = createSwingScoutHeaderPanel();
+    m_swingScoutHeaderPanel.createField(getScoutObject(), getSwingEnvironment());
+    if (!m_swingScoutHeaderPanel.isEmpty()) {
+      JComponent swingHeaderPanel = m_swingScoutHeaderPanel.getSwingField();
+      contentPane.add(swingHeaderPanel, BorderLayoutEx.NORTH);
     }
     // desktop pane
     JPanel spacerPanel = new JPanelEx();
@@ -147,8 +145,8 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     if (UIManager.get("desktop") != null) {
       spacerPanel.setBackground(UIManager.getColor("desktop"));
     }
-    m_desktopComposite = getSwingEnvironment().createDesktop(m_swingFrame, getScoutObject());
-    JComponent desktopPane = m_desktopComposite.getSwingDesktopPane();
+    m_swingScoutDesktop = getSwingEnvironment().createDesktop(m_swingFrame, getScoutObject());
+    JComponent desktopPane = m_swingScoutDesktop.getSwingDesktopPane();
     desktopPane.setCursor(null);
     spacerPanel.add(desktopPane);
     contentPane.add(spacerPanel, BorderLayoutEx.CENTER);
@@ -159,8 +157,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
       m_statusBarComposite.createField(getScoutObject(), getSwingEnvironment());
       contentPane.add(m_statusBarComposite.getSwingStatusBar(), BorderLayout.SOUTH);
     }
-    //
-    registerListenerOnToolsView();
+
     m_swingFrame.pack();
     if (m_swingFrame instanceof JFrame) {
       // register ctrl-TAB and ctrl-shift-TAB actions according to ui
@@ -171,8 +168,8 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
 
         @Override
         public void actionPerformed(ActionEvent e) {
-          if (m_desktopComposite != null) {
-            JInternalFrame[] a = m_desktopComposite.getSwingDesktopPane().getAllFrames();
+          if (m_swingScoutDesktop != null) {
+            JInternalFrame[] a = m_swingScoutDesktop.getSwingDesktopPane().getAllFrames();
             if (a != null && a.length > 0) {
               a[0].getContentPane().transferFocus();
             }
@@ -212,19 +209,6 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     return b == null || b.booleanValue();
   }
 
-  /**
-   * <ul>
-   * <li>Register listener on {@link JToolTabsBar} to notify {@link ToolsViewPlaceholder} about collapse / expand state.
-   * </li>
-   * <li>Register listener on {@link ToolsViewPlaceholder} to notify layout manager of {@link SwingScoutToolBar} about
-   * resize changes of tool bar.</li>
-   * </ul>
-   */
-  private void registerListenerOnToolsView() {
-    ToolsViewPlaceholder toolsViewPlaceholder = ((SwingScoutDesktop) m_desktopComposite).getToolsViewPlaceholder();
-    new ToolsViewAndTabsBarSynchronizer(toolsViewPlaceholder, m_toolBarComposite);
-  }
-
   @Override
   public Frame getSwingFrame() {
     return m_swingFrame;
@@ -232,7 +216,11 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
 
   @Override
   public ISwingScoutDesktop getDesktopComposite() {
-    return m_desktopComposite;
+    return m_swingScoutDesktop;
+  }
+
+  public SwingScoutHeaderPanel getSwingScoutHeaderPanel() {
+    return m_swingScoutHeaderPanel;
   }
 
   /**
@@ -467,6 +455,15 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     else if (IDesktop.PROP_STATUS.equals(name)) {
       setStatusFromScout();
     }
+  }
+
+  /**
+   * To be overwritten to install a custom header panel
+   * 
+   * @return
+   */
+  protected SwingScoutHeaderPanel createSwingScoutHeaderPanel() {
+    return new SwingScoutHeaderPanel();
   }
 
   /*

@@ -16,11 +16,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.Icon;
-
-import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
-import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
-import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
 import org.eclipse.scout.rt.ui.swing.ext.JToggleButtonEx;
 
 /**
@@ -33,13 +28,10 @@ public class JTabEx extends JToggleButtonEx {
 
   public static final String PROP_ACTIVE = "active";
 
-  private final ISwingEnvironment m_env;
   private boolean m_mouseOver = false;
-  private IconGroup m_iconGroup = new IconGroup();
   private boolean m_active;
 
-  public JTabEx(ISwingEnvironment env) {
-    m_env = env;
+  public JTabEx() {
     m_active = isSelected();
     setModel(new ToggleButtonModel() {
       private static final long serialVersionUID = 1L;
@@ -65,37 +57,6 @@ public class JTabEx extends JToggleButtonEx {
         firePropertyChange(PROP_ACTIVE, oldActive, m_active);
       }
     });
-  }
-
-  public void setIconGroupById(String iconId) {
-    m_iconGroup = new IconGroup(m_env, iconId);
-
-    setIcon(m_iconGroup.getIcon(IconState.NORMAL));
-    setDisabledIcon(m_iconGroup.getIcon(IconState.DISABLED));
-    setPressedIcon(m_iconGroup.getIcon(IconState.SELECTED));
-    setSelectedIcon(m_iconGroup.getIcon(IconState.SELECTED));
-    setRolloverIcon(m_iconGroup.getIcon(IconState.ROLLOVER));
-
-    repaint();
-  }
-
-  public IconGroup getIconGroup() {
-    return m_iconGroup;
-  }
-
-  protected Icon getIconForTabState() {
-    if (!isEnabled()) {
-      return getIconGroup().getIcon(IconState.DISABLED);
-    }
-    else if (isSelected()) {
-      return getIconGroup().getIcon(IconState.SELECTED);
-    }
-    else if (isMouseOver()) {
-      return getIconGroup().getIcon(IconState.ROLLOVER);
-    }
-    else {
-      return getIconGroup().getIcon(IconState.NORMAL);
-    }
   }
 
   public boolean isMouseOver() {

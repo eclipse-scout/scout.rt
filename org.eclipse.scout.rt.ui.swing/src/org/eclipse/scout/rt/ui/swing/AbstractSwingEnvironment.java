@@ -96,12 +96,6 @@ import org.eclipse.scout.rt.ui.swing.window.desktop.ISwingScoutRootFrame;
 import org.eclipse.scout.rt.ui.swing.window.desktop.SwingScoutDesktop;
 import org.eclipse.scout.rt.ui.swing.window.desktop.SwingScoutRootFrame;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitLayoutConstraints;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJNavigationWidget;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJToolTabsBar;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJViewTabsBar;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JNavigationWidget;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JToolTabsBar;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JViewTabsBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.tray.ISwingScoutTray;
 import org.eclipse.scout.rt.ui.swing.window.desktop.tray.SwingScoutTray;
 import org.eclipse.scout.rt.ui.swing.window.dialog.SwingScoutDialog;
@@ -1175,6 +1169,11 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   }
 
   @Override
+  public int getLogoHorizontalAlignment() {
+    return 0;
+  }
+
+  @Override
   public Component getPopupOwner() {
     return m_popupOwner;
   }
@@ -1251,35 +1250,5 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     public void storeBounds(Rectangle bounds) {
       ClientUIPreferences.getInstance().setFormBounds(m_form, bounds);
     }
-  }
-
-  @Override
-  public AbstractJNavigationWidget createNavigationWidgetPanel() {
-    return new JNavigationWidget(this);
-  }
-
-  @Override
-  public AbstractJToolTabsBar createToolTabsBar() {
-    return new JToolTabsBar(this);
-  }
-
-  @Override
-  public AbstractJViewTabsBar createViewTabsBar() {
-    return new JViewTabsBar(this);
-  }
-
-  @Override
-  public int getToolBarHeight() {
-    return 30;
-  }
-
-  @Override
-  public int getHeaderPanelHeight() {
-    return 85;
-  }
-
-  @Override
-  public Color getHeaderPanelColor() {
-    return null;
   }
 }

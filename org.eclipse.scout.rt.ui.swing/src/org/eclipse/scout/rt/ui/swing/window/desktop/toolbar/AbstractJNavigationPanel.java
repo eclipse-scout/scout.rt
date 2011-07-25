@@ -15,9 +15,10 @@ import java.awt.Point;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
-public abstract class AbstractJNavigationWidget extends JPanel {
+public abstract class AbstractJNavigationPanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
 
@@ -29,11 +30,12 @@ public abstract class AbstractJNavigationWidget extends JPanel {
 
   private final ISwingEnvironment m_env;
 
-  public AbstractJNavigationWidget(ISwingEnvironment env) {
+  public AbstractJNavigationPanel(ISwingEnvironment env) {
     m_env = env;
+    setOpaque(false);
   }
 
-  public abstract void rebuild();
+  public abstract void rebuild(IDesktop desktop);
 
   public AbstractAction getBackAction() {
     return m_backAction;

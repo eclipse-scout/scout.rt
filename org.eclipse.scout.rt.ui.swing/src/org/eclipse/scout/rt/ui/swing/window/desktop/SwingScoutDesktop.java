@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JInternalFrameEx;
+import org.eclipse.scout.rt.ui.swing.window.desktop.layout.IMultiSplitStrategy;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitDesktopManager;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitLayout;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitLayoutConstraints;
@@ -39,8 +40,6 @@ import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitLayoutConst
  */
 public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements ISwingScoutDesktop {
 
-  private ToolsViewPlaceholder m_toolsViewPlaceholder;
-
   public SwingScoutDesktop() {
     //keep empty
   }
@@ -52,7 +51,7 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
     setSwingField(swingDesktop);
     //
     swingDesktop.setDesktopManager(new MultiSplitDesktopManager());
-    ColumnSplitStrategyWithToolsView columnSplitStrategy = new ColumnSplitStrategyWithToolsView();
+    IMultiSplitStrategy columnSplitStrategy = createMultiSplitStrategy();
     MultiSplitLayout layout = new MultiSplitLayout(columnSplitStrategy);
     swingDesktop.setLayout(layout);
     swingDesktop.setOpaque(true);
@@ -67,9 +66,13 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
     // register ctrl-TAB and ctrl-shift-TAB actions according to ui
     swingDesktop.getActionMap().put("selectNextFrame", new P_SwingTabFrameAction(1));
     swingDesktop.getActionMap().put("selectPreviousFrame", new P_SwingTabFrameAction(-1));
-    m_toolsViewPlaceholder = new ToolsViewPlaceholder(swingDesktop, columnSplitStrategy);
     // development shortcuts
     SwingUtility.installDevelopmentShortcuts(getSwingDesktopPane());
+  }
+
+  @Override
+  public JDesktopPane getSwingField() {
+    return (JDesktopPane) super.getSwingField();
   }
 
   @Override
@@ -116,10 +119,6 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
     MultiSplitLayoutConstraints mc = (MultiSplitLayoutConstraints) constraints;
     f.setTabIndex(mc.tabIndex);
     f.setVisible(true);
-    if (mc.col == 2) {
-      f.setName("Synth.ToolsView");
-      m_toolsViewPlaceholder.addFrame(f);
-    }
     getSwingDesktopPane().add(f, mc);
     //ticket 90942, detail pane initially only has 20px height
     DesktopManager dm = getSwingDesktopPane().getDesktopManager();
@@ -133,14 +132,13 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
 
   @Override
   public void removeView(JInternalFrameEx f) {
-    m_toolsViewPlaceholder.removeFrame(f);
     getSwingDesktopPane().getDesktopManager().closeFrame(f);
     f.setVisible(false);
     getSwingDesktopPane().remove(f);
   }
 
-  public ToolsViewPlaceholder getToolsViewPlaceholder() {
-    return m_toolsViewPlaceholder;
+  protected IMultiSplitStrategy createMultiSplitStrategy() {
+    return new ColumnSplitStrategy();
   }
 
   /*

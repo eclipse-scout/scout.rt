@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,16 +24,14 @@ import org.eclipse.scout.rt.ui.swing.window.desktop.layout.IMultiSplitStrategy;
  * <p>
  * Caching of split locations
  */
-public class ColumnSplitStrategyWithToolsView implements IMultiSplitStrategy {
-  private int m_span;
-  private int m_toolsViewMinWidth;
-  private int[][] m_location;
-  private int[][] m_definedLocation;
+public class ColumnSplitStrategy implements IMultiSplitStrategy {
+  protected int m_span;
+  protected int[][] m_location;
+  protected int[][] m_definedLocation;
   private Job m_storageJob;
 
-  public ColumnSplitStrategyWithToolsView() {
+  public ColumnSplitStrategy() {
     m_span = 1000;
-    m_toolsViewMinWidth = 250;
     m_definedLocation = new int[][]{new int[]{0, 250, 750, 1000}, new int[]{0, 250, 750, 1000}, new int[]{0, 250, 750, 1000}};
     int[][] saved = null;
     try {
@@ -86,23 +84,13 @@ public class ColumnSplitStrategyWithToolsView implements IMultiSplitStrategy {
     return null;
   }
 
-  public void setToolsViewWidth(int toolsViewWidth) {
-    for (int r = 0; r < 3; r++) {
-      setSplitLocation(r, 2, m_span - toolsViewWidth);
-    }
-  }
-
-  public void setToolsViewMinWidth(int toolsViewMinWidth) {
-    m_toolsViewMinWidth = toolsViewMinWidth;
-  }
-
   @Override
   public void updateSpan(int newSpan) {
     m_span = newSpan;
     for (int r = 0; r < 3; r++) {
-      int toolViewWidth = m_definedLocation[r][3] - m_definedLocation[r][2];
+      int rightColumnWidth = m_definedLocation[r][3] - m_definedLocation[r][2];
       m_location[r][3] = m_span;
-      m_location[r][2] = m_span - Math.max(m_toolsViewMinWidth, toolViewWidth);
+      m_location[r][2] = m_span - rightColumnWidth;
       m_location[r][1] = m_definedLocation[r][1];
       if (m_location[r][1] + 20 > m_location[r][2]) {
         int mid = (m_location[r][1] + m_location[r][2]) / 2;

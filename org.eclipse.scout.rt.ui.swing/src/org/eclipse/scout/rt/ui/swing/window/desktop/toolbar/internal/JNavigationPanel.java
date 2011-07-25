@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -20,6 +21,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,13 +29,17 @@ import javax.swing.JToolBar;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
+import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
-import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJNavigationWidget;
+import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJNavigationPanel;
 
-public class JNavigationWidget extends AbstractJNavigationWidget {
+public class JNavigationPanel extends AbstractJNavigationPanel {
 
   private static final long serialVersionUID = 1L;
 
@@ -44,8 +50,10 @@ public class JNavigationWidget extends AbstractJNavigationWidget {
   private JButton m_stopRefreshButton;
   private JButton m_historyButton;
 
-  public JNavigationWidget(ISwingEnvironment env) {
+  public JNavigationPanel(ISwingEnvironment env) {
     super(env);
+    setOpaque(false);
+    setLayout(new GridBagLayout());
 
     env.addPropertyChangeListener(new PropertyChangeListener() {
       @Override
@@ -66,16 +74,20 @@ public class JNavigationWidget extends AbstractJNavigationWidget {
   }
 
   @Override
-  public void rebuild() {
+  public void rebuild(IDesktop desktop) {
     removeAll();
 
     m_swingToolBar = new JToolBar(JToolBar.HORIZONTAL);
     m_swingToolBar.setFloatable(false);
-    m_swingToolBar.setBorder(new EmptyBorder(0, 0, 0, 0));
+    m_swingToolBar.setBorder(new EmptyBorder(0, 3, 0, 0));
+    m_swingToolBar.setOpaque(false);
+    m_swingToolBar.setMargin(new Insets(0, 0, 0, 0));
+
     m_swingToolBar.setLayout(new GridBagLayout());
 
     // history button
     m_historyButton = new JButton(getHistoryAction());
+    m_historyButton.setOpaque(false);
     m_historyButton.setEnabled(getBackAction().isEnabled() || getForwardAction().isEnabled());
     installButtonIcons(m_historyButton, SwingIcons.NavigationHistory, UIManager.getString("Navigation.history"));
     if (m_historyButton.getIcon() == null) {
@@ -85,23 +97,46 @@ public class JNavigationWidget extends AbstractJNavigationWidget {
 
     // back button
     m_backButton = new JButton(getBackAction());
+    m_backButton.setOpaque(false);
     installButtonIcons(m_backButton, SwingIcons.NavigationBack, UIManager.getString("Navigation.back"));
     addButton(m_swingToolBar, m_backButton, new Insets(0, 0, 0, 3));
 
     // forward button
     m_forwardButton = new JButton(getForwardAction());
+    m_forwardButton.setOpaque(false);
     installButtonIcons(m_forwardButton, SwingIcons.NavigationForward, UIManager.getString("Navigation.forward"));
     addButton(m_swingToolBar, m_forwardButton, new Insets(0, 0, 0, 3));
 
     // stop / refresh button
     m_stopRefreshButton = new JButton(getRefreshAction());
+    m_stopRefreshButton.setOpaque(false);
     installButtonIcons(m_stopRefreshButton, SwingIcons.NavigationRefresh, UIManager.getString("Navigation.refresh"));
     addButton(m_swingToolBar, m_stopRefreshButton, new Insets(0, 0, 0, 0));
+
+    // tool button's
+    boolean separatorRendered = false;
+    for (IToolButton scoutToolButton : desktop.getToolButtons()) {
+      if (scoutToolButton instanceof AbstractFormToolButton) {
+        continue; // skip @{link AbstractFormToolButton}'s as rendered in @{link JToolTabsBar}
+      }
+
+      if (!separatorRendered) {
+        m_swingToolBar.addSeparator(new Dimension(10, 20));
+        separatorRendered = true;
+      }
+
+      ISwingScoutAction<IToolButton> swingScoutToolButton = createSwingScoutToolButton(scoutToolButton);
+      if (swingScoutToolButton != null) {
+        AbstractButton swingButton = (AbstractButton) swingScoutToolButton.getSwingField();
+        swingButton.setOpaque(false);
+        addButton(m_swingToolBar, swingButton, new Insets(0, 0, 0, 1));
+      }
+    }
 
     add(m_swingToolBar);
   }
 
-  private void addButton(JToolBar toolBar, JButton button, Insets insets) {
+  private void addButton(JToolBar toolBar, AbstractButton button, Insets insets) {
     // layout tool button
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.fill = GridBagConstraints.VERTICAL;
@@ -136,8 +171,8 @@ public class JNavigationWidget extends AbstractJNavigationWidget {
   @Override
   public Point getHistoryMenuLocation() {
     Point location = m_historyButton.getLocation();
-    location.y = location.y + m_historyButton.getHeight() + 5;
-    location.x = location.x + 5;
+    location.y = location.y + m_historyButton.getHeight();
+    location.x = location.x;
     return location;
   }
 
@@ -167,5 +202,10 @@ public class JNavigationWidget extends AbstractJNavigationWidget {
                   3);
 
     return new ImageIcon(img);
+  }
+
+  @SuppressWarnings("unchecked")
+  private ISwingScoutAction<IToolButton> createSwingScoutToolButton(IToolButton scoutToolButton) {
+    return getSwingEnvironment().createAction(this, scoutToolButton);
   }
 }
