@@ -111,9 +111,9 @@ public abstract class AbstractFormToolButton extends AbstractToolButton {
     }
     if (selected) {
       if (isToggleAction()) {
-        // unselect other tool buttons
+        // unselect other form tool buttons
         for (IToolButton b : desktop.getToolButtons()) {
-          if (b != this && b.isSelected()) {
+          if (b != this && b instanceof AbstractFormToolButton && b.isSelected()) {
             b.setSelected(false);
           }
         }
