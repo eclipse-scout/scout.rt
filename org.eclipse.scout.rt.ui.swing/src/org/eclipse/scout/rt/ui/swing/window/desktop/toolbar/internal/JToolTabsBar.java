@@ -106,7 +106,7 @@ public class JToolTabsBar extends AbstractJToolTabsBar {
             int newWidth = getPreferredSize().width;
             if (m_width != newWidth) {
               m_width = newWidth;
-              m_swingScoutHeaderPanel.adjustToolButtonPanelWidth(getPreferredSize().width);
+              m_swingScoutHeaderPanel.adjustToolButtonPanelWidth(getPreferredSize().width, false);
             }
           }
         }
@@ -114,7 +114,6 @@ public class JToolTabsBar extends AbstractJToolTabsBar {
           m_syncLock.release();
         }
       }
-
     });
   }
 

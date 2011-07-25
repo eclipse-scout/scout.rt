@@ -115,48 +115,58 @@ public class UIDefaultsInjector {
     /*
      * Texts
      */
-    defaults.put("OptionPane.okButtonText", SwingUtility.getNlsText("Ok"));
-    defaults.put("OptionPane.cancelButtonText", SwingUtility.getNlsText("Cancel"));
-    defaults.put("OptionPane.yesButtonText", SwingUtility.getNlsText("Yes"));
-    defaults.put("OptionPane.noButtonText", SwingUtility.getNlsText("No"));
-    defaults.put("OptionPane.copyPasteHint", SwingUtility.getNlsText("CopyPasteHint"));
-    defaults.put("OptionPane.copy", SwingUtility.getNlsText("Copy"));
-    defaults.put("FileChooser.lookInLabelText", SwingUtility.getNlsText("LookIn"));
-    defaults.put("FileChooser.filesOfTypeLabelText", SwingUtility.getNlsText("FilesOfType"));
-    defaults.put("FileChooser.fileNameLabelText", SwingUtility.getNlsText("FileName"));
-    defaults.put("FileChooser.saveButtonText", SwingUtility.getNlsText("Save"));
-    defaults.put("FileChooser.saveDialogTitleText", SwingUtility.getNlsText("Save"));
-    defaults.put("FileChooser.openButtonText", SwingUtility.getNlsText("Open"));
-    defaults.put("FileChooser.openDialogTitleText", SwingUtility.getNlsText("Open"));
-    defaults.put("FileChooser.cancelButtonText", SwingUtility.getNlsText("Cancel"));
-    defaults.put("FileChooser.updateButtonText", SwingUtility.getNlsText("Update"));
-    defaults.put("FileChooser.helpButtonText", SwingUtility.getNlsText("Help"));
-    defaults.put("ProgressWindow.interruptedText", SwingUtility.getNlsText("Interrupted"));
-    defaults.put("ProgressWindow.interruptText", SwingUtility.getNlsText("Cancel"));
-    defaults.put("Calendar.condensedText", SwingUtility.getNlsText("Condensed"));
-    defaults.put("Calendar.monthText", SwingUtility.getNlsText("Month"));
-    defaults.put("Calendar.weekText", SwingUtility.getNlsText("Week"));
-    defaults.put("Calendar.workWeekText", SwingUtility.getNlsText("WorkWeek"));
-    defaults.put("Calendar.dayText", SwingUtility.getNlsText("Day"));
-    defaults.put("Calendar.hourText", SwingUtility.getNlsText("Hour"));
-    defaults.put("Calendar.minuteText", SwingUtility.getNlsText("Minute"));
-    defaults.put("Calendar.chooseText", SwingUtility.getNlsText("Choose"));
-    defaults.put("Calendar.weekShortText", SwingUtility.getNlsText("WeekShort"));
-    defaults.put("Calendar.itemUntil", SwingUtility.getNlsText("Calendar_itemUntil"));
-    defaults.put("Calendar.itemFrom", SwingUtility.getNlsText("Calendar_itemFrom"));
-    defaults.put("Calendar.itemCont", SwingUtility.getNlsText("Calendar_itemCont"));
-    defaults.put("Calendar.earlier", SwingUtility.getNlsText("Calendar_earlier"));
-    defaults.put("Calendar.later", SwingUtility.getNlsText("Calendar_later"));
-    defaults.put("Planner.week", SwingUtility.getNlsText("Week"));
-    defaults.put("Planner.doubleWeek", SwingUtility.getNlsText("DoubleWeek"));
-    defaults.put("Planner.involvedPersons", SwingUtility.getNlsText("InvolvedPersons"));
-    defaults.put("Planner.displayedTimerange", SwingUtility.getNlsText("DisplayedTimerange"));
-    defaults.put("Planner.today", SwingUtility.getNlsText("Today"));
-    defaults.put("Navigation.history", SwingUtility.getNlsText("History"));
-    defaults.put("Navigation.back", SwingUtility.getNlsText("NavigationBackward"));
-    defaults.put("Navigation.forward", SwingUtility.getNlsText("NavigationForward"));
-    defaults.put("Navigation.refresh", SwingUtility.getNlsText("Refresh"));
-    defaults.put("Navigation.cancel", SwingUtility.getNlsText("Cancel"));
+    putIfUndefined(defaults, "OptionPane.okButtonText", SwingUtility.getNlsText("Ok"));
+    putIfUndefined(defaults, "OptionPane.cancelButtonText", SwingUtility.getNlsText("Cancel"));
+    putIfUndefined(defaults, "OptionPane.yesButtonText", SwingUtility.getNlsText("Yes"));
+    putIfUndefined(defaults, "OptionPane.noButtonText", SwingUtility.getNlsText("No"));
+    putIfUndefined(defaults, "OptionPane.copyPasteHint", SwingUtility.getNlsText("CopyPasteHint"));
+    putIfUndefined(defaults, "OptionPane.copy", SwingUtility.getNlsText("Copy"));
+    putIfUndefined(defaults, "FileChooser.lookInLabelText", SwingUtility.getNlsText("LookIn"));
+    putIfUndefined(defaults, "FileChooser.filesOfTypeLabelText", SwingUtility.getNlsText("FilesOfType"));
+    putIfUndefined(defaults, "FileChooser.fileNameLabelText", SwingUtility.getNlsText("FileName"));
+    putIfUndefined(defaults, "FileChooser.saveButtonText", SwingUtility.getNlsText("Save"));
+    putIfUndefined(defaults, "FileChooser.saveDialogTitleText", SwingUtility.getNlsText("Save"));
+    putIfUndefined(defaults, "FileChooser.openButtonText", SwingUtility.getNlsText("Open"));
+    putIfUndefined(defaults, "FileChooser.openDialogTitleText", SwingUtility.getNlsText("Open"));
+    putIfUndefined(defaults, "FileChooser.cancelButtonText", SwingUtility.getNlsText("Cancel"));
+    putIfUndefined(defaults, "FileChooser.updateButtonText", SwingUtility.getNlsText("Update"));
+    putIfUndefined(defaults, "FileChooser.helpButtonText", SwingUtility.getNlsText("Help"));
+    putIfUndefined(defaults, "ProgressWindow.interruptedText", SwingUtility.getNlsText("Interrupted"));
+    putIfUndefined(defaults, "ProgressWindow.interruptText", SwingUtility.getNlsText("Cancel"));
+    putIfUndefined(defaults, "Calendar.condensedText", SwingUtility.getNlsText("Condensed"));
+    putIfUndefined(defaults, "Calendar.monthText", SwingUtility.getNlsText("Month"));
+    putIfUndefined(defaults, "Calendar.weekText", SwingUtility.getNlsText("Week"));
+    putIfUndefined(defaults, "Calendar.workWeekText", SwingUtility.getNlsText("WorkWeek"));
+    putIfUndefined(defaults, "Calendar.dayText", SwingUtility.getNlsText("Day"));
+    putIfUndefined(defaults, "Calendar.hourText", SwingUtility.getNlsText("Hour"));
+    putIfUndefined(defaults, "Calendar.minuteText", SwingUtility.getNlsText("Minute"));
+    putIfUndefined(defaults, "Calendar.chooseText", SwingUtility.getNlsText("Choose"));
+    putIfUndefined(defaults, "Calendar.weekShortText", SwingUtility.getNlsText("WeekShort"));
+    putIfUndefined(defaults, "Calendar.itemUntil", SwingUtility.getNlsText("Calendar_itemUntil"));
+    putIfUndefined(defaults, "Calendar.itemFrom", SwingUtility.getNlsText("Calendar_itemFrom"));
+    putIfUndefined(defaults, "Calendar.itemCont", SwingUtility.getNlsText("Calendar_itemCont"));
+    putIfUndefined(defaults, "Calendar.earlier", SwingUtility.getNlsText("Calendar_earlier"));
+    putIfUndefined(defaults, "Calendar.later", SwingUtility.getNlsText("Calendar_later"));
+    putIfUndefined(defaults, "Planner.week", SwingUtility.getNlsText("Week"));
+    putIfUndefined(defaults, "Planner.doubleWeek", SwingUtility.getNlsText("DoubleWeek"));
+    putIfUndefined(defaults, "Planner.involvedPersons", SwingUtility.getNlsText("InvolvedPersons"));
+    putIfUndefined(defaults, "Planner.displayedTimerange", SwingUtility.getNlsText("DisplayedTimerange"));
+    putIfUndefined(defaults, "Planner.today", SwingUtility.getNlsText("Today"));
+    putIfUndefined(defaults, "Navigation.history", SwingUtility.getNlsText("History"));
+    putIfUndefined(defaults, "Navigation.back", SwingUtility.getNlsText("NavigationBackward"));
+    putIfUndefined(defaults, "Navigation.forward", SwingUtility.getNlsText("NavigationForward"));
+    putIfUndefined(defaults, "Navigation.refresh", SwingUtility.getNlsText("Refresh"));
+    putIfUndefined(defaults, "Navigation.cancel", SwingUtility.getNlsText("Cancel"));
+
+    /*
+     * Header panel
+     */
+    //  to specify a custom header panel background color
+    putIfUndefined(defaults, "HeaderPanel.background", null);
+    // to specify a custom header panel height. By default, the height is calculated automatically.
+    putIfUndefined(defaults, "HeaderPanel.height", 0);
+    // to specify the horizontal alignment of the logo. By default, the logo is aligned in center position. (Valid values are: 0=center, 1=right)
+    putIfUndefined(defaults, "HeaderPanel.logoHorizontalAlignment", 0);
   }
 
   /**

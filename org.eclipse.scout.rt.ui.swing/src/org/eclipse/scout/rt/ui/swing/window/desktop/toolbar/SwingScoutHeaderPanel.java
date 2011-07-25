@@ -21,6 +21,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.Spring;
 import javax.swing.SpringLayout;
+import javax.swing.UIManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.OptimisticLock;
@@ -105,11 +106,11 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
       container.add(m_logo);
       m_layout.putConstraint(SpringLayout.NORTH, m_logo, 0, SpringLayout.NORTH, container);
 
-      if (getSwingEnvironment().getLogoHorizontalAlignment() == 0) {
-        m_layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, m_logo, 0, SpringLayout.HORIZONTAL_CENTER, container);
+      if (UIManager.getInt("HeaderPanel.logoHorizontalAlignment") == 1) {
+        m_layout.putConstraint(SpringLayout.EAST, m_logo, 0, SpringLayout.EAST, container);
       }
       else {
-        m_layout.putConstraint(SpringLayout.EAST, m_logo, 0, SpringLayout.EAST, container);
+        m_layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, m_logo, 0, SpringLayout.HORIZONTAL_CENTER, container);
       }
 
       // register listener to hide logo if overlapping navigation panel
@@ -139,14 +140,14 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
       });
     }
 
-    Color color = getHeaderPanelColor();
+    Color color = UIManager.getColor("HeaderPanel.background");
     if (color != null) {
       container.setOpaque(true);
       container.setBackground(color);
     }
 
-    Integer height = getHeaderPanelHeight();
-    if (height != null) {
+    int height = UIManager.getInt("HeaderPanel.height");
+    if (height > 0) {
       container.setPreferredSize(new Dimension(-1, height));
     }
     else {
@@ -330,10 +331,17 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
    * 
    * @param width
    *          the new width to be set. Thereby, the with is only set if is different to the old width.
+   * @param force
+   *          to force the panel width to be updated also if the given value is the same
    */
-  public void adjustToolButtonPanelWidth(int width) {
-    Spring constraint = m_layout.getConstraint(SpringLayout.WEST, m_toolTabsPanel);
-    if (width != constraint.getValue()) {
+  public void adjustToolButtonPanelWidth(int width, boolean force) {
+    // it is crucial to compare the new value against the current value hold by the layout manager and not the size of the toolTabsPanel itself.
+    // This is because the toolTabsPanel might have the correct size, but the layout manager was never told about.
+    Spring constraintLeft = m_layout.getConstraint(SpringLayout.WEST, m_toolTabsPanel);
+    Spring constraintRigth = m_layout.getConstraint(SpringLayout.EAST, m_toolTabsPanel);
+    int currentWidth = (constraintRigth.getValue() - constraintLeft.getValue());
+
+    if (force || width != currentWidth) {
       // adjust width of tool button bar to be equals to the tool bar width
       m_layout.putConstraint(SpringLayout.WEST, m_toolTabsPanel, width * -1, SpringLayout.EAST, getSwingField());
 
@@ -402,24 +410,6 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
    */
   protected AbstractJViewTabsBar createViewTabsBar() {
     return new JViewTabsBar(getSwingEnvironment());
-  }
-
-  /**
-   * To be overwritten to specify a custom header panel height
-   * 
-   * @return the height of the panel or null to automatically calculate required height
-   */
-  protected Integer getHeaderPanelHeight() {
-    return null;
-  }
-
-  /**
-   * To be overwritten to specify the background color of the header panel
-   * 
-   * @return the color or null to use default L&F background color
-   */
-  protected Color getHeaderPanelColor() {
-    return null;
   }
 
   private class P_RefreshAction extends AbstractAction {

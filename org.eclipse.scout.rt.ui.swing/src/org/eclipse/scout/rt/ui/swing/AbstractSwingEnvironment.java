@@ -1169,11 +1169,6 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   }
 
   @Override
-  public int getLogoHorizontalAlignment() {
-    return 0;
-  }
-
-  @Override
   public Component getPopupOwner() {
     return m_popupOwner;
   }

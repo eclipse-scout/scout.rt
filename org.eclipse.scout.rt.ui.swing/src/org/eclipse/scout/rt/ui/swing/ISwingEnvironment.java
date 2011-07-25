@@ -340,13 +340,6 @@ public interface ISwingEnvironment {
   JComponent createLogo();
 
   /**
-   * To specify the horizontal alignment of the logo. By default, the logo is aligned in center position.
-   * 
-   * @return 0 for central alignment, 1 for right alignment
-   */
-  int getLogoHorizontalAlignment();
-
-  /**
    * @return the popupOwner for the (next) popup that is displayed
    */
   Component getPopupOwner();
