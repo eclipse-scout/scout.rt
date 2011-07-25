@@ -92,7 +92,7 @@ public abstract class AbstractSwingScoutActionButton<T extends IAction> extends 
         getSwingField().setDisabledIcon(iconGroup.getIcon(IconState.DISABLED));
       }
       if (iconGroup.hasIcon(IconState.SELECTED)) {
-        getSwingField().setPressedIcon(iconGroup.getIcon(IconState.SELECTED));
+        getSwingField().setSelectedIcon(iconGroup.getIcon(IconState.SELECTED));
       }
       if (iconGroup.hasIcon(IconState.ROLLOVER)) {
         getSwingField().setRolloverIcon(iconGroup.getIcon(IconState.ROLLOVER));
