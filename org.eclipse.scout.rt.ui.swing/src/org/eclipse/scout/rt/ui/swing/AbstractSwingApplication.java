@@ -70,8 +70,9 @@ public abstract class AbstractSwingApplication implements IApplication {
       System.out.println("Swing requires at least Java 1.6.0 Current is " + m.group(1));
       System.exit(-1);
     }
-    //
     try {
+      // @{link NlsLocale} is to be initialized before SwingEnvironment is created, as UIDefaultsInjector, which is initialized when instantiating SwingEnvironement, resolves NLS texts.
+      execInitLocale();
       SwingUtilities.invokeAndWait(
           new Runnable() {
             @Override
@@ -122,7 +123,6 @@ public abstract class AbstractSwingApplication implements IApplication {
    */
   @Override
   public Object start(final IApplicationContext context) throws Exception {
-    execInitLocale();
     if (Subject.getSubject(AccessController.getContext()) != null) {
       //there is a subject context
       return exit(startInSubject(context));
