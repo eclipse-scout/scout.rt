@@ -26,11 +26,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.FlowLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.JDialogEx;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
@@ -48,7 +48,7 @@ public class LoginDialog extends JDialogEx {
   public LoginDialog(AuthStatus status) {
     super();
     m_status = status;
-    setTitle(SwingUtility.getNlsText("Login"));
+    setTitle(UIManager.getString("LoginDialog.title"));
     createContents();
     pack();
     addWindowListener(new WindowAdapter() {
@@ -75,7 +75,7 @@ public class LoginDialog extends JDialogEx {
     }
     JLabel userLabel = new JLabel();
     contentPane.add(userLabel, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, insets, 0, 0));
-    userLabel.setText(SwingUtility.getNlsText("Username"));
+    userLabel.setText(UIManager.getString("LoginDialog.username"));
     m_userField = new JTextField(10);
     contentPane.add(m_userField, new GridBagConstraints(1, 1, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
     if (m_status.getUsername() != null) {
@@ -110,7 +110,7 @@ public class LoginDialog extends JDialogEx {
 
     JLabel passLabel = new JLabel();
     contentPane.add(passLabel, new GridBagConstraints(0, 2, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, insets, 0, 0));
-    passLabel.setText(SwingUtility.getNlsText("Password"));
+    passLabel.setText(UIManager.getString("LoginDialog.password"));
 
     m_passField = new JPasswordField(10);
     contentPane.add(m_passField, new GridBagConstraints(1, 2, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
@@ -148,7 +148,7 @@ public class LoginDialog extends JDialogEx {
       /*
        * ticket 80881: default false
        */
-      m_saveCheckBox = new JCheckBox(SwingUtility.getNlsText("SavePassword"), false);
+      m_saveCheckBox = new JCheckBox(UIManager.getString("LoginDialog.savePassword"), false);
       m_saveCheckBox.setOpaque(false);
       contentPane.add(m_saveCheckBox, new GridBagConstraints(1, 3, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
     }
@@ -159,7 +159,7 @@ public class LoginDialog extends JDialogEx {
     contentPane.add(buttonPanel, new GridBagConstraints(0, 11, 2, 1, 1, 0, GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
     m_okButton = new JButton();
     buttonPanel.add(m_okButton);
-    m_okButton.setText(SwingUtility.getNlsText("Ok"));
+    m_okButton.setText(UIManager.getString("LoginDialog.ok"));
     m_okButton.setEnabled(false);
     m_okButton.addActionListener(new ActionListener() {
       @Override
@@ -171,7 +171,7 @@ public class LoginDialog extends JDialogEx {
 
     JButton cancel = new JButton();
     buttonPanel.add(cancel);
-    cancel.setText(SwingUtility.getNlsText("Cancel"));
+    cancel.setText(UIManager.getString("LoginDialog.cancel"));
     cancel.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {

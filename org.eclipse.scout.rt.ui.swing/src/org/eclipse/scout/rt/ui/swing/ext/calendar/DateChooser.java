@@ -139,7 +139,6 @@ public class DateChooser {
     m_viewDate = truncDate(new Date());
     m_model = new EmptyCalendarModel();
 
-    verifyNlsTexts();
     displayMode = Math.min(3, Math.max(displayMode, 1));
     m_displayMode = displayMode;
     m_largeVersion = largeVersion;
@@ -292,7 +291,7 @@ public class DateChooser {
     ((FlowLayoutEx) controlPanel.getLayout()).setFillHorizontal(false);
     //
     m_linkDay = new JHyperlink();
-    m_linkDay.setText(UIManager.getString("Calendar.dayText"));
+    m_linkDay.setText(SwingUtility.getNlsText("Day"));
     m_linkDay.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -302,7 +301,7 @@ public class DateChooser {
     controlPanel.add(m_linkDay);
     //
     m_linkWorkWeek = new JHyperlink();
-    m_linkWorkWeek.setText(UIManager.getString("Calendar.workWeekText"));
+    m_linkWorkWeek.setText(SwingUtility.getNlsText("WorkWeek"));
     m_linkWorkWeek.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -312,7 +311,7 @@ public class DateChooser {
     controlPanel.add(m_linkWorkWeek);
     //
     m_linkWeek = new JHyperlink();
-    m_linkWeek.setText(UIManager.getString("Calendar.weekText"));
+    m_linkWeek.setText(SwingUtility.getNlsText("Week"));
     m_linkWeek.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -322,7 +321,7 @@ public class DateChooser {
     controlPanel.add(m_linkWeek);
     //
     m_linkMonth = new JHyperlink();
-    m_linkMonth.setText(UIManager.getString("Calendar.monthText"));
+    m_linkMonth.setText(SwingUtility.getNlsText("Month"));
     m_linkMonth.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -949,16 +948,16 @@ public class DateChooser {
     if (m_displayMode == DISPLAY_MODE_DAY) {
       DateFormat weekDayFmt = new SimpleDateFormat("EEEEE", NlsLocale.getDefault().getLocale());
       DateFormat dateFmt = new DateTimeFormatFactory().getDayMonthYear(DateFormat.LONG);
-      m_monthLabel.setText(weekDayFmt.format(vd) + " " + dateFmt.format(vd) + " - " + UIManager.getString("Calendar.weekText") + " " + weekNo);
+      m_monthLabel.setText(weekDayFmt.format(vd) + " " + dateFmt.format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
     }
     else if (m_displayMode == DISPLAY_MODE_WEEK) {
       // Calculate Startdate; go back to 1st day of week (1=sunday)
       c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - m_firstDayOfWeek + 7) % 7));
-      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", NlsLocale.getDefault().getLocale()).format(vd) + " - " + UIManager.getString("Calendar.weekText") + " " + weekNo);
+      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", NlsLocale.getDefault().getLocale()).format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
     }
     else if (m_displayMode == DISPLAY_MODE_WORKWEEK) {
       c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY + 7) % 7));
-      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", NlsLocale.getDefault().getLocale()).format(vd) + " - " + UIManager.getString("Calendar.weekText") + " " + weekNo);
+      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", NlsLocale.getDefault().getLocale()).format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
     }
     else if (m_displayMode == DISPLAY_MODE_MONTH) {
       // Calculate Startdate; go back to 1st of month, then back to 1st day of
@@ -1015,20 +1014,6 @@ public class DateChooser {
     c.add(Calendar.DATE, 1);
     Date dNew = new Date(c.getTime().getTime());
     return dNew;
-  }
-
-  private static void verifyNlsTexts() {
-    if (UIManager.get("Calendar.condensedText") == null) UIManager.put("Calendar.condensedText", "6 columns");
-    if (UIManager.get("Calendar.monthText") == null) UIManager.put("Calendar.monthText", "Month");
-    if (UIManager.get("Calendar.weekText") == null) UIManager.put("Calendar.weekText", "Week");
-    if (UIManager.get("Calendar.workWeekText") == null) UIManager.put("Calendar.workWeekText", "Working Week");
-    if (UIManager.get("Calendar.dayText") == null) UIManager.put("Calendar.dayText", "Day");
-    if (UIManager.get("Calendar.weekShortText") == null) UIManager.put("Calendar.weekShortText", "CW");
-    if (UIManager.get("Calendar.itemUntil") == null) UIManager.put("Calendar.itemUntil", "until");
-    if (UIManager.get("Calendar.itemFrom") == null) UIManager.put("Calendar.itemFrom", "from");
-    if (UIManager.get("Calendar.itemCont") == null) UIManager.put("Calendar.itemCont", "(cont)");
-    if (UIManager.get("Calendar.earlier") == null) UIManager.put("Calendar.earlier", "earlier");
-    if (UIManager.get("Calendar.later") == null) UIManager.put("Calendar.later", "later");
   }
 
   public JPanel getHeaderPanel() {

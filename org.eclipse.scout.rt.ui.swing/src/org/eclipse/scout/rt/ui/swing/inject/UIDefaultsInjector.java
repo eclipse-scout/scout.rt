@@ -115,48 +115,30 @@ public class UIDefaultsInjector {
     /*
      * Texts
      */
-    putIfUndefined(defaults, "OptionPane.okButtonText", SwingUtility.getNlsText("Ok"));
-    putIfUndefined(defaults, "OptionPane.cancelButtonText", SwingUtility.getNlsText("Cancel"));
-    putIfUndefined(defaults, "OptionPane.yesButtonText", SwingUtility.getNlsText("Yes"));
-    putIfUndefined(defaults, "OptionPane.noButtonText", SwingUtility.getNlsText("No"));
-    putIfUndefined(defaults, "OptionPane.copyPasteHint", SwingUtility.getNlsText("CopyPasteHint"));
-    putIfUndefined(defaults, "OptionPane.copy", SwingUtility.getNlsText("Copy"));
-    putIfUndefined(defaults, "FileChooser.lookInLabelText", SwingUtility.getNlsText("LookIn"));
-    putIfUndefined(defaults, "FileChooser.filesOfTypeLabelText", SwingUtility.getNlsText("FilesOfType"));
-    putIfUndefined(defaults, "FileChooser.fileNameLabelText", SwingUtility.getNlsText("FileName"));
-    putIfUndefined(defaults, "FileChooser.saveButtonText", SwingUtility.getNlsText("Save"));
-    putIfUndefined(defaults, "FileChooser.saveDialogTitleText", SwingUtility.getNlsText("Save"));
-    putIfUndefined(defaults, "FileChooser.openButtonText", SwingUtility.getNlsText("Open"));
-    putIfUndefined(defaults, "FileChooser.openDialogTitleText", SwingUtility.getNlsText("Open"));
-    putIfUndefined(defaults, "FileChooser.cancelButtonText", SwingUtility.getNlsText("Cancel"));
-    putIfUndefined(defaults, "FileChooser.updateButtonText", SwingUtility.getNlsText("Update"));
-    putIfUndefined(defaults, "FileChooser.helpButtonText", SwingUtility.getNlsText("Help"));
-    putIfUndefined(defaults, "ProgressWindow.interruptedText", SwingUtility.getNlsText("Interrupted"));
-    putIfUndefined(defaults, "ProgressWindow.interruptText", SwingUtility.getNlsText("Cancel"));
-    putIfUndefined(defaults, "Calendar.condensedText", SwingUtility.getNlsText("Condensed"));
-    putIfUndefined(defaults, "Calendar.monthText", SwingUtility.getNlsText("Month"));
-    putIfUndefined(defaults, "Calendar.weekText", SwingUtility.getNlsText("Week"));
-    putIfUndefined(defaults, "Calendar.workWeekText", SwingUtility.getNlsText("WorkWeek"));
-    putIfUndefined(defaults, "Calendar.dayText", SwingUtility.getNlsText("Day"));
-    putIfUndefined(defaults, "Calendar.hourText", SwingUtility.getNlsText("Hour"));
-    putIfUndefined(defaults, "Calendar.minuteText", SwingUtility.getNlsText("Minute"));
-    putIfUndefined(defaults, "Calendar.chooseText", SwingUtility.getNlsText("Choose"));
-    putIfUndefined(defaults, "Calendar.weekShortText", SwingUtility.getNlsText("WeekShort"));
-    putIfUndefined(defaults, "Calendar.itemUntil", SwingUtility.getNlsText("Calendar_itemUntil"));
-    putIfUndefined(defaults, "Calendar.itemFrom", SwingUtility.getNlsText("Calendar_itemFrom"));
-    putIfUndefined(defaults, "Calendar.itemCont", SwingUtility.getNlsText("Calendar_itemCont"));
-    putIfUndefined(defaults, "Calendar.earlier", SwingUtility.getNlsText("Calendar_earlier"));
-    putIfUndefined(defaults, "Calendar.later", SwingUtility.getNlsText("Calendar_later"));
-    putIfUndefined(defaults, "Planner.week", SwingUtility.getNlsText("Week"));
-    putIfUndefined(defaults, "Planner.doubleWeek", SwingUtility.getNlsText("DoubleWeek"));
-    putIfUndefined(defaults, "Planner.involvedPersons", SwingUtility.getNlsText("InvolvedPersons"));
-    putIfUndefined(defaults, "Planner.displayedTimerange", SwingUtility.getNlsText("DisplayedTimerange"));
-    putIfUndefined(defaults, "Planner.today", SwingUtility.getNlsText("Today"));
-    putIfUndefined(defaults, "Navigation.history", SwingUtility.getNlsText("History"));
-    putIfUndefined(defaults, "Navigation.back", SwingUtility.getNlsText("NavigationBackward"));
-    putIfUndefined(defaults, "Navigation.forward", SwingUtility.getNlsText("NavigationForward"));
-    putIfUndefined(defaults, "Navigation.refresh", SwingUtility.getNlsText("Refresh"));
-    putIfUndefined(defaults, "Navigation.cancel", SwingUtility.getNlsText("Cancel"));
+    // Texts, which are contained in JRE. Such texts must not be registered by putIfUndefined(..), but by put(..) instead to overwrite Java defaults.
+    defaults.put("OptionPane.okButtonText", SwingUtility.getNlsText("Ok"));
+    defaults.put("OptionPane.cancelButtonText", SwingUtility.getNlsText("Cancel"));
+    defaults.put("OptionPane.yesButtonText", SwingUtility.getNlsText("Yes"));
+    defaults.put("OptionPane.noButtonText", SwingUtility.getNlsText("No"));
+
+    defaults.put("FileChooser.lookInLabelText", SwingUtility.getNlsText("LookIn"));
+    defaults.put("FileChooser.filesOfTypeLabelText", SwingUtility.getNlsText("FilesOfType"));
+    defaults.put("FileChooser.fileNameLabelText", SwingUtility.getNlsText("FileName"));
+    defaults.put("FileChooser.saveButtonText", SwingUtility.getNlsText("Save"));
+    defaults.put("FileChooser.saveDialogTitleText", SwingUtility.getNlsText("Save"));
+    defaults.put("FileChooser.openButtonText", SwingUtility.getNlsText("Open"));
+    defaults.put("FileChooser.openDialogTitleText", SwingUtility.getNlsText("Open"));
+    defaults.put("FileChooser.cancelButtonText", SwingUtility.getNlsText("Cancel"));
+    defaults.put("FileChooser.updateButtonText", SwingUtility.getNlsText("Update"));
+    defaults.put("FileChooser.helpButtonText", SwingUtility.getNlsText("Help"));
+
+    // Texts, that cannot be resolved on behalf of global NLS provider as not set in SwingUtility yet. That typically applies to splash screen and login dialog.
+    putIfUndefined(defaults, "LoginDialog.username", SwingUtility.getNlsText("Username"));
+    putIfUndefined(defaults, "LoginDialog.password", SwingUtility.getNlsText("Password"));
+    putIfUndefined(defaults, "LoginDialog.title", SwingUtility.getNlsText("Login"));
+    putIfUndefined(defaults, "LoginDialog.savePassword", SwingUtility.getNlsText("SavePassword"));
+    putIfUndefined(defaults, "LoginDialog.ok", SwingUtility.getNlsText("Ok"));
+    putIfUndefined(defaults, "LoginDialog.cancel", SwingUtility.getNlsText("Cancel"));
 
     /*
      * Header panel

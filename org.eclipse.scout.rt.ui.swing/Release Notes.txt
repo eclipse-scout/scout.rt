@@ -169,3 +169,16 @@ Problem:
 - Height of Header panel should automatically be calculated based on installed L&F
 Migration:
 NONE
+
+26.07.2011 dwi
+bugzilla 353000
+bsi ticket 104'381
+Problem:
+In UIDefaultsInjector, there are configured some NLS texts to overwrite JRE default texts and to register Scout texts to be referenced in UI components.
+As injection of UI defaults is done while instantiating SwingApplication, but Locale is only set in Activator's start method, those text cannot be resolved in the proper language.
+Solution:
+- Moved call of execInitLocale() prior to creating SwingEnvironment
+- Removed most of the Scout text registrations in UIDefaultsInjector and put NLS resolution directly into Scout UI components itself (legacy). This has the advantage, that projects can overwrite those texts by a global NLS provider registered in ClientSession.
+- Added registration of a few texts in UIDefaultsInjectins that cannot be overwritten by global NLS provider. This is true for all texts resolved prior to ClientSession creation completet, e.g. login dialog.
+Migration:
+NONE

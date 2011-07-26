@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
@@ -62,11 +63,11 @@ public class JNavigationPanel extends AbstractJNavigationPanel {
           Boolean busy = (Boolean) evt.getNewValue();
           if (busy) {
             m_stopRefreshButton.setAction(getStopAction());
-            installButtonIcons(m_stopRefreshButton, SwingIcons.NavigationStop, UIManager.getString("Navigation.cancel"));
+            installButtonIcons(m_stopRefreshButton, SwingIcons.NavigationStop, SwingUtility.getNlsText("Cancel"));
           }
           else {
             m_stopRefreshButton.setAction(getRefreshAction());
-            installButtonIcons(m_stopRefreshButton, SwingIcons.NavigationRefresh, UIManager.getString("Navigation.refresh"));
+            installButtonIcons(m_stopRefreshButton, SwingIcons.NavigationRefresh, SwingUtility.getNlsText("Refresh"));
           }
         }
       }
@@ -89,7 +90,7 @@ public class JNavigationPanel extends AbstractJNavigationPanel {
     m_historyButton = new JButton(getHistoryAction());
     m_historyButton.setOpaque(false);
     m_historyButton.setEnabled(getBackAction().isEnabled() || getForwardAction().isEnabled());
-    installButtonIcons(m_historyButton, SwingIcons.NavigationHistory, UIManager.getString("Navigation.history"));
+    installButtonIcons(m_historyButton, SwingIcons.NavigationHistory, SwingUtility.getNlsText("History"));
     if (m_historyButton.getIcon() == null) {
       m_historyButton.setIcon(createArrowDownIcon());
     }
@@ -98,19 +99,19 @@ public class JNavigationPanel extends AbstractJNavigationPanel {
     // back button
     m_backButton = new JButton(getBackAction());
     m_backButton.setOpaque(false);
-    installButtonIcons(m_backButton, SwingIcons.NavigationBack, UIManager.getString("Navigation.back"));
+    installButtonIcons(m_backButton, SwingIcons.NavigationBack, SwingUtility.getNlsText("NavigationBackward"));
     addButton(m_swingToolBar, m_backButton, new Insets(0, 0, 0, 3));
 
     // forward button
     m_forwardButton = new JButton(getForwardAction());
     m_forwardButton.setOpaque(false);
-    installButtonIcons(m_forwardButton, SwingIcons.NavigationForward, UIManager.getString("Navigation.forward"));
+    installButtonIcons(m_forwardButton, SwingIcons.NavigationForward, SwingUtility.getNlsText("NavigationForward"));
     addButton(m_swingToolBar, m_forwardButton, new Insets(0, 0, 0, 3));
 
     // stop / refresh button
     m_stopRefreshButton = new JButton(getRefreshAction());
     m_stopRefreshButton.setOpaque(false);
-    installButtonIcons(m_stopRefreshButton, SwingIcons.NavigationRefresh, UIManager.getString("Navigation.refresh"));
+    installButtonIcons(m_stopRefreshButton, SwingIcons.NavigationRefresh, SwingUtility.getNlsText("Refresh"));
     addButton(m_swingToolBar, m_stopRefreshButton, new Insets(0, 0, 0, 0));
 
     // tool button's

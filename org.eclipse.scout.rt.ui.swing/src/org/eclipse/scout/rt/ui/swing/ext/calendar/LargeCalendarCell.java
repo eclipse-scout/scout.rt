@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -39,7 +39,6 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
@@ -249,7 +248,7 @@ public class LargeCalendarCell extends AbstractCalendarCell {
     }
     // labels for large size
     if (isFirstColumn() && (m_displayType != DateChooser.DISPLAY_MODE_DAY)) {
-      m_weekLabel = UIManager.getString("Calendar.weekShortText") + " " + c.get(Calendar.WEEK_OF_YEAR);
+      m_weekLabel = SwingUtility.getNlsText("WeekShort") + " " + c.get(Calendar.WEEK_OF_YEAR);
     }
     else {
       m_weekLabel = "";
@@ -397,8 +396,8 @@ public class LargeCalendarCell extends AbstractCalendarCell {
           g.drawLine(0, y, w, y);
           if (drawLabel) {
             String s;
-            if (hour == m_startHour && hour != 0) s = UIManager.getString("Calendar.earlier");
-            else if (hour == m_endHour && hour != 23) s = UIManager.getString("Calendar.later");
+            if (hour == m_startHour && hour != 0) s = SwingUtility.getNlsText("Calendar_earlier");
+            else if (hour == m_endHour && hour != 23) s = SwingUtility.getNlsText("Calendar_later");
             else if (hour == 0) s = formatHour(0);
             else if (hour < 10) s = formatHour(hour);
             else s = formatHour(hour);
