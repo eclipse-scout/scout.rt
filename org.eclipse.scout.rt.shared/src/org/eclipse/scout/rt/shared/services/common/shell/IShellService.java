@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
 import org.eclipse.scout.service.IService;
 
 /**
- * Currently known implementations are
- * org.eclipse.scout.rt.shared.win32.x86.service.internal.WindowsService
+ * Currently known implementations are {@link org.eclipse.scout.rt.shared.win32.x86.service.internal.WindowsService} and
+ * {@link org.eclipse.scout.rt.client.services.common.shell.DefaultShellService}
  */
 @Priority(-3)
 @InputValidation(ValidationStrategy.PROCESS)
