@@ -35,7 +35,18 @@ public final class SVGUtility {
   }
 
   public static SVGDocument readSVGDocument(InputStream in) throws ProcessingException {
-    String cn = "com.sun.org.apache.xerces.internal.parsers.SAXParser";
+    String cn;
+    try {
+      cn = Class.forName("org.apache.xerces.parsers.SAXParser").getName();
+    }
+    catch (Throwable t) {
+      try {
+        cn = Class.forName("com.sun.org.apache.xerces.internal.parsers.SAXParser").getName();
+      }
+      catch (Exception e) {
+        throw new ProcessingException("Finding SAXParser", e);
+      }
+    }
     SAXSVGDocumentFactory documentFactory = new SAXSVGDocumentFactory(cn);
     documentFactory.setValidating(false);
     SVGDocument doc;
