@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="SVG Client Test" id="org.eclipse.scout.svg.client.product" application="org.eclipse.scout.svg.client.app" useFeatures="false" includeLaunchers="true">
+
+   <plugins>
+      <plugin id="jre16.fragment" fragment="true"/>
+      <plugin id="org.apache.batik.bridge"/>
+      <plugin id="org.apache.batik.css"/>
+      <plugin id="org.apache.batik.dom"/>
+      <plugin id="org.apache.batik.dom.svg"/>
+      <plugin id="org.apache.batik.ext.awt"/>
+      <plugin id="org.apache.batik.extension"/>
+      <plugin id="org.apache.batik.parser"/>
+      <plugin id="org.apache.batik.svggen"/>
+      <plugin id="org.apache.batik.swing"/>
+      <plugin id="org.apache.batik.transcoder"/>
+      <plugin id="org.apache.batik.util"/>
+      <plugin id="org.apache.batik.util.gui"/>
+      <plugin id="org.apache.batik.xml"/>
+      <plugin id="org.eclipse.core.contenttype"/>
+      <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.runtime"/>
+      <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
+      <plugin id="org.eclipse.equinox.app"/>
+      <plugin id="org.eclipse.equinox.common"/>
+      <plugin id="org.eclipse.equinox.preferences"/>
+      <plugin id="org.eclipse.equinox.registry"/>
+      <plugin id="org.eclipse.equinox.security"/>
+      <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.osgi"/>
+      <plugin id="org.eclipse.scout.commons"/>
+      <plugin id="org.eclipse.scout.rt.client"/>
+      <plugin id="org.eclipse.scout.rt.shared"/>
+      <plugin id="org.eclipse.scout.service"/>
+      <plugin id="org.eclipse.scout.svg.client"/>
+      <plugin id="org.w3c.css.sac"/>
+      <plugin id="org.w3c.dom.smil"/>
+      <plugin id="org.w3c.dom.svg"/>
+   </plugins>
+
+
+</product>
