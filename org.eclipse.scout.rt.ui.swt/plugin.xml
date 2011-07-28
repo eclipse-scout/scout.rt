@@ -177,15 +177,6 @@
       </formField>
       <formField
             active="true"
-            modelClass="org.eclipse.scout.rt.client.ui.form.fields.svgfield.ISvgField"
-            name="Scout SVG field"
-            scope="default">
-           <uiClass
-           	class="org.eclipse.scout.rt.ui.swt.form.fields.svgfield.SwtScoutSvgField">
-           </uiClass>
-      </formField>
-      <formField
-            active="true"
             modelClass="org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField"
             name="Image field"
             scope="default">
