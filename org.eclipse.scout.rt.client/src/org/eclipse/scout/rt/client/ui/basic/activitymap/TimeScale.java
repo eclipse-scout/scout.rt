@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.CompositeObject;
  */
 public class TimeScale {
   private DateFormat m_dateFormat;
-  private List<MajorTimeColumn> m_childrenUnsorted = new ArrayList<MajorTimeColumn>(0);
+  private final List<MajorTimeColumn> m_childrenUnsorted = new ArrayList<MajorTimeColumn>(0);
   // cache for sorted objects, only access using the provided methods, never
   // access this member directly
   private MajorTimeColumn[] m_majorColumnsSorted;
@@ -123,7 +123,7 @@ public class TimeScale {
    */
   public double[] getRangeOf(Date beginTime, Date endTime) {
     if (getMinorTimeColumns().length <= 0) return null;
-    if (endTime == null || endTime.compareTo(getBeginTime()) <= 0) return null;
+    if (endTime == null || endTime.compareTo(getBeginTime()) < 0) return null;
     if (beginTime == null || beginTime.compareTo(getEndTime()) >= 0) return null;
     //
     MinorTimeColumn[] minCols = getMinorTimeColumns();
@@ -141,7 +141,7 @@ public class TimeScale {
         }
       }
       if (a != null && b == null) {
-        if (endTime.compareTo(minCols[i].getEndTime()) <= 0) {
+        if (endTime.compareTo(minCols[i].getEndTime()) < 0) {
           b = i;
         }
       }
