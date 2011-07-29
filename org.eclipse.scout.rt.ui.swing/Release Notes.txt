@@ -111,7 +111,7 @@ Ticket: 102'194 is about taking screen shots of forms. The problem is since the 
 Solution:
 Back event to notify the model once a screen shot is done. Furthermore a PrintApplicationAction is created to take screen shots of the whole application.
 Migration:
-none
+None
 
 19.07.2011 dwi
 Ticket: 103'927: Missing icon on datefield / timefield in Orson L&F. Furthermore, icon should become transparent if to less space is available (same behavior as in Rayo L&F)
@@ -122,4 +122,15 @@ Solution:
           - transparent datefield / timefield icons (datefield_date_selected.png, datefield_time_selected.png) inserted into Plug-In com.bsaig.scout.rt.client.bsi.icons.fragment
 104'140:  - Turned off hover effect of navigation buttons
 Migration:
-none
+None
+
+29.07.2011 dwi
+bugzilla 352420
+bsi ticket 104'189
+Problem:
+The height of the message box is too small if text of either intro or content is wider than the initial message box width and therefore needs to be wrapped.
+Solution:
+Preceding Swing size calculation, the span of the labels is constrained to the maximal display width of the message box. Thus, Swing is able to calculate the height correctly in respect to the wrapping text height.
+In order to make the text reflow when being resized to a width greater than the initial size, the span is reset just after being enlarged the first time.
+Migration:
+None
