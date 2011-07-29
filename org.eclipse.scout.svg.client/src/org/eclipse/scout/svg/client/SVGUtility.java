@@ -65,12 +65,15 @@ public final class SVGUtility {
     return doc;
   }
 
-  public static void writeSVGDocument(SVGDocument doc, OutputStream out) throws ProcessingException {
+  public static void writeSVGDocument(SVGDocument doc, OutputStream out, String encoding) throws ProcessingException {
     try {
       DOMSource domSource = new DOMSource(doc);
       StreamResult streamResult = new StreamResult(out);
-      Transformer xformer = TransformerFactory.newInstance().newTransformer();
-      xformer.transform(domSource, streamResult);
+      Transformer t = TransformerFactory.newInstance().newTransformer();
+      if (encoding != null) {
+        t.setOutputProperty("encoding", encoding);
+      }
+      t.transform(domSource, streamResult);
       out.close();
     }
     catch (Exception e) {
