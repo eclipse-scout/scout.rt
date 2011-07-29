@@ -160,7 +160,7 @@ public class SwtScoutHtmlField extends SwtScoutValueFieldComposite<IHtmlField> i
     }
     String cleanHtml = getEnvironment().styleHtmlText(this, rawHtml);
     try {
-      File indexFile = writeTempFile("index.html", new ByteArrayInputStream(cleanHtml.getBytes()));
+      File indexFile = writeTempFile("index.html", new ByteArrayInputStream(cleanHtml.getBytes("UTF-8")));
       File html = new File(m_tempDir.getAbsolutePath() + "/index.html");
       html.createNewFile();
       getSwtField().setUrl(indexFile.toURI().toURL().toExternalForm());
