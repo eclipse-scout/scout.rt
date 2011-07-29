@@ -25,14 +25,19 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -40,6 +45,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.View;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -55,6 +61,10 @@ import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 
 public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> implements ISwingScoutMessageBox {
+
+  private static final int MAX_WIDTH = 800;
+  private static final int MAX_HEIGHT = 600;
+  private static final int HORIZONTAL_PADDING = 12;
 
   private P_ScoutMessageBoxListener m_scoutMessageBoxListener;
   private Window m_swingParent;
@@ -90,33 +100,29 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     m_swingDialog.addWindowListener(new P_SwingWindowListener());
     // content
     JPanel contentPane = (JPanel) m_swingDialog.getContentPane();
-    contentPane.setLayout(new Layout());
+    contentPane.setLayout(new P_Layout());
     contentPane.setBackground(new Color(0xf2f2f2));
     if (getScoutMessageBox().getIntroText() != null) {
       String s = getScoutMessageBox().getIntroText();
       JPanel labelPanel = new JPanelEx(new FlowLayoutEx(FlowLayoutEx.LEFT));
-      labelPanel.setBorder(new EmptyBorder(16, 12, 16, 12));
+      labelPanel.setBorder(new EmptyBorder(16, HORIZONTAL_PADDING, 16, HORIZONTAL_PADDING));
       labelPanel.setBackground(Color.white);
       labelPanel.setOpaque(true);
       JLabelEx label = new JLabelEx();
       label.setText(s);
-      if (label.getPreferredSize().width > 800) {
-        label.setText(SwingUtility.createHtmlLabelText(s, true));
-      }
-      labelPanel.add(BorderLayout.CENTER, label);
+      ensureProperDimension(label);
+      labelPanel.add(label);
       contentPane.add(BorderLayout.NORTH, labelPanel);
     }
     if (getScoutMessageBox().getActionText() != null) {
       String s = getScoutMessageBox().getActionText();
       JPanel labelPanel = new JPanelEx(new FlowLayoutEx(FlowLayoutEx.LEFT));
-      labelPanel.setBorder(new CompoundBorder(new P_TopSeparatorBorder(), new EmptyBorder(16, 12, 16, 12)));
+      labelPanel.setBorder(new CompoundBorder(new P_TopSeparatorBorder(), new EmptyBorder(16, HORIZONTAL_PADDING, 16, HORIZONTAL_PADDING)));
       labelPanel.setOpaque(false);
       JLabelEx label = new JLabelEx();
       label.setText(s);
-      if (label.getPreferredSize().width > 800) {
-        label.setText(SwingUtility.createHtmlLabelText(s, true));
-      }
-      labelPanel.add(BorderLayout.CENTER, label);
+      ensureProperDimension(label);
+      labelPanel.add(label);
       contentPane.add(BorderLayout.CENTER, labelPanel);
     }
     // buttons
@@ -378,22 +384,18 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     }
   }
 
-  private class Layout extends BorderLayoutEx {
+  private class P_Layout extends BorderLayoutEx {
     private static final long serialVersionUID = 1L;
 
     @Override
     protected Dimension getLayoutSize(Container parent, int sizeflag) {
-      //min/pref size is at most 800x600
+      // min/pref size is at most MAX_WIDTH x MAX_HEIGHT
       Dimension d = super.getLayoutSize(parent, sizeflag);
       switch (sizeflag) {
-        case AbstractLayoutManager2.MIN_SIZE: {
-          if (d.width > 800) d.width = 800;
-          if (d.height > 600) d.height = 600;
-          break;
-        }
+        case AbstractLayoutManager2.MIN_SIZE:
         case AbstractLayoutManager2.PREF_SIZE: {
-          if (d.width > 800) d.width = 800;
-          if (d.height > 600) d.height = 600;
+          d.width = Math.min(d.width, MAX_WIDTH);
+          d.height = Math.min(d.height, MAX_HEIGHT);
           break;
         }
         case AbstractLayoutManager2.MAX_SIZE: {
@@ -402,5 +404,56 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
       }
       return d;
     }
+  }
+
+  /**
+   * Ensures proper text wrapping
+   * 
+   * @param label
+   *          the label component with its initial text set
+   */
+  private void ensureProperDimension(final JLabel label) {
+    if (label.getPreferredSize().width <= MAX_WIDTH) {
+      return;
+    }
+
+    // convert text to HTML to enable text wrapping
+    label.setText(SwingUtility.createHtmlLabelText(label.getText(), true));
+    // register listener to correct dimension
+    label.addPropertyChangeListener("ancestor", new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent e) {
+        JComponent component = (JComponent) e.getSource();
+        component.removePropertyChangeListener("ancestor", this);
+
+        final View view = (View) component.getClientProperty("html");
+        if (view == null) {
+          return;
+        }
+
+        final float initialHorizontalSpan = view.getPreferredSpan(View.X_AXIS);
+        final float initialVerticalSpan = view.getPreferredSpan(View.Y_AXIS);
+
+        // narrow horizontal span to allow proper height calculation. This precedes initial size calculation.
+        view.setSize(Math.min(MAX_WIDTH - 24, initialHorizontalSpan), initialVerticalSpan);
+
+        /*
+         * Restore initial span to allow the label to be resized wider than the preferred span specified.
+         * Otherwise, when resizing the component, the text will not reflow to adapt the new width.
+         * To prevent the label from flickering when being displayed, the size is only adjusted if component is resized to a width wider than the preferred width.
+         */
+        label.addComponentListener(new ComponentAdapter() {
+          @Override
+          public void componentResized(ComponentEvent e1) {
+            JPanel contentPane = (JPanel) m_swingDialog.getContentPane();
+            if (contentPane.getWidth() > MAX_WIDTH) {
+              label.removeComponentListener(this);
+              view.setSize(initialHorizontalSpan, initialVerticalSpan);
+            }
+          }
+        });
+      }
+    });
   }
 }

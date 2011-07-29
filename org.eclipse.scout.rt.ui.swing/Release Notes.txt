@@ -182,3 +182,14 @@ Solution:
 - Added registration of a few texts in UIDefaultsInjectins that cannot be overwritten by global NLS provider. This is true for all texts resolved prior to ClientSession creation completet, e.g. login dialog.
 Migration:
 NONE
+
+29.07.2011 dwi
+bugzilla 352420
+bsi ticket 104'189
+Problem:
+The height of the message box is too small if text of either intro or content is wider than the initial message box width and therefore needs to be wrapped.
+Solution:
+Preceding Swing size calculation, the span of the labels is constrained to the maximal display width of the message box. Thus, Swing is able to calculate the height correctly in respect to the wrapping text height.
+In order to make the text reflow when being resized to a width greater than the initial size, the span is reset just after being enlarged the first time.
+Migration:
+None
