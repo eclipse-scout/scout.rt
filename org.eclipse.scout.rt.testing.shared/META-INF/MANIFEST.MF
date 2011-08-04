@@ -13,4 +13,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: Eclipse Scout Project
 Export-Package: org.eclipse.scout.rt.testing.shared,
+ org.eclipse.scout.rt.testing.shared.runner,
  org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler

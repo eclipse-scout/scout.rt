@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -83,9 +83,21 @@ public final class ScoutAssert {
     return s + "expected:<" + expected + "> but was:<" + actual + ">";
   }
 
-  public static void jobSuccessfullyCompleted(JobEx job) throws ProcessingException {
+  public static void jobSuccessfullyCompleted(JobEx job) throws Throwable {
     Assert.assertEquals(job.getState(), Job.NONE);
-    job.throwOnError();
+    try {
+      job.throwOnError();
+    }
+    catch (ProcessingException e) {
+      // unpack original exception if required
+      if (job.getResult() != null) {
+        Throwable originalException = job.getResult().getException();
+        if (originalException != null && originalException != e) {
+          throw originalException;
+        }
+      }
+      throw e;
+    }
   }
 
 }
