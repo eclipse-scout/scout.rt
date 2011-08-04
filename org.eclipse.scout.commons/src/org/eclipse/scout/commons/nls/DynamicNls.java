@@ -86,7 +86,10 @@ public abstract class DynamicNls {
     }
     for (NlsResourceBundleCache c : m_resourceBundles) {
       try {
-        return c.getResourceBundle(locale).getString(key);
+        ResourceBundle resourceBundle = c.getResourceBundle(locale);
+        if (resourceBundle != null) {
+          return resourceBundle.getString(key);
+        }
       }
       catch (MissingResourceException e) {
         //nop
@@ -106,6 +109,9 @@ public abstract class DynamicNls {
     for (NlsResourceBundleCache c : m_resourceBundles) {
       try {
         ResourceBundle r = c.getResourceBundle(locale);
+        if (r == null) {
+          continue;
+        }
         for (Enumeration<String> en = r.getKeys(); en.hasMoreElements();) {
           String key = en.nextElement();
           String text = r.getString(key);

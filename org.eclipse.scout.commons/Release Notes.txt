@@ -102,3 +102,8 @@ Migration:
 Remove all occurrences and usages of &...& binds.
 Use regex "&[\{\[]*[a-zA-Z]+[a-zA-Z0-9._\[\]\{\}]*&" to find occurrences.
 When statement part composition is really needed, use string concatenation instead.
+
+04.08.2011 abr
+Bugzilla - Bug: 353924
+DynamicNLS and its extensions can now be used outside a running Eclipse (e.g. in a plain JUnit test).
+Migration: None

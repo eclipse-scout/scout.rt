@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,6 +18,7 @@
  */
 package org.eclipse.scout.commons.nls;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -26,6 +27,7 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
+import org.eclipse.scout.commons.internal.Activator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -63,7 +65,21 @@ public final class NlsResourceBundle extends PropertyResourceBundle {
     NlsResourceBundle root = null;
     NlsResourceBundle child = null;
     for (String suffix : suffixes) {
-      URL res = cl.getResource(baseName.replace('.', '/') + suffix + ".properties");
+      String fileName = baseName.replace('.', '/') + suffix + ".properties";
+      URL res = cl.getResource(fileName);
+      if (res == null && Activator.getDefault() == null) {
+        // running outside Eclipse (e.g. an ordinary JUnit test). Hence try to load the
+        // resource bundle from a file as well.
+        try {
+          File f = new File(fileName);
+          if (f.exists() && f.isFile()) {
+            res = f.toURI().toURL();
+          }
+        }
+        catch (Exception e) {
+          // nop
+        }
+      }
       if (res != null) {
         InputStream in = null;
         try {
