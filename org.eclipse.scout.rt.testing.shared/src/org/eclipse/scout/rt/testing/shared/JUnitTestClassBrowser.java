@@ -110,7 +110,7 @@ public class JUnitTestClassBrowser {
 
       String[] classNames;
       try {
-        BundleBrowser bundleBrowser = new BundleBrowser(bundle.getSymbolicName(), bundle.getSymbolicName());
+        BundleBrowser bundleBrowser = new BundleBrowser(bundle.getSymbolicName(), "");
         classNames = bundleBrowser.getClasses(false, true);
       }
       catch (Exception e1) {
@@ -154,7 +154,8 @@ public class JUnitTestClassBrowser {
    * @see #setBundleNameExcludePatterns(Pattern[])
    */
   protected boolean acceptBundle(Bundle bundle) {
-    return accept(bundle.getSymbolicName(), getBundleNameIncludePatterns(), getBundleNameExcludePatterns());
+    return !Platform.isFragment(bundle)
+        && accept(bundle.getSymbolicName(), getBundleNameIncludePatterns(), getBundleNameExcludePatterns());
   }
 
   /**
@@ -278,7 +279,7 @@ public class JUnitTestClassBrowser {
 
   /**
    * Transforms the given string into a regular expression pattern. The string is assumed to be a wildcard pattern or
-   * already a reagular expression pattern. The latter must be prefixed by <em>regex:</em>.
+   * already a regular expression pattern. The latter must be prefixed by <em>regex:</em>.
    * 
    * @param s
    * @return
