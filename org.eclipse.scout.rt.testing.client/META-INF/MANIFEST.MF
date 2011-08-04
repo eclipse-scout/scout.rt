@@ -14,4 +14,5 @@ Export-Package: org.eclipse.scout.testing.client,
  org.eclipse.scout.testing.client.form,
  org.eclipse.scout.testing.client.legacy,
  org.eclipse.scout.testing.client.robot,
- org.eclipse.scout.testing.client.runner
+ org.eclipse.scout.testing.client.runner,
+ org.eclipse.scout.testing.client.servicetunnel.http
