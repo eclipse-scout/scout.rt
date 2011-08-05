@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.FileUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.osgi.framework.Bundle;
 
@@ -91,20 +90,14 @@ public class ResourceServlet extends HttpServletEx {
   protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
     Path p = new Path(req.getRequestURI());
     String lastSegment = p.lastSegment();
-    if (!StringUtility.isNullOrEmpty(lastSegment)) {
-      if (lastSegment.contains(".") || req.getRequestURI().endsWith("/")) {
-        if (!writeStaticResource(req, res)) {
-          res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }
-      }
-      else {
-        res.sendRedirect(req.getRequestURI() + "/");
+    if ((lastSegment != null && lastSegment.contains(".")) || req.getRequestURI().endsWith("/")) {
+      if (!writeStaticResource(req, res)) {
+        res.setStatus(HttpServletResponse.SC_NOT_FOUND);
       }
     }
     else {
-      res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      res.sendRedirect(req.getRequestURI() + "/");
     }
-
   }
 
   @Override
