@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFormFieldGridData;
+import org.eclipse.scout.rt.ui.swt.form.fields.checkbox.ISwtScoutCheckbox;
 import org.eclipse.scout.rt.ui.swt.util.SwtLayoutUtility;
 import org.eclipse.swt.widgets.Composite;
 
@@ -47,12 +49,58 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
     getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
 
     Composite fieldContainer = getEnvironment().getFormToolkit().createComposite(container);
+    int visibleCount = 0;
     for (IFormField scoutField : getScoutObject().getFields()) {
       ISwtScoutFormField swtFormField = getEnvironment().createFormField(fieldContainer, scoutField);
-      // remove label fixed width hint
-      ILabelComposite childLabel = swtFormField.getSwtLabel();
-      if (childLabel != null && childLabel.getLayoutData() instanceof LogicalGridData) {
-        ((LogicalGridData) childLabel.getLayoutData()).widthHint = 0;
+
+      if (!(swtFormField.getScoutObject() instanceof ICheckBox)) {
+        // remove label fixed width hint
+        ILabelComposite childLabel = swtFormField.getSwtLabel();
+        if (childLabel != null && childLabel.getLayoutData() instanceof LogicalGridData) {
+          ((LogicalGridData) childLabel.getLayoutData()).widthHint = 0;
+          // <bsh 2010-10-01>
+          // Force an empty, but visible label for all but the first visible fields
+          // within an SequenceBox. This empty status label is necessary to show the
+          // "mandatory" indicator.
+          if (swtFormField.getScoutObject() instanceof IFormField) {
+            IFormField myScoutObject = ((IFormField) swtFormField.getScoutObject());
+            if (myScoutObject.isVisible()) {
+              visibleCount++;
+            }
+            if (visibleCount > 1) {
+              if (!childLabel.getVisible()) {
+                // make the label visible, but clear any text
+                childLabel.setVisible(true);
+                childLabel.setText("");
+              }
+            }
+          }
+          // <bsh>
+        }
+      }
+      // If swtFormField is a checkbox the placeholder-label has to be handeld
+      else {
+        // remove label fixed width hint
+        ILabelComposite childLabel = ((ISwtScoutCheckbox) swtFormField).getPlaceholderLabel();
+        if (childLabel != null && childLabel.getLayoutData() instanceof LogicalGridData) {
+          ((LogicalGridData) childLabel.getLayoutData()).widthHint = 0;
+          // <bsh 2010-10-01>
+          // Force an empty, but visible label for all but the first visible fields
+          // within an SequenceBox. This empty status label is necessary to show the
+          // "mandatory" indicator.
+          IFormField myScoutObject = ((IFormField) swtFormField.getScoutObject());
+          if (myScoutObject.isVisible()) {
+            visibleCount++;
+          }
+          if (visibleCount > 1) {
+            if (!childLabel.getVisible()) {
+              // make the label visible, but clear any text
+              childLabel.setVisible(true);
+              childLabel.setText("");
+            }
+          }
+          // <bsh>
+        }
       }
       // create layout constraints
       SwtScoutFormFieldGridData data = new SwtScoutFormFieldGridData(scoutField) {

@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.swt.ext.ILabelComposite;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
@@ -124,6 +125,11 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
   @Override
   public Button getSwtField() {
     return (Button) super.getSwtField();
+  }
+
+  @Override
+  public ILabelComposite getPlaceholderLabel() {
+    return m_labelPlaceholder;
   }
 
   @Override
