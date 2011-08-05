@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -143,6 +144,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
 
   protected void setTitleFromScout(String title) {
     if (title == null) title = "";
+    title = StringUtility.removeNewLines(title);
     setPartName(title);
   }
 
