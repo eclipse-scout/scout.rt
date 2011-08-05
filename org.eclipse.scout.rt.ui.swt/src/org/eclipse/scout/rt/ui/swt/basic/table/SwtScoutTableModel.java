@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtIcons;
@@ -119,7 +120,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
         }
       }
       ICell cell = getCell(element, columnIndex);
-      if (col != null && cell != null && col.getDataType() == Boolean.class) {
+      if (col != null && cell != null && col.getDataType() == Boolean.class && (!(col instanceof ISmartColumn) || ((ISmartColumn) col).getLookupCall() == null)) {
         Boolean b = (Boolean) cell.getValue();
         if (b != null && b.booleanValue()) {
           return m_imgCheckboxTrue;
