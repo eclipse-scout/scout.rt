@@ -104,7 +104,7 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   public String getText(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
     String text = scoutNode.getCell().getText();
-    text = StringUtility.replace(text, "\n", " ");
+    text = StringUtility.removeNewLines(text);
     return text;
   }
 

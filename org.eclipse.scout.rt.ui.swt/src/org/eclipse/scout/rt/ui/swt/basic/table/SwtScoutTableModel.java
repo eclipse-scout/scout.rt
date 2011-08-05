@@ -151,7 +151,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
       else {
         String text = cell.getText();
         if (!isMultiline()) {
-          text = StringUtility.replace(text, "\n", " ");
+          text = StringUtility.removeNewLines(text);
         }
         return text;
       }

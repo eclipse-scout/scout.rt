@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -149,6 +150,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     if (title == null) {
       title = "";
     }
+    title = StringUtility.removeNewLines(title);
     getShell().setText(title);
   }
 

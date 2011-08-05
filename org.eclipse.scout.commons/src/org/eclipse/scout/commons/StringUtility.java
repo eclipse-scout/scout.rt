@@ -234,6 +234,31 @@ public final class StringUtility {
   }
 
   /**
+   * Returns a new string resulting from replacing all new line characters ("\n", "\r\n", "\n\r" or "\r") with a single
+   * blank (" ").
+   * <p>
+   * Examples:
+   * 
+   * <pre>
+   * "a\r\nb" -> "a b"
+   * "a\nb" -> "a b"
+   * </pre>
+   * 
+   * </p>
+   * 
+   * @param text
+   *          the {@link String} thats new line characters should be removed
+   * @return a string derived from this string by replacing every occurrence of new line character with a
+   *         blank.
+   */
+  public static String removeNewLines(String text) {
+    if (isNullOrEmpty(text)) return null;
+    String s = text.replaceAll("\r\n|\n\r", " ");
+    s = s.replace('\n', ' ').replace('\r', ' ');
+    return s.trim();
+  }
+
+  /**
    * @return a single tag <foo/>
    */
   private static TagBounds getSingleTag(String text, String tagName, int pos) {
