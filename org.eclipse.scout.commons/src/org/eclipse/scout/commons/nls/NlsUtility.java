@@ -4,18 +4,10 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/**
- * Title: BSI Eclipse Util
- * Description: Eclipse Utilities
- * Copyright: Copyright (c) 2001,2006 BSI AG
- * Company: BSI AG www.bsiag.com
- * @author imo
- * @since 17.11.2007
- */
 package org.eclipse.scout.commons.nls;
 
 import java.lang.reflect.Field;

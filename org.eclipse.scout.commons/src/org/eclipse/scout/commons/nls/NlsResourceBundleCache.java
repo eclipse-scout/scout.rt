@@ -8,14 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/**
- * Title: BSI Eclipse Util
- * Description: Eclipse Utilities
- * Copyright: Copyright (c) 2001,2006 BSI AG
- * Company: BSI AG www.bsiag.com
- * @author imo
- * @since 19.11.2007
- */
 package org.eclipse.scout.commons.nls;
 
 import java.util.HashMap;
@@ -46,7 +38,7 @@ public class NlsResourceBundleCache {
       // double check with lock
       ResourceBundle r = m_resourceBundles.get(locale);
       if (r == null) {
-        r = NlsResourceBundle.getBundle(m_resourceBundleName, locale, m_wrapperClass.getClassLoader());
+        r = NlsResourceBundle.getBundle(m_resourceBundleName, locale, m_wrapperClass.getClassLoader(), m_wrapperClass);
         if (r != null) {
           m_resourceBundles.put(locale, r);
         }
