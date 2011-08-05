@@ -17,6 +17,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.dnd.DropTarget;
 import java.awt.event.MouseEvent;
+import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.JTree;
@@ -59,6 +60,15 @@ public class JTreeEx extends JTree {
     setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
     // register tree for tooltips
     ToolTipManager.sharedInstance().registerComponent(this);
+  }
+
+  //Performance optimization. See: http://hameister.org/JavaSwingJTreePerformance.html
+  //the plaf library calls this method to update the expanded state of a path.
+  //However, the implementation in JTree is very slow, and there is probably no use
+  //for this functionality in Scout.
+  @Override
+  public Enumeration<TreePath> getExpandedDescendants(final TreePath path) {
+    return null;
   }
 
   /**
