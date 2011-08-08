@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.testing.client.servicetunnel.http.MultiClientAuthenticator;
 import org.osgi.framework.Bundle;
 
@@ -104,6 +105,7 @@ public class DefaultTestClientSessionProvider implements ITestClientSessionProvi
    */
   protected void beforeStartSession(IClientSession clientSession, String runAs) {
     MultiClientAuthenticator.assignSessionToUser(clientSession, runAs);
+    TestingUtility.clearHttpAuthenticationCache();
   }
 
   /**
