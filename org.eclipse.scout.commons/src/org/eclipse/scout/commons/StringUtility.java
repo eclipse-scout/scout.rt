@@ -252,7 +252,7 @@ public final class StringUtility {
    *         blank.
    */
   public static String removeNewLines(String text) {
-    if (isNullOrEmpty(text)) return null;
+    if (isNullOrEmpty(text)) return text;
     String s = text.replaceAll("\r\n|\n\r", " ");
     s = s.replace('\n', ' ').replace('\r', ' ');
     return s.trim();
