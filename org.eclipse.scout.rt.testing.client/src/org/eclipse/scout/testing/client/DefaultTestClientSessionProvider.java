@@ -21,7 +21,10 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.testing.client.servicetunnel.http.MultiClientAuthenticator;
 import org.osgi.framework.Bundle;
@@ -96,8 +99,8 @@ public class DefaultTestClientSessionProvider implements ITestClientSessionProvi
 
   /**
    * Performs custom operations before the client session is started. This default implementation assigns the current
-   * session on the {@link MultiClientAuthenticator}, so that a possibly araising HTTP BASIC authentication can be
-   * performed.
+   * session on the {@link MultiClientAuthenticator}, so that a possibly arising HTTP BASIC authentication can be
+   * performed. Additionally, all message boxes are automatically canceled.
    * 
    * @param clientSession
    * @param runAs
@@ -106,6 +109,17 @@ public class DefaultTestClientSessionProvider implements ITestClientSessionProvi
   protected void beforeStartSession(IClientSession clientSession, String runAs) {
     MultiClientAuthenticator.assignSessionToUser(clientSession, runAs);
     TestingUtility.clearHttpAuthenticationCache();
+    // auto-cancel all message boxes
+    clientSession.getVirtualDesktop().addDesktopListener(new DesktopListener() {
+      @Override
+      public void desktopChanged(DesktopEvent e) {
+        switch (e.getType()) {
+          case DesktopEvent.TYPE_MESSAGE_BOX_ADDED:
+            e.getMessageBox().getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
+            break;
+        }
+      }
+    });
   }
 
   /**
