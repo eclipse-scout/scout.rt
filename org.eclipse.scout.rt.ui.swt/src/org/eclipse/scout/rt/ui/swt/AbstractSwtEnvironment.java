@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -606,16 +607,44 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   @Override
   public String styleHtmlText(ISwtScoutFormField<?> uiComposite, String rawHtml) {
+    return styleHtmlText(uiComposite.getSwtField(), rawHtml);
+  }
+
+  protected String styleHtmlText(Control c, String rawHtml) {
     if (rawHtml == null) {
       rawHtml = "";
     }
     if (StringUtility.getTag(rawHtml, "style") != null || StringUtility.getTag(rawHtml, "body") != null) {
+      // 1. replace possibly existing Content-Type meta tag
+      String metaTag = "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>";
+      rawHtml = Pattern.compile("(<meta\\s*http-equiv=\"Content-Type\"\\s*content=\"[^\"]+\"\\s*/>)", Pattern.CASE_INSENSITIVE).matcher(rawHtml).replaceFirst(metaTag);
+      if (StringUtility.find(rawHtml, metaTag) < 0) {
+        // 2. Content-Type not part of the original document -> add it in existing header or add a complete header definition
+        int body = StringUtility.find(rawHtml, "<body");
+        int head = StringUtility.find(rawHtml, "<head");
+        int metaInputPos = 0;
+        if (head > 0) {
+          // 2.a head tag is available -> add meta-tag at its beginning
+          metaInputPos = StringUtility.find(rawHtml, ">", head) + 1;
+        }
+        else if (body > 0) {
+          // 2.a head tag is missing -> add complete header before body tag
+          metaInputPos = body;
+          metaTag = "<head>" + metaTag + "</head>";
+        }
+
+        StringBuffer metaHtml = new StringBuffer(rawHtml.substring(0, metaInputPos));
+        metaHtml = metaHtml.append(metaTag);
+        metaHtml = metaHtml.append(rawHtml.substring(metaInputPos, rawHtml.length()));
+        rawHtml = metaHtml.toString();
+      }
       return rawHtml;
     }
+    // rawHtml is just an html fragment, surround with html envelope
     String cleanHtml = rawHtml;
     //remove surrounding html tag
     cleanHtml = StringUtility.removeTagBounds(cleanHtml, "html");
-    cleanHtml = createHtmlDocument(cleanHtml, createCSS(uiComposite.getSwtField()));
+    cleanHtml = createHtmlDocument(cleanHtml, createCSS(c));
     return cleanHtml;
   }
 
@@ -652,6 +681,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     StringBuilder b = new StringBuilder();
     b.append("<html>");
     b.append("<head>");
+    b.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>");
     b.append("<style type=\"text/css\">");
     b.append(css);
     b.append("</style>");
