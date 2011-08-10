@@ -46,3 +46,15 @@ Solution:
 Back event to notify the model once a screen shot is done. Furthermore a PrintApplicationAction is created to take screen shots of the whole application.
 Migration:
 none
+
+10.08.2011 abr
+Bugzilla Ticket 354350
+BSI Ticket 104'974
+Problem:
+The SwtScoutHtmlField transforms the document to display into an UTF-8 encoded byte array. If the transformed document contains a meta-tag "Content-Type"
+defining an encoding other than UTF-8 or if the default encoding of the underlying (default) browser is not UTF-8, invalid characters may displayed.
+Solution:
+The document to be displayed is augmented by an UTF-8 Content-Type definition of a possibly already existing one is rewritten
+(modified org.eclipse.scout.rt.ui.swt.AbstractSwtEnvironment.styleHtmlText(Control, String)).
+Migration:
+none
