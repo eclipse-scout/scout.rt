@@ -495,3 +495,12 @@ bsi ticket 102'074
 Problem:
 - When form tool button is selected, other tool buttons should only be deselected if of the type AbstractFormToolButton
 Migration: None
+
+09.08.2011 dwi
+bsi ticket #104'887
+Problem:
+When exporting table to CVS file format (AbstractTable#exportTableRowsAsCSV), columns of the type boolean are not considered.
+Solution:
+Added handling for values in boolean column. That is if no custom display text is set for such a cell, an 'X' is exported as value.
+Migration:
+None

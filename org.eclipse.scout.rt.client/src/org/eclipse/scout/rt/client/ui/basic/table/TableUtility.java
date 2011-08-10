@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.HTMLUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -282,8 +283,8 @@ public final class TableUtility {
           if (type == Boolean.class) {
             Boolean b = TypeCastUtility.castValue(columns[c].getValue(rows[r]), Boolean.class);
             if (b != null && b.booleanValue()) {
-              //make sure there is a text
-              if (text == null || text.trim().length() == 0) {
+              // only use X if no display text is set
+              if (!StringUtility.hasText(text)) {
                 text = "X";
               }
             }
