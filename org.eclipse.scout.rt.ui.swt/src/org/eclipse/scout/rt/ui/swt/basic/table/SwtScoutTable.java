@@ -423,6 +423,10 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
         // re-install columns
         initializeColumns();
+        if (getScoutObject().isAutoResizeColumns()) {
+          handleAutoSizeColumns();
+        }
+
         swtTableEvent = new SwtScoutTableEvent();
         break;
       }
@@ -435,10 +439,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     if (swtTableEvent != null) {
       swtTableModel.consumeTableModelEvent(swtTableEvent);
       getSwtTableViewer().refresh();
-      if (getScoutObject().isAutoResizeColumns()) {
-        handleAutoSizeColumns();
-      }
-
     }
     // refresh selection, indexes might have changed
     switch (e.getType()) {
