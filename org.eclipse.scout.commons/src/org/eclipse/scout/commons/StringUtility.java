@@ -255,7 +255,7 @@ public final class StringUtility {
     if (isNullOrEmpty(text)) return text;
     String s = text.replaceAll("\r\n|\n\r", " ");
     s = s.replace('\n', ' ').replace('\r', ' ');
-    return s.trim();
+    return s;
   }
 
   /**
