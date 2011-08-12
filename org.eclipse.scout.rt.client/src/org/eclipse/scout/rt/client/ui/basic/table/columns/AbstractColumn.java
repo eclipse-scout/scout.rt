@@ -314,9 +314,10 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     IFormField f = prepareEditInternal(row);
     if (f != null) {
       f.setLabelVisible(false);
-      GridData gd = f.getGridData();
+      GridData gd = f.getGridDataHints();
+      // apply horizontal alignment of column to respective editor field
       gd.horizontalAlignment = getHorizontalAlignment();
-      f.setGridDataInternal(gd);
+      f.setGridDataHints(gd);
       if (f instanceof IValueField<?>) {
         ((IValueField<T>) f).setValue(getValue(row));
       }
@@ -890,7 +891,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     if (getFont() != null) {
       cell.setFont(getFont());
     }
-    cell.setHorizontalAlignment(getConfiguredHorizontalAlignment());
+    cell.setHorizontalAlignment(getHorizontalAlignment());
     cell.setEditableInternal(isCellEditable(row));
   }
 

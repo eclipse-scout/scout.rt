@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -22,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanFi
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 
 /**
- * Column holding Boolean
+ * Column holding Boolean values
  */
 public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> implements IBooleanColumn {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBooleanColumn.class);
@@ -35,8 +38,19 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   }
 
   @Override
-  protected int getConfiguredHorizontalAlignment() {
-    return 0;
+  protected void initConfig() {
+    super.initConfig();
+    setVerticalAlignment(getConfiguredVerticalAlignment());
+  }
+
+  @Override
+  public int getVerticalAlignment() {
+    return propertySupport.getPropertyInt(PROP_VERTICAL_ALIGNMENT);
+  }
+
+  @Override
+  public void setVerticalAlignment(int verticalAlignment) {
+    propertySupport.setProperty(PROP_VERTICAL_ALIGNMENT, verticalAlignment);
   }
 
   @Override
@@ -62,7 +76,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
     final AbstractBooleanField f = new AbstractBooleanField() {
     };
     f.setValue(getValue(row));
-    f.markSaved();
+
     //automatic save when value changes
     f.addPropertyChangeListener(IBooleanField.PROP_VALUE, new PropertyChangeListener() {
       @Override
@@ -71,10 +85,22 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
           completeEdit(row, f);
         }
         catch (ProcessingException e1) {
-          LOG.error("failed to compelete edit mode", e1);
+          LOG.error("failed to complete edit mode", e1);
         }
       }
     });
     return f;
+  }
+
+  @Override
+  protected int getConfiguredHorizontalAlignment() {
+    return 0; // center position
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(200)
+  @ConfigPropertyValue("-1")
+  protected int getConfiguredVerticalAlignment() {
+    return -1; // top position
   }
 }

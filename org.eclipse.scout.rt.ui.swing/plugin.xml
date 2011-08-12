@@ -25,20 +25,20 @@
      </formField>
      <formField
            active="true"
-           modelClass="org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField"
-           name="Check Box"
-           scope="default">
-        <uiClass
-              class="org.eclipse.scout.rt.ui.swing.form.fields.checkbox.SwingScoutCheckBox">
-        </uiClass>
-     </formField>
-     <formField
-           active="true"
            modelClass="org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField"
            name="Date field"
            scope="default">
         <factory
               class="org.eclipse.scout.rt.ui.swing.form.fields.datefield.DateFieldFactory">
+        </factory>
+     </formField>
+     <formField
+           active="true"
+           modelClass="org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField"
+           name="Check Box"
+           scope="default">
+        <factory
+              class="org.eclipse.scout.rt.ui.swing.form.fields.checkbox.CheckBoxFactory">
         </factory>
      </formField>
      <formField
