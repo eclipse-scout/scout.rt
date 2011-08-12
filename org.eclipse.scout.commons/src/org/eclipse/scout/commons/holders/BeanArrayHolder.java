@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -39,10 +39,10 @@ public class BeanArrayHolder<T extends Serializable> implements IBeanArrayHolder
       ret = m_clazz.newInstance();
     }
     catch (InstantiationException e) {
-      throw new UndeclaredThrowableException(e, "ArrayBeanHolder: cannot instantiate " + m_clazz.toString());
+      throw new UndeclaredThrowableException(e, "BeanArrayHolder: cannot instantiate " + m_clazz.toString());
     }
     catch (IllegalAccessException e) {
-      throw new UndeclaredThrowableException(e, "ArrayBeanHolder: cannot instantiate " + m_clazz.toString());
+      throw new UndeclaredThrowableException(e, "BeanArrayHolder: cannot instantiate " + m_clazz.toString());
     }
     m_list.add(ret);
     m_stateList.put(ret, IBeanArrayHolder.State.NON_CHANGED);
