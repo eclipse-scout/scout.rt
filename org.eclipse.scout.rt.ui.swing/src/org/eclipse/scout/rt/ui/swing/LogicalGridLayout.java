@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -222,7 +222,12 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
               int delta = r.width - d.width;
               r.width = d.width;
               if (data.horizontalAlignment == 0) {
-                r.x += delta / 2;
+                // Do ceil the result as other layout managers of Java also handle floating calculation results that way.
+                // This is important if being used in conjunction with another layout manager.
+                // E.g. the editable checkbox in inline table cell is a JCheckBox and rendered by LogicalGridLayout,
+                // whereas the default boolean representation in a table cell is simply an image on a label positioned by
+                // default layout manager. If switching in between of edit and non-edit mode, the widget would bounce otherwise.
+                r.x += Math.ceil(delta / 2.0);
               }
               else if (data.horizontalAlignment > 0) {
                 r.x += delta;
@@ -239,7 +244,12 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
                 r.height = data.heightHint;
               }
               if (data.verticalAlignment == 0) {
-                r.y += delta / 2;
+                // Do ceil the result as other layout managers of Java also handle floating calculation results that way.
+                // This is important if being used in conjunction with another layout manager.
+                // E.g. the editable checkbox in inline table cell is a JCheckBox and rendered by LogicalGridLayout,
+                // whereas the default boolean representation in a table cell is simply an image on a label positioned by
+                // default layout manager. If switching in between of edit and non-edit mode, the widget would bounce otherwise.
+                r.y += Math.ceil(delta / 2.0);
               }
               else if (data.verticalAlignment > 0) {
                 r.y += delta;

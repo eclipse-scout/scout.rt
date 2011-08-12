@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swing.basic.table;
 import java.awt.AWTKeyStroke;
 import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
+import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
@@ -32,10 +33,14 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -44,6 +49,12 @@ import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 
 public class SwingScoutTableCellEditor {
+
+  /**
+   * Property to access the table cell's insets within the inline editor. The insets are registered as client property
+   * in {@link JTable}.
+   */
+  public static final String TABLE_CELL_INSETS = SwingScoutTableCellEditor.class.getName() + "#insets";
 
   private ISwingScoutTable m_tableComposite;
   private FocusTraversalPolicy m_focusTraversalPolicy;
@@ -111,7 +122,29 @@ public class SwingScoutTableCellEditor {
       }
     }
     if (fieldRef.get() != null) {
-      return m_tableComposite.getSwingEnvironment().createFormField(m_tableComposite.getSwingTable(), fieldRef.get());
+      // propagate vertical and horizontal alignment to @{link IBooleanField} (to layout properly)
+      if (scoutColumn instanceof IBooleanColumn) {
+        GridData gd = fieldRef.get().getGridDataHints();
+        gd.verticalAlignment = ((IBooleanColumn) scoutColumn).getVerticalAlignment();
+        gd.horizontalAlignment = scoutColumn.getHorizontalAlignment();
+        fieldRef.get().setGridDataHints(gd);
+      }
+
+      // propagate insets of table cell to inline editor (to layout properly)
+      Insets cellInsets = new Insets(0, 0, 0, 0);
+      TableCellRenderer cellRenderer = m_tableComposite.getSwingTable().getCellRenderer(row, col);
+      cellRenderer = (TableCellRenderer) m_tableComposite.getSwingTable().prepareRenderer(cellRenderer, row, col); // do not remove this call to ensure TableCellRenderer properties (e.g. insets) really belongs to the given cell (col, row). This seems to be a bug.
+      if (cellRenderer instanceof DefaultTableCellRenderer) {
+        cellInsets = ((DefaultTableCellRenderer) cellRenderer).getInsets();
+      }
+
+      m_tableComposite.getSwingTable().putClientProperty(SwingScoutTableCellEditor.TABLE_CELL_INSETS, cellInsets);
+      try {
+        return m_tableComposite.getSwingEnvironment().createFormField(m_tableComposite.getSwingTable(), fieldRef.get());
+      }
+      finally {
+        m_tableComposite.getSwingTable().putClientProperty(SwingScoutTableCellEditor.TABLE_CELL_INSETS, null);
+      }
     }
     else {
       return null;

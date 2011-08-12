@@ -804,7 +804,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public IFormField findFocusOwnerField() {
     Component comp = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     while (comp instanceof JComponent) {
-      IPropertyObserver o = SwingScoutComposite.getScoutModelOnWidget((JComponent) comp);
+      IPropertyObserver o = SwingScoutComposite.getScoutModelOnWidget(comp);
       if (o instanceof IFormField) {
         return (IFormField) o;
       }
