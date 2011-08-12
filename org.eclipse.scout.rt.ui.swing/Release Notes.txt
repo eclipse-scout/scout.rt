@@ -134,3 +134,16 @@ Preceding Swing size calculation, the span of the labels is constrained to the m
 In order to make the text reflow when being resized to a width greater than the initial size, the span is reset just after being enlarged the first time.
 Migration:
 None
+
+12.08.2011 dwi
+bsi ticket #100'300
+Problem:
+If having an editable column of the type boolean, values are rendered as checkboxes. When changing the value of that checkbox, the checkbox jumps from center position to the left edge. Furthermore, not the same checkbox widget is displayed as in non-edit mode.
+Solution:
+- Changed representation of checkbox to look the same in edit and non-edit mode.
+- Fixed layout problems when changing from non-edit to edit-mode (checkbox positioning)
+- Added VerticalAlignment on IBoolean column to align the checkbox in both directions, vertical and horizontal
+- Fixed problems in LogicalGridLayout manager to round resulting floating numbers (center position caluculations) the same way as Java layout managers do. Otherwise, the checkbox is positioned differently in between of the layout managers which causes the checkbox to jump around.
+- Fixed problems in inset calculation to look the same on the different L&F providers
+Migration:
+None

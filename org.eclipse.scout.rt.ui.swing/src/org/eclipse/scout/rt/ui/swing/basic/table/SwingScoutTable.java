@@ -14,7 +14,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
@@ -74,6 +76,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
@@ -89,6 +92,7 @@ import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableHeaderEx;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
+import org.eclipse.scout.rt.ui.swing.icons.CheckboxWithMarginIcon;
 
 /**
  * The prefix SwingScout... denotes a model COMPOSITION between a swing and a
@@ -97,6 +101,12 @@ import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
  */
 public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwingScoutTable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutTable.class);
+
+  /**
+   * The distance from the top of a label to the approximate top position of an uppercase character. As this distance
+   * cannot be obtained by {@link FontMetrics}, this approximation is used.
+   */
+  public static final int FONT_PADDING_TOP = 4;
 
   private P_ScoutTableListener m_scoutTableListener;
   private JTableHeader m_swingTableHeader;
@@ -239,7 +249,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected ListSelectionModel getSwingTableSelectionModel() {
-    return (ListSelectionModel) getSwingTable().getSelectionModel();
+    return getSwingTable().getSelectionModel();
   }
 
   @Override
@@ -1037,51 +1047,74 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         if (cell != null) {
           // enabled
           c.setEnabled(scoutTable.isEnabled() && scoutRow.isEnabled() && cell.isEnabled());
-          // align
+
           if (c instanceof JLabel) {
+            JLabel label = (JLabel) c;
+
+            // horizontal alignment
             int align = cell.getHorizontalAlignment();
             // first column always left-aligned
             if (column == 0 && (!StringUtility.isNullOrEmpty(scoutRow.getIconId()) || !StringUtility.isNullOrEmpty(cell.getIconId()))) {
               align = -1;
             }
             if (align > 0) {
-              ((JLabel) c).setHorizontalAlignment(SwingConstants.RIGHT);
+              label.setHorizontalAlignment(SwingConstants.RIGHT);
             }
             else if (align == 0) {
-              ((JLabel) c).setHorizontalAlignment(SwingConstants.CENTER);
+              label.setHorizontalAlignment(SwingConstants.CENTER);
             }
             else {
-              ((JLabel) c).setHorizontalAlignment(SwingConstants.LEFT);
+              label.setHorizontalAlignment(SwingConstants.LEFT);
             }
-          }
-          // icon
-          Icon icon = null;
-          if (scoutTable.isCheckable() && column == 0) {
-            icon = new CheckboxIcon();
-            ((CheckboxIcon) icon).setSelected(scoutRow.isChecked());
-            ((CheckboxIcon) icon).setEnabled(c.isEnabled());
-          }
-          else if (scoutCol.getDataType() == Boolean.class && (!(scoutCol instanceof ISmartColumn) || ((ISmartColumn) scoutCol).getLookupCall() == null)) {
-            icon = new CheckboxIcon();
-            Boolean b = (Boolean) cell.getValue();
-            ((CheckboxIcon) icon).setSelected(b != null && b.booleanValue());
-            ((CheckboxIcon) icon).setEnabled(c.isEnabled());
-          }
-          else if (cell.getIconId() != null) {
-            icon = getSwingEnvironment().getIcon(cell.getIconId());
-          }
-          else if (column == 0) {
-            icon = getSwingEnvironment().getIcon(scoutRow.getIconId());
+
+            // vertical alignment (only supported by boolean columns)
+            if (scoutCol instanceof IBooleanColumn) {
+              switch (((IBooleanColumn) scoutCol).getVerticalAlignment()) {
+                case 0:
+                  label.setVerticalAlignment(SwingConstants.CENTER);
+                  break;
+                case 1:
+                  label.setVerticalAlignment(SwingConstants.BOTTOM);
+                  break;
+                default:
+                  label.setVerticalAlignment(SwingConstants.TOP);
+                  break;
+              }
+            }
+
+            // icon
+            Icon icon = null;
+            if (scoutTable.isCheckable() && column == 0) {
+              // top inset is used to ensure the checkbox to be on the same position as the label text displayed
+              icon = new CheckboxWithMarginIcon(new Insets(FONT_PADDING_TOP, 0, 0, 5));
+              ((CheckboxIcon) icon).setSelected(scoutRow.isChecked());
+              ((CheckboxIcon) icon).setEnabled(c.isEnabled());
+            }
+            else if (scoutCol.getDataType() == Boolean.class && (!(scoutCol instanceof ISmartColumn) || ((ISmartColumn) scoutCol).getLookupCall() == null)) {
+              int fontPaddingTop = 0;
+              // font padding is only applied if checkbox is vertically aligned on top
+              if (label.getVerticalAlignment() == SwingConstants.TOP) {
+                fontPaddingTop = FONT_PADDING_TOP;
+              }
+
+              icon = new CheckboxWithMarginIcon(new Insets(fontPaddingTop, 0, 0, 0));
+              Boolean b = (Boolean) cell.getValue();
+              ((CheckboxIcon) icon).setSelected(b != null && b.booleanValue());
+              ((CheckboxIcon) icon).setEnabled(c.isEnabled());
+            }
+            else if (cell.getIconId() != null) {
+              icon = getSwingEnvironment().getIcon(cell.getIconId());
+            }
+            else if (column == 0) {
+              icon = getSwingEnvironment().getIcon(scoutRow.getIconId());
+            }
+            if (cell.isEditable()) {
+              icon = new P_IconWithMarker(icon);
+            }
+            label.setIcon(icon);
+            label.setDisabledIcon(icon);
           }
 
-          if (cell.isEditable()) {
-            icon = new P_IconWithMarker(icon);
-          }
-
-          if (c instanceof JLabel) {
-            ((JLabel) c).setIcon(icon);
-            ((JLabel) c).setDisabledIcon(icon);
-          }
           // foreground
           //TODO use row fg if cells value is null
           if (cell.getForegroundColor() != null) {

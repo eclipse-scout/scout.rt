@@ -27,9 +27,9 @@
            modelClass="org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField"
            name="Check Box"
            scope="default">
-        <uiClass
-              class="org.eclipse.scout.rt.ui.swing.form.fields.checkbox.SwingScoutCheckBox">
-        </uiClass>
+        <factory
+              class="org.eclipse.scout.rt.ui.swing.form.fields.checkbox.CheckBoxFactory">
+        </factory>
      </formField>
      <formField
            active="true"

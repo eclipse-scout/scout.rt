@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,4 +12,17 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 public interface IBooleanColumn extends IColumn<Boolean> {
 
+  String PROP_VERTICAL_ALIGNMENT = "verticalAlignment";
+
+  void setVerticalAlignment(int verticalAlignment);
+
+  /**
+   * <ul>
+   * <li>-1: top alignment</li>
+   * <li>0: middle alignment</li>
+   * <li>1: bottom alignment</li>
+   * </ul>
+   * The vertical alignment of the checkbox
+   */
+  int getVerticalAlignment();
 }

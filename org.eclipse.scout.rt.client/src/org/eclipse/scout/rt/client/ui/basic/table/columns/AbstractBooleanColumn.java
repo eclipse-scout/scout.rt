@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,16 +13,23 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 
 /**
- * Column holding Boolean
+ * Column holding Boolean values
  */
 public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> implements IBooleanColumn {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBooleanColumn.class);
+
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
 
@@ -31,8 +38,19 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   }
 
   @Override
-  protected int getConfiguredHorizontalAlignment() {
-    return 0;
+  protected void initConfig() {
+    super.initConfig();
+    setVerticalAlignment(getConfiguredVerticalAlignment());
+  }
+
+  @Override
+  public int getVerticalAlignment() {
+    return propertySupport.getPropertyInt(PROP_VERTICAL_ALIGNMENT);
+  }
+
+  @Override
+  public void setVerticalAlignment(int verticalAlignment) {
+    propertySupport.setProperty(PROP_VERTICAL_ALIGNMENT, verticalAlignment);
   }
 
   @Override
@@ -58,18 +76,31 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
     final AbstractBooleanField f = new AbstractBooleanField() {
     };
     f.setValue(getValue(row));
-    f.markSaved();
+
     //automatic save when value changes
     f.addPropertyChangeListener(IBooleanField.PROP_VALUE, new PropertyChangeListener() {
+      @Override
       public void propertyChange(PropertyChangeEvent e) {
         try {
           completeEdit(row, f);
         }
         catch (ProcessingException e1) {
-          e1.printStackTrace();
+          LOG.error("failed to complete edit mode", e1);
         }
       }
     });
     return f;
+  }
+
+  @Override
+  protected int getConfiguredHorizontalAlignment() {
+    return 0; // center position
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(200)
+  @ConfigPropertyValue("-1")
+  protected int getConfiguredVerticalAlignment() {
+    return -1; // top position
   }
 }
