@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.svg.ui.swt.internal;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.FileInputStream;
-
 import org.apache.batik.swing.svg.SVGUserAgent;
 import org.eclipse.scout.svg.client.SVGUtility;
 import org.eclipse.scout.svg.client.SilentSVGUserAgentAdapter;
@@ -26,36 +22,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.w3c.dom.svg.SVGDocument;
 
 public class SwtViewer extends Composite {
-  private static final String FOLDER = "D:\\dev\\svg";
 
   static {
     System.setProperty("sun.awt.noerasebackground", "true");
-  }
-
-  public SwtViewer(Composite parent, int mode) {
-    super(parent, mode);
-    setLayout(new FillLayout());
-    SVGUserAgent ua = new SilentSVGUserAgentAdapter() {
-      @Override
-      public void openLink(String uri, boolean newc) {
-        System.out.println("USER_AGENT.openLink(" + uri + "," + newc + ")");
-      }
-    };
-    JSVGCanvasSwtWrapper wrapper = new JSVGCanvasSwtWrapper(this, SWT.NONE, ua, true, false);
-    wrapper.getJSVGCanvas().addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        System.out.println("onClick");
-      }
-    });
-    //set document
-    try {
-      SVGDocument svgDocument = SVGUtility.readSVGDocument(new FileInputStream(FOLDER + "\\test.svg"));
-      wrapper.getJSVGCanvas().setDocument(svgDocument);
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
   }
 
   public static void show() {
@@ -71,6 +40,26 @@ public class SwtViewer extends Composite {
       }
     }
     instance.dispose();
+  }
+
+  public SwtViewer(Composite parent, int mode) {
+    super(parent, mode);
+    setLayout(new FillLayout());
+    SVGUserAgent ua = new SilentSVGUserAgentAdapter() {
+      @Override
+      public void openLink(String uri, boolean newc) {
+        System.out.println("USER_AGENT.openLink(" + uri + "," + newc + ")");
+      }
+    };
+    JSVGCanvasSwtWrapper wrapper = new JSVGCanvasSwtWrapper(this, SWT.NONE, ua, true, false);
+    //set document
+    try {
+      SVGDocument svgDocument = SVGUtility.readSVGDocument(SwtViewer.class.getResourceAsStream("sample.svg"), false);
+      wrapper.getJSVGCanvas().setDocument(svgDocument);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
 }

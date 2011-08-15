@@ -18,7 +18,7 @@ public class TestApplication implements IApplication {
   @Override
   public Object start(IApplicationContext context) throws Exception {
     SwtViewer.show();
-    Thread.sleep(20000000L);
+    Thread.sleep(Long.MAX_VALUE);
     return EXIT_OK;
   }
 
