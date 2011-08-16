@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
@@ -756,6 +757,10 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     if (uiColumnOrder[0] != 0) {
       getSwtField().setColumnOrder(m_uiColumnOrder);
       return;
+    }
+    // if column with icon has changed position
+    if (uiColumnOrder[1] != m_uiColumnOrder[1] && getScoutObject().getRowCount() > 0 && StringUtility.hasText(getScoutObject().getRow(0).getIconId())) {
+      getSwtTableViewer().refresh();
     }
     int[] truncatedColOrder = new int[uiColumnOrder.length - 1];
     for (int i = 0; i < truncatedColOrder.length; i++) {
