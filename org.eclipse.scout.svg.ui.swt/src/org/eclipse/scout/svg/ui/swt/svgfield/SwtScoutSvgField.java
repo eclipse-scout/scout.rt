@@ -49,7 +49,7 @@ public class SwtScoutSvgField extends SwtScoutFieldComposite<ISvgField> implemen
     final SVGUserAgent ua = new P_SVGUserAgent();
     JSVGCanvasSwtWrapper canvas = new JSVGCanvasSwtWrapper(container, SWT.NONE, ua, true, false);
     //IMPORTANT for supporting "getIntersectionList" and doing dynamic dom changes
-    canvas.getJSVGCanvas().setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
+    canvas.getJSVGCanvas().setDocumentState(JSVGCanvas.ALWAYS_INTERACTIVE);
     canvas.getJSVGCanvas().addMouseListener(new P_SwingMouseListener());
     getEnvironment().getFormToolkit().adapt(canvas, false, false);
     setSwtField(canvas);

@@ -50,8 +50,8 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
     //setup svg viewer
     final SVGUserAgent ua = new P_SVGUserAgent();
     JSVGCanvas canvas = new JSVGCanvas(ua, true, false);
-    //IMPORTANT for supporting "getIntersectionList" and doing dynamic dom changes
-    canvas.setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
+    //IMPORTANT for supporting hyperlinks
+    canvas.setDocumentState(JSVGCanvas.ALWAYS_INTERACTIVE);
     canvas.addMouseListener(new P_SwingMouseListener());
     SwingUtility.installDefaultFocusHandling(canvas);
     container.add(canvas);

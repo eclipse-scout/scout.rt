@@ -27,7 +27,7 @@ public class SvgFieldEvent extends EventObject {
    */
   public static final int TYPE_HYPERLINK = 10;
   /**
-   * The selected element was clicked
+   * A element was clicked
    */
   public static final int TYPE_CLICKED = 20;
 
