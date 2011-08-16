@@ -252,3 +252,11 @@ org.eclipse.scout.rt.server
 - RunningStatementStore added (store to hold currently running statements)
 - StatementProcessor changed to register / unregister currently running statements
 Migration: None
+
+16.08.2011 abr
+Bugzilla bug #354849
+bsi ticket #105170
+Added method org.eclipse.scout.rt.server.services.common.security.PermissionService.isCandidate(String) for deciding whether a
+class is a potential permission. The method checks the fully-qualified class name. Subclasses may override the default heuristic
+(i.e. '<hosting plug-in's symbolic name>.*.security.*Permission*').
+Migration: None

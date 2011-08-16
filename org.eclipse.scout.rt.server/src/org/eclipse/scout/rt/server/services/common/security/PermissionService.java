@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -61,14 +61,14 @@ public class PermissionService extends AbstractService implements IPermissionSer
             // filter
             for (String className : classNames) {
               // fast pre-check
-              if (className.indexOf("Permission") >= 0 && className.indexOf(".security.") >= 0) {
+              if (isCandidate(className)) {
                 try {
                   Class c = null;
                   c = bundle.loadClass(className);
                   if (Permission.class.isAssignableFrom(c)) {
                     if (!c.isInterface()) {
                       int flags = c.getModifiers();
-                      if (Modifier.isPublic(flags)) {
+                      if (Modifier.isPublic(flags) && !Modifier.isAbstract(flags)) {
                         discoveredPermissions.add(new BundleClassDescriptor(bundle.getSymbolicName(), c.getName()));
                       }
                     }
@@ -85,4 +85,16 @@ public class PermissionService extends AbstractService implements IPermissionSer
     }
   }
 
+  /**
+   * Checks whether the given class name is a potential permission class. This default implementation checks whether the
+   * class name contains <em>Permission</em> and that the class's package path contains an segment called
+   * <em>security</em>.
+   * 
+   * @param className
+   *          The class name to check.
+   * @return Returns <code>true</code> if the given class looks like a permission. Otherwise <code>false</code>.
+   */
+  protected boolean isCandidate(String className) {
+    return className.indexOf("Permission") >= 0 && className.indexOf(".security.") >= 0;
+  }
 }
