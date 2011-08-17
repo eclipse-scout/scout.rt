@@ -206,3 +206,18 @@ Solution:
 - Fixed problems in inset calculation to look the same on the different L&F providers
 Migration:
 None
+
+17.08.2011 dwi
+bsi ticket #104'549
+Problem:
+If having Drag & Drop support configured on a table, the copy-paste (CTRL-C) functionality is broken.
+Analysis:
+- If no DND is configured, default Swing mechanism exports the content of the table to the clipboard.
+- In case of having DND configured, a custom tranfer handler is installed which exports the content of the AbstractTable#execDrag to the clipboard.
+  If only having drop functionality configured, nothing is exported to the clipboard at all.
+Solution:
+- To always have the very same output to the clipboard regardless of DND configured or not, a tranfer handler is installed permanently.
+  Thereby, the export to the clipboard is changed to always consider the content of the table and not the output of the drag support.
+  That is exactely as Swing default implementation works.
+Migration:
+None

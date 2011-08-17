@@ -282,7 +282,7 @@ public class Cell implements ICell {
   public String toString() {
     String s = getText();
     if (s == null) {
-      s = "" + getValue();
+      s = StringUtility.emptyIfNull(getValue());
     }
     return s;
   }

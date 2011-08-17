@@ -19,8 +19,12 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -28,11 +32,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -48,7 +55,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -64,6 +70,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
@@ -119,14 +126,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   // cache
   private IKeyStroke[] m_installedScoutKs;
-
-  private int m_cachedScoutDragTransferTypes;
-  private int m_cachedScoutDropTransferTypes;
-
-  // DND
-  private TransferHandler m_emptySpaceTransferHandler;
-  private P_SwingRowTransferHandler m_rowTransferHandler;
-  private boolean m_dndInstalled;
 
   // keyboard navigation
   private TableKeyboardNavigationSupport m_keyboardNavigationSupport;
@@ -293,8 +292,17 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());
       setColumnsAutoResizeFromScout(getScoutObject().isAutoResizeColumns());
       setKeyStrokesFromScout();
-      updateDragTransferTypesFromScout();
-      updateDropTransferTypesFromScout();
+
+      // Install DND and CopyPaste transfer handler
+
+      // BSI ticket 104'549
+      // Even if no DND is configured, the handler must be installed to ensure equivalent copy-paste behavior with DND support installed or not.
+      // Otherwise, Swing installs @{link TableTransferHandler} whose implementation cannot be accessed which would be necessary to ensure the same copy-paste behavior in case of DND installed.
+      // Furthermore, the copy-paste output should not depend on any drag handler installed to always have the same result.
+      m_swingScrollPane.getViewport().setTransferHandler(new P_SwingEmptySpaceTransferHandler());
+      getSwingTable().setTransferHandler(new P_SwingRowTransferHandler());
+      getSwingTable().setDragEnabled(getScoutObject().getDragType() != 0 || getScoutObject().getDropType() != 0);
+
       setSelectionFromScout();
       // add checkable key mappings
       if (getScoutObject().isCheckable()) {
@@ -478,69 +486,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     }
   }
 
-  protected void updateDragTransferTypesFromScout() {
-    int scoutDragTransfer = getScoutObject().getDragType();
-    if (scoutDragTransfer != 0) {
-      m_cachedScoutDragTransferTypes = scoutDragTransfer;
-      // ensure installed
-      if (!m_dndInstalled) {
-        if (m_emptySpaceTransferHandler == null) {
-          m_emptySpaceTransferHandler = new P_SwingEmptySpaceTransferHandler();
-        }
-        if (m_rowTransferHandler == null) {
-          m_rowTransferHandler = new P_SwingRowTransferHandler();
-        }
-        m_swingScrollPane.getViewport().setTransferHandler(m_emptySpaceTransferHandler);
-        JTableEx table = getSwingTable();
-        table.setTransferHandler(m_rowTransferHandler);
-        table.setDragEnabled(true);
-        m_dndInstalled = true;
-      }
-    }
-    else {
-      if (m_cachedScoutDropTransferTypes == 0 && m_dndInstalled) {
-        // uninstall
-        m_swingScrollPane.getViewport().setTransferHandler(null);
-        JTableEx table = getSwingTable();
-        table.setTransferHandler(null);
-        table.setDragEnabled(false);
-        m_dndInstalled = false;
-      }
-    }
-  }
-
-  protected void updateDropTransferTypesFromScout() {
-    int scoutDropTransfer = getScoutObject().getDropType();
-    if (scoutDropTransfer != 0) {
-      m_cachedScoutDropTransferTypes = scoutDropTransfer;
-      // ensure installed
-      if (!m_dndInstalled) {
-
-        if (m_emptySpaceTransferHandler == null) {
-          m_emptySpaceTransferHandler = new P_SwingEmptySpaceTransferHandler();
-        }
-        if (m_rowTransferHandler == null) {
-          m_rowTransferHandler = new P_SwingRowTransferHandler();
-        }
-        m_swingScrollPane.getViewport().setTransferHandler(m_emptySpaceTransferHandler);
-        JTableEx table = getSwingTable();
-        table.setTransferHandler(m_rowTransferHandler);
-        table.setDragEnabled(true);
-        m_dndInstalled = true;
-      }
-    }
-    else {
-      if (m_cachedScoutDragTransferTypes == 0 && m_dndInstalled) {
-        // uninstall
-        m_swingScrollPane.getViewport().setTransferHandler(null);
-        JTableEx table = getSwingTable();
-        table.setTransferHandler(null);
-        table.setDragEnabled(false);
-        m_dndInstalled = false;
-      }
-    }
-  }
-
   /**
    * ticket 88564, do NOT use {@link #scrollToSelection()} when setting scout rows to swing, since this can lead to
    * confusing effects when doing multiple selection on a table
@@ -627,10 +572,10 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       setKeyStrokesFromScout();
     }
     else if (propName.equals(ITable.PROP_DRAG_TYPE)) {
-      updateDragTransferTypesFromScout();
+      getSwingTable().setDragEnabled(getScoutObject().getDragType() != 0 || getScoutObject().getDropType() != 0);
     }
     else if (propName.equals(ITable.PROP_DROP_TYPE)) {
-      updateDropTransferTypesFromScout();
+      getSwingTable().setDragEnabled(getScoutObject().getDragType() != 0 || getScoutObject().getDropType() != 0);
     }
     else if (propName.equals(ITable.PROP_KEYBOARD_NAVIGATION)) {
       setKeyboardNavigationFromScout();
@@ -935,7 +880,10 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   protected Transferable handleSwingDragRequest() {
     if (getUpdateSwingFromScoutLock().isAcquired()) return null;
-    //
+
+    if (getScoutObject().getDragType() == 0) {
+      return null;
+    }
     final Holder<TransferObject> result = new Holder<TransferObject>(TransferObject.class, null);
     if (getScoutObject() != null) {
       // notify Scout
@@ -955,9 +903,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       // end notify
     }
     TransferObject scoutTransferable = result.getValue();
-    Transferable swingTransferable = null;
-    swingTransferable = SwingUtility.createSwingTransferable(scoutTransferable);
-    return swingTransferable;
+    return SwingUtility.createSwingTransferable(scoutTransferable);
   }
 
   protected void handleKeyboardNavigationFromSwing(int rowIndex) {
@@ -1502,8 +1448,21 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     private static final long serialVersionUID = 1L;
 
     @Override
+    public int getSourceActions(JComponent c) {
+      return DnDConstants.ACTION_COPY;
+    }
+
+    @Override
     public boolean canDrag() {
-      return m_cachedScoutDragTransferTypes != 0;
+      return getScoutObject().getDragType() != 0;
+    }
+
+    @Override
+    public void exportToClipboard(JComponent comp, Clipboard clip, int action) throws IllegalStateException {
+      // overwrite default export mechanism to clipboard to ensure the content always to be the same,
+      // regardless whether there are drag handlers installed or not.
+      Transferable copyPasteTransferable = new P_CopyPasteTransferable();
+      Toolkit.getDefaultToolkit().getSystemClipboard().setContents(copyPasteTransferable, null);
     }
 
     @Override
@@ -1513,7 +1472,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-      return SwingUtility.isSupportedTransfer(m_cachedScoutDropTransferTypes, transferFlavors);
+      return SwingUtility.isSupportedTransfer(getScoutObject().getDropType(), transferFlavors);
     }
 
     @Override
@@ -1532,7 +1491,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-      return SwingUtility.isSupportedTransfer(m_cachedScoutDropTransferTypes, transferFlavors);
+      return SwingUtility.isSupportedTransfer(getScoutObject().getDropType(), transferFlavors);
     }
 
     @Override
@@ -1553,6 +1512,78 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       return null;
     }
 
+  }// end private class
+
+  /**
+   * Transferable for copy-paste with several text flavors supported
+   */
+  private class P_CopyPasteTransferable implements Transferable {
+
+    private Map<DataFlavor, Object> m_flavorMap = new HashMap<DataFlavor, Object>();
+
+    public P_CopyPasteTransferable() {
+      StringBuilder textPlain = new StringBuilder();
+      StringBuilder textHtml = new StringBuilder();
+      textHtml.append("<html><body><table border=\"0\">");
+
+      IColumn<?>[] columns = getScoutObject().getColumnSet().getVisibleColumns();
+      ITableRow[] rows = getScoutObject().getSelectedRows();
+      for (int row = 0; row < rows.length; row++) {
+        if (row > 0) {
+          textPlain.append("\n");
+        }
+        textHtml.append("<tr>");
+        for (IColumn<?> column : columns) {
+          String displayText = StringUtility.nvl(rows[row].getCell(column).getText(), "");
+          textPlain.append(displayText);
+          textHtml.append("<td>");
+          textHtml.append(HTMLUtility.decodeText(displayText));
+          textHtml.append("</td>");
+        }
+        textHtml.append("</tr>");
+      }
+      textHtml.append("</table></body></html>");
+
+      // register flavors
+      registerIfUndefined(DataFlavor.stringFlavor, textPlain.toString());
+      registerIfUndefined(createFlavor("text/plain;class=java.lang.String"), textPlain.toString());
+      registerIfUndefined(createFlavor("text/html;class=java.lang.String"), textHtml.toString());
+    }
+
+    @Override
+    public DataFlavor[] getTransferDataFlavors() {
+      return m_flavorMap.keySet().toArray(new DataFlavor[m_flavorMap.size()]);
+    }
+
+    @Override
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+      return m_flavorMap.containsKey(flavor);
+    }
+
+    @Override
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+      if (!isDataFlavorSupported(flavor)) {
+        throw new UnsupportedFlavorException(flavor);
+      }
+      return m_flavorMap.get(flavor);
+    }
+
+    private void registerIfUndefined(DataFlavor flavor, Object value) {
+      if (flavor == null || value == null || m_flavorMap.containsKey(flavor)) {
+        return;
+      }
+      m_flavorMap.put(flavor, value);
+    }
+
+    private DataFlavor createFlavor(String mimeType) {
+      try {
+        return new DataFlavor(mimeType);
+      }
+      catch (Throwable e) {
+        LOG.error("failed to create data flavor", e);
+      }
+      return null;
+    }
   }// end private class
 
   private class P_KeyboardNavigationSupport extends TableKeyboardNavigationSupport {
