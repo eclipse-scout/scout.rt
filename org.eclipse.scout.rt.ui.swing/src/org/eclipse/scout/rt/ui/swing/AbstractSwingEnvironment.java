@@ -961,7 +961,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   @Override
   public ISwingScoutFileChooser createFileChooser(Window w, IFileChooser fc) {
-    ISwingScoutFileChooser ui = new SwingScoutFileChooser(this, fc, w, true);
+    ISwingScoutFileChooser ui = new SwingScoutFileChooser(this, fc, w, false);
     decorate(fc, ui);
     return ui;
   }

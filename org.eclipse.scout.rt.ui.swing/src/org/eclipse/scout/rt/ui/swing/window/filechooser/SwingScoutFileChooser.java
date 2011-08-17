@@ -136,7 +136,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
           }
         }
         // check if exists
-        if ((!openMode) && f != null && f.exists()) {
+        if ((!openMode) && f != null && f.exists() && !f.isDirectory()) {
           int msgBoxResult = JOptionPane.showConfirmDialog(m_owner, SwingUtility.getNlsText("FileExistsOwerwriteQuestion"), null, JOptionPane.YES_NO_OPTION);
           if (msgBoxResult == JOptionPane.YES_OPTION) {
             break;

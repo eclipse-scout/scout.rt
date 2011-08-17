@@ -221,3 +221,26 @@ Solution:
   That is exactely as Swing default implementation works.
 Migration:
 None
+
+17.08.2011 dwi [contributed by Kohler Silvio, BSI Business Systems Integration AG]
+bsi ticket #104'228
+Problem:
+FileChooser looks different in folder and file-mode. That is because in folder-mode, always the Swing FileChooser is is used.
+However, when opening a FileChooser in file-mode, there can be distinguished between using AWT or Swing FileChooser. That can be
+configured in SwingEnvironment. By default, SwingEnvironment is configured to use an AWT dialog. That is why the FileChooser looks
+different in folder and file-mode, respectively. That should be changed to look the same.
+Solution:
+SwingEnvironment changed to use Swing FileChooser by default.
+Migration:
+None
+
+17.08.2011 dwi [contributed by Kohler Silvio, BSI Business Systems Integration AG]
+bsi ticket #104'231
+Problem:
+When using the FileChooser with folder-mode and save-mode set to true, a message is prompted in case the selected folder does already exist.
+The message asks the user whether to really overwrite the file.
+In folder mode, this message makes no sense and should be removed.
+Solution:
+Fixed
+Migration:
+None
