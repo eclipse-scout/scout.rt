@@ -21,6 +21,7 @@ import org.eclipse.scout.service.AbstractService;
  */
 public class WrappingProcessingRuntimeExceptionHandlerService extends AbstractService implements IExceptionHandlerService {
 
+  @Override
   public void handleException(ProcessingException t) {
     throw new WrappedProcessingRuntimeException(t);
   }

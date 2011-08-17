@@ -26,8 +26,8 @@ import org.eclipse.scout.testing.client.IGuiMock;
  */
 public class JavaRobot {
   private Robot m_robot;
-  private int x;
-  private int y;
+  private int m_x;
+  private int m_y;
 
   public JavaRobot() {
     try {
@@ -58,15 +58,15 @@ public class JavaRobot {
   }
 
   public void moveTo(int x, int y) {
-    this.x = x;
-    this.y = y;
+    this.m_x = x;
+    this.m_y = y;
     m_robot.mouseMove(x, y);
   }
 
   public void moveDelta(int dx, int dy) {
-    this.x += dx;
-    this.y += dy;
-    m_robot.mouseMove(x, y);
+    this.m_x += dx;
+    this.m_y += dy;
+    m_robot.mouseMove(m_x, m_y);
   }
 
   public void pressLeft() {

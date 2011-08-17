@@ -483,3 +483,9 @@ Solution:
 - Fixed problems in inset calculation to look the same on the different L&F providers
 Migration:
 None
+
+17.08.2011 abr
+bugzilla bug #350389
+bsi ticket #103068
+org.eclipse.scout.rt.client.servicetunnel.http.internal.HttpBackgroundJob is now implementing IClientSessionProvider.
+Migration: None

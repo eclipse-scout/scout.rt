@@ -19,6 +19,7 @@ import org.eclipse.scout.testing.client.IGuiMockService;
  */
 public class SwtMockService implements IGuiMockService {
 
+  @Override
   public IGuiMock createMock(IClientSession session) {
     return new SwtMock(session);
   }

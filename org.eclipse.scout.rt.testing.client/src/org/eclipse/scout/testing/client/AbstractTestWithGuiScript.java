@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.testing.shared.ScoutAssert;
 import org.eclipse.scout.service.SERVICES;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner.ClientSessionClass;
 import org.junit.Test;
 
 /**
@@ -123,6 +122,9 @@ public abstract class AbstractTestWithGuiScript {
   @Test
   public final void test() throws Throwable {
     clientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(getSessionClass());
+    if (SERVICES.getService(IGuiMockService.class) == null) {
+      return;
+    }
     final IGuiMock gui = SERVICES.getService(IGuiMockService.class).createMock(clientSession);
     //
     final ClientSyncJob runModelJob = new ClientSyncJob("Run", clientSession) {

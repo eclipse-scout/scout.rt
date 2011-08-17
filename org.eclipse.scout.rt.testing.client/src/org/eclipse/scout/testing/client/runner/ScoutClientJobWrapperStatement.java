@@ -42,6 +42,7 @@ public class ScoutClientJobWrapperStatement extends Statement {
     }
     else {
       ClientSyncJob job = new ClientSyncJob("JUnit Client Job Runner", m_clientSession) {
+        @Override
         protected void runVoid(org.eclipse.core.runtime.IProgressMonitor monitor) throws Throwable {
           doEvaluate();
         }

@@ -22,13 +22,15 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.Activator;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.IClientSessionProvider;
 import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
-public class HttpBackgroundJob extends JobEx {
+public class HttpBackgroundJob extends JobEx implements IClientSessionProvider {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HttpBackgroundJob.class);
 
   private final Object m_callerLock;
@@ -53,6 +55,11 @@ public class HttpBackgroundJob extends JobEx {
     if (text != null && text.equalsIgnoreCase("true")) {
       m_debug = true;
     }
+  }
+
+  @Override
+  public IClientSession getClientSession() {
+    return m_tunnel.getClientSession();
   }
 
   public ServiceTunnelResponse getResponse() {

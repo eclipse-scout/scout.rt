@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.shared;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.IService2;
@@ -102,4 +104,26 @@ public final class TestingUtility {
     }
   }
 
+  /**
+   * Clears Java's HTTP authentication cache.
+   * 
+   * @return Returns <code>true</code> if the operation was successful, otherwise <code>false</code>.
+   */
+  public static boolean clearHttpAuthenticationCache() {
+    boolean successful = true;
+    try {
+      Class<?> c = Class.forName("sun.net.www.protocol.http.AuthCacheValue");
+      Field cacheField = c.getDeclaredField("cache");
+      cacheField.setAccessible(true);
+      Object cache = cacheField.get(null);
+      Field hashtableField = cache.getClass().getDeclaredField("hashtable");
+      hashtableField.setAccessible(true);
+      Map<?, ?> map = (Map<?, ?>) hashtableField.get(cache);
+      map.clear();
+    }
+    catch (Throwable t) {
+      successful = false;
+    }
+    return successful;
+  }
 }

@@ -40,7 +40,6 @@ public final class ScoutClientAssert {
     assertContainsKeys(false, listbox, keys);
   }
 
-  @SuppressWarnings("unchecked")
   private static void assertContainsKeys(boolean strict, AbstractListBox<?> listbox, Object... keys) {
     // TODO abr check row visibility
     HashSet<Object> expectedKeys = new HashSet<Object>(Arrays.asList(keys));
@@ -245,6 +244,7 @@ public final class ScoutClientAssert {
     final HashSet<IFormField> expectedFields = new HashSet<IFormField>(Arrays.asList(fields));
     final ArrayList<IFormField> unexpectedFields = new ArrayList<IFormField>();
     form.visitFields(new IFormFieldVisitor() {
+      @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (viewKind.testField(field)) {
           boolean expected = expectedFields.remove(field);

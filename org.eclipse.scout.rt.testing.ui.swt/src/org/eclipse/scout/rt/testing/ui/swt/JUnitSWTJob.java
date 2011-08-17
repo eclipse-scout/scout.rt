@@ -48,10 +48,12 @@ public class JUnitSWTJob extends Job {
     //wait until the application is showing
     try {
       TestingUtility.waitUntil(IGuiMock.WAIT_TIMEOUT, new WaitCondition<Object>() {
+        @Override
         public Object run() {
           try {
             if (PlatformUI.isWorkbenchRunning()) {
               PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+                @Override
                 public void run() {
                   m_environment.ensureInitialized();
                 }

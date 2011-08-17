@@ -35,8 +35,8 @@ public class ScoutServerJobWrapperStatement extends Statement {
   private final Subject m_subject;
   private final Statement m_statement;
 
-  public ScoutServerJobWrapperStatement(IServerSession clientSession, Subject subject, Statement statement) {
-    m_serverSession = clientSession;
+  public ScoutServerJobWrapperStatement(IServerSession serverSession, Subject subject, Statement statement) {
+    m_serverSession = serverSession;
     m_subject = subject;
     m_statement = statement;
   }
