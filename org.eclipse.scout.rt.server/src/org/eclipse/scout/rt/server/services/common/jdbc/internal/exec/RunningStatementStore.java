@@ -33,7 +33,8 @@ public class RunningStatementStore {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RunningStatementStore.class);
 
-  private static WeakHashMap<IServerSession, Set<Statement>> statementMap = new WeakHashMap<IServerSession, Set<Statement>>();
+  private final static WeakHashMap<IServerSession, Set<Statement>> STATEMENT_MAP = new WeakHashMap<IServerSession, Set<Statement>>();
+  private final static Object STATEMENT_MAP_LOCK = new Object();
 
   private RunningStatementStore() {
   }
@@ -58,11 +59,11 @@ public class RunningStatementStore {
       LOG.error("failed to register statement due to missing session context");
       return;
     }
-    synchronized (session) {
-      Set<Statement> statements = statementMap.get(session);
+    synchronized(STATEMENT_MAP_LOCK){
+      Set<Statement> statements = STATEMENT_MAP.get(session);
       if (statements == null) {
         statements = new HashSet<Statement>();
-        statementMap.put(session, statements);
+        STATEMENT_MAP.put(session, statements);
       }
       statements.add(statement);
     }
@@ -83,8 +84,8 @@ public class RunningStatementStore {
       LOG.error("failed to unregister statement due to missing session context");
       return;
     }
-    synchronized (session) {
-      Set<Statement> statements = statementMap.get(session);
+    synchronized (STATEMENT_MAP_LOCK) {
+      Set<Statement> statements = STATEMENT_MAP.get(session);
       if (statements == null) {
         return;
       }
@@ -108,17 +109,16 @@ public class RunningStatementStore {
       return;
     }
 
-    Statement[] statementArray;
-    synchronized (session) {
-      Set<Statement> statements = statementMap.get(session);
-      if (statements == null) {
-        return;
-      }
-      statementArray = statements.toArray(new Statement[statements.size()]);
-      statements.clear();
+    Set<Statement> statements;
+    synchronized (STATEMENT_MAP_LOCK) {
+      statements=STATEMENT_MAP.remove(session);
     }
 
-    for (Statement statement : statementArray) {
+    if (statements == null) {
+      return;
+    }
+
+    for (Statement statement : statements) {
       try {
         statement.cancel();
         LOG.info("request sent to cancel processing statement");

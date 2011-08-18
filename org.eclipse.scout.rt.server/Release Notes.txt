@@ -260,3 +260,7 @@ Added method org.eclipse.scout.rt.server.services.common.security.PermissionServ
 class is a potential permission. The method checks the fully-qualified class name. Subclasses may override the default heuristic
 (i.e. '<hosting plug-in's symbolic name>.*.security.*Permission*').
 Migration: None
+
+18.08.2011 abr
+fixed concurrent modifications on RunningStatementStore
+Migration: None
