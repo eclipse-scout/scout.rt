@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
@@ -149,19 +150,22 @@ public class SwtScoutHtmlField extends SwtScoutValueFieldComposite<IHtmlField> i
         }
       }
     }
-    if (rawHtml == null || rawHtml.length() == 0) {
+
+    // style HTML
+    String styledHtml = getEnvironment().styleHtmlText(this, rawHtml);
+    if (StringUtility.isNullOrEmpty(styledHtml)) {
       getSwtField().setText("");
-      return;
     }
-    String cleanHtml = getEnvironment().styleHtmlText(this, rawHtml);
-    try {
-      File indexFile = writeTempFile("index.html", new ByteArrayInputStream(cleanHtml.getBytes("UTF-8")));
-      File html = new File(m_tempDir.getAbsolutePath() + "/index.html");
-      html.createNewFile();
-      getSwtField().setUrl(indexFile.toURI().toURL().toExternalForm());
-    }
-    catch (IOException e) {
-      LOG.error("could not create index file for html: '" + cleanHtml + "'", e);
+    else {
+      try {
+        File indexFile = writeTempFile("index.html", new ByteArrayInputStream(styledHtml.getBytes("UTF-8")));
+        File html = new File(m_tempDir.getAbsolutePath() + "/index.html");
+        html.createNewFile();
+        getSwtField().setUrl(indexFile.toURI().toURL().toExternalForm());
+      }
+      catch (IOException e) {
+        LOG.error("could not create index file for html: '" + styledHtml + "'", e);
+      }
     }
   }
 

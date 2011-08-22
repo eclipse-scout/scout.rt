@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,6 +35,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.HTMLUtility;
+import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -58,6 +59,7 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -607,90 +609,52 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   @Override
   public String styleHtmlText(ISwtScoutFormField<?> uiComposite, String rawHtml) {
-    return styleHtmlText(uiComposite.getSwtField(), rawHtml);
-  }
-
-  protected String styleHtmlText(Control c, String rawHtml) {
-    if (rawHtml == null) {
-      rawHtml = "";
-    }
-    if (StringUtility.getTag(rawHtml, "style") != null || StringUtility.getTag(rawHtml, "body") != null) {
-      // 1. replace possibly existing Content-Type meta tag
-      String metaTag = "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>";
-      rawHtml = Pattern.compile("(<meta\\s*http-equiv=\"Content-Type\"\\s*content=\"[^\"]+\"\\s*/>)", Pattern.CASE_INSENSITIVE).matcher(rawHtml).replaceFirst(metaTag);
-      if (StringUtility.find(rawHtml, metaTag) < 0) {
-        // 2. Content-Type not part of the original document -> add it in existing header or add a complete header definition
-        int body = StringUtility.find(rawHtml, "<body");
-        int head = StringUtility.find(rawHtml, "<head");
-        int metaInputPos = 0;
-        if (head > 0) {
-          // 2.a head tag is available -> add meta-tag at its beginning
-          metaInputPos = StringUtility.find(rawHtml, ">", head) + 1;
+    if (uiComposite.getScoutObject() instanceof IHtmlField) {
+      IHtmlField htmlField = (IHtmlField) uiComposite.getScoutObject();
+      if (htmlField.isHtmlEditor()) {
+        /*
+         * In HTML editor mode, the HTML is not styled except that an empty HTML skeleton is created in case the given HTML is empty.
+         * In general no extra styling should be applied because the HTML installed in the editor should be the very same as
+         * provided. Otherwise, if the user did some modifications in the HTML source and reloads the HTML in the editor anew,
+         * unwanted auto-corrections would be applied.
+         */
+        if (!StringUtility.hasText(rawHtml)) {
+          rawHtml = "<html><head></head><body></body></html>";
         }
-        else if (body > 0) {
-          // 2.a head tag is missing -> add complete header before body tag
-          metaInputPos = body;
-          metaTag = "<head>" + metaTag + "</head>";
-        }
-
-        StringBuffer metaHtml = new StringBuffer(rawHtml.substring(0, metaInputPos));
-        metaHtml = metaHtml.append(metaTag);
-        metaHtml = metaHtml.append(rawHtml.substring(metaInputPos, rawHtml.length()));
-        rawHtml = metaHtml.toString();
       }
-      return rawHtml;
+      else {
+        /*
+         * Because @{link SwtScoutHtmlField} is file based, it is crucial to set the content-type and charset appropriately.
+         * Also, the CSS needs not to be cleaned as the native browser is used.
+         */
+        rawHtml = HTMLUtility.cleanupHtml(rawHtml, true, false, createDefaultFontSettings(uiComposite.getSwtField()));
+      }
     }
-    // rawHtml is just an html fragment, surround with html envelope
-    String cleanHtml = rawHtml;
-    //remove surrounding html tag
-    cleanHtml = StringUtility.removeTagBounds(cleanHtml, "html");
-    cleanHtml = createHtmlDocument(cleanHtml, createCSS(c));
-    return cleanHtml;
+    return rawHtml;
   }
 
   /**
-   * get style for browser and html fields using inline html documents
+   * Get SWT specific default font settings
    */
-  protected String createCSS(Control c) {
-    int size = 12;
-    int fg = 0x000000;
-    if (c != null) {
-      FontData[] fa = c.getFont().getFontData();
+  protected DefaultFont createDefaultFontSettings(Control control) {
+    DefaultFont defaultFont = new DefaultFont();
+    defaultFont.setSize(12);
+    defaultFont.setForegroundColor(0x000000);
+    defaultFont.setFamily("sans-serif");
+
+    if (control != null) {
+      FontData[] fa = control.getFont().getFontData();
       if (fa != null && fa.length > 0) {
         if (fa[0].getHeight() > 0) {
-          size = fa[0].getHeight();
+          defaultFont.setSize(fa[0].getHeight());
         }
       }
-      Color col = c.getForeground();
+      Color col = control.getForeground();
       if (col != null) {
-        fg = col.getRed() * 0x10000 + col.getGreen() * 0x100 + col.getBlue();
+        defaultFont.setSize(col.getRed() * 0x10000 + col.getGreen() * 0x100 + col.getBlue());
       }
     }
-    String fgHex = Integer.toHexString(fg);
-    fgHex = "000000".substring(0, 6 - fgHex.length()) + fgHex;
-    return "body,th,td,p{color: #" + fgHex + ";font:" + size + "px sans-serif;}";
-  }
-
-  /**
-   * @return a html document with default style sheet
-   */
-  protected String createHtmlDocument(String bodyContent, String css) {
-    if (bodyContent == null || bodyContent.length() == 0) {
-      return "<html><body></body></html>";
-    }
-    StringBuilder b = new StringBuilder();
-    b.append("<html>");
-    b.append("<head>");
-    b.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>");
-    b.append("<style type=\"text/css\">");
-    b.append(css);
-    b.append("</style>");
-    b.append("</head>");
-    b.append("<body>");
-    b.append(bodyContent);
-    b.append("</body>");
-    b.append("</html>");
-    return b.toString();
+    return defaultFont;
   }
 
   @Override

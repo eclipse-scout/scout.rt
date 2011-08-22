@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.swing.form.fields.mailfield;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -43,11 +42,9 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimePart;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
@@ -397,25 +394,27 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
         }
       }
     }
-    Font f = UIManager.getFont("Label.font");
-    if (f == null) {
-      f = new JLabel().getFont();
-    }
-    HTMLDocument doc = HTMLUtility.cleanupDocument(HTMLUtility.parseDocument(buf.toString()), f.getFamily(), f.getSize(), "pt");
-    HTMLUtility.formatDocument(doc);
-    HashMap<String, URL> cidMap = new HashMap<String, URL>();
+
+    // style HTML
+    String styledHtml = getSwingEnvironment().styleHtmlText(this, buf.toString());
+
+    // replace ContentID's (cid)
+    Map<String, URL> cidToUrlMapping = new HashMap<String, URL>();
     for (SwingMailAttachment a : m_attachments) {
       String cid = a.getContentId();
       if (cid != null) {
-        cidMap.put(cid, a.getFile().toURI().toURL());
+        cidToUrlMapping.put(cid, a.getFile().toURI().toURL());
       }
     }
-    doc = HTMLUtility.replaceContendIDs(doc, cidMap);
-    String resolvedHtml = HTMLUtility.formatDocument(doc);
+    HTMLDocument htmlDoc = HTMLUtility.toHtmlDocument(styledHtml);
+    htmlDoc = HTMLUtility.replaceContendIDs(htmlDoc, cidToUrlMapping);
+    styledHtml = HTMLUtility.toHtmlText(htmlDoc);
+
+    // set content
     m_htmlDoc = (HTMLDocument) (m_htmlKit.createDefaultDocument());
     m_styleSheet = m_htmlDoc.getStyleSheet();
     m_htmlView.setDocument(m_htmlDoc);
-    m_htmlView.setText(resolvedHtml);
+    m_htmlView.setText(styledHtml);
     m_htmlView.setCaretPosition(0);
   }
 
