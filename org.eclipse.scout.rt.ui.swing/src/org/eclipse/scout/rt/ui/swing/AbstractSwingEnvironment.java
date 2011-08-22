@@ -1180,6 +1180,11 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   @Override
   public String styleHtmlText(ISwingScoutFormField<?> uiComposite, String rawHtml) {
+    String cleanHtml = rawHtml;
+    if (cleanHtml == null) {
+      cleanHtml = "";
+    }
+
     if (uiComposite.getScoutObject() instanceof IHtmlField) {
       IHtmlField htmlField = (IHtmlField) uiComposite.getScoutObject();
       if (htmlField.isHtmlEditor()) {
@@ -1189,19 +1194,19 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
          * provided. Otherwise, if the user did some modifications in the HTML source and reloads the HTML in the editor anew,
          * unwanted auto-corrections would be applied.
          */
-        if (!StringUtility.hasText(rawHtml)) {
-          rawHtml = "<html><head></head><body></body></html>";
+        if (!StringUtility.hasText(cleanHtml)) {
+          cleanHtml = "<html><head></head><body></body></html>";
         }
       }
       else {
-        rawHtml = HTMLUtility.cleanupHtml(rawHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()));
+        cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()));
       }
     }
     else if (uiComposite.getScoutObject() instanceof IMailField) {
-      rawHtml = HTMLUtility.cleanupHtml(rawHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()));
+      cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()));
     }
 
-    return rawHtml;
+    return cleanHtml;
   }
 
   /**

@@ -165,13 +165,18 @@ public final class HTMLUtility {
       Matcher matcherHtmlTag = createMatcherForTag(rawHtml, "html", false);
       if (!matcherHtmlTag.find()) {
         // no <html> tag found. Insert <html> tag just before first tag
-        Matcher matcherFirstTag = Pattern.compile("<([^!>]+?)>", Pattern.CASE_INSENSITIVE).matcher(rawHtml);
+        Matcher matcherFirstTag = Pattern.compile("<\\s*?[^!/][^>]*?>", Pattern.CASE_INSENSITIVE).matcher(rawHtml);
         if (matcherFirstTag.find()) {
           rawHtml = rawHtml.substring(0, matcherFirstTag.start()) + "<html>" + rawHtml.substring(matcherFirstTag.start(), rawHtml.length());
         }
         else {
-          // no tag found at all
-          rawHtml = rawHtml += "<html></html>";
+          // no tag found at all. Insert just after DOCTYPE declarations
+          Matcher matcherComment = Pattern.compile("<\\![^>]+?>", Pattern.CASE_INSENSITIVE).matcher(rawHtml);
+          int index = 0;
+          while (matcherComment.find()) {
+            index = matcherComment.end();
+          }
+          rawHtml = rawHtml.substring(0, index) + "<html>" + rawHtml.substring(index);
         }
       }
 
@@ -199,7 +204,36 @@ public final class HTMLUtility {
         rawHtml = rawHtml.substring(0, matcherHeadTag.end()) + "</head>" + rawHtml.substring(matcherHeadTag.end(), rawHtml.length());
       }
 
-      // 3a) ensure <BODY> tag
+      // 3) in case of a HTML fragment (without body and style definition) and with no CSS cleanup to be performed,
+      //    add default style. This is to adapt the application L&F.
+      if (!cleanupCss && defaultFont != null) {
+        Matcher matcherStyleTag = createMatcherForTag(rawHtml, "style", false);
+        Matcher matcherBodyTag = createMatcherForTag(rawHtml, "body", false);
+        if (!matcherStyleTag.find() && !matcherBodyTag.find()) {
+          // it is about a HTML fragment without body and without style definition
+          String defaultStyle = "body,th,td,p{";
+
+          // default color
+          String fgHex = Integer.toHexString(defaultFont.getForegroundColor());
+          defaultStyle += "color:#" + StringUtility.lpad(fgHex, "0", 6) + ";";
+          // default font-family
+          if (StringUtility.hasText(defaultFont.getFamily())) {
+            defaultStyle += "font-family:" + defaultFont.getFamily() + ";";
+          }
+          // default font-size
+          if (defaultFont.getSize() > 0) {
+            defaultStyle += "font-size:" + StringUtility.join("", String.valueOf(defaultFont.getSize()), defaultFont.getSizeUnit()) + ";";
+          }
+          defaultStyle += "}";
+
+          // insert default style just after <head> tag
+          matcherHeadTag = createMatcherForTag(rawHtml, "head", false);
+          matcherHeadTag.find();
+          rawHtml = rawHtml.substring(0, matcherHeadTag.end()) + "<style type=\"text/css\">" + defaultStyle + "</style>" + rawHtml.substring(matcherHeadTag.end());
+        }
+      }
+
+      // 4a) ensure <BODY> tag
       Matcher matcherBodyTag = createMatcherForTag(rawHtml, "body", false);
       if (!matcherBodyTag.find()) {
         // no <body> tag found. Insert just after </head> tag
@@ -208,7 +242,7 @@ public final class HTMLUtility {
         rawHtml = rawHtml.substring(0, matcherHeadEndTag.end()) + "<body>" + rawHtml.substring(matcherHeadEndTag.end(), rawHtml.length());
       }
 
-      // 3b) ensure </BODY> tag
+      // 4b) ensure </BODY> tag
       Matcher matcherBodyEndTag = createMatcherForTag(rawHtml, "body", true);
       if (!matcherBodyEndTag.find()) {
         // no </body> tag found. Insert just before </html> tag
@@ -217,10 +251,10 @@ public final class HTMLUtility {
         rawHtml = rawHtml.substring(0, matcherHtmlEndTag.start()) + "</body>" + rawHtml.substring(matcherHtmlEndTag.start(), rawHtml.length());
       }
 
-      // 4) Eliminate vertical scrollbar
+      // 5) Eliminate vertical scrollbar
       rawHtml = eliminateVerticalScrollbar(rawHtml);
 
-      // 5) cleanup CSS of document
+      // 6) cleanup CSS of document
       if (cleanupCss) {
         HTMLDocument htmlDoc = HTMLUtility.toHtmlDocument(rawHtml);
         if (htmlDoc != null) {
@@ -229,7 +263,7 @@ public final class HTMLUtility {
         }
       }
 
-      // 6) ensure <META> element with content-type and charset (This must be done after 5) as <META> tags are removed in cleanup)
+      // 7) ensure <META> element with content-type and charset (This must be done after 6) as <META> tags are removed in cleanup)
       if (ensureContentType) {
         rawHtml = HTMLUtility.addHtmlMetaElement("content-type", "text/html;charset=UTF-8", rawHtml);
       }

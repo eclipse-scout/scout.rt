@@ -91,6 +91,6 @@ Migration SWT:
 Migration Swing / SWT (optional):
 - In HTMLUtility, the following methods are marked deprecated. They will be removed in next Scout release.
   - HTMLUtility#parseDocument(String) to be replaced by HTMLUtility.toHtmlDocument(String)
-  - HTMLUtility#formatDocument(String) to be replaced by HTMLUtility.toHtmlText(String)
+  - HTMLUtility#formatDocument(String) to be replaced by HTMLUtility.toHtmlText(HTMLDocument)
   - HTMLUtility#cleanupDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
   - HTMLUtility#wellformDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
