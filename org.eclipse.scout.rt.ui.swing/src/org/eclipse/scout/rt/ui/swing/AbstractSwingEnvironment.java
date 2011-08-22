@@ -51,6 +51,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.commons.CSSPatch;
 import org.eclipse.scout.commons.HTMLUtility;
+import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
@@ -70,6 +72,7 @@ import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -1176,11 +1179,39 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   @Override
   public String styleHtmlText(ISwingScoutFormField<?> uiComposite, String rawHtml) {
-    Font f = UIManager.getFont("Label.font");
-    if (f == null) {
-      f = new JLabel().getFont();
+    if (uiComposite.getScoutObject() instanceof IHtmlField) {
+      IHtmlField htmlField = (IHtmlField) uiComposite.getScoutObject();
+      if (htmlField.isHtmlEditor()) {
+        /*
+         * In HTML editor mode, the HTML is not styled except that an empty HTML skeleton is created in case the given HTML is empty.
+         * In general no extra styling should be applied because the HTML installed in the editor should be the very same as
+         * provided. Otherwise, if the user did some modifications in the HTML source and reloads the HTML in the editor anew,
+         * unwanted auto-corrections would be applied.
+         */
+        if (!StringUtility.hasText(rawHtml)) {
+          rawHtml = "<html><head></head><body></body></html>";
+        }
+      }
+      else {
+        rawHtml = HTMLUtility.cleanupHtml(rawHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()));
+      }
     }
-    return HTMLUtility.formatDocument(HTMLUtility.cleanupDocument(HTMLUtility.parseDocument(rawHtml), f.getFamily(), f.getSize()));
+    return rawHtml;
+  }
+
+  /**
+   * Get Swing specific default font settings
+   */
+  protected DefaultFont createDefaultFontSettings(JComponent component) {
+    Font f = component.getFont();
+    Color color = component.getForeground();
+
+    DefaultFont defaultFont = new DefaultFont();
+    defaultFont.setFamily(f.getFamily());
+    defaultFont.setSize(f.getSize());
+    defaultFont.setSizeUnit("pt");
+    defaultFont.setForegroundColor(color.getRGB());
+    return defaultFont;
   }
 
   private static void checkThread() {

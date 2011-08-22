@@ -32,6 +32,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -154,7 +155,7 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
   }
 
   @Override
-  protected void setDisplayTextFromScout(String s) {
+  protected void setDisplayTextFromScout(String rawHtml) {
     // create attachments
     RemoteFile[] a = getScoutObject().getAttachments();
     if (a != null) {
@@ -169,20 +170,17 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
         }
       }
     }
-    // set content
-    JTextPane swingField = getSwingHtmlField();
-    if (s == null) {
-      s = "";
-    }
-    if (m_originalText == null) {
-      m_originalText = "";
-    }
-    if (m_originalText.equals(s)) {
+
+    // style HTML
+    rawHtml = StringUtility.nvl(rawHtml, "");
+    String styledHtml = getSwingEnvironment().styleHtmlText(this, rawHtml);
+    if (CompareUtility.equals(m_originalText, styledHtml)) {
       return;
     }
-    String wellFormedHtml = getSwingEnvironment().styleHtmlText(this, s);
-    m_originalText = wellFormedHtml;
-    //
+    m_originalText = styledHtml;
+
+    // set content
+    JTextPane swingField = getSwingHtmlField();
     int oldPos = swingField.getCaretPosition();
     m_htmlDoc = (HTMLDocument) (m_htmlKit.createDefaultDocument());
     File tempFolder = getTempFolder(false);

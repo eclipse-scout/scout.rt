@@ -56,6 +56,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import org.eclipse.scout.commons.HTMLUtility;
+import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.MailUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -401,21 +402,28 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     if (f == null) {
       f = new JLabel().getFont();
     }
-    HTMLDocument doc = HTMLUtility.cleanupDocument(HTMLUtility.parseDocument(buf.toString()), f.getFamily(), f.getSize());
-    HTMLUtility.formatDocument(doc);
-    HashMap<String, URL> cidMap = new HashMap<String, URL>();
+
+    Map<String, URL> cidMap = new HashMap<String, URL>();
     for (SwingMailAttachment a : m_attachments) {
       String cid = a.getContentId();
       if (cid != null) {
         cidMap.put(cid, a.getFile().toURI().toURL());
       }
     }
-    doc = HTMLUtility.replaceContendIDs(doc, cidMap);
-    String resolvedHtml = HTMLUtility.formatDocument(doc);
+
+    DefaultFont defaultFont = new DefaultFont();
+    defaultFont.setFamily(f.getFamily());
+    defaultFont.setSize(f.getSize());
+    defaultFont.setSizeUnit("pt");
+
+    // style HTML
+    String styledHtml = HTMLUtility.cleanupHtml(buf.toString(), false, true, defaultFont, cidMap);
+
+    // set content
     m_htmlDoc = (HTMLDocument) (m_htmlKit.createDefaultDocument());
     m_styleSheet = m_htmlDoc.getStyleSheet();
     m_htmlView.setDocument(m_htmlDoc);
-    m_htmlView.setText(resolvedHtml);
+    m_htmlView.setText(styledHtml);
     m_htmlView.setCaretPosition(0);
   }
 

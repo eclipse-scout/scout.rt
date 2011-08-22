@@ -138,7 +138,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   public String getPlainText() {
     String s = getValue();
     if (s != null) {
-      return HTMLUtility.getPlainText(HTMLUtility.parseDocument(s));
+      return HTMLUtility.getPlainText(HTMLUtility.toHtmlDocument(s));
     }
     return "";
   }

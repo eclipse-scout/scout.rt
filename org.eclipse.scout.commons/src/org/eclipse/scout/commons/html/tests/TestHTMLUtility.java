@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -31,9 +31,8 @@ public class TestHTMLUtility {
     CSSPatch.apply();
     //
     String s1 = IOUtility.getContent(new FileReader(new File("D:/TEMP/original.html")));
-    HTMLDocument doc = HTMLUtility.parseDocument(s1);
-    //doc = HTMLUtility.wellformDocument(doc, null, 0);
-    String s2 = HTMLUtility.formatDocument(doc);
+    HTMLDocument doc = HTMLUtility.toHtmlDocument(s1);
+    String s2 = HTMLUtility.toHtmlText(doc);
     System.out.println(s2);
   }
 
