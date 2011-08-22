@@ -609,6 +609,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   @Override
   public String styleHtmlText(ISwtScoutFormField<?> uiComposite, String rawHtml) {
+    if (rawHtml == null) {
+      rawHtml = "";
+    }
+    String cleanHtml = rawHtml;
+
     if (uiComposite.getScoutObject() instanceof IHtmlField) {
       IHtmlField htmlField = (IHtmlField) uiComposite.getScoutObject();
       if (htmlField.isHtmlEditor()) {
@@ -618,20 +623,20 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
          * provided. Otherwise, if the user did some modifications in the HTML source and reloads the HTML in the editor anew,
          * unwanted auto-corrections would be applied.
          */
-        if (!StringUtility.hasText(rawHtml)) {
-          rawHtml = "<html><head></head><body></body></html>";
-  }
-    }
+        if (!StringUtility.hasText(cleanHtml)) {
+          cleanHtml = "<html><head></head><body></body></html>";
+        }
+      }
       else {
         /*
          * Because @{link SwtScoutHtmlField} is file based, it is crucial to set the content-type and charset appropriately.
          * Also, the CSS needs not to be cleaned as the native browser is used.
          */
-        rawHtml = HTMLUtility.cleanupHtml(rawHtml, true, false, createDefaultFontSettings(uiComposite.getSwtField()));
-        }
+        cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, true, false, createDefaultFontSettings(uiComposite.getSwtField()));
       }
-      return rawHtml;
     }
+    return cleanHtml;
+  }
 
   /**
    * Get SWT specific default font settings
@@ -639,6 +644,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   protected DefaultFont createDefaultFontSettings(Control control) {
     DefaultFont defaultFont = new DefaultFont();
     defaultFont.setSize(12);
+    defaultFont.setSizeUnit("px");
     defaultFont.setForegroundColor(0x000000);
     defaultFont.setFamily("sans-serif");
 
