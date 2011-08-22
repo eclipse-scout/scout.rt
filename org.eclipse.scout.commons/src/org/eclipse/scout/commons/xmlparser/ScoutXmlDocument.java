@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -2589,6 +2589,9 @@ public class ScoutXmlDocument {
        */
       @Override
       public boolean equals(Object object) {
+        if (object == null) {
+          return false;
+        }
         try {
           P_Attribute attribute = (P_Attribute) object;
           return this.getName().equals(attribute.getName()) && this.getValueAsString().equals(attribute.getValueAsString());

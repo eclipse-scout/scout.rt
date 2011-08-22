@@ -620,18 +620,18 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
          */
         if (!StringUtility.hasText(rawHtml)) {
           rawHtml = "<html><head></head><body></body></html>";
-        }
-      }
+  }
+    }
       else {
         /*
          * Because @{link SwtScoutHtmlField} is file based, it is crucial to set the content-type and charset appropriately.
          * Also, the CSS needs not to be cleaned as the native browser is used.
          */
         rawHtml = HTMLUtility.cleanupHtml(rawHtml, true, false, createDefaultFontSettings(uiComposite.getSwtField()));
+        }
       }
+      return rawHtml;
     }
-    return rawHtml;
-  }
 
   /**
    * Get SWT specific default font settings
@@ -1685,7 +1685,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           applyScoutState();
         }
       });
-      ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), getClientSession()) {
+      ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), super.getClientSession()) {
         @Override
         protected void runVoid(IProgressMonitor syncMonitor) throws Throwable {
           fireGuiAttachedFromUI();
@@ -1702,7 +1702,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
     @Override
     protected void runVoid(IProgressMonitor monitor) throws Throwable {
-      ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), getClientSession()) {
+      ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), super.getClientSession()) {
         @Override
         protected void runVoid(IProgressMonitor syncMonitor) throws Throwable {
           fireDesktopActivatedFromUI();
@@ -1719,7 +1719,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
     @Override
     protected void runVoid(IProgressMonitor monitor) throws Throwable {
-      ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), getClientSession()) {
+      ClientSyncJob clienSyncJob = new ClientSyncJob(getDesktopOpenedTaskText(), super.getClientSession()) {
         @Override
         protected void runVoid(IProgressMonitor syncMonitor) throws Throwable {
           fireGuiDetachedFromUI();
