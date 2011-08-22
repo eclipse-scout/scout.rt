@@ -73,6 +73,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
+import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -1196,6 +1197,10 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
         rawHtml = HTMLUtility.cleanupHtml(rawHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()));
       }
     }
+    else if (uiComposite.getScoutObject() instanceof IMailField) {
+      rawHtml = HTMLUtility.cleanupHtml(rawHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()));
+    }
+
     return rawHtml;
   }
 

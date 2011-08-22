@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.swing.form.fields.mailfield;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -43,11 +42,9 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimePart;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
@@ -56,7 +53,6 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import org.eclipse.scout.commons.HTMLUtility;
-import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.MailUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -398,26 +394,21 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
         }
       }
     }
-    Font f = UIManager.getFont("Label.font");
-    if (f == null) {
-      f = new JLabel().getFont();
-    }
 
-    Map<String, URL> cidMap = new HashMap<String, URL>();
+    // style HTML
+    String styledHtml = getSwingEnvironment().styleHtmlText(this, buf.toString());
+
+    // replace ContentID's (cid)
+    Map<String, URL> cidToUrlMapping = new HashMap<String, URL>();
     for (SwingMailAttachment a : m_attachments) {
       String cid = a.getContentId();
       if (cid != null) {
-        cidMap.put(cid, a.getFile().toURI().toURL());
+        cidToUrlMapping.put(cid, a.getFile().toURI().toURL());
       }
     }
-
-    DefaultFont defaultFont = new DefaultFont();
-    defaultFont.setFamily(f.getFamily());
-    defaultFont.setSize(f.getSize());
-    defaultFont.setSizeUnit("pt");
-
-    // style HTML
-    String styledHtml = HTMLUtility.cleanupHtml(buf.toString(), false, true, defaultFont, cidMap);
+    HTMLDocument htmlDoc = HTMLUtility.toHtmlDocument(styledHtml);
+    htmlDoc = HTMLUtility.replaceContendIDs(htmlDoc, cidToUrlMapping);
+    styledHtml = HTMLUtility.toHtmlText(htmlDoc);
 
     // set content
     m_htmlDoc = (HTMLDocument) (m_htmlKit.createDefaultDocument());

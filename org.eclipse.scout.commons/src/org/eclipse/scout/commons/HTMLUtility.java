@@ -158,31 +158,6 @@ public final class HTMLUtility {
    * @return the formatted HTML document
    */
   public static String cleanupHtml(String rawHtml, boolean ensureContentType, boolean cleanupCss, DefaultFont defaultFont) {
-    return cleanupHtml(rawHtml, ensureContentType, cleanupCss, defaultFont, null);
-  }
-
-  /**
-   * <p>
-   * Applies some intelligence to the HTML document to ensure a valid HTML document.
-   * </p>
-   * 
-   * @param rawHtml
-   *          the raw HTML document
-   * @param ensureContentType
-   *          to add missing meta directive &lt;meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
-   * @param cleanupCss
-   *          to cleanup CSS as HTML has some trouble with some style constructs.<br/>
-   *          <small>For more information, please refer to {@link HTMLUtility#cleanupCss(HTMLDocument, DefaultFont)}
-   *          </small>
-   * @param defaultFont
-   *          to ensure default font set
-   * @param cidToUrlMapping
-   *          to replace the URL's of the given ContentID's (cid) <br/>
-   *          <small>For more information, please refer to {@link HTMLUtility#replaceContendIDs(HTMLDocument, Map)}
-   *          </small>
-   * @return the formatted HTML document
-   */
-  public static String cleanupHtml(String rawHtml, boolean ensureContentType, boolean cleanupCss, DefaultFont defaultFont, Map<String, URL> cidToUrlMapping) {
     rawHtml = StringUtility.nvl(rawHtml, "");
 
     try {
@@ -246,16 +221,10 @@ public final class HTMLUtility {
       rawHtml = eliminateVerticalScrollbar(rawHtml);
 
       // 5) cleanup CSS of document
-      if (cleanupCss || (cidToUrlMapping != null && cidToUrlMapping.size() > 0)) {
+      if (cleanupCss) {
         HTMLDocument htmlDoc = HTMLUtility.toHtmlDocument(rawHtml);
         if (htmlDoc != null) {
-          if (cleanupCss) {
-            htmlDoc = HTMLUtility.cleanupCss(htmlDoc, defaultFont);
-          }
-
-          if (cidToUrlMapping != null) {
-            htmlDoc = HTMLUtility.replaceContendIDs(htmlDoc, cidToUrlMapping);
-          }
+          htmlDoc = HTMLUtility.cleanupCss(htmlDoc, defaultFont);
           rawHtml = HTMLUtility.toHtmlText(htmlDoc);
         }
       }

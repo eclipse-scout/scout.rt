@@ -169,4 +169,4 @@ Migration Swing / SWT (optional):
   - HTMLUtility#parseDocument(String) to be replaced by HTMLUtility.toHtmlDocument(String)
   - HTMLUtility#formatDocument(String) to be replaced by HTMLUtility.toHtmlText(String)
   - HTMLUtility#cleanupDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
-  - HTMLUtility#cleanupDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
+  - HTMLUtility#wellformDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
