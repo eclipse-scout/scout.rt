@@ -609,10 +609,10 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   @Override
   public String styleHtmlText(ISwtScoutFormField<?> uiComposite, String rawHtml) {
-    if (rawHtml == null) {
-      rawHtml = "";
-    }
     String cleanHtml = rawHtml;
+    if (cleanHtml == null) {
+      cleanHtml = "";
+    }
 
     if (uiComposite.getScoutObject() instanceof IHtmlField) {
       IHtmlField htmlField = (IHtmlField) uiComposite.getScoutObject();
@@ -657,7 +657,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       }
       Color col = control.getForeground();
       if (col != null) {
-        defaultFont.setSize(col.getRed() * 0x10000 + col.getGreen() * 0x100 + col.getBlue());
+        defaultFont.setForegroundColor(col.getRed() * 0x10000 + col.getGreen() * 0x100 + col.getBlue());
       }
     }
     return defaultFont;
