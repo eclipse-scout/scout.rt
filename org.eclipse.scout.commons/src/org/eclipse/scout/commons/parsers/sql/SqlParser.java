@@ -201,7 +201,7 @@ public class SqlParser {
     ParseStep lock = ctx.checkAndAdd("Statement", list);
     if (lock == null) return null;
     try {
-      SingleStatement ss = parseSingleStatement(list, ctx);
+      IToken ss = parseSingleStatement(list, ctx);
       if (ss == null) {
         return null;
       }
@@ -209,7 +209,7 @@ public class SqlParser {
       s.addChild(ss);
       UnionToken u;
       IToken nexts = null;
-      while ((u = removeToken(list, UnionToken.class)) != null && ((nexts = parseSingleStatement(list, ctx)) != null || (nexts = parseBracketExpr(list, ctx)) != null)) {
+      while ((u = removeToken(list, UnionToken.class)) != null && (nexts = parseSingleStatement(list, ctx)) != null) {
         s.addChild(u);
         s.addChild(nexts);
       }
@@ -224,11 +224,40 @@ public class SqlParser {
     }
   }
 
-  private SingleStatement parseSingleStatement(List<IToken> list, ParseContext ctx) {
-    //Part+
+  /**
+   * return {@link SingleStatement} or {@link BracketExpr}
+   */
+  private IToken parseSingleStatement(List<IToken> list, ParseContext ctx) {
     ParseStep lock = ctx.checkAndAdd("SingleStatement", list);
     if (lock == null) return null;
     try {
+      //brackets
+      ArrayList<IToken> backup = new ArrayList<IToken>(list);
+      BracketExpr be = parseBracketExpr(list, ctx);
+      if (be != null) {
+        BracketExpr tmp = be;
+        while (tmp != null) {
+          IToken ch = tmp.getChildren().get(1);//open, token, close
+          if (ch instanceof BracketExpr) {
+            tmp = (BracketExpr) ch;
+          }
+          else if (ch instanceof Statement) {
+            return be;
+          }
+          else if (ch instanceof SingleStatement) {
+            return be;
+          }
+          else {
+            tmp = null;
+          }
+        }
+        //restore
+        list.clear();
+        list.addAll(backup);
+        return null;
+      }
+      //
+      //Part+
       Part p;
       SingleStatement ss = new SingleStatement();
       if ((p = parsePart(list, ctx, true)) != null) {
