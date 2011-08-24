@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.LayoutValidateManager;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -53,6 +54,12 @@ public final class SwtLayoutUtility {
       }
       else {
         trimW = trimH = control.getBorderWidth() * 2;
+      }
+      //WORKAROUND Margins are not considered so we have to add them manually. 
+      //This is especially necessary if StyledText#isWordWrap() and LogicalGridData#useUiHeight is set to true
+      if (control instanceof StyledText) {
+        StyledText styledText = (StyledText) control;
+        trimW += styledText.getLeftMargin() + styledText.getRightMargin();
       }
       int wHintFixed = wHint == SWT.DEFAULT ? wHint : Math.max(0, wHint - trimW);
       int hHintFixed = hHint == SWT.DEFAULT ? hHint : Math.max(0, hHint - trimH);

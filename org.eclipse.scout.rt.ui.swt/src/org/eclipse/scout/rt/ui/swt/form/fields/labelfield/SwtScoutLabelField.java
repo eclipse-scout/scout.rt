@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,9 +19,9 @@ import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 
 /**
  * <h3>SwtScoutLabelField</h3> ...
@@ -41,9 +41,26 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
     if (getScoutObject().isWrapText()) {
       style |= SWT.WRAP;
     }
-    Label text = getEnvironment().getFormToolkit().createLabel(container, "", style);
+
+    //Always set to multiline so that line breaks are visible even if wrapText is set to false
+    style |= SWT.MULTI;
+
+    StyledText text = getEnvironment().getFormToolkit().createStyledText(container, style);
+    text.setBackground(container.getBackground());
+    if (!UiDecorationExtensionPoint.getLookAndFeel().isEnabledAsReadOnly()) {
+      getSwtField().setEnabled(false);
+    }
+    //Editing the text is never allowed at label fields
+    getSwtField().setEditable(false);
+
+    //Make sure the wrap indent is the same as the indent so that the text is vertically aligned
+    text.setWrapIndent(text.getIndent());
+
+    //Make sure the text is horizontally aligned with the label
+    int borderWidth = 4;
+    text.setMargins(0, borderWidth, 0, borderWidth);
+
     LogicalGridData textData = LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData());
-    textData.topInset = 4;
     text.setLayoutData(textData);
     container.setTabList(new Control[]{});
     setSwtContainer(container);
@@ -54,8 +71,8 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
   }
 
   @Override
-  public Label getSwtField() {
-    return (Label) super.getSwtField();
+  public StyledText getSwtField() {
+    return (StyledText) super.getSwtField();
   }
 
   /*
@@ -87,6 +104,11 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
   protected void setTextWrapFromScout(boolean booleanValue) {
     // XXX
     // getSwtField().setWordWrap(booleanValue);
+  }
+
+  @Override
+  protected void setFieldEnabled(Control swtField, boolean enabled) {
+    // void here
   }
 
   /**

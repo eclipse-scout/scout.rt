@@ -76,7 +76,6 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
     }
     if (getScoutObject().isMultilineText()) {
       style |= SWT.MULTI | SWT.V_SCROLL;
-
     }
     else {
       style |= SWT.SINGLE;
@@ -84,7 +83,15 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
     if (getScoutObject().isWrapText()) {
       style |= SWT.WRAP;
     }
+
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, style);
+    //Make sure the wrap indent is the same as the indent so that the text is vertically aligned
+    textField.setWrapIndent(textField.getIndent());
+    //Funnily enough if style is set to multi line the margins are different.
+    //In order to align text with other fields a correction is necessary.
+    if ((textField.getStyle() & SWT.MULTI) != 0) {
+      textField.setMargins(2, 2, 2, 2);
+    }
     //
     textField.addDisposeListener(new DisposeListener() {
       @Override
