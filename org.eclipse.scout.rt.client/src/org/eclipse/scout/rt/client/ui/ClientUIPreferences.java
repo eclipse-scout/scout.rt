@@ -64,7 +64,6 @@ public class ClientUIPreferences {
   private static final String APPLICATION_WINDOW_BOUNDS = "application.window.bounds";
   private static final String CALENDAR_DISPLAY_MODE = "calendar.display.mode";
   private static final String CALENDAR_DISPLAY_CONDENSED = "calendar.display.condensed";
-  private static final String FORM_BOUNDS = "form.bounds";
   private static final String DESKTOP_COLUMN_SPLITS = "desktop.columnSplits";
   private static final String NLS_LOCALE_ISO = "nls_locale_iso";
 
@@ -75,7 +74,11 @@ public class ClientUIPreferences {
   }
 
   public Rectangle getFormBounds(IForm form) {
-    String key = FORM_BOUNDS + "_" + form.getClass().getName();
+    String key = form.computeCacheBoundsKey();
+    if (key == null) {
+      return null;
+    }
+
     String value = m_env.get(key, "");
     if (!StringUtility.isNullOrEmpty(value)) {
       try {
@@ -96,7 +99,11 @@ public class ClientUIPreferences {
   }
 
   public void setFormBounds(IForm form, Rectangle bounds) {
-    String key = FORM_BOUNDS + "_" + form.getClass().getName();
+    String key = form.computeCacheBoundsKey();
+    if (key == null) {
+      return;
+    }
+
     if (bounds == null) {
       m_env.remove(key);
     }

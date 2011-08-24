@@ -2261,6 +2261,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
+  public String computeCacheBoundsKey() {
+    return "form.bounds" + "_" + getClass().getName();
+  }
+
+  @Override
   public int getDisplayHint() {
     return m_displayHint;
   }

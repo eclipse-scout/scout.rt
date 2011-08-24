@@ -427,6 +427,13 @@ public interface IForm extends IPropertyObserver {
   boolean isCacheBounds();
 
   /**
+   * Computes a key which is used when saving the bounds of the form.  
+   * 
+   * @return a key to distinguish the forms. It must not be null.
+   */
+  String computeCacheBoundsKey();
+
+  /**
    * @return one of the DISPLAY_HINT_* constants or a custom value
    */
   int getDisplayHint();
