@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -69,6 +69,9 @@ public class StringColumnFilter implements ITableColumnFilter<String> {
     HashMap<String, Integer> countMap = new HashMap<String, Integer>();
     for (ITableRow row : m_column.getTable().getRows()) {
       String s = m_column.getDisplayText(row);
+      if (s != null && s.trim().length() == 0) {
+        s = null;
+      }
       if (s != null && !hist.containsKey(s)) {
         FontSpec font = (row.isFilterAccepted() ? null : FontSpec.parse("italic"));
         hist.put(s, new LookupRow(s, s, null, null, null, null, font));
@@ -99,6 +102,9 @@ public class StringColumnFilter implements ITableColumnFilter<String> {
   @Override
   public boolean accept(ITableRow row) {
     String value = m_column.getDisplayText(row);
+    if (value != null && value.trim().length() == 0) {
+      value = null;
+    }
     if (m_pattern != null) {
       if (m_regexPat == null) {
         m_regexPat = Pattern.compile(StringUtility.toRegExPattern("*" + m_pattern.toLowerCase() + "*"));
