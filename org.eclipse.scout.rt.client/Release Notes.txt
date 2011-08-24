@@ -552,3 +552,10 @@ Migration SWT:
   - AbstractSwtEnvironment#styleHtmlText(Control, String)
   - AbstractSwtEnvironment#createCSS(Control)
   - AbstractSwtEnvironment#createHtmlDocument(String, String)
+
+22.07.2011 dwi [contributed by Remo Arpagaus, BSI Business Systems Integration AG]
+bsi ticket #105’126
+Problem:
+When using ‘yyyy’ in the format of an AbstractDateField, there is no interpretation of the century. Entering 11 for the year results in 0011 CE instead of 2011 CE
+Resources changed: AbstractDateField
+Migration: None
