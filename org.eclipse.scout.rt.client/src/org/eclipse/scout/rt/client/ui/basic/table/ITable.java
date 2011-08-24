@@ -313,7 +313,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   /**
    * composite cell containing the union of all values of this rows that are in
    * a column with property summary=true when no summary column visible or there
-   * are none, this defaults to the first visible column
+   * are none, this defaults to the first defined visible column
    * 
    * @see IColumn#isSummary()
    */
