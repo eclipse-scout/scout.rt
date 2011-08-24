@@ -86,10 +86,11 @@ public class SwtScoutTabItem extends SwtScoutGroupBox implements ISwtScoutTabIte
   }
 
   public void setUiFocus(boolean b) {
-    m_uiFocus = b;
-    if (!isDisposed()) {
-      updateImage();
+    if (isDisposed() || getTabItem().isDisposed()) {
+      return;
     }
+    m_uiFocus = b;
+    updateImage();
   }
 
   private void updateImage() {
