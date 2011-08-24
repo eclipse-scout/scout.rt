@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -317,6 +318,21 @@ public class ColumnSet {
   public IColumn getFirstVisibleColumn() {
     if (m_visibleIndexes.length > 0) {
       return m_columns[m_visibleIndexes[0]];
+    }
+    else {
+      return null;
+    }
+  }
+
+  public IColumn getFirstDefinedVisibileColumn() {
+    int colIdx = m_columns.length;
+    for (int i = 0; i < m_visibleIndexes.length; i++) {
+      if (CompareUtility.compareTo(m_visibleIndexes[i], colIdx) < 0) {
+        colIdx = m_visibleIndexes[i];
+      }
+    }
+    if (colIdx != m_columns.length) {
+      return m_columns[colIdx];
     }
     else {
       return null;

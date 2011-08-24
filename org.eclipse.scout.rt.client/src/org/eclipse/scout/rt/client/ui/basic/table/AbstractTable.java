@@ -797,7 +797,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public ICell getSummaryCell(ITableRow row) {
     IColumn<?>[] a = getColumnSet().getSummaryColumns();
     if (a.length == 0) {
-      IColumn<?> col = getColumnSet().getFirstVisibleColumn();
+      IColumn<?> col = getColumnSet().getFirstDefinedVisibileColumn();
       if (col != null) {
         a = new IColumn<?>[]{col};
       }
