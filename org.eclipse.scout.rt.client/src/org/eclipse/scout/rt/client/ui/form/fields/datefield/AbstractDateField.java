@@ -749,6 +749,13 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   }
 
   private Date parseHelper(DateFormat df, String text, BooleanHolder includesTime) {
+    // >>> ticket #105'126
+    if (df instanceof SimpleDateFormat) {
+      String pattern = ((SimpleDateFormat) df).toPattern();
+      df = new SimpleDateFormat(pattern.replaceAll("yyyy", "yy")); // Always use century interpretation
+    }
+    // <<< ticket #105'126
+
     Date d = null;
     if (d == null) {
       try {
