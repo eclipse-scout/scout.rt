@@ -26,13 +26,15 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
-import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 import org.eclipse.scout.rt.ui.swing.icons.CheckboxWithMarginIcon;
+import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
 
 public class SwingTreeCellRenderer implements TreeCellRenderer {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingTreeCellRenderer.class);
+  private static final boolean COMPOSITE_ICON_ENABLED = "true".equals(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.fix355669"));
   private static final long serialVersionUID = 1L;
 
   private final ISwingEnvironment m_env;
@@ -66,20 +68,33 @@ public class SwingTreeCellRenderer implements TreeCellRenderer {
     label.setEnabled(scoutTree.isEnabled() && node.isEnabled() && cell.isEnabled());
     // icon
     String iconName = cell.getIconId();
-    Icon icon = null;
+    CheckboxWithMarginIcon checkboxIcon = null;
     if (scoutTree != null && scoutTree.isCheckable()) {
       // top inset is used to ensure the checkbox to be on the same position as the label text displayed
-      icon = new CheckboxWithMarginIcon(new Insets(0, 0, 0, 5));
-      ((CheckboxIcon) icon).setSelected(node.isChecked());
-      ((CheckboxIcon) icon).setEnabled(label.isEnabled());
+      checkboxIcon = new CheckboxWithMarginIcon(new Insets(0, 0, 0, 5));
+      checkboxIcon.setSelected(node.isChecked());
+      checkboxIcon.setEnabled(label.isEnabled());
     }
-    else if (iconName != null) {
+    //deco icon
+    Icon decoIcon = null;
+    if (iconName != null) {
       if (expanded) {
-        icon = m_env.getIcon(iconName + "_open");
+        decoIcon = m_env.getIcon(iconName + "_open");
       }
-      if (icon == null) {
-        icon = m_env.getIcon(iconName);
+      if (decoIcon == null) {
+        decoIcon = m_env.getIcon(iconName);
       }
+    }
+    //composite icon
+    Icon icon = null;
+    if (COMPOSITE_ICON_ENABLED && checkboxIcon != null && decoIcon != null) {
+      icon = new CompositeIcon(0, checkboxIcon, decoIcon);
+    }
+    else if (checkboxIcon != null) {
+      icon = checkboxIcon;
+    }
+    else if (decoIcon != null) {
+      icon = decoIcon;
     }
     label.setIcon(icon);
     label.setDisabledIcon(label.getIcon());

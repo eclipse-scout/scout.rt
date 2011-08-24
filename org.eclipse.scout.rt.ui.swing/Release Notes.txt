@@ -279,3 +279,17 @@ Migration SWT:
   - AbstractSwtEnvironment#styleHtmlText(Control, String)
   - AbstractSwtEnvironment#createCSS(Control)
   - AbstractSwtEnvironment#createHtmlDocument(String, String)
+
+24.08.2011 imo
+bsi ticket 102089, bug 355669
+Problem:
+When a listbox or treebox is checkable=true then it shows checkmarks as icons.
+However if the listbox also has an icon defined either directly on the listbox
+or via its data provider (codetype/lookupcall), then this icon is not shown.
+Solution:
+In this (rare) case both icons are displayed as a composite icon.
+Since this is a behaviour change (even though a positive enhancement)
+this feature must be activated in eclipse scout 3.7 using the config.ini property:
+scout.fix355669=true
+Migration:
+None
