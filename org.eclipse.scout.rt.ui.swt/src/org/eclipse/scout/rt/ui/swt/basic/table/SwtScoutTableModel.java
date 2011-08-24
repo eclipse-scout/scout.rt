@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt.basic.table;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -27,13 +28,17 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 
 public class SwtScoutTableModel implements IStructuredContentProvider, ITableColorProvider, ITableLabelProvider, ITableFontProvider {
+  private static final boolean COMPOSITE_ICON_ENABLED = "true".equals(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.fix355669"));
   private transient ListenerList listenerList = null;
   private final ITable m_table;
   private final ISwtEnvironment m_environment;
@@ -109,24 +114,27 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     int[] columnOrder = m_swtTable.getSwtField().getColumnOrder();
     if (columnOrder.length > 1) {
       IColumn col = m_columnManager.getColumnByModelIndex(columnIndex - 1);
+      ICell cell = getCell(element, columnIndex);
+      //checkbox
+      Image checkBoxImage = null;
       if (columnOrder[1] == columnIndex && m_swtTable.getScoutObject() != null && m_swtTable.getScoutObject().isCheckable()) {
         if (((ITableRow) element).isChecked()) {
-          return m_imgCheckboxTrue;
+          checkBoxImage = m_imgCheckboxTrue;
         }
         else {
-          return m_imgCheckboxFalse;
+          checkBoxImage = m_imgCheckboxFalse;
         }
       }
-      ICell cell = getCell(element, columnIndex);
-      if (col != null && cell != null && col.getDataType() == Boolean.class) {
+      else if (col != null && cell != null && col.getDataType() == Boolean.class) {
         Boolean b = (Boolean) cell.getValue();
         if (b != null && b.booleanValue()) {
-          return m_imgCheckboxTrue;
+          checkBoxImage = m_imgCheckboxTrue;
         }
         else {
-          return m_imgCheckboxFalse;
+          checkBoxImage = m_imgCheckboxFalse;
         }
       }
+      //deco
       String iconId = null;
       if (cell != null && cell.getIconId() != null) {
         iconId = cell.getIconId();
@@ -135,7 +143,31 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
         ITableRow row = (ITableRow) element;
         iconId = row.getIconId();
       }
-      return m_environment.getIcon(iconId);
+      Image decoImage = m_environment.getIcon(iconId);
+      //merge
+      if (COMPOSITE_ICON_ENABLED && checkBoxImage != null && decoImage != null) {
+        String key = checkBoxImage.handle + "_" + iconId;
+        ImageRegistry reg = Activator.getDefault().getImageRegistry();
+        Image compositeImage = reg.get(key);
+        if (compositeImage == null) {
+          int w1 = checkBoxImage.getBounds().width;
+          int w2 = decoImage.getBounds().width;
+          int h = Math.max(checkBoxImage.getBounds().height, decoImage.getBounds().height);
+          compositeImage = new Image(Display.getCurrent(), w1 + w2, h);
+          GC gc = new GC(compositeImage);
+          gc.drawImage(checkBoxImage, 0, 0);
+          gc.drawImage(decoImage, w1, 0);
+          gc.dispose();
+          reg.put(key, compositeImage);
+        }
+        return compositeImage;
+      }
+      if (checkBoxImage != null) {
+        return checkBoxImage;
+      }
+      if (decoImage != null) {
+        return decoImage;
+      }
     }
     return null;
   }
@@ -182,6 +214,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     listenerList.add(listener);
   }
 
+  @Override
   public void removeListener(ILabelProviderListener listener) {
     if (listenerList != null) {
       listenerList.remove(listener);

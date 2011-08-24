@@ -80,6 +80,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
+import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
@@ -91,8 +92,8 @@ import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableHeaderEx;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
-import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 import org.eclipse.scout.rt.ui.swing.icons.CheckboxWithMarginIcon;
+import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
 
 /**
  * The prefix SwingScout... denotes a model COMPOSITION between a swing and a
@@ -101,6 +102,7 @@ import org.eclipse.scout.rt.ui.swing.icons.CheckboxWithMarginIcon;
  */
 public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwingScoutTable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutTable.class);
+  private static final boolean COMPOSITE_ICON_ENABLED = "true".equals(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.fix355669"));
 
   /**
    * The distance from the top of a label to the approximate top position of an uppercase character. As this distance
@@ -1082,13 +1084,13 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
               }
             }
 
-            // icon
-            Icon icon = null;
+            // check icon
+            CheckboxWithMarginIcon checkboxIcon = null;
             if (scoutTable.isCheckable() && column == 0) {
               // top inset is used to ensure the checkbox to be on the same position as the label text displayed
-              icon = new CheckboxWithMarginIcon(new Insets(FONT_PADDING_TOP, 0, 0, 5));
-              ((CheckboxIcon) icon).setSelected(scoutRow.isChecked());
-              ((CheckboxIcon) icon).setEnabled(c.isEnabled());
+              checkboxIcon = new CheckboxWithMarginIcon(new Insets(FONT_PADDING_TOP, 0, 0, 5));
+              checkboxIcon.setSelected(scoutRow.isChecked());
+              checkboxIcon.setEnabled(c.isEnabled());
             }
             else if (scoutCol.getDataType() == Boolean.class && (!(scoutCol instanceof ISmartColumn) || ((ISmartColumn) scoutCol).getLookupCall() == null)) {
               int fontPaddingTop = 0;
@@ -1096,18 +1098,31 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
               if (label.getVerticalAlignment() == SwingConstants.TOP) {
                 fontPaddingTop = FONT_PADDING_TOP;
               }
-
-              icon = new CheckboxWithMarginIcon(new Insets(fontPaddingTop, 0, 0, 0));
+              checkboxIcon = new CheckboxWithMarginIcon(new Insets(fontPaddingTop, 0, 0, 0));
               Boolean b = (Boolean) cell.getValue();
-              ((CheckboxIcon) icon).setSelected(b != null && b.booleanValue());
-              ((CheckboxIcon) icon).setEnabled(c.isEnabled());
+              checkboxIcon.setSelected(b != null && b.booleanValue());
+              checkboxIcon.setEnabled(c.isEnabled());
             }
-            else if (cell.getIconId() != null) {
-              icon = getSwingEnvironment().getIcon(cell.getIconId());
+            //deco icon
+            Icon decoIcon = null;
+            if (cell.getIconId() != null) {
+              decoIcon = getSwingEnvironment().getIcon(cell.getIconId());
             }
             else if (column == 0) {
-              icon = getSwingEnvironment().getIcon(scoutRow.getIconId());
+              decoIcon = getSwingEnvironment().getIcon(scoutRow.getIconId());
             }
+            //composite icon
+            Icon icon = null;
+            if (COMPOSITE_ICON_ENABLED && checkboxIcon != null && decoIcon != null) {
+              icon = new CompositeIcon(0, checkboxIcon, decoIcon);
+            }
+            else if (checkboxIcon != null) {
+              icon = checkboxIcon;
+            }
+            else if (decoIcon != null) {
+              icon = decoIcon;
+            }
+            //wrap editable icon
             if (cell.isEditable()) {
               icon = new P_IconWithMarker(icon);
             }
