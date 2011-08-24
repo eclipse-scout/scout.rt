@@ -89,7 +89,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
-import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
@@ -111,7 +110,6 @@ import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
  */
 public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwingScoutTable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutTable.class);
-  private static final boolean COMPOSITE_ICON_ENABLED = "true".equals(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.fix355669"));
 
   /**
    * The distance from the top of a label to the approximate top position of an uppercase character. As this distance
@@ -1090,7 +1088,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             }
             //composite icon
             Icon icon = null;
-            if (COMPOSITE_ICON_ENABLED && checkboxIcon != null && decoIcon != null) {
+            if (checkboxIcon != null && decoIcon != null) {
               icon = new CompositeIcon(0, checkboxIcon, decoIcon);
             }
             else if (checkboxIcon != null) {

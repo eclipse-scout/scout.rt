@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.Display;
 
 public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProvider, IFontProvider, IColorProvider {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutTreeModel.class);
-  private static final boolean COMPOSITE_ICON_ENABLED = "true".equals(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.fix355669"));
 
   private ITree m_tree;
   private final ISwtEnvironment m_environment;
@@ -107,7 +106,7 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     Image decoImage = null;
     decoImage = m_environment.getIcon(iconId);
     //merge
-    if (COMPOSITE_ICON_ENABLED && checkBoxImage != null && decoImage != null) {
+    if (checkBoxImage != null && decoImage != null) {
       String key = checkBoxImage.handle + "_" + iconId;
       ImageRegistry reg = Activator.getDefault().getImageRegistry();
       Image compositeImage = reg.get(key);

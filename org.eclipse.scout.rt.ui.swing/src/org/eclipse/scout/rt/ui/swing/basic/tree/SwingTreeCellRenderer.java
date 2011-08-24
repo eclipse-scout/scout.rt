@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.icons.CheckboxWithMarginIcon;
@@ -34,7 +33,6 @@ import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
 
 public class SwingTreeCellRenderer implements TreeCellRenderer {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingTreeCellRenderer.class);
-  private static final boolean COMPOSITE_ICON_ENABLED = "true".equals(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.fix355669"));
   private static final long serialVersionUID = 1L;
 
   private final ISwingEnvironment m_env;
@@ -87,7 +85,7 @@ public class SwingTreeCellRenderer implements TreeCellRenderer {
     }
     //composite icon
     Icon icon = null;
-    if (COMPOSITE_ICON_ENABLED && checkboxIcon != null && decoIcon != null) {
+    if (checkboxIcon != null && decoIcon != null) {
       icon = new CompositeIcon(0, checkboxIcon, decoIcon);
     }
     else if (checkboxIcon != null) {

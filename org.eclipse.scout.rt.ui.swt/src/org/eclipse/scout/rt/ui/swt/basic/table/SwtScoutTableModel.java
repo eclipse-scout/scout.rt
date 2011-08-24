@@ -39,7 +39,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
 public class SwtScoutTableModel implements IStructuredContentProvider, ITableColorProvider, ITableLabelProvider, ITableFontProvider {
-  private static final boolean COMPOSITE_ICON_ENABLED = "true".equals(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.fix355669"));
   private transient ListenerList listenerList = null;
   private final ITable m_table;
   private final ISwtEnvironment m_environment;
@@ -145,7 +144,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
       }
       Image decoImage = m_environment.getIcon(iconId);
       //merge
-      if (COMPOSITE_ICON_ENABLED && checkBoxImage != null && decoImage != null) {
+      if (checkBoxImage != null && decoImage != null) {
         String key = checkBoxImage.handle + "_" + iconId;
         ImageRegistry reg = Activator.getDefault().getImageRegistry();
         Image compositeImage = reg.get(key);
