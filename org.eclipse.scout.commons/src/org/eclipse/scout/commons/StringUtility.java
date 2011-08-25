@@ -322,7 +322,7 @@ public final class StringUtility {
   public static String replaceTags(String text, String tagName, final String replacement) {
     return replaceTags(text, tagName, new ITagProcessor() {
       @Override
-      public String processTag(String tagName, String tagContent) {
+      public String processTag(String name, String tagContent) {
         return replacement;
       }
     });
@@ -1171,7 +1171,9 @@ public final class StringUtility {
       }
       catch (IOException e) {
       }
-      in.close();
+      if (in != null) {
+        in.close();
+      }
     }
 
     return buffer.toByteArray();
@@ -1325,5 +1327,31 @@ public final class StringUtility {
       return s != null ? s.intern() : null;
     }
     return s;
+  }
+
+  /**
+   * <p>
+   * Attempts to match the entire region against the regex.
+   * </p>
+   * <p>
+   * <small>Thereby, the pattern works case-insensitive and in dot-all mode. See {@link Pattern for more information}
+   * </small>
+   * </p>
+   * 
+   * @param s
+   * @param regex
+   * @return
+   */
+  public static boolean contains(String s, String regex) {
+    if (s == null || regex == null) {
+      return false;
+    }
+    try {
+      Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+      return pattern.matcher(s).matches();
+    }
+    catch (Throwable t) {
+      return false;
+    }
   }
 }

@@ -643,21 +643,26 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
    */
   protected DefaultFont createDefaultFontSettings(Control control) {
     DefaultFont defaultFont = new DefaultFont();
-    defaultFont.setSize(12);
-    defaultFont.setSizeUnit("px");
+    defaultFont.setSize(8);
+    defaultFont.setSizeUnit("pt");
     defaultFont.setForegroundColor(0x000000);
-    defaultFont.setFamily("sans-serif");
+    defaultFont.setFamilies(new String[]{"sans-serif"});
 
     if (control != null) {
-      FontData[] fa = control.getFont().getFontData();
-      if (fa != null && fa.length > 0) {
-        if (fa[0].getHeight() > 0) {
-          defaultFont.setSize(fa[0].getHeight());
+      FontData[] fontData = control.getFont().getFontData();
+      if (fontData != null && fontData.length > 0) {
+        int height = fontData[0].getHeight();
+        if (height > 0) {
+          defaultFont.setSize(height);
+        }
+        String fontFamily = fontData[0].getName();
+        if (StringUtility.hasText(fontFamily)) {
+          defaultFont.setFamilies(new String[]{fontFamily, "sans-serif"});
         }
       }
-      Color col = control.getForeground();
-      if (col != null) {
-        defaultFont.setForegroundColor(col.getRed() * 0x10000 + col.getGreen() * 0x100 + col.getBlue());
+      Color color = control.getForeground();
+      if (color != null) {
+        defaultFont.setForegroundColor(color.getRed() * 0x10000 + color.getGreen() * 0x100 + color.getBlue());
       }
     }
     return defaultFont;
