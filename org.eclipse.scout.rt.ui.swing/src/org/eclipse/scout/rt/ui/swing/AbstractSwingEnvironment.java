@@ -1217,7 +1217,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     Color color = component.getForeground();
 
     DefaultFont defaultFont = new DefaultFont();
-    defaultFont.setFamily(f.getFamily());
+    defaultFont.setFamilies(new String[]{f.getFamily(), "sans-serif"});
     defaultFont.setSize(f.getSize());
     defaultFont.setSizeUnit("pt");
     defaultFont.setForegroundColor(color.getRGB());

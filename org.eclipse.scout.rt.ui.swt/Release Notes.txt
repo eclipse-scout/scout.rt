@@ -108,3 +108,20 @@ this feature must be activated in eclipse scout 3.7 using the config.ini propert
 scout.fix355669=true
 Migration:
 None
+
+25.08.2011 dwi
+BSI ticket #105'026
+Problem:
+Default font specific issues in HTML cleanup which is applied to the HTML text prior being provided to AbstractHtmlField:
+ - Application specific default font settings should always be applied to body style definition if not specified yet
+ - default font size unit on SWT should be pt instead of px
+ - precedence of font-families should be supported in default font settings
+Solution:
+- Changed HTMLUtility#cleanupHtml(..) to ensure default font settings to be contained in CSS style definition
+- changed default font size unit in AbstractSwtEnvironment#createDefaultFontSettings(Control) to pt
+Plug-Ins changed:
+- org.eclipse.scout.commons
+- org.eclipse.scout.rt.ui.swt
+- org.eclipse.scout.rt.ui.swing
+Migration:
+None

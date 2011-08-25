@@ -1325,4 +1325,30 @@ public final class StringUtility {
     }
     return s;
   }
+
+  /**
+   * <p>
+   * Attempts to match the entire region against the regex.
+   * </p>
+   * <p>
+   * <small>Thereby, the pattern works case-insensitive and in dot-all mode. See {@link Pattern for more information}
+   * </small>
+   * </p>
+   * 
+   * @param s
+   * @param regex
+   * @return
+   */
+  public static boolean contains(String s, String regex) {
+    if (s == null || regex == null) {
+      return false;
+    }
+    try {
+      Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+      return pattern.matcher(s).matches();
+    }
+    catch (Throwable t) {
+      return false;
+    }
+  }
 }

@@ -204,35 +204,10 @@ public final class HTMLUtility {
         rawHtml = rawHtml.substring(0, matcherHeadTag.end()) + "</head>" + rawHtml.substring(matcherHeadTag.end(), rawHtml.length());
       }
 
-      // 3) in case of a HTML fragment (without body and style definition) and with no CSS cleanup to be performed,
-      //    add default style. This is to adapt the application L&F.
+      // 3) in case of no default font specified in HTML, add default style. This is to adapt the application L&F.
       if (!cleanupCss && defaultFont != null) {
-        Matcher matcherStyleTag = createMatcherForTag(rawHtml, "style", false);
-        Matcher matcherBodyTag = createMatcherForTag(rawHtml, "body", false);
-        if (!matcherStyleTag.find() && !matcherBodyTag.find()) {
-          // it is about a HTML fragment without body and without style definition
-          String defaultStyle = "body,th,td,p{";
-
-          // default color
-          String fgHex = Integer.toHexString(defaultFont.getForegroundColor());
-          defaultStyle += "color:#" + StringUtility.lpad(fgHex, "0", 6) + ";";
-          // default font-family
-          if (StringUtility.hasText(defaultFont.getFamily())) {
-            defaultStyle += "font-family:" + defaultFont.getFamily() + ";";
-          }
-          // default font-size
-          if (defaultFont.getSize() > 0) {
-            defaultStyle += "font-size:" + StringUtility.join("", String.valueOf(defaultFont.getSize()), defaultFont.getSizeUnit()) + ";";
-          }
-          defaultStyle += "}";
-
-          // insert default style just after <head> tag
-          matcherHeadTag = createMatcherForTag(rawHtml, "head", false);
-          matcherHeadTag.find();
-          rawHtml = rawHtml.substring(0, matcherHeadTag.end()) + "<style type=\"text/css\">" + defaultStyle + "</style>" + rawHtml.substring(matcherHeadTag.end());
-        }
+        rawHtml = ensureDefaultFont(rawHtml, defaultFont);
       }
-
       // 4a) ensure <BODY> tag
       Matcher matcherBodyTag = createMatcherForTag(rawHtml, "body", false);
       if (!matcherBodyTag.find()) {
@@ -580,7 +555,7 @@ public final class HTMLUtility {
   @Deprecated
   public static HTMLDocument cleanupDocument(HTMLDocument htmlDoc, String defaultFontFamily, int defaultFontSize) {
     DefaultFont defaultFont = new DefaultFont();
-    defaultFont.setFamily(defaultFontFamily);
+    defaultFont.setFamilies(new String[]{defaultFontFamily});
     defaultFont.setSize(defaultFontSize);
     return HTMLUtility.cleanupCss(htmlDoc, defaultFont);
   }
@@ -598,7 +573,7 @@ public final class HTMLUtility {
     String htmlText = HTMLUtility.toHtmlText(htmlDoc);
 
     DefaultFont defaultFont = new DefaultFont();
-    defaultFont.setFamily(defaultFontFamily);
+    defaultFont.setFamilies(new String[]{defaultFontFamily});
     defaultFont.setSize(defaultFontSize);
     htmlText = HTMLUtility.cleanupHtml(htmlText, false, true, defaultFont);
 
@@ -641,8 +616,9 @@ public final class HTMLUtility {
     if (style == null) {
       style = styleSheet.addStyle(styleName, null);
     }
-    if (style.getAttribute(CSS.Attribute.FONT_FAMILY) == null && defaultFont.getFamily() != null) {
-      styleSheet.addCSSAttribute(style, CSS.Attribute.FONT_FAMILY, defaultFont.getFamily());
+    String family = defaultFont.getFamiliesConcatenated();
+    if (style.getAttribute(CSS.Attribute.FONT_FAMILY) == null && family != null) {
+      styleSheet.addCSSAttribute(style, CSS.Attribute.FONT_FAMILY, family);
     }
     if (style.getAttribute(CSS.Attribute.FONT_SIZE) == null && defaultFont.getSize() > 0 && defaultFont.getSizeUnit() != null) {
       styleSheet.addCSSAttribute(style, CSS.Attribute.FONT_SIZE, defaultFont.getSize() + defaultFont.getSizeUnit());
@@ -796,6 +772,97 @@ public final class HTMLUtility {
     return rawHtml;
   }
 
+  /**
+   * To ensure default font settings set in CSS body style
+   * 
+   * @param rawHtml
+   * @param defaultFont
+   * @return
+   */
+  private static String ensureDefaultFont(String rawHtml, DefaultFont defaultFont) {
+    if (defaultFont == null || rawHtml == null) {
+      return rawHtml;
+    }
+
+    // ensure style tag
+    Matcher matcherStyleTag = createMatcherForTag(rawHtml, "style", false);
+    if (matcherStyleTag.find()) {
+      // style tag found: ensure style-type 'text/css'
+      String styleTag = matcherStyleTag.group();
+      if (!StringUtility.contains(styleTag, "type\\s*=\\s*['\"]text/css['\"]")) {
+        rawHtml = matcherStyleTag.replaceFirst("<style type=\"text/css\">");
+      }
+    }
+    else {
+      // insert <style> tag just after <head> tag
+      Matcher matcherHeadTag = createMatcherForTag(rawHtml, "head", false);
+      matcherHeadTag.find();
+      rawHtml = rawHtml.substring(0, matcherHeadTag.end()) + "<style type=\"text/css\"></style>" + rawHtml.substring(matcherHeadTag.end());
+    }
+
+    // extract content of <style> tag
+    matcherStyleTag = createMatcherForTag(rawHtml, "style", false);
+    matcherStyleTag.find();
+    Matcher matcherStyleEndTag = createMatcherForTag(rawHtml, "style", true);
+    if (!matcherStyleEndTag.find()) {
+      LOG.warn("No closing </style> tag found");
+      return rawHtml;
+    }
+    String styleContent = rawHtml.substring(matcherStyleTag.end(), matcherStyleEndTag.start());
+
+    // ensure style for <body> element
+    Pattern patternBodyStyle = Pattern.compile("(.*?body[^\\{]*?\\s*\\{)\\s*([^\\}]*?)\\s*(\\}.*)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+    Matcher matcherBodyStyle = patternBodyStyle.matcher(styleContent);
+    if (!matcherBodyStyle.find()) {
+      styleContent = StringUtility.join("", styleContent, "body{}");
+    }
+    // extract body-style
+    matcherBodyStyle = patternBodyStyle.matcher(styleContent);
+    matcherBodyStyle.find();
+    String preBodyStyleContent = matcherBodyStyle.group(1);
+    String bodyStyleContent = StringUtility.trim(StringUtility.nvl(matcherBodyStyle.group(2), ""));
+    String postBodyStyleContent = matcherBodyStyle.group(3);
+
+    // check if combined font formatting is configured
+    if (bodyStyleContent.contains("font:")) {
+      return rawHtml;
+    }
+
+    // assemble font formatting
+    String fontFamily = defaultFont.getFamiliesConcatenated();
+    // font-family
+    if (fontFamily != null && !StringUtility.contains(bodyStyleContent, "font-family")) {
+      if (StringUtility.hasText(bodyStyleContent) && !bodyStyleContent.endsWith(";")) {
+        bodyStyleContent += ";";
+      }
+      bodyStyleContent += "font-family:" + defaultFont.getFamiliesConcatenated() + ";";
+    }
+    // font-size
+    int fontSize = defaultFont.getSize();
+    if (fontSize > 0 && !StringUtility.contains(bodyStyleContent, "font-size")) {
+      if (StringUtility.hasText(bodyStyleContent) && !bodyStyleContent.endsWith(";")) {
+        bodyStyleContent += ";";
+      }
+      bodyStyleContent += "font-size:" + StringUtility.join("", String.valueOf(defaultFont.getSize()), defaultFont.getSizeUnit()) + ";";
+    }
+    // foreground color
+    if (!StringUtility.contains(bodyStyleContent, "[\\s;]color:")) {
+      if (StringUtility.hasText(bodyStyleContent) && !bodyStyleContent.endsWith(";")) {
+        bodyStyleContent += ";";
+      }
+      String fgHex = Integer.toHexString(defaultFont.getForegroundColor());
+      bodyStyleContent += "color:#" + StringUtility.lpad(fgHex, "0", 6) + ";";
+    }
+    styleContent = (preBodyStyleContent + bodyStyleContent + postBodyStyleContent);
+
+    // replace style definition
+    matcherStyleTag = createMatcherForTag(rawHtml, "style", false);
+    matcherStyleTag.find();
+    matcherStyleEndTag = createMatcherForTag(rawHtml, "style", true);
+    matcherStyleEndTag.find();
+    return rawHtml.substring(0, matcherStyleTag.end()) + styleContent + rawHtml.substring(matcherStyleEndTag.start());
+  }
+
   private static class MutableHTMLDocument extends HTMLDocument {
     private static final long serialVersionUID = 1L;
 
@@ -827,24 +894,45 @@ public final class HTMLUtility {
   }
 
   public static class DefaultFont {
-    private String m_family;
+    private String[] m_families;
     private int m_size;
     private String m_sizeUnit;
     private int m_foregroundColor;
 
     public DefaultFont() {
-      m_family = "sans-serif";
+      m_families = new String[]{"sans-serif"};
       m_size = 12;
       m_sizeUnit = "pt";
       m_foregroundColor = 0x000000;
     }
 
-    public String getFamily() {
-      return m_family;
+    public String[] getFamilies() {
+      if (m_families == null) {
+        return new String[0];
+      }
+      return m_families;
     }
 
-    public void setFamily(String family) {
-      m_family = family;
+    public void setFamilies(String[] families) {
+      m_families = families;
+    }
+
+    /**
+     * @return the concatenated font families
+     */
+    public String getFamiliesConcatenated() {
+      String familyString = null;
+      for (String familiy : getFamilies()) {
+        if (!StringUtility.hasText(familiy)) {
+          continue;
+        }
+        // in case of whitespace characters, quote font-family
+        if (familiy.matches(".*\\s.*")) {
+          familiy = "'" + familiy + "'";
+        }
+        familyString = StringUtility.join(",", familyString, familiy);
+      }
+      return familyString;
     }
 
     public int getSize() {
