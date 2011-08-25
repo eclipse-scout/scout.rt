@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.stringfield;
 
 import java.beans.PropertyChangeEvent;
+import java.lang.reflect.Method;
 
+import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -19,6 +21,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
@@ -46,6 +49,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.osgi.framework.Version;
 
 public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringField> implements ISwtScoutStringField {
   public static final int DEFAULT_CASE = 0;
@@ -83,14 +87,29 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
     if (getScoutObject().isWrapText()) {
       style |= SWT.WRAP;
     }
-
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, style);
-    //Make sure the wrap indent is the same as the indent so that the text is vertically aligned
-    textField.setWrapIndent(textField.getIndent());
-    //Funnily enough if style is set to multi line the margins are different.
-    //In order to align text with other fields a correction is necessary.
-    if ((textField.getStyle() & SWT.MULTI) != 0) {
-      textField.setMargins(2, 2, 2, 2);
+
+    //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
+    Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
+    if (frameworkVersion.getMajor() == 3
+        && frameworkVersion.getMinor() <= 5) {
+      //FIXME we need a bugfix for bug 350237
+    }
+    else {
+      try {
+        //Make sure the wrap indent is the same as the indent so that the text is vertically aligned
+        Method setWrapIndent = StyledText.class.getMethod("setWrapIndent", int.class);
+        setWrapIndent.invoke(textField, textField.getIndent());
+        //Funnily enough if style is set to multi line the margins are different.
+        //In order to align text with other fields a correction is necessary.
+        if ((textField.getStyle() & SWT.MULTI) != 0) {
+          Method setMargins = StyledText.class.getMethod("setMargins", int.class, int.class, int.class, int.class);
+          setMargins.invoke(textField, 2, 2, 2, 2);
+        }
+      }
+      catch (Exception e) {
+        Activator.getDefault().getLog().log(new Status(Status.WARNING, Activator.PLUGIN_ID, "could not access methods 'setWrapIndent' and 'setMargins' on 'StyledText'.", e));
+      }
     }
     //
     textField.addDisposeListener(new DisposeListener() {
