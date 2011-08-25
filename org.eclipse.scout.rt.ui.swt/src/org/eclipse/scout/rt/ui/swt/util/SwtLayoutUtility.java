@@ -12,9 +12,12 @@ package org.eclipse.scout.rt.ui.swt.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 
+import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.LayoutValidateManager;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.swt.SWT;
@@ -25,6 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Scrollable;
+import org.osgi.framework.Version;
 
 public final class SwtLayoutUtility {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtLayoutUtility.class);
@@ -55,11 +59,30 @@ public final class SwtLayoutUtility {
       else {
         trimW = trimH = control.getBorderWidth() * 2;
       }
-      //WORKAROUND Margins are not considered so we have to add them manually. 
+      //WORKAROUND Margins are not considered so we have to add them manually.
       //This is especially necessary if StyledText#isWordWrap() and LogicalGridData#useUiHeight is set to true
       if (control instanceof StyledText) {
         StyledText styledText = (StyledText) control;
-        trimW += styledText.getLeftMargin() + styledText.getRightMargin();
+
+        //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
+        Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
+        if (frameworkVersion.getMajor() == 3
+            && frameworkVersion.getMinor() <= 4) {
+          trimW = trimW + 4;
+        }
+        else {
+          try {
+            Method getLeftMargin = StyledText.class.getMethod("getLeftMargin");
+            int leftMargin = (Integer) getLeftMargin.invoke(styledText);
+            Method getRightMargin = StyledText.class.getMethod("getRightMargin");
+            int rightMargin = (Integer) getRightMargin.invoke(styledText);
+            trimW = trimW + leftMargin + rightMargin;
+
+          }
+          catch (Exception e) {
+            Activator.getDefault().getLog().log(new Status(Status.WARNING, Activator.PLUGIN_ID, "could not access methods 'getLeftMargin' and 'getRightMargin' on 'StyledText'.", e));
+          }
+        }
       }
       int wHintFixed = wHint == SWT.DEFAULT ? wHint : Math.max(0, wHint - trimW);
       int hHintFixed = hHint == SWT.DEFAULT ? hHint : Math.max(0, hHint - trimH);
