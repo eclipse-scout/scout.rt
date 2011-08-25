@@ -145,7 +145,7 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
       Image decoImage = m_environment.getIcon(iconId);
       //merge
       if (checkBoxImage != null && decoImage != null) {
-        String key = checkBoxImage.handle + "_" + iconId;
+        String key = ((checkBoxImage == m_imgCheckboxTrue) ? (SwtIcons.CheckboxYes) : (SwtIcons.CheckboxYes)) + "_" + iconId;
         ImageRegistry reg = Activator.getDefault().getImageRegistry();
         Image compositeImage = reg.get(key);
         if (compositeImage == null) {
