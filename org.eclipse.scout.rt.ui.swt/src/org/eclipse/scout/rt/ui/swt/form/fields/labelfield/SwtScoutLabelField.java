@@ -48,10 +48,10 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
     StyledText text = getEnvironment().getFormToolkit().createStyledText(container, style);
     text.setBackground(container.getBackground());
     if (!UiDecorationExtensionPoint.getLookAndFeel().isEnabledAsReadOnly()) {
-      getSwtField().setEnabled(false);
+      text.setEnabled(false);
     }
     //Editing the text is never allowed at label fields
-    getSwtField().setEditable(false);
+    text.setEditable(false);
 
     //Make sure the wrap indent is the same as the indent so that the text is vertically aligned
     text.setWrapIndent(text.getIndent());
