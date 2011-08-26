@@ -50,6 +50,7 @@ public interface IBookmarkStorageService extends IService {
    *          department=dev
    *          It is up to the implementation to define and handle the target group parameter
    */
+  @InputValidation(ValidationStrategy.NO_CHECK)
   void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup) throws ProcessingException;
 
 }
