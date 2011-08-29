@@ -52,7 +52,9 @@ public final class EventListenerProfiler {
    * immediately after adding
    */
   public void registerSourceAsWeakReference(IEventListenerSource source) {
-    if (!m_enabled) return;
+    if (!m_enabled) {
+      return;
+    }
     synchronized (m_sourcesLock) {
       m_sources.add(new WeakReference<IEventListenerSource>(source));
     }
@@ -68,7 +70,9 @@ public final class EventListenerProfiler {
      */
     System.gc();
     PrintWriter out = new PrintWriter(o, true);
-    if (!m_enabled) return;
+    if (!m_enabled) {
+      return;
+    }
     try {
       EventListenerSnapshot snapshot = new EventListenerSnapshot();
       synchronized (m_sourcesLock) {

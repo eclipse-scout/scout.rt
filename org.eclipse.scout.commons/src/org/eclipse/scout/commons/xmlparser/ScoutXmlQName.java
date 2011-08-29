@@ -49,25 +49,39 @@ public class ScoutXmlQName implements Comparable {
    * @since 1.0
    */
   protected static String extractNamespace(String nameExpanded) {
-    if (isExpanded(nameExpanded)) return nameExpanded.replaceAll("\\{", "").replaceAll("}.*", "");
-    else return "";
+    if (isExpanded(nameExpanded)) {
+      return nameExpanded.replaceAll("\\{", "").replaceAll("}.*", "");
+    }
+    else {
+      return "";
+    }
   }
 
   /**
    * @since 1.0
    */
   protected static String extractPrefix(String namePrefixed) {
-    if (isPrefixed(namePrefixed)) return namePrefixed.replaceAll(":.*", "");
-    else return "";
+    if (isPrefixed(namePrefixed)) {
+      return namePrefixed.replaceAll(":.*", "");
+    }
+    else {
+      return "";
+    }
   }
 
   /**
    * @since 1.0
    */
   protected static String extractLocalName(String name) {
-    if (isPrefixed(name)) return name.replaceAll(".*:", "");
-    else if (isExpanded(name)) return name.replaceAll("\\{.*\\}", "");
-    else return name;
+    if (isPrefixed(name)) {
+      return name.replaceAll(".*:", "");
+    }
+    else if (isExpanded(name)) {
+      return name.replaceAll("\\{.*\\}", "");
+    }
+    else {
+      return name;
+    }
   }
 
   /**
@@ -110,16 +124,24 @@ public class ScoutXmlQName implements Comparable {
    */
   @Override
   public int compareTo(Object object) {
-    if (object != null) return this.toString().compareTo(object.toString());
-    else return 0;
+    if (object != null) {
+      return this.toString().compareTo(object.toString());
+    }
+    else {
+      return 0;
+    }
   }
 
   /**
    * @since 1.0
    */
   public int compareToIgnoreCase(Object object) {
-    if (object != null) return this.toString().compareToIgnoreCase(object.toString());
-    else return 0;
+    if (object != null) {
+      return this.toString().compareToIgnoreCase(object.toString());
+    }
+    else {
+      return 0;
+    }
   }
 
   /**

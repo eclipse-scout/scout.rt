@@ -32,7 +32,9 @@ public final class DateUtility {
       return "";
     }
     Locale loc = LocaleThreadLocal.get();
-    if (loc == null) loc = Locale.getDefault();
+    if (loc == null) {
+      loc = Locale.getDefault();
+    }
     return DateFormat.getDateInstance(DateFormat.DEFAULT, loc).format(d);
   }
 
@@ -44,7 +46,9 @@ public final class DateUtility {
       return "";
     }
     Locale loc = LocaleThreadLocal.get();
-    if (loc == null) loc = Locale.getDefault();
+    if (loc == null) {
+      loc = Locale.getDefault();
+    }
     return DateFormat.getTimeInstance(DateFormat.SHORT, loc).format(d);
   }
 
@@ -56,7 +60,9 @@ public final class DateUtility {
       return "";
     }
     Locale loc = LocaleThreadLocal.get();
-    if (loc == null) loc = Locale.getDefault();
+    if (loc == null) {
+      loc = Locale.getDefault();
+    }
     return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, loc).format(d);
   }
 
@@ -71,7 +77,9 @@ public final class DateUtility {
   }
 
   public static Date parse(String s, String pattern) {
-    if (s == null) return null;
+    if (s == null) {
+      return null;
+    }
     try {
       return new SimpleDateFormat(pattern).parse(s);
     }
@@ -81,7 +89,9 @@ public final class DateUtility {
   }
 
   public static Date addHours(Date d, int hours) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar cal = Calendar.getInstance();
     cal.setTime(d);
     cal.add(Calendar.HOUR_OF_DAY, hours);
@@ -92,7 +102,9 @@ public final class DateUtility {
    * add count days days is truncated to second and can be negative
    */
   public static Date addDays(Date d, double count) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     int sec = (int) (count * 3600 * 24);
     int sign = 1;
     if (sec < 0) {
@@ -109,7 +121,9 @@ public final class DateUtility {
   }
 
   public static Date addMonths(Date d, int count) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar cal = Calendar.getInstance();
     cal.setTime(d);
     cal.add(Calendar.MONTH, count);
@@ -117,7 +131,9 @@ public final class DateUtility {
   }
 
   public static Date addYears(Date d, int count) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar cal = Calendar.getInstance();
     cal.setTime(d);
     cal.add(Calendar.YEAR, count);
@@ -131,7 +147,9 @@ public final class DateUtility {
    * @return int with the the day of the week (sunday=1)
    */
   public static int getWeekday(Date d) {
-    if (d == null) return -1;
+    if (d == null) {
+      return -1;
+    }
     Calendar cal = Calendar.getInstance();
     cal.setTime(d);
     int w = cal.get(Calendar.DAY_OF_WEEK);
@@ -142,7 +160,9 @@ public final class DateUtility {
    * truncate the date to a day with time 00:00:00.000
    */
   public static Date truncDate(Date d) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     truncCalendar(c);
@@ -150,7 +170,9 @@ public final class DateUtility {
   }
 
   public static Date truncDateToMinute(Date d) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     c.set(Calendar.SECOND, 0);
@@ -159,7 +181,9 @@ public final class DateUtility {
   }
 
   public static Date truncDateToSecond(Date d) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     c.set(Calendar.MILLISECOND, 0);
@@ -170,7 +194,9 @@ public final class DateUtility {
    * truncate the date to month
    */
   public static Date truncDateToWeek(Date d) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     truncCalendarToWeek(c, -1);
@@ -181,7 +207,9 @@ public final class DateUtility {
    * truncate the date to month
    */
   public static Date truncDateToMonth(Date d) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     truncCalendarToMonth(c);
@@ -192,7 +220,9 @@ public final class DateUtility {
    * truncate the date to year
    */
   public static Date truncDateToYear(Date d) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     truncCalendarToYear(c);
@@ -217,9 +247,15 @@ public final class DateUtility {
    *          +1 or -1
    */
   public static void truncCalendarToWeek(Calendar c, int adjustIncrement) {
-    if (adjustIncrement < -1) adjustIncrement = -1;
-    if (adjustIncrement > 1) adjustIncrement = 1;
-    if (adjustIncrement == 0) adjustIncrement = -1;
+    if (adjustIncrement < -1) {
+      adjustIncrement = -1;
+    }
+    if (adjustIncrement > 1) {
+      adjustIncrement = 1;
+    }
+    if (adjustIncrement == 0) {
+      adjustIncrement = -1;
+    }
     c.set(Calendar.HOUR, 0);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.MINUTE, 0);
@@ -260,7 +296,9 @@ public final class DateUtility {
    * @return true if d is in the range [minDate,maxDate]
    */
   public static boolean isInRange(Date minDate, Date d, Date maxDate) {
-    if (d == null || minDate == null || maxDate == null) return false;
+    if (d == null || minDate == null || maxDate == null) {
+      return false;
+    }
     return minDate.compareTo(d) <= 0 && d.compareTo(maxDate) <= 0;
   }
 
@@ -269,8 +307,12 @@ public final class DateUtility {
    *         fromDate or toDate may be null
    */
   public static boolean intersects(Date fromDate, Date toDate, Date minDate, Date maxDate) {
-    if (minDate == null || maxDate == null) return false;
-    if (fromDate == null && toDate == null) return false;
+    if (minDate == null || maxDate == null) {
+      return false;
+    }
+    if (fromDate == null && toDate == null) {
+      return false;
+    }
     if (fromDate == null) {
       return toDate.compareTo(minDate) >= 0;
     }
@@ -292,7 +334,9 @@ public final class DateUtility {
   }
 
   public static Date nextDay(Date d) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     c.add(Calendar.DATE, 1);
@@ -304,8 +348,12 @@ public final class DateUtility {
     Date max = null;
     for (Date d : a) {
       if (d != null) {
-        if (max == null) max = d;
-        else if (d.compareTo(max) > 0) max = d;
+        if (max == null) {
+          max = d;
+        }
+        else if (d.compareTo(max) > 0) {
+          max = d;
+        }
       }
     }
     return max;
@@ -315,8 +363,12 @@ public final class DateUtility {
     Date min = null;
     for (Date d : a) {
       if (d != null) {
-        if (min == null) min = d;
-        else if (d.compareTo(min) < 0) min = d;
+        if (min == null) {
+          min = d;
+        }
+        else if (d.compareTo(min) < 0) {
+          min = d;
+        }
       }
     }
     return min;
@@ -356,9 +408,15 @@ public final class DateUtility {
    * @return array of days that with time set to 00:00:00.000
    */
   public static Date[] getCoveredDays(Date from, Date to) {
-    if (from == null) from = to;
-    if (to == null) to = from;
-    if (from.compareTo(to) > 0) to = from;
+    if (from == null) {
+      from = to;
+    }
+    if (to == null) {
+      to = from;
+    }
+    if (from.compareTo(to) > 0) {
+      to = from;
+    }
     //
     if (from.compareTo(to) == 0) {
       return new Date[]{truncDate(from)};
@@ -382,8 +440,12 @@ public final class DateUtility {
   }
 
   public static <T> T nvl(T value, T valueWhenNull) {
-    if (value != null) return value;
-    else return valueWhenNull;
+    if (value != null) {
+      return value;
+    }
+    else {
+      return valueWhenNull;
+    }
   }
 
   public static Date convertCalendar(Calendar c) {
@@ -475,8 +537,12 @@ public final class DateUtility {
     double t = ((c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE)) * 60 + c.get(Calendar.SECOND)) * 1000 + c.get(Calendar.MILLISECOND);
     Double d = new Double(t / DAY_MILLIS);
     // range check;
-    if (d.doubleValue() < 0) d = new Double(0);
-    if (d.doubleValue() > 1) d = new Double(1);
+    if (d.doubleValue() < 0) {
+      d = new Double(0);
+    }
+    if (d.doubleValue() > 1) {
+      d = new Double(1);
+    }
     return d;
   }
 }

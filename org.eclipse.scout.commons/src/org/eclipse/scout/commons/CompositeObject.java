@@ -36,7 +36,9 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof CompositeObject)) return false;
+    if (!(o instanceof CompositeObject)) {
+      return false;
+    }
     return compareTo((CompositeObject) o) == 0;
   }
 
@@ -58,19 +60,33 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
     Object[] other = o.m_value;
     for (int i = 0; i < me.length && i < other.length; i++) {
       int c = compareImpl(me[i], other[i]);
-      if (c != 0) return c;
+      if (c != 0) {
+        return c;
+      }
     }
-    if (me.length < other.length) return -1;
-    if (me.length > other.length) return 1;
+    if (me.length < other.length) {
+      return -1;
+    }
+    if (me.length > other.length) {
+      return 1;
+    }
     return 0;
   }
 
   @SuppressWarnings("unchecked")
   private int compareImpl(Object a, Object b) {
-    if (a == null && b == null) return 0;
-    if (a == null) return -1;
-    if (b == null) return 1;
-    if ((a instanceof Comparable) && (b instanceof Comparable)) return ((Comparable) a).compareTo(b);
+    if (a == null && b == null) {
+      return 0;
+    }
+    if (a == null) {
+      return -1;
+    }
+    if (b == null) {
+      return 1;
+    }
+    if ((a instanceof Comparable) && (b instanceof Comparable)) {
+      return ((Comparable) a).compareTo(b);
+    }
     return a.toString().compareTo(b.toString());
   }
 
@@ -79,7 +95,9 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
     String s = "[";
     for (int i = 0; i < m_value.length; i++) {
       s += String.valueOf(m_value[i]);
-      if (i + 1 < m_value.length) s += ",";
+      if (i + 1 < m_value.length) {
+        s += ",";
+      }
     }
     s += "]";
     return s;

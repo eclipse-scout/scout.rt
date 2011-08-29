@@ -250,12 +250,17 @@ public final class FileUtility {
             // Copy the bits from instream to outstream
             byte[] buf = new byte[102400];
             int len;
-            while ((len = is.read(buf)) > 0)
+            while ((len = is.read(buf)) > 0) {
               fos.write(buf, 0, len);
+            }
           }
           finally {
-            if (fos != null) fos.close();
-            if (is != null) is.close();
+            if (fos != null) {
+              fos.close();
+            }
+            if (is != null) {
+              is.close();
+            }
           }
           if (file.getTime() >= 0) {
             f.setLastModified(file.getTime());
@@ -423,7 +428,9 @@ public final class FileUtility {
             targetLocation, children[i]));
       }
     }
-    else copyFile(sourceLocation, targetLocation);
+    else {
+      copyFile(sourceLocation, targetLocation);
+    }
   }
 
   public static List<File> listTree(File f, boolean includeFiles, boolean includeFolders) throws IOException {
@@ -457,10 +464,12 @@ public final class FileUtility {
       addFolderToJar(srcDir, srcDir, zOut);
     }
     finally {
-      if (zOut != null) try {
-        zOut.close();
-      }
-      catch (Throwable t) {
+      if (zOut != null) {
+        try {
+          zOut.close();
+        }
+        catch (Throwable t) {
+        }
       }
     }
   }
@@ -503,8 +512,12 @@ public final class FileUtility {
    * @return the mime type for the specified extension
    */
   public static String getContentTypeForExtension(String ext) {
-    if (ext == null) return null;
-    if (ext.startsWith(".")) ext = ext.substring(1);
+    if (ext == null) {
+      return null;
+    }
+    if (ext.startsWith(".")) {
+      ext = ext.substring(1);
+    }
     ext = ext.toLowerCase();
     return EXT_TO_MIME_TYPE_MAP.get(ext);
   }

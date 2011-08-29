@@ -259,7 +259,9 @@ public final class HTMLUtility {
    * @return
    */
   public static HTMLDocument cleanupCss(HTMLDocument htmlDoc, DefaultFont defaultFont) {
-    if (htmlDoc == null) return htmlDoc;
+    if (htmlDoc == null) {
+      return htmlDoc;
+    }
     MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc;
     StyleSheet styleSheet = doc.getStyleSheet();
     Style style;
@@ -369,7 +371,9 @@ public final class HTMLUtility {
    * folder)
    */
   public static HTMLDocument replaceContendIDs(HTMLDocument htmlDoc, final Map<String, URL> cidToUrlMapping) {
-    if (htmlDoc == null) return htmlDoc;
+    if (htmlDoc == null) {
+      return htmlDoc;
+    }
     MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc;
     StyleSheet styleSheet = doc.getStyleSheet();
     final IntegerHolder changeCount = new IntegerHolder(0);
@@ -424,7 +428,9 @@ public final class HTMLUtility {
   }
 
   public static HTMLDocument copyReferencedFilesToCache(HTMLDocument htmlDoc, final File cacheDir) {
-    if (htmlDoc == null) return htmlDoc;
+    if (htmlDoc == null) {
+      return htmlDoc;
+    }
     MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc;
     // StyleSheet styleSheet=doc.getStyleSheet();
     final IntegerHolder changeCount = new IntegerHolder(0);
@@ -469,7 +475,9 @@ public final class HTMLUtility {
   }
 
   public static String getPlainText(HTMLDocument htmlDoc) {
-    if (htmlDoc == null) return "";
+    if (htmlDoc == null) {
+      return "";
+    }
     try {
       return htmlDoc.getText(0, htmlDoc.getLength());
     }

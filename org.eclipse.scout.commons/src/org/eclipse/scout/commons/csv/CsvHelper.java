@@ -474,9 +474,15 @@ public class CsvHelper {
   }
 
   private String exportCell(Object o, Format f) {
-    if (f != null && o != null) return f.format(o);
-    else if (o == null) return "";
-    else return o.toString();
+    if (f != null && o != null) {
+      return f.format(o);
+    }
+    else if (o == null) {
+      return "";
+    }
+    else {
+      return o.toString();
+    }
   }
 
   private String encodeText(String text) {
@@ -505,7 +511,9 @@ public class CsvHelper {
 
   private String stringReplace(String s, String sOld, String sNew) {
     sNew = (sNew == null ? "" : sNew);
-    if (s == null || sOld == null) return s;
+    if (s == null || sOld == null) {
+      return s;
+    }
     StringBuffer buf = new StringBuffer();
     int oldLen = sOld.length();
     int pos = 0;
@@ -563,10 +571,12 @@ public class CsvHelper {
       throw new ProcessingException("reading header row");
     }
     finally {
-      if (bufferedReader != null) try {
-        bufferedReader.close();
-      }
-      catch (Exception e) {
+      if (bufferedReader != null) {
+        try {
+          bufferedReader.close();
+        }
+        catch (Exception e) {
+        }
       }
     }
   }

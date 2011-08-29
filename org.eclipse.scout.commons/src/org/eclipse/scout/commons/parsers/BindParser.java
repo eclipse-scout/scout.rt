@@ -108,7 +108,9 @@ public class BindParser {
   }
 
   private boolean parseStatement() {
-    if (LOG.isTraceEnabled()) trace("parseStatement");
+    if (LOG.isTraceEnabled()) {
+      trace("parseStatement");
+    }
     int index = m_pos.getIndex();
     parseWhitespace(0);
     if (parseTokenList()) {
@@ -121,7 +123,9 @@ public class BindParser {
   }
 
   private boolean parseTokenList() {
-    if (LOG.isTraceEnabled()) trace("parseTokenList");
+    if (LOG.isTraceEnabled()) {
+      trace("parseTokenList");
+    }
     int index = m_pos.getIndex();
     if (parseToken()) {
       index = m_pos.getIndex();
@@ -140,7 +144,9 @@ public class BindParser {
   }
 
   private ArrayList<String> parseFunctionArgList() {
-    if (LOG.isTraceEnabled()) trace("parseFunctionArgList");
+    if (LOG.isTraceEnabled()) {
+      trace("parseFunctionArgList");
+    }
     int index = m_pos.getIndex();
     ArrayList<String> textList = new ArrayList<String>();
     String text;
@@ -163,7 +169,9 @@ public class BindParser {
   }
 
   private boolean parseToken() {
-    if (LOG.isTraceEnabled()) trace("parseToken");
+    if (LOG.isTraceEnabled()) {
+      trace("parseToken");
+    }
     if (parseText() != null ||
         parseExtendedBind() != null ||
         parseChar()) {
@@ -175,7 +183,9 @@ public class BindParser {
   }
 
   private String parseText() {
-    if (LOG.isTraceEnabled()) trace("parseText");
+    if (LOG.isTraceEnabled()) {
+      trace("parseText");
+    }
     int index = m_pos.getIndex();
     if (matches("'")) {
       while (parseTextChar()) {
@@ -191,7 +201,9 @@ public class BindParser {
   }
 
   private String parseFunctionArg() {
-    if (LOG.isTraceEnabled()) trace("parseFunctionArg");
+    if (LOG.isTraceEnabled()) {
+      trace("parseFunctionArg");
+    }
     int index = m_pos.getIndex();
     String arg;
     if ((arg = parseText()) != null || (arg = parseName()) != null || (arg = parseNumber()) != null) {
@@ -202,7 +214,9 @@ public class BindParser {
   }
 
   private IToken parseExtendedBind() {
-    if (LOG.isTraceEnabled()) trace("parseExtendedBind");
+    if (LOG.isTraceEnabled()) {
+      trace("parseExtendedBind");
+    }
     int index = m_pos.getIndex();
     String attribute = null;
     String op = null;
@@ -239,7 +253,9 @@ public class BindParser {
   }
 
   private String parseAttribute() {
-    if (LOG.isTraceEnabled()) trace("parseAttribute");
+    if (LOG.isTraceEnabled()) {
+      trace("parseAttribute");
+    }
     int index = m_pos.getIndex();
     if (parseOp() == null) {
       return parseName();
@@ -251,7 +267,9 @@ public class BindParser {
   }
 
   private String parseOp() {
-    if (LOG.isTraceEnabled()) trace("parseOp");
+    if (LOG.isTraceEnabled()) {
+      trace("parseOp");
+    }
     int index = m_pos.getIndex();
     if (matches("=")) {
       return "=";
@@ -301,7 +319,9 @@ public class BindParser {
   }
 
   private IToken parseBind() {
-    if (LOG.isTraceEnabled()) trace("parseBind");
+    if (LOG.isTraceEnabled()) {
+      trace("parseBind");
+    }
     IToken token = null;
     int index = m_pos.getIndex();
     if ((token = parsePlainValueBind()) != null ||
@@ -318,7 +338,9 @@ public class BindParser {
   }
 
   private IToken parsePlainValueBind() {
-    if (LOG.isTraceEnabled()) trace("parsePlainValueBind");
+    if (LOG.isTraceEnabled()) {
+      trace("parsePlainValueBind");
+    }
     int index = m_pos.getIndex();
     String name;
     if (matches("#") && (name = parseName()) != null && matches("#")) {
@@ -338,7 +360,9 @@ public class BindParser {
    */
   @Deprecated
   private IToken parsePlainSqlBind() {
-    if (LOG.isTraceEnabled()) trace("parsePlainSqlBind");
+    if (LOG.isTraceEnabled()) {
+      trace("parsePlainSqlBind");
+    }
     int index = m_pos.getIndex();
     String name;
     if (matches("&") && (name = parseName()) != null && matches("&")) {
@@ -363,7 +387,9 @@ public class BindParser {
   }
 
   private IToken parseFunctionBind() {
-    if (LOG.isTraceEnabled()) trace("parseFunctionBind");
+    if (LOG.isTraceEnabled()) {
+      trace("parseFunctionBind");
+    }
     int index = m_pos.getIndex();
     if (matches("::") || matches("##")) {
       boolean plainValue = m_str.substring(index, index + 2).equals("##");
@@ -378,7 +404,9 @@ public class BindParser {
   }
 
   private IToken parseDatabaseSpecificToken() {
-    if (LOG.isTraceEnabled()) trace("parseDatabaseSpecificToken");
+    if (LOG.isTraceEnabled()) {
+      trace("parseDatabaseSpecificToken");
+    }
     int index = m_pos.getIndex();
     String name;
     if (matches("$$") && (name = parseName()) != null) {
@@ -389,7 +417,9 @@ public class BindParser {
   }
 
   private IToken parseStdBind() {
-    if (LOG.isTraceEnabled()) trace("parseStdBind");
+    if (LOG.isTraceEnabled()) {
+      trace("parseStdBind");
+    }
     int index = m_pos.getIndex();
     String name;
     if (matches(":") && (name = parseName()) != null) {
@@ -405,7 +435,9 @@ public class BindParser {
   }
 
   private String parseName() {
-    if (LOG.isTraceEnabled()) trace("parseName");
+    if (LOG.isTraceEnabled()) {
+      trace("parseName");
+    }
     int index = m_pos.getIndex();
     while (parseNameChar()) {
     }
@@ -419,7 +451,9 @@ public class BindParser {
   }
 
   private String parseNumber() {
-    if (LOG.isTraceEnabled()) trace("parseNumber");
+    if (LOG.isTraceEnabled()) {
+      trace("parseNumber");
+    }
     int index = m_pos.getIndex();
     while (parseNumberChar()) {
     }
@@ -433,7 +467,9 @@ public class BindParser {
   }
 
   private boolean parseChar() {
-    if (LOG.isTraceEnabled()) trace("parseChar");
+    if (LOG.isTraceEnabled()) {
+      trace("parseChar");
+    }
     int index = m_pos.getIndex();
     if (index < m_str.length()) {
       m_pos.setIndex(index + 1);
@@ -455,7 +491,9 @@ public class BindParser {
   }
 
   private boolean parseTextChar() {
-    if (LOG.isTraceEnabled()) trace("parseTextChar");
+    if (LOG.isTraceEnabled()) {
+      trace("parseTextChar");
+    }
     int index = m_pos.getIndex();
     int len = m_str.length();
     if (index < len && m_str.charAt(index) != '\'') {
@@ -472,7 +510,9 @@ public class BindParser {
   }
 
   private boolean parseNumberChar() {
-    if (LOG.isTraceEnabled()) trace("parseNumberChar");
+    if (LOG.isTraceEnabled()) {
+      trace("parseNumberChar");
+    }
     int index = m_pos.getIndex();
     int len = m_str.length();
     if (index < len && Character.isDigit(m_str.charAt(index))) {
@@ -485,7 +525,9 @@ public class BindParser {
   }
 
   private boolean parseNameChar() {
-    if (LOG.isTraceEnabled()) trace("parseNameChar");
+    if (LOG.isTraceEnabled()) {
+      trace("parseNameChar");
+    }
     int index = m_pos.getIndex();
     int len = m_str.length();
     if (index < len && NAME_MAP.indexOf(m_str.charAt(index)) >= 0) {
@@ -501,7 +543,9 @@ public class BindParser {
    * @return true if the next char is a name char, without changing the parse position
    */
   private boolean peekNameChar() {
-    if (LOG.isTraceEnabled()) trace("parseNameChar");
+    if (LOG.isTraceEnabled()) {
+      trace("parseNameChar");
+    }
     int index = m_pos.getIndex();
     int len = m_str.length();
     if (index < len && NAME_MAP.indexOf(m_str.charAt(index)) >= 0) {
@@ -516,8 +560,9 @@ public class BindParser {
     int index = m_pos.getIndex();
     int len = m_str.length();
     int i = index;
-    while (i < len && S_MAP.indexOf(m_str.charAt(i)) >= 0)
+    while (i < len && S_MAP.indexOf(m_str.charAt(i)) >= 0) {
       i++;
+    }
     if (i - index >= nunRequired) {
       m_pos.setIndex(i);
       return true;

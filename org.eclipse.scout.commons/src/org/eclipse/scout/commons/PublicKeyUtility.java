@@ -37,7 +37,9 @@ public final class PublicKeyUtility {
    * @throws NoSuchAlgorithmException
    */
   public static byte[][]/* public key/private key */createKeyPair(String keyAlgorithm, int bitSize) throws NoSuchAlgorithmException {
-    if (keyAlgorithm == null) keyAlgorithm = "DSA";
+    if (keyAlgorithm == null) {
+      keyAlgorithm = "DSA";
+    }
     KeyPairGenerator instance = KeyPairGenerator.getInstance(keyAlgorithm);
     if (bitSize > 0) {
       instance.initialize(bitSize);
@@ -63,8 +65,12 @@ public final class PublicKeyUtility {
    * @throws SignatureException
    */
   public static byte[]/* Signature */sign(byte[] data, byte[] privateKey, String keyAlgorithm, String signAlgorithm) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
-    if (keyAlgorithm == null) keyAlgorithm = "DSA";
-    if (signAlgorithm == null) signAlgorithm = "SHA1withDSA";
+    if (keyAlgorithm == null) {
+      keyAlgorithm = "DSA";
+    }
+    if (signAlgorithm == null) {
+      signAlgorithm = "SHA1withDSA";
+    }
 
     PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKey);
     KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm);
@@ -97,9 +103,15 @@ public final class PublicKeyUtility {
    * @throws InvalidKeySpecException
    */
   public static boolean verify(byte[] data, byte[] publicKey, byte[] signatureData, String keyAlgorithm, String signAlgorithm) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, InvalidKeySpecException {
-    if (keyAlgorithm == null) keyAlgorithm = "DSA";
-    if (signAlgorithm == null) signAlgorithm = "SHA1withDSA";
-    if (data == null || signatureData == null) return false;
+    if (keyAlgorithm == null) {
+      keyAlgorithm = "DSA";
+    }
+    if (signAlgorithm == null) {
+      signAlgorithm = "SHA1withDSA";
+    }
+    if (data == null || signatureData == null) {
+      return false;
+    }
 
     X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKey);
     KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm);

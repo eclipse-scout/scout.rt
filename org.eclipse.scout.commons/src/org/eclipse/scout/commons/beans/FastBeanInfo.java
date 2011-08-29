@@ -72,7 +72,9 @@ public class FastBeanInfo {
   }
 
   private static String decapitalize(String s) {
-    if (s == null || s.length() == 0) return "";
+    if (s == null || s.length() == 0) {
+      return "";
+    }
     if (s.length() >= 2 && Character.isUpperCase(s.charAt(0)) && Character.isUpperCase(s.charAt(1))) {
       return s;
     }
@@ -96,7 +98,9 @@ public class FastBeanInfo {
               String kind = matcher.group(1);
               String name = decapitalize(matcher.group(2));
               Class<?>[] paramTypes = m.getParameterTypes();
-              if (paramTypes == null) paramTypes = new Class<?>[0];
+              if (paramTypes == null) {
+                paramTypes = new Class<?>[0];
+              }
               Class<?> retType = m.getReturnType();
               //
               if (kind.equals("get") && paramTypes.length == 0 && retType != null && retType != Void.TYPE) {

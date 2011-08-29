@@ -23,15 +23,25 @@ public final class CompareUtility {
 
   public static <T> boolean equals(T a, T b) {
     // object level check
-    if (a == null && b == null) return true;
-    else if (a == null) return false;
-    else if (b == null) return false;
-    if (a.equals(b)) return true;
+    if (a == null && b == null) {
+      return true;
+    }
+    else if (a == null) {
+      return false;
+    }
+    else if (b == null) {
+      return false;
+    }
+    if (a.equals(b)) {
+      return true;
+    }
     // array check
     if (a.getClass().isArray() && b.getClass().isArray()) {
       int na = Array.getLength(a);
       int nb = Array.getLength(b);
-      if (na != nb) return false;
+      if (na != nb) {
+        return false;
+      }
       for (int i = 0; i < na; i++) {
         if (!equals(Array.get(a, i), Array.get(b, i))) {
           return false;
@@ -47,10 +57,18 @@ public final class CompareUtility {
   }
 
   public static <T extends Comparable<T>> int compareTo(T a, T b) {
-    if (a == null && b == null) return 0;
-    else if (a == null) return -1;
-    else if (b == null) return 1;
-    else return a.compareTo(b);
+    if (a == null && b == null) {
+      return 0;
+    }
+    else if (a == null) {
+      return -1;
+    }
+    else if (b == null) {
+      return 1;
+    }
+    else {
+      return a.compareTo(b);
+    }
   }
 
 }

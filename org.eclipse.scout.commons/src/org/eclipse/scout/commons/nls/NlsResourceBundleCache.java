@@ -33,7 +33,9 @@ public class NlsResourceBundleCache {
   }
 
   public ResourceBundle getResourceBundle(Locale locale) {
-    if (locale == null) throw new IllegalArgumentException("locale must not be null");
+    if (locale == null) {
+      throw new IllegalArgumentException("locale must not be null");
+    }
     synchronized (m_resourceBundlesLock) {
       // double check with lock
       ResourceBundle r = m_resourceBundles.get(locale);

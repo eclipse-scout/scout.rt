@@ -36,7 +36,9 @@ public final class BundleContextUtility {
    *         in development mode, and it is only supported in {@link Platform#inDevelopmentMode()}
    */
   public static String resolve(String s) {
-    if (s == null || s.length() == 0) return s;
+    if (s == null || s.length() == 0) {
+      return s;
+    }
     String t = s;
     Matcher m = VARIABLE_PATTERN.matcher(t);
     while (m.find()) {
@@ -44,7 +46,9 @@ public final class BundleContextUtility {
       String value = null;
       if (key.equals("workspace_loc")) {
         if (!Platform.inDevelopmentMode()) {
-          if (value == null) throw new IllegalArgumentException("resolving expression \"" + s + "\": variable ${" + key + "} is not supported in production mode");
+          if (value == null) {
+            throw new IllegalArgumentException("resolving expression \"" + s + "\": variable ${" + key + "} is not supported in production mode");
+          }
         }
         try {
           String dev = new URL(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.dev")).getFile();
@@ -62,7 +66,9 @@ public final class BundleContextUtility {
         catch (Exception e) {
         }
       }
-      if (value == null) throw new IllegalArgumentException("resolving expression \"" + s + "\": variable ${" + key + "} is not defined in the bundle context");
+      if (value == null) {
+        throw new IllegalArgumentException("resolving expression \"" + s + "\": variable ${" + key + "} is not defined in the bundle context");
+      }
       t = t.substring(0, m.start()) + value + t.substring(m.end());
       // next
       m = VARIABLE_PATTERN.matcher(t);

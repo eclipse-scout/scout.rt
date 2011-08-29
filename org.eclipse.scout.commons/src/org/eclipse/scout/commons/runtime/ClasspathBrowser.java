@@ -73,7 +73,9 @@ public class ClasspathBrowser {
           }
         }
         catch (Exception e) {
-          if (DEBUG_PATH) log(e.getMessage());
+          if (DEBUG_PATH) {
+            log(e.getMessage());
+          }
         }
       }
       // next
@@ -98,7 +100,9 @@ public class ClasspathBrowser {
   }
 
   private void visitClasspaths(String classpaths) throws Exception {
-    if (DEBUG_PATH) log("visit classpaths " + classpaths);
+    if (DEBUG_PATH) {
+      log("visit classpaths " + classpaths);
+    }
     String[] a = classpaths.split(File.pathSeparator);
     for (String cp : a) {
       visitClasspath(cp);
@@ -106,7 +110,9 @@ public class ClasspathBrowser {
   }
 
   private void visitClasspath(String classpath) throws Exception {
-    if (DEBUG_PATH) log(" visit classpath " + classpath);
+    if (DEBUG_PATH) {
+      log(" visit classpath " + classpath);
+    }
     File f = new File(classpath.trim());
     if (f.isDirectory()) {
       String dirName = f.getCanonicalPath();
@@ -123,13 +129,17 @@ public class ClasspathBrowser {
       visitJar(f);
     }
     else {
-      if (DEBUG_PATH) log(" " + classpath + " does not exist");
+      if (DEBUG_PATH) {
+        log(" " + classpath + " does not exist");
+      }
     }
   }
 
   private void visitJar(File f) throws Exception {
     JarFile jarFile = new JarFile(f);
-    if (DEBUG_PATH) log("  visit jar " + f + " with " + jarFile.size() + " elements");
+    if (DEBUG_PATH) {
+      log("  visit jar " + f + " with " + jarFile.size() + " elements");
+    }
     for (Enumeration en = jarFile.entries(); en.hasMoreElements();) {
       JarEntry entry = (JarEntry) en.nextElement();
       if (entry.isDirectory()) {
@@ -146,7 +156,9 @@ public class ClasspathBrowser {
     File[] files = dir.listFiles();
     if (files != null) {
       int n = files.length;
-      if (DEBUG_PATH) log("  visit dir " + dir + " with " + n + " elements");
+      if (DEBUG_PATH) {
+        log("  visit dir " + dir + " with " + n + " elements");
+      }
       for (int i = 0; i < n; i++) {
         if (files[i].isDirectory()) {
           visitDirectory(namePrefixLen, files[i]);
@@ -167,11 +179,15 @@ public class ClasspathBrowser {
       className = className.replaceAll("[/\\\\]", ".");
       if (acceptClass(className)) {
         // add
-        if (DEBUG_ENTRY) log("   C " + className + " +");
+        if (DEBUG_ENTRY) {
+          log("   C " + className + " +");
+        }
         m_classes.add(className);
       }
       else {
-        if (DEBUG_ENTRY) log("   C " + className + " -");
+        if (DEBUG_ENTRY) {
+          log("   C " + className + " -");
+        }
       }
     }
     else {
@@ -189,29 +205,59 @@ public class ClasspathBrowser {
       }
       if (acceptResoure(resPath, resName)) {
         // add
-        if (DEBUG_ENTRY) log("   R " + resPath + resName + " +");
+        if (DEBUG_ENTRY) {
+          log("   R " + resPath + resName + " +");
+        }
         m_resources.add(resPath + resName);
       }
       else {
-        if (DEBUG_ENTRY) log("   R " + resPath + resName + " -");
+        if (DEBUG_ENTRY) {
+          log("   R " + resPath + resName + " -");
+        }
       }
     }
   }
 
   protected boolean acceptClass(String className) {
-    if (className.indexOf("$") >= 0) return false;
-    if (className.startsWith("java.")) return false;
-    if (className.startsWith("javax.")) return false;
-    if (className.startsWith("com.sun.")) return false;
-    if (className.startsWith("sun.")) return false;
-    if (className.startsWith("sunw.")) return false;
-    if (className.startsWith("org.")) return false;
-    if (className.startsWith("oracle.")) return false;
-    if (className.startsWith("com.thoughtworks.")) return false;
-    if (className.startsWith("com.ibm.")) return false;
-    if (className.startsWith("com.tivoli.")) return false;
-    if (className.startsWith("net.sf.retrotranslator.")) return false;
-    if (className.startsWith("WEB-INF.classes.")) return false;
+    if (className.indexOf("$") >= 0) {
+      return false;
+    }
+    if (className.startsWith("java.")) {
+      return false;
+    }
+    if (className.startsWith("javax.")) {
+      return false;
+    }
+    if (className.startsWith("com.sun.")) {
+      return false;
+    }
+    if (className.startsWith("sun.")) {
+      return false;
+    }
+    if (className.startsWith("sunw.")) {
+      return false;
+    }
+    if (className.startsWith("org.")) {
+      return false;
+    }
+    if (className.startsWith("oracle.")) {
+      return false;
+    }
+    if (className.startsWith("com.thoughtworks.")) {
+      return false;
+    }
+    if (className.startsWith("com.ibm.")) {
+      return false;
+    }
+    if (className.startsWith("com.tivoli.")) {
+      return false;
+    }
+    if (className.startsWith("net.sf.retrotranslator.")) {
+      return false;
+    }
+    if (className.startsWith("WEB-INF.classes.")) {
+      return false;
+    }
     return true;
   }
 
@@ -224,17 +270,39 @@ public class ClasspathBrowser {
    */
 
   protected boolean acceptResoure(String path, String name) {
-    if (path.startsWith("/java/")) return false;
-    if (path.startsWith("/sun/")) return false;
-    if (path.startsWith("/com/sun/")) return false;
-    if (path.startsWith("/javax/")) return false;
-    if (path.startsWith("/java/")) return false;
-    if (path.startsWith("/org/")) return false;
-    if (path.startsWith("/oracle/")) return false;
-    if (path.startsWith("/com/ibm/")) return false;
-    if (path.startsWith("/com/tivoli/")) return false;
-    if (path.startsWith("/net/sf/retrotranslator/")) return false;
-    if (path.startsWith("/WEB-INF/classes/")) return false;
+    if (path.startsWith("/java/")) {
+      return false;
+    }
+    if (path.startsWith("/sun/")) {
+      return false;
+    }
+    if (path.startsWith("/com/sun/")) {
+      return false;
+    }
+    if (path.startsWith("/javax/")) {
+      return false;
+    }
+    if (path.startsWith("/java/")) {
+      return false;
+    }
+    if (path.startsWith("/org/")) {
+      return false;
+    }
+    if (path.startsWith("/oracle/")) {
+      return false;
+    }
+    if (path.startsWith("/com/ibm/")) {
+      return false;
+    }
+    if (path.startsWith("/com/tivoli/")) {
+      return false;
+    }
+    if (path.startsWith("/net/sf/retrotranslator/")) {
+      return false;
+    }
+    if (path.startsWith("/WEB-INF/classes/")) {
+      return false;
+    }
     return true;
   }
 

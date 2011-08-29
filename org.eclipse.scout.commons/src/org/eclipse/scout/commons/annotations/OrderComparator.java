@@ -19,10 +19,18 @@ public class OrderComparator implements Comparator<Object> {
 
   @Override
   public int compare(Object a, Object b) {
-    if (a == b) return 0;
-    if (a == null && b == null) return 0;
-    if (a == null) return -1;
-    if (b == null) return 1;
+    if (a == b) {
+      return 0;
+    }
+    if (a == null && b == null) {
+      return 0;
+    }
+    if (a == null) {
+      return -1;
+    }
+    if (b == null) {
+      return 1;
+    }
     double pa = getOrderOf(a);
     double pb = getOrderOf(b);
     if (pa > pb) {
@@ -35,7 +43,9 @@ public class OrderComparator implements Comparator<Object> {
   }
 
   public static double getOrderOf(Object o) {
-    if (o == null) return 0;
+    if (o == null) {
+      return 0;
+    }
     double d = 0;
     Order order = o.getClass().getAnnotation(Order.class);
     if (order != null) {

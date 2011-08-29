@@ -31,7 +31,9 @@ public final class NlsLocale {
   }
 
   public NlsLocale(Locale l) {
-    if (l == null) l = Locale.getDefault();
+    if (l == null) {
+      l = Locale.getDefault();
+    }
     m_locale = l;
   }
 

@@ -20,10 +20,18 @@ public class PriorityComparator implements Comparator<Object> {
 
   @Override
   public int compare(Object a, Object b) {
-    if (a == b) return 0;
-    if (a == null && b == null) return 0;
-    if (a == null) return -1;
-    if (b == null) return 1;
+    if (a == b) {
+      return 0;
+    }
+    if (a == null && b == null) {
+      return 0;
+    }
+    if (a == null) {
+      return -1;
+    }
+    if (b == null) {
+      return 1;
+    }
     float pa = getPriorityOf(a);
     float pb = getPriorityOf(b);
     if (pa > pb) {
@@ -36,7 +44,9 @@ public class PriorityComparator implements Comparator<Object> {
   }
 
   public static float getPriorityOf(Object o) {
-    if (o == null) return 0;
+    if (o == null) {
+      return 0;
+    }
     float f;
     Priority prio = o.getClass().getAnnotation(Priority.class);
     if (prio != null) {

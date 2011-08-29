@@ -147,7 +147,9 @@ public class TestBeanUtility {
   }
 
   private static String dumpMethod(Method m) {
-    if (m == null) return null;
+    if (m == null) {
+      return null;
+    }
     return m.getReturnType() + " " + m.getName() + Arrays.asList(m.getParameterTypes());
   }
 }

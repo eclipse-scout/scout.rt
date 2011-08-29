@@ -32,7 +32,9 @@ public final class EncryptionUtility {
    *          be used decrypt data using the triple-des key
    */
   public static byte[] decryptBase64(String data, byte[] tripleDesKey) {
-    if (data == null) return null;
+    if (data == null) {
+      return null;
+    }
     if (data.length() >= 9 && data.charAt(8) == '#') {
       data = data.substring(9);
     }
@@ -46,14 +48,18 @@ public final class EncryptionUtility {
    *          be used decrypt data using the triple-des key
    */
   public static byte[] decrypt(byte[] data, byte[] tripleDesKey) {
-    if (data == null) return null;
+    if (data == null) {
+      return null;
+    }
     TripleDES t = null;
     try {
       t = new TripleDES(tripleDesKey);
       return t.decrypt(data, true);
     }
     finally {
-      if (t != null) t.destroy();
+      if (t != null) {
+        t.destroy();
+      }
     }
   }
 
@@ -65,14 +71,18 @@ public final class EncryptionUtility {
    * @return encrypted data using the triple-des key
    */
   public static byte[] encrypt(byte[] data, byte[] tripleDesKey) {
-    if (data == null) return null;
+    if (data == null) {
+      return null;
+    }
     TripleDES t = null;
     try {
       t = new TripleDES(tripleDesKey);
       return t.encrypt(data);
     }
     finally {
-      if (t != null) t.destroy();
+      if (t != null) {
+        t.destroy();
+      }
     }
   }
 

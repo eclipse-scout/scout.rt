@@ -241,7 +241,9 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
   @Override
   public void addContextMessage(String message) {
     if (message != null) {
-      if (m_contextMessages == null) m_contextMessages = new ArrayList<String>();
+      if (m_contextMessages == null) {
+        m_contextMessages = new ArrayList<String>();
+      }
       m_contextMessages.add(0, message);
     }
   }

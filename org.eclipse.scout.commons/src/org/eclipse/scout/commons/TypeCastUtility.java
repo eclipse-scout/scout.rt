@@ -133,7 +133,9 @@ public final class TypeCastUtility {
       toType = getWrappedType(toType);
     }
     // direct check
-    if (toType.isInstance(o)) return o;
+    if (toType.isInstance(o)) {
+      return o;
+    }
 
     // need conversion
     Class fromType = o.getClass();
@@ -151,8 +153,12 @@ public final class TypeCastUtility {
    */
   private int getTypeId(Class type) {
     Integer id = m_typeMap.get(type);
-    if (id == null) return 0;
-    else return id.intValue();
+    if (id == null) {
+      return 0;
+    }
+    else {
+      return id.intValue();
+    }
   }
 
   /**
@@ -160,8 +166,12 @@ public final class TypeCastUtility {
    */
   private int getPrimitiveTypeId(Class type) {
     Integer id = m_primitiveTypeMap.get(type);
-    if (id == null) return 0;
-    else return id.intValue();
+    if (id == null) {
+      return 0;
+    }
+    else {
+      return id.intValue();
+    }
   }
 
   /**
@@ -178,7 +188,9 @@ public final class TypeCastUtility {
   @SuppressWarnings("unchecked")
   private <T> T getPrimitiveNull(Class<T> primitiveType) {
     int fromId = getPrimitiveTypeId(primitiveType);
-    if (fromId == 0) throw new IllegalArgumentException(primitiveType + " no primitive type");
+    if (fromId == 0) {
+      throw new IllegalArgumentException(primitiveType + " no primitive type");
+    }
     switch (fromId) {
       case BOOLEAN: {
         return (T) new Boolean(false);
@@ -261,7 +273,10 @@ public final class TypeCastUtility {
     while (t.isArray()) {
       dims[dim] = Array.getLength(od);
       t = t.getComponentType();
-      if (dims[dim] == 0) break;// if array length is 0 break up
+      if (dims[dim] == 0)
+       {
+        break;// if array length is 0 break up
+      }
       // next
       od = Array.get(od, 0);
       dim++;
@@ -277,13 +292,19 @@ public final class TypeCastUtility {
 
   private Object castBasicValueImpl(Object o, Class fromType, Class toType) {
     // null check
-    if (o == null) return null;
+    if (o == null) {
+      return null;
+    }
     // from type in map
     int fromId = getTypeId(fromType);
-    if (fromId == 0) throw createException(o, fromType, toType, 2, "no from-mapping");
+    if (fromId == 0) {
+      throw createException(o, fromType, toType, 2, "no from-mapping");
+    }
     // to type in map
     int toId = getTypeId(toType);
-    if (toId == 0) throw createException(o, fromType, toType, 3, "no to-mapping");
+    if (toId == 0) {
+      throw createException(o, fromType, toType, 3, "no to-mapping");
+    }
     switch (fromId) {
       case CHARACTER: {
         switch (toId) {
@@ -682,7 +703,10 @@ public final class TypeCastUtility {
         break;
       }
       case STRING: {
-        if (((String) o).length() == 0) return null;// special handling for empty
+        if (((String) o).length() == 0)
+         {
+          return null;// special handling for empty
+        }
         // strings
         switch (toId) {
           case CHARACTER: {
@@ -1288,11 +1312,21 @@ public final class TypeCastUtility {
 
   private boolean txStringToBoolean(String o) {
     o = o.toLowerCase();
-    if (o.equals("true")) return true;
-    if (o.equals("1")) return true;
-    if (o.equals("yes")) return true;
-    if (o.equals("x")) return true;
-    if (o.equals("on")) return true;
+    if (o.equals("true")) {
+      return true;
+    }
+    if (o.equals("1")) {
+      return true;
+    }
+    if (o.equals("yes")) {
+      return true;
+    }
+    if (o.equals("x")) {
+      return true;
+    }
+    if (o.equals("on")) {
+      return true;
+    }
     return false;
   }
 
@@ -1770,15 +1804,27 @@ public final class TypeCastUtility {
   }
 
   private BigDecimal txTriStateToBigDecimal(TriState o) {
-    if (o.isUndefined()) return null;
-    else if (o.getBooleanValue()) return BigDecimal.ONE;
-    else return BigDecimal.ZERO;
+    if (o.isUndefined()) {
+      return null;
+    }
+    else if (o.getBooleanValue()) {
+      return BigDecimal.ONE;
+    }
+    else {
+      return BigDecimal.ZERO;
+    }
   }
 
   private BigInteger txTriStateToBigInteger(TriState o) {
-    if (o.isUndefined()) return null;
-    else if (o.getBooleanValue()) return BigInteger.ONE;
-    else return BigInteger.ZERO;
+    if (o.isUndefined()) {
+      return null;
+    }
+    else if (o.getBooleanValue()) {
+      return BigInteger.ONE;
+    }
+    else {
+      return BigInteger.ZERO;
+    }
   }
 
   private TriState txBooleanToTriState(boolean o) {
@@ -1855,7 +1901,9 @@ public final class TypeCastUtility {
     }
     //
     m_debugEnabled = LOG.isDebugEnabled();
-    if (m_debugEnabled) LOG.debug("queryClass=" + queryClass + ", genericsOwnerClass=" + genericsOwnerClass + ", genericsParameterIndex=" + genericsParameterIndex);
+    if (m_debugEnabled) {
+      LOG.debug("queryClass=" + queryClass + ", genericsOwnerClass=" + genericsOwnerClass + ", genericsParameterIndex=" + genericsParameterIndex);
+    }
     TypeDesc desc = new TypeDesc();
     HashSet<Type> loopDetector = new HashSet<Type>();
     visitGenericsHierarchy(queryClass, genericsOwnerClass, genericsParameterIndex, desc, loopDetector);
@@ -1885,7 +1933,9 @@ public final class TypeCastUtility {
       if (c == stopType) {
         //stop class, set generics index
         desc.parameterizedTypeIndex = stopTypeGenericsParameterIndex;
-        if (m_debugEnabled) LOG.debug("foundStopClass " + c + ", using generics index " + desc.parameterizedTypeIndex);
+        if (m_debugEnabled) {
+          LOG.debug("foundStopClass " + c + ", using generics index " + desc.parameterizedTypeIndex);
+        }
         return true;
       }
       boolean foundStopClass = false;
@@ -1918,14 +1968,18 @@ public final class TypeCastUtility {
         }
       }
       if (foundStopClass) {
-        if (m_debugEnabled) LOG.debug("visit " + VerboseUtility.dumpGenerics(c));
+        if (m_debugEnabled) {
+          LOG.debug("visit " + VerboseUtility.dumpGenerics(c));
+        }
         if (desc.resolvedClazz == null) {
           //find the index of the typeParameter
           desc.parameterizedTypeIndex = 0;
           TypeVariable<?>[] vars = c.getTypeParameters();
           for (int i = 0; i < vars.length; i++) {
             if (vars[i] == desc.typeVariable) {
-              if (m_debugEnabled) LOG.debug(desc.typeVariable + " has index " + i);
+              if (m_debugEnabled) {
+                LOG.debug(desc.typeVariable + " has index " + i);
+              }
               desc.parameterizedTypeIndex = i;
               break;
             }
@@ -1950,11 +2004,15 @@ public final class TypeCastUtility {
         loopDetector.remove(pt);
       }
       //found path to stopClass
-      if (m_debugEnabled) LOG.debug("visit " + VerboseUtility.dumpGenerics(pt));
+      if (m_debugEnabled) {
+        LOG.debug("visit " + VerboseUtility.dumpGenerics(pt));
+      }
       if (desc.resolvedClazz == null) {
         //find next type variable
         Type actualArg = pt.getActualTypeArguments()[desc.parameterizedTypeIndex];
-        if (m_debugEnabled) LOG.debug("index " + desc.parameterizedTypeIndex + " matches to " + actualArg);
+        if (m_debugEnabled) {
+          LOG.debug("index " + desc.parameterizedTypeIndex + " matches to " + actualArg);
+        }
         while (actualArg instanceof GenericArrayType) {
           //it is something like <T[]>
           actualArg = ((GenericArrayType) actualArg).getGenericComponentType();
@@ -1971,7 +2029,9 @@ public final class TypeCastUtility {
           desc.typeVariable = (TypeVariable) actualArg;
         }
         else {
-          if (m_debugEnabled) LOG.debug("failed with " + actualArg);
+          if (m_debugEnabled) {
+            LOG.debug("failed with " + actualArg);
+          }
           throw new IllegalArgumentException("expected ParameterizedType with actual argument of type Class or TypeVariable when encountered " + VerboseUtility.dumpGenerics(type));
         }
       }

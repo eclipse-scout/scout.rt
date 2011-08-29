@@ -106,7 +106,9 @@ public class ScoutXmlParser {
       }
       if (!warnedDefaultParserNotFound) {
         warnedDefaultParserNotFound = true;
-        if (LOG.isInfoEnabled()) LOG.info("Missing dependency to org.apache.xerces. Using alternative " + m_xmlReader.getClass().getName());
+        if (LOG.isInfoEnabled()) {
+          LOG.info("Missing dependency to org.apache.xerces. Using alternative " + m_xmlReader.getClass().getName());
+        }
       }
     }
 
@@ -218,7 +220,9 @@ public class ScoutXmlParser {
   public ScoutXmlDocument parse(InputStream stream, String systemId) throws IOException, SAXException {
     InputSource inputSource = new InputSource(stream);
 
-    if (systemId != null) inputSource.setSystemId(new File(systemId).toURI().toString());
+    if (systemId != null) {
+      inputSource.setSystemId(new File(systemId).toURI().toString());
+    }
 
     m_xmlReader.parse(inputSource);
 
@@ -259,16 +263,28 @@ public class ScoutXmlParser {
    * @since 1.0
    */
   public ScoutXmlDocument parse(String source, String systemId) throws IOException, SAXException {
-    if (source.equals("")) return m_xmlDocument;
-    else try {
-      if (new File(source).exists()) source = new File(source).toURI().toString();
-      else new URI(source);
-
-      m_xmlReader.parse(source);
+    if (source.equals("")) {
+      return m_xmlDocument;
     }
-    catch (URISyntaxException exception) {
-      if (source.trim().startsWith("<")) this.parse(new ByteArrayInputStream(source.getBytes()), systemId);
-      else throw new ScoutXmlException("Unknown source. If it is a file path the file doesn't exist.");
+    else {
+      try {
+        if (new File(source).exists()) {
+          source = new File(source).toURI().toString();
+        }
+        else {
+          new URI(source);
+        }
+
+        m_xmlReader.parse(source);
+      }
+      catch (URISyntaxException exception) {
+        if (source.trim().startsWith("<")) {
+          this.parse(new ByteArrayInputStream(source.getBytes()), systemId);
+        }
+        else {
+          throw new ScoutXmlException("Unknown source. If it is a file path the file doesn't exist.");
+        }
+      }
     }
 
     return m_xmlDocument;
@@ -334,7 +350,9 @@ public class ScoutXmlParser {
       m_xmlReader.setFeature("http://xml.org/sax/features/validation", validating);
     }
     catch (Exception exception) {
-      if (validating) throw new ScoutXmlException("The currently instantiated SAX parser doesn't allow to turn validation on.", exception);
+      if (validating) {
+        throw new ScoutXmlException("The currently instantiated SAX parser doesn't allow to turn validation on.", exception);
+      }
     }
   }
 
@@ -370,28 +388,40 @@ public class ScoutXmlParser {
     public void startElement(String namespaceURI, String localName, String qnamePrefixed, Attributes attributes) throws SAXException {
       String text = m_textBuffer.toString().trim(); // Other wise problems with
       // mixed content
-      if (text.length() > 0) m_current.addText(text);
-      if (m_textBuffer.length() > 0) m_textBuffer = new StringBuffer();
+      if (text.length() > 0) {
+        m_current.addText(text);
+      }
+      if (m_textBuffer.length() > 0) {
+        m_textBuffer = new StringBuffer();
+      }
 
       m_ancestor = m_current;
       m_current = m_xmlDocument.new ScoutXmlElement();
 
       m_current.setName(qnamePrefixed.equals("") ? localName : qnamePrefixed);
 
-      if (m_xmlDocument.hasRoot()) m_ancestor.addChild(m_current);
-      else m_xmlDocument.setRoot(m_current);
+      if (m_xmlDocument.hasRoot()) {
+        m_ancestor.addChild(m_current);
+      }
+      else {
+        m_xmlDocument.setRoot(m_current);
+      }
 
       if (m_namespaceBuffer.size() > 0) {
         m_current.setNamespaces(m_namespaceBuffer);
         m_namespaceBuffer = new Hashtable<String, String>();
       }
 
-      if (attributes.getLength() > 0) m_current.setAttributes(attributes);
+      if (attributes.getLength() > 0) {
+        m_current.setAttributes(attributes);
+      }
     }
 
     @Override
     public void characters(char[] characters, int start, int length) throws SAXException {
-      if (length > 0) m_textBuffer.append(characters, start, length);
+      if (length > 0) {
+        m_textBuffer.append(characters, start, length);
+      }
     }
 
     @Override
@@ -402,8 +432,12 @@ public class ScoutXmlParser {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
       String text = m_textBuffer.toString().trim();
-      if (text.length() > 0) m_current.addText(text);
-      if (m_textBuffer.length() > 0) m_textBuffer = new StringBuffer();
+      if (text.length() > 0) {
+        m_current.addText(text);
+      }
+      if (m_textBuffer.length() > 0) {
+        m_textBuffer = new StringBuffer();
+      }
 
       m_current.optimize();
 
@@ -425,9 +459,13 @@ public class ScoutXmlParser {
       m_namespaceBuffer = null;
       m_textBuffer = null;
 
-      if (m_numberOfIgnoredErrors > 0) LOG.warn(m_numberOfIgnoredErrors + " recoverable error(s) were ignored.");
+      if (m_numberOfIgnoredErrors > 0) {
+        LOG.warn(m_numberOfIgnoredErrors + " recoverable error(s) were ignored.");
+      }
 
-      if (m_numberOfIgnoredWarnings > 0) LOG.warn(m_numberOfIgnoredWarnings + " warnings(s) were ignored.");
+      if (m_numberOfIgnoredWarnings > 0) {
+        LOG.warn(m_numberOfIgnoredWarnings + " warnings(s) were ignored.");
+      }
     }
 
     @Override
@@ -472,8 +510,12 @@ public class ScoutXmlParser {
   private class P_SaxEntityResolver implements org.xml.sax.EntityResolver {
     @Override
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException {
-      if (ScoutXmlParser.this.isIgnoreExternalEntities()) return new InputSource(new ByteArrayInputStream(new String("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").getBytes()));
-      else return null;
+      if (ScoutXmlParser.this.isIgnoreExternalEntities()) {
+        return new InputSource(new ByteArrayInputStream(new String("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").getBytes()));
+      }
+      else {
+        return null;
+      }
     }
   }
 
@@ -485,14 +527,22 @@ public class ScoutXmlParser {
 
     @Override
     public void error(SAXParseException exception) throws SAXException {
-      if (ScoutXmlParser.this.isIgnoreSaxErrors()) m_numberOfIgnoredErrors++;
-      else throw exception;
+      if (ScoutXmlParser.this.isIgnoreSaxErrors()) {
+        m_numberOfIgnoredErrors++;
+      }
+      else {
+        throw exception;
+      }
     }
 
     @Override
     public void warning(SAXParseException exception) throws SAXException {
-      if (ScoutXmlParser.this.isIgnoreSaxWarnings()) m_numberOfIgnoredWarnings++;
-      else LOG.warn(exception.getMessage());
+      if (ScoutXmlParser.this.isIgnoreSaxWarnings()) {
+        m_numberOfIgnoredWarnings++;
+      }
+      else {
+        LOG.warn(exception.getMessage());
+      }
     }
   }
 

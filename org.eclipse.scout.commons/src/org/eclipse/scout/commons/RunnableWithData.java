@@ -36,11 +36,13 @@ public class RunnableWithData implements Runnable {
       StackTraceElement[] trace = m_constructorStackTrace.getStackTrace();
       int traceIndex = 0;
       // find constructor
-      while (traceIndex + 1 < trace.length && !getClass().getName().equals(trace[traceIndex].getClassName()))
+      while (traceIndex + 1 < trace.length && !getClass().getName().equals(trace[traceIndex].getClassName())) {
         traceIndex++;
+      }
       // find origin
-      while (traceIndex + 1 < trace.length && getClass().getName().equals(trace[traceIndex].getClassName()))
+      while (traceIndex + 1 < trace.length && getClass().getName().equals(trace[traceIndex].getClassName())) {
         traceIndex++;
+      }
       StackTraceElement[] trace2 = new StackTraceElement[trace.length - traceIndex];
       System.arraycopy(trace, traceIndex, trace2, 0, trace2.length);
       m_originatingStackTrace = new Exception();

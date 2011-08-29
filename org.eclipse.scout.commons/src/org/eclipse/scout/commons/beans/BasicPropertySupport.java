@@ -120,7 +120,9 @@ public class BasicPropertySupport implements IEventListenerSource {
         return new HashMap<String, Object>(m_props);
       }
       catch (ConcurrentModificationException cme) {
-        if (LOG.isDebugEnabled()) LOG.debug(null, cme);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(null, cme);
+        }
       }
     }
     return new HashMap<String, Object>(m_props);
@@ -359,7 +361,9 @@ public class BasicPropertySupport implements IEventListenerSource {
   }
 
   private void firePropertyChangeImpl(PropertyChangeEvent e) {
-    if (e == null) return;
+    if (e == null) {
+      return;
+    }
     //
     if (isPropertiesChanging()) {
       // buffer the event for later batch firing

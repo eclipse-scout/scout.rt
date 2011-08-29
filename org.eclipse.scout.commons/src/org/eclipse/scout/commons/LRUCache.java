@@ -69,7 +69,9 @@ public class LRUCache<K, V> {
   }
 
   public void put(K key, V value) {
-    if (m_targetSize <= 0) return;
+    if (m_targetSize <= 0) {
+      return;
+    }
     boolean fire = false;
     V fireValue = null;
     //
@@ -95,7 +97,9 @@ public class LRUCache<K, V> {
   }
 
   public void remove(K key) {
-    if (m_targetSize <= 0) return;
+    if (m_targetSize <= 0) {
+      return;
+    }
     boolean fire = false;
     V fireValue = null;
     //
@@ -270,11 +274,19 @@ public class LRUCache<K, V> {
 
     @Override
     public int compare(CacheEntry ca, CacheEntry cb) {
-      if (ca.m_timestamp < cb.m_timestamp) return +1;
-      if (ca.m_timestamp > cb.m_timestamp) return -1;
+      if (ca.m_timestamp < cb.m_timestamp) {
+        return +1;
+      }
+      if (ca.m_timestamp > cb.m_timestamp) {
+        return -1;
+      }
       // equal timestamps
-      if (ca.m_secondarySeq == null) ca.m_secondarySeq = (m_nextSecondarySeq++);
-      if (cb.m_secondarySeq == null) cb.m_secondarySeq = (m_nextSecondarySeq++);
+      if (ca.m_secondarySeq == null) {
+        ca.m_secondarySeq = (m_nextSecondarySeq++);
+      }
+      if (cb.m_secondarySeq == null) {
+        cb.m_secondarySeq = (m_nextSecondarySeq++);
+      }
       return ca.m_secondarySeq.compareTo(cb.m_secondarySeq);
     }
   }// end class

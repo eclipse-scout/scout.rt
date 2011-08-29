@@ -50,7 +50,9 @@ public class CompositeLong implements Comparable, Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null) return false;
+    if (o == null) {
+      return false;
+    }
     return compareTo(o) == 0;
   }
 
@@ -59,11 +61,19 @@ public class CompositeLong implements Comparable, Serializable {
     long[] me = this.m_value;
     long[] other = ((CompositeLong) o).m_value;
     for (int i = 0; i < me.length && i < other.length; i++) {
-      if (me[i] < other[i]) return -1;
-      if (me[i] > other[i]) return 1;
+      if (me[i] < other[i]) {
+        return -1;
+      }
+      if (me[i] > other[i]) {
+        return 1;
+      }
     }
-    if (me.length < other.length) return -1;
-    if (me.length > other.length) return 1;
+    if (me.length < other.length) {
+      return -1;
+    }
+    if (me.length > other.length) {
+      return 1;
+    }
     return 0;
   }
 
@@ -72,7 +82,9 @@ public class CompositeLong implements Comparable, Serializable {
     String s = "[";
     for (int i = 0; i < m_value.length; i++) {
       s += String.valueOf(m_value[i]);
-      if (i + 1 < m_value.length) s += ",";
+      if (i + 1 < m_value.length) {
+        s += ",";
+      }
     }
     s += "]";
     return s;

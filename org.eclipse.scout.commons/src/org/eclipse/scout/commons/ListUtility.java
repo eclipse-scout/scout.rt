@@ -66,11 +66,15 @@ public final class ListUtility {
   }
 
   public static <T> String format(Collection<T> list, String delimiter) {
-    if (list == null) return "";
+    if (list == null) {
+      return "";
+    }
     StringBuffer buf = new StringBuffer();
     int index = 0;
     for (T o : list) {
-      if (index > 0) buf.append(delimiter);
+      if (index > 0) {
+        buf.append(delimiter);
+      }
       buf.append("" + o);
       index++;
     }
@@ -86,7 +90,9 @@ public final class ListUtility {
     if (c != null) {
       int index = 0;
       for (T o : c) {
-        if (index > 0) buf.append(", ");
+        if (index > 0) {
+          buf.append(", ");
+        }
         String s;
         if (o instanceof Number) {
           s = o.toString();
@@ -185,7 +191,9 @@ public final class ListUtility {
    * otherwise null
    */
   public static <T> T getUnique(T... n) {
-    if (n == null || n.length == 0) return null;
+    if (n == null || n.length == 0) {
+      return null;
+    }
     T retVal = null;
     for (int i = 0; i < n.length; i++) {
       if (n[i] != null) {

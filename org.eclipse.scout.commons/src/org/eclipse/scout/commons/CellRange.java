@@ -64,13 +64,21 @@ public class CellRange implements Serializable {
   }
 
   public int getColumnCount() {
-    if (isColumnsOnly()) return -1;
-    else return m_col2 - m_col1 + 1;
+    if (isColumnsOnly()) {
+      return -1;
+    }
+    else {
+      return m_col2 - m_col1 + 1;
+    }
   }
 
   public int getRowCount() {
-    if (isRowsOnly()) return -1;
-    else return m_row2 - m_row1 + 1;
+    if (isRowsOnly()) {
+      return -1;
+    }
+    else {
+      return m_row2 - m_row1 + 1;
+    }
   }
 
   public CellRange normalize(int rowCount, int colCount) {
@@ -139,13 +147,19 @@ public class CellRange implements Serializable {
     String s = "";
     while (col >= 0) {
       int n = col % 26;
-      if (n == 0 && col >= 26) n = 26;
+      if (n == 0 && col >= 26) {
+        n = 26;
+      }
       if (n > 0) {
         char ch = (char) ('A' + n - 1);
         s = ch + s;
       }
-      if (col == 0) col = -1;
-      else col = (col - n) / 26;
+      if (col == 0) {
+        col = -1;
+      }
+      else {
+        col = (col - n) / 26;
+      }
     }
     if (row > 0) {
       s = s + row;
@@ -187,17 +201,23 @@ public class CellRange implements Serializable {
         break;
       }
     }
-    if (a[1] == 0) a[1] = -1;
+    if (a[1] == 0) {
+      a[1] = -1;
+    }
     //
     if (i < s.length()) {
       a[0] = Integer.parseInt(s.substring(i));
     }
-    if (a[0] == 0) a[0] = -1;
+    if (a[0] == 0) {
+      a[0] = -1;
+    }
     return a;
   }
 
   private void rangeCheck(int row, int col) {
-    if (row == 0 || row < -1 || col == 0 || col < -1) throw new IllegalArgumentException("value must be at least 1 or -1 for wildcards: " + row + "," + col);
+    if (row == 0 || row < -1 || col == 0 || col < -1) {
+      throw new IllegalArgumentException("value must be at least 1 or -1 for wildcards: " + row + "," + col);
+    }
   }
 
   private void rangeOrder() {

@@ -24,7 +24,9 @@ public final class NumberUtility {
   }
 
   public static Double toDouble(Number n) {
-    if (n == null) return null;
+    if (n == null) {
+      return null;
+    }
     if (n instanceof Float) {
       // rounding error workaround
       return new Double(n.toString());
@@ -35,27 +37,37 @@ public final class NumberUtility {
   }
 
   public static Integer toInteger(Number n) {
-    if (n == null) return null;
+    if (n == null) {
+      return null;
+    }
     return n.intValue();
   }
 
   public static Long toLong(Number n) {
-    if (n == null) return null;
+    if (n == null) {
+      return null;
+    }
     return n.longValue();
   }
 
   public static BigDecimal toBigDecimal(Double d) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     return BigDecimal.valueOf(d);
   }
 
   public static BigInteger toBigInteger(Long l) {
-    if (l == null) return null;
+    if (l == null) {
+      return null;
+    }
     return BigInteger.valueOf(l);
   }
 
   public static double avg(double... a) {
-    if (a == null) return 0;
+    if (a == null) {
+      return 0;
+    }
     long count = a.length;
     double sum = sum(a);
     if (count > 0) {
@@ -67,7 +79,9 @@ public final class NumberUtility {
   }
 
   public static double median(double... a) {
-    if (a == null) return 0;
+    if (a == null) {
+      return 0;
+    }
     int count = a.length;
     double[] b = new double[a.length];
     System.arraycopy(a, 0, b, 0, count);
@@ -89,8 +103,12 @@ public final class NumberUtility {
   }
 
   public static double sum(double... a) {
-    if (a == null) return 0;
-    if (a.length == 0) return 0;
+    if (a == null) {
+      return 0;
+    }
+    if (a.length == 0) {
+      return 0;
+    }
     double sum = 0;
     for (double d : a) {
       sum += d;
@@ -99,8 +117,12 @@ public final class NumberUtility {
   }
 
   public static long sum(long... a) {
-    if (a == null) return 0;
-    if (a.length == 0) return 0;
+    if (a == null) {
+      return 0;
+    }
+    if (a.length == 0) {
+      return 0;
+    }
     long sum = 0;
     for (long d : a) {
       sum += d;
@@ -109,8 +131,12 @@ public final class NumberUtility {
   }
 
   public static double min(double... a) {
-    if (a == null) return 0;
-    if (a.length == 0) return 0;
+    if (a == null) {
+      return 0;
+    }
+    if (a.length == 0) {
+      return 0;
+    }
     double min = Double.MAX_VALUE;
     for (double d : a) {
       min = Math.min(min, d);
@@ -119,8 +145,12 @@ public final class NumberUtility {
   }
 
   public static double max(double... a) {
-    if (a == null) return 0;
-    if (a.length == 0) return 0;
+    if (a == null) {
+      return 0;
+    }
+    if (a.length == 0) {
+      return 0;
+    }
     double max = Double.MIN_VALUE;
     for (double d : a) {
       max = Math.max(max, d);
@@ -172,55 +202,85 @@ public final class NumberUtility {
   }
 
   public static Number sign(Number n) {
-    if (n == null) return new Integer(0);
+    if (n == null) {
+      return new Integer(0);
+    }
     double d = n.doubleValue();
-    if (d < 0) return new Integer(-1);
-    if (d > 0) return new Integer(+1);
+    if (d < 0) {
+      return new Integer(-1);
+    }
+    if (d > 0) {
+      return new Integer(+1);
+    }
     return new Integer(0);
   }
 
   public static int parseInt(String s) {
-    if (s == null) return 0;
+    if (s == null) {
+      return 0;
+    }
     return TypeCastUtility.castValue(s, Integer.class);
   }
 
   public static long parseLong(String s) {
-    if (s == null) return 0;
+    if (s == null) {
+      return 0;
+    }
     return TypeCastUtility.castValue(s, Long.class);
   }
 
   public static double parseDouble(String s) {
-    if (s == null) return 0;
+    if (s == null) {
+      return 0;
+    }
     return TypeCastUtility.castValue(s, Double.class);
   }
 
   public static String format(Number n) {
-    if (n == null) return "";
+    if (n == null) {
+      return "";
+    }
     Locale loc = LocaleThreadLocal.get();
-    if (loc == null) loc = Locale.getDefault();
+    if (loc == null) {
+      loc = Locale.getDefault();
+    }
     return NumberFormat.getInstance(loc).format(n);
   }
 
   public static <T> T nvl(T value, T valueWhenNull) {
-    if (value != null) return value;
-    else return valueWhenNull;
+    if (value != null) {
+      return value;
+    }
+    else {
+      return valueWhenNull;
+    }
   }
 
   public static int nvl(Integer value, Number valueWhenNull) {
-    if (value != null) return value;
-    else return valueWhenNull.intValue();
+    if (value != null) {
+      return value;
+    }
+    else {
+      return valueWhenNull.intValue();
+    }
   }
 
   public static long nvl(Long value, Number valueWhenNull) {
-    if (value != null) return value;
-    else return valueWhenNull.longValue();
+    if (value != null) {
+      return value;
+    }
+    else {
+      return valueWhenNull.longValue();
+    }
   }
 
   /**
    * trunc a floating number to integer without rounding it
    */
   public static double trunc(Number n) {
-    if (n == null) return 0;
+    if (n == null) {
+      return 0;
+    }
     return Math.floor(n.doubleValue());
   }
 
@@ -238,8 +298,12 @@ public final class NumberUtility {
   }
 
   public static BigDecimal getBigDecimalValue(Object o) {
-    if (o != null && o.toString().length() > 0) return new BigDecimal(o.toString());
-    else return null;
+    if (o != null && o.toString().length() > 0) {
+      return new BigDecimal(o.toString());
+    }
+    else {
+      return null;
+    }
   }
 
   /**
@@ -251,8 +315,14 @@ public final class NumberUtility {
    *         Else it returns the devision result.
    */
   public static Double divide(Double numerator, Double denominator) {
-    if (numerator == null || denominator == null || denominator.equals(0.0)) return null;
-    else if (numerator.equals(0.0)) return 0d;
-    else return numerator / denominator;
+    if (numerator == null || denominator == null || denominator.equals(0.0)) {
+      return null;
+    }
+    else if (numerator.equals(0.0)) {
+      return 0d;
+    }
+    else {
+      return numerator / denominator;
+    }
   }
 }

@@ -86,10 +86,12 @@ public final class NlsResourceBundle extends PropertyResourceBundle {
           LOG.warn(null, e);
         }
         finally {
-          if (in != null) try {
-            in.close();
-          }
-          catch (Throwable t) {
+          if (in != null) {
+            try {
+              in.close();
+            }
+            catch (Throwable t) {
+            }
           }
         }
       }

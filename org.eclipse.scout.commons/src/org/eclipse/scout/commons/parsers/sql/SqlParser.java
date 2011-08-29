@@ -199,7 +199,9 @@ public class SqlParser {
   private Statement parseStatement(List<IToken> list, ParseContext ctx) {
     //SingleStatement (UnionToken SingleStatement)*
     ParseStep lock = ctx.checkAndAdd("Statement", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       IToken ss = parseSingleStatement(list, ctx);
       if (ss == null) {
@@ -229,7 +231,9 @@ public class SqlParser {
    */
   private IToken parseSingleStatement(List<IToken> list, ParseContext ctx) {
     ParseStep lock = ctx.checkAndAdd("SingleStatement", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       //brackets
       ArrayList<IToken> backup = new ArrayList<IToken>(list);
@@ -283,7 +287,9 @@ public class SqlParser {
   private Part parsePart(List<IToken> list, ParseContext ctx, boolean rootPart) {
     //PartToken ListExpr
     ParseStep lock = ctx.checkAndAdd("Part", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       PartToken pt;
       ListExpr le;
@@ -342,7 +348,9 @@ public class SqlParser {
   private ListExpr parseListExpr(List<IToken> list, ParseContext ctx) {
     //OrExpr (ListSeparator OrExpr)*
     ParseStep lock = ctx.checkAndAdd("ListExpr", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       OrExpr oe = parseOrExpr(list, ctx);
       if (oe == null) {
@@ -369,7 +377,9 @@ public class SqlParser {
   private OrExpr parseOrExpr(List<IToken> list, ParseContext ctx) {
     //AndExpr (BinaryOp['OR'] AndExpr)*
     ParseStep lock = ctx.checkAndAdd("OrExpr", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       AndExpr ae = parseAndExpr(list, ctx);
       if (ae == null) {
@@ -397,7 +407,9 @@ public class SqlParser {
   private AndExpr parseAndExpr(List<IToken> list, ParseContext ctx) {
     //MathExpr (BinaryOp['AND'] MathExpr)*
     ParseStep lock = ctx.checkAndAdd("AndExpr", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       IToken me = parseMathExpr(list, ctx);
       if (me == null) {
@@ -425,7 +437,9 @@ public class SqlParser {
   private MathExpr parseMathExpr(List<IToken> list, ParseContext ctx) {
     //_simpleExpr (BinaryOp _simpleExpr)*
     ParseStep lock = ctx.checkAndAdd("MathExpr", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       IToken se = parseSimpleExpr(list, ctx);
       if (se == null) {
@@ -452,7 +466,9 @@ public class SqlParser {
   private IToken parseSimpleExpr(List<IToken> list, ParseContext ctx) {
     //UnaryPrefixExpr | MinusExpr | Atom
     ParseStep lock = ctx.checkAndAdd("SimpleExpr", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       IToken t;
       if ((t = parseUnaryPrefixExpr(list, ctx)) != null) {
@@ -474,7 +490,9 @@ public class SqlParser {
   private UnaryPrefixExpr parseUnaryPrefixExpr(List<IToken> list, ParseContext ctx) {
     //UnaryPrefix Atom
     ParseStep lock = ctx.checkAndAdd("UnaryPrefixExpr", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       UnaryPrefix up = null;
       IToken a = null;
@@ -501,7 +519,9 @@ public class SqlParser {
   private MinusExpr parseMinusExpr(List<IToken> list, ParseContext ctx) {
     //BinaryOp['-'] Atom
     ParseStep lock = ctx.checkAndAdd("MinusExpr", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       MathOp mo = null;
       IToken a = null;
@@ -528,7 +548,9 @@ public class SqlParser {
   private FunExpr parseFunExpr(List<IToken> list, ParseContext ctx) {
     //Name BracketExpr
     ParseStep lock = ctx.checkAndAdd("FunExpr", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       Name nm = null;
       BracketExpr be = null;
@@ -555,7 +577,9 @@ public class SqlParser {
   private BracketExpr parseBracketExpr(List<IToken> list, ParseContext ctx) {
     //BracketExpr = OpenBracketToken (Statement | ListExpr) CloseBracketToken
     ParseStep lock = ctx.checkAndAdd("BracketExpr", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       IToken open = null;
       IToken t = null;
@@ -586,7 +610,9 @@ public class SqlParser {
   private Atom parseAtom(List<IToken> list, ParseContext ctx) {
     //(BracketExpr Outer | Statement | OrExpr | FunExpr | Name | Text | BinaryOp['*']) (OuterJoinToken)? (Name["AS"])? (Name[alias])?
     ParseStep lock = ctx.checkAndAdd("Atom", list);
-    if (lock == null) return null;
+    if (lock == null) {
+      return null;
+    }
     try {
       IToken t = null;
       if ((t = parseBracketExpr(list, ctx)) != null) {

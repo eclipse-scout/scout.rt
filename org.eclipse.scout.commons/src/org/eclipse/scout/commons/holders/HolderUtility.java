@@ -45,7 +45,9 @@ public final class HolderUtility {
    * value copy of the holder for serialization
    */
   public static <T> IHolder<T> createSerializableHolder(IHolder<T> h) {
-    if (h == null) return null;
+    if (h == null) {
+      return null;
+    }
     return new Holder<T>(h.getHolderType(), h.getValue());
   }
 

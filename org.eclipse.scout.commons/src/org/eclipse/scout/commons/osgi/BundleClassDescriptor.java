@@ -22,8 +22,12 @@ public class BundleClassDescriptor implements Serializable {
   private String m_className;
 
   public BundleClassDescriptor(String bundleSymbolicName, String className) {
-    if (bundleSymbolicName == null) throw new IllegalArgumentException("bundleSymbolicName must not be null");
-    if (className == null) throw new IllegalArgumentException("className must not be null");
+    if (bundleSymbolicName == null) {
+      throw new IllegalArgumentException("bundleSymbolicName must not be null");
+    }
+    if (className == null) {
+      throw new IllegalArgumentException("className must not be null");
+    }
     m_bundleSymbolicName = bundleSymbolicName;
     m_className = className;
   }

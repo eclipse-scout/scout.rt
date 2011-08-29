@@ -124,7 +124,9 @@ public final class VerboseUtility {
   }
 
   public static String dumpType(Class cls) {
-    if (cls == null) return "null";
+    if (cls == null) {
+      return "null";
+    }
     Class compClass = cls;
     String dim = "";
     while (compClass.isArray()) {
@@ -133,20 +135,28 @@ public final class VerboseUtility {
     }
     Package pkg = compClass.getPackage();
     String s = compClass.getName();
-    if (pkg != null) s = s.substring(pkg.getName().length() + 1);
+    if (pkg != null) {
+      s = s.substring(pkg.getName().length() + 1);
+    }
     return s + dim;
   }
 
   public static String dumpObject(Object o) {
-    if (o == null) return "null";
+    if (o == null) {
+      return "null";
+    }
     if (o.getClass().isArray()) {
       StringBuffer buf = new StringBuffer();
       buf.append("[");
       int n = Array.getLength(o);
-      if (n > 100) n = 100;
+      if (n > 100) {
+        n = 100;
+      }
       for (int i = 0; i < n; i++) {
         buf.append(dumpObject(Array.get(o, i)));
-        if (i + 1 < n) buf.append(",");
+        if (i + 1 < n) {
+          buf.append(",");
+        }
       }
       if (Array.getLength(o) > n) {
         buf.append(",...");
@@ -157,7 +167,9 @@ public final class VerboseUtility {
     else if (o.getClass() == Byte.class) {
       Byte b = (Byte) o;
       String s = Integer.toHexString(b != null ? (b.intValue() & 0xff) : 0);
-      if (s.length() < 2) s = "0" + s;
+      if (s.length() < 2) {
+        s = "0" + s;
+      }
       return s;
     }
     else if (o instanceof Subject) {
@@ -176,16 +188,22 @@ public final class VerboseUtility {
   }
 
   public static String dumpTypeAndObject(Object o) {
-    if (o == null) return "null";
+    if (o == null) {
+      return "null";
+    }
     return dumpType(o.getClass()) + ":" + dumpObject(o);
   }
 
   public static String dumpObjects(Object[] args) {
-    if (args == null) return "";
+    if (args == null) {
+      return "";
+    }
     StringBuffer buf = new StringBuffer();
     for (int i = 0; i < args.length; i++) {
       buf.append(dumpObject(args[i]));
-      if (i + 1 < args.length) buf.append(", ");
+      if (i + 1 < args.length) {
+        buf.append(", ");
+      }
     }
     return buf.toString();
   }

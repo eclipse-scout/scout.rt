@@ -17,11 +17,14 @@ public final class TripleDES {
   private DESKey k3;
 
   public TripleDES(byte[] key192Bit) {
-    if (key192Bit.length == 0) throw new ArrayIndexOutOfBoundsException("Creating a zero-length triple-DES key");
+    if (key192Bit.length == 0) {
+      throw new ArrayIndexOutOfBoundsException("Creating a zero-length triple-DES key");
+    }
     if (key192Bit.length < 24) {
       byte[] k = new byte[24];
-      for (int i = 0; i < 24; i += key192Bit.length)
+      for (int i = 0; i < 24; i += key192Bit.length) {
         System.arraycopy(key192Bit, 0, k, i, Math.min(key192Bit.length, 24 - i));
+      }
       key192Bit = k;
     }
     k1 = new DESKey(makeLong(key192Bit, 0, 8));
@@ -30,7 +33,9 @@ public final class TripleDES {
   }
 
   public byte[] encrypt(byte[] plain) {
-    if (plain == null || plain.length == 0) return new byte[0];
+    if (plain == null || plain.length == 0) {
+      return new byte[0];
+    }
     int len = plain.length;
     byte[] cipher = new byte[((len + plainBlockSize() - 1) / plainBlockSize()) * plainBlockSize()];
     for (int i = 0; i < cipher.length; i = i + plainBlockSize()) {
@@ -52,17 +57,22 @@ public final class TripleDES {
   }
 
   public byte[] decrypt(byte[] cipher, boolean removeEndingZeros) {
-    if (cipher == null || cipher.length == 0) return new byte[0];
+    if (cipher == null || cipher.length == 0) {
+      return new byte[0];
+    }
     int len = cipher.length;
-    if (len % plainBlockSize() != 0) throw new IllegalArgumentException("cipher length must be multiple of " + plainBlockSize());
+    if (len % plainBlockSize() != 0) {
+      throw new IllegalArgumentException("cipher length must be multiple of " + plainBlockSize());
+    }
     byte[] plain = new byte[len];
     for (int i = 0; i < cipher.length; i = i + plainBlockSize()) {
       decryptBlock(cipher, i, plain, i);
     }
     if (removeEndingZeros) {
       int reducedLen = len;
-      while (reducedLen > 0 && plain[reducedLen - 1] == 0x00)
+      while (reducedLen > 0 && plain[reducedLen - 1] == 0x00) {
         reducedLen--;
+      }
       if (reducedLen < len) {
         byte[] newPlain = new byte[reducedLen];
         System.arraycopy(plain, 0, newPlain, 0, reducedLen);
@@ -73,11 +83,17 @@ public final class TripleDES {
   }
 
   public void destroy() {
-    if (k1 != null) k1.destroy();
+    if (k1 != null) {
+      k1.destroy();
+    }
     k1 = null;
-    if (k2 != null) k2.destroy();
+    if (k2 != null) {
+      k2.destroy();
+    }
     k2 = null;
-    if (k3 != null) k3.destroy();
+    if (k3 != null) {
+      k3.destroy();
+    }
     k3 = null;
   }
 
@@ -96,8 +112,9 @@ public final class TripleDES {
   private static long pickBits(long a, byte[] bits) {
     long r = 0;
     int l = bits.length;
-    for (int b = 0; b < l; b++)
+    for (int b = 0; b < l; b++) {
       r = (r << 1) | ((a >>> (63 - bits[b])) & 1);
+    }
     return r;
   }
 
@@ -131,8 +148,9 @@ public final class TripleDES {
   private static long makeLong(byte[] buf, int i, int length) {
     long r = 0;
     length += i;
-    for (int j = i; j < length; j++)
+    for (int j = i; j < length; j++) {
       r = (r << 8) | (buf[j] & 0xffL);
+    }
     return r;
   }
 

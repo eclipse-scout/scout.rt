@@ -84,7 +84,9 @@ public final class ConfigIniUtility {
     for (ConfigIniProperty p : configProperties) {
       if (matchesBeanClass(p, beanType, filter)) {
         String v = p.getValue();
-        if (v != null && v.length() == 0) v = null;
+        if (v != null && v.length() == 0) {
+          v = null;
+        }
         props.put(p.getPropertyName(), v);
       }
     }

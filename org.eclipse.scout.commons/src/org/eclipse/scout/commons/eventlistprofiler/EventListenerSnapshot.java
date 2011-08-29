@@ -27,7 +27,9 @@ public class EventListenerSnapshot implements IEventListenerSnapshot {
 
   @Override
   public void add(Class<?> listenerType, String context, Object listener) {
-    if (listener == null) return;
+    if (listener == null) {
+      return;
+    }
     String key = listenerType.getName();
     if (context != null) {
       key += "#" + context;

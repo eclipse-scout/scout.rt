@@ -57,15 +57,23 @@ public abstract class AbstractLogFilter implements ILogFilter {
 
   @Override
   public boolean isIgnoredLine(String line) {
-    if (line.startsWith("PasswordSecurityFilter::")) return true;
+    if (line.startsWith("PasswordSecurityFilter::")) {
+      return true;
+    }
     return false;
   }
 
   @Override
   public boolean isLogEntryStartLine(String line) {
-    if (SIMPLE_LOG_PARSE_PATTERN.matcher(line).matches()) return true;
-    if (ECLIPSE_LOG_PARSE_PATTERN1.matcher(line).matches()) return true;
-    if (ECLIPSE_LOG_PARSE_PATTERN2.matcher(line).matches()) return true;
+    if (SIMPLE_LOG_PARSE_PATTERN.matcher(line).matches()) {
+      return true;
+    }
+    if (ECLIPSE_LOG_PARSE_PATTERN1.matcher(line).matches()) {
+      return true;
+    }
+    if (ECLIPSE_LOG_PARSE_PATTERN2.matcher(line).matches()) {
+      return true;
+    }
     return false;
   }
 
@@ -86,7 +94,9 @@ public abstract class AbstractLogFilter implements ILogFilter {
         if (entry.size() > 1) {
           StringBuffer b = new StringBuffer();
           for (int i = 1; i < entry.size(); i++) {
-            if (b.length() > 0) b.append("\n");
+            if (b.length() > 0) {
+              b.append("\n");
+            }
             b.append(entry.get(i));
           }
           e.attachment = b.toString();
@@ -123,7 +133,9 @@ public abstract class AbstractLogFilter implements ILogFilter {
             // ignore
           }
           else {
-            if (attachmentBuf.length() > 0) attachmentBuf.append("\n");
+            if (attachmentBuf.length() > 0) {
+              attachmentBuf.append("\n");
+            }
             attachmentBuf.append(line);
           }
         }
@@ -141,7 +153,9 @@ public abstract class AbstractLogFilter implements ILogFilter {
         e.message = "New Session";
         StringBuffer attachmentBuf = new StringBuffer();
         for (String line : entry) {
-          if (attachmentBuf.length() > 0) attachmentBuf.append("\n");
+          if (attachmentBuf.length() > 0) {
+            attachmentBuf.append("\n");
+          }
           attachmentBuf.append(line);
         }
         e.attachment = attachmentBuf.toString().trim();

@@ -203,7 +203,9 @@ public class ScoutXmlDocument {
    * @since 1.3
    */
   public boolean equalsSemantically(Object object) {
-    if (object == null) return false;
+    if (object == null) {
+      return false;
+    }
     try {
       boolean oldSetting = this.isPrettyPrint();
       this.setPrettyPrint(false);
@@ -217,8 +219,12 @@ public class ScoutXmlDocument {
 
         return result;
       }
-      else if (object instanceof String) return string.equals(object);
-      else return false;
+      else if (object instanceof String) {
+        return string.equals(object);
+      }
+      else {
+        return false;
+      }
     }
     catch (Exception exception) {
       return false;
@@ -232,14 +238,24 @@ public class ScoutXmlDocument {
     String n = null;
 
     if (name.startsWith(n = this.getRoot().getNameExpanded())) {
-      if (name.equals(n)) return this.getRoot();
-      else return this.getRoot().getChild(name.replaceFirst(n, ""));
+      if (name.equals(n)) {
+        return this.getRoot();
+      }
+      else {
+        return this.getRoot().getChild(name.replaceFirst(n, ""));
+      }
     }
     else if (name.startsWith(n = this.getRoot().getNamePrefixed())) {
-      if (name.equals(n)) return this.getRoot();
-      else return this.getRoot().getChild(name.replaceFirst(n, ""));
+      if (name.equals(n)) {
+        return this.getRoot();
+      }
+      else {
+        return this.getRoot().getChild(name.replaceFirst(n, ""));
+      }
     }
-    else return null;
+    else {
+      return null;
+    }
   }
 
   /**
@@ -382,8 +398,12 @@ public class ScoutXmlDocument {
   public void setPrettyPrint(boolean prettyPrint) {
     m_prettyPrint = prettyPrint;
 
-    if (prettyPrint) this.setIndent(DEFAULT_INDENT);
-    else this.setIndent("");
+    if (prettyPrint) {
+      this.setIndent(DEFAULT_INDENT);
+    }
+    else {
+      this.setIndent("");
+    }
   }
 
   /**
@@ -504,12 +524,18 @@ public class ScoutXmlDocument {
   private void write(Writer writer) throws IOException {
     BufferedWriter bufferedWriter = null;
 
-    if (writer instanceof BufferedWriter) bufferedWriter = (BufferedWriter) writer;
-    else bufferedWriter = new BufferedWriter(writer);
+    if (writer instanceof BufferedWriter) {
+      bufferedWriter = (BufferedWriter) writer;
+    }
+    else {
+      bufferedWriter = new BufferedWriter(writer);
+    }
 
     bufferedWriter.write("<?xml version=\"" + m_xmlVersion + "\" encoding=\"" + m_xmlEncoding + "\"?>");
 
-    if (ScoutXmlDocument.this.isPrettyPrint()) bufferedWriter.newLine();
+    if (ScoutXmlDocument.this.isPrettyPrint()) {
+      bufferedWriter.newLine();
+    }
 
     if (m_root != null) {
       if (m_externalDtdLocation != null) {
@@ -518,11 +544,17 @@ public class ScoutXmlDocument {
         bufferedWriter.write(m_root.getNamePrefixed());
         bufferedWriter.write(' ');
 
-        if (m_externalDtdPublicId == null) bufferedWriter.write("SYSTEM \"" + m_externalDtdLocation);
-        else bufferedWriter.write("PUBLIC \"" + m_externalDtdPublicId + "\" \"" + m_externalDtdLocation);
+        if (m_externalDtdPublicId == null) {
+          bufferedWriter.write("SYSTEM \"" + m_externalDtdLocation);
+        }
+        else {
+          bufferedWriter.write("PUBLIC \"" + m_externalDtdPublicId + "\" \"" + m_externalDtdLocation);
+        }
         bufferedWriter.write("\">");
 
-        if (ScoutXmlDocument.this.isPrettyPrint()) bufferedWriter.newLine();
+        if (ScoutXmlDocument.this.isPrettyPrint()) {
+          bufferedWriter.newLine();
+        }
       }
 
       m_root.write(bufferedWriter);
@@ -590,7 +622,13 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public void setName(String name) {
-      if (ScoutXmlDocument.this.isStrictlyChecking()) if (ScoutXmlQName.isPrefixed(name)) if (getNamespace(ScoutXmlQName.extractPrefix(name)) == null) throw new ScoutXmlException("Unbound prefix: " + ScoutXmlQName.extractPrefix(name));
+      if (ScoutXmlDocument.this.isStrictlyChecking()) {
+        if (ScoutXmlQName.isPrefixed(name)) {
+          if (getNamespace(ScoutXmlQName.extractPrefix(name)) == null) {
+            throw new ScoutXmlException("Unbound prefix: " + ScoutXmlQName.extractPrefix(name));
+          }
+        }
+      }
 
       m_nameID = m_nameRegistry.getID(name, true);
     }
@@ -702,7 +740,9 @@ public class ScoutXmlDocument {
       if (m_requiredAttributeNames != null) {
         for (int i = 0; i < m_requiredAttributeNames.length; i++) {
           try {
-            if (!((ScoutXmlElement) node).hasAttribute(m_requiredAttributeNames[i], m_requiredAttributeValues[i])) return;
+            if (!((ScoutXmlElement) node).hasAttribute(m_requiredAttributeNames[i], m_requiredAttributeValues[i])) {
+              return;
+            }
           }
           catch (NullPointerException exception) {
             return;
@@ -753,7 +793,9 @@ public class ScoutXmlDocument {
       if (m_requiredAttributeNames != null) {
         for (int i = 0; i < m_requiredAttributeNames.length; i++) {
           try {
-            if (!((ScoutXmlElement) node).hasAttribute(m_requiredAttributeNames[i], m_requiredAttributeValues[i])) return;
+            if (!((ScoutXmlElement) node).hasAttribute(m_requiredAttributeNames[i], m_requiredAttributeValues[i])) {
+              return;
+            }
           }
           catch (NullPointerException exception) {
             return;
@@ -846,11 +888,17 @@ public class ScoutXmlDocument {
           stringToCompare = stringToCompare.toUpperCase();
         }
 
-        if (string.matches(stringToCompare)) nameMatched(node);
+        if (string.matches(stringToCompare)) {
+          nameMatched(node);
+        }
       }
       else {
-        if (m_ignoreQueryCase && string.equalsIgnoreCase(m_stringToCompare)) nameMatched(node);
-        else if (string.equals(m_stringToCompare)) nameMatched(node);
+        if (m_ignoreQueryCase && string.equalsIgnoreCase(m_stringToCompare)) {
+          nameMatched(node);
+        }
+        else if (string.equals(m_stringToCompare)) {
+          nameMatched(node);
+        }
       }
     }
 
@@ -1018,8 +1066,12 @@ public class ScoutXmlDocument {
             m_content = child;
           }
           else if (m_content instanceof List) {
-            if (position == -1) ((List) m_content).add(child);
-            else ((List) m_content).add(position, child);
+            if (position == -1) {
+              ((List) m_content).add(child);
+            }
+            else {
+              ((List) m_content).add(position, child);
+            }
           }
           else {
             List newContent = new ArrayList(INITIAL_CONTENT_LIST_SIZE);
@@ -1045,8 +1097,9 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public void addChildren(List children) {
-      for (int i = 0; i < children.size(); i++)
+      for (int i = 0; i < children.size(); i++) {
         this.addChild((ScoutXmlElement) children.get(i));
+      }
     }
 
     /**
@@ -1089,8 +1142,12 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public int countAttributes() {
-      if (m_attributes != null) return m_attributes.size();
-      else return 0;
+      if (m_attributes != null) {
+        return m_attributes.size();
+      }
+      else {
+        return 0;
+      }
     }
 
     /**
@@ -1112,8 +1169,11 @@ public class ScoutXmlDocument {
         Iterator iterator = ((List) m_content).iterator();
         int noChildren = 0;
 
-        while (iterator.hasNext())
-          if (iterator.next() instanceof ScoutXmlElement) noChildren++;
+        while (iterator.hasNext()) {
+          if (iterator.next() instanceof ScoutXmlElement) {
+            noChildren++;
+          }
+        }
 
         return noChildren;
       }
@@ -1167,8 +1227,12 @@ public class ScoutXmlDocument {
      * @since 1.1
      */
     public int countSiblings(String name) {
-      if (this.hasParent()) return (((Integer) this.getParent().visitChildren(new P_NodeCounter(name))).intValue() - 1);
-      else return 0;
+      if (this.hasParent()) {
+        return (((Integer) this.getParent().visitChildren(new P_NodeCounter(name))).intValue() - 1);
+      }
+      else {
+        return 0;
+      }
     }
 
     /**
@@ -1177,8 +1241,12 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public int countNamespaces() {
-      if (this.hasNamespace()) return m_namespaces.size();
-      else return 0;
+      if (this.hasNamespace()) {
+        return m_namespaces.size();
+      }
+      else {
+        return 0;
+      }
     }
 
     /**
@@ -1476,8 +1544,12 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public int getIndex() {
-      if (this.hasParent()) return this.getParent().getChildren().indexOf(this);
-      else return 0;
+      if (this.hasParent()) {
+        return this.getParent().getChildren().indexOf(this);
+      }
+      else {
+        return 0;
+      }
     }
 
     /**
@@ -1485,10 +1557,20 @@ public class ScoutXmlDocument {
      */
     @Override
     public String getNamespace(String prefix) {
-      if (prefix != null) if (this.hasNamespace(prefix)) return (String) m_namespaces.get(prefix);
-      else if (this.hasParent()) return this.getParent().getNamespace(prefix);
-      else return null;
-      else return null;
+      if (prefix != null) {
+        if (this.hasNamespace(prefix)) {
+          return (String) m_namespaces.get(prefix);
+        }
+        else if (this.hasParent()) {
+          return this.getParent().getNamespace(prefix);
+        }
+        else {
+          return null;
+        }
+      }
+      else {
+        return null;
+      }
     }
 
     /**
@@ -1503,8 +1585,12 @@ public class ScoutXmlDocument {
      */
     public ScoutXmlElement getChild(int index) {
       try {
-        if ((index == 0) && (m_content instanceof ScoutXmlElement)) return (ScoutXmlElement) m_content;
-        else return (ScoutXmlElement) this.getChildren().get(index);
+        if ((index == 0) && (m_content instanceof ScoutXmlElement)) {
+          return (ScoutXmlElement) m_content;
+        }
+        else {
+          return (ScoutXmlElement) this.getChildren().get(index);
+        }
       }
       catch (Exception exception) {
         throw new ScoutXmlException("Child with index " + index + " does not exist for '" + this.getPath() + "'");
@@ -1546,7 +1632,9 @@ public class ScoutXmlDocument {
           for (int i = 0; i < ((List) m_content).size(); i++) {
             Object o = ((List) m_content).get(i);
 
-            if (o instanceof ScoutXmlElement) children.add(o);
+            if (o instanceof ScoutXmlElement) {
+              children.add(o);
+            }
           }
         }
         else {
@@ -1615,7 +1703,9 @@ public class ScoutXmlDocument {
         Iterator iterator = m_attributes.iterator();
 
         for (int i = 0; iterator.hasNext(); i++) {
-          if (((P_Attribute) iterator.next()).getNamePrefixed().equals(name)) return true;
+          if (((P_Attribute) iterator.next()).getNamePrefixed().equals(name)) {
+            return true;
+          }
         }
       }
 
@@ -1646,8 +1736,11 @@ public class ScoutXmlDocument {
       else if (m_content instanceof List) {
         Iterator iterator = ((List) m_content).iterator();
 
-        while (iterator.hasNext())
-          if (iterator.next() instanceof ScoutXmlElement) return true;
+        while (iterator.hasNext()) {
+          if (iterator.next() instanceof ScoutXmlElement) {
+            return true;
+          }
+        }
       }
 
       return false;
@@ -1664,16 +1757,24 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public boolean hasNamespace() {
-      if (m_namespaces != null) return (!m_namespaces.isEmpty());
-      else return false;
+      if (m_namespaces != null) {
+        return (!m_namespaces.isEmpty());
+      }
+      else {
+        return false;
+      }
     }
 
     /**
      * @since 1.0
      */
     public boolean hasNamespace(String prefix) {
-      if (this.hasNamespace() && (prefix != null)) return m_namespaces.containsKey(prefix);
-      else return false;
+      if (this.hasNamespace() && (prefix != null)) {
+        return m_namespaces.containsKey(prefix);
+      }
+      else {
+        return false;
+      }
     }
 
     /**
@@ -1705,7 +1806,9 @@ public class ScoutXmlDocument {
 
         while (iterator.hasNext()) {
           Object contentPart = iterator.next();
-          if (contentPart instanceof String || contentPart instanceof Integer) return true;
+          if (contentPart instanceof String || contentPart instanceof Integer) {
+            return true;
+          }
         }
       }
 
@@ -1730,21 +1833,31 @@ public class ScoutXmlDocument {
       // 1. Optimize content data structure
 
       if (m_content instanceof List) {
-        if (((List) m_content).size() == 0) m_content = null;
-        else ((ArrayList) m_content).trimToSize();
+        if (((List) m_content).size() == 0) {
+          m_content = null;
+        }
+        else {
+          ((ArrayList) m_content).trimToSize();
+        }
       }
 
       // 2. Optimize attribute data structure
 
       if (m_attributes != null) {
-        if (m_attributes.isEmpty()) m_attributes = null;
-        else ((ArrayList) m_attributes).trimToSize();
+        if (m_attributes.isEmpty()) {
+          m_attributes = null;
+        }
+        else {
+          ((ArrayList) m_attributes).trimToSize();
+        }
       }
 
       // 3. Optimize namespace data structure
 
       if (m_namespaces != null) {
-        if (m_namespaces.isEmpty()) m_namespaces = null;
+        if (m_namespaces.isEmpty()) {
+          m_namespaces = null;
+        }
       }
     }
 
@@ -1785,16 +1898,28 @@ public class ScoutXmlDocument {
         for (int i = 0; i < ((List) m_content).size(); i++) {
           Object contentPart = ((List) m_content).get(i);
 
-          if (contentPart instanceof String) stringBuffer.append((String) contentPart);
-          else if (contentPart instanceof Integer) stringBuffer.append(m_textRegistry.getValueAsString((Integer) contentPart));
+          if (contentPart instanceof String) {
+            stringBuffer.append((String) contentPart);
+          }
+          else if (contentPart instanceof Integer) {
+            stringBuffer.append(m_textRegistry.getValueAsString((Integer) contentPart));
+          }
         }
 
         text = stringBuffer.toString();
       }
 
-      if (text != null) if (ScoutXmlDocument.this.isIgnoreIndentWhitespace()) return text.replaceAll("\n *", "\n").replaceAll("\n\t*", "\n");
-      else return text;
-      else return defaultValue;
+      if (text != null) {
+        if (ScoutXmlDocument.this.isIgnoreIndentWhitespace()) {
+          return text.replaceAll("\n *", "\n").replaceAll("\n\t*", "\n");
+        }
+        else {
+          return text;
+        }
+      }
+      else {
+        return defaultValue;
+      }
     }
 
     /**
@@ -2074,8 +2199,12 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public ScoutXmlElement getRoot() {
-      if (this.hasParent()) return this.getParent().getRoot();
-      else return this;
+      if (this.hasParent()) {
+        return this.getParent().getRoot();
+      }
+      else {
+        return this;
+      }
     }
 
     /**
@@ -2142,8 +2271,12 @@ public class ScoutXmlDocument {
      */
     public void removeChild(ScoutXmlElement child) {
       try {
-        if (m_content.equals(child)) m_content = null;
-        else ((List) m_content).remove(child);
+        if (m_content.equals(child)) {
+          m_content = null;
+        }
+        else {
+          ((List) m_content).remove(child);
+        }
       }
       catch (Exception exception) {
         // Do nothing...
@@ -2219,8 +2352,12 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public void removeNamespace(String prefix) {
-      if (this.hasNamespace(prefix)) m_namespaces.remove(prefix);
-      else LOG.warn("Namespace with prefix '" + prefix + "' not removed, it doesn't exist for element '" + this.getNamePrefixed() + "'.");
+      if (this.hasNamespace(prefix)) {
+        m_namespaces.remove(prefix);
+      }
+      else {
+        LOG.warn("Namespace with prefix '" + prefix + "' not removed, it doesn't exist for element '" + this.getNamePrefixed() + "'.");
+      }
     }
 
     /**
@@ -2246,8 +2383,12 @@ public class ScoutXmlDocument {
         for (int i = 0; i < ((List) m_content).size(); i++) {
           Object contentPart = ((List) m_content).get(i);
 
-          if (contentPart instanceof String) ((List) m_content).remove(contentPart);
-          else if (contentPart instanceof Integer) ((List) m_content).remove(contentPart);
+          if (contentPart instanceof String) {
+            ((List) m_content).remove(contentPart);
+          }
+          else if (contentPart instanceof Integer) {
+            ((List) m_content).remove(contentPart);
+          }
         }
       }
     }
@@ -2341,11 +2482,15 @@ public class ScoutXmlDocument {
      */
     public void setAttribute(String name, String value) {
       if (value != null) {
-        if (m_attributes == null) m_attributes = new ArrayList(INITIAL_ATTRIBUTE_LIST_SIZE);
+        if (m_attributes == null) {
+          m_attributes = new ArrayList(INITIAL_ATTRIBUTE_LIST_SIZE);
+        }
 
         P_Attribute newAttribute = new P_Attribute(name, value);
 
-        if (ScoutXmlDocument.this.isStrictlyChecking() && this.hasAttribute(newAttribute.getNameExpanded())) this.getAttributeNode(newAttribute.getNameExpanded()).setValue(value);
+        if (ScoutXmlDocument.this.isStrictlyChecking() && this.hasAttribute(newAttribute.getNameExpanded())) {
+          this.getAttributeNode(newAttribute.getNameExpanded()).setValue(value);
+        }
 
         m_attributes.add(newAttribute);
       }
@@ -2357,10 +2502,15 @@ public class ScoutXmlDocument {
      */
     protected void setAttributes(Attributes attributes) {
       if (attributes.getLength() > 0) {
-        if (m_attributes == null) m_attributes = new ArrayList(attributes.getLength());
+        if (m_attributes == null) {
+          m_attributes = new ArrayList(attributes.getLength());
+        }
 
-        for (int i = 0; i < attributes.getLength(); i++)
-          if ((attributes.getValue(i) != null) && (!attributes.getValue(i).equals(""))) m_attributes.add(new P_Attribute(attributes.getQName(i), attributes.getValue(i)));
+        for (int i = 0; i < attributes.getLength(); i++) {
+          if ((attributes.getValue(i) != null) && (!attributes.getValue(i).equals(""))) {
+            m_attributes.add(new P_Attribute(attributes.getQName(i), attributes.getValue(i)));
+          }
+        }
       }
     }
 
@@ -2368,7 +2518,9 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public void setNamespace(String prefix, String namespaceURI) {
-      if (m_namespaces == null) m_namespaces = new Hashtable(INITIAL_NAMESPACE_MAP_SIZE);
+      if (m_namespaces == null) {
+        m_namespaces = new Hashtable(INITIAL_NAMESPACE_MAP_SIZE);
+      }
 
       m_namespaces.put((prefix != null ? prefix : ""), namespaceURI);
     }
@@ -2377,7 +2529,9 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     protected void setNamespaces(Map namespaces) {
-      if (m_namespaces == null) m_namespaces = new Hashtable(namespaces.size());
+      if (m_namespaces == null) {
+        m_namespaces = new Hashtable(namespaces.size());
+      }
 
       m_namespaces.putAll(namespaces);
     }
@@ -2418,8 +2572,9 @@ public class ScoutXmlDocument {
       if (this.hasAttributes()) {
         Iterator iterator = m_attributes.iterator();
 
-        while (iterator.hasNext() && visitor.isNotDoneYet())
+        while (iterator.hasNext() && visitor.isNotDoneYet()) {
           visitor.visit((P_Attribute) iterator.next());
+        }
 
         return visitor.getResult();
       }
@@ -2434,8 +2589,9 @@ public class ScoutXmlDocument {
     protected Object visitChildren(P_AbstractNodeVisitor visitor) {
       Iterator iterator = this.getChildren().iterator();
 
-      while (iterator.hasNext() && visitor.isNotDoneYet())
+      while (iterator.hasNext() && visitor.isNotDoneYet()) {
         visitor.visit((ScoutXmlElement) iterator.next());
+      }
 
       return visitor.getResult();
     }
@@ -2464,8 +2620,12 @@ public class ScoutXmlDocument {
     public void write(Writer writer) throws IOException {
       BufferedWriter bufferedWriter = null;
 
-      if (writer instanceof BufferedWriter) bufferedWriter = (BufferedWriter) writer;
-      else bufferedWriter = new BufferedWriter(writer);
+      if (writer instanceof BufferedWriter) {
+        bufferedWriter = (BufferedWriter) writer;
+      }
+      else {
+        bufferedWriter = new BufferedWriter(writer);
+      }
 
       this.write(bufferedWriter, "");
       bufferedWriter.flush();
@@ -2512,29 +2672,39 @@ public class ScoutXmlDocument {
           bufferedWriter.write('>');
 
           if (m_content instanceof List) {
-            if (ScoutXmlDocument.this.isPrettyPrint()) bufferedWriter.newLine();
+            if (ScoutXmlDocument.this.isPrettyPrint()) {
+              bufferedWriter.newLine();
+            }
 
             for (int i = 0; i < ((List) m_content).size(); i++) {
               Object o = ((List) m_content).get(i);
 
-              if (o instanceof ScoutXmlElement) ((ScoutXmlElement) o).write(bufferedWriter, currentIndent + ScoutXmlDocument.this.getIndent());
+              if (o instanceof ScoutXmlElement) {
+                ((ScoutXmlElement) o).write(bufferedWriter, currentIndent + ScoutXmlDocument.this.getIndent());
+              }
               else if (o instanceof Integer) {
                 bufferedWriter.write(currentIndent + ScoutXmlDocument.this.getIndent());
                 this.writeEncoded(bufferedWriter, m_textRegistry.getValueAsString(((Integer) o).intValue()));
 
-                if (ScoutXmlDocument.this.isPrettyPrint()) bufferedWriter.newLine();
+                if (ScoutXmlDocument.this.isPrettyPrint()) {
+                  bufferedWriter.newLine();
+                }
               }
             }
 
             bufferedWriter.write(currentIndent);
           }
           else if (m_content instanceof ScoutXmlElement) {
-            if (ScoutXmlDocument.this.isPrettyPrint()) bufferedWriter.newLine();
+            if (ScoutXmlDocument.this.isPrettyPrint()) {
+              bufferedWriter.newLine();
+            }
 
             ((ScoutXmlElement) m_content).write(bufferedWriter, currentIndent + ScoutXmlDocument.this.getIndent());
             bufferedWriter.write(currentIndent);
           }
-          else if (m_content instanceof Integer) this.writeEncoded(bufferedWriter, m_textRegistry.getValueAsString((Integer) m_content));
+          else if (m_content instanceof Integer) {
+            this.writeEncoded(bufferedWriter, m_textRegistry.getValueAsString((Integer) m_content));
+          }
 
           bufferedWriter.write('<');
           bufferedWriter.write('/');
@@ -2546,7 +2716,9 @@ public class ScoutXmlDocument {
           bufferedWriter.write('>');
         }
 
-        if (ScoutXmlDocument.this.isPrettyPrint()) bufferedWriter.newLine();
+        if (ScoutXmlDocument.this.isPrettyPrint()) {
+          bufferedWriter.newLine();
+        }
       }
       else {
         throw new ScoutXmlException("Can't write this element because it has no name.");
@@ -2561,8 +2733,12 @@ public class ScoutXmlDocument {
         for (int i = 0; i < string.length(); i++) {
           String ch = "" + string.charAt(i);
           String escaped = ScoutXmlDocument.XML_ENTITIES.get(ch);
-          if (escaped != null) bufferedWriter.write(escaped);
-          else bufferedWriter.write(ch);
+          if (escaped != null) {
+            bufferedWriter.write(escaped);
+          }
+          else {
+            bufferedWriter.write(ch);
+          }
         }
       }
     }
@@ -2744,8 +2920,12 @@ public class ScoutXmlDocument {
       public void write(Writer writer) throws IOException {
         BufferedWriter bufferedWriter = null;
 
-        if (writer instanceof BufferedWriter) bufferedWriter = (BufferedWriter) writer;
-        else bufferedWriter = new BufferedWriter(writer);
+        if (writer instanceof BufferedWriter) {
+          bufferedWriter = (BufferedWriter) writer;
+        }
+        else {
+          bufferedWriter = new BufferedWriter(writer);
+        }
 
         bufferedWriter.write(m_nameRegistry.getValueAsString(m_nameID));
         bufferedWriter.write('=');

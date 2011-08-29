@@ -149,7 +149,9 @@ public final class StringUtility {
   }
 
   public static boolean parseBoolean(String s, boolean defaultValue) {
-    if (s == null || s.length() == 0) return defaultValue;
+    if (s == null || s.length() == 0) {
+      return defaultValue;
+    }
     s = s.toLowerCase().trim();
     if (defaultValue) {
       return !("0,false,no".indexOf(s) >= 0);
@@ -169,7 +171,9 @@ public final class StringUtility {
    * @since Build 153
    */
   public static int getLineCount(String s) {
-    if (s == null || s.length() == 0) return 0;
+    if (s == null || s.length() == 0) {
+      return 0;
+    }
     int r = 1;
     int pos = 0;
     while ((pos = s.indexOf('\n', pos)) >= 0) {
@@ -187,16 +191,22 @@ public final class StringUtility {
   public static String[] getLines(String s) {
     int count = getLineCount(s);
     String[] lines = new String[count];
-    if (count == 0) return lines;
+    if (count == 0) {
+      return lines;
+    }
     int index = 0;
     int begin = 0;
     int pos = 0;
     while ((pos = s.indexOf('\n', pos)) >= 0) {
       String unit = s.substring(begin, pos);
       int ulen = unit.length();
-      if (ulen > 0 && unit.charAt(0) == '\r') unit = unit.substring(1);
+      if (ulen > 0 && unit.charAt(0) == '\r') {
+        unit = unit.substring(1);
+      }
       ulen = unit.length();
-      if (ulen > 0 && unit.charAt(ulen - 1) == '\r') unit = unit.substring(0, ulen - 1);
+      if (ulen > 0 && unit.charAt(ulen - 1) == '\r') {
+        unit = unit.substring(0, ulen - 1);
+      }
       ulen = unit.length();
       lines[index] = unit;
       // next
@@ -212,7 +222,9 @@ public final class StringUtility {
    * encode a string by escaping " -> "" and ' -> ''
    */
   public static String stringEsc(String s) {
-    if (s == null) return null;
+    if (s == null) {
+      return null;
+    }
     s = s.replaceAll("[\"]", "\"\"");
     s = s.replaceAll("[']", "''");
     return s;
@@ -228,7 +240,9 @@ public final class StringUtility {
   }
 
   public static String removeMnemonic(String text) {
-    if (text == null) return null;
+    if (text == null) {
+      return null;
+    }
     Matcher m = MNEMONIC_PATTERN.matcher(text);
     return m.replaceAll("$1");
   }
@@ -252,7 +266,9 @@ public final class StringUtility {
    *         blank.
    */
   public static String removeNewLines(String text) {
-    if (isNullOrEmpty(text)) return text;
+    if (isNullOrEmpty(text)) {
+      return text;
+    }
     String s = text.replaceAll("\r\n|\n\r", " ");
     s = s.replace('\n', ' ').replace('\r', ' ');
     return s;
@@ -307,7 +323,9 @@ public final class StringUtility {
    * @return the contents between a start and a end tag, resp "" when there is a single tag
    */
   public static String getTag(String text, String tagName) {
-    if (text == null) return null;
+    if (text == null) {
+      return null;
+    }
     TagBounds a;
     TagBounds b;
     if ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = getEndTag(text, tagName, a.end)).begin >= 0) {
@@ -336,7 +354,9 @@ public final class StringUtility {
    * be careful to not replace the tag again with the tag, this will result in an endless loop
    */
   public static String replaceTags(String text, String tagName, ITagProcessor processor) {
-    if (text == null) return null;
+    if (text == null) {
+      return null;
+    }
     TagBounds a;
     TagBounds b;
     while ((a = getSingleTag(text, tagName, 0)).begin >= 0) {
@@ -353,7 +373,9 @@ public final class StringUtility {
   }
 
   public static String removeTag(String text, String tagName) {
-    if (text == null) return null;
+    if (text == null) {
+      return null;
+    }
     TagBounds a;
     TagBounds b;
     while ((a = getSingleTag(text, tagName, 0)).begin >= 0) {
@@ -366,7 +388,9 @@ public final class StringUtility {
   }
 
   public static String removeTags(String text, String[] tagNames) {
-    if (text == null) return null;
+    if (text == null) {
+      return null;
+    }
     for (int i = 0; i < tagNames.length; i++) {
       text = removeTag(text, tagNames[i]);
     }
@@ -374,13 +398,17 @@ public final class StringUtility {
   }
 
   public static String removeTags(String text) {
-    if (text == null) return null;
+    if (text == null) {
+      return null;
+    }
     text = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(text).replaceAll("");
     return text;
   }
 
   public static String removeTagBounds(String text, String tagName) {
-    if (text == null) return null;
+    if (text == null) {
+      return null;
+    }
     TagBounds a;
     TagBounds b;
     while ((a = getSingleTag(text, tagName, 0)).begin >= 0) {
@@ -393,7 +421,9 @@ public final class StringUtility {
   }
 
   public static String replaceTagBounds(String text, String tagName, String start, String end) {
-    if (text == null) return null;
+    if (text == null) {
+      return null;
+    }
     TagBounds a;
     int b;
     int startPos = 0;
@@ -413,7 +443,9 @@ public final class StringUtility {
   public static final Pattern MNEMONIC_PATTERN = Pattern.compile("\\&([-?_.,a-zA-Z0-9])", Pattern.DOTALL);
 
   public static char getMnemonic(String text) {
-    if (text == null) return 0x0;
+    if (text == null) {
+      return 0x0;
+    }
     Matcher m = MNEMONIC_PATTERN.matcher(text);
     if (m.find()) {
       return m.group(1).charAt(0);
@@ -422,7 +454,9 @@ public final class StringUtility {
   }
 
   public static String wrapText(String s, int lineSize) {
-    if (s == null) return null;
+    if (s == null) {
+      return null;
+    }
     StringBuffer buf = new StringBuffer();
     if (s != null) {
       char[] ch = s.toCharArray();
@@ -446,7 +480,9 @@ public final class StringUtility {
   }
 
   public static String wrapWord(String s, int lineSize) {
-    if (s == null) return null;
+    if (s == null) {
+      return null;
+    }
     StringBuffer buf = new StringBuffer();
     for (String line : s.split("[\\n\\r]")) {
       if (buf.length() > 0) {
@@ -472,14 +508,18 @@ public final class StringUtility {
   }
 
   public static String unwrapText(String s) {
-    if (s == null || s.length() == 0) return null;
+    if (s == null || s.length() == 0) {
+      return null;
+    }
     s = s.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ');
     s = s.replaceAll("[ ]+", " ");
     return s.trim();
   }
 
   public static boolean isQuotedText(String s) {
-    if (s == null || s.length() == 0) return false;
+    if (s == null || s.length() == 0) {
+      return false;
+    }
     if (s.charAt(0) == '\'' && s.charAt(s.length() - 1) == '\'') {
       return true;
     }
@@ -490,7 +530,9 @@ public final class StringUtility {
   }
 
   public static String unquoteText(String s) {
-    if (s == null || s.length() == 0) return null;
+    if (s == null || s.length() == 0) {
+      return null;
+    }
     if (s.charAt(0) == '\'' && s.charAt(s.length() - 1) == '\'') {
       s = s.substring(1, s.length() - 1);
     }
@@ -501,18 +543,30 @@ public final class StringUtility {
   }
 
   public static String valueOf(Object o) {
-    if (o == null) return "";
-    if (o instanceof byte[]) return new String((byte[]) o);
-    if (o instanceof char[]) return new String((char[]) o);
+    if (o == null) {
+      return "";
+    }
+    if (o instanceof byte[]) {
+      return new String((byte[]) o);
+    }
+    if (o instanceof char[]) {
+      return new String((char[]) o);
+    }
     return o.toString();
   }
 
   public static String className(Object o) {
-    if (o == null) return "";
+    if (o == null) {
+      return "";
+    }
     String s = o.getClass().getName();
     int i = s.lastIndexOf('.');
-    if (i >= 0) return s.substring(i + 1);
-    else return s;
+    if (i >= 0) {
+      return s.substring(i + 1);
+    }
+    else {
+      return s;
+    }
   }
 
   /*
@@ -522,7 +576,9 @@ public final class StringUtility {
   private static final String CONVERT_UTF_ASCII_HEX_CHARS = "0123456789abcdef";
 
   public static String convertUTFAscii(String s, boolean escapeControlChars) {
-    if (s == null || s.length() == 0) return s;
+    if (s == null || s.length() == 0) {
+      return s;
+    }
     int len = s.length();
     StringBuffer buf = new StringBuffer(len * 2);
     for (int i = 0; i < len; i++) {
@@ -532,20 +588,36 @@ public final class StringUtility {
           buf.append("\\\\");
           break;
         case '\t':
-          if (escapeControlChars) buf.append("\\t");
-          else buf.append(ch);
+          if (escapeControlChars) {
+            buf.append("\\t");
+          }
+          else {
+            buf.append(ch);
+          }
           break;
         case '\n':
-          if (escapeControlChars) buf.append("\\n");
-          else buf.append(ch);
+          if (escapeControlChars) {
+            buf.append("\\n");
+          }
+          else {
+            buf.append(ch);
+          }
           break;
         case '\r':
-          if (escapeControlChars) buf.append("\\r");
-          else buf.append(ch);
+          if (escapeControlChars) {
+            buf.append("\\r");
+          }
+          else {
+            buf.append(ch);
+          }
           break;
         case '\f':
-          if (escapeControlChars) buf.append("\\f");
-          else buf.append(ch);
+          if (escapeControlChars) {
+            buf.append("\\f");
+          }
+          else {
+            buf.append(ch);
+          }
           break;
         default:
           if ((ch < 0x0020) || (ch > 0x007e)) {
@@ -569,7 +641,9 @@ public final class StringUtility {
    * chars to their original forms
    */
   public static String convertAsciiUTF(String s) {
-    if (s == null || s.length() == 0) return s;
+    if (s == null || s.length() == 0) {
+      return s;
+    }
     char ch;
     int len = s.length();
     StringBuffer buf = new StringBuffer(len);
@@ -622,12 +696,18 @@ public final class StringUtility {
   }
 
   public static int asc(String s) {
-    if (s == null || s.length() == 0) return 0;
-    else return s.charAt(0);
+    if (s == null || s.length() == 0) {
+      return 0;
+    }
+    else {
+      return s.charAt(0);
+    }
   }
 
   public static byte[] hexToBytes(String s) {
-    if (s == null) return new byte[0];
+    if (s == null) {
+      return new byte[0];
+    }
     int slen = s.length();
     byte[] a = new byte[slen / 2];
     for (int i = 0; i < slen; i = i + 2) {
@@ -637,7 +717,9 @@ public final class StringUtility {
   }
 
   public static String bytesToHex(byte[] a) {
-    if (a == null || a.length == 0) return null;
+    if (a == null || a.length == 0) {
+      return null;
+    }
     StringBuffer buf = new StringBuffer(a.length * 2);
     int hi, lo;
     for (int i = 0; i < a.length; i++) {
@@ -727,23 +809,37 @@ public final class StringUtility {
   }
 
   public static boolean equalsIgnoreCase(String a, String b) {
-    if (a == null) a = "";
-    if (b == null) b = "";
+    if (a == null) {
+      a = "";
+    }
+    if (b == null) {
+      b = "";
+    }
     return a.equalsIgnoreCase(b);
   }
 
   public static boolean notEequalsIgnoreCase(String a, String b) {
-    if (a == null) a = "";
-    if (b == null) b = "";
+    if (a == null) {
+      a = "";
+    }
+    if (b == null) {
+      b = "";
+    }
     return !a.equalsIgnoreCase(b);
   }
 
   public static final Pattern NEWLINE_PATTERN = Pattern.compile("[\\n\\r]+");
 
   public static boolean equalsIgnoreNewLines(String a, String b) {
-    if (a == b) return true;
-    if (a == null) return false;
-    if (b == null) return false;
+    if (a == b) {
+      return true;
+    }
+    if (a == null) {
+      return false;
+    }
+    if (b == null) {
+      return false;
+    }
     return NEWLINE_PATTERN.matcher(a).replaceAll(" ").equals(NEWLINE_PATTERN.matcher(b).replaceAll(" "));
   }
 
@@ -755,8 +851,12 @@ public final class StringUtility {
    * since JRE 1.5 same as: <code>"test-text/info.12345".replaceAll("[^a-zA-Z0-2]","_")</code>
    */
   public static String filterText(String text, String allowedCharacters, String replacementText) {
-    if (text == null || allowedCharacters == null) return text;
-    if (replacementText == null) replacementText = "";
+    if (text == null || allowedCharacters == null) {
+      return text;
+    }
+    if (replacementText == null) {
+      replacementText = "";
+    }
     return text.replaceAll("[^" + allowedCharacters + "]", replacementText);
   }
 
@@ -765,7 +865,9 @@ public final class StringUtility {
   }
 
   public static int find(String s, String what, int start) {
-    if (s == null || start >= s.length()) return -1;
+    if (s == null || start >= s.length()) {
+      return -1;
+    }
     return s.indexOf(what, start);
   }
 
@@ -789,8 +891,12 @@ public final class StringUtility {
    *         phone number will be returned.
    */
   public static String formatPhone(String phoneNumber, String formattingPattern, String countryCode) {
-    if (phoneNumber == null) return null;
-    if (formattingPattern == null) return phoneNumber;
+    if (phoneNumber == null) {
+      return null;
+    }
+    if (formattingPattern == null) {
+      return phoneNumber;
+    }
     if (countryCode == null) {
       return phoneNumber;
     }
@@ -874,38 +980,56 @@ public final class StringUtility {
   }
 
   public static String lowercase(String s) {
-    if (s == null) return null;
-    else return s.toLowerCase();
+    if (s == null) {
+      return null;
+    }
+    else {
+      return s.toLowerCase();
+    }
   }
 
   public static String uppercase(String s) {
-    if (s == null) return null;
-    else return s.toUpperCase();
+    if (s == null) {
+      return null;
+    }
+    else {
+      return s.toUpperCase();
+    }
   }
 
   public static String[] split(String s, String regex) {
-    if (s == null || s.length() == 0) return new String[0];
+    if (s == null || s.length() == 0) {
+      return new String[0];
+    }
     return s.split(regex);
   }
 
   public static String substring(String s, int start) {
-    if (s == null || start >= s.length()) return "";
+    if (s == null || start >= s.length()) {
+      return "";
+    }
     return s.substring(start);
   }
 
   public static String substring(String s, int start, int len) {
-    if (s == null || start >= s.length()) return "";
+    if (s == null || start >= s.length()) {
+      return "";
+    }
     len = Math.min(s.length() - start, len);
     return s.substring(start, start + len);
   }
 
   public static String trim(String s) {
-    if (s == null) return null;
+    if (s == null) {
+      return null;
+    }
     return s.trim();
   }
 
   public static String lpad(String s, String fill, int len) {
-    if (s == null || fill == null || s.length() >= len || fill.length() == 0) return s;
+    if (s == null || fill == null || s.length() >= len || fill.length() == 0) {
+      return s;
+    }
     StringBuffer buf = new StringBuffer(s);
     while (buf.length() < len) {
       buf.insert(0, fill);
@@ -914,7 +1038,9 @@ public final class StringUtility {
   }
 
   public static String rpad(String s, String fill, int len) {
-    if (s == null || fill == null || s.length() >= len || fill.length() == 0) return s;
+    if (s == null || fill == null || s.length() >= len || fill.length() == 0) {
+      return s;
+    }
     StringBuffer buf = new StringBuffer(s);
     while (buf.length() < len) {
       buf.append(fill);
@@ -955,8 +1081,12 @@ public final class StringUtility {
   }
 
   public static String nvl(Object value, String valueWhenNull) {
-    if (value != null) return value.toString();
-    else return valueWhenNull;
+    if (value != null) {
+      return value.toString();
+    }
+    else {
+      return valueWhenNull;
+    }
   }
 
   /**
@@ -964,7 +1094,9 @@ public final class StringUtility {
    */
   public static String replace(String s, String sOld, String sNew) {
     sNew = (sNew == null ? "" : sNew);
-    if (s == null || sOld == null) return s;
+    if (s == null || sOld == null) {
+      return s;
+    }
     return s.replace(sOld, sNew);
   }
 
@@ -972,7 +1104,9 @@ public final class StringUtility {
    * replace plain text without using regex, ignoring case
    */
   public static String replaceNoCase(String s, String sOld, String sNew) {
-    if (s == null || sOld == null || sNew == null) return s;
+    if (s == null || sOld == null || sNew == null) {
+      return s;
+    }
     StringBuffer buf = new StringBuffer();
     int oldLen = sOld.length();
     int pos = 0;
@@ -1015,7 +1149,9 @@ public final class StringUtility {
   private static final TagBounds TAG_BOUNDS_NOT_FOUND = new TagBounds(-1, -1);
 
   public static String unescapeWhitespace(String s) {
-    if (s == null) return null;
+    if (s == null) {
+      return null;
+    }
     s = s.replaceAll("\\\\n", "\n");
     s = s.replaceAll("\\\\t", "\t");
     s = s.replaceAll("\\\\r", "\r");
@@ -1025,7 +1161,9 @@ public final class StringUtility {
   }
 
   public static String escapeWhitespace(String s) {
-    if (s == null) return null;
+    if (s == null) {
+      return null;
+    }
     s = s.replaceAll("\n", "\\\\n");
     s = s.replaceAll("\t", "\\\\t");
     s = s.replaceAll("\r", "\\\\r");
@@ -1306,12 +1444,22 @@ public final class StringUtility {
    * compare two strings using a locale-dependent {@link Collator}
    */
   public static int compareIgnoreCase(Locale locale, String a, String b) {
-    if (a != null && a.length() == 0) a = null;
-    if (b != null && b.length() == 0) b = null;
+    if (a != null && a.length() == 0) {
+      a = null;
+    }
+    if (b != null && b.length() == 0) {
+      b = null;
+    }
     //
-    if (a == b) return 0;
-    if (a == null) return -1;
-    if (b == null) return 1;
+    if (a == b) {
+      return 0;
+    }
+    if (a == null) {
+      return -1;
+    }
+    if (b == null) {
+      return 1;
+    }
     Collator collator = Collator.getInstance(locale);
     collator.setStrength(Collator.SECONDARY);
     return collator.compare(a, b);

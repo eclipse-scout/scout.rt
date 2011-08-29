@@ -28,7 +28,9 @@ public final class Base64Utility {
    */
   public static String encode(byte[] bytes) {
     int length = bytes.length;
-    if (length == 0) return "";
+    if (length == 0) {
+      return "";
+    }
     StringBuffer buffer =
         new StringBuffer((int) Math.ceil(length / 3d) * 4);
     int remainder = length % 3;
@@ -43,7 +45,9 @@ public final class Base64Utility {
       buffer.append(ALPHABET.charAt((block >>> 6) & 0x3f));
       buffer.append(ALPHABET.charAt(block & 0x3f));
     }
-    if (remainder == 0) return buffer.toString();
+    if (remainder == 0) {
+      return buffer.toString();
+    }
     if (remainder == 1) {
       block = (bytes[i] & 0xff) << 4;
       buffer.append(ALPHABET.charAt(block >>> 6));
@@ -69,7 +73,9 @@ public final class Base64Utility {
   public static byte[] decode(String string) {
     string = string.replaceAll("[^A-Za-z0-9+/=]", "");
     int length = string.length();
-    if (length == 0) return new byte[0];
+    if (length == 0) {
+      return new byte[0];
+    }
     int pad = (string.charAt(length - 2) == '=') ? 2 :
         (string.charAt(length - 1) == '=') ? 1 : 0;
     int size = length * 3 / 4 - pad;
@@ -83,8 +89,12 @@ public final class Base64Utility {
           (ALPHABET.indexOf(string.charAt(i++)) & 0xff) << 6 |
           (ALPHABET.indexOf(string.charAt(i++)) & 0xff);
       buffer[index++] = (byte) (block >>> 16);
-      if (index < size) buffer[index++] = (byte) ((block >>> 8) & 0xff);
-      if (index < size) buffer[index++] = (byte) (block & 0xff);
+      if (index < size) {
+        buffer[index++] = (byte) ((block >>> 8) & 0xff);
+      }
+      if (index < size) {
+        buffer[index++] = (byte) (block & 0xff);
+      }
     }
     return buffer;
   }

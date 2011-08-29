@@ -65,7 +65,9 @@ public class EventListenerList implements IEventListenerSource {
           Object ref = lList[i + 1];
           if (ref instanceof WeakReference) {
             result[j] = (T) ((WeakReference) ref).get();
-            if (result[j] == null) nullCount++;
+            if (result[j] == null) {
+              nullCount++;
+            }
             j++;
           }
           else {

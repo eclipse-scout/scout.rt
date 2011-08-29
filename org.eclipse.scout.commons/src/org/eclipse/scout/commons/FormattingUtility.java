@@ -42,7 +42,9 @@ public final class FormattingUtility {
    */
   public static String formatObject(Object o) {
     Locale loc = LocaleThreadLocal.get();
-    if (loc == null) loc = Locale.getDefault();
+    if (loc == null) {
+      loc = Locale.getDefault();
+    }
 
     String ret = null;
 

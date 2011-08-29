@@ -53,7 +53,9 @@ public final class NlsUtility {
         // if the class is not public) then change the accessible
         // attribute of the field
         // before trying to set the value.
-        if (!isAccessible) makeAccessible(field);
+        if (!isAccessible) {
+          makeAccessible(field);
+        }
         // Set the value into the field. We should never get an
         // exception here because
         // we know we have a public static non-final field. If we do get
@@ -136,7 +138,9 @@ public final class NlsUtility {
   }
 
   public static Locale parseLocale(String pattern) {
-    if (pattern == null) return Locale.getDefault();
+    if (pattern == null) {
+      return Locale.getDefault();
+    }
     String[] a = pattern.split("_");
     switch (a.length) {
       case 1:

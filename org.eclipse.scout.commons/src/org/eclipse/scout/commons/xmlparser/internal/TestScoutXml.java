@@ -82,7 +82,9 @@ public final class TestScoutXml {
       parser.setIgnoreExternalEntities(true);
       ScoutXmlDocument document = null;
 
-      if (files[i].getName().endsWith("dtd")) continue;
+      if (files[i].getName().endsWith("dtd")) {
+        continue;
+      }
       if (readDirectory != null) {
         System.out.println();
         long timeR = System.currentTimeMillis();

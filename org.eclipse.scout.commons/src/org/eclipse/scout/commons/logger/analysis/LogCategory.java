@@ -36,9 +36,13 @@ public class LogCategory {
 
   // parse all "Caused by: javax.servlet.ServletException: abc def"
   private String createAttachmentSignature(String s) {
-    if (s == null) return "- none -";
+    if (s == null) {
+      return "- none -";
+    }
     s = s.trim();
-    if (s.length() == 0) return "- none -";
+    if (s.length() == 0) {
+      return "- none -";
+    }
     //
     StringBuffer buf = new StringBuffer();
     for (String line : s.split("\n")) {

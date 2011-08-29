@@ -417,8 +417,12 @@ public final class IOUtility {
    *         separators.
    */
   public static File toFile(String s) {
-    if (s == null) return null;
-    else return new File(s.replace('\\', File.separatorChar).replace('/', File.separatorChar));
+    if (s == null) {
+      return null;
+    }
+    else {
+      return new File(s.replace('\\', File.separatorChar).replace('/', File.separatorChar));
+    }
   }
 
   /**

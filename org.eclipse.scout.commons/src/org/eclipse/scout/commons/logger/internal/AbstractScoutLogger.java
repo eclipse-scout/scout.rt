@@ -22,7 +22,9 @@ public abstract class AbstractScoutLogger implements IScoutLogger {
   }
 
   protected void log(int level, String format, Object[] args, Throwable t) {
-    if (!isLoggable(level)) return;
+    if (!isLoggable(level)) {
+      return;
+    }
     LogRecord record = JavaLogUtility.buildLogRecord(AbstractScoutLogger.class, JavaLogUtility.scoutToJavaLevel(level), format, args);
     record.setLoggerName(getName());
     record.setThrown(t);

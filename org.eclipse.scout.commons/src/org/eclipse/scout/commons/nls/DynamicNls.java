@@ -67,7 +67,9 @@ public abstract class DynamicNls {
    *          werden
    */
   public final String getText(Locale locale, String key, String... messageArguments) {
-    if (key == null) return null;
+    if (key == null) {
+      return null;
+    }
     //
     String text = getTextInternal(locale, key);
     return NlsUtility.bindText(text, messageArguments);

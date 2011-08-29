@@ -68,8 +68,12 @@ public class TTLCache<K, V> {
 
   public V get(K key) {
     CacheEntryTTL ce = getEntry(key);
-    if (ce != null) return ce.getValue();
-    else return null;
+    if (ce != null) {
+      return ce.getValue();
+    }
+    else {
+      return null;
+    }
   }
 
   public Set<K> keySet() {

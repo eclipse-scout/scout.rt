@@ -551,8 +551,12 @@ public final class MailUtility {
    * @since 2.7
    */
   public static String getContentTypeForExtension(String ext) {
-    if (ext == null) return null;
-    if (ext.startsWith(".")) ext = ext.substring(1);
+    if (ext == null) {
+      return null;
+    }
+    if (ext.startsWith(".")) {
+      ext = ext.substring(1);
+    }
     ext = ext.toLowerCase();
     String type = FileUtility.getContentTypeForExtension(ext);
     if (type == null) {
