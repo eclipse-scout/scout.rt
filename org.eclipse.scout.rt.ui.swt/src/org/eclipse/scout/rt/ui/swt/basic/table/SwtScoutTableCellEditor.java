@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt.basic.table;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorDeactivationEvent;
@@ -111,13 +112,17 @@ public class SwtScoutTableCellEditor {
         if (c == null || !(c instanceof Control)) {
           return;
         }
-        boolean oldValue = m_tableIsEditingAndContainsFocus;
-        boolean newValue = SwtUtility.isAncestorOf(m_tableComposite.getSwtField(), (Control) c);
-        m_tableIsEditingAndContainsFocus = newValue;
-        if (oldValue && !newValue) {
-          TableViewer v = m_tableComposite.getSwtTableViewer();
-          if (v instanceof TableViewerEx) {
-            ((TableViewerEx) v).applyEditorValue();
+        boolean wasEditingOrContainedFocus = m_tableIsEditingAndContainsFocus;
+        if (wasEditingOrContainedFocus) {
+          boolean isEditingOrContainsFocus =
+              (SwtUtility.isAncestorOf(m_tableComposite.getSwtField(), (Control) c)
+              || c.getData() instanceof Dialog);
+          m_tableIsEditingAndContainsFocus = isEditingOrContainsFocus;
+          if (wasEditingOrContainedFocus && !isEditingOrContainsFocus) {
+            TableViewer v = m_tableComposite.getSwtTableViewer();
+            if (v instanceof TableViewerEx) {
+              ((TableViewerEx) v).applyEditorValue();
+            }
           }
         }
       }

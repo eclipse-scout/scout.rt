@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -67,7 +67,6 @@ public class DateChooserDialog extends Dialog {
     m_model = new DatefieldTableModel(getEnvironment());
     setDisplayDate(date);
     setBlockOnOpen(true);
-
   }
 
   private void setDisplayDate(Date date) {
@@ -78,7 +77,6 @@ public class DateChooserDialog extends Dialog {
   public Date openDateChooser(Control c) {
     showDialogFor(c);
     return m_returnDate;
-
   }
 
   /**
@@ -94,10 +92,8 @@ public class DateChooserDialog extends Dialog {
     });
     // make sure that the popup fit into the application window.
     Rectangle appBounds = getEnvironment().getDisplay().getBounds();
-    Point absPrefPos = field.toDisplay(field.getSize().x - getShell().getSize().x, field
-        .getSize().y);
-    Rectangle prefBounds = new Rectangle(absPrefPos.x, absPrefPos.y, getShell().getSize().x,
-        getShell().getSize().y);
+    Point absPrefPos = field.toDisplay(field.getSize().x - getShell().getSize().x, field.getSize().y);
+    Rectangle prefBounds = new Rectangle(absPrefPos.x, absPrefPos.y, getShell().getSize().x, getShell().getSize().y);
     // horizontal correction
     if (prefBounds.x + prefBounds.width > appBounds.width) {
       prefBounds.x = appBounds.width - prefBounds.width;
@@ -143,7 +139,6 @@ public class DateChooserDialog extends Dialog {
     m_cursor = new TableCursor(table, SWT.NONE);
 
     m_cursor.addSelectionListener(new SelectionAdapter() {
-
       @Override
       public void widgetSelected(SelectionEvent e) {
         TableCursor cursor = (TableCursor) e.widget;
@@ -155,7 +150,6 @@ public class DateChooserDialog extends Dialog {
             close();
           }
         });
-
       }
     });
 
@@ -185,38 +179,6 @@ public class DateChooserDialog extends Dialog {
     m_viewer.setLabelProvider(m_model);
     m_viewer.setContentProvider(m_model);
     m_viewer.setInput(m_model);
-
-    // table.addListener(SWT.Resize, new Listener(){
-    // public void handleEvent(Event event) {
-    // m_viewer.getTable().
-    // }
-    // });
-    // layout
-    // table.setLayout(new Layout() {
-    // protected org.eclipse.swt.graphics.Point computeSize(Composite composite,
-    // int wHint, int hHint, boolean flushCache) {
-    // Control[] children = composite.getChildren();
-    // Table t = ((Table) children[0]);
-    // t.getGridLineWidth();
-    // System.out.println("item height = "+new Point(5*t.getGridLineWidth() +7 *
-    // COLUMN_WIDTH + t.getBorderWidth()*2,
-    // ( t.getItemCount()-1)*t.getGridLineWidth() +t.getItemCount() *
-    // t.getItemHeight() + t.getHeaderHeight()+t.getBorderWidth()*2));
-    // return new Point(5*t.getGridLineWidth() +7 * COLUMN_WIDTH +
-    // t.getBorderWidth()*2,
-    // ( t.getItemCount()-1)*t.getGridLineWidth() +t.getItemCount() *
-    // t.getItemHeight() + t.getHeaderHeight()+t.getBorderWidth()*2);
-    // }
-    //
-    // protected void layout(Composite composite, boolean flushCache) {
-    // Rectangle clientArea = composite.getClientArea();
-    // Control[] children = composite.getChildren();
-    // // Point size = children[0].computeSize(SWT.DEFAULT, SWT.DEFAULT);
-    // System.out.println("bounds = "+clientArea);
-    // children[0].setBounds(clientArea.x,clientArea.y,clientArea.width,
-    // clientArea.height);
-    // }
-    // });
 
     return table;
   }
@@ -294,5 +256,4 @@ public class DateChooserDialog extends Dialog {
   public ISwtEnvironment getEnvironment() {
     return m_environment;
   }
-
 }
