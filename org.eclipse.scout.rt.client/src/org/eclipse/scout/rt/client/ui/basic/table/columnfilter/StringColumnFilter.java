@@ -65,7 +65,7 @@ public class StringColumnFilter implements ITableColumnFilter<String> {
     HashMap<String, Integer> countMap = new HashMap<String, Integer>();
     for (ITableRow row : m_column.getTable().getRows()) {
       String s = m_column.getDisplayText(row);
-      if (s != null && s.trim().length() == 0) {
+      if (!StringUtility.hasText(s)) {
         s = null;
       }
       if (s != null && !hist.containsKey(s)) {
@@ -96,7 +96,7 @@ public class StringColumnFilter implements ITableColumnFilter<String> {
 
   public boolean accept(ITableRow row) {
     String value = m_column.getDisplayText(row);
-    if (value != null && value.trim().length() == 0) {
+    if (!StringUtility.hasText(value)) {
       value = null;
     }
     if (m_pattern != null) {

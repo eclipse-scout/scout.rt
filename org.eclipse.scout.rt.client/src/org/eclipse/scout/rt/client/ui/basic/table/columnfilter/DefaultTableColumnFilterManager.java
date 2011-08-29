@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -78,7 +78,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     ITableColumnFilter<?> filter = m_filterMap.get(col);
     if (filter == null) {
       if (col instanceof ISmartColumn<?>) {
-        filter = new SmartColumnFilter((ISmartColumn) col);
+        filter = new StringColumnFilter(col);
       }
       else if (String.class.isAssignableFrom(col.getDataType())) {
         filter = new StringColumnFilter(col);

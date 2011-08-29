@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,8 +25,9 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
- *
+ * Deprecated This class will be removed in the next release because it is not used anymore.
  */
+@Deprecated
 public class SmartColumnFilter<T> implements ITableColumnFilter<T> {
   private final ISmartColumn<T> m_column;
   private Set<T> m_selectedValues;
