@@ -61,17 +61,27 @@ public class ColumnSplitStrategy implements IMultiSplitStrategy {
       for (int r = 0; r < in.length; r++) {
         in[r][0] = 0;
         if (r == 0) {
-          if (in[r][3] < 60) in[r][3] = 60;
+          if (in[r][3] < 60) {
+            in[r][3] = 60;
+          }
         }
         else {
           in[r][3] = in[0][3];
         }
         //
-        if (in[r][1] - 20 < in[r][0]) in[r][1] = in[r][0] + 20;
-        if (in[r][2] - 20 < in[r][1]) in[r][2] = in[r][1] + 20;
+        if (in[r][1] - 20 < in[r][0]) {
+          in[r][1] = in[r][0] + 20;
+        }
+        if (in[r][2] - 20 < in[r][1]) {
+          in[r][2] = in[r][1] + 20;
+        }
         //
-        if (in[r][1] + 20 > in[r][2]) in[r][1] = in[r][2] - 20;
-        if (in[r][2] + 20 > in[r][3]) in[r][2] = in[r][3] - 20;
+        if (in[r][1] + 20 > in[r][2]) {
+          in[r][1] = in[r][2] - 20;
+        }
+        if (in[r][2] + 20 > in[r][3]) {
+          in[r][2] = in[r][3] - 20;
+        }
         //
         if (in[r][1] + 20 > in[r][2]) {
           int mid = (in[r][1] + in[r][2]) / 2;

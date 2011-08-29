@@ -83,7 +83,9 @@ public class DependentCloseListener {
       int activeCount = 0;
       if (m_dependingWindows != null && m_dependingWindows.size() > 0) {
         for (Window w : m_dependingWindows) {
-          if (w.isVisible()) activeCount++;
+          if (w.isVisible()) {
+            activeCount++;
+          }
         }
       }
       if (activeCount == 0) {

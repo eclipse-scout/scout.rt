@@ -42,8 +42,9 @@ public class WeekCalendarItem extends AbstractCalendarItem {
     // We want a correct numbering of timeless item. Global counter stored
     // inside WeekCell (only used if timeless).
     int timelessIndex = 0;
-    if (!m_item.isTimed())
+    if (!m_item.isTimed()) {
       timelessIndex = ((WeekCell)m_cell).getNextTimelessCounter();
+    }
 
     WeekItemData wid = new WeekItemData ();
     wid.m_item = m_item;

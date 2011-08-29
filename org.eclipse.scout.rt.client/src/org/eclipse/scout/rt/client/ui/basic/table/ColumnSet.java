@@ -104,7 +104,9 @@ public class ColumnSet {
     for (int modelIndex = 0; modelIndex < n; modelIndex++) {
       IColumn col = getColumn(modelIndex);
       int viewHint = col.getVisibleColumnIndexHint();
-      if (viewHint < 0) viewHint = viewIndex;
+      if (viewHint < 0) {
+        viewHint = viewIndex;
+      }
       sortMap.put(new CompositeObject(viewHint, viewIndex), col);
       // next
       viewIndex++;
@@ -260,8 +262,12 @@ public class ColumnSet {
   }
 
   public IColumn getColumn(int index) {
-    if (index >= 0 && index < m_columns.length) return m_columns[index];
-    else return null;
+    if (index >= 0 && index < m_columns.length) {
+      return m_columns[index];
+    }
+    else {
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -276,13 +282,21 @@ public class ColumnSet {
   }
 
   public IColumn getDisplayableColumn(int index) {
-    if (index >= 0 && index < m_displayableIndexes.length) return m_columns[m_displayableIndexes[index]];
-    else return null;
+    if (index >= 0 && index < m_displayableIndexes.length) {
+      return m_columns[m_displayableIndexes[index]];
+    }
+    else {
+      return null;
+    }
   }
 
   public IColumn getVisibleColumn(int index) {
-    if (index >= 0 && index < m_visibleIndexes.length) return m_columns[m_visibleIndexes[index]];
-    else return null;
+    if (index >= 0 && index < m_visibleIndexes.length) {
+      return m_columns[m_visibleIndexes[index]];
+    }
+    else {
+      return null;
+    }
   }
 
   public IColumn[] getColumns() {
@@ -351,7 +365,9 @@ public class ColumnSet {
 
   public int getIndexFor(IColumn column) {
     for (int i = 0; i < m_columns.length; i++) {
-      if (m_columns[i] == column) return i;
+      if (m_columns[i] == column) {
+        return i;
+      }
     }
     return -1;
   }
@@ -478,8 +494,12 @@ public class ColumnSet {
   }
 
   public IColumn resolveColumn(IColumn c) {
-    if (c.getTable() == m_table) return c;
-    else return null;
+    if (c.getTable() == m_table) {
+      return c;
+    }
+    else {
+      return null;
+    }
   }
 
   public IColumn[] resolveColumns(IColumn[] a) {
@@ -510,7 +530,9 @@ public class ColumnSet {
    */
   public void handleSortEvent(IColumn col, boolean multiSort) {
     col = resolveColumn(col);
-    if (col == null) return;
+    if (col == null) {
+      return;
+    }
     //
     try {
       m_table.setTableChanging(true);
@@ -526,7 +548,9 @@ public class ColumnSet {
       else {
         int explicitCount = 0;
         for (IColumn c : m_userSortColumns) {
-          if (c.isSortExplicit()) explicitCount++;
+          if (c.isSortExplicit()) {
+            explicitCount++;
+          }
         }
         if (isSortColumn(col) && col.isSortExplicit() && explicitCount == 1) {
           toggleSortColumn(col);
@@ -894,7 +918,9 @@ public class ColumnSet {
       IColumn col = getColumn(modelIndex);
       if (col.isDisplayable() && col.isVisible()) {
         int viewHint = col.getVisibleColumnIndexHint();
-        if (viewHint < 0) viewHint = viewIndex;
+        if (viewHint < 0) {
+          viewHint = viewIndex;
+        }
         sortMap.put(new CompositeObject(viewHint, viewIndex), modelIndex);
         // next
         viewIndex++;

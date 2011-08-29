@@ -230,7 +230,9 @@ public class OrganizeColumnsForm extends AbstractForm {
             protected void execAction() throws ProcessingException {
               for (ITableRow row : getSelectedRows()) {
                 Boolean b = getCheckBoxColumn().getValue(row);
-                if (b == null) b = false;
+                if (b == null) {
+                  b = false;
+                }
                 b = !b;
                 getCheckBoxColumn().setValue(row, b);
               }

@@ -262,7 +262,9 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
       boolean initOpaque = ((Boolean) getClientProperty(fld, CLIENT_PROP_INITIAL_OPAQUE)).booleanValue();
       Color c = SwingUtility.createColor(scoutColor);
       boolean opaque = (c != null ? true : initOpaque);
-      if (c == null) c = initCol;
+      if (c == null) {
+        c = initCol;
+      }
       fld.setOpaque(opaque);
       fld.setBackground(c);
     }
@@ -273,7 +275,9 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     if (fld != null) {
       Color initCol = (Color) getClientProperty(fld, CLIENT_PROP_INITIAL_FOREGROUND);
       Color c = SwingUtility.createColor(scoutColor);
-      if (c == null) c = initCol;
+      if (c == null) {
+        c = initCol;
+      }
       fld.setForeground(c);
     }
   }
@@ -283,7 +287,9 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     if (fld != null) {
       Font initFont = (Font) getClientProperty(fld, CLIENT_PROP_INITIAL_FONT);
       Font f = SwingUtility.createFont(scoutFont, initFont);
-      if (f == null) f = initFont;
+      if (f == null) {
+        f = initFont;
+      }
       fld.setFont(f);
     }
   }

@@ -198,7 +198,9 @@ public class ActivityMapSelection {
   }
 
   private boolean intersects(double[] a, double[] b) {
-    if (a == null || b == null) return false;
+    if (a == null || b == null) {
+      return false;
+    }
     double start = Math.max(a[0], b[0]);
     double end = Math.min(a[1], b[1]);
     return start < end;

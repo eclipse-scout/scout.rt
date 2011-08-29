@@ -45,7 +45,9 @@ public class ClientRule extends AbstractPropertyObserver implements ISchedulingR
 
   @Override
   public boolean contains(ISchedulingRule rule) {
-    if (this == rule) return true;
+    if (this == rule) {
+      return true;
+    }
     //
     if (this.isEnabled() && rule instanceof ClientRule) {
       return (this.getClientSession() == ((ClientRule) rule).getClientSession());
@@ -56,7 +58,9 @@ public class ClientRule extends AbstractPropertyObserver implements ISchedulingR
 
   @Override
   public boolean isConflicting(ISchedulingRule rule) {
-    if (this == rule) return true;
+    if (this == rule) {
+      return true;
+    }
     //
     if (this.isEnabled() && rule instanceof ClientRule) {
       return (this.getClientSession() == ((ClientRule) rule).getClientSession());

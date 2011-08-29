@@ -105,13 +105,21 @@ public class TimelineColumn extends Composite implements PaintListener {
       int y = (int) Math.round(deltaY * i) + yTimed;
 
       // right background color within noon rectangle
-      if (time == 12) e.gc.setBackground(SwtColors.getInstance().lightgray);
-      else e.gc.setBackground(SwtColors.getInstance().white);
+      if (time == 12) {
+        e.gc.setBackground(SwtColors.getInstance().lightgray);
+      }
+      else {
+        e.gc.setBackground(SwtColors.getInstance().white);
+      }
 
       e.gc.drawLine(0, y, bounds.width - 1, y);
 
-      if (time <= CalendarConstants.DAY_TIMELINE_START_TIME) e.gc.drawText(SwtUtility.getNlsText(Display.getCurrent(), "Calendar_earlier"), 3, y + 1, true);
-      else if (time >= CalendarConstants.DAY_TIMELINE_END_TIME - 1) e.gc.drawText(SwtUtility.getNlsText(Display.getCurrent(), "Calendar_later"), 3, y + 1, true);
+      if (time <= CalendarConstants.DAY_TIMELINE_START_TIME) {
+        e.gc.drawText(SwtUtility.getNlsText(Display.getCurrent(), "Calendar_earlier"), 3, y + 1, true);
+      }
+      else if (time >= CalendarConstants.DAY_TIMELINE_END_TIME - 1) {
+        e.gc.drawText(SwtUtility.getNlsText(Display.getCurrent(), "Calendar_later"), 3, y + 1, true);
+      }
       else {
         String hours = time < 10 ? "0" + time + ":00" : "" + time + ":00";
         e.gc.drawText(hours, 3, y + 1, true);

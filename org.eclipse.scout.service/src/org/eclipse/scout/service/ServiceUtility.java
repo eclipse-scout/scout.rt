@@ -91,7 +91,9 @@ public final class ServiceUtility {
    * The property is set if service is a subtype of the config ini type.
    */
   public static void injectConfigProperties(Object service) {
-    if (service == null) return;
+    if (service == null) {
+      return;
+    }
     FastBeanInfo beanInfo = BeanUtility.getFastBeanInfo(service.getClass(), null);
     Map<String, String> map = ConfigIniUtility.getProperties(service.getClass());
     for (Map.Entry<String, String> e : map.entrySet()) {
@@ -123,7 +125,9 @@ public final class ServiceUtility {
    */
   public static Method getServiceOperation(Class<?> serviceClass, String operation, Class<?>[] paramTypes) throws ProcessingException {
     try {
-      if (serviceClass == null) throw new ProcessingException("service class is null");
+      if (serviceClass == null) {
+        throw new ProcessingException("service class is null");
+      }
       return serviceClass.getMethod(operation, paramTypes);
     }
     catch (ProcessingException e) {
@@ -132,7 +136,9 @@ public final class ServiceUtility {
     catch (Throwable t) {
       if (t instanceof InvocationTargetException) {
         Throwable test = ((InvocationTargetException) t).getTargetException();
-        if (test != null) t = test;
+        if (test != null) {
+          t = test;
+        }
       }
       if (t instanceof ProcessingException) {
         throw (ProcessingException) t;
@@ -154,9 +160,15 @@ public final class ServiceUtility {
    */
   public static Object invoke(Method serviceOperation, Object service, Object[] callerArgs) throws ProcessingException {
     try {
-      if (serviceOperation == null) throw new ProcessingException("serviceOperation is null");
-      if (service == null) throw new ProcessingException("service is null");
-      if (callerArgs == null) callerArgs = new Object[0];
+      if (serviceOperation == null) {
+        throw new ProcessingException("serviceOperation is null");
+      }
+      if (service == null) {
+        throw new ProcessingException("service is null");
+      }
+      if (callerArgs == null) {
+        callerArgs = new Object[0];
+      }
       Object data = serviceOperation.invoke(service, callerArgs);
       return data;
     }
@@ -166,7 +178,9 @@ public final class ServiceUtility {
     catch (Throwable t) {
       if (t instanceof InvocationTargetException) {
         Throwable test = ((InvocationTargetException) t).getTargetException();
-        if (test != null) t = test;
+        if (test != null) {
+          t = test;
+        }
       }
       if (t instanceof ProcessingException) {
         throw (ProcessingException) t;

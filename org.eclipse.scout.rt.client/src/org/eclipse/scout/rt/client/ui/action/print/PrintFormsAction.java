@@ -120,8 +120,12 @@ public class PrintFormsAction extends AbstractAction {
   @SuppressWarnings("unchecked")
   @Override
   protected void execAction() throws ProcessingException {
-    if (getFormTypes() == null) throw new VetoException("formTypes array is null");
-    if (getDestinationFolder() == null) throw new VetoException("destinationFolder is null");
+    if (getFormTypes() == null) {
+      throw new VetoException("formTypes array is null");
+    }
+    if (getDestinationFolder() == null) {
+      throw new VetoException("destinationFolder is null");
+    }
     m_printedFiles.clear();
     m_formCount = 0;
     m_imageCount = 0;

@@ -64,8 +64,9 @@ public class MonthCell extends AbstractCell
 		int weekEndDay1 = (firstDay - 1 + 5) % 7 + 1;
 		int weekEndDay2 = (firstDay - 1 + 6) % 7 + 1;
 		if (m_calendar.getCondensedMode()
-				&& (day == weekEndDay1 || day == weekEndDay2)) // a week-end day?
-			vertSpan = 1;
+				&& (day == weekEndDay1 || day == weekEndDay2)) {
+      vertSpan = 1;
+    }
 
 		// data object for custom layout manager
 		MonthCellData cd = new MonthCellData ();
@@ -88,8 +89,9 @@ public class MonthCell extends AbstractCell
 	@Override
   protected void drawLabels (PaintEvent e) {
 		// week label only if first column
-		if (m_isFirstColumn)
-			drawWeekLabel(e);
+		if (m_isFirstColumn) {
+      drawWeekLabel(e);
+    }
 
 		// day label
 		drawDayLabel(e);

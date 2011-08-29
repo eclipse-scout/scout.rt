@@ -144,13 +144,17 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     // load tree
     ITree tree = getTree();
     try {
-      if (tree != null) tree.setTreeChanging(true);
+      if (tree != null) {
+        tree.setTreeChanging(true);
+      }
       //
       // backup currently selected tree node and its path to root
       boolean oldSelectionOwned = false;
       int oldSelectionDirectChildIndex = -1;
       ITreeNode oldSelectedNode = null;
-      if (tree != null) oldSelectedNode = tree.getSelectedNode();
+      if (tree != null) {
+        oldSelectedNode = tree.getSelectedNode();
+      }
       String oldSelectedText = null;
       if (oldSelectedNode != null) {
         ITreeNode t = oldSelectedNode;
@@ -194,7 +198,9 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
       }
     }
     finally {
-      if (tree != null) tree.setTreeChanging(false);
+      if (tree != null) {
+        tree.setTreeChanging(false);
+      }
     }
     // copy to table
     rebuildTable();
@@ -230,8 +236,12 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   }
 
   private ITreeNode getTreeNodeFor(ITableRow tableRow) {
-    if (tableRow == null) return null;
-    else return m_tableRowToPageMap.get(tableRow);
+    if (tableRow == null) {
+      return null;
+    }
+    else {
+      return m_tableRowToPageMap.get(tableRow);
+    }
   }
 
   private ITreeNode[] getTreeNodesFor(ITableRow[] tableRows) {

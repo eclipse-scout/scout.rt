@@ -45,7 +45,9 @@ public class CsvSqlAdapter {
   private ISqlService m_sqlService;
 
   public CsvSqlAdapter(ISqlService service) {
-    if (service == null) throw new IllegalArgumentException("sql service must not be null");
+    if (service == null) {
+      throw new IllegalArgumentException("sql service must not be null");
+    }
     m_sqlService = service;
   }
 
@@ -192,7 +194,9 @@ public class CsvSqlAdapter {
         for (Iterator<String> it = cols.iterator(); it.hasNext();) {
           String colName = it.next();
           buf.append(colName);
-          if (it.hasNext()) buf.append(",");
+          if (it.hasNext()) {
+            buf.append(",");
+          }
         }
         buf.append(" FROM ");
         buf.append(params.getTableName());

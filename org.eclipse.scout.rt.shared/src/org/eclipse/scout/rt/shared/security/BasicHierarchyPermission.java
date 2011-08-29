@@ -94,8 +94,12 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
 
   @SuppressWarnings("boxing")
   public final void setLevel(int level) {
-    if (m_readOnly) throw new SecurityException("Permission is read-only");
-    if (!m_validLevels.contains(level)) throw new IllegalArgumentException("invalid level: " + level);
+    if (m_readOnly) {
+      throw new SecurityException("Permission is read-only");
+    }
+    if (!m_validLevels.contains(level)) {
+      throw new IllegalArgumentException("invalid level: " + level);
+    }
     m_level = level;
   }
 

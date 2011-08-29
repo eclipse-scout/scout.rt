@@ -59,13 +59,17 @@ public class CodeService extends AbstractService implements ICodeService {
 
   @Override
   public ICodeType findCodeTypeById(Object id) {
-    if (id == null) return null;
+    if (id == null) {
+      return null;
+    }
     return getCodeTypeCache().findCodeTypeById(id);
   }
 
   @Override
   public ICodeType findCodeTypeById(Long partitionId, Object id) {
-    if (id == null) return null;
+    if (id == null) {
+      return null;
+    }
     return getCodeTypeCache(partitionId).findCodeTypeById(id);
   }
 
@@ -91,24 +95,32 @@ public class CodeService extends AbstractService implements ICodeService {
 
   @Override
   public <T extends ICodeType> T reloadCodeType(Class<T> type) {
-    if (type == null) return null;
+    if (type == null) {
+      return null;
+    }
     m_codeTypeStore.unloadCodeTypeCache(type);
     return getCodeTypeCache().reloadCodeType(type);
   }
 
   @Override
   public ICodeType[] reloadCodeTypes(Class... types) {
-    if (types == null) return null;
+    if (types == null) {
+      return null;
+    }
     m_codeTypeStore.unloadCodeTypeCache(types);
     return getCodeTypeCache().reloadCodeTypes(types);
   }
 
   @Override
   public BundleClassDescriptor[] getAllCodeTypeClasses(String classPrefix) {
-    if (classPrefix == null) return new BundleClassDescriptor[0];
+    if (classPrefix == null) {
+      return new BundleClassDescriptor[0];
+    }
     synchronized (m_codeTypeClassDescriptorMapLock) {
       BundleClassDescriptor[] a = m_codeTypeClassDescriptorMap.get(classPrefix);
-      if (a != null) return a;
+      if (a != null) {
+        return a;
+      }
       //
       HashSet<BundleClassDescriptor> discoveredCodeTypes = new HashSet<BundleClassDescriptor>();
       for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {

@@ -113,7 +113,9 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   private Class<? extends ITree> getConfiguredTree() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     Class<? extends ITree>[] f = ConfigurationUtility.filterClasses(dca, ITree.class);
-    if (f.length == 1) return f[0];
+    if (f.length == 1) {
+      return f[0];
+    }
     else {
       for (Class<? extends ITree> c : f) {
         if (c.getDeclaringClass() != AbstractTreeField.class) {
@@ -190,12 +192,16 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     if (treeFieldData.isValueSet()) {
       if (m_tree != null) {
         try {
-          if (!valueChangeTriggersEnabled) setValueChangeTriggerEnabled(false);
+          if (!valueChangeTriggersEnabled) {
+            setValueChangeTriggerEnabled(false);
+          }
           //
           m_tree.importTreeData(treeFieldData);
         }
         finally {
-          if (!valueChangeTriggersEnabled) setValueChangeTriggerEnabled(true);
+          if (!valueChangeTriggersEnabled) {
+            setValueChangeTriggerEnabled(true);
+          }
         }
       }
     }

@@ -231,7 +231,9 @@ public abstract class AbstractServerSession implements IServerSession {
         }
       });
     }
-    if (m_initialized) return;
+    if (m_initialized) {
+      return;
+    }
     m_initialized = true;
   }
 
@@ -242,8 +244,12 @@ public abstract class AbstractServerSession implements IServerSession {
 
   @Override
   public final void loadSession(Bundle bundle) throws ProcessingException {
-    if (isActive()) throw new IllegalStateException("session is active");
-    if (bundle == null) throw new IllegalArgumentException("bundle must not be null");
+    if (isActive()) {
+      throw new IllegalStateException("session is active");
+    }
+    if (bundle == null) {
+      throw new IllegalArgumentException("bundle must not be null");
+    }
     m_bundle = bundle;
     m_active = true;
     assignUserId();

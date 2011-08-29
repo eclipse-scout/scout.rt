@@ -232,7 +232,9 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public int getGroupBoxIndex(IGroupBox groupBox) {
     for (int i = 0; i < m_groupBoxes.length; i++) {
-      if (m_groupBoxes[i] == groupBox) return i;
+      if (m_groupBoxes[i] == groupBox) {
+        return i;
+      }
     }
     return -1;
   }

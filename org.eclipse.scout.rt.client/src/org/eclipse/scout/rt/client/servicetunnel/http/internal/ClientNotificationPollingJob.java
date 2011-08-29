@@ -46,7 +46,9 @@ public class ClientNotificationPollingJob extends ClientAsyncJob {
       pingService.ping("GetClientNotifications");
     }
     catch (Throwable t) {
-      if (LOG.isInfoEnabled()) LOG.info("polling", t);
+      if (LOG.isInfoEnabled()) {
+        LOG.info("polling", t);
+      }
     }
     if (monitor.isCanceled()) {
       return Status.CANCEL_STATUS;

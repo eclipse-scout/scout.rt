@@ -105,14 +105,20 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     }
     else if (value instanceof Collection || value.getClass().isArray()) {
       Object array;
-      if (value instanceof Collection) array = ((Collection) value).toArray();
-      else array = value;
+      if (value instanceof Collection) {
+        array = ((Collection) value).toArray();
+      }
+      else {
+        array = value;
+      }
       int n = Array.getLength(array);
       StringBuffer buf = new StringBuffer();
       buf.append("(");
       if (n > 0) {
         for (int i = 0; i < n; i++) {
-          if (i > 0) buf.append(",");
+          if (i > 0) {
+            buf.append(",");
+          }
           buf.append(toPlainText(Array.get(array, i)));
         }
       }
@@ -358,8 +364,12 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
           }
           catch (SQLException e2) {
             // send original exception
-            if (e1 instanceof SQLException) throw (SQLException) e1;
-            else throw new SQLException("failed setting bytes on jdbcBindIndex " + jdbcBindIndex);
+            if (e1 instanceof SQLException) {
+              throw (SQLException) e1;
+            }
+            else {
+              throw new SQLException("failed setting bytes on jdbcBindIndex " + jdbcBindIndex);
+            }
           }
         }
         break;
@@ -477,8 +487,12 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
       }
       case Types.BLOB: {
         Blob b = rs.getBlob(jdbcBindIndex);
-        if (b == null) o = null;
-        else o = b.getBytes(1, (int) b.length());
+        if (b == null) {
+          o = null;
+        }
+        else {
+          o = b.getBytes(1, (int) b.length());
+        }
         break;
       }
       default: {
@@ -494,7 +508,9 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
 
   @Override
   public void registerOutput(CallableStatement cs, int index, Class c) throws SQLException {
-    if (c == null) throw new SQLException("registering output index " + index + " with type null");
+    if (c == null) {
+      throw new SQLException("registering output index " + index + " with type null");
+    }
     int jdbcType = getJdbcType(c);
     cs.registerOutParameter(index, jdbcType);
   }
@@ -996,8 +1012,12 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
   }
 
   protected String adaptBindName(String bindName) {
-    if (bindName == null) return bindName;
-    if (bindName.startsWith(PLAIN_BIND_MARKER_PREFIX)) return bindName.substring(1);
+    if (bindName == null) {
+      return bindName;
+    }
+    if (bindName.startsWith(PLAIN_BIND_MARKER_PREFIX)) {
+      return bindName.substring(1);
+    }
     return ":" + bindName;
   }
 

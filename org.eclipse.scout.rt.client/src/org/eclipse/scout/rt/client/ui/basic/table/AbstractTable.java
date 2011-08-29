@@ -834,7 +834,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public ICell getCell(ITableRow row, IColumn<?> col) {
     row = resolveRow(row);
-    if (row == null || col == null) return null;
+    if (row == null || col == null) {
+      return null;
+    }
     return row.getCell(col.getColumnIndex());
   }
 
@@ -1482,8 +1484,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public boolean isSelectedRow(ITableRow row) {
     row = resolveRow(row);
-    if (row == null) return false;
-    else return m_selectedRows.contains(row);
+    if (row == null) {
+      return false;
+    }
+    else {
+      return m_selectedRows.contains(row);
+    }
   }
 
   @Override
@@ -1697,7 +1703,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public String getDefaultIconId() {
     String iconId = propertySupport.getPropertyString(PROP_DEFAULT_ICON);
-    if (iconId != null && iconId.length() == 0) iconId = null;
+    if (iconId != null && iconId.length() == 0) {
+      iconId = null;
+    }
     return iconId;
   }
 
@@ -1843,7 +1851,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     int missingCount = 0;
     for (int i = 0; i < rowIndexes.length; i++) {
       rows[i] = getRow(rowIndexes[i]);
-      if (rows[i] == null) missingCount++;
+      if (rows[i] == null) {
+        missingCount++;
+      }
     }
     if (missingCount > 0) {
       ITableRow[] newRows = new ITableRow[rowIndexes.length - missingCount];
@@ -1924,7 +1934,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @Override
   public ITableRow addRowByArray(Object dataArray) throws ProcessingException {
-    if (dataArray == null) return null;
+    if (dataArray == null) {
+      return null;
+    }
     ITableRow[] a = addRowsByMatrix(new Object[]{dataArray});
     if (a.length > 0) {
       return a[0];
@@ -1982,7 +1994,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public ITableRow[] addRows(ITableRow[] newRows, boolean markAsInserted, int[] insertIndexes) throws ProcessingException {
-    if (newRows == null || newRows.length == 0) return new ITableRow[0];
+    if (newRows == null || newRows.length == 0) {
+      return new ITableRow[0];
+    }
     try {
       setTableChanging(true);
       //
@@ -2012,15 +2026,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         // add existing rows
         for (int i = 0; i < oldRowCount; i++) {
           // find next empty slot
-          while (sortArray[sortArrayIndex] != null)
+          while (sortArray[sortArrayIndex] != null) {
             sortArrayIndex++;
+          }
           sortArray[sortArrayIndex] = m_rows.get(i);
         }
         // add new rows that have no given sortIndex
         for (int i = insertIndexes.length; i < newIRows.length; i++) {
           // find next empty slot
-          while (sortArray[sortArrayIndex] != null)
+          while (sortArray[sortArrayIndex] != null) {
             sortArrayIndex++;
+          }
           sortArray[sortArrayIndex] = newIRows[i];
         }
         sortInternal(sortArray);
@@ -2078,10 +2094,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void moveRowImpl(int sourceIndex, int targetIndex) {
-    if (sourceIndex < 0) sourceIndex = 0;
-    if (sourceIndex >= getRowCount()) sourceIndex = getRowCount() - 1;
-    if (targetIndex < 0) targetIndex = 0;
-    if (targetIndex >= getRowCount()) targetIndex = getRowCount() - 1;
+    if (sourceIndex < 0) {
+      sourceIndex = 0;
+    }
+    if (sourceIndex >= getRowCount()) {
+      sourceIndex = getRowCount() - 1;
+    }
+    if (targetIndex < 0) {
+      targetIndex = 0;
+    }
+    if (targetIndex >= getRowCount()) {
+      targetIndex = getRowCount() - 1;
+    }
     if (targetIndex != sourceIndex) {
       synchronized (m_cachedRowsLock) {
         m_cachedRows = null;
@@ -2865,8 +2889,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < result.length; i++) {
           if (i > 0) {
-            if (isMultilineText()) buf.append("\n");
-            else buf.append(", ");
+            if (isMultilineText()) {
+              buf.append("\n");
+            }
+            else {
+              buf.append(", ");
+            }
           }
           buf.append(result[i].getText());
         }
@@ -2911,7 +2939,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public ITableRow[] resolveRows(ITableRow[] rows) {
-    if (rows == null) rows = new ITableRow[0];
+    if (rows == null) {
+      rows = new ITableRow[0];
+    }
     int mismatchCount = 0;
     for (int i = 0; i < rows.length; i++) {
       if (resolveRow(rows[i]) != rows[i]) {
@@ -3124,7 +3154,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private void fireRowDropAction(ITableRow row, TransferObject dropData) {
     ITableRow[] rows = null;
-    if (row != null) rows = new ITableRow[]{row};
+    if (row != null) {
+      rows = new ITableRow[]{row};
+    }
     TableEvent e = new TableEvent(this, TableEvent.TYPE_ROW_DROP_ACTION, rows);
     e.setDropObject(dropData);
     fireTableEventInternal(e);
@@ -3321,7 +3353,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         int colIndex = col.getColumnIndex();
         String pattern = StringUtility.toRegExPattern(prefix.toLowerCase());
         pattern = pattern + ".*";
-        if (LOG.isInfoEnabled()) LOG.info("finding regex:" + pattern + " in column " + getColumnSet().getColumn(colIndex).getHeaderCell().getText());
+        if (LOG.isInfoEnabled()) {
+          LOG.info("finding regex:" + pattern + " in column " + getColumnSet().getColumn(colIndex).getHeaderCell().getText());
+        }
         // loop over values and find matching one
         int rowCount = getRowCount();
         ITableRow selRow = getSelectedRow();

@@ -69,8 +69,12 @@ public class SwingScoutFocusTraversalPolicy extends InternalFrameFocusTraversalP
     else if (cycle.size() > 0) {
       nextComp = cycle.get(0);
     }
-    if (LOG.isDebugEnabled()) LOG.debug("curr: " + aComponent);
-    if (LOG.isDebugEnabled()) LOG.debug("next: " + nextComp);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("curr: " + aComponent);
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("next: " + nextComp);
+    }
     return nextComp;
   }
 
@@ -102,8 +106,12 @@ public class SwingScoutFocusTraversalPolicy extends InternalFrameFocusTraversalP
     else if (cycle.size() > 0) {
       prevComp = cycle.get(cycle.size() - 1);
     }
-    if (LOG.isDebugEnabled()) LOG.debug("curr: " + aComponent);
-    if (LOG.isDebugEnabled()) LOG.debug("prev: " + prevComp);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("curr: " + aComponent);
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("prev: " + prevComp);
+    }
     return prevComp;
   }
 

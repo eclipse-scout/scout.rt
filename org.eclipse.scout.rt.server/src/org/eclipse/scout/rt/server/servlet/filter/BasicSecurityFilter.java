@@ -50,7 +50,9 @@ public class BasicSecurityFilter extends AbstractChainableSecurityFilter {
     super.init(config0);
     FilterConfigInjection.FilterConfig config = new FilterConfigInjection(config0, getClass()).getAnyConfig();
     String usersParam = config.getInitParameter("users");
-    if (usersParam == null) throw new ServletException("missing init-param with name 'users'");
+    if (usersParam == null) {
+      throw new ServletException("missing init-param with name 'users'");
+    }
     m_userDatabase = new HashMap<String, String>();
     for (String pair : usersParam.split(",")) {
       String[] a = pair.trim().split("=", 2);

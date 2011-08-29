@@ -148,7 +148,9 @@ public final class ThreadContext {
   }
 
   private static <T> void putInternal(T value) {
-    if (value == null) return;
+    if (value == null) {
+      return;
+    }
     if (value instanceof Locale) {
       LocaleThreadLocal.set((Locale) value);
     }
@@ -172,7 +174,9 @@ public final class ThreadContext {
   }
 
   public static <T> void clearInternal(T value) {
-    if (value == null) return;
+    if (value == null) {
+      return;
+    }
     HashMap<Class, Object> threadMap = getThreadMap(false);
     if (threadMap != null) {
       HashSet<Class> keys = new HashSet<Class>();

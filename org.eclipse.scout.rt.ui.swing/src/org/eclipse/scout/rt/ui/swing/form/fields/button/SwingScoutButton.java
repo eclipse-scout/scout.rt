@@ -199,13 +199,17 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
   @Override
   protected void setHorizontalAlignmentFromScout(int scoutAlign) {
     getSwingButton().setAlignmentX(SwingUtility.createAlignmentX(scoutAlign));
-    if (getSwingContainer().isShowing()) getSwingContainer().revalidate();
+    if (getSwingContainer().isShowing()) {
+      getSwingContainer().revalidate();
+    }
   }
 
   @Override
   protected void setVerticalAlignmentFromScout(int scoutAlign) {
     getSwingButton().setAlignmentY(SwingUtility.createAlignmentY(scoutAlign));
-    if (getSwingContainer().isShowing()) getSwingContainer().revalidate();
+    if (getSwingContainer().isShowing()) {
+      getSwingContainer().revalidate();
+    }
   }
 
   @Override
@@ -234,7 +238,9 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
   }
 
   protected void setSelectionFromSwing(final boolean b) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutButton().isSelected() != b) {
       // radio button behavior since swing fires deselections
@@ -360,7 +366,9 @@ public class SwingScoutButton extends SwingScoutFieldComposite<IButton> implemen
   private class P_ScoutButtonListener implements ButtonListener, WeakEventListener {
     @Override
     public void buttonChanged(ButtonEvent e) {
-      if (isIgnoredScoutEvent(ButtonEvent.class, "" + e.getType())) return;
+      if (isIgnoredScoutEvent(ButtonEvent.class, "" + e.getType())) {
+        return;
+      }
       //
       switch (e.getType()) {
         case ButtonEvent.TYPE_DISARM: {

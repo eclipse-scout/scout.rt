@@ -35,7 +35,9 @@ public class FilterChainImpl implements FilterChain {
   public void doFilter(ServletRequest req, ServletResponse res) throws IOException, ServletException {
     if (m_filters.size() > 0) {
       Filter nextFilter = m_filters.remove(0);
-      if (Activator.DEBUG) Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterChain: doFilter " + nextFilter.getClass().getSimpleName()));
+      if (Activator.DEBUG) {
+        Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterChain: doFilter " + nextFilter.getClass().getSimpleName()));
+      }
       nextFilter.doFilter(req, res, this);
     }
     else {

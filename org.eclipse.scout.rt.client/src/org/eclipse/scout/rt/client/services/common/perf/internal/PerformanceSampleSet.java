@@ -32,7 +32,9 @@ public class PerformanceSampleSet {
   }
 
   public void addSample(long millis) {
-    if (millis < 0) millis = 0;
+    if (millis < 0) {
+      millis = 0;
+    }
     synchronized (m_samplesLock) {
       long l = m_samplesSum;
       int i = (m_samplesLastIndex + 1) % m_samples.length;

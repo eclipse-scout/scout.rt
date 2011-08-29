@@ -26,13 +26,17 @@ public final class ServiceTunnelUtility {
   }
 
   public static <T> T createProxy(Class<T> serviceInterfaceClass, IServiceTunnel tunnel) {
-    if (tunnel == null) throw new IllegalArgumentException("tunnel is null");
+    if (tunnel == null) {
+      throw new IllegalArgumentException("tunnel is null");
+    }
     return createProxy(serviceInterfaceClass, new ServiceTunnelInvocationHandler(serviceInterfaceClass, tunnel));
   }
 
   @SuppressWarnings("unchecked")
   public static <T> T createProxy(Class<T> serviceInterfaceClass, InvocationHandler handler) {
-    if (handler == null) throw new IllegalArgumentException("handler is null");
+    if (handler == null) {
+      throw new IllegalArgumentException("handler is null");
+    }
     return (T) Proxy.newProxyInstance(
         serviceInterfaceClass.getClassLoader(),
         new Class[]{serviceInterfaceClass},

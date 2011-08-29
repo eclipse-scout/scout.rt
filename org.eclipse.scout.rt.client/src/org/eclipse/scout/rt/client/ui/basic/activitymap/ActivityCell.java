@@ -139,9 +139,15 @@ public class ActivityCell extends MemoryOptimizedObject {
    * @param minorValue
    */
   public ActivityCell(Object[] row) {
-    if (row == null || row.length < 2) throw new IllegalArgumentException("row must not be null or shorted than 2 elements");
-    if (row[0] == null) throw new IllegalArgumentException("resourceId must not be null");
-    if (row[1] == null) throw new IllegalArgumentException("itemid must not be null");
+    if (row == null || row.length < 2) {
+      throw new IllegalArgumentException("row must not be null or shorted than 2 elements");
+    }
+    if (row[0] == null) {
+      throw new IllegalArgumentException("resourceId must not be null");
+    }
+    if (row[1] == null) {
+      throw new IllegalArgumentException("itemid must not be null");
+    }
     for (int i = 0; i < row.length; i++) {
       if (row[i] != null) {
         switch (i) {

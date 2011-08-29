@@ -41,8 +41,12 @@ public class JPasswordFieldEx extends JPasswordField {
   @Override
   public String getText() {
     char[] ch = getPassword();
-    if (ch == null) return null;
-    else return new String(ch);
+    if (ch == null) {
+      return null;
+    }
+    else {
+      return new String(ch);
+    }
   }
 
   private boolean m_realFocusable = true;

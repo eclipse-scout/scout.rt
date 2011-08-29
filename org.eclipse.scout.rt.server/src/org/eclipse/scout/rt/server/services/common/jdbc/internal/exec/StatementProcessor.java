@@ -88,7 +88,9 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases, int maxRowCount) throws ProcessingException {
-    if (stm == null) throw new ProcessingException("statement is null");
+    if (stm == null) {
+      throw new ProcessingException("statement is null");
+    }
     try {
       m_callerService = callerService;
       m_originalStm = stm;
@@ -150,8 +152,12 @@ public class StatementProcessor implements IStatementProcessor {
       // add select into out binds
       for (IToken t : intoModel.getOutputTokens()) {
         IBindOutput out = createOutput(t, m_bindBases);
-        if (!out.isSelectInto()) throw new ProcessingException("out parameter is not a 'select into': " + out);
-        if (out.isJdbcBind()) throw new ProcessingException("out parameter is a jdbc bind: " + out);
+        if (!out.isSelectInto()) {
+          throw new ProcessingException("out parameter is not a 'select into': " + out);
+        }
+        if (out.isJdbcBind()) {
+          throw new ProcessingException("out parameter is a jdbc bind: " + out);
+        }
         out.setJdbcBindIndex(-1);
         m_outputList.add(out);
       }
@@ -243,10 +249,12 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      if (rs != null) try {
-        rs.close();
-      }
-      catch (Throwable t) {
+      if (rs != null) {
+        try {
+          rs.close();
+        }
+        catch (Throwable t) {
+        }
       }
       try {
         cache.releasePreparedStatement(ps);
@@ -302,10 +310,12 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      if (rs != null) try {
-        rs.close();
-      }
-      catch (Throwable t) {
+      if (rs != null) {
+        try {
+          rs.close();
+        }
+        catch (Throwable t) {
+        }
       }
       try {
         cache.releasePreparedStatement(ps);
@@ -364,10 +374,12 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      if (rs != null) try {
-        rs.close();
-      }
-      catch (Throwable t) {
+      if (rs != null) {
+        try {
+          rs.close();
+        }
+        catch (Throwable t) {
+        }
       }
       try {
         cache.releasePreparedStatement(ps);
@@ -763,7 +775,9 @@ public class StatementProcessor implements IStatementProcessor {
           break;
         }
       }
-      if (o == null) throw new ProcessingException("Cannot find input for '" + valueInputToken + "' in bind bases.");
+      if (o == null) {
+        throw new ProcessingException("Cannot find input for '" + valueInputToken + "' in bind bases.");
+      }
     }
     else if (bindToken instanceof FunctionInputToken) {
       o = new FunctionInput(m_callerService, m_bindBases, (FunctionInputToken) bindToken);
@@ -976,7 +990,9 @@ public class StatementProcessor implements IStatementProcessor {
           break;
         }
       }
-      if (o == null) throw new ProcessingException("Cannot find output for '" + valueOutputToken + "' in bind base. When selecting into shared context variables make sure these variables are initialized using CONTEXT.set<i>PropertyName</i>(null)");
+      if (o == null) {
+        throw new ProcessingException("Cannot find output for '" + valueOutputToken + "' in bind base. When selecting into shared context variables make sure these variables are initialized using CONTEXT.set<i>PropertyName</i>(null)");
+      }
     }
     else {
       throw new ProcessingException("Cannot find output for '" + bindToken.getClass());

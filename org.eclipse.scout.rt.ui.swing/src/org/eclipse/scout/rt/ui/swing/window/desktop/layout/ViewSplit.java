@@ -137,14 +137,18 @@ class ViewSplit {
 
   public boolean isFixed() {
     for (CellSplit s : m_cellSplits) {
-      if (s.isFixed()) return true;
+      if (s.isFixed()) {
+        return true;
+      }
     }
     return false;
   }
 
   public boolean isRowSplit() {
     for (CellSplit s : m_cellSplits) {
-      if (s.isRowSplit()) return true;
+      if (s.isRowSplit()) {
+        return true;
+      }
     }
     return false;
   }

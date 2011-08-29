@@ -43,7 +43,9 @@ public class DefaultCalendarModel implements CalendarModel {
   }
 
   private Date getIndexDate(Date d, Date defaultDate) {
-    if (d == null) return defaultDate;
+    if (d == null) {
+      return defaultDate;
+    }
     return DateChooser.truncDate(d);
   }
 

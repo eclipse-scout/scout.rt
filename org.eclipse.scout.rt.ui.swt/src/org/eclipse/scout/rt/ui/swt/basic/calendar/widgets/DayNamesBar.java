@@ -62,10 +62,12 @@ public class DayNamesBar extends Composite implements PaintListener {
 
 		// how many columns? (condensed mode)
 		int nbCols;
-		if (m_nbDays == 7 && m_condensed)
-			nbCols = 6;
-		else
-			nbCols = m_nbDays;
+		if (m_nbDays == 7 && m_condensed) {
+      nbCols = 6;
+    }
+    else {
+      nbCols = m_nbDays;
+    }
 
 		GridData gd;
 		gd = new GridData ();
@@ -133,9 +135,11 @@ public class DayNamesBar extends Composite implements PaintListener {
 	@Override
 	public void dispose () {
 		// dispose all created labels
-		for (Label l: labelList)
-			if (l != null && !l.isDisposed())
-				l.dispose();
+		for (Label l: labelList) {
+      if (l != null && !l.isDisposed()) {
+        l.dispose();
+      }
+    }
 
 		super.dispose();
 	}

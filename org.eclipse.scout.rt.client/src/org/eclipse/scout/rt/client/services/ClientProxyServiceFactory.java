@@ -62,7 +62,9 @@ public class ClientProxyServiceFactory implements IServiceFactory {
   private final Object m_serviceLock = new Object();
 
   public ClientProxyServiceFactory(Class<?> serviceClass) {
-    if (serviceClass == null) throw new IllegalArgumentException("service type must not be null");
+    if (serviceClass == null) {
+      throw new IllegalArgumentException("service type must not be null");
+    }
     m_serviceClass = serviceClass;
   }
 
@@ -124,7 +126,9 @@ public class ClientProxyServiceFactory implements IServiceFactory {
           }
           else {
             m_sessionClass = (Class<? extends IClientSession>) m_bundle.loadClass(m_sessionType);
-            if (!IClientSession.class.isAssignableFrom(m_sessionClass)) throw new IllegalArgumentException("session type must be a subtype of " + IClientSession.class + ": " + m_sessionType);
+            if (!IClientSession.class.isAssignableFrom(m_sessionClass)) {
+              throw new IllegalArgumentException("session type must be a subtype of " + IClientSession.class + ": " + m_sessionType);
+            }
           }
         }
       }

@@ -62,8 +62,12 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   @Override
   protected BigDecimal parseValueInternal(String text) throws ProcessingException {
     BigDecimal retVal = null;
-    if (text == null) text = "";
-    else text = text.trim();
+    if (text == null) {
+      text = "";
+    }
+    else {
+      text = text.trim();
+    }
     if (text.length() > 0) {
       NumberFormat numberFormat = createNumberFormat();
       if (isPercent()) {

@@ -57,7 +57,9 @@ public class ComponentSpyAction extends AbstractAction {
       currentDialog = null;
     }
     Component c = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-    if (c == null) return;
+    if (c == null) {
+      return;
+    }
     Object s = null;
     if (c instanceof JTree) {
       TreePath path = ((JTree) c).getSelectionPath();

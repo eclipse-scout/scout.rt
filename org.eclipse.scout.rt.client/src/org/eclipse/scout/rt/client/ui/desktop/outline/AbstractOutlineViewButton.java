@@ -37,7 +37,9 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
         break;
       }
     }
-    if (m_outline == null) throw new IllegalArgumentException("the outline type " + outlineType.getName() + " is not registered in the desktop");
+    if (m_outline == null) {
+      throw new IllegalArgumentException("the outline type " + outlineType.getName() + " is not registered in the desktop");
+    }
     callInitializer();
   }
 

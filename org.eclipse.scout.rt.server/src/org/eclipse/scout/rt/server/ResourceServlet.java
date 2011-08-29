@@ -64,15 +64,25 @@ public class ResourceServlet extends HttpServletEx {
     if (m_warPath == null) {
       m_warPath = config.getInitParameter("war-path"); //$NON-NLS-1$
     }
-    if (m_warPath == null || m_warPath.trim().length() == 0) m_warPath = null;
-    if (m_warPath != null && m_warPath.endsWith("/")) m_warPath = m_warPath.substring(0, m_warPath.length() - 1);
+    if (m_warPath == null || m_warPath.trim().length() == 0) {
+      m_warPath = null;
+    }
+    if (m_warPath != null && m_warPath.endsWith("/")) {
+      m_warPath = m_warPath.substring(0, m_warPath.length() - 1);
+    }
     //
     m_bundleName = config.getInitParameter("bundle-name"); //$NON-NLS-1$
-    if (m_bundleName == null || m_bundleName.trim().length() == 0) m_bundleName = null;
+    if (m_bundleName == null || m_bundleName.trim().length() == 0) {
+      m_bundleName = null;
+    }
     //
     m_bundlePath = config.getInitParameter("bundle-path"); //$NON-NLS-1$
-    if (m_bundlePath == null || m_bundlePath.trim().length() == 0) m_bundlePath = null;
-    if (m_bundlePath != null && m_bundlePath.endsWith("/")) m_bundlePath = m_bundlePath.substring(0, m_bundlePath.length() - 1);
+    if (m_bundlePath == null || m_bundlePath.trim().length() == 0) {
+      m_bundlePath = null;
+    }
+    if (m_bundlePath != null && m_bundlePath.endsWith("/")) {
+      m_bundlePath = m_bundlePath.substring(0, m_bundlePath.length() - 1);
+    }
     //
     // check config
     if (m_warPath != null) {
@@ -156,7 +166,9 @@ public class ResourceServlet extends HttpServletEx {
         writtenContentLength += bytesRead;
         bytesRead = is.read(buffer);
       }
-      if (contentLength == -1 || contentLength != writtenContentLength) resp.setContentLength(writtenContentLength);
+      if (contentLength == -1 || contentLength != writtenContentLength) {
+        resp.setContentLength(writtenContentLength);
+      }
 
       return true;
     }
@@ -169,7 +181,10 @@ public class ResourceServlet extends HttpServletEx {
 
   protected int setResponseParameters(final HttpServletRequest req, final HttpServletResponse resp, String contentType, long lastModified, int contentLength) {
     String etag = null;
-    if (lastModified != -1 && contentLength != -1) etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+    if (lastModified != -1 && contentLength != -1)
+     {
+      etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+    }
 
     // Check for cache revalidation.
     // We should prefer ETag validation as the guarantees are stronger and all
@@ -191,13 +206,21 @@ public class ResourceServlet extends HttpServletEx {
     }
 
     // return the full contents regularly
-    if (contentLength != -1) resp.setContentLength(contentLength);
+    if (contentLength != -1) {
+      resp.setContentLength(contentLength);
+    }
 
-    if (contentType != null) resp.setContentType(contentType);
+    if (contentType != null) {
+      resp.setContentType(contentType);
+    }
 
-    if (lastModified > 0) resp.setDateHeader(LAST_MODIFIED, lastModified);
+    if (lastModified > 0) {
+      resp.setDateHeader(LAST_MODIFIED, lastModified);
+    }
 
-    if (etag != null) resp.setHeader(ETAG, etag);
+    if (etag != null) {
+      resp.setHeader(ETAG, etag);
+    }
 
     return HttpServletResponse.SC_ACCEPTED;
   }

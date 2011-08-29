@@ -213,15 +213,23 @@ public class CentralPanel extends Composite {
 
     // how many days?
     int nbDays;
-    if (m_calendar.getDisplayMode() == DisplayMode.WORKWEEK) nbDays = 5;
-    else nbDays = 7;
+    if (m_calendar.getDisplayMode() == DisplayMode.WORKWEEK) {
+      nbDays = 5;
+    }
+    else {
+      nbDays = 7;
+    }
 
     // how many columns
     int nbCols = nbDays;
-    if (m_calendar.getCondensedMode() && m_calendar.getDisplayMode() == DisplayMode.WEEK) nbCols--;
+    if (m_calendar.getCondensedMode() && m_calendar.getDisplayMode() == DisplayMode.WEEK) {
+      nbCols--;
+    }
 
     // create day name bar (not day mode)
-    if (m_calendar.getDisplayMode() != DisplayMode.DAY) m_dayNames = new DayNamesBar(this, SWT.NONE, m_calendar, nbDays, m_calendar.getCondensedMode());
+    if (m_calendar.getDisplayMode() != DisplayMode.DAY) {
+      m_dayNames = new DayNamesBar(this, SWT.NONE, m_calendar, nbDays, m_calendar.getCondensedMode());
+    }
 
     // create a timeline
     m_timeline = new TimelineColumn(this, SWT.NONE);
@@ -296,8 +304,9 @@ public class CentralPanel extends Composite {
    */
   protected void setWeekItemsLayoutData() {
     if (m_weekCells != null) {
-      for (WeekCell day : m_weekCells)
+      for (WeekCell day : m_weekCells) {
         day.setItemsLayoutData();
+      }
     }
   }
 
@@ -310,8 +319,12 @@ public class CentralPanel extends Composite {
 
     // nb of columns
     int nbCols;
-    if (m_calendar.getCondensedMode()) nbCols = 6;
-    else nbCols = 7;
+    if (m_calendar.getCondensedMode()) {
+      nbCols = 6;
+    }
+    else {
+      nbCols = 7;
+    }
 
     // create day name bar
     m_dayNames = new DayNamesBar(this, SWT.NONE, m_calendar, 7, m_calendar.getCondensedMode());
@@ -421,25 +434,44 @@ public class CentralPanel extends Composite {
   protected void disposeWidgets() {
 
     // dispose all cells from the month cells collection
-    if (m_monthCells != null) for (ArrayList<MonthCell> week : m_monthCells)
-      for (MonthCell cell : week)
-        if (cell != null && !cell.isDisposed()) cell.dispose();
+    if (m_monthCells != null) {
+      for (ArrayList<MonthCell> week : m_monthCells) {
+        for (MonthCell cell : week) {
+          if (cell != null && !cell.isDisposed()) {
+            cell.dispose();
+          }
+        }
+      }
+    }
 
     // same from the week cells one
-    if (m_weekCells != null) for (WeekCell cell : m_weekCells)
-      if (cell != null && !cell.isDisposed()) cell.dispose();
+    if (m_weekCells != null) {
+      for (WeekCell cell : m_weekCells) {
+        if (cell != null && !cell.isDisposed()) {
+          cell.dispose();
+        }
+      }
+    }
 
-    if (m_emptyComposite != null && !m_emptyComposite.isDisposed()) m_emptyComposite.dispose();
+    if (m_emptyComposite != null && !m_emptyComposite.isDisposed()) {
+      m_emptyComposite.dispose();
+    }
 
-    if (m_dayNames != null && !m_dayNames.isDisposed()) m_dayNames.dispose();
+    if (m_dayNames != null && !m_dayNames.isDisposed()) {
+      m_dayNames.dispose();
+    }
 
-    if (m_timeline != null && !m_timeline.isDisposed()) m_timeline.dispose();
+    if (m_timeline != null && !m_timeline.isDisposed()) {
+      m_timeline.dispose();
+    }
 
     m_weekCells = null;
     m_monthCells = null;
     m_dateMap = null;
 
-    if (m_cells != null && !m_cells.isDisposed()) m_cells.dispose();
+    if (m_cells != null && !m_cells.isDisposed()) {
+      m_cells.dispose();
+    }
 
   }
 
@@ -447,17 +479,22 @@ public class CentralPanel extends Composite {
   public void reloadCalendarItems() {
 
     if (m_weekCells != null) {
-      for (WeekCell day : m_weekCells)
+      for (WeekCell day : m_weekCells) {
         day.reloadCalendarItems();
+      }
 
       calcTimelessMaxCount();
       setWeekItemsLayoutData();
       m_timeline.init();
     }
 
-    if (m_monthCells != null) for (ArrayList<MonthCell> week : m_monthCells)
-      for (MonthCell day : week)
-        day.reloadCalendarItems();
+    if (m_monthCells != null) {
+      for (ArrayList<MonthCell> week : m_monthCells) {
+        for (MonthCell day : week) {
+          day.reloadCalendarItems();
+        }
+      }
+    }
 
     // redo the layout
     m_cells.layout();
@@ -471,10 +508,13 @@ public class CentralPanel extends Composite {
       }
     }
 
-    if (m_monthCells != null) for (ArrayList<MonthCell> week : m_monthCells)
-      for (MonthCell day : week) {
-        day.layout();
+    if (m_monthCells != null) {
+      for (ArrayList<MonthCell> week : m_monthCells) {
+        for (MonthCell day : week) {
+          day.layout();
+        }
       }
+    }
   }
 
   /** update state of selected cell */
@@ -483,20 +523,26 @@ public class CentralPanel extends Composite {
     // week or day mode
     if (m_weekCells != null) {
       for (WeekCell day : m_weekCells) {
-        if (selectedDate.getTime().equals(day.getDate().getTime()))
-        // set selected
-        day.setSelected(true);
-        else day.setSelected(false);
+        if (selectedDate.getTime().equals(day.getDate().getTime())) {
+          // set selected
+          day.setSelected(true);
+        }
+        else {
+          day.setSelected(false);
+        }
       }
       // month mode
     }
     else {
       for (ArrayList<MonthCell> week : m_monthCells) {
         for (MonthCell day : week) {
-          if (selectedDate.getTime().equals(day.getDate().getTime()))
-          // set selected
-          day.setSelected(true);
-          else day.setSelected(false);
+          if (selectedDate.getTime().equals(day.getDate().getTime())) {
+            // set selected
+            day.setSelected(true);
+          }
+          else {
+            day.setSelected(false);
+          }
         }
       }
     } // end else

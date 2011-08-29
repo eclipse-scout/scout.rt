@@ -63,7 +63,9 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
    */
   public ClientJob(String name, IClientSession session, boolean sync, boolean system) {
     super(name);
-    if (session == null) throw new IllegalArgumentException("session is null");
+    if (session == null) {
+      throw new IllegalArgumentException("session is null");
+    }
     m_session = session;
     m_listeners = new EventListenerList();
     setUser(false);
@@ -106,7 +108,9 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
    */
   public final void setSync(boolean sync) {
     if (sync != isSync()) {
-      if (getState() != NONE) throw new IllegalStateException("sync property cannot be changed once the job is scheduled");
+      if (getState() != NONE) {
+        throw new IllegalStateException("sync property cannot be changed once the job is scheduled");
+      }
       //
       if (sync) {
         setRule(new ClientRule(m_session));

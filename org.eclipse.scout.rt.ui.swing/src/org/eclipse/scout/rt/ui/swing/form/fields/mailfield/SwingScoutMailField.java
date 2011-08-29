@@ -559,12 +559,16 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
           handleSwingPopup(((SwingMailAttachmentView) source));
         }
       }
-      if (fix != null) fix.mouseReleased(this, e);
+      if (fix != null) {
+        fix.mouseReleased(this, e);
+      }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-      if (fix.mouseClicked()) return;
+      if (fix.mouseClicked()) {
+        return;
+      }
       Object source = e.getSource();
       if (source instanceof SwingMailAttachmentView) {
         final File file = ((SwingMailAttachmentView) source).getAttachment().getFile();

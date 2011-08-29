@@ -112,8 +112,12 @@ public abstract class AbstractCalendarItem extends Composite implements Calendar
     // text
     String s = m_cell.getCalendar().getModel().getLabel(m_item.getItem(), m_cell.getDate().getTime());
 
-    if (this instanceof WeekCalendarItem) return "WeekCalendarItem {" + s + "}";
-    else return "MonthCalendarItem {" + s + "}";
+    if (this instanceof WeekCalendarItem) {
+      return "WeekCalendarItem {" + s + "}";
+    }
+    else {
+      return "MonthCalendarItem {" + s + "}";
+    }
 
   }
 }

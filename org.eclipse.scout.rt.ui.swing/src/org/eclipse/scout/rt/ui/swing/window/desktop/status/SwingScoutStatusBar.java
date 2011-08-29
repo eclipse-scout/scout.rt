@@ -138,7 +138,9 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
     showCard(CARD_LOGO);
     // adjust sizes
     int h = UIManager.getInt("StatusBar.height");
-    if (h <= 0) h = 29;
+    if (h <= 0) {
+      h = 29;
+    }
     bar.setMinimumSize(new Dimension(0, h));
     bar.setPreferredSize(new Dimension(800, h));
     bar.setMaximumSize(new Dimension(2048, h));
@@ -219,9 +221,15 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
   protected void handleNetworkLatencyChanged(final Long value) {
     if (m_swingNetworkLatency != null) {
       Icon icon = null;
-      if (value <= 70) icon = m_iconNetworkLatencyGreen;
-      else if (value <= 200) icon = m_iconNetworkLatencyYellow;
-      else icon = m_iconNetworkLatencyRed;
+      if (value <= 70) {
+        icon = m_iconNetworkLatencyGreen;
+      }
+      else if (value <= 200) {
+        icon = m_iconNetworkLatencyYellow;
+      }
+      else {
+        icon = m_iconNetworkLatencyRed;
+      }
       final Icon iconf = icon;
       SwingUtilities.invokeLater(
           new Runnable() {

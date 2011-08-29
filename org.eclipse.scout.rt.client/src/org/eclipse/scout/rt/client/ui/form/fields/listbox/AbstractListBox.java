@@ -222,7 +222,9 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   private Class<? extends ITable> getConfiguredTable() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     Class<? extends ITable>[] f = ConfigurationUtility.filterClasses(dca, ITable.class);
-    if (f.length == 1) return f[0];
+    if (f.length == 1) {
+      return f[0];
+    }
     else {
       for (Class<? extends ITable> c : f) {
         if (c.getDeclaringClass() != AbstractListBox.class) {
@@ -412,7 +414,9 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
 
   @Override
   public void setFilterActiveRowsValue(TriState t) {
-    if (t == null) t = TriState.TRUE;
+    if (t == null) {
+      t = TriState.TRUE;
+    }
     propertySupport.setProperty(PROP_FILTER_ACTIVE_ROWS_VALUE, t);
   }
 
@@ -487,7 +491,9 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     execFilterLookupResult(call, result);
     int len = 0;
     for (LookupRow r : result) {
-      if (r != null) len++;
+      if (r != null) {
+        len++;
+      }
     }
     LookupRow[] a = new LookupRow[len];
     int index = 0;
@@ -544,11 +550,15 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
 
   @Override
   protected String formatValueInternal(T[] validValue) {
-    if (validValue == null || validValue.length == 0) return "";
+    if (validValue == null || validValue.length == 0) {
+      return "";
+    }
     StringBuffer b = new StringBuffer();
     ITableRow[] rows = getKeyColumnInternal().findRows(validValue);
     for (int i = 0; i < rows.length; i++) {
-      if (i > 0) b.append(", ");
+      if (i > 0) {
+        b.append(", ");
+      }
       b.append(getTextColumnInternal().getValue(rows[i]));
     }
     return b.toString();
@@ -691,7 +701,9 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     }
     T[] array = (T[]) Array.newInstance(getHolderType().getComponentType(), 0);
     a = set.toArray(array);
-    if (a != null && a.length == 0) a = null;
+    if (a != null && a.length == 0) {
+      a = null;
+    }
     return a;
   }
 
@@ -726,7 +738,9 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   }
 
   private void syncValueToTable() {
-    if (m_valueTableSyncActive) return;
+    if (m_valueTableSyncActive) {
+      return;
+    }
     try {
       m_valueTableSyncActive = true;
       getTable().setTableChanging(true);
@@ -750,7 +764,9 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   }
 
   private void syncTableToValue() {
-    if (m_valueTableSyncActive) return;
+    if (m_valueTableSyncActive) {
+      return;
+    }
     try {
       m_valueTableSyncActive = true;
       m_table.setTableChanging(true);
@@ -843,7 +859,9 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   @Override
   public int getFieldIndex(IFormField f) {
     for (int i = 0; i < m_fields.length; i++) {
-      if (m_fields[i] == f) return i;
+      if (m_fields[i] == f) {
+        return i;
+      }
     }
     return -1;
   }
@@ -858,16 +876,22 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   @Override
   public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
     // myself
-    if (!visitor.visitField(this, startLevel, 0)) return false;
+    if (!visitor.visitField(this, startLevel, 0)) {
+      return false;
+    }
     // children
     int index = 0;
     IFormField[] f = m_fields;
     for (int i = 0; i < f.length; i++) {
       if (f[i] instanceof ICompositeField) {
-        if (!((ICompositeField) f[i]).visitFields(visitor, startLevel + 1)) return false;
+        if (!((ICompositeField) f[i]).visitFields(visitor, startLevel + 1)) {
+          return false;
+        }
       }
       else {
-        if (!visitor.visitField(f[i], startLevel, index)) return false;
+        if (!visitor.visitField(f[i], startLevel, index)) {
+          return false;
+        }
       }
       index++;
     }

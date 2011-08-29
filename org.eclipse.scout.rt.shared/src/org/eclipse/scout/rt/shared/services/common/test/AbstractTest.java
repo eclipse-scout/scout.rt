@@ -142,7 +142,9 @@ public abstract class AbstractTest extends AbstractService implements ITest {
     TestStatus s = createStatus();
     s.setSeverity(TestStatus.INFO);
     s.setDuration(getLastTiming());
-    if (message != null) s.setMessage(message);
+    if (message != null) {
+      s.setMessage(message);
+    }
     addStatus(s);
   }
 
@@ -167,8 +169,12 @@ public abstract class AbstractTest extends AbstractService implements ITest {
     TestStatus s = createStatus();
     s.setSeverity(TestStatus.WARNING);
     s.setDuration(getLastTiming());
-    if (message != null) s.setMessage(message);
-    if (t != null) s.setException(t);
+    if (message != null) {
+      s.setMessage(message);
+    }
+    if (t != null) {
+      s.setException(t);
+    }
     addStatus(s);
   }
 
@@ -193,8 +199,12 @@ public abstract class AbstractTest extends AbstractService implements ITest {
     TestStatus s = createStatus();
     s.setSeverity(TestStatus.ERROR);
     s.setDuration(getLastTiming());
-    if (message != null) s.setMessage(message);
-    if (t != null) s.setException(t);
+    if (message != null) {
+      s.setMessage(message);
+    }
+    if (t != null) {
+      s.setException(t);
+    }
     addStatus(s);
   }
 
@@ -211,8 +221,12 @@ public abstract class AbstractTest extends AbstractService implements ITest {
     TestStatus s = createStatus();
     s.setSeverity(TestStatus.FATAL);
     s.setDuration(getLastTiming());
-    if (message != null) s.setMessage(message);
-    if (t != null) s.setException(t);
+    if (message != null) {
+      s.setMessage(message);
+    }
+    if (t != null) {
+      s.setException(t);
+    }
     addStatus(s);
   }
 

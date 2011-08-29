@@ -75,8 +75,12 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   protected void setDisplayTextFromScout(String s) {
     JLabel swingField = getSwingLabelField();
     String oldText = swingField.getText();
-    if (s == null) s = "";
-    if (oldText == null) oldText = "";
+    if (s == null) {
+      s = "";
+    }
+    if (oldText == null) {
+      oldText = "";
+    }
     if (oldText.equals(s)) {
       return;
     }

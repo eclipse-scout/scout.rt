@@ -81,7 +81,9 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
   }
 
   public static Pattern getSearchPattern(String s) {
-    if (s == null) s = "";
+    if (s == null) {
+      s = "";
+    }
     s = s.toLowerCase();
     if (!s.endsWith("*")) {
       s = s + "*";

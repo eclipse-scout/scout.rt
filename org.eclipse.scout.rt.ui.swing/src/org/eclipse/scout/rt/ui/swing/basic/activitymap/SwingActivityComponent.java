@@ -46,8 +46,12 @@ public class SwingActivityComponent extends DefaultActivityComponent {
       if (m_cell.getMajorColor() != null) {
         // major fill
         float f = m_cell.getMajorValue();
-        if (f < 0) f = 0;
-        if (f > 1) f = 1;
+        if (f < 0) {
+          f = 0;
+        }
+        if (f > 1) {
+          f = 1;
+        }
         int dy = (int) (f * (h - 2 - 2));
         // clear bg
         g.setColor(Color.white);
@@ -61,8 +65,12 @@ public class SwingActivityComponent extends DefaultActivityComponent {
         if (m_cell.getMinorColor() != null) {
           // minor fill
           f = m_cell.getMinorValue();
-          if (f < 0) f = 0;
-          if (f > 1) f = 1;
+          if (f < 0) {
+            f = 0;
+          }
+          if (f > 1) {
+            f = 1;
+          }
           dy = (int) (f * (h - 2 - 4 - 4));
           // clear bg
           g.setColor(Color.white);

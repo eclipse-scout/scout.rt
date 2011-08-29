@@ -36,7 +36,9 @@ public class Windows7KeyHandler {
 
   public void install() {
     String osName = System.getProperty("os.name");
-    if (osName == null || !osName.startsWith("Windows")) return;
+    if (osName == null || !osName.startsWith("Windows")) {
+      return;
+    }
     //
     if (m_listener == null) {
       m_listener = new AWTEventListener() {
@@ -161,7 +163,9 @@ public class Windows7KeyHandler {
         }
         else {
           //move to left and store default bounds
-          if (!wasMaximized || defaultView == null) setDefaultBounds(frame, curView);
+          if (!wasMaximized || defaultView == null) {
+            setDefaultBounds(frame, curView);
+          }
           frame.setBounds(leftView);
         }
       }
@@ -208,7 +212,9 @@ public class Windows7KeyHandler {
         }
         else {
           //move to right and store default bounds
-          if (!wasMaximized || defaultView == null) setDefaultBounds(frame, curView);
+          if (!wasMaximized || defaultView == null) {
+            setDefaultBounds(frame, curView);
+          }
           frame.setBounds(rightView);
         }
       }

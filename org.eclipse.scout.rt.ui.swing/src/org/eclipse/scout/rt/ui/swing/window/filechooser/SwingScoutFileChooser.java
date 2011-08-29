@@ -170,22 +170,36 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
       StringBuffer buf = new StringBuffer();
       if (extensions != null) {
         for (int i = 0; i < extensions.length; i++) {
-          if (i > 0) buf.append(", ");
+          if (i > 0) {
+            buf.append(", ");
+          }
           buf.append("*." + extensions[i]);
         }
       }
       if (buf.length() == 0) {
         buf.append("*.*");
       }
-      if (m_owner instanceof Dialog) dlg = new FileDialog((Dialog) m_owner, buf.toString(), openMode ? FileDialog.LOAD : FileDialog.SAVE);
-      else if (m_owner instanceof Frame) dlg = new FileDialog((Frame) m_owner, buf.toString(), openMode ? FileDialog.LOAD : FileDialog.SAVE);
-      else dlg = new FileDialog(new Frame(), buf.toString(), openMode ? FileDialog.LOAD : FileDialog.SAVE);
+      if (m_owner instanceof Dialog) {
+        dlg = new FileDialog((Dialog) m_owner, buf.toString(), openMode ? FileDialog.LOAD : FileDialog.SAVE);
+      }
+      else if (m_owner instanceof Frame) {
+        dlg = new FileDialog((Frame) m_owner, buf.toString(), openMode ? FileDialog.LOAD : FileDialog.SAVE);
+      }
+      else {
+        dlg = new FileDialog(new Frame(), buf.toString(), openMode ? FileDialog.LOAD : FileDialog.SAVE);
+      }
       System.setSecurityManager(sm);
     }
     catch (Exception e) {
-      if (m_owner instanceof Dialog) dlg = new FileDialog((Dialog) m_owner);
-      else if (m_owner instanceof Frame) dlg = new FileDialog((Frame) m_owner);
-      else dlg = new FileDialog(new Frame());
+      if (m_owner instanceof Dialog) {
+        dlg = new FileDialog((Dialog) m_owner);
+      }
+      else if (m_owner instanceof Frame) {
+        dlg = new FileDialog((Frame) m_owner);
+      }
+      else {
+        dlg = new FileDialog(new Frame());
+      }
     }
     finally {
       try {
@@ -214,7 +228,9 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
       else {
         StringBuffer extBuf = new StringBuffer();
         for (int i = 0; i < extArrayF.length; i++) {
-          if (extBuf.length() > 0) extBuf.append(";");
+          if (extBuf.length() > 0) {
+            extBuf.append(";");
+          }
           extBuf.append("*." + extArrayF[i]);
         }
         dlg.setFile(extBuf.toString());
@@ -270,8 +286,12 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
 
     @Override
     public String getDescription() {
-      if (m_ext.length() > 0) return "*." + m_ext;
-      else return "*.*";
+      if (m_ext.length() > 0) {
+        return "*." + m_ext;
+      }
+      else {
+        return "*.*";
+      }
     }
 
     public String getExt() {

@@ -138,7 +138,9 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
    */
   @Override
   public void putObject(Object object) throws ProcessingException {
-    if (LOG.isInfoEnabled()) LOG.info("obj=" + object);
+    if (LOG.isInfoEnabled()) {
+      LOG.info("obj=" + object);
+    }
     getJmsXAResource().putObject(object, true);
   }
 
@@ -171,7 +173,9 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
   private JmsTransactionMember getJmsXAResource() throws ProcessingException {
     String resId = new Long(m_config.getCrc()).toString();
     ITransaction reg = ThreadContext.get(ITransaction.class);
-    if (reg == null) throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
+    if (reg == null) {
+      throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
+    }
     JmsTransactionMember res = (JmsTransactionMember) reg.getMember(resId);
     if (res == null) {
       res = new JmsTransactionMember(m_config);

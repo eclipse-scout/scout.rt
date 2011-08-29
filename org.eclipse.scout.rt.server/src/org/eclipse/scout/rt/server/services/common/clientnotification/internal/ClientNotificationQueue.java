@@ -40,9 +40,15 @@ public class ClientNotificationQueue {
   }
 
   public void putNotification(IClientNotification notification, IClientNotificationFilter filter) {
-    if (notification == null) throw new IllegalArgumentException("notification must not be null");
-    if (filter == null) throw new IllegalArgumentException("filter must not be null");
-    if (LOG.isDebugEnabled()) LOG.debug("put " + notification + " for " + filter);
+    if (notification == null) {
+      throw new IllegalArgumentException("notification must not be null");
+    }
+    if (filter == null) {
+      throw new IllegalArgumentException("filter must not be null");
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("put " + notification + " for " + filter);
+    }
     synchronized (m_queueLock) {
       for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
         QueueElement e = it.next();
@@ -131,8 +137,12 @@ public class ClientNotificationQueue {
      */
     public boolean isConsumedBy(IServerSession session) {
       // fast check
-      if (session == null) return false;
-      if (m_consumedBySessions == null) return false;
+      if (session == null) {
+        return false;
+      }
+      if (m_consumedBySessions == null) {
+        return false;
+      }
       //
       synchronized (m_consumedBySessionsLock) {
         if (m_consumedBySessions != null) {

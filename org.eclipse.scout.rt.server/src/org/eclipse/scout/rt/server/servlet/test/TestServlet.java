@@ -63,9 +63,13 @@ public class TestServlet extends HttpServletEx {
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
     String qname = config.getInitParameter("session");
-    if (qname == null) throw new ServletException("Expected init-param \"session\"");
+    if (qname == null) {
+      throw new ServletException("Expected init-param \"session\"");
+    }
     String runAs = config.getInitParameter("runAs");
-    if (runAs == null) throw new ServletException("Expected init-param \"runAs\"");
+    if (runAs == null) {
+      throw new ServletException("Expected init-param \"runAs\"");
+    }
     //
     int i = qname.lastIndexOf('.');
     try {

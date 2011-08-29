@@ -183,8 +183,12 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
     }
     JTextComponent swingField = getSwingTextComponent();
     String oldText = swingField.getText();
-    if (s == null) s = "";
-    if (oldText == null) oldText = "";
+    if (s == null) {
+      s = "";
+    }
+    if (oldText == null) {
+      oldText = "";
+    }
     if (oldText.equals(s)) {
       return;
     }
@@ -248,8 +252,12 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
     JTextComponent swingField = getSwingTextComponent();
     Caret c = swingField.getCaret();
     int textLength = swingField.getText().length();
-    if (startIndex < 0) startIndex = c.getMark();
-    if (endIndex < 0) endIndex = c.getDot();
+    if (startIndex < 0) {
+      startIndex = c.getMark();
+    }
+    if (endIndex < 0) {
+      endIndex = c.getDot();
+    }
     startIndex = Math.min(Math.max(startIndex, -1), textLength);
     endIndex = Math.min(Math.max(endIndex, 0), textLength);
     if (c.getMark() != startIndex || c.getDot() != endIndex) {
@@ -259,7 +267,9 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
   }
 
   protected void setSelectionFromSwing() {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     Caret c = getSwingTextComponent().getCaret();
     int textLength = StringUtility.length(getSwingTextComponent().getText());
@@ -475,12 +485,16 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
 
     @Override
     public void mouseReleased(MouseEvent e) {
-      if(fix!=null) fix.mouseReleased(this, e);
+      if(fix!=null) {
+        fix.mouseReleased(this, e);
+      }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-      if (fix.mouseClicked()) return;
+      if (fix.mouseClicked()) {
+        return;
+      }
       if (e.getClickCount() == 2) {
         handleSwingLinkTrigger();
       }

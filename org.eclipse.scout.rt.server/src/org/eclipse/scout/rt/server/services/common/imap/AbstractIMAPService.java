@@ -172,15 +172,19 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
       throw new ProcessingException(e.getMessage(), e);
     }
     finally {
-      if (m_folder != null) try {
-        m_folder.close(false);
+      if (m_folder != null) {
+        try {
+          m_folder.close(false);
+        }
+        catch (Throwable fatal) {
+        }
       }
-      catch (Throwable fatal) {
-      }
-      if (m_store != null) try {
-        m_store.close();
-      }
-      catch (Throwable fatal) {
+      if (m_store != null) {
+        try {
+          m_store.close();
+        }
+        catch (Throwable fatal) {
+        }
       }
     }
   }

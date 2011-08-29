@@ -48,7 +48,9 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   // format value for display
   @Override
   protected String formatValueInternal(Boolean validValue) {
-    if (validValue == null) return "";
+    if (validValue == null) {
+      return "";
+    }
     // ticket 79554
     return validValue ? ScoutTexts.get("Yes") : ScoutTexts.get("No");
   }
@@ -69,7 +71,9 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   @Override
   protected Boolean parseValueInternal(String text) throws ProcessingException {
     Boolean retVal = null;
-    if (text != null && text.length() == 0) text = null;
+    if (text != null && text.length() == 0) {
+      text = null;
+    }
     if (text != null) {
       if (text.equals("1")) {
         retVal = true;

@@ -97,17 +97,20 @@ public class LabelledCombo extends Composite {
 		combo.addSelectionListener(new SelectionAdapter() {
 			@Override
       public void widgetSelected (SelectionEvent e) {
-				for (SelectionListener l: listeners)
-					if (l != null)
-						l.widgetSelected(e);
+				for (SelectionListener l: listeners) {
+          if (l != null) {
+            l.widgetSelected(e);
+          }
+        }
 			}
 		});
 	}
 
 	/** add combo selection listener */
 	public void addSelectionListener (SelectionListener listener) {
-		if (listener != null)
-			listeners.add(listener);
+		if (listener != null) {
+      listeners.add(listener);
+    }
 	}
 	/** remove combo selection listener */
 	public void removeSelectionListener (SelectionListener listener) {

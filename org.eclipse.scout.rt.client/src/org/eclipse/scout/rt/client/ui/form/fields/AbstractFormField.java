@@ -816,7 +816,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public final void setXML(String xml) throws ProcessingException {
-    if (xml == null) return;
+    if (xml == null) {
+      return;
+    }
     try {
       SimpleXmlElement root = new SimpleXmlElement();
       root.parseString(xml);

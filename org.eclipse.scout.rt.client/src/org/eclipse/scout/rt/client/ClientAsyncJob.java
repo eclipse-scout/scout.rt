@@ -42,7 +42,9 @@ public class ClientAsyncJob extends ClientJob {
    */
   @Override
   public boolean belongsTo(Object family) {
-    if (super.belongsTo(family)) return true;
+    if (super.belongsTo(family)) {
+      return true;
+    }
     if (family == ClientAsyncJob.class) {
       return true;
     }

@@ -130,7 +130,9 @@ public class LegacyComposerStatementBuilder {
 
   private String visitEntityNode(EntityNode node) {
     String stm = ((AbstractComposerEntity) node.getEntity()).getLegacyStatement();
-    if (stm == null) stm = "";
+    if (stm == null) {
+      stm = "";
+    }
     // negation
     if (node.isNegative()) {
       stm = "NOT " + stm;
@@ -160,7 +162,9 @@ public class LegacyComposerStatementBuilder {
 
   private String visitAttributeNode(final AttributeNode node) {
     String originalStatement = ((AbstractComposerAttribute) node.getAttribute()).getLegacyStatement();
-    if (originalStatement == null) originalStatement = "";
+    if (originalStatement == null) {
+      originalStatement = "";
+    }
     // replace the S in the string by the generated unique bind name
     final Map<String, String> bindTranslationTable = localizeBindNames("S");
     String stm = localizeStatement(originalStatement, bindTranslationTable);

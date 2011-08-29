@@ -208,7 +208,11 @@ public class LoginDialog extends JDialogEx {
   }
 
   private void updateOkButton() {
-    if (m_status.getUsername() != null && m_status.getUsername().length() > 0 && m_status.getPassword() != null && m_status.getPassword().length() > 0) m_okButton.setEnabled(true);
-    else m_okButton.setEnabled(false);
+    if (m_status.getUsername() != null && m_status.getUsername().length() > 0 && m_status.getPassword() != null && m_status.getPassword().length() > 0) {
+      m_okButton.setEnabled(true);
+    }
+    else {
+      m_okButton.setEnabled(false);
+    }
   }
 }

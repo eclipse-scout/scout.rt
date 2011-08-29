@@ -19,7 +19,9 @@ public class SimplePrincipal implements Principal, Serializable {
   private String m_name;
 
   public SimplePrincipal(String name) {
-    if (name == null) throw new IllegalArgumentException("name must not be null");
+    if (name == null) {
+      throw new IllegalArgumentException("name must not be null");
+    }
     m_name = name;
   }
 
@@ -35,7 +37,9 @@ public class SimplePrincipal implements Principal, Serializable {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this) return true;
+    if (other == this) {
+      return true;
+    }
     if (!(other instanceof SimplePrincipal)) {
       return false;
     }

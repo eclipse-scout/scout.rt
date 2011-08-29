@@ -220,7 +220,9 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
     public void viewChanged(CalendarViewEvent e) {
       switch (e.getType()) {
         case CalendarViewEvent.TYPE_SELECTION_CHANGED: {
-          if (getUpdateSwingFromScoutLock().isAcquired()) return;
+          if (getUpdateSwingFromScoutLock().isAcquired()) {
+            return;
+          }
           //
           final Date[] dates = e.getSource().getSelectedDates();
           // check swing-side lock

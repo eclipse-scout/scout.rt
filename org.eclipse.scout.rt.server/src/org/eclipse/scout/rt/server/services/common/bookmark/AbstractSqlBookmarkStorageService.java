@@ -167,10 +167,12 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
       throw new ProcessingException("loading object" + id, t);
     }
     finally {
-      if (oin != null) try {
-        oin.close();
-      }
-      catch (Throwable t) {
+      if (oin != null) {
+        try {
+          oin.close();
+        }
+        catch (Throwable t) {
+        }
       }
     }
   }
@@ -230,10 +232,12 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
       throw new ProcessingException("storing user bookmarks", e);
     }
     finally {
-      if (oout != null) try {
-        oout.close();
-      }
-      catch (Throwable t) {
+      if (oout != null) {
+        try {
+          oout.close();
+        }
+        catch (Throwable t) {
+        }
       }
     }
   }
@@ -253,10 +257,12 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
       throw new ProcessingException("storing global bookmarks", e);
     }
     finally {
-      if (oout != null) try {
-        oout.close();
-      }
-      catch (Throwable t) {
+      if (oout != null) {
+        try {
+          oout.close();
+        }
+        catch (Throwable t) {
+        }
       }
     }
   }

@@ -83,7 +83,9 @@ public abstract class TableKeyboardNavigationSupport extends AbstractKeyboardNav
         if (column < 0) {
           return;
         }
-        if (LOG.isInfoEnabled()) LOG.info("finding regex:" + regex + " in column " + tableModel.getColumnName(column));
+        if (LOG.isInfoEnabled()) {
+          LOG.info("finding regex:" + regex + " in column " + tableModel.getColumnName(column));
+        }
         // loop over values and find matching one
         int startIndex = m_table.getSelectionModel().getAnchorSelectionIndex();
         if (startIndex < 0) {

@@ -55,11 +55,19 @@ public class CongruencyFilter {
 
   public boolean isCongruent(TableDesc o1, TableDesc o2) {
     // forced changes
-    if (o1 != null && isTriggerChanged(o1.getFullName())) return false;
-    if (o2 != null && isTriggerChanged(o2.getFullName())) return false;
+    if (o1 != null && isTriggerChanged(o1.getFullName())) {
+      return false;
+    }
+    if (o2 != null && isTriggerChanged(o2.getFullName())) {
+      return false;
+    }
     // default
-    if (o1 == o2) return true;
-    if (o1 == null || o2 == null) return false;
+    if (o1 == o2) {
+      return true;
+    }
+    if (o1 == null || o2 == null) {
+      return false;
+    }
     return o1.getName().equals(o2.getName()) &&
         isCongruent(o1.getPrimaryKey(), o2.getPrimaryKey()) &&
         isCongruentAndRelevant(o1.getColumns(), o2.getColumns()) &&
@@ -68,23 +76,35 @@ public class CongruencyFilter {
   }
 
   public boolean isCongruent(ViewDesc o1, ViewDesc o2) {
-    if (o1 == o2) return true;
-    if (o1 == null || o2 == null) return false;
+    if (o1 == o2) {
+      return true;
+    }
+    if (o1 == null || o2 == null) {
+      return false;
+    }
     return o1.getName().equals(o2.getName()) &&
         o1.getStatement().equals(o2.getStatement()) &&
         isCongruentAndRelevant(o1.getGrants(), o2.getGrants());
   }
 
   public boolean isCongruent(TableGrantDesc o1, TableGrantDesc o2) {
-    if (o1 == o2) return true;
-    if (o1 == null || o2 == null) return false;
+    if (o1 == o2) {
+      return true;
+    }
+    if (o1 == null || o2 == null) {
+      return false;
+    }
     return o1.getGrantee().equals(o2.getGrantee()) &&
         o1.getType().equals(o2.getType());
   }
 
   public boolean isCongruent(ColumnDesc o1, ColumnDesc o2) {
-    if (o1 == o2) return true;
-    if (o1 == null || o2 == null) return false;
+    if (o1 == o2) {
+      return true;
+    }
+    if (o1 == null || o2 == null) {
+      return false;
+    }
     //
     return o1.getName().equals(o2.getName()) &&
         o1.isNullable() == o2.isNullable() &&
@@ -92,23 +112,35 @@ public class CongruencyFilter {
   }
 
   public boolean isCongruent(IndexDesc o1, IndexDesc o2) {
-    if (o1 == o2) return true;
-    if (o1 == null || o2 == null) return false;
+    if (o1 == o2) {
+      return true;
+    }
+    if (o1 == null || o2 == null) {
+      return false;
+    }
     return o1.isUnique() == o2.isUnique() &&
         o1.getColumnNames().equals(o2.getColumnNames());// equality of content
     // AND order
   }
 
   public boolean isCongruent(PrimaryKeyDesc o1, PrimaryKeyDesc o2) {
-    if (o1 == o2) return true;
-    if (o1 == null || o2 == null) return false;
+    if (o1 == o2) {
+      return true;
+    }
+    if (o1 == null || o2 == null) {
+      return false;
+    }
     return o1.getColumnNames().equals(o2.getColumnNames());// equality of
     // content AND order
   }
 
   public boolean isCongruent(SequenceDesc o1, SequenceDesc o2) {
-    if (o1 == o2) return true;
-    if (o1 == null || o2 == null) return false;
+    if (o1 == o2) {
+      return true;
+    }
+    if (o1 == null || o2 == null) {
+      return false;
+    }
     return o1.getName().equals(o2.getName());
   }
 
@@ -133,7 +165,9 @@ public class CongruencyFilter {
   }
 
   public boolean containsCongruent(Collection c, Object o) {
-    if (o == null) return false;
+    if (o == null) {
+      return false;
+    }
     try {
       Method m = getClass().getMethod("isCongruent", new Class[]{o.getClass(), o.getClass()});
       for (Iterator it = c.iterator(); it.hasNext();) {

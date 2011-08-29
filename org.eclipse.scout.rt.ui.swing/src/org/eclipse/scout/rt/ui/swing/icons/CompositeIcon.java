@@ -33,7 +33,9 @@ public class CompositeIcon implements Icon {
     int index = 0;
     for (Icon icon : m_icons) {
       if (icon != null) {
-        if (index > 0) w += m_gap;
+        if (index > 0) {
+          w += m_gap;
+        }
         w = w + icon.getIconWidth();
         h = Math.max(h, icon.getIconHeight());
         index++;

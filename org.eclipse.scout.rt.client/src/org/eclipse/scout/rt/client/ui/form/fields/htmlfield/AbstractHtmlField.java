@@ -110,7 +110,9 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   @Override
   public void setMaxLength(int len) {
-    if (len > 0) propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
+    if (len > 0) {
+      propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
+    }
     if (isInitialized()) {
       setValue(getValue());
     }
@@ -176,7 +178,9 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   // convert string to a real string
   @Override
   protected String parseValueInternal(String text) throws ProcessingException {
-    if (text != null && text.length() == 0) text = null;
+    if (text != null && text.length() == 0) {
+      text = null;
+    }
     return text;
   }
 
@@ -210,7 +214,9 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     @Override
     public boolean setTextFromUI(String htmlText) {
       if (isHtmlEditor()) {
-        if (htmlText != null && htmlText.length() == 0) htmlText = null;
+        if (htmlText != null && htmlText.length() == 0) {
+          htmlText = null;
+        }
         // parse always, validity might change even if text is same
         return parseValue(htmlText);
       }

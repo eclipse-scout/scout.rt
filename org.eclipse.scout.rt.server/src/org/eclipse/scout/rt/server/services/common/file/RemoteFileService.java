@@ -116,8 +116,12 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
       long partLength = file.length();
       if (maxBlockSize > -1 && partLength > maxBlockSize) {
         partLength = partLength - startPosition;
-        if (partLength > maxBlockSize) partLength = maxBlockSize;
-        if (partLength <= 0) partLength = 0;
+        if (partLength > maxBlockSize) {
+          partLength = maxBlockSize;
+        }
+        if (partLength <= 0) {
+          partLength = 0;
+        }
       }
       result.setContentLength((int) partLength);
       if (includeContent != null && (!includeContent)) {

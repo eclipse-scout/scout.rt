@@ -155,7 +155,9 @@ public class SessionsView extends DefaultView {
         int i = 0;
         for (Principal principal : subject.getPrincipals()) {
           if (principal != null) {
-            if (i > 0) p.br();
+            if (i > 0) {
+              p.br();
+            }
             String s = "principal[" + i + "] name=" + principal.getName() + " toString=" + principal.toString() + " class=" + principal.getClass();
             s = s.replaceAll("[\\n\\r]+", " ");
             p.printNoBreak(s);

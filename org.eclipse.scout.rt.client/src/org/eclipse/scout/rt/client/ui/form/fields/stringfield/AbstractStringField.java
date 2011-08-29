@@ -193,7 +193,9 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
 
   @Override
   public void setMaxLength(int len) {
-    if (len > 0) propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
+    if (len > 0) {
+      propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
+    }
     if (isInitialized()) {
       setValue(getValue());
     }
@@ -368,7 +370,9 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
   // convert string to a real string
   @Override
   protected String parseValueInternal(String text) throws ProcessingException {
-    if (text != null && text.length() == 0) text = null;
+    if (text != null && text.length() == 0) {
+      text = null;
+    }
     String fmt = getFormat();
     if (fmt != null && text != null) {
       if (IStringField.FORMAT_LOWER.equals(fmt)) {
@@ -406,7 +410,9 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
 
     @Override
     public boolean setTextFromUI(String newText) {
-      if (newText != null && newText.length() == 0) newText = null;
+      if (newText != null && newText.length() == 0) {
+        newText = null;
+      }
       // parse always, validity might change even if text is same
       return parseValue(newText);
     }
@@ -431,8 +437,12 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
     @Override
     public void fireKeyTypedFromUI(String newText) {
       String oldText = getDisplayText();
-      if (oldText != null && oldText.length() == 0) oldText = null;
-      if (newText != null && newText.length() == 0) newText = null;
+      if (oldText != null && oldText.length() == 0) {
+        oldText = null;
+      }
+      if (newText != null && newText.length() == 0) {
+        newText = null;
+      }
       if (oldText == newText || (oldText != null && oldText.equals(newText))) {
         // no change
         return;

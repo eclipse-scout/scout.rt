@@ -52,7 +52,9 @@ public class TableRow implements ITableRow {
 
   public TableRow(ColumnSet columnSet, Object[] values) throws ProcessingException {
     this(columnSet);
-    if (values == null) values = new Object[0];
+    if (values == null) {
+      values = new Object[0];
+    }
     for (int i = 0; i < values.length; i++) {
       Cell cell = getCellForUpdate(i);
       cell.setValue(values[i]);
@@ -206,7 +208,9 @@ public class TableRow implements ITableRow {
 
   @Override
   public Object[] getKeyValues() {
-    if (m_columnSet == null) throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
+    if (m_columnSet == null) {
+      throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
+    }
     int[] keyColumns = m_columnSet.getKeyColumnIndexes();
     if (keyColumns.length == 0) {
       keyColumns = m_columnSet.getAllColumnIndexes();
@@ -320,7 +324,9 @@ public class TableRow implements ITableRow {
 
   @Override
   public void setIconId(String id) {
-    if (m_columnSet == null) throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
+    if (m_columnSet == null) {
+      throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
+    }
     IColumn col = m_columnSet.getFirstVisibleColumn();
     if (col != null) {
       m_cells.get(col.getColumnIndex()).setIconId(id);
@@ -329,7 +335,9 @@ public class TableRow implements ITableRow {
 
   @Override
   public String getIconId() {
-    if (m_columnSet == null) throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
+    if (m_columnSet == null) {
+      throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
+    }
     IColumn col = m_columnSet.getFirstVisibleColumn();
     if (col != null) {
       return m_cells.get(col.getColumnIndex()).getIconId();

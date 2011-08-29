@@ -73,9 +73,13 @@ public final class DataModelUtility {
    *          is the entity on which to start resolving or null to start on top of the entity/attribute tree
    */
   public static IDataModelEntity externalIdToEntity(IDataModel f, String externalId, IDataModelEntity parentEntity) {
-    if (externalId == null) return null;
+    if (externalId == null) {
+      return null;
+    }
     Matcher m = PAT_EXTERNAL_ID.matcher(externalId);
-    if (!m.matches()) throw new IllegalArgumentException("externalId is invalid: " + externalId);
+    if (!m.matches()) {
+      throw new IllegalArgumentException("externalId is invalid: " + externalId);
+    }
     String folderName = m.group(2);
     String elemName = m.group(3);
     if (folderName != null) {
@@ -99,9 +103,13 @@ public final class DataModelUtility {
    *          is the entity on which to start resolving or null to start on top of the entity/attribute tree
    */
   public static IDataModelAttribute externalIdToAttribute(IDataModel f, String externalId, IDataModelEntity parentEntity) {
-    if (externalId == null) return null;
+    if (externalId == null) {
+      return null;
+    }
     Matcher m = PAT_EXTERNAL_ID.matcher(externalId);
-    if (!m.matches()) throw new IllegalArgumentException("externalId is invalid: " + externalId);
+    if (!m.matches()) {
+      throw new IllegalArgumentException("externalId is invalid: " + externalId);
+    }
     String folderName = m.group(2);
     String elemName = m.group(3);
     Map<String, String> meta = importMetaData(m.group(5));
@@ -161,7 +169,9 @@ public final class DataModelUtility {
    * empty values are imported as null
    */
   public static Map<String, String> importMetaData(String s) {
-    if (s == null) return null;
+    if (s == null) {
+      return null;
+    }
     Map<String, String> map = new HashMap<String, String>(1);
     for (String e : PAT_SEMI_COLON.split(s)) {
       Matcher m = PAT_NVPAIR.matcher(e);
@@ -180,7 +190,9 @@ public final class DataModelUtility {
    * null values are exported as empty strings
    */
   public static String exportMetaData(Map<String, String> map) {
-    if (map == null || map.size() == 0) return "";
+    if (map == null || map.size() == 0) {
+      return "";
+    }
     StringBuffer buf = new StringBuffer(16);
     for (Map.Entry<String, String> e : map.entrySet()) {
       buf.append(";");

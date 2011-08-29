@@ -46,7 +46,9 @@ public class AllUserFilter implements IClientNotificationFilter {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
+    if (obj == null) {
+      return false;
+    }
     return obj.getClass() == this.getClass();
   }
 

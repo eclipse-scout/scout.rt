@@ -73,7 +73,9 @@ public final class DesktopProfiler {
    * adding
    */
   public void registerTree(ITree tree) {
-    if (!m_enabled) return;
+    if (!m_enabled) {
+      return;
+    }
     synchronized (m_listLock) {
       m_trees.add(new WeakReference<ITree>(tree));
     }
@@ -85,7 +87,9 @@ public final class DesktopProfiler {
    * immediately after adding
    */
   public void registerTreeNode(ITreeNode node) {
-    if (!m_enabled) return;
+    if (!m_enabled) {
+      return;
+    }
     synchronized (m_listLock) {
       m_treeNodes.add(new WeakReference<ITreeNode>(node));
     }
@@ -97,7 +101,9 @@ public final class DesktopProfiler {
    * immediately after adding
    */
   public void registerTable(ITable table) {
-    if (!m_enabled) return;
+    if (!m_enabled) {
+      return;
+    }
     synchronized (m_listLock) {
       m_tables.add(new WeakReference<ITable>(table));
     }
@@ -109,7 +115,9 @@ public final class DesktopProfiler {
    * immediately after adding
    */
   public void registerTableRow(ITableRow row) {
-    if (!m_enabled) return;
+    if (!m_enabled) {
+      return;
+    }
     synchronized (m_listLock) {
       m_tableRows.add(new WeakReference<ITableRow>(row));
     }
@@ -121,7 +129,9 @@ public final class DesktopProfiler {
    * adding
    */
   public void registerForm(IForm form) {
-    if (!m_enabled) return;
+    if (!m_enabled) {
+      return;
+    }
     synchronized (m_listLock) {
       m_forms.add(new WeakReference<IForm>(form));
     }
@@ -133,7 +143,9 @@ public final class DesktopProfiler {
    * immediately after adding
    */
   public void registerFormField(IFormField formField) {
-    if (!m_enabled) return;
+    if (!m_enabled) {
+      return;
+    }
     synchronized (m_listLock) {
       m_formFields.add(new WeakReference<IFormField>(formField));
     }
@@ -145,7 +157,9 @@ public final class DesktopProfiler {
    * immediately after adding
    */
   public void registerObject(Object o) {
-    if (!m_enabled) return;
+    if (!m_enabled) {
+      return;
+    }
     synchronized (m_listLock) {
       m_objects.add(new WeakReference<Object>(o));
     }
@@ -160,7 +174,9 @@ public final class DesktopProfiler {
      * this call to gc is intended
      */
     System.gc();
-    if (!m_enabled) return;
+    if (!m_enabled) {
+      return;
+    }
     PrintWriter out = new PrintWriter(o, true);
     try {
       synchronized (m_listLock) {

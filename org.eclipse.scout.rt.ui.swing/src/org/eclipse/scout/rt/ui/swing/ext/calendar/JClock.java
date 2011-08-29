@@ -90,7 +90,9 @@ public class JClock extends JComponent {
     //
     int minutes = (int) ((Math.atan2(x, -y) + 2.0 * Math.PI) * 12.0 * 60.0 / Math.PI / 2.0);
     minutes = minutes % (12 * 60);
-    if (!isAM()) minutes = minutes + 12 * 60;
+    if (!isAM()) {
+      minutes = minutes + 12 * 60;
+    }
     //snap
     minutes = ((minutes + 7) / 15) * 15;
     return minutes;

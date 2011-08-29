@@ -117,7 +117,9 @@ public class EmbeddedSplashWindow implements ISplashWindow {
   @Override
   public void setStatusText(String s) {
     if (m_splash != null) {
-      if (s == null) s = "";
+      if (s == null) {
+        s = "";
+      }
       m_statusText = s;
       m_splash.repaint();
     }

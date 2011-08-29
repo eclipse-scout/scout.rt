@@ -59,7 +59,9 @@ public class SearchFilter implements Serializable, Cloneable {
   }
 
   public void setDisplayTexts(String[] displayTexts) {
-    if (displayTexts == null) displayTexts = new String[0];
+    if (displayTexts == null) {
+      displayTexts = new String[0];
+    }
     m_displayTexts = new ArrayList<String>(Arrays.asList(displayTexts));
   }
 
@@ -92,7 +94,9 @@ public class SearchFilter implements Serializable, Cloneable {
       throw new RuntimeException(e);
     }
     f.m_completed = m_completed;
-    if (m_formData != null) f.m_formData = (AbstractFormData) m_formData.clone();
+    if (m_formData != null) {
+      f.m_formData = (AbstractFormData) m_formData.clone();
+    }
     f.m_displayTexts = new ArrayList<String>(m_displayTexts);
     return f;
   }

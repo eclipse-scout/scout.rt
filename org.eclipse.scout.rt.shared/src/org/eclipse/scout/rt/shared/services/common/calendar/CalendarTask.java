@@ -104,7 +104,9 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
   @Override
   public boolean isIntersecting(Date minDate, Date maxDate) {
     Date d = m_due;
-    if (d == null) d = m_complete;
+    if (d == null) {
+      d = m_complete;
+    }
     return DateUtility.intersects(m_start, d, minDate, maxDate);
   }
 
@@ -161,8 +163,14 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
   @Override
   protected void dumpState(Map<String, Object> attributes) {
     super.dumpState(attributes);
-    if (m_start != null) attributes.put("start", getDumpDateFormat().format(m_start));
-    if (m_due != null) attributes.put("due", getDumpDateFormat().format(m_due));
-    if (m_complete != null) attributes.put("complete", getDumpDateFormat().format(m_complete));
+    if (m_start != null) {
+      attributes.put("start", getDumpDateFormat().format(m_start));
+    }
+    if (m_due != null) {
+      attributes.put("due", getDumpDateFormat().format(m_due));
+    }
+    if (m_complete != null) {
+      attributes.put("complete", getDumpDateFormat().format(m_complete));
+    }
   }
 }

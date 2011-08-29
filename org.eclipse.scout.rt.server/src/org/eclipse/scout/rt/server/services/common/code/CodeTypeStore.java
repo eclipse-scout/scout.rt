@@ -104,18 +104,32 @@ public class CodeTypeStore {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
       PartitionLanguageComposite other = (PartitionLanguageComposite) obj;
       if (language == null) {
-        if (other.language != null) return false;
+        if (other.language != null) {
+          return false;
+        }
       }
-      else if (!language.equals(other.language)) return false;
+      else if (!language.equals(other.language)) {
+        return false;
+      }
       if (partitionId == null) {
-        if (other.partitionId != null) return false;
+        if (other.partitionId != null) {
+          return false;
+        }
       }
-      else if (!partitionId.equals(other.partitionId)) return false;
+      else if (!partitionId.equals(other.partitionId)) {
+        return false;
+      }
       return true;
     }
   }

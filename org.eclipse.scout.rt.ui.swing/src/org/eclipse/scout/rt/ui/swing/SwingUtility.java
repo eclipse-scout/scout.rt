@@ -143,9 +143,15 @@ public final class SwingUtility {
       }
       default: {
         StringBuffer buf = new StringBuffer();
-        if ((e.getModifiers() & KeyEvent.SHIFT_MASK) != 0) buf.append("shift-");
-        if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) buf.append("ctrl-");
-        if ((e.getModifiers() & (KeyEvent.ALT_MASK | KeyEvent.ALT_GRAPH_MASK)) != 0) buf.append("alt-");
+        if ((e.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
+          buf.append("shift-");
+        }
+        if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
+          buf.append("ctrl-");
+        }
+        if ((e.getModifiers() & (KeyEvent.ALT_MASK | KeyEvent.ALT_GRAPH_MASK)) != 0) {
+          buf.append("alt-");
+        }
         buf.append(getKeyText(e).toLowerCase());
         return buf.toString();
       }
@@ -209,7 +215,9 @@ public final class SwingUtility {
   }
 
   public static String inspectUIResourceType(Object scoutUIResource) {
-    if (scoutUIResource == null) return "String";
+    if (scoutUIResource == null) {
+      return "String";
+    }
     else if (scoutUIResource instanceof Boolean) {
       return "Boolean";
     }
@@ -240,8 +248,12 @@ public final class SwingUtility {
   }
 
   public static Rectangle createRectangle(BoundsSpec r) {
-    if (r == null) return null;
-    else return new Rectangle(r.x, r.y, r.width, r.height);
+    if (r == null) {
+      return null;
+    }
+    else {
+      return new Rectangle(r.x, r.y, r.width, r.height);
+    }
   }
 
   public static Color createColor(String c) {
@@ -268,16 +280,28 @@ public final class SwingUtility {
     else {
       String name = scoutFont.getName();
       if (name == null) {
-        if (templateFont != null) name = templateFont.getName();
-        else name = "Dialog";
+        if (templateFont != null) {
+          name = templateFont.getName();
+        }
+        else {
+          name = "Dialog";
+        }
       }
       int style = Font.PLAIN;
-      if (scoutFont.isBold()) style = style | Font.BOLD;
-      if (scoutFont.isItalic()) style = style | Font.ITALIC;
+      if (scoutFont.isBold()) {
+        style = style | Font.BOLD;
+      }
+      if (scoutFont.isItalic()) {
+        style = style | Font.ITALIC;
+      }
       int size = scoutFont.getSize();
       if (size <= 0) {
-        if (templateFont != null) size = templateFont.getSize();
-        else size = 11;
+        if (templateFont != null) {
+          size = templateFont.getSize();
+        }
+        else {
+          size = 11;
+        }
       }
       return new Font(name, style, size);
     }
@@ -344,7 +368,9 @@ public final class SwingUtility {
   }
 
   public static Transferable createSwingTransferable(TransferObject scoutT) {
-    if (scoutT == null) return null;
+    if (scoutT == null) {
+      return null;
+    }
     if (scoutT instanceof FileListTransferObject) {
       return new FileListTransferable(((FileListTransferObject) scoutT).getFileList());
     }
@@ -413,7 +439,9 @@ public final class SwingUtility {
 
   @SuppressWarnings("unchecked")
   public static TransferObject createScoutTransferable(Transferable swingT) {
-    if (swingT == null) return null;
+    if (swingT == null) {
+      return null;
+    }
     DataFlavor[] flavors = swingT.getTransferDataFlavors();
     Exception ex = null;
     FileListTransferObject fileTransferObject = null;
@@ -431,7 +459,9 @@ public final class SwingUtility {
           }
         }
         catch (Exception e) {
-          if (ex == null) ex = e;
+          if (ex == null) {
+            ex = e;
+          }
         }
       }
       else if (flavors[i].isMimeTypeEqual(DataFlavor.javaSerializedObjectMimeType)) {
@@ -441,7 +471,9 @@ public final class SwingUtility {
           }
         }
         catch (Exception e) {
-          if (ex == null) ex = e;
+          if (ex == null) {
+            ex = e;
+          }
         }
       }
       else if (flavors[i].isMimeTypeEqual(DataFlavor.imageFlavor)) {
@@ -451,7 +483,9 @@ public final class SwingUtility {
           }
         }
         catch (Exception e) {
-          if (ex == null) ex = e;
+          if (ex == null) {
+            ex = e;
+          }
         }
       }
       else if (flavors[i].isFlavorTextType()) {
@@ -461,7 +495,9 @@ public final class SwingUtility {
           }
         }
         catch (Exception e) {
-          if (ex == null) ex = e;
+          if (ex == null) {
+            ex = e;
+          }
         }
       }
       else if (flavors[i].isMimeTypeEqual(DataFlavor.javaJVMLocalObjectMimeType)) {
@@ -471,7 +507,9 @@ public final class SwingUtility {
           }
         }
         catch (Exception e) {
-          if (ex == null) ex = e;
+          if (ex == null) {
+            ex = e;
+          }
         }
       }
     }
@@ -819,8 +857,12 @@ public final class SwingUtility {
       if (intersections.size() > 0) {
         Rectangle unionAll = null;
         for (Rectangle i : intersections) {
-          if (unionAll == null) unionAll = i;
-          else unionAll = unionAll.union(i);
+          if (unionAll == null) {
+            unionAll = i;
+          }
+          else {
+            unionAll = unionAll.union(i);
+          }
         }
         return unionAll;
       }
@@ -881,13 +923,25 @@ public final class SwingUtility {
       Rectangle a = r.getBounds();
       Rectangle screen = intersectRectangleWithScreen(referenceRect, includeReservedInsets, singleMonitor);
       // first check size
-      if (screen.width < a.width) a.width = screen.width;
-      if (screen.height < a.height) a.height = screen.height;
+      if (screen.width < a.width) {
+        a.width = screen.width;
+      }
+      if (screen.height < a.height) {
+        a.height = screen.height;
+      }
       // adjust location
-      if (a.x < screen.x) a.x = screen.x;
-      if (a.y < screen.y) a.y = screen.y;
-      if (a.x + a.width > screen.x + screen.width) a.x = screen.x + screen.width - a.width;
-      if (a.y + a.height > screen.y + screen.height) a.y = screen.y + screen.height - a.height;
+      if (a.x < screen.x) {
+        a.x = screen.x;
+      }
+      if (a.y < screen.y) {
+        a.y = screen.y;
+      }
+      if (a.x + a.width > screen.x + screen.width) {
+        a.x = screen.x + screen.width - a.width;
+      }
+      if (a.y + a.height > screen.y + screen.height) {
+        a.y = screen.y + screen.height - a.height;
+      }
       return a;
     }
     else {
@@ -930,8 +984,12 @@ public final class SwingUtility {
   public static <T extends Component> T findChildComponent(Component parent, Class<T> type) {
     ArrayList<T> list = new ArrayList<T>(1);
     findChildComponentsRec(parent, type, list, 1);
-    if (list.size() > 0) return list.get(0);
-    else return null;
+    if (list.size() > 0) {
+      return list.get(0);
+    }
+    else {
+      return null;
+    }
   }
 
   public static <T extends Component> List<T> findChildComponents(Component parent, Class<T> type) {

@@ -80,8 +80,12 @@ public abstract class AbstractComposerAttribute extends AbstractDataModelAttribu
 
   @Override
   public String getId() {
-    if (m_id != null) return m_id;
-    else return getClass().getSimpleName();
+    if (m_id != null) {
+      return m_id;
+    }
+    else {
+      return getClass().getSimpleName();
+    }
   }
 
   @Override

@@ -46,7 +46,9 @@ public class SwingPopupWorker implements Runnable {
 
   @Override
   public void run() {
-    if (m_scoutMenus == null || m_scoutMenus.length == 0) return;
+    if (m_scoutMenus == null || m_scoutMenus.length == 0) {
+      return;
+    }
     //
     JPopupMenu pop = new JPopupMenu();
     // recursively add actions

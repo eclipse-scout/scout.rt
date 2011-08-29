@@ -28,7 +28,9 @@ public class CallInspector {
     m_info.setOperation(call.getOperation());
     Object[] args = call.getArgs();
     Object[] newArgs = new Object[(args != null ? args.length : 0)];
-    if (newArgs.length > 0) System.arraycopy(args, 0, newArgs, 0, newArgs.length);
+    if (newArgs.length > 0) {
+      System.arraycopy(args, 0, newArgs, 0, newArgs.length);
+    }
     m_info.setArguments(newArgs);
   }
 
@@ -39,7 +41,9 @@ public class CallInspector {
   public boolean isTimeout(long millis) {
     if (!m_info.isActive()) {
       long dt = System.currentTimeMillis() - m_info.getEndTime();
-      if (dt >= millis) return true;
+      if (dt >= millis) {
+        return true;
+      }
     }
     return false;
   }
@@ -52,7 +56,9 @@ public class CallInspector {
       m_info.setReturnException(res.getException());
       Object[] args = res.getOutVars();
       Object[] newArgs = new Object[(args != null ? args.length : 0)];
-      if (newArgs.length > 0) System.arraycopy(args, 0, newArgs, 0, newArgs.length);
+      if (newArgs.length > 0) {
+        System.arraycopy(args, 0, newArgs, 0, newArgs.length);
+      }
       m_info.setOutVariables(newArgs);
     }
   }

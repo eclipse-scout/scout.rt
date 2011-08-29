@@ -201,11 +201,15 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       cell.setText(app.getSubject());
       StringBuffer buf = new StringBuffer();
       if (app.getLocation() != null) {
-        if (buf.length() > 0) buf.append("\n");
+        if (buf.length() > 0) {
+          buf.append("\n");
+        }
         buf.append(app.getLocation());
       }
       if (app.getBody() != null) {
-        if (buf.length() > 0) buf.append("\n");
+        if (buf.length() > 0) {
+          buf.append("\n");
+        }
         buf.append(app.getBody());
       }
       if (buf.length() > 0) {
@@ -217,7 +221,9 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       cell.setText(task.getSubject());
       StringBuffer buf = new StringBuffer();
       if (task.getBody() != null) {
-        if (buf.length() > 0) buf.append("\n");
+        if (buf.length() > 0) {
+          buf.append("\n");
+        }
         buf.append(task.getBody());
       }
       if (buf.length() > 0) {
@@ -383,7 +389,9 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
             return Status.OK_STATUS;
           }
           synchronized (m_result) {
-            if (m_result != null) break;
+            if (m_result != null) {
+              break;
+            }
             try {
               m_result.wait(2000L);
             }

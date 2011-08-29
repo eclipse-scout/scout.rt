@@ -118,7 +118,9 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
   @Override
   public boolean accept(ITableRow row) {
     for (ITableColumnFilter f : m_filterMap.values()) {
-      if (!f.accept(row)) return false;
+      if (!f.accept(row)) {
+        return false;
+      }
     }
     return true;
   }

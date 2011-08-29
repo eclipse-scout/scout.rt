@@ -137,8 +137,12 @@ public class SwingMock implements IGuiMock {
     waitUntil(new WaitCondition<Object>() {
       @Override
       public Object run() {
-        if (isWindowActive(title)) return true;
-        else return null;
+        if (isWindowActive(title)) {
+          return true;
+        }
+        else {
+          return null;
+        }
       }
     });
     waitForIdle();
@@ -149,8 +153,12 @@ public class SwingMock implements IGuiMock {
     waitUntil(new WaitCondition<Object>() {
       @Override
       public Object run() {
-        if (isWindowOpen(title)) return true;
-        else return null;
+        if (isWindowOpen(title)) {
+          return true;
+        }
+        else {
+          return null;
+        }
       }
     });
     waitForIdle();
@@ -845,7 +853,9 @@ public class SwingMock implements IGuiMock {
             for (Component parent : enumerateParentContainers()) {
               for (Component o : SwingUtility.findChildComponents(parent, Component.class)) {
                 if (o instanceof AbstractButton) {
-                  if (cleanButtonLabel(label).equals(cleanButtonLabel(((AbstractButton) o).getText()))) return (AbstractButton) o;
+                  if (cleanButtonLabel(label).equals(cleanButtonLabel(((AbstractButton) o).getText()))) {
+                    return (AbstractButton) o;
+                  }
                 }
               }
             }
@@ -946,19 +956,41 @@ public class SwingMock implements IGuiMock {
   }
 
   protected FieldType getFieldTypeOf(JComponent c) {
-    if (c == null) return null;
-    if (!c.isShowing()) return null;
-    if (c.getVisibleRect().isEmpty()) return null;
+    if (c == null) {
+      return null;
+    }
+    if (!c.isShowing()) {
+      return null;
+    }
+    if (c.getVisibleRect().isEmpty()) {
+      return null;
+    }
     //
-    if (c instanceof JLabel) return FieldType.Label;
-    if (c instanceof JTextComponent) return FieldType.Text;
-    if (c instanceof JCheckBox) return FieldType.Checkbox;
-    if (c instanceof JRadioButton) return FieldType.RadioButton;
-    if (c instanceof JTable) return FieldType.Table;
-    if (c instanceof JTree) return FieldType.Tree;
+    if (c instanceof JLabel) {
+      return FieldType.Label;
+    }
+    if (c instanceof JTextComponent) {
+      return FieldType.Text;
+    }
+    if (c instanceof JCheckBox) {
+      return FieldType.Checkbox;
+    }
+    if (c instanceof JRadioButton) {
+      return FieldType.RadioButton;
+    }
+    if (c instanceof JTable) {
+      return FieldType.Table;
+    }
+    if (c instanceof JTree) {
+      return FieldType.Tree;
+    }
     if (c instanceof AbstractButton) {
-      if (SwingUtilities.getAncestorOfClass(JScrollBar.class, c) != null) return FieldType.ScrollButton;
-      else return FieldType.PushButton;
+      if (SwingUtilities.getAncestorOfClass(JScrollBar.class, c) != null) {
+        return FieldType.ScrollButton;
+      }
+      else {
+        return FieldType.PushButton;
+      }
     }
     return null;
   }

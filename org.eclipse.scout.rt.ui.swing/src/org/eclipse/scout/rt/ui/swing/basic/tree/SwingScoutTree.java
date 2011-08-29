@@ -121,7 +121,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (getUpdateSwingFromScoutLock().isAcquired()) return;
+        if (getUpdateSwingFromScoutLock().isAcquired()) {
+          return;
+        }
         //
         if (getScoutObject() != null) {
           TreePath selectedPath = getSwingTree().getSelectionPath();
@@ -235,8 +237,12 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   private void setExpansionFromScoutRec(ITreeNode scoutNode) {
     boolean exp;
-    if (scoutNode.getParentNode() == null) exp = true;
-    else exp = scoutNode.isExpanded();
+    if (scoutNode.getParentNode() == null) {
+      exp = true;
+    }
+    else {
+      exp = scoutNode.isExpanded();
+    }
     //
     TreePath path = scoutNodeToTreePath(scoutNode);
     if (exp) {
@@ -257,7 +263,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   protected void setExpansionFromSwing(TreePath path, final boolean b) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null) {
       final ITreeNode scoutNode = treePathToScoutNode(path);
@@ -345,7 +353,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
    * Fires changes of selection as well as changes on lead/anchor indices
    */
   protected void setSelectionFromSwing(TreePath[] paths) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null) {
       if (paths != null && paths.length > 0) {
@@ -578,7 +588,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   protected boolean handleSwingDragEnabled() {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return false;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return false;
+    }
     //
     final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
     if (getScoutObject() != null) {
@@ -602,7 +614,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   protected Transferable handleSwingDragRequest() {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return null;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return null;
+    }
     //
     final Holder<TransferObject> result = new Holder<TransferObject>(TransferObject.class, null);
     if (getScoutObject() != null) {
@@ -628,7 +642,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   protected void handleSwingDropAction(TreePath path, Transferable swingTransferable) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (swingTransferable != null) {
       if (getScoutObject() != null) {
@@ -650,7 +666,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   protected void handleSwingNodePopup(final MouseEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null) {
       TreePath path = getSwingTree().getPathForLocation(e.getX(), e.getY());
@@ -677,7 +695,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   protected void handleSwingNodeClick(TreePath path) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null) {
       final ITreeNode scoutNode = treePathToScoutNode(path);
@@ -697,7 +717,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   protected void handleSwingNodeAction(TreePath path) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null) {
       final ITreeNode scoutNode = treePathToScoutNode(path);
@@ -716,7 +738,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   protected void handleSwingHyperlinkAction(TreePath path, final URL url) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null && path != null) {
       final ITreeNode scoutNode = treePathToScoutNode(path);
@@ -738,12 +762,16 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
    * static Convenience helpers
    */
   public static ITreeNode treePathToScoutNode(TreePath path) {
-    if (path == null) return null;
+    if (path == null) {
+      return null;
+    }
     return (ITreeNode) path.getLastPathComponent();
   }
 
   public static ITreeNode[] treePathsToScoutNodes(TreePath[] paths) {
-    if (paths == null) return new ITreeNode[0];
+    if (paths == null) {
+      return new ITreeNode[0];
+    }
     ITreeNode[] scoutNodes = new ITreeNode[paths.length];
     for (int i = 0; i < paths.length; i++) {
       scoutNodes[i] = treePathToScoutNode(paths[i]);
@@ -752,13 +780,17 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   public static TreePath scoutNodeToTreePath(ITreeNode scoutNode) {
-    if (scoutNode == null) return null;
+    if (scoutNode == null) {
+      return null;
+    }
     Object[] path = getPathToRoot(scoutNode, 0);
     return new TreePath(path);
   }
 
   public static TreePath[] scoutNodesToTreePaths(ITreeNode[] scoutNodes) {
-    if (scoutNodes == null) return new TreePath[0];
+    if (scoutNodes == null) {
+      return new TreePath[0];
+    }
     TreePath[] paths = new TreePath[scoutNodes.length];
     for (int i = 0; i < scoutNodes.length; i++) {
       paths[i] = scoutNodeToTreePath(scoutNodes[i]);
@@ -769,13 +801,21 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   public static ITreeNode[] getPathToRoot(ITreeNode scoutNode, int depth) {
     ITreeNode[] retNodes;
     if (scoutNode == null) {
-      if (depth == 0) return null;
-      else retNodes = new ITreeNode[depth];
+      if (depth == 0) {
+        return null;
+      }
+      else {
+        retNodes = new ITreeNode[depth];
+      }
     }
     else {
       depth++;
-      if (scoutNode.getParentNode() == null) retNodes = new ITreeNode[depth];
-      else retNodes = getPathToRoot(scoutNode.getParentNode(), depth);
+      if (scoutNode.getParentNode() == null) {
+        retNodes = new ITreeNode[depth];
+      }
+      else {
+        retNodes = getPathToRoot(scoutNode.getParentNode(), depth);
+      }
       retNodes[retNodes.length - depth] = scoutNode;
     }
     return retNodes;
@@ -788,7 +828,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     @Override
     public void treeChanged(final TreeEvent e) {
       if (isHandleScoutTreeEvent(new TreeEvent[]{e})) {
-        if (isIgnoredScoutEvent(TreeEvent.class, "" + e.getType())) return;
+        if (isIgnoredScoutEvent(TreeEvent.class, "" + e.getType())) {
+          return;
+        }
         //
         Runnable t = new Runnable() {
           @Override
@@ -817,7 +859,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
             filteredList.add(a[i]);
           }
         }
-        if (filteredList.size() == 0) return;
+        if (filteredList.size() == 0) {
+          return;
+        }
         Runnable t = new Runnable() {
           @Override
           public void run() {
@@ -935,12 +979,16 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
           handleSwingHyperlinkAction(detector.getTreePath(), detector.getHyperlink());
         }
       }
-      if (fix != null) fix.mouseReleased(this, e);
+      if (fix != null) {
+        fix.mouseReleased(this, e);
+      }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-      if (fix.mouseClicked()) return;
+      if (fix.mouseClicked()) {
+        return;
+      }
       if (e.getButton() == MouseEvent.BUTTON1) {
         if (e.getClickCount() == 1) {
           // ticket 86377

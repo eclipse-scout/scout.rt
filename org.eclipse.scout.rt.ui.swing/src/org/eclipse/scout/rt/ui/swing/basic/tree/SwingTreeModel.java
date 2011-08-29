@@ -161,7 +161,9 @@ public class SwingTreeModel implements TreeModel {
   }
 
   public int[] scoutNodesToSwingIndexes(Object scoutParent, Object[] scoutChildren) {
-    if (scoutChildren == null || scoutChildren.length == 0) return new int[0];
+    if (scoutChildren == null || scoutChildren.length == 0) {
+      return new int[0];
+    }
     ArrayList<Integer> indexList = new ArrayList<Integer>(scoutChildren.length);
     for (Object scoutChild : scoutChildren) {
       int i = getCachedChildIndex(scoutParent, scoutChild);

@@ -129,7 +129,9 @@ public abstract class AbstractSwingScoutActionButton<T extends IAction> extends 
   }
 
   protected void setSelectionFromSwing(final boolean b) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     // notify Scout
     Runnable t = new Runnable() {

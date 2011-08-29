@@ -117,7 +117,9 @@ public final class SwingLayoutUtility {
   }
 
   public static Dimension getSize(Component c, int sizeflag) {
-    if (c == null) return new Dimension(0, 0);
+    if (c == null) {
+      return new Dimension(0, 0);
+    }
     //special case due to swing bug: html labels need to know the current parent layout's size
     if (c instanceof JLabel) {
       View v = (View) ((JLabel) c).getClientProperty(javax.swing.plaf.basic.BasicHTML.propertyKey);
@@ -166,10 +168,18 @@ public final class SwingLayoutUtility {
         getSize(c, MAX)
         };
     // validation
-    if (d[MIN].width > d[PREF].width) d[MIN].width = d[PREF].width;
-    if (d[MIN].height > d[PREF].height) d[MIN].height = d[PREF].height;
-    if (d[MAX].width < d[PREF].width) d[MAX].width = d[PREF].width;
-    if (d[MAX].height < d[PREF].height) d[MAX].height = d[PREF].height;
+    if (d[MIN].width > d[PREF].width) {
+      d[MIN].width = d[PREF].width;
+    }
+    if (d[MIN].height > d[PREF].height) {
+      d[MIN].height = d[PREF].height;
+    }
+    if (d[MAX].width < d[PREF].width) {
+      d[MAX].width = d[PREF].width;
+    }
+    if (d[MAX].height < d[PREF].height) {
+      d[MAX].height = d[PREF].height;
+    }
     return d;
   }
 
@@ -202,8 +212,12 @@ public final class SwingLayoutUtility {
           r.height - insets.top - insets.bottom
           );
     }
-    if (r.width < 0) r.width = 0;
-    if (r.height < 0) r.height = 0;
+    if (r.width < 0) {
+      r.width = 0;
+    }
+    if (r.height < 0) {
+      r.height = 0;
+    }
     return r;
   }
 
@@ -237,8 +251,12 @@ public final class SwingLayoutUtility {
       while (true) {
         c.invalidate();
         c = c.getParent();
-        if (c == null) break;
-        if (c instanceof JComponent && ((JComponent) c).isValidateRoot()) break;
+        if (c == null) {
+          break;
+        }
+        if (c instanceof JComponent && ((JComponent) c).isValidateRoot()) {
+          break;
+        }
       }
     }
   }

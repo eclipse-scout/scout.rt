@@ -35,13 +35,17 @@ public class HandCursorAdapater {
     comp.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(MouseEvent e) {
-        if (!comp.isEnabled()) return;
+        if (!comp.isEnabled()) {
+          return;
+        }
         showHandCursor();
       }
 
       @Override
       public void mouseExited(MouseEvent e) {
-        if (!comp.isEnabled()) return;
+        if (!comp.isEnabled()) {
+          return;
+        }
         showDefaultCursor();
       }
     });

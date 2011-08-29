@@ -76,8 +76,9 @@ public class WeekCell extends AbstractCell {
     int weekEndDay2 = (firstDay - 1 + 6) % 7 + 1;
     if (m_calendar.getCondensedMode()
         && m_calendar.getDisplayMode() == DisplayMode.WEEK
-        && (day == weekEndDay1 || day == weekEndDay2)) // a week-end day?
+        && (day == weekEndDay1 || day == weekEndDay2)) {
       vertSpan = 1;
+    }
 
     GridData gd;
     gd = new GridData ();
@@ -158,8 +159,9 @@ public class WeekCell extends AbstractCell {
   @Override
   protected void drawLabels (PaintEvent e) {
     if (m_drawHeader) {
-      if (m_isFirstColumn)
+      if (m_isFirstColumn) {
         drawWeekLabel(e);
+      }
 
       drawDayLabel(e);
     }

@@ -48,11 +48,15 @@ public class UserNavigationHistory {
   }
 
   public Bookmark addStep(int level, String name, String iconId) {
-    if (!m_addStepEnabled) return null;
+    if (!m_addStepEnabled) {
+      return null;
+    }
     //
     try {
       Bookmark bm = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
-      if (bm == null) return null;
+      if (bm == null) {
+        return null;
+      }
       bm.setTitle(StringUtility.rpad("", " ", level * 2) + name);
       bm.setIconId(iconId);
       // if last position was same as new one, skip it

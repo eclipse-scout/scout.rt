@@ -80,7 +80,9 @@ public class PrincipalNameFilter implements IClientNotificationFilter {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
+    if (obj == null) {
+      return false;
+    }
     if (obj.getClass() == this.getClass()) {
       PrincipalNameFilter o = (PrincipalNameFilter) obj;
       return o.m_principalName == this.m_principalName || (o.m_principalName != null && o.m_principalName.equals(this.m_principalName));

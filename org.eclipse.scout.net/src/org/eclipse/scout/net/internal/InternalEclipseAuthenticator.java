@@ -48,11 +48,15 @@ public class InternalEclipseAuthenticator extends Authenticator {
       }
     }
     if (result != null) {
-      if (NetActivator.DEBUG) NetActivator.getDefault().getLog().log(new Status(Status.INFO, NetActivator.PLUGIN_ID, "net.auth SUCCESS " + getRequestingURL() + " " + getRequestorType() + " " + result.getUserName()));
+      if (NetActivator.DEBUG) {
+        NetActivator.getDefault().getLog().log(new Status(Status.INFO, NetActivator.PLUGIN_ID, "net.auth SUCCESS " + getRequestingURL() + " " + getRequestorType() + " " + result.getUserName()));
+      }
       return result;
     }
     else {
-      if (NetActivator.DEBUG) NetActivator.getDefault().getLog().log(new Status(Status.INFO, NetActivator.PLUGIN_ID, "net.auth NONE " + getRequestingURL() + " " + getRequestorType()));
+      if (NetActivator.DEBUG) {
+        NetActivator.getDefault().getLog().log(new Status(Status.INFO, NetActivator.PLUGIN_ID, "net.auth NONE " + getRequestingURL() + " " + getRequestorType()));
+      }
       return null;
     }
   }

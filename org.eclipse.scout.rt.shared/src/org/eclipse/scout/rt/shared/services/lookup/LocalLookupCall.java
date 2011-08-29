@@ -50,7 +50,9 @@ public class LocalLookupCall extends LookupCall {
   }
 
   public static Pattern createLowerCaseSearchPattern(String s) {
-    if (s == null) s = "";
+    if (s == null) {
+      s = "";
+    }
     s = s.toLowerCase();
     if (s.indexOf('*') < 0) {
       s = s + "*";

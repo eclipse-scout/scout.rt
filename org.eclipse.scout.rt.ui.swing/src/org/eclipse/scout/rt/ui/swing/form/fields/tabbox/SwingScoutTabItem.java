@@ -107,7 +107,9 @@ public class SwingScoutTabItem extends SwingScoutComposite<IGroupBox> implements
   protected void setLabelFromScout() {
     if (getSwingTabIcon() instanceof SwingTabIcon) {
       String s = getScoutObject().getLabel();
-      if (s == null) s = "";
+      if (s == null) {
+        s = "";
+      }
       String label = StringUtility.removeMnemonic(s);
       ((SwingTabIcon) getSwingTabIcon()).setText(label);
     }

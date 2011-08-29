@@ -27,7 +27,9 @@ class ArrayInput implements IBindInput {
   private int m_jdbcBindIndex = -1;
 
   public ArrayInput(Object array, ValueInputToken target) throws ProcessingException {
-    if (array != null && !array.getClass().isArray()) throw new ProcessingException("array parameter must be an array type: " + array.getClass());
+    if (array != null && !array.getClass().isArray()) {
+      throw new ProcessingException("array parameter must be an array type: " + array.getClass());
+    }
     m_array = array;
     m_arrayLen = m_array != null ? Array.getLength(m_array) : 0;
     m_target = target;

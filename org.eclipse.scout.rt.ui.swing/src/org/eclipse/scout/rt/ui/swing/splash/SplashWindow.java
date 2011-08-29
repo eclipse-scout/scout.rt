@@ -129,7 +129,9 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
 
   @Override
   public void setStatusText(String s) {
-    if (s == null) s = "";
+    if (s == null) {
+      s = "";
+    }
     m_statusText = s;
     repaint();
   }

@@ -122,7 +122,9 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
   }
 
   private void handleSwingCalendarPopup(final MouseEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     final CalendarComponent item = (CalendarComponent) getDateChooser().getCalendarItemFor(e);
     if (item != null) {
@@ -156,7 +158,9 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
   }
 
   private void handleSwingCalendarItemAction(MouseEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     // action on item
     // notify Scout
@@ -261,7 +265,9 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (getUpdateSwingFromScoutLock().isAcquired()) return;
+      if (getUpdateSwingFromScoutLock().isAcquired()) {
+        return;
+      }
       //
       // notify Scout
       Runnable t = new Runnable() {
@@ -292,12 +298,16 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
       if (e.isPopupTrigger()) {
         handleSwingCalendarPopup(e);
       }
-      if(fix!=null) fix.mouseReleased(this, e);
+      if(fix!=null) {
+        fix.mouseReleased(this, e);
+      }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-      if (fix.mouseClicked()) return;
+      if (fix.mouseClicked()) {
+        return;
+      }
       if (!e.isPopupTrigger() && e.getClickCount() >= 2) {
         handleSwingCalendarItemAction(e);
       }
@@ -309,7 +319,9 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     public void viewChanged(CalendarViewEvent e) {
       switch (e.getType()) {
         case CalendarViewEvent.TYPE_SELECTION_CHANGED: {
-          if (getUpdateSwingFromScoutLock().isAcquired()) return;
+          if (getUpdateSwingFromScoutLock().isAcquired()) {
+            return;
+          }
           //
           final Date d = getDateChooser().getDate();
           final CalendarComponent cc = (CalendarComponent) getDateChooser().getSelectedItem();
@@ -326,7 +338,9 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
           break;
         }
         case CalendarViewEvent.TYPE_SETUP_CHANGED: {
-          if (getUpdateSwingFromScoutLock().isAcquired()) return;
+          if (getUpdateSwingFromScoutLock().isAcquired()) {
+            return;
+          }
           //
           final int m = getDateChooser().getDisplayMode();
           final Date minDate = getDateChooser().getViewDateStart();

@@ -133,17 +133,23 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     if (getScoutMessageBox().getYesButtonText() != null) {
       m_swingButtonYes = createButton(getScoutMessageBox().getYesButtonText(), UIManager.getIcon("SystemButton.yesIcon"));
       buttonPanel.add(m_swingButtonYes);
-      if (defaultButton == null) defaultButton = m_swingButtonYes;
+      if (defaultButton == null) {
+        defaultButton = m_swingButtonYes;
+      }
     }
     if (getScoutMessageBox().getNoButtonText() != null) {
       m_swingButtonNo = createButton(getScoutMessageBox().getNoButtonText(), UIManager.getIcon("SystemButton.noIcon"));
       buttonPanel.add(m_swingButtonNo);
-      if (defaultButton == null) defaultButton = m_swingButtonNo;
+      if (defaultButton == null) {
+        defaultButton = m_swingButtonNo;
+      }
     }
     if (getScoutMessageBox().getCancelButtonText() != null) {
       m_swingButtonCancel = createButton(getScoutMessageBox().getCancelButtonText(), UIManager.getIcon("SystemButton.cancelIcon"));
       buttonPanel.add(m_swingButtonCancel);
-      if (defaultButton == null) defaultButton = m_swingButtonCancel;
+      if (defaultButton == null) {
+        defaultButton = m_swingButtonCancel;
+      }
     }
     // set ENTER key
     if (m_swingButtonYes != null) {
@@ -172,7 +178,9 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
       addButtonKeyStroke(m_swingButtonCopy, "control C");
     }
     contentPane.add(BorderLayout.SOUTH, buttonPanel);
-    if (defaultButton != null) buttonPanel.getRootPane().setDefaultButton(defaultButton);
+    if (defaultButton != null) {
+      buttonPanel.getRootPane().setDefaultButton(defaultButton);
+    }
     // init layout
     m_swingDialog.pack();
   }

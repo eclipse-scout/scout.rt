@@ -344,7 +344,9 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     private void addNewFolder(ITreeNode parentNode) throws ProcessingException {
-      if (parentNode == null) parentNode = getRootNode();
+      if (parentNode == null) {
+        parentNode = getRootNode();
+      }
       BookmarkFolderForm form = new BookmarkFolderForm();
       form.startModify();
       form.waitFor();

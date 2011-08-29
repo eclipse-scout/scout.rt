@@ -63,7 +63,9 @@ public class JmsObserver {
         for (Iterator<WeakReference<IJmsCallback>> it = list.iterator(); it.hasNext();) {
           WeakReference<IJmsCallback> ref = it.next();
           IJmsCallback o = ref.get();
-          if (o == null) it.remove();
+          if (o == null) {
+            it.remove();
+          }
         }
         if (list.size() == 0) {
           empty.add(conf);
@@ -96,14 +98,16 @@ public class JmsObserver {
    */
   private void fireCallback(JmsJndiConfig config, final Message msg, final Object value) {
     synchronized (m_observerMapLock) {
-      if (m_observerMap != null) for (WeakReference<IJmsCallback> callback : m_observerMap.get(config)) {
-        final IJmsCallback c = callback.get();
-        if (c != null) {
-          try {
-            c.execOnMessage(msg, value);
-          }
-          catch (ProcessingException e) {
-            LOG.error("Message " + msg, e);
+      if (m_observerMap != null) {
+        for (WeakReference<IJmsCallback> callback : m_observerMap.get(config)) {
+          final IJmsCallback c = callback.get();
+          if (c != null) {
+            try {
+              c.execOnMessage(msg, value);
+            }
+            catch (ProcessingException e) {
+              LOG.error("Message " + msg, e);
+            }
           }
         }
       }
@@ -166,13 +170,17 @@ public class JmsObserver {
     Collection<WeakReference<IJmsCallback>> list = null;
     synchronized (m_observerMap) {
       list = m_observerMap.get(config);
-      if (list != null) list.remove(callback);
+      if (list != null) {
+        list.remove(callback);
+      }
     }
     synchronized (m_jmsListenerMap) {
       if (list != null && list.size() == 0) {
         JmsListener listener = m_jmsListenerMap.get(config);
         if (listener != null) {
-          if (LOG.isInfoEnabled()) LOG.info("method=" + callback.getClass().getName());
+          if (LOG.isInfoEnabled()) {
+            LOG.info("method=" + callback.getClass().getName());
+          }
           listener.stopListeningOnQueue();
           m_jmsListenerMap.remove(config);
           m_observerMap.remove(config);
@@ -189,7 +197,9 @@ public class JmsObserver {
     cleanup();
     // only add if not already added
     synchronized (m_jmsListenerMap) {
-      if (LOG.isInfoEnabled()) LOG.info("" + m_observerMap + " listeners");
+      if (LOG.isInfoEnabled()) {
+        LOG.info("" + m_observerMap + " listeners");
+      }
       for (JmsListener listener : m_jmsListenerMap.values()) {
         try {
           listener.stopListeningOnQueue();

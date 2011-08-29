@@ -51,7 +51,9 @@ public class SingleUserFilter implements IClientNotificationFilter {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
+    if (obj == null) {
+      return false;
+    }
     if (obj.getClass() == this.getClass()) {
       SingleUserFilter o = (SingleUserFilter) obj;
       return o.m_userId == this.m_userId || (o.m_userId != null && o.m_userId.equals(this.m_userId));

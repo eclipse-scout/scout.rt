@@ -49,7 +49,9 @@ public final class BookmarkUtility {
   }
 
   public static IOutline resolveOutline(IOutline[] outlines, String className) {
-    if (className == null) return null;
+    if (className == null) {
+      return null;
+    }
     // pass 1: fully qualified name
     for (IOutline o : outlines) {
       if (o.getClass().getName().equals(className)) {
@@ -73,7 +75,9 @@ public final class BookmarkUtility {
    *          is the columnId, simple class name or class name of the columns to find
    */
   public static IColumn resolveColumn(IColumn[] columns, String identifier) {
-    if (identifier == null) return null;
+    if (identifier == null) {
+      return null;
+    }
     // pass 1: fully qualified name
     for (IColumn c : columns) {
       if (identifier.equals(c.getClass().getName())) {
@@ -97,7 +101,9 @@ public final class BookmarkUtility {
   }
 
   public static IPage resolvePage(IPage[] pages, String className, String bookmarkIdentifier) {
-    if (className == null) return null;
+    if (className == null) {
+      return null;
+    }
     TreeMap<CompositeObject, IPage> sortMap = new TreeMap<CompositeObject, IPage>();
     String simpleClassName = className.replaceAll("^.*\\.", "");
     int index = 0;
@@ -180,8 +186,12 @@ public final class BookmarkUtility {
    * serializable
    */
   public static Class makeSerializableClass(Class c) {
-    if (c == null) throw new IllegalArgumentException("class must not be null");
-    if (c.isArray()) throw new IllegalArgumentException("class must not be an array class");
+    if (c == null) {
+      throw new IllegalArgumentException("class must not be null");
+    }
+    if (c.isArray()) {
+      throw new IllegalArgumentException("class must not be an array class");
+    }
     if (c.isPrimitive()) {
       return c;
     }
@@ -605,7 +615,9 @@ public final class BookmarkUtility {
   }
 
   private static long createSearchFilterCRC(SearchFilter filter) {
-    if (filter == null) return 0L;
+    if (filter == null) {
+      return 0L;
+    }
     try {
       CRC32 crc = new CRC32();
       ByteArrayOutputStream bo = new ByteArrayOutputStream();

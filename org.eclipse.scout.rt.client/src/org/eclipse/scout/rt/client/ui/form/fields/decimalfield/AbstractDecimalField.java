@@ -293,7 +293,9 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
 
   @Override
   protected String formatValueInternal(T validValue) {
-    if (validValue == null) return "";
+    if (validValue == null) {
+      return "";
+    }
     String displayValue = createNumberFormat().format(validValue);
     return displayValue;
   }
@@ -306,8 +308,12 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
       validValue = null;
     }
     else {
-      if (getMaxValue() != null && compareInternal(rawValue, getMaxValue()) > 0) throw new VetoException(ScoutTexts.get("NumberTooLargeMessageXY", "" + getMinValue(), "" + getMaxValue()));
-      if (getMinValue() != null && compareInternal(rawValue, getMinValue()) < 0) throw new VetoException(ScoutTexts.get("NumberTooSmallMessageXY", "" + getMinValue(), "" + getMaxValue()));
+      if (getMaxValue() != null && compareInternal(rawValue, getMaxValue()) > 0) {
+        throw new VetoException(ScoutTexts.get("NumberTooLargeMessageXY", "" + getMinValue(), "" + getMaxValue()));
+      }
+      if (getMinValue() != null && compareInternal(rawValue, getMinValue()) < 0) {
+        throw new VetoException(ScoutTexts.get("NumberTooSmallMessageXY", "" + getMinValue(), "" + getMaxValue()));
+      }
       validValue = rawValue;
     }
     return validValue;
@@ -343,7 +349,9 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
   private class P_UIFacade implements IDecimalFieldUIFacade {
     @Override
     public boolean setTextFromUI(String newText) {
-      if (newText != null && newText.length() == 0) newText = null;
+      if (newText != null && newText.length() == 0) {
+        newText = null;
+      }
       // parse always, validity might change even if text is same
       return parseValue(newText);
     }

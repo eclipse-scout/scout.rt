@@ -58,8 +58,12 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
   @Override
   protected Integer parseValueInternal(String text) throws ProcessingException {
     Integer retVal = null;
-    if (text == null) text = "";
-    else text = text.trim();
+    if (text == null) {
+      text = "";
+    }
+    else {
+      text = text.trim();
+    }
     if (text.length() > 0) {
       ParsePosition p = new ParsePosition(0);
       Number n = createNumberFormat().parse(text, p);

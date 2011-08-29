@@ -349,10 +349,18 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       buf.append("os.name_version: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "\n");
       buf.append("user.name: " + System.getProperty("user.name") + "\n");
       buf.append("\n");
-      if (m_title != null) buf.append(m_title + "\n\n");
-      if (m_introText != null) buf.append(m_introText + "\n\n");
-      if (m_actionText != null) buf.append(m_actionText + "\n\n");
-      if (m_hiddenText != null) buf.append(m_hiddenText + "\n\n");
+      if (m_title != null) {
+        buf.append(m_title + "\n\n");
+      }
+      if (m_introText != null) {
+        buf.append(m_introText + "\n\n");
+      }
+      if (m_actionText != null) {
+        buf.append(m_actionText + "\n\n");
+      }
+      if (m_hiddenText != null) {
+        buf.append(m_hiddenText + "\n\n");
+      }
       m_copyPasteTextInternal = buf.toString();
     }
   }

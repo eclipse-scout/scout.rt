@@ -121,11 +121,15 @@ public class FlowLayoutEx extends AbstractLayoutManager2 implements SwingConstan
     for (int i = 0; i < m_visibleComponents.length; i++) {
       m_visibleComponentSizes[i] = SwingLayoutUtility.getValidatedSizes(m_visibleComponents[i]);
       if (m_orientation == HORIZONTAL) {
-        if (i > 0) m_preferredSpan += m_hgap;
+        if (i > 0) {
+          m_preferredSpan += m_hgap;
+        }
         m_preferredSpan += m_visibleComponentSizes[i][SwingLayoutUtility.PREF].width;
       }
       else {
-        if (i > 0) m_preferredSpan += m_vgap;
+        if (i > 0) {
+          m_preferredSpan += m_vgap;
+        }
         m_preferredSpan += m_visibleComponentSizes[i][SwingLayoutUtility.PREF].height;
       }
     }

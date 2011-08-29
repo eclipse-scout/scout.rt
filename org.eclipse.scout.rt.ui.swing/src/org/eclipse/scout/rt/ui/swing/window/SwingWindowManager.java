@@ -66,7 +66,11 @@ public final class SwingWindowManager {
   }
 
   public Dialog getActiveModalDialog() {
-    if (m_modalDialogStack.isEmpty()) return null;
-    else return m_modalDialogStack.get(m_modalDialogStack.size() - 1);
+    if (m_modalDialogStack.isEmpty()) {
+      return null;
+    }
+    else {
+      return m_modalDialogStack.get(m_modalDialogStack.size() - 1);
+    }
   }
 }

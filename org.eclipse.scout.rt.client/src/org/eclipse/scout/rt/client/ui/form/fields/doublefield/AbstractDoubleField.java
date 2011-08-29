@@ -60,8 +60,12 @@ public abstract class AbstractDoubleField extends AbstractDecimalField<Double> i
   @Override
   protected Double parseValueInternal(String text) throws ProcessingException {
     Double retVal = null;
-    if (text == null) text = "";
-    else text = text.trim();
+    if (text == null) {
+      text = "";
+    }
+    else {
+      text = text.trim();
+    }
     if (text.length() > 0) {
       NumberFormat numberFormat = createNumberFormat();
       if (isPercent()) {

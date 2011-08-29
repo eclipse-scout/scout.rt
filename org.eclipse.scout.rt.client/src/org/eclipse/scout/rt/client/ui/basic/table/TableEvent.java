@@ -177,7 +177,9 @@ public class TableEvent extends java.util.EventObject {
    */
   public void addPopupMenu(IMenu menu) {
     if (menu != null) {
-      if (m_popupMenus == null) m_popupMenus = new ArrayList<IMenu>();
+      if (m_popupMenus == null) {
+        m_popupMenus = new ArrayList<IMenu>();
+      }
       m_popupMenus.add(menu);
     }
   }
@@ -187,7 +189,9 @@ public class TableEvent extends java.util.EventObject {
    */
   public void addPopupMenus(IMenu[] menus) {
     if (menus != null) {
-      if (m_popupMenus == null) m_popupMenus = new ArrayList<IMenu>();
+      if (m_popupMenus == null) {
+        m_popupMenus = new ArrayList<IMenu>();
+      }
       m_popupMenus.addAll(Arrays.asList(menus));
     }
   }
@@ -196,16 +200,24 @@ public class TableEvent extends java.util.EventObject {
    * used by TYPE_ROW_POPUP to add actions
    */
   public IMenu[] getPopupMenus() {
-    if (m_popupMenus != null) return m_popupMenus.toArray(new IMenu[0]);
-    else return new IMenu[0];
+    if (m_popupMenus != null) {
+      return m_popupMenus.toArray(new IMenu[0]);
+    }
+    else {
+      return new IMenu[0];
+    }
   }
 
   /**
    * used by TYPE_ROW_POPUP to add actions
    */
   public int getPopupMenuCount() {
-    if (m_popupMenus != null) return m_popupMenus.size();
-    else return 0;
+    if (m_popupMenus != null) {
+      return m_popupMenus.size();
+    }
+    else {
+      return 0;
+    }
   }
 
   public boolean isConsumed() {
@@ -289,7 +301,9 @@ public class TableEvent extends java.util.EventObject {
       else {
         buf.append("rows {");
         for (int i = 0; i < m_rows.length; i++) {
-          if (i >= 0) buf.append(",");
+          if (i >= 0) {
+            buf.append(",");
+          }
           buf.append("" + m_rows[i]);
         }
         buf.append("}");

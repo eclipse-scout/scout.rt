@@ -214,7 +214,10 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
 
   @Override
   public void setMiniCalendarCount(int n) {
-    if (n < 0 || n > 6) return;// ignore it
+    if (n < 0 || n > 6)
+     {
+      return;// ignore it
+    }
     propertySupport.setPropertyInt(PROP_MINI_CALENDAR_COUNT, n);
   }
 
@@ -288,7 +291,9 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
   }
 
   private void syncSelectionFromResourceToActivity() {
-    if (m_selectionMediatorRunning) return;
+    if (m_selectionMediatorRunning) {
+      return;
+    }
     try {
       m_selectionMediatorRunning = true;
       //
@@ -300,7 +305,9 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
   }
 
   private void syncSelectionFromActivityToResource() {
-    if (m_selectionMediatorRunning) return;
+    if (m_selectionMediatorRunning) {
+      return;
+    }
     try {
       m_selectionMediatorRunning = true;
       //

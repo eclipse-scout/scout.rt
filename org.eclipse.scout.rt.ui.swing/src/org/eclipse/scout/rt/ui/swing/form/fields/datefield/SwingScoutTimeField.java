@@ -261,7 +261,9 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
       JComponent popupContent;
       Action acceptAction;
       Date d = getScoutObject().getValue();
-      if (d == null) d = new Date();
+      if (d == null) {
+        d = new Date();
+      }
       //create date chooser
       final TimeChooser timeChooser = new TimeChooser();
       timeChooser.setTime(d);

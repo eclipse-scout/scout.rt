@@ -143,7 +143,9 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   }
 
   protected void setTitleFromScout(String title) {
-    if (title == null) title = "";
+    if (title == null) {
+      title = "";
+    }
     title = StringUtility.removeNewLines(title);
     setPartName(title);
   }

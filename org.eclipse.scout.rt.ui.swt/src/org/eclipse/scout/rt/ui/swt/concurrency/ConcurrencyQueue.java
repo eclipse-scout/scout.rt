@@ -63,7 +63,9 @@ class ConcurrencyQueue {
   public void add(Runnable r) {
     if (r != null) {
       synchronized (m_listLock) {
-        if (LOG.isDebugEnabled()) LOG.debug(m_infoCached + " add: " + r);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(m_infoCached + " add: " + r);
+        }
         m_list.add(r);
         updateInternalInfo();
         m_listLock.notifyAll();
@@ -153,9 +155,13 @@ class ConcurrencyQueue {
     if (r != null) {
       try {
         long startTime = System.currentTimeMillis();
-        if (LOG.isDebugEnabled()) LOG.debug(m_infoCached + " dispatchStart: " + r);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(m_infoCached + " dispatchStart: " + r);
+        }
         r.run();
-        if (LOG.isDebugEnabled()) LOG.debug(m_infoCached + " dispatchEnd " + (System.currentTimeMillis() - startTime) + " ms:   " + r);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(m_infoCached + " dispatchEnd " + (System.currentTimeMillis() - startTime) + " ms:   " + r);
+        }
       }
       catch (Throwable t) {
         LOG.error(null, t);

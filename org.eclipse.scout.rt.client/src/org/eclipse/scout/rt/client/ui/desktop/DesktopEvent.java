@@ -171,7 +171,9 @@ public class DesktopEvent extends EventObject {
    */
   public void addPopupMenu(IMenu menu) {
     if (menu != null) {
-      if (m_popupMenus == null) m_popupMenus = new ArrayList<IMenu>();
+      if (m_popupMenus == null) {
+        m_popupMenus = new ArrayList<IMenu>();
+      }
       m_popupMenus.add(menu);
     }
   }
@@ -181,7 +183,9 @@ public class DesktopEvent extends EventObject {
    */
   public void addPopupMenus(IMenu[] menus) {
     if (menus != null) {
-      if (m_popupMenus == null) m_popupMenus = new ArrayList<IMenu>();
+      if (m_popupMenus == null) {
+        m_popupMenus = new ArrayList<IMenu>();
+      }
       m_popupMenus.addAll(Arrays.asList(menus));
     }
   }
@@ -190,16 +194,24 @@ public class DesktopEvent extends EventObject {
    * used by TYPE_TRAY_POPUP to add menus
    */
   public IMenu[] getPopupMenus() {
-    if (m_popupMenus != null) return m_popupMenus.toArray(new IMenu[0]);
-    else return new IMenu[0];
+    if (m_popupMenus != null) {
+      return m_popupMenus.toArray(new IMenu[0]);
+    }
+    else {
+      return new IMenu[0];
+    }
   }
 
   /**
    * used by TYPE_TRAY_POPUP to add menus
    */
   public int getPopupMenuCount() {
-    if (m_popupMenus != null) return m_popupMenus.size();
-    else return 0;
+    if (m_popupMenus != null) {
+      return m_popupMenus.size();
+    }
+    else {
+      return 0;
+    }
   }
 
   public Map<String, Object> getPrintParameters() {

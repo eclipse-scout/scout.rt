@@ -189,7 +189,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     else if (f instanceof ICompositeField) {
       for (IFormField sub : ((ICompositeField) f).getFields()) {
         IButton b = findFirstButtonInFieldTree(sub);
-        if (b != null) return b;
+        if (b != null) {
+          return b;
+        }
       }
     }
     return null;
@@ -514,7 +516,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @Override
   public int getFieldIndex(IFormField f) {
     for (int i = 0; i < m_fields.length; i++) {
-      if (m_fields[i] == f) return i;
+      if (m_fields[i] == f) {
+        return i;
+      }
     }
     return -1;
   }
@@ -534,16 +538,22 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @Override
   public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
     // myself
-    if (!visitor.visitField(this, startLevel, 0)) return false;
+    if (!visitor.visitField(this, startLevel, 0)) {
+      return false;
+    }
     // children
     int index = 0;
     IFormField[] f = m_fields;
     for (int i = 0; i < f.length; i++) {
       if (f[i] instanceof ICompositeField) {
-        if (!((ICompositeField) f[i]).visitFields(visitor, startLevel + 1)) return false;
+        if (!((ICompositeField) f[i]).visitFields(visitor, startLevel + 1)) {
+          return false;
+        }
       }
       else {
-        if (!visitor.visitField(f[i], startLevel, index)) return false;
+        if (!visitor.visitField(f[i], startLevel, index)) {
+          return false;
+        }
       }
       index++;
     }
@@ -551,7 +561,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   private void syncValueToButtons() {
-    if (m_valueAndSelectionMediatorActive) return;
+    if (m_valueAndSelectionMediatorActive) {
+      return;
+    }
     try {
       m_valueAndSelectionMediatorActive = true;
       //
@@ -567,7 +579,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   private void syncButtonsToValue(IButton selectedButton) {
-    if (m_valueAndSelectionMediatorActive) return;
+    if (m_valueAndSelectionMediatorActive) {
+      return;
+    }
     try {
       m_valueAndSelectionMediatorActive = true;
       //

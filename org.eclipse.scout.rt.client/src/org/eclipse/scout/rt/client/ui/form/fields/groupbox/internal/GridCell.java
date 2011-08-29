@@ -65,17 +65,25 @@ public class GridCell {
   protected GridCell getSplitCell(int before, int maxWeight, int colCount) {
     int after = maxWeight - before - data.h * data.w;
     // split-off item with ancestor and descendant
-    if ((colCount - 1) * before >= (data.h + after)) return this;
+    if ((colCount - 1) * before >= (data.h + after)) {
+      return this;
+    }
     // split-off item with ancestor and no descendant
-    if (before > 0 && after == 0) return this;
+    if (before > 0 && after == 0) {
+      return this;
+    }
     // not the split-off item
     if (m_down != null) {
       GridCell cell = m_down.getSplitCell(before + data.h, maxWeight, colCount);
-      if (cell != null) return cell;
+      if (cell != null) {
+        return cell;
+      }
     }
     if (m_right != null) {
       GridCell cell = m_right.getSplitCell(before, maxWeight, colCount);
-      if (cell != null) return cell;
+      if (cell != null) {
+        return cell;
+      }
     }
     return null;
   }

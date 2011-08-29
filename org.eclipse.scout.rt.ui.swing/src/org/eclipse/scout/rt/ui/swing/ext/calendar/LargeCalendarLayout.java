@@ -82,7 +82,9 @@ public class LargeCalendarLayout implements LayoutManager2 {
     //
     Dimension size = parent.getSize();
     Insets insets = parent.getInsets();
-    if (insets == null) insets = new Insets(0, 0, 0, 0);
+    if (insets == null) {
+      insets = new Insets(0, 0, 0, 0);
+    }
     int x = insets.left;
     int y = insets.top;
     int w = size.width - insets.left - insets.right;

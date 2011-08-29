@@ -84,7 +84,9 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
     String failoverString = config.getInitParameter("failover");
     m_failover = Boolean.parseBoolean(failoverString);
     String realmParam = config.getInitParameter("realm");
-    if (realmParam == null) realmParam = "Default";
+    if (realmParam == null) {
+      realmParam = "Default";
+    }
     m_realm = realmParam;
   }
 

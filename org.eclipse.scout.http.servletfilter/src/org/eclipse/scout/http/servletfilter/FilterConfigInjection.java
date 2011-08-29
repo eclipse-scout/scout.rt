@@ -113,7 +113,9 @@ public class FilterConfigInjection {
   }
 
   private Map<String, String> getCachedPropertyMap(String path) {
-    if (path == null) path = "";
+    if (path == null) {
+      path = "";
+    }
     Map<String, String> map;
     synchronized (m_configCacheLock) {
       map = m_configCache.get(path);

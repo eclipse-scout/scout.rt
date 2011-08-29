@@ -107,7 +107,9 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
    * @return true if that scout event is ignored
    */
   public boolean isIgnoredScoutEvent(Class eventType, String name) {
-    if (m_ignoredScoutEvents.isEmpty()) return false;
+    if (m_ignoredScoutEvents.isEmpty()) {
+      return false;
+    }
     boolean b = m_ignoredScoutEvents.contains(eventType.getSimpleName() + ":" + name);
     return b;
   }
@@ -239,7 +241,9 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
       try {
         if (lock.acquire()) {
           Container container = getSwingContainer();
-          if (container == null) container = getSwingField();
+          if (container == null) {
+            container = getSwingField();
+          }
           if (container != null) {
             for (Component c : SwingUtility.findChildComponents(container, Component.class)) {
               ISwingScoutComposite ui = getCompositeOnWidget(c);
@@ -280,7 +284,9 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
       try {
         if (lock.acquire()) {
           Container container = getSwingContainer();
-          if (container == null) container = getSwingField();
+          if (container == null) {
+            container = getSwingField();
+          }
           if (container != null) {
             for (Component c : SwingUtility.findChildComponents(container, Component.class)) {
               ISwingScoutComposite ui = getCompositeOnWidget(c);
@@ -445,7 +451,9 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
   private class P_SwingDefaultFocusListener extends FocusAdapter {
     @Override
     public void focusGained(FocusEvent f) {
-      if (f.isTemporary()) return;
+      if (f.isTemporary()) {
+        return;
+      }
       setInputDirty(true);
       handleSwingFocusGained();
     }
@@ -521,7 +529,9 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
   private class P_ScoutPropertyChangeListener implements PropertyChangeListener, WeakEventListener {
     @Override
     public void propertyChange(final PropertyChangeEvent e) {
-      if (isIgnoredScoutEvent(PropertyChangeEvent.class, e.getPropertyName())) return;
+      if (isIgnoredScoutEvent(PropertyChangeEvent.class, e.getPropertyName())) {
+        return;
+      }
       //
       if (isHandleScoutPropertyChange(e.getPropertyName(), e.getNewValue())) {
         Runnable t = new Runnable() {

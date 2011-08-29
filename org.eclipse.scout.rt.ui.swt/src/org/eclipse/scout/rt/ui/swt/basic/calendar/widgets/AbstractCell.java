@@ -118,8 +118,9 @@ public abstract class AbstractCell extends Composite implements PaintListener {
       if (items != null) {
         try {
           // add them to the cache
-          for (Object item : items)
+          for (Object item : items) {
             m_itemsCached.add(new CalendarItemContainer(item, this));
+          }
         }
         catch (ConcurrentModificationException cme) {
           LOG.warn("ConcurrentModificationException on getItems");
@@ -175,11 +176,14 @@ public abstract class AbstractCell extends Composite implements PaintListener {
         }
         return m_itemsCached;
       }
-      else return null;
+      else {
+        return null;
+      }
     } // -- end cach null
-    else
-    // cache not null, returns it
-    return m_itemsCached;
+    else {
+      // cache not null, returns it
+      return m_itemsCached;
+    }
   }
 
   /** get the number of timeless items for that cell */
@@ -246,8 +250,12 @@ public abstract class AbstractCell extends Composite implements PaintListener {
   /** draw composite border with the current (unselected/selected) border color */
   protected void drawBorder(PaintEvent e) {
     /** set right color */
-    if (m_isSelected) e.gc.setForeground(BORDER_SELECTED_COLOR);
-    else e.gc.setForeground(BORDER_UNSELECTED_COLOR);
+    if (m_isSelected) {
+      e.gc.setForeground(BORDER_SELECTED_COLOR);
+    }
+    else {
+      e.gc.setForeground(BORDER_UNSELECTED_COLOR);
+    }
 
     Rectangle bounds = getBounds();
     e.gc.drawRectangle(0, 0, bounds.width - 1, bounds.height - 1);
@@ -269,7 +277,9 @@ public abstract class AbstractCell extends Composite implements PaintListener {
   /** the current cell gets selected */
   public void setSelected() {
     // do we need to change the view date
-    if (!m_isCurrentPeriod) m_calendar.setViewDate(m_cellDate);
+    if (!m_isCurrentPeriod) {
+      m_calendar.setViewDate(m_cellDate);
+    }
 
     // report selection to main calendar
     m_calendar.setSelectedItem(null);
@@ -338,9 +348,13 @@ public abstract class AbstractCell extends Composite implements PaintListener {
 
   public void setSelected(boolean selected) {
     // changed?
-    if (m_isSelected == selected) return;
+    if (m_isSelected == selected) {
+      return;
+    }
 
-    if (selected) setFocus();
+    if (selected) {
+      setFocus();
+    }
 
     m_isSelected = selected;
     redraw();
@@ -374,8 +388,12 @@ public abstract class AbstractCell extends Composite implements PaintListener {
     setWeekText(weekName);
 
     // gray background for cell not in the curent month
-    if (m_isCurrentPeriod) setBackground(SwtColors.getInstance().white);
-    else setBackground(SwtColors.getInstance().lightgray);
+    if (m_isCurrentPeriod) {
+      setBackground(SwtColors.getInstance().white);
+    }
+    else {
+      setBackground(SwtColors.getInstance().lightgray);
+    }
 
   }
 
@@ -386,8 +404,12 @@ public abstract class AbstractCell extends Composite implements PaintListener {
       for (Object element : getItems()) {
         CalendarItemContainer item = (CalendarItemContainer) element;
         // create new calendar item + set label
-        if (this instanceof WeekCell) m_widgetItems.add(new WeekCalendarItem(this, SWT.NONE, item));
-        else if (this instanceof MonthCell) m_widgetItems.add(new MonthCalendarItem(this, SWT.NONE, item));
+        if (this instanceof WeekCell) {
+          m_widgetItems.add(new WeekCalendarItem(this, SWT.NONE, item));
+        }
+        else if (this instanceof MonthCell) {
+          m_widgetItems.add(new MonthCalendarItem(this, SWT.NONE, item));
+        }
       }
     }
   }
@@ -402,8 +424,11 @@ public abstract class AbstractCell extends Composite implements PaintListener {
   /** dispose all contained calendar items */
   protected void disposeCalendarItems() {
     if (m_widgetItems != null) {
-      for (AbstractCalendarItem item : m_widgetItems)
-        if (item != null && !item.isDisposed()) item.dispose();
+      for (AbstractCalendarItem item : m_widgetItems) {
+        if (item != null && !item.isDisposed()) {
+          item.dispose();
+        }
+      }
       m_widgetItems = new ArrayList<AbstractCalendarItem>();
     }
   }

@@ -153,20 +153,25 @@ public class DateBrowserBar extends Composite {
 
   @Override
   public void dispose () {
-    if (m_fastbackward != null && !m_fastbackward.isDisposed())
+    if (m_fastbackward != null && !m_fastbackward.isDisposed()) {
       m_fastbackward.dispose();
+    }
 
-    if (m_backward != null && !m_backward.isDisposed())
+    if (m_backward != null && !m_backward.isDisposed()) {
       m_backward.dispose();
+    }
 
-    if (m_label != null && !m_label.isDisposed())
+    if (m_label != null && !m_label.isDisposed()) {
       m_label.dispose();
+    }
 
-    if (m_forward != null && !m_forward.isDisposed())
+    if (m_forward != null && !m_forward.isDisposed()) {
       m_forward.dispose();
+    }
 
-    if (m_fastforward != null && !m_fastforward.isDisposed())
+    if (m_fastforward != null && !m_fastforward.isDisposed()) {
       m_fastforward.dispose();
+    }
 
     super.dispose();
   }

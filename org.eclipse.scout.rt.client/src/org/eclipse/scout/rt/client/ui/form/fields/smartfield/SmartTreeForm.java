@@ -587,7 +587,9 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     public void update(String text) {
       // check pattern
       String s = text;
-      if (s == null) s = "";
+      if (s == null) {
+        s = "";
+      }
       s = s.toLowerCase();
       IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
       if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {

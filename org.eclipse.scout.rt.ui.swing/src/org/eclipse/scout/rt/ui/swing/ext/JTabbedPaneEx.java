@@ -41,8 +41,12 @@ public class JTabbedPaneEx extends JTabbedPane implements ChangeListener {
   public Dimension getMinimumSize() {
     Dimension m = new Dimension(super.getMinimumSize());
     Dimension p = super.getPreferredSize();
-    if (m.width > p.width) m.width = p.width;
-    if (m.height > p.height) m.height = p.height;
+    if (m.width > p.width) {
+      m.width = p.width;
+    }
+    if (m.height > p.height) {
+      m.height = p.height;
+    }
     return m;
   }
 

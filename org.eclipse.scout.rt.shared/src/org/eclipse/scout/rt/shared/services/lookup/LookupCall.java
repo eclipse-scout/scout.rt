@@ -183,7 +183,9 @@ public class LookupCall implements Cloneable, Serializable {
    * see {@link #getActive()}
    */
   public void setActive(TriState s) {
-    if (s == null) s = TriState.UNDEFINED;
+    if (s == null) {
+      s = TriState.UNDEFINED;
+    }
     m_active = s;
   }
 

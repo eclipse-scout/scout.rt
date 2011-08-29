@@ -65,7 +65,9 @@ public class ProcessInspector {
   public boolean acceptCall(String serviceClassName, String operation) {
     String callId = serviceClassName + "." + operation;
     for (String s : m_ignoredCallSet) {
-      if (callId.matches(s)) return false;
+      if (callId.matches(s)) {
+        return false;
+      }
     }
     return true;
   }

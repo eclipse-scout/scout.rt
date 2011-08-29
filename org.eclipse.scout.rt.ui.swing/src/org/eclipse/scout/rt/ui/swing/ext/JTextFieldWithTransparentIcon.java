@@ -95,7 +95,9 @@ public class JTextFieldWithTransparentIcon extends JTextFieldEx {
     addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        if (!isIconEnabled()) return;
+        if (!isIconEnabled()) {
+          return;
+        }
         for (IDropDownButtonListener l : m_listeners) {
           l.iconClicked(e.getSource());
         }
@@ -135,7 +137,9 @@ public class JTextFieldWithTransparentIcon extends JTextFieldEx {
       }
 
       void updateIcon(boolean mouseOver) {
-        if (!isIconEnabled()) return;
+        if (!isIconEnabled()) {
+          return;
+        }
         boolean oldMouseOver = m_mouseOver;
         if (oldMouseOver != mouseOver) {
           m_mouseOver = mouseOver;

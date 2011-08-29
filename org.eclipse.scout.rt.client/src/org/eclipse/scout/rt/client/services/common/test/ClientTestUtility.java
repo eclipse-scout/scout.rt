@@ -47,7 +47,9 @@ public final class ClientTestUtility {
   }
 
   public static void sleep(final int seconds) {
-    if (seconds <= 0) return;
+    if (seconds <= 0) {
+      return;
+    }
     final BlockingCondition bc = new BlockingCondition(true);
     new ClientSyncJob("sleep", ClientSyncJob.getCurrentSession()) {
       @Override

@@ -34,10 +34,18 @@ public class HyperlinkEx extends Hyperlink {
 
   public HyperlinkEx(Composite parent, int style) {
     super(parent, style);
-    if ((style & (SWT.CENTER | SWT.RIGHT)) == 0) style |= SWT.LEFT;
-    if ((style & SWT.CENTER) != 0) align = SWT.CENTER;
-    if ((style & SWT.RIGHT) != 0) align = SWT.RIGHT;
-    if ((style & SWT.LEFT) != 0) align = SWT.LEFT;
+    if ((style & (SWT.CENTER | SWT.RIGHT)) == 0) {
+      style |= SWT.LEFT;
+    }
+    if ((style & SWT.CENTER) != 0) {
+      align = SWT.CENTER;
+    }
+    if ((style & SWT.RIGHT) != 0) {
+      align = SWT.RIGHT;
+    }
+    if ((style & SWT.LEFT) != 0) {
+      align = SWT.LEFT;
+    }
   }
 
   @SuppressWarnings("restriction")

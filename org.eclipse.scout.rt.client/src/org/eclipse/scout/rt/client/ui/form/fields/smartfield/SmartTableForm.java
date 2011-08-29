@@ -111,7 +111,9 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
         rows = new LookupRow[0];
       }
       int n = rows.length;
-      if (maxCount > 0) n = Math.min(n, maxCount);
+      if (maxCount > 0) {
+        n = Math.min(n, maxCount);
+      }
       ITableRow[] tableRows = new ITableRow[n];
       for (int i = 0; i < n; i++) {
         tableRows[i] = table.createRow(new Object[]{rows[i], null});

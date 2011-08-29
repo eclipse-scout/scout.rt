@@ -49,7 +49,9 @@ public class ImageFieldEvent extends EventObject {
 
   public void addPopupMenu(IMenu menu) {
     if (menu != null) {
-      if (m_popupMenus == null) m_popupMenus = new ArrayList<IMenu>();
+      if (m_popupMenus == null) {
+        m_popupMenus = new ArrayList<IMenu>();
+      }
       m_popupMenus.add(menu);
     }
   }
@@ -59,7 +61,9 @@ public class ImageFieldEvent extends EventObject {
    */
   public void addPopupMenus(IMenu[] menus) {
     if (menus != null) {
-      if (m_popupMenus == null) m_popupMenus = new ArrayList<IMenu>();
+      if (m_popupMenus == null) {
+        m_popupMenus = new ArrayList<IMenu>();
+      }
       m_popupMenus.addAll(Arrays.asList(menus));
     }
   }
@@ -68,16 +72,24 @@ public class ImageFieldEvent extends EventObject {
    * used by TYPE_POPUP to add actions
    */
   public IMenu[] getPopupMenus() {
-    if (m_popupMenus != null) return m_popupMenus.toArray(new IMenu[0]);
-    else return new IMenu[0];
+    if (m_popupMenus != null) {
+      return m_popupMenus.toArray(new IMenu[0]);
+    }
+    else {
+      return new IMenu[0];
+    }
   }
 
   /**
    * used by TYPE_POPUP to add actions
    */
   public int getPopupMenuCount() {
-    if (m_popupMenus != null) return m_popupMenus.size();
-    else return 0;
+    if (m_popupMenus != null) {
+      return m_popupMenus.size();
+    }
+    else {
+      return 0;
+    }
   }
 
   /**

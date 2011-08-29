@@ -298,8 +298,12 @@ public class ServiceTunnelServlet extends HttpServletEx {
         }
       }
       else {
-        if (ajaxSessionId != null) throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-SessionId'");
-        if (ajaxUserId != null) throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-UserId'");
+        if (ajaxSessionId != null) {
+          throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-SessionId'");
+        }
+        if (ajaxUserId != null) {
+          throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-UserId'");
+        }
       }
       //invoke
       Map<Class, Object> backup = ThreadContext.backup();

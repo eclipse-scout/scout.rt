@@ -130,16 +130,30 @@ public class FontSpec implements java.io.Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
     FontSpec other = (FontSpec) obj;
     if (m_name == null) {
-      if (other.m_name != null) return false;
+      if (other.m_name != null) {
+        return false;
+      }
     }
-    else if (!m_name.equals(other.m_name)) return false;
-    if (m_size != other.m_size) return false;
-    if (m_style != other.m_style) return false;
+    else if (!m_name.equals(other.m_name)) {
+      return false;
+    }
+    if (m_size != other.m_size) {
+      return false;
+    }
+    if (m_style != other.m_style) {
+      return false;
+    }
     return true;
   }
 }

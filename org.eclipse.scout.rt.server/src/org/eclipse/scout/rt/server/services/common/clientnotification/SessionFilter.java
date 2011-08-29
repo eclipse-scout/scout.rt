@@ -53,7 +53,9 @@ public class SessionFilter implements IClientNotificationFilter {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
+    if (obj == null) {
+      return false;
+    }
     if (obj.getClass() == this.getClass()) {
       SessionFilter o = (SessionFilter) obj;
       return o.m_sessionRef.get() == this.m_sessionRef.get();

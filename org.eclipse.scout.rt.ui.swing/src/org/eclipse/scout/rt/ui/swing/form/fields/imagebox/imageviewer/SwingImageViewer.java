@@ -80,12 +80,18 @@ public class SwingImageViewer extends JComponent {
 
       @Override
       public void mouseReleased(MouseEvent e) {
-        if (fix != null) if(fix!=null) fix.mouseReleased(this, e);
+        if (fix != null) {
+          if(fix!=null) {
+            fix.mouseReleased(this, e);
+          }
+        }
       }
 
       @Override
       public void mouseClicked(java.awt.event.MouseEvent e) {
-        if (fix.mouseClicked()) return;
+        if (fix.mouseClicked()) {
+          return;
+        }
         requestFocus();
       }
     });

@@ -43,7 +43,9 @@ public class ServiceTunnelRequest implements Serializable {
     m_operation = op;
     m_parameterTypes = parameterTypes;
     m_args = args;
-    if (m_args == null) m_args = new Object[0];
+    if (m_args == null) {
+      m_args = new Object[0];
+    }
     m_nlsLocale = NlsLocale.getDefault().getLocale();
     m_locale = Locale.getDefault();
   }

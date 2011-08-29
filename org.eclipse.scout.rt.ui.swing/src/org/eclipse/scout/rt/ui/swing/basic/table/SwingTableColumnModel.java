@@ -110,7 +110,9 @@ public class SwingTableColumnModel extends DefaultTableColumnModel implements Pr
   @Override
   protected void fireColumnMoved(TableColumnModelEvent e) {
     super.fireColumnMoved(e);
-    if (m_swingScoutTable.getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (m_swingScoutTable.getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (m_swingScoutTable.getScoutObject() != null) {
       // store all columns because the move of one column also changes the

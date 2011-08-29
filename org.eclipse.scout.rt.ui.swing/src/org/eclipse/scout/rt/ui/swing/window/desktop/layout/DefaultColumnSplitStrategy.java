@@ -62,7 +62,9 @@ public class DefaultColumnSplitStrategy implements IMultiSplitStrategy {
 
   @Override
   public void setSplitLocation(int row, int col, int newLocation) {
-    if (col == 0 || col == 3) return;
+    if (col == 0 || col == 3) {
+      return;
+    }
     //
     if (m_location[row][col - 1] + 20 < newLocation && newLocation + 20 < m_location[row][col + 1]) {
       m_location[row][col] = newLocation;

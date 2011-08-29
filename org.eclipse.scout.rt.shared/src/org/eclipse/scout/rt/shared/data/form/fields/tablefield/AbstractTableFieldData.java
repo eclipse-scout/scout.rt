@@ -72,8 +72,12 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
   @Override
   public int getRowState(int row) {
     Number n = (Number) getValueInternal(row, getColumnCount());
-    if (n != null) return n.intValue();
-    else return STATUS_NON_CHANGED;
+    if (n != null) {
+      return n.intValue();
+    }
+    else {
+      return STATUS_NON_CHANGED;
+    }
   }
 
   @Override

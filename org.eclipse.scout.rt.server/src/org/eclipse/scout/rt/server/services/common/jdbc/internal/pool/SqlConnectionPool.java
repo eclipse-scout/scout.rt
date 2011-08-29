@@ -100,7 +100,9 @@ public final class SqlConnectionPool {
             // create new connection
             PoolEntry test = new PoolEntry();
             test.conn = new SqlConnectionBuilder().createJdbcConnection(service);
-            if (LOG.isInfoEnabled()) LOG.info("created jdbc connection " + test.conn);
+            if (LOG.isInfoEnabled()) {
+              LOG.info("created jdbc connection " + test.conn);
+            }
             service.callbackAfterConnectionCreated(test.conn);
             test.createTime = System.currentTimeMillis();
             m_idleEntries.add(test);
@@ -139,13 +141,17 @@ public final class SqlConnectionPool {
       candidate.leaseBegin = System.currentTimeMillis();
       candidate.leaseCount++;
       m_busyEntries.add(candidate);
-      if (LOG.isDebugEnabled()) LOG.debug("lease   " + candidate.conn);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("lease   " + candidate.conn);
+      }
       return candidate.conn;
     }
   }
 
   public void releaseConnection(Connection conn) {
-    if (LOG.isDebugEnabled()) LOG.debug("release " + conn);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("release " + conn);
+    }
     synchronized (m_poolLock) {
       PoolEntry candidate = null;
       for (Iterator it = m_busyEntries.iterator(); it.hasNext();) {

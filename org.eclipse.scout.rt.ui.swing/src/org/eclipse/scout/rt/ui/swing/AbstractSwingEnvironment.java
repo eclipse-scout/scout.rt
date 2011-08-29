@@ -1235,7 +1235,9 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   }
 
   private static void checkThread() {
-    if (!SwingUtilities.isEventDispatchThread()) throw new IllegalStateException("Must be called in swing thread");
+    if (!SwingUtilities.isEventDispatchThread()) {
+      throw new IllegalStateException("Must be called in swing thread");
+    }
   }
 
   @Override

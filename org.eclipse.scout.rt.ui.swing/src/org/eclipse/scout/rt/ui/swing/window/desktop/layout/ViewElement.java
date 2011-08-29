@@ -43,14 +43,22 @@ class ViewElement {
     int dy = sizes[0].height - d.height;
     if (dy > 0) {
       // expand
-      if (!top.isFixed()) top.move(-dy, true);
-      else bottom.move(dy, true);
+      if (!top.isFixed()) {
+        top.move(-dy, true);
+      }
+      else {
+        bottom.move(dy, true);
+      }
     }
     dy = d.height - sizes[2].height;
     if (dy > 0) {
       // shrink
-      if (!top.isFixed()) top.move(dy, true);
-      else bottom.move(-dy, true);
+      if (!top.isFixed()) {
+        top.move(dy, true);
+      }
+      else {
+        bottom.move(-dy, true);
+      }
     }
   }
 

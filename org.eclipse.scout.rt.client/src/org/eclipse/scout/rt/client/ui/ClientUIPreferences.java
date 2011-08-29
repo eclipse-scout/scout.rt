@@ -140,10 +140,12 @@ public class ClientUIPreferences {
         return null;
       }
       finally {
-        if (in != null) try {
-          in.close();
-        }
-        catch (Throwable t) {
+        if (in != null) {
+          try {
+            in.close();
+          }
+          catch (Throwable t) {
+          }
         }
       }
     }
@@ -172,10 +174,12 @@ public class ClientUIPreferences {
         m_env.remove(key);
       }
       finally {
-        if (out != null) try {
-          out.close();
-        }
-        catch (Throwable t) {
+        if (out != null) {
+          try {
+            out.close();
+          }
+          catch (Throwable t) {
+          }
         }
       }
     }
@@ -348,12 +352,24 @@ public class ClientUIPreferences {
     if (table != null) {
       for (IColumn col : table.getColumns()) {
         String keySuffix = getColumnKey(col);
-        if (m_env.get(TABLE_COLUMN_VISIBLE + keySuffix, null) != null) return true;
-        if (m_env.get(TABLE_COLUMN_UIINDEX + keySuffix, null) != null) return true;
-        if (m_env.get(TABLE_COLUMN_SORT_INDEX + keySuffix, null) != null) return true;
-        if (m_env.get(TABLE_COLUMN_SORT_ASC + keySuffix, null) != null) return true;
-        if (m_env.get(TABLE_COLUMN_SORT_EXPLICIT + keySuffix, null) != null) return true;
-        if (m_env.get(TABLE_COLUMN_WIDTH + keySuffix, null) != null) return true;
+        if (m_env.get(TABLE_COLUMN_VISIBLE + keySuffix, null) != null) {
+          return true;
+        }
+        if (m_env.get(TABLE_COLUMN_UIINDEX + keySuffix, null) != null) {
+          return true;
+        }
+        if (m_env.get(TABLE_COLUMN_SORT_INDEX + keySuffix, null) != null) {
+          return true;
+        }
+        if (m_env.get(TABLE_COLUMN_SORT_ASC + keySuffix, null) != null) {
+          return true;
+        }
+        if (m_env.get(TABLE_COLUMN_SORT_EXPLICIT + keySuffix, null) != null) {
+          return true;
+        }
+        if (m_env.get(TABLE_COLUMN_WIDTH + keySuffix, null) != null) {
+          return true;
+        }
       }
     }
     return false;

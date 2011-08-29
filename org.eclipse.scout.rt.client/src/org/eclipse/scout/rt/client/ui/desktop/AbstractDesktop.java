@@ -799,7 +799,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void setKeyStrokes(IKeyStroke[] ks) {
-    if (ks == null) ks = new IKeyStroke[0];
+    if (ks == null) {
+      ks = new IKeyStroke[0];
+    }
     propertySupport.setProperty(PROP_KEY_STROKES, ks);
   }
 
@@ -1245,10 +1247,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       ArrayList<IMenu> list = new ArrayList<IMenu>();
       execAddTrayMenus(list);
       for (IMenu m : list) {
-        if (m != null) m.prepareAction();
+        if (m != null) {
+          m.prepareAction();
+        }
       }
       for (IMenu m : list) {
-        if (m != null && m.isVisible()) event.addPopupMenu(m);
+        if (m != null && m.isVisible()) {
+          event.addPopupMenu(m);
+        }
       }
     }
     catch (ProcessingException e) {
@@ -1302,7 +1308,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {
     for (IMenu m : getMenus()) {
-      if (runMenuRec(m, menuType)) return true;
+      if (runMenuRec(m, menuType)) {
+        return true;
+      }
     }
     return false;
   }
@@ -1320,7 +1328,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
     // children
     for (IMenu c : m.getChildActions()) {
-      if (runMenuRec(c, menuType)) return true;
+      if (runMenuRec(c, menuType)) {
+        return true;
+      }
     }
     return false;
   }

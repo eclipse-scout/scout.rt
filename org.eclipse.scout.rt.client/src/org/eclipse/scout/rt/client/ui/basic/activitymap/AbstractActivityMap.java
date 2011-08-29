@@ -345,13 +345,17 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
 
   @Override
   public ActivityCell resolveActivityCell(ActivityCell cell) {
-    if (cell == null) return cell;
+    if (cell == null) {
+      return cell;
+    }
     return m_activities.get(new CompositeLong(cell.getResourceId(), cell.getActivityId()));
   }
 
   @Override
   public ActivityCell[] resolveActivityCells(ActivityCell[] cells) {
-    if (cells == null) cells = new ActivityCell[0];
+    if (cells == null) {
+      cells = new ActivityCell[0];
+    }
     int mismatchCount = 0;
     for (int i = 0; i < cells.length; i++) {
       if (resolveActivityCell(cells[i]) != cells[i]) {
@@ -495,7 +499,9 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   @Override
   public Long[] getSelectedResourceIds() {
     Long[] a = (Long[]) propertySupport.getProperty(PROP_SELECTED_RESOURCE_IDS);
-    if (a == null) a = new Long[0];
+    if (a == null) {
+      a = new Long[0];
+    }
     return a;
   }
 
@@ -914,7 +920,10 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
 
   @Override
   public void setWorkDayCount(int n) {
-    if (n < 1 || n > 6) return;// ignore it
+    if (n < 1 || n > 6)
+     {
+      return;// ignore it
+    }
     propertySupport.setPropertyInt(PROP_WORK_DAY_COUNT, n);
   }
 
@@ -955,7 +964,9 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
 
   @Override
   public void setIntradayInterval(long millis) {
-    if (millis < 15L * 60000L || millis > 24L * 3600000L) throw new IllegalArgumentException("intradayIntervalMinutes must be between 15 minutes and 24 hours");
+    if (millis < 15L * 60000L || millis > 24L * 3600000L) {
+      throw new IllegalArgumentException("intradayIntervalMinutes must be between 15 minutes and 24 hours");
+    }
     propertySupport.setPropertyLong(PROP_INTRADAY_INTERVAL, millis);
   }
 

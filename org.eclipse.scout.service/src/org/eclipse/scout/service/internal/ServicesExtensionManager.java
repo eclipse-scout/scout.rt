@@ -83,9 +83,13 @@ public class ServicesExtensionManager implements Listener {
   @SuppressWarnings("unchecked")
   public void added(IExtension extension) {
     Bundle contributorBundle = Platform.getBundle(extension.getContributor().getName());
-    if (contributorBundle == null) return;
+    if (contributorBundle == null) {
+      return;
+    }
     final BundleContext context = contributorBundle.getBundleContext();
-    if (context == null) return;
+    if (context == null) {
+      return;
+    }
     ArrayList<ServiceRegistration> list = new ArrayList<ServiceRegistration>();
     for (IConfigurationElement serviceElement : extension.getConfigurationElements()) {
       try {
@@ -123,7 +127,9 @@ public class ServicesExtensionManager implements Listener {
         }
         // add impl
         if (serviceElement.getName().equals("service")) {
-          if (sessionType != null && factory == null) throw new IllegalArgumentException("cannot specify a session without a factory");
+          if (sessionType != null && factory == null) {
+            throw new IllegalArgumentException("cannot specify a session without a factory");
+          }
           if (factory == null) {
             factory = new DefaultServiceFactory(serviceClass);
           }
@@ -146,7 +152,9 @@ public class ServicesExtensionManager implements Listener {
           }
         }
         else if (serviceElement.getName().equals("proxy")) {
-          if (factory == null) throw new IllegalArgumentException("a proxy requires a factory");
+          if (factory == null) {
+            throw new IllegalArgumentException("a proxy requires a factory");
+          }
           ArrayList<String> clazzes = new ArrayList<String>();
           clazzes.add(serviceClass.getName());
           if (!serviceClass.isInterface()) {

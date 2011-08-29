@@ -109,19 +109,25 @@ public class JavaRobot {
   }
 
   public void typeText(String s) {
-    if (s == null || s.length() == 0) return;
+    if (s == null || s.length() == 0) {
+      return;
+    }
     for (char c : s.toCharArray()) {
       boolean shift = Character.isUpperCase(c);
       char upperChar = Character.toUpperCase(c);
       if ((upperChar == ' ') || (upperChar >= 'A' && upperChar <= 'Z') || (upperChar >= '0' && upperChar <= '9')) {
         try {
-          if (shift) m_robot.keyPress(KeyEvent.VK_SHIFT);
+          if (shift) {
+            m_robot.keyPress(KeyEvent.VK_SHIFT);
+          }
           //
           m_robot.keyPress((int) upperChar);
           m_robot.keyRelease((int) upperChar);
         }
         finally {
-          if (shift) m_robot.keyRelease(KeyEvent.VK_SHIFT);
+          if (shift) {
+            m_robot.keyRelease(KeyEvent.VK_SHIFT);
+          }
         }
       }
       else {

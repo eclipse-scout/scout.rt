@@ -27,8 +27,12 @@ public class ServiceTunnelInvocationHandler implements InvocationHandler {
   private final IServiceTunnel m_tunnel;
 
   public ServiceTunnelInvocationHandler(Class<?> serviceInterfaceClass, IServiceTunnel tunnel) {
-    if (serviceInterfaceClass == null) throw new IllegalArgumentException("serviceInterfaceClass must not be null");
-    if (tunnel == null) throw new IllegalArgumentException("tunnel must not be null");
+    if (serviceInterfaceClass == null) {
+      throw new IllegalArgumentException("serviceInterfaceClass must not be null");
+    }
+    if (tunnel == null) {
+      throw new IllegalArgumentException("tunnel must not be null");
+    }
     m_serviceInterfaceClass = serviceInterfaceClass;
     m_tunnel = tunnel;
   }

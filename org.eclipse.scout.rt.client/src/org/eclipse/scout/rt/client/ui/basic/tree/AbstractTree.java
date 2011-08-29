@@ -448,7 +448,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private void applyNodeFiltersRecInternal(ITreeNode inode, boolean parentAccepted, int level) {
-    if (inode == null) return;
+    if (inode == null) {
+      return;
+    }
     inode.setFilterAccepted(true);
     if (m_nodeFilters.size() > 0) {
       for (ITreeNodeFilter filter : m_nodeFilters) {
@@ -507,7 +509,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public String getIconId() {
     String iconId = propertySupport.getPropertyString(PROP_ICON_ID);
-    if (iconId != null && iconId.length() == 0) iconId = null;
+    if (iconId != null && iconId.length() == 0) {
+      iconId = null;
+    }
     return iconId;
   }
 
@@ -660,7 +664,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public ITreeNode[] findNodes(Object[] primaryKeys) {
-    if (primaryKeys == null || primaryKeys.length <= 0) return new ITreeNode[0];
+    if (primaryKeys == null || primaryKeys.length <= 0) {
+      return new ITreeNode[0];
+    }
     final HashSet<Object> keySet = new HashSet<Object>(Arrays.asList(primaryKeys));
     P_AbstractCollectingTreeVisitor v = new P_AbstractCollectingTreeVisitor() {
       @Override
@@ -752,8 +758,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isNodeExpanded(ITreeNode node) {
-    if (node != null) return node.isExpanded();
-    else return false;
+    if (node != null) {
+      return node.isExpanded();
+    }
+    else {
+      return false;
+    }
   }
 
   @Override
@@ -810,14 +820,22 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isNodeEnabled(ITreeNode node) {
-    if (node != null) return node.isEnabled();
-    else return false;
+    if (node != null) {
+      return node.isEnabled();
+    }
+    else {
+      return false;
+    }
   }
 
   @Override
   public boolean isNodeEnabledGranted(ITreeNode node) {
-    if (node != null) return node.isEnabledGranted();
-    else return false;
+    if (node != null) {
+      return node.isEnabledGranted();
+    }
+    else {
+      return false;
+    }
   }
 
   @Override
@@ -862,14 +880,22 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isNodeVisible(ITreeNode node) {
-    if (node != null) return node.isVisible();
-    else return false;
+    if (node != null) {
+      return node.isVisible();
+    }
+    else {
+      return false;
+    }
   }
 
   @Override
   public boolean isNodeVisibleGranted(ITreeNode node) {
-    if (node != null) return node.isVisibleGranted();
-    else return false;
+    if (node != null) {
+      return node.isVisibleGranted();
+    }
+    else {
+      return false;
+    }
   }
 
   @Override
@@ -902,8 +928,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isNodeLeaf(ITreeNode node) {
-    if (node != null) return node.isLeaf();
-    else return false;
+    if (node != null) {
+      return node.isLeaf();
+    }
+    else {
+      return false;
+    }
   }
 
   @Override
@@ -919,8 +949,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isNodeChecked(ITreeNode node) {
-    if (node != null) return node.isChecked();
-    else return false;
+    if (node != null) {
+      return node.isChecked();
+    }
+    else {
+      return false;
+    }
   }
 
   @Override
@@ -947,8 +981,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public int getNodeStatus(ITreeNode node) {
-    if (node != null) return node.getStatus();
-    else return ITreeNode.STATUS_NON_CHANGED;
+    if (node != null) {
+      return node.getStatus();
+    }
+    else {
+      return ITreeNode.STATUS_NON_CHANGED;
+    }
   }
 
   @Override
@@ -1167,7 +1205,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void removeChildNodes(ITreeNode parent, ITreeNode[] children) {
-    if (children == null || children.length == 0) return;
+    if (children == null || children.length == 0) {
+      return;
+    }
     try {
       setTreeChanging(true);
       //
@@ -1221,7 +1261,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public ITreeNode[] resolveVirtualNodes(ITreeNode[] nodes) throws ProcessingException {
-    if (nodes == null) return new ITreeNode[0];
+    if (nodes == null) {
+      return new ITreeNode[0];
+    }
     try {
       setTreeChanging(true);
       //
@@ -1279,13 +1321,17 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   private boolean visitNodeRec(ITreeNode node, ITreeVisitor v) {
     boolean b = v.visit(node);
-    if (!b) return b;
+    if (!b) {
+      return b;
+    }
     ITreeNode[] a = node.getChildNodes();
     for (int i = 0; i < a.length; i++) {
       // it might be that the visit of a node detached the node from the tree
       if (a[i].getTree() != null) {
         b = visitNodeRec(a[i], v);
-        if (!b) return b;
+        if (!b) {
+          return b;
+        }
       }
     }
     return true;
@@ -1300,7 +1346,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (node.isVisible()) {
       if (includeParent) {
         boolean b = v.visit(node);
-        if (!b) return b;
+        if (!b) {
+          return b;
+        }
       }
       if (node.isExpanded()) {
         ITreeNode[] a = node.getFilteredChildNodes();
@@ -1309,7 +1357,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           // tree
           if (a[i].getTree() != null) {
             boolean b = visitVisibleNodeRec(a[i], v, true);
-            if (!b) return b;
+            if (!b) {
+              return b;
+            }
           }
         }
       }
@@ -1332,7 +1382,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     P_AbstractCountingTreeVisitor v = new P_AbstractCountingTreeVisitor() {
       @Override
       public boolean visit(ITreeNode node) {
-        if (node.isStatusInserted()) addCount(1);
+        if (node.isStatusInserted()) {
+          addCount(1);
+        }
         return true;
       }
     };
@@ -1345,7 +1397,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     P_AbstractCollectingTreeVisitor v = new P_AbstractCollectingTreeVisitor() {
       @Override
       public boolean visit(ITreeNode node) {
-        if (node.isStatusInserted()) addNodeToList(node);
+        if (node.isStatusInserted()) {
+          addNodeToList(node);
+        }
         return true;
       }
     };
@@ -1358,7 +1412,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     P_AbstractCountingTreeVisitor v = new P_AbstractCountingTreeVisitor() {
       @Override
       public boolean visit(ITreeNode node) {
-        if (node.isStatusUpdated()) addCount(1);
+        if (node.isStatusUpdated()) {
+          addCount(1);
+        }
         return true;
       }
     };
@@ -1371,7 +1427,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     P_AbstractCollectingTreeVisitor v = new P_AbstractCollectingTreeVisitor() {
       @Override
       public boolean visit(ITreeNode node) {
-        if (node.isStatusUpdated()) addNodeToList(node);
+        if (node.isStatusUpdated()) {
+          addNodeToList(node);
+        }
         return true;
       }
     };
@@ -1698,7 +1756,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private ITreeNode[] resolveNodes(ITreeNode[] nodes) {
-    if (nodes == null) return new ITreeNode[0];
+    if (nodes == null) {
+      return new ITreeNode[0];
+    }
     int mismatchCount = 0;
     for (int i = 0; i < nodes.length; i++) {
       if (resolveNode(nodes[i]) == null) {
@@ -1827,8 +1887,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     ArrayList<IMenu> emptySpaceMenus = new ArrayList<IMenu>();
     for (IMenu menu : e.getPopupMenus()) {
       if (menu.isVisible()) {
-        if (menu.isEmptySpaceAction()) emptySpaceMenus.add(menu);
-        else nodeMenus.add(menu);
+        if (menu.isEmptySpaceAction()) {
+          emptySpaceMenus.add(menu);
+        }
+        else {
+          nodeMenus.add(menu);
+        }
       }
     }
     if (nodeMenus.size() > 0 && emptySpaceMenus.size() > 0) {

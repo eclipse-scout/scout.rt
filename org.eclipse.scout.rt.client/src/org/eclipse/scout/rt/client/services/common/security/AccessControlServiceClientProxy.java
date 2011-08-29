@@ -118,8 +118,12 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
       return BasicHierarchyPermission.LEVEL_NONE;
     }
     if (!(p instanceof BasicHierarchyPermission)) {
-      if (checkPermission(p)) return BasicHierarchyPermission.LEVEL_ALL;
-      else return BasicHierarchyPermission.LEVEL_NONE;
+      if (checkPermission(p)) {
+        return BasicHierarchyPermission.LEVEL_ALL;
+      }
+      else {
+        return BasicHierarchyPermission.LEVEL_NONE;
+      }
     }
     BasicHierarchyPermission hp = (BasicHierarchyPermission) p;
     if (state.m_permissions == null) {

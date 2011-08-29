@@ -69,7 +69,9 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   // convert string to a real string
   @Override
   protected String parseValueInternal(String text) throws ProcessingException {
-    if (text != null && text.length() == 0) text = null;
+    if (text != null && text.length() == 0) {
+      text = null;
+    }
     return text;
   }
 

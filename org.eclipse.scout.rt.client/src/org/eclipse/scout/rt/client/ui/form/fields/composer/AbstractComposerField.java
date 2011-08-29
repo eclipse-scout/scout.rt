@@ -100,7 +100,9 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   private Class<? extends ITree> getConfiguredTree() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     Class<? extends ITree>[] f = ConfigurationUtility.filterClasses(dca, ITree.class);
-    if (f.length == 1) return f[0];
+    if (f.length == 1) {
+      return f[0];
+    }
     else {
       for (Class<? extends ITree> c : f) {
         if (c.getDeclaringClass() != AbstractComposerField.class) {
@@ -281,12 +283,16 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     if (treeFieldData.isValueSet()) {
       if (m_tree != null) {
         try {
-          if (!valueChangeTriggersEnabled) setValueChangeTriggerEnabled(false);
+          if (!valueChangeTriggersEnabled) {
+            setValueChangeTriggerEnabled(false);
+          }
           //
           m_tree.importTreeData(treeFieldData);
         }
         finally {
-          if (!valueChangeTriggersEnabled) setValueChangeTriggerEnabled(true);
+          if (!valueChangeTriggersEnabled) {
+            setValueChangeTriggerEnabled(true);
+          }
         }
       }
     }
@@ -639,7 +645,9 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         EntityNode enode = (EntityNode) node;
         String externalId = DataModelUtility.entityToExternalId(enode.getEntity());
         if (externalId == null) {
-          if (LOG.isInfoEnabled()) LOG.info("could not find entity data for: " + enode.getEntity());
+          if (LOG.isInfoEnabled()) {
+            LOG.info("could not find entity data for: " + enode.getEntity());
+          }
           return null;
         }
         ComposerEntityNodeData data = new ComposerEntityNodeData();
@@ -651,7 +659,9 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         AttributeNode anode = (AttributeNode) node;
         String externalId = DataModelUtility.attributeToExternalId(anode.getAttribute());
         if (externalId == null) {
-          if (LOG.isInfoEnabled()) LOG.info("could not find attribute data for: " + anode.getAttribute());
+          if (LOG.isInfoEnabled()) {
+            LOG.info("could not find attribute data for: " + anode.getAttribute());
+          }
           return null;
         }
         ComposerAttributeNodeData data = new ComposerAttributeNodeData();

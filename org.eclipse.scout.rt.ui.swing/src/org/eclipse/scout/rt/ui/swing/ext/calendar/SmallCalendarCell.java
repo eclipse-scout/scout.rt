@@ -102,13 +102,21 @@ public class SmallCalendarCell extends AbstractCalendarCell {
     Color c;
     if (m_dateChooser != null && !m_dateChooser.isWorkDay(getRepresentedDate())) {
       // weekend
-      if (m_isMajor) c = m_majorColorForWeekend;
-      else c = m_minorColorForWeekend;
+      if (m_isMajor) {
+        c = m_majorColorForWeekend;
+      }
+      else {
+        c = m_minorColorForWeekend;
+      }
     }
     else {
       // work
-      if (m_isMajor) c = m_majorColorForWork;
-      else c = m_minorColorForWork;
+      if (m_isMajor) {
+        c = m_majorColorForWork;
+      }
+      else {
+        c = m_minorColorForWork;
+      }
     }
     setForeground(c);
   }

@@ -252,7 +252,9 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
   }
 
   protected void handleSwingImageTransform(ImageTransformEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     // notify Scout
     final AffineTransformSpec at = new AffineTransformSpec(e.getDx(), e.getDy(), e.getSx(), e.getSy(), e.getAngle());
@@ -344,7 +346,9 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
   private class P_ScoutImageFieldListener implements ImageFieldListener {
     @Override
     public void imageFieldChanged(final ImageFieldEvent e) {
-      if (isIgnoredScoutEvent(ImageFieldEvent.class, "" + e.getType())) return;
+      if (isIgnoredScoutEvent(ImageFieldEvent.class, "" + e.getType())) {
+        return;
+      }
       //
       if (isHandleScoutImageFieldEvent(e)) {
         Runnable t = new Runnable() {

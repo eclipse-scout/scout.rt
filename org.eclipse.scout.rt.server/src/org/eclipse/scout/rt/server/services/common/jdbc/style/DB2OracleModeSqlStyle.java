@@ -26,10 +26,12 @@ public class DB2OracleModeSqlStyle extends DB2SqlStyle {
       testStatement.execute("SELECT 1 FROM DUAL");
     }
     finally {
-      if (testStatement != null) try {
-        testStatement.close();
-      }
-      catch (Throwable t) {
+      if (testStatement != null) {
+        try {
+          testStatement.close();
+        }
+        catch (Throwable t) {
+        }
       }
     }
   }

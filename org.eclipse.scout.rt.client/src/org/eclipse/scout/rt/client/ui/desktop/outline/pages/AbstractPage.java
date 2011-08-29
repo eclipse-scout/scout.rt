@@ -167,7 +167,9 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @ConfigOperation
   @Order(55)
   protected void execDataChanged(Object... dataTypes) throws ProcessingException {
-    if (getTree() == null) return;
+    if (getTree() == null) {
+      return;
+    }
     //
     HashSet<ITreeNode> pathsToSelections = new HashSet<ITreeNode>();
     for (ITreeNode node : getTree().getSelectedNodes()) {

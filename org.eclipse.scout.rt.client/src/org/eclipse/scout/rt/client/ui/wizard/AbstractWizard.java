@@ -565,7 +565,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @SuppressWarnings("unchecked")
   public <T extends IWizardStep<? extends IForm>> T getAvailableStep(Class<T> type) {
     for (IWizardStep<? extends IForm> step : m_availableStepList) {
-      if (type.isInstance(step)) return (T) step;
+      if (type.isInstance(step)) {
+        return (T) step;
+      }
     }
     return null;
   }
@@ -574,7 +576,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @SuppressWarnings("unchecked")
   public <T extends IWizardStep<? extends IForm>> T getStep(Class<T> type) {
     for (IWizardStep<? extends IForm> step : m_stepList) {
-      if (type.isInstance(step)) return (T) step;
+      if (type.isInstance(step)) {
+        return (T) step;
+      }
     }
     return null;
   }
@@ -592,7 +596,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public IWizardStep<? extends IForm> getStepBySimpleClassName(String simpleClassName) {
     for (IWizardStep<? extends IForm> step : m_stepList) {
-      if (step.getClass().getSimpleName().equals(simpleClassName)) return step;
+      if (step.getClass().getSimpleName().equals(simpleClassName)) {
+        return step;
+      }
     }
     return null;
   }
@@ -600,16 +606,22 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public IWizardStep<? extends IForm> getStepByClassName(String className) {
     for (IWizardStep<? extends IForm> step : m_stepList) {
-      if (step.getClass().getName().equals(className)) return step;
+      if (step.getClass().getName().equals(className)) {
+        return step;
+      }
     }
     return null;
   }
 
   @Override
   public int getStepIndex(IWizardStep<? extends IForm> step) {
-    if (step == null) return -1;
+    if (step == null) {
+      return -1;
+    }
     for (int i = 0; i < m_stepList.size(); i++) {
-      if (m_stepList.get(i) == step) return i;
+      if (m_stepList.get(i) == step) {
+        return i;
+      }
     }
     return -1;
   }
@@ -783,51 +795,79 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       return list;
     }
     if (from == null) {
-      if (to != null && includeTo) list.add(to);
+      if (to != null && includeTo) {
+        list.add(to);
+      }
       return list;
     }
     if (to == null) {
-      if (from != null && includeFrom) list.add(from);
+      if (from != null && includeFrom) {
+        list.add(from);
+      }
       return list;
     }
     int fromIndex = getStepIndex(from);
     int toIndex = getStepIndex(to);
     if (fromIndex == toIndex) {
-      if (includeFrom) list.add(from);
-      else if (includeTo) list.add(to);
+      if (includeFrom) {
+        list.add(from);
+      }
+      else if (includeTo) {
+        list.add(to);
+      }
       return list;
     }
     if (fromIndex == toIndex - 1) {
-      if (includeFrom) list.add(from);
-      if (includeTo) list.add(to);
+      if (includeFrom) {
+        list.add(from);
+      }
+      if (includeTo) {
+        list.add(to);
+      }
       return list;
     }
     if (fromIndex < toIndex - 1) {
-      if (includeFrom) list.add(from);
+      if (includeFrom) {
+        list.add(from);
+      }
       int n = toIndex - fromIndex - 1;
       for (int i = 0; i < n; i++) {
         list.add(m_stepList.get(fromIndex + 1 + i));
       }
-      if (includeTo) list.add(to);
+      if (includeTo) {
+        list.add(to);
+      }
       return list;
     }
     if (fromIndex == toIndex + 1) {
-      if (includeFrom) list.add(from);
-      if (includeTo) list.add(to);
+      if (includeFrom) {
+        list.add(from);
+      }
+      if (includeTo) {
+        list.add(to);
+      }
       return list;
     }
     if (fromIndex > toIndex + 1) {
-      if (includeFrom) list.add(from);
+      if (includeFrom) {
+        list.add(from);
+      }
       int n = fromIndex - toIndex - 1;
       for (int i = 0; i < n; i++) {
         list.add(m_stepList.get(fromIndex - 1 - i));
       }
-      if (includeTo) list.add(to);
+      if (includeTo) {
+        list.add(to);
+      }
       return list;
     }
     // default
-    if (includeFrom) list.add(from);
-    if (includeTo) list.add(to);
+    if (includeFrom) {
+      list.add(from);
+    }
+    if (includeTo) {
+      list.add(to);
+    }
     return list;
   }
 
@@ -1124,11 +1164,15 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   private void assertOpen() throws ProcessingException {
-    if (isClosed()) throw new ProcessingException("wizard is closed");
+    if (isClosed()) {
+      throw new ProcessingException("wizard is closed");
+    }
   }
 
   private void assertClosed() throws ProcessingException {
-    if (!isClosed()) throw new ProcessingException("wizard is already started");
+    if (!isClosed()) {
+      throw new ProcessingException("wizard is already started");
+    }
   }
 
   @Override

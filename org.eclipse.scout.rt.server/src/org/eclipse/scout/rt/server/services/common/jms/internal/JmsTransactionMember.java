@@ -241,7 +241,9 @@ public class JmsTransactionMember implements ITransactionMember {
   public void putObject(Object obj, boolean autoCommit) throws ProcessingException {
     ensureCache();
 
-    if (LOG.isInfoEnabled()) LOG.info("obj=" + obj);
+    if (LOG.isInfoEnabled()) {
+      LOG.info("obj=" + obj);
+    }
     Session session = getSession();
     //
     Message msg0 = null;

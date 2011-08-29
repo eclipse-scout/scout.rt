@@ -252,7 +252,9 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   @Override
   public void setMaxLength(int len) {
-    if (len > 0) propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
+    if (len > 0) {
+      propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
+    }
     if (isInitialized()) {
       setValue(getValue());
     }
@@ -293,8 +295,12 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   @Override
   public File getValueAsFile() {
     String value = getValue();
-    if (value == null) return null;
-    else return new File(value);
+    if (value == null) {
+      return null;
+    }
+    else {
+      return new File(value);
+    }
   }
 
   @Override
@@ -321,7 +327,9 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   @Override
   public boolean fileExists() {
-    if (getValue() == null) return false;
+    if (getValue() == null) {
+      return false;
+    }
     return getValueAsFile().exists();
   }
 
@@ -374,7 +382,9 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   @Override
   protected String parseValueInternal(String text) throws ProcessingException {
     String retVal = null;
-    if (text != null && text.trim().length() == 0) text = null;
+    if (text != null && text.trim().length() == 0) {
+      text = null;
+    }
     if (text != null) {
       text = text.trim();
       text = StringUtility.unquoteText(text);
@@ -405,7 +415,9 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
         e = "." + m_fileExtensions[0];
       }
       text = p;
-      if (p.length() > 0) text += File.separator;
+      if (p.length() > 0) {
+        text += File.separator;
+      }
       text += n;
       text += e;
       retVal = text;
@@ -443,7 +455,9 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
     @Override
     public boolean setTextFromUI(String newText) {
-      if (newText != null && newText.length() == 0) newText = null;
+      if (newText != null && newText.length() == 0) {
+        newText = null;
+      }
       return parseValue(newText);
     }
   }

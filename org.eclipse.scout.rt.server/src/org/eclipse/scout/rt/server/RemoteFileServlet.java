@@ -55,8 +55,14 @@ public class RemoteFileServlet extends HttpServletEx {
     String f = config.getInitParameter("folder"); //$NON-NLS-1$
     if (f != null) {
       f = f.replaceAll("\\\\", "/"); //$NON-NLS-1$
-      while (f.startsWith("/"))f = f.substring(1); //$NON-NLS-1$
-      while (f.endsWith("/"))f = f.substring(0, f.lastIndexOf('/')); //$NON-NLS-1$
+      while (f.startsWith("/"))
+       {
+        f = f.substring(1); //$NON-NLS-1$
+      }
+      while (f.endsWith("/"))
+       {
+        f = f.substring(0, f.lastIndexOf('/')); //$NON-NLS-1$
+      }
       m_folder = '/' + f;
     }
   }
@@ -81,7 +87,10 @@ public class RemoteFileServlet extends HttpServletEx {
     // "/") then try index.*-files.
     if (StringUtility.isNullOrEmpty(pathInfo) || pathInfo.replaceAll("\\\\", "/").endsWith("/")) { //$NON-NLS-1$ //$NON-NLS-2$
       String prefix = "/"; //$NON-NLS-1$
-      if (pathInfo != null && pathInfo.replaceAll("\\\\", "/").endsWith("/")) prefix = pathInfo.replaceAll("\\\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+      if (pathInfo != null && pathInfo.replaceAll("\\\\", "/").endsWith("/"))
+       {
+        prefix = pathInfo.replaceAll("\\\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+      }
       fileList = Arrays.asList(
           prefix + "index.html", //$NON-NLS-1$
           prefix + "index.htm", //$NON-NLS-1$
@@ -120,7 +129,9 @@ public class RemoteFileServlet extends HttpServletEx {
     IRemoteFileService rfs = SERVICES.getService(IRemoteFileService.class);
     RemoteFile spec = new RemoteFile((resourcePath == null) ? null : m_folder + resourcePath, -1);
     RemoteFile remoteFile = rfs.getRemoteFileHeader(spec);
-    if (!remoteFile.exists()) return false;
+    if (!remoteFile.exists()) {
+      return false;
+    }
 
     long lastModified = remoteFile.getLastModified();
     int contentLength = remoteFile.getContentLength();
@@ -133,7 +144,10 @@ public class RemoteFileServlet extends HttpServletEx {
 
   protected int setResponseParameters(final HttpServletRequest req, final HttpServletResponse resp, final String resourcePath, String contentType, long lastModified, int contentLength) {
     String etag = null;
-    if (lastModified != -1 && contentLength != -1) etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+    if (lastModified != -1 && contentLength != -1)
+     {
+      etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+    }
 
     // Check for cache revalidation.
     // We should prefer ETag validation as the guarantees are stronger and all
@@ -155,13 +169,21 @@ public class RemoteFileServlet extends HttpServletEx {
     }
 
     // return the full contents regularly
-    if (contentLength != -1) resp.setContentLength(contentLength);
+    if (contentLength != -1) {
+      resp.setContentLength(contentLength);
+    }
 
-    if (contentType != null) resp.setContentType(contentType);
+    if (contentType != null) {
+      resp.setContentType(contentType);
+    }
 
-    if (lastModified > 0) resp.setDateHeader(LAST_MODIFIED, lastModified);
+    if (lastModified > 0) {
+      resp.setDateHeader(LAST_MODIFIED, lastModified);
+    }
 
-    if (etag != null) resp.setHeader(ETAG, etag);
+    if (etag != null) {
+      resp.setHeader(ETAG, etag);
+    }
 
     return HttpServletResponse.SC_ACCEPTED;
   }

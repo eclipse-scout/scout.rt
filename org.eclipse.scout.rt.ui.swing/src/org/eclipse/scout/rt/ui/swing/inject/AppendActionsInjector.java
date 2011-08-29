@@ -42,8 +42,12 @@ public class AppendActionsInjector {
       if (a.isSeparator()) {
         if (!lastActionWasSeparator) {
           if (a.isVisible()) {
-            if (parent instanceof JPopupMenu) ((JPopupMenu) parent).addSeparator();
-            else if (parent instanceof JMenu) ((JMenu) parent).addSeparator();
+            if (parent instanceof JPopupMenu) {
+              ((JPopupMenu) parent).addSeparator();
+            }
+            else if (parent instanceof JMenu) {
+              ((JMenu) parent).addSeparator();
+            }
             else {
               LOG.warn("invalid container for separator: " + parent);
             }

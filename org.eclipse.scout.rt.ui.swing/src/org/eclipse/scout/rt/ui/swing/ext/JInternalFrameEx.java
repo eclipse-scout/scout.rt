@@ -173,13 +173,17 @@ public class JInternalFrameEx extends JInternalFrame implements IWaitSupport {
   public JDesktopPane getDesktopPane() {
     Container p;
     p = getParent();
-    while (p != null && !(p instanceof JDesktopPane))
+    while (p != null && !(p instanceof JDesktopPane)) {
       p = p.getParent();
+    }
 
     if (p == null) {
-      if (getDesktopIcon() != null) p = getDesktopIcon().getParent();
-      while (p != null && !(p instanceof JDesktopPane))
+      if (getDesktopIcon() != null) {
+        p = getDesktopIcon().getParent();
+      }
+      while (p != null && !(p instanceof JDesktopPane)) {
         p = p.getParent();
+      }
     }
     return (JDesktopPane) p;
   }

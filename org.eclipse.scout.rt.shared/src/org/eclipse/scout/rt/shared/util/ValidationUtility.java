@@ -58,19 +58,29 @@ public final class ValidationUtility {
     }
     int min = ((Number) minLength).intValue();
     if (value instanceof String) {
-      if (((String) value).length() < min) throw new ProcessingException(displayName + " is too short");
+      if (((String) value).length() < min) {
+        throw new ProcessingException(displayName + " is too short");
+      }
     }
     else if (value.getClass().isArray()) {
-      if (Array.getLength(value) < min) throw new ProcessingException(displayName + " is too short");
+      if (Array.getLength(value) < min) {
+        throw new ProcessingException(displayName + " is too short");
+      }
     }
     else if (value instanceof Collection<?>) {
-      if (((Collection<?>) value).size() < min) throw new ProcessingException(displayName + " is too short");
+      if (((Collection<?>) value).size() < min) {
+        throw new ProcessingException(displayName + " is too short");
+      }
     }
     else if (value instanceof Map<?, ?>) {
-      if (((Map<?, ?>) value).size() < min) throw new ProcessingException(displayName + " is too short");
+      if (((Map<?, ?>) value).size() < min) {
+        throw new ProcessingException(displayName + " is too short");
+      }
     }
     else {
-      if (value.toString().length() < min) throw new ProcessingException(displayName + " is too short");
+      if (value.toString().length() < min) {
+        throw new ProcessingException(displayName + " is too short");
+      }
     }
   }
 
@@ -80,19 +90,29 @@ public final class ValidationUtility {
     }
     int max = ((Number) maxLength).intValue();
     if (value instanceof String) {
-      if (((String) value).length() > max) throw new ProcessingException(displayName + " is too long");
+      if (((String) value).length() > max) {
+        throw new ProcessingException(displayName + " is too long");
+      }
     }
     else if (value.getClass().isArray()) {
-      if (Array.getLength(value) > max) throw new ProcessingException(displayName + " is too long");
+      if (Array.getLength(value) > max) {
+        throw new ProcessingException(displayName + " is too long");
+      }
     }
     else if (value instanceof Collection<?>) {
-      if (((Collection<?>) value).size() > max) throw new ProcessingException(displayName + " is too long");
+      if (((Collection<?>) value).size() > max) {
+        throw new ProcessingException(displayName + " is too long");
+      }
     }
     else if (value instanceof Map<?, ?>) {
-      if (((Map<?, ?>) value).size() > max) throw new ProcessingException(displayName + " is too long");
+      if (((Map<?, ?>) value).size() > max) {
+        throw new ProcessingException(displayName + " is too long");
+      }
     }
     else {
-      if (value.toString().length() > max) throw new ProcessingException(displayName + " is too long");
+      if (value.toString().length() > max) {
+        throw new ProcessingException(displayName + " is too long");
+      }
     }
   }
 
@@ -103,7 +123,9 @@ public final class ValidationUtility {
     }
     Comparable<? extends Object> min = ((Comparable<?>) minValue);
     if (value instanceof Comparable<?>) {
-      if (((Comparable<Object>) value).compareTo(min) < 0) throw new ProcessingException(displayName + " is too small");
+      if (((Comparable<Object>) value).compareTo(min) < 0) {
+        throw new ProcessingException(displayName + " is too small");
+      }
     }
     else {
       throw new ProcessingException(displayName + " is not comparable");
@@ -117,7 +139,9 @@ public final class ValidationUtility {
     }
     Comparable<? extends Object> max = ((Comparable<?>) maxValue);
     if (value instanceof Comparable<?>) {
-      if (((Comparable<Object>) value).compareTo(max) > 0) throw new ProcessingException(displayName + " is too large");
+      if (((Comparable<Object>) value).compareTo(max) > 0) {
+        throw new ProcessingException(displayName + " is too large");
+      }
     }
     else {
       throw new ProcessingException(displayName + " is not comparable");

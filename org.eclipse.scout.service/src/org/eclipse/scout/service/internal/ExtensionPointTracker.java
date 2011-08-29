@@ -64,7 +64,10 @@ public class ExtensionPointTracker {
     m_registry = registry;
     m_extensionPointId = extensionPointId;
     m_listener = (listener != null) ? listener : NULL_LISTENER;
-    if (extensionPointId == null || -1 == extensionPointId.indexOf('.')) throw new IllegalArgumentException("Unexpected Extension Point Identifier: " + extensionPointId); //$NON-NLS-1$
+    if (extensionPointId == null || -1 == extensionPointId.indexOf('.'))
+     {
+      throw new IllegalArgumentException("Unexpected Extension Point Identifier: " + extensionPointId); //$NON-NLS-1$
+    }
     int lastDotIndex = extensionPointId.lastIndexOf('.');
     m_namespace = extensionPointId.substring(0, lastDotIndex);
     m_simpleName = extensionPointId.substring(lastDotIndex + 1);

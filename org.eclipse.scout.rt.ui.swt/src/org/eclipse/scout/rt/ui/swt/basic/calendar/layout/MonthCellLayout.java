@@ -52,9 +52,11 @@ public class MonthCellLayout extends Layout {
 
     // init pos array
     int[][] ary = new int[numColumns][numLines];
-    for (int v = 0; v < numLines; v++)
-      for (int h = 0; h < numColumns; h++)
+    for (int v = 0; v < numLines; v++) {
+      for (int h = 0; h < numColumns; h++) {
         ary[h][v] = -1;
+      }
+    }
 
     // 1st pass
     int colIndex = 0;
@@ -81,7 +83,9 @@ public class MonthCellLayout extends Layout {
       }
 
       colIndex = (colIndex + 1) % numColumns;
-      if (colIndex % numColumns == 0) lineIndex++;
+      if (colIndex % numColumns == 0) {
+        lineIndex++;
+      }
     }
 
     int lastId = -1;

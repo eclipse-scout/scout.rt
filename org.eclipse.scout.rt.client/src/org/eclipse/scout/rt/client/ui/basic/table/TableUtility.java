@@ -153,8 +153,12 @@ public final class TableUtility {
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < result.length; i++) {
           if (i > 0) {
-            if (multilineText) buf.append("\n");
-            else buf.append(", ");
+            if (multilineText) {
+              buf.append("\n");
+            }
+            else {
+              buf.append(", ");
+            }
           }
           buf.append(result[i].getText());
         }

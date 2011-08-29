@@ -60,8 +60,9 @@ public class SwtColors {
   }
 
   public static SwtColors getInstance () {
-    if (instance == null)
+    if (instance == null) {
       instance = new SwtColors ();
+    }
 
     return instance;
   }

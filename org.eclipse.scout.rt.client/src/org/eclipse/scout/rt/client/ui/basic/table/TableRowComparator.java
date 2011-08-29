@@ -31,7 +31,9 @@ public class TableRowComparator implements Comparator<ITableRow> {
       if (!m_columns[i].getHeaderCell().isSortAscending()) {
         c = -c;
       }
-      if (c != 0) return c;
+      if (c != 0) {
+        return c;
+      }
     }
     return 0;
   }

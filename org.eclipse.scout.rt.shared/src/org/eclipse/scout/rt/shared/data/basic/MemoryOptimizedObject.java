@@ -77,8 +77,12 @@ public class MemoryOptimizedObject implements Serializable {
 
   protected synchronized Object getValueInternal(int bitPos) {
     int index = getIndexFor(bitPos);
-    if (index >= 0) return m_data[index];
-    else return null;
+    if (index >= 0) {
+      return m_data[index];
+    }
+    else {
+      return null;
+    }
   }
 
   private int getIndexFor(int bitPos) {

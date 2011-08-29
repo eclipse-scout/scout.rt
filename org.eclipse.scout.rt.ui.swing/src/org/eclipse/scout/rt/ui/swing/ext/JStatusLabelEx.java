@@ -190,7 +190,9 @@ public class JStatusLabelEx extends JComponent {
         buf.append(m_status.getTitle());
       }
       if (m_status.getMessage() != null) {
-        if (buf.length() > 0) buf.append("\n");
+        if (buf.length() > 0) {
+          buf.append("\n");
+        }
         buf.append(m_status.getMessage());
       }
       m_statusLabel.setToolTipText(buf.toString());

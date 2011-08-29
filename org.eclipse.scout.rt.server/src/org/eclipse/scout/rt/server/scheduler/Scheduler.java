@@ -111,7 +111,9 @@ public class Scheduler implements IScheduler {
 
   @Override
   public void addJob(ISchedulerJob newJob) {
-    if (newJob == null) throw new IllegalArgumentException("job must not be null");
+    if (newJob == null) {
+      throw new IllegalArgumentException("job must not be null");
+    }
     synchronized (m_queueLock) {
       newJob.setDisposed(false);
       String groupId = newJob.getGroupId();
@@ -308,7 +310,9 @@ public class Scheduler implements IScheduler {
         }
         else if (job.acceptTick(tick)) {
           m_runningJobs.add(job);
-          if (LOG.isInfoEnabled()) LOG.info("job " + job + " triggered at " + tick);
+          if (LOG.isInfoEnabled()) {
+            LOG.info("job " + job + " triggered at " + tick);
+          }
           P_JobRunner runner = new P_JobRunner(job, tick);
           Thread t = new Thread(runner, "Scheduler.JobLauncher." + job.getGroupId() + "." + job.getJobId());
           t.setDaemon(true);
@@ -389,16 +393,22 @@ public class Scheduler implements IScheduler {
 
     @Override
     public void run() {
-      if (LOG.isInfoEnabled()) LOG.info("scheduler started");
+      if (LOG.isInfoEnabled()) {
+        LOG.info("scheduler started");
+      }
       while (!isStopSignal()) {
         try {
           if (isActive()) {
             TickSignal signal = m_ticker.waitForNextTick();
-            if (LOG.isDebugEnabled()) LOG.debug("tick " + signal);
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("tick " + signal);
+            }
             visitAllJobs(signal);
           }
           else {
-            if (LOG.isDebugEnabled()) LOG.debug("ticking suspended");
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("ticking suspended");
+            }
             try {
               sleep(1000);
             }
@@ -411,7 +421,9 @@ public class Scheduler implements IScheduler {
           LOG.error("unexpected error: ", t);
         }
       }
-      if (LOG.isInfoEnabled()) LOG.info("scheduler stopped");
+      if (LOG.isInfoEnabled()) {
+        LOG.info("scheduler stopped");
+      }
     }
   }
 

@@ -315,7 +315,9 @@ public class ServicesView extends DefaultView {
                 @Override
                 public void run() {
                   String propText = getFormParameter("value", "");
-                  if (propText.length() == 0) propText = null;
+                  if (propText.length() == 0) {
+                    propText = null;
+                  }
                   try {
                     service.changeProperty(finalDesc, propText);
                   }
@@ -403,14 +405,20 @@ public class ServicesView extends DefaultView {
   }
 
   private String createSignature(Class c) {
-    if (c == null) return "void";
-    else return createSignature(new Class[]{c});
+    if (c == null) {
+      return "void";
+    }
+    else {
+      return createSignature(new Class[]{c});
+    }
   }
 
   private String createSignature(Class[] a) {
     StringBuffer sig = new StringBuffer();
     for (Class c : a) {
-      if (sig.length() > 0) sig.append(", ");
+      if (sig.length() > 0) {
+        sig.append(", ");
+      }
       sig.append(c.getSimpleName());
     }
     return sig.toString();

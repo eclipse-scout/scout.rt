@@ -830,9 +830,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       AbstractFormFieldData data = dataMap.get(f);
       // locally declared field properties
       Class stopClass;
-      if (data instanceof AbstractTableFieldData) stopClass = AbstractTableFieldData.class;
-      else if (data instanceof AbstractValueFieldData) stopClass = AbstractValueFieldData.class;
-      else stopClass = AbstractFormFieldData.class;
+      if (data instanceof AbstractTableFieldData) {
+        stopClass = AbstractTableFieldData.class;
+      }
+      else if (data instanceof AbstractValueFieldData) {
+        stopClass = AbstractValueFieldData.class;
+      }
+      else {
+        stopClass = AbstractFormFieldData.class;
+      }
       properties = BeanUtility.getProperties(data, stopClass, new FormDataPropertyFilter());
       for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
         AbstractPropertyData pd = data.getPropertyById(it.next());
@@ -848,9 +854,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       AbstractFormFieldData data = dataMap.get(f);
       // locally declared field properties
       Class stopClass;
-      if (data instanceof AbstractTableFieldData) stopClass = AbstractTableFieldData.class;
-      else if (data instanceof AbstractValueFieldData) stopClass = AbstractValueFieldData.class;
-      else stopClass = AbstractFormFieldData.class;
+      if (data instanceof AbstractTableFieldData) {
+        stopClass = AbstractTableFieldData.class;
+      }
+      else if (data instanceof AbstractValueFieldData) {
+        stopClass = AbstractValueFieldData.class;
+      }
+      else {
+        stopClass = AbstractFormFieldData.class;
+      }
       properties = BeanUtility.getProperties(data, stopClass, new FormDataPropertyFilter());
       for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
         AbstractPropertyData pd = data.getPropertyById(it.next());
@@ -1156,7 +1168,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     catch (ProcessingException e) {
       // clear search
-      if (m_searchFilter != null) m_searchFilter.clear();
+      if (m_searchFilter != null) {
+        m_searchFilter.clear();
+      }
       // store was not successfully stored
       m_formStored = false;
       throwVetoExceptionInternal(e);
@@ -1166,7 +1180,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     catch (Throwable t) {
       // clear search
-      if (m_searchFilter != null) m_searchFilter.clear();
+      if (m_searchFilter != null) {
+        m_searchFilter.clear();
+      }
       throw new ProcessingException("form: " + getTitle(), t);
     }
     fireFormStoreAfter();

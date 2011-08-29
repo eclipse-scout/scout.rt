@@ -174,7 +174,9 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
   @Override
   public HyperlinkEx createHyperlink(Composite parent, String text, int style) {
     HyperlinkEx hyperlink = new HyperlinkEx(parent, style | getOrientation());
-    if (text != null) hyperlink.setText(text);
+    if (text != null) {
+      hyperlink.setText(text);
+    }
     getHyperlinkGroup().add(hyperlink);
     adapt(hyperlink);
     hyperlink.addListener(SWT.KeyDown, new P_HyperlinkKeyListener());

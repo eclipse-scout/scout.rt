@@ -148,7 +148,9 @@ public class SwtCalendar extends Composite implements PaintListener {
     //logger.debug("Refreshing layout...");
 
     // get rid of old panel
-    if (m_calendarPanel != null && !m_calendarPanel.isDisposed()) m_calendarPanel.dispose();
+    if (m_calendarPanel != null && !m_calendarPanel.isDisposed()) {
+      m_calendarPanel.dispose();
+    }
 
     // create a new one
     m_calendarPanel = new CentralPanel(m_centralComposite, SWT.NONE, this);
@@ -231,13 +233,17 @@ public class SwtCalendar extends Composite implements PaintListener {
   }
 
   protected void repaintCellRange(Date a, Date b) {
-    if (b == null) b = a;
+    if (b == null) {
+      b = a;
+    }
     Calendar cal = Calendar.getInstance();
     cal.setTime(truncDate(a));
     while (cal.getTime().compareTo(b) <= 0) {
       AbstractCell cell = m_calendarPanel.getCellFromDate(cal.getTime());
       // repaint?
-      if (cell != null) cell.redraw();
+      if (cell != null) {
+        cell.redraw();
+      }
 
       cal.add(Calendar.DATE, 1);
     }
@@ -269,11 +275,15 @@ public class SwtCalendar extends Composite implements PaintListener {
     if (newMode != DisplayMode.MONTH &&
         newMode != DisplayMode.WEEK &&
         newMode != DisplayMode.WORKWEEK &&
-        newMode != DisplayMode.DAY) throw new IllegalArgumentException("illegal display mode: " + newMode);
+        newMode != DisplayMode.DAY) {
+      throw new IllegalArgumentException("illegal display mode: " + newMode);
+    }
 
     // changed?
     int oldMode = m_selectionScope.getDisplayMode();
-    if (oldMode == newMode) return;
+    if (oldMode == newMode) {
+      return;
+    }
 
     // set new mode
     m_selectionScope.setDisplayMode(newMode);
@@ -292,7 +302,9 @@ public class SwtCalendar extends Composite implements PaintListener {
 
     // changed?
     boolean oldMode = m_selectionScope.getCondensedMode();
-    if (oldMode == mode) return;
+    if (oldMode == mode) {
+      return;
+    }
 
     // set new condensed mode
     m_selectionScope.setCondensedMode(mode);
@@ -306,11 +318,15 @@ public class SwtCalendar extends Composite implements PaintListener {
 
   public void setFirstDayOfWeek(int day) {
 
-    if (day < 1 || day > 7) throw new IllegalArgumentException("Illegal first day of week: " + day);
+    if (day < 1 || day > 7) {
+      throw new IllegalArgumentException("Illegal first day of week: " + day);
+    }
 
     // changed?
     int oldDay = m_selectionScope.getFirstDayOfWeek();
-    if (oldDay == day) return;
+    if (oldDay == day) {
+      return;
+    }
 
     // set new day
     //m_selectionScope.setFirstDayOfWeek(day);
@@ -496,13 +512,17 @@ public class SwtCalendar extends Composite implements PaintListener {
 
     // null check
     if (c == null) {
-      if (m_viewDate != null) return;
+      if (m_viewDate != null) {
+        return;
+      }
       c = Calendar.getInstance();
     }
 
     // changed?
     c = truncDate(c);
-    if (m_viewDate.equals(c)) return;
+    if (m_viewDate.equals(c)) {
+      return;
+    }
 
     // for refresh
     boolean showingScopeChanged = changedViewDateInterval(c);
@@ -515,7 +535,9 @@ public class SwtCalendar extends Composite implements PaintListener {
     // calculate view date start/end
     calcViewDateInterval();
 
-    if (showingScopeChanged) refreshLayout();
+    if (showingScopeChanged) {
+      refreshLayout();
+    }
 
   }
 
@@ -541,7 +563,9 @@ public class SwtCalendar extends Composite implements PaintListener {
   }
 
   public static Calendar truncDate(Calendar c) {
-    if (c == null) return null;
+    if (c == null) {
+      return null;
+    }
     c.set(Calendar.HOUR, 0);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.MINUTE, 0);
@@ -585,7 +609,9 @@ public class SwtCalendar extends Composite implements PaintListener {
   /** set selection to the given date c */
   public void setSelectedDate(Calendar c) {
     c = truncDate(c);
-    if (c != null) m_selectedDate = c;
+    if (c != null) {
+      m_selectedDate = c;
+    }
   }
 
   public void setSelectedDateFromUI(Calendar c) {
@@ -594,7 +620,9 @@ public class SwtCalendar extends Composite implements PaintListener {
 
   /** update selection with the set selected date */
   public void updateSelection() {
-    if (m_calendarPanel != null) m_calendarPanel.updateSelection(m_selectedDate);
+    if (m_calendarPanel != null) {
+      m_calendarPanel.updateSelection(m_selectedDate);
+    }
   }
 
   public Calendar getSelectedDate() {
@@ -672,13 +700,21 @@ public class SwtCalendar extends Composite implements PaintListener {
   @Override
   public void dispose() {
     // dispose all contained swt widgets
-    if (m_browserBar != null && !m_browserBar.isDisposed()) m_browserBar.dispose();
+    if (m_browserBar != null && !m_browserBar.isDisposed()) {
+      m_browserBar.dispose();
+    }
 
-    if (m_centralComposite != null && !m_centralComposite.isDisposed()) m_centralComposite.dispose();
+    if (m_centralComposite != null && !m_centralComposite.isDisposed()) {
+      m_centralComposite.dispose();
+    }
 
-    if (m_calendarPanel != null && !m_calendarPanel.isDisposed()) m_calendarPanel.dispose();
+    if (m_calendarPanel != null && !m_calendarPanel.isDisposed()) {
+      m_calendarPanel.dispose();
+    }
 
-    if (m_selectionScope != null && !m_selectionScope.isDisposed()) m_selectionScope.dispose();
+    if (m_selectionScope != null && !m_selectionScope.isDisposed()) {
+      m_selectionScope.dispose();
+    }
 
     super.dispose();
   }

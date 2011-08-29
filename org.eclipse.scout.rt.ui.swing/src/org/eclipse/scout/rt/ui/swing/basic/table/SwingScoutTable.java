@@ -210,7 +210,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (getUpdateSwingFromScoutLock().isAcquired()) return;
+        if (getUpdateSwingFromScoutLock().isAcquired()) {
+          return;
+        }
         //
         if (getScoutObject() != null) {
           int[] rowIndexes = getSwingTable().getSelectedRows();
@@ -260,7 +262,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void setContextColumnFromSwing(int viewIndex) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     registerColumnHeaderPopupOwner(viewIndex);
     //
@@ -415,7 +419,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void setSelectionFromScout() {
-    if (getScoutObject() == null) return;
+    if (getScoutObject() == null) {
+      return;
+    }
     //
     ITableRow[] scoutRows = getScoutObject().getSelectedRows();
     ListSelectionModel lsm = getSwingTableSelectionModel();
@@ -459,7 +465,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void setSelectionFromSwing(final int[] swingRows) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null) {
       if (getSwingTable().getSelectionModel().getValueIsAdjusting()) {
@@ -515,7 +523,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void storeColumnWidthsFromSwing(List<TableColumn> swingColumns) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     // store gui index and width of column
     SwingTableColumnModel cm = getSwingTableColumnModel();
@@ -704,7 +714,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void handleSwingEmptySpacePopup(final MouseEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null) {
       // notify Scout
@@ -722,7 +734,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void handleSwingDropAction(int rowIndex, Transferable swingTransferable) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null) {
       if (swingTransferable != null) {
@@ -744,7 +758,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void handleSwingRowPopup(final MouseEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null) {
       // notify Scout
@@ -762,7 +778,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void handleSwingRowClick(int rowIndex) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null && rowIndex >= 0) {
       final ITableRow scoutRow = swingToScoutRow(rowIndex);
@@ -782,7 +800,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void handleSwingHyperlinkAction(int rowIndex, int colIndex, final URL url) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null && rowIndex >= 0 && colIndex >= 0) {
       final ITableRow scoutRow = swingToScoutRow(rowIndex);
@@ -803,7 +823,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void handleSwingRowAction(int rowIndex) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     if (getScoutObject() != null && rowIndex >= 0) {
       final ITableRow scoutRow = swingToScoutRow(rowIndex);
@@ -822,7 +844,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void handleSwingHeaderSort(final int sortIndex, final boolean shiftDown, final boolean controlDown) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     setContextColumnFromSwing(sortIndex);
     if (sortIndex >= 0) {
@@ -843,7 +867,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected void handleSwingHeaderPopup(final MouseEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     final int sortIndex = getSwingTable().getTableHeader().columnAtPoint(e.getPoint());
     setContextColumnFromSwing(sortIndex);
@@ -879,7 +905,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected Transferable handleSwingDragRequest() {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return null;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return null;
+    }
 
     if (getScoutObject().getDragType() == 0) {
       return null;
@@ -921,7 +949,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected ITableRow[] swingToScoutRows(int[] swingRows) {
-    if (swingRows == null || swingRows.length == 0) return new ITableRow[0];
+    if (swingRows == null || swingRows.length == 0) {
+      return new ITableRow[0];
+    }
     //
     ITable table = getScoutObject();
     if (table != null) {
@@ -962,7 +992,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   }
 
   protected int[] scoutToSwingRows(ITableRow[] rows) {
-    if (rows == null || rows.length == 0) return new int[0];
+    if (rows == null || rows.length == 0) {
+      return new int[0];
+    }
     //
     ITable table = getScoutObject();
     if (table != null) {
@@ -1259,7 +1291,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       }
       else {
         // sorting only if there was no dragging
-        if (m_pressedPoint == null) m_pressedPoint = e.getPoint();
+        if (m_pressedPoint == null) {
+          m_pressedPoint = e.getPoint();
+        }
         m_pressedPoint.translate(-e.getX(), -e.getY());
         int r = Math.abs(m_pressedPoint.x) + Math.abs(m_pressedPoint.y);
         if (r < 4 && e.getClickCount() == 1) {
@@ -1272,12 +1306,16 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           }
         }
       }
-      if (fix != null) fix.mouseReleased(this, e);
+      if (fix != null) {
+        fix.mouseReleased(this, e);
+      }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-      if (fix.mouseClicked()) return;
+      if (fix.mouseClicked()) {
+        return;
+      }
       if (e.getClickCount() == 2) {
         if (getSwingTable().getTableHeader().getCursor().getType() != Cursor.DEFAULT_CURSOR) {
           final int[] oldColumnWidths = new int[getSwingTableColumnModel().getColumnCount()];
@@ -1358,12 +1396,16 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       if (e.isPopupTrigger()) {
         handleSwingRowPopup(e);
       }
-      if (fix != null) fix.mouseReleased(this, e);
+      if (fix != null) {
+        fix.mouseReleased(this, e);
+      }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-      if (fix.mouseClicked()) return;
+      if (fix.mouseClicked()) {
+        return;
+      }
       if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
         int pressedRow = getSwingTable().rowAtPoint(e.getPoint());
         if (pressedRow >= 0) {
@@ -1403,7 +1445,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     @Override
     public void tableChanged(final TableEvent e) {
       if (isHandleScoutTableEvent(new TableEvent[]{e})) {
-        if (isIgnoredScoutEvent(TableEvent.class, "" + e.getType())) return;
+        if (isIgnoredScoutEvent(TableEvent.class, "" + e.getType())) {
+          return;
+        }
         //
         Runnable t = new Runnable() {
           @Override
@@ -1431,7 +1475,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             filteredList.add(a[i]);
           }
         }
-        if (filteredList.size() == 0) return;
+        if (filteredList.size() == 0) {
+          return;
+        }
         Runnable t = new Runnable() {
           @Override
           public void run() {

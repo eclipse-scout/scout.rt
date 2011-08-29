@@ -580,8 +580,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   @Override
   public T getSelectedValue() {
     ITableRow row = m_table.getSelectedRow();
-    if (row != null) return getValue(row);
-    else return null;
+    if (row != null) {
+      return getValue(row);
+    }
+    else {
+      return null;
+    }
   }
 
   @Override
@@ -601,8 +605,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   @Override
   public String getSelectedDisplayText() {
     ITableRow row = m_table.getSelectedRow();
-    if (row != null) return getDisplayText(row);
-    else return null;
+    if (row != null) {
+      return getDisplayText(row);
+    }
+    else {
+      return null;
+    }
   }
 
   @Override

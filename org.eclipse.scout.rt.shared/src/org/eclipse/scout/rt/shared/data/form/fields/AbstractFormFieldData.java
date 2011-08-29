@@ -125,7 +125,9 @@ public abstract class AbstractFormFieldData implements Serializable {
   }
 
   public AbstractFormFieldData getFieldById(String id) {
-    if (m_fieldMap == null) return null;
+    if (m_fieldMap == null) {
+      return null;
+    }
     for (AbstractFormFieldData f : m_fieldMap.values()) {
       if (f.getFieldId().equals(id)) {
         return f;
@@ -136,7 +138,9 @@ public abstract class AbstractFormFieldData implements Serializable {
 
   @SuppressWarnings("unchecked")
   public <T extends AbstractFormFieldData> T getFieldByClass(Class<T> c) {
-    if (m_fieldMap == null) return null;
+    if (m_fieldMap == null) {
+      return null;
+    }
     return (T) m_fieldMap.get(c);
   }
 
@@ -155,7 +159,9 @@ public abstract class AbstractFormFieldData implements Serializable {
   }
 
   public AbstractFormFieldData[] getFields() {
-    if (m_fieldMap == null) return new AbstractFormFieldData[0];
+    if (m_fieldMap == null) {
+      return new AbstractFormFieldData[0];
+    }
     return m_fieldMap.values().toArray(new AbstractFormFieldData[m_fieldMap.size()]);
   }
 

@@ -116,10 +116,14 @@ public class InternalNetAuthenticator extends Authenticator {
       catch (Throwable ex) {
         Throwable t = ex;
         if (t instanceof InvocationTargetException) {
-          if (t.getCause() != null) t = t.getCause();
+          if (t.getCause() != null) {
+            t = t.getCause();
+          }
         }
         else if (t instanceof UndeclaredThrowableException) {
-          if (t.getCause() != null) t = t.getCause();
+          if (t.getCause() != null) {
+            t = t.getCause();
+          }
         }
         throw t;
       }

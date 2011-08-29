@@ -75,10 +75,16 @@ public class WidgetPrinter {
 
   private void printToFile(Map<String, Object> parameters) throws Throwable {
     m_printedFile = (File) parameters.remove("file");
-    if (m_printedFile == null) throw new IllegalArgumentException("parameter \"file\" must not be null");
+    if (m_printedFile == null) {
+      throw new IllegalArgumentException("parameter \"file\" must not be null");
+    }
     String contentType = (String) parameters.remove("contentType");
-    if (contentType == null) contentType = "image/jpg";
-    if (!contentType.startsWith("image/")) throw new IllegalArgumentException("only supporting contentTypes image/*");
+    if (contentType == null) {
+      contentType = "image/jpg";
+    }
+    if (!contentType.startsWith("image/")) {
+      throw new IllegalArgumentException("only supporting contentTypes image/*");
+    }
     for (String n : parameters.keySet()) {
       LOG.warn("Unknown parameter: " + n + "=" + parameters.get(n));
     }
@@ -87,7 +93,9 @@ public class WidgetPrinter {
     BufferedImage img = createBufferedImage();
     String imageFormat = contentType.substring(contentType.indexOf("/") + 1);
     boolean ok = ImageIO.write(img, imageFormat, m_printedFile);
-    if (!ok) throw new IOException("no appropriate writer was found for imageFormat \"" + imageFormat + "\"");
+    if (!ok) {
+      throw new IOException("no appropriate writer was found for imageFormat \"" + imageFormat + "\"");
+    }
   }
 
   private BufferedImage createBufferedImage() {

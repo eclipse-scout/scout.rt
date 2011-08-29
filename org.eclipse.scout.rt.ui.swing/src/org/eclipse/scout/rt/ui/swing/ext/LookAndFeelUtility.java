@@ -35,8 +35,12 @@ public final class LookAndFeelUtility {
    */
   public static Color translucent(Color color, int ratio) {
     int alpha = (int) Math.round(ratio * 2.5);
-    if (alpha < 0) alpha = 0;
-    else if (alpha > 255) alpha = 255;
+    if (alpha < 0) {
+      alpha = 0;
+    }
+    else if (alpha > 255) {
+      alpha = 255;
+    }
     return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
   }
 

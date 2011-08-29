@@ -61,8 +61,12 @@ public class TablePageState extends AbstractPageState implements Serializable, C
   }
 
   public List<CompositeObject> getSelectedChildrenPrimaryKeys() {
-    if (m_selectedChildrenPrimaryKeys == null) return Collections.emptyList();
-    else return Collections.unmodifiableList(m_selectedChildrenPrimaryKeys);
+    if (m_selectedChildrenPrimaryKeys == null) {
+      return Collections.emptyList();
+    }
+    else {
+      return Collections.unmodifiableList(m_selectedChildrenPrimaryKeys);
+    }
   }
 
   public void setSelectedChildrenPrimaryKeys(List<CompositeObject> list) {

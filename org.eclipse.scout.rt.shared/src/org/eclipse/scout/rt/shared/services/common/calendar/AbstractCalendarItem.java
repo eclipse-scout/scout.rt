@@ -147,7 +147,9 @@ public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Ser
     attributes.put("id", m_id);
     attributes.put("owner", m_owner);
     attributes.put("subject", m_subject);
-    if (m_body != null) attributes.put("body", m_body.replace('\n', ' ').replace('\r', ' ').substring(0, Math.min(200, m_body.length())));
+    if (m_body != null) {
+      attributes.put("body", m_body.replace('\n', ' ').replace('\r', ' ').substring(0, Math.min(200, m_body.length())));
+    }
     attributes.put("recurrencyPattern", m_recurrencyPattern);
   }
 
@@ -161,7 +163,9 @@ public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Ser
     int count = 0;
     for (Map.Entry<String, Object> e : attributes.entrySet()) {
       if (e.getValue() != null) {
-        if (count > 0) b.append(", ");
+        if (count > 0) {
+          b.append(", ");
+        }
         b.append(e.getKey() + "=" + e.getValue());
         count++;
       }

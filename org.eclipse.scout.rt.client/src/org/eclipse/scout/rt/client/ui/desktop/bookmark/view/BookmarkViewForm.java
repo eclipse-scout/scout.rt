@@ -147,7 +147,9 @@ public class BookmarkViewForm extends AbstractForm {
           protected void execChangedValue() throws ProcessingException {
             String s = StringUtility.emptyIfNull(getValue()).trim();
             if (s.length() > 0) {
-              if (!s.endsWith("*")) s = s + "*";
+              if (!s.endsWith("*")) {
+                s = s + "*";
+              }
               m_lowercaseFilterPattern = Pattern.compile(StringUtility.toRegExPattern(s.toLowerCase()));
               getUserBookmarkTreeField().getTree().addNodeFilter(this);
             }

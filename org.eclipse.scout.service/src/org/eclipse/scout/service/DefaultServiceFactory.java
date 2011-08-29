@@ -38,8 +38,12 @@ public class DefaultServiceFactory implements IServiceFactory {
   private Object m_serviceLock = new Object();
 
   public DefaultServiceFactory(Class<?> serviceClass) {
-    if (serviceClass == null) throw new IllegalArgumentException("service type must not be null");
-    if (serviceClass.isInterface()) throw new IllegalArgumentException("service type must not be an interface: " + serviceClass);
+    if (serviceClass == null) {
+      throw new IllegalArgumentException("service type must not be null");
+    }
+    if (serviceClass.isInterface()) {
+      throw new IllegalArgumentException("service type must not be an interface: " + serviceClass);
+    }
     m_serviceClass = serviceClass;
   }
 

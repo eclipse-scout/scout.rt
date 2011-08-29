@@ -103,12 +103,18 @@ class MultiTimeRange implements Cloneable {
       return;
     }
     Object oldEntry = m_multipleTimeRangeMap.put(from, new TimeRange(from, to));
-    if (oldEntry != null) throw new RuntimeException("Error: should not have an entry for key: " + from);
+    if (oldEntry != null) {
+      throw new RuntimeException("Error: should not have an entry for key: " + from);
+    }
   }
 
   private void checkParams(Date from, Date to) {
-    if (from == null || to == null) throw new IllegalArgumentException("from and to must not be null.");
-    if (!to.after(from)) throw new IllegalArgumentException("time range must be > 0.");
+    if (from == null || to == null) {
+      throw new IllegalArgumentException("from and to must not be null.");
+    }
+    if (!to.after(from)) {
+      throw new IllegalArgumentException("time range must be > 0.");
+    }
   }
 
   /**
@@ -205,7 +211,9 @@ class MultiTimeRange implements Cloneable {
    * @since 06.02.2006 - tha@bsiag.com
    */
   public Date getBeginDate() {
-    if (m_multipleTimeRangeMap.isEmpty()) return null;
+    if (m_multipleTimeRangeMap.isEmpty()) {
+      return null;
+    }
     return (m_multipleTimeRangeMap.get(m_multipleTimeRangeMap.firstKey())).getFrom();
   }
 
@@ -215,15 +223,21 @@ class MultiTimeRange implements Cloneable {
    * @since 06.02.2006 - tha@bsiag.com
    */
   public Date getEndDate() {
-    if (m_multipleTimeRangeMap.isEmpty()) return null;
+    if (m_multipleTimeRangeMap.isEmpty()) {
+      return null;
+    }
     return (m_multipleTimeRangeMap.get(m_multipleTimeRangeMap.lastKey())).getTo();
   }
 
   public boolean contains(Date representedDate) {
-    if (representedDate == null || m_multipleTimeRangeMap.isEmpty()) return false;
+    if (representedDate == null || m_multipleTimeRangeMap.isEmpty()) {
+      return false;
+    }
     Date firstKeyAfterRepresentedDate = new Date(representedDate.getTime() + 1);
     SortedMap headMap = m_multipleTimeRangeMap.headMap(firstKeyAfterRepresentedDate);
-    if (headMap.isEmpty()) return false;
+    if (headMap.isEmpty()) {
+      return false;
+    }
     return (m_multipleTimeRangeMap.get(headMap.lastKey())).contains(representedDate);
   }
 

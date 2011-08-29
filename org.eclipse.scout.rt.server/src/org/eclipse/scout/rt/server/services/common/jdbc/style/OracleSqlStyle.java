@@ -61,10 +61,12 @@ public class OracleSqlStyle extends AbstractSqlStyle {
       testStatement.execute("SELECT 1 FROM DUAL");
     }
     finally {
-      if (testStatement != null) try {
-        testStatement.close();
-      }
-      catch (Throwable t) {
+      if (testStatement != null) {
+        try {
+          testStatement.close();
+        }
+        catch (Throwable t) {
+        }
       }
     }
   }

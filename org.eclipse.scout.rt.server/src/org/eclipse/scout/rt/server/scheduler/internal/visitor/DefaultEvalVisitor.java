@@ -36,14 +36,18 @@ public class DefaultEvalVisitor implements IEvalVisitor {
   @Override
   public boolean toBoolean(Object o) {
     Boolean b = TypeCastUtility.castValue(o, Boolean.class);
-    if (b == null) b = false;
+    if (b == null) {
+      b = false;
+    }
     return b;
   }
 
   @Override
   public int toInt(Object o) {
     Integer n = TypeCastUtility.castValue(o, Integer.class);
-    if (n == null) n = 0;
+    if (n == null) {
+      n = 0;
+    }
     return n;
   }
 }

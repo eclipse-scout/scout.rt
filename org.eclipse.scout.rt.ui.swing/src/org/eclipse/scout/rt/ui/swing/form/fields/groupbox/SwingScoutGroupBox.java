@@ -252,7 +252,9 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
 
   protected void changeContainerLabel() {
     String s = getScoutObject().isLabelVisible() ? getScoutObject().getLabel() : null;
-    if (s == null) s = "";
+    if (s == null) {
+      s = "";
+    }
     if (!s.equals(containerLabel)) {
       containerLabel = s;
       if (containerBorderInstalled) {
@@ -338,7 +340,9 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
   }
 
   protected void handleSwingGroupBoxExpanded(final boolean expanded) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     //notify Scout
     Runnable t = new Runnable() {

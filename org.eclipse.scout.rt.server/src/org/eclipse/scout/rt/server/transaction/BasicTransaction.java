@@ -33,12 +33,18 @@ public class BasicTransaction implements ITransaction {
   public void registerResource(ITransactionMember member) {
     synchronized (m_memberMapLock) {
       String memberId = member.getMemberId();
-      if (LOG.isDebugEnabled()) LOG.debug("" + memberId + "/" + member);
-      if (m_memberMap == null) m_memberMap = new HashMap<String, Object>();
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("" + memberId + "/" + member);
+      }
+      if (m_memberMap == null) {
+        m_memberMap = new HashMap<String, Object>();
+      }
       // release existing
       ITransactionMember old = (ITransactionMember) m_memberMap.get(memberId);
       if (old != null) {
-        if (LOG.isWarnEnabled()) LOG.warn("releasing overwritten " + memberId + "/" + old);
+        if (LOG.isWarnEnabled()) {
+          LOG.warn("releasing overwritten " + memberId + "/" + old);
+        }
         old.release();
       }
       m_memberMap.put(memberId, member);
@@ -48,9 +54,13 @@ public class BasicTransaction implements ITransaction {
   @Override
   public ITransactionMember getMember(String memberId) {
     synchronized (m_memberMapLock) {
-      if (m_memberMap == null) m_memberMap = new HashMap<String, Object>();
+      if (m_memberMap == null) {
+        m_memberMap = new HashMap<String, Object>();
+      }
       ITransactionMember res = (ITransactionMember) m_memberMap.get(memberId);
-      if (LOG.isDebugEnabled()) LOG.debug("" + memberId + "->" + res);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("" + memberId + "->" + res);
+      }
       return res;
     }
   }
@@ -58,7 +68,9 @@ public class BasicTransaction implements ITransaction {
   @Override
   public ITransactionMember[] getMembers() {
     synchronized (m_memberMapLock) {
-      if (m_memberMap == null) m_memberMap = new HashMap<String, Object>();
+      if (m_memberMap == null) {
+        m_memberMap = new HashMap<String, Object>();
+      }
       return m_memberMap.values().toArray(new ITransactionMember[0]);
     }
   }
@@ -72,7 +84,9 @@ public class BasicTransaction implements ITransaction {
           Object o = m_memberMap.get(memberId);
           if (o == member) {
             m_memberMap.remove(memberId);
-            if (LOG.isDebugEnabled()) LOG.debug("" + memberId + "->" + o);
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("" + memberId + "->" + o);
+            }
           }
         }
       }
@@ -83,7 +97,9 @@ public class BasicTransaction implements ITransaction {
   public boolean commitPhase1() {
     Collection xaList;
     synchronized (m_memberMapLock) {
-      if (m_memberMap == null) m_memberMap = new HashMap<String, Object>();
+      if (m_memberMap == null) {
+        m_memberMap = new HashMap<String, Object>();
+      }
       xaList = new ArrayList<Object>(m_memberMap.values());
     }
     boolean allSuccessful = true;
@@ -91,7 +107,9 @@ public class BasicTransaction implements ITransaction {
       ITransactionMember res = (ITransactionMember) it.next();
       try {
         if (res.needsCommit()) {
-          if (LOG.isDebugEnabled()) LOG.debug(" " + res);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(" " + res);
+          }
           boolean b = res.commitPhase1();
           allSuccessful = allSuccessful && b;
         }
@@ -107,14 +125,18 @@ public class BasicTransaction implements ITransaction {
   public void commitPhase2() {
     Collection xaList;
     synchronized (m_memberMapLock) {
-      if (m_memberMap == null) m_memberMap = new HashMap<String, Object>();
+      if (m_memberMap == null) {
+        m_memberMap = new HashMap<String, Object>();
+      }
       xaList = new ArrayList<Object>(m_memberMap.values());
     }
     for (Iterator it = xaList.iterator(); it.hasNext();) {
       ITransactionMember res = (ITransactionMember) it.next();
       try {
         if (res.needsCommit()) {
-          if (LOG.isDebugEnabled()) LOG.debug(" " + res);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(" " + res);
+          }
           res.commitPhase2();
         }
       }
@@ -128,15 +150,21 @@ public class BasicTransaction implements ITransaction {
   public void rollback() {
     Collection xaList;
     synchronized (m_memberMapLock) {
-      if (m_memberMap == null) m_memberMap = new HashMap<String, Object>();
+      if (m_memberMap == null) {
+        m_memberMap = new HashMap<String, Object>();
+      }
       xaList = new ArrayList<Object>(m_memberMap.values());
     }
-    if (LOG.isDebugEnabled()) LOG.debug("");
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("");
+    }
     for (Iterator it = xaList.iterator(); it.hasNext();) {
       ITransactionMember res = (ITransactionMember) it.next();
       try {
         if (res.needsCommit()) {
-          if (LOG.isDebugEnabled()) LOG.debug(" " + res);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(" " + res);
+          }
           res.rollback();
         }
       }
@@ -150,15 +178,21 @@ public class BasicTransaction implements ITransaction {
   public void release() {
     Collection xaList;
     synchronized (m_memberMapLock) {
-      if (m_memberMap == null) m_memberMap = new HashMap<String, Object>();
+      if (m_memberMap == null) {
+        m_memberMap = new HashMap<String, Object>();
+      }
       xaList = new ArrayList<Object>(m_memberMap.values());
       m_memberMap.clear();
     }
-    if (LOG.isDebugEnabled()) LOG.debug("");
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("");
+    }
     for (Iterator it = xaList.iterator(); it.hasNext();) {
       ITransactionMember res = (ITransactionMember) it.next();
       try {
-        if (LOG.isDebugEnabled()) LOG.debug(" " + res);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(" " + res);
+        }
         res.release();
       }
       catch (Throwable t) {

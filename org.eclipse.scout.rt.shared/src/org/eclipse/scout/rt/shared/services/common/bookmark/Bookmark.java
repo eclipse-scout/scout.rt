@@ -138,8 +138,12 @@ public class Bookmark implements Serializable, Cloneable {
   }
 
   public List<AbstractPageState> getPath() {
-    if (m_path == null) return Collections.emptyList();
-    else return Collections.unmodifiableList(m_path);
+    if (m_path == null) {
+      return Collections.emptyList();
+    }
+    else {
+      return Collections.unmodifiableList(m_path);
+    }
   }
 
   public void addPathElement(AbstractPageState state) {
@@ -165,10 +169,12 @@ public class Bookmark implements Serializable, Cloneable {
         throw new ProcessingException("title: " + getTitle(), e);
       }
       finally {
-        if (oout != null) try {
-          oout.close();
-        }
-        catch (Throwable t) {
+        if (oout != null) {
+          try {
+            oout.close();
+          }
+          catch (Throwable t) {
+          }
         }
       }
     }
@@ -190,10 +196,12 @@ public class Bookmark implements Serializable, Cloneable {
       throw new ProcessingException("title: " + getTitle(), e);
     }
     finally {
-      if (oin != null) try {
-        oin.close();
-      }
-      catch (Throwable t) {
+      if (oin != null) {
+        try {
+          oin.close();
+        }
+        catch (Throwable t) {
+        }
       }
     }
     m_serializedData = data;

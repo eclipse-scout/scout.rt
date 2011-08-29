@@ -57,15 +57,23 @@ public class SequenceDesc implements java.io.Serializable {
     StringBuffer buf = new StringBuffer();
     buf.append("<sequence");
     buf.append(" name=\"" + m_name + "\"");
-    if (m_min != 0) buf.append(" min=\"" + m_min + "\"");
-    if (m_max != 0) buf.append(" max=\"" + m_max + "\"");
-    if (m_increment != 0) buf.append(" increment=\"" + m_increment + "\"");
+    if (m_min != 0) {
+      buf.append(" min=\"" + m_min + "\"");
+    }
+    if (m_max != 0) {
+      buf.append(" max=\"" + m_max + "\"");
+    }
+    if (m_increment != 0) {
+      buf.append(" increment=\"" + m_increment + "\"");
+    }
     buf.append("/>\n");
     return buf.toString();
   }
 
   private long checkLongRange(BigDecimal d) {
-    if (d != null && d.compareTo(BigDecimal.valueOf(0)) >= 0 && d.compareTo(BigDecimal.valueOf(Long.MAX_VALUE)) <= 0) return d.longValue();
+    if (d != null && d.compareTo(BigDecimal.valueOf(0)) >= 0 && d.compareTo(BigDecimal.valueOf(Long.MAX_VALUE)) <= 0) {
+      return d.longValue();
+    }
     return 0;
   }
 

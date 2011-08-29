@@ -140,7 +140,9 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
 
   @Override
   public ICodeType findCodeTypeById(Object id) {
-    if (id == null) return null;
+    if (id == null) {
+      return null;
+    }
     ServiceState state = getServiceState();
     synchronized (state.m_cacheLock) {
       for (ICodeType ct : state.m_cache.values()) {
@@ -154,7 +156,9 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
 
   @Override
   public ICodeType findCodeTypeById(Long partitionId, Object id) {
-    if (id == null) return null;
+    if (id == null) {
+      return null;
+    }
     ServiceState state = getServiceState(partitionId);
     synchronized (state.m_cacheLock) {
       for (ICodeType ct : state.m_cache.values()) {
@@ -205,7 +209,9 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
   }
 
   private <T extends ICode> Class getDeclaringCodeTypeClass(final Class<T> type) {
-    if (type == null) return null;
+    if (type == null) {
+      return null;
+    }
     Class declaringCodeTypeClass = null;
     if (type.getDeclaringClass() != null) {
       // code is inner type of code type or another code
@@ -300,11 +306,15 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
 
   @Override
   public BundleClassDescriptor[] getAllCodeTypeClasses(String classPrefix) {
-    if (classPrefix == null) return new BundleClassDescriptor[0];
+    if (classPrefix == null) {
+      return new BundleClassDescriptor[0];
+    }
     ServiceState state = getServiceState();
     synchronized (state.m_codeTypeClassDescriptorMapLock) {
       BundleClassDescriptor[] a = state.m_codeTypeClassDescriptorMap.get(classPrefix);
-      if (a != null) return a;
+      if (a != null) {
+        return a;
+      }
       //
       HashSet<BundleClassDescriptor> localCodeTypes = new HashSet<BundleClassDescriptor>();
       for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {

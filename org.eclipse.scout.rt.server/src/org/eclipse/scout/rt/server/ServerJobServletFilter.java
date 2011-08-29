@@ -77,7 +77,9 @@ public class ServerJobServletFilter implements Filter {
       if (serverSession == null) {
         String qname = config.getInitParameter("session");
         Class<? extends IServerSession> serverSessionClass;
-        if (qname == null) throw new ServletException("Expected init-param \"session\"");
+        if (qname == null) {
+          throw new ServletException("Expected init-param \"session\"");
+        }
         int i = qname.lastIndexOf('.');
         try {
           serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);

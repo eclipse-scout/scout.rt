@@ -36,7 +36,9 @@ public class CodeTypeCache {
   }
 
   public ICodeType findCodeTypeById(Object id) {
-    if (id == null) return null;
+    if (id == null) {
+      return null;
+    }
     synchronized (m_cacheLock) {
       for (ICodeType ct : m_cache.values()) {
         if (id.equals(ct.getId())) {
@@ -75,7 +77,9 @@ public class CodeTypeCache {
 
   @SuppressWarnings("unchecked")
   public <T extends ICode> T getCode(final Class<T> type) {
-    if (type == null) return null;
+    if (type == null) {
+      return null;
+    }
     Class declaringCodeTypeClass = null;
     if (type.getDeclaringClass() != null) {
       // code is inner type of code type or another code

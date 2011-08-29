@@ -69,7 +69,9 @@ public class SwingIconLocator {
       if (img == null && !m_imagesByNameCache.containsKey(name)) {
         img = createImageImpl(name);
         m_imagesByNameCache.put(name, img);
-        if (LOG.isDebugEnabled()) LOG.debug("load image '" + name + "' as " + img);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("load image '" + name + "' as " + img);
+        }
         if (img == null) {
           warnImageNotFound(name);
         }
@@ -106,7 +108,9 @@ public class SwingIconLocator {
   }
 
   protected Image decorateForDevelopment(Image img) {
-    if (img == null) return img;
+    if (img == null) {
+      return img;
+    }
     try {
       ImageIcon icon = new ImageIcon(img);
       int w = icon.getIconWidth();

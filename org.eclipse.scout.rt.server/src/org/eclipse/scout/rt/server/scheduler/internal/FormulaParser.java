@@ -67,7 +67,9 @@ public class FormulaParser {
 
   public FormulaRoot parse(String formula) throws ParseException {
     str = formula;
-    if (str != null) str = str.trim();
+    if (str != null) {
+      str = str.trim();
+    }
     FormulaRoot root;
     if (str == null || str.length() == 0) {
       root = new FormulaRoot(new NullAtom());
@@ -77,8 +79,12 @@ public class FormulaParser {
       pos = new ParsePosition(0);
       try {
         INode t = parseToken(0);
-        if (t == null) throw new ParseException("no node parsed", pos.getIndex());
-        if (pos.getIndex() < str.length()) throw new ParseException("formula not fully parsed (index " + pos.getIndex() + " of " + str.length() + ") : " + formula, pos.getIndex());
+        if (t == null) {
+          throw new ParseException("no node parsed", pos.getIndex());
+        }
+        if (pos.getIndex() < str.length()) {
+          throw new ParseException("formula not fully parsed (index " + pos.getIndex() + " of " + str.length() + ") : " + formula, pos.getIndex());
+        }
         root = new FormulaRoot(t);
       }
       catch (ParseException ce) {
@@ -93,7 +99,9 @@ public class FormulaParser {
   }
 
   private INode parseToken(int level) throws ParseException {
-    if (level >= 5) return parseAtom();
+    if (level >= 5) {
+      return parseAtom();
+    }
     INode leftToken;
     if ((leftToken = parseToken(level + 1)) != null) {
       int save = pos.getIndex();
@@ -176,37 +184,83 @@ public class FormulaParser {
       // ok,found op, valid in current level ?
       String op = str.substring(index, pos.getIndex());
       if (level == 1) {
-        if (op.equals("&&")) return op;
-        else if (op.equals("||")) return op;
-        else return null;
+        if (op.equals("&&")) {
+          return op;
+        }
+        else if (op.equals("||")) {
+          return op;
+        }
+        else {
+          return null;
+        }
       }
       else if (level == 2) {
-        if (op.equals("==")) return op;
-        else if (op.equals("<=")) return op;
-        else if (op.equals(">=")) return op;
-        else if (op.equals("<>")) return op;
-        else if (op.equals("!=")) return op;
-        else if (op.equals("<")) return op;
-        else if (op.equals(">")) return op;
-        else return null;
+        if (op.equals("==")) {
+          return op;
+        }
+        else if (op.equals("<=")) {
+          return op;
+        }
+        else if (op.equals(">=")) {
+          return op;
+        }
+        else if (op.equals("<>")) {
+          return op;
+        }
+        else if (op.equals("!=")) {
+          return op;
+        }
+        else if (op.equals("<")) {
+          return op;
+        }
+        else if (op.equals(">")) {
+          return op;
+        }
+        else {
+          return null;
+        }
       }
       else if (level == 3) {
-        if (op.equals("+")) return op;
-        else if (op.equals("-")) return op;
-        else return null;
+        if (op.equals("+")) {
+          return op;
+        }
+        else if (op.equals("-")) {
+          return op;
+        }
+        else {
+          return null;
+        }
       }
       else if (level == 4) {
-        if (op.equals("*")) return op;
-        else if (op.equals("/")) return op;
-        else if (op.equals("%")) return op;
-        else return null;
+        if (op.equals("*")) {
+          return op;
+        }
+        else if (op.equals("/")) {
+          return op;
+        }
+        else if (op.equals("%")) {
+          return op;
+        }
+        else {
+          return null;
+        }
       }
       else if (level == 5) {
-        if (op.equals("^")) return op;
-        else if (op.equals("&")) return op;
-        else if (op.equals("|")) return op;
-        else if (op.equals("<<")) return op;
-        else if (op.equals(">>")) return op;
+        if (op.equals("^")) {
+          return op;
+        }
+        else if (op.equals("&")) {
+          return op;
+        }
+        else if (op.equals("|")) {
+          return op;
+        }
+        else if (op.equals("<<")) {
+          return op;
+        }
+        else if (op.equals(">>")) {
+          return op;
+        }
         return null;
       }
       else {
@@ -220,14 +274,30 @@ public class FormulaParser {
 
   private INode parseAtom() throws ParseException {
     INode cmd;
-    if ((cmd = parseWrappedToken()) != null) return cmd;
-    if ((cmd = parseNotToken()) != null) return cmd;
-    if ((cmd = parseNullAtom()) != null) return cmd;
-    if ((cmd = parseIntegerAtom()) != null) return cmd;
-    if ((cmd = parseBooleanAtom()) != null) return cmd;
-    if ((cmd = parseStringAtom()) != null) return cmd;
-    if ((cmd = parseSignalRef()) != null) return cmd;
-    if ((cmd = parseArgRef()) != null) return cmd;
+    if ((cmd = parseWrappedToken()) != null) {
+      return cmd;
+    }
+    if ((cmd = parseNotToken()) != null) {
+      return cmd;
+    }
+    if ((cmd = parseNullAtom()) != null) {
+      return cmd;
+    }
+    if ((cmd = parseIntegerAtom()) != null) {
+      return cmd;
+    }
+    if ((cmd = parseBooleanAtom()) != null) {
+      return cmd;
+    }
+    if ((cmd = parseStringAtom()) != null) {
+      return cmd;
+    }
+    if ((cmd = parseSignalRef()) != null) {
+      return cmd;
+    }
+    if ((cmd = parseArgRef()) != null) {
+      return cmd;
+    }
     else {
       // failed
       return null;
@@ -284,7 +354,9 @@ public class FormulaParser {
       pos.setIndex(i);
       String s = str.substring(index, pos.getIndex());
       s = s.trim();
-      if (s.startsWith("+")) s = s.substring(1);
+      if (s.startsWith("+")) {
+        s = s.substring(1);
+      }
       if (s.indexOf(".") >= 0) {
         throw new ParseException("only supporting integer numbers: " + s, index);
       }
@@ -334,17 +406,39 @@ public class FormulaParser {
     int index = pos.getIndex();
     String name = parseName();
     if (name != null) {
-      if (name.equalsIgnoreCase("second")) return new SignalRef(SignalRef.SECOND);
-      else if (name.equalsIgnoreCase("minute")) return new SignalRef(SignalRef.MINUTE);
-      else if (name.equalsIgnoreCase("hour")) return new SignalRef(SignalRef.HOUR);
-      else if (name.equalsIgnoreCase("day")) return new SignalRef(SignalRef.DAY);
-      else if (name.equalsIgnoreCase("week")) return new SignalRef(SignalRef.WEEK);
-      else if (name.equalsIgnoreCase("month")) return new SignalRef(SignalRef.MONTH);
-      else if (name.equalsIgnoreCase("year")) return new SignalRef(SignalRef.YEAR);
-      else if (name.equalsIgnoreCase("dayOfWeek")) return new SignalRef(SignalRef.DAY_OF_WEEK);
-      else if (name.equalsIgnoreCase("dayOfMonthReverse")) return new SignalRef(SignalRef.DAY_OF_MONTH_REVERSE);
-      else if (name.equalsIgnoreCase("dayOfYear")) return new SignalRef(SignalRef.DAY_OF_YEAR);
-      else if (name.equalsIgnoreCase("secondOfDay")) return new SignalRef(SignalRef.SECOND_OF_DAY);
+      if (name.equalsIgnoreCase("second")) {
+        return new SignalRef(SignalRef.SECOND);
+      }
+      else if (name.equalsIgnoreCase("minute")) {
+        return new SignalRef(SignalRef.MINUTE);
+      }
+      else if (name.equalsIgnoreCase("hour")) {
+        return new SignalRef(SignalRef.HOUR);
+      }
+      else if (name.equalsIgnoreCase("day")) {
+        return new SignalRef(SignalRef.DAY);
+      }
+      else if (name.equalsIgnoreCase("week")) {
+        return new SignalRef(SignalRef.WEEK);
+      }
+      else if (name.equalsIgnoreCase("month")) {
+        return new SignalRef(SignalRef.MONTH);
+      }
+      else if (name.equalsIgnoreCase("year")) {
+        return new SignalRef(SignalRef.YEAR);
+      }
+      else if (name.equalsIgnoreCase("dayOfWeek")) {
+        return new SignalRef(SignalRef.DAY_OF_WEEK);
+      }
+      else if (name.equalsIgnoreCase("dayOfMonthReverse")) {
+        return new SignalRef(SignalRef.DAY_OF_MONTH_REVERSE);
+      }
+      else if (name.equalsIgnoreCase("dayOfYear")) {
+        return new SignalRef(SignalRef.DAY_OF_YEAR);
+      }
+      else if (name.equalsIgnoreCase("secondOfDay")) {
+        return new SignalRef(SignalRef.SECOND_OF_DAY);
+      }
     }
     pos.setIndex(index);
     return null;
@@ -392,7 +486,9 @@ public class FormulaParser {
       }
       int index = pos.getIndex();
       int len = str.length();
-      if (index >= len) return 0x00;
+      if (index >= len) {
+        return 0x00;
+      }
       char ch = str.charAt(index);
       if (index < len && notCharacterMap.indexOf(ch) < 0) {// regular character
         pos.setIndex(index + 1);
@@ -452,21 +548,25 @@ public class FormulaParser {
     int len = str.length();
     int i = index;
     // white
-    while (i < len && S_MAP.indexOf(str.charAt(i)) >= 0)
+    while (i < len && S_MAP.indexOf(str.charAt(i)) >= 0) {
       i++;
+    }
     // comment?
     while (i + 1 < len && str.charAt(i) == '/' && str.charAt(i + 1) == '*') {
       i = i + 2;
       int end = str.indexOf("*/", i);
-      if (end < 0) throw new ParseException("missing comment end: */", i);
+      if (end < 0) {
+        throw new ParseException("missing comment end: */", i);
+      }
       String text = str.substring(i, end).trim();
       if (text.length() > 0) {
         // found comment
       }
       i = end + 2;
       // white
-      while (i < len && S_MAP.indexOf(str.charAt(i)) >= 0)
+      while (i < len && S_MAP.indexOf(str.charAt(i)) >= 0) {
         i++;
+      }
     }
     if (i - index >= numRequired) {
       pos.setIndex(i);

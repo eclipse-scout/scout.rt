@@ -572,13 +572,17 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   public final void loadChildren() throws ProcessingException {
     ITree tree = getTree();
     try {
-      if (tree != null) tree.setTreeChanging(true);
+      if (tree != null) {
+        tree.setTreeChanging(true);
+      }
       //
       // backup currently selected tree node and its path to root
       boolean oldSelectionOwned = false;
       int oldSelectionDirectChildIndex = -1;
       ITreeNode oldSelectedNode = null;
-      if (tree != null) oldSelectedNode = tree.getSelectedNode();
+      if (tree != null) {
+        oldSelectedNode = tree.getSelectedNode();
+      }
       Object[] oldSelectedRowKeys = null;
       if (oldSelectedNode != null) {
         ITreeNode t = oldSelectedNode;
@@ -645,7 +649,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }
     }
     finally {
-      if (tree != null) tree.setTreeChanging(false);
+      if (tree != null) {
+        tree.setTreeChanging(false);
+      }
     }
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
     if (desktop != null) {

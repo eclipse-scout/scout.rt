@@ -65,12 +65,16 @@ public class JTextFieldWithDropDownButton extends JTextFieldEx {
 
       @Override
       public void mouseReleased(MouseEvent e) {
-        if(fix!=null) fix.mouseReleased(this, e);
+        if(fix!=null) {
+          fix.mouseReleased(this, e);
+        }
       }
 
       @Override
       public void mouseClicked(MouseEvent e) {
-        if (fix.mouseClicked()) return;
+        if (fix.mouseClicked()) {
+          return;
+        }
         Region r = getRegionTouchedByCursor(e.getPoint());
         if (r == Region.TEXTAREA) {
           return;

@@ -133,8 +133,12 @@ public class SwtMock implements IGuiMock {
     waitUntil(new WaitCondition<Object>() {
       @Override
       public Object run() {
-        if (isWindowActive(title)) return true;
-        else return null;
+        if (isWindowActive(title)) {
+          return true;
+        }
+        else {
+          return null;
+        }
       }
     });
     waitForIdle();
@@ -145,8 +149,12 @@ public class SwtMock implements IGuiMock {
     waitUntil(new WaitCondition<Object>() {
       @Override
       public Object run() {
-        if (isWindowOpen(title)) return true;
-        else return null;
+        if (isWindowOpen(title)) {
+          return true;
+        }
+        else {
+          return null;
+        }
       }
     });
     waitForIdle();
@@ -184,9 +192,13 @@ public class SwtMock implements IGuiMock {
       @Override
       public Boolean run() throws Throwable {
         CTabItem view = findWorkbenchView(title);
-        if (view != null && view.getParent().getSelection() == view) return true;
+        if (view != null && view.getParent().getSelection() == view) {
+          return true;
+        }
         Shell shell = findShell(title);
-        if (shell != null && shell == getActiveShell()) return true;
+        if (shell != null && shell == getActiveShell()) {
+          return true;
+        }
         return false;
       }
     });
@@ -198,9 +210,13 @@ public class SwtMock implements IGuiMock {
       @Override
       public Boolean run() throws Throwable {
         CTabItem view = findWorkbenchView(title);
-        if (view != null) return true;
+        if (view != null) {
+          return true;
+        }
         Shell shell = findShell(title);
-        if (shell != null) return true;
+        if (shell != null) {
+          return true;
+        }
         return false;
       }
     });
@@ -735,21 +751,45 @@ public class SwtMock implements IGuiMock {
   }
 
   protected FieldType getFieldTypeOf(Control c) {
-    if (c.isDisposed()) return null;
-    if (!c.isVisible()) return null;
+    if (c.isDisposed()) {
+      return null;
+    }
+    if (!c.isVisible()) {
+      return null;
+    }
     //
-    if (c instanceof Label) return FieldType.Label;
-    if (c instanceof Text) return FieldType.Text;
-    if (c instanceof StyledText) return FieldType.Text;
-    if (c instanceof Table) return FieldType.Table;
-    if (c instanceof Tree) return FieldType.Tree;
-    if (c instanceof DropDownButton) return FieldType.DropdownButton;
+    if (c instanceof Label) {
+      return FieldType.Label;
+    }
+    if (c instanceof Text) {
+      return FieldType.Text;
+    }
+    if (c instanceof StyledText) {
+      return FieldType.Text;
+    }
+    if (c instanceof Table) {
+      return FieldType.Table;
+    }
+    if (c instanceof Tree) {
+      return FieldType.Tree;
+    }
+    if (c instanceof DropDownButton) {
+      return FieldType.DropdownButton;
+    }
     if (c instanceof Button) {
       int style = c.getStyle();
-      if ((style & SWT.CHECK) != 0) return FieldType.Checkbox;
-      else if ((style & SWT.RADIO) != 0) return FieldType.RadioButton;
-      else if (c.getParent() instanceof Scrollable) return FieldType.ScrollButton;
-      else return FieldType.PushButton;
+      if ((style & SWT.CHECK) != 0) {
+        return FieldType.Checkbox;
+      }
+      else if ((style & SWT.RADIO) != 0) {
+        return FieldType.RadioButton;
+      }
+      else if (c.getParent() instanceof Scrollable) {
+        return FieldType.ScrollButton;
+      }
+      else {
+        return FieldType.PushButton;
+      }
     }
     return null;
   }
@@ -781,7 +821,9 @@ public class SwtMock implements IGuiMock {
   }
 
   protected TreeItem findTreeItemRec(TreeItem[] items, String nodeText) {
-    if (items == null) return null;
+    if (items == null) {
+      return null;
+    }
     //
     for (TreeItem item : items) {
       if (nodeText.equals(item.getText())) {
@@ -796,7 +838,9 @@ public class SwtMock implements IGuiMock {
   }
 
   protected void addTreeItemsRec(TreeItem[] items, List<String> list) {
-    if (items == null) return;
+    if (items == null) {
+      return;
+    }
     //
     for (TreeItem item : items) {
       list.add(item.getText(0));
@@ -859,7 +903,9 @@ public class SwtMock implements IGuiMock {
               Composite parent = shell;
               for (Control o : SwtUtility.findChildComponents(parent, Control.class)) {
                 if (o instanceof Button) {
-                  if (cleanButtonLabel(label).equals(cleanButtonLabel(((Button) o).getText()))) return (Button) o;
+                  if (cleanButtonLabel(label).equals(cleanButtonLabel(((Button) o).getText()))) {
+                    return (Button) o;
+                  }
                 }
               }
             }

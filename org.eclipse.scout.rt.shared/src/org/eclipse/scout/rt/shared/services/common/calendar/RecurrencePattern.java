@@ -195,7 +195,9 @@ public class RecurrencePattern implements java.io.Serializable {
   }
 
   public void setType(int v) {
-    if (v < TYPE_DAILY || v > TYPE_YEARLY_SPEC) throw new IllegalArgumentException("type (" + v + ") must be in [TYPE_DAILY,TYPE_YEARLY_SPEC]");
+    if (v < TYPE_DAILY || v > TYPE_YEARLY_SPEC) {
+      throw new IllegalArgumentException("type (" + v + ") must be in [TYPE_DAILY,TYPE_YEARLY_SPEC]");
+    }
     m_type = v;
   }
 
@@ -212,7 +214,9 @@ public class RecurrencePattern implements java.io.Serializable {
   }
 
   public void setInstance(int v) {
-    if (v != 0 && (v < INST_FIRST || v > INST_LAST)) throw new IllegalArgumentException("instance (" + v + ") must be in [INST_FIRST,INST_LAST]");
+    if (v != 0 && (v < INST_FIRST || v > INST_LAST)) {
+      throw new IllegalArgumentException("instance (" + v + ") must be in [INST_FIRST,INST_LAST]");
+    }
     m_instance = v;
   }
 
@@ -349,7 +353,9 @@ public class RecurrencePattern implements java.io.Serializable {
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {
-          if (count >= m_occurrences) break;
+          if (count >= m_occurrences) {
+            break;
+          }
         }
       }
     }
@@ -384,7 +390,9 @@ public class RecurrencePattern implements java.io.Serializable {
            */
           if (m_noEndDate == false) {
             if (m_lastDate == null) {
-              if (count >= m_occurrences) break;
+              if (count >= m_occurrences) {
+                break;
+              }
             }
           }
         }
@@ -401,7 +409,9 @@ public class RecurrencePattern implements java.io.Serializable {
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {
-          if (count >= m_occurrences) break;
+          if (count >= m_occurrences) {
+            break;
+          }
         }
       }
     }
@@ -445,7 +455,9 @@ public class RecurrencePattern implements java.io.Serializable {
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {
-          if (count >= m_occurrences) break;
+          if (count >= m_occurrences) {
+            break;
+          }
         }
       }
     }
@@ -509,7 +521,9 @@ public class RecurrencePattern implements java.io.Serializable {
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {
-          if (count >= m_occurrences) break;
+          if (count >= m_occurrences) {
+            break;
+          }
         }
       }
     }
@@ -546,7 +560,9 @@ public class RecurrencePattern implements java.io.Serializable {
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {
-          if (count >= m_occurrences) break;
+          if (count >= m_occurrences) {
+            break;
+          }
         }
       }
     }
@@ -612,7 +628,9 @@ public class RecurrencePattern implements java.io.Serializable {
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {
-          if (count >= m_occurrences) break;
+          if (count >= m_occurrences) {
+            break;
+          }
         }
       }
     }

@@ -117,12 +117,24 @@ public class JmsJndiConfig {
 
   public long getCrc() {
     CRC32 crc = new CRC32();
-    if (m_connectionFactoryJndiName != null) crc.update(m_connectionFactoryJndiName.getBytes());
-    if (m_initialContextFactory != null) crc.update(m_initialContextFactory.getBytes());
-    if (m_jndiName != null) crc.update(m_jndiName.getBytes());
-    if (m_password != null) crc.update(m_password.getBytes());
-    if (m_userName != null) crc.update(m_userName.getBytes());
-    if (m_providerUrl != null) crc.update(m_providerUrl.getBytes());
+    if (m_connectionFactoryJndiName != null) {
+      crc.update(m_connectionFactoryJndiName.getBytes());
+    }
+    if (m_initialContextFactory != null) {
+      crc.update(m_initialContextFactory.getBytes());
+    }
+    if (m_jndiName != null) {
+      crc.update(m_jndiName.getBytes());
+    }
+    if (m_password != null) {
+      crc.update(m_password.getBytes());
+    }
+    if (m_userName != null) {
+      crc.update(m_userName.getBytes());
+    }
+    if (m_providerUrl != null) {
+      crc.update(m_providerUrl.getBytes());
+    }
 
     return crc.getValue();
   }
@@ -153,8 +165,12 @@ public class JmsJndiConfig {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (!(obj instanceof JmsJndiConfig)) return false;
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof JmsJndiConfig)) {
+      return false;
+    }
     return compareTo(obj) == 0;
   }
 
@@ -168,6 +184,8 @@ public class JmsJndiConfig {
         CompareUtility.compareTo(c.getUserName(), this.m_userName) == 0) {
       return 0;
     }
-    else return -1;
+    else {
+      return -1;
+    }
   }
 }

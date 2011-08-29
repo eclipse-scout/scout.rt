@@ -47,11 +47,15 @@ public final class SERVICES {
    */
   public static <T extends Object> T getService(Class<T> serviceInterfaceClass, String filter) {
     Activator a = Activator.getDefault();
-    if (a == null || serviceInterfaceClass == null) return null;
+    if (a == null || serviceInterfaceClass == null) {
+      return null;
+    }
     // start the tracker, blocks until all service factories have been registered
     a.getServicesExtensionManager().start();
     BundleContext context = a.getBundle().getBundleContext();
-    if (context == null) return null;
+    if (context == null) {
+      return null;
+    }
 
     ServiceReference serviceReference = null;
     if (filter == null) {
@@ -122,12 +126,16 @@ public final class SERVICES {
   @SuppressWarnings("unchecked")
   public static <T extends Object> T[] getServices(Class<T> serviceInterfaceClass, String filter) {
     Activator a = Activator.getDefault();
-    if (a == null || serviceInterfaceClass == null) return (T[]) Array.newInstance(serviceInterfaceClass, 0);
+    if (a == null || serviceInterfaceClass == null) {
+      return (T[]) Array.newInstance(serviceInterfaceClass, 0);
+    }
     // start the tracker, blocks until all service factories have been
     // registered
     a.getServicesExtensionManager().start();
     BundleContext context = a.getBundle().getBundleContext();
-    if (context == null) return (T[]) Array.newInstance(serviceInterfaceClass, 0);
+    if (context == null) {
+      return (T[]) Array.newInstance(serviceInterfaceClass, 0);
+    }
     ServiceReference[] refs = null;
     try {
       refs = context.getAllServiceReferences(serviceInterfaceClass.getName(), filter);

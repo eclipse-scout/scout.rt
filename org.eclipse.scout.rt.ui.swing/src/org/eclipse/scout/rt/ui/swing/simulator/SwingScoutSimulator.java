@@ -101,20 +101,24 @@ public final class SwingScoutSimulator {
           if (o instanceof P_MouseTask) {
             P_MouseTask task = (P_MouseTask) o;
             long dt = (startTime + task.getTimeOffset()) - System.currentTimeMillis() - 10;
-            if (dt > 0) try {
-              Thread.sleep(dt);
-            }
-            catch (InterruptedException ie) {
+            if (dt > 0) {
+              try {
+                Thread.sleep(dt);
+              }
+              catch (InterruptedException ie) {
+              }
             }
             SwingUtilities.invokeAndWait(task);
           }
           else if (o instanceof P_KeyStrokeTask) {
             P_KeyStrokeTask task = (P_KeyStrokeTask) o;
             long dt = (startTime + task.getTimeOffset()) - System.currentTimeMillis() - 10;
-            if (dt > 0) try {
-              Thread.sleep(dt);
-            }
-            catch (InterruptedException ie) {
+            if (dt > 0) {
+              try {
+                Thread.sleep(dt);
+              }
+              catch (InterruptedException ie) {
+              }
             }
             SwingUtilities.invokeAndWait(task);
           }

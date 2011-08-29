@@ -319,7 +319,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   @Order(40)
   protected Object execCustomBindFunction(String functionName, String[] args, Object[] bindBases) throws ProcessingException {
     if (functionName.equals("level")) {
-      if (args.length != 1) throw new IllegalArgumentException("expected 1 argument for function '" + functionName + "'");
+      if (args.length != 1) {
+        throw new IllegalArgumentException("expected 1 argument for function '" + functionName + "'");
+      }
       String permissionClassName = args[0];
       String levelField = null;
       // eventually a level id?
@@ -334,7 +336,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       return ret != null ? ret : new LongHolder();
     }
     else if (functionName.equals("code")) {
-      if (args.length != 1) throw new IllegalArgumentException("expected 1 argument for function '" + functionName + "'");
+      if (args.length != 1) {
+        throw new IllegalArgumentException("expected 1 argument for function '" + functionName + "'");
+      }
       String codeClassName = args[0];
       Class codeClass = loadBundleClassLenient(m_codeNameToDescriptor, codeClassName);
       if (codeClass == null) {
@@ -349,7 +353,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       }
     }
     else if (functionName.equals("text")) {
-      if (args.length < 1) throw new IllegalArgumentException("expected at least 1 argument for function '" + functionName + "'");
+      if (args.length < 1) {
+        throw new IllegalArgumentException("expected at least 1 argument for function '" + functionName + "'");
+      }
       if (args.length == 1) {
         String[] tmp = new String[2];
         tmp[0] = args[0];
@@ -371,7 +377,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   }
 
   private Object tryGetPermissionLevel(Class permissionClass, String levelField, IAccessControlService accessControlService) throws ProcessingException {
-    if (permissionClass == null) return null;
+    if (permissionClass == null) {
+      return null;
+    }
     try {
       if (levelField != null) {
         return permissionClass.getField(levelField).get(null);
@@ -669,7 +677,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
 
   protected Connection getTransaction() throws ProcessingException {
     ITransaction reg = ThreadContext.get(ITransaction.class);
-    if (reg == null) throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
+    if (reg == null) {
+      throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
+    }
     SqlTransactionMember member = (SqlTransactionMember) reg.getMember(getTransactionMemberId());
     if (member == null) {
       Connection conn;
@@ -695,7 +705,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
    */
   protected final IStatementCache getStatementCache() throws ProcessingException {
     ITransaction reg = ThreadContext.get(ITransaction.class);
-    if (reg == null) throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
+    if (reg == null) {
+      throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
+    }
     IStatementCache res = (IStatementCache) reg.getMember(PreparedStatementCache.TRANSACTION_MEMBER_ID);
     if (res == null) {
       res = new PreparedStatementCache(getJdbcStatementCacheSize());

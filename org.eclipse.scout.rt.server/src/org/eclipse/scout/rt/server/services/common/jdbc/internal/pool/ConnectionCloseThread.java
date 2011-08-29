@@ -29,7 +29,9 @@ class ConnectionCloseThread extends Thread {
 
   @Override
   public void run() {
-    if (LOG.isInfoEnabled()) LOG.info("close connection " + m_conn);
+    if (LOG.isInfoEnabled()) {
+      LOG.info("close connection " + m_conn);
+    }
     try {
       m_conn.close();
     }

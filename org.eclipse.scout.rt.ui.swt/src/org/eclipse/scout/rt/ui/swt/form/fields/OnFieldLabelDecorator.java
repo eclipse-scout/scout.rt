@@ -51,7 +51,9 @@ public class OnFieldLabelDecorator implements PaintListener, FocusListener {
       c.removePaintListener(this);
       c.removeFocusListener(this);
     }
-    if (m_boldFont != null) m_boldFont.dispose();
+    if (m_boldFont != null) {
+      m_boldFont.dispose();
+    }
   }
 
   /*
@@ -91,7 +93,9 @@ public class OnFieldLabelDecorator implements PaintListener, FocusListener {
       for (FontData data : fd) {
         data.setStyle(SWT.BOLD);
       }
-      if (m_boldFont == null) m_boldFont = new Font(f.getDevice(), fd);
+      if (m_boldFont == null) {
+        m_boldFont = new Font(f.getDevice(), fd);
+      }
       e.gc.setFont(m_boldFont);
     }
     e.gc.drawString(s, x, y);

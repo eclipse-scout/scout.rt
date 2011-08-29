@@ -36,8 +36,12 @@ public class CalendarItemTransferable implements Transferable {
 
   @Override
   public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-    if (flavor.isMimeTypeEqual(DataFlavor.javaJVMLocalObjectMimeType)) return m_item;
-    else return null;
+    if (flavor.isMimeTypeEqual(DataFlavor.javaJVMLocalObjectMimeType)) {
+      return m_item;
+    }
+    else {
+      return null;
+    }
   }
 
   @Override

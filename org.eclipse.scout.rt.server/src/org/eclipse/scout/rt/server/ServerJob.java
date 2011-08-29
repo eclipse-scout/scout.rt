@@ -64,7 +64,9 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
    */
   public ServerJob(String name, IServerSession serverSession, Subject subject) {
     super(name);
-    if (serverSession == null) throw new IllegalArgumentException("serverSession is null");
+    if (serverSession == null) {
+      throw new IllegalArgumentException("serverSession is null");
+    }
     m_serverSession = serverSession;
     m_subject = subject;
     setProperty(ScoutTexts.JOB_PROPERTY_NAME, m_serverSession.getNlsTexts());
@@ -94,7 +96,9 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
    * The subject can only be modified as long as the job is not scheduled
    */
   public void setSubject(Subject subject) {
-    if (getState() != NONE) throw new IllegalStateException("This job is already scheduled/running");
+    if (getState() != NONE) {
+      throw new IllegalStateException("This job is already scheduled/running");
+    }
     m_subject = subject;
   }
 
@@ -195,7 +199,9 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     catch (Throwable t) {
       if (t instanceof UndeclaredThrowableException) {
         Throwable test = ((UndeclaredThrowableException) t).getUndeclaredThrowable();
-        if (test != null) t = test;
+        if (test != null) {
+          t = test;
+        }
       }
       if (t.getCause() instanceof ProcessingException) {
         t = t.getCause();

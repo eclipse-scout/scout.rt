@@ -75,10 +75,18 @@ public class ColumnDesc implements java.io.Serializable {
     buf.append(" name=\"" + m_name + "\"");
     buf.append(" type=\"" + m_typeName + "\"");
     buf.append(" nullable=\"" + (m_nullable ? "yes" : "no") + "\"");
-    if (m_size != 0) buf.append(" size=\"" + m_size + "\"");
-    if (m_precision != 0) buf.append(" precision=\"" + m_precision + "\"");
-    if (m_decimalDigits != 0) buf.append(" decimaldigits=\"" + m_decimalDigits + "\"");
-    if (m_defaultValue != null) buf.append(" defaultValue=\"" + m_defaultValue + "\"");
+    if (m_size != 0) {
+      buf.append(" size=\"" + m_size + "\"");
+    }
+    if (m_precision != 0) {
+      buf.append(" precision=\"" + m_precision + "\"");
+    }
+    if (m_decimalDigits != 0) {
+      buf.append(" decimaldigits=\"" + m_decimalDigits + "\"");
+    }
+    if (m_defaultValue != null) {
+      buf.append(" defaultValue=\"" + m_defaultValue + "\"");
+    }
     buf.append("/>\n");
     return buf.toString();
   }

@@ -59,7 +59,9 @@ public class SortSpec implements Serializable {
    */
   public boolean isSortColumn(int columnIndex) {
     for (int i : m_columns) {
-      if (i == columnIndex) return true;
+      if (i == columnIndex) {
+        return true;
+      }
     }
     return false;
   }
@@ -70,7 +72,9 @@ public class SortSpec implements Serializable {
    */
   public int getSortColumnOrder(int columnIndex) {
     for (int i = 0; i < m_columns.length; i++) {
-      if (m_columns[i] == columnIndex) return i;
+      if (m_columns[i] == columnIndex) {
+        return i;
+      }
     }
     return -1;
   }

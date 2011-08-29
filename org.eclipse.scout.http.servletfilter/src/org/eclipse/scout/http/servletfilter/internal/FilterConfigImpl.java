@@ -64,7 +64,9 @@ public class FilterConfigImpl implements FilterConfig {
       try {
         m_servletContext = servletContext;
         m_filter = (Filter) m_serviceElement.createExecutableExtension("class");
-        if (Activator.DEBUG) Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterConfig: init " + m_filter.getClass().getSimpleName()));
+        if (Activator.DEBUG) {
+          Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterConfig: init " + m_filter.getClass().getSimpleName()));
+        }
         m_filter.init(this);
       }
       catch (Throwable t) {
@@ -78,7 +80,9 @@ public class FilterConfigImpl implements FilterConfig {
   public void destroy() {
     if (m_filter != null) {
       try {
-        if (Activator.DEBUG) Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterConfig: destroy " + m_filter.getClass().getSimpleName()));
+        if (Activator.DEBUG) {
+          Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterConfig: destroy " + m_filter.getClass().getSimpleName()));
+        }
         m_filter.destroy();
       }
       catch (Throwable t) {
@@ -103,7 +107,9 @@ public class FilterConfigImpl implements FilterConfig {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null) return false;
+    if (o == null) {
+      return false;
+    }
     return this.m_equalityCode.equals(((FilterConfigImpl) o).m_equalityCode);
   }
 

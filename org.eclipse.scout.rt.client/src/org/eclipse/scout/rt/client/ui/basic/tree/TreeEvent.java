@@ -159,13 +159,21 @@ public class TreeEvent extends EventObject {
   }
 
   public ITreeNode getDeselectedNode() {
-    if (m_deselectedNodes != null && m_deselectedNodes.length > 0) return m_deselectedNodes[0];
-    else return null;
+    if (m_deselectedNodes != null && m_deselectedNodes.length > 0) {
+      return m_deselectedNodes[0];
+    }
+    else {
+      return null;
+    }
   }
 
   public ITreeNode[] getDeselectedNodes() {
-    if (m_deselectedNodes != null) return m_deselectedNodes;
-    else return new ITreeNode[0];
+    if (m_deselectedNodes != null) {
+      return m_deselectedNodes;
+    }
+    else {
+      return new ITreeNode[0];
+    }
   }
 
   protected void setDeselectedNodes(ITreeNode[] deselectedNodes) {
@@ -173,13 +181,21 @@ public class TreeEvent extends EventObject {
   }
 
   public ITreeNode getNewSelectedNode() {
-    if (m_newSelectedNodes != null && m_newSelectedNodes.length > 0) return m_newSelectedNodes[0];
-    else return null;
+    if (m_newSelectedNodes != null && m_newSelectedNodes.length > 0) {
+      return m_newSelectedNodes[0];
+    }
+    else {
+      return null;
+    }
   }
 
   public ITreeNode[] getNewSelectedNodes() {
-    if (m_newSelectedNodes != null) return m_newSelectedNodes;
-    else return new ITreeNode[0];
+    if (m_newSelectedNodes != null) {
+      return m_newSelectedNodes;
+    }
+    else {
+      return new ITreeNode[0];
+    }
   }
 
   protected void setNewSelectedNodes(ITreeNode[] newSelectedNodes) {
@@ -187,13 +203,21 @@ public class TreeEvent extends EventObject {
   }
 
   public ITreeNode getNode() {
-    if (m_nodes != null && m_nodes.length > 0) return m_nodes[0];
-    else return null;
+    if (m_nodes != null && m_nodes.length > 0) {
+      return m_nodes[0];
+    }
+    else {
+      return null;
+    }
   }
 
   public ITreeNode[] getNodes() {
-    if (m_nodes != null) return m_nodes;
-    else return new ITreeNode[0];
+    if (m_nodes != null) {
+      return m_nodes;
+    }
+    else {
+      return new ITreeNode[0];
+    }
   }
 
   public ITreeNode getChildNode() {
@@ -206,7 +230,9 @@ public class TreeEvent extends EventObject {
 
   public void addPopupMenu(IMenu menu) {
     if (menu != null) {
-      if (m_popupMenus == null) m_popupMenus = new ArrayList<IMenu>();
+      if (m_popupMenus == null) {
+        m_popupMenus = new ArrayList<IMenu>();
+      }
       m_popupMenus.add(menu);
     }
   }
@@ -216,7 +242,9 @@ public class TreeEvent extends EventObject {
    */
   public void addPopupMenus(IMenu[] menus) {
     if (menus != null) {
-      if (m_popupMenus == null) m_popupMenus = new ArrayList<IMenu>();
+      if (m_popupMenus == null) {
+        m_popupMenus = new ArrayList<IMenu>();
+      }
       m_popupMenus.addAll(Arrays.asList(menus));
     }
   }
@@ -225,16 +253,24 @@ public class TreeEvent extends EventObject {
    * used by TYPE_ROW_POPUP to add actions
    */
   public IMenu[] getPopupMenus() {
-    if (m_popupMenus != null) return m_popupMenus.toArray(new IMenu[0]);
-    else return new IMenu[0];
+    if (m_popupMenus != null) {
+      return m_popupMenus.toArray(new IMenu[0]);
+    }
+    else {
+      return new IMenu[0];
+    }
   }
 
   /**
    * used by TYPE_ROW_POPUP to add actions
    */
   public int getPopupMenuCount() {
-    if (m_popupMenus != null) return m_popupMenus.size();
-    else return 0;
+    if (m_popupMenus != null) {
+      return m_popupMenus.size();
+    }
+    else {
+      return 0;
+    }
   }
 
   /**
@@ -303,7 +339,9 @@ public class TreeEvent extends EventObject {
       else {
         buf.append("{");
         for (int i = 0; i < m_nodes.length; i++) {
-          if (i >= 0) buf.append(",");
+          if (i >= 0) {
+            buf.append(",");
+          }
           buf.append("\"" + m_nodes[i] + "\"");
         }
         buf.append("}");

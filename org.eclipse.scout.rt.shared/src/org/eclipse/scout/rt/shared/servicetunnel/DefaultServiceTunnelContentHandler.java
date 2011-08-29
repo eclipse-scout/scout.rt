@@ -174,7 +174,9 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     long y = System.nanoTime();
     setData(buf, msg, compressed);
     y = System.nanoTime() - y;
-    if (LOG.isDebugEnabled()) LOG.debug("message encoding took " + y + " nanoseconds");
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("message encoding took " + y + " nanoseconds");
+    }
     buf.append("</data>\n");
     buf.append("  <info");
     buf.append(" origin=\"" + m_originAddress + "\"");
@@ -230,7 +232,9 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     long y = System.nanoTime();
     setData(buf, msg, compressed);
     y = System.nanoTime() - y;
-    if (LOG.isDebugEnabled()) LOG.debug("message encoding took " + y + " nanoseconds");
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("message encoding took " + y + " nanoseconds");
+    }
     buf.append("</data>\n");
     buf.append("  <info");
     buf.append(" origin=\"" + m_originAddress + "\"");
@@ -281,15 +285,19 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       buf.append(base64Data);
     }
     finally {
-      if (serialout != null) try {
-        serialout.close();
+      if (serialout != null) {
+        try {
+          serialout.close();
+        }
+        catch (Throwable fatal) {
+        }
       }
-      catch (Throwable fatal) {
-      }
-      if (deflater != null) try {
-        deflater.end();
-      }
-      catch (Throwable fatal) {
+      if (deflater != null) {
+        try {
+          deflater.end();
+        }
+        catch (Throwable fatal) {
+        }
       }
     }
   }
@@ -352,7 +360,9 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     long y = System.nanoTime();
     Object res = getData(dataPart, compressed);
     y = System.nanoTime() - y;
-    if (LOG.isDebugEnabled()) LOG.debug("message decoding took " + y + " nanoseconds");
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("message decoding took " + y + " nanoseconds");
+    }
     return res;
   }
 
@@ -375,15 +385,19 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       }
     }
     finally {
-      if (serialin != null) try {
-        serialin.close();
+      if (serialin != null) {
+        try {
+          serialin.close();
+        }
+        catch (Throwable fatal) {
+        }
       }
-      catch (Throwable fatal) {
-      }
-      if (inflater != null) try {
-        inflater.end();
-      }
-      catch (Throwable fatal) {
+      if (inflater != null) {
+        try {
+          inflater.end();
+        }
+        catch (Throwable fatal) {
+        }
       }
     }
   }

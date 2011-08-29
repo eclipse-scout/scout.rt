@@ -110,7 +110,9 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
     for (int i = 0; i < c.length; i++) {
       String cls = c[i].getClass().getName();
       int dot = Math.max(cls.lastIndexOf('.'), cls.lastIndexOf('>'));
-      if (dot >= 0) cls = cls.substring(dot + 1);
+      if (dot >= 0) {
+        cls = cls.substring(dot + 1);
+      }
       names[i] = cls + " (" + c[i].getName() + (c[i].isVisible() ? "" : " invisible") + ")";
       constraints[i] = m_info.gridDatas[i].toString();
     }

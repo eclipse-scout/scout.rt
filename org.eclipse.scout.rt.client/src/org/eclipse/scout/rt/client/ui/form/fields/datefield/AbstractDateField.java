@@ -248,7 +248,9 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   // format value for display
   @Override
   protected String formatValueInternal(Date validValue) {
-    if (validValue == null) return "";
+    if (validValue == null) {
+      return "";
+    }
     DateFormat df = getDateFormat();
     String displayValue = df.format(validValue);
     return displayValue;
@@ -281,7 +283,9 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
    */
   @Override
   protected Date parseValueInternal(String text) throws ProcessingException {
-    if (text != null && text.trim().length() == 0) text = null;
+    if (text != null && text.trim().length() == 0) {
+      text = null;
+    }
     if (text == null) {
       return null;
     }
@@ -347,7 +351,9 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
    * @rn imo, 06.04.2006, only adjust date not date/time
    */
   private Date applyAutoTime(Date d) {
-    if (d == null) return d;
+    if (d == null) {
+      return d;
+    }
     Calendar timeCal = Calendar.getInstance();
     long autoTime = getAutoTimeMillis();
     if (autoTime == 0L && isHasTime()) {
@@ -455,8 +461,12 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     // range check -2000 ... +9000
     Calendar cal = Calendar.getInstance();
     cal.setTime(retVal);
-    if (cal.get(Calendar.YEAR) < -2000) cal.set(Calendar.YEAR, -2000);
-    if (cal.get(Calendar.YEAR) > 9000) cal.set(Calendar.YEAR, 9000);
+    if (cal.get(Calendar.YEAR) < -2000) {
+      cal.set(Calendar.YEAR, -2000);
+    }
+    if (cal.get(Calendar.YEAR) > 9000) {
+      cal.set(Calendar.YEAR, 9000);
+    }
     retVal = cal.getTime();
     //adapt time
     retVal = applyAutoTime(retVal);
@@ -468,7 +478,9 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
    */
   private Date parseDateTimeInternal(String text, DateFormat defaultFormat) throws ProcessingException {
     Date retVal = null;
-    if (text != null && text.trim().length() == 0) text = null;
+    if (text != null && text.trim().length() == 0) {
+      text = null;
+    }
     if (text == null) {
       return retVal;
     }
@@ -493,8 +505,12 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     // range check -2000 ... +9000
     Calendar cal = Calendar.getInstance();
     cal.setTime(retVal);
-    if (cal.get(Calendar.YEAR) < -2000) cal.set(Calendar.YEAR, -2000);
-    if (cal.get(Calendar.YEAR) > 9000) cal.set(Calendar.YEAR, 9000);
+    if (cal.get(Calendar.YEAR) < -2000) {
+      cal.set(Calendar.YEAR, -2000);
+    }
+    if (cal.get(Calendar.YEAR) > 9000) {
+      cal.set(Calendar.YEAR, 9000);
+    }
     retVal = cal.getTime();
     if (!includesTime.getValue()) {
       retVal = applyAutoTime(retVal);
@@ -507,7 +523,9 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
    */
   private Date parseTimeInternal(String text, DateFormat defaultFormat) throws ProcessingException {
     Date retVal = null;
-    if (text != null && text.trim().length() == 0) text = null;
+    if (text != null && text.trim().length() == 0) {
+      text = null;
+    }
     if (text == null) {
       return retVal;
     }
@@ -519,8 +537,12 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     // range check -2000 ... +9000
     Calendar cal = Calendar.getInstance();
     cal.setTime(retVal);
-    if (cal.get(Calendar.YEAR) < -2000) cal.set(Calendar.YEAR, -2000);
-    if (cal.get(Calendar.YEAR) > 9000) cal.set(Calendar.YEAR, 9000);
+    if (cal.get(Calendar.YEAR) < -2000) {
+      cal.set(Calendar.YEAR, -2000);
+    }
+    if (cal.get(Calendar.YEAR) > 9000) {
+      cal.set(Calendar.YEAR, 9000);
+    }
     retVal = cal.getTime();
     // truncate value
     DateFormat df = getDateFormat();
@@ -544,7 +566,9 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     Date d;
     if (defaultFormat != null) {
       d = parseHelper(defaultFormat, text, includesTime);
-      if (d != null) return d;
+      if (d != null) {
+        return d;
+      }
     }
     StringBuffer dateFormat = new StringBuffer();
     if (text.matches("[0-9]{6}")) {
@@ -576,19 +600,31 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
     d = parseHelper(DateFormat.getDateInstance(DateFormat.SHORT), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(DateFormat.getDateInstance(DateFormat.MEDIUM), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(DateFormat.getDateInstance(DateFormat.LONG), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     //add convenience patterns for english locales
     if (Locale.getDefault().getLanguage().equals("en")) {
       d = parseHelper(new SimpleDateFormat("M / d / yy"), text, includesTime);
-      if (d != null) return d;
+      if (d != null) {
+        return d;
+      }
       d = parseHelper(new SimpleDateFormat("MMM d,yyyy"), text, includesTime);
-      if (d != null) return d;
+      if (d != null) {
+        return d;
+      }
       d = parseHelper(new SimpleDateFormat("MMMM d,yyyy"), text, includesTime);
-      if (d != null) return d;
+      if (d != null) {
+        return d;
+      }
     }
     return null;
   }
@@ -601,7 +637,9 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     Date d = null;
     if (defaultFormat != null) {
       d = parseHelper(defaultFormat, text, includesTime);
-      if (d != null) return d;
+      if (d != null) {
+        return d;
+      }
     }
     StringBuffer dateFormat = new StringBuffer();
     if (text.matches("[0-9]{6}")) {
@@ -634,67 +672,119 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
     //time
     d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM)).toPattern() + ":SSS"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     for (DateFormat t : new DateFormat[]{
                 DateFormat.getDateInstance(DateFormat.SHORT),
                 DateFormat.getDateInstance(DateFormat.MEDIUM),
                 DateFormat.getDateInstance(DateFormat.LONG)}) {
       if (t instanceof SimpleDateFormat) {
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mm a"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hhmm a"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hmm a"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h a"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mma"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hhmma"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " ha"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " H:mm"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HHmm"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HH"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " Hmm"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " H"), text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
         d = parseHelper(t, text, includesTime);
-        if (d != null) return d;
+        if (d != null) {
+          return d;
+        }
       }
     }
     //date
     //add convenience patterns for english locales
     if (Locale.getDefault().getLanguage().equals("en")) {
       d = parseHelper(new SimpleDateFormat("M / d / yy"), text, includesTime);
-      if (d != null) return d;
+      if (d != null) {
+        return d;
+      }
       d = parseHelper(new SimpleDateFormat("MMM d,yyyy"), text, includesTime);
-      if (d != null) return d;
+      if (d != null) {
+        return d;
+      }
       d = parseHelper(new SimpleDateFormat("MMMM d,yyyy"), text, includesTime);
-      if (d != null) return d;
+      if (d != null) {
+        return d;
+      }
     }
     return null;
   }
@@ -703,7 +793,9 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     Date d = null;
     if (defaultFormat != null) {
       d = parseHelper(defaultFormat, text, includesTime);
-      if (d != null) return d;
+      if (d != null) {
+        return d;
+      }
     }
     //
     if (text.matches("[0-9]{3}")) {
@@ -717,34 +809,62 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
     if (defaultFormat != null) {
       d = parseHelper(defaultFormat, text, includesTime);
-      if (d != null) return d;
+      if (d != null) {
+        return d;
+      }
     }
     d = parseHelper(DateFormat.getTimeInstance(DateFormat.SHORT), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("h:mm a"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("hhmm a"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("hmm a"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("h a"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("h:mma"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("hhmma"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("ha"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("H:mm"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("HHmm"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("HH"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("Hmm"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     d = parseHelper(new SimpleDateFormat("H"), text, includesTime);
-    if (d != null) return d;
+    if (d != null) {
+      return d;
+    }
     return null;
   }
 

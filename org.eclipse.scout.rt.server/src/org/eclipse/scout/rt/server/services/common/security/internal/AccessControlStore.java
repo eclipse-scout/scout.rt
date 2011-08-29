@@ -83,7 +83,9 @@ public class AccessControlStore {
    */
   public void setPermissionsOfCurrentSubject(Permissions p) {
     Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null) throw new SecurityException("subject is null");
+    if (subject == null) {
+      throw new SecurityException("subject is null");
+    }
     for (Principal principal : subject.getPrincipals()) {
       if (principal != null) {
         String principalName = principal.getName();

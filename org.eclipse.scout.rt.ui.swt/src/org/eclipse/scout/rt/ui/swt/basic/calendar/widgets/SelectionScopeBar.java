@@ -253,13 +253,21 @@ public class SelectionScopeBar extends Composite {
 
   @Override
   public void dispose() {
-    if (m_dayWidget != null && !m_dayWidget.isDisposed()) m_dayWidget.dispose();
+    if (m_dayWidget != null && !m_dayWidget.isDisposed()) {
+      m_dayWidget.dispose();
+    }
 
-    if (m_workWeekWidget != null && !m_workWeekWidget.isDisposed()) m_workWeekWidget.dispose();
+    if (m_workWeekWidget != null && !m_workWeekWidget.isDisposed()) {
+      m_workWeekWidget.dispose();
+    }
 
-    if (m_weekWidget != null && !m_weekWidget.isDisposed()) m_weekWidget.dispose();
+    if (m_weekWidget != null && !m_weekWidget.isDisposed()) {
+      m_weekWidget.dispose();
+    }
 
-    if (m_monthWidget != null && !m_monthWidget.isDisposed()) m_monthWidget.dispose();
+    if (m_monthWidget != null && !m_monthWidget.isDisposed()) {
+      m_monthWidget.dispose();
+    }
 
     super.dispose();
   }

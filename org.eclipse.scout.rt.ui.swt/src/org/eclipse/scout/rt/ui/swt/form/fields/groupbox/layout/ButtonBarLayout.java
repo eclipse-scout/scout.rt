@@ -50,8 +50,12 @@ public class ButtonBarLayout extends Layout {
       }
     }
     //WORKAROUND for bug in swt composite setting size to 64x64 when 0,0
-    if (size.x <= 0) size.x = 1;
-    if (size.y <= 0) size.y = 1;
+    if (size.x <= 0) {
+      size.x = 1;
+    }
+    if (size.y <= 0) {
+      size.y = 1;
+    }
     //end
     return size;
   }

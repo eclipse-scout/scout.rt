@@ -161,7 +161,9 @@ public class CalendarComponent {
     day = DateUtility.truncDate(day);
     String s = createDayTooltip(day);
     String s2 = m_cell.getTooltipText();
-    if (s2 != null && s2.length() > 0) s = s + "\n" + s2;
+    if (s2 != null && s2.length() > 0) {
+      s = s + "\n" + s2;
+    }
     return s;
   }
 

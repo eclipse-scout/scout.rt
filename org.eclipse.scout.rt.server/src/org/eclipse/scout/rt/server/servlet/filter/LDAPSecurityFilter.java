@@ -83,7 +83,9 @@ public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
         exists = object.equals(paramName);
       }
     }
-    if (paramValue == null && !exists) throw new ServletException("Missing init-param with name '" + paramName + "'.");
+    if (paramValue == null && !exists) {
+      throw new ServletException("Missing init-param with name '" + paramName + "'.");
+    }
     return paramValue;
   }
 
@@ -225,7 +227,9 @@ public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
       return true;
     }
     catch (NamingException ne) {
-      if (showexceptions) ne.printStackTrace();
+      if (showexceptions) {
+        ne.printStackTrace();
+      }
       return false;
     }
 

@@ -68,8 +68,12 @@ public class AbstractAccessControlService extends AbstractService implements IAc
       return BasicHierarchyPermission.LEVEL_NONE;
     }
     if (!(p instanceof BasicHierarchyPermission)) {
-      if (checkPermission(p)) return BasicHierarchyPermission.LEVEL_ALL;
-      else return BasicHierarchyPermission.LEVEL_NONE;
+      if (checkPermission(p)) {
+        return BasicHierarchyPermission.LEVEL_ALL;
+      }
+      else {
+        return BasicHierarchyPermission.LEVEL_NONE;
+      }
     }
     BasicHierarchyPermission hp = (BasicHierarchyPermission) p;
     Permissions c = getPermissions();

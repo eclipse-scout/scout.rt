@@ -92,7 +92,9 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
     AbstractValueFieldData<T> v = (AbstractValueFieldData<T>) source;
     if (v.isValueSet()) {
       try {
-        if (!valueChangeTriggersEnabled) setValueChangeTriggerEnabled(false);
+        if (!valueChangeTriggersEnabled) {
+          setValueChangeTriggerEnabled(false);
+        }
         //
         T newValue;
         Object o = v.getValue();
@@ -111,7 +113,9 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
         this.setValue(newValue);
       }
       finally {
-        if (!valueChangeTriggersEnabled) setValueChangeTriggerEnabled(true);
+        if (!valueChangeTriggersEnabled) {
+          setValueChangeTriggerEnabled(true);
+        }
       }
     }
   }
@@ -127,7 +131,9 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       x.setObjectAttribute("value", value);
     }
     catch (IOException e) {
-      if (LOG.isInfoEnabled()) LOG.info("not serializable value in field " + getClass().getName() + "/" + getLabel() + ": " + e);
+      if (LOG.isInfoEnabled()) {
+        LOG.info("not serializable value in field " + getClass().getName() + "/" + getLabel() + ": " + e);
+      }
     }
   }
 
@@ -318,7 +324,9 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
    * internal single observer for value changed triggers
    */
   protected void valueChangedInternal() {
-    if (LOG.isDebugEnabled()) LOG.debug(getLabel() + " " + VerboseUtility.dumpObject(getValue()));
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(getLabel() + " " + VerboseUtility.dumpObject(getValue()));
+    }
   }
 
   @Override
@@ -327,8 +335,12 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   }
 
   private void setValueChanging(boolean b) {
-    if (b) m_valueChanging++;
-    else m_valueChanging--;
+    if (b) {
+      m_valueChanging++;
+    }
+    else {
+      m_valueChanging--;
+    }
   }
 
   @Override
@@ -337,8 +349,12 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   }
 
   private void setValueParsing(boolean b) {
-    if (b) m_valueParsing++;
-    else m_valueParsing--;
+    if (b) {
+      m_valueParsing++;
+    }
+    else {
+      m_valueParsing--;
+    }
   }
 
   @Override
@@ -347,8 +363,12 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   }
 
   private void setValueValidating(boolean b) {
-    if (b) m_valueValidating++;
-    else m_valueValidating--;
+    if (b) {
+      m_valueValidating++;
+    }
+    else {
+      m_valueValidating--;
+    }
   }
 
   @Override

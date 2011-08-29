@@ -56,8 +56,12 @@ public class ServerServiceFactory implements IServiceFactory {
   private Object m_serviceLock = new Object();
 
   public ServerServiceFactory(Class<?> serviceClass) {
-    if (serviceClass == null) throw new IllegalArgumentException("service type must not be null");
-    if (serviceClass.isInterface()) throw new IllegalArgumentException("service type must not be an interface: " + serviceClass);
+    if (serviceClass == null) {
+      throw new IllegalArgumentException("service type must not be null");
+    }
+    if (serviceClass.isInterface()) {
+      throw new IllegalArgumentException("service type must not be an interface: " + serviceClass);
+    }
     m_serviceClass = serviceClass;
   }
 
@@ -111,7 +115,9 @@ public class ServerServiceFactory implements IServiceFactory {
           }
           else {
             m_sessionClass = (Class<? extends IServerSession>) m_bundle.loadClass(m_sessionType);
-            if (!IServerSession.class.isAssignableFrom(m_sessionClass)) throw new IllegalArgumentException("session type must be a subtype of " + IServerSession.class + ": " + m_sessionType);
+            if (!IServerSession.class.isAssignableFrom(m_sessionClass)) {
+              throw new IllegalArgumentException("session type must be a subtype of " + IServerSession.class + ": " + m_sessionType);
+            }
           }
         }
       }

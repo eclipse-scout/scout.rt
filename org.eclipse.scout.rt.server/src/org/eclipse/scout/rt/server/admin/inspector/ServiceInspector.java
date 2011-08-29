@@ -34,7 +34,9 @@ public class ServiceInspector {
     // make service inventory
     if (m_service instanceof IAdaptable) {
       IServiceInventory si = (IServiceInventory) ((IAdaptable) m_service).getAdapter(IServiceInventory.class);
-      if (si != null) inv.addState(si.getInventory());
+      if (si != null) {
+        inv.addState(si.getInventory());
+      }
     }
     return inv;
   }
@@ -44,7 +46,9 @@ public class ServiceInspector {
   }
 
   public void changeProperty(PropertyDescriptor propDesc, String propText) throws Exception {
-    if (propText != null && propText.length() == 0) propText = null;
+    if (propText != null && propText.length() == 0) {
+      propText = null;
+    }
     Method setterMethod = propDesc.getWriteMethod();
     if (setterMethod != null) {
       Object value = TypeCastUtility.castValue(propText, propDesc.getPropertyType());

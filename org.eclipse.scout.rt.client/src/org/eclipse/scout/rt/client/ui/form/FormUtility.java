@@ -107,7 +107,9 @@ public final class FormUtility {
     }
 
     public void handleResult() throws ProcessingException {
-      if (m_firstEx != null) throw m_firstEx;
+      if (m_firstEx != null) {
+        throw m_firstEx;
+      }
     }
   }
 
@@ -130,7 +132,9 @@ public final class FormUtility {
     }
 
     public void handleResult() throws ProcessingException {
-      if (m_firstEx != null) throw m_firstEx;
+      if (m_firstEx != null) {
+        throw m_firstEx;
+      }
     }
   }
 
@@ -156,7 +160,9 @@ public final class FormUtility {
     }
 
     public void handleResult() throws ProcessingException {
-      if (m_firstEx != null) throw m_firstEx;
+      if (m_firstEx != null) {
+        throw m_firstEx;
+      }
     }
   }
 

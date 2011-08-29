@@ -484,7 +484,9 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   @Override
   public void setActiveFilter(TriState t) {
     if (isActiveFilterEnabled()) {
-      if (t == null) t = TriState.TRUE;
+      if (t == null) {
+        t = TriState.TRUE;
+      }
       m_activeFilter = t;
     }
   }
@@ -726,7 +728,9 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
 
   @Override
   protected T parseValueInternal(String text) throws ProcessingException {
-    if (text != null && text.length() == 0) text = null;
+    if (text != null && text.length() == 0) {
+      text = null;
+    }
     ISmartFieldProposalForm smartForm = getProposalForm();
     LookupRow acceptedProposalRow = null;
     if (smartForm != null && StringUtility.equalsIgnoreNewLines(smartForm.getSearchText(), text)) {
@@ -1010,7 +1014,9 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   @Override
   public void prepareTextLookup(LookupCall call, String text) throws ProcessingException {
     String textPattern = text;
-    if (textPattern == null) textPattern = "";
+    if (textPattern == null) {
+      textPattern = "";
+    }
     textPattern = textPattern.toLowerCase();
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
     if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
@@ -1328,7 +1334,9 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   private LookupRow[] cleanupResultList(List<LookupRow> list) {
     int len = 0;
     for (LookupRow r : list) {
-      if (r != null) len++;
+      if (r != null) {
+        len++;
+      }
     }
     LookupRow[] a = new LookupRow[len];
     int index = 0;

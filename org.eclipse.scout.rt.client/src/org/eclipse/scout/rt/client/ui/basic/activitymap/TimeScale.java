@@ -122,9 +122,15 @@ public class TimeScale {
    *         the range
    */
   public double[] getRangeOf(Date beginTime, Date endTime) {
-    if (getMinorTimeColumns().length <= 0) return null;
-    if (endTime == null || endTime.compareTo(getBeginTime()) <= 0) return null;
-    if (beginTime == null || beginTime.compareTo(getEndTime()) >= 0) return null;
+    if (getMinorTimeColumns().length <= 0) {
+      return null;
+    }
+    if (endTime == null || endTime.compareTo(getBeginTime()) <= 0) {
+      return null;
+    }
+    if (beginTime == null || beginTime.compareTo(getEndTime()) >= 0) {
+      return null;
+    }
     //
     MinorTimeColumn[] minCols = getMinorTimeColumns();
     Integer a = null, b = null;
@@ -200,10 +206,16 @@ public class TimeScale {
 
   private int locationToIndex(double d) {
     int count = getMinorTimeColumns().length;
-    if (count == 0) return -1;
+    if (count == 0) {
+      return -1;
+    }
     int i = (int) (d * count);
-    if (i >= count) i = count - 1;
-    else if (i < 0) i = 0;
+    if (i >= count) {
+      i = count - 1;
+    }
+    else if (i < 0) {
+      i = 0;
+    }
     return i;
   }
 

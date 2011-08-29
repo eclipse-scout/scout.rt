@@ -80,7 +80,9 @@ public class SwtScoutCalendar extends SwtCalendar {
     setDisplayMode(calendarModel.getDisplayMode());
     setCondensedMode(calendarModel.isDisplayCondensed());
     Calendar selectedDate = Calendar.getInstance();
-    if (calendarModel.getSelectedDate() != null) selectedDate.setTime(calendarModel.getSelectedDate());
+    if (calendarModel.getSelectedDate() != null) {
+      selectedDate.setTime(calendarModel.getSelectedDate());
+    }
     setViewDate(selectedDate);
 
     //attach property listener

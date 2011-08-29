@@ -306,8 +306,12 @@ public class LargeCalendarCell extends AbstractCalendarCell {
   @Override
   public void paint(Graphics g) {
     super.paint(g);
-    if (m_isMajor) setBackground(m_yesMajorColor);
-    else setBackground(m_notMajorColor);
+    if (m_isMajor) {
+      setBackground(m_yesMajorColor);
+    }
+    else {
+      setBackground(m_notMajorColor);
+    }
     Insets insets = getInsets();
     Rectangle view;
     if (insets != null) {
@@ -391,16 +395,30 @@ public class LargeCalendarCell extends AbstractCalendarCell {
         for (int hour = m_startHour; hour <= m_endHour; hour = hour + step) {
           int y = timedView.y + (hour - m_startHour) * (timedView.height) / (m_endHour + 1 - m_startHour);
           boolean majorHour = (hour == 12 || hour == 13);
-          if (majorHour) g.setColor(darkLineCol);
-          else g.setColor(lineCol);
+          if (majorHour) {
+            g.setColor(darkLineCol);
+          }
+          else {
+            g.setColor(lineCol);
+          }
           g.drawLine(0, y, w, y);
           if (drawLabel) {
             String s;
-            if (hour == m_startHour && hour != 0) s = SwingUtility.getNlsText("Calendar_earlier");
-            else if (hour == m_endHour && hour != 23) s = SwingUtility.getNlsText("Calendar_later");
-            else if (hour == 0) s = formatHour(0);
-            else if (hour < 10) s = formatHour(hour);
-            else s = formatHour(hour);
+            if (hour == m_startHour && hour != 0) {
+              s = SwingUtility.getNlsText("Calendar_earlier");
+            }
+            else if (hour == m_endHour && hour != 23) {
+              s = SwingUtility.getNlsText("Calendar_later");
+            }
+            else if (hour == 0) {
+              s = formatHour(0);
+            }
+            else if (hour < 10) {
+              s = formatHour(hour);
+            }
+            else {
+              s = formatHour(hour);
+            }
             //
             g.setColor(textCol);
             g.drawString(s, 1, y + ascent);
@@ -455,7 +473,9 @@ public class LargeCalendarCell extends AbstractCalendarCell {
     int w = g.getClipBounds().width;
     int h = g.getClipBounds().height;
     int n = getItems().size();
-    if (n <= 0) return;
+    if (n <= 0) {
+      return;
+    }
     FontMetrics fm = getFontMetrics(getFont());
     int heightByFont = n * fm.getHeight();
     boolean showLabel = (heightByFont <= h && getWidth() >= SWITCH_ITEM_WIDTH);
@@ -551,7 +571,9 @@ public class LargeCalendarCell extends AbstractCalendarCell {
     int hTimeless = Math.max(0, m_dateChooser.getTimelessSectionHeightHint() - 1);
     int yTimed = hTimeless + 1;
     int hTimed = clipRect.height - hTimeless;
-    if (getItems().size() <= 0) return;
+    if (getItems().size() <= 0) {
+      return;
+    }
     int timelessIndex = 0;
     int timelessItemHeight = 0;
     if (m_countTimeless > 0) {
@@ -568,7 +590,10 @@ public class LargeCalendarCell extends AbstractCalendarCell {
         r.width = (int) (cc.getX1() * w) - r.x;
         r.y = yTimed + (int) (cc.getFromRelative() * hTimed / intervalMillis);
         r.height = yTimed + (int) (cc.getToRelative() * hTimed / intervalMillis) - r.y;
-        if (r.height <= 4) r.height = 4;// minimum height
+        if (r.height <= 4)
+         {
+          r.height = 4;// minimum height
+        }
       }
       else {// timeless
         r.x = 0;
@@ -629,8 +654,12 @@ public class LargeCalendarCell extends AbstractCalendarCell {
       m_fullDay = model.isFullDay(item);
       //
       m_fromRelative = getTimeOfDayMillis(model.getFromDate(item)) - repTimeOfDayStart - HOUR_MILLIS * m_startHour;
-      if (m_fromRelative < 0) m_fromRelative = 0;
-      if (m_fromRelative > displayInterval) m_fromRelative = displayInterval;
+      if (m_fromRelative < 0) {
+        m_fromRelative = 0;
+      }
+      if (m_fromRelative > displayInterval) {
+        m_fromRelative = displayInterval;
+      }
       //
       Date d2 = model.getToDate(item);
       if (d2 == null) {
@@ -639,8 +668,12 @@ public class LargeCalendarCell extends AbstractCalendarCell {
       else {
         m_toRelative = getTimeOfDayMillis(d2) - repTimeOfDayStart - HOUR_MILLIS * m_startHour;
       }
-      if (m_toRelative < 0) m_toRelative = 0;
-      if (m_toRelative > displayInterval) m_toRelative = displayInterval;
+      if (m_toRelative < 0) {
+        m_toRelative = 0;
+      }
+      if (m_toRelative > displayInterval) {
+        m_toRelative = displayInterval;
+      }
       // check end of day set
       if (m_fromRelative >= displayInterval - HOUR_MILLIS && m_toRelative >= displayInterval - m_endHour * HOUR_MILLIS) {
         m_fromRelative = displayInterval - HOUR_MILLIS;
@@ -699,8 +732,12 @@ public class LargeCalendarCell extends AbstractCalendarCell {
     }
 
     public boolean intersects(ItemWrapper other) {
-      if (this.m_fromRelative <= other.m_fromRelative && other.m_fromRelative < this.m_toRelative) return true;
-      else if (this.m_fromRelative < other.m_toRelative && other.m_toRelative <= this.m_toRelative) return true;
+      if (this.m_fromRelative <= other.m_fromRelative && other.m_fromRelative < this.m_toRelative) {
+        return true;
+      }
+      else if (this.m_fromRelative < other.m_toRelative && other.m_toRelative <= this.m_toRelative) {
+        return true;
+      }
       return false;
     }
 
@@ -719,7 +756,9 @@ public class LargeCalendarCell extends AbstractCalendarCell {
     // wrappers
     public Color getColor() {
       Color c = m_dateChooser.getModel().getColor(m_item);
-      if (c == null) c = getBackground();
+      if (c == null) {
+        c = getBackground();
+      }
       return c;
     }
 
@@ -739,7 +778,9 @@ public class LargeCalendarCell extends AbstractCalendarCell {
       }
       else {
         int i = this.getCompareDate().compareTo(o.getCompareDate());
-        if (i == 0) i = this.getCompareId().compareTo(o.getCompareId());
+        if (i == 0) {
+          i = this.getCompareId().compareTo(o.getCompareId());
+        }
         return i;
       }
     }
@@ -825,7 +866,9 @@ public class LargeCalendarCell extends AbstractCalendarCell {
     @Override
     public void dragGestureRecognized(DragGestureEvent e) {
       Object item = getItemAt(e.getDragOrigin());
-      if (item == null) return;
+      if (item == null) {
+        return;
+      }
       if (m_dateChooser.getModel().isDraggable(item)) {
         ItemWrapper cic = new ItemWrapper(item);
         cic.setDragSourceDate(getRepresentedDate());

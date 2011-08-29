@@ -76,13 +76,17 @@ public class SwingScoutLink extends SwingScoutFieldComposite<IButton> implements
   @Override
   protected void setHorizontalAlignmentFromScout(int scoutAlign) {
     getSwingField().setAlignmentX(SwingUtility.createAlignmentX(scoutAlign));
-    if (getSwingContainer().isShowing()) getSwingContainer().revalidate();
+    if (getSwingContainer().isShowing()) {
+      getSwingContainer().revalidate();
+    }
   }
 
   @Override
   protected void setVerticalAlignmentFromScout(int scoutAlign) {
     getSwingField().setAlignmentY(SwingUtility.createAlignmentY(scoutAlign));
-    if (getSwingContainer().isShowing()) getSwingContainer().revalidate();
+    if (getSwingContainer().isShowing()) {
+      getSwingContainer().revalidate();
+    }
   }
 
   @Override

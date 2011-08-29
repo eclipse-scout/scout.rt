@@ -49,7 +49,9 @@ public abstract class AbstractTableRowBuilder {
   }
 
   public ITableRow createRow(Object rowValues) throws ProcessingException {
-    if (!rowValues.getClass().isArray()) throw new IllegalArgumentException("argument must be an array value []");
+    if (!rowValues.getClass().isArray()) {
+      throw new IllegalArgumentException("argument must be an array value []");
+    }
     ITableRow row = createEmptyTableRow();
     for (int c = 0, nc = Array.getLength(rowValues); c < nc; c++) {
       row.setCellValue(c, Array.get(rowValues, c));
@@ -62,9 +64,15 @@ public abstract class AbstractTableRowBuilder {
   }
 
   public ITableRow[] createRowsByArray(Object dataArray, int rowStatus) throws ProcessingException {
-    if (dataArray == null) dataArray = new Object[0];
-    if (dataArray instanceof Collection) dataArray = ((Collection) dataArray).toArray();
-    if (!dataArray.getClass().isArray()) throw new IllegalArgumentException("argument must be a matrix value [][]");
+    if (dataArray == null) {
+      dataArray = new Object[0];
+    }
+    if (dataArray instanceof Collection) {
+      dataArray = ((Collection) dataArray).toArray();
+    }
+    if (!dataArray.getClass().isArray()) {
+      throw new IllegalArgumentException("argument must be a matrix value [][]");
+    }
     ITableRow[] rows = new ITableRow[Array.getLength(dataArray)];
     for (int r = 0; r < rows.length; r++) {
       rows[r] = createRow(new Object[]{Array.get(dataArray, r)});
@@ -99,8 +107,12 @@ public abstract class AbstractTableRowBuilder {
       isRef = false;
       dataMatrix = dataMatrixOrReference;
     }
-    if (dataMatrix == null) dataMatrix = new Object[0][0];
-    if (!dataMatrix.getClass().isArray()) throw new IllegalArgumentException("argument must be a matrix value [][]");
+    if (dataMatrix == null) {
+      dataMatrix = new Object[0][0];
+    }
+    if (!dataMatrix.getClass().isArray()) {
+      throw new IllegalArgumentException("argument must be a matrix value [][]");
+    }
     //
     ITableRow[] rows = new ITableRow[Array.getLength(dataMatrix)];
     if (isRef) {

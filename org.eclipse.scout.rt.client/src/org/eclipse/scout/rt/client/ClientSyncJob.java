@@ -35,7 +35,9 @@ public class ClientSyncJob extends ClientJob {
    */
   @Override
   public boolean belongsTo(Object family) {
-    if (super.belongsTo(family)) return true;
+    if (super.belongsTo(family)) {
+      return true;
+    }
     if (family == ClientSyncJob.class) {
       return true;
     }

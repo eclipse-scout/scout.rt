@@ -145,27 +145,51 @@ public class CellStyle implements ICellSpecialization {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
     CellStyle other = (CellStyle) obj;
     if (m_backgroundColor == null) {
-      if (other.m_backgroundColor != null) return false;
+      if (other.m_backgroundColor != null) {
+        return false;
+      }
     }
-    else if (!m_backgroundColor.equals(other.m_backgroundColor)) return false;
+    else if (!m_backgroundColor.equals(other.m_backgroundColor)) {
+      return false;
+    }
     if (m_fontPattern == null) {
-      if (other.m_fontPattern != null) return false;
+      if (other.m_fontPattern != null) {
+        return false;
+      }
     }
-    else if (!m_fontPattern.equals(other.m_fontPattern)) return false;
+    else if (!m_fontPattern.equals(other.m_fontPattern)) {
+      return false;
+    }
     if (m_foregroundColor == null) {
-      if (other.m_foregroundColor != null) return false;
+      if (other.m_foregroundColor != null) {
+        return false;
+      }
     }
-    else if (!m_foregroundColor.equals(other.m_foregroundColor)) return false;
-    if (m_horizontalAlignment != other.m_horizontalAlignment) return false;
+    else if (!m_foregroundColor.equals(other.m_foregroundColor)) {
+      return false;
+    }
+    if (m_horizontalAlignment != other.m_horizontalAlignment) {
+      return false;
+    }
     if (m_iconId == null) {
-      if (other.m_iconId != null) return false;
+      if (other.m_iconId != null) {
+        return false;
+      }
     }
-    else if (!m_iconId.equals(other.m_iconId)) return false;
+    else if (!m_iconId.equals(other.m_iconId)) {
+      return false;
+    }
     return true;
   }
 }

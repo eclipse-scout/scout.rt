@@ -207,7 +207,9 @@ public abstract class AbstractWorkflowData implements Serializable {
   }
 
   public AbstractWorkflowStepData findStepData(Long stepDefinitionNr) {
-    if (stepDefinitionNr == null) return null;
+    if (stepDefinitionNr == null) {
+      return null;
+    }
     for (AbstractWorkflowStepData step : m_stepList) {
       if (step.getDefinitionNr() == stepDefinitionNr) {
         return step;
@@ -247,8 +249,12 @@ public abstract class AbstractWorkflowData implements Serializable {
   }
 
   public void setCurrentStepDataIndex(int index) {
-    if (index < 0) index = 0;
-    if (index >= m_stepList.size()) index = m_stepList.size();
+    if (index < 0) {
+      index = 0;
+    }
+    if (index >= m_stepList.size()) {
+      index = m_stepList.size();
+    }
     m_currentStepIndex = index;
   }
 

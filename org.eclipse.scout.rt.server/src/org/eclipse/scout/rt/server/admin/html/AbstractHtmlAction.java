@@ -63,7 +63,9 @@ public abstract class AbstractHtmlAction implements Runnable {
 
   public String getFormParameter(String name, String defaultValue) {
     String s = m_formParameters.get(name);
-    if (s == null) s = defaultValue;
+    if (s == null) {
+      s = defaultValue;
+    }
     return s;
   }
 }

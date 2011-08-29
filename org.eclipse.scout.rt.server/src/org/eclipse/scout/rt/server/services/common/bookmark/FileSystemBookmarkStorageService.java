@@ -52,7 +52,9 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
   @SuppressWarnings("unchecked")
   @Override
   public void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup) throws ProcessingException {
-    if (!ACCESS.check(new PublishUserBookmarkPermission())) throw new ProcessingException("Function denied", new SecurityException("Function denied"));
+    if (!ACCESS.check(new PublishUserBookmarkPermission())) {
+      throw new ProcessingException("Function denied", new SecurityException("Function denied"));
+    }
     //
     HashSet<Object> set = new HashSet<Object>();
     Collection<Object> userIdList = (Collection<Object>) targetGroup.get("userIdList");
@@ -92,10 +94,12 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
         LOG.error(null, t);
       }
       finally {
-        if (oin != null) try {
-          oin.close();
-        }
-        catch (Throwable fatal) {
+        if (oin != null) {
+          try {
+            oin.close();
+          }
+          catch (Throwable fatal) {
+          }
         }
       }
     }
@@ -119,10 +123,12 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
         LOG.error(null, t);
       }
       finally {
-        if (oin != null) try {
-          oin.close();
-        }
-        catch (Throwable fatal) {
+        if (oin != null) {
+          try {
+            oin.close();
+          }
+          catch (Throwable fatal) {
+          }
         }
       }
     }
@@ -155,10 +161,12 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
       throw new ProcessingException("", e);
     }
     finally {
-      if (oout != null) try {
-        oout.close();
-      }
-      catch (Throwable fatal) {
+      if (oout != null) {
+        try {
+          oout.close();
+        }
+        catch (Throwable fatal) {
+        }
       }
     }
   }
@@ -189,10 +197,12 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
       throw new ProcessingException("", e);
     }
     finally {
-      if (oout != null) try {
-        oout.close();
-      }
-      catch (Throwable fatal) {
+      if (oout != null) {
+        try {
+          oout.close();
+        }
+        catch (Throwable fatal) {
+        }
       }
     }
   }

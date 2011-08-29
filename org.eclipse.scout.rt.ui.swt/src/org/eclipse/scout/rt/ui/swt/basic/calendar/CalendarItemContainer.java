@@ -51,10 +51,12 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
     //
     m_fromRelative = AbstractCell.getTimeOfDayMillis(model.getFromDate(item)) - repTimeOfDayStart
         - HOUR_MILLIS * DAY_TIMELINE_START_TIME;
-    if (m_fromRelative < 0)
+    if (m_fromRelative < 0) {
       m_fromRelative = 0;
-    if (m_fromRelative > displayInterval)
+    }
+    if (m_fromRelative > displayInterval) {
       m_fromRelative = displayInterval;
+    }
     //
     Date d2 = model.getToDate(item);
     if (d2 == null) {
@@ -63,10 +65,12 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
       m_toRelative = AbstractCell.getTimeOfDayMillis(d2) - repTimeOfDayStart - HOUR_MILLIS
           * DAY_TIMELINE_START_TIME;
     }
-    if (m_toRelative < 0)
+    if (m_toRelative < 0) {
       m_toRelative = 0;
-    if (m_toRelative > displayInterval)
+    }
+    if (m_toRelative > displayInterval) {
       m_toRelative = displayInterval;
+    }
     // check end of day set
     if (m_fromRelative >= displayInterval - HOUR_MILLIS
         && m_toRelative >= displayInterval - DAY_TIMELINE_END_TIME * HOUR_MILLIS) {
@@ -125,10 +129,12 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
   }
 
   public boolean intersects(CalendarItemContainer other) {
-    if (this.m_fromRelative <= other.m_fromRelative && other.m_fromRelative < this.m_toRelative)
+    if (this.m_fromRelative <= other.m_fromRelative && other.m_fromRelative < this.m_toRelative) {
       return true;
-    else if (this.m_fromRelative < other.m_toRelative && other.m_toRelative <= this.m_toRelative)
+    }
+    else if (this.m_fromRelative < other.m_toRelative && other.m_toRelative <= this.m_toRelative) {
       return true;
+    }
     return false;
   }
 
@@ -143,8 +149,9 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
   // wrappers
   public Color getColor() {
     Color c = m_cell.getCalendar().getModel().getColor(m_item);
-    if (c == null)
+    if (c == null) {
       c = new Color(SwtColors.getStandardDisplay(),m_cell.getBackground().getRed(), m_cell.getBackground().getGreen(), m_cell.getBackground().getBlue());
+    }
     return c;
   }
 
@@ -162,8 +169,9 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
       return ((Comparable<Object>) m_item).compareTo(((CalendarItemContainer) o).getItem());
     } else {
       int i = this.getCompareDate().compareTo(((CalendarItemContainer) o).getCompareDate());
-      if (i == 0)
+      if (i == 0) {
         i = this.getCompareId().compareTo(((CalendarItemContainer) o).getCompareId());
+      }
       return i;
     }
   }

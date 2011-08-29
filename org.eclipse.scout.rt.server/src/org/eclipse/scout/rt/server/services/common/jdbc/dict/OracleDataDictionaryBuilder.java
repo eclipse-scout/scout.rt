@@ -213,10 +213,12 @@ public class OracleDataDictionaryBuilder {
        */
     }
     finally {
-      if (stm != null) try {
-        stm.close();
-      }
-      catch (Exception fatal) {
+      if (stm != null) {
+        try {
+          stm.close();
+        }
+        catch (Exception fatal) {
+        }
       }
     }
     return dd;

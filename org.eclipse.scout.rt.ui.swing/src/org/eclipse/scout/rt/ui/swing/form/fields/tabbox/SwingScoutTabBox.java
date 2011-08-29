@@ -159,7 +159,9 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
   protected void setSelectedTabFromSwing() {
     updateTabItemSelected();
     //
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     Component comp = getSwingTabbedPane().getSelectedComponent();
     final IGroupBox box = m_swingGroupToScoutGroup.get(comp);

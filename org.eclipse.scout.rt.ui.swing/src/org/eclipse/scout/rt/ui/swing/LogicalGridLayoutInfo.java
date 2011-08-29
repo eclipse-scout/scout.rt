@@ -51,10 +51,18 @@ class LogicalGridLayoutInfo {
     TreeSet<Integer> usedRows = new TreeSet<Integer>();
     // ticket 86645 use member gridDatas instead of param cons
     for (LogicalGridData gd : gridDatas) {
-      if (gd.gridx < 0) gd.gridx = 0;
-      if (gd.gridy < 0) gd.gridy = 0;
-      if (gd.gridw < 1) gd.gridw = 1;
-      if (gd.gridh < 1) gd.gridh = 1;
+      if (gd.gridx < 0) {
+        gd.gridx = 0;
+      }
+      if (gd.gridy < 0) {
+        gd.gridy = 0;
+      }
+      if (gd.gridw < 1) {
+        gd.gridw = 1;
+      }
+      if (gd.gridh < 1) {
+        gd.gridh = 1;
+      }
       for (int x = gd.gridx; x < gd.gridx + gd.gridw; x++) {
         usedCols.add(x);
       }
@@ -112,14 +120,30 @@ class LogicalGridLayoutInfo {
         d.height = cons.heightHint;
       }
       compSize[i] = d;
-      if (cons.gridx < 0) cons.gridx = 0;
-      if (cons.gridy < 0) cons.gridy = 0;
-      if (cons.gridw < 1) cons.gridw = 1;
-      if (cons.gridh < 1) cons.gridh = 1;
-      if (cons.gridx >= cols) cons.gridx = cols - 1;
-      if (cons.gridy >= rows) cons.gridy = rows - 1;
-      if (cons.gridx + cons.gridw - 1 >= cols) cons.gridw = cols - cons.gridx;
-      if (cons.gridy + cons.gridh >= rows) cons.gridh = rows - cons.gridy;
+      if (cons.gridx < 0) {
+        cons.gridx = 0;
+      }
+      if (cons.gridy < 0) {
+        cons.gridy = 0;
+      }
+      if (cons.gridw < 1) {
+        cons.gridw = 1;
+      }
+      if (cons.gridh < 1) {
+        cons.gridh = 1;
+      }
+      if (cons.gridx >= cols) {
+        cons.gridx = cols - 1;
+      }
+      if (cons.gridy >= rows) {
+        cons.gridy = rows - 1;
+      }
+      if (cons.gridx + cons.gridw - 1 >= cols) {
+        cons.gridw = cols - cons.gridx;
+      }
+      if (cons.gridy + cons.gridh >= rows) {
+        cons.gridh = rows - cons.gridy;
+      }
     }
     initializeColumns(env, compSize, hgap);
     initializeRows(env, compSize, vgap);

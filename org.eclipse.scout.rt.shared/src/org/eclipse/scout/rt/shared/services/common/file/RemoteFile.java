@@ -107,7 +107,9 @@ public class RemoteFile implements Serializable {
     }
     if (dir != null && dir.trim().length() > 0) {
       dir = dir.replace('\\', '/').trim();
-      if (!dir.endsWith("/")) dir = dir + "/";
+      if (!dir.endsWith("/")) {
+        dir = dir + "/";
+      }
       m_dir = dir;
     }
     m_name = name;
@@ -368,7 +370,9 @@ public class RemoteFile implements Serializable {
         if (maxReadSize > -1 && readSize + len > maxReadSize) {
           maxBufferBoundary = (int) (maxReadSize - readSize);
         }
-        if (maxBufferBoundary < len) len = maxBufferBoundary;
+        if (maxBufferBoundary < len) {
+          len = maxBufferBoundary;
+        }
         out.write(b, 0, len);
         readSize += len;
       }
@@ -600,7 +604,9 @@ public class RemoteFile implements Serializable {
    * @since 2.7
    */
   public static String getContentTypeForExtension(String ext) {
-    if (ext.startsWith(".")) ext = ext.substring(1);
+    if (ext.startsWith(".")) {
+      ext = ext.substring(1);
+    }
     ext = ext.toLowerCase();
     return FILE_EXTENSION_TO_MIME_TYPE_MAP.get(ext);
   }

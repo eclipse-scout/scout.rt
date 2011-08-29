@@ -87,12 +87,16 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
                 handleSwingEditActivityPopup(e);
               }
             }
-            if(fix!=null) fix.mouseReleased(this, e);
+            if(fix!=null) {
+              fix.mouseReleased(this, e);
+            }
           }
 
           @Override
           public void mouseClicked(MouseEvent e) {
-            if (fix.mouseClicked()) return;
+            if (fix.mouseClicked()) {
+              return;
+            }
             if (e.getClickCount() == 2) {
               if (!e.isMetaDown()) {
                 handleCellActionFromSwing(e);
@@ -105,13 +109,17 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
         new FocusAdapter() {
           @Override
           public void focusGained(FocusEvent e) {
-            if (e.isTemporary()) return;
+            if (e.isTemporary()) {
+              return;
+            }
             setSelectedActivityCellFromSwing((SwingActivityComponent) e.getComponent());
           }
 
           @Override
           public void focusLost(FocusEvent e) {
-            if (e.isTemporary()) return;
+            if (e.isTemporary()) {
+              return;
+            }
             setSelectedActivityCellFromSwing(null);
           }
         }
@@ -148,12 +156,16 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
 
           @Override
           public void mouseReleased(MouseEvent e) {
-            if(fix!=null) fix.mouseReleased(this, e);
+            if(fix!=null) {
+              fix.mouseReleased(this, e);
+            }
           }
 
           @Override
           public void mouseClicked(MouseEvent e) {
-            if (fix.mouseClicked()) return;
+            if (fix.mouseClicked()) {
+              return;
+            }
             if (e.getClickCount() == 2) {
               if (!e.isMetaDown()) {
                 handleCellActionFromSwing(e);
@@ -173,7 +185,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
       m_scoutListener = new ActivityMapListener() {
         @Override
         public void activityMapChanged(final ActivityMapEvent e) {
-          if (isIgnoredScoutEvent(ActivityMapEvent.class, "" + e.getType())) return;
+          if (isIgnoredScoutEvent(ActivityMapEvent.class, "" + e.getType())) {
+            return;
+          }
           //
           switch (e.getType()) {
             case ActivityMapEvent.TYPE_ACTIVITIES_DELETED:
@@ -241,7 +255,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
   }
 
   private void setSelectedActivityCellFromSwing(SwingActivityComponent comp) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     final ActivityCell cell = (comp != null ? comp.getScoutActivityCell() : null);
     // notify Scout
@@ -257,7 +273,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
   }
 
   private void handleCellActionFromSwing(MouseEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     final ActivityCell cell = (e.getComponent() instanceof SwingActivityComponent) ? ((SwingActivityComponent) e.getComponent()).getScoutActivityCell() : null;
     Point p = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), getSwingActivityMap());
@@ -294,7 +312,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
   }
 
   private void setSelectionFromSwing(int[] rows, double[] range) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     final double[] normalizedRange = range;
     Long[] ids = getScoutActivityMap().getResourceIds();
@@ -370,7 +390,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
   }
 
   private void handleSwingNewActivityPopup(final MouseEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     // notify Scout
     Runnable t = new Runnable() {
@@ -386,7 +408,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
   }
 
   private void handleSwingEditActivityPopup(final MouseEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) return;
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
     //
     // notify Scout
     Runnable t = new Runnable() {

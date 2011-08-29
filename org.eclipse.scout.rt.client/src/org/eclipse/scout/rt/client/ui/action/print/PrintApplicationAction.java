@@ -62,8 +62,12 @@ public class PrintApplicationAction extends AbstractAction {
 
   @Override
   protected void execAction() throws ProcessingException {
-    if (getDesktop() == null) throw new VetoException("desktop is null");
-    if (getDestinationFolder() == null) throw new VetoException("destinationFolder is null");
+    if (getDesktop() == null) {
+      throw new VetoException("desktop is null");
+    }
+    if (getDestinationFolder() == null) {
+      throw new VetoException("destinationFolder is null");
+    }
     firePrintEvent(new PrintEvent(PrintApplicationAction.this, PrintEvent.TYPE_PRINT_START));
     if (m_formFilter == null) {
       // accept all filter

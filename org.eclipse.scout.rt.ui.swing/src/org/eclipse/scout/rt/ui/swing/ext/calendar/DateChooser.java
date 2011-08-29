@@ -229,10 +229,18 @@ public class DateChooser {
     b.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (m_displayMode == DISPLAY_MODE_MONTH) prevYear();
-        else if (m_displayMode == DISPLAY_MODE_WEEK) prevMonth();
-        else if (m_displayMode == DISPLAY_MODE_WORKWEEK) prevMonth();
-        else prevWeek();
+        if (m_displayMode == DISPLAY_MODE_MONTH) {
+          prevYear();
+        }
+        else if (m_displayMode == DISPLAY_MODE_WEEK) {
+          prevMonth();
+        }
+        else if (m_displayMode == DISPLAY_MODE_WORKWEEK) {
+          prevMonth();
+        }
+        else {
+          prevWeek();
+        }
       }
     });
     headerPanel.add(b);
@@ -241,10 +249,18 @@ public class DateChooser {
     b.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (m_displayMode == DISPLAY_MODE_MONTH) prevMonth();
-        else if (m_displayMode == DISPLAY_MODE_WEEK) prevWeek();
-        else if (m_displayMode == DISPLAY_MODE_WORKWEEK) prevWeek();
-        else prevDay();
+        if (m_displayMode == DISPLAY_MODE_MONTH) {
+          prevMonth();
+        }
+        else if (m_displayMode == DISPLAY_MODE_WEEK) {
+          prevWeek();
+        }
+        else if (m_displayMode == DISPLAY_MODE_WORKWEEK) {
+          prevWeek();
+        }
+        else {
+          prevDay();
+        }
       }
     });
     headerPanel.add(b);
@@ -264,10 +280,18 @@ public class DateChooser {
     b.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (m_displayMode == DISPLAY_MODE_MONTH) nextMonth();
-        else if (m_displayMode == DISPLAY_MODE_WEEK) nextWeek();
-        else if (m_displayMode == DISPLAY_MODE_WORKWEEK) nextWeek();
-        else nextDay();
+        if (m_displayMode == DISPLAY_MODE_MONTH) {
+          nextMonth();
+        }
+        else if (m_displayMode == DISPLAY_MODE_WEEK) {
+          nextWeek();
+        }
+        else if (m_displayMode == DISPLAY_MODE_WORKWEEK) {
+          nextWeek();
+        }
+        else {
+          nextDay();
+        }
       }
     });
     headerPanel.add(b);
@@ -276,10 +300,18 @@ public class DateChooser {
     b.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (m_displayMode == DISPLAY_MODE_MONTH) nextYear();
-        else if (m_displayMode == DISPLAY_MODE_WEEK) nextMonth();
-        else if (m_displayMode == DISPLAY_MODE_WORKWEEK) nextMonth();
-        else nextWeek();
+        if (m_displayMode == DISPLAY_MODE_MONTH) {
+          nextYear();
+        }
+        else if (m_displayMode == DISPLAY_MODE_WEEK) {
+          nextMonth();
+        }
+        else if (m_displayMode == DISPLAY_MODE_WORKWEEK) {
+          nextMonth();
+        }
+        else {
+          nextWeek();
+        }
       }
     });
     headerPanel.add(b);
@@ -408,8 +440,12 @@ public class DateChooser {
       Object oldItem = m_selectedItem;
       m_selectedItem = item;
       CalendarModel model = getModel();
-      if (oldItem != null) repaintCellRange(model.getFromDate(oldItem), model.getToDate(oldItem));
-      if (item != null) repaintCellRange(model.getFromDate(item), model.getToDate(item));
+      if (oldItem != null) {
+        repaintCellRange(model.getFromDate(oldItem), model.getToDate(oldItem));
+      }
+      if (item != null) {
+        repaintCellRange(model.getFromDate(item), model.getToDate(item));
+      }
       fireSelectionChanged();
     }
   }
@@ -523,12 +559,18 @@ public class DateChooser {
     if (newMode != DISPLAY_MODE_MONTH &&
         newMode != DISPLAY_MODE_WEEK &&
         newMode != DISPLAY_MODE_WORKWEEK &&
-        newMode != DISPLAY_MODE_DAY) throw new IllegalArgumentException("illegal display mode: " + newMode);
+        newMode != DISPLAY_MODE_DAY) {
+      throw new IllegalArgumentException("illegal display mode: " + newMode);
+    }
     int oldMode = m_displayMode;
-    if (oldMode == newMode) return;
+    if (oldMode == newMode) {
+      return;
+    }
     m_displayMode = newMode;
     Date base = getDate();
-    if (base != null) m_viewDate = base;
+    if (base != null) {
+      m_viewDate = base;
+    }
     updateControlPanelState();
     // recalculate and relayout
     reconfigureLayout();
@@ -552,7 +594,10 @@ public class DateChooser {
   }
 
   public void setWorkDayCount(int n) {
-    if (n < 0 || n > 7) return;// ignore it
+    if (n < 0 || n > 7)
+     {
+      return;// ignore it
+    }
     m_workDayCount = n;
     updateStates();
     m_container.repaint();
@@ -629,12 +674,16 @@ public class DateChooser {
   }
 
   protected void repaintCellRange(Date a, Date b) {
-    if (b == null) b = a;
+    if (b == null) {
+      b = a;
+    }
     Calendar cal = Calendar.getInstance();
     cal.setTime(truncDate(a));
     while (cal.getTime().compareTo(b) <= 0) {
       AbstractCalendarCell cell = m_dateMap.get(cal.getTime());
-      if (cell != null) cell.refresh();
+      if (cell != null) {
+        cell.refresh();
+      }
       cal.add(Calendar.DATE, 1);
     }
   }
@@ -668,7 +717,9 @@ public class DateChooser {
     }
     c.add(type, amount);
     setViewDate(truncDate(c.getTime()));
-    if (fireNotification) notifyShiftViewDateListeners(type, amount);
+    if (fireNotification) {
+      notifyShiftViewDateListeners(type, amount);
+    }
     fireParentAndChildCalendarShift();
     updateSelections();
   }
@@ -741,7 +792,9 @@ public class DateChooser {
   }
 
   public void toggleSelectedDate(Date d) {
-    if (d == null) return;
+    if (d == null) {
+      return;
+    }
     d = truncDate(d);
     if (isMultiSelect()) {
       if (m_selectedDates.contains(d)) {
@@ -754,7 +807,9 @@ public class DateChooser {
   }
 
   public void addSelectedDate(Date d) {
-    if (d == null) return;
+    if (d == null) {
+      return;
+    }
     d = truncDate(d);
     if (isMultiSelect()) {
       TreeSet<Date> newSet = new TreeSet<Date>();
@@ -782,7 +837,9 @@ public class DateChooser {
   }
 
   public void removeSelectedDate(Date d) {
-    if (d == null) return;
+    if (d == null) {
+      return;
+    }
     d = truncDate(d);
     if (isMultiSelect()) {
       TreeSet<Date> newSet = new TreeSet<Date>();
@@ -823,7 +880,9 @@ public class DateChooser {
 
   protected final void setViewDate(Date d) {
     if (d == null) {
-      if (m_viewDate != null) return;
+      if (m_viewDate != null) {
+        return;
+      }
       d = new Date();
     }
     Date newDate = truncDate(d);
@@ -941,7 +1000,9 @@ public class DateChooser {
   private void updateStates() {
     Calendar c = Calendar.getInstance();
     Date vd = getViewDate();
-    if (vd == null) vd = truncDate(new Date());
+    if (vd == null) {
+      vd = truncDate(new Date());
+    }
     c.setTime(vd);
     int monthNo = c.get(Calendar.MONTH);
     int weekNo = c.get(Calendar.WEEK_OF_YEAR);
@@ -976,10 +1037,18 @@ public class DateChooser {
         boolean isInMonth = c.get(Calendar.MONTH) == monthNo;
         AbstractCalendarCell cc = m_cell[y][x];
         boolean firstCol;
-        if (m_displayMode == DateChooser.DISPLAY_MODE_MONTH) firstCol = (c.get(Calendar.DAY_OF_WEEK) == m_firstDayOfWeek);
-        else if (m_displayMode == DateChooser.DISPLAY_MODE_WEEK) firstCol = (c.get(Calendar.DAY_OF_WEEK) == m_firstDayOfWeek);
-        else if (m_displayMode == DateChooser.DISPLAY_MODE_WORKWEEK) firstCol = (c.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY);
-        else /* day */firstCol = true;
+        if (m_displayMode == DateChooser.DISPLAY_MODE_MONTH) {
+          firstCol = (c.get(Calendar.DAY_OF_WEEK) == m_firstDayOfWeek);
+        }
+        else if (m_displayMode == DateChooser.DISPLAY_MODE_WEEK) {
+          firstCol = (c.get(Calendar.DAY_OF_WEEK) == m_firstDayOfWeek);
+        }
+        else if (m_displayMode == DateChooser.DISPLAY_MODE_WORKWEEK) {
+          firstCol = (c.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY);
+        }
+        else {
+          /* day */firstCol = true;
+        }
         cc.setRepresentedState(c, isInMonth, firstCol, getDisplayMode());
         m_dateMap.put(cc.getRepresentedDate(), cc);
         // next
@@ -990,7 +1059,9 @@ public class DateChooser {
   }
 
   public static Date truncDate(Date d) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     c.set(Calendar.HOUR, 0);
@@ -1008,7 +1079,9 @@ public class DateChooser {
   }
 
   public static Date nextDay(Date d) {
-    if (d == null) return null;
+    if (d == null) {
+      return null;
+    }
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     c.add(Calendar.DATE, 1);
@@ -1161,24 +1234,30 @@ public class DateChooser {
       g.translate(x, y);
       g.setColor(c.getForeground());
       if (m_steps == +2) {
-        for (int i = 0; i <= 3; i++)
+        for (int i = 0; i <= 3; i++) {
           g.drawLine(i, i, i, 6 - i);
-        for (int i = 0; i <= 3; i++)
+        }
+        for (int i = 0; i <= 3; i++) {
           g.drawLine(i + 3, i, i + 3, 6 - i);
+        }
       }
       else if (m_steps == +1) {
-        for (int i = 0; i <= 3; i++)
+        for (int i = 0; i <= 3; i++) {
           g.drawLine(i + 1, i, i + 1, 6 - i);
+        }
       }
       else if (m_steps == -1) {
-        for (int i = 0; i <= 3; i++)
+        for (int i = 0; i <= 3; i++) {
           g.drawLine(5 - i, i, 5 - i, 6 - i);
+        }
       }
       else if (m_steps == -2) {
-        for (int i = 0; i <= 3; i++)
+        for (int i = 0; i <= 3; i++) {
           g.drawLine(6 - i, i, 6 - i, 6 - i);
-        for (int i = 0; i <= 3; i++)
+        }
+        for (int i = 0; i <= 3; i++) {
           g.drawLine(3 - i, i, 3 - i, 6 - i);
+        }
       }
       g.translate(-x, -y);
     }

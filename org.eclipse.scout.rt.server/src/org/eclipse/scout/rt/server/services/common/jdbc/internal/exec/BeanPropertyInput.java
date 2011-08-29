@@ -27,7 +27,9 @@ class BeanPropertyInput implements IBindInput {
   private int m_jdbcBindIndex = -1;
 
   public BeanPropertyInput(String propertyName, Object[] beans, ValueInputToken target) throws ProcessingException {
-    if (beans == null) beans = new Object[0];
+    if (beans == null) {
+      beans = new Object[0];
+    }
     m_propertyName = propertyName;
     m_beans = beans;
     m_target = target;

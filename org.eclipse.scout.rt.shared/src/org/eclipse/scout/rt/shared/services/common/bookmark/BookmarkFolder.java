@@ -182,14 +182,20 @@ public class BookmarkFolder implements Serializable, Cloneable {
       path.add(this);
       //
       result = v.visitFolder(path);
-      if (!result) return result;
+      if (!result) {
+        return result;
+      }
       for (Bookmark b : new ArrayList<Bookmark>(getBookmarks())) {
         result = v.visitBookmark(path, b);
-        if (!result) return result;
+        if (!result) {
+          return result;
+        }
       }
       for (BookmarkFolder f : new ArrayList<BookmarkFolder>(getFolders())) {
         result = f.visitInternal(v, path);
-        if (!result) return result;
+        if (!result) {
+          return result;
+        }
       }
       return result;
     }

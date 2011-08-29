@@ -38,13 +38,17 @@ public abstract class AbstractLayoutManager2 implements LayoutManager2 {
   }
 
   public static String dump(Object o) {
-    if (o == null) return "null";
+    if (o == null) {
+      return "null";
+    }
     else if (o.getClass().isArray()) {
       int n = Array.getLength(o);
       StringBuffer b = new StringBuffer();
       b.append("[");
       for (int i = 0; i < n; i++) {
-        if (i > 0) b.append(",");
+        if (i > 0) {
+          b.append(",");
+        }
         b.append(dump(Array.get(o, i)));
       }
       b.append("]");

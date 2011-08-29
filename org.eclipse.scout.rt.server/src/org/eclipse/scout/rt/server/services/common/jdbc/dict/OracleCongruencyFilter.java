@@ -30,7 +30,9 @@ public class OracleCongruencyFilter extends CongruencyFilter {
   public String getCanonicalColumnType(ColumnDesc cd) {
     String type = cd.getTypeName().toUpperCase();
     // bugs in oracle are corrected first
-    if (type.equals("DOUBLE")) type = "DOUBLE PRECISION";
+    if (type.equals("DOUBLE")) {
+      type = "DOUBLE PRECISION";
+    }
     // map column type names to canonical names
     if (type.equals("DATE") || type.equals("TIME") || type.equals("TIMESTAMP")) {
       type = "DATE";

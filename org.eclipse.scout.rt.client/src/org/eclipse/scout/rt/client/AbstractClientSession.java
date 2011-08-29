@@ -208,7 +208,9 @@ public abstract class AbstractClientSession implements IClientSession {
   @Override
   public final void startSession(Bundle bundle) {
     m_bundle = bundle;
-    if (isActive()) throw new IllegalStateException("session is active");
+    if (isActive()) {
+      throw new IllegalStateException("session is active");
+    }
     try {
       String policy = bundle.getBundleContext().getProperty("org.eclipse.scout.memory");
       if ("small".equals(policy)) {
@@ -249,8 +251,12 @@ public abstract class AbstractClientSession implements IClientSession {
 
   @Override
   public void setDesktop(IDesktop a) throws ProcessingException {
-    if (a == null) throw new IllegalArgumentException("argument must not be null");
-    if (m_desktop != null) throw new IllegalStateException("desktop is active");
+    if (a == null) {
+      throw new IllegalArgumentException("argument must not be null");
+    }
+    if (m_desktop != null) {
+      throw new IllegalStateException("desktop is active");
+    }
     m_desktop = a;
     if (m_desktop != null) {
       if (m_virtualDesktop != null) {
@@ -329,7 +335,9 @@ public abstract class AbstractClientSession implements IClientSession {
       LOG.info("logout on server", t);
     }
     setActive(false);
-    if (LOG.isInfoEnabled()) LOG.info("end session event loop");
+    if (LOG.isInfoEnabled()) {
+      LOG.info("end session event loop");
+    }
   }
 
   @Override

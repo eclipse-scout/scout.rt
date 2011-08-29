@@ -207,8 +207,12 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
   @Override
   protected void dumpState(Map<String, Object> attributes) {
     super.dumpState(attributes);
-    if (m_start != null) attributes.put("start", getDumpDateFormat().format(m_start));
-    if (m_end != null) attributes.put("end", getDumpDateFormat().format(m_end));
+    if (m_start != null) {
+      attributes.put("start", getDumpDateFormat().format(m_start));
+    }
+    if (m_end != null) {
+      attributes.put("end", getDumpDateFormat().format(m_end));
+    }
     attributes.put("fullDay", m_fullDay);
     attributes.put("location", m_location);
     attributes.put("busyStatus", m_busyStatus);

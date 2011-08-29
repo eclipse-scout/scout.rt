@@ -186,7 +186,9 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   private Class<? extends ITable> getConfiguredTable() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     Class<? extends ITable>[] f = ConfigurationUtility.filterClasses(dca, ITable.class);
-    if (f.length == 1) return f[0];
+    if (f.length == 1) {
+      return f[0];
+    }
     else {
       for (Class<? extends ITable> c : f) {
         if (c.getDeclaringClass() != AbstractTableField.class) {
@@ -310,7 +312,9 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     if (tableFieldData.isValueSet()) {
       if (m_table != null) {
         try {
-          if (!valueChangeTriggersEnabled) setValueChangeTriggerEnabled(false);
+          if (!valueChangeTriggersEnabled) {
+            setValueChangeTriggerEnabled(false);
+          }
           //
           m_table.updateTable(tableFieldData);
           if (m_table.isCheckable()
@@ -321,7 +325,9 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
           }
         }
         finally {
-          if (!valueChangeTriggersEnabled) setValueChangeTriggerEnabled(true);
+          if (!valueChangeTriggersEnabled) {
+            setValueChangeTriggerEnabled(true);
+          }
         }
       }
     }

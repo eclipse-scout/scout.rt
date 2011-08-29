@@ -111,7 +111,9 @@ public class HtmlComponent {
   }
 
   public void formTextArea(String fieldName, String value) {
-    if (value == null) value = "";
+    if (value == null) {
+      value = "";
+    }
     int valueLen = value.length();
     int cols = 50;
     int rows = 1;
@@ -228,10 +230,18 @@ public class HtmlComponent {
 
   public void startTable(int border, int cellspacing, int cellpadding, String width) {
     out.print("<table");
-    if (border >= 0) out.print(" border=" + border);
-    if (cellspacing >= 0) out.print(" cellspacing=" + cellspacing);
-    if (cellpadding >= 0) out.print(" cellpadding=" + cellpadding);
-    if (width != null) out.print(" width='" + width + "'");
+    if (border >= 0) {
+      out.print(" border=" + border);
+    }
+    if (cellspacing >= 0) {
+      out.print(" cellspacing=" + cellspacing);
+    }
+    if (cellpadding >= 0) {
+      out.print(" cellpadding=" + cellpadding);
+    }
+    if (width != null) {
+      out.print(" width='" + width + "'");
+    }
     out.print(">");
   }
 
@@ -265,9 +275,15 @@ public class HtmlComponent {
 
   public void startTableCell(int rows, int cols, String color) {
     out.print("<td");
-    if (rows > 1) out.print(" rowspan=" + rows);
-    if (cols > 1) out.print(" colspan=" + cols);
-    if (color != null) out.print(" bgcolor='#" + color + "'");
+    if (rows > 1) {
+      out.print(" rowspan=" + rows);
+    }
+    if (cols > 1) {
+      out.print(" colspan=" + cols);
+    }
+    if (color != null) {
+      out.print(" bgcolor='#" + color + "'");
+    }
     out.print(">");
   }
 
@@ -306,7 +322,9 @@ public class HtmlComponent {
   }
 
   public String javaToHtml(String s) {
-    if (s == null) return "";
+    if (s == null) {
+      return "";
+    }
     s = s.replaceAll("<", "&lt;");
     s = s.replaceAll(">", "&gt;");
     return s;

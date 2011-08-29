@@ -161,19 +161,39 @@ public class HolidayCalendarItemParser {
     //
     int weekday = -1;
     if (weekdayPattern != null) {
-      if (weekdayPattern.equalsIgnoreCase("MONDAY")) weekday = Calendar.MONDAY;
-      else if (weekdayPattern.equalsIgnoreCase("TUESDAY")) weekday = Calendar.TUESDAY;
-      else if (weekdayPattern.equalsIgnoreCase("WEDNESDAY")) weekday = Calendar.WEDNESDAY;
-      else if (weekdayPattern.equalsIgnoreCase("THURSDAY")) weekday = Calendar.THURSDAY;
-      else if (weekdayPattern.equalsIgnoreCase("FRIDAY")) weekday = Calendar.FRIDAY;
-      else if (weekdayPattern.equalsIgnoreCase("SATURDAY")) weekday = Calendar.SATURDAY;
-      else if (weekdayPattern.equalsIgnoreCase("SUNDAY")) weekday = Calendar.SUNDAY;
+      if (weekdayPattern.equalsIgnoreCase("MONDAY")) {
+        weekday = Calendar.MONDAY;
+      }
+      else if (weekdayPattern.equalsIgnoreCase("TUESDAY")) {
+        weekday = Calendar.TUESDAY;
+      }
+      else if (weekdayPattern.equalsIgnoreCase("WEDNESDAY")) {
+        weekday = Calendar.WEDNESDAY;
+      }
+      else if (weekdayPattern.equalsIgnoreCase("THURSDAY")) {
+        weekday = Calendar.THURSDAY;
+      }
+      else if (weekdayPattern.equalsIgnoreCase("FRIDAY")) {
+        weekday = Calendar.FRIDAY;
+      }
+      else if (weekdayPattern.equalsIgnoreCase("SATURDAY")) {
+        weekday = Calendar.SATURDAY;
+      }
+      else if (weekdayPattern.equalsIgnoreCase("SUNDAY")) {
+        weekday = Calendar.SUNDAY;
+      }
     }
     int instance = 0;
     if (instancePattern != null) {
-      if (instancePattern.equalsIgnoreCase("FIRST")) instance = 1;
-      else if (instancePattern.equalsIgnoreCase("LAST")) instance = -1;
-      else instance = Integer.parseInt(instancePattern);
+      if (instancePattern.equalsIgnoreCase("FIRST")) {
+        instance = 1;
+      }
+      else if (instancePattern.equalsIgnoreCase("LAST")) {
+        instance = -1;
+      }
+      else {
+        instance = Integer.parseInt(instancePattern);
+      }
     }
     Date startDate = null;
     if (relativeToId != null) {
@@ -210,7 +230,9 @@ public class HolidayCalendarItemParser {
         while (n > 0) {
           if (cal.get(Calendar.DAY_OF_WEEK) == weekday) {
             n--;
-            if (n == 0) break;
+            if (n == 0) {
+              break;
+            }
           }
           cal.add(Calendar.DATE, 1);
         }
@@ -221,7 +243,9 @@ public class HolidayCalendarItemParser {
         while (n > 0) {
           if (cal.get(Calendar.DAY_OF_WEEK) == weekday) {
             n--;
-            if (n == 0) break;
+            if (n == 0) {
+              break;
+            }
           }
           cal.add(Calendar.DATE, -1);
         }
@@ -235,7 +259,9 @@ public class HolidayCalendarItemParser {
     String s = null;
     for (int i = 0; i < locPatterns.length; i++) {
       s = e.getStringAttribute(attributeNamePrefix + "_" + locPatterns[i], null);
-      if (s != null) break;
+      if (s != null) {
+        break;
+      }
     }
     return s;
   }

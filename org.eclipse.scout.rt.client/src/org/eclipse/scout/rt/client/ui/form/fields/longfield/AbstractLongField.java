@@ -57,8 +57,12 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   @Override
   protected Long parseValueInternal(String text) throws ProcessingException {
     Long retVal = null;
-    if (text == null) text = "";
-    else text = text.trim();
+    if (text == null) {
+      text = "";
+    }
+    else {
+      text = text.trim();
+    }
     if (text.length() > 0) {
       ParsePosition p = new ParsePosition(0);
       Number n = createNumberFormat().parse(text, p);

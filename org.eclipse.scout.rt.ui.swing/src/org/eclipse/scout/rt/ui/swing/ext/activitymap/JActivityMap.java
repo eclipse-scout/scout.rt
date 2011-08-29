@@ -85,12 +85,16 @@ public class JActivityMap extends JComponent implements Scrollable {
           public void mouseReleased(MouseEvent e) {
             Component parent = getParentAt(e.getComponent(), e.getPoint());
             parent.dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, parent));
-            if(fix!=null) fix.mouseReleased(this, e);
+            if(fix!=null) {
+              fix.mouseReleased(this, e);
+            }
           }
 
           @Override
           public void mouseClicked(MouseEvent e) {
-            if (fix.mouseClicked()) return;
+            if (fix.mouseClicked()) {
+              return;
+            }
             Component parent = getParentAt(e.getComponent(), e.getPoint());
             parent.dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, parent));
           }
@@ -273,12 +277,16 @@ public class JActivityMap extends JComponent implements Scrollable {
         if (isButton1(e)) {
           dispatchEvent(SwingUtilities.convertMouseEvent(e.getComponent(), e, JActivityMap.this));
         }
-        if(fix!=null) fix.mouseReleased(this, e);
+        if(fix!=null) {
+          fix.mouseReleased(this, e);
+        }
       }
 
       @Override
       public void mouseClicked(MouseEvent e) {
-        if (fix.mouseClicked()) return;
+        if (fix.mouseClicked()) {
+          return;
+        }
         EventListener[] listeners = m_listeners.getListeners(MouseListener.class);
         for (EventListener listener : listeners) {
           ((MouseListener) listener).mouseClicked(e);
@@ -542,11 +550,19 @@ public class JActivityMap extends JComponent implements Scrollable {
     if (normalizedColumnRange != null) {
       int w = getVisibleViewportView().width;
       int a = (int) (normalizedColumnRange[0] * w);
-      if (a < 0) a = -1;
-      if (a >= w) a = w;
+      if (a < 0) {
+        a = -1;
+      }
+      if (a >= w) {
+        a = w;
+      }
       int b = (int) (normalizedColumnRange[1] * w);
-      if (b < 0) b = -1;
-      if (b >= w) b = w;
+      if (b < 0) {
+        b = -1;
+      }
+      if (b >= w) {
+        b = w;
+      }
       r.x = a;
       r.width = b - a;
     }
