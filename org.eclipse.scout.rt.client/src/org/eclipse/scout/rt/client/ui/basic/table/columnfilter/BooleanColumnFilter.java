@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -55,7 +56,7 @@ public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITabl
     hist.put(true, new LookupRow(true, "(" + ScoutTexts.get("ColumnFilterCheckedText") + ")"));
     hist.put(false, new LookupRow(false, "(" + ScoutTexts.get("ColumnFilterUncheckedText") + ")"));
     for (ITableRow row : m_column.getTable().getRows()) {
-      Boolean key = m_column.getValue(row);
+      Boolean key = BooleanUtility.nvl(m_column.getValue(row), false);
       Integer count = countMap.get(key);
       countMap.put(key, count != null ? count + 1 : 1);
     }
@@ -68,9 +69,6 @@ public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITabl
     }
     ArrayList<LookupRow> list = new ArrayList<LookupRow>();
     list.addAll(hist.values());
-    //
-    Integer nullCount = countMap.get(null);
-    list.add(new LookupRow(null, "(" + ScoutTexts.get("ColumnFilterNullText") + ")" + (nullCount != null && nullCount > 1 ? " (" + nullCount + ")" : "")));
     return list;
   }
 
@@ -81,7 +79,7 @@ public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITabl
 
   @Override
   public boolean accept(ITableRow row) {
-    Boolean value = m_column.getValue(row);
+    Boolean value = BooleanUtility.nvl(m_column.getValue(row), false);
     if (m_selectedValues != null) {
       if (!m_selectedValues.contains(value)) {
         return false;
