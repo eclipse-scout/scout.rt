@@ -54,40 +54,40 @@ import org.eclipse.swt.widgets.Menu;
 public abstract class AbstractCell extends Composite implements PaintListener {
   protected static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCell.class);
 
-  public final Color BACKGROUND = SwtColors.getInstance().white;
-  public final Color BORDER_SELECTED_COLOR = SwtColors.getInstance().blue;
-  public final Color BORDER_UNSELECTED_COLOR = SwtColors.getInstance().gray;
+  public static final Color BACKGROUND = SwtColors.getInstance().getWhite();
+  public static final Color BORDER_SELECTED_COLOR = SwtColors.getInstance().getBlue();
+  public static final Color BORDER_UNSELECTED_COLOR = SwtColors.getInstance().getGray();
 
-  protected Color background = BACKGROUND;
+  private Color background = BACKGROUND;
 
   /** main Calendar object */
-  protected SwtCalendar m_calendar;
+  private SwtCalendar m_calendar;
 
   /** cell calendar date */
-  protected Calendar m_cellDate;
+  private Calendar m_cellDate;
 
   /** is first column? */
-  protected boolean m_isFirstColumn;
+  private boolean m_isFirstColumn;
 
   /** is this cell part of the current month/week? */
-  protected boolean m_isCurrentPeriod;
+  private boolean m_isCurrentPeriod;
   /** cell selected? */
-  protected boolean m_isSelected;
+  private boolean m_isSelected;
 
-  protected String m_weekText = null;
-  protected String m_dayText = null;
+  private String m_weekText = null;
+  private String m_dayText = null;
 
   /** manager for context menu regarding this cell */
-  protected MenuManager m_menuManager;
+  private MenuManager m_menuManager;
 
   /** cached CalendarItemContainer */
-  protected TreeSet<CalendarItemContainer> m_itemsCached;
+  private TreeSet<CalendarItemContainer> m_itemsCached;
 
   /** widget celendar items contained within this cell */
-  protected ArrayList<AbstractCalendarItem> m_widgetItems;
+  private ArrayList<AbstractCalendarItem> m_widgetItems;
 
   /** number of timeless items within that cell */
-  protected int m_countTimeless;
+  private int m_countTimeless;
 
   public AbstractCell(Composite parent, int style) {
     super(parent, style);
@@ -208,6 +208,14 @@ public abstract class AbstractCell extends Composite implements PaintListener {
     return m_calendar;
   }
 
+  protected void setCalendar(SwtCalendar calendar) {
+    m_calendar = calendar;
+  }
+
+  protected ArrayList<AbstractCalendarItem> getWidgetItems() {
+    return m_widgetItems;
+  }
+
   /** method getting called by the PaintListener */
   @Override
   public void paintControl(PaintEvent e) {
@@ -227,7 +235,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
   protected void drawDayLabel(PaintEvent e) {
     if (m_dayText != null) {
       // foreground to black
-      e.gc.setForeground(SwtColors.getInstance().black);
+      e.gc.setForeground(SwtColors.getInstance().getBlack());
 
       // get cell bounds
       Rectangle bounds = getBounds();
@@ -240,7 +248,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
   protected void drawWeekLabel(PaintEvent e) {
     if (m_dayText != null) {
       // foreground to black
-      e.gc.setForeground(SwtColors.getInstance().black);
+      e.gc.setForeground(SwtColors.getInstance().getBlack());
 
       // test draw a test
       e.gc.drawString(m_weekText, 3, 1, true);
@@ -316,8 +324,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
           Calendar newDate = Calendar.getInstance();
           newDate.setTime(m_cellDate.getTime());
           newDate.add(Calendar.DATE, 1);
-          AbstractCell cell = m_calendar.getCentralPanel()
-              .getCellFromDate(newDate.getTime());
+          AbstractCell cell = m_calendar.getCentralPanel().getCellFromDate(newDate.getTime());
           if (cell != null) {
             cell.setSelected();
           }
@@ -328,8 +335,7 @@ public abstract class AbstractCell extends Composite implements PaintListener {
           newDate = Calendar.getInstance();
           newDate.setTime(m_cellDate.getTime());
           newDate.add(Calendar.DATE, -1);
-          cell = m_calendar.getCentralPanel()
-              .getCellFromDate(newDate.getTime());
+          cell = m_calendar.getCentralPanel().getCellFromDate(newDate.getTime());
           if (cell != null) {
             cell.setSelected();
           }
@@ -360,6 +366,10 @@ public abstract class AbstractCell extends Composite implements PaintListener {
     redraw();
   }
 
+  protected void setSelectedInternal(boolean selected) {
+    m_isSelected = selected;
+  }
+
   public boolean getSelected() {
     return m_isSelected;
   }
@@ -376,6 +386,26 @@ public abstract class AbstractCell extends Composite implements PaintListener {
     return m_cellDate;
   }
 
+  protected void setDate(Calendar cellDate) {
+    m_cellDate = cellDate;
+  }
+
+  protected boolean isFirstColumn() {
+    return m_isFirstColumn;
+  }
+
+  protected void setFirstColumn(boolean isFirstColumn) {
+    m_isFirstColumn = isFirstColumn;
+  }
+
+  protected boolean isCurrentPeriod() {
+    return m_isCurrentPeriod;
+  }
+
+  protected void setCurrentPeriod(boolean isCurrentPeriod) {
+    m_isCurrentPeriod = isCurrentPeriod;
+  }
+
   protected void setVisualState() {
     // week name
     String weekName = m_isFirstColumn ? SwtUtility.getNlsText(Display.getCurrent(), "WeekShort") + " " + m_cellDate.get(Calendar.WEEK_OF_YEAR) : "";
@@ -389,10 +419,10 @@ public abstract class AbstractCell extends Composite implements PaintListener {
 
     // gray background for cell not in the curent month
     if (m_isCurrentPeriod) {
-      setBackground(SwtColors.getInstance().white);
+      setBackground(SwtColors.getInstance().getWhite());
     }
     else {
-      setBackground(SwtColors.getInstance().lightgray);
+      setBackground(SwtColors.getInstance().getLightgray());
     }
 
   }

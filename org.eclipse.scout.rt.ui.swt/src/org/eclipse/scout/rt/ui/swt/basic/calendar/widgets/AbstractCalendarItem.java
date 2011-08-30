@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.ui.swt.basic.calendar.widgets;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarConstants;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarItemContainer;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -18,16 +17,16 @@ import org.eclipse.swt.widgets.Menu;
  * 
  * @author Michael Rudolf, Andreas Hoegger
  */
-public abstract class AbstractCalendarItem extends Composite implements CalendarConstants, PaintListener, MouseTrackListener {
+public abstract class AbstractCalendarItem extends Composite implements PaintListener, MouseTrackListener {
 
   /** model calendar item */
-  protected CalendarItemContainer m_item;
+  private CalendarItemContainer m_item;
 
   /** reference to parent cell */
-  protected AbstractCell m_cell;
+  private AbstractCell m_cell;
 
   /** manager for context menu regarding this cell */
-  protected MenuManager m_menuManager;
+  private MenuManager m_menuManager;
 
   public AbstractCalendarItem(AbstractCell parent, int style, CalendarItemContainer item) {
     super(parent, style);
@@ -42,6 +41,22 @@ public abstract class AbstractCalendarItem extends Composite implements Calendar
     setLayout();
     setupMenu();
     hookListeners();
+  }
+
+  protected CalendarItemContainer getItem() {
+    return m_item;
+  }
+
+  protected void setItem(CalendarItemContainer item) {
+    m_item = item;
+  }
+
+  protected AbstractCell getCell() {
+    return m_cell;
+  }
+
+  protected void setCell(AbstractCell cell) {
+    m_cell = cell;
   }
 
   protected void createControls() {

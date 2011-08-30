@@ -45,12 +45,12 @@ import org.eclipse.swt.widgets.Listener;
  */
 public class SwtScoutCalendar extends SwtCalendar {
 
-  protected ICalendar m_scoutCalendarModel;
-  protected Lock m_singleObserverLock = new ReentrantLock();
+  private ICalendar m_scoutCalendarModel;
+  private Lock m_singleObserverLock = new ReentrantLock();
   private SwtScoutCalendarField m_field;
   private OptimisticLock m_propertyChangeLock;
 
-  protected P_ScoutCalendarPropertyListener m_activePropertyListener; //used for auto-detach
+  private P_ScoutCalendarPropertyListener m_activePropertyListener; //used for auto-detach
 
   public SwtScoutCalendar(Composite parent, int style, SwtScoutCalendarField field) {
     super(parent, style);
@@ -101,7 +101,7 @@ public class SwtScoutCalendar extends SwtCalendar {
             manager.add(new Separator());
           }
           else {
-            manager.add(new SwtScoutAction((IMenu) menuItem, m_field.getEnvironment(), Action.AS_PUSH_BUTTON).getSwtAction());
+            manager.add(new SwtScoutAction(menuItem, m_field.getEnvironment(), Action.AS_PUSH_BUTTON).getSwtAction());
           }
         }
       }
@@ -119,7 +119,7 @@ public class SwtScoutCalendar extends SwtCalendar {
             manager.add(new Separator());
           }
           else {
-            manager.add(new SwtScoutAction((IMenu) menuItem, m_field.getEnvironment(), Action.AS_PUSH_BUTTON).getSwtAction());
+            manager.add(new SwtScoutAction(menuItem, m_field.getEnvironment(), Action.AS_PUSH_BUTTON).getSwtAction());
           }
         }
       }
@@ -211,7 +211,7 @@ public class SwtScoutCalendar extends SwtCalendar {
       Runnable r = new Runnable() {
         @Override
         public void run() {
-          m_scoutCalendarModel.setViewRange(m_viewDateStart.getTime(), m_viewDateEnd.getTime());
+          m_scoutCalendarModel.setViewRange(getViewDateStart().getTime(), getViewDateEnd().getTime());
         }
       };
       JobEx job = m_field.getEnvironment().invokeScoutLater(r, 0);

@@ -21,18 +21,57 @@ import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarItemContainer;
 public final class WeekItemData {
 
   /** max timeless item count in any cell of the week */
-  public int timelessMaxCount;
+  private int timelessMaxCount;
 
   /** timeless item count in the parent cell */
-  public int timelessCount;
+  private int timelessCount;
 
   /** timeless index of that item */
-  public int timelessIndex;
+  private int timelessIndex;
 
   /** corresponding CalendarItemContainer of that item */
-  public CalendarItemContainer m_item;
+  private CalendarItemContainer m_item;
 
   /** height of the offset caused by the presence of a header */
-  public int offsetCellHeader = 0;
+  private int offsetCellHeader = 0;
 
+  public int getTimelessMaxCount() {
+    return timelessMaxCount;
+  }
+
+  public void setTimelessMaxCount(int timelessMaxCount) {
+    this.timelessMaxCount = timelessMaxCount;
+  }
+
+  public int getTimelessCount() {
+    return timelessCount;
+  }
+
+  public void setTimelessCount(int timelessCount) {
+    this.timelessCount = timelessCount;
+  }
+
+  public int getTimelessIndex() {
+    return timelessIndex;
+  }
+
+  public void setTimelessIndex(int timelessIndex) {
+    this.timelessIndex = timelessIndex;
+  }
+
+  public CalendarItemContainer getItem() {
+    return m_item;
+  }
+
+  public void setItem(CalendarItemContainer item) {
+    m_item = item;
+  }
+
+  public int getOffsetCellHeader() {
+    return offsetCellHeader;
+  }
+
+  public void setOffsetCellHeader(int offsetCellHeader) {
+    this.offsetCellHeader = offsetCellHeader;
+  }
 }

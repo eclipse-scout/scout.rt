@@ -22,8 +22,7 @@ import org.eclipse.swt.widgets.Layout;
  * 
  * @author Michael Rudolf, Andreas Hoegger
  */
-public class WeekItemLayout extends Layout
-    implements CalendarConstants {
+public class WeekItemLayout extends Layout {
 
   private static final int MIN_WIDTH = 3;
   private static final int MIN_HEIGHT = 4;
@@ -50,19 +49,19 @@ public class WeekItemLayout extends Layout
       WeekItemData dat = (WeekItemData) child.getLayoutData();
 
       // possible header offset
-      int yOffset = Math.max(0, dat.offsetCellHeader - 1);
+      int yOffset = Math.max(0, dat.getOffsetCellHeader() - 1);
       // timeless height: 24 pixels x the max nb of timeless items but at most the third of the cell height
-      int timelessHeight = Math.min(24 * dat.timelessMaxCount, 33 * clipRect.height / 100);
+      int timelessHeight = Math.min(24 * dat.getTimelessMaxCount(), 33 * clipRect.height / 100);
       // hTimeless: timelessHeight - 1 but at least 0
       int hTimeless = Math.max(0, timelessHeight - 1);
       int yTimed = yOffset + hTimeless + 1;
       int hTimed = clipRect.height - yOffset - hTimeless;
 
       Rectangle r = new Rectangle(0, 0, 0, 0);
-      long intervalMillis = (DAY_TIMELINE_END_TIME /*+ 1*/- DAY_TIMELINE_START_TIME) * HOUR_MILLIS;
+      long intervalMillis = (CalendarConstants.DAY_TIMELINE_END_TIME /*+ 1*/- CalendarConstants.DAY_TIMELINE_START_TIME) * CalendarConstants.HOUR_MILLIS;
 
       int timelessItemHeight = 0;
-      int countTimeless = dat.timelessCount;
+      int countTimeless = dat.getTimelessCount();
       if (countTimeless > 0) {
         // timelessItemHeight: timeless part divided by the nb of timeless items, but at least 5
         timelessItemHeight = Math.max(5, hTimeless / countTimeless);
@@ -75,15 +74,15 @@ public class WeekItemLayout extends Layout
       int w = clipRect.width;
 
       // timed
-      if (dat.m_item.isTimed()) {
-        r.x = (int) (dat.m_item.getX0() * w);
-        r.width = (int) (dat.m_item.getX1() * w) - r.x;
+      if (dat.getItem().isTimed()) {
+        r.x = (int) (dat.getItem().getX0() * w);
+        r.width = (int) (dat.getItem().getX1() * w) - r.x;
 
         // check that there is a minimum width
         r.width = r.width < MIN_WIDTH ? MIN_WIDTH : r.width;
 
-        r.y = yTimed + (int) (dat.m_item.getFromRelative() * hTimed / intervalMillis);
-        r.height = yTimed + (int) (dat.m_item.getToRelative() * hTimed / intervalMillis) - r.y;
+        r.y = yTimed + (int) (dat.getItem().getFromRelative() * hTimed / intervalMillis);
+        r.height = yTimed + (int) (dat.getItem().getToRelative() * hTimed / intervalMillis) - r.y;
 
         // check min height
         r.height = r.height < MIN_HEIGHT ? MIN_HEIGHT : r.height;
@@ -92,7 +91,7 @@ public class WeekItemLayout extends Layout
       else {
         r.x = 0;
         r.width = w;
-        r.y = yOffset + (int) (dat.timelessIndex * timelessItemHeight);
+        r.y = yOffset + (dat.getTimelessIndex() * timelessItemHeight);
         r.height = r.y < hTimeless + yOffset ? timelessItemHeight : 0;
 
       } // end if timeless

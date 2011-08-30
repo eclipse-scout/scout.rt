@@ -21,6 +21,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 
 class LogicalGridLayoutInfo {
+//CHECKSTYLE:OFF
   LogicalGridData[/* component count */] gridDatas;
   Control[/* component count */] components;
   int[/* component count */] componentWidths;
@@ -35,6 +36,8 @@ class LogicalGridLayoutInfo {
   int[/*column*/] widthHints;
   double[/* column */] weightX;
   double[/* row */] weightY;
+
+//CHECKSTYLE:ON
 
   LogicalGridLayoutInfo(Control[] components, LogicalGridData[] cons, int hgap, int vgap, int wHint, boolean flushCache) {
     this.components = components;

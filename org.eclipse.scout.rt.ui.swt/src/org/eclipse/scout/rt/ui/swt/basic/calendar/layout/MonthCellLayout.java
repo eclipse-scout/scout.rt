@@ -27,9 +27,24 @@ import org.eclipse.swt.widgets.Layout;
 public class MonthCellLayout extends Layout {
   protected static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtCalendar.class);
 
-  public int numColumns = 1;
+  private int numColumns = 1;
+  private int numLines = 1;
 
-  public int numLines = 1;
+  public int getNumColumns() {
+    return numColumns;
+  }
+
+  public void setNumColumns(int numColumns) {
+    this.numColumns = numColumns;
+  }
+
+  public int getNumLines() {
+    return numLines;
+  }
+
+  public void setNumLines(int numLines) {
+    this.numLines = numLines;
+  }
 
   @Override
   protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
@@ -68,8 +83,8 @@ public class MonthCellLayout extends Layout {
         Control child = children[i];
         MonthCellData dat = (MonthCellData) child.getLayoutData();
 
-        int hSpan = Math.max(1, Math.min(dat.horizontalSpan, numColumns - colIndex));
-        int vSpan = Math.max(1, Math.min(dat.verticalSpan, numLines - lineIndex));
+        int hSpan = Math.max(1, Math.min(dat.getHorizontalSpan(), numColumns - colIndex));
+        int vSpan = Math.max(1, Math.min(dat.getHorizontalSpan(), numLines - lineIndex));
 
         for (int v = 0; v < vSpan; v++) {
           for (int h = 0; h < hSpan; h++) {
@@ -77,7 +92,6 @@ public class MonthCellLayout extends Layout {
             ary[colIndex + h][lineIndex + v] = i;
           }
         }
-
         // next elem
         i++;
       }
@@ -101,8 +115,8 @@ public class MonthCellLayout extends Layout {
 
           int x = Math.round(h * cellWidth);
           int y = Math.round(v * cellHeight);
-          int width = Math.round(dat.horizontalSpan * cellWidth);
-          int height = Math.round(dat.verticalSpan * cellHeight);
+          int width = Math.round(dat.getHorizontalSpan() * cellWidth);
+          int height = Math.round(dat.getVerticalSpan() * cellHeight);
 
           // inset not (yet) done
 
@@ -114,7 +128,5 @@ public class MonthCellLayout extends Layout {
         }
       }
     }
-
   }
-
 }

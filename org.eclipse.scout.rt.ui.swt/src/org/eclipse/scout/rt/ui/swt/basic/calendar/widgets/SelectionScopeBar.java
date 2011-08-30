@@ -35,20 +35,20 @@ public class SelectionScopeBar extends Composite {
   protected static final IScoutLogger LOG = ScoutLogManager.getLogger(SelectionScopeBar.class);
 
   /** parent composite */
-  protected SwtCalendar m_calendar;
+  private SwtCalendar m_calendar;
 
   /* contained widgets */
-  protected Button m_dayWidget;
-  protected Button m_workWeekWidget;
-  protected Button m_weekWidget;
-  protected Button m_monthWidget;
-  //protected LabelledCombo m_firstDayWidget;
-  protected Button m_condensedWidget;
+  private Button m_dayWidget;
+  private Button m_workWeekWidget;
+  private Button m_weekWidget;
+  private Button m_monthWidget;
+  //private LabelledCombo m_firstDayWidget;
+  private Button m_condensedWidget;
 
   /** display mode of the calendar */
-  protected int m_scope;
-  protected int m_firstDay;
-  protected boolean m_condensed;
+  private int m_scope;
+  private int m_firstDay;
+  private boolean m_condensed;
 
   public SelectionScopeBar(SwtCalendar parent, int style) {
     super(parent, style);
@@ -89,7 +89,7 @@ public class SelectionScopeBar extends Composite {
     // create button 1
     m_dayWidget = new Button(this, SWT.RADIO);
     m_dayWidget.setText(SwtUtility.getNlsText(Display.getCurrent(), "Day"));
-    m_dayWidget.setBackground(SwtColors.getInstance().white);
+    m_dayWidget.setBackground(SwtColors.getInstance().getWhite());
     gd = new GridData();
     gd.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
     m_dayWidget.setLayoutData(gd);
@@ -97,7 +97,7 @@ public class SelectionScopeBar extends Composite {
     // create button 2
     m_workWeekWidget = new Button(this, SWT.RADIO);
     m_workWeekWidget.setText(SwtUtility.getNlsText(Display.getCurrent(), "WorkWeek"));
-    m_workWeekWidget.setBackground(SwtColors.getInstance().white);
+    m_workWeekWidget.setBackground(SwtColors.getInstance().getWhite());
     gd = new GridData();
     gd.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
     m_workWeekWidget.setLayoutData(gd);
@@ -105,7 +105,7 @@ public class SelectionScopeBar extends Composite {
     // create button 3
     m_weekWidget = new Button(this, SWT.RADIO);
     m_weekWidget.setText(SwtUtility.getNlsText(Display.getCurrent(), "Week"));
-    m_weekWidget.setBackground(SwtColors.getInstance().white);
+    m_weekWidget.setBackground(SwtColors.getInstance().getWhite());
     gd = new GridData();
     gd.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
     m_weekWidget.setLayoutData(gd);
@@ -113,14 +113,14 @@ public class SelectionScopeBar extends Composite {
     // create button 4
     m_monthWidget = new Button(this, SWT.RADIO);
     m_monthWidget.setText(SwtUtility.getNlsText(Display.getCurrent(), "Month"));
-    m_monthWidget.setBackground(SwtColors.getInstance().white);
+    m_monthWidget.setBackground(SwtColors.getInstance().getWhite());
     gd = new GridData();
     gd.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
     m_monthWidget.setLayoutData(gd);
 
     // create the label and combo
 //    m_firstDayWidget = new LabelledCombo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
-//    m_firstDayWidget.setBackground(SWTColors.getInstance().white);
+//    m_firstDayWidget.setBackground(SWTColors.getInstance().getWhite());
 //
 //    // get days of the week and add them
 //    String[] wdOneBased = new DateFormatSymbols(Locale.getDefault()).getWeekdays();
@@ -138,13 +138,13 @@ public class SelectionScopeBar extends Composite {
     // create button 5
     m_condensedWidget = new Button(this, SWT.CHECK);
     m_condensedWidget.setText(SwtUtility.getNlsText(Display.getCurrent(), "Condensed"));
-    m_condensedWidget.setBackground(SwtColors.getInstance().white);
+    m_condensedWidget.setBackground(SwtColors.getInstance().getWhite());
     gd = new GridData();
     gd.grabExcessHorizontalSpace = true;
     gd.horizontalAlignment = GridData.END;
     m_condensedWidget.setLayoutData(gd);
 
-    setBackground(SwtColors.getInstance().white);
+    setBackground(SwtColors.getInstance().getWhite());
   }
 
   /** set display mode, e.g. month, week, working week, day */

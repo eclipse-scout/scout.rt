@@ -40,37 +40,37 @@ import org.eclipse.swt.widgets.Listener;
 public class CentralPanel extends Composite {
 
   /** ref to calendar */
-  protected SwtCalendar m_calendar;
+  private SwtCalendar m_calendar;
 
   /** empty composite to keep alignement */
-  protected Composite m_emptyComposite;
+  private Composite m_emptyComposite;
 
   /** widget representing the day names */
-  protected DayNamesBar m_dayNames;
+  private DayNamesBar m_dayNames;
 
   /** widget representing the timeline */
-  protected TimelineColumn m_timeline;
+  private TimelineColumn m_timeline;
 
   /** cell list for week or day view */
-  protected ArrayList<WeekCell> m_weekCells = null;
+  private ArrayList<WeekCell> m_weekCells = null;
 
   /** cell list list for month view */
-  protected ArrayList<ArrayList<MonthCell>> m_monthCells = null;
+  private ArrayList<ArrayList<MonthCell>> m_monthCells = null;
 
   /** to hold the existing cell according to their dates */
-  protected HashMap<Date, AbstractCell> m_dateMap;
+  private HashMap<Date, AbstractCell> m_dateMap;
 
   /** composite for holding the cell widgets */
-  protected Composite m_cells;
+  private Composite m_cells;
 
   /** panel width */
-  protected int m_panelWidth = 0;
+  private int m_panelWidth = 0;
 
   /** panel height */
-  protected int m_panelHeight = 0;
+  private int m_panelHeight = 0;
 
   /** max number of timeless items within any cell */
-  protected int m_timelessMaxCount;
+  private int m_timelessMaxCount;
 
   public CentralPanel(Composite parent, int style, SwtCalendar calendar) {
     super(parent, style);
@@ -98,7 +98,7 @@ public class CentralPanel extends Composite {
     layout.verticalSpacing = 2;
     layout.numColumns = 2;
     this.setLayout(layout);
-    this.setBackground(SwtColors.getInstance().white);
+    this.setBackground(SwtColors.getInstance().getWhite());
 
     // to make this composite focusable
     addListener(SWT.KeyDown, new Listener() {
@@ -165,7 +165,7 @@ public class CentralPanel extends Composite {
     m_cells.setLayout(layout);
     //
     // white background
-    m_cells.setBackground(SwtColors.getInstance().white);
+    m_cells.setBackground(SwtColors.getInstance().getWhite());
 
     // new week cell list
     m_weekCells = new ArrayList<WeekCell>();
@@ -204,7 +204,7 @@ public class CentralPanel extends Composite {
     GridData gd;
 
     m_emptyComposite = new Composite(this, SWT.NONE);
-    m_emptyComposite.setBackground(SwtColors.getInstance().white);
+    m_emptyComposite.setBackground(SwtColors.getInstance().getWhite());
     gd = new GridData();
     gd.widthHint = CalendarConstants.TIMELINE_WIDTH;
     gd.heightHint = 1;
@@ -254,7 +254,7 @@ public class CentralPanel extends Composite {
     m_cells.setLayout(layout3);
     //
     // white background
-    m_cells.setBackground(SwtColors.getInstance().white);
+    m_cells.setBackground(SwtColors.getInstance().getWhite());
     //
     // to make this composite focusable
     m_cells.addListener(SWT.KeyDown, new Listener() {
@@ -284,8 +284,7 @@ public class CentralPanel extends Composite {
     }
 
     // set date browser bar header
-    m_calendar.setDateBrowserHeader(new SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-        .format(viewDate.getTime()) + " - " + SwtUtility.getNlsText(Display.getCurrent(), "Week") + " " + weekNo);
+    m_calendar.setDateBrowserHeader(new SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(viewDate.getTime()) + " - " + SwtUtility.getNlsText(Display.getCurrent(), "Week") + " " + weekNo);
 
     addItemsToCells();
     calcTimelessMaxCount();
@@ -342,12 +341,12 @@ public class CentralPanel extends Composite {
     //
     // its layout
     MonthCellLayout layout = new MonthCellLayout();
-    layout.numColumns = nbCols;
-    layout.numLines = 12;
+    layout.setNumColumns(nbCols);
+    layout.setNumLines(12);
     m_cells.setLayout(layout);
     //
     // white background
-    m_cells.setBackground(SwtColors.getInstance().white);
+    m_cells.setBackground(SwtColors.getInstance().getWhite());
 
     // grab starting date
     Calendar currentDate = Calendar.getInstance();
@@ -500,7 +499,7 @@ public class CentralPanel extends Composite {
     m_cells.layout();
 
     // redraw
-//		redraw();
+//    redraw();
 
     if (m_weekCells != null) {
       for (WeekCell day : m_weekCells) {

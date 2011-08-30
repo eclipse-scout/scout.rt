@@ -19,13 +19,13 @@ import org.eclipse.swt.widgets.Display;
 public class TimelineColumn extends Composite implements PaintListener {
 
   /** should we draw a header line */
-  protected boolean m_drawHeader;
+  private boolean m_drawHeader;
 
   /** y offset, depends on m_drawHeader */
-  protected int m_realOffsetY;
+  private int m_realOffsetY;
 
   /** ref. to central calendar panel */
-  protected CentralPanel m_centralPanel;
+  private CentralPanel m_centralPanel;
 
   public TimelineColumn(CentralPanel parent, int style) {
     this(parent, style, true);
@@ -59,13 +59,13 @@ public class TimelineColumn extends Composite implements PaintListener {
     gd.verticalAlignment = GridData.FILL;
     this.setLayoutData(gd);
 
-    setBackground(SwtColors.getInstance().white);
+    setBackground(SwtColors.getInstance().getWhite());
   }
 
   @Override
   public void paintControl(PaintEvent e) {
     // set drawing color
-    e.gc.setForeground(SwtColors.getInstance().gray);
+    e.gc.setForeground(SwtColors.getInstance().getGray());
 
     // draw borders and timeline
     drawBorder(e);
@@ -96,9 +96,9 @@ public class TimelineColumn extends Composite implements PaintListener {
     int x2 = bounds.width - 3;
     int y2 = (int) Math.round(deltaY);
     Rectangle noon = new Rectangle(x1, y1, x2, y2);
-    e.gc.setBackground(SwtColors.getInstance().lightgray);
+    e.gc.setBackground(SwtColors.getInstance().getLightgray());
     e.gc.fillRectangle(noon);
-    e.gc.setBackground(SwtColors.getInstance().white);
+    e.gc.setBackground(SwtColors.getInstance().getWhite());
 
     int time = CalendarConstants.DAY_TIMELINE_START_TIME;
     for (int i = 0; i < slots; i++) {
@@ -106,10 +106,10 @@ public class TimelineColumn extends Composite implements PaintListener {
 
       // right background color within noon rectangle
       if (time == 12) {
-        e.gc.setBackground(SwtColors.getInstance().lightgray);
+        e.gc.setBackground(SwtColors.getInstance().getLightgray());
       }
       else {
-        e.gc.setBackground(SwtColors.getInstance().white);
+        e.gc.setBackground(SwtColors.getInstance().getWhite());
       }
 
       e.gc.drawLine(0, y, bounds.width - 1, y);

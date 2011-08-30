@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt;
 public class LogicalGridData {
   public static final String CLIENT_PROPERTY_NAME = LogicalGridData.class.getName();
 
+//CHECKSTYLE:OFF
   public int gridx;
   public int gridy;
   public int gridw = 1;
@@ -35,6 +36,8 @@ public class LogicalGridData {
   public boolean fillVertical = true;
   //
   public int topInset;
+
+//CHECKSTYLE:ON
 
   public LogicalGridData() {
   }

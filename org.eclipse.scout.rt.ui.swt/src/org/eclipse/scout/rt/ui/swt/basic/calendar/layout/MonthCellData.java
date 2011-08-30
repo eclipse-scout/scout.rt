@@ -17,8 +17,23 @@ package org.eclipse.scout.rt.ui.swt.basic.calendar.layout;
  */
 public final class MonthCellData {
 
-  public int verticalSpan = 1;
+  private int verticalSpan = 1;
 
-  public int horizontalSpan = 1;
+  private int horizontalSpan = 1;
 
+  public int getVerticalSpan() {
+    return verticalSpan;
+  }
+
+  public void setVerticalSpan(int verticalSpan) {
+    this.verticalSpan = verticalSpan;
+  }
+
+  public int getHorizontalSpan() {
+    return horizontalSpan;
+  }
+
+  public void setHorizontalSpan(int horizontalSpan) {
+    this.horizontalSpan = horizontalSpan;
+  }
 }

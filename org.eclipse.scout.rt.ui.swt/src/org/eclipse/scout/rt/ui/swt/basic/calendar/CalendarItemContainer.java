@@ -4,37 +4,36 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.basic.calendar;
 
-
 import java.util.Date;
+
+import org.eclipse.scout.rt.ui.swt.basic.calendar.widgets.AbstractCell;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.scout.rt.ui.swt.basic.calendar.widgets.AbstractCell;
 
 /**
  * Wrapper for a calendar item with some adjustments to the start and end time,
  * etc.
  */
-
 @SuppressWarnings("unchecked")
-
 /* corresponds to inner class LargeCalendarCell.ItemWrapper in
  * the swt implementation */
-public class CalendarItemContainer implements Comparable, CalendarConstants {
-  protected Object m_item;
-  protected boolean m_labeled;
-  protected long m_fromRelative, m_toRelative;// truncated to actual DAY
-  protected Rectangle m_bounds;
-  protected boolean m_fullDay;
-  protected float m_x0, m_x1;
+public class CalendarItemContainer implements Comparable {
+
+  private Object m_item;
+  private boolean m_labeled;
+  private long m_fromRelative, m_toRelative;// truncated to actual DAY
+  private Rectangle m_bounds;
+  private boolean m_fullDay;
+  private float m_x0, m_x1;
 
   /** reference to the day cell */
-  protected AbstractCell m_cell;
+  private AbstractCell m_cell;
 
   public CalendarItemContainer(Object item, AbstractCell cell) {
     m_cell = cell;
@@ -43,14 +42,12 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
     m_bounds = new Rectangle(1, 2, 3, 4);
     long repTimeOfDayStart = AbstractCell.getTimeOfDayMillis(m_cell.getDate().getTime());
     // TODO: why + 1
-    long displayInterval = HOUR_MILLIS
-        * (DAY_TIMELINE_END_TIME /* TODO need this? + 1 */- DAY_TIMELINE_START_TIME);
+    long displayInterval = CalendarConstants.HOUR_MILLIS * (CalendarConstants.DAY_TIMELINE_END_TIME /* TODO need this? + 1 */- CalendarConstants.DAY_TIMELINE_START_TIME);
     CalendarModel model = m_cell.getCalendar().getModel();
     //
     m_fullDay = model.isFullDay(item);
     //
-    m_fromRelative = AbstractCell.getTimeOfDayMillis(model.getFromDate(item)) - repTimeOfDayStart
-        - HOUR_MILLIS * DAY_TIMELINE_START_TIME;
+    m_fromRelative = AbstractCell.getTimeOfDayMillis(model.getFromDate(item)) - repTimeOfDayStart - CalendarConstants.HOUR_MILLIS * CalendarConstants.DAY_TIMELINE_START_TIME;
     if (m_fromRelative < 0) {
       m_fromRelative = 0;
     }
@@ -61,9 +58,9 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
     Date d2 = model.getToDate(item);
     if (d2 == null) {
       m_toRelative = m_fromRelative;
-    } else {
-      m_toRelative = AbstractCell.getTimeOfDayMillis(d2) - repTimeOfDayStart - HOUR_MILLIS
-          * DAY_TIMELINE_START_TIME;
+    }
+    else {
+      m_toRelative = AbstractCell.getTimeOfDayMillis(d2) - repTimeOfDayStart - CalendarConstants.HOUR_MILLIS * CalendarConstants.DAY_TIMELINE_START_TIME;
     }
     if (m_toRelative < 0) {
       m_toRelative = 0;
@@ -72,14 +69,14 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
       m_toRelative = displayInterval;
     }
     // check end of day set
-    if (m_fromRelative >= displayInterval - HOUR_MILLIS
-        && m_toRelative >= displayInterval - DAY_TIMELINE_END_TIME * HOUR_MILLIS) {
-      m_fromRelative = displayInterval - HOUR_MILLIS;
+    if (m_fromRelative >= displayInterval - CalendarConstants.HOUR_MILLIS
+        && m_toRelative >= displayInterval - CalendarConstants.DAY_TIMELINE_END_TIME * CalendarConstants.HOUR_MILLIS) {
+      m_fromRelative = displayInterval - CalendarConstants.HOUR_MILLIS;
       m_toRelative = displayInterval;
     }
     // check emty set
     if (m_toRelative == m_fromRelative) {
-      m_toRelative = m_fromRelative + HOUR_MILLIS;
+      m_toRelative = m_fromRelative + CalendarConstants.HOUR_MILLIS;
     }
   }
 
@@ -150,7 +147,7 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
   public Color getColor() {
     Color c = m_cell.getCalendar().getModel().getColor(m_item);
     if (c == null) {
-      c = new Color(SwtColors.getStandardDisplay(),m_cell.getBackground().getRed(), m_cell.getBackground().getGreen(), m_cell.getBackground().getBlue());
+      c = new Color(SwtColors.getStandardDisplay(), m_cell.getBackground().getRed(), m_cell.getBackground().getGreen(), m_cell.getBackground().getBlue());
     }
     return c;
   }
@@ -167,7 +164,8 @@ public class CalendarItemContainer implements Comparable, CalendarConstants {
   public int compareTo(Object o) {
     if (m_item instanceof Comparable) {
       return ((Comparable<Object>) m_item).compareTo(((CalendarItemContainer) o).getItem());
-    } else {
+    }
+    else {
       int i = this.getCompareDate().compareTo(((CalendarItemContainer) o).getCompareDate());
       if (i == 0) {
         i = this.getCompareId().compareTo(((CalendarItemContainer) o).getCompareId());

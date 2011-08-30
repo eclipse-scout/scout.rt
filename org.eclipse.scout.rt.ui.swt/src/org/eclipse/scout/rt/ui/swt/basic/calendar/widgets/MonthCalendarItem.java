@@ -54,8 +54,8 @@ public class MonthCalendarItem extends AbstractCalendarItem {
   @Override
   public void paintControl(PaintEvent e) {
     // background color
-    Color color = new Color(SwtColors.getStandardDisplay(), m_item.getColor().getRed(), m_item.getColor().getGreen(), m_item.getColor().getBlue());
-    if (m_item.getItem().equals(m_cell.getCalendar().getSelectedItem())) {
+    Color color = new Color(SwtColors.getStandardDisplay(), getItem().getColor().getRed(), getItem().getColor().getGreen(), getItem().getColor().getBlue());
+    if (getItem().getItem().equals(getCell().getCalendar().getSelectedItem())) {
       color = SwtColors.getInstance().getDarker(color);
     }
     setBackground(color);
@@ -66,11 +66,10 @@ public class MonthCalendarItem extends AbstractCalendarItem {
     // relative coordinate system, origine (0,0)
     r.x = 0;
     r.y = 0;
-    m_item.setLabeled(true);/*r.height>=fm.getAscent() && r.width>=SWITCH_ITEM_WIDTH*/
+    getItem().setLabeled(true);/*r.height>=fm.getAscent() && r.width>=SWITCH_ITEM_WIDTH*/
     FontMetrics fm = e.gc.getFontMetrics();
-    if (m_item.isLabeled()) {
-      String s = m_cell.getCalendar().getModel()
-              .getLabel(m_item.getItem(), m_cell.getDate().getTime());
+    if (getItem().isLabeled()) {
+      String s = getCell().getCalendar().getModel().getLabel(getItem().getItem(), getCell().getDate().getTime());
       int centery = Math.max(0, (r.height - fm.getAscent()) / 2 - 3);
       e.gc.drawString(s, r.x + 3, r.y + centery);
     }
@@ -81,5 +80,4 @@ public class MonthCalendarItem extends AbstractCalendarItem {
   public void dispose() {
     super.dispose();
   }
-
 }

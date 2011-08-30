@@ -20,9 +20,9 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarModel;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.CalendarViewEvent;
-import org.eclipse.scout.rt.ui.swt.basic.calendar.DisplayMode;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.EmptyCalendarModel;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.ICalendarViewListener;
+import org.eclipse.scout.rt.ui.swt.basic.calendar.DisplayMode;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.SwtColors;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -51,37 +51,37 @@ import org.eclipse.swt.widgets.Composite;
 public class SwtCalendar extends Composite implements PaintListener {
   protected static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtCalendar.class);
 
-  protected ArrayList<ICalendarViewListener> calendarViewListeners;
+  private ArrayList<ICalendarViewListener> calendarViewListeners;
 
-  protected int m_workDayCount = 5;
+  private int m_workDayCount = 5;
 
-  protected Map m_itemMap;
+  private Map m_itemMap;
 
   /** selected date */
-  protected Calendar m_selectedDate;
+  private Calendar m_selectedDate;
 
   /** current calendar date */
-  protected Calendar m_viewDate;
+  private Calendar m_viewDate;
   /** start calendar date */
-  protected Calendar m_viewDateStart;
+  private Calendar m_viewDateStart;
   /** end calendar date */
-  protected Calendar m_viewDateEnd;
+  private Calendar m_viewDateEnd;
 
-  protected CalendarModel m_model;
-  protected Object m_selectedItem;
-  protected boolean m_calendarUpdating;
+  private CalendarModel m_model;
+  private Object m_selectedItem;
+  private boolean m_calendarUpdating;
 
   /** date browser bar to set the date backward/forward */
-  protected DateBrowserBar m_browserBar;
+  private DateBrowserBar m_browserBar;
 
   /** central composite to hold the calendar area */
-  protected Composite m_centralComposite;
+  private Composite m_centralComposite;
 
   /** reference to the calendar area (child of m_centralComposite) */
-  protected CentralPanel m_calendarPanel;
+  private CentralPanel m_calendarPanel;
 
   /** selection scope widget (month, week, work week, day */
-  protected SelectionScopeBar m_selectionScope;
+  private SelectionScopeBar m_selectionScope;
 
   public SwtCalendar(Composite parent, int style) {
     super(parent, style);
@@ -191,7 +191,7 @@ public class SwtCalendar extends Composite implements PaintListener {
       Date viewDateEnd = getViewDateEnd().getTime();
       CalendarViewEvent e = new CalendarViewEvent(this, CalendarViewEvent.TYPE_SELECTION_CHANGED, viewDate, viewDateStart, viewDateEnd);
       for (int i = 0; i < calendarViewListeners.size(); i++) {
-        ((ICalendarViewListener) calendarViewListeners.get(i)).viewChanged(e);
+        (calendarViewListeners.get(i)).viewChanged(e);
       }
     }
   }
@@ -203,7 +203,7 @@ public class SwtCalendar extends Composite implements PaintListener {
       Date viewDateEnd = getViewDateEnd().getTime();
       CalendarViewEvent e = new CalendarViewEvent(this, CalendarViewEvent.TYPE_VISIBLE_RANGE_CHANGED, viewDate, viewDateStart, viewDateEnd);
       for (int i = 0; i < calendarViewListeners.size(); i++) {
-        ((ICalendarViewListener) calendarViewListeners.get(i)).viewChanged(e);
+        (calendarViewListeners.get(i)).viewChanged(e);
       }
     }
   }
@@ -375,8 +375,8 @@ public class SwtCalendar extends Composite implements PaintListener {
 
   @Override
   public void paintControl(PaintEvent e) {
-    setBackground(SwtColors.getInstance().white);
-    setForeground(SwtColors.getInstance().darkgray);
+    setBackground(SwtColors.getInstance().getWhite());
+    setForeground(SwtColors.getInstance().getDarkgray());
 
     drawBorders(e);
   }
