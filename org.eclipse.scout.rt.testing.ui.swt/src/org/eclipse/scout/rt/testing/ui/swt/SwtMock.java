@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.ui.swt;
 
+import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * Uses SwtBot
+ * Uses awt {@link Robot} and not SWTBot since SWTBot is not really a gui emulator.
  */
 public class SwtMock implements IGuiMock {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtMock.class);
@@ -904,7 +905,7 @@ public class SwtMock implements IGuiMock {
               for (Control o : SwtUtility.findChildComponents(parent, Control.class)) {
                 if (o instanceof Button) {
                   if (cleanButtonLabel(label).equals(cleanButtonLabel(((Button) o).getText()))) {
-                    return (Button) o;
+                    return o;
                   }
                 }
               }
