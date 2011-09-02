@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.CompositeObject;
  */
 public class TimeScale {
   private DateFormat m_dateFormat;
-  private List<MajorTimeColumn> m_childrenUnsorted = new ArrayList<MajorTimeColumn>(0);
+  private final List<MajorTimeColumn> m_childrenUnsorted = new ArrayList<MajorTimeColumn>(0);
   // cache for sorted objects, only access using the provided methods, never
   // access this member directly
   private MajorTimeColumn[] m_majorColumnsSorted;
@@ -122,48 +122,61 @@ public class TimeScale {
    *         the range
    */
   public double[] getRangeOf(Date beginTime, Date endTime) {
-    if (getMinorTimeColumns().length <= 0) {
-      return null;
-    }
-    if (endTime == null || endTime.compareTo(getBeginTime()) <= 0) {
-      return null;
-    }
-    if (beginTime == null || beginTime.compareTo(getEndTime()) >= 0) {
-      return null;
-    }
-    //
-    MinorTimeColumn[] minCols = getMinorTimeColumns();
     Integer a = null, b = null;
-    Integer lastIndex = null;
-    int count = minCols.length;
-    for (int i = 0; i < count; i++) {
-      lastIndex = i;
-      if (a == null) {
-        if (beginTime.compareTo(minCols[i].getBeginTime()) < 0) {
-          a = i;
-        }
-        else if (beginTime.compareTo(minCols[i].getEndTime()) < 0) {
-          a = i;
-        }
-      }
-      if (a != null && b == null) {
-        if (endTime.compareTo(minCols[i].getEndTime()) <= 0) {
-          b = i;
-        }
-      }
-      if (a != null && b != null) {
-        break;
-      }
-    }
-    if (a != null && b == null) {
-      b = lastIndex;
-    }
-    if (a != null && b != null) {
-      return new double[]{indexToRange(a)[0], indexToRange(b)[1]};
-    }
-    else {
+    a = getStartMinorColumnIndex(beginTime);
+    if (a == null) {
       return null;
     }
+    if (beginTime.equals(endTime)) {
+      b = a;
+    }
+    if (b == null) {
+      b = getEndMinorColumnIndex(endTime);
+    }
+    if (b == null) {
+      return null;
+    }
+    return new double[]{indexToRange(a)[0], indexToRange(b)[1]};
+  }
+
+  protected Integer getStartMinorColumnIndex(Date startTime) {
+    if (startTime == null) {
+      return null;
+    }
+    if (startTime.before(getBeginTime())) {
+      return 0;
+    }
+    if (startTime.after(getEndTime())) {
+      return null;
+    }
+    MinorTimeColumn[] minCols = getMinorTimeColumns();
+    //approach in descending order
+    for (int i = minCols.length - 1; i >= 0; i--) {
+      if (startTime.compareTo(minCols[i].getBeginTime()) >= 0) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  protected Integer getEndMinorColumnIndex(Date endTime) {
+    if (endTime == null) {
+      return null;
+    }
+    if (endTime.before(getBeginTime())) {
+      return null;
+    }
+    MinorTimeColumn[] minCols = getMinorTimeColumns();
+    if (endTime.after(getEndTime())) {
+      return getMinorTimeColumns().length - 1;
+    }
+    //approach in ascending order
+    for (int i = 0; i < minCols.length; i++) {
+      if (endTime.compareTo(minCols[i].getEndTime()) <= 0) {
+        return i;
+      }
+    }
+    return null;
   }
 
   /**

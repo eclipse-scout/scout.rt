@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,17 +27,20 @@ public class TimeScaleBuilder {
 
   public TimeScale build() {
     Date[] days = m_map.getDays();
-    TimeScale set = new TimeScale();
+    TimeScale set = null;
     switch (m_map.getPlanningMode()) {
       case IActivityMap.PLANNING_MODE_INTRADAY: {
+        set = new IntradayTimeScale();
         buildIntradayScale(days, set);
         break;
       }
       case IActivityMap.PLANNING_MODE_DAY: {
+        set = new TimeScale();
         buildDayScale(days, set);
         break;
       }
       case IActivityMap.PLANNING_MODE_WEEK: {
+        set = new TimeScale();
         buildWeekScale(days, set);
         break;
       }
@@ -117,10 +120,9 @@ public class TimeScaleBuilder {
     else {
       cal.add(Calendar.WEEK_OF_YEAR, 1);
     }
-    Date b = cal.getTime();
-    cal.add(Calendar.HOUR_OF_DAY, (-24 + m_map.getLastHourOfDay()));
+    cal.setTimeInMillis(cal.getTimeInMillis() - 1);
     Date justBeforeEnd = cal.getTime();
-    MinorTimeColumn col = new MinorTimeColumn(parent, a, b);
+    MinorTimeColumn col = new MinorTimeColumn(parent, a, justBeforeEnd);
     col.setLargeText(new SimpleDateFormat("'" + ScoutTexts.get("Week") + "' w").format(a));
     col.setMediumText(new SimpleDateFormat("w").format(a));
     col.setSmallText(new SimpleDateFormat("w").format(a));
@@ -155,8 +157,9 @@ public class TimeScaleBuilder {
     cal.setTime(d);
     Date a = cal.getTime();
     cal.add(Calendar.DATE, 1);
-    Date b = cal.getTime();
-    MinorTimeColumn col = new MinorTimeColumn(parent, a, b);
+    cal.setTimeInMillis(cal.getTimeInMillis() - 1);
+    Date justBeforeEnd = cal.getTime();
+    MinorTimeColumn col = new MinorTimeColumn(parent, a, justBeforeEnd);
     col.setLargeText(new SimpleDateFormat("dd").format(a));
     col.setMediumText(new SimpleDateFormat("dd").format(a));
     col.setSmallText(new SimpleDateFormat("dd").format(a));
