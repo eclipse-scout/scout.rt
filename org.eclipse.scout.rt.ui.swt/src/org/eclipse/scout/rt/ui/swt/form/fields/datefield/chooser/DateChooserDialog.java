@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,6 +22,8 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.ext.table.util.TableCellRolloverSupport;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableCursor;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
@@ -141,11 +143,9 @@ public class DateChooserDialog extends Dialog {
     new TableCellRolloverSupport(viewer);
     table.setHeaderVisible(true);
     m_cursor = new TableCursor(table, SWT.NONE);
-
-    m_cursor.addSelectionListener(new SelectionAdapter() {
-
+    m_cursor.addMouseListener(new MouseAdapter() {
       @Override
-      public void widgetSelected(SelectionEvent e) {
+      public void mouseUp(MouseEvent e) {
         TableCursor cursor = (TableCursor) e.widget;
         Date date = ((DateRow) cursor.getRow().getData()).getDate(cursor.getColumn() - 1);
         m_returnDate = date;
