@@ -22,6 +22,8 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.ext.table.util.TableCellRolloverSupport;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableCursor;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
@@ -110,7 +112,7 @@ public class DateChooserDialog extends Dialog {
 
   @Override
   protected Control createContents(Composite parent) {
-    Composite rootArea = new Composite(parent, SWT.NO_FOCUS);
+    Composite rootArea = new Composite(parent, SWT.NONE);
     Control navigationArea = createControlArea(rootArea);
 
     Control calendarArea = createPickDateArea(rootArea);
@@ -138,9 +140,9 @@ public class DateChooserDialog extends Dialog {
     table.setHeaderVisible(true);
     m_cursor = new TableCursor(table, SWT.NONE);
 
-    m_cursor.addSelectionListener(new SelectionAdapter() {
+    m_cursor.addMouseListener(new MouseAdapter() {
       @Override
-      public void widgetSelected(SelectionEvent e) {
+      public void mouseUp(MouseEvent e) {
         TableCursor cursor = (TableCursor) e.widget;
         Date date = ((DateRow) cursor.getRow().getData()).getDate(cursor.getColumn() - 1);
         m_returnDate = date;
@@ -184,7 +186,7 @@ public class DateChooserDialog extends Dialog {
   }
 
   private Control createControlArea(Composite parent) {
-    Composite rootArea = getEnvironment().getFormToolkit().createComposite(parent, SWT.NO_FOCUS);
+    Composite rootArea = getEnvironment().getFormToolkit().createComposite(parent, SWT.NONE);
     createButton(rootArea, TYPE_BACK_YEAR);
     createButton(rootArea, TYPE_BACK_MONTH);
     m_monthLabel = getEnvironment().getFormToolkit().createLabel(rootArea, "", SWT.CENTER);
