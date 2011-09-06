@@ -396,8 +396,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       return;
     }
     SwtScoutTableEvent swtTableEvent = null;
-    // TableModelEvent swtTableEvent=null;
-    SwtScoutTableModel swtTableModel = (SwtScoutTableModel) getSwtTableViewer().getContentProvider();
     /*
      * check the scout observer to filter all events that are used here
      * @see isHandleScoutTableEvent()
@@ -438,7 +436,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
     //
     if (swtTableEvent != null) {
-      swtTableModel.consumeTableModelEvent(swtTableEvent);
       getSwtTableViewer().refresh();
     }
     // refresh selection, indexes might have changed

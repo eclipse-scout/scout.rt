@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.basic.table;
 
-import java.util.HashMap;
-
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.SafeRunnable;
@@ -42,7 +40,6 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   private transient ListenerList listenerList = null;
   private final ITable m_table;
   private final ISwtEnvironment m_environment;
-  private HashMap<ITableRow, HashMap<IColumn<?>, ICell>> m_cachedCells;
   private final SwtScoutTable m_swtTable;
   private final TableColumnManager m_columnManager;
   private final Image m_imgCheckboxFalse;
@@ -57,8 +54,6 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     m_imgCheckboxTrue = Activator.getIcon(SwtIcons.CheckboxYes);
     m_imgCheckboxFalse = Activator.getIcon(SwtIcons.CheckboxNo);
     m_disabledForegroundColor = m_environment.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
-    rebuildCache();
-
   }
 
   public boolean isMultiline() {
@@ -200,6 +195,16 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
     return null;
   }
 
+  protected ICell getCell(Object row, int colIndex) {
+    IColumn<?> column = m_columnManager.getColumnByModelIndex(colIndex - 1);
+    if (column != null) {
+      return m_table.getCell((ITableRow) row, column);
+    }
+    else {
+      return null;
+    }
+  }
+
   @Override
   public boolean isLabelProperty(Object element, String property) {
     return false;
@@ -255,36 +260,6 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
 
   @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-  }
-
-  public void consumeTableModelEvent(SwtScoutTableEvent swtTableEvent) {
-    rebuildCache();
-  }
-
-  protected ICell getCell(Object row, int colIndex) {
-    IColumn<?> column = m_columnManager.getColumnByModelIndex(colIndex - 1);
-    if (column != null) {
-      if (m_cachedCells.get(row) == null) {
-        rebuildCache();
-      }
-      return m_cachedCells.get(row).get(column);
-    }
-    else {
-      return null;
-    }
-  }
-
-  private void rebuildCache() {
-    m_cachedCells = new HashMap<ITableRow, HashMap<IColumn<?>, ICell>>();
-    if (m_table != null) {
-      for (ITableRow scoutRow : m_table.getRows()) {
-        HashMap<IColumn<?>, ICell> cells = new HashMap<IColumn<?>, ICell>();
-        for (IColumn<?> col : m_table.getColumnSet().getVisibleColumns()) {
-          cells.put(col, m_table.getCell(scoutRow, col));
-        }
-        m_cachedCells.put(scoutRow, cells);
-      }
-    }
   }
 
   public SwtScoutTable getSwtScoutTable() {
