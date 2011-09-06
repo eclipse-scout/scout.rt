@@ -555,11 +555,16 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   private TableColumn getSwtColumnAt(Point p) {
     Table table = getSwtTableViewer().getTable();
     int x = p.x + getSwtField().getHorizontalBar().getSelection();
-    for (TableColumn c : table.getColumns()) {
-      if (x >= 0 && x <= c.getWidth()) {
-        return c;
+    int[] order = table.getColumnOrder();
+    for (int index : order) {
+      // loop over columns according current display-order
+      TableColumn c = table.getColumn(index);
+      if (c != null) {
+        if (x >= 0 && x <= c.getWidth()) {
+          return c;
+        }
+        x = x - c.getWidth();
       }
-      x = x - c.getWidth();
     }
     return null;
   }
