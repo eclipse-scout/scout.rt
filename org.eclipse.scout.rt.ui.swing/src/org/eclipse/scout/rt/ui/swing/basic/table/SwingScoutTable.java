@@ -1174,7 +1174,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           if (c instanceof JLabel) {
             ((JLabel) c).setText(text);
             if (m_htmlViewCache != null) {
-              m_htmlViewCache.updateHtmlView((JLabel) c);
+              m_htmlViewCache.updateHtmlView((JLabel) c, cell.getForegroundColor() != null);
             }
           }
           // tooltip

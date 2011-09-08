@@ -308,3 +308,11 @@ Plug-Ins changed:
 - org.eclipse.scout.rt.ui.rap
 Migration:
 None
+
+07.09.2011 rar
+BSI ticket #99'210
+Problem:
+The foreground color of JLabels which are disabled and contain HTML are not correclty greyed out. See: http://stackoverflow.com/questions/2242542/jlabel-not-greyed-out-when-disabled-when-html-text-displayed/
+Solution:
+Set the foreground color direclty using the color declared in the UIDefaults "TextField.inactiveForeground"
+Migration: None
