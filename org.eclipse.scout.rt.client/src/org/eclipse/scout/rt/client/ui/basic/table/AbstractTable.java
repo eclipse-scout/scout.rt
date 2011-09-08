@@ -233,7 +233,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * This is a hint for the UI to set the table height to a fixed pixel height
+   * This is a hint for the UI iff it is not capable of
+   * having variable table row height based on cell contents (such as rap/rwt).
+   * <p>
+   * This hint defines the table row height in pixels being used as the fixed row height for all table rows of this
+   * table.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(92)

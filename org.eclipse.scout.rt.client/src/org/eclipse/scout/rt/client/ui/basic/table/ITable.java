@@ -354,12 +354,18 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   void setMultilineText(boolean on);
 
   /**
-   * @return a hint for the UI to set the table height to a fixed pixel height, default is -1
+   * This is a hint for the UI iff it is not capable of
+   * having variable table row height based on cell contents (such as rap/rwt).
+   * <p>
+   * This hint defines the table row height in pixels being used as the fixed row height for all table rows of this
+   * table.
+   * 
+   * @return the hint in pixels, default is -1
    */
   int getRowHeightHint();
 
   /**
-   * set a hint for the UI to set the table height to a fixed pixel height, default is -1
+   * see {@link #getRowHeightHint()}
    */
   void setRowHeightHint(int h);
 
