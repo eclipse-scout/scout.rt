@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.zip.Adler32;
 
 import javax.swing.JLabel;
+import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
 
@@ -38,10 +39,14 @@ public class HtmlViewCache {
   /**
    * update html view using the cache
    */
-  public void updateHtmlView(JLabel label) {
+  public void updateHtmlView(JLabel label, boolean customForeground) {
     String text = label.getText();
     View value = null;
     if (BasicHTML.isHTMLString(text)) {
+      if (!customForeground) {
+        label.setForeground(label.isEnabled() ? UIManager.getDefaults().getColor("TextField.foreground") : UIManager.getDefaults().getColor("TextField.inactiveForeground"));
+      }
+
       Adler32 crc = new Adler32();
       crc.update(text.getBytes());
       Color fg = label.getForeground();
@@ -56,5 +61,4 @@ public class HtmlViewCache {
     }
     label.putClientProperty(BasicHTML.propertyKey, value);
   }
-
 }
