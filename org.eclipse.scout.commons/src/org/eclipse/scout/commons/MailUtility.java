@@ -456,6 +456,7 @@ public final class MailUtility {
     htmlBodyPart.setContent(multiPartHtml);
     MimeBodyPart part = new MimeBodyPart();
     part.setContent(htmlMessage, CONTENT_TYPE_TEXT_HTML);
+    part.setHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_HTML);
     part.setHeader("Content-Transfer-Encoding", "quoted-printable");
     multiPartHtml.addBodyPart(part);
     for (DataSource source : htmlDataSourceList) {
