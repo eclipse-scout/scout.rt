@@ -177,17 +177,15 @@ public final class SVGUtility {
   }
 
   /**
-   * Set the text content of a text element, in case it contains newlines add tspan elements.
+   * Set the text content of a text element, in case it contains newlines then add tspan elements.
    * Requires the GVT tree to be attached to the svg document.
    * 
    * @param textElement
    * @param value
    * @param rowGap
    *          in px
-   * @param wordWrapWidth
-   *          in px. This feature is experimental as a convenience since svg does not support native text wrap.
    */
-  public static void setTextContent(Element e, String value, Float rowGap, Float wordWrapWidth) {
+  public static void setTextContent(Element e, String value, Float rowGap) {
     if (e == null) {
       return;
     }
@@ -201,7 +199,7 @@ public final class SVGUtility {
       textElement.setTextContent(null);
       return;
     }
-    if (!value.contains("\n") && wordWrapWidth == null) {
+    if (!value.contains("\n")) {
       textElement.setTextContent(value);
       return;
     }
@@ -230,7 +228,7 @@ public final class SVGUtility {
     //create tspan lines
     float y = 0;
     textElement.setTextContent(null);
-    for (String line : splitLines(textElement, value, wordWrapWidth)) {
+    for (String line : value.split("[\n\r]")) {
       SVGTSpanElement tspanElem = (SVGTSpanElement) textElement.getOwnerDocument().createElementNS(SVG_NS, SVGConstants.SVG_TSPAN_TAG);
       textElement.appendChild(tspanElem);
       tspanElem.setTextContent(line);
@@ -240,10 +238,22 @@ public final class SVGUtility {
     }
   }
 
-  private static List<String> splitLines(SVGTextContentElement e, String value, Float wordWrap) {
-    List<String> lines = Arrays.asList(value.split("[\n\r]"));
-    if (wordWrap == null || wordWrap <= 0 || value.length() == 0) {
-      return lines;
+  /**
+   * @param contextElement
+   *          is the {@link SVGTextContentElement} containing optional style and font information context for the
+   *          wrapping algorithm
+   * @param text
+   * @param wordWrapWidth
+   *          in px. This feature is experimental as a convenience since svg does not support native text wrap.
+   * @return the wrapped text with additional newline characters where it was wrapped.
+   */
+  public static String[] wrapText(SVGTextContentElement contextElement, String text, Float wordWrap) {
+    if (text == null) {
+      return new String[0];
+    }
+    List<String> lines = Arrays.asList(text.split("[\n\r]"));
+    if (wordWrap == null || wordWrap <= 0 || text.length() == 0) {
+      return new String[]{text};
     }
     float wrap = wordWrap.floatValue();
     ArrayList<String> wrappedLines = new ArrayList<String>(lines.size());
@@ -254,10 +264,10 @@ public final class SVGUtility {
       }
       line = line.replaceAll("[\\s]+", " ").trim();
       try {
-        e.setTextContent(line);
+        contextElement.setTextContent(line);
         float[] w = new float[line.length()];
         for (int i = 0; i < w.length; i++) {
-          w[i] = e.getExtentOfChar(i).getWidth();
+          w[i] = contextElement.getExtentOfChar(i).getWidth();
         }
         //
         String[] words = line.split("[ ]");
@@ -294,10 +304,10 @@ public final class SVGUtility {
         }
       }
       finally {
-        e.setTextContent(null);
+        contextElement.setTextContent(null);
       }
     }
-    return wrappedLines;
+    return wrappedLines.toArray(new String[wrappedLines.size()]);
   }
 
   private static float convertToPx(String valueWithUnit) {
@@ -325,9 +335,9 @@ public final class SVGUtility {
   }
 
   /**
-   * Wrap the element with a link to an url
+   * Enclose the element with a link to an url
    */
-  public static void wrapWithHyperlink(Element e, String url) {
+  public static void addHyperlink(Element e, String url) {
     Element aElem = e.getOwnerDocument().createElementNS(SVG_NS, "a");
     e.getParentNode().insertBefore(aElem, e);
     e.getParentNode().removeChild(e);
