@@ -18,10 +18,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.CloseButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.OkButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ButtonsBox.SelectAllButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ButtonsBox.SelectNoneButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsTableField;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.OkButton;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -130,7 +130,7 @@ public class OrganizeColumnsForm extends AbstractForm {
         @Override
         protected void execReloadTableData() throws ProcessingException {
           ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
-          for (IColumn col : m_table.getColumnSet().getAllColumnsInUserOrder()) {
+          for (IColumn<?> col : m_table.getColumnSet().getAllColumnsInUserOrder()) {
             if (col.isDisplayable()) {
               if (col.isVisible() || col.isVisibleGranted()) {
                 IHeaderCell headerCell = col.getHeaderCell();
@@ -148,7 +148,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           for (int i = 0; i < getTable().getRowCount(); i++) {
             ITableRow row = getTable().getRow(i);
             Boolean b = (Boolean) row.getCell(getTable().getCheckBoxColumn()).getValue();
-            IColumn col = (IColumn) row.getCell(getTable().getKeyColumn()).getValue();
+            IColumn<?> col = (IColumn<?>) row.getCell(getTable().getKeyColumn()).getValue();
             m_origValues.put(col.getClass().getName(), b);
           }
         }
@@ -191,7 +191,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Order(10)
-          public class KeyColumn extends AbstractColumn<IColumn> {
+          public class KeyColumn extends AbstractColumn<IColumn<?>> {
             @Override
             protected boolean getConfiguredPrimaryKey() {
               return true;
@@ -207,7 +207,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           public class CheckBoxColumn extends AbstractBooleanColumn {
             @Override
             protected int getConfiguredWidth() {
-              return 24;
+              return 20;
             }
           }
 
@@ -215,7 +215,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           public class TextColumn extends AbstractStringColumn {
             @Override
             protected int getConfiguredWidth() {
-              return 200;
+              return 180;
             }
           }
 
@@ -492,7 +492,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
     @Override
     protected void execStore() throws ProcessingException {
-      IColumn[] visibleColumns = getColumnsTableField().getTable().getKeyColumn().getValues(getColumnsTableField().getTable().getCheckBoxColumn().findRows(true));
+      IColumn<?>[] visibleColumns = getColumnsTableField().getTable().getKeyColumn().getValues(getColumnsTableField().getTable().getCheckBoxColumn().findRows(true));
       m_table.getColumnSet().setVisibleColumns(visibleColumns);
       // make changes persistent
       ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);

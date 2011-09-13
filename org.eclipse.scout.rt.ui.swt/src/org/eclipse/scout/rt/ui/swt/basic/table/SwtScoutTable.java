@@ -655,8 +655,11 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   }
 
   /**
-   * Distributes the table width to the columns considered column weights of
-   * model. Empty space will be distributed weighted.
+   * <p>
+   * Distributes the table width to the columns considering column weights of model. <br/>
+   * The initial widths of the columns are used as weights as well as the minimum widths. <br/>
+   * Empty space will be distributed weighted.
+   * </p>
    */
   protected void handleAutoSizeColumns() {
     int totalWidth = getSwtField().getClientArea().width;
@@ -696,7 +699,9 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         i++;
       }
       else {
-        entry.getKey().setWidth(totalWidth);
+        //Column must not get smaller than initial width.
+        int width = Math.max(totalWidth, entry.getValue());
+        entry.getKey().setWidth(width);
       }
     }
   }
