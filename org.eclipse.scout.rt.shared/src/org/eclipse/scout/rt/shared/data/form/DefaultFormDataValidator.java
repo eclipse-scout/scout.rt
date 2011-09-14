@@ -81,7 +81,7 @@ public class DefaultFormDataValidator {
         ValidationUtility.checkMandatoryArray(ctx.fieldName, ctx.fieldValue);
       }
       else {
-        ValidationUtility.checkMandatoryValue(ctx.fieldName, ctx.fieldValue);
+        ValidationUtility.checkMandatoryValue(ctx.fieldName, treat0AsNullIfAppropriate(ctx));
       }
     }
   }
@@ -123,7 +123,7 @@ public class DefaultFormDataValidator {
         }
       }
       else {
-        if (ctx.fieldValue != null) {
+        if (treat0AsNullIfAppropriate(ctx) != null) {
           ValidationUtility.checkCodeTypeValue(ctx.fieldName, ctx.fieldValue, createCodeType(ctx));
         }
       }
@@ -150,7 +150,7 @@ public class DefaultFormDataValidator {
         }
       }
       else {
-        if (ctx.fieldValue != null) {
+        if (treat0AsNullIfAppropriate(ctx) != null) {
           ValidationUtility.checkLookupCallValue(ctx.fieldName, ctx.fieldValue, createLookupCall(ctx));
         }
       }
@@ -404,4 +404,19 @@ public class DefaultFormDataValidator {
     }
   }
 
+  private static Object treat0AsNullIfAppropriate(ValueCheckContext ctx) throws ProcessingException {
+    // special treatment of code type, lookup call and mandatory check if zero null equality is provided
+    boolean zeroNullEquality = Boolean.TRUE.equals(ctx.ruleMap.get(ValidationRule.ZERO_NULL_EQUALITY));
+    Object value = ctx.fieldValue;
+    if (zeroNullEquality && value != null) {
+      // equality is provided and a value is set
+      // if provided value corresponds to 0, provided null to the check method (reject validation)
+      if (value instanceof Number) {
+        if (((Number) value).longValue() == 0L) {
+          value = null;
+        }
+      }
+    }
+    return value;
+  }
 }

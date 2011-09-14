@@ -183,4 +183,15 @@ public @interface ValidationRule {
    * default rule packaged with scout
    */
   String MASTER_VALUE_REQUIRED = "masterValueRequired";
+  /**
+   * rule value type is {@link Boolean}
+   * <p>
+   * If rule value is true, 0 (zero) is treated null, thus no code type or lookup call validation occurs for value 0
+   * (same treatment as for null) and a mandatory field providing 0 as value will be rejected. In opposite, a rule value
+   * of false will cause the code type / lookup call validation to be executed and the mandatory field check will accept
+   * an input value of 0.
+   * </p>
+   * default rule packaged with scout
+   */
+  String ZERO_NULL_EQUALITY = "zeroNullEquality";
 }

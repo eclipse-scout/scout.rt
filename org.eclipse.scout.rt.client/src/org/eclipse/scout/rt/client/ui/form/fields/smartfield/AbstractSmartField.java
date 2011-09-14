@@ -137,6 +137,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(300)
   @ConfigPropertyValue("true")
+  @ValidationRule(ValidationRule.ZERO_NULL_EQUALITY)
   protected boolean getConfiguredTreat0AsNull() {
     return true;
   }
