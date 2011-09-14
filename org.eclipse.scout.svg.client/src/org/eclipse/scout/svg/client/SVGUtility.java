@@ -239,12 +239,14 @@ public final class SVGUtility {
   }
 
   /**
+   * This feature is experimental as a convenience since svg does not support native text operations.
+   * 
    * @param contextElement
    *          is the {@link SVGTextContentElement} containing optional style and font information context for the
    *          wrapping algorithm
    * @param text
    * @param wordWrapWidth
-   *          in px. This feature is experimental as a convenience since svg does not support native text wrap.
+   *          in px
    * @return the wrapped text with additional newline characters where it was wrapped.
    */
   public static String[] wrapText(SVGTextContentElement contextElement, String text, Float wordWrap) {
@@ -308,6 +310,86 @@ public final class SVGUtility {
       }
     }
     return wrappedLines.toArray(new String[wrappedLines.size()]);
+  }
+
+  /**
+   * This feature is experimental as a convenience since svg does not support native text operations.
+   * 
+   * @param contextElement
+   *          is the {@link SVGTextContentElement} containing optional style and font information context for the
+   *          wrapping algorithm
+   * @param text
+   *          is one line of text (no newlines)
+   * @param clipWidth
+   *          in px
+   * @return the text clipped to fit the clipWidth. If the text is too large it is cropped and "..." is appended at the
+   *         end.
+   */
+  public static String clipText(SVGTextContentElement contextElement, String text, float clipWidth) {
+    if (text == null || text.length() == 0) {
+      return text;
+    }
+    if (clipWidth <= 0) {
+      return text;
+    }
+    String suffix = "...";
+    try {
+      contextElement.setTextContent(text + suffix);
+      int textLen = text.length();
+      int suffixLen = suffix.length();
+      float textWidth = 0;
+      float suffixWidth = 0;
+      float[] w = new float[textLen + suffixLen];
+      for (int i = 0; i < w.length; i++) {
+        w[i] = contextElement.getExtentOfChar(i).getWidth();
+        if (i < textLen) {
+          textWidth += w[i];
+        }
+        else {
+          suffixWidth += w[i];
+        }
+      }
+      if (textWidth <= clipWidth) {
+        return text;
+      }
+      int i = textLen - 1;
+      while (i > 0 && textWidth + suffixWidth > clipWidth) {
+        textWidth -= w[i];
+        i--;
+      }
+      return text.substring(0, i + 1) + suffix;
+    }
+    finally {
+      contextElement.setTextContent(null);
+    }
+  }
+
+  /**
+   * This feature is experimental as a convenience since svg does not support native text operations.
+   * 
+   * @param contextElement
+   *          is the {@link SVGTextContentElement} containing optional style and font information context for the
+   *          wrapping algorithm
+   * @param text
+   *          is one line of text (no newlines)
+   * @return the text width in pixels
+   */
+  public static float getTextWidth(SVGTextContentElement contextElement, String text) {
+    if (text == null || text.length() == 0) {
+      return 0;
+    }
+    try {
+      contextElement.setTextContent(text);
+      int textLen = text.length();
+      float textWidth = 0;
+      for (int i = 0; i < textLen; i++) {
+        textWidth += contextElement.getExtentOfChar(i).getWidth();
+      }
+      return textWidth;
+    }
+    finally {
+      contextElement.setTextContent(null);
+    }
   }
 
   private static float convertToPx(String valueWithUnit) {
