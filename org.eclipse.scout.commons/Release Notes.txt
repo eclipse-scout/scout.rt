@@ -66,3 +66,17 @@ Build Path
     Button "Edit..."
      Button "Add"
       add a new entry with "Accessible" javax/**
+
+19.09.2011 dwi
+BSI ticket #105'945
+Problem:
+Implementation of MailUtilty#createMimeMessageFromWordArchiveInternal(..) should behave the same as on Eclipse Scout Trunk (after 2011-Jun).
+Solution:
+In details, that means:
+	- remove the generated file header.html as only be used by Word itself to edit the HTML document
+	- proper creation of mime message depending on html or/and plain-text is available (also separation of code)
+	- ensure content-type and charset to be set when HTML body is applicable
+Plug-Ins changed:
+- org.eclipse.scout.commons [MailUtilty.class]
+Migration:
+None
