@@ -142,3 +142,15 @@ Plug-Ins changed:
 - org.eclipse.scout.rt.ui.swing
 Migration:
 None
+
+19.09.2011 dwi
+BSI ticket #105'945
+Problem:
+Implementation of MailUtilty#createMimeMessageFromWordArchiveInternal(..) should behave the same as on Eclipse Scout Trunk (after 2011-Jun).
+Solution:
+In details, that means:
+- ensure content-type and charset to be set when HTML body is applicable
+Plug-Ins changed:
+- org.eclipse.scout.commons [MailUtilty.class]
+Migration:
+None
