@@ -62,7 +62,6 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     m_enabled = row.isEnabled();
     m_checked = row.isChecked();
     m_status = row.getStatus();
-    //XXX set row icon,bg,fg,tooltip on row-main-cell
     m_cells = new Cell[table.getColumnCount()];
     for (int i = 0; i < m_cells.length; i++) {
       m_cells[i] = new Cell(this, row.getCell(i));
@@ -218,6 +217,9 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   }
 
   public ICell getCell(int columnIndex) {
+    if (columnIndex < 0 || columnIndex >= m_cells.length) {
+      return new Cell();
+    }
     return m_cells[columnIndex];
   }
 

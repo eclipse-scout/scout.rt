@@ -233,7 +233,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * This is a hint for the UI to set the table height to a fixed pixel height
+   * This is a hint for the UI iff it is not capable of
+   * having variable table row height based on cell contents (such as rap/rwt).
+   * <p>
+   * This hint defines the table row height in pixels being used as the fixed row height for all table rows of this
+   * table.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(92)
@@ -420,32 +424,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       setTableCustomizer(createTableCustomizer());
     }
     // columns
-    Class<? extends IColumn>[] ca = getConfiguredColumns();
-    ArrayList<IColumn<?>> colList = new ArrayList<IColumn<?>>();
-    for (int i = 0; i < ca.length; i++) {
-      try {
-        IColumn<?> column = ConfigurationUtility.newInnerInstance(this, ca[i]);
-        colList.add(column);
-      }
-      catch (Exception e) {
-        LOG.warn(null, e);
-      }
-    }
-    try {
-      injectColumnsInternal(colList);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contribute columns.", e);
-    }
-
-    ArrayList<IColumn> completeList = new ArrayList<IColumn>();
-    completeList.addAll(colList);
-    m_columnSet = new ColumnSet(this, completeList);
-
-    if (getConfiguredCheckableColumn() != null) {
-      AbstractBooleanColumn checkableColumn = getColumnSet().getColumnByClass(getConfiguredCheckableColumn());
-      setCheckableColumn(checkableColumn);
-    }
+    createColumnsInternal();
     // menus
     ArrayList<IMenu> menuList = new ArrayList<IMenu>();
     Class<? extends IMenu>[] ma = getConfiguredMenus();
@@ -534,6 +513,56 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     });
   }
 
+  private void initColumnsInternal() {
+    for (IColumn<?> c : getColumnSet().getColumns()) {
+      try {
+        c.initColumn();
+      }
+      catch (Throwable t) {
+        LOG.error("column " + c, t);
+      }
+    }
+    getColumnSet().initialize();
+  }
+
+  private void disposeColumnsInternal() {
+    for (IColumn<?> c : getColumnSet().getColumns()) {
+      try {
+        c.disposeColumn();
+      }
+      catch (Throwable t) {
+        LOG.error("column " + c, t);
+      }
+    }
+  }
+
+  private void createColumnsInternal() {
+    Class<? extends IColumn>[] ca = getConfiguredColumns();
+    ArrayList<IColumn<?>> colList = new ArrayList<IColumn<?>>();
+    for (int i = 0; i < ca.length; i++) {
+      try {
+        IColumn<?> column = ConfigurationUtility.newInnerInstance(this, ca[i]);
+        colList.add(column);
+      }
+      catch (Exception e) {
+        LOG.warn(null, e);
+      }
+    }
+    try {
+      injectColumnsInternal(colList);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contribute columns.", e);
+    }
+    ArrayList<IColumn> completeList = new ArrayList<IColumn>();
+    completeList.addAll(colList);
+    m_columnSet = new ColumnSet(this, completeList);
+    if (getConfiguredCheckableColumn() != null) {
+      AbstractBooleanColumn checkableColumn = getColumnSet().getColumnByClass(getConfiguredCheckableColumn());
+      setCheckableColumn(checkableColumn);
+    }
+  }
+
   /**
    * Override this internal method only in order to make use of dynamic fields<br>
    * Used to manage column list and add/remove columns
@@ -608,10 +637,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   protected void initTableInternal() throws ProcessingException {
-    for (IColumn<?> c : getColumnSet().getColumns()) {
-      c.initColumn();
-    }
-    getColumnSet().initialize();
+    initColumnsInternal();
     if (getColumnFilterManager() == null) {
       setColumnFilterManager(createColumnFilterManager());
     }
@@ -628,9 +654,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   protected void disposeTableInternal() throws ProcessingException {
-    for (IColumn<?> c : getColumnSet().getColumns()) {
-      c.disposeColumn();
-    }
+    disposeColumnsInternal();
   }
 
   public void doHyperlinkAction(ITableRow row, IColumn<?> col, URL url) throws ProcessingException {
@@ -2258,6 +2282,22 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       m_selectedRows.addAll(backupSelection);
     }
     fireRowOrderChanged();
+  }
+
+  public void resetColumnConfiguration() {
+    discardAllRows();
+    //
+    try {
+      setTableChanging(true);
+      //
+      disposeColumnsInternal();
+      createColumnsInternal();
+      initColumnsInternal();
+      fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED));
+    }
+    finally {
+      setTableChanging(false);
+    }
   }
 
   public void resetColumnVisibilities() {
