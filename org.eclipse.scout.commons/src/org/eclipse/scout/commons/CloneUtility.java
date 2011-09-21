@@ -56,7 +56,10 @@ public final class CloneUtility {
     @Override
     protected Object replaceObject(Object obj) throws IOException {
       if (obj != null) {
-        m_usedClassLoaders.add(obj.getClass().getClassLoader());
+        ClassLoader cl = obj.getClass().getClassLoader();
+        if (cl != null) {
+          m_usedClassLoaders.add(cl);
+        }
       }
       return obj;
     }
@@ -82,7 +85,7 @@ public final class CloneUtility {
       catch (Exception e1) {
         for (ClassLoader cl : m_classLoaders) {
           try {
-            return cl.loadClass(desc.getName());
+            return Class.forName(desc.getName(), true, cl);
           }
           catch (Exception e2) {
             //nop
