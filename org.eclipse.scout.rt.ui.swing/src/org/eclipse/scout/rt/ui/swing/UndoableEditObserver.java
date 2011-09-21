@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -98,11 +98,19 @@ public final class UndoableEditObserver implements FocusListener, UndoableEditLi
 
   @Override
   public void keyPressed(KeyEvent e) {
-    // Ctrl-Z
-    if ((e.getKeyCode() == KeyEvent.VK_Z) && (e.isControlDown()) && (!e.isConsumed())) {
+    /*
+     * Bugzilla ticket 358365:
+     * To properly intercept Ctrl-Z/Ctrl-Y keystrokes, it is not sufficient to only test for the 'Ctrl'-key being pressed.
+     * That is because on Windows systems, the key 'Alt Gr' is composed of both of the keys, 'Ctrl' and 'Alt', respectively.
+     * E.g. if heading for a special character represented by 'Alt-Gr' + 'Z', that would result in an unwanted undo event otherwise.
+     */
+    if (e.isConsumed() || !e.isControlDown() || /* start bug 358365*/e.isAltDown() /* end bug 358365*/) {
+      return;
+    }
+    if (e.getKeyCode() == KeyEvent.VK_Z) {
       undoAction();
     }
-    else if ((e.getKeyCode() == KeyEvent.VK_Y) && (e.isControlDown()) && (!e.isConsumed())) {
+    else if (e.getKeyCode() == KeyEvent.VK_Y) {
       redoAction();
     }
   }
