@@ -316,3 +316,19 @@ The foreground color of JLabels which are disabled and contain HTML are not corr
 Solution:
 Set the foreground color direclty using the color declared in the UIDefaults "TextField.inactiveForeground"
 Migration: None
+
+21.09.2011 dwi
+BSI ticket #106'282
+Bugzilla ticket #358365
+Problem:
+If special characters represented by 'AltGr' + 'z' or 'AltGr' + 'y' are inserted into a textfield, the undo or redo action
+is perfomred instead of simply insert this special character.
+Solution:
+To properly intercept Ctrl-Z/Ctrl-Y keystrokes, it is not sufficient to only test for the 'Ctrl'-key being pressed.
+Additionally, it must be checked that the 'Alt' key is not pressed. Otherwise, if heading for a special character
+represented by 'Alt-Gr' + 'Z', that would result in an unwanted undo event.
+That is because on Windows systems, the key 'Alt Gr' is composed of both of the keys, 'Ctrl' and 'Alt', respectively.
+Plug-Ins changed:
+- org.eclipse.scout.rt.ui.swing [UndoableEditObserver.class]
+Migration:
+None
