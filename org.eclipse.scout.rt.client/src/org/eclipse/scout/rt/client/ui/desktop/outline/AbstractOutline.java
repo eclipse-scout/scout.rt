@@ -140,6 +140,9 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       @Override
       public boolean visit(ITreeNode node) {
         IPage page = (IPage) node;
+        if (page == null) {
+          return true;
+        }
         Class<? extends IPage> pageClass = page.getClass();
         for (Class<? extends IPage> c : pageTypes) {
           if (c.isAssignableFrom(pageClass)) {
