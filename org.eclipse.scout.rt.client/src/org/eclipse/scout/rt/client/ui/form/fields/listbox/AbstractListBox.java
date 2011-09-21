@@ -655,7 +655,6 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     ITableRow[] tableRows = getTable().getCheckedRows();
     if (tableRows != null) {
       lookupRows = new LookupRow[tableRows.length];
-      //XXX also use row icon,bg,fg,tooltip on row-main-cell
       for (int i = 0; i < tableRows.length; i++) {
         ICell cell = tableRows[i].getCell(1);
         lookupRows[i] = new LookupRow(tableRows[i].getCellValue(0), cell.getText(), cell.getIconId(), cell.getTooltipText(), cell.getBackgroundColor(), cell.getForegroundColor(), cell.getFont(), cell.isEnabled());
