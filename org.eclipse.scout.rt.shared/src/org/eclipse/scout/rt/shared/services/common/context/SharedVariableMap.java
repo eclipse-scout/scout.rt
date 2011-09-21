@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -55,12 +55,18 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    * Does not fire a change event
    */
   public void updateInternal(SharedVariableMap newMap) {
-    if (newMap.getVersion() >= getVersion()) {
+    if (newMap.getVersion() != getVersion()) {
       m_variables = new HashMap<String, Object>(newMap.m_variables);
       m_version = newMap.getVersion();
     }
   }
 
+  /**
+   * @return the version seq of the map state. This version number is changed every time the variable map changes.
+   *         Note that even a different number means that the version changed, it must not be higher, just different.
+   *         <p>
+   *         see https://bugs.eclipse.org/bugs/show_bug.cgi?id=358344
+   */
   public int getVersion() {
     return m_version;
   }
