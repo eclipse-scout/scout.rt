@@ -672,6 +672,19 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   void setTableCustomizer(ITableCustomizer c);
 
   /**
+   * Initialize and reset all columns. This operation removes all columns from the table and adds them as if the table
+   * was created again.
+   * <p>
+   * Note that this operation discards all table content by calling {@link #discardAllRows()} before rebuilding the
+   * columns.
+   * <p>
+   * When done a {@link TableEvent#TYPE_COLUMN_STRUCTURE_CHANGED} event is sent.
+   * <p>
+   * This can be useful on tables with dynamic injected columns that need to be refreshed after a state change.
+   */
+  void resetColumnConfiguration();
+
+  /**
    * initialize column visibility of all displayable columns
    */
   void resetColumnVisibilities();
