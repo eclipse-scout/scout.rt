@@ -424,7 +424,14 @@ public final class SVGUtility {
     e.getParentNode().insertBefore(aElem, e);
     e.getParentNode().removeChild(e);
     aElem.appendChild(e);
-    aElem.setAttributeNS(XLINK_NS, "href", url);
+    //check if "xlink" is the right localName for the attribute
+    String xlinkNs = e.getOwnerDocument().getDocumentElement().getAttributeNS(XMLConstants.XMLNS_NAMESPACE_URI, "xlink");
+    if (xlinkNs != null) {
+      aElem.setAttribute("xlink:href", url);
+    }
+    else {
+      aElem.setAttributeNS(XLINK_NS, "href", url);
+    }
   }
 
 }
