@@ -1609,7 +1609,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public void deselectRows(ITableRow[] rows) {
     rows = resolveRows(rows);
     if (rows != null && rows.length > 0) {
-      if (m_selectedRows.removeAll(Arrays.asList(rows))) {
+      TreeSet<ITableRow> newSelection = new TreeSet<ITableRow>(new RowIndexComparator());
+      newSelection.addAll(m_selectedRows);
+      if (newSelection.removeAll(Arrays.asList(rows))) {
+        m_selectedRows = newSelection;
         fireRowsSelected(m_selectedRows.toArray(new ITableRow[0]));
       }
     }
@@ -2455,10 +2458,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     //sort selection without firing an event
     if (m_selectedRows != null && m_selectedRows.size() > 0) {
-      ArrayList<ITableRow> backupSelection = new ArrayList<ITableRow>(m_selectedRows.size());
-      backupSelection.addAll(m_selectedRows);
-      m_selectedRows.clear();
-      m_selectedRows.addAll(backupSelection);
+      TreeSet<ITableRow> newSelection = new TreeSet<ITableRow>(new RowIndexComparator());
+      newSelection.addAll(m_selectedRows);
+      m_selectedRows = newSelection;
     }
     fireRowOrderChanged();
   }
