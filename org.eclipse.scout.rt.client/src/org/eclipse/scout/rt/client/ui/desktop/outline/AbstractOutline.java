@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import java.security.Permission;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -32,7 +33,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
@@ -136,6 +136,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void refreshPages(final Class... pageTypes) {
+    final ArrayList<IPage> candidates = new ArrayList<IPage>();
     ITreeVisitor v = new ITreeVisitor() {
       @Override
       public boolean visit(ITreeNode node) {
@@ -146,15 +147,18 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         Class<? extends IPage> pageClass = page.getClass();
         for (Class<? extends IPage> c : pageTypes) {
           if (c.isAssignableFrom(pageClass)) {
-            if (page instanceof AbstractPage) {
-              ((AbstractPage) page).dataChanged();
-            }
+            candidates.add(page);
           }
         }
         return true;
       }
     };
     visitNode(getRootNode(), v);
+    for (IPage page : candidates) {
+      if (page.getTree() != null) {
+        page.dataChanged();
+      }
+    }
   }
 
   @Override
@@ -352,9 +356,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     IPage activePage = getActivePage();
     if (activePage != null && m_contextPage != activePage) {
       m_contextPage = activePage;
-      if (activePage instanceof AbstractPage) {
-        activePage.pageActivatedNotify();
-      }
+      activePage.pageActivatedNotify();
     }
   }
 
@@ -363,9 +365,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     IPage page = m_contextPage;
     if (page != null) {
       m_contextPage = null;
-      if (page instanceof AbstractPage) {
-        page.pageDeactivatedNotify();
-      }
+      page.pageDeactivatedNotify();
     }
   }
 
