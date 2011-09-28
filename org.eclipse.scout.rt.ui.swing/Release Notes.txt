@@ -349,6 +349,6 @@ Supported values for vertical alignment are (HeaderPanel.logoVerticalAlignment):
 -1=top, 0=center, 1=bottom
 By default, the logo is aligned as follows: horizontal=center, vertical=top
 Plug-Ins changed:
-- org.eclipse.scout.rt.ui.swing [SwingScoutToolBar.class, UIDefaultsInjector.class]
+- org.eclipse.scout.rt.ui.swing [SwingScoutHeaderPanel.class, UIDefaultsInjector.class]
 Migration:
 None
