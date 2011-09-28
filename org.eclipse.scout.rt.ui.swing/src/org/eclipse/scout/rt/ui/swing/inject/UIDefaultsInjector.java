@@ -157,6 +157,11 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "Synth.ViewTab.foregroundSelected", new ColorUIResource(254, 154, 35));
     putIfUndefined(defaults, "Synth.ViewTab.font", new FontUIResource("Arial", Font.PLAIN, 12));
     putIfUndefined(defaults, "Synth.ViewTab.fontSelected", new FontUIResource("Arial", Font.BOLD, 12));
+
+    // to specify the horizontal alignment of the logo. Valid values are: 0=center, 1=right
+    putIfUndefined(defaults, "HeaderPanel.logoHorizontalAlignment", 0);
+    // to specify the vertical alignment of the logo. Valid values are: -1=top, 0=center, 1=bottom
+    putIfUndefined(defaults, "HeaderPanel.logoVerticalAlignment", -1);
   }
 
   /**
