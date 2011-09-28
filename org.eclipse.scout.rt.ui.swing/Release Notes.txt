@@ -332,3 +332,23 @@ Plug-Ins changed:
 - org.eclipse.scout.rt.ui.swing [UndoableEditObserver.class]
 Migration:
 None
+
+28.09.2011 dwi
+BSI ticket #106'563
+Bugzilla ticket #359225
+Problem:
+The logo in header panel is always positioned in center position.
+Instead, that should be configurable. Supported values would be:
+horizontal position: center, east
+vertical position: top, center, bottom
+Solution:
+Logo alignment can be controlled by setting according UI defaults in ISwingEnvironment#interceptUIDefaults(UIDefaults defaults).
+Supported values for horizontal alignment are (HeaderPanel.logoHorizontalAlignment):
+0=center, 1=right
+Supported values for vertical alignment are (HeaderPanel.logoVerticalAlignment):
+-1=top, 0=center, 1=bottom
+By default, the logo is aligned as follows: horizontal=center, vertical=top
+Plug-Ins changed:
+- org.eclipse.scout.rt.ui.swing [SwingScoutToolBar.class, UIDefaultsInjector.class]
+Migration:
+None

@@ -104,12 +104,30 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
     m_logo = getSwingEnvironment().createLogo();
     if (m_logo != null) {
       container.add(m_logo);
-      m_layout.putConstraint(SpringLayout.NORTH, m_logo, 0, SpringLayout.NORTH, container);
 
-      if (UIManager.getInt("HeaderPanel.logoHorizontalAlignment") == 1) {
+      // vertical alignment
+      int vAlignment = UIManager.getInt("HeaderPanel.logoVerticalAlignment");
+      switch (vAlignment) {
+        case 0: { // center
+          m_layout.putConstraint(SpringLayout.NORTH, m_logo, m_viewTabsPanel.getPreferredSize().height * -1, SpringLayout.VERTICAL_CENTER, container);
+          break;
+        }
+        case 1: { // bottom
+          m_layout.putConstraint(SpringLayout.SOUTH, m_logo, 0, SpringLayout.NORTH, m_viewTabsPanel);
+          break;
+        }
+        default: { // top
+          m_layout.putConstraint(SpringLayout.NORTH, m_logo, 0, SpringLayout.NORTH, container);
+          break;
+        }
+      }
+
+      // horizontal alignment
+      int hAlignment = UIManager.getInt("HeaderPanel.logoHorizontalAlignment");
+      if (hAlignment == 1) { // east
         m_layout.putConstraint(SpringLayout.EAST, m_logo, 0, SpringLayout.EAST, container);
       }
-      else {
+      else { // center
         m_layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, m_logo, 0, SpringLayout.HORIZONTAL_CENTER, container);
       }
 

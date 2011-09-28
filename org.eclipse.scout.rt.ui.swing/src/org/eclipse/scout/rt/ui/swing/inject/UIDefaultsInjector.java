@@ -147,8 +147,10 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "HeaderPanel.background", null);
     // to specify a custom header panel height. By default, the height is calculated automatically.
     putIfUndefined(defaults, "HeaderPanel.height", 0);
-    // to specify the horizontal alignment of the logo. By default, the logo is aligned in center position. (Valid values are: 0=center, 1=right)
+    // to specify the horizontal alignment of the logo. Valid values are: 0=center, 1=right
     putIfUndefined(defaults, "HeaderPanel.logoHorizontalAlignment", 0);
+    // to specify the vertical alignment of the logo. Valid values are: -1=top, 0=center, 1=bottom
+    putIfUndefined(defaults, "HeaderPanel.logoVerticalAlignment", -1);
   }
 
   /**
