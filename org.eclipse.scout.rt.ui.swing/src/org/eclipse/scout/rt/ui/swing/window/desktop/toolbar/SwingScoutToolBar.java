@@ -18,6 +18,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
+import javax.swing.UIManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -79,11 +80,6 @@ public class SwingScoutToolBar extends SwingScoutComposite<IDesktop> {
     m_navigationWidget.getStopRefreshButton().setPrimaryAction(new P_RefreshAction());
     m_navigationWidget.getStopRefreshButton().setSecondaryAction(m_progressHandler.createStopAction());
 
-    JComponent logo = getSwingEnvironment().createLogo();
-    toolBar.add(logo);
-    layout.putConstraint(SpringLayout.NORTH, logo, 0, SpringLayout.NORTH, toolBar);
-    layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, logo, 0, SpringLayout.HORIZONTAL_CENTER, toolBar);
-
     m_viewTabPanel = new JViewTabsBar(getSwingEnvironment());
     toolBar.add(m_viewTabPanel);
     layout.putConstraint(SpringLayout.SOUTH, m_viewTabPanel, 0, SpringLayout.SOUTH, toolBar);
@@ -94,6 +90,37 @@ public class SwingScoutToolBar extends SwingScoutComposite<IDesktop> {
     layout.putConstraint(SpringLayout.EAST, m_toolTabsPanel, 0, SpringLayout.EAST, toolBar);
     layout.putConstraint(SpringLayout.SOUTH, m_toolTabsPanel, 0, SpringLayout.SOUTH, toolBar);
     layout.putConstraint(SpringLayout.EAST, m_viewTabPanel, 0, SpringLayout.WEST, m_toolTabsPanel);
+
+    JComponent logo = getSwingEnvironment().createLogo();
+    if (logo != null) {
+      toolBar.add(logo);
+
+      // vertical alignment
+      int vAlignment = UIManager.getInt("HeaderPanel.logoVerticalAlignment");
+      switch (vAlignment) {
+        case 0: { // center
+          layout.putConstraint(SpringLayout.NORTH, logo, m_viewTabPanel.getPreferredSize().height * -1, SpringLayout.VERTICAL_CENTER, toolBar);
+          break;
+        }
+        case 1: { // bottom
+          layout.putConstraint(SpringLayout.SOUTH, logo, 0, SpringLayout.NORTH, m_viewTabPanel);
+          break;
+        }
+        default: { // top
+          layout.putConstraint(SpringLayout.NORTH, logo, 0, SpringLayout.NORTH, toolBar);
+          break;
+        }
+      }
+
+      // horizontal alignment
+      int hAlignment = UIManager.getInt("HeaderPanel.logoHorizontalAlignment");
+      if (hAlignment == 1) { // east
+        layout.putConstraint(SpringLayout.EAST, logo, 0, SpringLayout.EAST, toolBar);
+      }
+      else { // center
+        layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, logo, 0, SpringLayout.HORIZONTAL_CENTER, toolBar);
+      }
+    }
 
     toolBar.setOpaque(true);
     toolBar.setBackground(new Color(207, 226, 239));//XXX
