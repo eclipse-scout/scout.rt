@@ -36,6 +36,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.svg.SVGAElement;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGElement;
 import org.w3c.dom.svg.SVGPoint;
@@ -420,18 +421,11 @@ public final class SVGUtility {
    * Enclose the element with a link to an url
    */
   public static void addHyperlink(Element e, String url) {
-    Element aElem = e.getOwnerDocument().createElementNS(SVG_NS, "a");
+    SVGAElement aElem = (SVGAElement) e.getOwnerDocument().createElementNS(SVG_NS, "a");
     e.getParentNode().insertBefore(aElem, e);
     e.getParentNode().removeChild(e);
     aElem.appendChild(e);
-    //check if "xlink" is the right localName for the attribute
-    String xlinkNs = e.getOwnerDocument().getDocumentElement().getAttributeNS(XMLConstants.XMLNS_NAMESPACE_URI, "xlink");
-    if (xlinkNs != null) {
-      aElem.setAttribute("xlink:href", url);
-    }
-    else {
-      aElem.setAttributeNS(XLINK_NS, "href", url);
-    }
+    aElem.getHref().setBaseVal(url);
   }
 
 }
