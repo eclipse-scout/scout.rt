@@ -2472,6 +2472,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     try {
       setTableChanging(true);
       //
+      ITableColumnFilterManager filterManager = getColumnFilterManager();
+      try {
+        if (filterManager != null) {
+          filterManager.reset();
+        }
+      }
+      catch (ProcessingException e) {
+        //nop
+      }
       disposeColumnsInternal();
       createColumnsInternal();
       initColumnsInternal();
