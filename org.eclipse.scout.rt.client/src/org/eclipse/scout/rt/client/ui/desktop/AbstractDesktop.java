@@ -16,6 +16,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,6 +96,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDesktop.class);
 
+  private final IDesktopExtension m_localDesktopExtension;
   private final EventListenerList m_listenerList;
   private final Map<Object, EventListenerList> m_dataChangeListenerList;
   private final IDesktopUIFacade m_uiFacade;
@@ -113,7 +115,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final ArrayList<IForm> m_dialogStack;
   private final ArrayList<IMessageBox> m_messageBoxStack;
   private IMenu[] m_menus;
-  private IAction[] m_actions;
+  private IViewButton[] m_viewButtons;
+  private IToolButton[] m_toolButtons;
   private boolean m_autoPrefixWildcardForTextSearch;
   private boolean m_desktopInited;
   private boolean m_trayVisible;
@@ -123,6 +126,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * get it via {@code ClientScoutSession.getSession().getModelManager()}
    */
   public AbstractDesktop() {
+    m_localDesktopExtension = new P_LocalDesktopExtension();
     m_listenerList = new EventListenerList();
     m_dataChangeListenerList = new HashMap<Object, EventListenerList>();
     m_viewStack = new ArrayList<IForm>();
@@ -157,14 +161,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return null;
   }
 
-  private Class<? extends IMenu>[] getConfiguredMenus() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
-  }
-
   private Class<? extends IAction>[] getConfiguredActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IAction.class);
+    return ConfigurationUtility.filterClasses(dca, IAction.class);
   }
 
   /**
@@ -311,99 +310,111 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected void execAddTrayMenus(List<IMenu> menus) throws ProcessingException {
   }
 
+  /**
+   * Override to provide a set of extensions (modules) that contribute their content to this desktop.
+   * <p>
+   * The default returns an array containing only the {@link #getLocalDesktopExtension()}
+   * <p>
+   * When overriding, make sure to include the {@link #getLocalDesktopExtension()} (normally at the beginning of the
+   * list), otherwise local menus, outlines, etc. are not included.
+   * <p>
+   * The extension that are held by this desktop must call {@link IDesktopExtension#setCoreDesktop(this)} before using
+   * the extension. That way the extension can use and access this desktops methods.
+   */
+  protected IDesktopExtension[] getDesktopExtensions() {
+    return new IDesktopExtension[]{getLocalDesktopExtension()};
+  }
+
+  /**
+   * @return the special extension that contributes the contents of this desktop itself
+   */
+  protected IDesktopExtension getLocalDesktopExtension() {
+    return m_localDesktopExtension;
+  }
+
   protected void initConfig() {
     setTitle(getConfiguredTitle());
     setTrayVisible(getConfiguredTrayVisible());
-    Class[] a = getConfiguredOutlines();
+    propertySupport.setProperty(PROP_KEY_STROKES, new IKeyStroke[0]);
+    IDesktopExtension[] extensions = getDesktopExtensions();
+    //outlines
     ArrayList<IOutline> outlineList = new ArrayList<IOutline>();
-    if (a != null) {
-      for (Class element : a) {
+    if (extensions != null) {
+      for (IDesktopExtension ext : extensions) {
         try {
-          IOutline o = (IOutline) element.newInstance();
-          o.initTree();
-          outlineList.add(o);
+          ext.contributeOutlines(outlineList);
+        }
+        catch (Throwable t) {
+          LOG.error("contrinuting outlines by " + ext, t);
+        }
+      }
+    }
+    m_availableOutlines = ConfigurationUtility.sortByOrderAnnotation(outlineList).toArray(new IOutline[outlineList.size()]);
+    //actions (keyStroke, menu, viewButton, toolButton)
+    ArrayList<IAction> actionList = new ArrayList<IAction>();
+    if (extensions != null) {
+      for (IDesktopExtension ext : extensions) {
+        try {
+          ext.contributeActions(actionList);
+        }
+        catch (Throwable t) {
+          LOG.error("contrinuting actions by " + ext, t);
+        }
+      }
+    }
+    //extract keystroke hints from menus
+    for (IMenu menu : new ActionFinder().findActions(actionList, IMenu.class)) {
+      if (menu.getKeyStroke() != null) {
+        try {
+          IKeyStroke ks = new KeyStroke(menu.getKeyStroke(), menu);
+          actionList.add(ks);
         }
         catch (Throwable t) {
           LOG.error(null, t);
         }
       }
     }
-    m_availableOutlines = outlineList.toArray(new IOutline[0]);
-    // key strokes
-    propertySupport.setProperty(PROP_KEY_STROKES, new IKeyStroke[0]);
-    ArrayList<IKeyStroke> ksList = new ArrayList<IKeyStroke>();
-    Class<? extends IKeyStroke>[] ksArray = getConfiguredKeyStrokes();
-    for (int i = 0; i < ksArray.length; i++) {
+    //build completed menu, viewButton, toolButton arrays
+    List<IMenu> menuList = new ActionFinder().findActions(actionList, IMenu.class);
+    m_menus = ConfigurationUtility.sortByOrderAnnotation(menuList).toArray(new IMenu[menuList.size()]);
+    List<IViewButton> viewButtonList = new ActionFinder().findActions(actionList, IViewButton.class);
+    m_viewButtons = ConfigurationUtility.sortByOrderAnnotation(viewButtonList).toArray(new IViewButton[viewButtonList.size()]);
+    List<IToolButton> toolButtonList = new ActionFinder().findActions(actionList, IToolButton.class);
+    m_toolButtons = ConfigurationUtility.sortByOrderAnnotation(toolButtonList).toArray(new IToolButton[toolButtonList.size()]);
+    //add dynamic keyStrokes
+    List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class);
+    addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
+    //init outlines
+    for (IOutline o : m_availableOutlines) {
       try {
-        IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, ksArray[i]);
-        ksList.add(ks);
+        o.initTree();
       }
       catch (Throwable t) {
         LOG.error(null, t);
       }
     }
-    addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
-    // tools
-    ArrayList<IAction> actionList = new ArrayList<IAction>();
-    Class<? extends IAction>[] ta = getConfiguredActions();
-    for (Class<? extends IAction> element : ta) {
-      try {
-        IAction tool = ConfigurationUtility.newInnerInstance(this, element);
-        actionList.add(tool);
-      }
-      catch (Exception e) {
-        LOG.error(null, e);
-      }
-    }
-    m_actions = actionList.toArray(new IAction[actionList.size()]);
-    // menus
-    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
-    Class<? extends IMenu>[] ma = getConfiguredMenus();
-    for (Class<? extends IMenu> element : ma) {
-      try {
-        IMenu menu = ConfigurationUtility.newInnerInstance(this, element);
-        menuList.add(menu);
-      }
-      catch (Exception e) {
-        LOG.error(null, e);
-      }
-    }
-    m_menus = menuList.toArray(new IMenu[0]);
-    //add keystrokes for menus with defined keystrokes
-    ksList = new ArrayList<IKeyStroke>();
-    for (IMenu menu : new ActionFinder().findActions(getMenus(), IMenu.class)) {
-      if (menu.getKeyStroke() != null) {
-        try {
-          IKeyStroke ks = new KeyStroke(menu.getKeyStroke(), menu);
-          ksList.add(ks);
-        }
-        catch (Throwable t) {
-          LOG.error(null, t);
-        }
-      }
-    }
-    addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
   }
-
-  /*
-   * Runtime
-   */
 
   @Override
   public void initDesktop() throws ProcessingException {
     if (!m_desktopInited) {
       m_desktopInited = true;
-      // internal
+      //local
       prepareAllMenus();
-      // external
-      try {
-        execInit();
-      }
-      catch (ProcessingException e) {
-        throw e;
-      }
-      catch (Throwable t) {
-        throw new ProcessingException("init desktop", t);
+      //extensions
+      IDesktopExtension[] extensions = getDesktopExtensions();
+      if (extensions != null) {
+        for (IDesktopExtension ext : extensions) {
+          try {
+            ContributionCommand cc = ext.initDelegate();
+            if (cc == ContributionCommand.Stop) {
+              break;
+            }
+          }
+          catch (Throwable t) {
+            LOG.error("extension " + ext);
+          }
+        }
       }
     }
   }
@@ -833,14 +844,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
-  private Class<? extends IKeyStroke>[] getConfiguredKeyStrokes() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
-  }
-
   @Override
   public IMenu[] getMenus() {
-    return m_menus;
+    IMenu[] a = new IMenu[m_menus.length];
+    System.arraycopy(m_menus, 0, a, 0, a.length);
+    return a;
   }
 
   @Override
@@ -859,29 +867,46 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public IAction[] getActions() {
-    return m_actions;
+    IAction[] a = getKeyStrokes();
+    IAction[] b = getMenus();
+    IAction[] c = getViewButtons();
+    IAction[] d = getToolButtons();
+    if (a == null) {
+      a = new IAction[0];
+    }
+    if (b == null) {
+      b = new IAction[0];
+    }
+    if (c == null) {
+      c = new IAction[0];
+    }
+    if (d == null) {
+      d = new IAction[0];
+    }
+    IAction[] all = new IAction[a.length + b.length + c.length + d.length];
+    int offset = 0;
+    System.arraycopy(a, 0, all, offset, a.length);
+    offset += a.length;
+    System.arraycopy(b, 0, all, offset, b.length);
+    offset += b.length;
+    System.arraycopy(c, 0, all, offset, c.length);
+    offset += c.length;
+    System.arraycopy(d, 0, all, offset, d.length);
+    return all;
   }
 
   @Override
   public IToolButton[] getToolButtons() {
-    ArrayList<IToolButton> list = new ArrayList<IToolButton>(m_actions.length);
-    for (IAction a : getActions()) {
-      if (a instanceof IToolButton) {
-        list.add((IToolButton) a);
-      }
-    }
-    return list.toArray(new IToolButton[list.size()]);
+    IToolButton[] a = new IToolButton[m_toolButtons.length];
+    System.arraycopy(m_toolButtons, 0, a, 0, a.length);
+    return a;
   }
 
   @Override
   public IViewButton[] getViewButtons() {
-    ArrayList<IViewButton> list = new ArrayList<IViewButton>(m_actions.length);
-    for (IAction a : getActions()) {
-      if (a instanceof IViewButton) {
-        list.add((IViewButton) a);
-      }
-    }
-    return list.toArray(new IViewButton[list.size()]);
+    IViewButton[] a = new IViewButton[m_viewButtons.length];
+    System.arraycopy(m_viewButtons, 0, a, 0, a.length);
+    return a;
   }
 
   @Override
@@ -894,11 +919,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (m_pageDetailForm != f) {
       IForm oldForm = m_pageDetailForm;
       m_pageDetailForm = f;
-      try {
-        execPageDetailFormChanged(oldForm, m_pageDetailForm);
-      }
-      catch (Throwable t) {
-        LOG.error(null, t);
+      //extensions
+      IDesktopExtension[] extensions = getDesktopExtensions();
+      if (extensions != null) {
+        for (IDesktopExtension ext : extensions) {
+          try {
+            ContributionCommand cc = ext.pageDetailFormChangedDelegate(oldForm, m_pageDetailForm);
+            if (cc == ContributionCommand.Stop) {
+              break;
+            }
+          }
+          catch (Throwable t) {
+            LOG.error("extension " + ext, t);
+          }
+        }
       }
     }
   }
@@ -917,11 +951,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (force || m_pageSearchForm != f) {
       IForm oldForm = m_pageSearchForm;
       m_pageSearchForm = f;
-      try {
-        execPageSearchFormChanged(oldForm, m_pageSearchForm);
-      }
-      catch (Throwable t) {
-        LOG.error(null, t);
+      //extensions
+      IDesktopExtension[] extensions = getDesktopExtensions();
+      if (extensions != null) {
+        for (IDesktopExtension ext : extensions) {
+          try {
+            ContributionCommand cc = ext.pageSearchFormChangedDelegate(oldForm, m_pageSearchForm);
+            if (cc == ContributionCommand.Stop) {
+              break;
+            }
+          }
+          catch (Throwable t) {
+            LOG.error("extension " + ext, t);
+          }
+        }
       }
     }
   }
@@ -978,11 +1021,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (m_pageDetailTable != t) {
       ITable oldTable = m_pageDetailTable;
       m_pageDetailTable = t;
-      try {
-        execPageDetailTableChanged(oldTable, m_pageDetailTable);
-      }
-      catch (Throwable x) {
-        LOG.error(null, x);
+      //extensions
+      IDesktopExtension[] extensions = getDesktopExtensions();
+      if (extensions != null) {
+        for (IDesktopExtension ext : extensions) {
+          try {
+            ContributionCommand cc = ext.pageDetailTableChangedDelegate(oldTable, m_pageDetailTable);
+            if (cc == ContributionCommand.Stop) {
+              break;
+            }
+          }
+          catch (Throwable x) {
+            LOG.error("extension " + ext, x);
+          }
+        }
       }
     }
   }
@@ -1180,15 +1232,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void fireOutlineChanged(IOutline oldOutline, IOutline newOutline) {
     if (oldOutline != newOutline) {
-      // single observer callback
-      try {
-        execOutlineChanged(oldOutline, newOutline);
-      }
-      catch (ProcessingException t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(t);
-      }
-      catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(oldOutline + " -> " + newOutline, t));
+      //extensions
+      IDesktopExtension[] extensions = getDesktopExtensions();
+      if (extensions != null) {
+        for (IDesktopExtension ext : extensions) {
+          try {
+            ContributionCommand cc = ext.outlineChangedDelegate(oldOutline, newOutline);
+            if (cc == ContributionCommand.Stop) {
+              break;
+            }
+          }
+          catch (ProcessingException e) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          }
+          catch (Throwable t) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(oldOutline + " -> " + newOutline, t));
+          }
+        }
       }
     }
     // fire
@@ -1245,7 +1305,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private void addLocalPopupMenus(DesktopEvent event) {
     try {
       ArrayList<IMenu> list = new ArrayList<IMenu>();
-      execAddTrayMenus(list);
+      //extensions
+      IDesktopExtension[] extensions = getDesktopExtensions();
+      if (extensions != null) {
+        for (IDesktopExtension ext : extensions) {
+          try {
+            ContributionCommand cc = ext.addTrayMenusDelegate(list);
+            if (cc == ContributionCommand.Stop) {
+              break;
+            }
+          }
+          catch (Throwable t) {
+            LOG.error("extension " + ext, t);
+          }
+        }
+      }
       for (IMenu m : list) {
         if (m != null) {
           m.prepareAction();
@@ -1256,9 +1330,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           event.addPopupMenu(m);
         }
       }
-    }
-    catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
     catch (Throwable t) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
@@ -1291,7 +1362,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void afterTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
-    execTablePageLoaded(tablePage);
+    //extensions
+    IDesktopExtension[] extensions = getDesktopExtensions();
+    if (extensions != null) {
+      for (IDesktopExtension ext : extensions) {
+        try {
+          ContributionCommand cc = ext.tablePageLoadedDelegate(tablePage);
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
+        }
+        catch (Throwable t) {
+          LOG.error("extension " + ext, t);
+        }
+      }
+    }
   }
 
   @Override
@@ -1302,7 +1387,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     for (IForm dialog : getDialogStack()) {
       removeForm(dialog);
     }
-    execClosing();
+    //extensions
+    IDesktopExtension[] extensions = getDesktopExtensions();
+    if (extensions != null) {
+      for (IDesktopExtension ext : extensions) {
+        try {
+          ContributionCommand cc = ext.desktopClosingDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
+        }
+        catch (Throwable t) {
+          LOG.error("extension " + ext, t);
+        }
+      }
+    }
     fireDesktopClosed();
   }
 
@@ -1340,50 +1439,185 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return m_uiFacade;
   }
 
-  /*
-   * UI Facade
+  /**
+   * local desktop extension that calls local exec methods and returns local contributions in this class itself
    */
+  private class P_LocalDesktopExtension implements IDesktopExtension {
+    @Override
+    public IDesktop getCoreDesktop() {
+      return AbstractDesktop.this;
+    }
+
+    @Override
+    public void setCoreDesktop(IDesktop desktop) {
+      //nop
+    }
+
+    @Override
+    public void contributeOutlines(Collection<IOutline> outlines) {
+      Class<?>[] a = getConfiguredOutlines();
+      if (a != null) {
+        for (Class<?> element : a) {
+          try {
+            IOutline o = (IOutline) element.newInstance();
+            outlines.add(o);
+          }
+          catch (Throwable t) {
+            LOG.error("adding outline " + element, t);
+          }
+        }
+      }
+    }
+
+    @Override
+    public void contributeActions(Collection<IAction> actions) {
+      Class<? extends IAction>[] actionArray = getConfiguredActions();
+      for (Class<? extends IAction> element : actionArray) {
+        try {
+          IAction tool = ConfigurationUtility.newInnerInstance(AbstractDesktop.this, element);
+          actions.add(tool);
+        }
+        catch (Exception e) {
+          LOG.error("adding action " + element, e);
+        }
+      }
+    }
+
+    @Override
+    public ContributionCommand initDelegate() throws ProcessingException {
+      execInit();
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand desktopOpenedDelegate() throws ProcessingException {
+      execOpened();
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand desktopClosingDelegate() throws ProcessingException {
+      execClosing();
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand guiAttachedDelegate() throws ProcessingException {
+      execGuiAttached();
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand guiDetachedDelegate() throws ProcessingException {
+      execGuiDetached();
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+      execOutlineChanged(oldOutline, newOutline);
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand pageSearchFormChangedDelegate(IForm oldForm, IForm newForm) throws ProcessingException {
+      execPageSearchFormChanged(oldForm, newForm);
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand pageDetailFormChangedDelegate(IForm oldForm, IForm newForm) throws ProcessingException {
+      execPageDetailFormChanged(oldForm, newForm);
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand pageDetailTableChangedDelegate(ITable oldTable, ITable newTable) throws ProcessingException {
+      execPageDetailTableChanged(oldTable, newTable);
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage) throws ProcessingException {
+      execTablePageLoaded(tablePage);
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand addTrayMenusDelegate(List<IMenu> menus) throws ProcessingException {
+      execAddTrayMenus(menus);
+      return ContributionCommand.Continue;
+    }
+  }
+
   private class P_UIFacade implements IDesktopUIFacade {
 
     @Override
     public void fireGuiAttached() {
-      try {
-        setGuiAvailableInternal(true);
-        execGuiAttached();
-      }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      }
-      catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      setGuiAvailableInternal(true);
+      //extensions
+      IDesktopExtension[] extensions = getDesktopExtensions();
+      if (extensions != null) {
+        for (IDesktopExtension ext : extensions) {
+          try {
+            ContributionCommand cc = ext.guiAttachedDelegate();
+            if (cc == ContributionCommand.Stop) {
+              break;
+            }
+          }
+          catch (ProcessingException e) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          }
+          catch (Throwable t) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
+          }
+        }
       }
     }
 
     @Override
     public void fireGuiDetached() {
-      try {
-        setGuiAvailableInternal(false);
-        execGuiDetached();
-      }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      }
-      catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      setGuiAvailableInternal(false);
+      //extensions
+      IDesktopExtension[] extensions = getDesktopExtensions();
+      if (extensions != null) {
+        for (IDesktopExtension ext : extensions) {
+          try {
+            ContributionCommand cc = ext.guiDetachedDelegate();
+            if (cc == ContributionCommand.Stop) {
+              break;
+            }
+          }
+          catch (ProcessingException e) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          }
+          catch (Throwable t) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
+          }
+        }
       }
     }
 
     @Override
     public void fireDesktopOpenedFromUI() {
-      try {
-        setOpenedInternal(true);
-        execOpened();
-      }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      }
-      catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      setOpenedInternal(true);
+      //extensions
+      IDesktopExtension[] extensions = getDesktopExtensions();
+      if (extensions != null) {
+        for (IDesktopExtension ext : extensions) {
+          try {
+            ContributionCommand cc = ext.desktopOpenedDelegate();
+            if (cc == ContributionCommand.Stop) {
+              break;
+            }
+          }
+          catch (ProcessingException e) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          }
+          catch (Throwable t) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
+          }
+        }
       }
     }
 

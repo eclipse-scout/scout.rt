@@ -280,18 +280,17 @@ public interface IDesktop extends IPropertyObserver {
   void prepareAllMenus();
 
   /**
-   * @return all actions including tool buttons and view buttons
-   *         normally these are the tool buttons
+   * @return all actions including keyStroke, menu, toolButton and viewButton
    */
   IAction[] getActions();
 
   /**
-   * Convenience for {@link #getActions()} filtered by {@link IToolButton} normally these are the tool buttons
+   * @return all {@link IToolButton} actions
    */
   IToolButton[] getToolButtons();
 
   /**
-   * Convenience for {@link #getActions()} filtered by {@link IViewButton} normally these are the view tabs
+   * @return all {@link IViewButton} actions
    */
   IViewButton[] getViewButtons();
 
