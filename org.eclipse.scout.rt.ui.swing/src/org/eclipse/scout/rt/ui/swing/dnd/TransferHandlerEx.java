@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -59,6 +59,19 @@ public class TransferHandlerEx extends TransferHandler {
   @Override
   protected Transferable createTransferable(JComponent c) {
     return null;
+  }
+
+  @Override
+  public boolean canImport(TransferSupport support) {
+    /*
+     * By default, when the transfer is accepted, the chosen drop action is that picked by the user via their drag gesture.
+     * That means that if having held down the 'Ctrl' key while dragging an object, the action is supposed to be copy and move otherwise.
+     * That might be confusing as objects are discarded from the source application if only being dragged.
+     * That is why the drop action is always set to be copy regardless of the user gesture.
+     * That is same as done in @{link {@link DefaultDropTarget.P_DefaultDropHandler#drop(java.awt.dnd.DropTargetDropEvent)}.
+     */
+    support.setDropAction(DnDConstants.ACTION_COPY);
+    return super.canImport(support);
   }
 
   /**

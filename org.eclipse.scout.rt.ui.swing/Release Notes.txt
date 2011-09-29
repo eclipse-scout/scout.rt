@@ -352,3 +352,24 @@ Plug-Ins changed:
 - org.eclipse.scout.rt.ui.swing [SwingScoutHeaderPanel.class, UIDefaultsInjector.class]
 Migration:
 None
+
+28.09.2011 dwi
+BSI ticket #105'253
+Bugzilla ticket #359429
+Problem:
+When dragging an object into a Scout table, the behavior is different depending
+on whether the target object is a node or an empty space area. If being a node,
+the source object is always copied regardless of the user gesture applied. On
+the other hand, if dropping at an empty space location, the user gesture is
+considered, meaning that the object is effectively being moved unless the Ctrl
+key is held down.
+That should be changed to ignore the user gesture and always perform the copy
+drop action.
+Solution:
+The behavior is not the same as different drop targets are associated with the table and its viewport.
+The drop target of the viewport considers the user gesture whereas the table itself does not.
+Instrumented drop target of the viewport to ignore the user gesture and always use copy as drop action.
+Plug-Ins changed:
+- org.eclipse.scout.rt.ui.swing [TransferHandlerEx.class]
+Migration:
+None
