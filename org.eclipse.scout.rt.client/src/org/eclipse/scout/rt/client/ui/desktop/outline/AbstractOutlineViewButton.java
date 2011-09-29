@@ -17,6 +17,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.view.AbstractViewButton;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -28,6 +30,9 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
   private final IDesktop m_desktop;
   private IOutline m_outline;
 
+  /**
+   * call using {@link AbstractDesktop}.this or {@link AbstractDesktopExtension#getDelegatingDesktop()}
+   */
   public AbstractOutlineViewButton(IDesktop desktop, Class<? extends IOutline> outlineType) {
     super(false);
     m_desktop = desktop;
