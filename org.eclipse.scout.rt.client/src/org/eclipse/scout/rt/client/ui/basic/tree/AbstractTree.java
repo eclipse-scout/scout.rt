@@ -1320,6 +1320,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private boolean visitNodeRec(ITreeNode node, ITreeVisitor v) {
+    if (node == null) {
+      return true;
+    }
     boolean b = v.visit(node);
     if (!b) {
       return b;
