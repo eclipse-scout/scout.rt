@@ -14,6 +14,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -58,6 +59,31 @@ public final class ConfigurationUtility {
       }
     }
     return orderedClassesMap.values().toArray(new Class[orderedClassesMap.size()]);
+  }
+
+  /**
+   * Sorts the elements according to their {@link Order} annotation.
+   * <p>
+   * If one of the objects is not annotated with {@link Order}, its index in the list is used as order value.
+   */
+  public static <T> Collection<T> sortByOrderAnnotation(Collection<T> list) {
+    if(list==null){
+	  return null;
+	}
+    TreeMap<CompositeObject, T> sortMap = new TreeMap<CompositeObject, T>();
+    int index = 0;
+    for (T element : list) {
+      Class<?> c = element.getClass();
+      if (c.isAnnotationPresent(Order.class)) {
+        Order order = c.getAnnotation(Order.class);
+        sortMap.put(new CompositeObject(order.value(), index), element);
+      }
+      else {
+        sortMap.put(new CompositeObject(index, index), element);
+      }
+      index++;
+    }
+    return sortMap.values();
   }
 
   /**
@@ -131,7 +157,8 @@ public final class ConfigurationUtility {
       Class<?> c = implementationType;
       while (c != null && c != declaringType) {
         try {
-          Method overrideMethod = c.getDeclaredMethod(declaredMethod.getName(), declaredMethod.getParameterTypes());
+          //check if method is avaliable
+          c.getDeclaredMethod(declaredMethod.getName(), declaredMethod.getParameterTypes());
           return true;
         }
         catch (NoSuchMethodException e) {
