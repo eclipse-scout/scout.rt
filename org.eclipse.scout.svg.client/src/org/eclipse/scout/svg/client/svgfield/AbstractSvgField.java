@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.svg.client.svgfield;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.EventListener;
 
@@ -89,6 +90,16 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   @Override
   public void setSvgDocument(SVGDocument doc) {
     setSelection(null);
+    if (LOG.isTraceEnabled()) {
+      try {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        SVGUtility.writeSVGDocument(doc, out, "UTF-8");
+        LOG.trace(getClass().getName() + ".setSvgDocument\n" + new String(out.toByteArray(), "UTF-8"));
+      }
+      catch (Throwable t) {
+        //nop
+      }
+    }
     propertySupport.setProperty(PROP_SVG_DOCUMENT, doc);
   }
 
