@@ -363,7 +363,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     //extract keystroke hints from menus
-    for (IMenu menu : new ActionFinder().findActions(actionList, IMenu.class)) {
+    for (IMenu menu : new ActionFinder().findActions(actionList, IMenu.class, true)) {
       if (menu.getKeyStroke() != null) {
         try {
           IKeyStroke ks = new KeyStroke(menu.getKeyStroke(), menu);
@@ -375,14 +375,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     //build completed menu, viewButton, toolButton arrays
-    List<IMenu> menuList = new ActionFinder().findActions(actionList, IMenu.class);
+    List<IMenu> menuList = new ActionFinder().findActions(actionList, IMenu.class, false); // only top level menus
     m_menus = ConfigurationUtility.sortByOrderAnnotation(menuList).toArray(new IMenu[menuList.size()]);
-    List<IViewButton> viewButtonList = new ActionFinder().findActions(actionList, IViewButton.class);
+    List<IViewButton> viewButtonList = new ActionFinder().findActions(actionList, IViewButton.class, false);
     m_viewButtons = ConfigurationUtility.sortByOrderAnnotation(viewButtonList).toArray(new IViewButton[viewButtonList.size()]);
-    List<IToolButton> toolButtonList = new ActionFinder().findActions(actionList, IToolButton.class);
+    List<IToolButton> toolButtonList = new ActionFinder().findActions(actionList, IToolButton.class, false);
     m_toolButtons = ConfigurationUtility.sortByOrderAnnotation(toolButtonList).toArray(new IToolButton[toolButtonList.size()]);
     //add dynamic keyStrokes
-    List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class);
+    List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class, true);
     addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
     //init outlines
     for (IOutline o : m_availableOutlines) {
