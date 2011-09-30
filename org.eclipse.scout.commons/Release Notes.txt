@@ -160,3 +160,16 @@ Plug-Ins changed:
 - org.eclipse.scout.rt.ui.rap
 Migration:
 None
+
+30.09.2011 dwi [patch provided by dbu, BSI Business Systems Integration AG]
+BSI ticket #106'584
+Bugzilla 359358
+Problem:
+The HTML created from within a Microsoft Word file contains user-specific, unnecessary information.
+Also, not referenced attachments are included which unnecessarily increase the size of the MIME-message.
+Solution:
+Removed user-specific data and redundant attachments
+Plug-Ins changed:
+- org.eclipse.scout.commons [MailUtility.class]
+Migration:
+None

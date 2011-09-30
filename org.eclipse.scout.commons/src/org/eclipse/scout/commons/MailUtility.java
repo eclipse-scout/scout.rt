@@ -331,7 +331,7 @@ public final class MailUtility {
       return instance.createMimeMessageFromWordArchiveInternal(tempDir, simpleName, attachments, markAsUnsent);
     }
     catch (ProcessingException pe) {
-      throw (ProcessingException) pe;
+      throw pe;
     }
     catch (IOException e) {
       throw new ProcessingException("Error occured while accessing files", e);
@@ -390,6 +390,19 @@ public final class MailUtility {
         htmlMessage = htmlMessage.replaceAll("<link rel=colorSchemeMapping href=\"cid:colorschememapping.xml\">", "");
         htmlMessage = htmlMessage.replaceAll("<link rel=themeData href=\"cid:themedata.thmx\">", "");
         htmlMessage = htmlMessage.replaceAll("<link rel=Edit-Time-Data href=\"cid:editdata.mso\">", "");
+
+        // remove Microsoft Word tags
+        htmlMessage = htmlMessage.replaceAll("<!--\\[if gte mso(.*\\r?\\n)*?.*?endif\\]-->", "");
+        // remove any VML elements
+        htmlMessage = htmlMessage.replaceAll("<!--\\[if gte vml 1(.*\\r?\\n)*?.*?endif\\]-->", "");
+        // remove any VML elements part2
+        htmlMessage = htmlMessage.replaceAll("<!--\\[if !vml\\]>(.*\\r?\\n)*?.*?<!\\[endif\\]-->", "$1");
+        // remove not referenced attachments
+        for (DataSource ds : htmlDataSourceList) {
+          if (!htmlMessage.contains("cid:" + ds.getName())) {
+            htmlDataSourceList.remove(ds);
+          }
+        }
         hasHtml = StringUtility.hasText(htmlMessage);
       }
 
