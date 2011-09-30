@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -30,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.AbstractBookmarkTreeField;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm;
+import org.eclipse.scout.rt.client.ui.desktop.bookmark.IBookmarkForm;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.BookmarkViewForm.MainBox.TabBox.BookmarksBox;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.BookmarkViewForm.MainBox.TabBox.BookmarksBox.AddBookmarksLinkButton;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.BookmarkViewForm.MainBox.TabBox.BookmarksBox.ClearStartPageLinkButton;
@@ -57,6 +60,13 @@ public class BookmarkViewForm extends AbstractForm {
 
   public BookmarkViewForm() throws ProcessingException {
     super();
+  }
+
+  @ConfigProperty(ConfigProperty.FORM)
+  @Order(10)
+  @ConfigPropertyValue("null")
+  protected Class<? extends IBookmarkForm> getConfiguredBookmarkForm() {
+    return BookmarkForm.class;
   }
 
   @Override
@@ -215,20 +225,29 @@ public class BookmarkViewForm extends AbstractForm {
             Bookmark b = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
             if (b != null) {
               b.setKind(kind);
-              BookmarkForm form = new BookmarkForm();
+              IBookmarkForm form = null;
+              if (getConfiguredBookmarkForm() != null) {
+                try {
+                  form = getConfiguredBookmarkForm().newInstance();
+                }
+                catch (Exception e) {
+                  LOG.warn(null, e);
+                }
+              }
+              if (form == null) {
+                form = new BookmarkForm();
+              }
               form.setBookmarkRootFolder(getUserBookmarkTreeField().getBookmarkRootFolder());
-              form.getTitleField().setValue(b.getTitle());
-              form.getKeyStrokeField().setValue(b.getKeyStroke());
-              form.getDescriptionField().setValue(b.getText());
+              form.setBookmark(b);
               if (form.getBookmarkRootFolder() != form.getBookmarkRootFolder()) {
-                form.getFolderField().setValue(form.getBookmarkRootFolder());
+                form.setFolder(form.getBookmarkRootFolder());
               }
               form.startNew();
               form.waitFor();
               if (form.isFormStored()) {
-                b.setTitle(form.getTitleField().getValue());
-                b.setKeyStroke(form.getKeyStrokeField().getValue());
-                BookmarkFolder folder = form.getFolderField().getValue();
+                b.setTitle(b.getTitle());
+                b.setKeyStroke(b.getKeyStroke());
+                BookmarkFolder folder = form.getFolder();
                 if (folder == null) {
                   folder = form.getBookmarkRootFolder();
                 }

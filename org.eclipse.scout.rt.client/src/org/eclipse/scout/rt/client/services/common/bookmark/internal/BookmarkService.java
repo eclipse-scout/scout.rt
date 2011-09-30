@@ -83,7 +83,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
       case BookmarkServiceEvent.TYPE_CHANGED: {
         //refresh global keystrokes
         final ArrayList<Bookmark> list = new ArrayList<Bookmark>();
-        getBookmarkData().getUserBookmarks().visit(new IBookmarkVisitor() {
+        IBookmarkVisitor visitor = new IBookmarkVisitor() {
           @Override
           public boolean visitFolder(List<BookmarkFolder> path) {
             return true;
@@ -96,7 +96,9 @@ public class BookmarkService extends AbstractService implements IBookmarkService
             }
             return true;
           }
-        });
+        };
+        getBookmarkData().getUserBookmarks().visit(visitor);
+        getBookmarkData().getGlobalBookmarks().visit(visitor);
         if (list.size() > 0) {
           IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
           if (desktop != null) {

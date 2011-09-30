@@ -18,6 +18,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -48,6 +50,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.service.SERVICES;
 
@@ -110,9 +113,42 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     return false;
   }
 
-  protected abstract Permission getDeletePermission();
+  @ConfigProperty(ConfigProperty.TEXT)
+  @Order(10)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredGlobalBookmarkLabel() {
+    return ScoutTexts.get("GlobalBookmarks");
+  }
 
-  protected abstract Permission getUpdatePermission();
+  @ConfigProperty(ConfigProperty.TEXT)
+  @Order(20)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredPrivateBookmarkLabel() {
+    return ScoutTexts.get("PrivateBookmarks");
+  }
+
+  @ConfigProperty(ConfigProperty.FORM)
+  @Order(30)
+  @ConfigPropertyValue("null")
+  protected Class<? extends IBookmarkForm> getConfiguredBookmarkForm() {
+    return BookmarkForm.class;
+  }
+
+  protected Permission getDeletePermission(ArrayList<Bookmark> bookmarks) throws ProcessingException {
+    return getDeletePermission();
+  }
+
+  protected Permission getUpdatePermission(ArrayList<Bookmark> bookmarks) throws ProcessingException {
+    return getUpdatePermission();
+  }
+
+  protected Permission getDeletePermission() {
+    return null;
+  }
+
+  protected Permission getUpdatePermission() {
+    return null;
+  }
 
   public void populateTree() {
     try {
@@ -408,6 +444,8 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
       @Override
       protected void execPrepareAction() {
+        ITreeNode node = getSelectedNode();
+        setVisible(!isBookmarkNode(node));
         setVisiblePermission(getUpdatePermission());
       }
 
@@ -419,6 +457,14 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
     @Order(20)
     public class Separator1Menu extends MenuSeparator {
+
+      @Override
+      protected void execPrepareAction() throws ProcessingException {
+        ITreeNode node = getSelectedNode();
+        setVisible(!isBookmarkNode(node));
+        setVisiblePermission(getUpdatePermission());
+      }
+
     }
 
     @Order(40)
@@ -453,7 +499,10 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       BookmarkFolder bmFolder = (BookmarkFolder) getCell().getValue();
       String title = bmFolder.getTitle();
       if (Bookmark.INBOX_FOLDER_NAME.equals(title)) {
-        title = ScoutTexts.get("GlobalBookmarks");
+        title = getConfiguredGlobalBookmarkLabel();
+      }
+      else if (Bookmark.PRIVATE_FOLDER_NAME.equals(title)) {
+        title = getConfiguredPrivateBookmarkLabel();
       }
       cell.setText(title);
       cell.setIconId(AbstractIcons.TreeNode);
@@ -468,6 +517,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
       @Override
       protected void execPrepareAction() {
+        setEnabled(!isProtected());
         setVisiblePermission(getUpdatePermission());
       }
 
@@ -501,6 +551,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
       @Override
       protected void execPrepareAction() {
+        setEnabled(!isProtected());
         setVisiblePermission(getDeletePermission());
       }
 
@@ -523,6 +574,18 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         }
       }
     }
+
+    private boolean isProtected() {
+      ITreeNode node = FolderNode.this;
+      BookmarkFolder bmFolder = (BookmarkFolder) node.getCell().getValue();
+      if (Bookmark.INBOX_FOLDER_NAME.equals(bmFolder.getTitle()) ||
+          Bookmark.PRIVATE_FOLDER_NAME.equals(bmFolder.getTitle()) ||
+          Bookmark.SPOOL_FOLDER_NAME.equals(bmFolder.getTitle())) {
+        return true;
+      }
+      return false;
+    }
+
   }
 
   private class BookmarkNode extends AbstractTreeNode {
@@ -569,30 +632,46 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() {
-        setVisiblePermission(getUpdatePermission());
+      protected void execPrepareAction() throws ProcessingException {
+        ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
+        ITree tree = getTree();
+        for (ITreeNode node : tree.getSelectedNodes()) {
+          if (isBookmarkNode(node)) {
+            bookmarks.add((Bookmark) node.getCell().getValue());
+          }
+        }
+        setEnabledPermission(getUpdatePermission(bookmarks));
       }
 
       @Override
       protected void execAction() throws ProcessingException {
         ITreeNode node = BookmarkNode.this;
         Bookmark bm = (Bookmark) node.getCell().getValue();
-        BookmarkForm form = new BookmarkForm();
+        IBookmarkForm form = null;
+        if (getConfiguredBookmarkForm() != null) {
+          try {
+            form = getConfiguredBookmarkForm().newInstance();
+          }
+          catch (Exception e) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
+          }
+        }
+        if (form == null) {
+          form = new BookmarkForm();
+        }
+        form.setBookmark(bm);
         form.setBookmarkRootFolder(getBookmarkRootFolder());
-        form.getTitleField().setValue(bm.getTitle());
-        form.getKeyStrokeField().setValue(bm.getKeyStroke());
-        form.getDescriptionField().setValue(bm.getText());
         BookmarkFolder oldBmFolder = getParentBookmarkFolder(BookmarkNode.this);
         if (oldBmFolder != form.getBookmarkRootFolder()) {
-          form.getFolderField().setValue(oldBmFolder);
+          form.setFolder(oldBmFolder);
         }
         form.startModify();
         form.waitFor();
         if (form.isFormStored()) {
           ITree tree = getTree();
-          bm.setTitle(form.getTitleField().getValue());
-          bm.setKeyStroke(form.getKeyStrokeField().getValue());
-          final BookmarkFolder newBmFolder = form.getFolderField().getValue() != null ? form.getFolderField().getValue() : form.getBookmarkRootFolder();
+          bm.setTitle(form.getBookmark().getTitle());
+          bm.setKeyStroke(form.getBookmark().getKeyStroke());
+          final BookmarkFolder newBmFolder = form.getFolder() != null ? form.getFolder() : form.getBookmarkRootFolder();
           if (!CompareUtility.equals(oldBmFolder, newBmFolder)) {
             //find new folder node
             final AtomicReference<ITreeNode> newContainerNode = new AtomicReference<ITreeNode>(getTree().getRootNode());
@@ -631,8 +710,15 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execPrepareAction() {
-        setVisiblePermission(getDeletePermission());
+      protected void execPrepareAction() throws ProcessingException {
+        ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
+        ITree tree = getTree();
+        for (ITreeNode node : tree.getSelectedNodes()) {
+          if (isBookmarkNode(node)) {
+            bookmarks.add((Bookmark) node.getCell().getValue());
+          }
+        }
+        setEnabledPermission(getDeletePermission(bookmarks));
       }
 
       @Override
@@ -722,5 +808,4 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
   }
-
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm;
+import org.eclipse.scout.rt.client.ui.desktop.bookmark.IBookmarkForm;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.internal.ManageBookmarksForm;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.CreateGlobalBookmarkPermission;
@@ -76,27 +77,43 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     handleBookmarksChanged();
   }
 
+  @ConfigProperty(ConfigProperty.FORM)
+  @Order(20)
+  @ConfigPropertyValue("null")
+  protected Class<? extends IBookmarkForm> getConfiguredBookmarkForm() {
+    return BookmarkForm.class;
+  }
+
   private void createNewBookmark(int kind) throws ProcessingException {
     Bookmark b = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
     if (b != null) {
       IBookmarkService service = SERVICES.getService(IBookmarkService.class);
       b.setKind(kind);
-      BookmarkForm form = new BookmarkForm();
+      IBookmarkForm form = null;
+      if (getConfiguredBookmarkForm() != null) {
+        try {
+          form = getConfiguredBookmarkForm().newInstance();
+        }
+        catch (Exception e) {
+          LOG.warn(null, e);
+        }
+      }
+      if (form == null) {
+        form = new BookmarkForm();
+      }
       if (kind == Bookmark.GLOBAL_BOOKMARK) {
         form.setBookmarkRootFolder(service.getBookmarkData().getGlobalBookmarks());
       }
       else if (kind == Bookmark.USER_BOOKMARK) {
         form.setBookmarkRootFolder(service.getBookmarkData().getUserBookmarks());
       }
-      form.getTitleField().setValue(b.getTitle());
-      form.getKeyStrokeField().setValue(b.getKeyStroke());
-      form.getDescriptionField().setValue(b.getText());
+      form.setBookmark(b);
       form.startNew();
       form.waitFor();
       if (form.isFormStored()) {
-        b.setTitle(form.getTitleField().getValue());
-        b.setKeyStroke(form.getKeyStrokeField().getValue());
-        BookmarkFolder folder = form.getFolderField().getValue();
+        b.setTitle(form.getBookmark().getTitle());
+        b.setKeyStroke(form.getBookmark().getKeyStroke());
+        BookmarkFolder folder = form.getFolder();
         if (folder == null) {
           folder = form.getBookmarkRootFolder();
         }

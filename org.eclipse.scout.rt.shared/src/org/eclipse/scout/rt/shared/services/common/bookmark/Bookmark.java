@@ -38,7 +38,9 @@ public class Bookmark implements Serializable, Cloneable {
 
   public static final String SPOOL_FOLDER_NAME = "[SPOOL]";
   public static final String INBOX_FOLDER_NAME = "[INBOX]";
+  public static final String PRIVATE_FOLDER_NAME = "[PRIVATE]";
 
+  private long m_id;
   private int m_kind;
   private String m_title;
   private String m_text;
@@ -81,6 +83,14 @@ public class Bookmark implements Serializable, Cloneable {
   public void setIconId(String iconid) {
     m_iconId = iconid;
     m_serializedData = null;
+  }
+
+  public long getId() {
+    return m_id;
+  }
+
+  public void setId(long id) {
+    m_id = id;
   }
 
   public int getKind() {
@@ -242,6 +252,6 @@ public class Bookmark implements Serializable, Cloneable {
 
   @Override
   public String toString() {
-    return "Bookmark[title=" + getTitle() + "]";
+    return "Bookmark[title=" + getTitle() + ", id=" + getId() + "]";
   }
 }

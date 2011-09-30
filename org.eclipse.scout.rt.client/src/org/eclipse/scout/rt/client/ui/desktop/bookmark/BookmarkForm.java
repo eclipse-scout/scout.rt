@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,23 +24,47 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
-public class BookmarkForm extends AbstractForm {
+public class BookmarkForm extends AbstractForm implements IBookmarkForm {
   private BookmarkFolder m_bookmarkRootFolder;
+  private Bookmark m_bookmark;
 
   public BookmarkForm() throws ProcessingException {
     super();
   }
 
+  @Override
   public BookmarkFolder getBookmarkRootFolder() {
     return m_bookmarkRootFolder;
   }
 
+  @Override
   public void setBookmarkRootFolder(BookmarkFolder bookmarkRootFolder) {
     m_bookmarkRootFolder = bookmarkRootFolder;
     ((BookmarkFolderLookupCall) getFolderField().getLookupCall()).setRootFolder(m_bookmarkRootFolder);
+  }
+
+  @Override
+  public Bookmark getBookmark() {
+    if (m_bookmark != null) {
+      m_bookmark.setTitle(getTitleField().getValue());
+      m_bookmark.setKeyStroke(getKeyStrokeField().getValue());
+      m_bookmark.setText(getDescriptionField().getValue());
+    }
+    return m_bookmark;
+  }
+
+  @Override
+  public void setBookmark(Bookmark bookmark) {
+    m_bookmark = bookmark;
+    if (bookmark != null) {
+      getTitleField().setValue(bookmark.getTitle());
+      getKeyStrokeField().setValue(bookmark.getKeyStroke());
+      getDescriptionField().setValue(bookmark.getText());
+    }
   }
 
   @Override
@@ -48,10 +72,12 @@ public class BookmarkForm extends AbstractForm {
     return ScoutTexts.get("Bookmark");
   }
 
+  @Override
   public void startModify() throws ProcessingException {
     startInternal(new ModifyHandler());
   }
 
+  @Override
   public void startNew() throws ProcessingException {
     startInternal(new NewHandler());
   }
@@ -198,5 +224,15 @@ public class BookmarkForm extends AbstractForm {
     protected void execPostLoad() throws ProcessingException {
       touch();
     }
+  }
+
+  @Override
+  public BookmarkFolder getFolder() throws ProcessingException {
+    return getFolderField().getValue();
+  }
+
+  @Override
+  public void setFolder(BookmarkFolder folder) throws ProcessingException {
+    getFolderField().setValue(folder);
   }
 }

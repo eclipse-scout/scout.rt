@@ -559,3 +559,13 @@ Problem:
 When using ‘yyyy’ in the format of an AbstractDateField, there is no interpretation of the century. Entering 11 for the year results in 0011 CE instead of 2011 CE
 Resources changed: AbstractDateField
 Migration: None
+
+30.09.2011 abr [contributed by Adrian Moser, BSI Business Systems Integration AG]
+bugzilla ticket: 359418
+Bookmark Management Customization
+Changes/Fixes to Scout Bookmark Handling:
+- Scout implementation should be able to use a customized BookmarkForm
+- AbstractBookmarkTreeField: New/Edit Menu PrepareActions (Permissions) should be customizable
+- AbstractBookmarkTreeField : "New Folder" should not be possible on Bookmark Node
+- Text for Global/Private Bookmarks should be configurable
+Migration: None
