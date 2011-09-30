@@ -67,9 +67,9 @@ public final class ConfigurationUtility {
    * If one of the objects is not annotated with {@link Order}, its index in the list is used as order value.
    */
   public static <T> Collection<T> sortByOrderAnnotation(Collection<T> list) {
-    if(list==null){
-	  return null;
-	}
+    if (list == null) {
+      return null;
+    }
     TreeMap<CompositeObject, T> sortMap = new TreeMap<CompositeObject, T>();
     int index = 0;
     for (T element : list) {
@@ -79,7 +79,7 @@ public final class ConfigurationUtility {
         sortMap.put(new CompositeObject(order.value(), index), element);
       }
       else {
-        sortMap.put(new CompositeObject(index, index), element);
+        sortMap.put(new CompositeObject((double) index, index), element);
       }
       index++;
     }
