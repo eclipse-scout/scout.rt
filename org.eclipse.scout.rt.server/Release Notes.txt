@@ -264,3 +264,7 @@ Migration: None
 18.08.2011 abr
 fixed concurrent modifications on RunningStatementStore
 Migration: None
+
+02.10.2011 hmu
+Use same method to extract the username of an logged in Subject in AbstractClientSession and AccessControlStore
+Migration: None
