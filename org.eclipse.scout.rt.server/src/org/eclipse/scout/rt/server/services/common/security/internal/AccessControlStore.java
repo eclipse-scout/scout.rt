@@ -10,31 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.security.internal;
 
-import java.security.AccessController;
 import java.security.Permissions;
-import java.security.Principal;
-
-import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
-import org.eclipse.scout.rt.server.services.common.clientnotification.PrincipalNameFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SingleUserFilter;
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
 import org.eclipse.scout.service.SERVICES;
 
 /**
  * <p>
- * {@link Permissions} store per principal name
+ * {@link Permissions} store per userId
  * </p>
  * <p>
- * Maintains a map of one {@link Permissions} object per principal (name).
+ * Maintains a map of one {@link Permissions} object per userId (derived from their Subject, see
+ * {@link IAccessControlService#getUserIdOfCurrentSubject()}).
  * </p>
  * <p>
- * The principal name is case insensitive, case does not matter.
+ * The userId is case insensitive, case does not matter.
  * </p>
  */
 public class AccessControlStore {
@@ -43,7 +40,7 @@ public class AccessControlStore {
   /**
    * the internal store, the {@link String} used as key is always lower case
    */
-  private TTLCache<String/* principalName */, Permissions> m_store;
+  private TTLCache<String/* userId */, Permissions> m_store;
   private Object m_storeLock;
 
   public AccessControlStore() {
@@ -52,128 +49,102 @@ public class AccessControlStore {
   }
 
   /**
-   * @return the first permission collection that is associated with a principal
-   *         name of the current subject
+   * @return the permission collection that is associated with the current subject
    */
   public Permissions getPermissionsOfCurrentSubject() {
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject != null) {
-      for (Principal principal : subject.getPrincipals()) {
-        if (principal != null) {
-          String principalName = principal.getName();
-          if (principalName != null) {
-            principalName = principalName.toLowerCase();
-          }
-          Permissions permissions = getPermissions(principalName);
-          if (permissions != null) {
-            return permissions;
-          }
-        }
-      }
+    String userId = SERVICES.getService(IAccessControlService.class).getUserIdOfCurrentSubject();
+    if (userId == null) {
+      return null;
     }
-    return null;
+    return getPermissions(userId);
   }
 
   /**
-   * sets permission collection that is associated with a principal
-   * name of the current subject
+   * sets permission collection that is associated with the current subject
    * 
    * @param p
    *          permission collection
    */
   public void setPermissionsOfCurrentSubject(Permissions p) {
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null) {
-      throw new SecurityException("subject is null");
+    String userId = SERVICES.getService(IAccessControlService.class).getUserIdOfCurrentSubject();
+    if (userId == null) {
+      throw new SecurityException("userId is null");
     }
-    for (Principal principal : subject.getPrincipals()) {
-      if (principal != null) {
-        String principalName = principal.getName();
-        if (principalName != null) {
-          principalName = principalName.toLowerCase();
-        }
-        setPermissions(principalName, p);
-        return;
-      }
-    }
-    throw new SecurityException("subject contains no principals");
+    setPermissions(userId, p);
   }
 
   /**
-   * @param principalName
-   *          name of principal, case-insensitive
-   * @return the permission collection that is associated with this principal
-   *         name, <code>null</code> if the parameter is <code>null</code>
+   * @param userId
+   *          of Subject
+   * @return the permission collection that is associated with this userId, <code>null</code> if the parameter is
+   *         <code>null</code>
    */
-  public Permissions getPermissions(String principalName) {
-    if (principalName == null) {
+  public Permissions getPermissions(String userId) {
+    if (userId == null) {
       return null;
     }
     synchronized (m_storeLock) {
-      return m_store.get(principalName.toLowerCase());
+      return m_store.get(userId.toLowerCase());
     }
   }
 
   /**
-   * associate a permission collection with this principal name
+   * associate a permission collection with this userId
    * 
-   * @param principalName
-   *          name of principal, case-insensitive, if <code>null</code> method
-   *          does nothing
+   * @param userId
+   *          if userId is <code>null</code> the method does nothing
    */
-  public void setPermissions(String principalName, Permissions p) {
-    if (principalName != null) {
-      synchronized (m_storeLock) {
-        if (p == null) {
-          p = new Permissions();
-          p.setReadOnly();
-        }
-        m_store.put(principalName.toLowerCase(), p);
-      }
-      // notify clients
-      SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(p), new PrincipalNameFilter(principalName, 120000L));
+  public void setPermissions(String userId, Permissions p) {
+    if (userId == null) {
+      return;
     }
+    synchronized (m_storeLock) {
+      if (p == null) {
+        p = new Permissions();
+        p.setReadOnly();
+      }
+      m_store.put(userId.toLowerCase(), p);
+    }
+    // notify clients
+    SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(p), new SingleUserFilter(userId, 120000L));
   }
 
   /**
-   * clears the cache for a set of principal names
-   * 
-   * @param principalNames
-   *          names of principals, case insensitive
+   * clears the cache
    */
   public void clearCache() {
-    String[] principalNames;
+    String[] userIds;
     synchronized (m_storeLock) {
-      principalNames = m_store.keySet().toArray(new String[m_store.size()]);
+      userIds = m_store.keySet().toArray(new String[m_store.size()]);
     }
     // notify with a filter, that will be accepted nowhere
     SERVICES.getService(IClientNotificationService.class).putNotification(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
-    clearCacheOfPrincipals(principalNames);
+    clearCacheOfUserIds(userIds);
   }
 
   /**
-   * clears the cache for a set of principal names
+   * clears the cache for a set of userIds
    * 
-   * @param principalNames
-   *          names of principals, case insensitive
+   * @param userIds
+   *          derived from the Subject, see{@link IAccessControlService#getUserIdOfCurrentSubject()}
    */
-  public void clearCacheOfPrincipals(String... principalNames) {
+  public void clearCacheOfUserIds(String... userIds) {
     synchronized (m_storeLock) {
-      for (String principalName : principalNames) {
-        if (principalName != null) {
-          m_store.remove(principalName.toLowerCase());
+      for (String userId : userIds) {
+        if (userId != null) {
+          m_store.remove(userId.toLowerCase());
         }
       }
     }
     //notify clients
-    for (String principalName : principalNames) {
-      if (principalName != null) {
-        SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(null), new PrincipalNameFilter(principalName, 120000L));
+    for (String userId : userIds) {
+      if (userId != null) {
+        SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(null), new SingleUserFilter(userId, 120000L));
       }
     }
   }
 
-  public String[] getPrincipalNames() {
+  public String[] getUserIds() {
     synchronized (m_storeLock) {
       return m_store.keySet().toArray(new String[m_store.keySet().size()]);
     }

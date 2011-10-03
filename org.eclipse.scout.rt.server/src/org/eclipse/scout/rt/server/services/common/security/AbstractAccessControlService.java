@@ -11,12 +11,18 @@
 package org.eclipse.scout.rt.server.services.common.security;
 
 import java.lang.reflect.Method;
+import java.security.AccessController;
 import java.security.AllPermission;
 import java.security.Permission;
 import java.security.Permissions;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -37,8 +43,70 @@ public class AbstractAccessControlService extends AbstractService implements IAc
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAccessControlService.class);
 
   private AccessControlStore m_accessControlStore;
+  private Pattern[] m_userIdSearchPatterns;
 
   public AbstractAccessControlService() {
+    m_userIdSearchPatterns = new Pattern[]{
+        Pattern.compile(".*\\\\([^/@]+)"),
+        Pattern.compile(".*\\\\([^/@]+)[/@].*"),
+        Pattern.compile("([^/@]+)"),
+        Pattern.compile("([^/@]+)[/@].*"),
+        };
+  }
+
+  /**
+   * see {@link #setUserIdSearchPatterns(Pattern...)}
+   */
+  protected Pattern[] getUserIdSearchPatterns() {
+    return m_userIdSearchPatterns;
+  }
+
+  /**
+   * see {@link #setUserIdSearchPatterns(Pattern...)}
+   */
+  protected void setUserIdSearchPatterns(Pattern... patterns) {
+    m_userIdSearchPatterns = patterns;
+  }
+
+  /**
+   * Set the pattern by which the userId is searched for in the list of jaas
+   * principal names.<br>
+   * The first group of the pattern is assumed to be the username.<br>
+   * By default the following patterns are applied in this order:
+   * <ul>
+   * <li>".*\\\\([^/@]+)" matching "DOMAIN\\user" to "user"
+   * <li>".*\\\\([^/@]+)[/@].*" matching "DOMAIN\\user@domain.com" to "user"
+   * <li>"([^/@]+)" matching "user" to "user"
+   * <li>"([^/@]+)[/@].*" matching "user@domain.com" to "user"
+   * </ul>
+   */
+  protected void setUserIdSearchPatterns(String... patterns) {
+    Pattern[] a = new Pattern[patterns.length];
+    for (int i = 0; i < a.length; i++) {
+      a[i] = Pattern.compile(patterns[i]);
+    }
+    setUserIdSearchPatterns(a);
+  }
+
+  @Override
+  public String getUserIdOfCurrentSubject() {
+    Subject s = Subject.getSubject(AccessController.getContext());
+    if (s == null) {
+      return null;
+    }
+    if (m_userIdSearchPatterns == null) {
+      return null;
+    }
+    for (Principal p : s.getPrincipals()) {
+      String name = p.getName().toLowerCase();
+      for (Pattern pat : m_userIdSearchPatterns) {
+        Matcher m = pat.matcher(name);
+        if (m.matches()) {
+          return m.group(1);
+        }
+      }
+    }
+    return null;
   }
 
   @SuppressWarnings("deprecation")
@@ -163,24 +231,35 @@ public class AbstractAccessControlService extends AbstractService implements IAc
     m_accessControlStore.clearCache();
   }
 
+  /**
+   * @deprecated Use {@link #clearCacheOfUserIds(String...)} instead
+   */
+  @SuppressWarnings("deprecation")
   @Override
-  public void clearCacheOfPrincipals(String... principalNames) {
-    if (principalNames == null) {
+  @Deprecated
+  public void clearCacheOfPrincipals(String... userIds) {
+    clearCacheOfUserIds(userIds);
+  }
+
+  @Override
+  public void clearCacheOfUserIds(String... userIds) {
+    if (userIds == null || userIds.length == 0) {
       return;
     }
-    String[] principals = m_accessControlStore.getPrincipalNames();
+    String[] users = m_accessControlStore.getUserIds();
     ArrayList<String> toDelete = new ArrayList<String>();
-    for (String name : principalNames) {
+    for (String name : userIds) {
       if (name != null) {
         name = name.toLowerCase();
-        for (String p : principals) {
-          if (p.equals(name) || p.endsWith("\\" + name)) {
+        for (String p : users) {
+          if (p.equals(name)) {
             toDelete.add(p);
+            break;
           }
         }
       }
     }
-    m_accessControlStore.clearCacheOfPrincipals(toDelete.toArray(new String[toDelete.size()]));
+    m_accessControlStore.clearCacheOfUserIds(toDelete.toArray(new String[toDelete.size()]));
   }
 
   @SuppressWarnings("deprecation")

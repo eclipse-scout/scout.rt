@@ -32,6 +32,8 @@ import org.eclipse.scout.service.IService;
 @InputValidation(ValidationStrategy.PROCESS)
 public interface IAccessControlService extends IService {
 
+  String getUserIdOfCurrentSubject();
+
   boolean checkPermission(Permission p);
 
   int getPermissionLevel(Permission p);
@@ -59,15 +61,20 @@ public interface IAccessControlService extends IService {
   void clearCache();
 
   /**
-   * Clear cache of specified principals. This can be useful when some permissions and/or user-role mappings have
+   * @deprecated Use {@link #clearCacheOfUserIds(String...)} instead
+   */
+  @Deprecated
+  @RemoteServiceAccessDenied
+  void clearCacheOfPrincipals(String... userIds);
+
+  /**
+   * Clear cache of specified userIds.<br>
+   * This can be useful when some permissions and/or user-role mappings have
    * changed.
    * This method is lenient.
-   * It deletes all permissions of principals where
-   * the principalName matches the name in the store or
-   * the name in the store ends with "\principalName"
    */
   @RemoteServiceAccessDenied
-  void clearCacheOfPrincipals(String... principalNames);
+  void clearCacheOfUserIds(String... userIds);
 
   /**
    * @deprecated

@@ -12,15 +12,9 @@ package org.eclipse.scout.rt.server;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.security.AccessController;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -37,6 +31,7 @@ import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFilter;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 
@@ -48,18 +43,11 @@ public abstract class AbstractServerSession implements IServerSession {
   private boolean m_active;
   private NlsLocale m_nlsLocale;
   private Locale m_locale;
-  private Pattern[] m_userIdSearchPatterns;
   private HashMap<Object, Object> m_attributes;
   private SharedVariableMap m_sharedVariableMap;
   private boolean m_webSession;
 
   public AbstractServerSession(boolean autoInitConfig) {
-    m_userIdSearchPatterns = new Pattern[]{
-        Pattern.compile(".*\\\\([^/@]+)"),
-        Pattern.compile(".*\\\\([^/@]+)[/@].*"),
-        Pattern.compile("([^/@]+)"),
-        Pattern.compile("([^/@]+)[/@].*"),
-        };
     m_locale = LocaleThreadLocal.get();
     if (m_locale == null) {
       m_locale = Locale.getDefault();
@@ -102,28 +90,8 @@ public abstract class AbstractServerSession implements IServerSession {
   }
 
   private void assignUserId() {
-    String foundName = null;
-    Subject s = Subject.getSubject(AccessController.getContext());
-    if (s != null) {
-      if (m_userIdSearchPatterns != null) {
-        for (Principal p : s.getPrincipals()) {
-          String name = p.getName().toLowerCase();
-          for (Pattern pat : m_userIdSearchPatterns) {
-            Matcher m = pat.matcher(name);
-            if (m.matches()) {
-              foundName = m.group(1);
-              break;
-            }
-          }
-        }
-      }
-    }
-    if (foundName != null) {
-      setUserIdInternal(foundName);
-    }
-    else {
-      setUserIdInternal(null);
-    }
+    String userId = SERVICES.getService(IAccessControlService.class).getUserIdOfCurrentSubject();
+    setUserIdInternal(userId);
   }
 
   /**
@@ -141,41 +109,6 @@ public abstract class AbstractServerSession implements IServerSession {
 
   private void setUserIdInternal(String newValue) {
     setSharedContextVariable("userId", String.class, newValue);
-  }
-
-  /**
-   * see {@link #setUserIdSearchPatterns(Pattern...)}
-   */
-  protected Pattern[] getUserIdSearchPatterns() {
-    return m_userIdSearchPatterns;
-  }
-
-  /**
-   * see {@link #setUserIdSearchPatterns(Pattern...)}
-   */
-  protected void setUserIdSearchPatterns(Pattern... patterns) {
-    m_userIdSearchPatterns = patterns;
-    assignUserId();
-  }
-
-  /**
-   * Set the pattern by which the userId is searched for in the list of jaas
-   * principal names.<br>
-   * The first group of the pattern is assumed to be the username.<br>
-   * By default the following patterns are applied in this order:
-   * <ul>
-   * <li>".*\\\\([^/@]+)" matching "DOMAIN\\user" to "user"
-   * <li>".*\\\\([^/@]+)[/@].*" matching "DOMAIN\\user@domain.com" to "user"
-   * <li>"([^/@]+)" matching "user" to "user"
-   * <li>"([^/@]+)[/@].*" matching "user@domain.com" to "user"
-   * </ul>
-   */
-  protected void setUserIdSearchPatterns(String... patterns) {
-    Pattern[] a = new Pattern[patterns.length];
-    for (int i = 0; i < a.length; i++) {
-      a[i] = Pattern.compile(patterns[i]);
-    }
-    setUserIdSearchPatterns(a);
   }
 
   @Override
