@@ -180,6 +180,11 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   @Override
+  public String getUserIdOfCurrentSubject() {
+    return getRemoteService().getUserIdOfCurrentSubject();
+  }
+
+  @Override
   public void clearCache() {
     ServiceState state = getServiceState();
     synchronized (state.m_cacheLock) {
@@ -188,7 +193,14 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   @Override
-  public void clearCacheOfPrincipals(String... principalNames) {
+  public void clearCacheOfUserIds(String... userIds) {
+    //nop
+  }
+
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  @Override
+  public void clearCacheOfPrincipals(String... userIds) {
     //nop
   }
 
