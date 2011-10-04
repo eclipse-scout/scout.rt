@@ -2414,6 +2414,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public void sort() {
     try {
       if (isSortEnabled()) {
+        // Consider any active sort-column, not only explicit ones.
+        // This is to support reverse (implicit) sorting of columns, meaning that multiple column sort is done
+        // without CTRL-key held. In contrast to explicit multiple column sort, the first clicked column
+        // is the least significant sort column.
         IColumn<?>[] sortCols = getColumnSet().getSortColumns();
         if (sortCols.length > 0) {
           // first make sure decorations and lookups are up-to-date
@@ -3143,8 +3147,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private void fireRowClick(ITableRow row) {
     if (row != null) {
       try {
-        //single observer for checkable tables
-        if (isCheckable() && row.isEnabled() && isEnabled()) {
+        // single observer for checkable tables
+        // if row click is targetted to cell editor, do not interpret click as check/uncheck event
+        if (isCheckable() && row.isEnabled() && isEnabled() && !isCellEditable(row, getContextColumn())) {
           row.setChecked(!row.isChecked());
         }
         //end single observer
@@ -3689,6 +3694,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         row = resolveRow(row);
         if (row != null && col != null) {
           try {
+            // ensure the editable row to be selected.
+            // This is crucial if the cell's value is changed right away in @{link IColumn#prepareEdit(ITableRow)}, e.g. in @{link AbstractBooleanColumn}
+            row.getTable().selectRow(row);
             IFormField f = col.prepareEdit(row);
             if (f != null) {
               m_editContext = new P_CellEditorContext(row, col, f);

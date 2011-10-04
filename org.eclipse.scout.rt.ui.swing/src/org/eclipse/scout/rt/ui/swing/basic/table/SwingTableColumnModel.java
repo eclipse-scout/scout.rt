@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,6 +21,7 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
@@ -158,5 +159,43 @@ public class SwingTableColumnModel extends DefaultTableColumnModel implements Pr
         }
       }
     }
+  }
+
+  @Override
+  public void moveColumn(int columnIndex, int newIndex) {
+    if (isMoveColumnAllowed(columnIndex, newIndex)) {
+      super.moveColumn(columnIndex, newIndex);
+    }
+  }
+
+  /**
+   * Ensure the first column to retain a non-editable column. Otherwise, the checkable and editable column would
+   * be the very same column which is confusing.
+   * 
+   * @param oldIndex
+   * @param newIndex
+   * @return
+   */
+  private boolean isMoveColumnAllowed(int oldIndex, int newIndex) {
+    ITable table = m_swingScoutTable.getScoutObject();
+    if (!table.isCheckable() || oldIndex == newIndex) {
+      return true;
+    }
+
+    // do not allow an editable column to be moved as first column
+    if (newIndex == 0) {
+      IColumn columnToMove = table.getColumnSet().getVisibleColumn(oldIndex);
+      if (columnToMove.isEditable()) {
+        return false;
+      }
+    }
+    // do not allow the first column to be moved if the succeeding column is an editable column
+    if (oldIndex == 0 && table.getColumnSet().getVisibleColumnCount() > 1) {
+      IColumn succeedingColumn = table.getColumnSet().getVisibleColumn(1);
+      if (succeedingColumn.isEditable()) {
+        return false;
+      }
+    }
+    return true;
   }
 }

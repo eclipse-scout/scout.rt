@@ -92,6 +92,9 @@ public class SwingScoutTableCellEditor {
         decorateEditorComposite(editorComposite, row, col);
         m_cachedSwingEditorComponent = editorComposite.getSwingContainer();
       }
+      else {
+        m_cachedSwingEditorComponent = null;
+      }
     }
     return m_cachedSwingEditorComponent;
   }

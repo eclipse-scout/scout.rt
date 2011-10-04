@@ -61,6 +61,8 @@ public interface IColumn<T> extends IPropertyObserver {
    */
   String PROP_AUTO_OPTIMIZE_WIDTH = "autoOptimizeWidth";
 
+  String PROP_EDITABLE = "editable";
+
   void initColumn() throws ProcessingException;
 
   void disposeColumn() throws ProcessingException;
@@ -88,8 +90,32 @@ public interface IColumn<T> extends IPropertyObserver {
 
   T[] getValues(ITableRow[] rows);
 
+  /**
+   * <p>
+   * Updates the value of the given row.
+   * </p>
+   * <p>
+   * If any cell editor is active, editing is canceled and it's value rejected.
+   * </p>
+   * 
+   * @param r
+   * @param value
+   * @throws ProcessingException
+   */
   void setValue(ITableRow r, T value) throws ProcessingException;
 
+  /**
+   * <p>
+   * Updates the value of the given row.
+   * </p>
+   * <p>
+   * If any cell editor is active, editing is canceled and it's value rejected.
+   * </p>
+   * 
+   * @param r
+   * @param value
+   * @throws ProcessingException
+   */
   void setValue(int rowIndex, T value) throws ProcessingException;
 
   /**

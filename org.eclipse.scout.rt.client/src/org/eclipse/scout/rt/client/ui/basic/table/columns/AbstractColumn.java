@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Array;
 import java.security.Permission;
 import java.util.ArrayList;
@@ -51,7 +53,6 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   private ITable m_table;
   private final HeaderCell m_headerCell;
   private boolean m_primaryKey;
-  private boolean m_editable;
   private boolean m_summary;
   /**
    * A column is presented to the user when it is displayable AND visible this
@@ -69,6 +70,15 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   public AbstractColumn() {
     m_headerCell = new HeaderCell();
     initConfig();
+    propertySupport.addPropertyChangeListener(new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        // force decoration of rows on property change.
+        // This is important to recalculate editability of editable cells.
+        getTable().updateAllRows();
+      }
+    });
   }
 
   /*
@@ -292,7 +302,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   @ConfigOperation
   @Order(60)
   protected boolean execIsEditable(ITableRow row) throws ProcessingException {
-    return getTable() != null && getTable().isEnabled() && this.isVisible() && row.getCell(this).isEnabled() && this.isEditable() && row != null && row.isEnabled();
+    return getTable() != null && getTable().isEnabled() && this.isVisible() && this.isEditable() && row.getCell(this).isEnabled() && row != null && row.isEnabled();
   }
 
   /**
@@ -305,7 +315,8 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * 
    * @param row
    *          on which editing occurs
-   * @return a field for editing, use super.{@link #execPrepareEdit(ITableRow)} for the default implementation.
+   * @return a field for editing or null to install an empty cell editor. Use super.{@link #execPrepareEdit(ITableRow)}
+   *         for the default implementation.
    */
   @SuppressWarnings("unchecked")
   @ConfigOperation
@@ -338,7 +349,35 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     if (editingField instanceof IValueField) {
       IValueField v = (IValueField) editingField;
       if (v.isSaveNeeded()) {
-        setValue(row, parseValue(row, ((IValueField) editingField).getValue()));
+        applyValueInternal(row, parseValue(row, ((IValueField) editingField).getValue()));
+      }
+    }
+  }
+
+  /**
+   * <p>
+   * Updates the value of the cell with the given value.
+   * </p>
+   * <p>
+   * Thereby, if sorting is enabled on table, it is temporarily suspended to prevent rows from scampering.
+   * </p>
+   * 
+   * @param row
+   * @param newValue
+   * @throws ProcessingException
+   */
+  protected void applyValueInternal(ITableRow row, T newValue) throws ProcessingException {
+    if (!getTable().isSortEnabled()) {
+      setValue(row, newValue);
+    }
+    else {
+      // suspend sorting to prevent rows from scampering
+      try {
+        getTable().setSortEnabled(false);
+        setValue(row, newValue);
+      }
+      finally {
+        getTable().setSortEnabled(true);
       }
     }
   }
@@ -1020,12 +1059,12 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   @Override
   public boolean isEditable() {
-    return m_editable;
+    return propertySupport.getPropertyBool(PROP_EDITABLE);
   }
 
   @Override
-  public void setEditable(boolean editable) {
-    m_editable = editable;
+  public void setEditable(boolean b) {
+    propertySupport.setPropertyBool(PROP_EDITABLE, b);
   }
 
   @Override

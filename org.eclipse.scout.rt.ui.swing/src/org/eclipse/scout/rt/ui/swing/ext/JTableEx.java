@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -395,6 +395,13 @@ public class JTableEx extends JTable {
   @Override
   public TransferHandler getTransferHandler() {
     return (TransferHandler) getClientProperty("TransferHandler");
+  }
+
+  @Override
+  public boolean isCellEditable(int row, int column) {
+    // do not translate index to Swing table model index as done by Scout itself in @{link ColumnSet}.
+    // That is important if columns were moved.
+    return getModel().isCellEditable(row, column);
   }
 
   /**

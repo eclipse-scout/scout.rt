@@ -1129,7 +1129,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             else if (decoIcon != null) {
               icon = decoIcon;
             }
-            //wrap editable icon
             if (cell.isEditable()) {
               icon = new P_IconWithMarker(icon);
             }
@@ -1313,7 +1312,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
     @Override
     public void mouseClicked(MouseEvent e) {
-      if (fix.mouseClicked()) {
+      if (fix != null && fix.mouseClicked()) {
         return;
       }
       if (e.getClickCount() == 2) {
@@ -1403,7 +1402,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
     @Override
     public void mouseClicked(MouseEvent e) {
-      if (fix.mouseClicked()) {
+      if (fix != null && fix.mouseClicked()) {
         return;
       }
       if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {

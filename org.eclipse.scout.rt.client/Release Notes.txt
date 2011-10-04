@@ -569,3 +569,45 @@ Changes/Fixes to Scout Bookmark Handling:
 - AbstractBookmarkTreeField : "New Folder" should not be possible on Bookmark Node
 - Text for Global/Private Bookmarks should be configurable
 Migration: None
+
+04.10.2011 dwi
+BSI ticket #106'222, #99'582, #105'229
+Bugzilla ticket #358064, #359811, #359812
+Problem:
+All the tickets mentioned belong to the editable cell topic:
+a) If properties like visiblity or editability are changed on IColumn, the accessiblity of editable cells within that column is not calculated anew.
+   As consequence, the UI representation of such cells does not correspond to the values on the model.
+b) If a value of an editable boolean column is changed by inline editing, other values of that column are toggled/untoggled as well.
+   Even though holding the correct value on model, their UI representation differs. For instance, if forcing the UI to refresh by resizing a column, the checked state in UI gets corrected.
+c) If toggling three times the very same cell of an editable boolean column, the value is not stored in the model anymore.
+d) If toggling a cell of an editable boolean column, it's value is immediately written back to the model which is good.
+   This has the effect, that if there is an implict or explicit sort installed on that column, toggled rows are scampering.
+   This is especially absurd, if the column is part of an implicit sort, meaning that no CTRL-key was held while determing
+   the sort columns. Due to lack of the visual representation of such an implicit sort column, the user gets really confused
+   as rows are reorganized for no reason. This problem is also applicable to other types of editable columns.
+e) If clicking on a cell of an editable boolean column, the cell transitions into modification state, meaning that the associated cell editor is activated.
+   Even though the toggled value is already written back to model, the editor remains open which is confusing to the user.
+   This should be changed to immediately close the cell editor if the value is toggled.
+f) If an editable colum is moved, the column is not editable anymore. Only if the column is moved back to its origin location, the column becomes editable anymore.
+g) If having a checkable table and a cell editor of an editable column does not fill the whole cell space,
+   clicking on that empty space toggles the checked state of the row. This is confusing and moreover error-prone as not the row is intended to be checked/unchecked but rather the cell editor activated / toggled.
+h) If having a checkable table and moving an editable column to the very first position, a click on that column correctly activates the inline editor.
+   Thus, the checked state of that row cannot be changed by clicking on the presented checkbox.
+   This should be changed to not allow an editable column to be moved to the first position. Moreorver, the first column should also be freezed if the succeeding column is an editable one.
+Solution:
+a) Apply row decoration on property change
+b) This was because the active cell editor remained active after toggling the value.
+   Fixed that a still active cell editor gets closed prior to update the model state.
+c) solved by e)
+d) Changed that if the value of a cell editor is written back to model, the sort (if applicable) is suspended.
+   Thus, even though the column represents an implict or explicit sort column, its values are not sorted anymore which in turn is the expected behavior.
+   In consequence, to get the column's values sorted again, the user has to sort the column anew.
+e) Instead of creating an ICheckBox as cell editor which stays active until the focus get lost, an empty cell editor (null) is created.
+   As the toggled value is immediately written back to the model, this editor gets closed shortly after (see b).
+f) Fixed
+g) Mouseclicks that are targetted to cell editors are not interpereted as row-check nor row-uncheck clicks anymore.
+h) Fixed
+Plug-Ins changed:
+- org.eclipse.scout.rt.ui.swing, org.eclipse.scout.rt.client
+Migration:
+None

@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
@@ -21,8 +19,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
-import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 
 /**
  * Column holding Boolean values
@@ -73,23 +69,9 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
 
   @Override
   protected IFormField prepareEditInternal(final ITableRow row) throws ProcessingException {
-    final AbstractBooleanField f = new AbstractBooleanField() {
-    };
-    f.setValue(getValue(row));
-
-    //automatic save when value changes
-    f.addPropertyChangeListener(IBooleanField.PROP_VALUE, new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        try {
-          completeEdit(row, f);
-        }
-        catch (ProcessingException e1) {
-          LOG.error("failed to complete edit mode", e1);
-        }
-      }
-    });
-    return f;
+    // no cell editor is used. Instead, the value is changed right away.
+    applyValueInternal(row, !BooleanUtility.nvl(getValue(row), false));
+    return null;
   }
 
   @Override

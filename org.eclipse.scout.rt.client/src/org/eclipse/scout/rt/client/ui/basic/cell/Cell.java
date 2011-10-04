@@ -16,6 +16,8 @@ import java.util.Map;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
@@ -26,6 +28,8 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
  * rarely used properties.
  */
 public class Cell implements ICell {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Cell.class);
 
   private static final Map<CellStyle, CellStyle> SHARED_STYLE_STORE;
   private static final Object SHARED_STYLE_STORE_LOCK = new Object();
@@ -53,7 +57,7 @@ public class Cell implements ICell {
     }
     catch (ProcessingException e) {
       //should never happen
-      e.printStackTrace();
+      LOG.error("Unexpected", e);
     }
   }
 

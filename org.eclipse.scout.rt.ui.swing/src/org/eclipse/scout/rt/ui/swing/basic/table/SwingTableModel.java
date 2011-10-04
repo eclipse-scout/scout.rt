@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing.basic.table;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -89,6 +90,12 @@ public class SwingTableModel extends AbstractTableModel {
   }
 
   public void updateModelState(int newRowCount) {
+    // cancel a potential active cell editor
+    TableCellEditor activeEditor = m_swingScoutTable.getSwingTable().getCellEditor();
+    if (activeEditor != null) {
+      activeEditor.cancelCellEditing();
+    }
+
     int oldRowCount = m_rowCount;
     m_rowCount = newRowCount;
     if (oldRowCount == 0 && newRowCount == 0) {
