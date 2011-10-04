@@ -903,7 +903,12 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   @SuppressWarnings("unchecked")
   public void acceptProposal(LookupRow row) {
     m_currentLookupRow = row;
-    setValue((T) row.getKey());
+    if (isAllowCustomText()) {
+      setValue((T) row.getText());
+    }
+    else {
+      setValue((T) row.getKey());
+    }
   }
 
   @Override

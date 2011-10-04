@@ -611,3 +611,13 @@ Plug-Ins changed:
 - org.eclipse.scout.rt.ui.swing, org.eclipse.scout.rt.client
 Migration:
 None
+
+
+04.10.2011 hmu
+Bugzilla ticket #359840
+Problem:
+SmartField doesn't handle isAllowCustomText properly when value changed in ui
+Plug-Ins changed:
+- org.eclipse.scout.rt.client
+Migration:
+None
