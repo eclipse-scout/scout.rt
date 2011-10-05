@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -50,6 +50,11 @@ public class BookmarkFolderForm extends AbstractForm {
 
   @Order(10f)
   public class MainBox extends AbstractGroupBox {
+
+    @Override
+    protected int getConfiguredGridColumnCount() {
+      return 1;
+    }
 
     @Order(10f)
     public class GroupBox extends AbstractGroupBox {

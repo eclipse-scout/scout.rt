@@ -39,12 +39,14 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.IOpenBookmarkCommand;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.IPublishBookmarkCommand;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
@@ -59,6 +61,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   private BookmarkFolder m_bookmarkRootFolder;
   private IPublishBookmarkCommand m_publishBookmarkCommand;
+  private IOpenBookmarkCommand m_openBookmarkCommand;
 
   public AbstractBookmarkTreeField() {
     super();
@@ -80,8 +83,27 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     return node instanceof FolderNode;
   }
 
+  /**
+   * It's up to the Eclipse Scout implementation to handle bookmark publishing,
+   * e.g. selection of receivers of the published bookmark
+   * 
+   * @param command
+   *          the command to publish a bookmark
+   */
   public void injectPublishBookmarkCommand(IPublishBookmarkCommand command) {
     m_publishBookmarkCommand = command;
+  }
+
+  /**
+   * If an application needs to execute additional code when a bookmark is opened,
+   * it can inject a command here.
+   * Please note: The command should at least open the bookmark, by calling {@link IDesktop#activateBookmark()}
+   * 
+   * @param command
+   *          the command to be executed when a user opens a bookmark
+   */
+  public void injectOpenBookmarkCommand(IOpenBookmarkCommand command) {
+    m_openBookmarkCommand = command;
   }
 
   private BookmarkFolder getParentBookmarkFolder(ITreeNode node) {
@@ -501,9 +523,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       if (Bookmark.INBOX_FOLDER_NAME.equals(title)) {
         title = getConfiguredGlobalBookmarkLabel();
       }
-      else if (Bookmark.PRIVATE_FOLDER_NAME.equals(title)) {
-        title = getConfiguredPrivateBookmarkLabel();
-      }
       cell.setText(title);
       cell.setIconId(AbstractIcons.TreeNode);
     }
@@ -579,7 +598,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       ITreeNode node = FolderNode.this;
       BookmarkFolder bmFolder = (BookmarkFolder) node.getCell().getValue();
       if (Bookmark.INBOX_FOLDER_NAME.equals(bmFolder.getTitle()) ||
-          Bookmark.PRIVATE_FOLDER_NAME.equals(bmFolder.getTitle()) ||
           Bookmark.SPOOL_FOLDER_NAME.equals(bmFolder.getTitle())) {
         return true;
       }
@@ -605,7 +623,15 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           cell.setText(bm.getTitle());
         }
         cell.setTooltipText(bm.getText());
-        cell.setIconId(AbstractIcons.Bookmark);
+        if (StringUtility.isNullOrEmpty(bm.getIconId())) {
+          cell.setIconId(AbstractIcons.Bookmark);
+        }
+        else {
+          cell.setIconId(bm.getIconId());
+        }
+        if (bm.isNew()) {
+          cell.setFont(new FontSpec(null, FontSpec.STYLE_BOLD, 0));
+        }
       }
     }
 
@@ -620,7 +646,12 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       protected void execAction() throws ProcessingException {
         ITreeNode node = BookmarkNode.this;
         Bookmark bm = (Bookmark) node.getCell().getValue();
-        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(bm, false);
+        if (m_openBookmarkCommand != null) {
+          m_openBookmarkCommand.openBookmark(bm);
+        }
+        else {
+          ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(bm, false);
+        }
       }
     }
 
@@ -662,6 +693,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         form.setBookmark(bm);
         form.setBookmarkRootFolder(getBookmarkRootFolder());
         BookmarkFolder oldBmFolder = getParentBookmarkFolder(BookmarkNode.this);
+        boolean oldIsNew = bm.isNew();
         if (oldBmFolder != form.getBookmarkRootFolder()) {
           form.setFolder(oldBmFolder);
         }
@@ -671,6 +703,8 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           ITree tree = getTree();
           bm.setTitle(form.getBookmark().getTitle());
           bm.setKeyStroke(form.getBookmark().getKeyStroke());
+          bm.setKind(form.getBookmark().getKind());
+          bm.setIconId(form.getBookmark().getIconId());
           final BookmarkFolder newBmFolder = form.getFolder() != null ? form.getFolder() : form.getBookmarkRootFolder();
           if (!CompareUtility.equals(oldBmFolder, newBmFolder)) {
             //find new folder node
@@ -693,6 +727,9 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             tree.updateNode(node);
             refreshBookmarkModel();
           }
+        }
+        else if (oldIsNew != form.getBookmark().isNew()) {
+          refreshBookmarkModel();
         }
       }
     }

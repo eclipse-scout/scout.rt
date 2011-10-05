@@ -612,7 +612,6 @@ Plug-Ins changed:
 Migration:
 None
 
-
 04.10.2011 hmu
 Bugzilla ticket #359840
 Problem:
@@ -621,3 +620,14 @@ Plug-Ins changed:
 - org.eclipse.scout.rt.client
 Migration:
 None
+
+05.10.2011 abr [contributed by Adrian Moser, BSI Business Systems Integration AG]
+bugzilla ticket: 359418
+Bookmark Management Customization
+- Private Folder should be removed (not needed)
+- Support for additional logic when user opens bookmark: IOpenBookmarkCommand
+- AbstractBookmarkTreeField: Support for custom icons
+- BookmarkFolderForm: Grid width should be 1.
+- IBookmarkForm: JavaDoc shoud be added.
+- Bookmark: Support for new Bookmark (unread Bookmarks) should be added
+Migration: None

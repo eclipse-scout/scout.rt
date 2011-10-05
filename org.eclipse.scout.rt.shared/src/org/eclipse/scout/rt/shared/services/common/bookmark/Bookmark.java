@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -38,10 +38,10 @@ public class Bookmark implements Serializable, Cloneable {
 
   public static final String SPOOL_FOLDER_NAME = "[SPOOL]";
   public static final String INBOX_FOLDER_NAME = "[INBOX]";
-  public static final String PRIVATE_FOLDER_NAME = "[PRIVATE]";
 
   private long m_id;
   private int m_kind;
+  private boolean m_new;
   private String m_title;
   private String m_text;
   private String m_keyStroke;
@@ -136,6 +136,14 @@ public class Bookmark implements Serializable, Cloneable {
   public void setKeyStroke(String s) {
     m_keyStroke = s;
     m_serializedData = null;
+  }
+
+  public boolean isNew() {
+    return m_new;
+  }
+
+  public void setNew(boolean bookmarkIsUnread) {
+    m_new = bookmarkIsUnread;
   }
 
   public String getOutlineClassName() {
@@ -252,6 +260,6 @@ public class Bookmark implements Serializable, Cloneable {
 
   @Override
   public String toString() {
-    return "Bookmark[title=" + getTitle() + ", id=" + getId() + "]";
+    return "Bookmark[title=" + getTitle() + ", id=" + getId() + ", kind=" + (getKind() == Bookmark.GLOBAL_BOOKMARK ? "Global" : "User") + "]";
   }
 }

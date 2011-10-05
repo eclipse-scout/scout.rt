@@ -17,19 +17,54 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 
 public interface IBookmarkForm extends IForm {
 
+  /**
+   * @param bookmark
+   *          the bookmark to be modified
+   */
   void setBookmark(Bookmark bookmark);
 
+  /**
+   * @return the bookmark for further processing
+   */
   Bookmark getBookmark();
 
+  /**
+   * Set the top-level folder where the bookmark is located
+   * 
+   * @param rootFolder
+   *          top-level folder
+   */
   void setBookmarkRootFolder(BookmarkFolder rootFolder);
 
+  /**
+   * @return the top-level folder where the bookmark is located
+   */
   BookmarkFolder getBookmarkRootFolder();
 
+  /**
+   * @return the folder where the bookmark is located
+   * @throws ProcessingException
+   */
   BookmarkFolder getFolder() throws ProcessingException;
 
+  /**
+   * @param folder
+   *          the folder where the bookmark is located
+   * @throws ProcessingException
+   */
   void setFolder(BookmarkFolder folder) throws ProcessingException;
 
+  /**
+   * Opens the form for modification of an existing bookmark
+   * 
+   * @throws ProcessingException
+   */
   void startModify() throws ProcessingException;
 
+  /**
+   * Opens the form for creation of a new bookmark
+   * 
+   * @throws ProcessingException
+   */
   void startNew() throws ProcessingException;
 }
