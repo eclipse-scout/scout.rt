@@ -240,6 +240,17 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return null;
   }
 
+  /**
+   * Only editable columns: truf if the field is reuqired/mandatory.
+   * Affects only the field if the column is editable
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(210)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredMandatory() {
+    return false;
+  }
+
   @ConfigOperation
   @Order(10)
   protected void execInitColumn() throws ProcessingException {
@@ -325,6 +336,9 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     IFormField f = prepareEditInternal(row);
     if (f != null) {
       f.setLabelVisible(false);
+      if (getConfiguredMandatory()) {
+        f.setMandatory(true);
+      }
       GridData gd = f.getGridDataHints();
       // apply horizontal alignment of column to respective editor field
       gd.horizontalAlignment = getHorizontalAlignment();

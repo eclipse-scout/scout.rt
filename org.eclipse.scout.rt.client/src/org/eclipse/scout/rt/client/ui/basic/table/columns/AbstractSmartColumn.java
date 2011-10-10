@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -55,6 +55,17 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
   @ConfigPropertyValue("null")
   protected Class<? extends ICodeType> getConfiguredCodeType() {
     return null;
+  }
+
+  /**
+   * If this method is not overwritten, and the smartfield has a codeType then
+   * the value of browseHierarchy is automatically determined by {@link ICodeType#isHierarchy()}
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(310)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredBrowseHierarchy() {
+    return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -191,6 +202,7 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
     };
 
     f.setLookupCall(getLookupCall());
+    f.setBrowseHierarchy(getConfiguredBrowseHierarchy());
     return f;
   }
 

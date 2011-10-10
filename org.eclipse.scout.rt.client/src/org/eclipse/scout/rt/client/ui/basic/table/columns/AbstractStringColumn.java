@@ -39,6 +39,14 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   /*
    * Configuration
    */
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(130)
+  @ConfigPropertyValue("4000")
+  protected int getConfiguredMaxLength() {
+    return 4000;
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)
   @ConfigPropertyValue("false")
@@ -134,6 +142,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
     AbstractStringField f = new AbstractStringField() {
     };
+    f.setMaxLength(getConfiguredMaxLength());
     f.setInputMasked(isInputMasked());
     boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
     f.setMultilineText(multi);
