@@ -63,6 +63,7 @@ import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IContentProblemDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
@@ -1244,18 +1245,19 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // check all fields that might be invalid
     final ArrayList<String> invalidTexts = new ArrayList<String>();
     final ArrayList<String> mandatoryTexts = new ArrayList<String>();
-    P_AbstractCollectingFieldVisitor<IFormField> v = new P_AbstractCollectingFieldVisitor<IFormField>() {
+    P_AbstractCollectingFieldVisitor<IContentProblemDescriptor> v = new P_AbstractCollectingFieldVisitor<IContentProblemDescriptor>() {
       @Override
       public boolean visitField(IFormField f, int level, int fieldIndex) {
-        if (!f.isContentValid()) {
-          if (f.getErrorStatus() != null) {
-            invalidTexts.add(f.getFullyQualifiedLabel(": ") + ": " + f.getErrorStatus().getMessage());
+        IContentProblemDescriptor desc = f.getContentProblemDescriptor();
+        if (desc != null) {
+          if (desc.getErrorStatus() != null) {
+            invalidTexts.add(desc.getDisplayText() + ": " + desc.getErrorStatus().getMessage());
           }
           else {
-            mandatoryTexts.add(f.getFullyQualifiedLabel(": "));
+            mandatoryTexts.add(desc.getDisplayText());
           }
           if (getCollectionCount() == 0) {
-            collect(f);
+            collect(desc);
           }
         }
         return true;
@@ -1263,7 +1265,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     };
     visitFields(v);
     if (v.getCollectionCount() > 0) {
-      IFormField first = v.getCollection().get(0);
+      IContentProblemDescriptor firstProblem = v.getCollection().get(0);
       if (LOG.isInfoEnabled()) {
         LOG.info("there are fields with errors");
       }
@@ -1282,7 +1284,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
       }
       String introText = ScoutTexts.get("FormIncompleteIntro");
-      first.requestFocus();
+      firstProblem.activateProblemLocation();
       VetoException veto = new VetoException(introText, buf.toString());
       throw veto;
     }
@@ -1568,7 +1570,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       @Override
       public boolean visitField(IFormField f, int level, int fieldIndex) {
         if (f instanceof IFormField) {
-          ((IFormField) f).checkSaveNeeded();
+          f.checkSaveNeeded();
         }
         return true;
       }

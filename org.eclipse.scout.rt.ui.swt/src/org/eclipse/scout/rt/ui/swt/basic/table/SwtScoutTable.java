@@ -374,6 +374,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     for (TableEvent element : a) {
       switch (element.getType()) {
         case TableEvent.TYPE_REQUEST_FOCUS:
+        case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
         case TableEvent.TYPE_ROWS_INSERTED:
         case TableEvent.TYPE_ROWS_UPDATED:
         case TableEvent.TYPE_ROWS_DELETED:
@@ -403,6 +404,22 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     switch (e.getType()) {
       case TableEvent.TYPE_REQUEST_FOCUS: {
         getSwtField().setFocus();
+        break;
+      }
+      case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL: {
+        //start editing
+        int swtCol = -1;
+        TableColumn[] swtColumns = getSwtField().getColumns();
+        for (int c = 0; c < swtColumns.length; c++) {
+          if (swtColumns[c].getData(KEY_SCOUT_COLUMN) == e.getFirstColumn()) {
+            swtCol = c;
+            break;
+          }
+        }
+        ITableRow scoutRow = e.getFirstRow();
+        if (scoutRow != null && swtCol >= 0) {
+          getSwtTableViewer().editElement(scoutRow, swtCol);
+        }
         break;
       }
       case TableEvent.TYPE_ROWS_INSERTED:

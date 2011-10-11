@@ -1215,14 +1215,24 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
+  public IContentProblemDescriptor getContentProblemDescriptor() {
+    if (!isContentValid()) {
+      return new FormFieldProblemDescriptor(this);
+    }
+    return null;
+  }
+
+  @Override
   public boolean isContentValid() {
     IProcessingStatus errorStatus = getErrorStatus();
     if (errorStatus != null && (errorStatus.getSeverity() == IProcessingStatus.ERROR || errorStatus.getSeverity() == IProcessingStatus.FATAL)) {
       return false;
     }
+    /*
     if (isMandatory()) {
       //nop
     }
+    */
     return true;
   }
 

@@ -426,7 +426,17 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
 
   void setDefaultIconId(String iconId);
 
+  /**
+   * Notify the ui factory to give focus to the table
+   */
   void requestFocus();
+
+  /**
+   * Notify the ui factory to give focus to the table cell.
+   * <p>
+   * This will only work if the table cell is editable.
+   */
+  void requestFocusInCell(IColumn<?> column, ITableRow row);
 
   void addTableListener(TableListener listener);
 

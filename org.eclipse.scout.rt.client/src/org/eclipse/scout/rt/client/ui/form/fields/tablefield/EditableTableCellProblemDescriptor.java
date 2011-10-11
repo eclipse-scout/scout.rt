@@ -1,0 +1,63 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
+
+import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.IContentProblemDescriptor;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+
+/**
+ * This interface is used to check fields for valid content and - in case invalid - activate / select / focus the
+ * appropriate location
+ * <p>
+ * see {@link IFormField#getContentProblemDescriptor()}
+ */
+public class EditableTableCellProblemDescriptor implements IContentProblemDescriptor {
+  private final ITableField<?> m_tableField;
+  private final ITableRow m_row;
+  private final IColumn<?> m_col;
+
+  public EditableTableCellProblemDescriptor(ITableField<?> tableField, ITableRow row, IColumn<?> col) {
+    m_tableField = tableField;
+    m_row = row;
+    m_col = col;
+  }
+
+  @Override
+  public String getDisplayText() {
+    return "(" + m_tableField.getFullyQualifiedLabel(": ") + ") " + m_col.getHeaderCell().getText();
+  }
+
+  @Override
+  public IProcessingStatus getErrorStatus() {
+    return null;
+  }
+
+  @Override
+  public void activateProblemLocation() {
+    //make sure the table is showing (activate parent tabs)
+    IGroupBox g = m_tableField.getParentGroupBox();
+    while (g != null) {
+      if (g.getParentField() instanceof ITabBox) {
+        ITabBox t = (ITabBox) g.getParentField();
+        if (t.getSelectedTab() != g) {
+          t.setSelectedTab(g);
+        }
+      }
+      g = g.getParentGroupBox();
+    }
+    m_tableField.getTable().requestFocusInCell(m_col, m_row);
+  }
+}

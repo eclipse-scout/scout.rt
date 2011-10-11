@@ -1087,6 +1087,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  public void requestFocusInCell(IColumn<?> column, ITableRow row) {
+    if (column.isCellEditable(row)) {
+      fireRequestFocusInCell(column, row);
+    }
+  }
+
+  @Override
   public void extractTableData(AbstractTableFieldData target) throws ProcessingException {
     for (int i = 0, ni = getRowCount(); i < ni; i++) {
       ITableRow row = getRow(i);
@@ -3187,6 +3194,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private void fireRequestFocus() {
     fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_REQUEST_FOCUS));
+  }
+
+  private void fireRequestFocusInCell(IColumn<?> column, ITableRow row) {
+    TableEvent e = new TableEvent(this, TableEvent.TYPE_REQUEST_FOCUS_IN_CELL);
+    e.setColumns(new IColumn<?>[]{column});
+    e.setRows(new ITableRow[]{row});
+    fireTableEventInternal(e);
   }
 
   private void fireRowFilterChanged() {

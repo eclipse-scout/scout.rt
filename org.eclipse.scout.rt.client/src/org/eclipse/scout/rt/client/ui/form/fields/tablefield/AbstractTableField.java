@@ -46,6 +46,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldProblemDescriptor;
+import org.eclipse.scout.rt.client.ui.form.fields.IContentProblemDescriptor;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
@@ -444,16 +447,41 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  public boolean isContentValid() {
-    boolean b = super.isContentValid();
-    if (b) {
-      if (isMandatory()) {
-        if (getTable() == null || getTable().getRowCount() < 1) {
-          return false;
+  public IContentProblemDescriptor getContentProblemDescriptor() {
+    IContentProblemDescriptor desc = super.getContentProblemDescriptor();
+    //super check
+    if (desc != null) {
+      return desc;
+    }
+    //check mandatory
+    ITable table = getTable();
+    if (isMandatory()) {
+      if (table == null || table.getRowCount() < 1) {
+        return new FormFieldProblemDescriptor(this);
+      }
+    }
+    //check editable cells
+    if (table != null) {
+      for (ITableRow row : table.getRows()) {
+        for (IColumn col : table.getColumns()) {
+          if (col.isCellEditable(row)) {
+            try {
+              IFormField editor = col.prepareEdit(row);
+              if (editor != null) {
+                boolean editorValid = editor.isContentValid();
+                if (!editorValid) {
+                  return new EditableTableCellProblemDescriptor(this, row, col);
+                }
+              }
+            }
+            catch (Throwable t) {
+              LOG.error("validating " + getClass().getSimpleName() + " for row " + row.getRowIndex() + " for column " + col.getClass().getSimpleName(), t);
+            }
+          }
         }
       }
     }
-    return b;
+    return null;
   }
 
   @Override

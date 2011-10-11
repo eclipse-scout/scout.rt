@@ -438,9 +438,15 @@ public interface IFormField extends IPropertyObserver {
 
   /**
    * @return true if field content (value on value fields) is valid, no error status is set on field and mandatory
-   *         property is met
+   *         property is met.
+   *         Shorthand form for {@link #getContentProblemDescriptor()==null}
    */
   boolean isContentValid();
+
+  /**
+   * @return either null when everything is valid or a problem descriptor that contains more details.
+   */
+  IContentProblemDescriptor getContentProblemDescriptor();
 
   String getTooltipText();
 

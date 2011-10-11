@@ -602,6 +602,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     for (int i = 0; i < a.length; i++) {
       switch (a[i].getType()) {
         case TableEvent.TYPE_REQUEST_FOCUS:
+        case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
         case TableEvent.TYPE_ROWS_INSERTED:
         case TableEvent.TYPE_ROWS_UPDATED:
         case TableEvent.TYPE_ROWS_DELETED:
@@ -629,6 +630,24 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     switch (e.getType()) {
       case TableEvent.TYPE_REQUEST_FOCUS: {
         getSwingTable().requestFocus();
+        break;
+      }
+      case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL: {
+        //start editing
+        TableColumnModel tcm = getSwingTable().getColumnModel();
+        int swingCol = -1;
+        for (int c = 0; c < tcm.getColumnCount(); c++) {
+          if (tcm.getColumn(c) instanceof SwingTableColumn) {
+            if (((SwingTableColumn) tcm.getColumn(c)).getScoutColumn() == e.getFirstColumn()) {
+              swingCol = c;
+              break;
+            }
+          }
+        }
+        int swingRow = scoutToSwingRow(e.getFirstRow());
+        if (swingRow >= 0 && swingCol >= 0) {
+          getSwingTable().editCellAt(swingRow, swingCol);
+        }
         break;
       }
       case TableEvent.TYPE_ROWS_DELETED:

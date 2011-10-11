@@ -77,7 +77,7 @@ public class TableEvent extends java.util.EventObject {
   public static final int TYPE_ROW_POPUP = 700;
   /**
    * Broadcast request to add actions for popup on empty space (not on rows)
-   *<p>
+   * <p>
    * valid properties: add actions to: popupActions
    */
   public static final int TYPE_EMPTY_SPACE_POPUP = 701;
@@ -112,7 +112,18 @@ public class TableEvent extends java.util.EventObject {
    */
   public static final int TYPE_COLUMN_HEADERS_UPDATED = 780;
 
+  /**
+   * Request ui to set focus to the table
+   */
   public static final int TYPE_REQUEST_FOCUS = 800;
+
+  /**
+   * Request ui to activate editing of the cell and set focus to it
+   * <p>
+   * Only for editable cells
+   */
+  public static final int TYPE_REQUEST_FOCUS_IN_CELL = 805;
+
   /**
    * A row has been clicked (by the mouse)
    * <p>
@@ -256,6 +267,10 @@ public class TableEvent extends java.util.EventObject {
    */
   public IColumn[] getColumns() {
     return m_columns;
+  }
+
+  public IColumn getFirstColumn() {
+    return m_columns.length > 0 ? m_columns[0] : null;
   }
 
   protected void setColumns(IColumn[] columns) {
