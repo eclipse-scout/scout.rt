@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.testing.ui.swing;
 
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -31,7 +32,6 @@ import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -194,9 +194,10 @@ public class SwingMock implements IGuiMock {
     return syncExec(new MockRunnable<Boolean>() {
       @Override
       public Boolean run() throws Throwable {
-        Window w = findWindow(title);
-        if (w != null) {
-          return w.isActive();
+        for (Window w : findWindows(title)) {
+          if (w.isActive()) {
+            return true;
+          }
         }
         JInternalFrame f = findInternalFrame(title);
         if (f != null) {
@@ -212,9 +213,10 @@ public class SwingMock implements IGuiMock {
     return syncExec(new MockRunnable<Boolean>() {
       @Override
       public Boolean run() throws Throwable {
-        Window w = findWindow(title);
-        if (w != null) {
-          return w.isVisible();
+        for (Window w : findWindows(title)) {
+          if (w.isVisible()) {
+            return true;
+          }
         }
         JInternalFrame f = findInternalFrame(title);
         if (f != null) {
@@ -774,12 +776,27 @@ public class SwingMock implements IGuiMock {
         if (w instanceof Dialog && title.equals(((Dialog) w).getTitle())) {
           return w;
         }
-        else if (w instanceof JFrame && title.equals(((JFrame) w).getTitle())) {
+        else if (w instanceof Frame && title.equals(((Frame) w).getTitle())) {
           return w;
         }
       }
     }
     return null;
+  }
+
+  protected List<Window> findWindows(String title) {
+    ArrayList<Window> list = new ArrayList<Window>();
+    for (Window w : Window.getWindows()) {
+      if (w.isVisible()) {
+        if (w instanceof Dialog && title.equals(((Dialog) w).getTitle())) {
+          list.add(w);
+        }
+        else if (w instanceof Frame && title.equals(((Frame) w).getTitle())) {
+          list.add(w);
+        }
+      }
+    }
+    return list;
   }
 
   protected JInternalFrame findInternalFrame(String title) {
