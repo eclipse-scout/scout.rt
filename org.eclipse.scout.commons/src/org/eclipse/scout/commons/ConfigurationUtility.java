@@ -132,7 +132,7 @@ public final class ConfigurationUtility {
   }
 
   public static <T> T newInnerInstance(Object instance, Class<T> innerClass) throws Exception {
-    if (innerClass.getDeclaringClass() != null) {
+    if (innerClass.getDeclaringClass() != null && (innerClass.getModifiers() & Modifier.STATIC) == 0) {
       Constructor<T> c = innerClass.getDeclaredConstructor(new Class[]{innerClass.getDeclaringClass()});
       return c.newInstance(new Object[]{instance});
     }
