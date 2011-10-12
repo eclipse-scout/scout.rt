@@ -107,7 +107,8 @@ public class SwingMock implements IGuiMock {
       return;
     }
     //
-    for (int pass = 0; pass < 1; pass++) {
+    for (int pass = 0; pass < 2; pass++) {
+      m_bot.sleep(80);
       //wait until gui queue is empty
       syncExec(new MockRunnable<Object>() {
         @Override
