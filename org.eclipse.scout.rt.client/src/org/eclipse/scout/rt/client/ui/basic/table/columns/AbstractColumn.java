@@ -76,7 +76,10 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
       public void propertyChange(PropertyChangeEvent evt) {
         // force decoration of rows on property change.
         // This is important to recalculate editability of editable cells.
-        getTable().updateAllRows();
+        ITable table = getTable();
+        if (table != null) {
+          table.updateAllRows();
+        }
       }
     });
   }
