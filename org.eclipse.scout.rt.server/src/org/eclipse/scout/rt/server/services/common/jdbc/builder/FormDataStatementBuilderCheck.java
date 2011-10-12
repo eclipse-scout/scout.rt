@@ -126,8 +126,8 @@ public class FormDataStatementBuilderCheck {
   }
 
   protected void checkValueField(AbstractValueFieldData<?> v) {
-    ValuePartDefinition part = null;
-    for (ValuePartDefinition f : builder.getValuePartDefinitions()) {
+    BasicPartDefinition part = null;
+    for (BasicPartDefinition f : builder.getBasicPartDefinitions()) {
       if (part != null) {
         break;
       }
@@ -148,12 +148,12 @@ public class FormDataStatementBuilderCheck {
       String op;
       Class<?> dataType = v.getHolderType();
       if (String.class.isAssignableFrom(dataType)) {
-        op = "ComposerConstants.OPERATOR_CONTAINS";
+        op = "DataModelConstants.OPERATOR_CONTAINS";
       }
       else {
-        op = "ComposerConstants.OPERATOR_EQ";
+        op = "DataModelConstants.OPERATOR_EQ";
       }
-      addBodyLine("setFieldDefinition(" + resolveImport(v.getClass()) + ".class," + sql + "," + op + ");");
+      addBodyLine("setBasicDefinition(" + resolveImport(v.getClass()) + ".class," + sql + "," + op + ");");
     }
   }
 

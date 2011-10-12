@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
  * the part is registered with {@link FormDataStatementBuilder#setPartDefinition(Class, new
  * PartDefinition("LAST_NAME"))}
  */
-public class ExampleFullTextPartDefinition extends ValuePartDefinition {
+public class ExampleFullTextPartDefinition extends BasicPartDefinition {
 
   /**
    * @param attribute
@@ -34,7 +34,7 @@ public class ExampleFullTextPartDefinition extends ValuePartDefinition {
   }
 
   @Override
-  public String createInstance(FormDataStatementBuilder builder, List<Object> fieldDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
+  protected String createInstanceImpl(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
     String pattern = (String) bindValues.get(0);
     //generate a search patter from pattern, decorate and replace pattern
     //...

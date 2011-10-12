@@ -24,12 +24,11 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 /**
  * Definition of a property-to-sql and valueField-to-sql mapping for {@link AbstractPropertyData} and
  * {@link AbstractValueFieldData}
+ * 
+ * @deprecated use the more general {@link BasicPartDefinition} instead.
  */
-public class ValuePartDefinition implements DataModelConstants {
-  private final ClassIdentifier[] m_valueTypeClassIdentifiers;
-  private final String m_sqlAttribute;
-  private final int m_operation;
-  private final boolean m_plainBind;
+@Deprecated
+public class ValuePartDefinition extends BasicPartDefinition {
 
   /**
    * @param valueType
@@ -101,54 +100,14 @@ public class ValuePartDefinition implements DataModelConstants {
    * see {@link #ValuePartDefinition(Class, String, int)}
    */
   public ValuePartDefinition(ClassIdentifier[] valueTypeClassIdentifiers, String sqlAttribute, int operator, boolean plainBind) {
-    m_valueTypeClassIdentifiers = valueTypeClassIdentifiers != null ? valueTypeClassIdentifiers : new ClassIdentifier[0];
-    m_sqlAttribute = sqlAttribute;
-    m_operation = operator;
-    m_plainBind = plainBind;
-    //check types
-    for (ClassIdentifier classIdentifier : m_valueTypeClassIdentifiers) {
-      Class<?> c = classIdentifier.getLastSegment();
-      if (AbstractPropertyData.class.isAssignableFrom(c)) {
-        //ok
-      }
-      else if (AbstractValueFieldData.class.isAssignableFrom(c)) {
-        //ok
-      }
-      else {
-        throw new IllegalArgumentException("" + c + " is not of type AbstractPropertyData or AbstractValueFieldData");
-      }
-      for (int i = 0; i < classIdentifier.getClasses().length - 1; i++) {
-        Class<?> containerClass = classIdentifier.getClasses()[i];
-        if (AbstractFormFieldData.class.isAssignableFrom(containerClass)) {
-          // ok
-        }
-        else {
-          throw new IllegalArgumentException("" + containerClass + " is not of type AbstractFormFieldData (segment " + i + " in " + classIdentifier + ")");
-        }
-      }
-    }
+    super(valueTypeClassIdentifiers, sqlAttribute, operator, plainBind);
   }
 
-  public String getSqlAttribute() {
-    return m_sqlAttribute;
-  }
-
-  public int getOperation() {
-    return m_operation;
-  }
-
-  /**
-   * @return true for a plain bind (without jdbc ?) and false for jdbc ? binds.
-   */
-  public boolean isPlainBind() {
-    return m_plainBind;
-  }
-
-  /**
-   * @return array of {@link AbstractValueData} class identifiers
-   */
-  public ClassIdentifier[] getValueTypeClassIdentifiers() {
-    return m_valueTypeClassIdentifiers;
+  @Override
+  public boolean accept(AbstractFormData formData) throws ProcessingException {
+    Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap = formData.getAllFieldsRec();
+    Map<Integer, Map<String, AbstractPropertyData<?>>> propertiesBreathFirstMap = formData.getAllPropertiesRec();
+    return accept(formData, fieldsBreathFirstMap, propertiesBreathFirstMap);
   }
 
   /**
@@ -168,7 +127,7 @@ public class ValuePartDefinition implements DataModelConstants {
    *         the form data
    * @throws ProcessingException
    */
-  public boolean accept(AbstractFormData formData, Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap, Map<Integer, Map<String, AbstractPropertyData<?>>> propertiesBreathFirstMap) throws ProcessingException {
+  protected boolean accept(AbstractFormData formData, Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap, Map<Integer, Map<String, AbstractPropertyData<?>>> propertiesBreathFirstMap) throws ProcessingException {
     if (getValueTypeClassIdentifiers().length > 0) {
       for (ClassIdentifier valueType : getValueTypeClassIdentifiers()) {
         Object dataObject = formData.findFieldByClass(fieldsBreathFirstMap, valueType);
@@ -190,34 +149,17 @@ public class ValuePartDefinition implements DataModelConstants {
     return false;
   }
 
+  @Override
+  protected String createInstanceImpl(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
+    return createInstance(builder, valueDatas, bindNames, bindValues, parentAliasMap);
+  }
+
   /**
-   * Override this method to intercept and change part instance properties such as values, operation type, etc.<br>
-   * Sometimes it is convenient to set the operation to {@link DataModelConstants#OPERATOR_NONE} which uses the
-   * attribute
-   * itself as the complete statement part.
-   * 
-   * @param builder
-   * @param valueDatas
-   *          the form data objects containing the runtime values {@link AbstractValueFieldData} and
-   *          {@link AbstractPropertyData}
-   * @param bindNames
-   *          by default the names "a", "b", "c", ... representing then value bindValues in the same order as the
-   *          values
-   * @param bindValues
-   *          the values of the {@link AbstractValueFieldData}s and {@link AbstractPropertyData}s in the same order
-   * @return the result sql text; null if that part is to be ignored
-   *         <p>
-   *         normally calls
-   *         {@link FormDataStatementBuilder#createStatementPart(Integer, String, int, List, List, boolean, Map)}
-   *         <p>
-   *         Can make use of alias markers such as @Person@.LAST_NAME, these are resolved in the
-   *         {@link FormDataStatementBuilder}
-   *         <p>
-   *         Only additional bind values - other than the bindValues passed to createStatementPart - must be added using
-   *         {@link FormDataStatementBuilder#addBind(String, Object)}
-   * @throws ProcessingException
+   * @deprecated override
+   *             {@link BasicPartDefinition#createInstanceImpl(FormDataStatementBuilder, List, List, List, Map)} instead
    */
-  public String createInstance(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
+  @Deprecated
+  protected String createInstance(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
     return createNewInstance(builder, valueDatas, bindNames, bindValues, parentAliasMap);
   }
 
@@ -225,7 +167,7 @@ public class ValuePartDefinition implements DataModelConstants {
    * @deprecated use {@link #createInstance(FormDataStatementBuilder, List, List, List, Map)} instead
    */
   @Deprecated
-  public String createNewInstance(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
+  protected String createNewInstance(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
     return builder.createSqlPart(DataModelConstants.AGGREGATION_NONE, getSqlAttribute(), getOperation(), bindNames, bindValues, isPlainBind(), parentAliasMap);
   }
 }

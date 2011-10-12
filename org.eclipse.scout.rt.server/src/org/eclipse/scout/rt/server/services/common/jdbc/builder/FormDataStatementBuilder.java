@@ -36,13 +36,11 @@ import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEitherOrNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
-import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.DataModelUtility;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
@@ -117,6 +115,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  * 
  * @author imo
  */
+@SuppressWarnings("deprecation")
 public class FormDataStatementBuilder implements DataModelConstants {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormDataStatementBuilder.class);
   private static final Pattern PLAIN_ATTRIBUTE_PATTERN = Pattern.compile("(<attribute>)([a-zA-Z_][a-zA-Z0-9_]*)(</attribute>)");
@@ -149,7 +148,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   private AliasMapper m_aliasMapper;
   private Map<Class<?>, DataModelAttributePartDefinition> m_dataModelAttMap;
   private Map<Class<?>, DataModelEntityPartDefinition> m_dataModelEntMap;
-  private List<ValuePartDefinition> m_valueDefs;
+  private List<BasicPartDefinition> m_basicDefs;
   private Map<String, Object> m_bindMap;
   private AtomicInteger m_sequenceProvider;
   private StringBuffer m_where;
@@ -163,7 +162,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     m_bindMap = new HashMap<String, Object>();
     m_dataModelAttMap = new HashMap<Class<?>, DataModelAttributePartDefinition>();
     m_dataModelEntMap = new HashMap<Class<?>, DataModelEntityPartDefinition>();
-    m_valueDefs = new ArrayList<ValuePartDefinition>();
+    m_basicDefs = new ArrayList<BasicPartDefinition>();
     setSequenceProvider(new AtomicInteger(0));
   }
 
@@ -201,52 +200,108 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * When multiple occurrences are simultaneously used, the sqlAttribute may be written as
    * <code>(&lt;attribute&gt;@PERSON@.ORDER_STATUS&lt;/attribute&gt; OR &lt;attribute&gt;@PERSON@.DELIVERY_STATUS&lt;/attribute&gt;)</code>
    * <p>
-   * The operator and aggregationType are required, unless a {@link ValuePartDefinition} is used.
+   * The operator and aggregationType are required, unless a {@link BasicPartDefinition} is used.
    */
+  public void setBasicDefinition(Class<?> fieldType, String sqlAttribute, int operator) {
+    setBasicDefinition(new BasicPartDefinition(fieldType, sqlAttribute, operator));
+  }
+
+  /**
+   * see {@link #setBasicDefinition(Class, String, int)}
+   */
+  public void setBasicDefinition(ClassIdentifier fieldTypeIdentifier, String sqlAttribute, int operator) {
+    setBasicDefinition(new BasicPartDefinition(fieldTypeIdentifier, sqlAttribute, operator));
+  }
+
+  /**
+   * see {@link #setBasicDefinition(Class, String, int)}
+   */
+  public void setBasicDefinition(Class<?> fieldType, String sqlAttribute, int operator, boolean plainBind) {
+    setBasicDefinition(new BasicPartDefinition(fieldType, sqlAttribute, operator, plainBind));
+  }
+
+  /**
+   * see {@link #setBasicDefinition(Class, String, int)}
+   */
+  public void setBasicDefinition(ClassIdentifier fieldTypeIdentifier, String sqlAttribute, int operator, boolean plainBind) {
+    setBasicDefinition(new BasicPartDefinition(fieldTypeIdentifier, sqlAttribute, operator, plainBind));
+  }
+
+  /**
+   * see {@link #setBasicDefinition(Class, String, int)}
+   */
+  public void setBasicDefinition(Class<?>[] fieldTypes, String sqlAttribute, int operator) {
+    setBasicDefinition(new BasicPartDefinition(fieldTypes, sqlAttribute, operator, false));
+  }
+
+  /**
+   * see {@link #setBasicDefinition(Class, String, int)}
+   */
+  public void setBasicDefinition(ClassIdentifier[] fieldTypeIdentifiers, String sqlAttribute, int operator) {
+    setBasicDefinition(new BasicPartDefinition(fieldTypeIdentifiers, sqlAttribute, operator, false));
+  }
+
+  /**
+   * see {@link #setBasicDefinition(Class, String, int)}
+   */
+  public void setBasicDefinition(BasicPartDefinition def) {
+    m_basicDefs.add(def);
+  }
+
+  /**
+   * @deprecated use setBasicDefinition instead
+   */
+  @Deprecated
   public void setValueDefinition(Class<?> fieldType, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldType, sqlAttribute, operator));
   }
 
   /**
-   * see {@link #setValueDefinition(Class, String, int)}
+   * @deprecated use setBasicDefinition instead
    */
+  @Deprecated
   public void setValueDefinition(ClassIdentifier fieldTypeIdentifier, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldTypeIdentifier, sqlAttribute, operator));
   }
 
   /**
-   * see {@link #setValueDefinition(Class, String, int)}
+   * @deprecated use setBasicDefinition instead
    */
+  @Deprecated
   public void setValueDefinition(Class<?> fieldType, String sqlAttribute, int operator, boolean plainBind) {
     setValueDefinition(new ValuePartDefinition(fieldType, sqlAttribute, operator, plainBind));
   }
 
   /**
-   * see {@link #setValueDefinition(Class, String, int)}
+   * @deprecated use setBasicDefinition instead
    */
+  @Deprecated
   public void setValueDefinition(ClassIdentifier fieldTypeIdentifier, String sqlAttribute, int operator, boolean plainBind) {
     setValueDefinition(new ValuePartDefinition(fieldTypeIdentifier, sqlAttribute, operator, plainBind));
   }
 
   /**
-   * see {@link #setValueDefinition(Class, String, int)}
+   * @deprecated use setBasicDefinition instead
    */
+  @Deprecated
   public void setValueDefinition(Class<?>[] fieldTypes, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldTypes, sqlAttribute, operator, false));
   }
 
   /**
-   * see {@link #setValueDefinition(Class, String, int)}
+   * @deprecated use setBasicDefinition instead
    */
+  @Deprecated
   public void setValueDefinition(ClassIdentifier[] fieldTypeIdentifiers, String sqlAttribute, int operator) {
     setValueDefinition(new ValuePartDefinition(fieldTypeIdentifiers, sqlAttribute, operator, false));
   }
 
   /**
-   * see {@link #setValueDefinition(Class, String, int)}
+   * @deprecated use setBasicDefinition instead
    */
+  @Deprecated
   public void setValueDefinition(ValuePartDefinition def) {
-    m_valueDefs.add(def);
+    m_basicDefs.add(def);
   }
 
   /**
@@ -352,47 +407,29 @@ public class FormDataStatementBuilder implements DataModelConstants {
   public String build(AbstractFormData formData) throws ProcessingException {
     m_where = new StringBuffer();
     // get all formData fields and properties defined directly and indirectly by extending template fields, respectively
-    Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap = formData.getAllFieldsRec();
-    Map<Integer, Map<String, AbstractPropertyData<?>>> propertiesBreathFirstMap = formData.getAllPropertiesRec();
     //build constraints for fields
-    for (ValuePartDefinition def : m_valueDefs) {
-      if (def.accept(formData, fieldsBreathFirstMap, propertiesBreathFirstMap)) {
-        ClassIdentifier[] valueTypes = def.getValueTypeClassIdentifiers();
-        List<Object> valueDatas = new ArrayList<Object>(valueTypes.length);
-        List<String> bindNames = new ArrayList<String>(valueTypes.length);
-        List<Object> bindValues = new ArrayList<Object>(valueTypes.length);
-        for (int i = 0; i < valueTypes.length; i++) {
-          if (AbstractFormFieldData.class.isAssignableFrom(valueTypes[i].getLastSegment())) {
-            AbstractFormFieldData field = formData.findFieldByClass(fieldsBreathFirstMap, valueTypes[i]);
-            valueDatas.add(field);
-            bindNames.add("" + (char) (((int) 'a') + i));
-            if (field instanceof AbstractValueFieldData<?>) {
-              bindValues.add(((AbstractValueFieldData<?>) field).getValue());
-            }
-            else {
-              bindValues.add(null);
-            }
-          }
-          else if (AbstractPropertyData.class.isAssignableFrom(valueTypes[i].getLastSegment())) {
-            AbstractPropertyData<?> property = formData.findPropertyByClass(propertiesBreathFirstMap, valueTypes[i]);
-            valueDatas.add(property);
-            bindNames.add("" + (char) (((int) 'a') + i));
-            bindValues.add(property.getValue());
+    for (BasicPartDefinition def : m_basicDefs) {
+      if (def.accept(formData)) {
+        Map<String, String> parentAliasMap = getAliasMapper().getRootAliases();
+        EntityContribution contrib = def.createInstance(this, formData, parentAliasMap);
+        // if there are no where parts, do nothing
+        if (contrib != null && contrib.getWhereParts().size() != 0) {
+          String wherePart = ListUtility.format(contrib.getWhereParts(), " AND ");
+          if (contrib.getFromParts().size() > 0) {
+            // there are from parts
+            // create an EXISTS (SELECT 1 FROM ... WHERE ...)
+            String fromPart = ListUtility.format(contrib.getFromParts(), ", ");
+            addWhere(" AND EXISTS (SELECT 1 FROM " + fromPart + " WHERE " + wherePart + ")");
           }
           else {
-            valueDatas.add(null);
-            bindNames.add("" + (char) (((int) 'a') + i));
-            bindValues.add(null);
+            // no from parts, just use the where parts
+            addWhere(" AND " + wherePart);
           }
-        }
-        Map<String, String> parentAliasMap = getAliasMapper().getRootAliases();
-        String s = def.createInstance(this, valueDatas, bindNames, bindValues, parentAliasMap);
-        if (s != null) {
-          addWhere(" AND " + s);
         }
       }
     }
     //build constraints for composer trees
+    Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap = formData.getAllFieldsRec();
     for (Map<String, AbstractFormFieldData> map : fieldsBreathFirstMap.values()) {
       for (AbstractFormFieldData f : map.values()) {
         if (f.isValueSet()) {
@@ -526,8 +563,16 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
   }
 
-  public List<ValuePartDefinition> getValuePartDefinitions() {
-    return Collections.unmodifiableList(m_valueDefs);
+  /**
+   * @deprecated use {@link #getBasicPartDefinitions()} instead
+   */
+  @Deprecated
+  public List<BasicPartDefinition> getValuePartDefinitions() {
+    return Collections.unmodifiableList(m_basicDefs);
+  }
+
+  public List<BasicPartDefinition> getBasicPartDefinitions() {
+    return Collections.unmodifiableList(m_basicDefs);
   }
 
   public Map<Class<?>, DataModelAttributePartDefinition> getDataModelAttributePartDefinitions() {
