@@ -224,7 +224,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * @return a transferable object representing the given rows
+   * this method should not be implemented if you support {@link AbstractTree#execDrag(ITreeNode[])} (drag of mulitple
+   * nodes), as it takes precedence
+   * 
+   * @return a transferable object representing the given row
    */
   @ConfigOperation
   @Order(20)
@@ -233,10 +236,22 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * process drop action
+   * Drag of multiple nodes. If this method is implemented, also single drags will be handled by Scout,
+   * the method {@link AbstractTree#execDrag(ITreeNode)} must not be implemented then.
+   * 
+   * @return a transferable object representing the given rows
    */
   @ConfigOperation
   @Order(30)
+  protected TransferObject execDrag(ITreeNode[] nodes) throws ProcessingException {
+    return null;
+  }
+
+  /**
+   * process drop action
+   */
+  @ConfigOperation
+  @Order(40)
   protected void execDrop(ITreeNode node, TransferObject t) throws ProcessingException {
   }
 
@@ -246,7 +261,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * Default delegates to {@link ITreeNode#decorateCell()}
    */
   @ConfigOperation
-  @Order(35)
+  @Order(50)
   protected void execDecorateCell(ITreeNode node, Cell cell) throws ProcessingException {
     if (cell.getIconId() == null && getIconId() != null) {
       cell.setIconId(getIconId());
@@ -255,19 +270,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @ConfigOperation
-  @Order(45)
+  @Order(60)
   protected void execNodesSelected(TreeEvent e) throws ProcessingException {
   }
 
   @ConfigOperation
-  @Order(50)
+  @Order(70)
   protected void execNodeClick(ITreeNode node) throws ProcessingException {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_CLICK, node);
     fireTreeEventInternal(e);
   }
 
   @ConfigOperation
-  @Order(52)
+  @Order(80)
   protected void execNodeAction(ITreeNode node) throws ProcessingException {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_ACTION, node);
     fireTreeEventInternal(e);
@@ -299,7 +314,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
             if (e.getDragObject() == null) {
               try {
-                e.setDragObject(execDrag(e.getNode()));
+                TransferObject transferObject = execDrag(e.getNode());
+                if (transferObject == null) {
+                  transferObject = execDrag(e.getNodes());
+                }
+                e.setDragObject(transferObject);
               }
               catch (Throwable t) {
                 LOG.error("Drag", t);

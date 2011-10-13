@@ -631,3 +631,13 @@ Bookmark Management Customization
 - IBookmarkForm: JavaDoc shoud be added.
 - Bookmark: Support for new Bookmark (unread Bookmarks) should be added
 Migration: None
+
+13.10.2011 abr [contributed by Adrian Moser, BSI Business Systems Integration AG]
+bugzilla ticket: 359418
+Bookmark Management Customization
+Enhancements/fixes for the bookmark field (client-side only):
+- allow dragging and transfer of multiple nodes
+- Possibility to use a row-level PublishUserBookmarkPermission
+- Deletion of bookmark folders improved
+- some more JavaDoc added.
+Migration: None

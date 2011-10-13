@@ -12,8 +12,11 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CompareUtility;
@@ -156,12 +159,34 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     return BookmarkForm.class;
   }
 
+  /**
+   * @param bookmarks
+   *          selected for deletion
+   * @return the row-level permission to delete bookmarks, default is {@link getDeletePermission()}
+   * @throws ProcessingException
+   */
   protected Permission getDeletePermission(ArrayList<Bookmark> bookmarks) throws ProcessingException {
     return getDeletePermission();
   }
 
+  /**
+   * @param bookmarks
+   *          selected for update
+   * @return the row-level permission to update bookmarks, default is {@link getUpdatePermission()}
+   * @throws ProcessingException
+   */
   protected Permission getUpdatePermission(ArrayList<Bookmark> bookmarks) throws ProcessingException {
     return getUpdatePermission();
+  }
+
+  /**
+   * @param bookmark
+   *          selected for publishing
+   * @return the row-level permission to publish this bookmark, default is {@link getPublishPermission()}
+   * @throws ProcessingException
+   */
+  protected Permission getPublishPermission(Bookmark bookmark) throws ProcessingException {
+    return getPublishPermission();
   }
 
   protected Permission getDeletePermission() {
@@ -170,6 +195,10 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   protected Permission getUpdatePermission() {
     return null;
+  }
+
+  protected Permission getPublishPermission() {
+    return new PublishUserBookmarkPermission();
   }
 
   public void populateTree() {
@@ -318,14 +347,9 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Override
-    protected TransferObject execDrag(ITreeNode node) {
+    protected TransferObject execDrag(ITreeNode[] nodes) {
       if (ACCESS.check(getUpdatePermission())) {
-        if (isBookmarkNode(node)) {
-          return new JavaTransferObject(node);
-        }
-        else if (isFolderNode(node)) {
-          return new JavaTransferObject(node);
-        }
+        return new JavaTransferObject(nodes);
       }
       return null;
     }
@@ -336,53 +360,76 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         try {
           getTree().setTreeChanging(true);
           //
-          if (((JavaTransferObject) t).getLocalObject() instanceof ITreeNode) {
-            ITreeNode dragNode = (ITreeNode) ((JavaTransferObject) t).getLocalObject();
-            if (dragNode != dropNode && dragNode.getTree() == getTree()) {
-              if (isFolderNode(dragNode)) {
-                if (isBookmarkNode(dropNode)) {
-                  dropNode = dropNode.getParentNode();
-                }
-              }
-              //
-              if (isBookmarkNode(dragNode) && isFolderNode(dropNode)) {
-                //append to folder
-                getTree().removeNode(dragNode);
-                getTree().addChildNode(dropNode, dragNode);
-                refreshBookmarkModel();
-              }
-              else if (isBookmarkNode(dragNode) && isBookmarkNode(dropNode)) {
-                //insert before dropNode
-                getTree().removeNode(dragNode);
-                int pos = dropNode.getChildNodeIndex();
-                getTree().addChildNode(pos, dropNode.getParentNode(), dragNode);
-              }
-              else if (isFolderNode(dragNode) && dropNode == null) {
-                //move to top
-                getTree().removeNode(dragNode);
-                getTree().addChildNode(getTree().getRootNode(), dragNode);
-              }
-              else if (isFolderNode(dragNode) && isFolderNode(dropNode)) {
-                //append to folder, NOTE: the drag node may be an ancestor of the drop node!
-                if (getTree().isAncestorNodeOf(dragNode, dropNode)) {
-                  ITreeNode dragParent = dragNode.getParentNode();
-                  if (dragParent != null) {
-                    int dragPos = dragNode.getChildNodeIndex();
-                    ITreeNode dropAncestor = dropNode;
-                    while (dropAncestor.getParentNode() != dragNode) {
-                      dropAncestor = dropAncestor.getParentNode();
-                    }
-                    getTree().removeNode(dropAncestor);
-                    getTree().removeNode(dragNode);
-                    getTree().addChildNode(dragPos, dragParent, dropAncestor);
-                    getTree().addChildNode(dropNode, dragNode);
+          if (((JavaTransferObject) t).getLocalObject() instanceof ITreeNode[]) {
+            boolean updateTree = false;
+            ITreeNode[] dragNodes = (ITreeNode[]) ((JavaTransferObject) t).getLocalObject();
+            HashSet<ITreeNode> draggedFolders = new HashSet<ITreeNode>();
+            for (ITreeNode source : dragNodes) {
+              if (source != dropNode && source.getTree() == getTree()) {
+                ITreeNode target = dropNode;
+                if (isFolderNode(source)) {
+                  if (isBookmarkNode(target)) {
+                    target = target.getParentNode();
                   }
                 }
-                else {
-                  getTree().removeNode(dragNode);
-                  getTree().addChildNode(dropNode, dragNode);
+                //
+                if (isBookmarkNode(source) && isFolderNode(target)) {
+                  //append to folder
+                  getTree().removeNode(source);
+                  getTree().addChildNode(target, source);
+                  updateTree = true;
+                }
+                else if (isBookmarkNode(source) && isBookmarkNode(target)) {
+                  //insert before dropNode
+                  getTree().removeNode(source);
+                  int pos = target.getChildNodeIndex();
+                  getTree().addChildNode(pos, target.getParentNode(), source);
+                }
+                else if (isFolderNode(source) && target == null) {
+                  //move to top
+                  getTree().removeNode(source);
+                  getTree().addChildNode(getTree().getRootNode(), source);
+                }
+                else if (isFolderNode(source) && isFolderNode(target)) {
+                  boolean parentWasDragged = false;
+                  for (ITreeNode parent : draggedFolders) {
+                    if (getTree().isAncestorNodeOf(parent, source)) {
+                      parentWasDragged = true;
+                      draggedFolders.add(source);
+                    }
+                  }
+
+                  if (!parentWasDragged) {
+                    //append to folder, NOTE: the drag node may be an ancestor of the drop node!
+                    if (getTree().isAncestorNodeOf(source, target)) {
+                      ITreeNode sourceParent = source.getParentNode();
+                      if (sourceParent != null) {
+                        int dragPos = source.getChildNodeIndex();
+                        ITreeNode targetAncestor = target;
+                        ITreeNode targetAncestorWalkThrough = target;
+                        while (targetAncestorWalkThrough.getParentNode() != source) {
+                          if (!Arrays.asList(dragNodes).contains(targetAncestor.getParentNode())) {
+                            targetAncestor = targetAncestorWalkThrough.getParentNode();
+                          }
+                          targetAncestorWalkThrough = targetAncestorWalkThrough.getParentNode();
+                        }
+
+                        getTree().removeNode(targetAncestor);
+                        getTree().removeNode(source);
+                        getTree().addChildNode(dragPos, sourceParent, targetAncestor);
+                        getTree().addChildNode(target, source);
+                      }
+                    }
+                    else {
+                      getTree().removeNode(source);
+                      getTree().addChildNode(target, source);
+                    }
+                  }
                 }
               }
+            }
+            if (updateTree) {
+              refreshBookmarkModel();
             }
           }
         }
@@ -572,26 +619,67 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       protected void execPrepareAction() {
         setEnabled(!isProtected());
         setVisiblePermission(getDeletePermission());
+        setText(getConfiguredText());
+        for (ITreeNode node : getTree().getSelectedNodes()) {
+          if (!(node instanceof FolderNode)) {
+            setText(ScoutTexts.get("DeleteMenu"));
+          }
+        }
       }
 
       @Override
       protected void execAction() throws ProcessingException {
         ITree tree = getTree();
-        ArrayList<String> items = new ArrayList<String>();
-        ArrayList<ITreeNode> filteredNodes = new ArrayList<ITreeNode>();
+        Set<ITreeNode> folders = new HashSet<ITreeNode>();
+        Set<ITreeNode> bookmarks = new HashSet<ITreeNode>();
         for (ITreeNode node : tree.getSelectedNodes()) {
-          if (isFolderNode(node)) {
-            items.add(node.getCell().getText());
-            filteredNodes.add(node);
+          addNodeFoldersToSet(folders, node);
+          addNodeBookmarksToSet(bookmarks, node);
+        }
+        ArrayList<String> names = new ArrayList<String>();
+        for (ITreeNode folder : folders) {
+          names.add(((BookmarkFolder) folder.getCell().getValue()).getTitle());
+        }
+        for (ITreeNode bookmark : bookmarks) {
+          ArrayList<Bookmark> check = new ArrayList<Bookmark>();
+          check.add(((Bookmark) bookmark.getCell().getValue()));
+          if (ACCESS.check(getDeletePermission(check))) {
+            names.add(((Bookmark) bookmark.getCell().getValue()).getTitle());
           }
         }
-        if (items.size() <= 1 || MessageBox.showDeleteConfirmationMessage(items.toArray(new String[0]))) {
-          for (ITreeNode node : filteredNodes) {
-            tree.removeNode(node);
+        if (MessageBox.showDeleteConfirmationMessage(names.toArray(new String[names.size()]))) {
+          // delete bookmarks
+          for (ITreeNode bookmark : bookmarks) {
+            getTree().removeNode(bookmark);
           }
-          rebuildBookmarkModel();
+          // delete folders
+          for (ITreeNode bookmark : folders) {
+            getTree().removeNode(bookmark);
+          }
+          refreshBookmarkModel();
         }
       }
+
+      private void addNodeBookmarksToSet(Set<ITreeNode> items, ITreeNode node) {
+        if (isFolderNode(node)) {
+          for (ITreeNode child : node.getChildNodes()) {
+            addNodeBookmarksToSet(items, child);
+          }
+        }
+        else if (isBookmarkNode(node)) {
+          items.add(node);
+        }
+      }
+
+      private void addNodeFoldersToSet(Set<ITreeNode> items, ITreeNode node) {
+        if (isFolderNode(node)) {
+          items.add(node);
+          for (ITreeNode child : node.getChildNodes()) {
+            addNodeFoldersToSet(items, child);
+          }
+        }
+      }
+
     }
 
     private boolean isProtected() {
@@ -791,7 +879,12 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
       @Override
       protected void execPrepareAction() throws ProcessingException {
-        setVisiblePermission(new PublishUserBookmarkPermission());
+        Bookmark bookmark = null;
+        ITreeNode selectedNode = getTree().getSelectedNode();
+        if (isBookmarkNode(selectedNode)) {
+          bookmark = (Bookmark) selectedNode.getCell().getValue();
+        }
+        setVisiblePermission(getPublishPermission(bookmark));
       }
 
       @Override
