@@ -48,3 +48,8 @@ Internal security audit
 - enhanced access control on gui remote service calls: see enahncements on IAccessControlService.checkServiceTunnelAccess
 - adding logout service and calling it from IClientSession.stop();
 Migration: None
+
+14.10.2011 abr [contributed by Adrian Moser, BSI Business Systems Integration AG]
+bugzilla ticket: 360946
+Bookmarks do not save column visibility
+Migration: None
