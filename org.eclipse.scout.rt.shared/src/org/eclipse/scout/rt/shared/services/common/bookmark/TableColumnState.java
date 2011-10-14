@@ -30,6 +30,8 @@ public class TableColumnState implements Serializable, Cloneable {
     this.m_width = state.m_width;
     this.m_sortOrder = state.m_sortOrder;
     this.m_sortAscending = state.m_sortAscending;
+    this.m_displayable = state.m_displayable;
+    this.m_visible = state.m_visible;
   }
 
   public String getClassName() {
