@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
@@ -466,6 +467,10 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         for (IColumn col : table.getColumns()) {
           if (col.isCellEditable(row)) {
             try {
+              if (col instanceof IBooleanColumn) { // TODO dwi / imo: exclusion of boolean column is just a temporary workaround to not automatically toggle its value
+                continue;
+              }
+
               IFormField editor = col.prepareEdit(row);
               if (editor != null) {
                 boolean editorValid = editor.isContentValid();
