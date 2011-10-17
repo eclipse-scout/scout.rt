@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.transaction.BasicTransaction;
+import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
@@ -114,30 +115,20 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
   }
 
   /**
-   * This method is only allowed to be invoked if not being in a server job yet. All subsequent calls within
-   * {@link ServerJob#runTransaction(IProgressMonitor))} have the {@link IServerSession} set in their thread context.
-   * After execution completes, {@link IServerSession} is cleared from the thread context.
-   * This call is typically made only once per server request, e.g. in {@link ServiceTunnelServlet} or
-   * {@link ServerJobServletFilter}.
+   * <p>
+   * All subsequent calls within {@link ServerJob#runTransaction(IProgressMonitor))} have the {@link IServerSession} set
+   * in their thread context. After execution completes, {@link IServerSession} is cleared from the thread context.
+   * </p>
+   * <p>
+   * By calling this method, a new transaction on {@link IServerSession} is created and automatically comitted after
+   * successful completion.
+   * </p>
    * 
    * @param monitor
    */
   @Override
   public final IStatus runNow(IProgressMonitor monitor) {
-    Job job = getJobManager().currentJob();
-    if (job != null && job instanceof ServerJob) {
-      throw new IllegalStateException("Nested server jobs are not allowed within the same thread.");
-    }
-
-    IStatus status = null;
-    try {
-      ThreadContext.put(getServerSession());
-      status = super.runNow(monitor);
-    }
-    finally {
-      ThreadContext.clear(getServerSession());
-    }
-    return status;
+    return super.runNow(monitor);
   }
 
   @Override
@@ -145,7 +136,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     try {
       if (m_subject != null) {
         try {
-          return (IStatus) Subject.doAs(
+          return Subject.doAs(
               m_subject,
               new PrivilegedExceptionAction<IStatus>() {
                 @Override
@@ -180,7 +171,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
   }
 
   private IStatus runTransactionWrapper(IProgressMonitor monitor) throws Exception {
-    BasicTransaction transaction = new BasicTransaction();
+    ITransaction transaction = createNewTransaction();
     Map<Class, Object> backup = ThreadContext.backup();
     Locale oldLocale = LocaleThreadLocal.get();
     NlsLocale oldNlsLocale = NlsLocale.getDefault();
@@ -285,6 +276,10 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
       }
     }
     return "anonymous";
+  }
+
+  protected ITransaction createNewTransaction() {
+    return new BasicTransaction();
   }
 
 }
