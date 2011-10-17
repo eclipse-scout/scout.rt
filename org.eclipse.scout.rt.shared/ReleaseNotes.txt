@@ -53,3 +53,39 @@ Migration: None
 bugzilla ticket: 360946
 Bookmarks do not save column visibility
 Migration: None
+
+17.10.2011 imo Iteration 2 of scout validation framwework
+In order to modularize the validation package, the following classes have moved:
+org.eclipse.scout.rt.shared.data.IValidator -> org.eclipse.scout.rt.shared.validate.IValidator
+org.eclipse.scout.rt.shared.data.DefaultValidator -> org.eclipse.scout.rt.shared.validate.DefaultValidator
+org.eclipse.scout.rt.shared.util.ValidationUtility -> org.eclipse.scout.rt.shared.validate.ValidationUtility
+org.eclipse.scout.rt.shared.data.form.InputValidation -> org.eclipse.scout.rt.shared.validate.InputValidation
+org.eclipse.scout.rt.shared.data.form.OutputValidation -> org.eclipse.scout.rt.shared.validate.OutputValidation
+org.eclipse.scout.rt.shared.data.form.ValidationRule -> org.eclipse.scout.rt.shared.validate.ValidationRule
+org.eclipse.scout.rt.shared.data.form.ValidationStrategy -> org.eclipse.scout.rt.shared.validate.IValidationStrategy
+And the following code needs to be replaced:
+IValidationStrategy.NO_CHECK -> IValidationStrategy.NO_CHECK.class
+IValidationStrategy.QUERY -> IValidationStrategy.QUERY.class
+IValidationStrategy.PROCESS -> IValidationStrategy.PROCESS.class
+The validation now covers form data field validation using ValidationRule as well as method parameter and bean field validation using
+annotations in org.eclipse.scout.rt.shared.validate.annotations.
+These include:
+@CodeValue
+@LookupValue
+@Mandatory
+@MaxLength
+@MaxValue
+@MinLength
+@MinValue
+@RegexMatch
+@Treat0AsNull
+@FieldReference (meta)
+@ValidateAnnotationMarker (meta)
+
+The (default) input validation on server side is activated using the config.ini property
+org.eclipse.scout.rt.server.validateInput=true
+The main classes doing validation are (in call order):
+- ServiceTunnelServlet
+- DefaultTransactionDelegate
+- DefaultValidator
+- IValidateCheck (and subtypes)

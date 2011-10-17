@@ -14,13 +14,13 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.data.form.InputValidation;
-import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
+import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.service.IService;
 
 @Priority(-3)
-@InputValidation(ValidationStrategy.PROCESS)
+@InputValidation(IValidationStrategy.PROCESS.class)
 public interface IBookmarkStorageService extends IService {
 
   /**
@@ -50,7 +50,7 @@ public interface IBookmarkStorageService extends IService {
    *          department=dev
    *          It is up to the implementation to define and handle the target group parameter
    */
-  @InputValidation(ValidationStrategy.NO_CHECK)
+  @InputValidation(IValidationStrategy.NO_CHECK.class)
   void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup) throws ProcessingException;
 
 }

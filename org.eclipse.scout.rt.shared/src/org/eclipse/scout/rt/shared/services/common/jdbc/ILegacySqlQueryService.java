@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.shared.services.common.jdbc;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.data.form.InputValidation;
-import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
+import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -21,7 +21,7 @@ import org.eclipse.scout.service.IService;
  * deprecation marker is set in next release
  */
 @Priority(-3)
-@InputValidation(ValidationStrategy.PROCESS)
+@InputValidation(IValidationStrategy.PROCESS.class)
 public interface ILegacySqlQueryService extends IService {
 
   String createPlainText(String s, Object... bindBases) throws ProcessingException;

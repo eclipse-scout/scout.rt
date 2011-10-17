@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.shared.services.common.offline;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.shared.data.form.InputValidation;
-import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
+import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -26,7 +26,7 @@ import org.eclipse.scout.service.IService;
  * org.eclipse.scout.services extension.
  */
 @Priority(-3)
-@InputValidation(ValidationStrategy.PROCESS)
+@InputValidation(IValidationStrategy.PROCESS.class)
 public interface IOfflineDispatcherService extends IService {
 
   String getServerSessionClass();

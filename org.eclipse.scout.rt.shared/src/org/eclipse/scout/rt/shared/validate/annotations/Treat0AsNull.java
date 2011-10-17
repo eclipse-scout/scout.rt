@@ -8,18 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.services.common.exceptionhandler;
+package org.eclipse.scout.rt.shared.validate.annotations;
 
-import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
-import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
-import org.eclipse.scout.service.IService;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Priority(-3)
-@InputValidation(IValidationStrategy.PROCESS.class)
-public interface IExceptionHandlerService extends IService {
-
-  void handleException(ProcessingException t);
-
+/**
+ * The value - if numeric 0 - should be treated as null for validation
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@ValidateAnnotationMarker
+public @interface Treat0AsNull {
+  boolean value() default true;
 }

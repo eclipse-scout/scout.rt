@@ -20,7 +20,9 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.util.ValidationUtility;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
+import org.eclipse.scout.rt.shared.validate.OutputValidation;
+import org.eclipse.scout.rt.shared.validate.ValidationUtility;
 
 /**
  * Method annotation on a client form field used in scout sdk in order to generate the validation rule map on the

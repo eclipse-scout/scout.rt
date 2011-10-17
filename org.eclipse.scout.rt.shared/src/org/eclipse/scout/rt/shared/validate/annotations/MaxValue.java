@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.data.form;
+package org.eclipse.scout.rt.shared.validate.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,18 +16,22 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use any of the {@link ValidationStrategy} values or a custom value
+ * maximum value
  * <p>
- * Method annotation on server service methods. This annotation is read by the DefaultOutputValidator in the
- * DefaultTransactionDelegate to perform central output validation.
+ * In order to annotate a field where you have no access (super class) you may consider using {@link FieldReference} on
+ * a placeholder field.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
-public @interface OutputValidation {
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@ValidateAnnotationMarker
+public @interface MaxValue {
+
+  double value();
 
   /**
-   * Any of the {@link ValidationStrategy} values or a custom value
+   * subtree=false is the default, the check is applied to the parameter or field only.
+   * <p>
+   * subtree=true causes the check to be applied to all objects in the subtree of this objects (deep structure) as well.
    */
-  int value();
-
+  boolean subtree() default false;
 }

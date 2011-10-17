@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.shared.services.common.workflow;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.data.form.InputValidation;
-import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
+import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -27,7 +27,7 @@ import org.eclipse.scout.service.IService;
  * This interface is not intended to be implemented by third party
  */
 @Priority(-3)
-@InputValidation(ValidationStrategy.PROCESS)
+@InputValidation(IValidationStrategy.PROCESS.class)
 public interface IWorkflowProviderService extends IService {
 
   /**
@@ -35,7 +35,7 @@ public interface IWorkflowProviderService extends IService {
    *          Standard sql searchFilter
    * @return specs for all available workflow types that can be used in {@link #create(T)} and {@link #resume(Long)}
    */
-  @InputValidation(ValidationStrategy.QUERY)
+  @InputValidation(IValidationStrategy.QUERY.class)
   AbstractWorkflowData[] getAvailableWorkflowTypes(SearchFilter filter) throws ProcessingException;
 
   /**
@@ -43,7 +43,7 @@ public interface IWorkflowProviderService extends IService {
    *          Standard sql searchFilter
    * @return filtered workflows accessible in the current user session
    */
-  @InputValidation(ValidationStrategy.QUERY)
+  @InputValidation(IValidationStrategy.QUERY.class)
   AbstractWorkflowData[] getFilteredWorkflows(SearchFilter filter) throws ProcessingException;
 
   /**

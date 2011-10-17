@@ -14,8 +14,8 @@ import java.util.Date;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.data.form.InputValidation;
-import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
+import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -29,7 +29,7 @@ import org.eclipse.scout.service.IService;
  * In order to use, register it in the extension "org.eclipse.scout.rt.client.serviceProxy"
  */
 @Priority(-3)
-@InputValidation(ValidationStrategy.PROCESS)
+@InputValidation(IValidationStrategy.PROCESS.class)
 public interface IPasswordManagementService extends IService {
 
   /**

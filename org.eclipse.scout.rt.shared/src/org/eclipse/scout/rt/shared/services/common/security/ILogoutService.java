@@ -11,15 +11,15 @@
 package org.eclipse.scout.rt.shared.services.common.security;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.shared.data.form.InputValidation;
-import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
+import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.service.IService;
 
 /**
  * Support service to explicitly close a session and release cached sessions, resources, and credentials
  */
 @Priority(-3)
-@InputValidation(ValidationStrategy.PROCESS)
+@InputValidation(IValidationStrategy.PROCESS.class)
 public interface ILogoutService extends IService {
 
   /**

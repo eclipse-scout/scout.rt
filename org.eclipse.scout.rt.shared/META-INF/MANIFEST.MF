@@ -9,7 +9,6 @@ Require-Bundle: org.eclipse.scout.service;visibility:=reexport,
  org.eclipse.scout.commons;visibility:=reexport,
  org.eclipse.core.runtime
 Export-Package: org.eclipse.scout.rt.shared,
- org.eclipse.scout.rt.shared.data,
  org.eclipse.scout.rt.shared.data.basic,
  org.eclipse.scout.rt.shared.data.basic.table,
  org.eclipse.scout.rt.shared.data.form,
@@ -39,7 +38,9 @@ Export-Package: org.eclipse.scout.rt.shared,
  org.eclipse.scout.rt.shared.services.common.workflow,
  org.eclipse.scout.rt.shared.services.lookup,
  org.eclipse.scout.rt.shared.servicetunnel,
- org.eclipse.scout.rt.shared.util
+ org.eclipse.scout.rt.shared.validate,
+ org.eclipse.scout.rt.shared.validate.annotations,
+ org.eclipse.scout.rt.shared.validate.checks
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

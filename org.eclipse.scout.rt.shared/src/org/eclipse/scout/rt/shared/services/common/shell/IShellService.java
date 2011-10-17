@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.shared.services.common.shell;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.data.form.InputValidation;
-import org.eclipse.scout.rt.shared.data.form.ValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
+import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -21,7 +21,7 @@ import org.eclipse.scout.service.IService;
  * {@link org.eclipse.scout.rt.client.services.common.shell.DefaultShellService}
  */
 @Priority(-3)
-@InputValidation(ValidationStrategy.PROCESS)
+@InputValidation(IValidationStrategy.PROCESS.class)
 public interface IShellService extends IService {
 
   /**
