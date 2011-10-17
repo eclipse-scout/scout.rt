@@ -154,7 +154,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   }
 
   protected TreeSelectionModel getSwingTreeSelectionModel() {
-    return (TreeSelectionModel) getSwingTree().getSelectionModel();
+    return getSwingTree().getSelectionModel();
   }
 
   @Override
@@ -672,7 +672,6 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     //
     if (getScoutObject() != null) {
       TreePath path = getSwingTree().getPathForLocation(e.getX(), e.getY());
-      // XXX imo
       final ITreeNode node = path != null ? (ITreeNode) path.getLastPathComponent() : null;
       // notify Scout
       Runnable t = new Runnable() {
