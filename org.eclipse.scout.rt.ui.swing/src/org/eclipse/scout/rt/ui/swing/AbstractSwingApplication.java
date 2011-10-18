@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
-import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.ui.swing.splash.SplashProgressMonitor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;

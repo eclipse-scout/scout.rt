@@ -36,7 +36,7 @@ import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
-import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.shared.services.common.test.BasicTestContext;
 import org.eclipse.scout.rt.shared.services.common.test.ITest;
 import org.eclipse.scout.rt.shared.services.common.test.TestStatus;

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.services.common.security;
+package org.eclipse.scout.commons.security;
 
 import java.io.Serializable;
 import java.security.Principal;

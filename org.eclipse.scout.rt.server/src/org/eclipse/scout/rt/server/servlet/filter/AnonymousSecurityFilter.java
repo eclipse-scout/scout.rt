@@ -10,24 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.servlet.filter;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
-
 /**
- * a security filter allowing anonymous access to the application.
+ * @see {@link org.eclipse.scout.http.servletfilter.security.AnonymousSecurityFilter}
+ * @deprecated use {@link org.eclipse.scout.http.servletfilter.security.AnonymousSecurityFilter} instead.
  */
-public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
-  public static final String ANONYMOUS_USER_NAME = "anonymous";
-
-  @Override
-  protected int negotiate(HttpServletRequest req, HttpServletResponse resp, PrincipalHolder holder) throws IOException, ServletException {
-    holder.setPrincipal(new SimplePrincipal(ANONYMOUS_USER_NAME));
-    return STATUS_CONTINUE_WITH_PRINCIPAL;
-  }
+@Deprecated
+public class AnonymousSecurityFilter extends org.eclipse.scout.http.servletfilter.security.AnonymousSecurityFilter {
 
 }

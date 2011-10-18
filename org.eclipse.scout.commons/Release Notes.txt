@@ -173,3 +173,22 @@ Plug-Ins changed:
 - org.eclipse.scout.commons [MailUtility.class]
 Migration:
 None
+
+18.10.2011 aho
+bugzilla ticket: 361256
+To make reuse of the ServletFilters in RAP projects. The following classes
+should be moved to the 'org.eclipse.scout.http.servletfilter' bundle:
+- org.eclipse.scout.rt.server.servlet.filter.AbstractChainableSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.AnonymousSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.BasicSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.DataSourceSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.LDAPSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.TomcatSecurityFilter
+
+All servlet filters in the 'org.eclipse.scout.rt.server' bundle were kept as @deprecated subclasses of the moved ones.
+
+Furthermore the
+'org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal' should
+be moved to the 'org.eclipse.scout.commons' bundle.
+
+Migration: change all 'org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal' imports to 'org.eclipse.scout.commons.security.SimplePrincipal'.
