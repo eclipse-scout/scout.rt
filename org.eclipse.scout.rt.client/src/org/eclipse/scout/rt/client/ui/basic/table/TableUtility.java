@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ITimeColumn;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
@@ -242,11 +241,6 @@ public final class TableUtility {
         type = String.class;
         byValue = false;
         format = null;
-      }
-      else if (col instanceof ITimeColumn) {
-        type = Date.class;
-        byValue = true;
-        format = ((ITimeColumn) col).getFormat();
       }
       else if (col instanceof IBooleanColumn) {
         type = Boolean.class;

@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 
 /**
- * Column holding Strings
+ * Column holding Date
  */
 public abstract class AbstractDateColumn extends AbstractColumn<Date> implements IDateColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
