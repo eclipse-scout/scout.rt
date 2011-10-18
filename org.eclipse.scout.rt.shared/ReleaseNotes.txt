@@ -61,7 +61,6 @@ org.eclipse.scout.rt.shared.data.DefaultValidator -> org.eclipse.scout.rt.shared
 org.eclipse.scout.rt.shared.util.ValidationUtility -> org.eclipse.scout.rt.shared.validate.ValidationUtility
 org.eclipse.scout.rt.shared.data.form.InputValidation -> org.eclipse.scout.rt.shared.validate.InputValidation
 org.eclipse.scout.rt.shared.data.form.OutputValidation -> org.eclipse.scout.rt.shared.validate.OutputValidation
-org.eclipse.scout.rt.shared.data.form.ValidationRule -> org.eclipse.scout.rt.shared.validate.ValidationRule
 org.eclipse.scout.rt.shared.data.form.ValidationStrategy -> org.eclipse.scout.rt.shared.validate.IValidationStrategy
 And the following code needs to be replaced:
 IValidationStrategy.NO_CHECK -> IValidationStrategy.NO_CHECK.class
@@ -89,7 +88,6 @@ The main classes doing validation are (in call order):
 - DefaultTransactionDelegate
 - DefaultValidator
 - IValidateCheck (and subtypes)
-
 
 18.10.2011 aho
 bugzilla ticket: 361256
