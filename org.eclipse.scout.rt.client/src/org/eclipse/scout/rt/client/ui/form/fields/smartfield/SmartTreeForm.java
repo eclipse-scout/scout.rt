@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -76,51 +77,68 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     });
   }
 
-  public void update(boolean selectCurrentValue, boolean synchonous) throws ProcessingException {
-    ITree tree = getResultTreeField().getTree();
-    try {
-      tree.setTreeChanging(true);
-      //
-      m_matchingNodesFilter.update(getSearchText());
-      tree.addNodeFilter(m_matchingNodesFilter);
+  /**
+   * @return the pattern used to filter tree nodes based on the text typed into the smartfield
+   */
+  @ConfigOperation
+  @Order(100)
+  protected Pattern execCreatePatternForTreeFilter(String filterText) {
+    // check pattern
+    String s = filterText;
+    if (s == null) s = "";
+    s = s.toLowerCase();
+    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
+      s = "*" + s;
     }
-    finally {
-      tree.setTreeChanging(false);
+    if (!s.endsWith("*")) {
+      s = s + "*";
     }
-    String statusText = null;
-    getStatusField().setValue(statusText);
-    getStatusField().setVisible(statusText != null);
-    if (getNewButton().isEnabled()) {
-      getNewButton().setVisible(getSingleMatch() == null);
-    }
-    if (selectCurrentValue) {
-      if (tree.getSelectedNodeCount() == 0) {
-        selectCurrentValueInternal();
-      }
-    }
-    structureChanged(getResultTreeField());
+    s = StringUtility.toRegExPattern(s);
+    return Pattern.compile(s, Pattern.DOTALL);
   }
 
-  private void updateActiveFilter() {
-    ITree tree = getResultTreeField().getTree();
-    try {
-      tree.setTreeChanging(true);
-      //
-      if (getSmartField().isActiveFilterEnabled()) {
-        m_activeNodesFilter.update(getSmartField().getActiveFilter());
+  /**
+   * @return true if the node is accepted by the tree filter pattern defined in
+   *         {@link #execCreatePatternForTreeFilter(String)}
+   */
+  @ConfigOperation
+  @Order(110)
+  protected boolean execAcceptNodeByTreeFilter(Pattern filterPattern, ITreeNode node, int level) {
+    @SuppressWarnings("unchecked")
+    ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
+    LookupRow row = (LookupRow) node.getCell().getValue();
+    if (node.isChildrenLoaded()) {
+      if (row != null) {
+        String q1 = node.getTree().getPathText(node, "\n");
+        String q2 = node.getTree().getPathText(node, " ");
+        if (q1 != null && q2 != null) {
+          String[] path = (q1 + "\n" + q2).split("\n");
+          for (String pathText : path) {
+            if (pathText != null && filterPattern.matcher(pathText.toLowerCase()).matches()) {
+              // use "level-1" because a tree smart field assumes its tree to
+              // have multiple roots, but the ITree model is built as
+              // single-root tree with invisible root node
+              if (sf.acceptBrowseHierarchySelection(row.getKey(), level - 1, node.isLeaf())) {
+                return true;
+              }
+            }
+          }
+        }
+        return false;
       }
-      else {
-        m_activeNodesFilter.update(TriState.TRUE);
-      }
-      tree.addNodeFilter(m_activeNodesFilter);
     }
-    finally {
-      tree.setTreeChanging(false);
-    }
-    structureChanged(getResultTreeField());
+    return true;
   }
 
-  private LookupRow getSingleMatch() {
+  /**
+   * Override this method to change that behaviour of what is a single match.
+   * <p>
+   * By default a single match is when there is a single enabled LEAF node in the tree
+   */
+  @ConfigOperation
+  @Order(120)
+  protected LookupRow execGetSingleMatch() {
     // when load incremental is set, dont visit the tree but use text-to-key
     // lookup method on smartfield.
     if (getSmartField().isBrowseLoadIncremental()) {
@@ -161,6 +179,50 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     }
   }
 
+  public void update(boolean selectCurrentValue, boolean synchonous) throws ProcessingException {
+    ITree tree = getResultTreeField().getTree();
+    try {
+      tree.setTreeChanging(true);
+      //
+      m_matchingNodesFilter.update(getSearchText());
+      tree.addNodeFilter(m_matchingNodesFilter);
+    }
+    finally {
+      tree.setTreeChanging(false);
+    }
+    String statusText = null;
+    getStatusField().setValue(statusText);
+    getStatusField().setVisible(statusText != null);
+    if (getNewButton().isEnabled()) {
+      getNewButton().setVisible(execGetSingleMatch() == null);
+    }
+    if (selectCurrentValue) {
+      if (tree.getSelectedNodeCount() == 0) {
+        selectCurrentValueInternal();
+      }
+    }
+    structureChanged(getResultTreeField());
+  }
+
+  private void updateActiveFilter() {
+    ITree tree = getResultTreeField().getTree();
+    try {
+      tree.setTreeChanging(true);
+      //
+      if (getSmartField().isActiveFilterEnabled()) {
+        m_activeNodesFilter.update(getSmartField().getActiveFilter());
+      }
+      else {
+        m_activeNodesFilter.update(TriState.TRUE);
+      }
+      tree.addNodeFilter(m_activeNodesFilter);
+    }
+    finally {
+      tree.setTreeChanging(false);
+    }
+    structureChanged(getResultTreeField());
+  }
+
   public LookupRow getAcceptedProposal() throws ProcessingException {
     LookupRow row = null;
     ITreeNode node = getResultTreeField().getTree().getSelectedNode();
@@ -174,7 +236,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       return null;
     }
     else {
-      return getSingleMatch();
+      return execGetSingleMatch();
     }
   }
 
@@ -578,46 +640,12 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     }
 
     public void update(String text) {
-      // check pattern
-      String s = text;
-      if (s == null) s = "";
-      s = s.toLowerCase();
-      IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-      if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
-        s = "*" + s;
-      }
-      if (!s.endsWith("*")) {
-        s = s + "*";
-      }
-      s = StringUtility.toRegExPattern(s);
-      m_searchPattern = Pattern.compile(s, Pattern.DOTALL);
+      m_searchPattern = execCreatePatternForTreeFilter(text);
     }
 
     @SuppressWarnings("unchecked")
     public boolean accept(ITreeNode node, int level) {
-      ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
-      LookupRow row = (LookupRow) node.getCell().getValue();
-      if (node.isChildrenLoaded()) {
-        if (row != null) {
-          String q1 = node.getTree().getPathText(node, "\n");
-          String q2 = node.getTree().getPathText(node, " ");
-          if (q1 != null && q2 != null) {
-            String[] path = (q1 + "\n" + q2).split("\n");
-            for (String pathText : path) {
-              if (pathText != null && m_searchPattern.matcher(pathText.toLowerCase()).matches()) {
-                // use "level-1" because a tree smart field assumes its tree to
-                // have multiple roots, but the ITree model is built as
-                // single-root tree with invisible root node
-                if (sf.acceptBrowseHierarchySelection(row.getKey(), level - 1, node.isLeaf())) {
-                  return true;
-                }
-              }
-            }
-          }
-          return false;
-        }
-      }
-      return true;
+      return execAcceptNodeByTreeFilter(m_searchPattern, node, level);
     }
   }
 
