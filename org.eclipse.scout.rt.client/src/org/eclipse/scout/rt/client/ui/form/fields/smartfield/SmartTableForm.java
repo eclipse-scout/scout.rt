@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
@@ -175,7 +176,14 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     }
   }
 
-  private LookupRow getSingleMatch() {
+  /**
+   * Override this method to change that behaviour of what is a single match.
+   * <p>
+   * By default a single match is when there is only one enabled row in the drop down table
+   */
+  @ConfigOperation
+  @Order(120)
+  protected LookupRow execGetSingleMatch() {
     int matchCount = 0;
     LookupRow foundRow = null;
     for (LookupRow row : getResultTableField().getTable().getKeyColumn().getValues()) {
@@ -202,7 +210,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
       return null;
     }
     else {
-      return getSingleMatch();
+      return execGetSingleMatch();
     }
   }
 
