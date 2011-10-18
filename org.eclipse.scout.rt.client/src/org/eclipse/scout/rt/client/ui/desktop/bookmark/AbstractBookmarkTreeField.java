@@ -694,7 +694,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
   }
 
-  private class BookmarkNode extends AbstractTreeNode {
+  private class BookmarkNode extends AbstractTreeNode implements IBookmarkNode {
     @Override
     protected boolean getConfiguredLeaf() {
       return true;
@@ -935,6 +935,18 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           MessageBox.showOkMessage(null, null, ScoutTexts.get("ApplyBookmarkToSearchFailedMessage"));
         }
       }
+    }
+
+    @Override
+    public Bookmark getBookmark() {
+      ITreeNode node = BookmarkNode.this;
+      return (Bookmark) node.getCell().getValue();
+    }
+
+    @Override
+    public BookmarkFolder getParentFolder() {
+      ITreeNode node = BookmarkNode.this;
+      return (BookmarkFolder) node.getParentNode().getCell().getValue();
     }
 
   }

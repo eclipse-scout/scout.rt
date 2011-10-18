@@ -641,3 +641,9 @@ Enhancements/fixes for the bookmark field (client-side only):
 - Deletion of bookmark folders improved
 - some more JavaDoc added.
 Migration: None
+
+18.10.2011 abr [contributed by Adrian Moser, BSI Business Systems Integration AG]
+bugzilla ticket: 361233
+Allow implementations to handle AbstractBookmarkTreeField's DnD drop requests
+Added IBookmarkNode interface that allows the receiver to read bookmark data.
+Migration: None
