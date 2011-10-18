@@ -138,6 +138,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
    * Override this method to change that behaviour of what is a single match.
    * <p>
    * By default a single match is when there is a single enabled LEAF node in the tree
+   * <p>
    */
   @ConfigOperation
   @Order(120)

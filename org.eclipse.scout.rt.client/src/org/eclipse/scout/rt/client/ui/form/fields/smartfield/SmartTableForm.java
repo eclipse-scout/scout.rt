@@ -180,6 +180,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
    * Override this method to change that behaviour of what is a single match.
    * <p>
    * By default a single match is when there is only one enabled row in the drop down table
+   * <p>
    */
   @ConfigOperation
   @Order(120)
