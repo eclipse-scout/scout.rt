@@ -93,20 +93,20 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
     String useJndiConnectionString = config.getInitParameter("useJndiConnection");
     m_useJndiConnection = Boolean.parseBoolean(useJndiConnectionString);
 
-    m_jdbcDriverName = getInitParam(config, "jdbcDriverName");
-    m_jdbcMappingName = getInitParam(config, "jdbcMappingName");
-    m_jdbcUserName = getInitParam(config, "jdbcUsername");
-    m_jdbcPassword = getInitParam(config, "jdbcPassword");
-    m_selectStatement = getInitParam(config, "selectUserPass");
-    m_jndiName = getInitParam(config, "jndiName");
+    m_jdbcDriverName = getInitParam(config, "jdbcDriverName", !m_useJndiConnection);
+    m_jdbcMappingName = getInitParam(config, "jdbcMappingName", !m_useJndiConnection);
+    m_jdbcUserName = getInitParam(config, "jdbcUsername", false);
+    m_jdbcPassword = getInitParam(config, "jdbcPassword", false);
+    m_selectStatement = getInitParam(config, "selectUserPass", !m_useJndiConnection);
+    m_jndiName = getInitParam(config, "jndiName", m_useJndiConnection);
     m_jndiInitialContextFactory = config.getInitParameter("jndiInitialContextFactory");
     m_jndiProviderUrl = config.getInitParameter("jndiProviderUrl");
     m_jndiUrlPkgPrefixes = config.getInitParameter("jndiUrlPkgPrefixes");
   }
 
-  private String getInitParam(FilterConfig filterConfig, String paramName) throws ServletException {
+  private String getInitParam(FilterConfig filterConfig, String paramName, boolean requierd) throws ServletException {
     String paramValue = filterConfig.getInitParameter(paramName);
-    if ((m_useJndiConnection && paramName.indexOf("jndi") != -1 && paramValue == null) || (!m_useJndiConnection && paramName.indexOf("jdbc") != -1 && paramValue == null)) {
+    if (requierd && paramValue == null) {
       throw new ServletException("Missing init-param with name '" + paramName + "'.");
     }
     return paramValue;
@@ -153,7 +153,6 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
 
   protected boolean isValidUser(String username, String password) throws ServletException {
     Connection databaseConnection = null;
-    PreparedStatement stmt = null;
     try {
 
       if (m_useJndiConnection) {
@@ -162,28 +161,14 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
       else {
         databaseConnection = createJdbcDirectConnection();
       }
+      return isValidUser(username, password, databaseConnection);
 
-      stmt = databaseConnection.prepareStatement(m_selectStatement);
-      stmt.setString(1, username);
-      stmt.setString(2, password);
-      stmt.execute();
-      ResultSet resultSet = stmt.getResultSet();
-      return (resultSet.next() && resultSet.getString(1).equals(username));
     }
     catch (Exception e) {
       LOG.error("Cannot SELECT user/pass.", e);
       throw new ServletException(e.getMessage(), e);
     }
     finally {
-      try {
-        if (stmt != null) {
-          stmt.close();
-          stmt = null;
-        }
-      }
-      catch (SQLException e) {
-        LOG.warn("Exception in close stmt!", e);
-      }
       try {
         if (databaseConnection != null) {
           databaseConnection.close();
@@ -196,7 +181,30 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
     }
   }
 
-  private String encryptPass(String pass) throws ServletException {
+  protected boolean isValidUser(String username, String password, Connection connection) throws SQLException {
+    PreparedStatement stmt = null;
+    try {
+      stmt = connection.prepareStatement(m_selectStatement);
+      stmt.setString(1, username);
+      stmt.setString(2, password);
+      stmt.execute();
+      ResultSet resultSet = stmt.getResultSet();
+      return (resultSet.next() && resultSet.getString(1).equals(username));
+    }
+    finally {
+      try {
+        if (stmt != null) {
+          stmt.close();
+          stmt = null;
+        }
+      }
+      catch (SQLException e) {
+        LOG.warn("Exception in close stmt!", e);
+      }
+    }
+  }
+
+  protected String encryptPass(String pass) throws ServletException {
     String passEncrypted = null;
     if (pass != null) {
       try {
