@@ -32,11 +32,11 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.ui.swing.splash.SplashProgressMonitor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -208,7 +208,7 @@ public abstract class AbstractSwingApplication implements IApplication {
   protected void showLoadError(Throwable error) {
     ErrorHandler handler = new ErrorHandler(error);
     if (!(handler.getText().indexOf(UserInterruptedException.class.getSimpleName()) >= 0)) {
-      JOptionPane.showMessageDialog(
+      SwingUtility.showMessageDialogSynthCapable(
           null,
           StringUtility.join("\n\n", handler.getText(), handler.getDetail()),
           handler.getTitle(),
