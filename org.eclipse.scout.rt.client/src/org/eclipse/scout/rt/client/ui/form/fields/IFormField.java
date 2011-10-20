@@ -446,7 +446,7 @@ public interface IFormField extends IPropertyObserver {
   /**
    * @return either null when everything is valid or a problem descriptor that contains more details.
    */
-  IContentProblemDescriptor getContentProblemDescriptor();
+  IValidateContentDescriptor validateContent();
 
   String getTooltipText();
 

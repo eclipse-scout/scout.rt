@@ -63,7 +63,7 @@ import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.IContentProblemDescriptor;
+import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
@@ -1245,10 +1245,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // check all fields that might be invalid
     final ArrayList<String> invalidTexts = new ArrayList<String>();
     final ArrayList<String> mandatoryTexts = new ArrayList<String>();
-    P_AbstractCollectingFieldVisitor<IContentProblemDescriptor> v = new P_AbstractCollectingFieldVisitor<IContentProblemDescriptor>() {
+    P_AbstractCollectingFieldVisitor<IValidateContentDescriptor> v = new P_AbstractCollectingFieldVisitor<IValidateContentDescriptor>() {
       @Override
       public boolean visitField(IFormField f, int level, int fieldIndex) {
-        IContentProblemDescriptor desc = f.getContentProblemDescriptor();
+        IValidateContentDescriptor desc = f.validateContent();
         if (desc != null) {
           if (desc.getErrorStatus() != null) {
             invalidTexts.add(desc.getDisplayText() + ": " + desc.getErrorStatus().getMessage());
@@ -1265,7 +1265,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     };
     visitFields(v);
     if (v.getCollectionCount() > 0) {
-      IContentProblemDescriptor firstProblem = v.getCollection().get(0);
+      IValidateContentDescriptor firstProblem = v.getCollection().get(0);
       if (LOG.isInfoEnabled()) {
         LOG.info("there are fields with errors");
       }

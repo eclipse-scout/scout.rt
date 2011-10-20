@@ -16,9 +16,9 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
  * This interface is used to check fields for valid content and - in case invalid - activate / select / focus the
  * appropriate location
  * <p>
- * see {@link IFormField#getContentProblemDescriptor()}
+ * see {@link IFormField#validateContent()}
  */
-public interface IContentProblemDescriptor {
+public interface IValidateContentDescriptor {
 
   /**
    * @return the name of the location/field/part

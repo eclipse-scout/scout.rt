@@ -18,13 +18,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
  * This interface is used to check fields for valid content and - in case invalid - activate / select / focus the
  * appropriate location
  * <p>
- * see {@link IFormField#getContentProblemDescriptor()}
+ * see {@link IFormField#validateContent()}
  */
-public class FormFieldProblemDescriptor implements IContentProblemDescriptor {
+public class ValidateFormFieldDescriptor implements IValidateContentDescriptor {
   private final IFormField m_field;
   private final IProcessingStatus m_errorStatus;
 
-  public FormFieldProblemDescriptor(IFormField field) {
+  public ValidateFormFieldDescriptor(IFormField field) {
     m_field = field;
     m_errorStatus = field.getErrorStatus();
   }

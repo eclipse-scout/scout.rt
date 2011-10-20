@@ -1215,9 +1215,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public IContentProblemDescriptor getContentProblemDescriptor() {
+  public IValidateContentDescriptor validateContent() {
     if (!isContentValid()) {
-      return new FormFieldProblemDescriptor(this);
+      return new ValidateFormFieldDescriptor(this);
     }
     return null;
   }
