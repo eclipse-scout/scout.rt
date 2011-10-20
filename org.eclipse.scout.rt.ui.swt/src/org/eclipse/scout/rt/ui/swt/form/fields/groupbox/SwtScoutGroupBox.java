@@ -295,11 +295,11 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
   }
 
   protected void updateBackgroundImageHorizontalAlignFromScout() {
-    // XXX
+    // TODO
   }
 
   protected void updateBackgroundImageVerticalAlignFromScout() {
-    // XXX
+    // TODO
   }
 
   private void installSwtContainerBorder() {
