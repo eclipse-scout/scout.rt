@@ -65,6 +65,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
@@ -3154,12 +3155,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private void fireRowClick(ITableRow row) {
     if (row != null) {
       try {
-        // single observer for checkable tables
-        // if row click is targetted to cell editor, do not interpret click as check/uncheck event
-        if (isCheckable() && row.isEnabled() && isEnabled() && !isCellEditable(row, getContextColumn())) {
-          row.setChecked(!row.isChecked());
-        }
-        //end single observer
+        interceptRowClickSingleObserver(row);
         execRowClick(row);
       }
       catch (ProcessingException ex) {
@@ -3167,6 +3163,35 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       catch (Throwable t) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      }
+    }
+  }
+
+  protected void interceptRowClickSingleObserver(ITableRow row) throws ProcessingException {
+    // single observer for checkable tables
+    // if row click is targetted to cell editor, do not interpret click as check/uncheck event
+    if (row.isEnabled() && isEnabled()) {
+      IColumn<?> ctxCol = getContextColumn();
+      if (isCellEditable(row, ctxCol)) {
+        //cell-level checkbox
+        if (ctxCol instanceof IBooleanColumn) {
+          //editable boolean columns consume this click
+          IFormField field = ctxCol.prepareEdit(row);
+          if (field instanceof IBooleanField) {
+            IBooleanField bfield = (IBooleanField) field;
+            bfield.setChecked(!bfield.isChecked());
+            ctxCol.completeEdit(row, field);
+          }
+        }
+        else {
+          //other editable columns have no effect HERE, the ui will open an editor
+        }
+      }
+      else {
+        //row-level checkbox
+        if (isCheckable()) {
+          row.setChecked(!row.isChecked());
+        }
       }
     }
   }

@@ -106,62 +106,63 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   @Override
   public Image getColumnImage(Object element, int columnIndex) {
     int[] columnOrder = m_swtTable.getSwtField().getColumnOrder();
-    if (columnOrder.length > 1) {
-      IColumn col = m_columnManager.getColumnByModelIndex(columnIndex - 1);
-      ICell cell = getCell(element, columnIndex);
-      //checkbox
-      Image checkBoxImage = null;
-      if (columnOrder[1] == columnIndex && m_swtTable.getScoutObject() != null && m_swtTable.getScoutObject().isCheckable()) {
-        if (((ITableRow) element).isChecked()) {
-          checkBoxImage = m_imgCheckboxTrue;
-        }
-        else {
-          checkBoxImage = m_imgCheckboxFalse;
-        }
+    if (columnOrder.length <= 1) {
+      return null;
+    }
+    IColumn col = m_columnManager.getColumnByModelIndex(columnIndex - 1);
+    ICell cell = getCell(element, columnIndex);
+    //checkbox
+    Image checkBoxImage = null;
+    if (columnOrder[1] == columnIndex && m_swtTable.getScoutObject() != null && m_swtTable.getScoutObject().isCheckable()) {
+      if (((ITableRow) element).isChecked()) {
+        checkBoxImage = m_imgCheckboxTrue;
       }
-      else if (col != null && cell != null && col.getDataType() == Boolean.class && (!(col instanceof ISmartColumn) || ((ISmartColumn) col).getLookupCall() == null)) {
-        Boolean b = (Boolean) cell.getValue();
-        if (b != null && b.booleanValue()) {
-          checkBoxImage = m_imgCheckboxTrue;
-        }
-        else {
-          checkBoxImage = m_imgCheckboxFalse;
-        }
+      else {
+        checkBoxImage = m_imgCheckboxFalse;
       }
-      //deco
-      String iconId = null;
-      if (cell != null && cell.getIconId() != null) {
-        iconId = cell.getIconId();
+    }
+    else if (col != null && cell != null && col.getDataType() == Boolean.class && (!(col instanceof ISmartColumn) || ((ISmartColumn) col).getLookupCall() == null)) {
+      Boolean b = (Boolean) cell.getValue();
+      if (b != null && b.booleanValue()) {
+        checkBoxImage = m_imgCheckboxTrue;
       }
-      else if (columnOrder[1] == columnIndex) {
-        ITableRow row = (ITableRow) element;
-        iconId = row.getIconId();
+      else {
+        checkBoxImage = m_imgCheckboxFalse;
       }
-      Image decoImage = m_environment.getIcon(iconId);
-      //merge
-      if (checkBoxImage != null && decoImage != null) {
-        String key = ((checkBoxImage == m_imgCheckboxTrue) ? (SwtIcons.CheckboxYes) : (SwtIcons.CheckboxYes)) + "_" + iconId;
-        ImageRegistry reg = Activator.getDefault().getImageRegistry();
-        Image compositeImage = reg.get(key);
-        if (compositeImage == null) {
-          int w1 = checkBoxImage.getBounds().width;
-          int w2 = decoImage.getBounds().width;
-          int h = Math.max(checkBoxImage.getBounds().height, decoImage.getBounds().height);
-          compositeImage = new Image(Display.getCurrent(), w1 + w2, h);
-          GC gc = new GC(compositeImage);
-          gc.drawImage(checkBoxImage, 0, 0);
-          gc.drawImage(decoImage, w1, 0);
-          gc.dispose();
-          reg.put(key, compositeImage);
-        }
-        return compositeImage;
+    }
+    //deco
+    String iconId = null;
+    if (cell != null && cell.getIconId() != null) {
+      iconId = cell.getIconId();
+    }
+    else if (columnOrder[1] == columnIndex) {
+      ITableRow row = (ITableRow) element;
+      iconId = row.getIconId();
+    }
+    Image decoImage = m_environment.getIcon(iconId);
+    //merge
+    if (checkBoxImage != null && decoImage != null) {
+      String key = ((checkBoxImage == m_imgCheckboxTrue) ? (SwtIcons.CheckboxYes) : (SwtIcons.CheckboxYes)) + "_" + iconId;
+      ImageRegistry reg = Activator.getDefault().getImageRegistry();
+      Image compositeImage = reg.get(key);
+      if (compositeImage == null) {
+        int w1 = checkBoxImage.getBounds().width;
+        int w2 = decoImage.getBounds().width;
+        int h = Math.max(checkBoxImage.getBounds().height, decoImage.getBounds().height);
+        compositeImage = new Image(Display.getCurrent(), w1 + w2, h);
+        GC gc = new GC(compositeImage);
+        gc.drawImage(checkBoxImage, 0, 0);
+        gc.drawImage(decoImage, w1, 0);
+        gc.dispose();
+        reg.put(key, compositeImage);
       }
-      if (checkBoxImage != null) {
-        return checkBoxImage;
-      }
-      if (decoImage != null) {
-        return decoImage;
-      }
+      return compositeImage;
+    }
+    if (checkBoxImage != null) {
+      return checkBoxImage;
+    }
+    if (decoImage != null) {
+      return decoImage;
     }
     return null;
   }

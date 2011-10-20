@@ -15,6 +15,8 @@ import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
@@ -36,8 +38,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
@@ -186,7 +191,7 @@ public class SwingScoutTableCellEditor {
         @Override
         public void actionPerformed(ActionEvent e) {
           m_cellEditor.stopCellEditing();
-          editPreviousTableCell(row, col);
+          enqueueEditNextTableCell(row, col, false);
         }
       });
     }
@@ -200,7 +205,7 @@ public class SwingScoutTableCellEditor {
         @Override
         public void actionPerformed(ActionEvent e) {
           m_cellEditor.stopCellEditing();
-          editNextTableCell(row, col);
+          enqueueEditNextTableCell(row, col, true);
         }
       });
     }
@@ -220,6 +225,19 @@ public class SwingScoutTableCellEditor {
     }
   }
 
+  protected boolean isBooleanColumnAt(Point p) {
+    JTable table = m_tableComposite.getSwingTable();
+    int col = table.columnAtPoint(p);
+    if (col >= 0) {
+      TableColumn tc = table.getColumnModel().getColumn(col);
+      if (tc instanceof SwingTableColumn) {
+        IColumn<?> scoutCol = ((SwingTableColumn) tc).getScoutColumn();
+        return (scoutCol instanceof IBooleanColumn);
+      }
+    }
+    return false;
+  }
+
   protected void cancelEditorFromSwing() {
     m_tableIsEditingAndContainsFocus = false;
     if (m_cachedSwingEditorComponent != null) {
@@ -234,58 +252,25 @@ public class SwingScoutTableCellEditor {
     }
   }
 
-  protected void editNextTableCell(int row, int col) {
-    JTable table = m_tableComposite.getSwingTable();
-    if (row >= 0 && col >= 0) {
-      int rowCount = table.getRowCount();
-      int colCount = table.getColumnCount();
-      int a = rowCount + colCount;
-      while (a > 1) {
-        a--;
-        col++;
-        if (col >= colCount) {
-          row++;
-          col = 0;
-        }
-        if (row >= rowCount) {
-          row = 0;
-        }
-        if (table.isCellEditable(row, col)) {
-          table.getSelectionModel().setSelectionInterval(row, row);
-          table.getColumnModel().getSelectionModel().setSelectionInterval(col, col);
-          table.scrollRectToVisible(table.getCellRect(row, col, true));
-          table.editCellAt(row, col);
+  protected void enqueueEditNextTableCell(int uiRow, int uiCol, final boolean forward) {
+    if (uiRow < 0 || uiCol < 0) {
+      return;
+    }
+    final ITableRow row = m_tableComposite.getScoutObject().getFilteredRow(uiRow);
+    final IColumn col = m_tableComposite.getScoutObject().getColumnSet().getVisibleColumn(uiCol);
+    if (row == null || col == null) {
+      return;
+    }
+    m_tableComposite.getSwingEnvironment().invokeScoutLater(new Runnable() {
+      @Override
+      public void run() {
+        if (m_tableComposite.getSwingEnvironment() == null) {
           return;
         }
+        ITable table = m_tableComposite.getScoutObject();
+        TableUtility.editNextTableCell(table, row, col, forward, null);
       }
-    }
-  }
-
-  protected void editPreviousTableCell(int row, int col) {
-    JTable table = m_tableComposite.getSwingTable();
-    if (row >= 0 && col >= 0) {
-      int rowCount = table.getRowCount();
-      int colCount = table.getColumnCount();
-      int a = rowCount + colCount;
-      while (a > 1) {
-        a--;
-        col--;
-        if (col < 0) {
-          row--;
-          col = colCount - 1;
-        }
-        if (row < 0) {
-          row = rowCount - 1;
-        }
-        if (table.isCellEditable(row, col)) {
-          table.getSelectionModel().setSelectionInterval(row, row);
-          table.getColumnModel().getSelectionModel().setSelectionInterval(col, col);
-          table.scrollRectToVisible(table.getCellRect(row, col, true));
-          table.editCellAt(row, col);
-          return;
-        }
-      }
-    }
+    }, 0L);
   }
 
   protected void permanentFocusOwnerChanged(PropertyChangeEvent e) {
@@ -293,8 +278,13 @@ public class SwingScoutTableCellEditor {
     if (c == null) {
       return;
     }
+    Window w1 = SwingUtilities.getWindowAncestor(c);
+    Window w2 = SwingUtilities.getWindowAncestor(m_tableComposite.getSwingContainer());
+    if (w1 == null || w2 == null || w1 != w2 && SwingUtilities.isDescendingFrom(w1, w2)) {
+      return;
+    }
     boolean oldValue = m_tableIsEditingAndContainsFocus;
-    boolean newValue = SwingUtilities.isDescendingFrom(c, m_tableComposite.getSwingTable()) && c != m_tableComposite.getSwingTable();
+    boolean newValue = (SwingUtilities.isDescendingFrom(c, m_tableComposite.getSwingTable()) && c != m_tableComposite.getSwingTable());
     m_tableIsEditingAndContainsFocus = newValue;
     if (oldValue && !newValue) {
       if (m_cellEditor != null) {
@@ -353,9 +343,13 @@ public class SwingScoutTableCellEditor {
     }
 
     @Override
-    public boolean isCellEditable(EventObject anEvent) {
-      if (anEvent instanceof MouseEvent) {
-        return ((MouseEvent) anEvent).getClickCount() >= getClickCountToStart();
+    public boolean isCellEditable(EventObject e) {
+      if (e instanceof MouseEvent) {
+        //no edit on boolean column when mouse was clicked
+        if (isBooleanColumnAt(((MouseEvent) e).getPoint())) {
+          return false;
+        }
+        return ((MouseEvent) e).getClickCount() >= getClickCountToStart();
       }
       return true;
     }

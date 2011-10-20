@@ -646,7 +646,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
         int swingRow = scoutToSwingRow(e.getFirstRow());
         if (swingRow >= 0 && swingCol >= 0) {
-          getSwingTable().editCellAt(swingRow, swingCol);
+          JTable table = getSwingTable();
+          table.scrollRectToVisible(table.getCellRect(swingRow, swingCol, true));
+          table.editCellAt(swingRow, swingCol);
         }
         break;
       }

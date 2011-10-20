@@ -301,4 +301,78 @@ public final class TableUtility {
     return a;
   }
 
+  public static interface ITableCellEditorFilter {
+    boolean accept(ITableRow row, IColumn<?> col);
+  }
+
+  /**
+   * based on row and column, find the next visible cell and start editing
+   * 
+   * @param table
+   * @param row
+   * @param col
+   * @param forward
+   * @param filter
+   *          (optional) is used to further narrow which cells are editable. This filter is checked after the check to
+   *          {@link ITable#isCellEditable(ITableRow, IColumn)}
+   */
+  public static void editNextTableCell(ITable table, ITableRow currentRow, IColumn<?> currentCol, boolean forward, ITableCellEditorFilter filter) {
+    if (table == null) {
+      return;
+    }
+    int rowCount = table.getFilteredRowCount();
+    int colCount = table.getVisibleColumnCount();
+    if (rowCount <= 0 || colCount <= 0) {
+      return;
+    }
+    currentRow = table.resolveRow(currentRow);
+    currentCol = table.getColumnSet().resolveColumn(currentCol);
+    if (currentRow == null || currentCol == null) {
+      return;
+    }
+    int row = table.getFilteredRowIndex(currentRow);
+    int modelCol = currentCol.getColumnIndex();
+    int[] visibleIndexes = table.getColumnSet().getVisibleColumnIndexes();
+    int col = -1;
+    for (int i = 0; i < visibleIndexes.length; i++) {
+      if (visibleIndexes[i] == modelCol) {
+        col = i;
+        break;
+      }
+    }
+    if (row < 0 || col < 0) {
+      return;
+    }
+    int a = rowCount * colCount;
+    while (a > 1) {
+      a--;
+      if (forward) {
+        col++;
+        if (col >= colCount) {
+          row++;
+          col = 0;
+        }
+        if (row >= rowCount) {
+          row = 0;
+        }
+      }
+      else {
+        col--;
+        if (col < 0) {
+          row--;
+          col = colCount - 1;
+        }
+        if (row < 0) {
+          row = rowCount - 1;
+        }
+      }
+      ITableRow tr = table.getFilteredRow(row);
+      IColumn<?> tc = table.getColumnSet().getVisibleColumn(col);
+      if (tr != null && tc != null && table.isCellEditable(tr, tc) && (filter == null || filter.accept(tr, tc))) {
+        table.requestFocusInCell(tc, tr);
+        return;
+      }
+    }
+  }
+
 }

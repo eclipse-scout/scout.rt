@@ -15,9 +15,12 @@ import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.TreeSet;
 
 import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -41,15 +44,14 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.FormFieldProblemDescriptor;
-import org.eclipse.scout.rt.client.ui.form.fields.IContentProblemDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
+import org.eclipse.scout.rt.client.ui.form.fields.ValidateFormFieldDescriptor;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
@@ -448,8 +450,8 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  public IContentProblemDescriptor getContentProblemDescriptor() {
-    IContentProblemDescriptor desc = super.getContentProblemDescriptor();
+  public IValidateContentDescriptor validateContent() {
+    IValidateContentDescriptor desc = super.validateContent();
     //super check
     if (desc != null) {
       return desc;
@@ -458,24 +460,37 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     ITable table = getTable();
     if (isMandatory()) {
       if (table == null || table.getRowCount() < 1) {
-        return new FormFieldProblemDescriptor(this);
+        return new ValidateFormFieldDescriptor(this);
       }
     }
+    //make editable columns visible during check
+    HashSet<IColumn<?>> invisbleEditableColumns = new HashSet<IColumn<?>>();
+    for (IColumn col : table.getColumns()) {
+      if (col.isEditable() && col.isDisplayable() && !col.isVisible()) {
+        invisbleEditableColumns.add(col);
+      }
+    }
+    for (IColumn col : invisbleEditableColumns) {
+      col.setVisible(true);
+    }
     //check editable cells
+    ValidateTableFieldDescriptor tableDesc = null;
+    TreeSet<String> columnNames = new TreeSet<String>();
     if (table != null) {
       for (ITableRow row : table.getRows()) {
         for (IColumn col : table.getColumns()) {
           if (col.isCellEditable(row)) {
             try {
-              if (col instanceof IBooleanColumn) { // TODO dwi / imo: exclusion of boolean column is just a temporary workaround to not automatically toggle its value
-                continue;
-              }
-
               IFormField editor = col.prepareEdit(row);
               if (editor != null) {
                 boolean editorValid = editor.isContentValid();
                 if (!editorValid) {
-                  return new EditableTableCellProblemDescriptor(this, row, col);
+                  //column should remain visible
+                  invisbleEditableColumns.remove(col);
+                  if (tableDesc == null) {
+                    tableDesc = new ValidateTableFieldDescriptor(this, row, col);
+                  }
+                  columnNames.add(col.getHeaderCell().getText());
                 }
               }
             }
@@ -486,7 +501,15 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         }
       }
     }
-    return null;
+    //make valid invisible cols again invisible
+    for (IColumn col : invisbleEditableColumns) {
+      col.setVisible(false);
+    }
+    if (tableDesc == null) {
+      return null;
+    }
+    tableDesc.setDisplayText(ScoutTexts.get("TableName") + " " + getLabel() + ": " + ListUtility.format(columnNames));
+    return tableDesc;
   }
 
   @Override

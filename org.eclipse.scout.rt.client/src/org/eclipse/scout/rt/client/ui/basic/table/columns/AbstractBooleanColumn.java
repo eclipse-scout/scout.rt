@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
@@ -19,6 +18,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 
 /**
  * Column holding Boolean values
@@ -69,9 +69,9 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
 
   @Override
   protected IFormField prepareEditInternal(final ITableRow row) throws ProcessingException {
-    // no cell editor is used. Instead, the value is changed right away.
-    applyValueInternal(row, !BooleanUtility.nvl(getValue(row), false));
-    return null;
+    AbstractBooleanField f = new AbstractBooleanField() {
+    };
+    return f;
   }
 
   @Override

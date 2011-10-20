@@ -22,15 +22,16 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableUtility;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
-import org.eclipse.scout.rt.ui.swt.ext.table.TableViewerEx;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.keystroke.SwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
@@ -112,16 +113,17 @@ public class SwtScoutTableCellEditor {
         if (c == null || !(c instanceof Control)) {
           return;
         }
-        boolean wasEditingOrContainedFocus = m_tableIsEditingAndContainsFocus;
-        if (wasEditingOrContainedFocus) {
-          boolean isEditingOrContainsFocus =
-              (SwtUtility.isAncestorOf(m_tableComposite.getSwtField(), (Control) c)
-              || c.getData() instanceof Dialog);
-          m_tableIsEditingAndContainsFocus = isEditingOrContainsFocus;
-          if (wasEditingOrContainedFocus && !isEditingOrContainsFocus) {
-            TableViewer v = m_tableComposite.getSwtTableViewer();
-            if (v instanceof TableViewerEx) {
-              ((TableViewerEx) v).applyEditorValue();
+        boolean oldValue = m_tableIsEditingAndContainsFocus;
+        boolean newValue = (SwtUtility.isAncestorOf(m_tableComposite.getSwtField(), (Control) c) || c.getData() instanceof Dialog);
+        m_tableIsEditingAndContainsFocus = newValue;
+        if (oldValue && !newValue) {
+          TableViewer v = m_tableComposite.getSwtTableViewer();
+          if (v.isCellEditorActive()) {
+            for (CellEditor editor : v.getCellEditors()) {
+              if (editor != null && editor.isActivated() && editor instanceof P_SwtCellEditor) {
+                ((P_SwtCellEditor) editor).focusLost();
+                break;
+              }
             }
           }
         }
@@ -172,17 +174,6 @@ public class SwtScoutTableCellEditor {
   }
 
   protected void decorateEditorComposite(ISwtScoutComposite<? extends IFormField> editorComposite, final ITableRow scoutRow, final IColumn<?> scoutCol) {
-    //auto toggle checkboxes
-    if (editorComposite.getScoutObject() instanceof IBooleanField) {
-      final IBooleanField cb = (IBooleanField) editorComposite.getScoutObject();
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          cb.getUIFacade().setSelectedFromUI(!cb.isChecked());
-        }
-      };
-      editorComposite.getEnvironment().invokeScoutLater(t, 0);
-    }
   }
 
   protected void saveEditorFromSwt() {
@@ -205,6 +196,27 @@ public class SwtScoutTableCellEditor {
       }
     };
     m_tableComposite.getEnvironment().invokeScoutLater(t, 0);
+  }
+
+  protected void enqueueEditNextTableCell(final ITableRow row, final IColumn<?> col, final boolean forward) {
+    if (row == null || col == null) {
+      return;
+    }
+    m_tableComposite.getEnvironment().invokeScoutLater(new Runnable() {
+      @Override
+      public void run() {
+        if (m_tableComposite.getEnvironment() == null) {
+          return;
+        }
+        ITable table = m_tableComposite.getScoutObject();
+        TableUtility.editNextTableCell(table, row, col, forward, new TableUtility.ITableCellEditorFilter() {
+          @Override
+          public boolean accept(ITableRow rowx, IColumn<?> colx) {
+            return !(colx instanceof IBooleanColumn);
+          }
+        });
+      }
+    }, 0L);
   }
 
   protected IColumn<?> getScoutColumn(String property) {
@@ -243,7 +255,12 @@ public class SwtScoutTableCellEditor {
             synchronized (b) {
               try {
                 if (table != null && row != null && column != null) {
-                  b.set(table.isCellEditable(row, column));
+                  if (column instanceof IBooleanColumn) {
+                    b.set(false);
+                  }
+                  else {
+                    b.set(table.isCellEditable(row, column));
+                  }
                 }
               }
               catch (Throwable ex) {
@@ -268,6 +285,8 @@ public class SwtScoutTableCellEditor {
   private class P_SwtCellEditor extends CellEditor {
     private Composite m_container;
     private Object m_value;
+    private ITableRow m_editScoutRow;
+    private IColumn<?> m_editScoutCol;
 
     protected P_SwtCellEditor(Composite parent) {
       super(parent);
@@ -306,15 +325,38 @@ public class SwtScoutTableCellEditor {
     @Override
     protected void doSetFocus() {
       m_container.traverse(SWT.TRAVERSE_TAB_NEXT);
+      m_tableIsEditingAndContainsFocus = true;
       Control focusControl = m_container.getDisplay().getFocusControl();
       if (focusControl != null) {
         focusControl.addTraverseListener(new TraverseListener() {
           @Override
           public void keyTraversed(TraverseEvent e) {
-            if (e.detail == SWT.TRAVERSE_ESCAPE || e.detail == SWT.TRAVERSE_RETURN) {
+            switch (e.detail) {
+              case SWT.TRAVERSE_ESCAPE:
+              case SWT.TRAVERSE_RETURN: {
               e.doit = false;
+              break;
+            }
+            case SWT.TRAVERSE_TAB_NEXT: {
+              e.doit = false;
+              ITableRow scoutRow = m_editScoutRow;
+              IColumn<?> scoutCol = m_editScoutCol;
+              fireApplyEditorValue();
+              deactivate();
+              enqueueEditNextTableCell(scoutRow, scoutCol, true);
+              break;
+            }
+            case SWT.TRAVERSE_TAB_PREVIOUS: {
+              e.doit = false;
+              ITableRow scoutRow = m_editScoutRow;
+              IColumn<?> scoutCol = m_editScoutCol;
+              fireApplyEditorValue();
+              deactivate();
+              enqueueEditNextTableCell(scoutRow, scoutCol, false);
+              break;
             }
           }
+        }
         });
       }
     }
@@ -331,13 +373,24 @@ public class SwtScoutTableCellEditor {
 
     @Override
     public void activate(ColumnViewerEditorActivationEvent e) {
+      m_editScoutRow = null;
+      m_editScoutCol = null;
+      m_tableIsEditingAndContainsFocus = false;
       if (e.getSource() instanceof ViewerCell) {
         ViewerCell cell = (ViewerCell) e.getSource();
         TableViewer viewer = m_tableComposite.getSwtTableViewer();
         TableColumn swtCol = viewer.getTable().getColumn(cell.getColumnIndex());
         IColumn<?> scoutCol = (IColumn<?>) swtCol.getData(SwtScoutTable.KEY_SCOUT_COLUMN);
         ITableRow scoutRow = (ITableRow) cell.getElement();
+        //no edit on boolean column when mouse was clicked
+        if (e.sourceEvent instanceof MouseEvent) {
+          if (scoutCol instanceof IBooleanColumn) {
+            return;
+          }
+        }
         if (scoutRow != null && scoutCol != null) {
+          m_editScoutRow = scoutRow;
+          m_editScoutCol = scoutCol;
           @SuppressWarnings("unused")
           Control control = getEditorControl(m_container, scoutRow, scoutCol);
         }
@@ -348,6 +401,8 @@ public class SwtScoutTableCellEditor {
 
     @Override
     protected void deactivate(ColumnViewerEditorDeactivationEvent e) {
+      m_editScoutRow = null;
+      m_editScoutCol = null;
       for (Control c : m_container.getChildren()) {
         c.dispose();
       }
@@ -355,6 +410,11 @@ public class SwtScoutTableCellEditor {
       if (e.eventType == ColumnViewerEditorDeactivationEvent.EDITOR_CANCELED) {
         cancelEditorFromSwt();
       }
+    }
+
+    @Override
+    public void focusLost() {
+      super.focusLost();
     }
   }
 }
