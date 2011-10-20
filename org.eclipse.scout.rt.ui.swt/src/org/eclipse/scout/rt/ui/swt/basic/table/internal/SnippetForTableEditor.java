@@ -193,7 +193,7 @@ public class SnippetForTableEditor {
       }
       super.deactivate(event);
       if (event.eventType == ColumnViewerEditorDeactivationEvent.EDITOR_CANCELED) {
-        System.out.println("canceled");//XXX
+        System.out.println("canceled");
       }
     }
 
