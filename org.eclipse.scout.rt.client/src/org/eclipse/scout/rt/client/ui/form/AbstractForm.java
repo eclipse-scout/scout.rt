@@ -126,6 +126,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private boolean m_visibleGranted;
   // search
   private SearchFilter m_searchFilter;
+  //validate content assistant
+  private IValidateContentDescriptor m_currentValidateContentDescriptor;
 
   // current timers
   private P_CloseTimer m_scoutCloseTimer;
@@ -1232,6 +1234,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void validateForm() throws ProcessingException {
+    m_currentValidateContentDescriptor = null;
     if (!execCheckFields()) {
       VetoException veto = new VetoException("Validate " + getClass().getSimpleName());
       veto.consume();
@@ -1284,7 +1287,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
       }
       String introText = ScoutTexts.get("FormIncompleteIntro");
-      firstProblem.activateProblemLocation();
+      m_currentValidateContentDescriptor = firstProblem;
+      //
       VetoException veto = new VetoException(introText, buf.toString());
       throw veto;
     }
@@ -2414,6 +2418,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
             catch (ProcessingException se) {
               se.addContextMessage(ScoutTexts.get("FormButtonClicked") + " " + getTitle() + "." + e.getButton().getLabel());
               SERVICES.getService(IExceptionHandlerService.class).handleException(se);
+            }
+            if (m_currentValidateContentDescriptor != null) {
+              m_currentValidateContentDescriptor.activateProblemLocation();
+              m_currentValidateContentDescriptor = null;
             }
           }// end
         }

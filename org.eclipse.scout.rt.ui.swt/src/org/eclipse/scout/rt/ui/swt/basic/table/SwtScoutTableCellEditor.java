@@ -327,6 +327,9 @@ public class SwtScoutTableCellEditor {
       m_container.traverse(SWT.TRAVERSE_TAB_NEXT);
       m_tableIsEditingAndContainsFocus = true;
       Control focusControl = m_container.getDisplay().getFocusControl();
+      if (focusControl != null && !SwtUtility.isAncestorOf(m_container, focusControl)) {
+        focusControl = null;
+      }
       if (focusControl != null) {
         focusControl.addTraverseListener(new TraverseListener() {
           @Override
