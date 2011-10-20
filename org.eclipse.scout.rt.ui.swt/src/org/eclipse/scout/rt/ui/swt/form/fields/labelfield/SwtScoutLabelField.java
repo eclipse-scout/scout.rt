@@ -121,7 +121,7 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
   }
 
   protected void setTextWrapFromScout(boolean booleanValue) {
-    // XXX
+    // TODO sle wrap does not work as expected
     // getSwtField().setWordWrap(booleanValue);
   }
 
