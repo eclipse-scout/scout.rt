@@ -127,7 +127,7 @@ BSI Business Systems Integration AG - initial API and implementation
          version="0.0.0"/>
 
    <plugin
-         id="org.apache.derby.jdbc_10.5.3.fragment"
+         id="org.apache.derby.jdbc_1053.fragment"
          download-size="0"
          install-size="0"
          version="0.0.0"

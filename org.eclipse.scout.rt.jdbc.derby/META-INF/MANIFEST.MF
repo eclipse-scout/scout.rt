@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scout Derby Support
+Bundle-Name: Scout Derby Support for Eclipse Scout Version 10.5.3
 Bundle-SymbolicName: org.eclipse.scout.rt.jdbc.derby
 Bundle-Version: 10.5.3.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Derby JDBC Fragment Version 10.5.3
-Bundle-SymbolicName: org.apache.derby.jdbc_10.5.3.fragment
-Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: org.apache.derby.jdbc_1053.fragment
+Bundle-Version: 10.5.3.qualifier
 Fragment-Host: system.bundle
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/derby.jar
