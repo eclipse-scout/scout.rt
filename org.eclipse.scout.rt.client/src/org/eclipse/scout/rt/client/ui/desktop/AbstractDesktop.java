@@ -1086,6 +1086,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public void openBrowserWindow(String path) {
+    fireOpenBrowserWindow(path);
+  }
+
+  @Override
   public boolean isAutoPrefixWildcardForTextSearch() {
     return m_autoPrefixWildcardForTextSearch;
   }
@@ -1278,6 +1283,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void fireFileChooserAdded(IFileChooser fc) {
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FILE_CHOOSER_ADDED, fc);
+    fireDesktopEvent(e);
+  }
+
+  private void fireOpenBrowserWindow(String path) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_BROWSER_WINDOW, path);
     fireDesktopEvent(e);
   }
 

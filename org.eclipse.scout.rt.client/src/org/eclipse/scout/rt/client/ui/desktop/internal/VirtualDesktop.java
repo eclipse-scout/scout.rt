@@ -224,6 +224,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void openBrowserWindow(String path) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public void addForm(IForm form) {
     throw createUnsupportedOperationException();
   }

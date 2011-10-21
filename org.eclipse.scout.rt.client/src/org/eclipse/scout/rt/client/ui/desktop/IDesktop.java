@@ -395,6 +395,11 @@ public interface IDesktop extends IPropertyObserver {
   void addFileChooser(IFileChooser fc);
 
   /**
+   * Creates and opens a browser window to download a file or open an url via user interface (only in web ui)
+   */
+  void openBrowserWindow(String path);
+
+  /**
    * Prints the desktop parameter details see {@link PrintDevice}
    */
   void printDesktop(PrintDevice device, Map<String, Object> parameters);

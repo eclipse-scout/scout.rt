@@ -50,10 +50,11 @@ public class DesktopEvent extends EventObject {
    */
   public static final int TYPE_PRINT = 900;
   /**
-   *
-   */
+	 *
+	 */
   public static final int TYPE_PRINTED = 901;
   public static final int TYPE_FILE_CHOOSER_ADDED = 910;
+  public static final int TYPE_OPEN_BROWSER_WINDOW = 920;
   /**
    * Send a broadcast event to find the {@link IFormField} that owns the focus
    * The listener can store the result using {@link #setFocusedField()} The event waits some time to give asynchronous
@@ -72,6 +73,7 @@ public class DesktopEvent extends EventObject {
   private IFormField m_focusedField;
   private IMessageBox m_messageBox;
   private IFileChooser m_fileChooser;
+  private String m_path;
   private PrintDevice m_printDevice;
   private Map<String, Object> m_printParameters;
   private List<IMenu> m_popupMenus;
@@ -88,27 +90,28 @@ public class DesktopEvent extends EventObject {
   }
 
   public DesktopEvent(IDesktop source, int type, IForm form) {
-    super(source);
-    m_type = type;
+    this(source, type);
     m_form = form;
   }
 
   public DesktopEvent(IDesktop source, int type, IMessageBox messageBox) {
-    super(source);
-    m_type = type;
+    this(source, type);
     m_messageBox = messageBox;
   }
 
   public DesktopEvent(IDesktop source, int type, IOutline outline) {
-    super(source);
-    m_type = type;
+    this(source, type);
     m_outline = outline;
   }
 
   public DesktopEvent(IDesktop source, int type, IFileChooser fc) {
-    super(source);
-    m_type = type;
+    this(source, type);
     m_fileChooser = fc;
+  }
+
+  public DesktopEvent(IDesktop source, int type, String path) {
+    this(source, type);
+    m_path = path;
   }
 
   public DesktopEvent(IDesktop source, int type, PrintDevice printDevice, Map<String, Object> printParameters) {
@@ -140,6 +143,10 @@ public class DesktopEvent extends EventObject {
 
   public IFileChooser getFileChooser() {
     return m_fileChooser;
+  }
+
+  public String getPath() {
+    return m_path;
   }
 
   public IMessageBox getMessageBox() {
