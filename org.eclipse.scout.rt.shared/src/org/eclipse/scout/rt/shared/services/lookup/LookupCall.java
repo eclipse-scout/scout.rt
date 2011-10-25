@@ -93,7 +93,7 @@ public class LookupCall implements Cloneable, Serializable {
     return false;
   }
 
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.DOC)
   @Order(30)
   @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {

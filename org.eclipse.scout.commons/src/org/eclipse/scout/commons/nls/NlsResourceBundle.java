@@ -141,7 +141,7 @@ public final class NlsResourceBundle extends PropertyResourceBundle {
     try {
       URL location = clazz.getProtectionDomain().getCodeSource().getLocation();
       if ("file".equals(location.getProtocol())) {
-        File projectLocation = new File(location.toURI()).getParentFile();
+        File projectLocation = new File(location.toURI());
         if (projectLocation.exists() && projectLocation.isDirectory()) {
           File f = new File(projectLocation, fileName);
           if (f.exists() && f.isFile()) {

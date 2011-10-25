@@ -25,10 +25,10 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFilter;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -139,7 +139,7 @@ public abstract class AbstractServerSession implements IServerSession {
    * override this method to set the application specific texts implementation
    */
   @Override
-  public DynamicNls getNlsTexts() {
+  public ScoutTexts getNlsTexts() {
     return null;
   }
 
@@ -185,6 +185,7 @@ public abstract class AbstractServerSession implements IServerSession {
     }
     m_bundle = bundle;
     m_active = true;
+    ScoutTexts.invalidateTextProviderCache();
     assignUserId();
     execLoadSession();
   }

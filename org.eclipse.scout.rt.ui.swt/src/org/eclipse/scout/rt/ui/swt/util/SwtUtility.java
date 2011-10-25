@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -940,7 +939,7 @@ public final class SwtUtility {
   /**
    * set the text provider for global swt texts on display
    */
-  public static void setNlsTextsOnDisplay(Display display, DynamicNls textProvider) {
+  public static void setNlsTextsOnDisplay(Display display, ScoutTexts textProvider) {
     display.setData(ScoutTexts.JOB_PROPERTY_NAME.toString(), textProvider);
   }
 
@@ -949,7 +948,7 @@ public final class SwtUtility {
    */
   public static String getNlsText(Display display, String key, String... messageArguments) {
     if (display != null) {
-      DynamicNls textProvider = (DynamicNls) display.getData(ScoutTexts.JOB_PROPERTY_NAME.toString());
+      ScoutTexts textProvider = (ScoutTexts) display.getData(ScoutTexts.JOB_PROPERTY_NAME.toString());
       if (textProvider != null) {
         return textProvider.getText(key, messageArguments);
       }

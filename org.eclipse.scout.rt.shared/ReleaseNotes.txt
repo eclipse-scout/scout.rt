@@ -107,3 +107,32 @@ Furthermore the
 be moved to the 'org.eclipse.scout.commons' bundle.
 
 Migration: change all 'org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal' imports to 'org.eclipse.scout.commons.security.SimplePrincipal'.
+
+24.10.2011 mvi
+Bugzilla ticket 361816
+Replace current NLS support with Text Provider Services
+- added ITextProviderService, IDocumentationTextProviderService, AbstractDynamicNlsTextProviderService
+- Migrated existing text providers to scout text provider services
+- TEXTS class added for consistent translation retrieval
+- Splitted org.eclipse.scout.rt.shared texts into two plugins:
+  - org.eclipse.scout.rt.shared contains text provider service with all texts that are used by the runtime
+  - org.eclipse.scout.rt.shared.legacy.texts.fragment contains all texts that are no longer used by the runtime
+- getConfiguredDoc properties moved to different ConfigProperty type for Scout SDK (support for Docs Text Providers)
+- ScoutTexts changed to use text services (cached).
+Migration:
+- Add "org.eclipse.scout.rt.shared.legacy.texts.fragment" to all products.
+- For each existing NLS Class (directly or indirectly extending "org.eclipse.scout.rt.shared.ScoutTexts" or "org.eclipse.scout.commons.nls.DynamicNls"):
+  - create a new "<YourSharedPlugin>.services.common.text.<Name>TextProviderService" extending "org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService" in the corresponding shared plugin.
+- For each created TextProvider Service:
+  - Overwrite the method "getDynamicNlsBaseName" and return the same value as in the "RESOURCE_BUNDLE_NAME" constant (stored in the corresponding Texts class) as string literal.
+  - Register the service in the corresponding plugin as scout service using the "org.eclipse.scout.service.DefaultServiceFactory", no session class and give a ranking > 0. E.g.: <service class="com.bsiag.crm.shared.core.services.common.text.CoreTextProviderService" factory="org.eclipse.scout.service.DefaultServiceFactory" ranking="100" />
+- Delete all Texts classes and replace all uses of the old Texts classes with the class "org.eclipse.scout.rt.shared.TEXTS".
+- Remove the "getNlsTexts" methods from the Session classes if existent (unless you use session-dependent translations).
+- Correct return type of "getConfiguredNlsProvider" of all SqlServices (if existent) to return the new type defined by AbstractSqlService and return "ScoutTexts.class" inside the method.
+- If somewhere the "SwingUtility.setNlsTexts" method or "SwtUtility.setNlsTextsOnDisplay" method is used, set it to "ScoutTexts.getInstance()".
+- Delete all .nls files (NLS Editor can now be accessed using the TextProviderService Node in the Scout Explorer of the Scout perspective).
+  If you want to keep the .nls files (e.g. to support key shortcuts like ctrl+shift+r) do the following:
+  - Open the .nls file in the text editor (right click -> open with).
+  - Remove the following properties: "Nls-Type", "Nls-File-Prefix", "Nls-Translation-Folder".
+  - Change the property "Nls-Class" to the fully qualified name of the Text Provider Service you would like to edit with this .nls file.
+  - Save the changes and open the .nls file again in the Multilanguage Editor (right click -> open with).

@@ -126,7 +126,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     return null;
   }
 
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.DOC)
   @Order(60)
   @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {

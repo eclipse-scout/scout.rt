@@ -29,7 +29,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
@@ -43,6 +42,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.shared.OfflineState;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
@@ -105,7 +105,7 @@ public abstract class AbstractClientSession implements IClientSession {
    * override this method to set the application specific texts implementation
    */
   @Override
-  public DynamicNls getNlsTexts() {
+  public ScoutTexts getNlsTexts() {
     return null;
   }
 
@@ -220,6 +220,7 @@ public abstract class AbstractClientSession implements IClientSession {
         setMemoryPolicy(new MediumMemoryPolicy());
       }
       m_iconLocator = createIconLocator();
+      ScoutTexts.invalidateTextProviderCache();
       execLoadSession();
       setActive(true);
     }

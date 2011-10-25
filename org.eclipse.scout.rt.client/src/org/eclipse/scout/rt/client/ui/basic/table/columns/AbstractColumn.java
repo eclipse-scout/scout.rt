@@ -236,7 +236,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return false;
   }
 
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.DOC)
   @Order(200)
   @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {

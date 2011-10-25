@@ -185,7 +185,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return 0;
   }
 
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.DOC)
   @Order(60)
   @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {

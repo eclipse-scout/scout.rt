@@ -33,7 +33,6 @@ import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.code.CodeService;
@@ -46,6 +45,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.jdbc.ILegacySqlQueryService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter.WhereToken;
@@ -59,7 +59,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlService.class);
 
   private SqlConnectionPool m_pool;
-  private Class<? extends DynamicNls> m_nlsProvider;
+  private Class<? extends ScoutTexts> m_nlsProvider;
   private ISqlStyle m_sqlStyle;
   private String m_transactionMemberId;
   private boolean m_directJdbcConnection;
@@ -157,7 +157,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   @ConfigProperty(ConfigProperty.NLS_PROVIDER)
   @Order(70)
   @ConfigPropertyValue("null")
-  protected Class<? extends DynamicNls> getConfiguredNlsProvider() {
+  protected Class<? extends ScoutTexts> getConfiguredNlsProvider() {
     return null;
   }
 
@@ -587,11 +587,11 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     return null;
   }
 
-  public Class<? extends DynamicNls> getNlsProvider() {
+  public Class<? extends ScoutTexts> getNlsProvider() {
     return m_nlsProvider;
   }
 
-  public void setNlsProvider(Class<? extends DynamicNls> nlsProvider) {
+  public void setNlsProvider(Class<? extends ScoutTexts> nlsProvider) {
     m_nlsProvider = nlsProvider;
   }
 

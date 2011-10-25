@@ -21,7 +21,7 @@ import java.util.ResourceBundle;
 /**
  * Warning: Avoid osgi imports in this class, so it can be used in J2EE
  */
-public abstract class DynamicNls {
+public class DynamicNls {
 
   private ArrayList<NlsResourceBundleCache> m_resourceBundles;
 
@@ -29,9 +29,9 @@ public abstract class DynamicNls {
     m_resourceBundles = new ArrayList<NlsResourceBundleCache>();
   }
 
-  protected void registerResourceBundle(String resourceBundleName, Class<?> wrapperClass) {
+  public void registerResourceBundle(String resourceBundleName, Class<?> wrapperClass) {
     m_resourceBundles.add(0, new NlsResourceBundleCache(resourceBundleName, wrapperClass));
-    NlsUtility.dynamicBindFields(wrapperClass);
+    //NlsUtility.dynamicBindFields(wrapperClass);
   }
 
   /**
@@ -70,7 +70,7 @@ public abstract class DynamicNls {
     if (key == null) {
       return null;
     }
-    //
+
     String text = getTextInternal(locale, key);
     return NlsUtility.bindText(text, messageArguments);
   }
@@ -78,11 +78,11 @@ public abstract class DynamicNls {
   /**
    * Override this method to change default locale behaviour
    */
-  protected Locale getDefaultLocale() {
+  private Locale getDefaultLocale() {
     return NlsLocale.getDefault().getLocale();
   }
 
-  protected String getTextInternal(Locale locale, String key) {
+  private String getTextInternal(Locale locale, String key) {
     if (locale == null) {
       locale = getDefaultLocale();
     }
@@ -97,7 +97,7 @@ public abstract class DynamicNls {
         //nop
       }
     }
-    return "{undefined text " + key + "}";
+    return null;
   }
 
   /**

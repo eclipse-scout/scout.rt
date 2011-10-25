@@ -3,7 +3,4 @@
 # To ensure a properly working nls support of    #
 # keep this file untouched directly.             #
 ##################################################
-Nls-Type=dynamic
-Nls-Class=org.eclipse.scout.rt.shared.ScoutTexts
-Nls-File-Prefix=ScoutTexts
-Nls-Translation-Folder=resources/texts
+Nls-Class=org.eclipse.scout.rt.shared.services.common.text.ScoutTextProviderService

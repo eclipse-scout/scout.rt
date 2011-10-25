@@ -74,7 +74,6 @@ import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -195,12 +194,12 @@ public final class SwingUtility {
     return s.toLowerCase();
   }
 
-  private static DynamicNls globalTextProvider;
+  private static ScoutTexts globalTextProvider;
 
   /**
    * set the text provider for global swing texts
    */
-  public static void setNlsTexts(DynamicNls textProvider) {
+  public static void setNlsTexts(ScoutTexts textProvider) {
     globalTextProvider = textProvider;
   }
 

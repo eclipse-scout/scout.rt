@@ -80,7 +80,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return 0;
   }
 
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.DOC)
   @Order(110)
   @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {

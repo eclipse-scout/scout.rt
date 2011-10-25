@@ -10,11 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.commons.nls.DynamicNls;
+import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
+import org.eclipse.scout.service.SERVICES;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 
 /**
  * This is the base class for all scout-based translation classes.<br>
@@ -35,24 +42,28 @@ import org.eclipse.scout.commons.nls.DynamicNls;
  * 
  * @see translations.nls
  */
-public class ScoutTexts extends DynamicNls {
-  public static final String RESOURCE_BUNDLE_NAME = "resources.texts.ScoutTexts";//$NON-NLS-1$
+public class ScoutTexts {
+
   public static final QualifiedName JOB_PROPERTY_NAME = new QualifiedName("org.eclipse.scout.commons", "DynamicNls");
+  private static final ScoutTexts INSTANCE = new ScoutTexts();
 
-  private static ScoutTexts instance = new ScoutTexts();
+  protected ITextProviderService[] m_textProviderCache = null;
 
-  public static DynamicNls getInstance() {
-    DynamicNls jobInstance = null;
+  protected ScoutTexts() {
+    BundleContext c = Activator.getDefault().getBundle().getBundleContext();
     try {
-      jobInstance = (DynamicNls) Job.getJobManager().currentJob().getProperty(JOB_PROPERTY_NAME);
+      c.addServiceListener(new ServiceListener() {
+        @Override
+        public void serviceChanged(ServiceEvent event) {
+          if (event.getType() == ServiceEvent.REGISTERED || event.getType() == ServiceEvent.UNREGISTERING) {
+            invalidateTextProviderCache();
+          }
+        }
+      }, "(objectclass=" + ITextProviderService.class.getName() + ")");
     }
-    catch (Throwable t) {
-      //performance optimization: null job is very rare
+    catch (InvalidSyntaxException e) {
+      // cannot happen, filter has been tested.
     }
-    if (jobInstance != null) {
-      return jobInstance;
-    }
-    return instance;
   }
 
   public static String get(String key, String... messageArguments) {
@@ -63,7 +74,55 @@ public class ScoutTexts extends DynamicNls {
     return getInstance().getText(locale, key, messageArguments);
   }
 
-  protected ScoutTexts() {
-    registerResourceBundle(RESOURCE_BUNDLE_NAME, ScoutTexts.class);
+  public static ScoutTexts getInstance() {
+    ScoutTexts jobInstance = null;
+    try {
+      jobInstance = (ScoutTexts) Job.getJobManager().currentJob().getProperty(JOB_PROPERTY_NAME);
+    }
+    catch (Throwable t) {
+      //performance optimization: null job is very rare
+    }
+    if (jobInstance != null) {
+      return jobInstance;
+    }
+    return INSTANCE;
+  }
+
+  public static void invalidateTextProviderCache() {
+    getInstance().m_textProviderCache = null;
+  }
+
+  public final String getText(String key, String... messageArguments) {
+    return getText(null, key, messageArguments);
+  }
+
+  public final String getText(Locale locale, String key, String... messageArguments) {
+    return getTextInternal(locale, key, messageArguments);
+  }
+
+  public Map<String, String> getTextMap(Locale locale) {
+    HashMap<String, String> map = new HashMap<String, String>();
+    ITextProviderService[] providers = getTextProviders();
+    for (int i = providers.length - 1; i >= 0; i--) {
+      map.putAll(providers[i].getTextMap(locale));
+    }
+    return map;
+  }
+
+  protected synchronized ITextProviderService[] getTextProviders() {
+    if (m_textProviderCache == null) {
+      m_textProviderCache = SERVICES.getServices(ITextProviderService.class);
+    }
+    return m_textProviderCache;
+  }
+
+  protected String getTextInternal(Locale locale, String key, String... messageArguments) {
+    for (ITextProviderService provider : getTextProviders()) {
+      String result = provider.getText(locale, key, messageArguments);
+      if (result != null) {
+        return result;
+      }
+    }
+    return "{undefined text " + key + "}";
   }
 }

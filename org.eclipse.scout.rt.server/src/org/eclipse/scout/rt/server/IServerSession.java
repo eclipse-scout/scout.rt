@@ -15,8 +15,8 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.osgi.framework.Bundle;
 
 /**
@@ -41,7 +41,7 @@ public interface IServerSession {
 
   void setLocale(Locale l);
 
-  DynamicNls getNlsTexts();
+  ScoutTexts getNlsTexts();
 
   Object getAttribute(Object key);
 

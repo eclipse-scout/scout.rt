@@ -153,9 +153,14 @@ public @interface ConfigProperty {
    */
   String SQL = "SQL";
   /**
-   * NLS translated String
+   * NLS translated String referencing normal text provider services.
    */
   String TEXT = "TEXT";
+  /**
+   * NLS translated Strings referencing text provider services flagged with
+   * <code>IDocumentationTextProviderService</code>.
+   */
+  String DOC = "DOC";
   /**
    * int
    */

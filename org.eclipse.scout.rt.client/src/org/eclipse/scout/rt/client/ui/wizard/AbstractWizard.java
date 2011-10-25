@@ -132,7 +132,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     return null;
   }
 
-  @ConfigProperty(ConfigProperty.STRING)
+  @ConfigProperty(ConfigProperty.DOC)
   @Order(40)
   @ConfigPropertyValue("null")
   protected String getConfiguredDoc() {
