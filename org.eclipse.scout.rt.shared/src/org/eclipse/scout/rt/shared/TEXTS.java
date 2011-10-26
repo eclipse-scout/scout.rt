@@ -3,6 +3,10 @@ package org.eclipse.scout.rt.shared;
 import java.util.Locale;
 
 public class TEXTS {
+  public static String get(String key) {
+    return ScoutTexts.getInstance().getText(key);
+  }
+
   public static String get(String key, String... messageArguments) {
     return ScoutTexts.getInstance().getText(key, messageArguments);
   }
