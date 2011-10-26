@@ -14,6 +14,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -22,7 +23,6 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.eclipse.scout.rt.client.Activator;
@@ -47,7 +47,7 @@ import org.osgi.framework.Bundle;
  * methods loadCodeType, loadCodeTypes if getters and finders are called with
  * partitionId, cache is not used.
  * <p>
- * Service state is per [{@link IClientSession}.class,{@link NlsLocale},partitionId]
+ * Service state is per [{@link IClientSession}.class,{@link Locale#getDefault()},partitionId]
  */
 @Priority(-3)
 public class CodeServiceClientProxy extends AbstractService implements ICodeService {
@@ -74,7 +74,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
         partitionId = (Long) session.getSharedVariableMap().get(ICodeType.PROP_PARTITION_ID);
       }
     }
-    CompositeObject key = new CompositeObject(session.getClass(), NlsLocale.getDefault().getLocale(), partitionId);
+    CompositeObject key = new CompositeObject(session.getClass(), Locale.getDefault(), partitionId);
     synchronized (m_stateLock) {
       ServiceState data = (ServiceState) m_stateMap.get(key);
       if (data == null) {

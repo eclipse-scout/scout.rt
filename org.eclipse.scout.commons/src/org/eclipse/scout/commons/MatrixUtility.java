@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.commons.nls.NlsUtility;
 
 public final class MatrixUtility {
 
@@ -217,11 +217,10 @@ public final class MatrixUtility {
    * Convenience function to sort data for later call to {@link #createCodeRowArray(Object[][])} The sort indices are
    * 0-based.
    * <p>
-   * <b> It is recommended to use {@link #sort(Locale, Object[][], int...)} with the locale obtained by
-   * NlsLocale.getDefault().getLocale() </b>
+   * <b>It is recommended to use {@link #sort(Locale, Object[][], int...)} with the specific {@link Locale}</b>
    */
   public static void sort(Object[][] data, int... sortColumns) {
-    sort(NlsLocale.getDefault().getLocale(), data, sortColumns);
+    sort(NlsUtility.getDefaultLocale(), data, sortColumns);
   }
 
   /**

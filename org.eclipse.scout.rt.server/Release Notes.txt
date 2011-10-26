@@ -316,3 +316,37 @@ Migration:
   - Remove the following properties: "Nls-Type", "Nls-File-Prefix", "Nls-Translation-Folder".
   - Change the property "Nls-Class" to the fully qualified name of the Text Provider Service you would like to edit with this .nls file.
   - Save the changes and open the .nls file again in the Multilanguage Editor (right click -> open with).
+
+26.10.2011 dwi
+Bugzilla ticket 361795
+Problem:
+Decorating a Date or a Number has to use NlsLocale-Settings.
+Currently, Locale.getLocal() is used which may contradict with user-settings.
+Solution:
+In Java 6 it is possible to contribute custom Locales (e.g. en_CH) to the JRE. That is why Scout NlsLocale is not used anymore and therefore marked as deprecated.
+The user's locale is accessed as follows:
+- On client side, the user's locale is accessed by Locale.getDefault()
+- On server side the request's locale is accessed by LocaleThreadLocal.get() (convenience accessor: ServerSession.get().getLocale())
+Eventhough the class NlsLocale is marked as deprecated for legacy support, its constructor 'NlsLocale(Locale)' was removed because NlsLocale was changed to only act as delegate to the thread's locale (if applicable) or default locale otherwise.
+Please note: A locale consists of its language and country. The country is mainly responsible for format settings as for instance the grouping separator of numbers. A very few locales already exist in the JRE. But if you like to have the application in the English language with Switzerland as its region, you have to contribute your own locale-implementation 'en_CH'. Please see Migration section for detailed instructions to extend JRE with a custom locale.
+Plug-Ins changed:
+- org.eclipse.scout.commons
+- org.eclipse.scout.rt.client
+- org.eclipse.scout.rt.server
+- org.eclipse.scout.rt.shared
+- org.eclipse.scout.rt.ui.swing
+- org.eclipse.scout.rt.oraclelite10g.core
+- org.eclipse.scout.rt.xstream.shared
+Migration:
+- removed NlsLocale(Locale) (constructor): use Locale instead of NlsLocale
+- removed IServerSession#getNlsLocale(): use IServerSession#getLocale() instead (e.g. replace all ServerSession.get().getNlsLocale().getLocale() by ServerSession.get().getLocale())
+- In client Plug-Ins: replace NlsLocale.getDefault().getLocale() by Locale.getDefault()
+- In server Plug-Ins: replace NlsLocale.getThreadDefault().getLocale() by LocaleThreadLocal.get()
+- In shared Plug-Ins: replace NlsLocale.getDefault().getLocale() by NlsUtility.getDefaultLocale()
+Contribution of custom locales to the JRE:
+1. Create a plain Java project, e.g. x.y.localeprovider.en.ch
+2. Create two classes that inherit from {@link DateFormatProvider} and {@link NumberFormatProvider} and implement the method stubs specific to your locale
+3. Create the folder META-INF/services with two files java.text.spi.DateFormatProvider and java.text.spi.NumberFormatProvider
+4. In those files, simply put the the fully qualified name to your date/number provider
+5. Export project as JAR file and put it into \lib\ext of your JRE
+

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.nls.NlsLocale;
 
 public class ServiceTunnelRequest implements Serializable {
   private static final long serialVersionUID = 0L;
@@ -24,7 +23,6 @@ public class ServiceTunnelRequest implements Serializable {
   private String m_operation;
   private Class[] m_parameterTypes;
   private Object[] m_args;
-  private Locale m_nlsLocale;
   private Locale m_locale;
   private String m_version;
   private Object m_metaData;
@@ -46,7 +44,6 @@ public class ServiceTunnelRequest implements Serializable {
     if (m_args == null) {
       m_args = new Object[0];
     }
-    m_nlsLocale = NlsLocale.getDefault().getLocale();
     m_locale = Locale.getDefault();
   }
 
@@ -68,10 +65,6 @@ public class ServiceTunnelRequest implements Serializable {
 
   public Object[] getArgs() {
     return m_args;
-  }
-
-  public Locale getNlsLocale() {
-    return m_nlsLocale;
   }
 
   public Locale getLocale() {
@@ -100,10 +93,11 @@ public class ServiceTunnelRequest implements Serializable {
   }
 
   /**
-   * @return a single string with all package parts reduced to their first character, 
-   * except the last package fragment. All is concatenated together with _ instead of '.' and the method name is appended with '__'
-   * <p>
-   * Example for IPingService is "oesrssc_ping_IPingService__ping"
+   * @return a single string with all package parts reduced to their first character,
+   *         except the last package fragment. All is concatenated together with _ instead of '.' and the method name is
+   *         appended with '__'
+   *         <p>
+   *         Example for IPingService is "oesrssc_ping_IPingService__ping"
    */
   public static String toSoapOperation(String className, String methodName) {
     if (className == null || methodName == null) {

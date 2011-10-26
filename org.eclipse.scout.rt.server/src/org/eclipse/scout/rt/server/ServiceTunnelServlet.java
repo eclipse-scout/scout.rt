@@ -41,14 +41,13 @@ import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.osgi.BundleInspector;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.WebClientState;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -314,7 +313,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
         //
         ServiceTunnelRequest serviceRequest = deserializeInput(req.getInputStream());
         LocaleThreadLocal.set(serviceRequest.getLocale());
-        NlsLocale.setThreadDefault(new NlsLocale(serviceRequest.getNlsLocale()));
         //
         IServerSession serverSession;
         Subject subject;

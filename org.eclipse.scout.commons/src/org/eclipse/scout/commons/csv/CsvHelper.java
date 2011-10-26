@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -39,7 +39,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsUtility;
 
 public class CsvHelper {
   /**
@@ -67,7 +69,7 @@ public class CsvHelper {
 
   public CsvHelper(Locale locale, char separatorChar, char textDelimiterChar, String lineSeparator) {
     if (locale == null) {
-      locale = Locale.getDefault();
+      locale = NlsUtility.getDefaultLocale();
     }
     m_locale = locale;
     m_separatorChar = separatorChar != 0x00 ? separatorChar : ';';

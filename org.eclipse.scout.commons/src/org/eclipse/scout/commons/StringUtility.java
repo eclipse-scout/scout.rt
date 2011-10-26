@@ -29,7 +29,7 @@ import java.util.zip.InflaterInputStream;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.commons.nls.NlsUtility;
 
 public final class StringUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StringUtility.class);
@@ -1437,7 +1437,7 @@ public final class StringUtility {
    * compare two strings using a locale-dependent {@link Collator}
    */
   public static int compareIgnoreCase(String a, String b) {
-    return compareIgnoreCase(NlsLocale.getDefault().getLocale(), a, b);
+    return compareIgnoreCase(NlsUtility.getDefaultLocale(), a, b);
   }
 
   /**

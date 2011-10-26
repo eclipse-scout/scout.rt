@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.eclipse.scout.rt.server.internal.Activator;
@@ -195,11 +195,11 @@ public class CodeService extends AbstractService implements ICodeService {
   }
 
   private CodeTypeCache getCodeTypeCache() {
-    return m_codeTypeStore.getCodeTypeCache(NlsLocale.getDefault().getLocale());
+    return m_codeTypeStore.getCodeTypeCache(LocaleThreadLocal.get());
   }
 
   private CodeTypeCache getCodeTypeCache(Long partitionId) {
-    return m_codeTypeStore.getCodeTypeCache(partitionId, NlsLocale.getDefault().getLocale());
+    return m_codeTypeStore.getCodeTypeCache(partitionId, LocaleThreadLocal.get());
   }
 
 }

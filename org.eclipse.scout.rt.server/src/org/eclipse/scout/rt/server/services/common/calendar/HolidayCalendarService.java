@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.server.services.common.calendar;
 
 import java.util.Date;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.services.common.calendar.HolidayCalendarItemParser;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.IHolidayCalendarService;
@@ -60,7 +60,7 @@ public class HolidayCalendarService extends AbstractService implements IHolidayC
         }
       }
     }
-    return p != null ? p.getItems(NlsLocale.getDefault().getLocale(), minDate, maxDate) : new ICalendarItem[0];
+    return p != null ? p.getItems(LocaleThreadLocal.get(), minDate, maxDate) : new ICalendarItem[0];
   }
 
 }

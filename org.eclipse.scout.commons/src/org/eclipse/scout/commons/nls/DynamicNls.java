@@ -75,13 +75,6 @@ public class DynamicNls {
     return NlsUtility.bindText(text, messageArguments);
   }
 
-  /**
-   * Override this method to change default locale behaviour
-   */
-  private Locale getDefaultLocale() {
-    return NlsLocale.getDefault().getLocale();
-  }
-
   private String getTextInternal(Locale locale, String key) {
     if (locale == null) {
       locale = getDefaultLocale();
@@ -129,4 +122,10 @@ public class DynamicNls {
     return map;
   }
 
+  /**
+   * Override this method to change default locale behaviour
+   */
+  protected Locale getDefaultLocale() {
+    return NlsUtility.getDefaultLocale();
+  }
 }

@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
@@ -251,7 +250,7 @@ public class ScoutInfoForm extends AbstractForm {
     long memMax = Runtime.getRuntime().maxMemory() / 1024 / 1024;
     //
     buf.append("<tr><td>" + ScoutTexts.get("Username") + ":</td><td>&nbsp;</td><td>" + session.getUserId() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + NlsLocale.getDefault().getLocale().getDisplayLanguage() + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + Locale.getDefault().getDisplayLanguage() + "</td></tr>");
     buf.append("<tr><td>" + ScoutTexts.get("FormattingLocale") + ":</td><td>&nbsp;</td><td>" + Locale.getDefault() + "</td></tr>");
     buf.append("<tr><td>" + ScoutTexts.get("JavaVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.version") + "</td></tr>");
     buf.append("<tr><td>" + ScoutTexts.get("JavaVMVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.vm.version") + "</td></tr>");

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 
 /**
@@ -89,9 +88,6 @@ public final class ThreadContext {
     if (key == Locale.class) {
       return (T) LocaleThreadLocal.get();
     }
-    if (key == NlsLocale.class) {
-      return (T) NlsLocale.getDefault();
-    }
     //
     HashMap<Class, Object> threadMap = getThreadMap(false);
     if (threadMap != null) {
@@ -153,9 +149,6 @@ public final class ThreadContext {
     }
     if (value instanceof Locale) {
       LocaleThreadLocal.set((Locale) value);
-    }
-    if (value instanceof NlsLocale) {
-      NlsLocale.setThreadDefault((NlsLocale) value);
     }
     //
     HashMap<Class, Object> threadMap = getThreadMap(true);

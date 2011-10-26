@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.TreeSet;
 
 import javax.swing.Icon;
@@ -46,7 +47,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.calendar.DateTimeFormatFactory;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -594,8 +594,7 @@ public class DateChooser {
   }
 
   public void setWorkDayCount(int n) {
-    if (n < 0 || n > 7)
-     {
+    if (n < 0 || n > 7) {
       return;// ignore it
     }
     m_workDayCount = n;
@@ -917,7 +916,7 @@ public class DateChooser {
   private void reconfigureCells() {
     // 7 days (in condesed for the 7th is void)
     m_daysPanel.removeAll();
-    String[] wdStartingMonday = new DateFormatSymbols(NlsLocale.getDefault().getLocale()).getShortWeekdays();
+    String[] wdStartingMonday = new DateFormatSymbols(Locale.getDefault()).getShortWeekdays();
     // weekdays starting at 0 (as first day of week)
     String[] wd = new String[7];
     for (int i = 0; i < 7; i++) {
@@ -1007,25 +1006,25 @@ public class DateChooser {
     int monthNo = c.get(Calendar.MONTH);
     int weekNo = c.get(Calendar.WEEK_OF_YEAR);
     if (m_displayMode == DISPLAY_MODE_DAY) {
-      DateFormat weekDayFmt = new SimpleDateFormat("EEEEE", NlsLocale.getDefault().getLocale());
+      DateFormat weekDayFmt = new SimpleDateFormat("EEEEE", Locale.getDefault());
       DateFormat dateFmt = new DateTimeFormatFactory().getDayMonthYear(DateFormat.LONG);
       m_monthLabel.setText(weekDayFmt.format(vd) + " " + dateFmt.format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
     }
     else if (m_displayMode == DISPLAY_MODE_WEEK) {
       // Calculate Startdate; go back to 1st day of week (1=sunday)
       c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - m_firstDayOfWeek + 7) % 7));
-      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", NlsLocale.getDefault().getLocale()).format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
+      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
     }
     else if (m_displayMode == DISPLAY_MODE_WORKWEEK) {
       c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY + 7) % 7));
-      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", NlsLocale.getDefault().getLocale()).format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
+      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
     }
     else if (m_displayMode == DISPLAY_MODE_MONTH) {
       // Calculate Startdate; go back to 1st of month, then back to 1st day of
       // week (1=sunday)
       c.add(Calendar.DAY_OF_MONTH, -(c.get(Calendar.DAY_OF_MONTH) - 1));
       c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - m_firstDayOfWeek + 7) % 7));
-      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", NlsLocale.getDefault().getLocale()).format(vd));
+      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(vd));
     }
     Date newViewDateStart = truncDate(c.getTime());
     c.add(Calendar.DATE, m_cell.length * m_cell[0].length);

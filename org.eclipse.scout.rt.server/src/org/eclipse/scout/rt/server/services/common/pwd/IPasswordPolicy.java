@@ -4,14 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.pwd;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.nls.NlsLocale;
 
 /**
  * Title: BSI Scout V3 Copyright:
@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 public interface IPasswordPolicy {
 
   /**
-   * @return a localized text that describes the policy to the user use {@link NlsLocale#getDefault()} to access the
+   * @return a localized text that describes the policy to the user use {@link LocaleThreadLocal#get()} to access the
    *         language for user
    *         messages
    */

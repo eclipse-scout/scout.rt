@@ -161,10 +161,8 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     buf.append(msg.getVersion());
     buf.append("\" compressed=\"");
     buf.append(compressed);
-    buf.append("\" format=\"");
+    buf.append("\" locale=\"");
     buf.append(msg.getLocale().toString());
-    buf.append("\" language=\"");
-    buf.append(msg.getNlsLocale().toString());
     buf.append("\" service=\"");
     buf.append(msg.getServiceInterfaceClassName());
     buf.append("\" operation=\"");

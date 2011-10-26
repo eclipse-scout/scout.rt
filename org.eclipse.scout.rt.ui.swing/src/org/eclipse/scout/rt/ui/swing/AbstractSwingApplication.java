@@ -17,6 +17,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +32,6 @@ import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
@@ -71,7 +71,7 @@ public abstract class AbstractSwingApplication implements IApplication {
       System.exit(-1);
     }
     try {
-      // @{link NlsLocale} is to be initialized before SwingEnvironment is created, as UIDefaultsInjector, which is initialized when instantiating SwingEnvironement, resolves NLS texts.
+      // The default @{link Locale} has to be set prior to SwingEnvironment is created, because UIDefaultsInjector resolves NLS texts.
       execInitLocale();
 
       SwingUtilities.invokeAndWait(
@@ -111,16 +111,12 @@ public abstract class AbstractSwingApplication implements IApplication {
   }
 
   /**
-   * This abstract template application loads creates a JAAS subject based on the system property "user.name"
-   * and initiates the user language stored in {@link ClientUIPreferences#getNlsLocale()}.
+   * This abstract template application creates a JAAS subject based on the system property "user.name"
+   * and sets the user language stored in {@link ClientUIPreferences#getLocale()}.
    * <p>
    * The start is then delegated to {@link #startInSubject(IApplicationContext)}
    * <p>
-   * The change of the language has to be initiated by the client but the property is stored on the server so here we
-   * initiate the property with that's stored in the ClientUIPreferences see also
-   * {@link ClientUIPreferences#setNlsLocale(NlsLocale)}
-   * <p>
-   * Normally {@link #startInSubject(IApplicationContext)} is overrided
+   * Normally {@link #startInSubject(IApplicationContext)} is overriden
    */
   @Override
   public Object start(final IApplicationContext context) throws Exception {
@@ -153,15 +149,9 @@ public abstract class AbstractSwingApplication implements IApplication {
   }
 
   protected void execInitLocale() {
-    /**
-     * the change of the language has to be initiated by the client
-     * but the property is stored on the server
-     * so here we initiate the property with that's stored in the ClientUIPreferences
-     * see also {@link ClientUIPreferences#setNlsLocale(NlsLocale)}
-     */
-    NlsLocale l = ClientUIPreferences.getInstance().getNlsLocale();
-    if (l != null) {
-      NlsLocale.setDefault(l);
+    Locale locale = ClientUIPreferences.getInstance().getLocale();
+    if (locale != null) {
+      Locale.setDefault(locale);
     }
   }
 

@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
 import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
 import org.eclipse.scout.commons.prefs.UserScope;
@@ -65,7 +64,16 @@ public class ClientUIPreferences {
   private static final String CALENDAR_DISPLAY_MODE = "calendar.display.mode";
   private static final String CALENDAR_DISPLAY_CONDENSED = "calendar.display.condensed";
   private static final String DESKTOP_COLUMN_SPLITS = "desktop.columnSplits";
+
+  /**
+   * @deprecated to be removed in release 3.9.0
+   */
+  @Deprecated
   private static final String NLS_LOCALE_ISO = "nls_locale_iso";
+  private static final String NLS_LOCALE_LANGUAGE = "locale.language";
+  private static final String NLS_LOCALE_COUNTRY = "locale.country";
+
+  private static final Locale HOST_LOCALE = Locale.getDefault();
 
   private final IEclipsePreferences m_env;
 
@@ -618,22 +626,45 @@ public class ClientUIPreferences {
     return null;
   }
 
-  public NlsLocale getNlsLocale() {
-    String strVal = m_env.get(NLS_LOCALE_ISO, null);
-    if (strVal != null) {
-      return new NlsLocale(new Locale(strVal));
+  public Locale getLocale() {
+    // >> legacy support. To be removed in release 3.9.0.
+    String strLegacy = m_env.get(NLS_LOCALE_ISO, null);
+    if (strLegacy != null) {
+      m_env.remove(NLS_LOCALE_ISO); // remove legacy entry
+      m_env.put(NLS_LOCALE_LANGUAGE, strLegacy);
+      flush();
+    }
+    // << legacy support. To be removed in release 3.9.0.
+
+    String strLanguage = m_env.get(NLS_LOCALE_LANGUAGE, null);
+    String strCountry = m_env.get(NLS_LOCALE_COUNTRY, null);
+    if (strLanguage != null && strCountry != null) {
+      return new Locale(strLanguage, strCountry);
+    }
+    else if (strLanguage != null) {
+      return new Locale(strLanguage, ClientUIPreferences.getHostLocale().getCountry());
     }
     return null;
   }
 
-  public void setNlsLocale(NlsLocale l) {
-    if (l != null) {
-      m_env.put(NLS_LOCALE_ISO, l.getLocale().getLanguage());
+  public void setLocale(Locale locale) {
+    if (locale != null) {
+      m_env.put(NLS_LOCALE_LANGUAGE, locale.getLanguage());
+      m_env.put(NLS_LOCALE_COUNTRY, locale.getCountry());
     }
     else {
-      m_env.remove(NLS_LOCALE_ISO);
+      m_env.remove(NLS_LOCALE_LANGUAGE);
+      m_env.remove(NLS_LOCALE_COUNTRY);
     }
     flush();
+  }
+
+  /**
+   * @return
+   *         the startup locale of the Java Virtual Machine which typically is based on the host environment
+   */
+  public static Locale getHostLocale() {
+    return HOST_LOCALE;
   }
 
   public void setDesktopColumnSplits(int[][] splits) {

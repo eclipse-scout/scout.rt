@@ -25,7 +25,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFilter;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -41,7 +40,6 @@ public abstract class AbstractServerSession implements IServerSession {
   private Bundle m_bundle;
   private boolean m_initialized;
   private boolean m_active;
-  private NlsLocale m_nlsLocale;
   private Locale m_locale;
   private HashMap<Object, Object> m_attributes;
   private SharedVariableMap m_sharedVariableMap;
@@ -52,7 +50,6 @@ public abstract class AbstractServerSession implements IServerSession {
     if (m_locale == null) {
       m_locale = Locale.getDefault();
     }
-    m_nlsLocale = NlsLocale.getDefault();
     m_attributes = new HashMap<Object, Object>();
     m_sharedVariableMap = new SharedVariableMap();
 
@@ -109,18 +106,6 @@ public abstract class AbstractServerSession implements IServerSession {
 
   private void setUserIdInternal(String newValue) {
     setSharedContextVariable("userId", String.class, newValue);
-  }
-
-  @Override
-  public NlsLocale getNlsLocale() {
-    return m_nlsLocale;
-  }
-
-  @Override
-  public void setNlsLocale(NlsLocale l) {
-    if (l != null) {
-      m_nlsLocale = l;
-    }
   }
 
   @Override

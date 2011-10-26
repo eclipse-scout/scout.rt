@@ -4,96 +4,91 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.commons.nls;
 
+import java.text.spi.DateFormatProvider;
+import java.text.spi.NumberFormatProvider;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
 
 /**
- * Sometimes it is useful to distinguish between a nls locale and a
- * formatting/date/currency locale In Switzerland for example some people like
- * to have nls language "en" but formatting locale de_CH This class represents
- * the nls locale
- * 
- * @see Locale.getLocale() for formatting locale
+ * @deprecated Will be removed in release 3.9.0 and is to be replaced by {@link Locale} or {@link LocaleThreadLocal}.
+ *             On client side, it is typically replaced by {@link Locale#getDefault()} or
+ *             {@link Locale#setDefault(Locale)}, on server side by {@link LocaleThreadLocal#get()} or
+ *             {@link LocaleThreadLocal#set(Locale)}, respectively. This is because on server side, the default
+ *             {@link Locale} must be bound to the current thread.
+ *             <p>
+ *             To support a custom locale (e.g. en_CH), do the following:
+ *             <ol>
+ *             <li>Create a plain Java project</li>
+ *             <li>Create two classes that inherit from {@link DateFormatProvider} and {@link NumberFormatProvider} and
+ *             implement the method stubs specific to your locale</li>
+ *             <li>Create the folder META-INF/services with two files java.text.spi.DateFormatProvider and
+ *             java.text.spi.NumberFormatProvider</li>
+ *             <li>In those files, simply put the the fully qualified name to your date/number providers</li>
+ *             <li>Export project as JAR file and put it into \lib\ext of your JRE</li>
+ *             </ol>
+ *             </p>
  */
+@Deprecated
 public final class NlsLocale {
 
-  private Locale m_locale;
-
-  public NlsLocale() {
-    this(null);
-  }
-
-  public NlsLocale(Locale l) {
-    if (l == null) {
-      l = Locale.getDefault();
-    }
-    m_locale = l;
-  }
-
   public Locale getLocale() {
-    return m_locale;
+    return NlsUtility.getDefaultLocale();
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
-    return m_locale.hashCode();
+    return getLocale().hashCode();
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object o) {
-    return (o instanceof NlsLocale && ((NlsLocale) o).m_locale.equals(this.m_locale));
+    return (o instanceof NlsLocale && ((NlsLocale) o).getLocale().equals(this.getLocale()));
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
-    return m_locale.toString();
+    return getLocale().toString();
   }
 
-  private static NlsLocale nlsLocale;
-  private static ThreadLocal<NlsLocale> nlsLocaleThreadLocal = new ThreadLocal<NlsLocale>();
-
+  /**
+   * @return
+   * @deprecated Will be removed in release 3.9.0, use {@link Locale#getDefault()} or {@link LocaleThreadLocal#get()}
+   *             instead.<br/>
+   *             Please note that {@link Locale#getDefault()} returns the locale for this instance of the Java Virtual
+   *             Machine.
+   *             Typically, this is only meaningful on client side. On server side, use {@link LocaleThreadLocal#get()}
+   *             instead.
+   */
+  @Deprecated
   public static NlsLocale getDefault() {
-    NlsLocale l = nlsLocaleThreadLocal.get();
-    if (l == null) {
-      l = nlsLocale;
-    }
-    if (l == null) {
-      Locale formattingLocale = LocaleThreadLocal.get();
-      if (formattingLocale != null) {
-        l = new NlsLocale(formattingLocale);
-      }
-    }
-    if (l == null) {
-      l = new NlsLocale(Locale.getDefault());
-    }
-    return l;
+    return new NlsLocale();
   }
 
+  /**
+   * @param l
+   * @deprecated Will be removed in release 3.9.0, use {@link Locale#setDefault(Locale)} instead.<br/>
+   *             Please note that this changes the default locale for this instance of the Java Virtual Machine.
+   *             Typically, this is only meaningful on client side. On server side, use
+   *             {@link LocaleThreadLocal#set(Locale)} instead.
+   */
+  @Deprecated
   public static void setDefault(NlsLocale l) {
-    nlsLocale = l;
+    Locale.setDefault(l.getLocale());
   }
 
+  /**
+   * @param l
+   * @deprecated Will be removed in release 3.9.0, use {@link LocaleThreadLocal#set(Locale)} instead.<br/>
+   */
+  @Deprecated
   public static void setThreadDefault(NlsLocale l) {
-    nlsLocaleThreadLocal.set(l);
+    LocaleThreadLocal.set(l.getLocale());
   }
-
 }
