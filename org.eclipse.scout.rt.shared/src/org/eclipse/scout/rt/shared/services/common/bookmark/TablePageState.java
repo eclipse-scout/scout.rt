@@ -25,6 +25,7 @@ public class TablePageState extends AbstractPageState implements Serializable, C
   private String m_searchFormState;
   private boolean m_searchFilterComplete;
   private String m_searchFilterState;
+  private byte[] m_tableCustomizerData;
   /**
    * legacy, replaced by m_availableColumns
    */
@@ -46,6 +47,7 @@ public class TablePageState extends AbstractPageState implements Serializable, C
     this.m_searchFormState = state.m_searchFormState;
     this.m_searchFilterState = state.m_searchFilterState;
     this.m_searchFilterComplete = state.m_searchFilterComplete;
+    this.m_tableCustomizerData = state.m_tableCustomizerData;
     if (state.m_visibleColumns != null) {
       this.m_visibleColumns = new ArrayList<TableColumnState>();
       for (TableColumnState col : state.m_visibleColumns) {
@@ -158,6 +160,21 @@ public class TablePageState extends AbstractPageState implements Serializable, C
     else {
       m_availableColumns = new ArrayList<TableColumnState>(cols);
     }
+  }
+
+  /**
+   * @return serialized TableCustomizer data
+   */
+  public byte[] getTableCustomizerData() {
+    return m_tableCustomizerData;
+  }
+
+  /**
+   * @param tableCustomizer
+   *          serialized TableCustomizer data for persistent storage with bookmark
+   */
+  public void setTableCustomizerData(byte[] tableCustomizer) {
+    m_tableCustomizerData = tableCustomizer;
   }
 
   @Override

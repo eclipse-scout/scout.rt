@@ -47,4 +47,15 @@ public interface ITableCustomizer {
    * Remove all existing custom columns, asks with a message box before deleting
    */
   void removeAllColumns() throws ProcessingException;
+
+  /**
+   * Get the serialized data of the TableCustomizer for further processing (e.g. storing a bookmark)
+   */
+  byte[] getSerializedData() throws ProcessingException;
+
+  /**
+   * Import the serialized data, e.g. after restoring from a bookmark
+   */
+  void setSerializedData(byte[] data) throws ProcessingException;
+
 }

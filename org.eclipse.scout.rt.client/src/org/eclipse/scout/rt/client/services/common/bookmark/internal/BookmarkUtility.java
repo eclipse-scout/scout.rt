@@ -402,6 +402,10 @@ public final class BookmarkUtility {
   @SuppressWarnings("deprecation")
   private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean loadChildren) throws ProcessingException {
     ITable table = tablePage.getTable();
+    if (tablePageState.getTableCustomizerData() != null) {
+      tablePage.getTable().getTableCustomizer().setSerializedData(tablePageState.getTableCustomizerData());
+      tablePage.getTable().resetColumnConfiguration();
+    }
     // starts search form
     tablePage.getSearchFilter();
     ColumnSet cs = table.getColumnSet();
@@ -565,6 +569,7 @@ public final class BookmarkUtility {
       state.setSearchFormState(searchForm.getXML("UTF-8"));
       state.setSearchFilterState(searchForm.getSearchFilter().isCompleted(), "" + createSearchFilterCRC(searchForm.getSearchFilter()));
     }
+    state.setTableCustomizerData(page.getTable().getTableCustomizer().getSerializedData());
     ArrayList<TableColumnState> allColumns = new ArrayList<TableColumnState>();
     //add all columns but in user order
     for (IColumn<?> c : cs.getAllColumnsInUserOrder()) {

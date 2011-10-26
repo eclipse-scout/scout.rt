@@ -39,4 +39,14 @@ public class AbstractTableCustomizer implements ITableCustomizer {
   @Override
   public void removeColumn(ICustomColumn<?> col) throws ProcessingException {
   }
+
+  @Override
+  public byte[] getSerializedData() throws ProcessingException {
+    return null;
+  }
+
+  @Override
+  public void setSerializedData(byte[] data) throws ProcessingException {
+
+  }
 }

@@ -27,13 +27,13 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
 import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
 import org.eclipse.scout.commons.prefs.UserScope;
-import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
+import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
+import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
-import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * UI model customization wrapping a {@link org.eclipse.core.runtime.Preferences} object with its location Stored
@@ -78,7 +78,7 @@ public class ClientUIPreferences {
   private final IEclipsePreferences m_env;
 
   public ClientUIPreferences() {
-    m_env = new UserScope().getNode(Activator.PLUGIN_ID);
+    m_env = SERVICES.getService(IUserPreferencesStorageService.class).loadPreferences();
   }
 
   public Rectangle getFormBounds(IForm form) {
@@ -685,11 +685,6 @@ public class ClientUIPreferences {
   }
 
   protected void flush() {
-    try {
-      m_env.flush();
-    }
-    catch (BackingStoreException ex) {
-      LOG.error("storing client ui preferences", ex);
-    }
+    SERVICES.getService(IUserPreferencesStorageService.class).storePreferences(m_env);
   }
 }

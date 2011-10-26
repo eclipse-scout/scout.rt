@@ -7,6 +7,7 @@
     <service class="org.eclipse.scout.rt.client.services.common.file.FileService" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
     <service class="org.eclipse.scout.rt.client.services.common.session.internal.ClientSessionRegistryService"/>
     <service class="org.eclipse.scout.rt.client.services.common.progress.internal.SimpleProgressService"/>
+    <service class="org.eclipse.scout.rt.client.services.common.prefs.FileSystemUserPreferencesStorageService"/>
     <service class="org.eclipse.scout.rt.client.services.common.clientnotification.internal.ClientNotificationConsumerService"/>
     <service class="org.eclipse.scout.rt.client.services.common.perf.internal.PerformanceAnalyzerService"/>
     <service class="org.eclipse.scout.rt.client.ui.desktop.navigation.internal.NavigationHistoryService" createImmediately="false" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory" ranking="-1"/>
