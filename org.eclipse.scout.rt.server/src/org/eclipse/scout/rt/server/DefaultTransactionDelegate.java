@@ -53,7 +53,8 @@ import org.osgi.framework.Version;
  * <p>
  * Override {@link #validateInput(IValidationStrategy, Object, Method, Object[])} and/or
  * {@link #validateOutput(IValidationStrategy, Object, Method, Object, Object[])} to modifiy the default central
- * validation.
+ * validation. You may use {@link #defaultValidateInput(IValidationStrategy, Object, Method, Object[])} and
+ * {@link #defaultValidateOutput(IValidationStrategy, Object, Method, Object, Object[])}
  * <p>
  * Set the config.ini properties to activate default validation:
  * 
@@ -357,6 +358,10 @@ public class DefaultTransactionDelegate {
    *          may be null, add corresponding null handling.
    */
   protected void validateInput(IValidationStrategy validationStrategy, Object service, Method op, Object[] args) throws Exception {
+    //defaultValidateInput(validationStrategy, service, op, args);
+  }
+
+  protected void defaultValidateInput(IValidationStrategy validationStrategy, Object service, Method op, Object[] args) throws Exception {
     new DefaultValidator(validationStrategy).validateMethodCall(op, args);
   }
 
@@ -367,6 +372,10 @@ public class DefaultTransactionDelegate {
    * This method is part of the protected api and can be overridden.
    */
   protected void validateOutput(IValidationStrategy validationStrategy, Object service, Method op, Object returnValue, Object[] outArgs) throws Exception {
+    //defaultValidateOutput(validationStrategy, service, op, returnValue, outArgs);
+  }
+
+  protected void defaultValidateOutput(IValidationStrategy validationStrategy, Object service, Method op, Object returnValue, Object[] outArgs) throws Exception {
     if ((outArgs != null && outArgs.length > 0) || returnValue != null) {
       DefaultValidator v = new DefaultValidator(validationStrategy);
       if (outArgs != null && outArgs.length > 0) {
