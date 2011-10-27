@@ -39,12 +39,12 @@ public interface ITableCustomizer {
   void modifyColumn(ICustomColumn<?> col) throws ProcessingException;
 
   /**
-   * Remove an existing custom column, asks with a message box before deleting
+   * Remove an existing custom column
    */
   void removeColumn(ICustomColumn<?> col) throws ProcessingException;
 
   /**
-   * Remove all existing custom columns, asks with a message box before deleting
+   * Remove all existing custom columns
    */
   void removeAllColumns() throws ProcessingException;
 

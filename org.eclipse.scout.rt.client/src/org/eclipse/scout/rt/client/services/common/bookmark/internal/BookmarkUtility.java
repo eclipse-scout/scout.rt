@@ -402,7 +402,8 @@ public final class BookmarkUtility {
   @SuppressWarnings("deprecation")
   private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean loadChildren) throws ProcessingException {
     ITable table = tablePage.getTable();
-    if (tablePageState.getTableCustomizerData() != null) {
+    if (tablePageState.getTableCustomizerData() != null && tablePage.getTable().getTableCustomizer() != null) {
+      tablePage.getTable().getTableCustomizer().removeAllColumns();
       tablePage.getTable().getTableCustomizer().setSerializedData(tablePageState.getTableCustomizerData());
       tablePage.getTable().resetColumnConfiguration();
     }
@@ -490,6 +491,10 @@ public final class BookmarkUtility {
             doSearch = false;
           }
         }
+        // in case search form is in correct state, but no search has been executed, force search
+        if (tablePage.getTable().getRowCount() == 0) {
+          doSearch = true;
+        }
         if (doSearch) {
           searchForm.setXML(tablePageState.getSearchFormState());
           if (tablePageState.isSearchFilterComplete()) {
@@ -569,7 +574,9 @@ public final class BookmarkUtility {
       state.setSearchFormState(searchForm.getXML("UTF-8"));
       state.setSearchFilterState(searchForm.getSearchFilter().isCompleted(), "" + createSearchFilterCRC(searchForm.getSearchFilter()));
     }
-    state.setTableCustomizerData(page.getTable().getTableCustomizer().getSerializedData());
+    if (page.getTable().getTableCustomizer() != null) {
+      state.setTableCustomizerData(page.getTable().getTableCustomizer().getSerializedData());
+    }
     ArrayList<TableColumnState> allColumns = new ArrayList<TableColumnState>();
     //add all columns but in user order
     for (IColumn<?> c : cs.getAllColumnsInUserOrder()) {

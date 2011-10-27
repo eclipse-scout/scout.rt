@@ -10,11 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 
+import java.util.ArrayList;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 public class RemoveAllCustomColumnsMenu extends AbstractMenu {
   private final ITable m_table;
@@ -46,6 +50,15 @@ public class RemoveAllCustomColumnsMenu extends AbstractMenu {
   protected void execAction() throws ProcessingException {
     if (m_table != null) {
       if (m_table.getTableCustomizer() != null) {
+        ArrayList<String> names = new ArrayList<String>();
+        for (IColumn column : m_table.getColumns()) {
+          if (column instanceof ICustomColumn<?>) {
+            names.add(column.getHeaderCell().getText());
+          }
+        }
+        if (!MessageBox.showDeleteConfirmationMessage(TEXTS.get("Columns"), names.toArray(new String[names.size()]))) {
+          return;
+        }
         m_table.getTableCustomizer().removeAllColumns();
       }
     }
