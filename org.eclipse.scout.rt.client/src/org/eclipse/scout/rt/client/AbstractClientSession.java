@@ -71,13 +71,18 @@ public abstract class AbstractClientSession implements IClientSession {
   private IMemoryPolicy m_memoryPolicy;
   private IIconLocator m_iconLocator;
   private final HashMap<String, Object> m_clientSessionData;
-  private final ScoutTexts m_scoutTexts;
+  private ScoutTexts m_scoutTexts;
+  private static final Map<Class<? extends IClientSession>, ScoutTexts> SCOUT_TEXTS_CACHE = new HashMap<Class<? extends IClientSession>, ScoutTexts>();
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
     m_sharedVariableMap = new SharedVariableMap();
-    m_scoutTexts = new ScoutTexts();
+    m_scoutTexts = SCOUT_TEXTS_CACHE.get(getClass());
+    if (m_scoutTexts == null) {
+      m_scoutTexts = new ScoutTexts();
+      SCOUT_TEXTS_CACHE.put(getClass(), m_scoutTexts);
+    }
     if (autoInitConfig) {
       initConfig();
     }
@@ -104,7 +109,12 @@ public abstract class AbstractClientSession implements IClientSession {
   }
 
   /**
-   * override this method to set the application specific texts implementation
+   * <p>
+   * Returns the {@link ScoutTexts} instance assigned to the type (class) of the current ClientSession.
+   * </p>
+   * <p>
+   * Override this method to set the application specific texts implementation
+   * </p>
    */
   @Override
   public ScoutTexts getNlsTexts() {
