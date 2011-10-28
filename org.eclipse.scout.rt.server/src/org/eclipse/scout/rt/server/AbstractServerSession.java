@@ -44,6 +44,7 @@ public abstract class AbstractServerSession implements IServerSession {
   private HashMap<Object, Object> m_attributes;
   private SharedVariableMap m_sharedVariableMap;
   private boolean m_webSession;
+  private final ScoutTexts m_scoutTexts;
 
   public AbstractServerSession(boolean autoInitConfig) {
     m_locale = LocaleThreadLocal.get();
@@ -52,7 +53,7 @@ public abstract class AbstractServerSession implements IServerSession {
     }
     m_attributes = new HashMap<Object, Object>();
     m_sharedVariableMap = new SharedVariableMap();
-
+    m_scoutTexts = new ScoutTexts();
     if (autoInitConfig) {
       initConfig();
     }
@@ -125,7 +126,7 @@ public abstract class AbstractServerSession implements IServerSession {
    */
   @Override
   public ScoutTexts getNlsTexts() {
-    return null;
+    return m_scoutTexts;
   }
 
   @Override
@@ -170,7 +171,7 @@ public abstract class AbstractServerSession implements IServerSession {
     }
     m_bundle = bundle;
     m_active = true;
-    ScoutTexts.invalidateTextProviderCache();
+    ScoutTexts.getInstance().invalidateTextProviderCache();
     assignUserId();
     execLoadSession();
   }
