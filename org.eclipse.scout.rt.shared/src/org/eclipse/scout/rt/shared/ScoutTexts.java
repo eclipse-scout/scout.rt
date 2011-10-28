@@ -45,11 +45,11 @@ import org.osgi.framework.ServiceListener;
 public class ScoutTexts {
 
   public static final QualifiedName JOB_PROPERTY_NAME = new QualifiedName("org.eclipse.scout.commons", "DynamicNls");
-  private static final ScoutTexts INSTANCE = new ScoutTexts();
+  private static final ScoutTexts preSessionInstance = new ScoutTexts();
 
   protected ITextProviderService[] m_textProviderCache = null;
 
-  protected ScoutTexts() {
+  public ScoutTexts() {
     BundleContext c = Activator.getDefault().getBundle().getBundleContext();
     try {
       c.addServiceListener(new ServiceListener() {
@@ -82,14 +82,17 @@ public class ScoutTexts {
     catch (Throwable t) {
       //performance optimization: null job is very rare
     }
-    if (jobInstance != null) {
-      return jobInstance;
+
+    //If session has not been initialized yet the preSessionInstance is used.
+    if (jobInstance == null) {
+      jobInstance = preSessionInstance;
     }
-    return INSTANCE;
+
+    return jobInstance;
   }
 
-  public static void invalidateTextProviderCache() {
-    getInstance().m_textProviderCache = null;
+  public void invalidateTextProviderCache() {
+    m_textProviderCache = null;
   }
 
   public final String getText(String key, String... messageArguments) {
