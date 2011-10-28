@@ -71,11 +71,13 @@ public abstract class AbstractClientSession implements IClientSession {
   private IMemoryPolicy m_memoryPolicy;
   private IIconLocator m_iconLocator;
   private final HashMap<String, Object> m_clientSessionData;
+  private final ScoutTexts m_scoutTexts;
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
     m_sharedVariableMap = new SharedVariableMap();
+    m_scoutTexts = new ScoutTexts();
     if (autoInitConfig) {
       initConfig();
     }
@@ -106,7 +108,7 @@ public abstract class AbstractClientSession implements IClientSession {
    */
   @Override
   public ScoutTexts getNlsTexts() {
-    return null;
+    return m_scoutTexts;
   }
 
   @Override
@@ -220,7 +222,7 @@ public abstract class AbstractClientSession implements IClientSession {
         setMemoryPolicy(new MediumMemoryPolicy());
       }
       m_iconLocator = createIconLocator();
-      ScoutTexts.invalidateTextProviderCache();
+      ScoutTexts.getInstance().invalidateTextProviderCache();
       execLoadSession();
       setActive(true);
     }
