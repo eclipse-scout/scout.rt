@@ -24,28 +24,19 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 
 /**
- * This is the base class for all scout-based translation classes.<br>
- * Do not change any member nor field of this class anytime otherwise the nls
- * support is not anymore garanteed. This class is auto generated and is
- * maintained by the plugins translations.nls file in the root directory of the
- * plugin.
- * <p>
- * The method getInstance() queries {@link Job#getProperty(org.eclipse.core.runtime.QualifiedName)} with
- * {@value #JOB_PROPERTY_NAME} to find the scope specific texts implementation. If this one is null, then the instance
- * itself is used as global default. That way applications can override scout texts in their application session only,
- * without interfering with other scout applications in the same osgi/eclipse runtime.
- * <p>
- * see IClientSession#getNlsTexts()<br/>
- * see IServerSession#getNlsTexts()<br/>
- * see ClientJob<br/>
- * see ServerJob<br/>
+ * This is the base class for translations access in scout applications.<br>
+ * It provides prioritized access to all text services available to the scope.
  * 
- * @see translations.nls
+ * @see IClientSession#getNlsTexts()
+ * @see IServerSession#getNlsTexts()
+ * @see ClientJob
+ * @see ServerJob
+ * @see ITextProviderService
  */
 public class ScoutTexts {
 
   public static final QualifiedName JOB_PROPERTY_NAME = new QualifiedName("org.eclipse.scout.commons", "DynamicNls");
-  private static final ScoutTexts preSessionInstance = new ScoutTexts();
+  private static final ScoutTexts defaultInstance = new ScoutTexts();
 
   protected ITextProviderService[] m_textProviderCache = null;
 
@@ -74,6 +65,15 @@ public class ScoutTexts {
     return getInstance().getText(locale, key, messageArguments);
   }
 
+  /**
+   * Queries {@link Job#getProperty(org.eclipse.core.runtime.QualifiedName)} with {@value #JOB_PROPERTY_NAME} to find
+   * the scope specific texts implementation (e.g. as defined on a session). If this one is null, then the default
+   * instance
+   * is used as global default. That way applications can override scout texts in their
+   * application sessions, without interfering with other scout applications in the same osgi/eclipse runtime.
+   * 
+   * @return The <code>ScoutTexts</code> instance to use in current scope.
+   */
   public static ScoutTexts getInstance() {
     ScoutTexts jobInstance = null;
     try {
@@ -83,14 +83,19 @@ public class ScoutTexts {
       //performance optimization: null job is very rare
     }
 
-    //If session has not been initialized yet the preSessionInstance is used.
+    //If session has not been initialized yet or does not define a ScoutTexts class, the preSessionInstance is used.
     if (jobInstance == null) {
-      jobInstance = preSessionInstance;
+      jobInstance = defaultInstance;
     }
 
     return jobInstance;
   }
 
+  /**
+   * Clears the cached list of text provider services.<br>
+   * This list will be re-created by getting a fresh list from the ServiceRegistry when the next translation is
+   * requested.
+   */
   public void invalidateTextProviderCache() {
     m_textProviderCache = null;
   }
