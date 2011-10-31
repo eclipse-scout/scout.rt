@@ -41,6 +41,9 @@ public class ScoutTexts {
   protected ITextProviderService[] m_textProviderCache = null;
 
   public ScoutTexts() {
+    if (Activator.getDefault() == null) {
+      return;
+    }
     BundleContext c = Activator.getDefault().getBundle().getBundleContext();
     try {
       c.addServiceListener(new ServiceListener() {
