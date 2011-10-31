@@ -333,15 +333,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       @Override
       public void formChanged(FormEvent e) throws ProcessingException {
         switch (e.getType()) {
-          case FormEvent.TYPE_STORE_BEFORE: {
+          case FormEvent.TYPE_STORE_AFTER: {
+            // save navigation history
             IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
             IPage page = AbstractPageWithTable.this;
             if (desktop != null && desktop.getOutline() != null && desktop.getOutline().getActivePage() == page) {
               SERVICES.getService(INavigationHistoryService.class).addStep(0, page.getCell().getText(), page.getCell().getIconId());
             }
-            break;
-          }
-          case FormEvent.TYPE_STORE_AFTER: {
+            // do page reload to execute search
             try {
               reloadPage();
             }
