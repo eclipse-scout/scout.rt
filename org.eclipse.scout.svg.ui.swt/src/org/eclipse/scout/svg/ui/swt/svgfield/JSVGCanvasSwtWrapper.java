@@ -17,6 +17,7 @@ import java.awt.Frame;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.JSVGComponent;
 import org.apache.batik.swing.svg.SVGUserAgent;
+import org.eclipse.scout.svg.client.JSVGCanvasEx;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -33,7 +34,7 @@ public class JSVGCanvasSwtWrapper extends Composite {
 
   public JSVGCanvasSwtWrapper(Composite parent, int style, SVGUserAgent ua, boolean eventsEnabled, boolean selectableText) {
     super(parent, style | SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.EMBEDDED);
-    m_svgCanvas = new JSVGCanvas(ua, eventsEnabled, selectableText);
+    m_svgCanvas = new JSVGCanvasEx(ua, eventsEnabled, selectableText);
     m_svgCanvas.setDocumentState(JSVGComponent.ALWAYS_DYNAMIC);
     m_svgCanvas.setLayout(new BorderLayout());
     m_svgCanvas.setDoubleBuffered(true);

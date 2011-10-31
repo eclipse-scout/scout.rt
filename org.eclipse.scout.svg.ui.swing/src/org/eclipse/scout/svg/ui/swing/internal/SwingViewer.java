@@ -18,6 +18,7 @@ import javax.swing.SwingUtilities;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGUserAgent;
 import org.apache.batik.swing.svg.SVGUserAgentGUIAdapter;
+import org.eclipse.scout.svg.client.JSVGCanvasEx;
 import org.eclipse.scout.svg.client.SVGUtility;
 import org.w3c.dom.svg.SVGDocument;
 
@@ -46,7 +47,7 @@ public class SwingViewer {
         System.out.println("USER_AGENT.openLink(" + uri + "," + newc + ")");
       }
     };
-    final JSVGCanvas canvas = new JSVGCanvas(ua, true, false);
+    final JSVGCanvas canvas = new JSVGCanvasEx(ua, true, false);
     frame.getContentPane().add(canvas, BorderLayout.CENTER);
     frame.pack();
     frame.setSize(800, 600);

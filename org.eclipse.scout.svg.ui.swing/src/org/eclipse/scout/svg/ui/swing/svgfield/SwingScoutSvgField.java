@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
+import org.eclipse.scout.svg.client.JSVGCanvasEx;
 import org.eclipse.scout.svg.client.SilentSVGUserAgentAdapter;
 import org.eclipse.scout.svg.client.svgfield.ISvgField;
 import org.w3c.dom.svg.SVGDocument;
@@ -49,7 +50,7 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
     }
     //setup svg viewer
     final SVGUserAgent ua = new P_SVGUserAgent();
-    JSVGCanvas canvas = new JSVGCanvas(ua, true, false);
+    JSVGCanvas canvas = new JSVGCanvasEx(ua, true, false);
     //IMPORTANT for supporting hyperlinks
     canvas.setDocumentState(JSVGCanvas.ALWAYS_INTERACTIVE);
     canvas.addMouseListener(new P_SwingMouseListener());
