@@ -13,8 +13,10 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CompareUtility;
@@ -93,7 +95,30 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
   }
 
   /**
-   * This method is called on server side to load codes <br>
+   * This method is called on server side to create basic code set
+   */
+  @ConfigOperation
+  @Order(1)
+  protected List<ICode<?>> execCreateCodes() throws ProcessingException {
+    Class<? extends ICode>[] a = getConfiguredCodes();
+    if (a == null || a.length == 0) {
+      return Collections.emptyList();
+    }
+    ArrayList<ICode<?>> list = new ArrayList<ICode<?>>(a.length);
+    for (int i = 0; i < a.length; i++) {
+      try {
+        ICode code = ConfigurationUtility.newInnerInstance(this, a[i]);
+        list.add(code);
+      }
+      catch (Exception e) {
+        LOG.warn(null, e);
+      }
+    }
+    return list;
+  }
+
+  /**
+   * This method is called on server side to load additional dynamic codes to the {@link #execCreateCodes()} list<br>
    * Sample for sql call:
    * 
    * <pre>
@@ -355,18 +380,12 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
     HashMap<ICode, ICode> codeToParentCodeMap = new HashMap<ICode, ICode>();
     HashMap<Object, ICode> idToCodeMap = new HashMap<Object, ICode>();
     // 1a add configured codes
-    Class<? extends ICode>[] a = getConfiguredCodes();
-    if (a != null) {
-      for (int i = 0; i < a.length; i++) {
-        try {
-          ICode code = ConfigurationUtility.newInnerInstance(this, a[i]);
-          allCodesOrdered.add(code);
-          idToCodeMap.put(code.getId(), code);
-          codeToParentCodeMap.put(code, null);
-        }
-        catch (Exception e) {
-          LOG.warn(null, e);
-        }
+    List<ICode<?>> createdList = execCreateCodes();
+    if (createdList != null) {
+      for (ICode code : createdList) {
+        allCodesOrdered.add(code);
+        idToCodeMap.put(code.getId(), code);
+        codeToParentCodeMap.put(code, null);
       }
     }
     // 1b add dynamic codes

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -140,6 +140,11 @@ public class CodeRow implements Serializable {
         t.getExtKey(),
         t.getValue(),
         t.getPartitionId());
+  }
+
+  public CodeRow(Object key, String text) {
+    m_key = key;
+    m_text = text;
   }
 
   public CodeRow(Object key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, Object parentKey, boolean active, String extKey, Number value, long partitionId) {
