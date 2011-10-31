@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class ResetColumnsMenu extends AbstractMenu {
@@ -48,7 +49,10 @@ public class ResetColumnsMenu extends AbstractMenu {
         if (m != null) {
           m.reset();
         }
-        m_table.getTableCustomizer().removeAllColumns();
+        ITableCustomizer cst = m_table.getTableCustomizer();
+        if (cst != null) {
+          cst.removeAllColumns();
+        }
       }
       finally {
         m_table.setTableChanging(false);
