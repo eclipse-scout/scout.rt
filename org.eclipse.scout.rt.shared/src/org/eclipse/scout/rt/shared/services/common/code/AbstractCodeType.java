@@ -118,6 +118,17 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
   }
 
   /**
+   * This method is called on server side to create a specific code for a code row. This method is called when loading
+   * codes, in particular by
+   */
+  @ConfigOperation
+  @Order(2)
+  protected ICode<?> execCreateCode(CodeRow newRow) throws ProcessingException {
+    ICode<?> code = new MutableCode(newRow);
+    return code;
+  }
+
+  /**
    * This method is called on server side to load additional dynamic codes to the {@link #execCreateCodes()} list<br>
    * Sample for sql call:
    * 
@@ -404,7 +415,7 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
           codeToParentCodeMap.remove(existingCode);
           execOverwriteCode(existingCode.toCodeRow(), newRow);
         }
-        ICode code = new MutableCode(newRow);
+        ICode code = execCreateCode(newRow);
         allCodesOrdered.add(code);
         idToCodeMap.put(code.getId(), code);
         Object parentId = newRow.getParentKey();
