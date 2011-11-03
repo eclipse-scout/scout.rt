@@ -120,6 +120,8 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
   /**
    * This method is called on server side to create a specific code for a code row. This method is called when loading
    * codes, in particular by
+   * 
+   * @return a {@link ICode} to accept that row, return null to ignore that row
    */
   @ConfigOperation
   @Order(2)
@@ -409,17 +411,25 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
         ICode existingCode = idToCodeMap.get(newRow.getKey());
         if (existingCode != null) {
           // There is already a static code with same id.
-          // Remove and re-add to preserve dynamic ordering.
-          allCodesOrdered.remove(existingCode);
-          idToCodeMap.remove(existingCode.getId());
-          codeToParentCodeMap.remove(existingCode);
           execOverwriteCode(existingCode.toCodeRow(), newRow);
         }
         ICode code = execCreateCode(newRow);
-        allCodesOrdered.add(code);
-        idToCodeMap.put(code.getId(), code);
-        Object parentId = newRow.getParentKey();
-        codeToParentIdMap.put(code, parentId);
+        if (code != null) {
+          if (existingCode != null) {
+            // remove old (and then re-add) to preserve dynamic ordering.
+            allCodesOrdered.remove(existingCode);
+            idToCodeMap.remove(existingCode.getId());
+            codeToParentCodeMap.remove(existingCode);
+          }
+          //add new
+          allCodesOrdered.add(code);
+          idToCodeMap.put(code.getId(), code);
+          Object parentId = newRow.getParentKey();
+          codeToParentIdMap.put(code, parentId);
+        }
+        else {
+          //nop
+        }
       }
       for (Iterator<Map.Entry<ICode, Object>> it = codeToParentIdMap.entrySet().iterator(); it.hasNext();) {
         Map.Entry<ICode, Object> e = it.next();
