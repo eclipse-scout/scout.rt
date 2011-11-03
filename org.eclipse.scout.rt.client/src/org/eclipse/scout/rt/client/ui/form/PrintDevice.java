@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,6 +27,10 @@ public enum PrintDevice {
      * file=java.io.File
      * contentType=String (optional)
      * </pre>
+     * 
+     * since 3.8: The output is written to the file with an additional .tmp extension. Only after the complete file is
+     * written, it is renamed to its desired name.
+     * Therefore callers can wait until the file is created and are done.
      */
     File(2);
 

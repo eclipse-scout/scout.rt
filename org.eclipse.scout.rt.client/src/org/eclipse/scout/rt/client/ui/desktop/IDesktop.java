@@ -400,7 +400,11 @@ public interface IDesktop extends IPropertyObserver {
   void openBrowserWindow(String path);
 
   /**
-   * Prints the desktop parameter details see {@link PrintDevice}
+   * Prints the desktop
+   * <p>
+   * The method returns immediately, the print is done int the background.
+   * <p>
+   * For details and parameter details see {@link PrintDevice}
    */
   void printDesktop(PrintDevice device, Map<String, Object> parameters);
 

@@ -69,12 +69,15 @@ public class WidgetPrinter {
       LOG.warn("Unknown parameter: " + n + "=" + parameters.get(n));
     }
     //
-    m_printedFile.getParentFile().mkdirs();
+    File tmpFile = new File(m_printedFile.getAbsolutePath() + ".tmp");
+    tmpFile.getParentFile().mkdirs();
     //
     ImageLoader imageLoader = new ImageLoader();
     imageLoader.data = new ImageData[]{image.getImageData()};
-    imageLoader.save(m_printedFile.getAbsolutePath(), SWT.IMAGE_JPEG);
+    imageLoader.save(tmpFile.getAbsolutePath(), SWT.IMAGE_JPEG);
     image.dispose();
+    m_printedFile.delete();
+    tmpFile.renameTo(m_printedFile);
   }
 
   private void printToPrinter(Image image, Map<String, Object> parameters) throws Throwable {

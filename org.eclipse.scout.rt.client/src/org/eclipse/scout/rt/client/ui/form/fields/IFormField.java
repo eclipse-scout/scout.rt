@@ -181,8 +181,11 @@ public interface IFormField extends IPropertyObserver {
   void disposeField();
 
   /**
-   * Convenience for {@link #getForm()} . {@link IForm#printField(IFormField, PrintDevice, Map)} parameter details
-   * see {@link PrintDevice}
+   * Convenience for {@link #getForm()} . {@link IForm#printField(IFormField, PrintDevice, Map)}
+   * <p>
+   * The method returns immediately, the print is done int the background.
+   * <p>
+   * For details and parameter details see {@link PrintDevice}
    */
   void printField(PrintDevice device, Map<String, Object> parameters);
 

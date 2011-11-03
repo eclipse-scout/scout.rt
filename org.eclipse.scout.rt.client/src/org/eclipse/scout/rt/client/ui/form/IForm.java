@@ -427,7 +427,7 @@ public interface IForm extends IPropertyObserver {
   boolean isCacheBounds();
 
   /**
-   * Computes a key which is used when saving the bounds of the form.  
+   * Computes a key which is used when saving the bounds of the form.
    * 
    * @return a key to distinguish the forms. It must not be null.
    */
@@ -527,13 +527,19 @@ public interface IForm extends IPropertyObserver {
 
   /**
    * Prints the form<br>
-   * parameter details see {@link PrintDevice}
+   * <p>
+   * The method returns immediately, the print is done int the background.
+   * <p>
+   * For details and parameter details see {@link PrintDevice}
    */
   void printForm(PrintDevice device, Map<String, Object> parameters);
 
   /**
    * Prints a form field<br>
-   * parameter details see {@link PrintDevice}
+   * <p>
+   * The method returns immediately, the print is done int the background.
+   * <p>
+   * For details and parameter details see {@link PrintDevice}
    */
   void printField(IFormField field, PrintDevice device, Map<String, Object> parameters);
 

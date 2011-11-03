@@ -89,18 +89,22 @@ public class WidgetPrinter {
       LOG.warn("Unknown parameter: " + n + "=" + parameters.get(n));
     }
     //
-    m_printedFile.getParentFile().mkdirs();
+    File tmpFile = new File(m_printedFile.getAbsolutePath() + ".tmp");
+    tmpFile.getParentFile().mkdirs();
     BufferedImage img = createBufferedImage();
     String imageFormat = contentType.substring(contentType.indexOf("/") + 1);
-    boolean ok = ImageIO.write(img, imageFormat, m_printedFile);
+    boolean ok = ImageIO.write(img, imageFormat, tmpFile);
     if (!ok) {
       throw new IOException("no appropriate writer was found for imageFormat \"" + imageFormat + "\"");
     }
+    //atomic rename
+    m_printedFile.delete();
+    tmpFile.renameTo(m_printedFile);
   }
 
   private BufferedImage createBufferedImage() {
     // print component to offscreen image
-    BufferedImage img = new BufferedImage(m_widget.getWidth(), m_widget.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+    BufferedImage img = new BufferedImage(m_widget.getWidth(), m_widget.getHeight(), BufferedImage.TYPE_INT_ARGB);
     Graphics gOff = img.getGraphics();
     gOff.setColor(Color.white);
     gOff.fillRect(0, 0, m_widget.getWidth(), m_widget.getHeight());
