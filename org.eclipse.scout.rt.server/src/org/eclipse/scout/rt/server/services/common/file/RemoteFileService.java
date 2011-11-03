@@ -326,27 +326,29 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
       throw new SecurityException("invalid path for file service: path may not be null");
     }
     File file = getFileInternal(spec);
-    if (file.exists()) {
+    if (!file.exists()) {
+      throw new ProcessingException("remote file does not exist: " + spec.getPath());
+    }
+    try {
+      int len = (int) file.length();
+      byte[] buf = new byte[Math.min(102400, len)];
+      int written = 0;
+      int delta = 0;
+      BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
       try {
-        int len = (int) file.length();
-        byte[] buf = new byte[Math.min(102400, len)];
-        int written = 0;
-        int delta = 0;
-        BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-        try {
-          while (written < len) {
-            delta = in.read(buf);
-            out.write(buf, 0, delta);
-            written += delta;
-          }
-        }
-        finally {
-          in.close();
+        while (written < len) {
+          delta = in.read(buf);
+          out.write(buf, 0, delta);
+          written += delta;
         }
       }
-      catch (IOException e) {
-        throw new ProcessingException("error streaming file: " + file.getAbsolutePath(), e);
+      finally {
+        in.close();
       }
     }
+    catch (IOException e) {
+      throw new ProcessingException("error streaming file: " + file.getAbsolutePath(), e);
+    }
   }
+
 }
