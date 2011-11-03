@@ -218,6 +218,11 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     }
   }
 
+  @Override
+  public boolean isFilterAcceptedForChildNode(ITreeNode childPageNode) {
+    return m_pageToTableRowMap.get(childPageNode) == null || m_pageToTableRowMap.get(childPageNode).isFilterAccepted();
+  }
+
   private void linkTableRowWithPage(ITableRow tableRow, IPage page) {
     m_tableRowToPageMap.put(tableRow, page);
     m_pageToTableRowMap.put(page, tableRow);
@@ -359,6 +364,14 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
           ITreeNode node = getTreeNodeFor(e.getFirstRow());
           if (node != null) {
             getTree().getUIFacade().fireNodeDropActionFromUI(node, e.getDropObject());
+          }
+          break;
+        }
+        case TableEvent.TYPE_ROW_FILTER_CHANGED: {
+          if (!isLeaf()) {
+            if (getTree() != null) {
+              getTree().applyNodeFilters();
+            }
           }
           break;
         }

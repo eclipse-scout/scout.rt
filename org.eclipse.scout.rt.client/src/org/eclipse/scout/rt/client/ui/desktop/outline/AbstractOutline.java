@@ -430,6 +430,13 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         ITableRow tableRow = ((IPageWithTable<?>) parentNode).getTableRowFor(node);
         return tableRow == null || tableRow.isFilterAccepted();
       }
+      else if (parentNode instanceof IPageWithNodes) {
+        for (ITreeNode child : parentNode.getChildNodes()) {
+          if (child.equals(node)) {
+            return ((IPageWithNodes) parentNode).isFilterAcceptedForChildNode(node);
+          }
+        }
+      }
       return true;
     }
   }
