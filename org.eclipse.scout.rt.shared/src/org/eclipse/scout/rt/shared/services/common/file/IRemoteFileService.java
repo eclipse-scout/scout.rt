@@ -16,8 +16,8 @@ import java.io.OutputStream;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.service.IService;
 
 @Priority(-3)
@@ -65,9 +65,11 @@ public interface IRemoteFileService extends IService {
   RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) throws ProcessingException;
 
   /**
-   * The file is not returned but immediately streamed from then original
+   * The file is not returned but immediately streamed from the original
    * location to the destination. <br>
    * The destination is not closed after write.
+   * <p>
+   * Throws an exception if the file does not exist.
    * 
    * @see #getRemoteFile(RemoteFile)
    */
