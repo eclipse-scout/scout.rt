@@ -4,13 +4,15 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
 /**
  * Node-oriented page (one of the two types of IPage @see IPage)<br>
@@ -26,5 +28,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 public interface IPageWithNodes extends IPage {
 
   ITable getInternalTable();
+
+  /**
+   * @param childPageNode
+   * @return the value {@link ITableRow#isFilterAccepted()} on the corresponding row of the inner table
+   */
+  boolean isFilterAcceptedForChildNode(ITreeNode childPageNode);
 
 }
