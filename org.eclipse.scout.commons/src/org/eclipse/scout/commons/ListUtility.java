@@ -43,6 +43,9 @@ public final class ListUtility {
     return copy;
   }
 
+  /**
+   * @return true if list contains any (at least 1) of the values
+   */
   public static <T> boolean containsAny(Collection<T> list, Collection<T> values) {
     if (list != null) {
       for (T o : values) {
@@ -54,6 +57,9 @@ public final class ListUtility {
     return false;
   }
 
+  /**
+   * @return true if list contains any (at least 1) of the values
+   */
   public static <T> boolean containsAny(Collection<T> list, T... values) {
     if (list != null) {
       for (T o : values) {
