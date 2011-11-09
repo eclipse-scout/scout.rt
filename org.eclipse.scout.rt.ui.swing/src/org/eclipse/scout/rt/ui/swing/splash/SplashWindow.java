@@ -33,6 +33,10 @@ import javax.swing.JRootPane;
 import javax.swing.UIManager;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
 import org.osgi.framework.Version;
 
@@ -137,20 +141,90 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
   }
 
   private class P_SplashScreen implements Icon {
+
     private Icon m_splashIcon;
     private int m_highlightSize = 200;
+
     private Point m_versionLocation;
+    private Color m_versionColor;
+    private int m_versionAlignment;
+    private Font m_versionFont;
+
     private Point m_statusTextLocation;
+    private Color m_statusTextColor;
+    private int m_statusTextAlignment;
+    private Font m_statusTextFont;
 
     public P_SplashScreen(Icon splashIcon) {
       m_splashIcon = splashIcon;
+
       m_versionLocation = (Point) UIManager.get("Splash.versionLocation");
+      m_versionColor = UIManager.getColor("Splash.versionColor");
+      m_versionAlignment = parseAlignment(UIManager.get("Splash.versionAlignment"));
+      m_versionFont = parseFont(UIManager.getString("Splash.versionFont"));
+
       m_statusTextLocation = (Point) UIManager.get("Splash.statusTextLocation");
+      m_statusTextColor = UIManager.getColor("Splash.statusTextColor");
+      m_statusTextAlignment = parseAlignment(UIManager.get("Splash.statusTextAlignment"));
+      m_statusTextFont = parseFont(UIManager.getString("Splash.statusTextFont"));
+    }
+
+    /**
+     * @param alignmentDef
+     *          Definition of (horizontal) alignment, either as number (-1, 0, 1) or as string ("left", "center",
+     *          "right"). The value "null" is valid, in which case the default alignment is returned.
+     * @return This method is guaranteed to always return one of the following values: -1 (left), 0 (center) or 1
+     *         (right). Default is -1.
+     */
+    private int parseAlignment(Object alignmentDef) {
+      if (alignmentDef != null) {
+        try {
+          String s = TypeCastUtility.castValue(alignmentDef, String.class);
+          if (StringUtility.equalsIgnoreCase(s, "center") || StringUtility.equalsIgnoreCase(s, "middle")) {
+            return 0;
+          }
+          if (StringUtility.equalsIgnoreCase(s, "right")) {
+            return 1;
+          }
+        }
+        catch (Throwable t) {
+          // nop
+        }
+        try {
+          int i = TypeCastUtility.castValue(alignmentDef, int.class);
+          if (i == 0) {
+            return 0;
+          }
+          if (i > 0) {
+            return 1;
+          }
+        }
+        catch (Throwable t) {
+          // nop
+        }
+      }
+      // Default: left
+      return -1;
+    }
+
+    /**
+     * Fail-safe call of method {@link SwingUtility#createFont(FontSpec)}.
+     */
+    private Font parseFont(String fontSpec) {
+      if (StringUtility.hasText(fontSpec)) {
+        try {
+          return SwingUtility.createFont(FontSpec.parse(fontSpec));
+        }
+        catch (Throwable t) {
+          // nop
+        }
+      }
+      return null;
     }
 
     @Override
     public void paintIcon(Component c, Graphics g, int x, int y) {
-      FontMetrics fm = g.getFontMetrics();
+      Font originalFont = g.getFont();
       int w = getWidth();
       int h = getHeight();
       m_splashIcon.paintIcon(c, g, x, y);
@@ -164,26 +238,55 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
       g2d.fillRect(phase - m_highlightSize, 0, m_highlightSize, h);
       g2d.setPaint(new GradientPaint(phase, 0, c1, phase + m_highlightSize, 0, c2, true));
       g2d.fillRect(phase, 0, m_highlightSize, h);
-      g2d.setPaint(getForeground());
 
       // use locations provided by the L/F or calculate default location of status- and version text.
+      g.setFont(m_versionFont);
       Point vloc = m_versionLocation;
       if (vloc == null) {
         vloc = new Point();
+        FontMetrics fm = g.getFontMetrics();
         vloc.x = 12;
         vloc.y = h - fm.getHeight() - 10;
       }
-      g.setColor(getForeground());
+      else {
+        // Alignment
+        FontMetrics fm = g.getFontMetrics();
+        vloc = new Point(vloc); // do not change m_versionLocation!
+        if (m_versionAlignment == 0) {
+          vloc.x -= (fm.stringWidth(m_versionText) / 2);
+        }
+        else if (m_versionAlignment > 0) {
+          vloc.x -= fm.stringWidth(m_versionText);
+        }
+      }
+      g.setColor(m_versionColor != null ? m_versionColor : getForeground());
       g.drawString(m_versionText, vloc.x, vloc.y);
+      g.setFont(originalFont);
+
       if (m_statusText != null) {
+        g.setFont(m_statusTextFont);
         Point sloc = m_statusTextLocation;
         if (sloc == null) {
           sloc = new Point();
+          FontMetrics fm = g.getFontMetrics();
           int offset = 12 + fm.stringWidth(m_versionText) + 4;
           sloc.x = Math.max((w - fm.stringWidth(m_statusText)) / 2, offset);
           sloc.y = h - fm.getHeight() - 10;
         }
+        else {
+          // Alignment
+          FontMetrics fm = g.getFontMetrics();
+          sloc = new Point(sloc); // do not change m_statusTextLocation!
+          if (m_statusTextAlignment == 0) {
+            sloc.x -= (fm.stringWidth(m_statusText) / 2);
+          }
+          else if (m_statusTextAlignment > 0) {
+            sloc.x -= fm.stringWidth(m_statusText);
+          }
+        }
+        g.setColor(m_statusTextColor != null ? m_statusTextColor : getForeground());
         g.drawString(m_statusText, sloc.x, sloc.y);
+        g.setFont(originalFont);
       }
     }
 
@@ -221,7 +324,5 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
     public int getIconHeight() {
       return 280;
     }
-
   }
-
 }

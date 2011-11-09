@@ -415,3 +415,16 @@ Plug-Ins changed:
 - org.eclipse.scout.rt.ui.swing, org.eclipse.scout.rt.client
 Migration:
 None
+
+17.10.2011 bsh
+Bugzilla ticket #361116
+Problem:
+The splash screen does not support different text colors for status text and version text. Also, texts are always left aligned.
+To allow more creative and flexible splash screen designs, those properties should be customizable.
+Solution:
+Added the following UI properties, which can be customized by setting the UI defaults in the SwingEnvironment:
+- Splash.versionColor and Splash.statusTextColor (a java.awt.Color object; if not specified, the value of Splash.text is used)
+- Splash.versionAlignment and Splash.statusTextAlignment ("left", "center", "right"; default is left)
+- Splash.versionFont and Splash.statusTextFont (a Scout FontSpec string, see org.eclipse.scout.rt.shared.data.basic.FontSpec)
+Migration:
+None
