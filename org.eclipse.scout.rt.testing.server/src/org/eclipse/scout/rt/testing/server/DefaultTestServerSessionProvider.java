@@ -10,10 +10,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.osgi.framework.Bundle;
 
 /**
@@ -37,7 +37,7 @@ public class DefaultTestServerSessionProvider implements ITestServerSessionProvi
       @Override
       protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
         // load session
-        IServerSession serverSessionInside = ThreadContext.get(IServerSession.class);
+        IServerSession serverSessionInside = ThreadContext.getServerSession();
         String symbolicName = serverSessionInside.getClass().getPackage().getName();
         Bundle bundle = Platform.getBundle(symbolicName);
         beforeStartSession(serverSessionInside, subject);
