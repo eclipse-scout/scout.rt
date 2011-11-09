@@ -208,6 +208,10 @@ public class JTableEx extends JTable {
           m_tableColumnModelListener = new P_TableColumnModelListener();
         }
         newModel.addColumnModelListener(m_tableColumnModelListener);
+        JTableHeader header = getTableHeader();
+        if (header instanceof JTableHeaderEx) {
+          ((JTableHeaderEx) header).updatePreferredHeight();
+        }
       }
     }
   }
