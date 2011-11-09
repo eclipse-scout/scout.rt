@@ -78,4 +78,16 @@ public final class ThreadContext {
     TRANSACTION.set(value);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  public static <T> T get(Class<T> key) {
+    return ThreadContextLegacy.get(key);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  public static <T> void put(T value) {
+    ThreadContextLegacy.put(value);
+  }
+
 }
