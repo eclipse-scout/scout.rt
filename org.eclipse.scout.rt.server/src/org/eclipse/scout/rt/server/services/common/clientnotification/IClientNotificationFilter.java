@@ -55,7 +55,7 @@ public interface IClientNotificationFilter extends Serializable {
    *         returned true for at least one session
    *         <p>
    *         This method is used on the server side, so you can get the server session with
-   *         ThreadContext.get(IServerSession.class)
+   *         ThreadContext.getServerSession()
    */
   boolean accept();
 }

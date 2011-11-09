@@ -10,16 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -33,160 +28,54 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 
 public final class ThreadContext {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ThreadContext.class);
+  private static final ThreadLocal<HttpServletRequest> HTTP_SERVLET_REQUEST = new ThreadLocal<HttpServletRequest>();
+  private static final ThreadLocal<HttpServletResponse> HTTP_SERVLET_RESPONSE = new ThreadLocal<HttpServletResponse>();
+  private static final ThreadLocal<IServerSession> SERVER_SESSION = new ThreadLocal<IServerSession>();
+  private static final ThreadLocal<ITransaction> TRANSACTION = new ThreadLocal<ITransaction>();
 
   private ThreadContext() {
   }
 
-  private static final Object MAP_LOCK;
-  private static final WeakHashMap<Thread, HashMap<Class, Object>> MAP;
-
-  static {
-    MAP_LOCK = new Object();
-    MAP = new WeakHashMap<Thread, HashMap<Class, Object>>();
-  }
-
-  private static HashMap<Class, Object> getThreadMap(boolean autoCreate) {
-    synchronized (MAP_LOCK) {
-      HashMap<Class, Object> threadMap = MAP.get(Thread.currentThread());
-      if (threadMap == null && autoCreate) {
-        threadMap = new HashMap<Class, Object>();
-        MAP.put(Thread.currentThread(), threadMap);
-      }
-      return threadMap;
-    }
-  }
-
   public static HttpServletRequest getHttpServletRequest() {
-    return getInternal(HttpServletRequest.class);
+    return HTTP_SERVLET_REQUEST.get();
   }
 
   public static HttpServletResponse getHttpServletResponse() {
-    return getInternal(HttpServletResponse.class);
+    return HTTP_SERVLET_RESPONSE.get();
   }
 
   public static IServerSession getServerSession() {
-    return getInternal(IServerSession.class);
+    return SERVER_SESSION.get();
   }
 
   public static ITransaction getTransaction() {
-    return getInternal(ITransaction.class);
+    return TRANSACTION.get();
   }
 
-  /**
-   * @return the value of type <T> stored in the current thread context
-   */
-  public static <T> T get(Class<T> key) {
-    return getInternal(key);
-  }
-
-  public static <T> T getCustomValue(Class<T> key) {
-    return getInternal(key);
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <T> T getInternal(Class<T> key) {
-    if (key == Locale.class) {
-      return (T) LocaleThreadLocal.get();
-    }
-    //
-    HashMap<Class, Object> threadMap = getThreadMap(false);
-    if (threadMap != null) {
-      return (T) threadMap.get(key);
-    }
-    else {
-      return null;
-    }
-  }
-
+  @SuppressWarnings("deprecation")
   public static Map<Class, Object> backup() {
-    Map<Class, Object> map = getThreadMap(false);
-    if (map != null) {
-      return new HashMap<Class, Object>(map);
-    }
-    else {
-      return new HashMap<Class, Object>();
-    }
+    return ThreadContextLegacy.backup();
   }
 
+  @SuppressWarnings("deprecation")
   public static void restore(Map<Class, Object> map) {
-    synchronized (MAP_LOCK) {
-      if (map != null) {
-        MAP.put(Thread.currentThread(), new HashMap<Class, Object>(map));
-      }
-      else {
-        MAP.remove(Thread.currentThread());
-      }
-    }
+    ThreadContextLegacy.restore(map);
   }
 
-  /**
-   * store the value in the current thread context (with all interfaces and
-   * super classes of value as keys)
-   */
-  public static <T extends HttpServletRequest> void put(T value) {
-    putInternal(value);
+  public static void putHttpServletRequest(HttpServletRequest value) {
+    HTTP_SERVLET_REQUEST.set(value);
   }
 
-  public static <T extends HttpServletResponse> void put(T value) {
-    putInternal(value);
+  public static void putHttpServletResponse(HttpServletResponse value) {
+    HTTP_SERVLET_RESPONSE.set(value);
   }
 
-  public static <T extends IServerSession> void put(T value) {
-    putInternal(value);
+  public static void putServerSession(IServerSession value) {
+    SERVER_SESSION.set(value);
   }
 
-  public static <T extends ITransaction> void put(T value) {
-    putInternal(value);
+  public static void putTransaction(ITransaction value) {
+    TRANSACTION.set(value);
   }
 
-  public static <T> void putCustomValue(T value) {
-    putInternal(value);
-  }
-
-  private static <T> void putInternal(T value) {
-    if (value == null) {
-      return;
-    }
-    if (value instanceof Locale) {
-      LocaleThreadLocal.set((Locale) value);
-    }
-    //
-    HashMap<Class, Object> threadMap = getThreadMap(true);
-    HashSet<Class> keys = new HashSet<Class>();
-    enumKeys(value.getClass(), keys);
-    for (Class key : keys) {
-      threadMap.put(key, value);
-    }
-  }
-
-  /**
-   * remove the value from the current thread context
-   */
-  public static <T> void clear(T value) {
-    clearInternal(value);
-  }
-
-  public static <T> void clearInternal(T value) {
-    if (value == null) {
-      return;
-    }
-    HashMap<Class, Object> threadMap = getThreadMap(false);
-    if (threadMap != null) {
-      HashSet<Class> keys = new HashSet<Class>();
-      enumKeys(value.getClass(), keys);
-      for (Class key : keys) {
-        threadMap.remove(key);
-      }
-    }
-  }
-
-  private static void enumKeys(Class c, HashSet<Class> keys) {
-    if (c != null) {
-      keys.add(c);
-      for (Class i : c.getInterfaces()) {
-        enumKeys(i, keys);
-      }
-      enumKeys(c.getSuperclass(), keys);
-    }
-  }
 }

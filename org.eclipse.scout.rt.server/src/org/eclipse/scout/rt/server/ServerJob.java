@@ -174,8 +174,8 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     Map<Class, Object> backup = ThreadContext.backup();
     Locale oldLocale = LocaleThreadLocal.get();
     try {
-      ThreadContext.put(m_serverSession);
-      ThreadContext.put(transaction);
+      ThreadContext.putServerSession(m_serverSession);
+      ThreadContext.putTransaction(transaction);
       LocaleThreadLocal.set(m_serverSession.getLocale());
       //
       IStatus status = runTransaction(monitor);
@@ -249,16 +249,21 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
    */
   @SuppressWarnings("unchecked")
   public static final <T extends IServerSession> T getCurrentSession(Class<T> type) {
+    IServerSession s;
     // try current job
     Job job = getJobManager().currentJob();
     if (job instanceof IServerSessionProvider) {
-      IServerSession s = ((IServerSessionProvider) job).getServerSession();
+      s = ((IServerSessionProvider) job).getServerSession();
       if (s != null && type.isAssignableFrom(s.getClass())) {
         return (T) s;
       }
     }
     // try ThreadContext
-    return ThreadContext.get(type);
+    s = ThreadContext.getServerSession();
+    if (s != null && type.isAssignableFrom(s.getClass())) {
+      return (T) s;
+    }
+    return null;
   }
 
   /**

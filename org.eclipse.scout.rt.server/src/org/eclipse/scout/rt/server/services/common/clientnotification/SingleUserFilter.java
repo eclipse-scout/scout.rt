@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.services.common.clientnotification;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ThreadContext;
 
 /**
@@ -45,7 +44,7 @@ public class SingleUserFilter implements IClientNotificationFilter {
 
   @Override
   public boolean accept() {
-    return m_userId != null && m_userId.equalsIgnoreCase(ThreadContext.get(IServerSession.class).getUserId());
+    return m_userId != null && m_userId.equalsIgnoreCase(ThreadContext.getServerSession().getUserId());
   }
 
   @Override

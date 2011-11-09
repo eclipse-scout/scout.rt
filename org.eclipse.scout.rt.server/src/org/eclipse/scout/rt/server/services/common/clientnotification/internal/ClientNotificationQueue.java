@@ -77,7 +77,7 @@ public class ClientNotificationQueue {
           for (Iterator<QueueElement> it = m_queue.iterator(); it.hasNext();) {
             QueueElement e = it.next();
             if (e.getFilter().isActive()) {
-              IServerSession serverSession = ThreadContext.get(IServerSession.class);
+              IServerSession serverSession = ThreadContext.getServerSession();
               if (!e.isConsumedBy(serverSession)) {
                 if (e.getFilter().accept()) {
                   list.add(e.getClientNotification());

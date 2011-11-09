@@ -37,7 +37,7 @@ import org.osgi.framework.ServiceRegistration;
  * The service exists once per osgi environment and is cached persistent. The
  * service is only available within a {@link Job} that implements {@link IServerSessionProvider} with a compatible
  * {@link IServerSession} type
- * or within a thread with {@link ThreadContext#get(Class)}!=null see {@link ServerJob}
+ * or within a thread with {@link ThreadContext#getServerSession()}!=null see {@link ServerJob}
  * <p>
  * The factory supports {@link ServiceConstants#SERVICE_SCOPE} with an {@link IServerSession} class.<br>
  * The factory supports {@link ServiceConstants#SERVICE_CREATE_IMMEDIATELY}

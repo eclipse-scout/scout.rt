@@ -93,7 +93,7 @@ public class DefaultTransactionDelegate {
     catch (Throwable t) {
       try {
         // cancel tx
-        ITransaction transaction = ThreadContext.get(ITransaction.class);
+        ITransaction transaction = ThreadContext.getTransaction();
         if (transaction != null) {
           transaction.addFailure(t);
         }
@@ -144,7 +144,7 @@ public class DefaultTransactionDelegate {
    */
   protected ServiceTunnelResponse invokeImpl(ServiceTunnelRequest serviceReq) throws Throwable {
     String soapOperation = ServiceTunnelRequest.toSoapOperation(serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation());
-    IServerSession serverSession = ThreadContext.get(IServerSession.class);
+    IServerSession serverSession = ThreadContext.getServerSession();
     String authenticatedUser = serverSession.getUserId();
     if (LOG.isDebugEnabled()) {
       LOG.debug("started " + serviceReq.getServiceInterfaceClassName() + "." + serviceReq.getOperation() + " by " + authenticatedUser + " at " + new Date());

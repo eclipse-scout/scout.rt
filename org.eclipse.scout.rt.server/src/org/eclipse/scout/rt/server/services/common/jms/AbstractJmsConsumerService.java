@@ -172,7 +172,7 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
    */
   private JmsTransactionMember getJmsXAResource() throws ProcessingException {
     String resId = new Long(m_config.getCrc()).toString();
-    ITransaction reg = ThreadContext.get(ITransaction.class);
+    ITransaction reg = ThreadContext.getTransaction();
     if (reg == null) {
       throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
     }

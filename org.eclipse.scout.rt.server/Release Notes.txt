@@ -350,3 +350,12 @@ Contribution of custom locales to the JRE:
 4. In those files, simply put the the fully qualified name to your date/number provider
 5. Export project as JAR file and put it into \lib\ext of your JRE
 
+09.11.2011 imo
+Legacy Cleanup of ThreadContext
+Problem: The generic ThreadContext.get and put methods consume lots of cpu and since the ThreadLocals of jre 1.5 are available,
+there is no more need for the class.
+Solution:
+ThreadContext only contains the 4 scout server state ThreadLocals.
+ThreadContextLegacy contains the old code (including ThreadContext state)
+Migration:
+Code locations referring to old methods of ThreadContext.Xyz are to be renamed to ThreadContextLegacy.Xyz

@@ -38,11 +38,11 @@ public final class ServerTestUtility {
   }
 
   public static IServerSession getServerSession() {
-    return ThreadContext.get(IServerSession.class);
+    return ThreadContext.getServerSession();
   }
 
   public static Bundle getServerBundle() {
-    return ThreadContext.get(IServerSession.class).getBundle();
+    return ThreadContext.getServerSession().getBundle();
   }
 
 }

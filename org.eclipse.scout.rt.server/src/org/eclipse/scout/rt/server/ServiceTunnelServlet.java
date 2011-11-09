@@ -265,8 +265,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
       lazyInit(req, res);
       //
       //legacy, deprecated, do not use servlet request/response in scout code
-      ThreadContext.put(req);
-      ThreadContext.put(res);
+      ThreadContext.putHttpServletRequest(req);
+      ThreadContext.putHttpServletResponse(res);
       //
       Subject subject = lookupSubjectOnHttpSession(req, res);
       IServerSession serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject);
@@ -309,8 +309,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
       Map<Class, Object> backup = ThreadContext.backup();
       try {
         //legacy, deprecated, do not use servlet request/response in scout code
-        ThreadContext.put(req);
-        ThreadContext.put(res);
+        ThreadContext.putHttpServletRequest(req);
+        ThreadContext.putHttpServletResponse(res);
         //
         ServiceTunnelRequest serviceRequest = deserializeInput(req.getInputStream());
         LocaleThreadLocal.set(serviceRequest.getLocale());

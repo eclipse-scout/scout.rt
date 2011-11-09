@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.services.common.test;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
@@ -50,7 +49,7 @@ public class DefaultLookupServicesTest extends AbstractServerTest {
   }
 
   protected LookupCall createLookupCall(ILookupService s, String methodName) throws Throwable {
-    Bundle serverBundle = ThreadContext.get(IServerSession.class).getBundle();
+    Bundle serverBundle = ThreadContext.getServerSession().getBundle();
     String groupName = serverBundle.getSymbolicName().replace("\\.server$", "");
     String lookupCallClassName = groupName + ".shared.services.lookup." + s.getClass().getSimpleName().replaceAll("LookupService$", "") + "LookupCall";
     LookupCall call = (LookupCall) serverBundle.loadClass(lookupCallClassName).newInstance();

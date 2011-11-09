@@ -64,7 +64,7 @@ public class CallInspector {
   }
 
   public void update() {
-    ITransaction xa = ThreadContext.get(ITransaction.class);
+    ITransaction xa = ThreadContext.getTransaction();
     if (xa != null) {
       m_info.setXaResources(xa.getMembers());
     }

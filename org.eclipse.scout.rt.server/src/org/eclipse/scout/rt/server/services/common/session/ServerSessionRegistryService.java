@@ -43,7 +43,7 @@ public class ServerSessionRegistryService extends AbstractService implements ISe
       @Override
       protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
         // load session
-        IServerSession serverSessionInside = ThreadContext.get(IServerSession.class);
+        IServerSession serverSessionInside = ThreadContext.getServerSession();
         String symbolicName = serverSessionInside.getClass().getPackage().getName();
         Bundle bundle = Platform.getBundle(symbolicName);
         serverSessionInside.loadSession(bundle);

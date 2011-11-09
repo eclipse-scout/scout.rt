@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,7 +42,7 @@ public class SessionFilter implements IClientNotificationFilter {
 
   @Override
   public boolean accept() {
-    return m_sessionRef != null && ThreadContext.get(IServerSession.class) == m_sessionRef.get();
+    return m_sessionRef != null && ThreadContext.getServerSession() == m_sessionRef.get();
   }
 
   @Override

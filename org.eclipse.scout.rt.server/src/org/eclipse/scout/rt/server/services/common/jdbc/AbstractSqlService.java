@@ -676,7 +676,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   }
 
   protected Connection getTransaction() throws ProcessingException {
-    ITransaction reg = ThreadContext.get(ITransaction.class);
+    ITransaction reg = ThreadContext.getTransaction();
     if (reg == null) {
       throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
     }
@@ -704,7 +704,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
    * @return the statement cache used for this {@link ITransaction} transaction
    */
   protected final IStatementCache getStatementCache() throws ProcessingException {
-    ITransaction reg = ThreadContext.get(ITransaction.class);
+    ITransaction reg = ThreadContext.getTransaction();
     if (reg == null) {
       throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
     }

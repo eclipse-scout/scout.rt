@@ -194,7 +194,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
 
   private ServiceTunnelResponse callService(ServiceTunnelRequest serviceReq) throws Exception {
     try {
-      IServerSession serverSession = ThreadContext.get(IServerSession.class);
+      IServerSession serverSession = ThreadContext.getServerSession();
       Class<?> serviceInterfaceClass = serverSession.getBundle().loadClass(serviceReq.getServiceInterfaceClassName());
       Object service = SERVICES.getService(serviceInterfaceClass);
       if (service == null) {
@@ -211,7 +211,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     }
     catch (Throwable t) {
       // cancel tx
-      ITransaction transaction = ThreadContext.get(ITransaction.class);
+      ITransaction transaction = ThreadContext.getTransaction();
       if (transaction != null) {
         transaction.addFailure(t);
       }

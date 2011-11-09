@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -34,7 +34,8 @@ public class SessionInspector {
     m_parent = parent;
     m_session = session;
     m_info = new SessionInfo();
-    HttpSession httpSession = (ThreadContext.get(HttpServletRequest.class) != null ? ThreadContext.get(HttpServletRequest.class).getSession() : null);
+    HttpServletRequest httpReq = ThreadContext.getHttpServletRequest();
+    HttpSession httpSession = (httpReq != null ? httpReq.getSession() : null);
     if (httpSession != null) {
       m_info.setSessionId(httpSession.getId());
       m_info.setCreationTime(httpSession.getCreationTime());
