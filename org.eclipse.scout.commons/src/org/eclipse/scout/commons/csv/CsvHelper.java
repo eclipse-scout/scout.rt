@@ -39,7 +39,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsUtility;
 
@@ -301,7 +300,6 @@ public class CsvHelper {
   public void exportHeaderRows(Writer writer, boolean writeNames, boolean writeTypes) throws ProcessingException {
     String line = null;
     int colIndex = 0;
-    int rowIndex = 0;
     Object val = null;
     String cell = null;
     try {
@@ -315,7 +313,6 @@ public class CsvHelper {
         writer.write(line);
         writer.write(m_lineSeparator);
       }
-      ArrayList<String> rowStrings = new ArrayList<String>();
     }
     catch (IOException e) {
       throw new ProcessingException("line=" + line + " colIndex=" + colIndex + " value=" + val + " cell=" + cell);

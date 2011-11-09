@@ -254,9 +254,7 @@ public final class TypeCastUtility {
         throw createException(o, fromType, toType, 1, "object is not an array");
       }
     }
-    Class fromCompType = fromType.getComponentType();
     Class toCompType = toType.getComponentType();
-    int len = Array.getLength(o);
     // calculate dimension
     int dim = 0;
     Class t = toType;
@@ -273,8 +271,7 @@ public final class TypeCastUtility {
     while (t.isArray()) {
       dims[dim] = Array.getLength(od);
       t = t.getComponentType();
-      if (dims[dim] == 0)
-       {
+      if (dims[dim] == 0) {
         break;// if array length is 0 break up
       }
       // next
@@ -703,8 +700,7 @@ public final class TypeCastUtility {
         break;
       }
       case STRING: {
-        if (((String) o).length() == 0)
-         {
+        if (((String) o).length() == 0) {
           return null;// special handling for empty
         }
         // strings

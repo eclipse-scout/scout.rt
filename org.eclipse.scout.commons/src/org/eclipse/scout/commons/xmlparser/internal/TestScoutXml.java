@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -72,7 +72,6 @@ public final class TestScoutXml {
   }
 
   private void testFileParsingWriting(String readDirectory, String writeDirectory) throws Exception {
-    long time = System.currentTimeMillis();
     File[] files = new File(readDirectory).listFiles();
 
     for (int i = 0; (i < files.length); i++) {
@@ -87,7 +86,6 @@ public final class TestScoutXml {
       }
       if (readDirectory != null) {
         System.out.println();
-        long timeR = System.currentTimeMillis();
         System.out.println("- Reading '" + files[i].getName() + "'...");
 
         document = parser.parse(new FileInputStream(files[i]), readDirectory);
@@ -97,7 +95,7 @@ public final class TestScoutXml {
         // timeR)/1000 + " second(s).");
       }
 
-      if (writeDirectory != null) {
+      if (writeDirectory != null && document != null) {
         System.out.println();
         long timeW = System.currentTimeMillis();
         System.out.println("- Writing '" + files[i].getName() + "'...");
