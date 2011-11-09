@@ -10,13 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.processing;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.RunningStatementStore;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.service.AbstractService;
@@ -26,23 +22,14 @@ public class ServerProcessingCancelService extends AbstractService implements IS
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerProcessingCancelService.class);
 
+  @SuppressWarnings("deprecation")
   @Override
   public void cancel() {
-    IServerSession session = ThreadContext.getServerSession();
-    if (session == null) {
-      LOG.error("failed to cancel server processing because job is not running in session context");
-      return;
-    }
+    //nop
+  }
 
-    // cancel all running server jobs that belong to that session
-    Job[] jobs = Job.getJobManager().find(ServerJob.class);
-    for (Job job : jobs) {
-      if (job instanceof ServerJob && ((ServerJob) job).getServerSession() == session) {
-        job.cancel();
-      }
-    }
-
-    // cancel running JDBC statements that belong to that session
-    RunningStatementStore.cancelAll();
+  @Override
+  public void cancel(long requestSequence) {
+    RunningStatementStore.cancel(requestSequence);
   }
 }

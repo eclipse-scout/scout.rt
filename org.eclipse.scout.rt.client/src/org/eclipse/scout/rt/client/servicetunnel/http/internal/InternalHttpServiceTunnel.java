@@ -228,7 +228,7 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
 
     IProgressMonitor mon = backgroundJob.getMonitor();
     if (JobEx.isCurrentJobCanceled() || (mon != null && mon.isCanceled())) {
-      sendCancelRequest();
+      sendCancelRequest(req.getRequestSequence());
     }
 
     if (res == null) {
@@ -243,9 +243,9 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
   /**
    * Signals the server to cancel processing jobs for the current session.
    */
-  protected void sendCancelRequest() {
+  protected void sendCancelRequest(long requestSequence) {
     try {
-      ServiceTunnelRequest cancelHttpRequest = new ServiceTunnelRequest(getVersion(), IServerProcessingCancelService.class, IServerProcessingCancelService.class.getMethod("cancel"), new Object[0]);
+      ServiceTunnelRequest cancelHttpRequest = new ServiceTunnelRequest(getVersion(), IServerProcessingCancelService.class, IServerProcessingCancelService.class.getMethod("cancel", long.class), new Object[]{requestSequence});
       HttpBackgroundJob cancelHttpJob = new HttpBackgroundJob(ScoutTexts.get("ServerCallCancelProcessing"), cancelHttpRequest, new Object(), this);
       cancelHttpJob.schedule();
     }

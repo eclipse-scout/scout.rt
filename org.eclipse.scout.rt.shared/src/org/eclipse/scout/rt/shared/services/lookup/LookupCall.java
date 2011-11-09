@@ -302,7 +302,7 @@ public class LookupCall implements Cloneable, Serializable {
             }
           }
           catch (ProcessingException e) {
-            if (!isCurrentJobCanceled()) {
+            if (!e.isInterruption() && !isCurrentJobCanceled()) {
               caller.dataFetched(null, e);
             }
           }
@@ -360,7 +360,7 @@ public class LookupCall implements Cloneable, Serializable {
             }
           }
           catch (ProcessingException e) {
-            if (!isCurrentJobCanceled()) {
+            if (!e.isInterruption() && !isCurrentJobCanceled()) {
               caller.dataFetched(null, e);
             }
           }
@@ -418,7 +418,7 @@ public class LookupCall implements Cloneable, Serializable {
             }
           }
           catch (ProcessingException e) {
-            if (!isCurrentJobCanceled()) {
+            if (!e.isInterruption() && !isCurrentJobCanceled()) {
               caller.dataFetched(null, e);
             }
           }
@@ -475,7 +475,7 @@ public class LookupCall implements Cloneable, Serializable {
             }
           }
           catch (ProcessingException e) {
-            if (!isCurrentJobCanceled()) {
+            if (!e.isInterruption() && !isCurrentJobCanceled()) {
               caller.dataFetched(null, e);
             }
           }

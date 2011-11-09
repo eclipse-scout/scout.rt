@@ -13,11 +13,14 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.VerboseUtility;
+import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 
 public class ServiceTunnelRequest implements Serializable {
   private static final long serialVersionUID = 0L;
+  private static final AtomicLong requestSequenceGenerator = new AtomicLong();
 
   private String m_serviceInterfaceClassName;
   private String m_operation;
@@ -26,6 +29,10 @@ public class ServiceTunnelRequest implements Serializable {
   private Locale m_locale;
   private String m_version;
   private Object m_metaData;
+  /**
+   * @since 3.8
+   */
+  private long m_requestSequence = requestSequenceGenerator.incrementAndGet();
 
   // for serialization
   private ServiceTunnelRequest() {
@@ -45,6 +52,16 @@ public class ServiceTunnelRequest implements Serializable {
       m_args = new Object[0];
     }
     m_locale = Locale.getDefault();
+  }
+
+  /**
+   * @return the request sequence for this session
+   *         <p>
+   *         The sequence can be used to find and manipulate transactions of the same session. Such a scenario is used
+   *         when cancelling "old" lookup requests using {@link IServerProcessingCancelService#cancel(long)}
+   */
+  public long getRequestSequence() {
+    return m_requestSequence;
   }
 
   public String getServiceInterfaceClassName() {

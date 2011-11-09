@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
 import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -33,7 +33,7 @@ public class RunningStatementStore {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RunningStatementStore.class);
 
-  private final static WeakHashMap<IServerSession, Set<Statement>> STATEMENT_MAP = new WeakHashMap<IServerSession, Set<Statement>>();
+  private final static WeakHashMap<IServerSession, Map<Long, Statement>> STATEMENT_MAP = new WeakHashMap<IServerSession, Map<Long, Statement>>();
   private final static Object STATEMENT_MAP_LOCK = new Object();
 
   private RunningStatementStore() {
@@ -59,14 +59,20 @@ public class RunningStatementStore {
       LOG.error("failed to register statement due to missing session context");
       return;
     }
-    synchronized(STATEMENT_MAP_LOCK){
-      Set<Statement> statements = STATEMENT_MAP.get(session);
-      if (statements == null) {
-        statements = new HashSet<Statement>();
-        STATEMENT_MAP.put(session, statements);
-      }
-      statements.add(statement);
+    Long seq = RequestSequenceThreadLocal.get();
+    if (seq == null) {
+      return;
     }
+
+    Map<Long, Statement> statementMap;
+    synchronized (STATEMENT_MAP_LOCK) {
+      statementMap = STATEMENT_MAP.get(session);
+      if (statementMap == null) {
+        statementMap = new HashMap<Long, Statement>();
+        STATEMENT_MAP.put(session, statementMap);
+      }
+    }
+    statementMap.put(seq, statement);
   }
 
   /**
@@ -84,13 +90,18 @@ public class RunningStatementStore {
       LOG.error("failed to unregister statement due to missing session context");
       return;
     }
-    synchronized (STATEMENT_MAP_LOCK) {
-      Set<Statement> statements = STATEMENT_MAP.get(session);
-      if (statements == null) {
-        return;
-      }
-      statements.remove(statement);
+    Long seq = RequestSequenceThreadLocal.get();
+    if (seq == null) {
+      return;
     }
+    Map<Long, Statement> statementMap;
+    synchronized (STATEMENT_MAP_LOCK) {
+      statementMap = STATEMENT_MAP.get(session);
+    }
+    if (statementMap == null) {
+      return;
+    }
+    statementMap.remove(seq);
   }
 
   /**
@@ -102,23 +113,22 @@ public class RunningStatementStore {
    * In consequence all registered statements of the current session are removed from {@link RunningStatementStore}.
    * </p>
    */
-  public static void cancelAll() {
+  public static void cancel(long requestSequence) {
     IServerSession session = ThreadContext.getServerSession();
     if (session == null) {
-      LOG.error("failed to register statement due to missing session context");
+      LOG.error("failed to find statement due to missing session context");
       return;
     }
 
-    Set<Statement> statements;
+    Map<Long, Statement> statementMap;
     synchronized (STATEMENT_MAP_LOCK) {
-      statements=STATEMENT_MAP.remove(session);
+      statementMap = STATEMENT_MAP.get(session);
     }
-
-    if (statements == null) {
+    if (statementMap == null) {
       return;
     }
-
-    for (Statement statement : statements) {
+    Statement statement = statementMap.get(requestSequence);
+    if (statement != null) {
       try {
         statement.cancel();
         LOG.info("request sent to cancel processing statement");

@@ -10,9 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.processing;
 
+import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.service.IService;
 
 public interface IServerProcessingCancelService extends IService {
 
+  /**
+   * @deprecated use {@link #cancel(long)} instead
+   */
+  @Deprecated
   void cancel();
+
+  /**
+   * cancel only specific backend job transaction of the same server session
+   */
+  @InputValidation(IValidationStrategy.NO_CHECK.class)
+  void cancel(long requestSequence);
 }

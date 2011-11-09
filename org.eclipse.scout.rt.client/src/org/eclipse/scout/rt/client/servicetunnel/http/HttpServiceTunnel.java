@@ -86,8 +86,8 @@ public class HttpServiceTunnel extends InternalHttpServiceTunnel {
   }
 
   @Override
-  protected void sendCancelRequest() {
-    super.sendCancelRequest();
+  protected void sendCancelRequest(long requestSequence) {
+    super.sendCancelRequest(requestSequence);
   }
 
   /**
