@@ -1755,7 +1755,21 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public final void setEnabled(boolean b) {
-    propertySupport.setPropertyBool(PROP_ENABLED, b);
+    boolean changed = propertySupport.setPropertyBool(PROP_ENABLED, b);
+    if (changed) {
+      //update the state of all current cell beans that are out there
+      try {
+        setTableChanging(true);
+        //
+        ITableRow[] rows = getRows();
+        for (ITableRow row : rows) {
+          enqueueDecorationTasks(row);
+        }
+      }
+      finally {
+        setTableChanging(false);
+      }
+    }
   }
 
   @Override
@@ -2622,44 +2636,49 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
      * 1. process lookup service calls
      */
     try {
-      BatchLookupCall batchCall = new BatchLookupCall();
-      ArrayList<ITableRow> tableRowList = new ArrayList<ITableRow>();
-      ArrayList<Integer> columnIndexList = new ArrayList<Integer>();
-      HashMap<LocalLookupCall, LookupRow[]> localLookupCache = new HashMap<LocalLookupCall, LookupRow[]>();
-      for (P_CellLookup lookup : m_cellLookupBuffer) {
-        ITableRow row = lookup.getRow();
-        if (row.getTable() == AbstractTable.this) {
-          ISmartColumn<?> col = lookup.getColumn();
-          LookupCall call = col.prepareLookupCall(row);
-          if (call != null) {
-            //split: local vs remote
-            if (call instanceof LocalLookupCall) {
-              LookupRow[] result = null;
-              //optimize local calls by caching the results
-              result = localLookupCache.get(call);
-              if (verifyLocalLookupCallBeanQuality((LocalLookupCall) call)) {
+      BatchLookupCall batchCall = null;
+      ArrayList<ITableRow> tableRowList = null;
+      ArrayList<Integer> columnIndexList = null;
+      if (m_cellLookupBuffer.size() > 0) {
+        batchCall = new BatchLookupCall();
+        tableRowList = new ArrayList<ITableRow>();
+        columnIndexList = new ArrayList<Integer>();
+        HashMap<LocalLookupCall, LookupRow[]> localLookupCache = new HashMap<LocalLookupCall, LookupRow[]>();
+        for (P_CellLookup lookup : m_cellLookupBuffer) {
+          ITableRow row = lookup.getRow();
+          if (row.getTable() == AbstractTable.this) {
+            ISmartColumn<?> col = lookup.getColumn();
+            LookupCall call = col.prepareLookupCall(row);
+            if (call != null) {
+              //split: local vs remote
+              if (call instanceof LocalLookupCall) {
+                LookupRow[] result = null;
+                //optimize local calls by caching the results
                 result = localLookupCache.get(call);
-                if (result == null) {
-                  result = call.getDataByKey();
-                  localLookupCache.put((LocalLookupCall) call, result);
+                if (verifyLocalLookupCallBeanQuality((LocalLookupCall) call)) {
+                  result = localLookupCache.get(call);
+                  if (result == null) {
+                    result = call.getDataByKey();
+                    localLookupCache.put((LocalLookupCall) call, result);
+                  }
                 }
+                else {
+                  result = call.getDataByKey();
+                }
+                applyLookupResult((InternalTableRow) row, col.getColumnIndex(), result);
               }
               else {
-                result = call.getDataByKey();
+                tableRowList.add(row);
+                columnIndexList.add(new Integer(col.getColumnIndex()));
+                batchCall.addLookupCall(call);
               }
-              applyLookupResult((InternalTableRow) row, col.getColumnIndex(), result);
-            }
-            else {
-              tableRowList.add(row);
-              columnIndexList.add(new Integer(col.getColumnIndex()));
-              batchCall.addLookupCall(call);
             }
           }
         }
       }
       m_cellLookupBuffer.clear();
       //
-      if (!batchCall.isEmpty()) {
+      if (batchCall != null && tableRowList != null && columnIndexList != null && !batchCall.isEmpty()) {
         ITableRow[] tableRows = tableRowList.toArray(new ITableRow[0]);
         LookupRow[][] resultArray;
         IBatchLookupService service = SERVICES.getService(IBatchLookupService.class);
