@@ -25,9 +25,10 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
- * Deprecated This class will be removed in the next release because it is not used anymore.
+ * @deprecated This class will be removed in the next release because it is not used anymore.
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public class SmartColumnFilter<T> implements ITableColumnFilter<T> {
   private final ISmartColumn<T> m_column;
   private Set<T> m_selectedValues;
