@@ -413,8 +413,8 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
           // There is already a static code with same id.
           execOverwriteCode(existingCode.toCodeRow(), newRow);
         }
-        ICode code = execCreateCode(newRow);
-        if (code != null) {
+        ICode newCode = execCreateCode(newRow);
+        if (newCode != null) {
           if (existingCode != null) {
             // remove old (and then re-add) to preserve dynamic ordering.
             allCodesOrdered.remove(existingCode);
@@ -422,13 +422,15 @@ public abstract class AbstractCodeType<T> implements ICodeType<T>, Serializable 
             codeToParentCodeMap.remove(existingCode);
           }
           //add new
-          allCodesOrdered.add(code);
-          idToCodeMap.put(code.getId(), code);
+          allCodesOrdered.add(newCode);
+          idToCodeMap.put(newCode.getId(), newCode);
           Object parentId = newRow.getParentKey();
-          codeToParentIdMap.put(code, parentId);
+          codeToParentIdMap.put(newCode, parentId);
         }
-        else {
-          //nop
+        else if (existingCode != null) {
+          // remove old (and then re-add) to preserve dynamic ordering.
+          allCodesOrdered.remove(existingCode);
+          allCodesOrdered.add(existingCode);
         }
       }
       for (Iterator<Map.Entry<ICode, Object>> it = codeToParentIdMap.entrySet().iterator(); it.hasNext();) {
