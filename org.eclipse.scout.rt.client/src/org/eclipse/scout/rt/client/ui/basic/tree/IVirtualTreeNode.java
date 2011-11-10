@@ -24,15 +24,16 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.VirtualPage;
  */
 public interface IVirtualTreeNode extends ITreeNode {
   /**
-   * @return the real node if the virtual node has been resolved, null otherwise
+   * @return the real node if the virtual node has been resolved, <code>null</code> otherwise.<br/>
    *         This value is used when a (old) reference to a {@link IVirtualTreeNode} is interested in the real node to
-   *         update its
-   *         reference
+   *         update its reference.
    */
   ITreeNode getResolvedNode();
 
   /**
-   * Set the real node of this virtual node.
+   * Attaches the real node to this virtual node. This method takes care
+   * to establish the contract of {@link IVirtualTreeNode} and {@link ITreeNode} with respect to the methods
+   * <code>equals(Object)</code> and <code>hashCode()</code>.
    */
   void setResolvedNode(ITreeNode resolvedNode);
 }

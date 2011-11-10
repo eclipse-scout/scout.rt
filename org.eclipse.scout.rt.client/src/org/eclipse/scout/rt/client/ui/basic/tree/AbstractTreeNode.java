@@ -65,6 +65,9 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
   private boolean m_visible;
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
+  // hash code is received from a virtual tree node when resolving to this node
+  // this node is not attached to a virtual node if m_hashCode is null
+  private Integer m_hashCode = null;
 
   public AbstractTreeNode() {
     this(true);
@@ -183,7 +186,24 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
 
   @Override
   public int hashCode() {
-    return 3;
+    if (m_hashCode != null) {
+      return m_hashCode.intValue();
+    }
+    return super.hashCode();
+  }
+
+  /**
+   * This method sets the internally used hash code. Should only be used by {@link VirtualTreeNode} when resolving this
+   * real node.
+   * 
+   * @param hashCode
+   */
+  void setHashCode(int hashCode) {
+    if (m_hashCode != null) {
+      LOG.warn("Overriding the hash code of an object will lead to inconsistent behavior of hash maps etc." +
+          " setHashCode() must not be called more than once.");
+    }
+    m_hashCode = Integer.valueOf(hashCode);
   }
 
   @Override

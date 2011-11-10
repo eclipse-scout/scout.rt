@@ -34,9 +34,12 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
     m_cell = new Cell(this);
   }
 
+  /**
+   * do NOT change this hashCode
+   */
   @Override
-  public int hashCode() {
-    return 3;
+  public final int hashCode() {
+    return super.hashCode();
   }
 
   @Override
@@ -58,6 +61,9 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   @Override
   public void setResolvedNode(ITreeNode resolvedNode) {
     m_resolvedNode = resolvedNode;
+    if (resolvedNode instanceof AbstractTreeNode) {
+      ((AbstractTreeNode) resolvedNode).setHashCode(this.hashCode());
+    }
   }
 
   public String getNodeId() {
