@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.transaction.BasicTransaction;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
@@ -43,6 +44,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
 
   private IServerSession m_serverSession;
   private Subject m_subject;
+  private long m_transactionSequence;
 
   /**
    * Perform a transaction on a {@link IServerSession} within a security {@link Subject} (optional)<br>
@@ -100,6 +102,23 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
       throw new IllegalStateException("This job is already scheduled/running");
     }
     m_subject = subject;
+  }
+
+  /**
+   * see {@link ITransaction#getTransactionSequence()}
+   */
+  public long getTransactionSequence() {
+    return m_transactionSequence;
+  }
+
+  /**
+   * see {@link ITransaction#getTransactionSequence()}
+   */
+  public void setTransactionSequence(long seq) {
+    if (getState() != NONE) {
+      throw new IllegalStateException("This job is already scheduled/running");
+    }
+    m_transactionSequence = seq;
   }
 
   @Override
@@ -177,6 +196,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
       ThreadContext.putServerSession(m_serverSession);
       ThreadContext.putTransaction(transaction);
       LocaleThreadLocal.set(m_serverSession.getLocale());
+      ActiveTransactionRegistry.register(transaction);
       //
       IStatus status = runTransaction(monitor);
       if (status == null) {
@@ -207,6 +227,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
       throw pe;
     }
     finally {
+      ActiveTransactionRegistry.unregister(transaction);
       if (transaction.hasFailures()) {
         // xa rollback
         transaction.rollback();
@@ -280,7 +301,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
   }
 
   protected ITransaction createNewTransaction() {
-    return new BasicTransaction();
+    return new BasicTransaction(getTransactionSequence());
   }
 
 }

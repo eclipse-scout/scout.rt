@@ -8,25 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
-
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+package org.eclipse.scout.rt.server.transaction;
 
 /**
- * thread local for {@link ServiceTunnelRequest#getRequestSequence()}
+ * Use this base class when implementing custom transaction members
+ * 
+ * @since 3.8
  */
-public class RequestSequenceThreadLocal {
-  private static ThreadLocal<Long> threadLocal = new ThreadLocal<Long>();
+public abstract class AbstractTransactionMember implements ITransactionMember {
+  private final String m_transactionMemberId;
 
-  private RequestSequenceThreadLocal() {
+  public AbstractTransactionMember(String transactionMemberId) {
+    m_transactionMemberId = transactionMemberId;
   }
 
-  public static Long get() {
-    Long l = threadLocal.get();
-    return l;
+  @Override
+  public String getMemberId() {
+    return m_transactionMemberId;
   }
 
-  public static void set(Long n) {
-    threadLocal.set(n);
+  @Override
+  public void cancel() {
   }
 }

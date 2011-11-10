@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,9 +19,9 @@ import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.IStatementCache;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 
-public class PreparedStatementCache implements ITransactionMember, IStatementCache {
+public class PreparedStatementCache extends AbstractTransactionMember implements IStatementCache {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PreparedStatementCache.class);
 
   public static final String TRANSACTION_MEMBER_ID = "PreparedStatementCache";
@@ -30,6 +30,7 @@ public class PreparedStatementCache implements ITransactionMember, IStatementCac
   private LRUCache<String, PreparedStatement> m_statementCache;
 
   public PreparedStatementCache(int statementCacheSize) {
+    super(TRANSACTION_MEMBER_ID);
     m_countCache = new LRUCache<String, Integer>(200, 120000L);
     m_statementCache = new LRUCache<String, PreparedStatement>(statementCacheSize, 3600000L);
     m_statementCache.addDisposeListener(new LRUCache.DisposeListener() {
@@ -44,11 +45,6 @@ public class PreparedStatementCache implements ITransactionMember, IStatementCac
         }
       }
     });
-  }
-
-  @Override
-  public String getMemberId() {
-    return TRANSACTION_MEMBER_ID;
   }
 
   @Override

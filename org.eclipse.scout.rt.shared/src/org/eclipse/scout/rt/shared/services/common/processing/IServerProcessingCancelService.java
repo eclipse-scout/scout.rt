@@ -17,13 +17,11 @@ import org.eclipse.scout.service.IService;
 public interface IServerProcessingCancelService extends IService {
 
   /**
-   * @deprecated use {@link #cancel(long)} instead
-   */
-  @Deprecated
-  void cancel();
-
-  /**
-   * cancel only specific backend job transaction of the same server session
+   * Cancel only specific backend job transaction of the same server session
+   * <p>
+   * Whenever a ClientJob - that is doing a backend call - is cancelled, this is detected by the
+   * InternalHttpServiceTunnel.tunnelOnline and calls {@link IServerProcessingCancelService#cancel(long)}. The
+   * server-side ServerProcessingCancelService calls ActiveTransactionRegistry.cancel
    */
   @InputValidation(IValidationStrategy.NO_CHECK.class)
   void cancel(long requestSequence);

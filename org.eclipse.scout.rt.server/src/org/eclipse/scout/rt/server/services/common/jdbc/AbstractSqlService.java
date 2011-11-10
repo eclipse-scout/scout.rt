@@ -454,6 +454,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     return execCustomBindFunction(functionName, args, bindBases);
   }
 
+  @Override
   public String getTransactionMemberId() {
     return m_transactionMemberId;
   }
@@ -686,7 +687,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       try {
         conn = leaseConnection();
         member = new SqlTransactionMember(getTransactionMemberId(), conn);
-        reg.registerResource(member);
+        reg.registerMember(member);
         // this is the start of the transaction
         execBeginTransaction();
       }
@@ -711,7 +712,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     IStatementCache res = (IStatementCache) reg.getMember(PreparedStatementCache.TRANSACTION_MEMBER_ID);
     if (res == null) {
       res = new PreparedStatementCache(getJdbcStatementCacheSize());
-      reg.registerResource((ITransactionMember) res);
+      reg.registerMember((ITransactionMember) res);
     }
     return res;
   }
@@ -883,12 +884,11 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     return null;
   }
 
-  private class SqlTransactionMember implements ITransactionMember {
-    private final String m_transactionMemberId;
+  private class SqlTransactionMember extends AbstractSqlTransactionMember {
     private final Connection m_conn;
 
     public SqlTransactionMember(String transactionMemberId, Connection conn) {
-      m_transactionMemberId = transactionMemberId;
+      super(transactionMemberId);
       m_conn = conn;
     }
 
@@ -899,16 +899,6 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
 
     public Connection getConnection() {
       return m_conn;
-    }
-
-    @Override
-    public boolean needsCommit() {
-      return true;
-    }
-
-    @Override
-    public boolean commitPhase1() {
-      return true;
     }
 
     @Override

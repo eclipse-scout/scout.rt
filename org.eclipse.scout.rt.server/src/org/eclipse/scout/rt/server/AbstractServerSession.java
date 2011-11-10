@@ -41,8 +41,9 @@ public abstract class AbstractServerSession implements IServerSession {
   private boolean m_initialized;
   private boolean m_active;
   private Locale m_locale;
-  private HashMap<Object, Object> m_attributes;
-  private SharedVariableMap m_sharedVariableMap;
+  private final HashMap<Object, Object> m_attributes;
+  private final Object m_attributesLock;
+  private final SharedVariableMap m_sharedVariableMap;
   private boolean m_webSession;
   private ScoutTexts m_scoutTexts;
   private static final Map<Class<? extends IServerSession>, ScoutTexts> SCOUT_TEXTS_CACHE = new HashMap<Class<? extends IServerSession>, ScoutTexts>();
@@ -52,6 +53,7 @@ public abstract class AbstractServerSession implements IServerSession {
     if (m_locale == null) {
       m_locale = Locale.getDefault();
     }
+    m_attributesLock = new Object();
     m_attributes = new HashMap<Object, Object>();
     m_sharedVariableMap = new SharedVariableMap();
     m_scoutTexts = SCOUT_TEXTS_CACHE.get(getClass());
@@ -141,12 +143,16 @@ public abstract class AbstractServerSession implements IServerSession {
 
   @Override
   public Object getAttribute(Object key) {
-    return m_attributes.get(key);
+    synchronized (m_attributesLock) {
+      return m_attributes.get(key);
+    }
   }
 
   @Override
   public void setAttribute(Object key, Object value) {
-    m_attributes.put(key, value);
+    synchronized (m_attributesLock) {
+      m_attributes.put(key, value);
+    }
   }
 
   protected void initConfig() {

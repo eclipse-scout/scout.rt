@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,6 +49,8 @@ import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISelectStreamHandler;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.IStatementCache;
@@ -55,6 +58,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.IStatementProcessor;
 import org.eclipse.scout.rt.server.services.common.jdbc.IStatementProcessorMonitor;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
+import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
 public class StatementProcessor implements IStatementProcessor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StatementProcessor.class);
@@ -69,8 +73,8 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
-  private ISqlService m_callerService;
-  private String m_originalStm;
+  private final ISqlService m_callerService;
+  private final String m_originalStm;
   private Object[] m_bindBases;
   private int m_maxRowCount;
   private BindModel m_bindModel;
@@ -222,7 +226,7 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        RunningStatementStore.register(ps);
+        registerActiveStatement(ps);
         try {
           rs = ps.executeQuery();
           for (Object[] row : processResultRows(rs, m_maxRowCount)) {
@@ -232,7 +236,7 @@ public class StatementProcessor implements IStatementProcessor {
           }
         }
         finally {
-          RunningStatementStore.unregister(ps);
+          unregisterActiveStatement(ps);
         }
       }
       finishOutputBatch();
@@ -284,7 +288,7 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        RunningStatementStore.register(ps);
+        registerActiveStatement(ps);
         try {
           rs = ps.executeQuery();
           for (Object[] row : processResultRows(rs, m_maxRowCount)) {
@@ -294,7 +298,7 @@ public class StatementProcessor implements IStatementProcessor {
           }
         }
         finally {
-          RunningStatementStore.unregister(ps);
+          unregisterActiveStatement(ps);
         }
       }
       finishOutputBatch();
@@ -339,7 +343,7 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        RunningStatementStore.register(ps);
+        registerActiveStatement(ps);
         try {
           rs = ps.executeQuery();
 
@@ -360,7 +364,7 @@ public class StatementProcessor implements IStatementProcessor {
           }
         }
         finally {
-          RunningStatementStore.unregister(ps);
+          unregisterActiveStatement(ps);
         }
       }
       finishOutputBatch();
@@ -408,12 +412,12 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        RunningStatementStore.register(ps);
+        registerActiveStatement(ps);
         try {
           rowCount = rowCount + ps.executeUpdate();
         }
         finally {
-          RunningStatementStore.unregister(ps);
+          unregisterActiveStatement(ps);
         }
       }
       return rowCount;
@@ -454,12 +458,12 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         cs = cache.getCallableStatement(conn, m_currentInputStm);
         bindBatch(cs);
-        RunningStatementStore.register(cs);
+        registerActiveStatement(cs);
         try {
           status = status && cs.execute();
         }
         finally {
-          RunningStatementStore.unregister(cs);
+          unregisterActiveStatement(cs);
         }
         nextOutputBatch();
         consumeOutputRow(cs);
@@ -1267,4 +1271,17 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
+  protected void registerActiveStatement(Statement s) throws SQLException {
+    ITransactionMember member = ThreadContext.getTransaction().getMember(getCallerService().getTransactionMemberId());
+    if (member instanceof AbstractSqlTransactionMember) {
+      ((AbstractSqlTransactionMember) member).registerActiveStatement(s);
+    }
+  }
+
+  protected void unregisterActiveStatement(Statement s) throws SQLException {
+    ITransactionMember member = ThreadContext.getTransaction().getMember(getCallerService().getTransactionMemberId());
+    if (member instanceof AbstractSqlTransactionMember) {
+      ((AbstractSqlTransactionMember) member).unregisterActiveStatement(s);
+    }
+  }
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,7 +18,10 @@ import javax.sql.DataSource;
 
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
+import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -302,8 +305,11 @@ public interface ISqlService extends IService {
    */
   String createPlainText(String s, Object... bindBases) throws ProcessingException;
 
+  String getTransactionMemberId();
+
   /**
-   * @return current connection from XA resource
+   * @return current connection from {@link ITransactionMember} that is registered inside the {@link ITransaction} (see
+   *         {@link ThreadContext#getTransaction()}) as {@link #getTransactionMemberId()}
    */
   Connection getConnection() throws ProcessingException;
 

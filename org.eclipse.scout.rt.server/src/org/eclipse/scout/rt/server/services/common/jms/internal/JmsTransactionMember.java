@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,7 +42,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jms.JmsJndiConfig;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 
 /**
  * Title: BSI Scout V3
@@ -56,10 +56,11 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * @since Build 192
  *        (Extracted out of JmsService class to an autonomous class)
  */
-public class JmsTransactionMember implements ITransactionMember {
+public class JmsTransactionMember extends AbstractTransactionMember {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JmsTransactionMember.class);
 
   public static final String TRANSACTION_MEMBER_ID = "JmsTransactionMember";
+
   // app ctx
   private ConnectionFactory m_cf;
   private Destination m_destination;
@@ -73,7 +74,8 @@ public class JmsTransactionMember implements ITransactionMember {
   private boolean m_useSecurityCredential;
 
   public JmsTransactionMember(JmsJndiConfig config) {
-    this.m_config = config;
+    super(new Long(config.getCrc()).toString());
+    m_config = config;
   }
 
   /**
@@ -101,12 +103,6 @@ public class JmsTransactionMember implements ITransactionMember {
         }
       }
     }
-  }
-
-  @Override
-  public String getMemberId() {
-
-    return new Long(m_config.getCrc()).toString();
   }
 
   public boolean isQueue() {

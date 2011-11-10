@@ -359,3 +359,10 @@ ThreadContext only contains the 4 scout server state ThreadLocals.
 ThreadContextLegacy contains the old code (including ThreadContext state)
 Migration (optional):
 Code locations referring to old methods of ThreadContext.Xyz should be renamed to ThreadContextLegacy.Xyz
+
+10.11.2011 imo
+Enhancement of transaction cancel process
+Solution:
+see javadoc on IServerProcessingCancelService and ITransaction
+Migration:
+When using custom ITransactionMember objects, use the super class AbstractTransactionMember to support for api extensions.

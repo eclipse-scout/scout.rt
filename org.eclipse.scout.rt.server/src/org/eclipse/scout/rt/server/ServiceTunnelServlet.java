@@ -46,7 +46,6 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.internal.Activator;
-import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.RequestSequenceThreadLocal;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
@@ -327,6 +326,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
         }
         AtomicReference<ServiceTunnelResponse> serviceResponseHolder = new AtomicReference<ServiceTunnelResponse>();
         ServerJob job = createServiceTunnelServerJob(serverSession, serviceRequest, serviceResponseHolder, subject);
+        job.setTransactionSequence(serviceRequest.getRequestSequence());
         job.runNow(new NullProgressMonitor());
         job.throwOnError();
         serializeOutput(res, serviceResponseHolder.get());
@@ -466,16 +466,9 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
     @Override
     protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      try {
-        RequestSequenceThreadLocal.set(getServiceRequest().getRequestSequence());
-        //
-        ServiceTunnelResponse serviceRes = runServerJobTransaction(getServiceRequest());
-        getServiceResponseHolder().set(serviceRes);
-        return Status.OK_STATUS;
-      }
-      finally {
-        RequestSequenceThreadLocal.set(null);
-      }
+      ServiceTunnelResponse serviceRes = runServerJobTransaction(getServiceRequest());
+      getServiceResponseHolder().set(serviceRes);
+      return Status.OK_STATUS;
     }
   }
 

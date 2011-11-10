@@ -11,25 +11,15 @@
 package org.eclipse.scout.rt.server.services.common.processing;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.RunningStatementStore;
+import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)
 public class ServerProcessingCancelService extends AbstractService implements IServerProcessingCancelService {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerProcessingCancelService.class);
-
-  @SuppressWarnings("deprecation")
   @Override
-  public void cancel() {
-    //nop
-  }
-
-  @Override
-  public void cancel(long requestSequence) {
-    RunningStatementStore.cancel(requestSequence);
+  public void cancel(long transcationSequence) {
+    ActiveTransactionRegistry.cancel(transcationSequence);
   }
 }

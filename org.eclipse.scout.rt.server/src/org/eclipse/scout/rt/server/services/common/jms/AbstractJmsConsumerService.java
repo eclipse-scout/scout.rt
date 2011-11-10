@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -179,7 +179,7 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
     JmsTransactionMember res = (JmsTransactionMember) reg.getMember(resId);
     if (res == null) {
       res = new JmsTransactionMember(m_config);
-      reg.registerResource(res);
+      reg.registerMember(res);
     }
     return res;
   }

@@ -4,16 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.server.transaction;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -21,23 +19,45 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 public class BasicTransaction implements ITransaction {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BasicTransaction.class);
 
-  private Object m_memberMapLock;
-  private HashMap<String, Object> m_memberMap;
+  private final long m_transactionSequence;
+  private final Object m_memberMapLock = new Object();
+  private final HashMap<String, ITransactionMember> m_memberMap = new HashMap<String, ITransactionMember>();
   private ArrayList<Throwable> m_failures = new ArrayList<Throwable>();
+  private boolean m_commitPhase;
+  private boolean m_cancelled;
 
   public BasicTransaction() {
-    m_memberMapLock = new Object();
+    this(0L);
+  }
+
+  /**
+   * @param transactionSequence
+   *          see {@link ITransaction#getTransactionSequence()}
+   */
+  public BasicTransaction(long transactionSequence) {
+    m_transactionSequence = transactionSequence;
   }
 
   @Override
+  public long getTransactionSequence() {
+    return m_transactionSequence;
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public void registerResource(ITransactionMember member) {
+    registerMember(member);
+  }
+
+  @Override
+  public void registerMember(ITransactionMember member) {
+    if (m_cancelled) {
+      throw new IllegalStateException("Transaction is cancelled");
+    }
     synchronized (m_memberMapLock) {
       String memberId = member.getMemberId();
       if (LOG.isDebugEnabled()) {
         LOG.debug("" + memberId + "/" + member);
-      }
-      if (m_memberMap == null) {
-        m_memberMap = new HashMap<String, Object>();
       }
       // release existing
       ITransactionMember old = (ITransactionMember) m_memberMap.get(memberId);
@@ -54,9 +74,6 @@ public class BasicTransaction implements ITransaction {
   @Override
   public ITransactionMember getMember(String memberId) {
     synchronized (m_memberMapLock) {
-      if (m_memberMap == null) {
-        m_memberMap = new HashMap<String, Object>();
-      }
       ITransactionMember res = (ITransactionMember) m_memberMap.get(memberId);
       if (LOG.isDebugEnabled()) {
         LOG.debug("" + memberId + "->" + res);
@@ -68,54 +85,54 @@ public class BasicTransaction implements ITransaction {
   @Override
   public ITransactionMember[] getMembers() {
     synchronized (m_memberMapLock) {
-      if (m_memberMap == null) {
-        m_memberMap = new HashMap<String, Object>();
-      }
-      return m_memberMap.values().toArray(new ITransactionMember[0]);
+      return getMembersNoLocking();
     }
+  }
+
+  private ITransactionMember[] getMembersNoLocking() {
+    return m_memberMap.values().toArray(new ITransactionMember[m_memberMap.size()]);
   }
 
   @Override
   public void unregisterMember(ITransactionMember member) {
-    if (member != null) {
-      synchronized (m_memberMapLock) {
-        String memberId = member.getMemberId();
-        if (m_memberMap != null) {
-          Object o = m_memberMap.get(memberId);
-          if (o == member) {
-            m_memberMap.remove(memberId);
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("" + memberId + "->" + o);
-            }
-          }
-        }
+    if (member == null) {
+      return;
+    }
+    unregisterMember(member.getMemberId());
+  }
+
+  @Override
+  public void unregisterMember(String memberId) {
+    synchronized (m_memberMapLock) {
+      Object o = m_memberMap.get(memberId);
+      m_memberMap.remove(memberId);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("" + memberId + "->" + o);
       }
     }
   }
 
   @Override
   public boolean commitPhase1() {
-    Collection xaList;
     synchronized (m_memberMapLock) {
-      if (m_memberMap == null) {
-        m_memberMap = new HashMap<String, Object>();
+      if (m_cancelled) {
+        throw new IllegalStateException("Transaction is cancelled");
       }
-      xaList = new ArrayList<Object>(m_memberMap.values());
+      m_commitPhase = true;
     }
     boolean allSuccessful = true;
-    for (Iterator it = xaList.iterator(); it.hasNext();) {
-      ITransactionMember res = (ITransactionMember) it.next();
+    for (ITransactionMember mem : getMembers()) {
       try {
-        if (res.needsCommit()) {
+        if (mem.needsCommit()) {
           if (LOG.isDebugEnabled()) {
-            LOG.debug(" " + res);
+            LOG.debug(" " + mem);
           }
-          boolean b = res.commitPhase1();
+          boolean b = mem.commitPhase1();
           allSuccessful = allSuccessful && b;
         }
       }
       catch (Throwable t) {
-        LOG.error("commit phase 1" + res, t);
+        LOG.error("commit phase 1" + mem, t);
       }
     }
     return allSuccessful && !hasFailures();
@@ -123,80 +140,54 @@ public class BasicTransaction implements ITransaction {
 
   @Override
   public void commitPhase2() {
-    Collection xaList;
-    synchronized (m_memberMapLock) {
-      if (m_memberMap == null) {
-        m_memberMap = new HashMap<String, Object>();
-      }
-      xaList = new ArrayList<Object>(m_memberMap.values());
-    }
-    for (Iterator it = xaList.iterator(); it.hasNext();) {
-      ITransactionMember res = (ITransactionMember) it.next();
+    for (ITransactionMember mem : getMembers()) {
       try {
-        if (res.needsCommit()) {
+        if (mem.needsCommit()) {
           if (LOG.isDebugEnabled()) {
-            LOG.debug(" " + res);
+            LOG.debug(" " + mem);
           }
-          res.commitPhase2();
+          mem.commitPhase2();
         }
       }
       catch (Throwable t) {
-        LOG.error("commit phase 2" + res, t);
+        LOG.error("commit phase 2" + mem, t);
       }
     }
   }
 
   @Override
   public void rollback() {
-    Collection xaList;
-    synchronized (m_memberMapLock) {
-      if (m_memberMap == null) {
-        m_memberMap = new HashMap<String, Object>();
-      }
-      xaList = new ArrayList<Object>(m_memberMap.values());
-    }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("");
-    }
-    for (Iterator it = xaList.iterator(); it.hasNext();) {
-      ITransactionMember res = (ITransactionMember) it.next();
+    for (ITransactionMember mem : getMembers()) {
       try {
-        if (res.needsCommit()) {
+        if (mem.needsCommit()) {
           if (LOG.isDebugEnabled()) {
-            LOG.debug(" " + res);
+            LOG.debug(" " + mem);
           }
-          res.rollback();
+          mem.rollback();
         }
       }
       catch (Throwable t) {
-        LOG.error("rollback " + res, t);
+        LOG.error("rollback " + mem, t);
       }
     }
   }
 
   @Override
   public void release() {
-    Collection xaList;
+    ITransactionMember[] a;
     synchronized (m_memberMapLock) {
-      if (m_memberMap == null) {
-        m_memberMap = new HashMap<String, Object>();
-      }
-      xaList = new ArrayList<Object>(m_memberMap.values());
+      a = getMembersNoLocking();
       m_memberMap.clear();
     }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("");
-    }
-    for (Iterator it = xaList.iterator(); it.hasNext();) {
-      ITransactionMember res = (ITransactionMember) it.next();
+    for (ITransactionMember mem : a) {
       try {
         if (LOG.isDebugEnabled()) {
-          LOG.debug(" " + res);
+          LOG.debug(" " + mem);
         }
-        res.release();
+        mem.release();
       }
       catch (Throwable t) {
-        LOG.error("release " + res, t);
+        LOG.error("release " + mem, t);
       }
     }
   }
@@ -216,4 +207,32 @@ public class BasicTransaction implements ITransaction {
     m_failures.add(t);
   }
 
+  @Override
+  public synchronized void cancel() {
+    synchronized (m_memberMapLock) {
+      if (m_commitPhase) {
+        return;
+      }
+      if (m_cancelled) {
+        return;
+      }
+      m_cancelled = true;
+      addFailure(new InterruptedException());
+    }
+    for (ITransactionMember mem : getMembers()) {
+      try {
+        mem.cancel();
+      }
+      catch (Throwable t) {
+        LOG.error("cancel " + mem, t);
+      }
+    }
+  }
+
+  @Override
+  public boolean isCancelled() {
+    synchronized (m_memberMapLock) {
+      return m_cancelled;
+    }
+  }
 }
