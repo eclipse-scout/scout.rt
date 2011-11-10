@@ -18,6 +18,7 @@ import java.net.SocketException;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.security.auth.Subject;
@@ -65,9 +66,8 @@ import org.osgi.framework.Version;
  * Override the methods {@link #filterInbound(Object)} and {@link #filterOutbound(Object)} to do central input/output
  * validation.
  * <p>
- * When using RAP (rich ajax platform) as the ui web app then the /ajax servlet alias must be used in order to map
- * requests to virtual sessions instead of (the unique) http session. The expected headers therefore are
- * "Ajax-SessionId" and "Ajax-UserId"
+ * When using RAP (rich ajax platform) as the ui web app then there must be a {@link WebSessionIdPrincipal} in the
+ * subject, in order to map those requests to virtual sessions instead of (the unique) http session.
  */
 public class ServiceTunnelServlet extends HttpServletEx {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
@@ -198,7 +198,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_orderedBundleList;
   }
 
-  private Subject lookupSubjectOnHttpSession(HttpServletRequest req, HttpServletResponse res) throws ProcessingException, ServletException {
+  private Subject lookupSubjectOnHttpRequest(HttpServletRequest req, HttpServletResponse res) throws ProcessingException, ServletException {
     Subject subject = Subject.getSubject(AccessController.getContext());
     if (subject == null) {
       Principal principal = req.getUserPrincipal();
@@ -217,12 +217,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
     if (subject == null) {
       throw new SecurityException("request contains neither remoteUser nor userPrincipal nor a subject with a principal");
     }
-    return subject;
-  }
-
-  private Subject lookupSubjectOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxUserId) throws ProcessingException, ServletException {
-    Subject subject = new Subject();
-    subject.getPrincipals().add(new SimplePrincipal(ajaxUserId));
     return subject;
   }
 
@@ -267,7 +261,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       ThreadContext.putHttpServletRequest(req);
       ThreadContext.putHttpServletResponse(res);
       //
-      Subject subject = lookupSubjectOnHttpSession(req, res);
+      Subject subject = lookupSubjectOnHttpRequest(req, res);
       IServerSession serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject);
       //
       ServerJob job = new AdminServiceJob(serverSession, subject, req, res);
@@ -287,21 +281,12 @@ public class ServiceTunnelServlet extends HttpServletEx {
     try {
       lazyInit(req, res);
       //
-      String servletPath = req.getServletPath();
-      String ajaxSessionId = req.getHeader("Ajax-SessionId");
-      String ajaxUserId = req.getHeader("Ajax-UserId");
-      boolean isVirtualImpersonatedRequest = (ajaxUserId != null && ajaxSessionId != null);
+      Set<VirtualSessionIdPrincipal> vps = Subject.getSubject(AccessController.getContext()).getPrincipals(VirtualSessionIdPrincipal.class);
+      String virtualSessionId = (vps.size() > 0 ? vps.iterator().next().getName() : null);
+      boolean isVirtualImpersonatedRequest = (virtualSessionId != null);
       if (isVirtualImpersonatedRequest) {
         if (!checkAjaxDelegateAccess(req, res)) {
           return;
-        }
-      }
-      else {
-        if (ajaxSessionId != null) {
-          throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-SessionId'");
-        }
-        if (ajaxUserId != null) {
-          throw new ServletException("servlet " + servletPath + ": forbidden header 'Ajax-UserId'");
         }
       }
       //invoke
@@ -315,13 +300,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
         LocaleThreadLocal.set(serviceRequest.getLocale());
         //
         IServerSession serverSession;
-        Subject subject;
+        Subject subject = lookupSubjectOnHttpRequest(req, res);
         if (isVirtualImpersonatedRequest) {
-          subject = lookupSubjectOnVirtualSession(req, res, ajaxUserId);
-          serverSession = lookupScoutServerSessionOnVirtualSession(req, res, ajaxSessionId, subject);
+          serverSession = lookupScoutServerSessionOnVirtualSession(req, res, virtualSessionId, subject);
         }
         else {
-          subject = lookupSubjectOnHttpSession(req, res);
           serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject);
         }
         AtomicReference<ServiceTunnelResponse> serviceResponseHolder = new AtomicReference<ServiceTunnelResponse>();
@@ -374,6 +357,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     if (localhost.equals(remotehost)) {
       return true;
     }
+    LOG.error("Ajax intermediate access is by default only allowed on the same host. Override that function to change this policy");
     res.sendError(HttpServletResponse.SC_FORBIDDEN);
     return false;
   }

@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLConnection;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -25,19 +23,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
-/**
- * If {@link IClientSession#getWebSessionId()} is not null then it is sent with every request as http header
- * "Ajax-SessionId" together with "Ajax-UserId"
- * to the /ajax servlet.
- * <p>
- * This is necessary since the web-gui-servlet is itself a single servlet that is calling the server-servlet /process
- * with a single cookie and therefore a single http session. When "Ajax-SessionId" is set, the ServiceTunnelServlet
- * /process recognizes this and is not associating the scout server session with the HttpSession but with a custom cache
- * associated with this ajax (remote) session id.
- * <p>
- * The "Ajax-UserId" header is added to impersonate the originally calling user (retrieved from the current
- * {@link Subject}s first principal).
- */
 public class HttpServiceTunnel extends InternalHttpServiceTunnel {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.client.http.debug";
 

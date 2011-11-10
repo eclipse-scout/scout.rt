@@ -52,6 +52,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 public abstract class AbstractClientSession implements IClientSession {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractClientSession.class);
+  private static final Map<Class<? extends IClientSession>, ScoutTexts> SCOUT_TEXTS_CACHE = new HashMap<Class<? extends IClientSession>, ScoutTexts>();
 
   // context
   private Bundle m_bundle;
@@ -65,14 +66,14 @@ public abstract class AbstractClientSession implements IClientSession {
   private VirtualDesktop m_virtualDesktop;
   private IServiceTunnel m_serviceTunnel;
   private Subject m_offlineSubject;
+  private Subject m_subject;
   private final SharedVariableMap m_sharedVariableMap;
   private boolean m_singleThreadSession;
-  private String m_webSessionId;
+  private String m_virtualSessionId;
   private IMemoryPolicy m_memoryPolicy;
   private IIconLocator m_iconLocator;
   private final HashMap<String, Object> m_clientSessionData;
   private ScoutTexts m_scoutTexts;
-  private static final Map<Class<? extends IClientSession>, ScoutTexts> SCOUT_TEXTS_CACHE = new HashMap<Class<? extends IClientSession>, ScoutTexts>();
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
@@ -422,13 +423,23 @@ public abstract class AbstractClientSession implements IClientSession {
   }
 
   @Override
-  public String getWebSessionId() {
-    return m_webSessionId;
+  public String getVirtualSessionId() {
+    return m_virtualSessionId;
   }
 
   @Override
-  public void setWebSessionId(String sessionId) {
-    m_webSessionId = sessionId;
+  public void setVirtualSessionId(String sessionId) {
+    m_virtualSessionId = sessionId;
+  }
+
+  @Override
+  public Subject getSubject() {
+    return m_subject;
+  }
+
+  @Override
+  public void setSubject(Subject subject) {
+    m_subject = subject;
   }
 
   protected IIconLocator createIconLocator() {

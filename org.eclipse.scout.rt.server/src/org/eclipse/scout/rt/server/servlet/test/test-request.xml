@@ -1,0 +1,12 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsse="http://schemas.xmlsoap.org/ws/2002/04/secext" xmlns:uiws="${tns}">
+  <soapenv:Header>
+    <wsse:Security soapenv:mustUnderstand="1">
+       <wsse:UsernameToken>
+         <wsse:Username>Scout</wsse:Username>
+         <wsse:Password Type="http://scout.eclipse.org/security#VirtualSessionId">ABCDEFG12345678</wsse:Password>
+       </wsse:UsernameToken>
+     </wsse:Security>
+  </soapenv:Header>
+  <soapenv:Body>
+  </soapenv:Body>
+</soapenv:Envelope>

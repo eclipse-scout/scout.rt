@@ -15,6 +15,8 @@ import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.security.auth.Subject;
+
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 
@@ -32,7 +34,15 @@ public class ServiceTunnelRequest implements Serializable {
   /**
    * @since 3.8
    */
-  private long m_requestSequence = requestSequenceGenerator.incrementAndGet();
+  private final long m_requestSequence = requestSequenceGenerator.incrementAndGet();
+  /**
+   * @since 3.8
+   */
+  private transient Subject m_clientSubject;
+  /**
+   * @since 3.8
+   */
+  private transient String m_virtualSessionId;
 
   // for serialization
   private ServiceTunnelRequest() {
@@ -94,6 +104,42 @@ public class ServiceTunnelRequest implements Serializable {
 
   public void setMetaData(Object o) {
     m_metaData = o;
+  }
+
+  /**
+   * The subject under which the request is done
+   * <p>
+   * Client only method. The member is transient and will be null on the server.
+   */
+  public Subject getClientSubject() {
+    return m_clientSubject;
+  }
+
+  /**
+   * The subject under which the request is done
+   * <p>
+   * Client only method. The member is transient and will be null on the server.
+   */
+  public void setClientSubject(Subject requestSubject) {
+    m_clientSubject = requestSubject;
+  }
+
+  /**
+   * The web (ajax) session under which the request is done
+   * <p>
+   * Client only method. The member is transient and will be null on the server.
+   */
+  public String getVirtualSessionId() {
+    return m_virtualSessionId;
+  }
+
+  /**
+   * The web (ajax) session under which the request is done
+   * <p>
+   * Client only method. The member is transient and will be null on the server.
+   */
+  public void setVirtualSessionId(String virtualSessionId) {
+    m_virtualSessionId = virtualSessionId;
   }
 
   @Override

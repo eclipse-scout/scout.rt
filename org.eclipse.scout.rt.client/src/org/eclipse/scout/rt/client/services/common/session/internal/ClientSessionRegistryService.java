@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.services.common.session.internal;
 
 import java.util.HashMap;
 
+import javax.security.auth.Subject;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -74,7 +76,7 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
 
   @Override
   @SuppressWarnings("unchecked")
-  public <T extends IClientSession> T newClientSession(Class<T> clazz, String webSessionId) {
+  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId) {
     String symbolicName = clazz.getPackage().getName();
     Bundle bundleLocator = null;
     while (symbolicName != null) {
@@ -89,8 +91,9 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
     if (bundle != null) {
       try {
         IClientSession clientSession = clazz.newInstance();
-        if (webSessionId != null) {
-          clientSession.setWebSessionId(webSessionId);
+        clientSession.setSubject(subject);
+        if (virtualSessionId != null) {
+          clientSession.setVirtualSessionId(virtualSessionId);
         }
         ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
           @Override

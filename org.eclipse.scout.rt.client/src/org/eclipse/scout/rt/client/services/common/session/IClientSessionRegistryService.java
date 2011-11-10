@@ -45,6 +45,6 @@ public interface IClientSessionRegistryService extends IService {
    *         Note: If the creation of the session requires a special jaas context call it only inside a
    *         {@link Subject#doAs(Subject, java.security.PrivilegedAction)} section
    */
-  <T extends IClientSession> T newClientSession(Class<T> clazz, String webSessionId);
+  <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId);
 
 }

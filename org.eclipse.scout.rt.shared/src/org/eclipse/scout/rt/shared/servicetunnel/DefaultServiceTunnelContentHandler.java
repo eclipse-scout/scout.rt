@@ -46,13 +46,13 @@ import org.osgi.framework.Bundle;
  * <pre>
  * @code
  * <?xml version="1.0" encoding="UTF-8"?>
- * <SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
- *   <SOAP-ENV:Body>
+ * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+ *   <soapenv:Body>
  *     <request version="3.0.0" format="de_CH" language="de_CH" service="org.eclipse.scout.rt.shared.services.common.ping.IPingService" operation="ping"/>
  *     <data>...</data>
  *     <info ts="20080715114301917" origin="192.168.1.105">For maximum performance, data is reduced, compressed and base64 encoded.</info>
- *   </SOAP-ENV:Body>
- * </SOAP-ENV:Envelope>
+ *   </soapenv:Body>
+ * </soapenv:Envelope>
  * }
  * </pre>
  * 
@@ -61,13 +61,13 @@ import org.osgi.framework.Bundle;
  * <pre>
  * @code
  * <?xml version="1.0" encoding="UTF-8"?>
- * <SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
- *   <SOAP-ENV:Body>
+ * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+ *   <soapenv:Body>
  *     <response status="OK" type="String"/>
  *     <data>...</data>
  *     <info ts="20080715114301917" origin="192.168.3.2">For maximum performance, data is reduced, compressed and base64 encoded.</info>
- *   </SOAP-ENV:Body>
- * </SOAP-ENV:Envelope>
+ *   </soapenv:Body>
+ * </soapenv:Envelope>
  * }
  * </pre>
  * 
@@ -76,15 +76,15 @@ import org.osgi.framework.Bundle;
  * <pre>
  * @code
  * <?xml version="1.0" encoding="UTF-8"?>
- * <SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
- *   <SOAP-ENV:Body>
+ * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+ *   <soapenv:Body>
  *     <response status="ERROR">
  *       <exception type="SecurityException">Access denied</exception>
  *     </response>
  *     <data>...</data>
  *     <info ts="20080715114301917" origin="192.168.3.2">For maximum performance, data is reduced, compressed and base64 encoded.</info>
- *   </SOAP-ENV:Body>
- * </SOAP-ENV:Envelope>
+ *   </soapenv:Body>
+ * </soapenv:Envelope>
  * }
  * </pre>
  * 
@@ -155,8 +155,15 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     // build soap message without sax (hi-speed)
     boolean compressed = isUseCompression();
     StringBuilder buf = new StringBuilder();
-    buf.append("<SOAP-ENV:Envelope SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n");
-    buf.append("<SOAP-ENV:Body>\n");
+    String wsse = createWsSecurityElement(msg);
+    if (wsse == null) {
+      wsse = "";
+    }
+    buf.append("<soapenv:Envelope soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wsse=\"http://schemas.xmlsoap.org/ws/2002/04/secext\">\n");
+    buf.append("<soapenv:Header>");
+    buf.append(wsse);
+    buf.append("</soapenv:Header>\n");
+    buf.append("<soapenv:Body>\n");
     buf.append("  <request version=\"");
     buf.append(msg.getVersion());
     buf.append("\" compressed=\"");
@@ -179,8 +186,8 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     buf.append("  <info");
     buf.append(" origin=\"" + m_originAddress + "\"");
     buf.append("/>\n");
-    buf.append("</SOAP-ENV:Body>");
-    buf.append("</SOAP-ENV:Envelope>");
+    buf.append("</soapenv:Body>");
+    buf.append("</soapenv:Envelope>");
     //
     if (LOG.isDebugEnabled()) {
       out = new DebugOutputStream(out);
@@ -203,8 +210,8 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     // build soap message without sax (hi-speed)
     boolean compressed = isUseCompression();
     StringBuilder buf = new StringBuilder();
-    buf.append("<SOAP-ENV:Envelope SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n");
-    buf.append("<SOAP-ENV:Body>\n");
+    buf.append("<soapenv:Envelope soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n");
+    buf.append("<soapenv:Body>\n");
     if (msg.getException() == null) {
       buf.append("  <response status=\"OK\"");
       Object x = msg.getData();
@@ -237,8 +244,8 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     buf.append("  <info");
     buf.append(" origin=\"" + m_originAddress + "\"");
     buf.append("/>\n");
-    buf.append("</SOAP-ENV:Body>");
-    buf.append("</SOAP-ENV:Envelope>");
+    buf.append("</soapenv:Body>");
+    buf.append("</soapenv:Envelope>");
     //
     if (LOG.isDebugEnabled()) {
       out = new DebugOutputStream(out);
@@ -410,4 +417,29 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     return true;
   }
 
+  /**
+   * @return the wsse:Security tag. The subject may be null and may contain no principals
+   *         <p>
+   *         Example WS-Security element for user/pass
+   * 
+   *         <pre>
+   * <wsse:Security soapenv:mustUnderstand="1">
+   *   <wsse:UsernameToken>
+   *     <wsse:Username>user</wsse:Username>
+   *     <wsse:Password Type="http://scout.eclipse.org/security#VirtualSessionId">ertwtrwet3465t4</wsse:Password>
+   *   </wsse:UsernameToken>
+   * </wsse:Security>
+   * </pre>
+   *         <p>
+   *         Example WS-Security element for token
+   * 
+   *         <pre>
+   * <wsse:Security soapenv:mustUnderstand="1">
+   *   <wsse:BinarySecurityToken Id="ID-X509Certificate" ValueType="http://...#X509v3" EncodingType="http://...#Base64Binary">AwIBAgIBBDAJBgUrD....==</wsse:BinarySecurityToken>
+   * </wsse:Security>
+   * </pre>
+   */
+  protected String createWsSecurityElement(ServiceTunnelRequest req) {
+    return SoapHandlingUtility.createDefaultWsSecurityElement(req);
+  }
 }

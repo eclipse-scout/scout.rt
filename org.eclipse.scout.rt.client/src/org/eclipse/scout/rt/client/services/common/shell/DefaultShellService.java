@@ -29,7 +29,7 @@ public class DefaultShellService extends AbstractService implements IShellServic
 
   @Override
   public void shellOpen(String path) throws ProcessingException {
-    if (StringUtility.hasText(ClientSyncJob.getCurrentSession().getWebSessionId())) {
+    if (StringUtility.hasText(ClientSyncJob.getCurrentSession().getVirtualSessionId())) {
       ClientSyncJob.getCurrentSession().getDesktop().openBrowserWindow(path);
     }
     else {
