@@ -237,6 +237,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     //add new association
     IPage childPage = execCreateChildPage(row);
     if (childPage != null) {
+      node.setResolvedNode(childPage);
       ICell tableCell = m_table.getSummaryCell(row);
       childPage.getCellForUpdate().updateFrom(tableCell);
       linkTableRowWithPage(row, childPage);

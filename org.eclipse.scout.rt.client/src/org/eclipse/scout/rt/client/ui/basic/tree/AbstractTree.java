@@ -1318,7 +1318,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         setTreeChanging(true);
         //
         ITreeNode resolvedNode = parentNode.resolveVirtualChildNode(vnode);
-        vnode.setResolvedNode(resolvedNode);
+        if (resolvedNode != vnode && vnode.getResolvedNode() == null) {
+          vnode.setResolvedNode(resolvedNode);
+        }
         return resolvedNode;
       }
       finally {
