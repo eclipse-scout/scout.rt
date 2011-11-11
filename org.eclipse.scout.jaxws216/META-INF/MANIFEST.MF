@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JAX-WS Scout integration
+Bundle-SymbolicName: org.eclipse.scout.jaxws216;singleton:=true
+Bundle-Version: 2.1.6.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: BSI Business Systems Integration AG
+Bundle-ClassPath: .
+Import-Package: javax.servlet;version="2.4.0",
+ javax.servlet.http;version="2.4.0"
+Require-Bundle: org.eclipse.scout.http.servletfilter;bundle-version="1.1.0",
+ org.eclipse.core.runtime;bundle-version="3.4.0",
+ org.eclipse.scout.commons,
+ org.eclipse.scout.rt.server
+Bundle-Activator: org.eclipse.scout.jaxws216.Activator
+Bundle-ActivationPolicy: lazy
+Export-Package: org.eclipse.scout.jaxws216,
+ org.eclipse.scout.jaxws216.adapters,
+ org.eclipse.scout.jaxws216.annotation,
+ org.eclipse.scout.jaxws216.handler,
+ org.eclipse.scout.jaxws216.handler.internal,
+ org.eclipse.scout.jaxws216.internal,
+ org.eclipse.scout.jaxws216.internal.resolver,
+ org.eclipse.scout.jaxws216.internal.resources,
+ org.eclipse.scout.jaxws216.internal.servlet,
+ org.eclipse.scout.jaxws216.internal.tube,
+ org.eclipse.scout.jaxws216.security,
+ org.eclipse.scout.jaxws216.security.consumer,
+ org.eclipse.scout.jaxws216.security.provider,
+ org.eclipse.scout.jaxws216.service,
+ org.eclipse.scout.jaxws216.session,
+ org.eclipse.scout.jaxws216.tool
