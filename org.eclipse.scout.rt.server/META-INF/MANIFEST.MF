@@ -45,6 +45,7 @@ Export-Package: org.eclipse.scout.rt.server,
  org.eclipse.scout.rt.server.services.common.workflow,
  org.eclipse.scout.rt.server.services.lookup,
  org.eclipse.scout.rt.server.servlet.filter,
+ org.eclipse.scout.rt.server.servlet.jaas,
  org.eclipse.scout.rt.server.servlet.test,
  org.eclipse.scout.rt.server.transaction
 Bundle-ClassPath: .

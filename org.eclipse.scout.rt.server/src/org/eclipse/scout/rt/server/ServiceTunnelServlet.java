@@ -16,9 +16,8 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.security.AccessController;
-import java.security.Principal;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.security.auth.Subject;
@@ -43,11 +42,12 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
+import org.eclipse.scout.rt.server.servlet.jaas.HttpAuthJaasFilter;
+import org.eclipse.scout.rt.server.servlet.jaas.SoapWsseJaasFilter;
 import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -65,6 +65,9 @@ import org.osgi.framework.Version;
  * <p>
  * Override the methods {@link #filterInbound(Object)} and {@link #filterOutbound(Object)} to do central input/output
  * validation.
+ * <p>
+ * By default there is a jaas convenience filter {@link HttpAuthJaasFilter} on /process and a {@link SoapWsseJaasFilter}
+ * on /ajax with priority 1000
  * <p>
  * When using RAP (rich ajax platform) as the ui web app then there must be a {@link WebSessionIdPrincipal} in the
  * subject, in order to map those requests to virtual sessions instead of (the unique) http session.
@@ -198,28 +201,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_orderedBundleList;
   }
 
-  private Subject lookupSubjectOnHttpRequest(HttpServletRequest req, HttpServletResponse res) throws ProcessingException, ServletException {
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null) {
-      Principal principal = req.getUserPrincipal();
-      if (principal == null || principal.getName() == null || principal.getName().trim().length() == 0) {
-        principal = null;
-        String name = req.getRemoteUser();
-        if (name != null && name.trim().length() > 0) {
-          principal = new SimplePrincipal(name);
-        }
-      }
-      if (principal != null) {
-        subject = new Subject();
-        subject.getPrincipals().add(principal);
-      }
-    }
-    if (subject == null) {
-      throw new SecurityException("request contains neither remoteUser nor userPrincipal nor a subject with a principal");
-    }
-    return subject;
-  }
-
   private IServerSession lookupScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, Subject subject) throws ProcessingException, ServletException {
     //external request: apply locking, this is the session initialization phase
     synchronized (req.getSession()) {
@@ -252,6 +233,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null) {
+      res.sendError(HttpServletResponse.SC_FORBIDDEN);
+      return;
+    }
     //invoke
     Map<Class, Object> backup = ThreadContext.backup();
     try {
@@ -261,7 +247,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
       ThreadContext.putHttpServletRequest(req);
       ThreadContext.putHttpServletResponse(res);
       //
-      Subject subject = lookupSubjectOnHttpRequest(req, res);
       IServerSession serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject);
       //
       ServerJob job = new AdminServiceJob(serverSession, subject, req, res);
@@ -278,35 +263,34 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null) {
+      res.sendError(HttpServletResponse.SC_FORBIDDEN);
+      return;
+    }
     try {
       lazyInit(req, res);
-      //
-      Set<VirtualSessionIdPrincipal> vps = Subject.getSubject(AccessController.getContext()).getPrincipals(VirtualSessionIdPrincipal.class);
-      String virtualSessionId = (vps.size() > 0 ? vps.iterator().next().getName() : null);
-      boolean isVirtualImpersonatedRequest = (virtualSessionId != null);
-      if (isVirtualImpersonatedRequest) {
-        if (!checkAjaxDelegateAccess(req, res)) {
-          return;
-        }
-      }
-      //invoke
       Map<Class, Object> backup = ThreadContext.backup();
+      Locale oldLocale = LocaleThreadLocal.get();
       try {
-        //legacy, deprecated, do not use servlet request/response in scout code
         ThreadContext.putHttpServletRequest(req);
         ThreadContext.putHttpServletResponse(res);
-        //
+        //read request
         ServiceTunnelRequest serviceRequest = deserializeInput(req.getInputStream());
         LocaleThreadLocal.set(serviceRequest.getLocale());
-        //
+        //virtual or http session?
         IServerSession serverSession;
-        Subject subject = lookupSubjectOnHttpRequest(req, res);
-        if (isVirtualImpersonatedRequest) {
+        String virtualSessionId = serviceRequest.getVirtualSessionId();
+        if (virtualSessionId != null) {
+          if (!checkAjaxDelegateAccess(req, res)) {
+            return;
+          }
           serverSession = lookupScoutServerSessionOnVirtualSession(req, res, virtualSessionId, subject);
         }
         else {
           serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject);
         }
+        //invoke
         AtomicReference<ServiceTunnelResponse> serviceResponseHolder = new AtomicReference<ServiceTunnelResponse>();
         ServerJob job = createServiceTunnelServerJob(serverSession, serviceRequest, serviceResponseHolder, subject);
         job.setTransactionSequence(serviceRequest.getRequestSequence());
@@ -316,6 +300,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       }
       finally {
         ThreadContext.restore(backup);
+        LocaleThreadLocal.set(oldLocale);
       }
     }
     catch (Throwable t) {

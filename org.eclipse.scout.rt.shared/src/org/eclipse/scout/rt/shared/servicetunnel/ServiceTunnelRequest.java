@@ -38,11 +38,11 @@ public class ServiceTunnelRequest implements Serializable {
   /**
    * @since 3.8
    */
-  private transient Subject m_clientSubject;
+  private String m_virtualSessionId;
   /**
    * @since 3.8
    */
-  private transient String m_virtualSessionId;
+  private transient Subject m_clientSubject;
 
   // for serialization
   private ServiceTunnelRequest() {
@@ -126,8 +126,6 @@ public class ServiceTunnelRequest implements Serializable {
 
   /**
    * The web (ajax) session under which the request is done
-   * <p>
-   * Client only method. The member is transient and will be null on the server.
    */
   public String getVirtualSessionId() {
     return m_virtualSessionId;
@@ -135,8 +133,6 @@ public class ServiceTunnelRequest implements Serializable {
 
   /**
    * The web (ajax) session under which the request is done
-   * <p>
-   * Client only method. The member is transient and will be null on the server.
    */
   public void setVirtualSessionId(String virtualSessionId) {
     m_virtualSessionId = virtualSessionId;

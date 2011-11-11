@@ -15,23 +15,23 @@ import java.io.InputStream;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.server.servlet.filter.DefaultVirtualSessionSecurityFilter;
+import org.eclipse.scout.rt.server.servlet.jaas.SoapWsseJaasFilter;
 
-public class TestDefaultVirtualSessionSecurityFilter {
+public class TestSoapWsseJaasFilter {
 
-  private static class TestFilter extends DefaultVirtualSessionSecurityFilter {
+  private static class TestFilter extends SoapWsseJaasFilter {
     @Override
-    public Subject negotiateSubject(InputStream httpIn, ByteArrayOutputStream cacheOut) throws Exception {
-      return super.negotiateSubject(httpIn, cacheOut);
+    public Subject parseSubject(InputStream httpIn, ByteArrayOutputStream cacheOut) throws Exception {
+      return super.parseSubject(httpIn, cacheOut);
     }
   }
 
   public static void main(String[] args) throws Exception {
     TestFilter filter = new TestFilter();
     filter.init(null);
-    InputStream httpIn = TestDefaultVirtualSessionSecurityFilter.class.getResourceAsStream("test-request.xml");
+    InputStream httpIn = TestSoapWsseJaasFilter.class.getResourceAsStream("test-request.xml");
     ByteArrayOutputStream cacheOut = new ByteArrayOutputStream();
-    Subject subject = filter.negotiateSubject(httpIn, cacheOut);
+    Subject subject = filter.parseSubject(httpIn, cacheOut);
     System.out.println("subject: " + subject);
   }
 }

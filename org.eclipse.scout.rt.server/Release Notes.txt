@@ -366,3 +366,14 @@ Solution:
 see javadoc on IServerProcessingCancelService and ITransaction
 Migration:
 When using custom ITransactionMember objects, use the super class AbstractTransactionMember to support for api extensions.
+
+11.11.2011 imo
+Enhancement of JAAS authentication
+Solution:
+default servlet filters in org.eclipse.scout.rt.server
+/process by DevelopmentAuthFilter with order 1000000
+/process by HttpAuthJaasFilter with order 1000010
+/ajax by SoapWsseJaasFilter with order 1000010
+see javadoc on HttpAuthJaasFilter, SoapWsseJaasFilter and DevelopmentAuthFilter
+Migration:
+None

@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.servlet.filter;
+package org.eclipse.scout.rt.server.servlet.jaas;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
+import java.security.Principal;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
@@ -32,11 +33,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.server.VirtualSessionIdPrincipal;
+import org.eclipse.scout.http.servletfilter.FilterConfigInjection;
+import org.eclipse.scout.http.servletfilter.security.SecureHttpServletRequestWrapper;
 import org.eclipse.scout.rt.shared.servicetunnel.SoapHandlingUtility;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -44,18 +45,28 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Filter used to authenticate soap headers containing virtual request (for ajax, rap)
+ * Transformation filter used to create a subject based on the soap headers containing a virtual request (from ajax,
+ * rap)
  * <p>
- * Reads the soap wsse header and creates a subject with the user principal and an additional
- * {@link VirtualSessionIdPrincipal}
+ * If there is already a subject set as {@link Subject#getSubject(java.security.AccessControlContext)} then the filter
+ * is transparent.
+ * <p>
+ * Reads the soap wsse header and transforms it to a subject with the user principal
+ * <p>
+ * Normally this filters the alias /ajax
+ * <p>
+ * This filter is registered in the scout server plugin.xml as /ajax by default with order 1'000'010 and has the active
+ * flag set to true
  */
-@Priority(-1)
-public class DefaultVirtualSessionSecurityFilter implements Filter {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultVirtualSessionSecurityFilter.class);
+public class SoapWsseJaasFilter implements Filter {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SoapWsseJaasFilter.class);
+
   private SAXParserFactory m_saxParserFactory;
+  private FilterConfigInjection m_injection;
 
   @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
+  public void init(FilterConfig config0) throws ServletException {
+    m_injection = new FilterConfigInjection(config0, getClass());
     try {
       m_saxParserFactory = SoapHandlingUtility.createSaxParserFactory();
     }
@@ -67,19 +78,26 @@ public class DefaultVirtualSessionSecurityFilter implements Filter {
   @Override
   public void destroy() {
     m_saxParserFactory = null;
+    m_injection = null;
   }
 
   @Override
   public void doFilter(ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
-    if (Subject.getSubject(AccessController.getContext()) != null) {
+    if (isSubjectSet()) {
       chain.doFilter(request, response);
       return;
     }
+    FilterConfigInjection.FilterConfig config = m_injection.getConfig(request);
+    if (!config.isActive()) {
+      chain.doFilter(request, response);
+      return;
+    }
+
     InputStream httpIn = request.getInputStream();
     ByteArrayOutputStream cacheOut = new ByteArrayOutputStream();
-    final Subject subject;
+    Subject subject;
     try {
-      subject = negotiateSubject(httpIn, cacheOut);
+      subject = parseSubject(httpIn, cacheOut);
     }
     catch (Throwable t) {
       LOG.warn("WS-Security check", t);
@@ -89,7 +107,7 @@ public class DefaultVirtualSessionSecurityFilter implements Filter {
     final InputStream cacheIn = new ByteArrayInputStream(cacheOut.toByteArray());
     cacheOut = null;
     //
-    final HttpServletRequestWrapper wreq = new HttpServletRequestWrapper((HttpServletRequest) request) {
+    final HttpServletRequestWrapper replayRequest = new HttpServletRequestWrapper((HttpServletRequest) request) {
       @Override
       public ServletInputStream getInputStream() throws IOException {
         return new ServletInputStream() {
@@ -100,21 +118,39 @@ public class DefaultVirtualSessionSecurityFilter implements Filter {
         };
       }
     };
+    continueChainWithPrincipal(subject, replayRequest, (HttpServletResponse) response, chain);
+  }
+
+  private void continueChainWithPrincipal(Subject subject, final HttpServletRequest req, final HttpServletResponse res, final FilterChain chain) throws IOException, ServletException {
     try {
-      Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
-        @Override
-        public Object run() throws Exception {
-          chain.doFilter(wreq, response);
-          return null;
-        }
-      });
+      Subject.doAs(
+          subject,
+          new PrivilegedExceptionAction<Object>() {
+            @Override
+            public Object run() throws Exception {
+              Principal principal = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next();
+              HttpServletRequest secureReq = new SecureHttpServletRequestWrapper(req, principal);
+              chain.doFilter(secureReq, res);
+              return null;
+            }
+          }
+          );
     }
     catch (PrivilegedActionException e) {
-      LOG.error("WS-Security delegate", e.getCause());
+      Throwable t = e.getCause();
+      if (t instanceof IOException) {
+        throw (IOException) t;
+      }
+      else if (t instanceof ServletException) {
+        throw (ServletException) t;
+      }
+      else {
+        throw new ServletException(t);
+      }
     }
   }
 
-  protected Subject negotiateSubject(final InputStream httpIn, final ByteArrayOutputStream cacheOut) throws Exception {
+  protected Subject parseSubject(final InputStream httpIn, final ByteArrayOutputStream cacheOut) throws Exception {
     InputStream filterIn = new InputStream() {
       @Override
       public int read() throws IOException {
@@ -148,19 +184,49 @@ public class DefaultVirtualSessionSecurityFilter implements Filter {
     };
     WSSEUserTokenHandler handler = new WSSEUserTokenHandler();
     SoapHandlingUtility.createSaxParser(m_saxParserFactory).parse(new InputSource(filterIn), handler);
-    if (handler.user == null || handler.pass == null || handler.type == null) {
-      throw new SecurityException("Username, password, or password type is undefined");
+    return createSubject(cleanString(handler.user), cleanString(handler.pass), cleanString(handler.passType));
+  }
+
+  /**
+   * override this method to do additional checks on credentials
+   */
+  protected Subject createSubject(String user, String pass, String passType) {
+    if (user == null) {
+      throw new SecurityException("SOAP header contains no principal name");
     }
-    if (!SoapHandlingUtility.WSSE_PASSWORD_TYPE_FOR_SCOUT_VIRTUAL_SESSION_ID.equals(handler.type)) {
-      throw new SecurityException("Password type is not '" + SoapHandlingUtility.WSSE_PASSWORD_TYPE_FOR_SCOUT_VIRTUAL_SESSION_ID + "'");
-    }
-    SimplePrincipal pUser = new SimplePrincipal(handler.user);
-    VirtualSessionIdPrincipal pSession = new VirtualSessionIdPrincipal(handler.pass);
     Subject subject = new Subject();
-    subject.getPrincipals().add(pUser);
-    subject.getPrincipals().add(pSession);
+    subject.getPrincipals().add(new SimplePrincipal(user));
     subject.setReadOnly();
     return subject;
+  }
+
+  private boolean isSubjectSet() {
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null) {
+      return false;
+    }
+    if (subject.getPrincipals().size() == 0) {
+      return false;
+    }
+    String name = subject.getPrincipals().iterator().next().getName();
+    if (name == null || name.trim().length() == 0) {
+      return false;
+    }
+    return true;
+  }
+
+  private String cleanString(String s) {
+    if (s == null) {
+      return null;
+    }
+    s = s.trim();
+    if (s.length() == 0) {
+      return null;
+    }
+    if (s.equalsIgnoreCase("null")) {
+      return null;
+    }
+    return s;
   }
 
   /**
@@ -175,7 +241,7 @@ public class DefaultVirtualSessionSecurityFilter implements Filter {
    */
   private static class WSSEUserTokenHandler extends DefaultHandler {
     public String user;
-    public String type;
+    public String passType;
     public String pass;
     //
     private boolean insideEnvelope;
@@ -214,7 +280,7 @@ public class DefaultVirtualSessionSecurityFilter implements Filter {
       }
       if (SoapHandlingUtility.WSSE_PASSWORD_ELEMENT.equals(qname)) {
         insidePasswort = true;
-        type = attributes.getValue("", SoapHandlingUtility.WSSE_PASSWORD_TYPE_ATTRIBUTE);
+        passType = attributes.getValue("", SoapHandlingUtility.WSSE_PASSWORD_TYPE_ATTRIBUTE);
         return;
       }
     }

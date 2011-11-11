@@ -19,4 +19,24 @@
       <run class="org.eclipse.scout.rt.server.ServerApplication"/>
     </application>
   </extension>
+  <extension point="org.eclipse.scout.http.servletfilter.filters">
+    <filter aliases="/process" class="org.eclipse.scout.rt.server.servlet.jaas.DevelopmentAuthFilter" ranking="1000000">
+       <init-param
+             name="active"
+             value="true">
+       </init-param>
+    </filter>
+    <filter aliases="/process" class="org.eclipse.scout.rt.server.servlet.jaas.HttpAuthJaasFilter" ranking="1000010">
+       <init-param
+             name="active"
+             value="true">
+       </init-param>
+    </filter>
+    <filter aliases="/ajax" class="org.eclipse.scout.rt.server.servlet.jaas.SoapWsseJaasFilter" ranking="1000010">
+       <init-param
+             name="active"
+             value="true">
+       </init-param>
+    </filter>
+  </extension>
 </plugin>

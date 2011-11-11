@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.security.Principal;
+import java.util.ArrayList;
 
 import javax.security.auth.Subject;
 import javax.xml.XMLConstants;
@@ -40,19 +41,17 @@ public final class SoapHandlingUtility {
 
   public static final String WSSE_PASSWORD_TYPE_ATTRIBUTE = "Type";
 
-  public static final String WSSE_PASSWORD_TYPE_FOR_SCOUT_VIRTUAL_SESSION_ID = "http://scout.eclipse.org/security#VirtualSessionId";
-
   public static final String DEFAULT_WSSE_USERNAME_TOKEN = "" +
       "<wsse:Security soapenv:mustUnderstand=\"1\">" +
       "  <wsse:UsernameToken>" +
       "    <wsse:Username>${username}</wsse:Username>" +
-      "    <wsse:Password Type=\"" + WSSE_PASSWORD_TYPE_FOR_SCOUT_VIRTUAL_SESSION_ID + "\">${password}</wsse:Password>" +
+      "    <wsse:Password Type=\"http://scout.eclipse.org/security#Token\">${password}</wsse:Password>" +
       "  </wsse:UsernameToken>" +
       "</wsse:Security>";
 
   /**
-   * Create a WS-Security username token containing {@link Principal#getName()} as username and the
-   * {@link ServiceTunnelRequest#getVirtualSessionId()} as password (plaintext)
+   * Create a WS-Security username token containing the first principal {@link Principal#getName()} as username and the
+   * second principal as password
    * <p>
    */
   public static String createDefaultWsSecurityElement(ServiceTunnelRequest req) {
@@ -60,12 +59,10 @@ public final class SoapHandlingUtility {
     if (subject == null || subject.getPrincipals().size() == 0) {
       return null;
     }
-    String virtualSessionId = req.getVirtualSessionId();
-    if (virtualSessionId == null) {
-      virtualSessionId = "";
-    }
-    Principal p = subject.getPrincipals().iterator().next();
-    String wsse = DEFAULT_WSSE_USERNAME_TOKEN.replace("${username}", p.getName()).replace("${password}", virtualSessionId);
+    ArrayList<Principal> list = new ArrayList<Principal>(subject.getPrincipals());
+    String user = (list.size() > 0 ? list.get(0).getName() : "");
+    String pass = (list.size() > 1 ? list.get(1).getName() : "");
+    String wsse = DEFAULT_WSSE_USERNAME_TOKEN.replace("${username}", user).replace("${password}", pass);
     return wsse;
   }
 
