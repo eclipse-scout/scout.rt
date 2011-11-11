@@ -320,20 +320,29 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   ICell getSummaryCell(ITableRow row);
 
   /**
-   * Note that this is not a java bean getter and thus not thread-safe.
-   * Calls to this method must be inside a {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
+   * @return the effective live editable state ( {@link IColumn#isCellEditable(ITableRow)} and
+   *         {@link IColumn#isVisible()} )
+   *         <p>
+   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside a
+   *         {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
    */
   boolean isCellEditable(int rowIndex, int columnIndex);
 
   /**
-   * Note that this is not a java bean getter and thus not thread-safe.
-   * Calls to this method must be inside a {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
+   * @return the effective live editable state ( {@link IColumn#isCellEditable(ITableRow)} and
+   *         {@link IColumn#isVisible()} )
+   *         <p>
+   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside a
+   *         {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
    */
   boolean isCellEditable(ITableRow row, int visibleColumnIndex);
 
   /**
-   * Note that this is not a java bean getter and thus not thread-safe.
-   * Calls to this method must be inside a {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
+   * @return the effective live editable state ( {@link IColumn#isCellEditable(ITableRow)} and
+   *         {@link IColumn#isVisible()} )
+   *         <p>
+   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside a
+   *         {@link ClientSyncJob} resp. a job using the {@link ClientRule}.
    */
   boolean isCellEditable(ITableRow row, IColumn<?> column);
 

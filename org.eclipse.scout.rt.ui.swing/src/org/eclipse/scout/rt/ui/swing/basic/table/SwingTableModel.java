@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.basic.table;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
@@ -77,16 +79,43 @@ public class SwingTableModel extends AbstractTableModel {
 
   @Override
   public boolean isCellEditable(final int x, final int y) {
-    ITable table = m_swingScoutTable.getScoutObject();
+    final ITable table = m_swingScoutTable.getScoutObject();
     if (table == null) {
       return false;
     }
-    ITableRow row = table.getFilteredRow(x);
-    IColumn column = table.getColumnSet().getVisibleColumn(y);
-    if (row == null || column == null) {
-      return false;
+    //make a safe model call
+    final AtomicBoolean b = new AtomicBoolean();
+    synchronized (b) {
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          // try first
+          synchronized (b) {
+            try {
+              final ITableRow row = table.getFilteredRow(x);
+              final IColumn column = table.getColumnSet().getVisibleColumn(y);
+              if (row == null || column == null) {
+                b.set(false);
+                return;
+              }
+              b.set(table.isCellEditable(row, column));
+            }
+            catch (Throwable ex) {
+              //fast access: ignore
+            }
+            b.notifyAll();
+          }
+        }
+      };
+      m_env.invokeScoutLater(r, 2345);
+      try {
+        b.wait(2345);
+      }
+      catch (InterruptedException e) {
+        //nop
+      }
     }
-    return table.getCell(row, column).isEditable();
+    return b.get();
   }
 
   public void updateModelState(int newRowCount) {

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
+import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 public interface ICell {
@@ -43,6 +45,12 @@ public interface ICell {
 
   boolean isEnabled();
 
+  /**
+   * @return true if the cell is <b>basically</b> editable. This flag is used primarly to decorate editable cells. It
+   *         does not regard
+   *         the visible state of the column, table and container.
+   *         To check for effective editable use {@link ITable#isCellEditable(int, int)} inside a {@link ClientJob}
+   */
   boolean isEditable();
 
   ICellObserver getObserver();

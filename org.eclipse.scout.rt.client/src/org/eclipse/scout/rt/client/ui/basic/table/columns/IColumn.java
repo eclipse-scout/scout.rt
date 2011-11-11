@@ -265,6 +265,8 @@ public interface IColumn<T> extends IPropertyObserver {
   /**
    * @return true if this cell (row, column) is editable <b>and</b> the column is editable {@link #isEditable()}
    *         <p>
+   *         It does NOT check if the column is visible, this is done in {@link ITable#isCellEditable(int, int)} et al.
+   *         <p>
    *         Note that this is not a java bean method and thus not thread-safe
    */
   boolean isCellEditable(ITableRow row);

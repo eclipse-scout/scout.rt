@@ -463,16 +463,8 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         return new ValidateFormFieldDescriptor(this);
       }
     }
-    //make editable columns visible during check
-    HashSet<IColumn<?>> invisbleEditableColumns = new HashSet<IColumn<?>>();
-    for (IColumn col : table.getColumns()) {
-      if (col.isEditable() && col.isDisplayable() && !col.isVisible()) {
-        invisbleEditableColumns.add(col);
-      }
-    }
-    for (IColumn col : invisbleEditableColumns) {
-      col.setVisible(true);
-    }
+    //make editable columns visible if check fails
+    HashSet<IColumn<?>> invisbleColumnsWithErrors = new HashSet<IColumn<?>>();
     //check editable cells
     ValidateTableFieldDescriptor tableDesc = null;
     TreeSet<String> columnNames = new TreeSet<String>();
@@ -485,8 +477,10 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
               if (editor != null) {
                 boolean editorValid = editor.isContentValid();
                 if (!editorValid) {
-                  //column should remain visible
-                  invisbleEditableColumns.remove(col);
+                  if (col.isDisplayable() && !col.isVisible()) {
+                    //column should become visible
+                    invisbleColumnsWithErrors.add(col);
+                  }
                   if (tableDesc == null) {
                     tableDesc = new ValidateTableFieldDescriptor(this, row, col);
                   }
@@ -501,9 +495,9 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         }
       }
     }
-    //make valid invisible cols again invisible
-    for (IColumn col : invisbleEditableColumns) {
-      col.setVisible(false);
+    //make invalid invisible columns visible again
+    for (IColumn col : invisbleColumnsWithErrors) {
+      col.setVisible(true);
     }
     if (tableDesc == null) {
       return null;

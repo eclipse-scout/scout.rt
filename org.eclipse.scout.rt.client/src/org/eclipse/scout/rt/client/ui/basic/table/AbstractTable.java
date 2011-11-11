@@ -886,7 +886,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @Override
   public boolean isCellEditable(ITableRow row, IColumn<?> column) {
-    return row != null && column != null && column.isCellEditable(row);
+    return row != null && column != null && column.isVisible() && column.isCellEditable(row);
   }
 
   @Override
@@ -1089,7 +1089,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void requestFocusInCell(IColumn<?> column, ITableRow row) {
-    if (column.isCellEditable(row)) {
+    if (isCellEditable(row, column)) {
       fireRequestFocusInCell(column, row);
     }
   }

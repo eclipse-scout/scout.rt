@@ -311,12 +311,13 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    *         <p>
    *         use this method only for dynamic checks of editable otherwise use {@link #getConfiguredEditable()}
    *         <p>
-   *         make sure to first make the super call that checks for default editable on table, row and column.
+   *         Note that this method is only called if {@link #getConfiguredEditable()} is true and cell, row and table
+   *         are enabled
    */
   @ConfigOperation
   @Order(60)
   protected boolean execIsEditable(ITableRow row) throws ProcessingException {
-    return getTable() != null && getTable().isEnabled() && this.isVisible() && this.isEditable() && row.getCell(this).isEnabled() && row != null && row.isEnabled();
+    return true;
   }
 
   /**
@@ -886,7 +887,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   @Override
   public final IFormField prepareEdit(ITableRow row) throws ProcessingException {
     ITable table = getTable();
-    if (table == null || !table.isCellEditable(row, this)) {
+    if (table == null || !this.isCellEditable(row)) {
       return null;
     }
     IFormField f = execPrepareEdit(row);
@@ -1086,13 +1087,16 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
 
   @Override
   public boolean isCellEditable(ITableRow row) {
-    try {
-      return execIsEditable(row);
+    if (getTable() != null && getTable().isEnabled() && this.isEditable() && row != null && row.isEnabled() && row.getCell(this).isEnabled()) {
+      try {
+        return execIsEditable(row);
+      }
+      catch (Throwable t) {
+        LOG.error("checking row " + row, t);
+        return false;
+      }
     }
-    catch (Throwable t) {
-      LOG.error("checking row " + row, t);
-      return false;
-    }
+    return false;
   }
 
   @Override
