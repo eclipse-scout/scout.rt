@@ -406,6 +406,7 @@ public final class BookmarkUtility {
       tablePage.getTable().getTableCustomizer().removeAllColumns();
       tablePage.getTable().getTableCustomizer().setSerializedData(tablePageState.getTableCustomizerData());
       tablePage.getTable().resetColumnConfiguration();
+      tablePage.setChildrenLoaded(false);
     }
     // starts search form
     tablePage.getSearchFilter();
