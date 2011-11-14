@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.basic.tree;
 
-import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -29,9 +28,7 @@ import org.eclipse.scout.rt.ui.swt.SwtIcons;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 
 public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProvider, IFontProvider, IColorProvider {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutTreeModel.class);
@@ -88,48 +85,19 @@ public class SwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   @Override
   public Image getImage(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
-    if (scoutNode == null) {
-      return null;
-    }
-    //check
-    Image checkBoxImage = null;
+    Image img = null;
     if (m_tree.isCheckable()) {
-      if (scoutNode.isChecked()) {
-        checkBoxImage = m_imgCheckboxTrue;
+      if (scoutNode != null && scoutNode.isChecked()) {
+        return m_imgCheckboxTrue;
       }
       else {
-        checkBoxImage = m_imgCheckboxFalse;
+        return m_imgCheckboxFalse;
       }
     }
-    //deco
-    String iconId = scoutNode.getCell().getIconId();
-    Image decoImage = null;
-    decoImage = m_environment.getIcon(iconId);
-    //merge
-    if (checkBoxImage != null && decoImage != null) {
-      String key = ((checkBoxImage == m_imgCheckboxTrue) ? (SwtIcons.CheckboxYes) : (SwtIcons.CheckboxNo)) + "_" + iconId;
-      ImageRegistry reg = Activator.getDefault().getImageRegistry();
-      Image compositeImage = reg.get(key);
-      if (compositeImage == null) {
-        int w1 = checkBoxImage.getBounds().width;
-        int w2 = decoImage.getBounds().width;
-        int h = Math.max(checkBoxImage.getBounds().height, decoImage.getBounds().height);
-        compositeImage = new Image(Display.getCurrent(), w1 + w2, h);
-        GC gc = new GC(compositeImage);
-        gc.drawImage(checkBoxImage, 0, 0);
-        gc.drawImage(decoImage, w1, 0);
-        gc.dispose();
-        reg.put(key, compositeImage);
-      }
-      return compositeImage;
+    else {
+      img = m_environment.getIcon(scoutNode.getCell().getIconId());
     }
-    if (checkBoxImage != null) {
-      return checkBoxImage;
-    }
-    if (decoImage != null) {
-      return decoImage;
-    }
-    return null;
+    return img;
   }
 
   @Override

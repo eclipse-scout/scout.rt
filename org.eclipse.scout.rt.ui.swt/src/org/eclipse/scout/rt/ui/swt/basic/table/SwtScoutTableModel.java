@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.swt.basic.table;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -32,9 +31,7 @@ import org.eclipse.scout.rt.ui.swt.SwtIcons;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 
 public class SwtScoutTableModel implements IStructuredContentProvider, ITableColorProvider, ITableLabelProvider, ITableFontProvider {
   private transient ListenerList listenerList = null;
@@ -106,63 +103,35 @@ public class SwtScoutTableModel implements IStructuredContentProvider, ITableCol
   @Override
   public Image getColumnImage(Object element, int columnIndex) {
     int[] columnOrder = m_swtTable.getSwtField().getColumnOrder();
-    if (columnOrder.length <= 1) {
-      return null;
-    }
-    IColumn col = m_columnManager.getColumnByModelIndex(columnIndex - 1);
-    ICell cell = getCell(element, columnIndex);
-    //checkbox
-    Image checkBoxImage = null;
-    if (columnOrder[1] == columnIndex && m_swtTable.getScoutObject() != null && m_swtTable.getScoutObject().isCheckable()) {
-      if (((ITableRow) element).isChecked()) {
-        checkBoxImage = m_imgCheckboxTrue;
+    if (columnOrder.length > 1) {
+      IColumn col = m_columnManager.getColumnByModelIndex(columnIndex - 1);
+      if (columnOrder[1] == columnIndex && m_swtTable.getScoutObject() != null && m_swtTable.getScoutObject().isCheckable()) {
+        if (((ITableRow) element).isChecked()) {
+          return m_imgCheckboxTrue;
+        }
+        else {
+          return m_imgCheckboxFalse;
+        }
       }
-      else {
-        checkBoxImage = m_imgCheckboxFalse;
+      ICell cell = getCell(element, columnIndex);
+      if (col != null && cell != null && col.getDataType() == Boolean.class && (!(col instanceof ISmartColumn) || ((ISmartColumn) col).getLookupCall() == null)) {
+        Boolean b = (Boolean) cell.getValue();
+        if (b != null && b.booleanValue()) {
+          return m_imgCheckboxTrue;
+        }
+        else {
+          return m_imgCheckboxFalse;
+        }
       }
-    }
-    else if (col != null && cell != null && col.getDataType() == Boolean.class && (!(col instanceof ISmartColumn) || ((ISmartColumn) col).getLookupCall() == null)) {
-      Boolean b = (Boolean) cell.getValue();
-      if (b != null && b.booleanValue()) {
-        checkBoxImage = m_imgCheckboxTrue;
+      String iconId = null;
+      if (cell != null && cell.getIconId() != null) {
+        iconId = cell.getIconId();
       }
-      else {
-        checkBoxImage = m_imgCheckboxFalse;
+      else if (columnOrder[1] == columnIndex) {
+        ITableRow row = (ITableRow) element;
+        iconId = row.getIconId();
       }
-    }
-    //deco
-    String iconId = null;
-    if (cell != null && cell.getIconId() != null) {
-      iconId = cell.getIconId();
-    }
-    else if (columnOrder[1] == columnIndex) {
-      ITableRow row = (ITableRow) element;
-      iconId = row.getIconId();
-    }
-    Image decoImage = m_environment.getIcon(iconId);
-    //merge
-    if (checkBoxImage != null && decoImage != null) {
-      String key = ((checkBoxImage == m_imgCheckboxTrue) ? (SwtIcons.CheckboxYes) : (SwtIcons.CheckboxNo)) + "_" + iconId;
-      ImageRegistry reg = Activator.getDefault().getImageRegistry();
-      Image compositeImage = reg.get(key);
-      if (compositeImage == null) {
-        int w1 = checkBoxImage.getBounds().width;
-        int w2 = decoImage.getBounds().width;
-        int h = Math.max(checkBoxImage.getBounds().height, decoImage.getBounds().height);
-        compositeImage = new Image(Display.getCurrent(), w1 + w2, h);
-        GC gc = new GC(compositeImage);
-        gc.drawImage(checkBoxImage, 0, 0);
-        gc.drawImage(decoImage, w1, 0);
-        gc.dispose();
-        reg.put(key, compositeImage);
-      }
-      return compositeImage;
-    }
-    if (checkBoxImage != null) {
-      return checkBoxImage;
-    }
-    if (decoImage != null) {
-      return decoImage;
+      return m_environment.getIcon(iconId);
     }
     return null;
   }
