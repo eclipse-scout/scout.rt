@@ -44,7 +44,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.http.servletfilter.helper.HttpAuthJaasFilter;
-import org.eclipse.scout.http.servletfilter.helper.SoapWsseJaasFilter;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;

@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.http.servletfilter.helper;
+package org.eclipse.scout.rt.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
 import java.security.Principal;
 import java.security.PrivilegedActionException;
@@ -33,12 +34,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.EncryptionUtility;
 import org.eclipse.scout.commons.SoapHandlingUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.http.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.http.servletfilter.security.SecureHttpServletRequestWrapper;
+import org.eclipse.scout.rt.server.internal.Activator;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -51,7 +55,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * If there is already a subject set as {@link Subject#getSubject(java.security.AccessControlContext)} then the filter
  * is transparent.
  * <p>
- * Reads the soap wsse header and transforms it to a subject with the user principal
+ * Reads the soap wsse header and transforms it to a subject with the user principal. The password is the triple-des
+ * encoding of "${timestamp}:${username}" using the config.ini parameter <code>scout.ajax.token.key</code>
  * <p>
  * Normally this filters the alias /ajax
  * <p>
@@ -60,6 +65,25 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class SoapWsseJaasFilter implements Filter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SoapWsseJaasFilter.class);
+
+  private static final byte[] tripleDesKey;
+  static {
+    String key = Activator.getDefault().getBundle().getBundleContext().getProperty("scout.ajax.token.key");
+    if (key == null) {
+      tripleDesKey = null;
+    }
+    else {
+      tripleDesKey = new byte[24];
+      byte[] keyBytes;
+      try {
+        keyBytes = key.getBytes("UTF-8");
+        System.arraycopy(keyBytes, 0, tripleDesKey, 0, Math.min(keyBytes.length, tripleDesKey.length));
+      }
+      catch (UnsupportedEncodingException e) {
+        LOG.error("reading property 'scout.ajax.token.key'", e);
+      }
+    }
+  }
 
   private SAXParserFactory m_saxParserFactory;
   private FilterConfigInjection m_injection;
@@ -184,15 +208,24 @@ public class SoapWsseJaasFilter implements Filter {
     };
     WSSEUserTokenHandler handler = new WSSEUserTokenHandler();
     SoapHandlingUtility.createSaxParser(m_saxParserFactory).parse(new InputSource(filterIn), handler);
-    return createSubject(cleanString(handler.user), cleanString(handler.pass), cleanString(handler.passType));
+    return createSubject(cleanString(handler.user), cleanString(handler.tokenRaw), cleanString(handler.tokenEncoding));
   }
 
   /**
    * override this method to do additional checks on credentials
    */
-  protected Subject createSubject(String user, String pass, String passType) {
-    if (user == null) {
-      throw new SecurityException("SOAP header contains no principal name");
+  protected Subject createSubject(String user, String tokenRaw, String tokenEncoding) throws Exception {
+    if (user == null || tokenRaw == null) {
+      LOG.error("Ajax back-end call contains no ws-security token. Check if the config.ini of the /rap and the /ajax webapp contains the property 'scout.ajax.token.key'.");
+      throw new SecurityException("SOAP header contains no ws-security token");
+    }
+    byte[] token = Base64Utility.decode(tokenRaw);
+    String msg = new String(EncryptionUtility.decrypt(token, tripleDesKey), "UTF-8");
+    String[] tupel = msg.split(":", 2);
+    long timestamp = Long.parseLong(tupel[0]);
+    String userRef = tupel[1];
+    if (timestamp < 0L || userRef == null || !userRef.equals(user)) {
+      throw new SecurityException("SOAP header contains no ws-security token");
     }
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal(user));
@@ -241,8 +274,8 @@ public class SoapWsseJaasFilter implements Filter {
    */
   private static class WSSEUserTokenHandler extends DefaultHandler {
     public String user;
-    public String passType;
-    public String pass;
+    public String tokenEncoding;
+    public String tokenRaw;
     //
     private boolean insideEnvelope;
     private boolean insideHeader;
@@ -280,7 +313,7 @@ public class SoapWsseJaasFilter implements Filter {
       }
       if (SoapHandlingUtility.WSSE_PASSWORD_ELEMENT.equals(qname)) {
         insidePasswort = true;
-        passType = attributes.getValue("", SoapHandlingUtility.WSSE_PASSWORD_TYPE_ATTRIBUTE);
+        tokenEncoding = attributes.getValue("", SoapHandlingUtility.WSSE_PASSWORD_TYPE_ATTRIBUTE);
         return;
       }
     }
@@ -295,7 +328,7 @@ public class SoapWsseJaasFilter implements Filter {
           user = new String(ch, start, length);
         }
         if (insidePasswort) {
-          pass = new String(ch, start, length);
+          tokenRaw = new String(ch, start, length);
         }
       }
 

@@ -32,7 +32,7 @@
              value="true">
        </init-param>
     </filter>
-    <filter aliases="/ajax" class="org.eclipse.scout.http.servletfilter.helper.SoapWsseJaasFilter" ranking="1000010">
+    <filter aliases="/ajax" class="org.eclipse.scout.rt.server.SoapWsseJaasFilter" ranking="1000010">
        <init-param
              name="active"
              value="true">

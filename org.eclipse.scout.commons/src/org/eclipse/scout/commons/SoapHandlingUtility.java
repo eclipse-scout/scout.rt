@@ -49,14 +49,15 @@ public final class SoapHandlingUtility {
    * Create a WS-Security username token containing username and password
    * <p>
    */
-  public static String createWsSecurityElement(String username, String password) {
+  public static String createWsSecurityUserNameToken(String username, byte[] password) {
     if (username == null) {
       username = "";
     }
+    username = username.replaceAll("[<>\"]", " ");
     if (password == null) {
-      password = "";
+      password = new byte[0];
     }
-    return DEFAULT_WSSE_USERNAME_TOKEN.replace("${username}", username).replace("${password}", password);
+    return DEFAULT_WSSE_USERNAME_TOKEN.replace("${username}", username).replace("${password}", Base64Utility.encode(password));
   }
 
   public static SAXParser createSaxParser(SAXParserFactory factory) throws ProcessingException {

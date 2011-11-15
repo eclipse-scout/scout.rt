@@ -15,7 +15,7 @@ import java.io.InputStream;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.http.servletfilter.helper.SoapWsseJaasFilter;
+import org.eclipse.scout.rt.server.SoapWsseJaasFilter;
 
 public class TestSoapWsseJaasFilter {
 
