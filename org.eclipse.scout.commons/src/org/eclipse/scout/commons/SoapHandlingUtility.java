@@ -8,12 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.servicetunnel;
+package org.eclipse.scout.commons;
 
-import java.security.Principal;
-import java.util.ArrayList;
-
-import javax.security.auth.Subject;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.SAXParser;
@@ -24,7 +20,7 @@ import javax.xml.validation.SchemaFactory;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
- *
+ * Convenience functions for soap message parsing and WSSE WS-Security
  */
 public final class SoapHandlingUtility {
   private SoapHandlingUtility() {
@@ -45,25 +41,22 @@ public final class SoapHandlingUtility {
       "<wsse:Security soapenv:mustUnderstand=\"1\">" +
       "  <wsse:UsernameToken>" +
       "    <wsse:Username>${username}</wsse:Username>" +
-      "    <wsse:Password Type=\"http://scout.eclipse.org/security#Token\">${password}</wsse:Password>" +
+      "    <wsse:Password Type=\"http://scout.eclipse.org/security#Base64\">${password}</wsse:Password>" +
       "  </wsse:UsernameToken>" +
       "</wsse:Security>";
 
   /**
-   * Create a WS-Security username token containing the first principal {@link Principal#getName()} as username and the
-   * second principal as password
+   * Create a WS-Security username token containing username and password
    * <p>
    */
-  public static String createDefaultWsSecurityElement(ServiceTunnelRequest req) {
-    Subject subject = req.getClientSubject();
-    if (subject == null || subject.getPrincipals().size() == 0) {
-      return null;
+  public static String createWsSecurityElement(String username, String password) {
+    if (username == null) {
+      username = "";
     }
-    ArrayList<Principal> list = new ArrayList<Principal>(subject.getPrincipals());
-    String user = (list.size() > 0 ? list.get(0).getName() : "");
-    String pass = (list.size() > 1 ? list.get(1).getName() : "");
-    String wsse = DEFAULT_WSSE_USERNAME_TOKEN.replace("${username}", user).replace("${password}", pass);
-    return wsse;
+    if (password == null) {
+      password = "";
+    }
+    return DEFAULT_WSSE_USERNAME_TOKEN.replace("${username}", username).replace("${password}", password);
   }
 
   public static SAXParser createSaxParser(SAXParserFactory factory) throws ProcessingException {

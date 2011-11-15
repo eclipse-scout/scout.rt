@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.servlet.jaas;
+package org.eclipse.scout.http.servletfilter.helper;
 
 import java.io.IOException;
 import java.security.AccessController;

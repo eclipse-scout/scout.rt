@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.servlet.jaas;
+package org.eclipse.scout.http.servletfilter.helper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,12 +33,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.scout.commons.SoapHandlingUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.http.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.http.servletfilter.security.SecureHttpServletRequestWrapper;
-import org.eclipse.scout.rt.shared.servicetunnel.SoapHandlingUtility;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

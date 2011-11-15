@@ -19,6 +19,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.net.InetAddress;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
@@ -26,8 +28,11 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
+import javax.security.auth.Subject;
+
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.SoapHandlingUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -440,6 +445,13 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
    * </pre>
    */
   protected String createWsSecurityElement(ServiceTunnelRequest req) {
-    return SoapHandlingUtility.createDefaultWsSecurityElement(req);
+    Subject subject = req.getClientSubject();
+    if (subject == null || subject.getPrincipals().size() == 0) {
+      return null;
+    }
+    ArrayList<Principal> list = new ArrayList<Principal>(subject.getPrincipals());
+    String user = (list.size() > 0 ? list.get(0).getName() : null);
+    String pass = (list.size() > 1 ? list.get(1).getName() : null);
+    return SoapHandlingUtility.createWsSecurityElement(user, pass);
   }
 }
