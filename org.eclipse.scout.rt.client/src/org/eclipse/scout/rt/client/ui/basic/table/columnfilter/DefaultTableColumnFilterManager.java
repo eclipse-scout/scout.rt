@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.SortBox;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -79,7 +81,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
 
   @Override
   @SuppressWarnings("unchecked")
-  public void showFilterForm(IColumn col) throws ProcessingException {
+  public void showFilterForm(IColumn col, boolean fullForm) throws ProcessingException {
     ITableColumnFilter<?> filter = m_filterMap.get(col);
     if (filter == null) {
       if (col instanceof ISmartColumn<?>) {
@@ -97,7 +99,12 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     }
     if (filter != null) {
       ColumnFilterForm f = new ColumnFilterForm();
-      f.setDisplayHint(IForm.DISPLAY_HINT_POPUP_DIALOG);
+      if (fullForm) {
+        f.setDisplayHint(IForm.DISPLAY_HINT_POPUP_DIALOG);
+      }
+      else {
+        f.getFieldByClass(SortBox.class).setVisible(false);
+      }
       f.setModal(true);
       f.setColumnFilter(filter);
       f.startModify();
@@ -134,5 +141,22 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
       }
     }
     return list;
+  }
+
+  @Override
+  public Collection<ITableColumnFilter> getFilters() {
+    return m_filterMap.values();
+  }
+
+  @Override
+  public void refresh() {
+    Collection<ITableColumnFilter> data = new ArrayList<ITableColumnFilter>();
+    data.addAll(m_filterMap.values());
+    m_filterMap.clear();
+    for (ITableColumnFilter filter : data) {
+      m_filterMap.put(filter.getColumn(), filter);
+      m_table.getColumnSet().updateColumn(filter.getColumn());
+    }
+    m_table.applyRowFilters();
   }
 }

@@ -53,6 +53,10 @@ public abstract class AbstractIcons implements Serializable {
   public static final String StatusError = "status_error";
   public static final String StatusInfo = "status_info";
   public static final String StatusWarning = "status_warning";
+  public static final String TableColumnFilterActive = "table_column_filter_active";
+  public static final String TableCustomColumn = "table_custom_column";
+  public static final String TableSortAsc = "table_sort_asc";
+  public static final String TableSortDesc = "table_sort_desc";
   public static final String TreeNode = "tree_node";
   public static final String TreeNodeOpen = "tree_node_open";
   public static final String WizardBackButton = "wizard_back";

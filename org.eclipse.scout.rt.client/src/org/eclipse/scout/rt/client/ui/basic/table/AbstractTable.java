@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.DefaultTableColumnFilterManager;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
@@ -2497,19 +2498,33 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     //
     try {
       setTableChanging(true);
-      //
-      ITableColumnFilterManager filterManager = getColumnFilterManager();
-      try {
-        if (filterManager != null) {
-          filterManager.reset();
-        }
+      // save displayable state
+      HashMap<String, Boolean> displayableState = new HashMap<String, Boolean>();
+      for (IColumn<?> col : getColumns()) {
+        displayableState.put(col.getColumnId(), col.isDisplayable());
       }
-      catch (ProcessingException e) {
-        //nop
-      }
+      // reset columns
       disposeColumnsInternal();
       createColumnsInternal();
       initColumnsInternal();
+      // re-apply displayable
+      for (IColumn<?> col : getColumns()) {
+        if (displayableState.get(col.getColumnId()) != null) {
+          col.setDisplayable(displayableState.get(col.getColumnId()));
+        }
+      }
+      // re-apply existing filters to new columns
+      ITableColumnFilterManager filterManager = getColumnFilterManager();
+      if (filterManager != null && filterManager.getFilters() != null) {
+        for (IColumn<?> col : getColumns()) {
+          for (ITableColumnFilter<?> filter : filterManager.getFilters()) {
+            if (filter.getColumn().getClass().equals(col.getClass())) {
+              filter.setColumn(col);
+            }
+          }
+          filterManager.refresh();
+        }
+      }
       fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED));
     }
     finally {

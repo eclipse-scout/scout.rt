@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * Checkboxes, Boolean values
  */
 public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITableColumnFilter<Boolean> {
-  private final IColumn<Boolean> m_column;
+  private IColumn<Boolean> m_column;
   private Set<Boolean> m_selectedValues;
 
   public BooleanColumnFilter(IColumn<Boolean> column) {
@@ -37,6 +37,12 @@ public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITabl
   @Override
   public IColumn<Boolean> getColumn() {
     return m_column;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setColumn(IColumn column) {
+    m_column = column;
   }
 
   @Override

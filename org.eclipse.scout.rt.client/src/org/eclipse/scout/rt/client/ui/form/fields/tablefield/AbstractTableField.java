@@ -78,7 +78,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   /**
-   * @return the selected row count, total row count and the sum of all numeric columns
+   * @return the visible row count, filtered row count, selected row count and the sum of all numeric columns
    *         <p>
    *         returns null if no table is contained within this table field
    */
@@ -93,6 +93,14 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
       }
       else {
         statusText.append(ScoutTexts.get("XRows", NumberUtility.format(nTotal)));
+      }
+
+      int fTotal = table.getRowCount() - nTotal;
+      if (fTotal == 1) {
+        statusText.append(", " + ScoutTexts.get("OneFiltered"));
+      }
+      else if (fTotal > 1) {
+        statusText.append(", " + ScoutTexts.get("XFiltered", NumberUtility.format(fTotal)));
       }
       int nSel = table.getSelectedRowCount();
       if (nSel == 1) {

@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 @Deprecated
 @SuppressWarnings("deprecation")
 public class SmartColumnFilter<T> implements ITableColumnFilter<T> {
-  private final ISmartColumn<T> m_column;
+  private ISmartColumn<T> m_column;
   private Set<T> m_selectedValues;
 
   public SmartColumnFilter(ISmartColumn<T> column) {
@@ -40,6 +40,17 @@ public class SmartColumnFilter<T> implements ITableColumnFilter<T> {
   @Override
   public IColumn<T> getColumn() {
     return m_column;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setColumn(IColumn column) {
+    if (column instanceof ISmartColumn) {
+      m_column = (ISmartColumn<T>) column;
+    }
+    else {
+      throw new IllegalArgumentException();
+    }
   }
 
   @Override

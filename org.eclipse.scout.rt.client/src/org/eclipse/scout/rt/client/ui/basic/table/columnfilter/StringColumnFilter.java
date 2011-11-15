@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  *
  */
 public class StringColumnFilter implements ITableColumnFilter<String> {
-  private final IColumn<String> m_column;
+  private IColumn<String> m_column;
   private Set<String> m_selectedValues;
   private String m_pattern;
   //cache
@@ -42,6 +42,12 @@ public class StringColumnFilter implements ITableColumnFilter<String> {
   @Override
   public IColumn<String> getColumn() {
     return m_column;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setColumn(IColumn column) {
+    m_column = column;
   }
 
   @Override

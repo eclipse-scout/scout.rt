@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  *
  */
 public class ComparableColumnFilter<T extends Comparable<T>> implements ITableColumnFilter<T> {
-  private final IColumn<T> m_column;
+  private IColumn<T> m_column;
   private Set<T> m_selectedValues;
   private T m_minimumValue;
   private T m_maximumValue;
@@ -39,6 +39,12 @@ public class ComparableColumnFilter<T extends Comparable<T>> implements ITableCo
   @Override
   public IColumn<T> getColumn() {
     return m_column;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setColumn(IColumn column) {
+    m_column = column;
   }
 
   @Override

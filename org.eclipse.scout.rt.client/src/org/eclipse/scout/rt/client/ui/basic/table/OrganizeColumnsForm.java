@@ -1,42 +1,66 @@
-/*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
+import java.util.List;
 
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.dnd.JavaTransferObject;
+import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.CloseButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ButtonsBox.SelectAllButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ButtonsBox.SelectNoneButton;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.CancelButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.AscendingButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.DescendingButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.WithoutButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsTableField;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.FilterBox;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.FilterBox.EditFilterButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetAllButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetColumnFiltersButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetSortingButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetVisibilityButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.AddCustomColumnButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.DeselectAllButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.ModifyCustomColumnButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.MoveDownButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.MoveUpButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.RemoveCustomColumnButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.SelectAllButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.OkButton;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetAllMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetColumnFiltersMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetSortingMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetVisibilityMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractLinkButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 public class OrganizeColumnsForm extends AbstractForm {
+
   ITable m_table;
-  TreeMap<String, Boolean> m_origValues = new TreeMap<String, Boolean>();
 
   public OrganizeColumnsForm(ITable table) throws ProcessingException {
     super(false);
@@ -46,80 +70,146 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return ScoutTexts.get("OrganizeTableColumnsTitle");
+    return TEXTS.get("OrganizeTableColumnsTitle");
   }
 
-  @Override
-  protected boolean getConfiguredModal() {
-    return true;
+  public AddCustomColumnButton getAddCustomColumnButton() {
+    return getFieldByClass(AddCustomColumnButton.class);
+  }
+
+  public AscendingButton getAscendingButton() {
+    return getFieldByClass(AscendingButton.class);
+  }
+
+  public CancelButton getCancelButton() {
+    return getFieldByClass(CancelButton.class);
   }
 
   public void startModify() throws ProcessingException {
-    startInternal(new ModifyHandler());
+    startInternal(new OrganizeColumnsForm.ModifyHandler());
+  }
+
+  public ColumnSortingBox getColumnSortingBox() {
+    return getFieldByClass(ColumnSortingBox.class);
+  }
+
+  public ColumnsTableField getColumnsTableField() {
+    return getFieldByClass(ColumnsTableField.class);
+  }
+
+  public DescendingButton getDescendingButton() {
+    return getFieldByClass(DescendingButton.class);
+  }
+
+  public DeselectAllButton getDeselectAllButton() {
+    return getFieldByClass(DeselectAllButton.class);
+  }
+
+  public EditFilterButton getEditFilterButton() {
+    return getFieldByClass(EditFilterButton.class);
+  }
+
+  public FilterBox getFilterBox() {
+    return getFieldByClass(FilterBox.class);
+  }
+
+  public GroupBox getGroupBox() {
+    return getFieldByClass(GroupBox.class);
   }
 
   public MainBox getMainBox() {
-    return (MainBox) getRootGroupBox();
+    return getFieldByClass(MainBox.class);
   }
 
-  public CloseButton getCloseButton() {
-    return getFieldByClass(CloseButton.class);
+  public ModifyCustomColumnButton getModifyCustomColumnButton() {
+    return getFieldByClass(ModifyCustomColumnButton.class);
   }
 
-  /*
-   * Field accessors
-   */
-  public ColumnsTableField getColumnsTableField() {
-    return getFieldByClass(ColumnsTableField.class);
+  public MoveDownButton getMoveDownButton() {
+    return getFieldByClass(MoveDownButton.class);
+  }
+
+  public MoveUpButton getMoveUpButton() {
+    return getFieldByClass(MoveUpButton.class);
   }
 
   public OkButton getOkButton() {
     return getFieldByClass(OkButton.class);
   }
 
+  public RemoveCustomColumnButton getRemoveCustomColumnButton() {
+    return getFieldByClass(RemoveCustomColumnButton.class);
+  }
+
+  public ResetAllButton getResetAllButton() {
+    return getFieldByClass(ResetAllButton.class);
+  }
+
+  public ResetBox getResetBox() {
+    return getFieldByClass(ResetBox.class);
+  }
+
+  public ResetColumnFiltersButton getResetColumnFilters() {
+    return getFieldByClass(ResetColumnFiltersButton.class);
+  }
+
+  public ResetSortingButton getResetSortingButton() {
+    return getFieldByClass(ResetSortingButton.class);
+  }
+
+  public ResetVisibilityButton getResetVisibilityButton() {
+    return getFieldByClass(ResetVisibilityButton.class);
+  }
+
   public SelectAllButton getSelectAllButton() {
     return getFieldByClass(SelectAllButton.class);
   }
 
-  public SelectNoneButton getSelectNoneButton() {
-    return getFieldByClass(SelectNoneButton.class);
+  public ViewBox getViewBox() {
+    return getFieldByClass(ViewBox.class);
   }
 
-  @Order(10)
+  public WithoutButton getWithoutButton() {
+    return getFieldByClass(WithoutButton.class);
+  }
+
+  @Order(10.0)
   public class MainBox extends AbstractGroupBox {
 
     @Override
-    protected int getConfiguredGridW() {
-      return 1;
+    protected int getConfiguredGridColumnCount() {
+      return 3;
     }
 
-    @Order(10)
+    @Override
+    protected int getConfiguredGridW() {
+      return 2;
+    }
+
+    @Order(10.0)
     public class GroupBox extends AbstractGroupBox {
+
       @Override
-      protected int getConfiguredGridColumnCount() {
-        return 2;
+      protected int getConfiguredGridW() {
+        return 1;
       }
 
-      @Order(10)
+      @Order(10.0)
       public class ColumnsTableField extends AbstractTableField<ColumnsTableField.Table> {
-        @Override
-        protected int getConfiguredGridW() {
-          return 1;
-        }
 
         @Override
         protected int getConfiguredGridH() {
-          return 8;
+          return 15;
         }
 
         @Override
-        protected boolean getConfiguredGridUseUiWidth() {
-          return true;
+        protected int getConfiguredGridW() {
+          return 2;
         }
 
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("Columns");
+          return TEXTS.get("Columns");
         }
 
         @Override
@@ -135,34 +225,119 @@ public class OrganizeColumnsForm extends AbstractForm {
               if (col.isVisible() || col.isVisibleGranted()) {
                 IHeaderCell headerCell = col.getHeaderCell();
                 TableRow row = new TableRow(getTable().getColumnSet());
-                getTable().getCheckBoxColumn().setValue(row, col.isVisible());
+
+                // Key
                 getTable().getKeyColumn().setValue(row, col);
-                getTable().getTextColumn().setValue(row, headerCell.getText());
-                row.setIconId(headerCell.getIconId());
+
+                // Visible
+                getTable().getVisibleColumn().setValue(row, col.isVisible());
+
+                // Column Title
+                getTable().getTitleColumn().setValue(row, headerCell.getText());
+
+                // Custom Column
+                if (col instanceof ICustomColumn<?>) {
+                  row.getCellForUpdate(getTable().getCustomColumnColumn().getColumnIndex()).setIconId(AbstractIcons.TableCustomColumn);
+                }
+
+                // Sorting
+                if (col.isSortActive()) {
+                  if (col.isSortAscending()) {
+                    row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(AbstractIcons.TableSortAsc);
+                  }
+                  else {
+                    row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(AbstractIcons.TableSortDesc);
+                  }
+                }
+                else {
+                  row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(null);
+                }
+
+                // Filter
+                if (col.isColumnFilterActive()) {
+                  row.getCellForUpdate(getTable().getFilterColumn().getColumnIndex()).setIconId(AbstractIcons.TableColumnFilterActive);
+                }
+
                 rowList.add(row);
               }
             }
           }
-          getTable().discardAllRows();
-          getTable().addRows(rowList.toArray(new ITableRow[rowList.size()]));
-          for (int i = 0; i < getTable().getRowCount(); i++) {
-            ITableRow row = getTable().getRow(i);
-            Boolean b = (Boolean) row.getCell(getTable().getCheckBoxColumn()).getValue();
-            IColumn<?> col = (IColumn<?>) row.getCell(getTable().getKeyColumn()).getValue();
-            m_origValues.put(col.getClass().getName(), b);
+          try {
+            getTable().setTableChanging(true);
+            getTable().discardAllRows();
+            getTable().addRows(rowList.toArray(new ITableRow[rowList.size()]));
+          }
+          finally {
+            getTable().setTableChanging(false);
           }
         }
 
-        @Order(10)
+        @Order(10.0)
         public class Table extends AbstractTable {
+
           @Override
-          protected boolean getConfiguredAutoResizeColumns() {
-            return true;
+          protected void execDecorateRow(ITableRow row) throws ProcessingException {
+            if (BooleanUtility.nvl(getVisibleColumn().getValue(row))) {
+              row.setFont(new FontSpec(null, FontSpec.STYLE_BOLD, 0));
+            }
+            else {
+              row.setFont(null);
+            }
           }
 
           @Override
-          protected boolean getConfiguredHeaderVisible() {
-            return false;
+          protected int getConfiguredDragType() {
+            return IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER;
+          }
+
+          @Override
+          protected int getConfiguredDropType() {
+            return IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER;
+          }
+
+          @Override
+          protected TransferObject execDrag(ITableRow[] rows) throws ProcessingException {
+            return new JavaTransferObject(rows);
+          }
+
+          @Override
+          protected void execDrop(ITableRow row, TransferObject transfer) throws ProcessingException {
+            if (transfer != null && transfer instanceof JavaTransferObject) {
+              Object localObject = ((JavaTransferObject) transfer).getLocalObject();
+              if (localObject != null) {
+                if (localObject instanceof ITableRow[]) {
+                  ITableRow[] draggedRows = (ITableRow[]) localObject;
+                  if (draggedRows != null && draggedRows.length > 0) {
+                    ITableRow draggedRow = draggedRows[0];
+                    if (draggedRow.getRowIndex() != row.getRowIndex()) {
+                      // target row other than source row
+                      try {
+                        getTable().setTableChanging(true);
+                        if (draggedRow.getRowIndex() < row.getRowIndex()) {
+                          while (draggedRow.getRowIndex() <= row.getRowIndex()) {
+                            moveDown(draggedRow);
+                          }
+                        }
+                        else {
+                          while (draggedRow.getRowIndex() >= row.getRowIndex()) {
+                            moveUp(draggedRow);
+                          }
+                        }
+                        updateColumnVisibilityAndOrder();
+                      }
+                      finally {
+                        getTable().setTableChanging(false);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          @Override
+          protected boolean getConfiguredAutoResizeColumns() {
+            return true;
           }
 
           @Override
@@ -171,27 +346,92 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execRowClick(ITableRow row) throws ProcessingException {
-            if (row != null && getContextColumn() == getCheckBoxColumn()) {
-              Boolean oldValue = getCheckBoxColumn().getValue(row);
-              getCheckBoxColumn().setValue(row, !oldValue);
-            }
-          }
-
-          public CheckBoxColumn getCheckBoxColumn() {
-            return getColumnSet().getColumnByClass(CheckBoxColumn.class);
+          protected boolean getConfiguredHeaderVisible() {
+            return false;
           }
 
           public KeyColumn getKeyColumn() {
             return getColumnSet().getColumnByClass(KeyColumn.class);
           }
 
-          public TextColumn getTextColumn() {
-            return getColumnSet().getColumnByClass(TextColumn.class);
+          public SortingColumn getSortingColumn() {
+            return getColumnSet().getColumnByClass(SortingColumn.class);
           }
 
-          @Order(10)
+          public FilterColumn getFilterColumn() {
+            return getColumnSet().getColumnByClass(FilterColumn.class);
+          }
+
+          public CustomColumnColumn getCustomColumnColumn() {
+            return getColumnSet().getColumnByClass(CustomColumnColumn.class);
+          }
+
+          public TitleColumn getTitleColumn() {
+            return getColumnSet().getColumnByClass(TitleColumn.class);
+          }
+
+          public VisibleColumn getVisibleColumn() {
+            return getColumnSet().getColumnByClass(VisibleColumn.class);
+          }
+
+          @Override
+          protected void execRowClick(ITableRow row) throws ProcessingException {
+            if (row != null && getContextColumn() == getVisibleColumn() && getKeyColumn().getValue(row) != null) {
+              Boolean oldValue = getVisibleColumn().getValue(row);
+              setColumnVisible(row, !oldValue);
+            }
+          }
+
+          @Override
+          protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
+            validateButtons();
+          }
+
+          @Order(10.0)
+          public class SpaceKeyStroke extends AbstractKeyStroke {
+            @Override
+            protected String getConfiguredKeyStroke() {
+              return "space";
+            }
+
+            @Override
+            protected void execAction() throws ProcessingException {
+              for (ITableRow row : getSelectedRows()) {
+                Boolean oldValue = BooleanUtility.nvl(getVisibleColumn().getValue(row));
+                setColumnVisible(row, !oldValue);
+              }
+            }
+          }
+
+          @Order(20.0)
+          public class UpKeyStroke extends AbstractKeyStroke {
+            @Override
+            protected String getConfiguredKeyStroke() {
+              return "alt-up";
+            }
+
+            @Override
+            protected void execAction() throws ProcessingException {
+              moveUp(getSelectedRow());
+            }
+          }
+
+          @Order(30.0)
+          public class DownKeyStroke extends AbstractKeyStroke {
+            @Override
+            protected String getConfiguredKeyStroke() {
+              return "alt-down";
+            }
+
+            @Override
+            protected void execAction() throws ProcessingException {
+              moveDown(getSelectedRow());
+            }
+          }
+
+          @Order(5.0)
           public class KeyColumn extends AbstractColumn<IColumn<?>> {
+
             @Override
             protected boolean getConfiguredPrimaryKey() {
               return true;
@@ -203,55 +443,85 @@ public class OrganizeColumnsForm extends AbstractForm {
             }
           }
 
-          @Order(20)
-          public class CheckBoxColumn extends AbstractBooleanColumn {
+          @Order(10.0)
+          public class VisibleColumn extends AbstractBooleanColumn {
+
+            @Override
+            protected String getConfiguredHeaderText() {
+              return TEXTS.get("Visible");
+            }
+
             @Override
             protected int getConfiguredWidth() {
               return 20;
             }
+
           }
 
-          @Order(30)
-          public class TextColumn extends AbstractStringColumn {
+          @Order(20.0)
+          public class TitleColumn extends AbstractStringColumn {
+
+            @Override
+            protected String getConfiguredHeaderText() {
+              return TEXTS.get("Title");
+            }
+
             @Override
             protected int getConfiguredWidth() {
-              return 180;
-            }
-          }
-
-          @Order(10)
-          public class SpaceKeyStroke extends AbstractKeyStroke {
-            @Override
-            protected String getConfiguredKeyStroke() {
-              return "space";
+              return 300;
             }
 
-            @Override
-            protected void execAction() throws ProcessingException {
-              for (ITableRow row : getSelectedRows()) {
-                Boolean b = getCheckBoxColumn().getValue(row);
-                if (b == null) {
-                  b = false;
-                }
-                b = !b;
-                getCheckBoxColumn().setValue(row, b);
-              }
-            }
           }
+
+          @Order(30.0)
+          public class SortingColumn extends AbstractStringColumn {
+
+            @Override
+            protected String getConfiguredHeaderText() {
+              return TEXTS.get("ColumnSorting");
+            }
+
+            @Override
+            protected int getConfiguredWidth() {
+              return 20;
+            }
+
+          }
+
+          @Order(40.0)
+          public class FilterColumn extends AbstractStringColumn {
+
+            @Override
+            protected String getConfiguredHeaderText() {
+              return TEXTS.get("ResetTableColumnFilter");
+            }
+
+            @Override
+            protected int getConfiguredWidth() {
+              return 20;
+            }
+
+          }
+
+          @Order(50.0)
+          public class CustomColumnColumn extends AbstractStringColumn {
+
+            @Override
+            protected int getConfiguredWidth() {
+              return 20;
+            }
+
+          }
+
         }
       }
 
-      @Order(20)
-      public class ButtonsBox extends AbstractGroupBox {
+      @Order(20.0)
+      public class ViewBox extends AbstractGroupBox {
 
         @Override
         protected int getConfiguredGridColumnCount() {
           return 1;
-        }
-
-        @Override
-        protected boolean getConfiguredBorderVisible() {
-          return false;
         }
 
         @Override
@@ -260,145 +530,38 @@ public class OrganizeColumnsForm extends AbstractForm {
         }
 
         @Override
-        protected int getConfiguredGridH() {
-          return 4;
+        protected String getConfiguredLabel() {
+          return TEXTS.get("View");
         }
 
-        @Override
-        protected double getConfiguredGridWeightY() {
-          return 0;
-        }
-
-        @Override
-        protected double getConfiguredGridWeightX() {
-          return 0;
-        }
-
-        @Override
-        protected boolean getConfiguredGridUseUiWidth() {
-          return true;
-        }
-
-        @Order(10)
-        public class MoveUpButton extends AbstractButton {
+        @Order(10.0)
+        public class SelectAllButton extends AbstractLinkButton {
 
           @Override
           protected String getConfiguredLabel() {
-            return ScoutTexts.get("ButtonMoveUp");
+            return TEXTS.get("ButtonSelectAll");
           }
 
           @Override
           protected boolean getConfiguredProcessButton() {
             return false;
-          }
-
-          @Override
-          protected boolean getConfiguredFillHorizontal() {
-            return true;
-          }
-
-          @Override
-          protected boolean getConfiguredGridUseUiWidth() {
-            return true;
-          }
-
-          @Override
-          protected boolean getConfiguredGridUseUiHeight() {
-            return true;
-          }
-
-          @Override
-          protected void execClickAction() {
-            ITableRow row = getColumnsTableField().getTable().getSelectedRow();
-            if (row != null && row.getRowIndex() - 1 >= 0) {
-              getColumnsTableField().getTable().moveRow(row.getRowIndex(), row.getRowIndex() - 1);
-            }
-          }
-        }
-
-        @Order(20)
-        public class MoveDownButton extends AbstractButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return ScoutTexts.get("ButtonMoveDown");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected boolean getConfiguredFillHorizontal() {
-            return true;
-          }
-
-          @Override
-          protected boolean getConfiguredGridUseUiWidth() {
-            return true;
-          }
-
-          @Override
-          protected boolean getConfiguredGridUseUiHeight() {
-            return true;
-          }
-
-          @Override
-          protected void execClickAction() {
-            ITableRow row = getColumnsTableField().getTable().getSelectedRow();
-            if (row != null && row.getRowIndex() + 1 < getColumnsTableField().getTable().getRowCount()) {
-              getColumnsTableField().getTable().moveRow(row.getRowIndex(), row.getRowIndex() + 1);
-            }
-          }
-        }
-
-        /**
-         * Button "select all"
-         */
-        @Order(30)
-        public class SelectAllButton extends AbstractButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return ScoutTexts.get("ButtonSelectAll");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected boolean getConfiguredFillHorizontal() {
-            return true;
-          }
-
-          @Override
-          protected boolean getConfiguredGridUseUiWidth() {
-            return true;
-          }
-
-          @Override
-          protected boolean getConfiguredGridUseUiHeight() {
-            return true;
           }
 
           @Override
           protected void execClickAction() throws ProcessingException {
-            getColumnsTableField().getTable().getCheckBoxColumn().fill(true);
+            for (ITableRow row : getColumnsTableField().getTable().getRows()) {
+              setColumnVisible(row, true);
+            }
           }
+
         }
 
-        /**
-         * Button "select none"
-         */
-        @Order(40)
-        public class SelectNoneButton extends AbstractButton {
+        @Order(20.0)
+        public class DeselectAllButton extends AbstractLinkButton {
 
           @Override
           protected String getConfiguredLabel() {
-            return ScoutTexts.get("ButtonDeselectAll");
+            return TEXTS.get("ButtonDeselectAll");
           }
 
           @Override
@@ -407,95 +570,553 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected boolean getConfiguredFillHorizontal() {
-            return true;
+          protected void execClickAction() throws ProcessingException {
+            for (ITableRow row : getColumnsTableField().getTable().getRows()) {
+              setColumnVisible(row, false);
+            }
+          }
+
+        }
+
+        @Order(30.0)
+        public class MoveUpButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("ButtonMoveUp");
           }
 
           @Override
-          protected boolean getConfiguredGridUseUiWidth() {
-            return true;
-          }
-
-          @Override
-          protected boolean getConfiguredGridUseUiHeight() {
-            return true;
+          protected boolean getConfiguredProcessButton() {
+            return false;
           }
 
           @Override
           protected void execClickAction() throws ProcessingException {
-            getColumnsTableField().getTable().getCheckBoxColumn().fill(false);
+            moveUp(getColumnsTableField().getTable().getSelectedRow());
           }
+
+        }
+
+        @Order(40.0)
+        public class MoveDownButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("ButtonMoveDown");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() {
+            moveDown(getColumnsTableField().getTable().getSelectedRow());
+          }
+
+        }
+
+        @Order(50.0)
+        public class AddCustomColumnButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("AddCustomColumnMenu");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execInitField() throws ProcessingException {
+            setVisible(m_table.getTableCustomizer() != null);
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            if (m_table != null) {
+              if (m_table.getTableCustomizer() != null) {
+                ArrayList<String> existingColumns = new ArrayList<String>();
+                for (IColumn c : m_table.getColumns()) {
+                  existingColumns.add(c.getColumnId());
+                }
+                m_table.getTableCustomizer().addColumn();
+
+                // find target row (selected row or first row)
+                ITableRow targetOrderRow = getColumnsTableField().getTable().getSelectedRow();
+                if (targetOrderRow == null && getColumnsTableField().getTable().getRowCount() > 0) {
+                  targetOrderRow = getColumnsTableField().getTable().getRow(0);
+                }
+                if (targetOrderRow == null) {
+                  return;
+                }
+
+                // find new row
+                getColumnsTableField().reloadTableData();
+                for (ITableRow newColumnRow : getColumnsTableField().getTable().getRows()) {
+                  if (!existingColumns.contains(getColumnsTableField().getTable().getKeyColumn().getValue(newColumnRow).getColumnId())) {
+                    // move new column
+                    try {
+                      getColumnsTableField().getTable().setTableChanging(true);
+                      if (newColumnRow.getRowIndex() < targetOrderRow.getRowIndex()) {
+                        while (newColumnRow.getRowIndex() < targetOrderRow.getRowIndex()) {
+                          moveDown(newColumnRow);
+                        }
+                      }
+                      else {
+                        while (newColumnRow.getRowIndex() > targetOrderRow.getRowIndex()) {
+                          moveUp(newColumnRow);
+                        }
+                      }
+                      updateColumnVisibilityAndOrder();
+
+                      // select new row
+                      getColumnsTableField().getTable().selectRow(newColumnRow);
+                    }
+                    finally {
+                      getColumnsTableField().getTable().setTableChanging(false);
+                    }
+                    break;
+                  }
+                }
+              }
+            }
+          }
+
+        }
+
+        @Order(60.0)
+        public class ModifyCustomColumnButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("SC_Label_Change");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            if (m_table != null) {
+              if (m_table.getTableCustomizer() != null) {
+                if (getColumnsTableField().getTable().getSelectedRow() != null) {
+                  IColumn<?> selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
+                  if (selectedCol instanceof ICustomColumn<?>) {
+                    m_table.getTableCustomizer().modifyColumn((ICustomColumn<?>) selectedCol);
+                  }
+                }
+              }
+            }
+            getColumnsTableField().reloadTableData();
+          }
+
+        }
+
+        @Order(70.0)
+        public class RemoveCustomColumnButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Remove");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            if (m_table != null) {
+              if (m_table.getTableCustomizer() != null) {
+                if (getColumnsTableField().getTable().getSelectedRow() != null) {
+                  IColumn<?> selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
+                  if (selectedCol instanceof ICustomColumn<?>) {
+                    m_table.getTableCustomizer().removeColumn((ICustomColumn<?>) selectedCol);
+                  }
+                }
+              }
+            }
+            getColumnsTableField().reloadTableData();
+          }
+
         }
       }
+
+      @Order(30.0)
+      public class ColumnSortingBox extends AbstractGroupBox {
+
+        @Override
+        protected int getConfiguredGridColumnCount() {
+          return 1;
+        }
+
+        @Override
+        protected int getConfiguredGridW() {
+          return 1;
+        }
+
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("ColumnSorting");
+        }
+
+        @Order(10.0)
+        public class AscendingButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Ascending");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            setSort(true);
+          }
+
+        }
+
+        @Order(20.0)
+        public class DescendingButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Descending");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            setSort(false);
+          }
+
+        }
+
+        @Order(30.0)
+        public class WithoutButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Without");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            setSort(null);
+          }
+
+        }
+      }
+
+      @Order(40.0)
+      public class FilterBox extends AbstractGroupBox {
+
+        @Override
+        protected int getConfiguredGridColumnCount() {
+          return 1;
+        }
+
+        @Override
+        protected int getConfiguredGridW() {
+          return 1;
+        }
+
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("ResetTableColumnFilter");
+        }
+
+        @Order(10.0)
+        public class EditFilterButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Edit_");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            Integer selectedIndex = null;
+            if (m_table != null && getColumnsTableField().getTable().getSelectedRow() != null) {
+              selectedIndex = getColumnsTableField().getTable().getSelectedRow().getRowIndex();
+              if (m_table.getColumnFilterManager() != null) {
+                IColumn<?> col = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
+                if (col != null) {
+                  m_table.getColumnFilterManager().showFilterForm(col, false);
+                }
+              }
+            }
+            getColumnsTableField().reloadTableData();
+            if (selectedIndex != null) {
+              getColumnsTableField().getTable().selectRow(selectedIndex);
+            }
+          }
+
+        }
+      }
+
+      @Order(50.0)
+      public class ResetBox extends AbstractGroupBox {
+
+        @Override
+        protected int getConfiguredGridColumnCount() {
+          return 1;
+        }
+
+        @Override
+        protected int getConfiguredGridW() {
+          return 1;
+        }
+
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("FormReset");
+        }
+
+        @Order(10.0)
+        public class ResetAllButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("ResetTableColumnsAll");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            doResetAction(ResetAllMenu.class);
+          }
+
+        }
+
+        @Order(20.0)
+        public class ResetVisibilityButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("View");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            doResetAction(ResetVisibilityMenu.class);
+          }
+
+        }
+
+        @Order(30.0)
+        public class ResetSortingButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("ColumnSorting");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            doResetAction(ResetSortingMenu.class);
+          }
+
+        }
+
+        @Order(40.0)
+        public class ResetColumnFiltersButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("ResetTableColumnFilter");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            doResetAction(ResetColumnFiltersMenu.class);
+          }
+
+        }
+      }
+
     }
 
-    /**
-     * Button "ok"
-     */
-    @Order(40)
-    public class OkButton extends AbstractButton {
+    @Order(20.0)
+    public class OkButton extends AbstractOkButton {
+    }
 
-      @Override
-      protected int getConfiguredSystemType() {
-        return IButton.SYSTEM_TYPE_OK;
+    @Order(30.0)
+    public class CancelButton extends AbstractCancelButton {
+    }
+  }
+
+  private void updateColumnVisibilityAndOrder() {
+    IColumn<?>[] visibleColumns = getColumnsTableField().getTable().getKeyColumn().getValues(getColumnsTableField().getTable().getVisibleColumn().findRows(true));
+    m_table.getColumnSet().setVisibleColumns(visibleColumns);
+  }
+
+  private void setColumnVisible(ITableRow row, Boolean visible) throws ProcessingException {
+    getColumnsTableField().getTable().getVisibleColumn().setValue(row, visible);
+    getColumnsTableField().getTable().getKeyColumn().getValue(row).setVisible(visible);
+
+    updateColumnVisibilityAndOrder();
+  }
+
+  private void moveUp(ITableRow row) {
+    if (row != null && row.getRowIndex() - 1 >= 0) {
+      getColumnsTableField().getTable().moveRow(row.getRowIndex(), row.getRowIndex() - 1);
+    }
+
+    updateColumnVisibilityAndOrder();
+  }
+
+  private void moveDown(ITableRow row) {
+    if (row != null && row.getRowIndex() + 1 < getColumnsTableField().getTable().getRowCount()) {
+      getColumnsTableField().getTable().moveRow(row.getRowIndex(), row.getRowIndex() + 1);
+    }
+
+    updateColumnVisibilityAndOrder();
+  }
+
+  private void validateButtons() {
+    ITableRow selectedRow = getColumnsTableField().getTable().getSelectedRow();
+    boolean selectedRowExists = selectedRow != null;
+    boolean isCustomColumn = selectedRow != null && getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow) instanceof ICustomColumn<?>;
+
+    getModifyCustomColumnButton().setEnabled(isCustomColumn);
+    getRemoveCustomColumnButton().setEnabled(isCustomColumn);
+
+    getMoveDownButton().setEnabled(selectedRowExists);
+    getMoveUpButton().setEnabled(selectedRowExists);
+
+    getAscendingButton().setEnabled(selectedRowExists);
+    getDescendingButton().setEnabled(selectedRowExists);
+    getWithoutButton().setEnabled(selectedRowExists);
+
+    getEditFilterButton().setEnabled(selectedRowExists);
+  }
+
+  private void doResetAction(Class<? extends IMenu> action) throws ProcessingException {
+    ResetColumnsMenu menu = new ResetColumnsMenu(m_table);
+    List<IMenu> childs = menu.getChildActions();
+    for (IMenu child : childs) {
+      if (child.getClass().equals(action)) {
+        child.doAction();
       }
+    }
+    getColumnsTableField().reloadTableData();
+  }
 
-      @Override
-      protected String getConfiguredLabel() {
-        return ScoutTexts.get("OkButton");
+  private void setSort(Boolean ascending) throws ProcessingException {
+    ITableRow row = getColumnsTableField().getTable().getSelectedRow();
+    if (row == null) {
+      return;
+    }
+
+    try {
+      getColumnsTableField().getTable().setTableChanging(true);
+      IColumn<?> selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(row);
+      if (ascending == null) {
+        m_table.getColumnSet().removeSortColumn(selectedCol);
       }
+      else {
+        m_table.getColumnSet().addSortColumn(selectedCol, ascending);
+      }
+      m_table.sort();
 
-      @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("OkButtonTooltip");
+      getColumnsTableField().reloadTableData();
+      getColumnsTableField().getTable().selectRow(row.getRowIndex());
+    }
+    finally {
+      getColumnsTableField().getTable().setTableChanging(false);
+    }
+  }
+
+  @Override
+  public void validateForm() throws ProcessingException {
+    boolean oneColumnIsVisble = false;
+    for (Boolean visible : getColumnsTableField().getTable().getVisibleColumn().getValues()) {
+      if (BooleanUtility.nvl(visible)) {
+        oneColumnIsVisble = true;
+        break;
       }
     }
 
-    /**
-     * Button "close"
-     */
-    @Order(50)
-    public class CloseButton extends AbstractButton {
-
-      @Override
-      protected int getConfiguredSystemType() {
-        return IButton.SYSTEM_TYPE_CLOSE;
-      }
-
-      @Override
-      protected String getConfiguredLabel() {
-        return ScoutTexts.get("CloseButton");
-      }
-
-      @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("CloseButtonTooltip");
-      }
+    if (!oneColumnIsVisble) {
+      throw new VetoException(TEXTS.get("OrganizeTableColumnsMinimalColumnCountMessage"));
     }
+  }
 
-  }// end main box
+  public class ModifyHandler extends AbstractFormHandler {
 
-  /**
-   * Handler for "Modify"
-   */
-  private class ModifyHandler extends AbstractFormHandler {
+    private Bookmark tableState;
 
     @Override
     protected void execLoad() throws ProcessingException {
+      // save original state
+      tableState = getDesktop().createBookmark();
       getColumnsTableField().reloadTableData();
     }
 
     @Override
     protected void execPostLoad() throws ProcessingException {
-      touch();
+      validateButtons();
     }
 
     @Override
     protected void execStore() throws ProcessingException {
-      IColumn<?>[] visibleColumns = getColumnsTableField().getTable().getKeyColumn().getValues(getColumnsTableField().getTable().getCheckBoxColumn().findRows(true));
-      m_table.getColumnSet().setVisibleColumns(visibleColumns);
       // make changes persistent
       ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
     }
-  }// end private handler
+
+    @Override
+    protected void execFinally() throws ProcessingException {
+      if (!isFormStored() && isSaveNeeded()) {
+        // revert to original state
+        getDesktop().activateBookmark(tableState, true);
+      }
+    }
+
+  }
 }

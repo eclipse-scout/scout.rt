@@ -15,6 +15,9 @@ package org.eclipse.scout.rt.ui.swing;
  */
 public interface SwingIcons {
   String TableColumnFilterActive = "table_column_filter_active";
+  String TableSortAsc = "table_sort_asc";
+  String TableSortDesc = "table_sort_desc";
+  String TableCustomColumn = "table_custom_column";
 
   String Mandantory = "mandatory";
   String MandantoryDisabled = "mandatory_disabled";
