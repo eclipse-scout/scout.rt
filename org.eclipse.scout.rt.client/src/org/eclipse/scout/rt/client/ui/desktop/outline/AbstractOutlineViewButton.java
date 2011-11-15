@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.view.AbstractViewButton;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
@@ -28,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 public abstract class AbstractOutlineViewButton extends AbstractViewButton {
 
   private final IDesktop m_desktop;
-  private IOutline m_outline;
+  private final IOutline m_outline;
 
   /**
    * call using {@link AbstractDesktop}.this or {@link AbstractDesktopExtension#getDelegatingDesktop()}
@@ -36,11 +35,16 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
   public AbstractOutlineViewButton(IDesktop desktop, Class<? extends IOutline> outlineType) {
     super(false);
     m_desktop = desktop;
+    IOutline outline = null;
     for (IOutline o : desktop.getAvailableOutlines()) {
       if (o.getClass() == outlineType) {
-        m_outline = o;
+        outline = o;
         break;
       }
+    }
+    m_outline = outline;
+    if (m_desktop == null) {
+      throw new IllegalArgumentException("Desktop can not be null");
     }
     if (m_outline == null) {
       throw new IllegalArgumentException("the outline type " + outlineType.getName() + " is not registered in the desktop");
@@ -100,9 +104,8 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
 
   @Override
   protected void execAction() throws ProcessingException {
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
     if (isSelected()) {
-      if (desktop != null && desktop.getOutline() != null && desktop.getOutline() == m_outline) {
+      if (m_desktop.getOutline() != null && m_desktop.getOutline() == m_outline) {
         //determine new selection
         ITreeNode newSelectedNode;
         if (m_outline.isRootNodeVisible()) {
