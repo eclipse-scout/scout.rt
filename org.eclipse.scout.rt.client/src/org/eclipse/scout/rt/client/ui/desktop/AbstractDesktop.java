@@ -38,6 +38,8 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -526,12 +528,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public IForm[] getViewStack() {
-    return m_viewStack.toArray(new IForm[0]);
+    return m_viewStack.toArray(new IForm[m_viewStack.size()]);
   }
 
   @Override
   public IForm[] getDialogStack() {
-    return m_dialogStack.toArray(new IForm[0]);
+    return m_dialogStack.toArray(new IForm[m_dialogStack.size()]);
   }
 
   /**
@@ -592,7 +594,29 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void addForm(final IForm form) {
+  public void addForm(IForm form) {
+    //Allow DesktopExtensions to do any modifications on forms before UI is informed
+    IDesktopExtension[] extensions = getDesktopExtensions();
+    if (extensions != null) {
+      final IHolder<IForm> formHolder = new Holder<IForm>(IForm.class, form);
+      for (IDesktopExtension ext : extensions) {
+        try {
+          ContributionCommand cc = ext.customFormModificationDelegate(formHolder);
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
+        }
+        catch (ProcessingException e) {
+          formHolder.setValue(form);
+          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        }
+        catch (Throwable t) {
+          formHolder.setValue(form);
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Formmodification error: " + form, t));
+        }
+      }
+      form = formHolder.getValue();
+    }
     if (form != null) {
       switch (form.getDisplayHint()) {
         case IForm.DISPLAY_HINT_POPUP_WINDOW:
@@ -1526,6 +1550,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     @Override
     public ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
       execOutlineChanged(oldOutline, newOutline);
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand customFormModificationDelegate(IHolder<IForm> formHolder) throws ProcessingException {
       return ContributionCommand.Continue;
     }
 

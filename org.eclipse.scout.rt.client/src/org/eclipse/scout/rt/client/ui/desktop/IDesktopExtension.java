@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -75,6 +76,18 @@ public interface IDesktopExtension {
    * Called whenever a new outline is activated on the desktop.
    */
   ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) throws ProcessingException;
+
+  /**
+   * Called right before a form is added to the desktop. This means, it is called
+   * before any UI is informed about the new form. The form is provided in a
+   * holder. This allows it to prevent the form being added to the desktop (set
+   * reference to null) do some general modifications need to be done prior UI instantiation 
+   * or even set it to another instance.
+   * 
+   * @param formHolder
+   *          contains the form that will be added to the desktop
+   */
+  ContributionCommand customFormModificationDelegate(IHolder<IForm> formHolder) throws ProcessingException;
 
   /**
    * Called after an other page was selected.

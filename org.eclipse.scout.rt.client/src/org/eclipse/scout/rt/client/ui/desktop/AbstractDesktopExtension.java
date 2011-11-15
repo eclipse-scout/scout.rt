@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -68,6 +69,11 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   @Override
   public ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
     return execOutlineChanged(oldOutline, newOutline);
+  }
+
+  @Override
+  public ContributionCommand customFormModificationDelegate(IHolder<IForm> formHolder) throws ProcessingException {
+    return execCustomFormModification(formHolder);
   }
 
   @Override
@@ -194,6 +200,20 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   @ConfigOperation
   @Order(30)
   protected ContributionCommand execOutlineChanged(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+    return ContributionCommand.Continue;
+  }
+
+  /**
+   * Called right before a form is added to the desktop. This means, it is called
+   * before any UI is informed about the new form. The form is provided in a
+   * holder. This allows it to prevent the form being added to the desktop (set
+   * reference to null) do some general modifications need to be done prior UI instantiation 
+   * or even set it to another instance.
+   * 
+   * @param formHolder
+   *          contains the form that will be added to the desktop
+   */
+  protected ContributionCommand execCustomFormModification(IHolder<IForm> formHolder) {
     return ContributionCommand.Continue;
   }
 
