@@ -18,7 +18,7 @@ import javax.swing.JTable;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
-import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTableCellEditor;
+import org.eclipse.scout.rt.ui.swing.basic.table.celleditor.SwingScoutTableCellEditor;
 import org.eclipse.scout.rt.ui.swing.extension.IFormFieldFactory;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 

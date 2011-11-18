@@ -52,11 +52,6 @@ public class SwingScoutDropDownPopup extends SwingScoutPopup {
     m_focusComponent = focusComponent;
   }
 
-  public SwingScoutDropDownPopup(ISwingEnvironment env, Component ownerComponent, Component focusComponent, int fixedWidth) {
-    super(env, ownerComponent, new Rectangle(ownerComponent.getLocationOnScreen(), ownerComponent.getSize()), fixedWidth);
-    m_focusComponent = focusComponent;
-  }
-
   public void makeNonFocusable() {
     getSwingWindow().setFocusableWindowState(false);
     getSwingWindow().setFocusable(false);

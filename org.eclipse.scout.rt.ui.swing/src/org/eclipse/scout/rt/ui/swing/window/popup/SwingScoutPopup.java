@@ -21,6 +21,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -54,12 +57,13 @@ public class SwingScoutPopup implements ISwingScoutView {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutPopup.class);
 
   private ISwingEnvironment m_env;
-  private int m_fixedWidth;
   private EventListenerList m_listenerList;
   private P_SwingScoutRootListener m_swingScoutRootListener;
   private Component m_ownerComponent;
   private Rectangle m_ownerBounds;
   private JWindowEx m_swingWindow;
+  private boolean m_resizable;
+  private P_ResizeListener m_resizeListener;
   // cache
   private boolean m_maximized;
   private boolean m_positionBelowReferenceField;// ticket 76521
@@ -67,17 +71,16 @@ public class SwingScoutPopup implements ISwingScoutView {
   private boolean m_opened;
   private boolean m_closeFired;
 
-  public SwingScoutPopup(ISwingEnvironment env, Component ownerComponent, Rectangle ownerBounds) {
-    this(env, ownerComponent, ownerBounds, 0);
-  }
+  private int m_fixedWidth;
+  private boolean m_popupOnField;
 
-  public SwingScoutPopup(ISwingEnvironment env, Component ownerComponent, Rectangle ownerBounds, int fixedWidth) {
+  public SwingScoutPopup(ISwingEnvironment env, Component ownerComponent, Rectangle ownerBounds) {
     m_env = env;
     m_ownerComponent = ownerComponent;
     m_ownerBounds = ownerBounds;
     m_listenerList = new EventListenerList();
-    m_fixedWidth = fixedWidth;
     m_positionBelowReferenceField = true;
+    m_resizeListener = new P_ResizeListener();
     //
     Window w = SwingUtilities.getWindowAncestor(m_ownerComponent);
     m_swingWindow = new JWindowEx(w);
@@ -99,34 +102,75 @@ public class SwingScoutPopup implements ISwingScoutView {
     m_swingWindow.pack();
   }
 
+  public int getFixedWidth() {
+    return m_fixedWidth;
+  }
+
+  public void setFixedWidth(int fixedWidth) {
+    m_fixedWidth = fixedWidth;
+  }
+
+  public boolean isPopupOnField() {
+    return m_popupOnField;
+  }
+
+  public void setPopupOnField(boolean popupOnField) {
+    m_popupOnField = popupOnField;
+  }
+
+  public boolean isPopupBelow() {
+    return m_positionBelowReferenceField;
+  }
+
   public void autoAdjustBounds() {
     try {
       if (m_ownerComponent.isShowing()) {
+        if (m_ownerBounds.width == 0 && m_ownerBounds.height == 0) {
+          m_ownerBounds.setSize(m_ownerComponent.getWidth(), m_ownerComponent.getHeight());
+        }
+
         m_swingWindow.validate();
         m_swingWindow.getRootPane().revalidate();
         //
-        Dimension d = m_swingWindow.getPreferredSize();
-        int minWidth;
-        if (m_fixedWidth > 0) {
-          d.width = m_fixedWidth;
-          minWidth = m_fixedWidth;
+        Dimension dimPref = m_swingWindow.getPreferredSize();
+        Dimension dimMin = m_swingWindow.getMinimumSize();
+
+        if (getFixedWidth() > 0) {
+          dimPref.width = getFixedWidth();
+          dimMin.width = getFixedWidth();
+        }
+        else if (!m_swingWindow.isPreferredSizeSet()) {
+          // ensure minimal with because calculated by layout manager
+          dimPref.width = Math.max(m_env.getFormColumnWidth() / 2, dimPref.width);
+          dimMin.width = Math.max(m_env.getFormColumnWidth() / 2, dimMin.width);
+        }
+
+        // ensure preferred width to be at least as mininum width
+        dimPref.width = Math.max(dimPref.width, dimMin.width);
+        // ensure preferred height to be at least as mininum height
+        dimPref.height = Math.max(dimPref.height, dimMin.height);
+
+        Point p = m_ownerBounds.getLocation();
+        Point above = new Point(p.x, p.y);
+        if (m_popupOnField) {
+          above.y += m_ownerBounds.height;
         }
         else {
-          d.width = Math.max(m_env.getFormColumnWidth() / 2, d.width);
-          minWidth = Math.max(m_env.getFormColumnWidth() / 2, m_swingWindow.getMinimumSize().width);
+          above.y -= 2;
         }
-        Point p = m_ownerBounds.getLocation();
-        Point above = new Point(p.x, p.y - 2);
-        Rectangle aboveView = SwingUtility.intersectRectangleWithScreen(new Rectangle(above.x, above.y - d.height, d.width, d.height), false, false);
-        if (aboveView.width < minWidth) {
-          aboveView.x = aboveView.x + aboveView.width - minWidth;
-          aboveView.width = minWidth;
+        Rectangle aboveView = SwingUtility.intersectRectangleWithScreen(new Rectangle(above.x, above.y - dimPref.height, dimPref.width, dimPref.height), false, false);
+        if (aboveView.width < dimMin.width) {
+          aboveView.x = aboveView.x + aboveView.width - dimMin.width;
+          aboveView.width = dimMin.width;
         }
-        Point below = new Point(p.x, p.y + 2 + m_ownerBounds.height);
-        Rectangle belowView = SwingUtility.intersectRectangleWithScreen(new Rectangle(below.x, below.y, d.width, d.height), false, false);
-        if (belowView.width < minWidth) {
-          belowView.x = belowView.x + belowView.width - minWidth;
-          belowView.width = minWidth;
+        Point below = new Point(p.x, p.y);
+        if (!m_popupOnField) {
+          below.y += (m_ownerBounds.height + 2);
+        }
+        Rectangle belowView = SwingUtility.intersectRectangleWithScreen(new Rectangle(below.x, below.y, dimPref.width, dimPref.height), false, false);
+        if (belowView.width < dimMin.width) {
+          belowView.x = belowView.x + belowView.width - dimMin.width;
+          belowView.width = dimMin.width;
         }
         // decide based on the preference positionBelowReferenceField
         Rectangle currentView = (m_positionBelowReferenceField ? belowView : aboveView);
@@ -147,12 +191,32 @@ public class SwingScoutPopup implements ISwingScoutView {
       }
     }
     catch (Throwable t) {
-      // this should not happen!
+      LOG.error("Unexpected", t);
     }
   }
 
   public Window getSwingWindow() {
     return m_swingWindow;
+  }
+
+  public boolean isResizable() {
+    return m_resizable;
+  }
+
+  public void setResizable(boolean resizable) {
+    if (m_resizable == resizable) {
+      return;
+    }
+    m_resizable = resizable;
+
+    if (resizable) {
+      m_swingWindow.addMouseListener(m_resizeListener);
+      m_swingWindow.addMouseMotionListener(m_resizeListener);
+    }
+    else {
+      m_swingWindow.removeMouseListener(m_resizeListener);
+      m_swingWindow.removeMouseMotionListener(m_resizeListener);
+    }
   }
 
   public Component getSwingOwnerComponent() {
@@ -393,5 +457,106 @@ public class SwingScoutPopup implements ISwingScoutView {
     public void windowClosed(WindowEvent e) {
       handleSwingWindowClosed();
     }
+  }// end private class
+
+  private class P_ResizeListener extends MouseAdapter implements MouseMotionListener {
+
+    private static final int NO_RESIZE = 0;
+    private static final int RESIZE_EAST = 1 << 1;
+    private static final int RESIZE_SOUTH = 1 << 2;
+    private static final int RESIZE_NORTH = 1 << 3;
+
+    private int m_direction = NO_RESIZE;
+
+    @Override
+    public void mouseReleased(MouseEvent mouseEvent) {
+      m_direction = NO_RESIZE;
+      m_swingWindow.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent mouseEvent) {
+      m_direction = getDirection(mouseEvent);
+      m_swingWindow.setCursor(getCursor(m_direction));
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent mouseEvent) {
+      Rectangle originalBounds = m_swingWindow.getBounds();
+      Rectangle newBounds = new Rectangle(originalBounds);
+      Point mousePosition = mouseEvent.getPoint();
+      SwingUtilities.convertPointToScreen(mousePosition, m_swingWindow);
+      if ((m_direction & RESIZE_EAST) > 0) {
+        int xEast = originalBounds.x + originalBounds.width;
+        int delta = mousePosition.x - xEast;
+        newBounds.width = Math.max(m_swingWindow.getMinimumSize().width, originalBounds.width + delta);
+      }
+      if ((m_direction & RESIZE_SOUTH) > 0) {
+        int yBottom = originalBounds.y + originalBounds.height;
+        int delta = mousePosition.y - yBottom;
+        newBounds.height = Math.max(m_swingWindow.getMinimumSize().height, originalBounds.height + delta);
+      }
+      if ((m_direction & RESIZE_NORTH) > 0) {
+        int yTop = originalBounds.y;
+        int delta = yTop - mousePosition.y;
+        newBounds.height = Math.max(m_swingWindow.getMinimumSize().height, originalBounds.height + delta);
+        newBounds.y = yTop + originalBounds.height - newBounds.height;
+      }
+      m_swingWindow.setBounds(newBounds);
+      m_swingWindow.validate();
+      m_swingWindow.repaint();
+    }
+
+    private int getDirection(MouseEvent event) {
+      Dimension dimension = m_swingWindow.getSize();
+      Insets insets = m_swingWindow.getRootPane().getInsets();
+
+      int eastBorder = dimension.width - insets.right;
+      int bottomBorder = dimension.height - insets.bottom;
+      int topBorder = insets.bottom;
+      Point mousePosition = event.getPoint();
+
+      int direction = NO_RESIZE;
+      if (mousePosition.x >= eastBorder) {
+        direction |= RESIZE_EAST;
+      }
+      if (isPopupBelow()) {
+        if (mousePosition.y >= bottomBorder) {
+          direction |= RESIZE_SOUTH;
+        }
+      }
+      else {
+        if (mousePosition.y <= topBorder) {
+          direction |= RESIZE_NORTH;
+        }
+      }
+      return direction;
+    }
+
+    private Cursor getCursor(int direction) {
+      int cursorType = Cursor.DEFAULT_CURSOR;
+      switch (direction) {
+        case RESIZE_EAST:
+          cursorType = Cursor.E_RESIZE_CURSOR;
+          break;
+        case RESIZE_SOUTH:
+          cursorType = Cursor.S_RESIZE_CURSOR;
+          break;
+        case RESIZE_NORTH:
+          cursorType = Cursor.N_RESIZE_CURSOR;
+          break;
+        case (RESIZE_SOUTH | RESIZE_EAST):
+          cursorType = Cursor.SE_RESIZE_CURSOR;
+          break;
+        case (RESIZE_NORTH | RESIZE_EAST):
+          cursorType = Cursor.NE_RESIZE_CURSOR;
+          break;
+        default:
+          cursorType = Cursor.DEFAULT_CURSOR;
+      }
+
+      return Cursor.getPredefinedCursor(cursorType);
+    }
+
   }// end private class
 }

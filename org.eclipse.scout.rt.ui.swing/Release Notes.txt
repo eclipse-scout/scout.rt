@@ -428,3 +428,15 @@ Added the following UI properties, which can be customized by setting the UI def
 - Splash.versionFont and Splash.statusTextFont (a Scout FontSpec string, see org.eclipse.scout.rt.shared.data.basic.FontSpec)
 Migration:
 None
+
+25.10.2011 dwi
+BSI ticket #99'518
+Bugzilla 347726
+Problem:
+In a table with multi-line text support, the String cell-editor should overflow the cell's dimension to enhance usability.
+It should be implemented a similar way as in Excel.
+Solution:
+When editing such a cell, a smartfield-like popup comes up to enter text. If the row already spanned multiple textlines, the popup merges with the cell-editor's dimension so you do not realize it is about a popup.
+It is further possible to resize that popup. The default size of that popup can be changed by setting 'WidthInPixel' and 'HeightInPixel' on the String field. That would be done in the 'prepareEditInternal' method of the string column.
+Migration:
+None

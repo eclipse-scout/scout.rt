@@ -94,6 +94,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
+import org.eclipse.scout.rt.ui.swing.basic.table.celleditor.SwingScoutTableCellEditor;
 import org.eclipse.scout.rt.ui.swing.dnd.TransferHandlerEx;
 import org.eclipse.scout.rt.ui.swing.ext.HtmlViewCache;
 import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;

@@ -305,7 +305,8 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
       popupContent.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(SwingUtility.createKeystroke("ESCAPE"), "escape");
       popupContent.getActionMap().put("escape", escAction);
       //show popup (focusComponent must be null! to allow focus in popup window)
-      m_proposalPopup = new SwingScoutDropDownPopup(getSwingEnvironment(), textField, textField, 100);
+      m_proposalPopup = new SwingScoutDropDownPopup(getSwingEnvironment(), textField, textField);
+      m_proposalPopup.setFixedWidth(100);
       m_proposalPopup.makeNonFocusable();
       m_proposalPopup.addSwingScoutViewListener(new SwingScoutViewListener() {
         @Override
