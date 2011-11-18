@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.swt.form.fields.datefield;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
@@ -22,6 +24,7 @@ import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
+import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.fields.datefield.chooser.TimeChooserDialog;
@@ -34,13 +37,18 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-public class SwtScoutTimeField extends SwtScoutValueFieldComposite<IDateField> implements ISwtScoutTimeField {
+public class SwtScoutTimeField extends SwtScoutValueFieldComposite<IDateField> implements ISwtScoutTimeField, IPopupSupport {
   private ButtonEx m_timeChooserButton;
   private TextFieldEditableSupport m_editableSupport;
+
+  private Set<IPopupSupportListener> m_popupEventListeners;
+  private Object m_popupEventListenerLock;
 
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
+    m_popupEventListeners = new HashSet<IPopupSupportListener>();
+    m_popupEventListenerLock = new Object();
     int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
     StatusLabelEx label = new StatusLabelEx(container, labelStyle, getEnvironment());
     getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
@@ -153,13 +161,45 @@ public class SwtScoutTimeField extends SwtScoutValueFieldComposite<IDateField> i
       if (d == null) {
         d = new Date();
       }
-      TimeChooserDialog dialog = new TimeChooserDialog(getSwtField().getShell(), d, getEnvironment());
-      Date newDate = dialog.openDateChooser(getSwtField());
-      if (newDate != null) {
-        getSwtField().setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(newDate));
-        handleSwtInputVerifier();
+      notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
+      try {
+        TimeChooserDialog dialog = new TimeChooserDialog(getSwtField().getShell(), d, getEnvironment());
+        Date newDate = dialog.openDateChooser(getSwtField());
+        if (newDate != null) {
+          getSwtField().setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(newDate));
+          handleSwtInputVerifier();
+        }
       }
-      getSwtField().setFocus();
+      finally {
+        notifyPopupEventListeners(IPopupSupportListener.TYPE_CLOSED);
+        if (!getSwtField().isDisposed()) {
+          getSwtField().setFocus();
+        }
+      }
+    }
+  }
+
+  private void notifyPopupEventListeners(int eventType) {
+    IPopupSupportListener[] listeners;
+    synchronized (m_popupEventListenerLock) {
+      listeners = m_popupEventListeners.toArray(new IPopupSupportListener[m_popupEventListeners.size()]);
+    }
+    for (IPopupSupportListener listener : listeners) {
+      listener.handleEvent(eventType);
+    }
+  }
+
+  @Override
+  public void addPopupEventListener(IPopupSupportListener listener) {
+    synchronized (m_popupEventListenerLock) {
+      m_popupEventListeners.add(listener);
+    }
+  }
+
+  @Override
+  public void removePopupEventListener(IPopupSupportListener listener) {
+    synchronized (m_popupEventListenerLock) {
+      m_popupEventListeners.remove(listener);
     }
   }
 

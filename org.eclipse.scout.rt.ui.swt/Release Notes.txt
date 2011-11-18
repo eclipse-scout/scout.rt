@@ -151,3 +151,32 @@ Plug-Ins changed:
 - org.eclipse.scout.rt.ui.rap
 Migration:
 None
+
+25.10.2011 dwi
+BSI ticket #107'237
+Bugzilla 361795
+Problem:
+Decorating a Date or a Number has to use NlsLocale-Settings.
+Currently, Locale.getLocal() is used which may contradict with user-settings.
+Solution:
+NLSLocale / is considered
+Plug-Ins changed:
+- org.eclipse.scout.commons
+- org.eclipse.scout.rt.ui.swt
+- org.eclipse.scout.rt.ui.swing
+- org.eclipse.scout.rt.ui.rap
+Migration:
+None
+
+25.10.2011 dwi
+BSI ticket #99'518
+Bugzilla 347726
+Problem:
+In a table with multi-line text support, the String cell-editor should overflow the cell's dimension to enhance usability.
+It should be implemented a similar way as in Excel.
+Solution:
+When editing such a cell, a smartfield-like popup comes up to enter text. If the row already spanned multiple textlines, the popup merges with the cell-editor's dimension so you do not realize it is about a popup.
+In Swing, it is further possible to resize that popup. The default size of that popup can be changed by setting 'WidthInPixel' and 'HeightInPixel' on the String field. That would be done in the 'prepareEditInternal' method of the string column.
+Migration:
+None
+

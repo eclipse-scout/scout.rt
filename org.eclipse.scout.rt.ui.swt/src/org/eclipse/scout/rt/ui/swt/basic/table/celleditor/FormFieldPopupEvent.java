@@ -8,40 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt.window;
+package org.eclipse.scout.rt.ui.swt.basic.table.celleditor;
 
 import java.util.EventObject;
 
-public class SwtScoutPartEvent extends EventObject {
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+
+public class FormFieldPopupEvent extends EventObject {
+
   private static final long serialVersionUID = 1L;
 
-  /**
-   * the part is opening but not yet open
-   */
-  public static final int TYPE_OPENING = 10;
-
-  /**
-   * the part is open but not yet active
-   */
-  public static final int TYPE_OPENED = 20;
-  /**
-   * the part is active
-   */
-  public static final int TYPE_ACTIVATED = 30;
-  /**
-   * the part is requesting closing but remains open
-   */
-  public static final int TYPE_CLOSING = 40;
-  /**
-   * the part is closed
-   */
-  public static final int TYPE_CLOSED = 50;
+  public static final int TYPE_OK = 1 << 0;
+  public static final int TYPE_CANCEL = 1 << 1;
+  public static final int TYPE_OPEN = 1 << 2;
+  public static final int TYPE_FOCUS_NEXT = 1 << 3;
+  public static final int TYPE_FOCUS_BACK = 1 << 4;
 
   private int m_type;
 
-  public boolean doit = true;
-
-  public SwtScoutPartEvent(ISwtScoutPart source, int type) {
+  public FormFieldPopupEvent(IFormField source, int type) {
     super(source);
     m_type = type;
   }
@@ -50,4 +35,8 @@ public class SwtScoutPartEvent extends EventObject {
     return m_type;
   }
 
+  @Override
+  public IFormField getSource() {
+    return (IFormField) super.getSource();
+  }
 }

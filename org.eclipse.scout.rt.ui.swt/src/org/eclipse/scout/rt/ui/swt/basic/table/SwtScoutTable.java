@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
+import org.eclipse.scout.rt.ui.swt.basic.table.celleditor.SwtScoutTableCellEditor;
 import org.eclipse.scout.rt.ui.swt.ext.table.TableEx;
 import org.eclipse.scout.rt.ui.swt.ext.table.util.TableRolloverSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.AbstractSwtScoutDndSupport;

@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class SwtScoutPopup implements ISwtScoutPart {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutPopup.class);
+  public static final String PROP_POPUP_OWNER = "propPopupOwner";
 
   private ISwtEnvironment m_env;
   private Control m_ownerComponent;
@@ -52,20 +53,28 @@ public class SwtScoutPopup implements ISwtScoutPart {
   private IForm m_scoutForm;
   private boolean m_positionBelowReferenceField;
   private boolean m_opened;
+  private boolean m_popupOnField;
+
+  private int m_widthHint;
+  private int m_heightHint;
 
   private ISwtScoutForm m_uiForm;
 
-  public SwtScoutPopup(ISwtEnvironment env, Control ownerComponent, Rectangle ownerBounds) {
+  public SwtScoutPopup(ISwtEnvironment env, Control ownerComponent, Rectangle ownerBounds, int style) {
     m_env = env;
     m_positionBelowReferenceField = true;
     m_ownerComponent = ownerComponent;
     m_ownerBounds = ownerBounds;
     m_listenerList = new EventListenerList();
-    //
-    m_swtWindow = new Shell(ownerComponent.getShell(), SWT.RESIZE);
+
+    m_widthHint = SWT.DEFAULT;
+    m_heightHint = SWT.DEFAULT;
+
+    m_swtWindow = new Shell(ownerComponent.getShell(), style);
     m_swtWindow.setData("extendedStyle", SWT.POP_UP);
     m_swtWindow.setLayout(new FillLayout());
     m_swtWindow.addDisposeListener(new P_SwtWindowDisposeListener());
+
     // content pane
     m_swtWindowContentPane = env.getFormToolkit().createComposite(m_swtWindow, SWT.NONE);
     m_swtWindowContentPane.setLayout(new FillLayout());
@@ -75,6 +84,49 @@ public class SwtScoutPopup implements ISwtScoutPart {
     return m_swtWindow;
   }
 
+  public void setBounds(Rectangle bounds) {
+    getShell().setBounds(bounds);
+    getShell().layout(true, true);
+  }
+
+  public boolean isPopupOnField() {
+    return m_popupOnField;
+  }
+
+  public void setPopupOnField(boolean popupOnField) {
+    m_popupOnField = popupOnField;
+  }
+
+  public boolean isPopupBelow() {
+    return m_positionBelowReferenceField;
+  }
+
+  public int getWidthHint() {
+    return m_widthHint;
+  }
+
+  public void setWidthHint(int widthHint) {
+    if (widthHint > 0) {
+      m_widthHint = widthHint;
+    }
+    else {
+      m_widthHint = SWT.DEFAULT;
+    }
+  }
+
+  public int getHeightHint() {
+    return m_heightHint;
+  }
+
+  public void setHeightHint(int heightHint) {
+    if (heightHint > 0) {
+      m_heightHint = heightHint;
+    }
+    else {
+      m_heightHint = SWT.DEFAULT;
+    }
+  }
+
   public void showForm(IForm scoutForm) throws ProcessingException {
     m_opened = true;
     if (m_scoutForm == null) {
@@ -82,6 +134,7 @@ public class SwtScoutPopup implements ISwtScoutPart {
       m_uiForm = m_env.createForm(getSwtContentPane(), scoutForm);
       autoAdjustBounds();
       if (m_opened) {
+        handleSwtWindowOpening();
         //open and activate, do NOT just call setVisible(true)
         m_swtWindow.open();
         autoAdjustBounds();
@@ -105,8 +158,8 @@ public class SwtScoutPopup implements ISwtScoutPart {
         m_swtWindow.dispose();
       }
     }
-    catch (Throwable e1) {
-      LOG.error("Failed closing popup for " + m_scoutForm, e1);
+    catch (Throwable t) {
+      LOG.error("Failed closing popup for " + m_scoutForm, t);
     }
   }
 
@@ -121,33 +174,42 @@ public class SwtScoutPopup implements ISwtScoutPart {
   }
 
   public void autoAdjustBounds() {
-    if (!getShell().isDisposed()) {
-      //invalidate all layouts
-      getShell().layout(true, true);
-      Point d = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-      d.x = Math.max(d.x, UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutDefaultColumnWidth());
-      d.y = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight(), d.y);
-      Point p = new Point(m_ownerBounds.x, m_ownerBounds.y);
-      Point above = new Point(p.x, p.y);
-      Rectangle aboveView = SwtUtility.intersectRectangleWithScreen(getShell().getDisplay(), new Rectangle(above.x, above.y - d.y, d.x, d.y), false, false);
-      Point below = new Point(p.x, p.y + m_ownerBounds.height);
-      Rectangle belowView = SwtUtility.intersectRectangleWithScreen(getShell().getDisplay(), new Rectangle(below.x, below.y, d.x, d.y), false, false);
-      // decide based on the preference positionBelowReferenceField
-      Rectangle currentView = m_positionBelowReferenceField ? belowView : aboveView;
-      Rectangle alternateView = m_positionBelowReferenceField ? aboveView : belowView;
-      Rectangle newView;
-      if (currentView.height >= alternateView.height) {
-        newView = currentView;
-      }
-      else {
-        newView = alternateView;
-        // toggle preference
-        m_positionBelowReferenceField = !m_positionBelowReferenceField;
-      }
-      if (!newView.equals(getShell().getBounds())) {
-        getShell().setBounds(newView);
-        getShell().layout(true, true);
-      }
+    if (getShell().isDisposed()) {
+      return;
+    }
+    if (m_ownerComponent.isDisposed()) {
+      LOG.warn("Unexpected: Owner component of popup is disposed");
+      return;
+    }
+    //invalidate all layouts
+    getShell().layout(true, true);
+    Point dim = getShell().computeSize(m_widthHint, m_heightHint, true);
+    dim.x = Math.max(dim.x, UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutDefaultColumnWidth());
+    dim.y = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight(), dim.y);
+
+    Point p = m_ownerComponent.toDisplay(new Point(-m_ownerComponent.getBorderWidth(), 0));
+    Point above = new Point(p.x, p.y);
+    if (m_popupOnField) {
+      above.y += m_ownerComponent.getBounds().height;
+    }
+
+    Rectangle aboveView = SwtUtility.intersectRectangleWithScreen(getShell().getDisplay(), new Rectangle(above.x, above.y - dim.y, dim.x, dim.y), false, false);
+    Point below = new Point(p.x, p.y);
+    if (!m_popupOnField) {
+      below.y += m_ownerComponent.getBounds().height;
+    }
+
+    Rectangle belowView = SwtUtility.intersectRectangleWithScreen(getShell().getDisplay(), new Rectangle(below.x, below.y, dim.x, dim.y), false, false);
+    // decide based on the preference positionBelowReferenceField
+    Rectangle currentView = m_positionBelowReferenceField ? belowView : aboveView;
+    Rectangle alternateView = m_positionBelowReferenceField ? aboveView : belowView;
+    if (currentView.height >= alternateView.height) {
+      getShell().setBounds(currentView);
+    }
+    else {
+      getShell().setBounds(alternateView);
+      // toggle preference
+      m_positionBelowReferenceField = !m_positionBelowReferenceField;
     }
   }
 
@@ -163,7 +225,7 @@ public class SwtScoutPopup implements ISwtScoutPart {
     m_listenerList.remove(SwtScoutPartListener.class, listener);
   }
 
-  private void fireSwtScoutPartEvent(SwtScoutPartEvent e) {
+  protected void fireSwtScoutPartEvent(SwtScoutPartEvent e) {
     if (m_swtWindow != null) {
       EventListener[] listeners = m_listenerList.getListeners(SwtScoutPartListener.class);
       if (listeners != null && listeners.length > 0) {
@@ -172,7 +234,7 @@ public class SwtScoutPopup implements ISwtScoutPart {
             ((SwtScoutPartListener) listener).partChanged(e);
           }
           catch (Throwable t) {
-            t.printStackTrace();
+            LOG.error("Unexpected:", t);
           }
         }
       }
@@ -182,7 +244,6 @@ public class SwtScoutPopup implements ISwtScoutPart {
   @Override
   public boolean isVisible() {
     return m_swtWindow != null && m_swtWindow.getVisible();
-
   }
 
   @Override
@@ -200,12 +261,20 @@ public class SwtScoutPopup implements ISwtScoutPart {
     // void
   }
 
-  private void handleSwtWindowOpened() {
+  protected void handleSwtWindowOpening() {
+    fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutPopup.this, SwtScoutPartEvent.TYPE_OPENING));
+  }
+
+  protected void handleSwtWindowOpened() {
     fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutPopup.this, SwtScoutPartEvent.TYPE_OPENED));
     fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutPopup.this, SwtScoutPartEvent.TYPE_ACTIVATED));
   }
 
-  private void handleSwtWindowClosed() {
+  protected Control getOwnerComponent() {
+    return m_ownerComponent;
+  }
+
+  protected void handleSwtWindowClosed() {
     fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutPopup.this, SwtScoutPartEvent.TYPE_CLOSED));
     Runnable job = new Runnable() {
       @Override

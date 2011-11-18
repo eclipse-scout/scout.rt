@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.smartfield;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,6 +33,7 @@ import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.ext.DropDownButton;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
+import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
@@ -38,7 +41,7 @@ import org.eclipse.scout.rt.ui.swt.keystroke.SwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartListener;
-import org.eclipse.scout.rt.ui.swt.window.popup.SwtScoutSmartFieldPopup;
+import org.eclipse.scout.rt.ui.swt.window.popup.SwtScoutDropDownPopup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusAdapter;
@@ -66,17 +69,20 @@ import org.eclipse.swt.widgets.Widget;
  * 
  * @since 1.0.0 10.04.2008
  */
-public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<?>> implements ISwtScoutSmartField {
+public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<?>> implements ISwtScoutSmartField, IPopupSupport {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutSmartField.class);
 
   private DropDownButton m_browseButton;
   private P_PendingProposalJob m_pendingProposalJob;
   private Object m_pendingProposalJobLock;
   // popup
-  private SwtScoutSmartFieldPopup m_proposalPopup;
+  private SwtScoutDropDownPopup m_proposalPopup;
   private final Object m_popupLock = new Object();
   private Menu m_contextMenu;
   private TextFieldEditableSupport m_editableSupport;
+
+  private Set<IPopupSupportListener> m_popupEventListeners;
+  private Object m_popupEventListenerLock;
 
   public SwtScoutSmartField() {
     m_pendingProposalJobLock = new Object();
@@ -84,6 +90,9 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected void initializeSwt(Composite parent) {
+    m_popupEventListeners = new HashSet<IPopupSupportListener>();
+    m_popupEventListenerLock = new Object();
+
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
     StatusLabelEx label = new StatusLabelEx(container, labelStyle, getEnvironment());
@@ -231,33 +240,35 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     // close old
     if (m_proposalPopup != null) {
       if (m_proposalPopup.isVisible()) {
-        try {
-          m_proposalPopup.closePart();
-        }
-        catch (ProcessingException e) {
-          LOG.warn("could not close popup.", e);
-        }
+        m_proposalPopup.closePart();
       }
       m_proposalPopup = null;
     }
     // show new
     if (form != null) {
       if (getSwtField().isFocusControl()) {
-        m_proposalPopup = new SwtScoutSmartFieldPopup(getEnvironment(), getSwtField(), getSwtField());
+        m_proposalPopup = new SwtScoutDropDownPopup(getEnvironment(), getSwtField(), getSwtField(), SWT.RESIZE);
         m_proposalPopup.addSwtScoutPartListener(new SwtScoutPartListener() {
           @Override
           public void partChanged(SwtScoutPartEvent e) {
             switch (e.getType()) {
-              case SwtScoutPartEvent.TYPE_CLOSED:
-              if (m_proposalPopup != null) {
-                m_proposalPopup = null;
+              case SwtScoutPartEvent.TYPE_OPENING: {
+                notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
+                break;
               }
-              break;
-            case SwtScoutPartEvent.TYPE_CLOSING:
-              hideProposalPopup();
-              break;
+              case SwtScoutPartEvent.TYPE_CLOSING: {
+                hideProposalPopup();
+                break;
+              }
+              case SwtScoutPartEvent.TYPE_CLOSED: {
+                if (m_proposalPopup != null) {
+                  m_proposalPopup = null;
+                  notifyPopupEventListeners(IPopupSupportListener.TYPE_CLOSED);
+                }
+                break;
+              }
+            }
           }
-        }
         });
         m_proposalPopup.getShell().addShellListener(new ShellAdapter() {
           @Override
@@ -310,7 +321,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
               form.doClose();
             }
             catch (ProcessingException e) {
-              e.printStackTrace();
+              LOG.error("could not close smartfield-form", e);
             }
           }
         };
@@ -322,12 +333,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
   protected void hideProposalPopup() {
     synchronized (m_popupLock) {
       if (m_proposalPopup != null && m_proposalPopup.isVisible()) {
-        try {
-          m_proposalPopup.closePart();
-        }
-        catch (ProcessingException e) {
-          LOG.warn("could not close popup.", e);
-        }
+        m_proposalPopup.closePart();
       }
       m_proposalPopup = null;
     }
@@ -522,6 +528,30 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
 
   }
 
+  private void notifyPopupEventListeners(int eventType) {
+    IPopupSupportListener[] listeners;
+    synchronized (m_popupEventListenerLock) {
+      listeners = m_popupEventListeners.toArray(new IPopupSupportListener[m_popupEventListeners.size()]);
+    }
+    for (IPopupSupportListener listener : listeners) {
+      listener.handleEvent(eventType);
+    }
+  }
+
+  @Override
+  public void addPopupEventListener(IPopupSupportListener listener) {
+    synchronized (m_popupEventListenerLock) {
+      m_popupEventListeners.add(listener);
+    }
+  }
+
+  @Override
+  public void removePopupEventListener(IPopupSupportListener listener) {
+    synchronized (m_popupEventListenerLock) {
+      m_popupEventListeners.remove(listener);
+    }
+  }
+
   private class P_UiFieldListener implements Listener {
 
     @Override
@@ -645,5 +675,4 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
       handleSwtBrowseAction();
     }
   } // end class P_F2KeyStroke
-
 }

@@ -8,26 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt.basic.table;
+package org.eclipse.scout.rt.ui.swt.basic.table.celleditor;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorDeactivationEvent;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
+import org.eclipse.scout.rt.ui.swt.basic.table.ISwtScoutTable;
+import org.eclipse.scout.rt.ui.swt.basic.table.SwtScoutTable;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
+import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport;
+import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport.IPopupSupportListener;
 import org.eclipse.scout.rt.ui.swt.keystroke.SwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
@@ -40,6 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Widget;
 
@@ -54,10 +61,12 @@ public class SwtScoutTableCellEditor {
 
   private final ISwtScoutTable m_tableComposite;
   private final Listener m_rowHeightListener;
-  //cache
-  private boolean m_tableIsEditingAndContainsFocus;
+
+  private P_FocusLostListener m_focusLostListener;
+  private Object m_focusLostListenerLock;
 
   public SwtScoutTableCellEditor(final ISwtScoutTable tableComposite) {
+    m_focusLostListenerLock = new Object();
     m_tableComposite = tableComposite;
     m_rowHeightListener = new Listener() {
       @Override
@@ -105,30 +114,32 @@ public class SwtScoutTableCellEditor {
     else {
       viewer.getTable().removeListener(SWT.MeasureItem, m_rowHeightListener);
     }
-    //add a hysteresis listener that commits the cell editor when the table has first received focus and then lost it
-    m_tableComposite.getEnvironment().getDisplay().addFilter(SWT.FocusIn, new Listener() {
-      @Override
-      public void handleEvent(Event e) {
-        Widget c = e.widget;
-        if (c == null || !(c instanceof Control)) {
-          return;
-        }
-        boolean oldValue = m_tableIsEditingAndContainsFocus;
-        boolean newValue = (SwtUtility.isAncestorOf(m_tableComposite.getSwtField(), (Control) c) || c.getData() instanceof Dialog);
-        m_tableIsEditingAndContainsFocus = newValue;
-        if (oldValue && !newValue) {
-          TableViewer v = m_tableComposite.getSwtTableViewer();
-          if (v.isCellEditorActive()) {
-            for (CellEditor editor : v.getCellEditors()) {
-              if (editor != null && editor.isActivated() && editor instanceof P_SwtCellEditor) {
-                ((P_SwtCellEditor) editor).focusLost();
-                break;
-              }
-            }
-          }
-        }
+  }
+
+  /**
+   * Installs a listener to close all active cell editors if the table looses the focus
+   */
+  private void installFocusLostListener() {
+    synchronized (m_focusLostListenerLock) {
+      if (m_focusLostListener == null) {
+        m_focusLostListener = new P_FocusLostListener();
+        m_tableComposite.getEnvironment().getDisplay().addFilter(SWT.FocusIn, m_focusLostListener);
       }
-    });
+    }
+
+    // ensure cell editors only to be active if focus is on table
+    Event event = new Event();
+    event.widget = m_tableComposite.getEnvironment().getDisplay().getFocusControl();
+    m_focusLostListener.handleEvent(event);
+  }
+
+  private void uninstallFocusLostListener() {
+    synchronized (m_focusLostListenerLock) {
+      if (m_focusLostListener != null) {
+        m_tableComposite.getEnvironment().getDisplay().removeFilter(SWT.FocusIn, m_focusLostListener);
+        m_focusLostListener = null;
+      }
+    }
   }
 
   protected Control getEditorControl(Composite parent, ITableRow scoutRow, IColumn<?> scoutCol) {
@@ -165,19 +176,125 @@ public class SwtScoutTableCellEditor {
         }
       }
     }
-    if (fieldRef.get() != null) {
-      return m_tableComposite.getEnvironment().createFormField(parent, fieldRef.get());
-    }
-    else {
+    IFormField formField = fieldRef.get();
+    if (formField == null) {
       return null;
     }
+
+    ISwtScoutComposite swtScoutFormField;
+    if (formField instanceof IStringField && ((IStringField) formField).isMultilineText()) {
+      // for fields to be presented as popup dialog
+      swtScoutFormField = createEditorCompositesPopup(parent, formField, scoutRow, scoutCol);
+    }
+    else {
+      swtScoutFormField = m_tableComposite.getEnvironment().createFormField(parent, formField);
+    }
+
+    // If the SWT field uses a @{Shell} to edit its value, the focus on the table gets lost while the shell is open.
+    // To prevent the cell editor from being closed, the focus lost listener must be uninstalled for the time the shell is open.
+    if (swtScoutFormField instanceof IPopupSupport) {
+      ((IPopupSupport) swtScoutFormField).addPopupEventListener(new IPopupSupportListener() {
+
+        @Override
+        public void handleEvent(int eventType) {
+          if (eventType == IPopupSupportListener.TYPE_OPENING) {
+            uninstallFocusLostListener();
+          }
+          else if (eventType == IPopupSupportListener.TYPE_CLOSED) {
+            installFocusLostListener();
+          }
+        }
+      });
+    }
+    return swtScoutFormField;
+  }
+
+  protected ISwtScoutComposite<? extends IFormField> createEditorCompositesPopup(Composite parent, IFormField formField, final ITableRow scoutRow, final IColumn<?> scoutCol) {
+    // uninstall focus lost listener as new shell is used for popup
+    uninstallFocusLostListener();
+
+    // overwrite layout properties
+    GridData gd = formField.getGridData();
+    gd.h = 1;
+    gd.w = IFormField.FULL_WIDTH;
+    gd.weightY = 1;
+    gd.weightX = 1;
+    formField.setGridDataInternal(gd);
+
+    TableColumn swtCol = getSwtColumn(scoutCol);
+    final P_SwtCellEditor cellEditor = (P_SwtCellEditor) m_tableComposite.getSwtTableViewer().getCellEditors()[getSwtColumnIndex(swtCol)];
+
+    int prefWidth = gd.widthInPixel;
+    int minWidth = swtCol.getWidth();
+    int prefHeight = gd.heightInPixel;
+    int minHeight = Math.max(105, m_tableComposite.getSwtTableViewer().getTable().getItemHeight());
+
+    prefHeight = Math.max(prefHeight, minHeight);
+    prefWidth = Math.max(prefWidth, minWidth);
+
+    // create placeholder field to represent the cell editor
+    Composite cellEditorComposite = new Composite(parent, SWT.NONE);
+
+    // create popup dialog to wrap the form field
+    SwtScoutFormFieldPopup formFieldDialog = new SwtScoutFormFieldPopup(cellEditorComposite);
+    formFieldDialog.setPrefHeight(prefHeight);
+    formFieldDialog.setPrefWidth(prefWidth);
+    formFieldDialog.setMinHeight(minHeight);
+    formFieldDialog.setMinWidth(minWidth);
+    formFieldDialog.createField(parent, formField, m_tableComposite.getEnvironment());
+    formFieldDialog.addEventListener(new IFormFieldPopupEventListener() {
+
+      @Override
+      public void handleEvent(FormFieldPopupEvent event) {
+        // install focus lost listener as shell is closed
+        installFocusLostListener();
+
+        if ((event.getType() & FormFieldPopupEvent.TYPE_OK) > 0) {
+          // save cell editor
+          cellEditor.stopCellEditing();
+        }
+        else if ((event.getType() & FormFieldPopupEvent.TYPE_CANCEL) > 0) {
+          // cancel cell editor
+          cellEditor.cancelCellEditing();
+        }
+
+        // traversal control
+        if ((event.getType() & FormFieldPopupEvent.TYPE_FOCUS_BACK) > 0) {
+          enqueueEditNextTableCell(scoutRow, scoutCol, false);
+        }
+        else if ((event.getType() & FormFieldPopupEvent.TYPE_FOCUS_NEXT) > 0) {
+          enqueueEditNextTableCell(scoutRow, scoutCol, true);
+        }
+      }
+    });
+
+    return formFieldDialog;
+  }
+
+  private TableColumn getSwtColumn(IColumn<?> scoutCol) {
+    for (TableColumn swtCol : m_tableComposite.getSwtTableViewer().getTable().getColumns()) {
+      IColumn<?> candidate = (IColumn<?>) swtCol.getData(SwtScoutTable.KEY_SCOUT_COLUMN);
+      if (candidate != null && CompareUtility.equals(candidate.getColumnId(), scoutCol.getColumnId())) {
+        return swtCol;
+      }
+    }
+    return null;
+  }
+
+  private int getSwtColumnIndex(TableColumn swtCol) {
+    Table table = m_tableComposite.getSwtTableViewer().getTable();
+    for (int i = 0; i < table.getColumnCount(); i++) {
+      if (table.getColumn(i) == swtCol) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   protected void decorateEditorComposite(ISwtScoutComposite<? extends IFormField> editorComposite, final ITableRow scoutRow, final IColumn<?> scoutCol) {
   }
 
   protected void saveEditorFromSwt() {
-    m_tableIsEditingAndContainsFocus = false;
     Runnable t = new Runnable() {
       @Override
       public void run() {
@@ -188,7 +305,6 @@ public class SwtScoutTableCellEditor {
   }
 
   protected void cancelEditorFromSwt() {
-    m_tableIsEditingAndContainsFocus = false;
     Runnable t = new Runnable() {
       @Override
       public void run() {
@@ -325,7 +441,6 @@ public class SwtScoutTableCellEditor {
     @Override
     protected void doSetFocus() {
       m_container.traverse(SWT.TRAVERSE_TAB_NEXT);
-      m_tableIsEditingAndContainsFocus = true;
       Control focusControl = m_container.getDisplay().getFocusControl();
       if (focusControl != null && !SwtUtility.isAncestorOf(m_container, focusControl)) {
         focusControl = null;
@@ -376,9 +491,10 @@ public class SwtScoutTableCellEditor {
 
     @Override
     public void activate(ColumnViewerEditorActivationEvent e) {
+      installFocusLostListener();
+
       m_editScoutRow = null;
       m_editScoutCol = null;
-      m_tableIsEditingAndContainsFocus = false;
       if (e.getSource() instanceof ViewerCell) {
         ViewerCell cell = (ViewerCell) e.getSource();
         TableViewer viewer = m_tableComposite.getSwtTableViewer();
@@ -404,6 +520,8 @@ public class SwtScoutTableCellEditor {
 
     @Override
     protected void deactivate(ColumnViewerEditorDeactivationEvent e) {
+      uninstallFocusLostListener();
+
       m_editScoutRow = null;
       m_editScoutCol = null;
       for (Control c : m_container.getChildren()) {
@@ -415,9 +533,45 @@ public class SwtScoutTableCellEditor {
       }
     }
 
+    public void stopCellEditing() {
+      fireApplyEditorValue();
+      deactivate();
+    }
+
+    public void cancelCellEditing() {
+      fireCancelEditor();
+      deactivate();
+    }
+  }
+
+  /**
+   * Hysteresis listener that commits the cell editor when the table has first received focus and then lost it. That is
+   * because cell editors in SWT are not closed automatically if the table looses the focus.
+   */
+  private class P_FocusLostListener implements Listener {
+
     @Override
-    public void focusLost() {
-      super.focusLost();
+    public void handleEvent(Event event) {
+      Widget w = event.widget;
+      if (w == null || !(w instanceof Control) || w.isDisposed()) {
+        return;
+      }
+      TableViewer viewer = m_tableComposite.getSwtTableViewer();
+      if (!viewer.isCellEditorActive()) {
+        return;
+      }
+
+      Control candidate = (Control) w;
+      Control tableControl = m_tableComposite.getSwtTableViewer().getControl();
+
+      if (!SwtUtility.isAncestorOf(tableControl, candidate)) {
+        for (CellEditor editor : viewer.getCellEditors()) {
+          if (editor != null && editor.isActivated() && editor instanceof P_SwtCellEditor) {
+            ((P_SwtCellEditor) editor).stopCellEditing();
+            break;
+          }
+        }
+      }
     }
   }
 }

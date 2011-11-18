@@ -1102,7 +1102,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       ownerBounds.x = pDisp.x;
       ownerBounds.y = pDisp.y;
     }
-    final SwtScoutPopup popup = new SwtScoutPopup(this, owner, ownerBounds);
+    final SwtScoutPopup popup = new SwtScoutPopup(this, owner, ownerBounds, SWT.RESIZE);
     popup.addSwtScoutPartListener(new SwtScoutPartListener() {
       @Override
       public void partChanged(SwtScoutPartEvent e) {
