@@ -148,7 +148,7 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
         closePopup(FormFieldPopupEvent.TYPE_CANCEL);
       }
     });
-    
+
     // TAB back
     component.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, new HashSet<AWTKeyStroke>());
     component.getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("shift TAB"), "reverse-tab");
@@ -160,9 +160,9 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
         closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_BACK);
       }
     });
-    
+
     // TAB / CTRL-TAB
-    // forward-focus-traversal key (TAB) cannot be installed by the component's action map because 
+    // forward-focus-traversal key (TAB) cannot be installed by the component's action map because
     // TAB / CTRL-TAB cannot be intercepted separately that way. This is required to support tabs within the field.
     // Also, if using KeyListener to intercept TAB events, there is a slightly hack necessary, because the CTRL
     // modifier is lost.
@@ -175,7 +175,7 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
         if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
           m_controlDown = true;
         }
-        if (e.getKeyCode() == KeyEvent.VK_TAB && !m_controlDown) {
+        if (e.getKeyCode() == KeyEvent.VK_TAB && !m_controlDown && !e.isShiftDown()) {
           closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_NEXT);
         }
       }
