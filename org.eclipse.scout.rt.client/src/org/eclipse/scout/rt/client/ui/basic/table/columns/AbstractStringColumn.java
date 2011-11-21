@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
@@ -146,10 +145,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     f.setInputMasked(isInputMasked());
     boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
     f.setMultilineText(multi);
-    f.setWrapText(true); //Avoid to have an horizontal scroll bar
-    GridData gd = f.getGridData();
-    gd.h = 4;
-    f.setGridDataInternal(gd);
+    f.setWrapText(true); // avoid to have an horizontal scroll bar
     return f;
   }
 
