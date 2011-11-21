@@ -139,7 +139,9 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     }
     // desktop pane
     JPanel spacerPanel = new JPanelEx();
-    spacerPanel.setBorder(new EmptyBorder(0, 1, 3, 1));
+    if (!SwingUtility.isSynth()) {
+      spacerPanel.setBorder(new EmptyBorder(0, 1, 3, 1));
+    }
     spacerPanel.setName("RootFrame.Spacer");
     spacerPanel.setLayout(new SingleLayout());
     if (UIManager.get("desktop") != null) {
