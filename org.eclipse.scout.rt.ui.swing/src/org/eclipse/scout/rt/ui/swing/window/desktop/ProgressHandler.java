@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.window.desktop.status.SwingProgressMonitor;
 import org.eclipse.scout.rt.ui.swing.window.desktop.status.SwingProgressProvider;
@@ -115,14 +114,16 @@ public class ProgressHandler {
 
     @Override
     public void actionPerformed(ActionEvent a) {
-      Job[] jobs = Job.getJobManager().find(ClientJob.class);
+      Job[] jobs = Job.getJobManager().find(null);
       if (jobs != null) {
         for (Job j : jobs) {
-          try {
-            j.cancel();
-          }
-          catch (Throwable t) {
-            //nop
+          if (!j.isSystem() && j.getState() == Job.RUNNING) {
+            try {
+              j.cancel();
+            }
+            catch (Throwable t) {
+              //nop
+            }
           }
         }
       }

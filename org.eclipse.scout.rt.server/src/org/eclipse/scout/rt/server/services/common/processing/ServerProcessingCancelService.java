@@ -19,7 +19,7 @@ import org.eclipse.scout.service.AbstractService;
 public class ServerProcessingCancelService extends AbstractService implements IServerProcessingCancelService {
 
   @Override
-  public void cancel(long transcationSequence) {
-    ActiveTransactionRegistry.cancel(transcationSequence);
+  public boolean cancel(long transcationSequence) {
+    return ActiveTransactionRegistry.cancel(transcationSequence);
   }
 }

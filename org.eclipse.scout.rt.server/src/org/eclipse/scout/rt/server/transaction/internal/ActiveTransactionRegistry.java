@@ -53,8 +53,8 @@ public class ActiveTransactionRegistry {
       LOG.error("failed to register transaction due to missing session");
       return;
     }
-    synchronized (state.m_statementMapLock) {
-      state.m_statementMap.put(tx.getTransactionSequence(), new WeakReference<ITransaction>(tx));
+    synchronized (state.m_txMapLock) {
+      state.m_txMap.put(tx.getTransactionSequence(), new WeakReference<ITransaction>(tx));
     }
   }
 
@@ -66,35 +66,38 @@ public class ActiveTransactionRegistry {
     if (state == null) {
       return;
     }
-    synchronized (state.m_statementMapLock) {
-      state.m_statementMap.remove(tx.getTransactionSequence());
+    synchronized (state.m_txMapLock) {
+      state.m_txMap.remove(tx.getTransactionSequence());
     }
   }
 
-  public static void cancel(long transactionSequence) {
+  /**
+   * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
+   */
+  public static boolean cancel(long transactionSequence) {
     if (transactionSequence == 0L) {
-      return;
+      return false;
     }
     SessionState state = getSessionState(false);
     if (state == null) {
-      return;
+      return false;
     }
     ITransaction tx;
-    synchronized (state.m_statementMapLock) {
-      WeakReference<ITransaction> ref = state.m_statementMap.get(transactionSequence);
+    synchronized (state.m_txMapLock) {
+      WeakReference<ITransaction> ref = state.m_txMap.get(transactionSequence);
       if (ref == null) {
-        return;
+        return false;
       }
       tx = ref.get();
       if (tx == null) {
-        return;
+        return false;
       }
     }
-    tx.cancel();
+    return tx.cancel();
   }
 
   private static class SessionState {
-    final Object m_statementMapLock = new Object();
-    final HashMap<Long, WeakReference<ITransaction>> m_statementMap = new HashMap<Long, WeakReference<ITransaction>>();
+    final Object m_txMapLock = new Object();
+    final HashMap<Long, WeakReference<ITransaction>> m_txMap = new HashMap<Long, WeakReference<ITransaction>>();
   }
 }

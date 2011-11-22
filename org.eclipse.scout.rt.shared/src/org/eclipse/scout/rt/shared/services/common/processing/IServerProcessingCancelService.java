@@ -22,7 +22,10 @@ public interface IServerProcessingCancelService extends IService {
    * Whenever a ClientJob - that is doing a backend call - is cancelled, this is detected by the
    * InternalHttpServiceTunnel.tunnelOnline and calls {@link IServerProcessingCancelService#cancel(long)}. The
    * server-side ServerProcessingCancelService calls ActiveTransactionRegistry.cancel
+   * <p>
+   * 
+   * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
    */
   @InputValidation(IValidationStrategy.NO_CHECK.class)
-  void cancel(long requestSequence);
+  boolean cancel(long requestSequence);
 }

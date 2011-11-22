@@ -70,9 +70,14 @@ public class HttpServiceTunnel extends InternalHttpServiceTunnel {
     return super.createURLConnection(call, callData);
   }
 
+  /**
+   * Signals the server to cancel processing jobs for the current session.
+   * 
+   * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
+   */
   @Override
-  protected void sendCancelRequest(long requestSequence) {
-    super.sendCancelRequest(requestSequence);
+  protected boolean sendCancelRequest(long requestSequence) {
+    return super.sendCancelRequest(requestSequence);
   }
 
   /**

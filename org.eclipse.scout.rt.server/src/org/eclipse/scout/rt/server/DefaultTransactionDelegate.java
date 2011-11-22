@@ -91,9 +91,9 @@ public class DefaultTransactionDelegate {
       response = invokeImpl(serviceReq);
     }
     catch (Throwable t) {
+      ITransaction transaction = ThreadContext.getTransaction();
       try {
         // cancel tx
-        ITransaction transaction = ThreadContext.getTransaction();
         if (transaction != null) {
           transaction.addFailure(t);
         }
@@ -102,12 +102,14 @@ public class DefaultTransactionDelegate {
         // nop
       }
       //log it
-      if (t instanceof ProcessingException) {
-        ((ProcessingException) t).addContextMessage("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation());
-        SERVICES.getService(IExceptionHandlerService.class).handleException((ProcessingException) t);
-      }
-      else {
-        LOG.error("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation(), t);
+      if (transaction == null || !transaction.isCancelled()) {
+        if (t instanceof ProcessingException) {
+          ((ProcessingException) t).addContextMessage("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation());
+          SERVICES.getService(IExceptionHandlerService.class).handleException((ProcessingException) t);
+        }
+        else {
+          LOG.error("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation(), t);
+        }
       }
       Throwable p = replaceOutboundException(t);
       response = new ServiceTunnelResponse(null, null, p);

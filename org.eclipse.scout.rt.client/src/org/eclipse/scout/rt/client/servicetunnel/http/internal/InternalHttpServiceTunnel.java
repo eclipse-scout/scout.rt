@@ -185,6 +185,7 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
     decorateBackgroundJob(req, backgroundJob);
     // wait until done
     ServiceTunnelResponse res = null;
+    boolean cancelled = false;
     synchronized (backgroundLock) {
       backgroundJob.schedule();
       while (true) {
@@ -192,12 +193,27 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
         if (res != null) {
           break;
         }
-        if (JobEx.isCurrentJobCanceled()) {
-          break;
-        }
         IProgressMonitor mon = backgroundJob.getMonitor();
-        if (mon != null && mon.isCanceled()) {
-          break;
+        if (JobEx.isCurrentJobCanceled() || (mon != null && mon.isCanceled())) {
+          boolean success = sendCancelRequest(req.getRequestSequence());
+          if (success) {
+            //in fact cancelled the job
+            cancelled = true;
+            break;
+          }
+          else {
+            //cancel was not possible, continue and reset cancel flags
+            if (mon != null) {
+              mon.setCanceled(false);
+            }
+            Job me = Job.getJobManager().currentJob();
+            if (me instanceof JobEx) {
+              IProgressMonitor myMon = ((JobEx) me).getMonitor();
+              if (myMon != null) {
+                myMon.setCanceled(false);
+              }
+            }
+          }
         }
         if (backgroundJob.getState() == JobEx.NONE) {
           break;
@@ -210,34 +226,40 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
         }
       }
     }
-
-    IProgressMonitor mon = backgroundJob.getMonitor();
-    if (JobEx.isCurrentJobCanceled() || (mon != null && mon.isCanceled())) {
-      sendCancelRequest(req.getRequestSequence());
-    }
-
-    if (res == null) {
-      backgroundJob.cancel();
+    if (res == null || cancelled) {
       return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
     }
-    else {
-      return res;
-    }
+    return res;
   }
 
   /**
    * Signals the server to cancel processing jobs for the current session.
+   * 
+   * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
    */
-  protected void sendCancelRequest(long requestSequence) {
+  protected boolean sendCancelRequest(long requestSequence) {
     try {
       ServiceTunnelRequest cancelCall = new ServiceTunnelRequest(getVersion(), IServerProcessingCancelService.class, IServerProcessingCancelService.class.getMethod("cancel", long.class), new Object[]{requestSequence});
       cancelCall.setClientSubject(getClientSession().getSubject());
       cancelCall.setVirtualSessionId(getClientSession().getVirtualSessionId());
       HttpBackgroundJob cancelHttpJob = new HttpBackgroundJob(ScoutTexts.get("ServerCallCancelProcessing"), cancelCall, new Object(), this);
+      cancelHttpJob.setSystem(true);
       cancelHttpJob.schedule();
+      try {
+        cancelHttpJob.join(10000L);
+        if (cancelHttpJob.getResponse() == null) {
+          return false;
+        }
+        Boolean result = (Boolean) cancelHttpJob.getResponse().getData();
+        return result != null && result.booleanValue();
+      }
+      catch (InterruptedException ie) {
+        return false;
+      }
     }
     catch (Throwable e) {
       LOG.warn("failed to cancel server processing", e);
+      return false;
     }
   }
 

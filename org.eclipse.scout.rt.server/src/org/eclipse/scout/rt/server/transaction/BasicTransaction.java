@@ -208,13 +208,13 @@ public class BasicTransaction implements ITransaction {
   }
 
   @Override
-  public synchronized void cancel() {
+  public synchronized boolean cancel() {
     synchronized (m_memberMapLock) {
       if (m_commitPhase) {
-        return;
+        return false;
       }
       if (m_cancelled) {
-        return;
+        return true;
       }
       m_cancelled = true;
       addFailure(new InterruptedException());
@@ -227,6 +227,7 @@ public class BasicTransaction implements ITransaction {
         LOG.error("cancel " + mem, t);
       }
     }
+    return true;
   }
 
   @Override

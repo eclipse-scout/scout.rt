@@ -216,7 +216,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
   private IServerSession lookupScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxSessionId, Subject subject) throws ProcessingException, ServletException {
     synchronized (m_ajaxSessionCache) {
       //update session timeout
-      m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(1000L, 1000L * req.getSession().getMaxInactiveInterval()));
+      int maxInactive = req.getSession().getMaxInactiveInterval();
+      if (maxInactive < 0) {
+        maxInactive = 3600;
+      }
+      m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(1000L, 1000L * maxInactive));
       IServerSession serverSession = m_ajaxSessionCache.get(ajaxSessionId);
       if (serverSession == null) {
         serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);

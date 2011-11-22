@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.IClientSessionProvider;
 import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -83,9 +82,6 @@ public class HttpBackgroundJob extends JobEx implements IClientSessionProvider {
       byte[] callData = msgout.toByteArray();
       // send
       m_urlConn = m_tunnel.createURLConnection(m_req, callData);
-      if (monitor.isCanceled()) {
-        throw new InterruptedException();
-      }
       // receive
       int code = (m_urlConn instanceof HttpURLConnection ? ((HttpURLConnection) m_urlConn).getResponseCode() : 200);
       m_tunnel.preprocessHttpRepsonse(m_urlConn, m_req, code);
@@ -97,15 +93,9 @@ public class HttpBackgroundJob extends JobEx implements IClientSessionProvider {
         return Status.CANCEL_STATUS;
       }
       httpin = m_urlConn.getInputStream();
-      if (monitor.isCanceled()) {
-        throw new InterruptedException();
-      }
       m_res = m_tunnel.getContentHandler().readResponse(httpin);
       httpin.close();
       httpin = null;
-      if (monitor.isCanceled()) {
-        throw new InterruptedException();
-      }
       if (m_debug) {
         time2 = System.nanoTime();
       }
@@ -131,24 +121,6 @@ public class HttpBackgroundJob extends JobEx implements IClientSessionProvider {
       }
       synchronized (m_callerLock) {
         m_callerLock.notifyAll();
-      }
-    }
-  }
-
-  @Override
-  protected void canceling() {
-    //cancel has precedence over failure
-    m_res = new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
-    Thread t = getThread();
-    if (t != null) {
-      t.interrupt();
-    }
-    if (m_urlConn instanceof HttpURLConnection) {
-      try {
-        ((HttpURLConnection) m_urlConn).disconnect();
-      }
-      catch (Throwable x) {
-        // nop
       }
     }
   }

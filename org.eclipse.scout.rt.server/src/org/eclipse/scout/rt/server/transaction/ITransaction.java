@@ -92,9 +92,11 @@ public interface ITransaction {
   void release();
 
   /**
-   * an external process may try to cancel the transaction
+   * an external process tries to cancel the transaction
+   * 
+   * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
    */
-  void cancel();
+  boolean cancel();
 
   boolean isCancelled();
 
