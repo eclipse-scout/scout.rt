@@ -72,7 +72,7 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
     setTitle(m_title);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     setFont(new Font("Dialog", Font.PLAIN, 8));
-    m_versionText = v.getMajor() + "." + v.getMinor() + "." + v.getMicro();
+    m_versionText = "Version " + v.getMajor() + "." + v.getMinor() + "." + v.getMicro();
     // initial layout
     JComponent pane = (JComponent) getContentPane();
     pane.setLayout(new BorderLayout());
