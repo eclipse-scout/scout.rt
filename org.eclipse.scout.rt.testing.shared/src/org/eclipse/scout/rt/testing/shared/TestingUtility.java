@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.testing.shared;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -67,7 +68,10 @@ public final class TestingUtility {
     for (Object service : services) {
       ServiceRegistration reg = bundle.getBundleContext().registerService(computeServiceNames(service), service, initParams);
       result.add(reg);
-      if (service instanceof IService2) {
+      if (Proxy.isProxyClass(service.getClass())) {
+        //nop
+      }
+      else if (service instanceof IService2) {
         ((IService2) service).initializeService(reg);
       }
       else if (service instanceof IService) {
