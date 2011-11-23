@@ -58,6 +58,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.IStatementProcessor;
 import org.eclipse.scout.rt.server.services.common.jdbc.IStatementProcessorMonitor;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
+import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
 public class StatementProcessor implements IStatementProcessor {
@@ -1272,14 +1273,22 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   protected void registerActiveStatement(Statement s) throws SQLException {
-    ITransactionMember member = ThreadContext.getTransaction().getMember(getCallerService().getTransactionMemberId());
+    ITransaction tx = ThreadContext.getTransaction();
+    if (tx == null) {
+      return;
+    }
+    ITransactionMember member = tx.getMember(getCallerService().getTransactionMemberId());
     if (member instanceof AbstractSqlTransactionMember) {
       ((AbstractSqlTransactionMember) member).registerActiveStatement(s);
     }
   }
 
   protected void unregisterActiveStatement(Statement s) throws SQLException {
-    ITransactionMember member = ThreadContext.getTransaction().getMember(getCallerService().getTransactionMemberId());
+    ITransaction tx = ThreadContext.getTransaction();
+    if (tx == null) {
+      return;
+    }
+    ITransactionMember member = tx.getMember(getCallerService().getTransactionMemberId());
     if (member instanceof AbstractSqlTransactionMember) {
       ((AbstractSqlTransactionMember) member).unregisterActiveStatement(s);
     }
