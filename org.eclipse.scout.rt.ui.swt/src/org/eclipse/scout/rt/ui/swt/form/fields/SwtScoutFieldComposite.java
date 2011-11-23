@@ -49,7 +49,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     m_swtLabel = label;
     if (m_swtLabel != null && label.getLayoutData() == null) {
       LogicalGridData statusLabelGridData = null;
-      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_TOP_LEFT) {
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
         statusLabelGridData = LogicalGridDataBuilder.createLabelOnTop(getScoutObject().getGridData());
       }
       else {

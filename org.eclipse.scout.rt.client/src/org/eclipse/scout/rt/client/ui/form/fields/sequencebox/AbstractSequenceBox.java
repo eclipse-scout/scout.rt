@@ -361,7 +361,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
       return false;
     }
 
-    if (formField.getLabelPosition() == IFormField.LABEL_POSITION_TOP_LEFT) {
+    if (formField.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
       return false;
     }
 

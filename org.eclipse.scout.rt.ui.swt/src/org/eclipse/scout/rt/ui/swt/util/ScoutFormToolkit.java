@@ -91,7 +91,7 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
   }
 
   protected int computeSwtLabelStyle(IFormField scoutObject) {
-    if (scoutObject != null && scoutObject.getLabelPosition() == IFormField.LABEL_POSITION_TOP_LEFT) {
+    if (scoutObject != null && scoutObject.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
       return SWT.LEFT | SWT.WRAP | SWT.MULTI;
     }
 

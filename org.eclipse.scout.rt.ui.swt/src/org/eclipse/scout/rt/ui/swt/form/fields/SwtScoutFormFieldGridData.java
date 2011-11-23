@@ -44,7 +44,7 @@ public class SwtScoutFormFieldGridData extends LogicalGridData {
     gc.useUiWidth = data.useUiWidth;
 
     //When having the label on top the container of the field must not have a fix size but use the calculated ui height instead.
-    if (m_scoutField.getLabelPosition() == IFormField.LABEL_POSITION_TOP_LEFT) {
+    if (m_scoutField.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
       gc.useUiHeight = true;
     }
     else {
