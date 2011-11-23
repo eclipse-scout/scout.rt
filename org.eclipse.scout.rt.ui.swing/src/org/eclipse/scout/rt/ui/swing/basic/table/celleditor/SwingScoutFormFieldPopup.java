@@ -213,7 +213,7 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
   }
 
   public void closePopup(int type) {
-    // update model with changed value
+    // force field to verify its input to be written back to model
     getInnerSwingField().getInputVerifier().verify(getInnerSwingField());
 
     // close popup

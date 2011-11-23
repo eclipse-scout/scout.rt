@@ -71,22 +71,14 @@ public class SwingScoutTableCellEditor {
 
   private boolean m_tableIsEditingAndContainsFocus;
   private JComponent m_cachedSwingEditorComponent;
+  private CellEditorListener m_cellEditorListener;
 
   public SwingScoutTableCellEditor(ISwingScoutTable tableComposite) {
     m_tableComposite = tableComposite;
     m_focusTraversalPolicy = new SwingScoutFocusTraversalPolicy();
     m_cellEditor = new P_SwingCellEditor();
-    m_cellEditor.addCellEditorListener(new CellEditorListener() {
-      @Override
-      public void editingStopped(ChangeEvent e) {
-        saveEditorFromSwing();
-      }
-
-      @Override
-      public void editingCanceled(ChangeEvent e) {
-        cancelEditorFromSwing();
-      }
-    });
+    m_cellEditorListener = new P_CellEditorListener();
+    m_cellEditor.addCellEditorListener(m_cellEditorListener);
   }
 
   //(re)install cell editors
@@ -185,18 +177,8 @@ public class SwingScoutTableCellEditor {
     prefHeight = Math.max(prefHeight, minHeight);
     prefWidth = Math.max(prefWidth, minWidth);
 
-    // create placeholder field to represent the cell editor
-    JPanel cellEditorPanel = new JPanel();
-    cellEditorPanel.setOpaque(false);
-
-    // create popup dialog to wrap the form field
-    SwingScoutFormFieldPopup formFieldDialog = new SwingScoutFormFieldPopup(cellEditorPanel);
-    formFieldDialog.setMinHeight(minHeight);
-    formFieldDialog.setMinWidth(minWidth);
-    formFieldDialog.setPrefHeight(prefHeight);
-    formFieldDialog.setPrefWidth(prefWidth);
-    formFieldDialog.createField(formField, m_tableComposite.getSwingEnvironment());
-    formFieldDialog.addEventListener(new IFormFieldPopupEventListener() {
+    // listener to receive events about the popup's state
+    final IFormFieldPopupEventListener popupListener = new IFormFieldPopupEventListener() {
 
       @Override
       public void handleEvent(FormFieldPopupEvent event) {
@@ -215,6 +197,58 @@ public class SwingScoutTableCellEditor {
         }
         else if ((event.getType() & FormFieldPopupEvent.TYPE_FOCUS_NEXT) > 0) {
           enqueueEditNextTableCell(row, col, true);
+        }
+      }
+    };
+
+    // create placeholder field to represent the cell editor
+    JPanel cellEditorPanel = new JPanel();
+    cellEditorPanel.setOpaque(false);
+    
+    // create popup dialog to wrap the form field
+    final SwingScoutFormFieldPopup formFieldDialog = new SwingScoutFormFieldPopup(cellEditorPanel);
+    formFieldDialog.setMinHeight(minHeight);
+    formFieldDialog.setMinWidth(minWidth);
+    formFieldDialog.setPrefHeight(prefHeight);
+    formFieldDialog.setPrefWidth(prefWidth);
+    formFieldDialog.createField(formField, m_tableComposite.getSwingEnvironment());
+    formFieldDialog.addEventListener(popupListener);
+
+    /*
+     * Wrap 'default cell editor listener' to intercept events on the cell editor.
+     * This is crucial because if the user clicks on another editable cell, its cell-editor is activated prior
+     * to the popup receives the WINDOW-CLOSED event (which simply is a mouse pressed event outside the dialog's boundaries) to
+     * properly close the popup and write its value back to the model. In consequence, the model is not updated with the new value.
+     */
+    m_cellEditor.removeCellEditorListener(m_cellEditorListener);
+    m_cellEditor.addCellEditorListener(new P_CellEditorListener() {
+
+      @Override
+      public void editingStopped(ChangeEvent e) {
+        closePopup(FormFieldPopupEvent.TYPE_OK);
+        // delegate event to default cell editor listener
+        super.editingStopped(e);
+      }
+
+      @Override
+      public void editingCanceled(ChangeEvent e) {
+        closePopup(FormFieldPopupEvent.TYPE_CANCEL);
+        // delegate event to default cell editor listener
+        super.editingCanceled(e);
+      }
+
+      private void closePopup(int popupEvent) {
+        try {
+          // remove popup listener to not receive events on the dialog's state because the cell editor is already closing
+          formFieldDialog.removeEventListener(popupListener);
+          // close the popup
+          formFieldDialog.closePopup(popupEvent);
+        }
+        finally {
+          // remove wrapper to not intercept cell editor events anymore
+          m_cellEditor.removeCellEditorListener(this);
+          // install default cell editor listener
+          m_cellEditor.addCellEditorListener(m_cellEditorListener);
         }
       }
     });
@@ -444,6 +478,18 @@ public class SwingScoutTableCellEditor {
         return;
       }
       editor.permanentFocusOwnerChanged(e);
+    }
+  }
+
+  private class P_CellEditorListener implements CellEditorListener {
+    @Override
+    public void editingStopped(ChangeEvent e) {
+      saveEditorFromSwing();
+    }
+
+    @Override
+    public void editingCanceled(ChangeEvent e) {
+      cancelEditorFromSwing();
     }
   }
 
