@@ -46,12 +46,12 @@ public class SwtScoutTimeField extends SwtScoutValueFieldComposite<IDateField> i
 
   @Override
   protected void initializeSwt(Composite parent) {
-    Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     m_popupEventListeners = new HashSet<IPopupSupportListener>();
     m_popupEventListenerLock = new Object();
-    int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-    StatusLabelEx label = new StatusLabelEx(container, labelStyle, getEnvironment());
-    getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+
+    Composite container = getEnvironment().getFormToolkit().createComposite(parent);
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
     ButtonEx timeChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH);
     timeChooserButton.setImage(getEnvironment().getIcon(AbstractIcons.DateFieldTime));

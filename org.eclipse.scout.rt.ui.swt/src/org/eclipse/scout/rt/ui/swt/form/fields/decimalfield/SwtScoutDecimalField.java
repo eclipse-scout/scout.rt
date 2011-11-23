@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -35,14 +35,13 @@ public class SwtScoutDecimalField extends SwtScoutValueFieldComposite<IDecimalFi
 
   @Override
   protected void initializeSwt(Composite parent) {
+    Composite container = getEnvironment().getFormToolkit().createComposite(parent);
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+
     int style = SWT.BORDER;
     style |= SwtUtility.getVerticalAlignment(getScoutObject().getGridData().verticalAlignment);
     style |= SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
-
-    Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-    StatusLabelEx label = new StatusLabelEx(container, labelStyle, getEnvironment());
-    getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+    
     Text text = getEnvironment().getFormToolkit().createText(container, style);
     text.setTextLimit(32);
     //

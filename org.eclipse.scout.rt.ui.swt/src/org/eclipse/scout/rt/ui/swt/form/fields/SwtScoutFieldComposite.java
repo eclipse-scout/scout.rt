@@ -106,7 +106,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     if (updateLayout && isConnectedToScout()) {
       /*
        * workaround for bug 344966 $
-       * (http://bugs.eclipse.org/bugs/show_bug.cgi?id=344966) 
+       * (http://bugs.eclipse.org/bugs/show_bug.cgi?id=344966)
        * controls with size 0,0 gets removed from the tab-list.
        */
       if (b) {

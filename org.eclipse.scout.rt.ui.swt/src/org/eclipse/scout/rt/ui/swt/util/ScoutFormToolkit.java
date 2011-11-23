@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.util;
 
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.basic.comp.CLabelEx;
 import org.eclipse.scout.rt.ui.swt.basic.comp.HyperlinkEx;
 import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
@@ -18,10 +19,13 @@ import org.eclipse.scout.rt.ui.swt.ext.ImageViewer;
 import org.eclipse.scout.rt.ui.swt.ext.ScrolledFormEx;
 import org.eclipse.scout.rt.ui.swt.ext.SectionContent;
 import org.eclipse.scout.rt.ui.swt.ext.SnapButtonMaximized;
+import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
+import org.eclipse.scout.rt.ui.swt.ext.StatusLabelMultiline;
 import org.eclipse.scout.rt.ui.swt.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.swt.ext.TextEx;
 import org.eclipse.scout.rt.ui.swt.ext.table.TableEx;
 import org.eclipse.scout.rt.ui.swt.ext.tree.TreeEx;
+import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.CTabFolder;
@@ -83,6 +87,29 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
     adapt(table, false, false);
     return table;
 
+  }
+
+  protected int computeSwtLabelStyle() {
+    return UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
+  }
+
+  public StatusLabelEx createStatusLabel(Composite parent, ISwtEnvironment environment) {
+    int labelStyle = computeSwtLabelStyle();
+
+    return createStatusLabel(parent, environment, labelStyle);
+  }
+
+  public StatusLabelEx createStatusLabel(Composite parent, ISwtEnvironment environment, int style) {
+    StatusLabelEx label = null;
+    if ((style & SWT.MULTI) != 0 || (style & SWT.WRAP) != 0) {
+      label = new StatusLabelMultiline(parent, style, environment);
+    }
+    else {
+      label = new StatusLabelEx(parent, style, environment);
+    }
+    adapt(label, false, false);
+
+    return label;
   }
 
   public StyledText createStyledText(Composite parent, int style) {

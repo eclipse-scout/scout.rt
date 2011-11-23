@@ -71,9 +71,8 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-    StatusLabelEx label = new StatusLabelEx(container, labelStyle, getEnvironment());
-    getEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+
     int style = SWT.BORDER;
     if (getScoutObject().isInputMasked()) {
       style |= SWT.PASSWORD;
