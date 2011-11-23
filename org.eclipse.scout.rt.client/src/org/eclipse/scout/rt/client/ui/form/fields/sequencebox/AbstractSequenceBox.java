@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.internal.SequenceBoxGrid;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -301,29 +302,15 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   }
 
   private void updateLabelComposition() {
+    if (!isLabelVisible()) {
+      return;
+    }
+
     try {
       if (m_labelCompositionLock.acquire()) {
-        IFormField suppressingField = null;
-        for (IFormField f : getFields()) {
-          f.setLabelSuppressed(false);
-        }
-        if (isLabelVisible()) {
-          for (IFormField f : getFields()) {
-            if (f.isVisible() && f.isLabelVisible()
-                && f.getLabelPosition() != IFormField.LABEL_POSITION_ON_FIELD) { // bsh 2010-10-01: don't use "on field" label in the label of the SequenceBox
-              suppressingField = f;
-              break;
-            }
-          }
-        }
-        if (suppressingField != null) {
-          m_labelSuffix = suppressingField.getLabel();
-          suppressingField.setLabelSuppressed(true);
-        }
-        else {
-          m_labelSuffix = null;
-        }
-        calculateExtendedLabel();
+        m_labelSuffix = execCreateLabelSuffix();
+
+        computeCompoundLabel();
       }
     }
     finally {
@@ -331,15 +318,66 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     }
   }
 
+  /**
+   * <p>
+   * Returns a string which will be appended to the actual label of the sequence box.
+   * </p>
+   * <p>
+   * As default it returns the label of the first field for which the function
+   * {@link #execIsLabelSuffixCandidate(IFormField)} returns true.
+   * </p>
+   */
+  protected String execCreateLabelSuffix() {
+    for (IFormField formField : getFields()) {
+      if (execIsLabelSuffixCandidate(formField)) {
+        formField.setLabelSuppressed(true);
+        return formField.getLabel();
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * <p>
+   * Computes whether the given formField should be considered when creating the compound label in
+   * {@link #execCreateLabelSuffix()}.
+   * </p>
+   */
+  protected boolean execIsLabelSuffixCandidate(IFormField formField) {
+    if (formField.isLabelSuppressed()) {
+      return true;
+    }
+
+    if (!formField.isVisible()) {
+      return false;
+    }
+
+    if (!formField.isLabelVisible()) {
+      return false;
+    }
+
+    if (formField.getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
+      return false;
+    }
+
+    //Checkbox fields have their label on the right side of the checkbox so it is not necessary to use it for the compound label
+    if (formField instanceof IBooleanField) {
+      return false;
+    }
+
+    return true;
+  }
+
   @Override
   public void setLabel(String name) {
     m_labelBase = name;
-    calculateExtendedLabel();
+    computeCompoundLabel();
   }
 
-  private void calculateExtendedLabel() {
+  private void computeCompoundLabel() {
     if (StringUtility.hasText(m_labelBase) && StringUtility.hasText(m_labelSuffix)) {
-      super.setLabel(StringUtility.emptyIfNull(m_labelBase) + " " + StringUtility.emptyIfNull(m_labelSuffix));
+      super.setLabel(m_labelBase + " " + m_labelSuffix);
     }
     else {
       super.setLabel(StringUtility.emptyIfNull(m_labelBase) + StringUtility.emptyIfNull(m_labelSuffix));
