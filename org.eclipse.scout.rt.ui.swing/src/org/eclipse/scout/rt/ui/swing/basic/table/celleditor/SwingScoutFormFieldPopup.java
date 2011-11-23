@@ -213,15 +213,22 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
   }
 
   public void closePopup(int type) {
+    if (isClosed()) {
+      return;
+    }
     // force field to verify its input to be written back to model
     getInnerSwingField().getInputVerifier().verify(getInnerSwingField());
 
     // close popup
-    m_swingScoutPopup.removeSwingScoutViewListener(m_popupEventListener);
-    m_swingScoutPopup.closeView();
-
-    // notify listeners
-    notifyEventListeners(new FormFieldPopupEvent(getScoutObject(), type));
+    try {
+      m_swingScoutPopup.removeSwingScoutViewListener(m_popupEventListener);
+      m_swingScoutPopup.closeView();
+      m_swingScoutPopup = null;
+    }
+    finally {
+      // notify listeners
+      notifyEventListeners(new FormFieldPopupEvent(getScoutObject(), type));
+    }
   }
 
   public int getMinWidth() {
@@ -258,6 +265,10 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
 
   public SwingScoutDropDownPopup getPopup() {
     return m_swingScoutPopup;
+  }
+
+  public boolean isClosed() {
+    return m_swingScoutPopup == null;
   }
 
   public JComponent getInnerSwingField() {

@@ -204,7 +204,7 @@ public class SwingScoutTableCellEditor {
     // create placeholder field to represent the cell editor
     JPanel cellEditorPanel = new JPanel();
     cellEditorPanel.setOpaque(false);
-    
+
     // create popup dialog to wrap the form field
     final SwingScoutFormFieldPopup formFieldDialog = new SwingScoutFormFieldPopup(cellEditorPanel);
     formFieldDialog.setMinHeight(minHeight);
@@ -226,6 +226,7 @@ public class SwingScoutTableCellEditor {
       @Override
       public void editingStopped(ChangeEvent e) {
         closePopup(FormFieldPopupEvent.TYPE_OK);
+        restoreCellEditorListener();
         // delegate event to default cell editor listener
         super.editingStopped(e);
       }
@@ -233,23 +234,26 @@ public class SwingScoutTableCellEditor {
       @Override
       public void editingCanceled(ChangeEvent e) {
         closePopup(FormFieldPopupEvent.TYPE_CANCEL);
+        restoreCellEditorListener();
         // delegate event to default cell editor listener
         super.editingCanceled(e);
       }
 
       private void closePopup(int popupEvent) {
-        try {
-          // remove popup listener to not receive events on the dialog's state because the cell editor is already closing
-          formFieldDialog.removeEventListener(popupListener);
-          // close the popup
-          formFieldDialog.closePopup(popupEvent);
+        if (formFieldDialog.isClosed()) {
+          return;
         }
-        finally {
-          // remove wrapper to not intercept cell editor events anymore
-          m_cellEditor.removeCellEditorListener(this);
-          // install default cell editor listener
-          m_cellEditor.addCellEditorListener(m_cellEditorListener);
-        }
+        // remove popup listener to not receive events on the dialog's state because the cell editor is already closing
+        formFieldDialog.removeEventListener(popupListener);
+        // close the popup
+        formFieldDialog.closePopup(popupEvent);
+      }
+
+      private void restoreCellEditorListener() {
+        // uninstall wrapper cell editor listener to not intercept cell editor events anymore
+        m_cellEditor.removeCellEditorListener(this);
+        // install default cell editor listener
+        m_cellEditor.addCellEditorListener(m_cellEditorListener);
       }
     });
 
