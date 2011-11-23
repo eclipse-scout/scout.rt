@@ -30,7 +30,7 @@ public class SwtScoutComposerField extends SwtScoutFieldComposite<IComposerField
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     // XXX create tree by using extension point (formField Extension),
     // m_treeComposite = getEnvironment().createTree(container, getScoutObject().getTree()); //FIXME AHO: please finish this pending task. I disabled this line meanwhile because it doens't works. regards MHA

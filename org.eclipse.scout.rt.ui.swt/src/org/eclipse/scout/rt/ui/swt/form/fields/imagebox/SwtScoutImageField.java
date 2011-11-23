@@ -46,7 +46,7 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     ImageViewer imgViewer = getEnvironment().getFormToolkit().createImageViewer(container);
     setSwtContainer(container);

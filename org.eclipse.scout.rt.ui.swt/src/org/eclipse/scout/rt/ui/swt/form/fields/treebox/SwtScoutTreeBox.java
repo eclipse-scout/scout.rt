@@ -35,7 +35,7 @@ public class SwtScoutTreeBox extends SwtScoutValueFieldComposite<ITreeBox<?>> im
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     // XXX create tree by using extension point (formField Extension),
     // m_treeComposite = getEnvironment().createTree(container,

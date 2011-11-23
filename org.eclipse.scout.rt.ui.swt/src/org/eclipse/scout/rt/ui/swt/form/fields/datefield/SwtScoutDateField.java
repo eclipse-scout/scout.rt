@@ -56,9 +56,9 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
   protected void initializeSwt(Composite parent) {
     m_popupEventListeners = new HashSet<IPopupSupportListener>();
     m_popupEventListenerLock = new Object();
-    
+
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
     ButtonEx dateChooserButton = getEnvironment().getFormToolkit().createButtonEx(container, SWT.PUSH);

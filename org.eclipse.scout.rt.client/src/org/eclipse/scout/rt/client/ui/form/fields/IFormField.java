@@ -116,6 +116,11 @@ public interface IFormField extends IPropertyObserver {
   int LABEL_POSITION_RIGHT = 3;
 
   /**
+   * position the label on the top of the field, aligned left
+   */
+  int LABEL_POSITION_TOP_LEFT = 4;
+
+  /**
    * use the systemwide default label with see {@link #setLabelWidthInPixel(int)} and {@link #getLabelWidthInPixel()}
    */
   int LABEL_WIDTH_DEFAULT = 0;

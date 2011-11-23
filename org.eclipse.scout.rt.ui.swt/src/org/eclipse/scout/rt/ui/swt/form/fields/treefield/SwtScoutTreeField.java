@@ -32,7 +32,7 @@ public class SwtScoutTreeField extends SwtScoutFieldComposite<ITreeField> implem
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     setSwtContainer(container);
     setSwtLabel(label);

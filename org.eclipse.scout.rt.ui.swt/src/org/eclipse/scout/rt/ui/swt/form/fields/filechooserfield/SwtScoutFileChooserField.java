@@ -50,7 +50,7 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
   protected void initializeSwt(Composite parent) {
     super.initializeSwt(parent);
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
     m_fileChooserButton = new DropDownButton(container, SWT.DROP_DOWN);

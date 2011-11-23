@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,7 +42,15 @@ public class SwtScoutFormFieldGridData extends LogicalGridData {
       gc.weighty = inheritWeightY(m_scoutField);
     }
     gc.useUiWidth = data.useUiWidth;
-    gc.useUiHeight = data.useUiHeight;
+
+    //When having the label on top the container of the field must not have a fix size but use the calculated ui height instead.
+    if (m_scoutField.getLabelPosition() == IFormField.LABEL_POSITION_TOP_LEFT) {
+      gc.useUiHeight = true;
+    }
+    else {
+      gc.useUiHeight = data.useUiHeight;
+    }
+
     gc.horizontalAlignment = data.horizontalAlignment;
     gc.verticalAlignment = data.verticalAlignment;
     gc.fillHorizontal = data.fillHorizontal;

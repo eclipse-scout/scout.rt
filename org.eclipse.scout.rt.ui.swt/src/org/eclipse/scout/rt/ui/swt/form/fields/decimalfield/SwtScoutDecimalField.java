@@ -36,12 +36,12 @@ public class SwtScoutDecimalField extends SwtScoutValueFieldComposite<IDecimalFi
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     int style = SWT.BORDER;
     style |= SwtUtility.getVerticalAlignment(getScoutObject().getGridData().verticalAlignment);
     style |= SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
-    
+
     Text text = getEnvironment().getFormToolkit().createText(container, style);
     text.setTextLimit(32);
     //

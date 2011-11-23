@@ -35,7 +35,7 @@ public class SwtScoutListBox extends SwtScoutValueFieldComposite<IListBox<?>> im
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     m_tableComposite = new SwtScoutTable();
     m_tableComposite.createField(container, getScoutObject().getTable(), getEnvironment());

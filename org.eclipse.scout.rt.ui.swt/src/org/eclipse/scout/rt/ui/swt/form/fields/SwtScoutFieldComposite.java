@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.ext.ILabelComposite;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
@@ -47,7 +48,15 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
   protected void setSwtLabel(ILabelComposite label) {
     m_swtLabel = label;
     if (m_swtLabel != null && label.getLayoutData() == null) {
-      m_swtLabel.setLayoutData(LogicalGridDataBuilder.createLabel(getScoutObject().getGridData()));
+      LogicalGridData statusLabelGridData = null;
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_TOP_LEFT) {
+        statusLabelGridData = LogicalGridDataBuilder.createLabelOnTop(getScoutObject().getGridData());
+      }
+      else {
+        statusLabelGridData = LogicalGridDataBuilder.createLabel(getScoutObject().getGridData());
+      }
+
+      m_swtLabel.setLayoutData(statusLabelGridData);
     }
   }
 

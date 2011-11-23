@@ -361,6 +361,10 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
       return false;
     }
 
+    if (formField.getLabelPosition() == IFormField.LABEL_POSITION_TOP_LEFT) {
+      return false;
+    }
+
     //Checkbox fields have their label on the right side of the checkbox so it is not necessary to use it for the compound label
     if (formField instanceof IBooleanField) {
       return false;

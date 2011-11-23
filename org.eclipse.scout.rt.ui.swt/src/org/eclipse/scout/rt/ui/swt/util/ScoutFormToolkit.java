@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.util;
 
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.basic.comp.CLabelEx;
 import org.eclipse.scout.rt.ui.swt.basic.comp.HyperlinkEx;
@@ -89,12 +90,16 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
 
   }
 
-  protected int computeSwtLabelStyle() {
+  protected int computeSwtLabelStyle(IFormField scoutObject) {
+    if (scoutObject != null && scoutObject.getLabelPosition() == IFormField.LABEL_POSITION_TOP_LEFT) {
+      return SWT.LEFT | SWT.WRAP | SWT.MULTI;
+    }
+
     return UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
   }
 
-  public StatusLabelEx createStatusLabel(Composite parent, ISwtEnvironment environment) {
-    int labelStyle = computeSwtLabelStyle();
+  public StatusLabelEx createStatusLabel(Composite parent, ISwtEnvironment environment, IFormField scoutObject) {
+    int labelStyle = computeSwtLabelStyle(scoutObject);
 
     return createStatusLabel(parent, environment, labelStyle);
   }

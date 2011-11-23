@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,6 +26,7 @@ public final class LogicalGridDataBuilder extends LogicalGridData {
   public static LogicalGridData createLabel(GridData correspondingFieldData) {
     LogicalGridData data = new LogicalGridData();
     data.gridx = 0;
+    data.gridy = 1;
     data.gridh = correspondingFieldData.h;
     data.weighty = 1.0;
     data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelWidth();
@@ -33,6 +34,19 @@ public final class LogicalGridDataBuilder extends LogicalGridData {
     data.useUiHeight = true;
     data.fillVertical = false;
     data.topInset = 1;
+    return data;
+  }
+
+  public static LogicalGridData createLabelOnTop(GridData correspondingFieldData) {
+    LogicalGridData data = new LogicalGridData();
+    data.gridx = 1;
+    data.gridy = 0;
+    data.weighty = 0.0;
+    data.weightx = 1.0;
+    data.useUiWidth = true;
+    data.useUiHeight = true;
+    data.fillVertical = true;
+    data.fillHorizontal = true;
     return data;
   }
 
@@ -44,6 +58,7 @@ public final class LogicalGridDataBuilder extends LogicalGridData {
   public static LogicalGridData createField(GridData gd) {
     LogicalGridData data = new LogicalGridData();
     data.gridx = 1;
+    data.gridy = 1;
     data.weightx = 1.0;
     data.gridh = gd.h;
     if (gd.weightY == 0 || gd.weightY < 0 && gd.h <= 1) {
@@ -60,6 +75,7 @@ public final class LogicalGridDataBuilder extends LogicalGridData {
   public static LogicalGridData createButton1() {
     LogicalGridData data = new LogicalGridData();
     data.gridx = 2;
+    data.gridy = 1;
     data.heightHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonHeight();
     data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonWidth();
     data.fillVertical = false;
@@ -70,6 +86,7 @@ public final class LogicalGridDataBuilder extends LogicalGridData {
   public static LogicalGridData createButton2() {
     LogicalGridData data = new LogicalGridData();
     data.gridx = 3;
+    data.gridy = 1;
     data.heightHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonHeight();
     data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonWidth();
     data.fillVertical = false;
@@ -80,6 +97,7 @@ public final class LogicalGridDataBuilder extends LogicalGridData {
   public static LogicalGridData createSmartButton() {
     LogicalGridData data = new LogicalGridData();
     data.gridx = 2;
+    data.gridy = 1;
     data.heightHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonHeight();
     data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonWithMenuWidth();
     data.fillVertical = false;

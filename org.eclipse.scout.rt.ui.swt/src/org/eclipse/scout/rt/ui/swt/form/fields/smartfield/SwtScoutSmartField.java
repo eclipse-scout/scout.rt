@@ -94,7 +94,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     m_popupEventListenerLock = new Object();
 
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     StyledText textField = getEnvironment().getFormToolkit().createStyledText(container, SWT.SINGLE | SWT.BORDER);
     m_browseButton = new DropDownButton(container, SWT.DROP_DOWN);

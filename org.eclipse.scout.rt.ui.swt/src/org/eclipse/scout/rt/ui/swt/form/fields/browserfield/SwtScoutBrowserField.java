@@ -46,7 +46,7 @@ public class SwtScoutBrowserField extends SwtScoutValueFieldComposite<IBrowserFi
   @Override
   protected void initializeSwt(Composite parent) {
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
-    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment());
+    StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
     Browser browser = getEnvironment().getFormToolkit().createBrowser(container, SWT.NONE);
     browser.addDisposeListener(new DisposeListener() {
