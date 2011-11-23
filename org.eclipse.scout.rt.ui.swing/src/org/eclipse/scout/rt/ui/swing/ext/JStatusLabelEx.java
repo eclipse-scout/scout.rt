@@ -59,20 +59,22 @@ public class JStatusLabelEx extends JComponent {
   private Icon m_mandatoryIconEnabled;
   private Icon m_mandatoryIconDisabled;
 
-  public JStatusLabelEx() {
-//    m_env = env;
+  public JStatusLabelEx(boolean iconAlignedRight) {
     setLayout(new BorderLayoutEx(0, 0));
     m_mandatoryIconEnabled = Activator.getIcon(SwingIcons.Mandantory);
     m_mandatoryIconDisabled = Activator.getIcon(SwingIcons.MandantoryDisabled);
 
-    // Create two panels
+    // Create a panel for the label and one for the statusLabel (icon).
+    //The one for the icon is only necessary if it should be aligned right (not directly next to the text).
     m_labelPanel = new JPanelEx();
     m_labelPanel.setLayout(new FlowLayoutEx(FlowLayoutEx.HORIZONTAL, FlowLayoutEx.RIGHT, 0, 0));
     add(m_labelPanel, BorderLayout.CENTER);
     //
-    m_iconPanel = new JPanelEx();
-    m_iconPanel.setLayout(new FlowLayoutEx(FlowLayoutEx.HORIZONTAL, FlowLayoutEx.RIGHT, 0, 0));
-    add(m_iconPanel, BorderLayout.EAST);
+    if (iconAlignedRight) {
+      m_iconPanel = new JPanelEx();
+      m_iconPanel.setLayout(new FlowLayoutEx(FlowLayoutEx.HORIZONTAL, FlowLayoutEx.RIGHT, 0, 0));
+      add(m_iconPanel, BorderLayout.EAST);
+    }
 
     // Add labels to panels (using the FlowLayoutEx)
     m_label = new JLabelEx();
@@ -88,14 +90,28 @@ public class JStatusLabelEx extends JComponent {
     m_statusLabel = new JLabelEx();
     m_statusLabel.setName("Synth.StatusLabelIcon");
     m_statusLabel.setVisible(false);
-    m_iconPanel.add(m_statusLabel);
+    if (iconAlignedRight) {
+      m_iconPanel.add(m_statusLabel);
+    }
+    else {
+      m_labelPanel.add(m_statusLabel);
+    }
     //
     m_mandatoryLabel = new JLabelEx();
     m_mandatoryLabel.setIcon(m_mandatoryIconEnabled);
     m_mandatoryLabel.setName("Synth.StatusLabelIcon");
     m_mandatoryLabel.setVisible(false);
     m_mandatoryLabelVisible = false;
-    m_iconPanel.add(m_mandatoryLabel);
+    if (iconAlignedRight) {
+      m_iconPanel.add(m_mandatoryLabel);
+    }
+    else {
+      m_labelPanel.add(m_statusLabel);
+    }
+  }
+
+  public JStatusLabelEx() {
+    this(true);
   }
 
   public void setMandatory(boolean b) {

@@ -31,7 +31,7 @@ public class SwingScoutDateTimeCompositeField extends SwingScoutFieldComposite<I
   protected void initializeSwing() {
     JPanelEx container = new JPanelEx();
     container.setOpaque(false);
-    JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+    JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
     m_dateField = createSwingScoutDateField();
     m_dateField.setIgnoreLabel(true);

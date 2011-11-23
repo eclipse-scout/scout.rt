@@ -327,7 +327,13 @@ public interface ISwingEnvironment {
   @Deprecated
   boolean acceptAsFocusTarget(Component comp);
 
+  /**
+   * @deprecated use {@link #createStatusLabel(IFormField)} instead.
+   */
+  @Deprecated
   JStatusLabelEx createStatusLabel();
+
+  JStatusLabelEx createStatusLabel(IFormField formField);
 
   OnFieldLabelDecorator createOnFieldLabelDecorator(JComponent c, boolean mandatory);
 

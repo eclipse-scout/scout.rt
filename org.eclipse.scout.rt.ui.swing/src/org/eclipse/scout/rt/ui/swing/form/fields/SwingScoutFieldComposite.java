@@ -65,7 +65,14 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
   protected void setSwingLabel(JStatusLabelEx swingLabel) {
     m_swingStatusLabel = swingLabel;
     if (m_swingStatusLabel != null) {
-      m_swingStatusLabel.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, LogicalGridDataBuilder.createLabel(getSwingEnvironment(), ((IFormField) getScoutObject()).getGridData()));
+      LogicalGridData statusLabelGridData = null;
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
+        statusLabelGridData = LogicalGridDataBuilder.createLabelOnTop(((IFormField) getScoutObject()).getGridData());
+      }
+      else {
+        statusLabelGridData = LogicalGridDataBuilder.createLabel(getSwingEnvironment(), ((IFormField) getScoutObject()).getGridData());
+      }
+      m_swingStatusLabel.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, statusLabelGridData);
     }
   }
 

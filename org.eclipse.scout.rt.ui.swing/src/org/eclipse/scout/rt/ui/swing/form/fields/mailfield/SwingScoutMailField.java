@@ -120,7 +120,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     m_attachments = new ArrayList<SwingMailAttachment>();
     JPanel container = new JPanelEx();
     container.setOpaque(false);
-    JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+    JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
     JComponent mailPanel = createMailComponent();
     mailPanel.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, LogicalGridDataBuilder.createField(getSwingEnvironment(), getScoutObject().getGridData()));

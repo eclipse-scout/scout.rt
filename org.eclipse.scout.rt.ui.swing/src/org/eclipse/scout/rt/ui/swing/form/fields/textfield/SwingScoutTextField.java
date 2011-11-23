@@ -30,7 +30,7 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
     super.initializeSwing();
     JPanelEx container = new JPanelEx();
     container.setOpaque(false);
-    JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+    JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
     JTextFieldEx textField = new JTextFieldEx();
     container.add(textField);

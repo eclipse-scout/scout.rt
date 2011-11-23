@@ -1153,9 +1153,21 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return new SwingScoutFocusTraversalPolicy().accept(comp);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public JStatusLabelEx createStatusLabel() {
-    JStatusLabelEx ui = new JStatusLabelEx();
+    return createStatusLabel(null);
+  }
+
+  @Override
+  public JStatusLabelEx createStatusLabel(IFormField formField) {
+    JStatusLabelEx ui = null;
+    if (formField != null && formField.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
+      ui = new JStatusLabelEx(false);
+    }
+    else {
+      ui = new JStatusLabelEx();
+    }
     ui.setName("Synth.StatusLabel");
     return ui;
   }

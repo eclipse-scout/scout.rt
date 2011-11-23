@@ -83,7 +83,7 @@ public class SwingScoutTimeField extends SwingScoutValueFieldComposite<IDateFiel
     JPanelEx container = new JPanelEx();
     container.setOpaque(false);
     if (!isIgnoreLabel()) {
-      JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+      JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
       container.add(label);
       setSwingLabel(label);
     }

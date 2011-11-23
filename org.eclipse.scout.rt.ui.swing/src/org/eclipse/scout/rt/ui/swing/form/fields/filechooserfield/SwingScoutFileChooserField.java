@@ -47,7 +47,7 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
   protected void initializeSwing() {
     JPanelEx container = new JPanelEx();
     container.setOpaque(false);
-    JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+    JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
     //
     JTextComponent textField = createTextField(container);

@@ -33,7 +33,7 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
   protected void initializeSwing() {
     JPanelEx container = new JPanelEx();
     container.setOpaque(false);
-    JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+    JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
     m_fieldPanel = new JPanelEx(new SingleLayout());
     LogicalGridData fieldData = LogicalGridDataBuilder.createField(getSwingEnvironment(), getScoutObject().getGridData());

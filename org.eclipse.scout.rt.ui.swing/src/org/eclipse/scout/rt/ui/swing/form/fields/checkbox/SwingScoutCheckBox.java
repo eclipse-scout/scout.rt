@@ -52,7 +52,7 @@ public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanFi
   protected void initializeSwing() {
     JPanelEx container = new JPanelEx();
     container.setOpaque(false);
-    JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+    JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
     JCheckBox swingCheckBox = createCheckBox(container);
     container.add(swingCheckBox);
@@ -104,8 +104,8 @@ public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanFi
       container.setBorder(new EmptyBorder(cellInsets));
 
       gd.fillVertical = false; // must be false to allow vertical alignment
-      gd.horizontalAlignment = getScoutObject().getGridDataHints().horizontalAlignment; // set alignment constraints (those constraints where injected by IBooleanColumn in @{link SwingScoutTableCellEditor}) 
-      gd.verticalAlignment = getScoutObject().getGridDataHints().verticalAlignment; // set alignment constraints (those constraints where injected by IBooleanColumn in @{link SwingScoutTableCellEditor}) 
+      gd.horizontalAlignment = getScoutObject().getGridDataHints().horizontalAlignment; // set alignment constraints (those constraints where injected by IBooleanColumn in @{link SwingScoutTableCellEditor})
+      gd.verticalAlignment = getScoutObject().getGridDataHints().verticalAlignment; // set alignment constraints (those constraints where injected by IBooleanColumn in @{link SwingScoutTableCellEditor})
       gd.weighty = 1.0; // must be greater than 0 to allow vertical alignment
     }
 

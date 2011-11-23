@@ -67,7 +67,7 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     JPanel container = new JPanelEx();
     container.setName(getScoutObject().getClass().getSimpleName() + ".container");
     container.setOpaque(false);
-    JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+    JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
     // viewer
     m_htmlKit = new HTMLEditorKit();

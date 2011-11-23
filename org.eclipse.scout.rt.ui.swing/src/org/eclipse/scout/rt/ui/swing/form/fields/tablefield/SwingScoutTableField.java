@@ -40,7 +40,7 @@ public class SwingScoutTableField extends SwingScoutFieldComposite<ITableField<?
     JPanelEx container = new JPanelEx();
     container.setName(getScoutObject().getClass().getName() + ".container");
     container.setOpaque(false);
-    JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+    JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
     container.add(label);
     m_swingTableStatus = createSwingTableStatus(container);
     //
