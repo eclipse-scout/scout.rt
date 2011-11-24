@@ -222,3 +222,15 @@ Contribution of custom locales to the JRE:
 3. Create the folder META-INF/services with two files java.text.spi.DateFormatProvider and java.text.spi.NumberFormatProvider
 4. In those files, simply put the the fully qualified name to your date/number provider
 5. Export project as JAR file and put it into \lib\ext of your JRE
+
+24.11.2011 dwi
+Bugzilla ticket 364545
+BSI ticket 108'224
+Problem:
+In table cells, tabulators are not rendered correctly namely as non-breaking spaces.
+Solution:
+Tabs are only to be interpreted as real tabs in multiline tables. If non-HTML text is content of a cell, its content is encoded to be printed as HTML.
+>In StringUtility#htmlEncode, tabs are to be converted into HTML tabs in the form of <span style=\"white-space:pre\">&#9;</span>
+>In StringUtility#htmlDecode, HTML tabs and HTML breaks are to be converted into \t and \n, respectively.
+Migration:
+None

@@ -19,6 +19,7 @@ import java.io.StringWriter;
 import java.text.Collator;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -780,10 +781,17 @@ public final class StringUtility {
     s = s.replace("'", "&#39;");
     s = s.replace("<", "&lt;");
     s = s.replace(">", "&gt;");
+    s = s.replace("\n\r", "<br/>");
     s = s.replace("\n", "<br/>");
+
+    // temporarily replace tabs with specific tab-identifier to not be replaced by subsequent whitespace pattern
+    String tabIdentifier = "#TAB#";
+    s = s.replace("\t", tabIdentifier);
+
     if (replaceSpace) {
       s = s.replaceAll("\\s", "&nbsp;");
     }
+    s = s.replace(tabIdentifier, "<span style=\"white-space:pre\">&#9;</span>");
     return s;
   }
 
@@ -792,19 +800,27 @@ public final class StringUtility {
    *         <xmp>replaces &, ", ', <, > and all whitespace</xmp>
    */
   public static String htmlDecode(String s) {
-    if (s == null) {
+    if (s == null || s.length() == 0) {
       return s;
     }
-    if (s.length() == 0) {
-      return s;
-    }
-    s = s.replace("&amp;", "&");
+
     s = s.replace("&nbsp;", " ");
     s = s.replace("&quot;", "\"");
     s = s.replace("&apos;", "'");
     s = s.replace("&#39;", "'");
     s = s.replace("&lt;", "<");
     s = s.replace("&gt;", ">");
+    s = s.replace("&amp;", "&");
+
+    // whitespace patterns
+    String zeroOrMoreWhitespaces = "\\s*?";
+    String oneOrMoreWhitespaces = "\\s+?";
+
+    // replace <br/> by \n
+    s = s.replaceAll("<" + zeroOrMoreWhitespaces + "br" + zeroOrMoreWhitespaces + "/" + zeroOrMoreWhitespaces + ">", "\n");
+    // replace HTML-tabs by \t
+    s = s.replaceAll("<" + zeroOrMoreWhitespaces + "span" + oneOrMoreWhitespaces + "style" + zeroOrMoreWhitespaces + "=" + zeroOrMoreWhitespaces + "\"white-space:pre\"" + zeroOrMoreWhitespaces + ">&#9;<" + zeroOrMoreWhitespaces + "/" + zeroOrMoreWhitespaces + "span" + zeroOrMoreWhitespaces + ">", "\t");
+
     return s;
   }
 
