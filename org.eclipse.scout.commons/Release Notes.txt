@@ -234,3 +234,20 @@ Tabs are only to be interpreted as real tabs in multiline tables. If non-HTML te
 >In StringUtility#htmlDecode, HTML tabs and HTML breaks are to be converted into \t and \n, respectively.
 Migration:
 None
+
+24.11.2011 dwi
+Bugzilla ticket 360195
+BSI ticket 105'945
+Problem:
+If creating a MIME-message from within a Word archive, files like item0001.xml und props0002.xml should also be filtered.
+Solution:
+Files with the following names are excluded:
+- filelist.xml
+- colorschememapping.xml
+- themedata.thmx
+- header.html
+- editdata.mso
+- item\\d{4}\\.xml [regex]
+- props\\d{4}\\.xml [regex]
+Migration:
+None

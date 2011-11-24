@@ -361,11 +361,14 @@ public final class MailUtility {
           folderName = filesFolder.getName();
           for (File file : filesFolder.listFiles()) {
             // exclude Microsoft Word specific directory file. This is only used to edit HTML in Word.
-            if (!file.getName().equalsIgnoreCase("filelist.xml") &&
-                !file.getName().equalsIgnoreCase("colorschememapping.xml") &&
-                !file.getName().equalsIgnoreCase("themedata.thmx") &&
-                !file.getName().equalsIgnoreCase("header.html") &&
-                !file.getName().equalsIgnoreCase("editdata.mso")) {
+            String filename = file.getName();
+            if (!filename.equalsIgnoreCase("filelist.xml") &&
+                !filename.equalsIgnoreCase("colorschememapping.xml") &&
+                !filename.equalsIgnoreCase("themedata.thmx") &&
+                !filename.equalsIgnoreCase("header.html") &&
+                !filename.equalsIgnoreCase("editdata.mso") &&
+                !filename.matches("item\\d{4}\\.xml") &&
+                !filename.matches("props\\d{4}\\.xml")) {
               FileDataSource fds = new FileDataSource(file);
               htmlDataSourceList.add(fds);
             }
