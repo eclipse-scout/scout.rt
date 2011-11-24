@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
+import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 
 public class SwingScoutDateTimeCompositeField extends SwingScoutFieldComposite<IDateField> implements ISwingScoutFormField<IDateField> {
@@ -54,8 +55,8 @@ public class SwingScoutDateTimeCompositeField extends SwingScoutFieldComposite<I
 
   protected LogicalGridData createDateFieldGridData() {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 1;
-    data.gridy = 0;
+    data.gridx = LogicalGridDataBuilder.FIELD_GRID_X;
+    data.gridy = LogicalGridDataBuilder.FIELD_GRID_Y;
     data.gridw = 1;
     data.gridh = 1;
     data.weightx = 1.0;
@@ -66,8 +67,8 @@ public class SwingScoutDateTimeCompositeField extends SwingScoutFieldComposite<I
 
   protected LogicalGridData createTimeFieldGridData() {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 2;
-    data.gridy = 0;
+    data.gridx = LogicalGridDataBuilder.FIELD_GRID_X + 1;
+    data.gridy = LogicalGridDataBuilder.FIELD_GRID_Y;
     data.gridw = 1;
     data.gridh = 1;
     data.weightx = 1.0;

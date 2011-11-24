@@ -17,13 +17,29 @@ import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
 
 public final class LogicalGridDataBuilder {
 
+  /**
+   * <p>
+   * x-position of the field.
+   * </p>
+   * Position is 1 because there can be a label on the left side
+   */
+  public static final int FIELD_GRID_X = 1;
+
+  /**
+   * <p>
+   * y-position of the field.
+   * </p>
+   * Position is 1 because there can be a label on top
+   */
+  public static final int FIELD_GRID_Y = 1;
+
   private LogicalGridDataBuilder() {
   }
 
   public static LogicalGridData createLabel(ISwingEnvironment env, GridData correspondingFieldData) {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 0;
-    data.gridy = 1;
+    data.gridx = FIELD_GRID_X - 1;
+    data.gridy = FIELD_GRID_Y;
     data.gridh = correspondingFieldData.h;
     data.weighty = 1.0;
     data.widthHint = env.getFieldLabelWidth();
@@ -36,8 +52,8 @@ public final class LogicalGridDataBuilder {
 
   public static LogicalGridData createLabelOnTop(GridData correspondingFieldData) {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 1;
-    data.gridy = 0;
+    data.gridx = FIELD_GRID_X;
+    data.gridy = FIELD_GRID_Y - 1;
     data.weighty = 0.0;
     data.weightx = 1.0;
     data.useUiWidth = true;
@@ -54,8 +70,8 @@ public final class LogicalGridDataBuilder {
    */
   public static LogicalGridData createField(ISwingEnvironment env, GridData correspondingFieldData) {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 1;
-    data.gridy = 1;
+    data.gridx = FIELD_GRID_X;
+    data.gridy = FIELD_GRID_Y;
     data.weightx = 1.0;
     data.gridh = correspondingFieldData.h;
     if (correspondingFieldData.weightY == 0 || (correspondingFieldData.weightY < 0 && correspondingFieldData.h <= 1)) {
@@ -71,8 +87,8 @@ public final class LogicalGridDataBuilder {
 
   public static LogicalGridData createButton1(ISwingEnvironment env) {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 2;
-    data.gridy = 1;
+    data.gridx = FIELD_GRID_X + 1;
+    data.gridy = FIELD_GRID_Y;
     data.fillVertical = false;
     data.useUiWidth = true;
     data.useUiHeight = true;
@@ -81,8 +97,8 @@ public final class LogicalGridDataBuilder {
 
   public static LogicalGridData createButton2(ISwingEnvironment env) {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 3;
-    data.gridy = 1;
+    data.gridx = FIELD_GRID_X + 2;
+    data.gridy = FIELD_GRID_Y;
     data.useUiWidth = true;
     data.useUiHeight = true;
     data.fillVertical = false;
