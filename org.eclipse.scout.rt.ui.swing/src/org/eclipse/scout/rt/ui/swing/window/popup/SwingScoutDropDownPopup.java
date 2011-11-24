@@ -86,20 +86,25 @@ public class SwingScoutDropDownPopup extends SwingScoutPopup {
             else {
               w = SwingUtilities.getWindowAncestor(me.getComponent());
             }
-            if (w != getSwingWindow()) {
-              Point p = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), getSwingOwnerComponent());
-              if (!getSwingOwnerComponent().contains(p)) {
-                // close window later (let potential field verifier run first)
-                SwingUtilities.invokeLater(new Runnable() {
-                  @Override
-                  public void run() {
-                    if (getSwingWindow().isVisible()) {
-                      closeView();
-                      fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutDropDownPopup.this, SwingScoutViewEvent.TYPE_CLOSED));
-                    }
+            if (w == getSwingWindow()) {
+              return;
+            }
+            if (w.getOwner() == getSwingWindow()) {
+              // separate popup window, e.g. a context-menu to copy, cut or paste text
+              return;
+            }
+            Point p = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), getSwingOwnerComponent());
+            if (!getSwingOwnerComponent().contains(p)) {
+              // close window later (let potential field verifier run first)
+              SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  if (getSwingWindow().isVisible()) {
+                    closeView();
+                    fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutDropDownPopup.this, SwingScoutViewEvent.TYPE_CLOSED));
                   }
-                });
-              }
+                }
+              });
             }
           }
         }
