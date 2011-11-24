@@ -174,16 +174,18 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
   }
 
   protected void setLabelVisibleFromScout() {
+    if (m_swingStatusLabel == null) {
+      return;
+    }
+
     boolean b = getScoutObject().isLabelVisible();
     if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
       m_swingStatusLabel.setText(null);
       m_swingStatusLabel.setLayoutWidthHint(0);
     }
-    if (m_swingStatusLabel != null) {
-      m_swingStatusLabel.setVisible(b);
-      if (m_swingContainer != null) {
-        m_swingContainer.revalidate();
-      }
+    m_swingStatusLabel.setVisible(b);
+    if (m_swingContainer != null) {
+      m_swingContainer.revalidate();
     }
   }
 
