@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -169,7 +170,10 @@ public class DefaultTransactionDelegate {
       callInspector = sessionInspector.requestCallInspector(serviceReq);
     }
     ServiceTunnelResponse serviceRes = null;
+    boolean backupIsWebClientCurrentThread = WebClientState.isWebClientInCurrentThread();
     try {
+      String virtualSessionId = serviceReq.getVirtualSessionId();
+      WebClientState.setWebClientInCurrentThread(virtualSessionId != null);
       //do checks
       Class<?> serviceInterfaceClass = null;
       for (Bundle b : m_loaderBundles) {
@@ -252,6 +256,7 @@ public class DefaultTransactionDelegate {
           LOG.warn(null, t);
         }
       }
+      WebClientState.setWebClientInCurrentThread(backupIsWebClientCurrentThread);
     }
   }
 
