@@ -81,6 +81,7 @@ import org.eclipse.scout.rt.ui.swing.concurrency.SwingScoutSynchronizer;
 import org.eclipse.scout.rt.ui.swing.ext.IEmbeddedFrameProviderService;
 import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
+import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelTop;
 import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.SwingScoutForm;
@@ -1163,7 +1164,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   public JStatusLabelEx createStatusLabel(IFormField formField) {
     JStatusLabelEx ui = null;
     if (formField != null && formField.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
-      ui = new JStatusLabelEx(false);
+      ui = new JStatusLabelTop();
     }
     else {
       ui = new JStatusLabelEx();

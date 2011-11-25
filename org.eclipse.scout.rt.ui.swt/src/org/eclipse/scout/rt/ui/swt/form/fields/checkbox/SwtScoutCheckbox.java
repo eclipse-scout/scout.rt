@@ -106,8 +106,8 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
     if (getSwtLabel() instanceof StatusLabelEx) {
       StatusLabelEx swtLabel = (StatusLabelEx) getSwtLabel();
 
-      if (swtLabel.getDisplayText() != null) {
-        getSwtField().setText(swtLabel.getDisplayText());
+      if (swtLabel.getText() != null) {
+        getSwtField().setText(swtLabel.getText());
       }
 
       getSwtField().setFont(swtLabel.getFont());

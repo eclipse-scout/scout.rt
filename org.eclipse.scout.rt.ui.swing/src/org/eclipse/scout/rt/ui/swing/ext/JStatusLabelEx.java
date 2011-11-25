@@ -59,22 +59,14 @@ public class JStatusLabelEx extends JComponent {
   private Icon m_mandatoryIconEnabled;
   private Icon m_mandatoryIconDisabled;
 
-  public JStatusLabelEx(boolean iconAlignedRight) {
+  private boolean statusHidesMandatoryIconEnabled;
+
+  public JStatusLabelEx() {
     setLayout(new BorderLayoutEx(0, 0));
     m_mandatoryIconEnabled = Activator.getIcon(SwingIcons.Mandantory);
     m_mandatoryIconDisabled = Activator.getIcon(SwingIcons.MandantoryDisabled);
 
-    // Create a panel for the label and one for the statusLabel (icon).
-    //The one for the icon is only necessary if it should be aligned right (not directly next to the text).
-    m_labelPanel = new JPanelEx();
-    m_labelPanel.setLayout(new FlowLayoutEx(FlowLayoutEx.HORIZONTAL, FlowLayoutEx.RIGHT, 0, 0));
-    add(m_labelPanel, BorderLayout.CENTER);
-    //
-    if (iconAlignedRight) {
-      m_iconPanel = new JPanelEx();
-      m_iconPanel.setLayout(new FlowLayoutEx(FlowLayoutEx.HORIZONTAL, FlowLayoutEx.RIGHT, 0, 0));
-      add(m_iconPanel, BorderLayout.EAST);
-    }
+    createPanels();
 
     // Add labels to panels (using the FlowLayoutEx)
     m_label = new JLabelEx();
@@ -85,33 +77,33 @@ public class JStatusLabelEx extends JComponent {
     m_label.setHorizontalAlignment(SwingConstants.RIGHT);
     m_label.setVerticalAlignment(SwingConstants.CENTER);
     m_label.setVisible(false);
-    m_labelPanel.add(m_label);
+    getLabelPanel().add(m_label);
     //
     m_statusLabel = new JLabelEx();
     m_statusLabel.setName("Synth.StatusLabelIcon");
     m_statusLabel.setVisible(false);
-    if (iconAlignedRight) {
-      m_iconPanel.add(m_statusLabel);
-    }
-    else {
-      m_labelPanel.add(m_statusLabel);
-    }
+    getIconPanel().add(m_statusLabel);
     //
     m_mandatoryLabel = new JLabelEx();
     m_mandatoryLabel.setIcon(m_mandatoryIconEnabled);
     m_mandatoryLabel.setName("Synth.StatusLabelIcon");
     m_mandatoryLabel.setVisible(false);
     m_mandatoryLabelVisible = false;
-    if (iconAlignedRight) {
-      m_iconPanel.add(m_mandatoryLabel);
-    }
-    else {
-      m_labelPanel.add(m_statusLabel);
-    }
+    setStatusHidesMandatoryIconEnabled(true);
+    getMandatoryIconPanel().add(m_mandatoryLabel);
   }
 
-  public JStatusLabelEx() {
-    this(true);
+  /**
+   * Creates a panel for the label and one for the statusLabel (icon).
+   */
+  protected void createPanels() {
+    m_labelPanel = new JPanelEx();
+    m_labelPanel.setLayout(new FlowLayoutEx(FlowLayoutEx.HORIZONTAL, FlowLayoutEx.RIGHT, 0, 0));
+    add(m_labelPanel, BorderLayout.CENTER);
+
+    m_iconPanel = new JPanelEx();
+    m_iconPanel.setLayout(new FlowLayoutEx(FlowLayoutEx.HORIZONTAL, FlowLayoutEx.RIGHT, 0, 0));
+    add(m_iconPanel, BorderLayout.EAST);
   }
 
   public void setMandatory(boolean b) {
@@ -120,7 +112,7 @@ public class JStatusLabelEx extends JComponent {
 
   public void showMandatoryIcon(boolean b) {
     m_mandatoryLabelVisible = b;
-    if (m_status != null) {
+    if (isStatusHidesMandatoryIconEnabled() && m_status != null) {
       // Do not actually show the label, the error status always "wins" (bsh 2010-10-08)
       return;
     }
@@ -214,7 +206,10 @@ public class JStatusLabelEx extends JComponent {
       m_statusLabel.setToolTipText(buf.toString());
       // visibility
       m_statusLabel.setVisible(true);
-      m_mandatoryLabel.setVisible(false);
+
+      if (isStatusHidesMandatoryIconEnabled()) {
+        m_mandatoryLabel.setVisible(false);
+      }
     }
   }
 
@@ -229,4 +224,38 @@ public class JStatusLabelEx extends JComponent {
   public Point getToolTipLocation(MouseEvent e) {
     return SwingUtility.getAdjustedToolTipLocation(e, this, getTopLevelAncestor());
   }
+
+  protected void setIconPanel(JPanelEx iconPanel) {
+    m_iconPanel = iconPanel;
+  }
+
+  protected JPanelEx getIconPanel() {
+    return m_iconPanel;
+  }
+
+  protected void setLabelPanel(JPanelEx labelPanel) {
+    m_labelPanel = labelPanel;
+  }
+
+  protected JPanelEx getLabelPanel() {
+    return m_labelPanel;
+  }
+
+  protected JPanelEx getMandatoryIconPanel() {
+    //Use the same panel for status icons and mandatory icons
+    return m_iconPanel;
+  }
+
+  protected JLabelEx getMandatoryLabel() {
+    return m_mandatoryLabel;
+  }
+
+  public boolean isStatusHidesMandatoryIconEnabled() {
+    return statusHidesMandatoryIconEnabled;
+  }
+
+  public void setStatusHidesMandatoryIconEnabled(boolean statusHidesMandatoryIconEnabled) {
+    this.statusHidesMandatoryIconEnabled = statusHidesMandatoryIconEnabled;
+  }
+
 }

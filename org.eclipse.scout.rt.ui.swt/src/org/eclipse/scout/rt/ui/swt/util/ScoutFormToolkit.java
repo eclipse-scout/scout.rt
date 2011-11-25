@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.ui.swt.ext.ScrolledFormEx;
 import org.eclipse.scout.rt.ui.swt.ext.SectionContent;
 import org.eclipse.scout.rt.ui.swt.ext.SnapButtonMaximized;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.swt.ext.StatusLabelMultiline;
+import org.eclipse.scout.rt.ui.swt.ext.StatusLabelTop;
 import org.eclipse.scout.rt.ui.swt.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.swt.ext.TextEx;
 import org.eclipse.scout.rt.ui.swt.ext.table.TableEx;
@@ -91,23 +91,19 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
   }
 
   protected int computeSwtLabelStyle(IFormField scoutObject) {
-    if (scoutObject != null && scoutObject.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
-      return SWT.LEFT | SWT.WRAP | SWT.MULTI;
-    }
-
     return UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
   }
 
   public StatusLabelEx createStatusLabel(Composite parent, ISwtEnvironment environment, IFormField scoutObject) {
     int labelStyle = computeSwtLabelStyle(scoutObject);
 
-    return createStatusLabel(parent, environment, labelStyle);
+    return createStatusLabel(parent, environment, scoutObject, labelStyle);
   }
 
-  public StatusLabelEx createStatusLabel(Composite parent, ISwtEnvironment environment, int style) {
+  public StatusLabelEx createStatusLabel(Composite parent, ISwtEnvironment environment, IFormField scoutObject, int style) {
     StatusLabelEx label = null;
-    if ((style & SWT.MULTI) != 0 || (style & SWT.WRAP) != 0) {
-      label = new StatusLabelMultiline(parent, style, environment);
+    if (scoutObject != null && scoutObject.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
+      label = new StatusLabelTop(parent, style, environment);
     }
     else {
       label = new StatusLabelEx(parent, style, environment);
