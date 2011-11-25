@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.security.AccessController;
 import java.util.Locale;
@@ -46,6 +47,7 @@ import org.eclipse.scout.http.servletfilter.helper.HttpAuthJaasFilter;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
+import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -204,6 +206,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       IServerSession serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
       if (serverSession == null) {
         serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
+        WebClientState.setWebClientInCurrentThread(false);
         req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
       }
       return serverSession;
@@ -221,6 +224,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       IServerSession serverSession = m_ajaxSessionCache.get(ajaxSessionId);
       if (serverSession == null) {
         serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
+        WebClientState.setWebClientInCurrentThread(true);
         m_ajaxSessionCache.put(ajaxSessionId, serverSession);
       }
       else {
@@ -281,6 +285,9 @@ public class ServiceTunnelServlet extends HttpServletEx {
         IServerSession serverSession;
         String virtualSessionId = serviceRequest.getVirtualSessionId();
         if (virtualSessionId != null) {
+          if (!checkAjaxDelegateAccess(req, res)) {
+            return;
+          }
           serverSession = lookupScoutServerSessionOnVirtualSession(req, res, virtualSessionId, subject);
         }
         else {
@@ -319,6 +326,28 @@ public class ServiceTunnelServlet extends HttpServletEx {
       LOG.error("Session=" + req.getSession().getId() + ", Client=" + req.getRemoteUser() + "@" + req.getRemoteAddr() + "/" + req.getRemoteHost(), t);
       res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
+  }
+
+  /**
+   * This default only grants access to remote caller on same localhost
+   * <p>
+   * This method is part of the protected api and can be overridden.
+   */
+  protected boolean checkAjaxDelegateAccess(HttpServletRequest req, final HttpServletResponse res) throws IOException, ServletException {
+    InetAddress remotehost = InetAddress.getByName(req.getRemoteHost());
+    //check access: local only
+    InetAddress localhost = InetAddress.getByAddress(new byte[]{127, 0, 0, 1});
+    if (localhost.equals(remotehost)) {
+      return true;
+    }
+    //be lenient if localhost is a named host instead of loop-back
+    localhost = InetAddress.getLocalHost();
+    if (localhost.equals(remotehost)) {
+      return true;
+    }
+    LOG.error("Ajax intermediate access is by default only allowed on the same host. Override that function to change this policy");
+    res.sendError(HttpServletResponse.SC_FORBIDDEN);
+    return false;
   }
 
   protected ServiceTunnelRequest deserializeInput(InputStream in) throws Exception {
