@@ -74,6 +74,11 @@ public interface ITableUIFacade {
    */
   TransferObject fireRowsDragRequestFromUI();
 
+  /**
+   * To copy selected rows into clipboard
+   */
+  TransferObject fireRowsCopyRequestFromUI();
+
   void fireRowDropActionFromUI(ITableRow row, TransferObject dropData);
 
   /**
@@ -95,5 +100,4 @@ public interface ITableUIFacade {
   boolean fireKeyTypedFromUI(String keyStrokeText, char keyChar);
 
   void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> column, URL url);
-
 }

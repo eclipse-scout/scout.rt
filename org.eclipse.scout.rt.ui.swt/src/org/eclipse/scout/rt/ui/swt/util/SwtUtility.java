@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.ui.swt.keystroke.SwtScoutKeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.HTMLTransfer;
 import org.eclipse.swt.dnd.ImageTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
@@ -64,33 +66,42 @@ public final class SwtUtility {
   private SwtUtility() {
   }
 
-  public static Object createSwtTransferable(TransferObject scoutT) {
-    if (scoutT == null) {
-      return null;
+  public static SwtTransferObject[] createSwtTransferables(TransferObject transferObject) {
+    List<SwtTransferObject> swtTranferObjects = new ArrayList<SwtTransferObject>();
+    if (transferObject instanceof FileListTransferObject) {
+      FileListTransferObject scoutTransferObject = ((FileListTransferObject) transferObject);
+      swtTranferObjects.add(new SwtTransferObject(FileTransfer.getInstance(), scoutTransferObject.getFilenames()));
     }
-    if (scoutT instanceof FileListTransferObject) {
-      return ((FileListTransferObject) scoutT).getFilenames();
+    else if (transferObject instanceof TextTransferObject) {
+      TextTransferObject scoutTransferObject = ((TextTransferObject) transferObject);
+      // text/plain
+      swtTranferObjects.add(new SwtTransferObject(TextTransfer.getInstance(), scoutTransferObject.getPlainText()));
+      // text/html
+      if (StringUtility.hasText(scoutTransferObject.getHtmlText())) {
+        swtTranferObjects.add(new SwtTransferObject(HTMLTransfer.getInstance(), scoutTransferObject.getHtmlText()));
+      }
     }
-    else if (scoutT instanceof TextTransferObject) {
-      return ((TextTransferObject) scoutT).getText();
+    else if (transferObject instanceof JavaTransferObject) {
+      JavaTransferObject scoutTransferObject = ((JavaTransferObject) transferObject);
+      swtTranferObjects.add(new SwtTransferObject(JVMLocalObjectTransfer.getInstance(), scoutTransferObject.getLocalObject()));
     }
-    else if (scoutT instanceof JavaTransferObject) {
-      return ((JavaTransferObject) scoutT).getLocalObject();
-    }
-    else if (scoutT instanceof ImageTransferObject) {
-      Object image = ((ImageTransferObject) scoutT).getImage();
-      if (image instanceof byte[]) {
+    else if (transferObject instanceof ImageTransferObject) {
+      ImageTransferObject scoutTransferObject = ((ImageTransferObject) transferObject);
+
+      Object image = scoutTransferObject.getImage();
+      if (image instanceof ImageData) {
+        swtTranferObjects.add(new SwtTransferObject(ImageTransfer.getInstance(), (ImageData) image));
+      }
+      else if (image instanceof byte[]) {
         ByteArrayInputStream imageInput = new ByteArrayInputStream((byte[]) image);
-        Image img = new Image(null, imageInput);
-        if (img != null) {
-          return img.getImageData();
-        }
-      }
-      else if (image instanceof ImageData) {
-        return image;
+        ImageData imageData = new Image(null, imageInput).getImageData();
+        swtTranferObjects.add(new SwtTransferObject(ImageTransfer.getInstance(), imageData));
       }
     }
-    return null;
+    else {
+      LOG.error("unsupported transfer object type: " + transferObject);
+    }
+    return swtTranferObjects.toArray(new SwtTransferObject[swtTranferObjects.size()]);
   }
 
   public static TransferObject createScoutTransferable(DropTargetEvent swtT) {
@@ -208,7 +219,6 @@ public final class SwtUtility {
       swtTransferList.add(TextTransfer.getInstance());
     }
     return swtTransferList.toArray(new Transfer[swtTransferList.size()]);
-
   }
 
   public static int getHorizontalAlignment(int scoutAlignment) {

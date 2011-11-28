@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardConsumer;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
+import org.eclipse.scout.rt.ui.swt.util.SwtTransferObject;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.swt.dnd.Clipboard;
@@ -83,10 +84,17 @@ public class SwtScoutClipboardService extends AbstractService implements IClipbo
         @Override
         public void run() {
           try {
-            Object contents = SwtUtility.createSwtTransferable(transferObject);
-            if (contents != null) {
-              getSwtClipboard().setContents(new Object[]{contents}, new Transfer[]{transfer});
+            SwtTransferObject[] swtTransferables = SwtUtility.createSwtTransferables(transferObject);
+            if (swtTransferables.length == 0) {
+              return;
             }
+            Transfer[] dataTypes = new Transfer[swtTransferables.length];
+            Object[] data = new Object[swtTransferables.length];
+            for (int i = 0; i < swtTransferables.length; i++) {
+              dataTypes[i] = swtTransferables[i].getTransfer();
+              data[i] = swtTransferables[i].getData();
+            }
+            getSwtClipboard().setContents(data, dataTypes);
           }
           catch (Throwable t) {
             LOG.warn("Cannot set system clipboard's contents", t);

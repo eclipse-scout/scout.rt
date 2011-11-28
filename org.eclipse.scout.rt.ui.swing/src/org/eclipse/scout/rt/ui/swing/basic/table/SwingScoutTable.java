@@ -23,7 +23,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -32,14 +31,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -70,7 +66,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
@@ -89,6 +84,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
+import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
@@ -956,6 +953,39 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     return SwingUtility.createSwingTransferable(scoutTransferable);
   }
 
+  protected Transferable handleSwingCopyRequest() {
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return null;
+    }
+
+    final Holder<TransferObject> result = new Holder<TransferObject>(TransferObject.class, null);
+    if (getScoutObject() != null) {
+      // notify Scout
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          if (!ACCESS.check(new CopyToClipboardPermission())) {
+            return;
+          }
+          TransferObject scoutTransferable = getScoutObject().getUIFacade().fireRowsCopyRequestFromUI();
+          result.setValue(scoutTransferable);
+        }
+      };
+      try {
+        getSwingEnvironment().invokeScoutLater(t, 20000).join(20000);
+      }
+      catch (InterruptedException e) {
+        //nop
+      }
+      // end notify
+    }
+    TransferObject scoutTransferable = result.getValue();
+    if (scoutTransferable != null) {
+      return SwingUtility.createSwingTransferable(scoutTransferable);
+    }
+    return null;
+  }
+
   protected void handleKeyboardNavigationFromSwing(int rowIndex) {
     ListSelectionModel selectionModel = getSwingTable().getSelectionModel();
     selectionModel.setSelectionInterval(rowIndex, rowIndex);
@@ -1539,10 +1569,10 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
     @Override
     public void exportToClipboard(JComponent comp, Clipboard clip, int action) throws IllegalStateException {
-      // overwrite default export mechanism to clipboard to ensure the content always to be the same,
-      // regardless whether there are drag handlers installed or not.
-      Transferable copyPasteTransferable = new P_CopyPasteTransferable();
-      Toolkit.getDefaultToolkit().getSystemClipboard().setContents(copyPasteTransferable, null);
+      Transferable transferable = handleSwingCopyRequest();
+      if (transferable != null) {
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(transferable, null);
+      }
     }
 
     @Override
@@ -1592,78 +1622,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       return null;
     }
 
-  }// end private class
-
-  /**
-   * Transferable for copy-paste with several text flavors supported
-   */
-  private class P_CopyPasteTransferable implements Transferable {
-
-    private Map<DataFlavor, Object> m_flavorMap = new HashMap<DataFlavor, Object>();
-
-    public P_CopyPasteTransferable() {
-      StringBuilder textPlain = new StringBuilder();
-      StringBuilder textHtml = new StringBuilder();
-      textHtml.append("<html><body><table border=\"0\">");
-
-      IColumn<?>[] columns = getScoutObject().getColumnSet().getVisibleColumns();
-      ITableRow[] rows = getScoutObject().getSelectedRows();
-      for (int row = 0; row < rows.length; row++) {
-        if (row > 0) {
-          textPlain.append("\n");
-        }
-        textHtml.append("<tr>");
-        for (IColumn<?> column : columns) {
-          String displayText = StringUtility.nvl(rows[row].getCell(column).getText(), "");
-          textPlain.append(displayText);
-          textHtml.append("<td>");
-          textHtml.append(HTMLUtility.decodeText(displayText));
-          textHtml.append("</td>");
-        }
-        textHtml.append("</tr>");
-      }
-      textHtml.append("</table></body></html>");
-
-      // register flavors
-      registerIfUndefined(DataFlavor.stringFlavor, textPlain.toString());
-      registerIfUndefined(createFlavor("text/plain;class=java.lang.String"), textPlain.toString());
-      registerIfUndefined(createFlavor("text/html;class=java.lang.String"), textHtml.toString());
-    }
-
-    @Override
-    public DataFlavor[] getTransferDataFlavors() {
-      return m_flavorMap.keySet().toArray(new DataFlavor[m_flavorMap.size()]);
-    }
-
-    @Override
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
-      return m_flavorMap.containsKey(flavor);
-    }
-
-    @Override
-    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-      if (!isDataFlavorSupported(flavor)) {
-        throw new UnsupportedFlavorException(flavor);
-      }
-      return m_flavorMap.get(flavor);
-    }
-
-    private void registerIfUndefined(DataFlavor flavor, Object value) {
-      if (flavor == null || value == null || m_flavorMap.containsKey(flavor)) {
-        return;
-      }
-      m_flavorMap.put(flavor, value);
-    }
-
-    private DataFlavor createFlavor(String mimeType) {
-      try {
-        return new DataFlavor(mimeType);
-      }
-      catch (Throwable e) {
-        LOG.error("failed to create data flavor", e);
-      }
-      return null;
-    }
   }// end private class
 
   private class P_KeyboardNavigationSupport extends TableKeyboardNavigationSupport {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.util.SwtTransferObject;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
@@ -232,13 +233,19 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
   private class P_SwtDragSourceListener extends DragSourceAdapter {
     @Override
     public void dragSetData(DragSourceEvent event) {
-      TransferObject scoutTransfer = handleSwtDragRequest();
-      if (scoutTransfer != null) {
-        Object data = SwtUtility.createSwtTransferable(scoutTransfer);
-        if (data != null) {
-          event.data = data;
-        }
+      TransferObject scoutTransferObject = handleSwtDragRequest();
+      if (scoutTransferObject == null) {
+        return;
       }
+      SwtTransferObject[] swtTransferables = SwtUtility.createSwtTransferables(scoutTransferObject);
+      if (swtTransferables.length == 0) {
+        return;
+      }
+      Object data = swtTransferables[0].getData();
+      if (data == null) {
+        return;
+      }
+      event.data = data;
     }
 
   } // end class P_SwtDragSourceListener

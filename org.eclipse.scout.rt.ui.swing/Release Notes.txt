@@ -440,3 +440,21 @@ When editing such a cell, a smartfield-like popup comes up to enter text. If the
 It is further possible to resize that popup. The default size of that popup can be changed by setting 'WidthInPixel' and 'HeightInPixel' on the String field. That would be done in the 'prepareEditInternal' method of the string column.
 Migration:
 None
+
+28.11.2011 dwi
+Bugzilla: 364019
+Problem:
+There has to be a possibility to disable the behaviour of Ctrl+C on tables. A use case for this would be an application
+with sensitive information (e.g. address data) that should not be allowed to be exported, only to be displayed to the user.
+Solution:
+> Added the method 'AbstractTable#execCopy(ITableRow[])' to return a transfer object to be put into the clipboard
+> By default, a TextTransferObject is returned with a text/plain and text/html representation of the selected rows.
+  That means that if the target understands HTML, the HTML representation is used over the plain-text representation.
+> In SWT, added copy support on tables (not implemented yet)
+> Added permission 'CopyToClipboardPermission' to enable / disable the copy functionality
+Migration Swing:
+> So far, the copy functionality was enabled by default. Because protected by a permission, it is disabled by default as of now.
+  To enable the CTRL-C behavior on tables, add the permission 'CopyToClipboardPermission' to the permission-set in AbstractAccessControlService#execLoadPermissions
+  or directly grant it to specific user roles in your database script.
+Migration SWT:
+> None because not supported yet. To enable the copy functionality, see migration notes for Swing.

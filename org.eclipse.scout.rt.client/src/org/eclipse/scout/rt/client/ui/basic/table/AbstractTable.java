@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
+import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -307,39 +308,76 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void execDrop(ITableRow row, TransferObject t) throws ProcessingException {
   }
 
+  /**
+   * Is called by a <code>CTRL-C</code> event on the table to copy the given rows into the clipboard.
+   * 
+   * @param rows
+   *          the rows selected
+   * @return a transferable object representing the given rows or null to not populate the clipboard.
+   */
   @ConfigOperation
-  @Order(40)
-  protected void execDecorateCell(Cell view, ITableRow row, IColumn<?> col) throws ProcessingException {
+  @Order(30)
+  protected TransferObject execCopy(ITableRow[] rows) throws ProcessingException {
+    if (rows.length == 0) {
+      return null;
+    }
+
+    StringBuilder plainText = new StringBuilder();
+    StringBuilder htmlText = new StringBuilder("<html><body><table border=\"0\">");
+
+    IColumn<?>[] columns = getColumnSet().getVisibleColumns();
+    for (int row = 0; row < rows.length; row++) {
+      htmlText.append("<tr>");
+      if (row > 0) {
+        plainText.append(System.getProperty("line.separator"));
+      }
+
+      for (int column = 0; column < columns.length; column++) {
+        String text = StringUtility.emptyIfNull(rows[row].getCell(column).getText());
+        htmlText.append("<td>");
+        htmlText.append(text);
+        htmlText.append("</td>");
+        if (column > 0) {
+          plainText.append("\t");
+        }
+        plainText.append(text);
+      }
+      htmlText.append("</tr>");
+    }
+    htmlText.append("</table></body></html>");
+
+    TextTransferObject transferObject = new TextTransferObject(plainText.toString(), htmlText.toString());
+    return transferObject;
   }
 
   /**
    * Table content changed, rows were added, removed or changed
    */
   @ConfigOperation
-  @Order(45)
+  @Order(40)
   protected void execContentChanged() throws ProcessingException {
   }
 
   @ConfigOperation
   @Order(50)
+  protected void execDecorateCell(Cell view, ITableRow row, IColumn<?> col) throws ProcessingException {
+  }
+
+  @ConfigOperation
+  @Order(60)
   protected void execInitTable() throws ProcessingException {
   }
 
   @ConfigOperation
-  @Order(55)
+  @Order(70)
   protected void execDisposeTable() throws ProcessingException {
-  }
-
-  @ConfigOperation
-  @Order(80)
-  protected void execDecorateRow(ITableRow row) throws ProcessingException {
   }
 
   /**
    * row is never null
    */
   @ConfigOperation
-  @Order(60)
+  @Order(80)
   protected void execRowClick(ITableRow row) throws ProcessingException {
     TableEvent e = new TableEvent(this, TableEvent.TYPE_ROW_CLICK, new ITableRow[]{row});
     fireTableEventInternal(e);
@@ -349,7 +387,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * row is never null
    */
   @ConfigOperation
-  @Order(62)
+  @Order(90)
   protected void execRowAction(ITableRow row) throws ProcessingException {
     Class<? extends IMenu> defaultMenuType = getConfiguredDefaultMenu();
     if (defaultMenuType != null) {
@@ -370,8 +408,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @ConfigOperation
-  @Order(70)
+  @Order(100)
   protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
+  }
+
+  @ConfigOperation
+  @Order(110)
+  protected void execDecorateRow(ITableRow row) throws ProcessingException {
   }
 
   /**
@@ -385,7 +428,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          (http://local/...)
    */
   @ConfigOperation
-  @Order(80)
+  @Order(120)
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
   }
 
@@ -491,6 +534,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             if (e.getDropObject() != null) {
               try {
                 execDrop(e.getFirstRow(), e.getDropObject());
+              }
+              catch (ProcessingException ex) {
+                SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+              }
+            }
+            break;
+          }
+          case TableEvent.TYPE_ROWS_COPY_REQUEST: {
+            if (e.getCopyObject() == null) {
+              try {
+                e.setCopyObject(execCopy(e.getRows()));
               }
               catch (ProcessingException ex) {
                 SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -2896,6 +2950,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       ce.setSortInMemoryAllowed(last.isSortInMemoryAllowed());
       ce.setDragObject(last.getDragObject());
       ce.setDropObject(last.getDropObject());
+      ce.setCopyObject(last.getCopyObject());
       ce.addPopupMenus(last.getPopupMenus());
       //columns
       HashSet<IColumn> colList = new HashSet<IColumn>();
@@ -3289,6 +3344,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     TableEvent e = new TableEvent(this, TableEvent.TYPE_ROW_DROP_ACTION, rows);
     e.setDropObject(dropData);
     fireTableEventInternal(e);
+  }
+
+  private TransferObject fireRowsCopyRequest() {
+    ITableRow[] rows = getSelectedRows();
+    if (rows != null && rows.length > 0) {
+      TableEvent e = new TableEvent(this, TableEvent.TYPE_ROWS_COPY_REQUEST, rows);
+      fireTableEventInternal(e);
+      return e.getCopyObject();
+    }
+    else {
+      return null;
+    }
   }
 
   private IMenu[] fireEmptySpacePopup() {
@@ -3707,7 +3774,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     public TransferObject fireRowsDragRequestFromUI() {
       try {
         pushUIProcessor();
-        //
         return fireRowsDragRequest();
       }
       finally {
@@ -3719,7 +3785,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     public void fireRowDropActionFromUI(ITableRow row, TransferObject dropData) {
       try {
         pushUIProcessor();
-        //
         row = resolveRow(row);
         fireRowDropAction(row, dropData);
       }
@@ -3728,6 +3793,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
+    @Override
+    public TransferObject fireRowsCopyRequestFromUI() {
+      try {
+        pushUIProcessor();
+        return fireRowsCopyRequest();
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+    
     @Override
     public void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> col, URL url) {
       try {

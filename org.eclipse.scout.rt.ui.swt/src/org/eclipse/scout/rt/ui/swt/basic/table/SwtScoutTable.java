@@ -41,6 +41,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.RowIndexComparator;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
@@ -49,12 +51,17 @@ import org.eclipse.scout.rt.ui.swt.ext.table.TableEx;
 import org.eclipse.scout.rt.ui.swt.ext.table.util.TableRolloverSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.AbstractSwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
+import org.eclipse.scout.rt.ui.swt.util.SwtTransferObject;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.UiRedrawHandler;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
@@ -162,6 +169,41 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     Menu contextMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
     contextMenu.addMenuListener(new P_ContextMenuListener());
     m_contextMenu = contextMenu;
+
+    // CTRL-C listener to copy selected rows into clipboard)
+    table.addKeyListener(new KeyAdapter() {
+
+      @Override
+      public void keyReleased(KeyEvent e) {
+        if ((e.stateMask & SWT.CONTROL) == 0 || e.keyCode != ((int) 'c')) {
+          return;
+        }
+        // CTRL-C event
+        TransferObject scoutTransferable = handleSwtCopyRequest();
+        if (scoutTransferable == null) {
+          return;
+        }
+
+        SwtTransferObject[] swtTransferables = SwtUtility.createSwtTransferables(scoutTransferable);
+        if (swtTransferables.length == 0) {
+          return;
+        }
+        
+        Clipboard clipboard = new Clipboard(getEnvironment().getDisplay());
+        try {
+          Transfer[] dataTypes = new Transfer[swtTransferables.length];
+          Object[] data = new Object[swtTransferables.length];
+          for (int i = 0; i < swtTransferables.length; i++) {
+            dataTypes[i] = swtTransferables[i].getTransfer();
+            data[i] = swtTransferables[i].getData();
+          }
+          clipboard.setContents(data, dataTypes);
+        }
+        finally {
+          clipboard.dispose();
+        }
+      }
+    });
   }
 
   @Override
@@ -770,6 +812,34 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         m_storeColumnWidthsJob.schedule(400);
       }
     }
+  }
+
+  protected TransferObject handleSwtCopyRequest() {
+    if (getUpdateSwtFromScoutLock().isAcquired()) {
+      return null;
+    }
+    final Holder<TransferObject> result = new Holder<TransferObject>(TransferObject.class, null);
+    if (getScoutObject() != null) {
+      // notify Scout
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          if (!ACCESS.check(new CopyToClipboardPermission())) {
+            return;
+          }
+          TransferObject scoutTransferable = getScoutObject().getUIFacade().fireRowsCopyRequestFromUI();
+          result.setValue(scoutTransferable);
+        }
+      };
+      try {
+        getEnvironment().invokeScoutLater(t, 20000).join(20000);
+      }
+      catch (InterruptedException e) {
+        //nop
+      }
+      // end notify
+    }
+    return result.getValue();
   }
 
   protected void handleSwtColumnMoved() {

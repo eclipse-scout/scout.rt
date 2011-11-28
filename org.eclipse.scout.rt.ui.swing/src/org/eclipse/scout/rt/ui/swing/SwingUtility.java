@@ -27,7 +27,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -82,6 +81,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swing.dnd.AwtImageTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.FileListTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.JVMLocalObjectTransferable;
+import org.eclipse.scout.rt.ui.swing.dnd.TextTransferable;
 import org.eclipse.scout.rt.ui.swing.simulator.SimulatorAction;
 import org.eclipse.scout.rt.ui.swing.simulator.SwingScoutSimulator;
 
@@ -374,7 +374,8 @@ public final class SwingUtility {
       return new FileListTransferable(((FileListTransferObject) scoutT).getFileList());
     }
     else if (scoutT instanceof TextTransferObject) {
-      return new StringSelection(((TextTransferObject) scoutT).getText());
+      TextTransferObject textTransferObject = (TextTransferObject) scoutT;
+      return new TextTransferable(textTransferObject.getPlainText(), textTransferObject.getHtmlText());
     }
     else if (scoutT instanceof ImageTransferObject) {
       ImageTransferObject imgTransferObject = (ImageTransferObject) scoutT;

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,10 +15,16 @@ package org.eclipse.scout.commons.dnd;
  */
 
 public class TextTransferObject extends TransferObject {
-  private String m_text;
+  private String m_plainText;
+  private String m_htmlText;
 
-  public TextTransferObject(String s) {
-    m_text = s;
+  public TextTransferObject(String plainText) {
+    this(plainText, null);
+  }
+
+  public TextTransferObject(String plainText, String htmlText) {
+    m_plainText = plainText;
+    m_htmlText = htmlText;
   }
 
   @Override
@@ -26,12 +32,25 @@ public class TextTransferObject extends TransferObject {
     return true;
   }
 
+  /**
+   * @deprecated use {@link TextTransferObject#getPlainText()}. Will be removed in release 3.8.0
+   * @return
+   */
+  @Deprecated
   public String getText() {
-    return m_text;
+    return getPlainText();
+  }
+
+  public String getPlainText() {
+    return m_plainText;
+  }
+
+  public String getHtmlText() {
+    return m_htmlText;
   }
 
   @Override
   public String toString() {
-    return "TextTransferObject[text=" + m_text + "]";
+    return "TextTransferObject[text=" + m_plainText + ";html=" + m_htmlText + "]";
   }
 }

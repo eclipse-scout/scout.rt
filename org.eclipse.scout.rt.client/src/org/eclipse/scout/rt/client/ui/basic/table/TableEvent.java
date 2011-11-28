@@ -99,6 +99,14 @@ public class TableEvent extends java.util.EventObject {
    * valid properties: rows, firstRow, lastRow, dropAction
    */
   public static final int TYPE_ROW_DROP_ACTION = 740;
+
+  /**
+   * Copy-To-Clipboard action was received
+   * <p>
+   * valid properties: rows, firstRow, lastRow, copyAction
+   */
+  public static final int TYPE_ROWS_COPY_REQUEST = 760;
+
   /**
    * Column order changed
    * <p>
@@ -139,6 +147,7 @@ public class TableEvent extends java.util.EventObject {
   private boolean m_consumed;
   private TransferObject m_dragObject;
   private TransferObject m_dropObject;
+  private TransferObject m_copyObject;
   private IColumn[] m_columns;
   private boolean m_sortInMemoryAllowed;
 
@@ -259,6 +268,17 @@ public class TableEvent extends java.util.EventObject {
 
   protected void setDropObject(TransferObject t) {
     m_dropObject = t;
+  }
+
+  /**
+   * used by {@link TableEvent#TYPE_ROWS_COPY_REQUEST}
+   */
+  public TransferObject getCopyObject() {
+    return m_copyObject;
+  }
+
+  protected void setCopyObject(TransferObject t) {
+    m_copyObject = t;
   }
 
   /**
