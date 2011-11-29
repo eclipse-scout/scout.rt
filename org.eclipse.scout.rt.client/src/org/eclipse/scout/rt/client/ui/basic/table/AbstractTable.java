@@ -22,12 +22,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -326,23 +329,45 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     StringBuilder htmlText = new StringBuilder("<html><body><table border=\"0\">");
 
     IColumn<?>[] columns = getColumnSet().getVisibleColumns();
-    for (int row = 0; row < rows.length; row++) {
+    Pattern patternHtmlContent = Pattern.compile("<\\s*body.*?>(.*?)<\\s*/\\s*body\\s*>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+
+    boolean firstRow = true;
+    for (ITableRow row : rows) {
+      // text/html
       htmlText.append("<tr>");
-      if (row > 0) {
+      // text/plain
+      if (!firstRow) {
         plainText.append(System.getProperty("line.separator"));
       }
 
-      for (int column = 0; column < columns.length; column++) {
-        String text = StringUtility.emptyIfNull(rows[row].getCell(column).getText());
-        htmlText.append("<td>");
-        htmlText.append(text);
-        htmlText.append("</td>");
-        if (column > 0) {
+      boolean firstColumn = true;
+      for (IColumn<?> column : columns) {
+        String text = StringUtility.emptyIfNull(row.getCell(column).getText());
+
+        // text/plain
+        if (!firstColumn) {
           plainText.append("\t");
         }
-        plainText.append(text);
+        plainText.append(StringUtility.unwrapText(text));
+
+        // text/html
+        htmlText.append("<td>");
+        // ensure proper HTML
+        String html = HTMLUtility.cleanupHtml(text, false, false, null);
+        // extract body content of HTML
+        Matcher matcher = patternHtmlContent.matcher(html);
+        if (matcher.find()) {
+          htmlText.append(matcher.group(1));
+        }
+        else {
+          // encode text to be included into HTML
+          htmlText.append(StringUtility.htmlEncode(text));
+        }
+        htmlText.append("</td>");
+        firstColumn = false;
       }
       htmlText.append("</tr>");
+      firstRow = false;
     }
     htmlText.append("</table></body></html>");
 
@@ -3803,7 +3828,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         popUIProcessor();
       }
     }
-    
+
     @Override
     public void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> col, URL url) {
       try {
