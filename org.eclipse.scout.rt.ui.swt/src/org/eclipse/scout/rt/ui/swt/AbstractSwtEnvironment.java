@@ -1103,6 +1103,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       ownerBounds.y = pDisp.y;
     }
     final SwtScoutPopup popup = new SwtScoutPopup(this, owner, ownerBounds, SWT.RESIZE);
+    popup.setMaxHeightHint(280);
     popup.addSwtScoutPartListener(new SwtScoutPartListener() {
       @Override
       public void partChanged(SwtScoutPartEvent e) {

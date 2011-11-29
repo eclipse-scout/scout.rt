@@ -57,6 +57,8 @@ public class SwtScoutPopup implements ISwtScoutPart {
 
   private int m_widthHint;
   private int m_heightHint;
+  private int m_maxHeightHint;
+  private int m_maxWidthHint;
 
   private ISwtScoutForm m_uiForm;
 
@@ -69,6 +71,8 @@ public class SwtScoutPopup implements ISwtScoutPart {
 
     m_widthHint = SWT.DEFAULT;
     m_heightHint = SWT.DEFAULT;
+    m_maxHeightHint = SWT.DEFAULT;
+    m_maxWidthHint = SWT.DEFAULT;
 
     m_swtWindow = new Shell(ownerComponent.getShell(), style);
     m_swtWindow.setData("extendedStyle", SWT.POP_UP);
@@ -127,6 +131,32 @@ public class SwtScoutPopup implements ISwtScoutPart {
     }
   }
 
+  public int getMaxHeightHint() {
+    return m_maxHeightHint;
+  }
+
+  public void setMaxHeightHint(int maxHeightHint) {
+    if (maxHeightHint > 0) {
+      m_maxHeightHint = maxHeightHint;
+    }
+    else {
+      m_maxHeightHint = SWT.DEFAULT;
+    }
+  }
+
+  public int getMaxWidthHint() {
+    return m_maxWidthHint;
+  }
+
+  public void setMaxWidthHint(int maxWidthHint) {
+    if (maxWidthHint > 0) {
+      m_maxWidthHint = maxWidthHint;
+    }
+    else {
+      m_maxWidthHint = SWT.DEFAULT;
+    }
+  }
+
   public void showForm(IForm scoutForm) throws ProcessingException {
     m_opened = true;
     if (m_scoutForm == null) {
@@ -182,10 +212,17 @@ public class SwtScoutPopup implements ISwtScoutPart {
       return;
     }
     //invalidate all layouts
-    getShell().layout(true, true);
     Point dim = getShell().computeSize(m_widthHint, m_heightHint, true);
+
+    // adjust width
     dim.x = Math.max(dim.x, UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutDefaultColumnWidth());
-    dim.y = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight(), dim.y);
+    if (m_maxWidthHint != SWT.DEFAULT) {
+      dim.x = Math.min(dim.x, m_maxWidthHint);
+    }
+    // adjust height
+    if (m_maxHeightHint != SWT.DEFAULT) {
+      dim.y = Math.min(dim.y, m_maxHeightHint);
+    }
 
     Point p = m_ownerComponent.toDisplay(new Point(-m_ownerComponent.getBorderWidth(), 0));
     Point above = new Point(p.x, p.y);
