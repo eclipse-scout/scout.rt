@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.holders;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.HashMap;
  *          the type of beans stored in the holder
  * @since 3.0
  */
-public class BeanArrayHolder<T> implements IBeanArrayHolder<T> {
+public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
   private static final long serialVersionUID = 1L;
   private ArrayList<T> m_list = new ArrayList<T>();
   private HashMap<T, State> m_stateList = new HashMap<T, State>();
