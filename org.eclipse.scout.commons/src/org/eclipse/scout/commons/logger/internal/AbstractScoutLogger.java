@@ -142,27 +142,27 @@ public abstract class AbstractScoutLogger implements IScoutLogger {
 
   @Override
   public void trace(String msg) {
-    log(LEVEL_DEBUG, msg, null, null);
+    log(LEVEL_TRACE, msg, null, null);
   }
 
   @Override
   public void trace(String format, Object arg) {
-    log(LEVEL_DEBUG, format, new Object[]{arg}, null);
+    log(LEVEL_TRACE, format, new Object[]{arg}, null);
   }
 
   @Override
   public void trace(String format, Object arg1, Object arg2) {
-    log(LEVEL_DEBUG, format, new Object[]{arg1, arg2}, null);
+    log(LEVEL_TRACE, format, new Object[]{arg1, arg2}, null);
   }
 
   @Override
   public void trace(String format, Object[] argArray) {
-    log(LEVEL_DEBUG, format, argArray, null);
+    log(LEVEL_TRACE, format, argArray, null);
   }
 
   @Override
   public void trace(String msg, Throwable t) {
-    log(LEVEL_DEBUG, msg, null, t);
+    log(LEVEL_TRACE, msg, null, t);
   }
 
   @Override
