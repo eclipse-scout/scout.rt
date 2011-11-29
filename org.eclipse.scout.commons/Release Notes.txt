@@ -154,3 +154,12 @@ Plug-Ins changed:
 - org.eclipse.scout.commons [MailUtilty.class]
 Migration:
 None
+
+29.11.2011 dwi/imo
+Bugzilla: 358369 (bug-fix)
+Problem:
+BeanArrayHolder should implement Serializable to be used as transfer object in client-server communication.
+However, the wrapped type must not necessarily be serializable to also be used as holder for any beans (e.g. beans of a webservice stub)
+Solution:
+Changed BeanArrayHolder to implement Serializable. This only applies to the holder, not the wrapped type.
+Migration: None
