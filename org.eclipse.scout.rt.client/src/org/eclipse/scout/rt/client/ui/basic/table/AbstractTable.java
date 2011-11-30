@@ -64,7 +64,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.AddCustomColumnMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ModifyCustomColumnMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.RemoveAllCustomColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.RemoveCustomColumnMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu;
@@ -364,7 +363,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (patternHtmlCheck.matcher(text).matches()) {
           // ensure proper HTML and extract body content
           Matcher matcher = patternBodyContent.matcher(HTMLUtility.cleanupHtml(text, false, false, null));
-          if (matcher.find()) {
+        if (matcher.find()) {
             html = matcher.group(1);
           }
         }
@@ -374,7 +373,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         htmlText.append("<td>");
         htmlText.append(html);
         htmlText.append("</td>");
-
         firstColumn = false;
       }
       htmlText.append("</tr>");
@@ -735,6 +733,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     initColumnsInternal();
     if (getColumnFilterManager() == null) {
       setColumnFilterManager(createColumnFilterManager());
+      ClientUIPreferences env = ClientUIPreferences.getInstance();
+      for (IColumn col : getColumns()) {
+        env.updateTableColumnFilter(col);
+      }
     }
   }
 
@@ -3466,7 +3468,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       if (e.getPopupMenuCount() > 0) {
         e.addPopupMenu(new MenuSeparator());
       }
-      for (IMenu m : new IMenu[]{new AddCustomColumnMenu(this), new ModifyCustomColumnMenu(this), new RemoveCustomColumnMenu(this), new RemoveAllCustomColumnsMenu(this)}) {
+      for (IMenu m : new IMenu[]{new AddCustomColumnMenu(this), new ModifyCustomColumnMenu(this), new RemoveCustomColumnMenu(this)}) {
         m.prepareAction();
         if (m.isVisible()) {
           e.addPopupMenu(m);

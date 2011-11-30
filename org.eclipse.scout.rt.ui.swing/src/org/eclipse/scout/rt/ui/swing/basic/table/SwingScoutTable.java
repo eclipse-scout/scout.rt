@@ -76,6 +76,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.table.ISortOrderColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -1186,6 +1187,14 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             }
             label.setIcon(icon);
             label.setDisabledIcon(icon);
+
+            // Sort Order Column
+            if (scoutCol instanceof ISortOrderColumn) {
+              IColumn sortCol = (IColumn) cell.getValue();
+              if (sortCol != null && sortCol.isSortActive() && sortCol.isSortExplicit()) {
+                label.setIcon(SortIconUtility.createSortIcon(sortCol, sortCol.getTable().getColumnSet().getSortColumns(), sortCol.isSortAscending()));
+              }
+            }
           }
 
           // foreground

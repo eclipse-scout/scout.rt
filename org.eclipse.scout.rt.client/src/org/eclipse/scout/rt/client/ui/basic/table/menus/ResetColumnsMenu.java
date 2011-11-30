@@ -31,7 +31,7 @@ public class ResetColumnsMenu extends AbstractMenu {
     return ScoutTexts.get("ResetTableColumns");
   }
 
-  @Order(0)
+  @Order(10.0)
   public class ResetAllMenu extends AbstractMenu {
 
     @Override
@@ -60,11 +60,53 @@ public class ResetColumnsMenu extends AbstractMenu {
     }
   }
 
-  @Order(5)
+  @Order(20.0)
   public class Separator1Menu extends MenuSeparator {
   }
 
-  @Order(10)
+  @Order(30.0)
+  public class ResetVisibilityMenu extends AbstractMenu {
+
+    @Override
+    protected String getConfiguredText() {
+      return ScoutTexts.get("ResetTableColumnsVisibility");
+    }
+
+    @Override
+    protected void execAction() {
+      try {
+        m_table.setTableChanging(true);
+        //
+        m_table.resetColumnVisibilities();
+      }
+      finally {
+        m_table.setTableChanging(false);
+      }
+    }
+  }
+
+  @Order(40.0)
+  public class ResetSortingMenu extends AbstractMenu {
+
+    @Override
+    protected String getConfiguredText() {
+      return ScoutTexts.get("ResetTableColumnsSorting");
+    }
+
+    @Override
+    protected void execAction() {
+      try {
+        m_table.setTableChanging(true);
+        //
+        m_table.resetColumnSortOrder();
+      }
+      finally {
+        m_table.setTableChanging(false);
+      }
+    }
+  }
+
+  @Order(50.0)
   public class ResetColumnFiltersMenu extends AbstractMenu {
 
     @Override
@@ -86,90 +128,6 @@ public class ResetColumnsMenu extends AbstractMenu {
         if (m != null) {
           m.reset();
         }
-      }
-      finally {
-        m_table.setTableChanging(false);
-      }
-    }
-  }
-
-  @Order(20)
-  public class ResetWidthsMenu extends AbstractMenu {
-
-    @Override
-    protected String getConfiguredText() {
-      return ScoutTexts.get("ResetTableColumnsWidth");
-    }
-
-    @Override
-    protected void execAction() {
-      try {
-        m_table.setTableChanging(true);
-        //
-        m_table.resetColumnWidths();
-      }
-      finally {
-        m_table.setTableChanging(false);
-      }
-    }
-  }
-
-  @Order(30)
-  public class ResetSortingMenu extends AbstractMenu {
-
-    @Override
-    protected String getConfiguredText() {
-      return ScoutTexts.get("ResetTableColumnsSorting");
-    }
-
-    @Override
-    protected void execAction() {
-      try {
-        m_table.setTableChanging(true);
-        //
-        m_table.resetColumnSortOrder();
-      }
-      finally {
-        m_table.setTableChanging(false);
-      }
-    }
-  }
-
-  @Order(40)
-  public class ResetOrderMenu extends AbstractMenu {
-
-    @Override
-    protected String getConfiguredText() {
-      return ScoutTexts.get("ResetTableColumnsOrder");
-    }
-
-    @Override
-    protected void execAction() {
-      try {
-        m_table.setTableChanging(true);
-        //
-        m_table.resetColumnOrder();
-      }
-      finally {
-        m_table.setTableChanging(false);
-      }
-    }
-  }
-
-  @Order(50)
-  public class ResetVisibilityMenu extends AbstractMenu {
-
-    @Override
-    protected String getConfiguredText() {
-      return ScoutTexts.get("ResetTableColumnsVisibility");
-    }
-
-    @Override
-    protected void execAction() {
-      try {
-        m_table.setTableChanging(true);
-        //
-        m_table.resetColumnVisibilities();
       }
       finally {
         m_table.setTableChanging(false);

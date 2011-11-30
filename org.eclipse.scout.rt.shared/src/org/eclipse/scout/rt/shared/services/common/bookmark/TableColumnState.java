@@ -21,6 +21,7 @@ public class TableColumnState implements Serializable, Cloneable {
   private boolean m_sortAscending;
   private Boolean m_displayable;
   private Boolean m_visible;
+  private byte[] m_columnFilterData;
 
   public TableColumnState() {
   }
@@ -32,6 +33,7 @@ public class TableColumnState implements Serializable, Cloneable {
     this.m_sortAscending = state.m_sortAscending;
     this.m_displayable = state.m_displayable;
     this.m_visible = state.m_visible;
+    this.m_columnFilterData = state.m_columnFilterData;
   }
 
   public String getClassName() {
@@ -85,6 +87,14 @@ public class TableColumnState implements Serializable, Cloneable {
   @Override
   public Object clone() {
     return new TableColumnState(this);
+  }
+
+  public byte[] getColumnFilterData() {
+    return m_columnFilterData;
+  }
+
+  public void setColumnFilterData(byte[] columnFilterData) {
+    m_columnFilterData = columnFilterData;
   }
 
 }

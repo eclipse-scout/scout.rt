@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,8 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  */
 @Deprecated
 @SuppressWarnings("deprecation")
-public class SmartColumnFilter<T> implements ITableColumnFilter<T> {
+public class SmartColumnFilter<T> implements ITableColumnFilter<T>, Serializable {
+  private static final long serialVersionUID = 1L;
   private ISmartColumn<T> m_column;
   private Set<T> m_selectedValues;
 

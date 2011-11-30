@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,8 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 /**
  * Checkboxes, Boolean values
  */
-public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITableColumnFilter<Boolean> {
+public class BooleanColumnFilter<T extends Comparable<Boolean>> implements ITableColumnFilter<Boolean>, Serializable {
+  private static final long serialVersionUID = 1L;
   private IColumn<Boolean> m_column;
   private Set<Boolean> m_selectedValues;
 

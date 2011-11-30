@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,19 +20,18 @@ import java.util.Set;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.CloseButton;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.DateDetailBox;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.NumberDetailBox;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.OkButton;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.StringDetailBox;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.DateDetailBox.DateSequenceBox.DateFromField;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.DateDetailBox.DateSequenceBox.DateToField;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.NumberDetailBox;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.NumberDetailBox.NumberSequenceBox.NumberFromField;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.NumberDetailBox.NumberSequenceBox.NumberToField;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.OkButton;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.StringDetailBox;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.StringDetailBox.PatternField;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.ValuesBox.ValuesTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn;
@@ -177,94 +176,6 @@ public class ColumnFilterForm extends AbstractForm {
     @Override
     protected int getConfiguredGridW() {
       return 1;
-    }
-
-    @Order(10)
-    public class SortBox extends AbstractGroupBox {
-
-      @Override
-      protected int getConfiguredGridColumnCount() {
-        return 1;
-      }
-
-      @Override
-      protected String getConfiguredLabel() {
-        return ScoutTexts.get("ColumnSorting");
-      }
-
-      @Override
-      protected boolean getConfiguredGridUseUiHeight() {
-        return true;
-      }
-
-      @Order(10)
-      public class SortUpButton extends AbstractLinkButton {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("ColumnSortAscending");
-        }
-
-        @Override
-        protected boolean getConfiguredProcessButton() {
-          return false;
-        }
-
-        @Override
-        protected void execClickAction() throws ProcessingException {
-          IColumn<?> col = getColumnFilter().getColumn();
-          col.getTable().getColumnSet().addSortColumn(col, true);
-          ClientUIPreferences.getInstance().setAllTableColumnPreferences(col.getTable());
-          col.getTable().sort();
-          doOk();
-        }
-      }
-
-      @Order(20)
-      public class SortDownButton extends AbstractLinkButton {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("SortDescending");
-        }
-
-        @Override
-        protected boolean getConfiguredProcessButton() {
-          return false;
-        }
-
-        @Override
-        protected void execClickAction() throws ProcessingException {
-          IColumn<?> col = getColumnFilter().getColumn();
-          col.getTable().getColumnSet().addSortColumn(col, false);
-          ClientUIPreferences.getInstance().setAllTableColumnPreferences(col.getTable());
-          col.getTable().sort();
-          doOk();
-        }
-      }
-
-      @Order(30)
-      public class SortNoneButton extends AbstractLinkButton {
-
-        @Override
-        protected String getConfiguredLabel() {
-          return ScoutTexts.get("ClearColumnSorting");
-        }
-
-        @Override
-        protected boolean getConfiguredProcessButton() {
-          return false;
-        }
-
-        @Override
-        protected void execClickAction() throws ProcessingException {
-          IColumn<?> col = getColumnFilter().getColumn();
-          col.getTable().getColumnSet().removeSortColumn(col);
-          ClientUIPreferences.getInstance().setAllTableColumnPreferences(col.getTable());
-          col.getTable().sort();
-          doOk();
-        }
-      }
     }
 
     @Order(20)

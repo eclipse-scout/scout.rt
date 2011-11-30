@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.Gr
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.FilterBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.FilterBox.EditFilterButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.FilterBox.RemoveFilterButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetAllButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetColumnFiltersButton;
@@ -36,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.Gr
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.RemoveCustomColumnButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.SelectAllButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.OkButton;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -55,7 +58,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 public class OrganizeColumnsForm extends AbstractForm {
@@ -107,6 +109,10 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   public EditFilterButton getEditFilterButton() {
     return getFieldByClass(EditFilterButton.class);
+  }
+
+  public RemoveFilterButton getRemoveFilterButton() {
+    return getFieldByClass(RemoveFilterButton.class);
   }
 
   public FilterBox getFilterBox() {
@@ -186,6 +192,11 @@ public class OrganizeColumnsForm extends AbstractForm {
       return 2;
     }
 
+    @Override
+    protected int getConfiguredWidthInPixel() {
+      return 520;
+    }
+
     @Order(10.0)
     public class GroupBox extends AbstractGroupBox {
 
@@ -199,7 +210,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
         @Override
         protected int getConfiguredGridH() {
-          return 15;
+          return 5;
         }
 
         @Override
@@ -234,6 +245,9 @@ public class OrganizeColumnsForm extends AbstractForm {
 
                 // Column Title
                 getTable().getTitleColumn().setValue(row, headerCell.getText());
+                if (Platform.inDevelopmentMode() && col.isSortActive()) {
+                  getTable().getTitleColumn().setValue(row, headerCell.getText() + " (" + col.getSortIndex() + ")");
+                }
 
                 // Custom Column
                 if (col instanceof ICustomColumn<?>) {
@@ -241,17 +255,7 @@ public class OrganizeColumnsForm extends AbstractForm {
                 }
 
                 // Sorting
-                if (col.isSortActive()) {
-                  if (col.isSortAscending()) {
-                    row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(AbstractIcons.TableSortAsc);
-                  }
-                  else {
-                    row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(AbstractIcons.TableSortDesc);
-                  }
-                }
-                else {
-                  row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(null);
-                }
+                getTable().getSortingColumn().setValue(row, col);
 
                 // Filter
                 if (col.isColumnFilterActive()) {
@@ -274,16 +278,6 @@ public class OrganizeColumnsForm extends AbstractForm {
 
         @Order(10.0)
         public class Table extends AbstractTable {
-
-          @Override
-          protected void execDecorateRow(ITableRow row) throws ProcessingException {
-            if (BooleanUtility.nvl(getVisibleColumn().getValue(row))) {
-              row.setFont(new FontSpec(null, FontSpec.STYLE_BOLD, 0));
-            }
-            else {
-              row.setFont(null);
-            }
-          }
 
           @Override
           protected int getConfiguredDragType() {
@@ -429,7 +423,7 @@ public class OrganizeColumnsForm extends AbstractForm {
             }
           }
 
-          @Order(5.0)
+          @Order(10.0)
           public class KeyColumn extends AbstractColumn<IColumn<?>> {
 
             @Override
@@ -443,7 +437,7 @@ public class OrganizeColumnsForm extends AbstractForm {
             }
           }
 
-          @Order(10.0)
+          @Order(20.0)
           public class VisibleColumn extends AbstractBooleanColumn {
 
             @Override
@@ -458,7 +452,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           }
 
-          @Order(20.0)
+          @Order(30.0)
           public class TitleColumn extends AbstractStringColumn {
 
             @Override
@@ -473,8 +467,8 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           }
 
-          @Order(30.0)
-          public class SortingColumn extends AbstractStringColumn {
+          @Order(40.0)
+          public class SortingColumn extends AbstractSortOrderColumn {
 
             @Override
             protected String getConfiguredHeaderText() {
@@ -488,7 +482,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           }
 
-          @Order(40.0)
+          @Order(50.0)
           public class FilterColumn extends AbstractStringColumn {
 
             @Override
@@ -503,7 +497,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           }
 
-          @Order(50.0)
+          @Order(60.0)
           public class CustomColumnColumn extends AbstractStringColumn {
 
             @Override
@@ -531,7 +525,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return TEXTS.get("View");
+          return TEXTS.get("ResetTableColumnsVisibility");
         }
 
         @Order(10.0)
@@ -852,7 +846,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected String getConfiguredLabel() {
-            return TEXTS.get("Edit_");
+            return TEXTS.get("EditFilterMenu");
           }
 
           @Override
@@ -879,6 +873,42 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
         }
+
+        @Order(20.0)
+        public class RemoveFilterButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Remove");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            Integer selectedIndex = null;
+            if (m_table != null && getColumnsTableField().getTable().getSelectedRow() != null) {
+              selectedIndex = getColumnsTableField().getTable().getSelectedRow().getRowIndex();
+              if (m_table.getColumnFilterManager() != null) {
+                IColumn<?> col = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
+                if (col != null) {
+                  ITableColumnFilter<?> filter = m_table.getColumnFilterManager().getFilter(col);
+                  m_table.getColumnFilterManager().getFilters().remove(filter);
+                  m_table.applyRowFilters();
+                }
+              }
+            }
+            getColumnsTableField().reloadTableData();
+            if (selectedIndex != null) {
+              getColumnsTableField().getTable().selectRow(selectedIndex);
+            }
+          }
+
+        }
+
       }
 
       @Order(50.0)
@@ -924,7 +954,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected String getConfiguredLabel() {
-            return TEXTS.get("View");
+            return TEXTS.get("ResetTableColumnsVisibility");
           }
 
           @Override
@@ -1023,6 +1053,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     ITableRow selectedRow = getColumnsTableField().getTable().getSelectedRow();
     boolean selectedRowExists = selectedRow != null;
     boolean isCustomColumn = selectedRow != null && getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow) instanceof ICustomColumn<?>;
+    boolean selectedRowHasFilter = selectedRowExists && getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow).isColumnFilterActive();
 
     getModifyCustomColumnButton().setEnabled(isCustomColumn);
     getRemoveCustomColumnButton().setEnabled(isCustomColumn);
@@ -1035,6 +1066,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     getWithoutButton().setEnabled(selectedRowExists);
 
     getEditFilterButton().setEnabled(selectedRowExists);
+    getRemoveFilterButton().setEnabled(selectedRowHasFilter);
   }
 
   private void doResetAction(Class<? extends IMenu> action) throws ProcessingException {
@@ -1056,12 +1088,17 @@ public class OrganizeColumnsForm extends AbstractForm {
 
     try {
       getColumnsTableField().getTable().setTableChanging(true);
-      IColumn<?> selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(row);
+      IColumn selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(row);
       if (ascending == null) {
         m_table.getColumnSet().removeSortColumn(selectedCol);
       }
       else {
-        m_table.getColumnSet().addSortColumn(selectedCol, ascending);
+        if (m_table.getColumnSet().isSortColumn(selectedCol)) {
+          m_table.getColumnSet().handleSortEvent(selectedCol, true);
+        }
+        else {
+          m_table.getColumnSet().addSortColumn(selectedCol, ascending);
+        }
       }
       m_table.sort();
 

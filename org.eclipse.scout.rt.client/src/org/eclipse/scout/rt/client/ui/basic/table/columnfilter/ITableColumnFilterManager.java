@@ -29,6 +29,10 @@ public interface ITableColumnFilterManager {
 
   <T> ITableColumnFilter<T> getFilter(IColumn<T> col);
 
+  byte[] getSerializedFilter(IColumn col);
+
+  void setSerializedFilter(byte[] filterData, IColumn col);
+
   /**
    * @return a collection of all filters of all rows
    */
@@ -49,12 +53,11 @@ public interface ITableColumnFilterManager {
    * 
    * @param col
    *          the filtered column
-   * @param fullForm
-   *          true: {@link IForm.DISPLAY_HINT_POPUP_DIALOG} will be used for display of the form and the sort options
-   *          will be shown
+   * @param showAsPopupDialog
+   *          true: {@link IForm.DISPLAY_HINT_POPUP_DIALOG} will be used for display of the form
    * @throws ProcessingException
    */
-  void showFilterForm(IColumn col, boolean fullForm) throws ProcessingException;
+  void showFilterForm(IColumn col, boolean showAsPopupDialog) throws ProcessingException;
 
   void reset() throws ProcessingException;
 }

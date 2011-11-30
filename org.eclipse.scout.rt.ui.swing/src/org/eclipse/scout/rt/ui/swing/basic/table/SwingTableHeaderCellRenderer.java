@@ -98,12 +98,7 @@ public class SwingTableHeaderCellRenderer implements TableCellRenderer {
       // icon
       Icon sortIcon = null;
       if (cell.isSortActive() && cell.isSortExplicit()) {
-        if (cell.isSortAscending()) {
-          sortIcon = m_sortUpIcon;
-        }
-        else {
-          sortIcon = m_sortDownIcon;
-        }
+        sortIcon = SortIconUtility.createSortIcon(scoutCol, scoutTable.getColumnSet().getSortColumns(), cell.isSortAscending());
       }
       Icon filterIcon = null;
       if (scoutCol.isColumnFilterActive()) {

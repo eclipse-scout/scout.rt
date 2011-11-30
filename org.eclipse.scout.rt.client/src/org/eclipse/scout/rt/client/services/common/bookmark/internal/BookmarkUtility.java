@@ -438,6 +438,17 @@ public final class BookmarkUtility {
         if (!existingVisibleCols.equals(visibleColumns)) {
           cs.setVisibleColumns(visibleColumns.toArray(new IColumn[0]));
         }
+        // filters
+        if (tablePage.getTable().getColumnFilterManager() != null) {
+          for (TableColumnState colState : allColumns) {
+            if (colState.getColumnFilterData() != null) {
+              IColumn col = BookmarkUtility.resolveColumn(cs.getColumns(), colState.getClassName());
+              if (col != null) {
+                tablePage.getTable().getColumnFilterManager().setSerializedFilter(colState.getColumnFilterData(), col);
+              }
+            }
+          }
+        }
         //sort order (only respect visible and user-sort columns)
         boolean userSortValid = true;
         TreeMap<Integer, IColumn> sortColMap = new TreeMap<Integer, IColumn>();
@@ -595,6 +606,9 @@ public final class BookmarkUtility {
         else {
           colState.setSortOrder(-1);
         }
+      }
+      if (page.getTable().getColumnFilterManager() != null && c.isColumnFilterActive()) {
+        colState.setColumnFilterData(page.getTable().getColumnFilterManager().getSerializedFilter(c));
       }
       allColumns.add(colState);
     }
