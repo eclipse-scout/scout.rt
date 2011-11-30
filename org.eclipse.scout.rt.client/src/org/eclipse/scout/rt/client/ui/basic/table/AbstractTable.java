@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -329,7 +330,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     StringBuilder htmlText = new StringBuilder("<html><body><table border=\"0\">");
 
     IColumn<?>[] columns = getColumnSet().getVisibleColumns();
-    Pattern patternHtmlContent = Pattern.compile("<\\s*body.*?>(.*?)<\\s*/\\s*body\\s*>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+    Pattern patternHtmlCheck = Pattern.compile(".*?<\\s*html.*?>.*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+    Pattern patternBodyContent = Pattern.compile("<\\s*body.*?>(.*?)<\\s*/\\s*body\\s*>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     boolean firstRow = true;
     for (ITableRow row : rows) {
@@ -342,28 +344,37 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
       boolean firstColumn = true;
       for (IColumn<?> column : columns) {
-        String text = StringUtility.emptyIfNull(row.getCell(column).getText());
+        String text;
+        if (column instanceof IBooleanColumn) {
+          boolean value = BooleanUtility.nvl(((IBooleanColumn) column).getValue(row), false);
+          text = value ? "X" : "";
+        }
+        else {
+          text = StringUtility.emptyIfNull(row.getCell(column).getText());
+        }
 
         // text/plain
         if (!firstColumn) {
           plainText.append("\t");
         }
-        plainText.append(StringUtility.unwrapText(text));
+        plainText.append(StringUtility.emptyIfNull(StringUtility.unwrapText(text)));
 
         // text/html
+        String html = null;
+        if (patternHtmlCheck.matcher(text).matches()) {
+          // ensure proper HTML and extract body content
+          Matcher matcher = patternBodyContent.matcher(HTMLUtility.cleanupHtml(text, false, false, null));
+          if (matcher.find()) {
+            html = matcher.group(1);
+          }
+        }
+        if (html == null) {
+          html = StringUtility.htmlEncode(text);
+        }
         htmlText.append("<td>");
-        // ensure proper HTML
-        String html = HTMLUtility.cleanupHtml(text, false, false, null);
-        // extract body content of HTML
-        Matcher matcher = patternHtmlContent.matcher(html);
-        if (matcher.find()) {
-          htmlText.append(matcher.group(1));
-        }
-        else {
-          // encode text to be included into HTML
-          htmlText.append(StringUtility.htmlEncode(text));
-        }
+        htmlText.append(html);
         htmlText.append("</td>");
+
         firstColumn = false;
       }
       htmlText.append("</tr>");
