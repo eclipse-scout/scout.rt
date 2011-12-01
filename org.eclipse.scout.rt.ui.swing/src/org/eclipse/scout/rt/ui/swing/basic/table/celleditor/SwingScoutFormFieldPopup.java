@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.ui.swing.basic.table.celleditor;
 
 import java.awt.AWTKeyStroke;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FocusTraversalPolicy;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -27,6 +29,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
@@ -35,6 +38,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
+import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
@@ -55,6 +59,7 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
   private int m_minHeight;
   private int m_prefHeight;
   private SwingScoutViewListener m_popupEventListener;
+  private FocusTraversalPolicy m_focusTraversalPolicy;
 
   private List<IFormFieldPopupEventListener> m_eventListeners = new ArrayList<IFormFieldPopupEventListener>();
   private Object m_eventListenerLock = new Object();
@@ -62,12 +67,12 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
   public SwingScoutFormFieldPopup(JComponent owner) {
     m_owner = owner;
     m_popupEventListener = new P_PopupEventListener();
+    m_focusTraversalPolicy = new SwingScoutFocusTraversalPolicy();
   }
 
   @Override
   protected void initializeSwing() {
     super.initializeSwing();
-
     m_owner.addHierarchyListener(new HierarchyListener() {
 
       @SuppressWarnings("unchecked")
@@ -97,27 +102,19 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
         rootPanel.setOpaque(false);
         m_swingScoutPopup.getSwingContentPane().add(rootPanel);
 
-        JScrollPane scrollPane = new JScrollPaneEx(m_innerSwingScoutFormField.getSwingField());
+        JScrollPane scrollPane = new JScrollPaneEx(getInnerSwingField());
         scrollPane.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, LogicalGridDataBuilder.createField(getSwingEnvironment(), ((IFormField) getScoutObject()).getGridData()));
         scrollPane.setBorder(null);
         rootPanel.add(scrollPane);
 
         // install popup listener
         m_swingScoutPopup.addSwingScoutViewListener(m_popupEventListener);
-        // install keystrokes on inner form field
-        installTraverseKeyStrokes(getInnerSwingField());
 
         // open popup
         m_swingScoutPopup.openView();
 
-        // request focus
-        getSwingEnvironment().invokeScoutLater(new Runnable() {
-
-          @Override
-          public void run() {
-            getScoutObject().requestFocus();
-          }
-        }, 0);
+        // install keystrokes
+        installTraverseKeyStrokes(scrollPane);
       }
     });
 
@@ -135,11 +132,10 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
   }
 
   private void installTraverseKeyStrokes(JComponent component) {
-    component.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, new HashSet<AWTKeyStroke>());
-    component.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, new HashSet<AWTKeyStroke>());
-
+    Component firstComponent = m_focusTraversalPolicy.getFirstComponent(component);
+    Component lastComponent = m_focusTraversalPolicy.getFirstComponent(component);
     // escape
-    component.getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("pressed ESCAPE"), "escape");
+    component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(SwingUtility.createKeystroke("pressed ESCAPE"), "escape");
     component.getActionMap().put("escape", new AbstractAction() {
       private static final long serialVersionUID = 1L;
 
@@ -150,44 +146,51 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
     });
 
     // shift-tab (backward-focus-traversal)
-    component.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, new HashSet<AWTKeyStroke>());
-    component.getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("shift TAB"), "reverse-tab");
-    component.getActionMap().put("reverse-tab", new AbstractAction() {
-      private static final long serialVersionUID = 1L;
+    if (firstComponent instanceof JComponent) {
+      JComponent c = (JComponent) firstComponent;
+      c.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, new HashSet<AWTKeyStroke>());
+      c.getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("shift TAB"), "reverse-tab");
+      c.getActionMap().put("reverse-tab", new AbstractAction() {
+        private static final long serialVersionUID = 1L;
 
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_BACK);
-      }
-    });
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_BACK);
+        }
+      });
+    }
 
     // tab (forward-focus-traversal) and ctrl-tab (tab within field)
     // Forward-focus-traversal key (TAB) cannot be installed by the component's action map because
     // tab / ctrl-tab cannot be intercepted separately that way. This is required to support tabs within the field.
     // Also, if using KeyListener to intercept tab events, there is a slightly hack necessary, because the ctrl
     // modifier is lost.
-    component.addKeyListener(new KeyAdapter() {
+    if (lastComponent instanceof JComponent) {
+      JComponent c = (JComponent) lastComponent;
+      c.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, new HashSet<AWTKeyStroke>());
+      c.addKeyListener(new KeyAdapter() {
 
-      private boolean m_controlDown;
+        private boolean m_controlDown;
 
-      @Override
-      public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-          m_controlDown = true;
+        @Override
+        public void keyPressed(KeyEvent e) {
+          if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+            m_controlDown = true;
+          }
+          if (e.getKeyCode() == KeyEvent.VK_TAB && !m_controlDown && !e.isShiftDown()) {
+            // forward-focus-traversal
+            closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_NEXT);
+          }
         }
-        if (e.getKeyCode() == KeyEvent.VK_TAB && !m_controlDown && !e.isShiftDown()) {
-          // forward-focus-traversal
-          closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_NEXT);
-        }
-      }
 
-      @Override
-      public void keyReleased(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-          m_controlDown = false;
+        @Override
+        public void keyReleased(KeyEvent e) {
+          if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+            m_controlDown = false;
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   public void addEventListener(IFormFieldPopupEventListener eventListener) {
@@ -217,7 +220,9 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
       return;
     }
     // force field to verify its input to be written back to model
-    getInnerSwingField().getInputVerifier().verify(getInnerSwingField());
+    if (getInnerSwingField() != null && getInnerSwingField().getInputVerifier() != null) {
+      getInnerSwingField().getInputVerifier().verify(getInnerSwingField());
+    }
 
     // close popup
     try {
@@ -272,7 +277,12 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
   }
 
   public JComponent getInnerSwingField() {
-    return m_innerSwingScoutFormField.getSwingField();
+    // prefer field over container to omit border panel
+    JComponent component = m_innerSwingScoutFormField.getSwingField();
+    if (component == null) {
+      component = m_innerSwingScoutFormField.getSwingContainer();
+    }
+    return component;
   }
 
   private Dimension toValidDimension(Dimension dimension) {
@@ -289,7 +299,29 @@ public class SwingScoutFormFieldPopup extends SwingScoutComposite<IFormField> {
 
     @Override
     public void viewChanged(SwingScoutViewEvent e) {
-      if (e.getType() == SwingScoutViewEvent.TYPE_CLOSED) {
+      if (e.getType() == SwingScoutViewEvent.TYPE_OPENED) {
+        // request focus
+        if (m_swingScoutPopup == null) {
+          return;
+        }
+        JComponent contentPane = m_swingScoutPopup.getSwingContentPane();
+        if (contentPane == null) {
+          return;
+        }
+        final Component firstComponent = m_focusTraversalPolicy.getFirstComponent(contentPane);
+        if (firstComponent == null) {
+          return;
+        }
+        // must be called after all pending AWT events have been processed to ensure the focus to be kept
+        SwingUtilities.invokeLater(new Runnable() {
+
+          @Override
+          public void run() {
+            firstComponent.requestFocus();
+          }
+        });
+      }
+      else if (e.getType() == SwingScoutViewEvent.TYPE_CLOSED) {
         closePopup(FormFieldPopupEvent.TYPE_OK);
       }
     }
