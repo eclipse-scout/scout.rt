@@ -19,11 +19,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.CompositeLong;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
@@ -71,42 +72,42 @@ public final class SwtUtility {
   }
 
   public static SwtTransferObject[] createSwtTransferables(TransferObject transferObject) {
-	    List<SwtTransferObject> swtTranferObjects = new ArrayList<SwtTransferObject>();
-	    if (transferObject instanceof FileListTransferObject) {
-	      FileListTransferObject scoutTransferObject = ((FileListTransferObject) transferObject);
-	      swtTranferObjects.add(new SwtTransferObject(FileTransfer.getInstance(), scoutTransferObject.getFilenames()));
-	    }
-	    else if (transferObject instanceof TextTransferObject) {
-	      TextTransferObject scoutTransferObject = ((TextTransferObject) transferObject);
-	      // text/plain
-	      swtTranferObjects.add(new SwtTransferObject(TextTransfer.getInstance(), scoutTransferObject.getPlainText()));
-	      // text/html
-	      if (StringUtility.hasText(scoutTransferObject.getHtmlText())) {
-	        swtTranferObjects.add(new SwtTransferObject(HTMLTransfer.getInstance(), scoutTransferObject.getHtmlText()));
-	      }
-	    }
-	    else if (transferObject instanceof JavaTransferObject) {
-	      JavaTransferObject scoutTransferObject = ((JavaTransferObject) transferObject);
-	      swtTranferObjects.add(new SwtTransferObject(JVMLocalObjectTransfer.getInstance(), scoutTransferObject.getLocalObject()));
-	    }
-	    else if (transferObject instanceof ImageTransferObject) {
-	      ImageTransferObject scoutTransferObject = ((ImageTransferObject) transferObject);
+    List<SwtTransferObject> swtTranferObjects = new ArrayList<SwtTransferObject>();
+    if (transferObject instanceof FileListTransferObject) {
+      FileListTransferObject scoutTransferObject = ((FileListTransferObject) transferObject);
+      swtTranferObjects.add(new SwtTransferObject(FileTransfer.getInstance(), scoutTransferObject.getFilenames()));
+    }
+    else if (transferObject instanceof TextTransferObject) {
+      TextTransferObject scoutTransferObject = ((TextTransferObject) transferObject);
+      // text/plain
+      swtTranferObjects.add(new SwtTransferObject(TextTransfer.getInstance(), scoutTransferObject.getPlainText()));
+      // text/html
+      if (StringUtility.hasText(scoutTransferObject.getHtmlText())) {
+        swtTranferObjects.add(new SwtTransferObject(HTMLTransfer.getInstance(), scoutTransferObject.getHtmlText()));
+      }
+    }
+    else if (transferObject instanceof JavaTransferObject) {
+      JavaTransferObject scoutTransferObject = ((JavaTransferObject) transferObject);
+      swtTranferObjects.add(new SwtTransferObject(JVMLocalObjectTransfer.getInstance(), scoutTransferObject.getLocalObject()));
+    }
+    else if (transferObject instanceof ImageTransferObject) {
+      ImageTransferObject scoutTransferObject = ((ImageTransferObject) transferObject);
 
-	      Object image = scoutTransferObject.getImage();
-	      if (image instanceof ImageData) {
-	        swtTranferObjects.add(new SwtTransferObject(ImageTransfer.getInstance(), (ImageData) image));
-	      }
-	      else if (image instanceof byte[]) {
-	        ByteArrayInputStream imageInput = new ByteArrayInputStream((byte[]) image);
-	        ImageData imageData = new Image(null, imageInput).getImageData();
-	        swtTranferObjects.add(new SwtTransferObject(ImageTransfer.getInstance(), imageData));
-	      }
-	    }
-	    else {
-	      LOG.error("unsupported transfer object type: " + transferObject);
-	    }
-	    return swtTranferObjects.toArray(new SwtTransferObject[swtTranferObjects.size()]);
-	  }
+      Object image = scoutTransferObject.getImage();
+      if (image instanceof ImageData) {
+        swtTranferObjects.add(new SwtTransferObject(ImageTransfer.getInstance(), (ImageData) image));
+      }
+      else if (image instanceof byte[]) {
+        ByteArrayInputStream imageInput = new ByteArrayInputStream((byte[]) image);
+        ImageData imageData = new Image(null, imageInput).getImageData();
+        swtTranferObjects.add(new SwtTransferObject(ImageTransfer.getInstance(), imageData));
+      }
+    }
+    else {
+      LOG.error("unsupported transfer object type: " + transferObject);
+    }
+    return swtTranferObjects.toArray(new SwtTransferObject[swtTranferObjects.size()]);
+  }
 
   public static TransferObject createScoutTransferable(DropTargetEvent swtT) {
     if (swtT == null || swtT.currentDataType == null) {
@@ -1067,6 +1068,23 @@ public final class SwtUtility {
         visitShellTreeRec(child, modalities, level + 1, out);
       }
     }
+  }
+
+  private static final Pattern MNEMONIC_PATTERN = Pattern.compile("(\\&)", Pattern.DOTALL);
+
+  /**
+   * Escapes every mnemonic character '&' in the string by simply doubling the character.
+   * 
+   * @param text
+   *          the string to be escaped, also <code>null</code> or empty string values are allowed
+   * @return the escaped string
+   * @see org.eclipse.swt.widgets.Label#setText(String)
+   */
+  public static String escapeMnemonics(String text) {
+    if (StringUtility.isNullOrEmpty(text)) {
+      return text;
+    }
+    return MNEMONIC_PATTERN.matcher(text).replaceAll("\\&$1");
   }
 
 }

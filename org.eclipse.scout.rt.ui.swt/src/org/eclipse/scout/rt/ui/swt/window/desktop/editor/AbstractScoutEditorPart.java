@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.listener.PartListener;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
@@ -160,7 +161,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
     //
     s = f.getSubTitle();
     if (s != null) {
-      getSwtForm().setText(StringUtility.removeNewLines(s != null ? s : ""));
+      getSwtForm().setText(SwtUtility.escapeMnemonics(StringUtility.removeNewLines(s != null ? s : "")));
     }
     else {
       getSwtForm().setText(null);
