@@ -27,6 +27,9 @@ public class LogExceptionHandlerService extends AbstractService implements IExce
 
   @Override
   public void handleException(ProcessingException pe) {
+    if (pe.isInterruption()) {
+      return;
+    }
     IProcessingStatus s = pe.getStatus();
     int logLevel = IScoutLogger.LEVEL_ERROR;
     if (pe instanceof VetoException) {
