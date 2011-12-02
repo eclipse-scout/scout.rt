@@ -25,4 +25,7 @@ public interface IBusyManagerService extends IService2 {
   void register(IClientSession session, IBusyHandler handler);
 
   void unregister(IClientSession session);
+
+  IBusyHandler getHandler(IClientSession session);
+
 }

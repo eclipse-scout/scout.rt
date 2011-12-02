@@ -46,12 +46,18 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
     Job.getJobManager().addJobChangeListener(m_jobChangeListener);
   }
 
-  private IBusyHandler getHandler(Job job) {
+  private IBusyHandler getHandlerInternal(Job job) {
     if (job instanceof IClientSessionProvider) {
       IClientSession session = ((IClientSessionProvider) job).getClientSession();
-      if (session != null) {
-        return (IBusyHandler) session.getData(HANDLER_CLIENT_SESSION_KEY);
-      }
+      return getHandler(session);
+    }
+    return null;
+  }
+
+  @Override
+  public IBusyHandler getHandler(IClientSession session) {
+    if (session != null) {
+      return (IBusyHandler) session.getData(HANDLER_CLIENT_SESSION_KEY);
     }
     return null;
   }
@@ -76,7 +82,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
     @Override
     public void running(IJobChangeEvent event) {
       final Job job = event.getJob();
-      IBusyHandler handler = getHandler(job);
+      IBusyHandler handler = getHandlerInternal(job);
       if (handler == null) {
         return;
       }
@@ -89,7 +95,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
     @Override
     public void done(IJobChangeEvent event) {
       final Job job = event.getJob();
-      IBusyHandler handler = getHandler(job);
+      IBusyHandler handler = getHandlerInternal(job);
       if (handler == null) {
         return;
       }
@@ -104,7 +110,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
     @Override
     public void blockingConditionStart(IJobChangeEvent event) {
       final Job job = event.getJob();
-      IBusyHandler handler = getHandler(job);
+      IBusyHandler handler = getHandlerInternal(job);
       if (handler == null) {
         return;
       }
@@ -114,7 +120,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
     @Override
     public void blockingConditionEnd(IJobChangeEvent event) {
       final Job job = event.getJob();
-      IBusyHandler handler = getHandler(job);
+      IBusyHandler handler = getHandlerInternal(job);
       if (handler == null) {
         return;
       }
