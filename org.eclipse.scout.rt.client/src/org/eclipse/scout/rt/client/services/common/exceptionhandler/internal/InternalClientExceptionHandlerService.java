@@ -49,6 +49,9 @@ public class InternalClientExceptionHandlerService extends AbstractService imple
 
   @Override
   public void handleException(ProcessingException pe) {
+    if (pe.isInterruption()) {
+      return;
+    }
     ServiceState state = getServiceState();
     try {
       if (state.m_handlerLock.acquire()) {

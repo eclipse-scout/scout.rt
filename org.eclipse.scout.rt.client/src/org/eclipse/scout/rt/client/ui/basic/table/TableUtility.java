@@ -72,12 +72,7 @@ public final class TableUtility {
       }
     }
     catch (ProcessingException e) {
-      if (e.isInterruption()) {
-        // nop
-      }
-      else {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      }
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
   }
 

@@ -346,12 +346,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
               reloadPage();
             }
             catch (ProcessingException ex) {
-              if (ex.isInterruption()) {
-                // nop
-              }
-              else {
-                SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
-              }
+              SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
             }
             break;
           }

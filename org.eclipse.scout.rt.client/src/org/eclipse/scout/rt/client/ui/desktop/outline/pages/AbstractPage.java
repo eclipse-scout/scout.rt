@@ -377,8 +377,13 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
       execPageActivated();
     }
     catch (Throwable t) {
-      //ticket 87361: only log a warning
-      LOG.warn("Caught a failure, probably due to operation cancelation by the user", t);
+      if (t instanceof ProcessingException && ((ProcessingException) t).isInterruption()) {
+        //nop
+      }
+      else {
+        //ticket 87361: only log a warning
+        LOG.warn("Caught a failure, probably due to operation cancelation by the user", t);
+      }
     }
   }
 
@@ -388,8 +393,13 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
       execPageDeactivated();
     }
     catch (Throwable t) {
-      //ticket 87361: only log a warning
-      LOG.warn("Caught a failure, probably due to operation cancelation by the user", t);
+      if (t instanceof ProcessingException && ((ProcessingException) t).isInterruption()) {
+        //nop
+      }
+      else {
+        //ticket 87361: only log a warning
+        LOG.warn("Caught a failure, probably due to operation cancelation by the user", t);
+      }
     }
   }
 

@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -186,6 +185,7 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
     // wait until done
     ServiceTunnelResponse res = null;
     boolean cancelled = false;
+    boolean sentCancelRequest= false;
     synchronized (backgroundLock) {
       backgroundJob.schedule();
       while (true) {
@@ -194,7 +194,8 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
           break;
         }
         IProgressMonitor mon = backgroundJob.getMonitor();
-        if (JobEx.isCurrentJobCanceled() || (mon != null && mon.isCanceled())) {
+        if ((!sentCancelRequest) && JobEx.isCurrentJobCanceled() || (mon != null && mon.isCanceled())) {
+          sentCancelRequest=true;
           boolean success = sendCancelRequest(req.getRequestSequence());
           if (success) {
             //in fact cancelled the job
@@ -202,17 +203,7 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
             break;
           }
           else {
-            //cancel was not possible, continue and reset cancel flags
-            if (mon != null) {
-              mon.setCanceled(false);
-            }
-            Job me = Job.getJobManager().currentJob();
-            if (me instanceof JobEx) {
-              IProgressMonitor myMon = ((JobEx) me).getMonitor();
-              if (myMon != null) {
-                myMon.setCanceled(false);
-              }
-            }
+            //cancel was not possible, continue
           }
         }
         if (backgroundJob.getState() == JobEx.NONE) {
@@ -270,12 +261,7 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
    */
   protected void decorateBackgroundJob(ServiceTunnelRequest call, Job backgroundJob) {
     backgroundJob.setUser(false);
-    if (call.getServiceInterfaceClassName().equals(IPingService.class.getName())) {
-      backgroundJob.setSystem(true);
-    }
-    else {
-      backgroundJob.setSystem(false);
-    }
+    backgroundJob.setSystem(true);
   }
 
   /**

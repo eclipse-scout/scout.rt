@@ -2796,12 +2796,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     catch (ProcessingException e) {
-      if (e.isInterruption()) {
-        // nop
-      }
-      else {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      }
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
     finally {
       m_cellLookupBuffer.clear();
