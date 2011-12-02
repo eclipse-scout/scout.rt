@@ -28,7 +28,7 @@
             name="Tab box"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.tabbox.SwtScoutTabBox">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.tabbox.SwtScoutTabBox">
             </uiClass>
       </formField>
       <formField
@@ -37,7 +37,7 @@
             name="Group box"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.groupbox.SwtScoutGroupBox">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.groupbox.SwtScoutGroupBox">
             </uiClass>
       </formField>
       <formField
@@ -46,7 +46,7 @@
             name="Snap box"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.snapbox.SwtScoutSnapBox">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.snapbox.SwtScoutSnapBox">
             </uiClass>
       </formField>
       <formField
@@ -55,7 +55,7 @@
             name="Smart field"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.smartfield.SwtScoutSmartField">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.smartfield.SwtScoutSmartField">
             </uiClass>
       </formField>
       <formField
@@ -64,7 +64,7 @@
             name="List Box"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.listbox.SwtScoutListBox">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.listbox.SwtScoutListBox">
             </uiClass>
       </formField>
       <formField
@@ -73,7 +73,7 @@
             name="Tree box"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.treebox.SwtScoutTreeBox">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.treebox.SwtScoutTreeBox">
             </uiClass>
       </formField>
       <formField
@@ -91,7 +91,7 @@
             name="Table field"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.tablefield.SwtScoutTableField">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.tablefield.SwtScoutTableField">
             </uiClass>
       </formField>
       <formField
@@ -100,7 +100,7 @@
             name="Tree field"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.treefield.SwtScoutTreeField">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.treefield.SwtScoutTreeField">
             </uiClass>
       </formField>
       <formField
@@ -109,7 +109,7 @@
             name="Boolean field, checkbox"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.checkbox.SwtScoutCheckbox">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.checkbox.SwtScoutCheckbox">
             </uiClass>
       </formField>
       <formField
@@ -118,7 +118,7 @@
             name="Decimal field"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.decimalfield.SwtScoutDecimalField">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.decimalfield.SwtScoutDecimalField">
             </uiClass>
       </formField>
       <formField
@@ -127,7 +127,7 @@
             name="File chooser field"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.filechooserfield.SwtScoutFileChooserField">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.filechooserfield.SwtScoutFileChooserField">
             </uiClass>
       </formField>
       <formField
@@ -136,7 +136,7 @@
             name="Label field"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.labelfield.SwtScoutLabelField">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.labelfield.SwtScoutLabelField">
             </uiClass>
       </formField>
       <formField
@@ -145,7 +145,7 @@
             name="Number field"
             scope="default">
            <uiClass
-           	class="org.eclipse.scout.rt.ui.swt.form.fields.numberfield.SwtScoutNumberField">
+            class="org.eclipse.scout.rt.ui.swt.form.fields.numberfield.SwtScoutNumberField">
            </uiClass>
       </formField>
       <formField
@@ -154,7 +154,7 @@
             name="Radio button group"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.radiobuttongroup.SwtScoutRadioButtonGroup">
+              class="org.eclipse.scout.rt.ui.swt.form.radiobuttongroup.SwtScoutRadioButtonGroup">
             </uiClass>
       </formField>
       <formField
@@ -163,7 +163,7 @@
             name="Sequence box"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.sequencebox.SwtScoutSequenceBox">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.sequencebox.SwtScoutSequenceBox">
             </uiClass>
       </formField>
       <formField
@@ -172,7 +172,7 @@
             name="Split box"
             scope="default">
            <uiClass
-           	class="org.eclipse.scout.rt.ui.swt.form.fields.splitbox.SwtScoutSplitBox">
+            class="org.eclipse.scout.rt.ui.swt.form.fields.splitbox.SwtScoutSplitBox">
            </uiClass>
       </formField>
       <formField
@@ -181,7 +181,7 @@
             name="Image field"
             scope="default">
            <uiClass
-           	class="org.eclipse.scout.rt.ui.swt.form.fields.imagebox.SwtScoutImageField">
+            class="org.eclipse.scout.rt.ui.swt.form.fields.imagebox.SwtScoutImageField">
            </uiClass>
       </formField>
       <formField
@@ -190,7 +190,7 @@
             name="Wrapped form field"
             scope="default">
             <uiClass
-            	class="org.eclipse.scout.rt.ui.swt.form.fields.wrappedformfield.SwtScoutWrappedFormField">
+              class="org.eclipse.scout.rt.ui.swt.form.fields.wrappedformfield.SwtScoutWrappedFormField">
             </uiClass>
       </formField>
       <formField
@@ -318,7 +318,6 @@
       </properties>
    </extension>
    <extension point="org.eclipse.scout.service.services">
-      <service class="org.eclipse.scout.rt.ui.swt.services.SwtScoutProgressService" />
       <service class="org.eclipse.scout.rt.ui.swt.services.UserActivityProvider"
                createImmediately="true">
       </service>
@@ -331,8 +330,8 @@
    </extension>
 
    <extension point="org.eclipse.ui.activities">
-      <activity	name="Remove Unused Icons Manager"
-	              id="activity.removeUnusedIcons" />
+      <activity  name="Remove Unused Icons Manager"
+                id="activity.removeUnusedIcons" />
          <activityPatternBinding activityId="activity.removeUnusedIcons"
                                  pattern="org\.eclipse\.ui\.editors/org\.eclipse\.ui\.edit\.text\.gotoLastEditPosition">
          </activityPatternBinding>

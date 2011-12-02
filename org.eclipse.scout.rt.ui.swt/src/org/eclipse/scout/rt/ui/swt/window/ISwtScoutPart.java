@@ -14,12 +14,24 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.forms.widgets.Form;
 
 public interface ISwtScoutPart {
   String MARKER_SCOLLED_FORM = "SCROLLED_FORM";
 
+  /**
+   * @return the scout form
+   */
   IForm getForm();
 
+  /**
+   * @return the swt form container
+   */
+  Form getSwtForm();
+
+  /**
+   * @return the composite of swt form container and scout form
+   */
   ISwtScoutForm getUiForm();
 
   void closePart() throws ProcessingException;

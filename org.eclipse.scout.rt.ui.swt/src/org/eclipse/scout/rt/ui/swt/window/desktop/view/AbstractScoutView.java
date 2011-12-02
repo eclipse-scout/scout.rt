@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
+import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.swt.util.listener.PartListener;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
@@ -34,9 +35,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Form;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -170,15 +171,30 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
   }
 
   protected void setImageFromScout(String iconId) {
-    setTitleImage(getSwtEnvironment().getIcon(iconId));
+    Image img = getSwtEnvironment().getIcon(iconId);
+    setTitleImage(img);
+    String sub = getForm().getSubTitle();
+    if (sub != null) {
+      getSwtForm().setImage(img);
+    }
+    else {
+      getSwtForm().setImage(null);
+    }
   }
 
   protected void setTitleFromScout(String title) {
-    if (title == null) {
-      title = "";
+    IForm f = getForm();
+    //
+    String s = f.getBasicTitle();
+    setPartName(StringUtility.removeNewLines(s != null ? s : ""));
+    //
+    s = f.getSubTitle();
+    if (s != null) {
+      getSwtForm().setText(StringUtility.removeNewLines(s != null ? s : ""));
     }
-    title = StringUtility.removeNewLines(title);
-    setPartName(title);
+    else {
+      getSwtForm().setText(null);
+    }
   }
 
   protected void setMaximizeEnabledFromScout(boolean maximizable) {
@@ -224,13 +240,17 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
 
   @Override
   public void createPartControl(Composite parent) {
-    FormToolkit toolkit = new FormToolkit(parent.getDisplay());
+    ScoutFormToolkit toolkit = getSwtEnvironment().getFormToolkit();
     m_rootForm = toolkit.createForm(parent);
-
     m_rootForm.setData(ISwtScoutPart.MARKER_SCOLLED_FORM, new Object());
     m_rootArea = m_rootForm.getBody();
     m_rootArea.setLayout(new ViewStackLayout());
     attatchListeners();
+  }
+
+  @Override
+  public Form getSwtForm() {
+    return m_rootForm;
   }
 
   protected Form getRootForm() {
@@ -271,7 +291,15 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
 
   @Override
   public boolean isActive() {
-    return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == getSite().getPage();
+    IWorkbenchWindow w = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+    if (w == null) {
+      return false;
+    }
+    IWorkbenchPage activePage = w.getActivePage();
+    if (activePage == null) {
+      return false;
+    }
+    return (activePage == getSite().getPage()) && (activePage.getActivePart() == this);
   }
 
   @Override

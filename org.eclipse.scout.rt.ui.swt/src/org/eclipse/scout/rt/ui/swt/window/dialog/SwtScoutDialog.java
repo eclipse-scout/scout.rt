@@ -106,6 +106,11 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     return m_uiForm;
   }
 
+  @Override
+  public Form getSwtForm() {
+    return m_rootForm;
+  }
+
   public Form getRootForm() {
     return m_rootForm;
   }
@@ -143,15 +148,30 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   }
 
   protected void setImageFromScout(String iconId) {
-    getShell().setImage(m_environment.getIcon(iconId));
+    Image img = m_environment.getIcon(iconId);
+    getShell().setImage(img);
+    String sub = getForm().getSubTitle();
+    if (sub != null) {
+      getSwtForm().setImage(img);
+    }
+    else {
+      getSwtForm().setImage(null);
+    }
   }
 
   protected void setTitleFromScout(String title) {
-    if (title == null) {
-      title = "";
+    IForm f = getForm();
+    //
+    String s = f.getBasicTitle();
+    getShell().setText(StringUtility.removeNewLines(s != null ? s : ""));
+    //
+    s = f.getSubTitle();
+    if (s != null) {
+      getSwtForm().setText(StringUtility.removeNewLines(s != null ? s : ""));
     }
-    title = StringUtility.removeNewLines(title);
-    getShell().setText(title);
+    else {
+      getSwtForm().setText(null);
+    }
   }
 
   protected void setMaximizeEnabledFromScout(boolean maximizable) {

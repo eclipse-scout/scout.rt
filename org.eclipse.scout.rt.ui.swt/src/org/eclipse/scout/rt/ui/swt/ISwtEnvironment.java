@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swt;
 
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.job.JobEx;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
@@ -69,7 +71,10 @@ public interface ISwtEnvironment {
   /**
    * {@link Boolean} busy/idle handling Use positive edge from swt 0->1 and
    * negative edge from scout 1->0
+   * 
+   * @deprecated replaced by {@link SwtBusyHandler}
    */
+  @Deprecated
   String PROP_BUSY = "busy";
 
   Display getDisplay();
@@ -204,6 +209,8 @@ public interface ISwtEnvironment {
   AbstractScoutEditorPart getEditorPart(IEditorInput editorInput, String editorId);
 
   String[] getAllPartIds();
+
+  Collection<ISwtScoutPart> getOpenFormParts();
 
   String getSwtPartIdForScoutPartId(String scoutViewLocation);
 

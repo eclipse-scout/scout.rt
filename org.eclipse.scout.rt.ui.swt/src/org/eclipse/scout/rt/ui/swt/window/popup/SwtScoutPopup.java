@@ -34,6 +34,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.forms.widgets.Form;
 
 /**
  * Popup window bound to a component (ownerComponent). The popup closes when
@@ -196,6 +197,11 @@ public class SwtScoutPopup implements ISwtScoutPart {
   @Override
   public IForm getForm() {
     return m_scoutForm;
+  }
+
+  @Override
+  public Form getSwtForm() {
+    return null;
   }
 
   @Override

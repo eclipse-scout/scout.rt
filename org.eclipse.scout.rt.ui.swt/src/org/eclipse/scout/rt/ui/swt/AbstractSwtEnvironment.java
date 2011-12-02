@@ -14,26 +14,19 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
@@ -45,9 +38,9 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -64,6 +57,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swt.basic.WidgetPrinter;
+import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.concurrency.SwtScoutSynchronizer;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.form.SwtScoutForm;
@@ -71,7 +65,6 @@ import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStrokeFilter;
 import org.eclipse.scout.rt.ui.swt.keystroke.KeyStrokeManager;
-import org.eclipse.scout.rt.ui.swt.services.SwtScoutProgressService;
 import org.eclipse.scout.rt.ui.swt.util.ColorFactory;
 import org.eclipse.scout.rt.ui.swt.util.FontRegistry;
 import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
@@ -123,6 +116,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PerspectiveAdapter;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.osgi.framework.Bundle;
@@ -136,10 +130,6 @@ import org.osgi.framework.Version;
 public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver implements ISwtEnvironment {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtEnvironment.class);
 
-  private static enum BusyStatus {
-    IDLE, DETECTING, BUSY
-  }
-
   private final Bundle m_applicationBundle;
 
   private final String m_perspectiveId;
@@ -149,7 +139,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   private int m_status;
 
   private SwtScoutSynchronizer m_synchronizer;
-  private BusyStatus m_busyStatus;
 
   private final Object m_immediateSwtJobsLock = new Object();
   private final List<Runnable> m_immediateSwtJobs = new ArrayList<Runnable>();
@@ -169,7 +158,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   private ScoutFormToolkit m_formToolkit;
   private FormFieldFactory m_formFieldFactory;
 
-  private IJobChangeListener m_jobChangeListener;
   private PropertyChangeSupport m_propertySupport;
 
   private boolean m_startDesktopCalled;
@@ -236,10 +224,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       }
       detachScoutListeners();
       detachSWTListeners();
-      if (m_jobChangeListener != null) {
-        Job.getJobManager().removeJobChangeListener(m_jobChangeListener);
-        m_jobChangeListener = null;
-      }
       if (m_synchronizer != null) {
         m_synchronizer = null;
       }
@@ -433,66 +417,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       if (m_synchronizer == null) {
         m_synchronizer = new SwtScoutSynchronizer(this);
       }
-      if (m_jobChangeListener == null) {
-        // add job manager listener for busy handling
-        m_jobChangeListener = new JobChangeAdapter() {
-          @Override
-          public void done(IJobChangeEvent e) {
-            if (!Job.getJobManager().isIdle()) {
-              for (Job j : Job.getJobManager().find(ClientJob.class)) {
-                if (j instanceof ClientJob) {
-                  ClientJob c = (ClientJob) j;
-                  if (c.isSync() && !c.isWaitFor()) {
-                    // there is a running job, still busy
-                    return;
-                  }
-                }
-              }
-            }
-            // idle
-            if (m_busyStatus == BusyStatus.BUSY || m_busyStatus == BusyStatus.DETECTING) {
-              // check whether the job queue is still idle in 100ms
-              Job j = new Job("JobChangeAdapter, double-check") {
-                @Override
-                protected IStatus run(IProgressMonitor m) {
-                  if (!Job.getJobManager().isIdle()) {
-                    for (Job runningJob : Job.getJobManager().find(ClientJob.class)) {
-                      if (runningJob instanceof ClientJob) {
-                        ClientJob c = (ClientJob) runningJob;
-                        if (c.isSync() && !c.isWaitFor()) {
-                          //there is a running job, still busy
-                          return Status.OK_STATUS;
-                        }
-                      }
-                    }
-                  }
-                  if (!PlatformUI.isWorkbenchRunning()) {
-                    return Status.OK_STATUS;
-                  }
-                  if (m_busyStatus == BusyStatus.BUSY || m_busyStatus == BusyStatus.DETECTING) {
-                    getDisplay().asyncExec(new Runnable() {
-                      @Override
-                      public void run() {
-                        setBusyInternal(BusyStatus.IDLE);
-                      }
-                    });
-                  }
-                  return Status.OK_STATUS;
-                }
-              };
-              j.setSystem(true);
-              j.schedule(100);
-            }
-          }
-        };
-        Job.getJobManager().addJobChangeListener(m_jobChangeListener);
-      }
       //
       m_iconLocator = createIconLocator();
       m_colorFactory = new ColorFactory(getDisplay());
       m_keyStrokeManager = new KeyStrokeManager(this);
       m_fontRegistry = new FontRegistry(getDisplay());
-      m_formToolkit = createScoutFormToolkit(getDisplay());
       attachScoutListeners();
       attachSWTListeners();
       IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -549,6 +478,8 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
       m_status = SwtEnvironmentEvent.STARTED;
       fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
+
+      attachBusyHandler(m_clientSession);
     }
     finally {
       if (m_status == SwtEnvironmentEvent.STARTING) {
@@ -556,6 +487,16 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
       }
     }
+  }
+
+  protected SwtBusyHandler attachBusyHandler(IClientSession session) {
+    IBusyManagerService service = SERVICES.getService(IBusyManagerService.class);
+    if (service == null) {
+      return null;
+    }
+    SwtBusyHandler handler = new SwtBusyHandler(session, this);
+    service.register(session, handler);
+    return handler;
   }
 
   protected void showClientSessionLoadError(Throwable error) {
@@ -670,46 +611,13 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   @Override
   public boolean isBusy() {
-    return m_busyStatus == BusyStatus.BUSY;
+    //replaced by SwtBusyHandler
+    return false;
   }
 
   @Override
   public void setBusyFromSwt(boolean b) {
-    checkThread();
-    if (b) {
-      if (m_busyStatus == BusyStatus.DETECTING || m_busyStatus == BusyStatus.BUSY) {
-        // status is already set to busy or detecting
-        return;
-      }
-      // Do not directly set status to busy in order to prevent mouse cursor flickering (default <-> waiting cursor).
-      // A job is scheduled that checks busy conditions after sleeping for 300 ms.
-      setBusyInternal(BusyStatus.DETECTING);
-      Job j = new Job("Busy in 300ms") {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-              if (m_busyStatus == BusyStatus.DETECTING) {
-                setBusyInternal(BusyStatus.BUSY);
-              }
-            }
-          });
-          return Status.OK_STATUS;
-        }
-      };
-      j.setSystem(true);
-      j.schedule(300);
-    }
-  }
-
-  protected void setBusyInternal(BusyStatus status) {
-    checkThread();
-    if (m_busyStatus != status) {
-      m_busyStatus = status;
-      SwtScoutProgressService service = SERVICES.getService(SwtScoutProgressService.class);
-      service.setWaitingCursor(m_busyStatus == BusyStatus.BUSY, this);
-    }
+    //replaced by SwtBusyHandler
   }
 
   @Override
@@ -751,7 +659,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   @Override
   public ImageDescriptor getImageDescriptor(String iconId) {
-
     return m_iconLocator.getImageDescriptor(iconId);
   }
 
@@ -811,6 +718,9 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   // form toolkit handling
   @Override
   public ScoutFormToolkit getFormToolkit() {
+    if (m_formToolkit == null) {
+      m_formToolkit = createScoutFormToolkit(getDisplay());
+    }
     return m_formToolkit;
   }
 
@@ -1243,6 +1153,11 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
+  @Override
+  public Collection<ISwtScoutPart> getOpenFormParts() {
+    return new ArrayList<ISwtScoutPart>(m_openForms.values());
+  }
+
   private class P_ScoutDesktopPropertyListener implements PropertyChangeListener {
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
@@ -1444,67 +1359,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
    */
   @Override
   public Shell getParentShellIgnoringPopups(int modalities) {
-    Shell shell = getDisplay().getActiveShell();
-    if (shell == null) {
-      if (PlatformUI.getWorkbench().getActiveWorkbenchWindow() != null) {
-        shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-      }
-    }
-    if (shell != null) {
-      while (SwtUtility.isPopupShell(shell) && shell.getParent() instanceof Shell) {
-        shell = (Shell) shell.getParent();
-      }
-    }
-    // traverse complete tree
-    if (shell == null) {
-      TreeMap<CompositeLong, Shell> map = new TreeMap<CompositeLong, Shell>();
-      for (IWorkbenchWindow w : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-        visitShellTreeRec(w.getShell(), modalities, 0, map);
-      }
-      if (map.size() > 0) {
-        shell = map.get(map.firstKey());
-      }
-    }
-    return shell;
-  }
-
-  /**
-   * Visit the complete workbench shell tree. Ignore popup shells and shells
-   * with extendedStyle popup The list is ordered by the following priorities:
-   * 1. system modal before application modal before modeless 2. sub shells
-   * before parent shells before top level shells
-   */
-  private void visitShellTreeRec(Shell shell, int modalities, int level, TreeMap<CompositeLong, Shell> out) {
-    if (shell != null) {
-      if (!SwtUtility.isPopupShell(shell)) {
-        int style = shell.getStyle();
-        if (level == 0) {
-          out.put(new CompositeLong(9, -level), shell);
-        }
-        else if ((style & SWT.SYSTEM_MODAL) != 0) {
-          if ((modalities & SWT.SYSTEM_MODAL) != 0) {
-            out.put(new CompositeLong(0, -level), shell);
-          }
-        }
-        else if ((style & SWT.APPLICATION_MODAL) != 0) {
-          if ((modalities & SWT.APPLICATION_MODAL) != 0) {
-            out.put(new CompositeLong(1, -level), shell);
-          }
-        }
-        else {
-          if ((modalities & SWT.MODELESS) != 0) {
-            out.put(new CompositeLong(2, -level), shell);
-          }
-        }
-        // children
-        Shell[] children = shell.getShells();
-        if (children != null) {
-          for (Shell child : children) {
-            visitShellTreeRec(child, modalities, level + 1, out);
-          }
-        }
-      }
-    }
+    return SwtUtility.getParentShellIgnoringPopups(getDisplay(), modalities);
   }
 
   @Override
@@ -1519,7 +1374,14 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   protected ScoutFormToolkit createScoutFormToolkit(Display display) {
-    return new ScoutFormToolkit(new FormToolkit(display));
+    return new ScoutFormToolkit(new FormToolkit(display) {
+      @Override
+      public Form createForm(Composite parent) {
+        Form f = super.createForm(parent);
+        decorateFormHeading(f);
+        return f;
+      }
+    });
   }
 
   @Override

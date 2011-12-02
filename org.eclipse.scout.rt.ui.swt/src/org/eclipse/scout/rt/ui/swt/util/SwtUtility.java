@@ -20,8 +20,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
@@ -58,6 +60,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 public final class SwtUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtUtility.class);
@@ -67,42 +71,42 @@ public final class SwtUtility {
   }
 
   public static SwtTransferObject[] createSwtTransferables(TransferObject transferObject) {
-    List<SwtTransferObject> swtTranferObjects = new ArrayList<SwtTransferObject>();
-    if (transferObject instanceof FileListTransferObject) {
-      FileListTransferObject scoutTransferObject = ((FileListTransferObject) transferObject);
-      swtTranferObjects.add(new SwtTransferObject(FileTransfer.getInstance(), scoutTransferObject.getFilenames()));
-    }
-    else if (transferObject instanceof TextTransferObject) {
-      TextTransferObject scoutTransferObject = ((TextTransferObject) transferObject);
-      // text/plain
-      swtTranferObjects.add(new SwtTransferObject(TextTransfer.getInstance(), scoutTransferObject.getPlainText()));
-      // text/html
-      if (StringUtility.hasText(scoutTransferObject.getHtmlText())) {
-        swtTranferObjects.add(new SwtTransferObject(HTMLTransfer.getInstance(), scoutTransferObject.getHtmlText()));
-      }
-    }
-    else if (transferObject instanceof JavaTransferObject) {
-      JavaTransferObject scoutTransferObject = ((JavaTransferObject) transferObject);
-      swtTranferObjects.add(new SwtTransferObject(JVMLocalObjectTransfer.getInstance(), scoutTransferObject.getLocalObject()));
-    }
-    else if (transferObject instanceof ImageTransferObject) {
-      ImageTransferObject scoutTransferObject = ((ImageTransferObject) transferObject);
+	    List<SwtTransferObject> swtTranferObjects = new ArrayList<SwtTransferObject>();
+	    if (transferObject instanceof FileListTransferObject) {
+	      FileListTransferObject scoutTransferObject = ((FileListTransferObject) transferObject);
+	      swtTranferObjects.add(new SwtTransferObject(FileTransfer.getInstance(), scoutTransferObject.getFilenames()));
+	    }
+	    else if (transferObject instanceof TextTransferObject) {
+	      TextTransferObject scoutTransferObject = ((TextTransferObject) transferObject);
+	      // text/plain
+	      swtTranferObjects.add(new SwtTransferObject(TextTransfer.getInstance(), scoutTransferObject.getPlainText()));
+	      // text/html
+	      if (StringUtility.hasText(scoutTransferObject.getHtmlText())) {
+	        swtTranferObjects.add(new SwtTransferObject(HTMLTransfer.getInstance(), scoutTransferObject.getHtmlText()));
+	      }
+	    }
+	    else if (transferObject instanceof JavaTransferObject) {
+	      JavaTransferObject scoutTransferObject = ((JavaTransferObject) transferObject);
+	      swtTranferObjects.add(new SwtTransferObject(JVMLocalObjectTransfer.getInstance(), scoutTransferObject.getLocalObject()));
+	    }
+	    else if (transferObject instanceof ImageTransferObject) {
+	      ImageTransferObject scoutTransferObject = ((ImageTransferObject) transferObject);
 
-      Object image = scoutTransferObject.getImage();
-      if (image instanceof ImageData) {
-        swtTranferObjects.add(new SwtTransferObject(ImageTransfer.getInstance(), (ImageData) image));
-      }
-      else if (image instanceof byte[]) {
-        ByteArrayInputStream imageInput = new ByteArrayInputStream((byte[]) image);
-        ImageData imageData = new Image(null, imageInput).getImageData();
-        swtTranferObjects.add(new SwtTransferObject(ImageTransfer.getInstance(), imageData));
-      }
-    }
-    else {
-      LOG.error("unsupported transfer object type: " + transferObject);
-    }
-    return swtTranferObjects.toArray(new SwtTransferObject[swtTranferObjects.size()]);
-  }
+	      Object image = scoutTransferObject.getImage();
+	      if (image instanceof ImageData) {
+	        swtTranferObjects.add(new SwtTransferObject(ImageTransfer.getInstance(), (ImageData) image));
+	      }
+	      else if (image instanceof byte[]) {
+	        ByteArrayInputStream imageInput = new ByteArrayInputStream((byte[]) image);
+	        ImageData imageData = new Image(null, imageInput).getImageData();
+	        swtTranferObjects.add(new SwtTransferObject(ImageTransfer.getInstance(), imageData));
+	      }
+	    }
+	    else {
+	      LOG.error("unsupported transfer object type: " + transferObject);
+	    }
+	    return swtTranferObjects.toArray(new SwtTransferObject[swtTranferObjects.size()]);
+	  }
 
   public static TransferObject createScoutTransferable(DropTargetEvent swtT) {
     if (swtT == null || swtT.currentDataType == null) {
@@ -219,6 +223,7 @@ public final class SwtUtility {
       swtTransferList.add(TextTransfer.getInstance());
     }
     return swtTransferList.toArray(new Transfer[swtTransferList.size()]);
+
   }
 
   public static int getHorizontalAlignment(int scoutAlignment) {
@@ -977,6 +982,91 @@ public final class SwtUtility {
     }
     // default
     return null;
+  }
+
+  /**
+   * @param modalities
+   *          combination of {@link SWT#SYSTEM_MODAL}, {@link SWT#APPLICATION_MODAL}, {@link SWT#MODELESS}
+   * @return best effort to get the "current" parent shell
+   *         <p>
+   *         Never null
+   */
+  public static Shell getParentShellIgnoringPopups(Display display, int modalities) {
+    Shell shell = display.getActiveShell();
+    if (shell == null) {
+      if (PlatformUI.getWorkbench().getActiveWorkbenchWindow() != null) {
+        shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+      }
+    }
+    if (shell != null) {
+      while (SwtUtility.isPopupShell(shell) && shell.getParent() instanceof Shell) {
+        shell = (Shell) shell.getParent();
+      }
+    }
+    // traverse complete tree
+    if (shell == null) {
+      TreeMap<CompositeLong, Shell> map = new TreeMap<CompositeLong, Shell>();
+      for (IWorkbenchWindow w : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+        visitShellTreeRec(w.getShell(), modalities, 0, map);
+      }
+      if (map.size() > 0) {
+        shell = map.get(map.firstKey());
+      }
+    }
+    if (shell != null && shell.getData() instanceof ProgressMonitorDialog) {
+      // do also ignore the ProgressMonitorDialog, otherwise there will be some strange behaviors
+      // when displaying a shell on top of the ProgressMonitorDialog-shell (f.e. when the
+      // ProgressMonitorDialog-shell disappears)
+      shell = (Shell) shell.getParent();
+    }
+    return shell;
+  }
+
+  /**
+   * Visit the complete workbench shell tree.
+   * Ignore popup shells and shells
+   * with extendedStyle popup
+   * <p>
+   * The list is ordered by the following priorities:<br>
+   * 1. system modal before application modal before modeless<br>
+   * 2. sub shells before parent shells before top level shells
+   */
+  private static void visitShellTreeRec(Shell shell, int modalities, int level, TreeMap<CompositeLong, Shell> out) {
+    if (shell == null) {
+      return;
+    }
+    if (!shell.isVisible()) {
+      return;
+    }
+    if (isPopupShell(shell)) {
+      return;
+    }
+    int style = shell.getStyle();
+    if (level == 0) {
+      out.put(new CompositeLong(9, -level), shell);
+    }
+    else if ((style & SWT.SYSTEM_MODAL) != 0) {
+      if ((modalities & SWT.SYSTEM_MODAL) != 0) {
+        out.put(new CompositeLong(0, -level), shell);
+      }
+    }
+    else if ((style & SWT.APPLICATION_MODAL) != 0) {
+      if ((modalities & SWT.APPLICATION_MODAL) != 0) {
+        out.put(new CompositeLong(1, -level), shell);
+      }
+    }
+    else {
+      if ((modalities & SWT.MODELESS) != 0) {
+        out.put(new CompositeLong(2, -level), shell);
+      }
+    }
+    // children
+    Shell[] children = shell.getShells();
+    if (children != null) {
+      for (Shell child : children) {
+        visitShellTreeRec(child, modalities, level + 1, out);
+      }
+    }
   }
 
 }
