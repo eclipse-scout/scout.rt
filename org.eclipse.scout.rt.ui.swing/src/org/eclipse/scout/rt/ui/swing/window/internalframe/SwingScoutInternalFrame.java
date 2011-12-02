@@ -16,8 +16,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.EventListener;
 
@@ -49,7 +47,6 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
   private ISwingEnvironment m_env;
   private boolean m_addedToDesktop;
   private EventListenerList m_listenerList;
-  private P_SwingScoutRootListener m_swingScoutRootListener;
   private JInternalFrameEx m_swingView;
   private Object m_viewConstraints;
   // cache
@@ -123,11 +120,6 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
       }
     });
     m_swingView.pack();
-    //
-    if (m_swingScoutRootListener == null) {
-      m_swingScoutRootListener = new P_SwingScoutRootListener();
-      m_env.addPropertyChangeListener(m_swingScoutRootListener);
-    }
   }
 
   @Override
@@ -192,10 +184,6 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
       m_boundsProvider.storeBounds(m_swingView.getBounds());
     }
     m_addedToDesktop = false;
-    if (m_swingScoutRootListener != null) {
-      m_env.removePropertyChangeListener(m_swingScoutRootListener);
-      m_swingScoutRootListener = null;
-    }
     m_env.getRootComposite().getDesktopComposite().removeView(m_swingView);
   }
 
@@ -250,16 +238,6 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
   public void setName(String name) {
     m_swingView.setName(name);
   }
-
-  private class P_SwingScoutRootListener implements PropertyChangeListener {
-    @Override
-    public void propertyChange(PropertyChangeEvent e) {
-      if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
-        boolean busy = ((Boolean) e.getNewValue()).booleanValue();
-        m_swingView.setWaitCursor(busy);
-      }
-    }
-  }// end private class
 
   private class P_SwingWindowListener implements InternalFrameListener {
     @Override

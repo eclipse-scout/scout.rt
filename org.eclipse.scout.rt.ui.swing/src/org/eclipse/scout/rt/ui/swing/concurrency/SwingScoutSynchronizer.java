@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -57,7 +57,6 @@ public class SwingScoutSynchronizer {
       LOG.warn("loop detection: " + j, new Exception("Loop detected"));
       return null;
     }
-    m_env.setBusyFromSwing(true);
     //send job
     final long deadLine = cancelTimeout > 0 ? System.currentTimeMillis() + cancelTimeout : -1;
     ClientSyncJob eclipseJob = new ClientSyncJob("Swing post::" + j, m_env.getScoutSession()) {
@@ -69,7 +68,6 @@ public class SwingScoutSynchronizer {
       }
     };
     eclipseJob.schedule();
-    m_env.setBusyFromSwing(false);
     return eclipseJob;
   }
 

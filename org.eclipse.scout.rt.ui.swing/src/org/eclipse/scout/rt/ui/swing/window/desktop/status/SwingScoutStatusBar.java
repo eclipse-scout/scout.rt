@@ -40,14 +40,13 @@ import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerServ
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.Activator;
-import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.FlowLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
-import org.eclipse.scout.rt.ui.swing.window.desktop.ProgressHandler;
+import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
 import org.eclipse.scout.service.SERVICES;
 
 public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
@@ -60,10 +59,8 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
   private static final String CARD_LOGO = "logo";
   private static final String CARD_ACTIVITY = "activity";
 
-  // state
-  private boolean m_busyCached;
-  private ProgressHandler m_progressHandler;
   private int m_visibilityPolicy;
+  private boolean m_progressVisible;
   // items
   private JLabel m_swingStatusLabel;
   private JPanel m_swingCardPanel;
@@ -85,21 +82,13 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
     m_iconNetworkLatencyYellow = Activator.getIcon(SwingIcons.NetworkLatencyYellow);
     m_iconNetworkLatencyRed = Activator.getIcon(SwingIcons.NetworkLatencyRed);
     //
-    m_busyCached = getSwingEnvironment().isBusy();
-    m_progressHandler = new ProgressHandler(getSwingEnvironment()) {
-      @Override
-      protected void handleProgressChangeInSwingThread() {
-        SwingScoutStatusBar.this.handleProgressChangeInSwingThread();
-      }
-    };
-
     Icon icon = UIManager.getIcon("StatusBar.StopButton.icon");
     // create button and add notifiers for starting progress listeners
     m_swingStopButton = new JButton(icon);
     m_swingStopButton.setFocusable(false);
     m_swingStopButton.setHorizontalAlignment(SwingConstants.CENTER);
     m_swingStopButton.setMargin(new Insets(0, 4, 0, 3));
-    m_swingStopButton.addActionListener(m_progressHandler.createStopAction());
+    m_swingStopButton.addActionListener(new SwingProgressHandler.CancelJobsAction());
     m_swingStopButton.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     //
     m_swingProgressBar = new JProgressBar(0, 100);
@@ -146,18 +135,17 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
     bar.setMaximumSize(new Dimension(2048, h));
     setSwingField(bar);
 
-    // swing listener
-    getSwingEnvironment().addPropertyChangeListener(
-        new PropertyChangeListener() {
-          @Override
-          public void propertyChange(PropertyChangeEvent e) {
-            if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
-              m_busyCached = (Boolean) e.getNewValue();
-              handleProgressChangeInSwingThread();
+    //progress handler
+    SwingProgressHandler progressHandler = SwingProgressHandler.getInstance();
+    if (progressHandler != null) {
+      progressHandler.addStateChangeListener(
+          new SwingProgressHandler.IStateChangeListener() {
+            @Override
+            public void stateChanged(SwingProgressHandler handler) {
+              handleProgressChangeInSwingThread(handler);
             }
-          }
-        }
-        );
+          });
+    }
     IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
     if (perf != null) {
       perf.addPropertyChangeListener(
@@ -249,13 +237,14 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
     setSwingStatus(getScoutObject().getStatus());
   }
 
-  private void handleProgressChangeInSwingThread() {
+  private void handleProgressChangeInSwingThread(SwingProgressHandler h) {
+    m_progressVisible = h.isJobRunning();
     if (m_swingProgressBar != null) {
       Integer newValue = null;
       String newText = null;
-      if (m_progressHandler.hasProgressMonitor()) {
+      if (h.isJobRunning()) {
         // percent
-        double f = m_progressHandler.getActiveWorked();
+        double f = h.getJobWorked();
         if (f <= 0) {
           newValue = null;
         }
@@ -263,7 +252,7 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
           newValue = (int) (f * 100);
         }
         // text
-        newText = m_progressHandler.getTaskName();
+        newText = h.getJobTaskName();
         if (newText == null || newText.length() == 0) {
           if (m_swingProgressBar.getValue() > 0) {
             newText = null;// auto-display of '%'
@@ -317,8 +306,7 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
   }
 
   protected void updateFieldVisibilities() {
-    boolean hasBusy = m_busyCached;
-    boolean hasProgress = m_progressHandler.hasProgressMonitor();
+    boolean hasProgress = m_progressVisible;
     boolean hasStatus = (m_swingStatusLabel.getText() != null && m_swingStatusLabel.getText().length() > 0);
     //
     boolean panelVisible = true;
@@ -329,17 +317,17 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
         break;
       }
       case VISIBLE_WHEN_BUSY: {
-        panelVisible = hasBusy;
+        panelVisible = false;
         break;
       }
       case VISIBLE_WHEN_TEXT_OR_BUSY: {
-        panelVisible = (hasBusy || hasProgress || hasStatus);
+        panelVisible = (hasProgress || hasStatus);
         break;
       }
     }
     // bar
     getSwingStatusBar().setVisible(panelVisible);
-    showCard((hasBusy | hasProgress) ? CARD_ACTIVITY : CARD_LOGO);
+    showCard((hasProgress) ? CARD_ACTIVITY : CARD_LOGO);
     // status
     m_swingStatusLabel.setVisible(hasStatus);
     // progress

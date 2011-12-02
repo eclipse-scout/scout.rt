@@ -26,8 +26,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.EventListener;
 
 import javax.swing.JComponent;
@@ -41,6 +39,7 @@ import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JWindowEx;
+import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyIndicator;
 import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 import org.eclipse.scout.rt.ui.swing.window.DependentCloseListener;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
@@ -58,7 +57,6 @@ public class SwingScoutPopup implements ISwingScoutView {
 
   private ISwingEnvironment m_env;
   private EventListenerList m_listenerList;
-  private P_SwingScoutRootListener m_swingScoutRootListener;
   private Component m_ownerComponent;
   private Rectangle m_ownerBounds;
   private JWindowEx m_swingWindow;
@@ -84,6 +82,7 @@ public class SwingScoutPopup implements ISwingScoutView {
     //
     Window w = SwingUtilities.getWindowAncestor(m_ownerComponent);
     m_swingWindow = new JWindowEx(w);
+    m_swingWindow.getRootPane().putClientProperty(SwingBusyIndicator.BUSY_SUPPORTED_CLIENT_PROPERTY, true);
     m_swingWindow.addWindowListener(new P_SwingWindowListener());
     // border (only used by non-synth)
     if (!SwingUtility.isSynth()) {
@@ -94,11 +93,6 @@ public class SwingScoutPopup implements ISwingScoutView {
     contentPane.setLayout(new P_PopupContentPaneLayout());
     contentPane.setCursor(Cursor.getDefaultCursor());
     m_swingWindow.getRootPane().setName("Synth.Popup");
-    // wait cursor
-    if (m_swingScoutRootListener == null) {
-      m_swingScoutRootListener = new P_SwingScoutRootListener();
-      m_env.addPropertyChangeListener(m_swingScoutRootListener);
-    }
     m_swingWindow.pack();
   }
 
@@ -304,10 +298,6 @@ public class SwingScoutPopup implements ISwingScoutView {
   public void closeView() {
     if (m_opened) {
       m_opened = false;
-      if (m_swingScoutRootListener != null) {
-        m_env.removePropertyChangeListener(m_swingScoutRootListener);
-        m_swingScoutRootListener = null;
-      }
       new DependentCloseListener(m_swingWindow).close();
     }
   }
@@ -370,16 +360,6 @@ public class SwingScoutPopup implements ISwingScoutView {
     m_swingWindow.setName(name);
     m_swingWindow.getRootPane().setName(name);
   }
-
-  private class P_SwingScoutRootListener implements PropertyChangeListener {
-    @Override
-    public void propertyChange(PropertyChangeEvent e) {
-      if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
-        boolean busy = ((Boolean) e.getNewValue()).booleanValue();
-        m_swingWindow.setWaitCursor(busy);
-      }
-    }
-  }// end private class
 
   private class P_PopupContentPaneLayout extends AbstractLayoutManager2 {
     @Override

@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
 import org.eclipse.scout.rt.ui.swing.splash.SplashProgressMonitor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -73,6 +74,9 @@ public abstract class AbstractSwingApplication implements IApplication {
     try {
       // The default @{link Locale} has to be set prior to SwingEnvironment is created, because UIDefaultsInjector resolves NLS texts.
       execInitLocale();
+
+      //attach default job handler
+      SwingProgressHandler.install();
 
       SwingUtilities.invokeAndWait(
           new Runnable() {
@@ -173,6 +177,7 @@ public abstract class AbstractSwingApplication implements IApplication {
           new Runnable() {
             @Override
             public void run() {
+              //start gui
               m_env.showGUI(clientSession);
               execSwingStarted(clientSession);
             }

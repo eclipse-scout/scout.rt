@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
+import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.eclipse.scout.rt.ui.swing.form.fields.OnFieldLabelDecorator;
@@ -64,7 +65,10 @@ public interface ISwingEnvironment {
   /**
    * {@link Boolean} busy/idle handling Use positive edge from swing 0->1 and
    * negative edge from scout 1->0
+   * 
+   * @deprecated replaced by {@link SwingBusyHandler}
    */
+  @Deprecated
   String PROP_BUSY = "busy";
 
   /**
@@ -173,6 +177,10 @@ public interface ISwingEnvironment {
    */
   void interceptUIDefaults(UIDefaults defaults);
 
+  /**
+   * @deprecated replaced by {@link SwingBusyHandler}
+   */
+  @Deprecated
   void setBusyFromSwing(boolean b);
 
   /**
@@ -197,8 +205,9 @@ public interface ISwingEnvironment {
   IFormField findFocusOwnerField();
 
   /**
-   * combination of gui and model busy flag
+   * @deprecated replaced by {@link SwingBusyHandler}
    */
+  @Deprecated
   boolean isBusy();
 
   /**

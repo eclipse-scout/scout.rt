@@ -17,8 +17,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -38,6 +36,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
+import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.AbstractJNavigationPanel;
 
 public class JNavigationPanel extends AbstractJNavigationPanel {
@@ -55,13 +54,16 @@ public class JNavigationPanel extends AbstractJNavigationPanel {
     super(env);
     setOpaque(false);
     setLayout(new GridBagLayout());
-
-    env.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (ISwingEnvironment.PROP_BUSY.equals(evt.getPropertyName())) {
-          Boolean busy = (Boolean) evt.getNewValue();
-          if (busy) {
+    //progress listener
+    SwingProgressHandler progressHandler = SwingProgressHandler.getInstance();
+    if (progressHandler != null) {
+      progressHandler.addStateChangeListener(new SwingProgressHandler.IStateChangeListener() {
+        @Override
+        public void stateChanged(SwingProgressHandler h) {
+          if (m_stopRefreshButton == null) {
+            return;
+          }
+          if (h.isJobRunning()) {
             m_stopRefreshButton.setAction(getStopAction());
             installButtonIcons(m_stopRefreshButton, SwingIcons.NavigationStop, SwingUtility.getNlsText("Cancel"));
           }
@@ -70,8 +72,8 @@ public class JNavigationPanel extends AbstractJNavigationPanel {
             installButtonIcons(m_stopRefreshButton, SwingIcons.NavigationRefresh, SwingUtility.getNlsText("Refresh"));
           }
         }
-      }
-    });
+      });
+    }
   }
 
   @Override

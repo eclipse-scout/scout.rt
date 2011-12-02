@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.ext;
 
-import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
@@ -20,14 +18,11 @@ import javax.swing.JDialog;
 import javax.swing.JRootPane;
 
 /**
- * JDialog with support of wait cursor property as a second layer over normal
- * cursor concept Using bug fixed {@link JRootPaneEx} with min/max size
+ * JDialog using bug fixed {@link JRootPaneEx} with min/max size
  * validation
  */
-public class JDialogEx extends JDialog implements IWaitSupport {
+public class JDialogEx extends JDialog {
   private static final long serialVersionUID = 1L;
-
-  private boolean m_waitCursor;
 
   public JDialogEx() {
     super();
@@ -77,27 +72,6 @@ public class JDialogEx extends JDialog implements IWaitSupport {
   protected void dialogInit() {
     super.dialogInit();
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-  }
-
-  @Override
-  public boolean isWaitCursor() {
-    return m_waitCursor;
-  }
-
-  @Override
-  public void setWaitCursor(boolean b) {
-    if (b != m_waitCursor) {
-      m_waitCursor = b;
-      Component comp = getContentPane();
-      if (m_waitCursor) {
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        comp.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-      }
-      else {
-        setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        comp.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-      }
-    }
   }
 
   @Override

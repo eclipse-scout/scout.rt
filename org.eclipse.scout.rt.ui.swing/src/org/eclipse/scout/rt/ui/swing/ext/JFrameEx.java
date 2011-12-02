@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.ui.swing.ext;
 
 import java.awt.AWTEvent;
-import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
@@ -27,17 +25,15 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
  * <ul>
  * <li>respects native screen insets (taskbar)</li>
  * <li>iconify</li>
- * <li>parallel wait cursor in addition to normal cursor</li>
  * <li>using {@link JRootPaneEx} with min/max size validation</li>
  * <li>fire property "state" whenever extendedState is changed</li>
  * <li>enable windows 7 keystrokes: WINDOWS-up/down/left/right keys for
  * maximize/minimize/left-align-screen-switch/right-align-screen-switch/</li>
  * </ul>
  */
-public class JFrameEx extends JFrame implements IWaitSupport {
+public class JFrameEx extends JFrame {
   private static final long serialVersionUID = 1L;
 
-  private boolean m_waitCursor;
   private boolean m_autoCorrectSize;
   private Windows7KeyHandler m_win7KeyHandler;
   private Rectangle m_nonMaximizedBounds;
@@ -131,27 +127,6 @@ public class JFrameEx extends JFrame implements IWaitSupport {
     setState(JFrame.ICONIFIED);
     setState(JFrame.NORMAL);
     super.toFront();
-  }
-
-  @Override
-  public boolean isWaitCursor() {
-    return m_waitCursor;
-  }
-
-  @Override
-  public void setWaitCursor(boolean b) {
-    if (b != m_waitCursor) {
-      m_waitCursor = b;
-      Component comp = getContentPane();
-      if (m_waitCursor) {
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        comp.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-      }
-      else {
-        setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        comp.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-      }
-    }
   }
 
   @Override

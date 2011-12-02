@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
-import org.eclipse.scout.rt.ui.swing.window.desktop.ProgressHandler;
+import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JNavigationPanel;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JToolTabsBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JViewTabsBar;
@@ -80,7 +80,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
     m_navigationPanel.setForwardAction(new P_ForwardAction());
     m_navigationPanel.setHistoryAction(new P_HistoryAction());
     m_navigationPanel.setRefreshAction(new P_RefreshAction());
-    m_navigationPanel.setStopAction(new ProgressHandler(getSwingEnvironment()).createStopAction());
+    m_navigationPanel.setStopAction(new SwingProgressHandler.CancelJobsAction());
     m_layout.putConstraint(SpringLayout.WEST, m_navigationPanel, 0, SpringLayout.WEST, container);
     m_layout.putConstraint(SpringLayout.NORTH, m_navigationPanel, 0, SpringLayout.NORTH, container);
 

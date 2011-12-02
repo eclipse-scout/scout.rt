@@ -43,12 +43,7 @@ import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.commons.CSSPatch;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
@@ -58,9 +53,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -82,6 +77,7 @@ import org.eclipse.scout.rt.ui.swing.ext.IEmbeddedFrameProviderService;
 import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelTop;
+import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler;
 import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
 import org.eclipse.scout.rt.ui.swing.form.SwingScoutForm;
@@ -116,16 +112,11 @@ import org.eclipse.scout.service.SERVICES;
 public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwingEnvironment.class);
 
-  private static enum BusyStatus {
-    IDLE, DETECTING, BUSY
-  }
-
   private boolean m_initialized;
   private IClientSession m_scoutSession;
   private SwingScoutSynchronizer m_synchronizer;
   private SwingIconLocator m_iconLocator;
   private ISwingScoutTray m_trayComposite;
-  private BusyStatus m_busyStatus;
   private Frame m_rootFrame;
   private FormFieldFactory m_formFieldFactory;
   private ISwingScoutRootFrame m_rootComposite;
@@ -166,58 +157,6 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
         setWindowIcon(m_rootFrame);
       }
       m_synchronizer = new SwingScoutSynchronizer(this);
-      // add job manager listener for busy handling
-      Job.getJobManager().addJobChangeListener(new JobChangeAdapter() {
-        @Override
-        public void done(IJobChangeEvent e) {
-          // ignore double-check jobs
-          if (e.getJob().getName().equals("JobChangeAdapter, double-check")) {
-            return;
-          }
-          if (!Job.getJobManager().isIdle()) {
-            for (Job j : Job.getJobManager().find(ClientJob.class)) {
-              if (j instanceof ClientJob) {
-                ClientJob c = (ClientJob) j;
-                if (c.isSync() && !c.isWaitFor()) {
-                  // there is a running job, still busy
-                  return;
-                }
-              }
-            }
-          }
-          // idle
-          if (m_busyStatus == BusyStatus.BUSY || m_busyStatus == BusyStatus.DETECTING) {
-            // check whether the job queue is still idle in 100ms
-            Job j = new Job("JobChangeAdapter, double-check") {
-              @Override
-              protected IStatus run(IProgressMonitor m) {
-                if (!Job.getJobManager().isIdle()) {
-                  for (Job runningJob : Job.getJobManager().find(ClientJob.class)) {
-                    if (runningJob instanceof ClientJob) {
-                      ClientJob c = (ClientJob) runningJob;
-                      if (c.isSync() && !c.isWaitFor()) {
-                        //there is a running job, still busy
-                        return Status.OK_STATUS;
-                      }
-                    }
-                  }
-                }
-                if (m_busyStatus == BusyStatus.BUSY || m_busyStatus == BusyStatus.DETECTING) {
-                  SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                      setBusyInternal(BusyStatus.IDLE);
-                    }
-                  });
-                }
-                return Status.OK_STATUS;
-              }
-            };
-            j.setSystem(true);
-            j.schedule(100);
-          }
-        }
-      });
     }
   }
 
@@ -520,6 +459,17 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
         }
       }.schedule();
     }
+    attachBusyHandler(session);
+  }
+
+  protected SwingBusyHandler attachBusyHandler(IClientSession session) {
+    IBusyManagerService service = SERVICES.getService(IBusyManagerService.class);
+    if (service == null) {
+      return null;
+    }
+    SwingBusyHandler handler = new SwingBusyHandler(session);
+    service.register(session, handler);
+    return handler;
   }
 
   @Override
@@ -537,46 +487,17 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return m_scoutSession;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean isBusy() {
-    return m_busyStatus == BusyStatus.BUSY;
+    //replaced by SwingBusyHandler
+    return false;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setBusyFromSwing(boolean b) {
-    checkThread();
-    if (b) {
-      setBusyInternal(BusyStatus.DETECTING);
-      Job j = new Job("Busy in 200ms") {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              if (m_busyStatus == BusyStatus.DETECTING) {
-                setBusyInternal(BusyStatus.BUSY);
-              }
-            }
-          });
-          return Status.OK_STATUS;
-        }
-      };
-      j.setSystem(true);
-      j.schedule(300);
-    }
-  }
-
-  /*
-   * must be called in swing thread
-   */
-  private void setBusyInternal(BusyStatus status) {
-    checkThread();
-    if (m_busyStatus != status) {
-      boolean oldValue = m_busyStatus == BusyStatus.BUSY;
-      m_busyStatus = status;
-      boolean newValue = m_busyStatus == BusyStatus.BUSY;
-      m_propertySupport.firePropertyChange(PROP_BUSY, oldValue, newValue);
-    }
+    //replaced by SwingBusyHandler
   }
 
   @Override

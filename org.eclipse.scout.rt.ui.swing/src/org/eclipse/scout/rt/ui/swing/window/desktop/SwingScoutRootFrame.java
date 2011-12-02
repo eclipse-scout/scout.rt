@@ -21,8 +21,6 @@ import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -49,7 +47,6 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
-import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
@@ -60,6 +57,7 @@ import org.eclipse.scout.rt.ui.swing.ext.ComponentSpyAction;
 import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JRootPaneEx;
+import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyIndicator;
 import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitDesktopManager;
@@ -79,7 +77,6 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
   private Frame m_swingFrame;
   private JRootPane m_swingRootPane;
   private P_ScoutDesktopListener m_scoutDesktopListener;
-  private P_SwingScoutRootListener m_swingScoutRootListener;
   private ISwingScoutDesktop m_swingScoutDesktop;
   private SwingScoutMenuBar m_menuBarComposite;
   private SwingScoutHeaderPanel m_swingScoutHeaderPanel;
@@ -99,6 +96,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
       m_swingFrame.removeAll();
       m_swingFrame.add(m_swingRootPane);
     }
+    m_swingRootPane.putClientProperty(SwingBusyIndicator.BUSY_SUPPORTED_CLIENT_PROPERTY, true);
   }
 
   @Override
@@ -248,10 +246,6 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
       getScoutObject().removeDesktopListener(m_scoutDesktopListener);
       m_scoutDesktopListener = null;
     }
-    if (m_swingScoutRootListener != null) {
-      getSwingEnvironment().removePropertyChangeListener(m_swingScoutRootListener);
-      m_swingScoutRootListener = null;
-    }
   }
 
   @Override
@@ -260,10 +254,6 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     if (m_scoutDesktopListener == null) {
       m_scoutDesktopListener = new P_ScoutDesktopListener();
       getScoutObject().addDesktopListener(m_scoutDesktopListener);
-    }
-    if (m_swingScoutRootListener == null) {
-      m_swingScoutRootListener = new P_SwingScoutRootListener();
-      getSwingEnvironment().addPropertyChangeListener(m_swingScoutRootListener);
     }
     IDesktop f = getScoutObject();
     setTitleFromScout(f.getTitle());
@@ -494,18 +484,6 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
           };
           getSwingEnvironment().invokeSwingLater(t);
           break;
-        }
-      }
-    }
-  }// end private class
-
-  private class P_SwingScoutRootListener implements PropertyChangeListener {
-    @Override
-    public void propertyChange(PropertyChangeEvent e) {
-      if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
-        boolean busy = ((Boolean) e.getNewValue()).booleanValue();
-        if (m_swingFrame instanceof JFrameEx) {
-          ((JFrameEx) m_swingFrame).setWaitCursor(busy);
         }
       }
     }

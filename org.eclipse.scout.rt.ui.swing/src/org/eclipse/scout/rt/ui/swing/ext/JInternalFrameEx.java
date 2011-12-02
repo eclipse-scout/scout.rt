@@ -26,18 +26,16 @@ import javax.swing.JInternalFrame;
  * <li>fix layout to BorderLayoutEx</li>
  * <li>fix dimensions</li>
  * <li>use container sizes and not ui sizes. support for non-y-resizing frames</li>
- * <li>set cursor to null when default to support for overall hour-glass cursor when parent frame is showing busy</li>
  * <li>support for a model tab index to be used instead of simply container order tabbing</li>
  * <li>fixed behaviour for resize-cursor display. only visible when resizing is in fact possible</li>
  * <li>fix resture sub focus: transferFocus instead of request focus and only use existing focus component iff it is
  * still showing and enabled</li>
  * </ul>
  */
-public class JInternalFrameEx extends JInternalFrame implements IWaitSupport {
+public class JInternalFrameEx extends JInternalFrame {
   private static final long serialVersionUID = 1L;
   private int m_tabIndex = 1;
   private boolean m_resizableY;
-  private boolean m_waitCursor;
 
   public static final String CLIENT_PROP_N_RESIZE_ENABLED = "swingScout.resizeNEnabled";
   public static final String CLIENT_PROP_W_RESIZE_ENABLED = "swingScout.resizeWEnabled";
@@ -52,7 +50,6 @@ public class JInternalFrameEx extends JInternalFrame implements IWaitSupport {
     // WORKAROUND correct layout (swing is not capable of considering the maximum size
     contentPane.setLayout(new BorderLayoutEx());
     // end workaround
-    setCursor(null);
     setName(name);
   }
 
@@ -265,26 +262,4 @@ public class JInternalFrameEx extends JInternalFrame implements IWaitSupport {
       }
     }
   }
-
-  @Override
-  public boolean isWaitCursor() {
-    return m_waitCursor;
-  }
-
-  @Override
-  public void setWaitCursor(boolean b) {
-    if (b != m_waitCursor) {
-      m_waitCursor = b;
-      Component comp = getContentPane();
-      if (m_waitCursor) {
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        comp.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-      }
-      else {
-        setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        comp.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-      }
-    }
-  }
-
 }

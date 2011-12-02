@@ -17,8 +17,6 @@ import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.EventListener;
 
 import javax.swing.JComponent;
@@ -34,6 +32,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.ComponentSpyAction;
 import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
+import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyIndicator;
 import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 import org.eclipse.scout.rt.ui.swing.window.DependentCloseListener;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutBoundsProvider;
@@ -47,7 +46,6 @@ public class SwingScoutFrame implements ISwingScoutView {
 
   private ISwingEnvironment m_env;
   private EventListenerList m_listenerList;
-  private P_SwingScoutRootListener m_swingScoutRootListener;
   private JFrameEx m_swingFrame;
   // cache
   private boolean m_maximized;
@@ -65,6 +63,7 @@ public class SwingScoutFrame implements ISwingScoutView {
     m_listenerList = new EventListenerList();
     //
     m_swingFrame = new JFrameEx();
+    m_swingFrame.getRootPane().putClientProperty(SwingBusyIndicator.BUSY_SUPPORTED_CLIENT_PROPERTY, true);
     JComponent contentPane = (JComponent) m_swingFrame.getContentPane();
     contentPane.setLayout(new BorderLayoutEx());
     contentPane.setCursor(Cursor.getDefaultCursor());
@@ -97,12 +96,6 @@ public class SwingScoutFrame implements ISwingScoutView {
     SwingUtility.installDevelopmentShortcuts((JComponent) m_swingFrame.getContentPane());
     // init layout
     m_swingFrame.pack();
-
-    //
-    if (m_swingScoutRootListener == null) {
-      m_swingScoutRootListener = new P_SwingScoutRootListener();
-      m_env.addPropertyChangeListener(m_swingScoutRootListener);
-    }
     // register component spy
     if (contentPane instanceof JComponent) {
       (contentPane).getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(SwingUtility.createKeystroke("shift alt F1"), "componentSpy");
@@ -190,10 +183,6 @@ public class SwingScoutFrame implements ISwingScoutView {
     if (m_boundsProvider != null) {
       m_boundsProvider.storeBounds(m_swingFrame.getBounds());
     }
-    if (m_swingScoutRootListener != null) {
-      m_env.removePropertyChangeListener(m_swingScoutRootListener);
-      m_swingScoutRootListener = null;
-    }
     new DependentCloseListener(m_swingFrame).close();
   }
 
@@ -244,16 +233,6 @@ public class SwingScoutFrame implements ISwingScoutView {
   public void setName(String name) {
     m_swingFrame.getRootPane().setName(name);
   }
-
-  private class P_SwingScoutRootListener implements PropertyChangeListener {
-    @Override
-    public void propertyChange(PropertyChangeEvent e) {
-      if (e.getPropertyName().equals(ISwingEnvironment.PROP_BUSY)) {
-        boolean busy = ((Boolean) e.getNewValue()).booleanValue();
-        m_swingFrame.setWaitCursor(busy);
-      }
-    }
-  }// end private class
 
   private class P_SwingWindowListener extends WindowAdapter {
     @Override
