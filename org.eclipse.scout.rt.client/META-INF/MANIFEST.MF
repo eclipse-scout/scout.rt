@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.scout.commons;visibility:=reexport,
  org.eclipse.scout.rt.shared;visibility:=reexport
 Export-Package: org.eclipse.scout.rt.client,
+ org.eclipse.scout.rt.client.busy,
  org.eclipse.scout.rt.client.services,
  org.eclipse.scout.rt.client.services.common.bookmark,
  org.eclipse.scout.rt.client.services.common.clientnotification,

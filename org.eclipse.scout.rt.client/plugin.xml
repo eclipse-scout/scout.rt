@@ -32,5 +32,10 @@
           ranking="-1"
           session="org.eclipse.scout.rt.client.IClientSession">
     </service>
+    <service
+          class="org.eclipse.scout.rt.client.busy.BusyManagerService"
+          createImmediately="false"
+          ranking="-1000">
+    </service>
   </extension>
 </plugin>
