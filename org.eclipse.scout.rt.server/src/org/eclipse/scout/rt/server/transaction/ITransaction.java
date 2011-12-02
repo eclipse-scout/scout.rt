@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.transaction;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
@@ -29,7 +30,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
  * that cancells the (potentially) running statement.
  * A cancelled transaction can only do a rollback and does not accept new members.
  * 
- * @since Build 183
+ * @since 3.4
  */
 public interface ITransaction {
 
@@ -48,7 +49,7 @@ public interface ITransaction {
   @Deprecated
   void registerResource(ITransactionMember member);
 
-  void registerMember(ITransactionMember member);
+  void registerMember(ITransactionMember member) throws ProcessingException;
 
   ITransactionMember getMember(String memberId);
 
@@ -74,7 +75,7 @@ public interface ITransaction {
    *         <p>
    *         Subsequently there will be a call to {@link #commitPhase2()} or {@link #rollback()}
    */
-  boolean commitPhase1();
+  boolean commitPhase1() throws ProcessingException;
 
   /**
    * commit phase 2 of the transaction members (commit phase 1 confirmation)

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.transaction;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -46,13 +47,18 @@ public class BasicTransaction implements ITransaction {
   @SuppressWarnings("deprecation")
   @Override
   public void registerResource(ITransactionMember member) {
-    registerMember(member);
+    try {
+      registerMember(member);
+    }
+    catch (ProcessingException e) {
+      throw new IllegalStateException("Interrupted");
+    }
   }
 
   @Override
-  public void registerMember(ITransactionMember member) {
+  public void registerMember(ITransactionMember member) throws ProcessingException {
     if (m_cancelled) {
-      throw new IllegalStateException("Transaction is cancelled");
+      throw new ProcessingException("Interrupted", new InterruptedException());
     }
     synchronized (m_memberMapLock) {
       String memberId = member.getMemberId();
@@ -113,10 +119,10 @@ public class BasicTransaction implements ITransaction {
   }
 
   @Override
-  public boolean commitPhase1() {
+  public boolean commitPhase1() throws ProcessingException {
     synchronized (m_memberMapLock) {
       if (m_cancelled) {
-        throw new IllegalStateException("Transaction is cancelled");
+        throw new ProcessingException("Interrupted", new InterruptedException());
       }
       m_commitPhase = true;
     }
