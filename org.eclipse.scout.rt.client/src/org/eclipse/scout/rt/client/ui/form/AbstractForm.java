@@ -171,6 +171,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return null;
   }
 
+  @ConfigProperty(ConfigProperty.TEXT)
+  @Order(11)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredSubTitle() {
+    return null;
+  }
+
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(20)
   @ConfigPropertyValue("0")
@@ -474,6 +481,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (getConfiguredTitle() != null) {
       setTitle(getConfiguredTitle());
     }
+    if (getConfiguredSubTitle() != null) {
+      setSubTitle(getConfiguredSubTitle());
+    }
     setMinimizeEnabled(getConfiguredMinimizeEnabled());
     setMaximizeEnabled(getConfiguredMaximizeEnabled());
     setMinimized(getConfiguredMinimized());
@@ -672,7 +682,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     catch (ProcessingException e) {
       e.addContextMessage(AbstractForm.this.getClass().getSimpleName());
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       disposeFormInternal();
       if (e instanceof VetoException) {
         try {
