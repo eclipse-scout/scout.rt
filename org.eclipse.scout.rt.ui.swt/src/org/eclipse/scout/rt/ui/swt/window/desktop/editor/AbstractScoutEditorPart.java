@@ -16,7 +16,6 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -190,9 +189,6 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
 
   protected void setCloseEnabledFromScout(boolean closebale) {
     // void
-  }
-
-  public void setStatusFromScout(IProcessingStatus newValue) {
   }
 
   /**

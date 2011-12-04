@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -193,9 +192,6 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
 
   protected void setCloseEnabledFromScout(boolean closebale) {
     // void
-  }
-
-  public void setStatusFromScout(IProcessingStatus newValue) {
   }
 
   @Override
