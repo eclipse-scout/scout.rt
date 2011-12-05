@@ -94,6 +94,10 @@ public interface ISwtEnvironment {
    */
   void ensureInitialized();
 
+  /**
+   * @deprecated replaced by {@link SwtBusyHandler}
+   */
+  @Deprecated
   boolean isBusy();
 
   void addPropertyChangeListener(PropertyChangeListener listener);
@@ -242,8 +246,9 @@ public interface ISwtEnvironment {
   String getPerspectiveId();
 
   /**
-   * @param b
+   * @deprecated replaced by {@link SwtBusyHandler}
    */
+  @Deprecated
   void setBusyFromSwt(boolean b);
 
   /**
