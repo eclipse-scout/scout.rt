@@ -89,10 +89,20 @@ public class SwingProgressHandler {
     fireStateChanged();
   }
 
+  /**
+   * Add a state change listener whenever {@link #isJobRunning()} changes.
+   * <p>
+   * The call is done in the swing thread {@link SwingUtilities#isEventDispatchThread()}
+   */
   public void addStateChangeListener(IStateChangeListener listener) {
     m_listenerList.add(IStateChangeListener.class, listener);
   }
 
+  /**
+   * Remove a state change listener whenever {@link #isJobRunning()} changes.
+   * <p>
+   * The call is done in the swing thread {@link SwingUtilities#isEventDispatchThread()}
+   */
   public void removeStateChangeListener(IStateChangeListener listener) {
     m_listenerList.remove(IStateChangeListener.class, listener);
   }
