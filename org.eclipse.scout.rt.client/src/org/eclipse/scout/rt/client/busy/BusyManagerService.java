@@ -86,6 +86,9 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
       if (handler == null) {
         return;
       }
+      if (!handler.acceptJob(job)) {
+        return;
+      }
       if (job instanceof ClientJob) {
         ((ClientJob) job).addJobChangeListenerEx(m_jobChangeListenerEx);
       }
@@ -97,6 +100,9 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
       final Job job = event.getJob();
       IBusyHandler handler = getHandlerInternal(job);
       if (handler == null) {
+        return;
+      }
+      if (!handler.acceptJob(job)) {
         return;
       }
       if (job instanceof ClientJob) {

@@ -93,13 +93,17 @@ public class SwingBusyIndicator {
         fireBusyPropertyChange(true);
       }
       //
-      ArrayList<RootPaneContainer> changedContainers = new ArrayList<RootPaneContainer>();
+      /**
+       * lazyHolder is filled lazy by {@link SwingUtilities#invokeLater(Runnable)}, do not use values outside of atw
+       * event queue thread!
+       */
+      ArrayList<RootPaneContainer> lazyHolder = new ArrayList<RootPaneContainer>();
       try {
-        setBusy(busyId, changedContainers);
+        setBusy(busyId, lazyHolder);
         runnable.run();
       }
       finally {
-        clearBusy(changedContainers);
+        clearBusy(lazyHolder);
       }
     }
     finally {
@@ -124,7 +128,13 @@ public class SwingBusyIndicator {
     UIManager.put(BUSY_UI_PROPERTY, value);
   }
 
-  private void setBusy(final long busyId, final Collection<RootPaneContainer> out) {
+  /**
+   * @param busyId
+   * @param lazyHolder
+   *          is filled lazy by {@link SwingUtilities#invokeLater(Runnable)}, do not use values outside of atw event
+   *          queue thread!
+   */
+  private void setBusy(final long busyId, final Collection<RootPaneContainer> lazyHolder) {
     SwingUtilities.invokeLater(
           new Runnable() {
             @Override
@@ -136,7 +146,7 @@ public class SwingBusyIndicator {
                   RootPaneContainer r = accept(w);
                   if (r != null) {
                     if (setBusy0(busyId, r)) {
-                      out.add(r);
+                      lazyHolder.add(r);
                     }
                   }
                 }
@@ -164,15 +174,20 @@ public class SwingBusyIndicator {
           });
   }
 
-  private void clearBusy(final Collection<RootPaneContainer> in) {
-    if (in.size() == 0) {
-      return;
-    }
+  /**
+   * @param lazyHolder
+   *          is filled lazy by {@link SwingUtilities#invokeLater(Runnable)}, do not use values outside of atw event
+   *          queue thread!
+   */
+  private void clearBusy(final Collection<RootPaneContainer> lazyHolder) {
     SwingUtilities.invokeLater(
           new Runnable() {
             @Override
             public void run() {
-              for (RootPaneContainer r : in) {
+              if (lazyHolder.size() == 0) {
+                return;
+              }
+              for (RootPaneContainer r : lazyHolder) {
                 clearBusy0(r);
               }
             }

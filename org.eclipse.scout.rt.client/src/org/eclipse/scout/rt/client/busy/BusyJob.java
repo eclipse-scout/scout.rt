@@ -59,7 +59,7 @@ public class BusyJob extends Job {
           return;
         }
         if (System.currentTimeMillis() > longOpTimestamp) {
-          break;
+          return;
         }
         try {
           lock.wait(100);
