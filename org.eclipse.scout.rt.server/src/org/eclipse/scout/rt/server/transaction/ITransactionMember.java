@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.server.transaction;
 
 /**
- * @since Build 183
+ * @since 3.4
  */
 public interface ITransactionMember {
 

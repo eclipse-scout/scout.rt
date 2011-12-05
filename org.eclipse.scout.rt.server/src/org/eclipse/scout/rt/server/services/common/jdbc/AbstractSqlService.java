@@ -921,7 +921,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         m_conn.rollback();
       }
       catch (Exception e) {
-        LOG.error(null, e);
+        if (!ThreadContext.getTransaction().isCancelled()) {
+          LOG.error(null, e);
+        }
       }
     }
 
