@@ -185,7 +185,7 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
     // wait until done
     ServiceTunnelResponse res = null;
     boolean cancelled = false;
-    boolean sentCancelRequest= false;
+    boolean sentCancelRequest = false;
     synchronized (backgroundLock) {
       backgroundJob.schedule();
       while (true) {
@@ -195,7 +195,7 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
         }
         IProgressMonitor mon = backgroundJob.getMonitor();
         if ((!sentCancelRequest) && JobEx.isCurrentJobCanceled() || (mon != null && mon.isCanceled())) {
-          sentCancelRequest=true;
+          sentCancelRequest = true;
           boolean success = sendCancelRequest(req.getRequestSequence());
           if (success) {
             //in fact cancelled the job
@@ -238,10 +238,15 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
       cancelHttpJob.schedule();
       try {
         cancelHttpJob.join(10000L);
-        if (cancelHttpJob.getResponse() == null) {
+        ServiceTunnelResponse cancelResult = cancelHttpJob.getResponse();
+        if (cancelResult == null) {
           return false;
         }
-        Boolean result = (Boolean) cancelHttpJob.getResponse().getData();
+        if (cancelResult.getException() != null) {
+          LOG.warn("cancel failed", cancelResult.getException());
+          return false;
+        }
+        Boolean result = (Boolean) cancelResult.getData();
         return result != null && result.booleanValue();
       }
       catch (InterruptedException ie) {
