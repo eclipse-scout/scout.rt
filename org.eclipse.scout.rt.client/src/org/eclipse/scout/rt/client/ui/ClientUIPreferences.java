@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
 import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
 import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.IUniqueColumnFilterIdentifier;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
@@ -204,6 +205,9 @@ public class ClientUIPreferences {
    */
   public String getColumnKey(IColumn c) {
     String key = c.getColumnId();
+    if (c instanceof IUniqueColumnFilterIdentifier) {
+      key = ((IUniqueColumnFilterIdentifier) c).getIdentifier() + "." + key;
+    }
     if (c.getTable() != null) {
       key = getTableKey(c.getTable()) + "#" + key;
     }

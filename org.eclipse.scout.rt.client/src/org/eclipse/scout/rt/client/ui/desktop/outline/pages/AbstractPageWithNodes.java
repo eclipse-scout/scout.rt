@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.IUniqueColumnFilterIdentifier;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
@@ -297,7 +298,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     }
 
     @Order(1)
-    public class LabelColumn extends AbstractStringColumn {
+    public class LabelColumn extends AbstractStringColumn implements IUniqueColumnFilterIdentifier {
       @Override
       protected String getConfiguredHeaderText() {
         return ScoutTexts.get("Folders");
@@ -312,6 +313,12 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
       protected int getConfiguredWidth() {
         return 800;
       }
+
+      @Override
+      public String getIdentifier() {
+        return AbstractPageWithNodes.this.getClass().getName();
+      }
+
     }
   }
 

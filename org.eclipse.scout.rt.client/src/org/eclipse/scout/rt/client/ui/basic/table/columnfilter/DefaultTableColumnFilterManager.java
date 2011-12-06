@@ -80,11 +80,14 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     try {
       m_table.setTableChanging(true);
       //
-      for (IColumn<?> col : m_filterMap.keySet()) {
+      for (IColumn col : m_filterMap.keySet()) {
         m_table.getColumnSet().updateColumn(col);
       }
       m_filterMap.clear();
       m_table.applyRowFilters();
+      for (IColumn col : m_table.getColumns()) {
+        ClientUIPreferences.getInstance().setTableColumnPreferences(col);
+      }
     }
     finally {
       m_table.setTableChanging(false);
