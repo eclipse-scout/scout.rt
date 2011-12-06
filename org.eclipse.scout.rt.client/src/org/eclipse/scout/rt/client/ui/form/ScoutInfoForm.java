@@ -14,11 +14,11 @@ import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Locale;
 
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.BooleanUtility;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
 import org.eclipse.scout.service.SERVICES;
@@ -250,20 +251,27 @@ public class ScoutInfoForm extends AbstractForm {
     long memMax = Runtime.getRuntime().maxMemory() / 1024 / 1024;
     //
     buf.append("<tr><td>" + ScoutTexts.get("Username") + ":</td><td>&nbsp;</td><td>" + session.getUserId() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + Locale.getDefault().getDisplayLanguage() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("FormattingLocale") + ":</td><td>&nbsp;</td><td>" + Locale.getDefault() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("JavaVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.version") + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("JavaVMVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.vm.version") + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("OSVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("os.name") + " " + System.getProperty("os.version") + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("OSUser") + ":</td><td>&nbsp;</td><td>" + System.getProperty("user.name") + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("MemoryStatus") + ":</td><td>&nbsp;</td><td>" + memUsed + "MB (total " + memTotal + "MB / max " + memMax + "MB)</td></tr>");
-    IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
-    if (perf != null) {
-      buf.append("<tr><td>" + ScoutTexts.get("NetworkLatency") + ":</td><td>&nbsp;</td><td>" + perf.getNetworkLatency() + " ms</td></tr>");
-      buf.append("<tr><td>" + ScoutTexts.get("ExecutionTime") + ":</td><td>&nbsp;</td><td>" + perf.getServerExecutionTime() + " ms</td></tr>");
-    }
-    if (session.getServiceTunnel() != null) {
-      buf.append("<tr><td>" + ScoutTexts.get("Server") + ":</td><td>&nbsp;</td><td>" + session.getServiceTunnel().getServerURL() + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + LocaleThreadLocal.get().getDisplayLanguage() + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("FormattingLocale") + ":</td><td>&nbsp;</td><td>" + LocaleThreadLocal.get() + "</td></tr>");
+
+    /**
+     * These information must only be presented in the case of an richclient. If the client is a webclient (ui.rap) then
+     * these informations must be omitted (Security) https://bugs.eclipse.org/bugs/show_bug.cgi?id=365761
+     */
+    if (WebClientState.isRichClientInCurrentThread()) {
+      buf.append("<tr><td>" + ScoutTexts.get("JavaVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.version") + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("JavaVMVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.vm.version") + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("OSVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("os.name") + " " + System.getProperty("os.version") + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("OSUser") + ":</td><td>&nbsp;</td><td>" + System.getProperty("user.name") + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("MemoryStatus") + ":</td><td>&nbsp;</td><td>" + memUsed + "MB (total " + memTotal + "MB / max " + memMax + "MB)</td></tr>");
+      IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
+      if (perf != null) {
+        buf.append("<tr><td>" + ScoutTexts.get("NetworkLatency") + ":</td><td>&nbsp;</td><td>" + perf.getNetworkLatency() + " ms</td></tr>");
+        buf.append("<tr><td>" + ScoutTexts.get("ExecutionTime") + ":</td><td>&nbsp;</td><td>" + perf.getServerExecutionTime() + " ms</td></tr>");
+      }
+      if (session.getServiceTunnel() != null) {
+        buf.append("<tr><td>" + ScoutTexts.get("Server") + ":</td><td>&nbsp;</td><td>" + session.getServiceTunnel().getServerURL() + "</td></tr>");
+      }
     }
   }
 
