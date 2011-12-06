@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.busy;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.commons.annotations.Priority;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.client.IClientSessionProvider;
 import org.eclipse.scout.rt.client.IJobChangeListenerEx;
 import org.eclipse.scout.rt.client.JobChangeAdapterEx;
 import org.eclipse.scout.service.AbstractService;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * The busy manager is the primary place to register/unregister {@link IBusyHandler} per {@link IClientSession}
@@ -39,11 +41,35 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
 
   private final IJobChangeListener m_jobChangeListener;
   private final IJobChangeListenerEx m_jobChangeListenerEx;
+  private JobManagerResumeThread m_jobManagerResumeThread;
 
   public BusyManagerService() {
     m_jobChangeListener = new P_JobChangeListener();
     m_jobChangeListenerEx = new P_JobChangeListenerEx();
+  }
+
+  @Override
+  public void initializeService(ServiceRegistration registration) {
+    super.initializeService(registration);
     Job.getJobManager().addJobChangeListener(m_jobChangeListener);
+    //Bug in eclipse job manager: sometimes a delayed scheduled job is not run after the delay but remains sleeping forever.
+    //To work around this issue, a call to IJobManager.resume() wakes up these jobs.
+    m_jobManagerResumeThread = new JobManagerResumeThread();
+    m_jobManagerResumeThread.start();
+  }
+
+  @Override
+  public void disposeServices() {
+    try {
+      if (m_jobManagerResumeThread != null) {
+        m_jobManagerResumeThread.cancel();
+      }
+      m_jobManagerResumeThread = null;
+      Job.getJobManager().removeJobChangeListener(m_jobChangeListener);
+    }
+    finally {
+      super.disposeServices();
+    }
   }
 
   private IBusyHandler getHandlerInternal(Job job) {
@@ -131,6 +157,42 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
         return;
       }
       handler.onJobBegin(job);
+    }
+  }
+
+  private static class JobManagerResumeThread extends Thread {
+
+    private boolean m_running = true;
+
+    public JobManagerResumeThread() {
+      super("JobManager-Resume");
+      setDaemon(true);
+    }
+
+    public void cancel() {
+      m_running = false;
+    }
+
+    @Override
+    public void run() {
+      while (true) {
+        if (!m_running) {
+          return;
+        }
+        try {
+          Thread.sleep(2000);
+          if (!m_running) {
+            return;
+          }
+          IJobManager m = Job.getJobManager();
+          if (m != null && !m.isSuspended()) {
+            m.resume();
+          }
+        }
+        catch (Throwable t) {
+          //nop
+        }
+      }
     }
   }
 
