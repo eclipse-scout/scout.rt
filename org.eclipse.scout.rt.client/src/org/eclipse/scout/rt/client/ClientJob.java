@@ -188,13 +188,11 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
         rescheduleWaitingSyncJobs();
       }
       m_waitFor = true;
-      scheduleDummyJob();
 
       m_waitForLock.wait();
     }
     m_waitFor = false;
     fireBlockingConditionEnd();
-    scheduleDummyJob();
     // continue work
   }
 
@@ -236,13 +234,6 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
     for (Job j : jobList) {
       j.wakeUp();
     }
-  }
-
-  /**
-   * schedule a dummy job to support for busy handling with job manager listener
-   */
-  private void scheduleDummyJob() {
-    new ClientAsyncJob("Dummy", m_session).schedule();
   }
 
   public final void addJobChangeListenerEx(IJobChangeListenerEx listener) {
