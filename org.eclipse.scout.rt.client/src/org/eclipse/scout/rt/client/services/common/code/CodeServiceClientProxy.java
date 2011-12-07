@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.code;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,8 +23,6 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
-import org.eclipse.scout.commons.runtime.BundleBrowser;
-import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -40,7 +37,6 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Bundle;
 
 /**
  * maintains a cache of ICodeType objects that can be (re)loaded using the
@@ -315,67 +311,21 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
       if (a != null) {
         return a;
       }
-      //
-      HashSet<BundleClassDescriptor> localCodeTypes = new HashSet<BundleClassDescriptor>();
-      for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
-        if (bundle.getSymbolicName().startsWith(classPrefix)) {
-          // ok
-        }
-        else if (classPrefix.startsWith(bundle.getSymbolicName() + ".")) {
-          // ok
-        }
-        else {
-          continue;
-        }
-        String[] classNames;
-        try {
-          BundleBrowser bundleBrowser = new BundleBrowser(bundle.getSymbolicName(), "");
-          classNames = bundleBrowser.getClasses(false, true);
-        }
-        catch (Exception e1) {
-          LOG.warn(null, e1);
-          continue;
-        }
-        // filter
-        for (String className : classNames) {
-          // fast pre-check
-          if (className.indexOf("CodeType") >= 0) {
-            try {
-              Class c = null;
-              c = bundle.loadClass(className);
-              if (ICodeType.class.isAssignableFrom(c)) {
-                if (!c.isInterface()) {
-                  int flags = c.getModifiers();
-                  if (Modifier.isPublic(flags) && (!Modifier.isAbstract(flags)) && (!c.getSimpleName().startsWith("Abstract"))) {
-                    if (ICodeType.class.isAssignableFrom(c)) {
-                      localCodeTypes.add(new BundleClassDescriptor(bundle.getSymbolicName(), c.getName()));
-                    }
-                  }
-                }
-              }
-            }
-            catch (Throwable t) {
-              // nop
-            }
-          }
-        }
-      }
-      // check with server side list
-      HashSet<BundleClassDescriptor> mergeSet = new HashSet<BundleClassDescriptor>();
+      // load code types from server-side
+      HashSet<BundleClassDescriptor> verifiedCodeTypes = new HashSet<BundleClassDescriptor>();
       BundleClassDescriptor[] remoteCodeTypes = getRemoteService().getAllCodeTypeClasses(classPrefix);
       for (BundleClassDescriptor d : remoteCodeTypes) {
-        if (localCodeTypes.remove(d)) {
-          mergeSet.add(d);
+        try {
+          // check whether code type is available on client-side
+          Platform.getBundle(d.getBundleSymbolicName()).loadClass(d.getClassName());
+          verifiedCodeTypes.add(d);
         }
-        else {
+        catch (Throwable t) {
           LOG.error("Missing code-type in client: " + d.getClassName() + ", defined in server-side bundle " + d.getBundleSymbolicName());
         }
       }
-      for (BundleClassDescriptor d : localCodeTypes) {
-        LOG.error("Phantom code-type in client: " + d.getClassName() + ", defined in client-side bundle " + d.getBundleSymbolicName());
-      }
       //
-      a = mergeSet.toArray(new BundleClassDescriptor[mergeSet.size()]);
+      a = verifiedCodeTypes.toArray(new BundleClassDescriptor[verifiedCodeTypes.size()]);
       state.m_codeTypeClassDescriptorMap.put(classPrefix, a);
       return a;
     }
