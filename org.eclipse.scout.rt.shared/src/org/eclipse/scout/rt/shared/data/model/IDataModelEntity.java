@@ -64,4 +64,29 @@ public interface IDataModelEntity extends IPropertyObserver {
 
   void setVisible(boolean b);
 
+  /**
+   * Controls the multiplicity of this entity in the context of its parent entity. The result is <code>true</code>, if
+   * this entity can occur multiple times within its parent's context. Default is <code>true</code>.
+   * <p/>
+   * <b>Example:</b>A person has a mother, a father and an arbitrary number of friends. Let's assume the
+   * <em>PersonEntity</em> contains a <em>PersonMotherEntity</em>, a <em>PersonFatherEntity</em> and a
+   * <em>PersonFriendEntity</em>. Both, the mother and father entities' {@link IDataModelEntity#isOneToMany()} return
+   * <code>false</code>. However the one of the friend entity return <code>true</code>.
+   * 
+   * @return Returns <code>true</code> (default) if this entity can occur multiple times in the context of its parent
+   *         entity. Otherwise the entity is considered many-to-one, i.e. this entity can occur at most one time within
+   *         the context of its parent entity.
+   * @since 3.8.0
+   */
+  boolean isOneToMany();
+
+  /**
+   * Controls the multiplicity of this entity in the context of its parent entity.
+   * 
+   * @param b
+   *          <code>true</code> if this entity is referenced at most one time by its parent entity.
+   * @see #isOneToMany()
+   * @since 3.8.0
+   */
+  void setOneToMany(boolean b);
 }

@@ -104,4 +104,19 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
    *         see {@link DataModelUtility}
    */
   Map<String, String> getMetaDataOfAttribute();
+
+  /**
+   * Describes whether this attribute holds a multi-value content. The default implementation derives the result from
+   * {@link #getType()}. The following types are considered multi-valued:
+   * <ul>
+   * <li>{@link DataModelConstants#TYPE_CODE_LIST}</li>
+   * <li>{@link DataModelConstants#TYPE_CODE_TREE}</li>
+   * <li>{@link DataModelConstants#TYPE_NUMBER_LIST}</li>
+   * <li>{@link DataModelConstants#TYPE_NUMBER_TREE}</li>
+   * </ul>
+   * 
+   * @return Returns <code>true</code> if this attribute holds multiple values. <code>false</code> otherwise.
+   * @since 3.8.0
+   */
+  boolean isMultiValued();
 }

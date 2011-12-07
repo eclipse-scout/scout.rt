@@ -37,6 +37,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
   private boolean m_visible;
+  private boolean m_oneToMany;
   private String m_text;
   private String m_iconId;
   private ArrayList<IDataModelAttribute> m_attributes;
@@ -76,6 +77,13 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     return true;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(50)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredOneToMany() {
+    return true;
+  }
+
   /**
    * Initialize this entity.
    */
@@ -99,6 +107,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     setText(getConfiguredText());
     setIconId(getConfiguredIconId());
     setVisible(getConfiguredVisible());
+    setOneToMany(getConfiguredOneToMany());
     ArrayList<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>();
     for (Class<? extends IDataModelAttribute> c : getConfiguredAttributes()) {
       try {
@@ -192,6 +201,16 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   public void setVisible(boolean b) {
     m_visibleProperty = b;
     calculateVisible();
+  }
+
+  @Override
+  public boolean isOneToMany() {
+    return m_oneToMany;
+  }
+
+  @Override
+  public void setOneToMany(boolean b) {
+    m_oneToMany = b;
   }
 
   /**

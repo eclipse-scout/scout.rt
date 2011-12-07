@@ -366,4 +366,16 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     m_visible = m_visibleGranted && m_visibleProperty;
   }
 
+  @Override
+  public boolean isMultiValued() {
+    switch (getType()) {
+      case DataModelConstants.TYPE_CODE_LIST:
+      case DataModelConstants.TYPE_CODE_TREE:
+      case DataModelConstants.TYPE_NUMBER_LIST:
+      case DataModelConstants.TYPE_NUMBER_TREE: {
+        return true;
+      }
+    }
+    return false;
+  }
 }
