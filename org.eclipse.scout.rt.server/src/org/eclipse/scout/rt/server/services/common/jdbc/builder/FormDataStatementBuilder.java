@@ -458,6 +458,34 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return getWhereConstraints();
   }
 
+  /**
+   * Creates a select statement by merging the given entity contribution with the given base statement. This builder's
+   * {@link #getWhereConstraints()} are added as well.
+   * 
+   * @param stm
+   *          base statement with &lt;selectParts/&gt;, &lt;fromParts/&gt;, &lt;whereParts/&gt;, &lt;groupByParts/&gt;
+   *          or &lt;havingParts/&gt; place holders.
+   * @param contribution
+   *          an entity contribution that is used to replace the markers in the given base statement.
+   * @return Returns given base statement having all place holders replaced by the given entity contribution.
+   * @throws ProcessingException
+   * @since 3.8.0
+   */
+  public String createSelectStatement(String stm, EntityContribution contribution) throws ProcessingException {
+    EntityContribution c = contribution;
+    if (c == null) {
+      c = new EntityContribution();
+    }
+    String where = StringUtility.trim(getWhereConstraints());
+    if (StringUtility.hasText(where)) {
+      if (where.toUpperCase().startsWith("AND")) {
+        where = where.substring(3);
+      }
+      c.getWhereParts().add(where);
+    }
+    return createEntityPart(stm, false, c);
+  }
+
   protected boolean isZeroTraversingAttribute(int operation, Object[] values) {
     Number value1 = values != null && values.length > 0 && values[0] instanceof Number ? (Number) values[0] : null;
     Number value2 = values != null && values.length > 1 && values[1] instanceof Number ? (Number) values[1] : null;
@@ -1023,7 +1051,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
         entityPart = StringUtility.replaceTags(entityPart, "whereParts", new ITagProcessor() {
           @Override
           public String processTag(String tagName, String tagContent) {
-            return " AND " + s;//legacy: always prefix an additional AND
+            return tagContent + " AND " + s;//legacy: always prefix an additional AND
           }
         });
       }
