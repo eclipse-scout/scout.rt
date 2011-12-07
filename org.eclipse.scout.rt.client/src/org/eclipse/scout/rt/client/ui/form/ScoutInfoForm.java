@@ -162,6 +162,13 @@ public class ScoutInfoForm extends AbstractForm {
           if (isSwing()) {
             return 1;
           }
+          /**
+           * If the client is a webclient (ui.rap) then some these informations must be omitted (Security) so the html
+           * field is smaller @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=365761
+           */
+          else if (WebClientState.isWebClientInCurrentThread()) {
+            return 12;
+          }
           return 20;
         }
 
