@@ -90,8 +90,29 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
 
   }
 
+  public int computeSwtLabelHorizontalAlignment(int scoutAlign) {
+    switch (scoutAlign) {
+      case -1: {
+        return SWT.LEFT;
+      }
+      case 0: {
+        return SWT.CENTER;
+      }
+      case 1: {
+        return SWT.RIGHT;
+      }
+      default: {
+        return UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
+      }
+    }
+  }
+
   protected int computeSwtLabelStyle(IFormField scoutObject) {
-    return UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
+    if (scoutObject == null) {
+      return SWT.NONE;
+    }
+
+    return computeSwtLabelHorizontalAlignment(scoutObject.getLabelHorizontalAlignment());
   }
 
   public StatusLabelEx createStatusLabel(Composite parent, ISwtEnvironment environment, IFormField scoutObject) {

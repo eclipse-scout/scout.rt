@@ -68,10 +68,12 @@ public class StatusLabelTop extends StatusLabelEx {
     setMarginsOnLabel(label);
     setLabel(label);
 
+    //Set the status icon to the top left corner
     GridData data = new GridData(SWT.LEFT, SWT.TOP, false, false);
     getStatusLabel().setLayoutData(data);
 
-    data = new GridData(SWT.LEFT, SWT.TOP, true, true);
+    //Make sure the label composite fills the cell so that horizontal alignment of the text works well
+    data = new GridData(SWT.FILL, SWT.FILL, true, true);
     label.setLayoutData(data);
   }
 

@@ -145,12 +145,6 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       if (getSwtLabel().getEnabled() != b) {
         updateLayout = true;
         getSwtLabel().setEnabled(b);
-        if (b) {
-          getSwtLabel().setForeground(null);
-        }
-        else {
-          getSwtLabel().setForeground(getEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled()));
-        }
       }
     }
     if (updateLayout && isConnectedToScout()) {

@@ -81,10 +81,11 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
     m_statusLabel = new Label(parent, SWT.NONE);
     m_environment.getFormToolkit().getFormToolkit().adapt(m_statusLabel, false, false);
 
-    GridData data = new GridData(SWT.LEFT, SWT.TOP, false, false);
-    getStatusLabel().setLayoutData(data);
+    GridData data = new GridData(SWT.RIGHT, SWT.CENTER, false, false);
+    m_statusLabel.setLayoutData(data);
 
-    data = new GridData(SWT.LEFT, SWT.TOP, true, true);
+    //Make sure the label composite fills the cell so that horizontal alignment of the text works well
+    data = new GridData(SWT.FILL, SWT.FILL, true, true);
     m_label.setLayoutData(data);
   }
 
@@ -167,8 +168,21 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
     return updateLayout;
   }
 
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+
+    if (enabled) {
+      setForeground(null);
+    }
+    else {
+      setForeground(getEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled()));
+    }
+  }
+
   protected void updateLabelForeground() {
-    if (isMandatory()) {
+    //Update the foreground only if the field is enabled otherwise the disabled state would not be visible
+    if (isEnabled() && isMandatory()) {
       m_label.setForeground(getMandatoryForegroundColor());
     }
     else {
