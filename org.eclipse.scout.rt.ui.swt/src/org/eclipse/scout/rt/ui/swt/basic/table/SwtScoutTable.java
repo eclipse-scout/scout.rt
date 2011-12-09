@@ -174,10 +174,11 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     table.addKeyListener(new KeyAdapter() {
 
       @Override
-      public void keyReleased(KeyEvent e) {
-        if ((e.stateMask & SWT.CONTROL) == 0 || e.keyCode != ((int) 'c')) {
+      public void keyPressed(KeyEvent e) {
+        if ((e.stateMask & SWT.MOD1) == 0 || e.keyCode != ((int) 'c')) {
           return;
         }
+
         // CTRL-C event
         TransferObject scoutTransferable = handleSwtCopyRequest();
         if (scoutTransferable == null) {
@@ -188,7 +189,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         if (swtTransferables.length == 0) {
           return;
         }
-        
+
         Clipboard clipboard = new Clipboard(getEnvironment().getDisplay());
         try {
           Transfer[] dataTypes = new Transfer[swtTransferables.length];
