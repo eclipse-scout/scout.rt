@@ -25,6 +25,7 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -80,7 +81,9 @@ public class WidgetPrinter {
     }
     String contentType = (String) parameters.remove("contentType");
     if (contentType == null) {
-      contentType = "image/jpg";
+      //auto-detect from file name
+      String fname = m_printedFile.getName().toLowerCase(Locale.US);
+      contentType = autoDetectContentType(fname);
     }
     if (!contentType.startsWith("image/")) {
       throw new IllegalArgumentException("only supporting contentTypes image/*");
@@ -104,7 +107,7 @@ public class WidgetPrinter {
 
   private BufferedImage createBufferedImage() {
     // print component to offscreen image
-    BufferedImage img = new BufferedImage(m_widget.getWidth(), m_widget.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    BufferedImage img = new BufferedImage(m_widget.getWidth(), m_widget.getHeight(), BufferedImage.TYPE_INT_RGB);
     Graphics gOff = img.getGraphics();
     gOff.setColor(Color.white);
     gOff.fillRect(0, 0, m_widget.getWidth(), m_widget.getHeight());
@@ -148,4 +151,22 @@ public class WidgetPrinter {
     }
   }
 
+  protected String autoDetectContentType(String fname) {
+    if (fname.endsWith(".jpg") || fname.endsWith(".jpeg")) {
+      return "image/jpg";
+    }
+    if (fname.endsWith(".gif")) {
+      return "image/gif";
+    }
+    if (fname.endsWith(".png")) {
+      return "image/png";
+    }
+    if (fname.endsWith(".tif")) {
+      return "image/tif";
+    }
+    if (fname.endsWith(".bmp")) {
+      return "image/bmp";
+    }
+    return "image/jpg";
+  }
 }
