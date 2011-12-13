@@ -32,8 +32,10 @@ import org.apache.batik.swing.svg.GVTTreeBuilder;
 import org.apache.batik.util.SVGConstants;
 import org.apache.batik.util.XMLConstants;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGAElement;
@@ -457,6 +459,15 @@ public final class SVGUtility {
 
   /**
    * Enclose the element with a link to an url
+   * <p>
+   * Bug fix: batik sometimes creates a new namespace for xlink even though the namespace is already defined. This
+   * utility method fixes that behaviour.
+   * <p>
+   * Bug: <xmp><a xlink:actuate="onRequest" xlink:type="simple" xlink:show="replace"
+   * xmlns:ns3="http://www.w3.org/1999/xlink" ns3:href="http://local/info-prev">....</a></xmp>
+   * <p>
+   * Fixed: <xmp><a xlink:actuate="onRequest" xlink:type="simple" xlink:show="replace"
+   * xlink:href="http://local/info-prev">....</a></xmp>
    */
   public static void addHyperlink(Element e, String url) {
     SVGAElement aElem = (SVGAElement) e.getOwnerDocument().createElementNS(SVG_NS, "a");
@@ -464,6 +475,28 @@ public final class SVGUtility {
     e.getParentNode().removeChild(e);
     aElem.appendChild(e);
     aElem.getHref().setBaseVal(url);
+    //bug fix: remove xmlns:xlink=... attributes, change attributes of ns xlink to have name prefixed with 'xlink'
+    NamedNodeMap nnmap = aElem.getAttributes();
+    for (int i = 0, n = nnmap.getLength(); i < n; i++) {
+      Node node = nnmap.item(i);
+      if (node instanceof Attr) {
+        Attr a = (Attr) node;
+        if (XLINK_NS.equals(a.getNamespaceURI()) && !"xlink".equals(a.getPrefix())) {
+          nnmap.removeNamedItemNS(a.getNamespaceURI(), a.getLocalName());
+          a.setPrefix("xlink");
+          nnmap.setNamedItemNS(a);
+        }
+      }
+    }
+    for (int i = 0, n = nnmap.getLength(); i < n; i++) {
+      Node node = nnmap.item(i);
+      if (node instanceof Attr) {
+        Attr a = (Attr) node;
+        if (javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(a.getNamespaceURI())) {
+          nnmap.removeNamedItemNS(a.getNamespaceURI(), a.getLocalName());
+        }
+      }
+    }
   }
 
 }
