@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -124,7 +124,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
   }
 
   protected void initConfig() {
-    m_row = new CodeRow(
+    m_row = interceptCodeRow(new CodeRow(
         getId(),
         getConfiguredText(),
         getConfiguredIconId(),
@@ -138,7 +138,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
         getConfiguredExtKey(),
         getConfiguredValue(),
         0
-        );
+        ));
     // add configured child codes
     Class<? extends ICode>[] a = getConfiguredCodes();
     if (a != null) {
@@ -152,6 +152,17 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
         }
       }
     }
+  }
+
+  /**
+   * This interception method is called from the {@link #initConfig()} method just on construction of the code object.
+   * <p>
+   * Override this method to change that code row used by this code or to return a different code row than the default.
+   * <p>
+   * The defaukt does nothing and returns the argument row.
+   */
+  protected CodeRow interceptCodeRow(CodeRow row) {
+    return row;
   }
 
   @Override
