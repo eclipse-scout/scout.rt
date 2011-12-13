@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -77,7 +77,7 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
     m_activityMapComposite.createField(getScoutObject().getActivityMap(), getSwingEnvironment());
     JSplitPane hsplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_resourceTableComposite.getSwingScrollPane(), m_activityMapComposite.getSwingScrollPane());
     hsplit.setBorder(null);
-    hsplit.setDividerLocation(168);
+    hsplit.setDividerLocation(getScoutObject().getSplitterPosition());
     hsplit.setDividerSize(3);
     container.add(hsplit, new PlannerFieldLayoutConstraints(PlannerFieldLayoutConstraints.PLANNER));
     // mediate v-scrolling

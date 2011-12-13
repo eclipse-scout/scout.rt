@@ -67,6 +67,13 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     return 2;
   }
 
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(20)
+  @ConfigPropertyValue("168")
+  protected int getConfiguredSplitterPosition() {
+    return 168;
+  }
+
   @Override
   protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
     loadResourceTableData();
@@ -142,6 +149,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     m_uiFacade = new P_PlannerFieldUIFacade();
     super.initConfig();
     setMiniCalendarCount(getConfiguredMiniCalendarCount());
+    setSplitterPosition(getConfiguredSplitterPosition());
     if (getConfiguredResourceTable() != null) {
       try {
         m_resourceTable = (T) ConfigurationUtility.newInnerInstance(this, getConfiguredResourceTable());
@@ -214,11 +222,20 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
 
   @Override
   public void setMiniCalendarCount(int n) {
-    if (n < 0 || n > 6)
-     {
+    if (n < 0 || n > 6) {
       return;// ignore it
     }
     propertySupport.setPropertyInt(PROP_MINI_CALENDAR_COUNT, n);
+  }
+
+  @Override
+  public int getSplitterPosition() {
+    return propertySupport.getPropertyInt(PROP_SPLITTER_POSITION);
+  }
+
+  @Override
+  public void setSplitterPosition(int splitterPosition) {
+    propertySupport.setPropertyInt(PROP_SPLITTER_POSITION, splitterPosition);
   }
 
   @Override
