@@ -250,19 +250,19 @@ public final class SVGUtility {
    *          in px
    * @return the wrapped text with additional newline characters where it was wrapped.
    */
-  public static String[] wrapText(SVGTextContentElement contextElement, String text, Float wordWrap) {
+  public static String wrapText(SVGTextContentElement contextElement, String text, Float wordWrap) {
     if (text == null) {
-      return new String[0];
+      return "";
     }
     List<String> lines = Arrays.asList(text.split("[\n\r]"));
     if (wordWrap == null || wordWrap <= 0 || text.length() == 0) {
-      return new String[]{text};
+      return text;
     }
     float wrap = wordWrap.floatValue();
     ArrayList<String> wrappedLines = new ArrayList<String>(lines.size());
     for (String line : lines) {
       if (line.trim().length() == 0) {
-        wrappedLines.add(line);
+        wrappedLines.add("");
         continue;
       }
       line = line.replaceAll("[\\s]+", " ").trim();
@@ -285,10 +285,17 @@ public final class SVGUtility {
           for (int i = startIndex; i < endIndex; i++) {
             dw += w[i];
           }
+          //wrap when there is at least one word and text exceeds line
           if (lineBuf.length() > 0 && acc + dw > wrap) {
-            acc = 0;
-            wrappedLines.add(lineBuf.toString());
+            //maybe text is absolutely too large
+            if (acc > wrap) {
+              wrappedLines.add(rtrim(clipText(contextElement, lineBuf.toString(), wrap)));
+            }
+            else {
+              wrappedLines.add(rtrim(lineBuf.toString()));
+            }
             lineBuf.setLength(0);
+            acc = 0;
           }
           acc += dw;
           lineBuf.append(word);
@@ -302,7 +309,13 @@ public final class SVGUtility {
         }
         //remaining text
         if (lineBuf.length() > 0) {
-          wrappedLines.add(lineBuf.toString());
+          //maybe text is absolutely too large
+          if (acc > wrap) {
+            wrappedLines.add(rtrim(clipText(contextElement, lineBuf.toString(), wrap)));
+          }
+          else {
+            wrappedLines.add(rtrim(lineBuf.toString()));
+          }
           lineBuf.setLength(0);
         }
       }
@@ -310,7 +323,32 @@ public final class SVGUtility {
         contextElement.setTextContent(null);
       }
     }
-    return wrappedLines.toArray(new String[wrappedLines.size()]);
+    while (wrappedLines.size() > 0 && wrappedLines.get(wrappedLines.size() - 1).length() == 0) {
+      wrappedLines.remove(wrappedLines.size() - 1);
+    }
+    StringBuilder buf = new StringBuilder();
+    for (int i = 0, n = wrappedLines.size(); i < n; i++) {
+      if (i > 0) {
+        buf.append("\n");
+      }
+      buf.append(wrappedLines.get(i));
+    }
+    return buf.toString();
+  }
+
+  private static String rtrim(String s) {
+    int len = s.length();
+    int r = len - 1;
+    while (r >= 0 && s.charAt(r) <= ' ') {
+      r--;
+    }
+    if (r == len - 1) {
+      return s;
+    }
+    if (r < 0) {
+      return "";
+    }
+    return s.substring(0, r + 1);
   }
 
   /**
