@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.AbstractBusyHandler;
 import org.eclipse.scout.rt.client.busy.IBusyHandler;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
  * Swing default implementation of busy handling.
@@ -35,7 +36,7 @@ public class SwingBusyHandler extends AbstractBusyHandler {
 
   @Override
   protected void runBusy() {
-    new SwingBusyJob("Waiting", this).schedule();
+    new SwingBusyJob(TEXTS.get("BusyJob"), this).schedule();
   }
 
 }

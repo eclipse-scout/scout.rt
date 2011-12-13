@@ -29,6 +29,7 @@ public class BusyJob extends Job {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BusyJob.class);
 
   private final IBusyHandler m_handler;
+  private boolean m_cancelApplied;
 
   public BusyJob(String name, IBusyHandler handler) {
     super(name);
@@ -58,6 +59,10 @@ public class BusyJob extends Job {
         if (!h.isBusy()) {
           return;
         }
+        if (!m_cancelApplied && monitor.isCanceled()) {
+          m_cancelApplied = true;
+          h.cancel();
+        }
         if (System.currentTimeMillis() > longOpTimestamp) {
           return;
         }
@@ -76,14 +81,13 @@ public class BusyJob extends Job {
     Object lock = h.getStateLock();
     try {
       monitor.beginTask(null, IProgressMonitor.UNKNOWN);
-      boolean cancelApplied = false;
       while (true) {
         synchronized (lock) {
           if (!h.isBusy()) {
             return;
           }
-          if (!cancelApplied && monitor.isCanceled()) {
-            cancelApplied = true;
+          if (!m_cancelApplied && monitor.isCanceled()) {
+            m_cancelApplied = true;
             h.cancel();
           }
           try {

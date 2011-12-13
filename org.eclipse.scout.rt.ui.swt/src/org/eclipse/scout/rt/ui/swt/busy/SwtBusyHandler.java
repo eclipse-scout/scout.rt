@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swt.busy;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.AbstractBusyHandler;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.swt.widgets.Display;
 
@@ -22,7 +23,6 @@ import org.eclipse.swt.widgets.Display;
  * @since 3.8
  */
 public class SwtBusyHandler extends AbstractBusyHandler {
-
   private final ISwtEnvironment m_env;
   private final Display m_display;
 
@@ -42,6 +42,6 @@ public class SwtBusyHandler extends AbstractBusyHandler {
 
   @Override
   protected void runBusy() {
-    new SwtBusyJob("Waiting", this).schedule();
+    new SwtBusyWaitJob(TEXTS.get("BusyJob"), this).schedule();
   }
 }

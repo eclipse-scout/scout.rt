@@ -35,6 +35,7 @@ public class SwingBusyJob extends BusyJob {
 
   public SwingBusyJob(String name, IBusyHandler handler) {
     super(name, handler);
+    setSystem(true);
   }
 
   @Override
