@@ -892,11 +892,6 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       m_conn = conn;
     }
 
-    @Override
-    public String getMemberId() {
-      return m_transactionMemberId;
-    }
-
     public Connection getConnection() {
       return m_conn;
     }
