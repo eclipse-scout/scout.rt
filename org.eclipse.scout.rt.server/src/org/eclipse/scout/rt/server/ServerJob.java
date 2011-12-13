@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
@@ -270,17 +269,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
    */
   @SuppressWarnings("unchecked")
   public static final <T extends IServerSession> T getCurrentSession(Class<T> type) {
-    IServerSession s;
-    // try current job
-    Job job = getJobManager().currentJob();
-    if (job instanceof IServerSessionProvider) {
-      s = ((IServerSessionProvider) job).getServerSession();
-      if (s != null && type.isAssignableFrom(s.getClass())) {
-        return (T) s;
-      }
-    }
-    // try ThreadContext
-    s = ThreadContext.getServerSession();
+    IServerSession s = ThreadContext.getServerSession();
     if (s != null && type.isAssignableFrom(s.getClass())) {
       return (T) s;
     }
