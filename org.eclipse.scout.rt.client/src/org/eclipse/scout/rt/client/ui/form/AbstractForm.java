@@ -684,13 +684,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       e.addContextMessage(AbstractForm.this.getClass().getSimpleName());
       disposeFormInternal();
       if (e instanceof VetoException) {
-        try {
-          execOnVetoException((VetoException) e, e.getStatus().getCode());
-        }
-        catch (ProcessingException ex) {
-          // nop
-        }
-        return this;
+        execOnVetoException((VetoException) e, e.getStatus().getCode());
       }
       else {
         throw e;
@@ -795,8 +789,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter) throws ProcessingException {
+    if (filter == null) {
+      filter = new FormDataPropertyFilter();
+    }
     // locally declared form properties
-    Map<String, Object> properties = BeanUtility.getProperties(source, AbstractFormData.class, new FormDataPropertyFilter());
+    Map<String, Object> properties = BeanUtility.getProperties(source, AbstractFormData.class, filter);
     for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
       AbstractPropertyData pd = source.getPropertyById(it.next());
       if (pd != null && !pd.isValueSet()) {
@@ -851,7 +848,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       else {
         stopClass = AbstractFormFieldData.class;
       }
-      properties = BeanUtility.getProperties(data, stopClass, new FormDataPropertyFilter());
+      properties = BeanUtility.getProperties(data, stopClass, filter);
       for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
         AbstractPropertyData pd = data.getPropertyById(it.next());
         if (pd != null && !pd.isValueSet()) {
@@ -875,7 +872,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       else {
         stopClass = AbstractFormFieldData.class;
       }
-      properties = BeanUtility.getProperties(data, stopClass, new FormDataPropertyFilter());
+      properties = BeanUtility.getProperties(data, stopClass, filter);
       for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
         AbstractPropertyData pd = data.getPropertyById(it.next());
         if (pd != null && !pd.isValueSet()) {
