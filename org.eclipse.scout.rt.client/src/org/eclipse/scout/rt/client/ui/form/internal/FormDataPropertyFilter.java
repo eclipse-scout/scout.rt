@@ -14,7 +14,6 @@ import java.io.Serializable;
 
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
-import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
@@ -35,9 +34,7 @@ public class FormDataPropertyFilter implements IPropertyFilter {
     if (descriptor.getWriteMethod() == null) {
       return false;
     }
-    if (AbstractFormData.class.isAssignableFrom(propertyType)) {
-      return false;
-    }
+    //do NOT filter out AbstractFormData values
     if (AbstractFormFieldData.class.isAssignableFrom(propertyType)) {
       return false;
     }
