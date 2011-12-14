@@ -16,19 +16,16 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.swing.AbstractAction;
-import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
-import javax.swing.KeyStroke;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
@@ -48,7 +45,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 public class SwingBusyIndicator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingBusyIndicator.class);
   private static final AtomicLong BUSY_SEQ = new AtomicLong();
-  private static final String BUSY_ID_CLIENT_PROPERTY = "SwingBusyIndicator.busyId";
+  private static final String BUSY_SET_CLIENT_PROPERTY = "SwingBusyIndicator.busySet";
   private static SwingBusyIndicator instance = new SwingBusyIndicator();
 
   /**
@@ -68,11 +65,14 @@ public class SwingBusyIndicator {
     return instance;
   }
 
-  public static void setInstance(SwingBusyIndicator newIndicator) {
+  public static synchronized void setInstance(SwingBusyIndicator newIndicator) {
+    if (instance != null) {
+      instance.dispose();
+    }
     instance = newIndicator;
   }
 
-  private final AtomicLong m_busyCounter = new AtomicLong();
+  private final AtomicInteger m_busyLevel = new AtomicInteger();
 
   /**
    * Should NOT be called on the ui thread {@link SwingUtilities#isEventDispatchThread()}
@@ -86,10 +86,9 @@ public class SwingBusyIndicator {
     if (SwingUtilities.isEventDispatchThread()) {
       throw new IllegalStateException("must not be called on ui thread");
     }
-    long busyId = 0L;
     try {
-      busyId = m_busyCounter.incrementAndGet();
-      if (busyId == 1L) {
+      int level = m_busyLevel.incrementAndGet();
+      if (level == 1L) {
         fireBusyPropertyChange(true);
       }
       //
@@ -99,7 +98,7 @@ public class SwingBusyIndicator {
        */
       ArrayList<RootPaneContainer> lazyHolder = new ArrayList<RootPaneContainer>();
       try {
-        setBusy(busyId, lazyHolder);
+        setBusy(lazyHolder);
         runnable.run();
       }
       finally {
@@ -107,11 +106,15 @@ public class SwingBusyIndicator {
       }
     }
     finally {
-      m_busyCounter.decrementAndGet();
-      if (busyId == 1L) {
+      int level = m_busyLevel.decrementAndGet();
+      if (level == 0L) {
         fireBusyPropertyChange(false);
       }
     }
+  }
+
+  public boolean isBusy() {
+    return m_busyLevel.get() > 0;
   }
 
   /**
@@ -124,7 +127,10 @@ public class SwingBusyIndicator {
     setBlocking(monitor);
   }
 
-  private void fireBusyPropertyChange(boolean value) {
+  protected void dispose() {
+  }
+
+  protected void fireBusyPropertyChange(boolean value) {
     UIManager.put(BUSY_UI_PROPERTY, value);
   }
 
@@ -134,7 +140,7 @@ public class SwingBusyIndicator {
    *          is filled lazy by {@link SwingUtilities#invokeLater(Runnable)}, do not use values outside of atw event
    *          queue thread!
    */
-  private void setBusy(final long busyId, final Collection<RootPaneContainer> lazyHolder) {
+  private void setBusy(final Collection<RootPaneContainer> lazyHolder) {
     SwingUtilities.invokeLater(
           new Runnable() {
             @Override
@@ -145,7 +151,7 @@ public class SwingBusyIndicator {
                 for (Window w : windows) {
                   RootPaneContainer r = accept(w);
                   if (r != null) {
-                    if (setBusy0(busyId, r)) {
+                    if (setBusy0(r)) {
                       lazyHolder.add(r);
                     }
                   }
@@ -218,15 +224,15 @@ public class SwingBusyIndicator {
     return (RootPaneContainer) c;
   }
 
-  private boolean setBusy0(long busyId, RootPaneContainer r) {
+  private boolean setBusy0(RootPaneContainer r) {
     JRootPane rootPane = r.getRootPane();
     if (rootPane == null) {
       return false;
     }
-    if (rootPane.getClientProperty(BUSY_ID_CLIENT_PROPERTY) != null) {
+    if (rootPane.getClientProperty(BUSY_SET_CLIENT_PROPERTY) != null) {
       return false;
     }
-    rootPane.putClientProperty(BUSY_ID_CLIENT_PROPERTY, busyId);
+    rootPane.putClientProperty(BUSY_SET_CLIENT_PROPERTY, true);
     BusyGlassPane glass = new BusyGlassPane();
     rootPane.setGlassPane(glass);
     glass.setVisible(true);
@@ -249,7 +255,7 @@ public class SwingBusyIndicator {
     if (rootPane == null) {
       return;
     }
-    rootPane.putClientProperty(BUSY_ID_CLIENT_PROPERTY, null);
+    rootPane.putClientProperty(BUSY_SET_CLIENT_PROPERTY, null);
     rootPane.setGlassPane(new IdleGlassPane());
     rootPane.getGlassPane().setVisible(false);
   }
@@ -259,6 +265,7 @@ public class SwingBusyIndicator {
 
     private IProgressMonitor m_monitor;
     private String m_blockingMessage;
+    private Rectangle m_messageRect;
 
     public BusyGlassPane() {
       setVisible(false);
@@ -267,8 +274,15 @@ public class SwingBusyIndicator {
       addMouseListener(new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
-          if (m_monitor == null) {
-            return;
+          Rectangle r = m_messageRect;
+          if (r != null && r.contains(e.getPoint())) {
+            IProgressMonitor mon = m_monitor;
+            if (mon != null && !mon.isCanceled()) {
+              m_blockingMessage = null;
+              m_messageRect = null;
+              mon.setCanceled(true);
+              repaint();
+            }
           }
         }
       });
@@ -277,24 +291,6 @@ public class SwingBusyIndicator {
     public void block(IProgressMonitor monitor) {
       m_monitor = monitor;
       m_blockingMessage = SwingUtility.getNlsText("BusyBlockingMessage");
-      setInputVerifier(new InputVerifier() {
-        @Override
-        public boolean verify(JComponent input) {
-          return false;
-        }
-      });
-      getInputMap(WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ESCAPE"), "esc");
-      getActionMap().put("esc", new AbstractAction() {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          m_monitor.setCanceled(true);
-          m_blockingMessage = null;
-          repaint();
-        }
-      });
-      requestFocus();
       repaint();
     }
 
@@ -302,19 +298,18 @@ public class SwingBusyIndicator {
     protected void paintComponent(Graphics g) {
       super.paintComponent(g);
       if (m_monitor != null) {
-        g.setColor(new Color(0x44000000, true));
-        g.fillRect(0, 0, getWidth(), getHeight());
         String s = m_blockingMessage;
         Window w = SwingUtilities.getWindowAncestor(this);
         if (s != null && w != null && w.isActive()) {
           int textWidth = g.getFontMetrics().stringWidth(s);
           int textHeight = g.getFontMetrics().getAscent();
           int pad = 8;
-          Rectangle messageRect = new Rectangle(getWidth() / 2 - textWidth / 2 - pad, getHeight() * 2 / 3 - textHeight / 2 - pad, textWidth + pad + pad, textHeight + pad + pad);
+          Rectangle r = new Rectangle(getWidth() / 2 - textWidth / 2 - pad, getHeight() * 4 / 5 - (textHeight + pad + pad), textWidth + pad + pad, textHeight + pad + pad);
+          m_messageRect = r;
           g.setColor(new Color(0x66000000, true));
-          g.fillRoundRect(messageRect.x, messageRect.y, messageRect.width, messageRect.height, pad + pad, pad + pad);
+          g.fillRoundRect(r.x, r.y, r.width, r.height, pad + pad, pad + pad);
           g.setColor(Color.white);
-          g.drawString(s, messageRect.x + pad, messageRect.y + pad + textHeight - 2);
+          g.drawString(s, r.x + pad, r.y + pad + textHeight - 2);
         }
       }
     }
