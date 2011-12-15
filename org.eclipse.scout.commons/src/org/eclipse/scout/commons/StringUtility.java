@@ -19,7 +19,6 @@ import java.io.StringWriter;
 import java.text.Collator;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
