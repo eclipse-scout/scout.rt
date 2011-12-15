@@ -17,6 +17,8 @@ import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -27,12 +29,15 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.ui.swing.basic.IconUtility;
 
 /**
  * Looks for icons in the resources/icons folder of bundles
  */
 public class SwingIconLocator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingIconLocator.class);
+
+  public static final Pattern IMAGE_WITH_STATE_PATTERN = Pattern.compile("(.*)(_active|_disabled|_mouse|_mouse_over|_open|_over|_pressed|_rollover|_selected)", Pattern.CASE_INSENSITIVE);
 
   private final Object m_cacheLock = new Object();
   private final HashMap<String, Image> m_imagesByNameCache = new HashMap<String, Image>();
@@ -60,7 +65,7 @@ public class SwingIconLocator {
   }
 
   public Image getImage(String name) {
-    if (name.length() == 0) {
+    if (name == null || AbstractIcons.Null.equals(name) || name.length() == 0) {
       return null;
     }
     Image img;
@@ -68,6 +73,9 @@ public class SwingIconLocator {
       img = m_imagesByNameCache.get(name);
       if (img == null && !m_imagesByNameCache.containsKey(name)) {
         img = createImageImpl(name);
+        if (img == null) {
+          img = autoCreateMissingImage(name);
+        }
         m_imagesByNameCache.put(name, img);
         if (LOG.isDebugEnabled()) {
           LOG.debug("load image '" + name + "' as " + img);
@@ -78,18 +86,6 @@ public class SwingIconLocator {
       }
     }
     return img;
-  }
-
-  protected void warnImageNotFound(String name) {
-    if (name.equals("window")) {
-      //optional image, maybe the new style window16, window256 etc were specified
-      return;
-    }
-    if (name.matches(".*(_active|_disabled|_mouse|_open|_over|_pressed|_rollover|_selected)")) {
-      //optional "sub" images
-      return;
-    }
-    LOG.warn("could not find image '" + name + "'");
   }
 
   private Image createImageImpl(String name) {
@@ -105,6 +101,44 @@ public class SwingIconLocator {
       return img;
     }
     return null;
+  }
+
+  /**
+   * When an image is missing, this method is called and a try can be made to aut-create the missing image (for example
+   * disabled state)
+   */
+  protected Image autoCreateMissingImage(String name) {
+    Matcher m = IMAGE_WITH_STATE_PATTERN.matcher(name);
+    if (!m.matches()) {
+      return null;
+    }
+    String state = m.group(2);
+    //valid sub-image state
+    if ("_disabled".equalsIgnoreCase(state)) {
+      Icon normal = getIcon(m.group(1));
+      if (normal == null) {
+        return null;
+      }
+      ImageIcon ii = IconUtility.blendIcon(IconUtility.grayIcon(normal), 0.6f, 0xeeeeee, 0.4f);
+      return (ii != null ? ii.getImage() : null);
+    }
+    return null;
+  }
+
+  protected void warnImageNotFound(String name) {
+    if (name == null) {
+      return;
+    }
+    if (name.equalsIgnoreCase("window")) {
+      //optional image, maybe the new style window16, window256 etc were specified
+      return;
+    }
+    Matcher m = IMAGE_WITH_STATE_PATTERN.matcher(name);
+    if (m.matches()) {
+      //optional "sub" images
+      return;
+    }
+    LOG.warn("could not find image '" + name + "'");
   }
 
   protected Image decorateForDevelopment(Image img) {
