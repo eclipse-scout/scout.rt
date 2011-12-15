@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
@@ -28,8 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -49,17 +48,18 @@ public class SwingBusyIndicator {
   private static SwingBusyIndicator instance = new SwingBusyIndicator();
 
   /**
-   * When busy blocking mode is on, clicks on a component are checked if the deepest component has
-   * {@link JComponent#getClientProperty(Object)} set.
-   * Also if ESCAPE is typed the current {@link IProgressMonitor} is cancelled.
+   * {@link JComponent#getClientProperty(Object)} marker for {@link RootPaneContainer}s that support busy with glasspane
+   * overlays.
    */
   public static final String BUSY_SUPPORTED_CLIENT_PROPERTY = "SwingBusyIndicator.busySupported";
+
   /**
-   * {@link UIManager#getDefaults()} . {@link UIDefaults#addPropertyChangeListener(java.beans.PropertyChangeListener)}
-   * can listen for this property of type
-   * boolean to detect for busy/idle
+   * When busy is active, this property is used to find out if a component is marked as
+   * busy-clickable and therefore event retarget to it is allowed.
+   * <p>
+   * Type {@link Boolean}
    */
-  public static final String BUSY_UI_PROPERTY = "SwingBusyIndicator.busyFlag";
+  public static final String BUSY_CLICKABLE_CLIENT_PROPERTY = "SwingBusyIndicator.busyClickable";
 
   public static SwingBusyIndicator getInstance() {
     return instance;
@@ -75,9 +75,9 @@ public class SwingBusyIndicator {
   private final AtomicInteger m_busyLevel = new AtomicInteger();
 
   /**
-   * Should NOT be called on the ui thread {@link SwingUtilities#isEventDispatchThread()}
+   * Shows a wait cursor on all windows, until the runnable has finished.
    * <p>
-   * Blocks and shows a wait cursor on all windows, until the runnable has finished.
+   * Should NOT be called on the ui thread {@link SwingUtilities#isEventDispatchThread()}
    */
   public void showWhile(Runnable runnable) {
     if (runnable == null) {
@@ -87,13 +87,10 @@ public class SwingBusyIndicator {
       throw new IllegalStateException("must not be called on ui thread");
     }
     try {
-      int level = m_busyLevel.incrementAndGet();
-      if (level == 1L) {
-        fireBusyPropertyChange(true);
-      }
+      m_busyLevel.incrementAndGet();
       //
       /**
-       * lazyHolder is filled lazy by {@link SwingUtilities#invokeLater(Runnable)}, do not use values outside of atw
+       * lazyHolder is filled lazy by {@link SwingUtilities#invokeLater(Runnable)}, do not use values outside of the
        * event queue thread!
        */
       ArrayList<RootPaneContainer> lazyHolder = new ArrayList<RootPaneContainer>();
@@ -106,10 +103,7 @@ public class SwingBusyIndicator {
       }
     }
     finally {
-      int level = m_busyLevel.decrementAndGet();
-      if (level == 0L) {
-        fireBusyPropertyChange(false);
-      }
+      m_busyLevel.decrementAndGet();
     }
   }
 
@@ -128,10 +122,6 @@ public class SwingBusyIndicator {
   }
 
   protected void dispose() {
-  }
-
-  protected void fireBusyPropertyChange(boolean value) {
-    UIManager.put(BUSY_UI_PROPERTY, value);
   }
 
   /**
@@ -273,19 +263,72 @@ public class SwingBusyIndicator {
       setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
       addMouseListener(new MouseAdapter() {
         @Override
+        public void mousePressed(MouseEvent e) {
+          IProgressMonitor mon = m_monitor;
+          if (mon == null) {
+            JComponent busyClickable = getBusyClickable(e);
+            if (busyClickable != null) {
+              retargetEvent(e, busyClickable);
+            }
+          }
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+          IProgressMonitor mon = m_monitor;
+          if (mon == null) {
+            JComponent busyClickable = getBusyClickable(e);
+            if (busyClickable != null) {
+              retargetEvent(e, busyClickable);
+            }
+          }
+        }
+
+        @Override
         public void mouseClicked(MouseEvent e) {
-          Rectangle r = m_messageRect;
-          if (r != null && r.contains(e.getPoint())) {
-            IProgressMonitor mon = m_monitor;
-            if (mon != null && !mon.isCanceled()) {
+          IProgressMonitor mon = m_monitor;
+          JComponent busyClickable = getBusyClickable(e);
+          if (mon == null) {
+            if (busyClickable != null) {
+              retargetEvent(e, busyClickable);
+            }
+          }
+          else {
+            Rectangle r = m_messageRect;
+            if (!mon.isCanceled() && (r != null && r.contains(e.getPoint())) || busyClickable != null) {
+              //blocking state
               m_blockingMessage = null;
-              m_messageRect = null;
               mon.setCanceled(true);
               repaint();
             }
           }
         }
       });
+    }
+
+    private JComponent getBusyClickable(MouseEvent e) {
+      if (e.getComponent() == null) {
+        return null;
+      }
+      Window w = SwingUtilities.getWindowAncestor(e.getComponent());
+      if (!(w instanceof RootPaneContainer)) {
+        return null;
+      }
+      Point p = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), ((RootPaneContainer) w).getContentPane());
+      Component c = SwingUtilities.getDeepestComponentAt(((RootPaneContainer) w).getContentPane(), p.x, p.y);
+      if (!(c instanceof JComponent)) {
+        return null;
+      }
+      Boolean b = (Boolean) ((JComponent) c).getClientProperty(BUSY_CLICKABLE_CLIENT_PROPERTY);
+      if (b != null && b.booleanValue()) {
+        return (JComponent) c;
+      }
+      return null;
+    }
+
+    private void retargetEvent(MouseEvent e, JComponent c) {
+      MouseEvent retargetEvent = SwingUtilities.convertMouseEvent(e.getComponent(), e, c);
+      c.dispatchEvent(retargetEvent);
     }
 
     public void block(IProgressMonitor monitor) {
