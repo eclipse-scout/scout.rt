@@ -59,7 +59,6 @@ import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JRootPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyIndicator;
 import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
-import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.MultiSplitDesktopManager;
 import org.eclipse.scout.rt.ui.swing.window.desktop.menubar.SwingScoutMenuBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.status.SwingScoutStatusBar;
@@ -352,7 +351,6 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
    * event handlers
    */
   protected void handleSwingWindowOpened(WindowEvent e) {
-    SwingWindowManager.getInstance().setActiveWindow(m_swingFrame);
     // fit initial size of views
     if (getDesktopComposite() != null) {
       DesktopManager dm = getDesktopComposite().getSwingDesktopPane().getDesktopManager();
@@ -363,7 +361,6 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
   }
 
   protected void handleSwingWindowActivated(WindowEvent e) {
-    SwingWindowManager.getInstance().setActiveWindow(m_swingFrame);
   }
 
   protected void handleSwingWindowClosing(WindowEvent e) {

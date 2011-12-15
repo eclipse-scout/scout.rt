@@ -45,7 +45,6 @@ import org.eclipse.scout.rt.ui.swing.window.DependentCloseListener;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
-import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 
 /**
  * Popup window bound to a component (ownerComponent). The popup closes when
@@ -261,7 +260,6 @@ public class SwingScoutPopup implements ISwingScoutView {
   }
 
   protected void handleSwingWindowOpened() {
-    SwingWindowManager.getInstance().setActiveWindow(getSwingWindow());
     fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutPopup.this, SwingScoutViewEvent.TYPE_OPENED));
   }
 
@@ -417,7 +415,6 @@ public class SwingScoutPopup implements ISwingScoutView {
 
     @Override
     public void windowActivated(WindowEvent e) {
-      SwingWindowManager.getInstance().setActiveWindow(getSwingWindow());
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutPopup.this, SwingScoutViewEvent.TYPE_ACTIVATED));
     }
 

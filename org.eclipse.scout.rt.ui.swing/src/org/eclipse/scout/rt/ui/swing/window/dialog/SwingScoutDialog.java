@@ -45,7 +45,6 @@ import org.eclipse.scout.rt.ui.swing.window.ISwingScoutBoundsProvider;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
-import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 
 public class SwingScoutDialog implements ISwingScoutView {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutDialog.class);
@@ -66,6 +65,10 @@ public class SwingScoutDialog implements ISwingScoutView {
   }
 
   public SwingScoutDialog(ISwingEnvironment env, Window swingParent, ISwingScoutBoundsProvider provider) {
+    this(env, swingParent, provider, true);
+  }
+
+  public SwingScoutDialog(ISwingEnvironment env, Window swingParent, ISwingScoutBoundsProvider provider, boolean modal) {
     m_env = env;
     m_boundsProvider = provider;
     while (swingParent != null && !(swingParent instanceof Dialog || swingParent instanceof Frame)) {
@@ -89,7 +92,7 @@ public class SwingScoutDialog implements ISwingScoutView {
      * WORKAROUND AWT doesn't show a dialog icon if dialog is not resizeable
      */
     m_swingDialog.setResizable(true);
-    m_swingDialog.setModal(true);
+    m_swingDialog.setModal(modal);
     m_swingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     m_swingDialog.addWindowListener(new P_SwingWindowListener());
     // focus handling
@@ -175,43 +178,32 @@ public class SwingScoutDialog implements ISwingScoutView {
   @Override
   public void openView() {
     m_opened = true;
-    try {
-      if (m_swingDialog.isModal()) {
-        SwingWindowManager.getInstance().pushModalDialog(m_swingDialog);
-        //m_env.interruptWaitingForSwing();
-      }
-      // preferred size
-      m_swingDialog.pack();
-      m_swingDialog.pack();// in case some wrapped fields were not able to
-      // respond to first preferred size request.
-      m_swingDialog.setLocationRelativeTo(m_swingDialog.getOwner());
-      if (m_boundsProvider != null) {
-        Rectangle c = m_boundsProvider.getBounds();
-        if (c != null) {
-          if (c.width == 0 || c.height == 0) {
-            c.width = m_swingDialog.getWidth();
-            c.height = m_swingDialog.getHeight();
-          }
-          m_swingDialog.setBounds(c);
+    // preferred size
+    m_swingDialog.pack();
+    m_swingDialog.pack();// in case some wrapped fields were not able to
+    // respond to first preferred size request.
+    m_swingDialog.setLocationRelativeTo(m_swingDialog.getOwner());
+    if (m_boundsProvider != null) {
+      Rectangle c = m_boundsProvider.getBounds();
+      if (c != null) {
+        if (c.width == 0 || c.height == 0) {
+          c.width = m_swingDialog.getWidth();
+          c.height = m_swingDialog.getHeight();
         }
-      }
-      Rectangle a = m_swingDialog.getBounds();
-      Rectangle b = SwingUtility.validateRectangleOnScreen(a, false, true);
-      if (!b.equals(a)) {
-        m_swingDialog.setLocation(b.getLocation());
-        m_swingDialog.setSize(b.getSize());
-      }
-      if (m_maximized) {
-        setMaximized(m_maximized);
-      }
-      if (m_opened) {
-        m_swingDialog.setVisible(true);
+        m_swingDialog.setBounds(c);
       }
     }
-    finally {
-      if (m_swingDialog.isModal()) {
-        SwingWindowManager.getInstance().popModalDialog(m_swingDialog);
-      }
+    Rectangle a = m_swingDialog.getBounds();
+    Rectangle b = SwingUtility.validateRectangleOnScreen(a, false, true);
+    if (!b.equals(a)) {
+      m_swingDialog.setLocation(b.getLocation());
+      m_swingDialog.setSize(b.getSize());
+    }
+    if (m_maximized) {
+      setMaximized(m_maximized);
+    }
+    if (m_opened) {
+      m_swingDialog.setVisible(true);
     }
   }
 
@@ -279,13 +271,11 @@ public class SwingScoutDialog implements ISwingScoutView {
   private class P_SwingWindowListener extends WindowAdapter {
     @Override
     public void windowOpened(WindowEvent e) {
-      SwingWindowManager.getInstance().setActiveWindow(m_swingDialog);
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutDialog.this, SwingScoutViewEvent.TYPE_OPENED));
     }
 
     @Override
     public void windowActivated(WindowEvent e) {
-      SwingWindowManager.getInstance().setActiveWindow(m_swingDialog);
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutDialog.this, SwingScoutViewEvent.TYPE_ACTIVATED));
     }
 

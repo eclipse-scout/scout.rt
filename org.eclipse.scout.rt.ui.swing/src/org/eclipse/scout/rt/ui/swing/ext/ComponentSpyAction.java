@@ -39,8 +39,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
-import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 
 /**
  *
@@ -99,7 +99,7 @@ public class ComponentSpyAction extends AbstractAction {
       }
     });
 
-    final JDialog dlg = new JDialog(SwingWindowManager.getInstance().getActiveWindow());
+    final JDialog dlg = new JDialog(SwingUtility.getOwnerForChildWindow());
     dlg.getRootPane().setName("Synth.Dialog");
     dlg.setTitle("Component Spy - Swing / Scout");
     dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

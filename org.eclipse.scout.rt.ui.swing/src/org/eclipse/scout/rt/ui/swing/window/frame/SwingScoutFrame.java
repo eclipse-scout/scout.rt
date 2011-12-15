@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.ui.swing.window.ISwingScoutBoundsProvider;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
-import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 
 public class SwingScoutFrame implements ISwingScoutView {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutFrame.class);
@@ -237,13 +236,11 @@ public class SwingScoutFrame implements ISwingScoutView {
   private class P_SwingWindowListener extends WindowAdapter {
     @Override
     public void windowOpened(WindowEvent e) {
-      SwingWindowManager.getInstance().setActiveWindow(m_swingFrame);
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutFrame.this, SwingScoutViewEvent.TYPE_OPENED));
     }
 
     @Override
     public void windowActivated(WindowEvent e) {
-      SwingWindowManager.getInstance().setActiveWindow(m_swingFrame);
       fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutFrame.this, SwingScoutViewEvent.TYPE_ACTIVATED));
     }
 

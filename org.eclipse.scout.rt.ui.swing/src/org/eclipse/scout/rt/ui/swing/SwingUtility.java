@@ -14,10 +14,12 @@ import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -26,6 +28,7 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
@@ -112,6 +115,73 @@ public final class SwingUtility {
       return true;
     }
     return false;
+  }
+
+  public static Window getOwnerForChildWindow() {
+    Window w = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusedWindow();
+    if (w != null) {
+      return w;
+    }
+    w = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+    if (w != null) {
+      return w;
+    }
+    /*
+     * Priority level1
+     * modal dialog: +200
+     * non-modal dialog: +100
+     * frame: +0
+     *
+     * Priority level2
+     * no owned windows: +10
+     */
+    TreeMap<Integer, Window> prioMap = new TreeMap<Integer, Window>();
+    for (Window cand : Window.getWindows()) {
+      if (cand == null) {
+        continue;
+      }
+      if (!cand.isVisible()) {
+        continue;
+      }
+      if (!cand.isShowing()) {
+        continue;
+      }
+      int prio = 0;
+      Window[] children = cand.getOwnedWindows();
+      if (children == null || children.length == 0) {
+        prio += 10;
+      }
+      if (cand instanceof Dialog) {
+        Dialog dlg = (Dialog) cand;
+        if (dlg.isModal()) {
+          prio += 200;
+        }
+        else {
+          prio += 100;
+        }
+        prioMap.put(prio, cand);
+      }
+      else if (cand instanceof Frame) {
+        if (!prioMap.containsKey(prio)) {
+          prioMap.put(prio, cand);
+        }
+      }
+    }
+    if (prioMap.size() > 0) {
+      return prioMap.get(prioMap.lastKey());
+    }
+    //last line of defense
+    if (prioMap.size() == 0) {
+      for (Window cand : Window.getWindows()) {
+        if (cand == null) {
+          continue;
+        }
+        if (cand.isVisible()) {
+          return cand;
+        }
+      }
+    }
+    return null;
   }
 
   /**

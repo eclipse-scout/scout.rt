@@ -243,7 +243,7 @@ public interface ISwingEnvironment {
 
   /**
    * @param owner
-   *          swing owner of the dialog
+   *          optional owner of the dialog
    */
   ISwingScoutView createDialog(Window owner, IForm form);
 
@@ -253,7 +253,7 @@ public interface ISwingEnvironment {
 
   /**
    * @param owner
-   *          swing owner of the frame
+   *          optional owner of the frame
    */
   ISwingScoutView createFrame(Window owner, IForm form);
 

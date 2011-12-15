@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Image;
@@ -91,7 +92,6 @@ import org.eclipse.scout.rt.ui.swing.inject.InitLookAndFeelInjector;
 import org.eclipse.scout.rt.ui.swing.inject.UIDefaultsInjector;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutBoundsProvider;
 import org.eclipse.scout.rt.ui.swing.window.ISwingScoutView;
-import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 import org.eclipse.scout.rt.ui.swing.window.desktop.ISwingScoutDesktop;
 import org.eclipse.scout.rt.ui.swing.window.desktop.ISwingScoutRootFrame;
 import org.eclipse.scout.rt.ui.swing.window.desktop.SwingScoutDesktop;
@@ -344,7 +344,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
               Runnable t = new Runnable() {
                 @Override
                 public void run() {
-                  showStandaloneForm(getRootFrame(), e.getForm());
+                  showStandaloneForm(null, e.getForm());
                 }
               };
               invokeSwingLater(t);
@@ -379,7 +379,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
               Runnable t = new Runnable() {
                 @Override
                 public void run() {
-                  showMessageBox(getRootFrame(), e.getMessageBox());
+                  showMessageBox(null, e.getMessageBox());
                 }
               };
               invokeSwingLater(t);
@@ -389,7 +389,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
               Runnable t = new Runnable() {
                 @Override
                 public void run() {
-                  showFileChooser(getRootFrame(), e.getFileChooser());
+                  showFileChooser(null, e.getFileChooser());
                 }
               };
               invokeSwingLater(t);
@@ -628,6 +628,19 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     }
   }
 
+  protected Window getOwnerForChildWindow(Component parent) {
+    if (parent != null) {
+      if (parent instanceof Window) {
+        return (Window) parent;
+      }
+      Window w = SwingUtilities.getWindowAncestor(parent);
+      if (w != null) {
+        return w;
+      }
+    }
+    return SwingUtility.getOwnerForChildWindow();
+  }
+
   @Override
   public ISwingScoutDesktop createDesktop(Window owner, IDesktop desktop) {
     ISwingScoutDesktop ui = new SwingScoutDesktop();
@@ -650,25 +663,10 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       return;
     }
     //
-    Window w = null;
-    if (w == null) {
-      w = SwingWindowManager.getInstance().getActiveModalDialog();
-    }
-    if (w == null) {
-      w = SwingWindowManager.getInstance().getActiveWindow();
-    }
-    if (w == null) {
-      if (parent instanceof Window) {
-        w = (Window) parent;
-      }
-      else {
-        w = SwingUtilities.getWindowAncestor(parent);
-      }
-    }
-    //
+    Window w = getOwnerForChildWindow(parent);
     switch (f.getDisplayHint()) {
       case IForm.DISPLAY_HINT_DIALOG: {
-        if (f.isModal()) {
+        if (f.isModal() || w instanceof Dialog) {
           view = createDialog(w, f);
         }
         else {
@@ -836,22 +834,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   @Override
   public void showMessageBox(Component parent, IMessageBox mb) {
-    Window w = null;
-    if (w == null) {
-      w = SwingWindowManager.getInstance().getActiveModalDialog();
-    }
-    if (w == null) {
-      w = SwingWindowManager.getInstance().getActiveWindow();
-    }
-    if (w == null) {
-      if (parent instanceof Window) {
-        w = (Window) parent;
-      }
-      else {
-        w = SwingUtilities.getWindowAncestor(parent);
-      }
-    }
-    ISwingScoutMessageBox mbox = createMessageBox(w, mb);
+    ISwingScoutMessageBox mbox = createMessageBox(getOwnerForChildWindow(parent), mb);
     mbox.showSwingMessageBox();
   }
 
@@ -866,22 +849,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   @Override
   public void showFileChooser(Component parent, IFileChooser fc) {
-    Window w = null;
-    if (w == null) {
-      w = SwingWindowManager.getInstance().getActiveModalDialog();
-    }
-    if (w == null) {
-      w = SwingWindowManager.getInstance().getActiveWindow();
-    }
-    if (w == null) {
-      if (parent instanceof Window) {
-        w = (Window) parent;
-      }
-      else {
-        w = SwingUtilities.getWindowAncestor(parent);
-      }
-    }
-    ISwingScoutFileChooser sfc = createFileChooser(w, fc);
+    ISwingScoutFileChooser sfc = createFileChooser(getOwnerForChildWindow(parent), fc);
     sfc.showFileChooser();
   }
 
@@ -908,7 +876,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     if (form.isCacheBounds()) {
       boundsProvider = new P_FormBoundsProvider(form);
     }
-    ISwingScoutView ui = new SwingScoutDialog(this, owner, boundsProvider);
+    ISwingScoutView ui = new SwingScoutDialog(this, owner, boundsProvider, form.isModal());
     ui.setName("Synth.Dialog");
     Window w = SwingUtilities.getWindowAncestor(ui.getSwingContentPane());
     if (w != null) {

@@ -17,7 +17,6 @@ import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
-import org.eclipse.scout.rt.ui.swing.window.SwingWindowManager;
 
 public class BasicDocumentFilter extends DocumentFilter {
   private static final long serialVersionUID = 1L;
@@ -76,7 +75,7 @@ public class BasicDocumentFilter extends DocumentFilter {
   protected String handleStringTooLong(String s, int availableLength) throws BadLocationException {
     //ticket 89148
     if (SwingUtility.isPasteAction() || SwingUtility.isSunDropAction()) {
-      SwingUtility.showMessageDialogSynthCapable(SwingWindowManager.getInstance().getActiveWindow(), SwingUtility.getNlsText("PasteTextTooLongForFieldX", "" + getMaxLength()), SwingUtility.getNlsText("Paste"), JOptionPane.WARNING_MESSAGE);
+      SwingUtility.showMessageDialogSynthCapable(SwingUtility.getOwnerForChildWindow(), SwingUtility.getNlsText("PasteTextTooLongForFieldX", "" + getMaxLength()), SwingUtility.getNlsText("Paste"), JOptionPane.WARNING_MESSAGE);
     }
     s = s.substring(0, availableLength);
     return s;
