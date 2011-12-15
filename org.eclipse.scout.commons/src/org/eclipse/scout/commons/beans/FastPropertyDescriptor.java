@@ -20,32 +20,31 @@ import java.lang.reflect.Method;
  * method so they exist.
  */
 public class FastPropertyDescriptor {
-  private final Class beanClass;
-  private final String name;
-
-  private Class propertyType;
-  private Method readMethod;
-  private Method writeMethod;
+  private final Class<?> m_beanClass;
+  private final String m_name;
+  private Class<?> m_propertyType;
+  private Method m_readMethod;
+  private Method m_writeMethod;
 
   public FastPropertyDescriptor(Class<?> beanClazz, String name, Method readMethod, Method writeMethod) {
-    this.beanClass = beanClazz;
-    this.name = name;
-    this.readMethod = readMethod;
-    this.writeMethod = writeMethod;
-    this.propertyType = findPropertyType(readMethod, writeMethod);
+    m_beanClass = beanClazz;
+    m_name = name;
+    m_readMethod = readMethod;
+    m_writeMethod = writeMethod;
+    m_propertyType = FastBeanUtility.findPropertyType(readMethod, writeMethod);
   }
 
   FastPropertyDescriptor(Class<?> beanClazz, String name) {
-    this.beanClass = beanClazz;
-    this.name = name;
+    m_beanClass = beanClazz;
+    m_name = name;
   }
 
   public Class getBeanClass() {
-    return beanClass;
+    return m_beanClass;
   }
 
   public String getName() {
-    return name;
+    return m_name;
   }
 
   /**
@@ -59,11 +58,7 @@ public class FastPropertyDescriptor {
    *         This is the type that will be returned by the ReadMethod.
    */
   public Class<?> getPropertyType() {
-    return propertyType;
-  }
-
-  void setPropertyType(Class type) {
-    propertyType = type;
+    return m_propertyType;
   }
 
   /**
@@ -73,11 +68,20 @@ public class FastPropertyDescriptor {
    *         May return null if the property can't be read.
    */
   public Method getReadMethod() {
-    return readMethod;
+    return m_readMethod;
   }
 
-  void setReadMethod(Method readMethod) {
-    this.readMethod = readMethod;
+  void addReadMethod(Method newMethod) {
+    //is new method less specific than existing
+    if (m_readMethod != null && m_propertyType != null && newMethod.getReturnType().isAssignableFrom(m_propertyType)) {
+      return;
+    }
+    m_readMethod = newMethod;
+    m_propertyType = m_readMethod.getReturnType();
+    //check write method; read type wins
+    if (m_writeMethod != null && !m_propertyType.isAssignableFrom(m_writeMethod.getParameterTypes()[0])) {
+      m_writeMethod = null;
+    }
   }
 
   /**
@@ -87,11 +91,21 @@ public class FastPropertyDescriptor {
    *         May return null if the property can't be written.
    */
   public Method getWriteMethod() {
-    return writeMethod;
+    return m_writeMethod;
   }
 
-  void setWriteMethod(Method writeMethod) {
-    this.writeMethod = writeMethod;
+  void addWriteMethod(Method newMethod) {
+    //is new method less specific than existing
+    if (m_writeMethod != null && newMethod.getParameterTypes()[0].isAssignableFrom(m_writeMethod.getParameterTypes()[0])) {
+      return;
+    }
+    if (m_propertyType == null) {
+      m_writeMethod = newMethod;
+      m_propertyType = m_writeMethod.getParameterTypes()[0];
+    }
+    else if (m_propertyType.isAssignableFrom(newMethod.getParameterTypes()[0])) {
+      m_writeMethod = newMethod;
+    }
   }
 
   @Override
@@ -116,10 +130,10 @@ public class FastPropertyDescriptor {
       FastPropertyDescriptor other = (FastPropertyDescriptor) obj;
       Method otherReadMethod = other.getReadMethod();
       Method otherWriteMethod = other.getWriteMethod();
-      if (!compareMethods(getReadMethod(), otherReadMethod)) {
+      if (!FastBeanUtility.compareMethods(getReadMethod(), otherReadMethod)) {
         return false;
       }
-      if (!compareMethods(getWriteMethod(), otherWriteMethod)) {
+      if (!FastBeanUtility.compareMethods(getWriteMethod(), otherWriteMethod)) {
         return false;
       }
       if (getPropertyType() == other.getPropertyType()) {
@@ -127,38 +141,6 @@ public class FastPropertyDescriptor {
       }
     }
     return false;
-  }
-
-  private static String capitalize(String s) {
-    if (s == null || s.length() == 0) {
-      return "";
-    }
-    return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-  }
-
-  private static boolean compareMethods(Method a, Method b) {
-    if ((a == null) != (b == null)) {
-      return false;
-    }
-
-    if (a != null && b != null) {
-      if (!a.equals(b)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private static Class findPropertyType(Method readMethod, Method writeMethod) {
-    if (readMethod != null) {
-      return readMethod.getReturnType();
-    }
-    else if (writeMethod != null) {
-      return writeMethod.getParameterTypes()[0];
-    }
-    else {
-      return null;
-    }
   }
 
 }
