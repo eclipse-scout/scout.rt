@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
@@ -56,18 +57,25 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
     int visibleCount = 0;
     for (int i = 0; i < scoutFields.length; i++) {
       // create item
-      ISwingScoutFormField swingScoutComposite = getSwingEnvironment().createFormField(innerFieldsContainer, scoutFields[i]);
+      ISwingScoutFormField childSwingScoutField = getSwingEnvironment().createFormField(innerFieldsContainer, scoutFields[i]);
       // remove label fixed width hint
-      JStatusLabelEx childLabel = swingScoutComposite.getSwingLabel();
+      JStatusLabelEx childLabel = childSwingScoutField.getSwingLabel();
       if (childLabel != null) {
+        //Make the label as small as possible
         childLabel.setFixedSize(0);
+
+        //Remove the label completely if the formField doesn't actually have a label on the left side
+        if (removeLabelCompletely(childSwingScoutField)) {
+          childLabel.setVisible(false);
+        }
+
         // <bsh 2010-10-01>
         // Force an empty, but visible label for all but the first visible fields
         // within an SequenceBox. This empty status label is necessary to show the
         // "mandatory" indicator.
-        if (swingScoutComposite.getScoutObject() instanceof IFormField) {
-          IFormField myScoutObject = ((IFormField) swingScoutComposite.getScoutObject());
-          if (myScoutObject.isVisible()) {
+        if (childSwingScoutField.getScoutObject() instanceof IFormField) {
+          IFormField childScoutField = ((IFormField) childSwingScoutField.getScoutObject());
+          if (childScoutField.isVisible()) {
             visibleCount++;
           }
           if (visibleCount > 1) {
@@ -89,8 +97,8 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
           useUiHeight = true;
         }
       };
-      swingScoutComposite.getSwingContainer().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, data);
-      innerFieldsContainer.add(swingScoutComposite.getSwingContainer());
+      childSwingScoutField.getSwingContainer().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, data);
+      innerFieldsContainer.add(childSwingScoutField.getSwingContainer());
     }
     setSwingLabel(label);
     setSwingField(innerFieldsContainer);
@@ -98,6 +106,27 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
     innerFieldsContainer.setLayout(new LogicalGridLayout(getSwingEnvironment(), getSwingEnvironment().getFormColumnGap(), 0));
     container.setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
     setChildMandatoryFromScout();
+  }
+
+  private boolean removeLabelCompletely(ISwingScoutFormField swingScoutFormField) {
+    if (swingScoutFormField == null) {
+      return false;
+    }
+
+    if (!(swingScoutFormField.getScoutObject() instanceof IFormField)) {
+      return false;
+    }
+
+    IFormField formField = ((IFormField) swingScoutFormField.getScoutObject());
+    if (formField.getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
+      return true;
+    }
+
+    if (formField instanceof IBooleanField) {
+      return true;
+    }
+
+    return false;
   }
 
   @Override

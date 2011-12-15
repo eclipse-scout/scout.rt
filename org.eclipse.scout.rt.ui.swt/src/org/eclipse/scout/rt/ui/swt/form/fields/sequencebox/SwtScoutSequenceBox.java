@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
@@ -49,43 +50,29 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
     for (IFormField scoutField : getScoutObject().getFields()) {
       ISwtScoutFormField swtFormField = getEnvironment().createFormField(fieldContainer, scoutField);
 
-      if (!(swtFormField.getScoutObject() instanceof ICheckBox)) {
-        // remove label fixed width hint
-        ILabelComposite childLabel = swtFormField.getSwtLabel();
-        if (childLabel != null && childLabel.getLayoutData() instanceof LogicalGridData) {
-          ((LogicalGridData) childLabel.getLayoutData()).widthHint = 0;
-          // <bsh 2010-10-01>
-          // Force an empty, but visible label for all but the first visible fields
-          // within an SequenceBox. This empty status label is necessary to show the
-          // "mandatory" indicator.
-          if (swtFormField.getScoutObject() instanceof IFormField) {
-            IFormField myScoutObject = ((IFormField) swtFormField.getScoutObject());
-            if (myScoutObject.isVisible()) {
-              visibleCount++;
-            }
-            if (visibleCount > 1) {
-              if (!childLabel.getVisible()) {
-                // make the label visible, but clear any text
-                childLabel.setVisible(true);
-                childLabel.setText("");
-              }
-            }
-          }
-          // <bsh>
-        }
+      ILabelComposite childLabel = null;
+      if (swtFormField.getScoutObject() instanceof ICheckBox) {
+        childLabel = ((ISwtScoutCheckbox) swtFormField).getPlaceholderLabel();
       }
-      // If swtFormField is a checkbox the placeholder-label has to be handeld
       else {
-        // remove label fixed width hint
-        ILabelComposite childLabel = ((ISwtScoutCheckbox) swtFormField).getPlaceholderLabel();
-        if (childLabel != null && childLabel.getLayoutData() instanceof LogicalGridData) {
-          ((LogicalGridData) childLabel.getLayoutData()).widthHint = 0;
-          // <bsh 2010-10-01>
-          // Force an empty, but visible label for all but the first visible fields
-          // within an SequenceBox. This empty status label is necessary to show the
-          // "mandatory" indicator.
-          IFormField myScoutObject = ((IFormField) swtFormField.getScoutObject());
-          if (myScoutObject.isVisible()) {
+        childLabel = swtFormField.getSwtLabel();
+      }
+      if (childLabel != null && childLabel.getLayoutData() instanceof LogicalGridData) {
+        //Make the label as small as possible
+        ((LogicalGridData) childLabel.getLayoutData()).widthHint = 0;
+
+        //Remove the label completely if the formField doesn't actually have a label on the left side
+        if (removeLabelCompletely(swtFormField)) {
+          childLabel.setVisible(false);
+        }
+
+        // <bsh 2010-10-01>
+        // Force an empty, but visible label for all but the first visible fields
+        // within an SequenceBox. This empty status label is necessary to show the
+        // "mandatory" indicator.
+        if (swtFormField.getScoutObject() instanceof IFormField) {
+          IFormField childScoutField = ((IFormField) swtFormField.getScoutObject());
+          if (childScoutField.isVisible()) {
             visibleCount++;
           }
           if (visibleCount > 1) {
@@ -95,8 +82,8 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
               childLabel.setText("");
             }
           }
-          // <bsh>
         }
+        // <bsh>
       }
       // create layout constraints
       SwtScoutFormFieldGridData data = new SwtScoutFormFieldGridData(scoutField) {
@@ -119,6 +106,27 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
     fieldContainer.setLayout(new LogicalGridLayout(6, 0));
     container.setLayout(new LogicalGridLayout(1, 0));
     setChildMandatoryFromScout();
+  }
+
+  private boolean removeLabelCompletely(ISwtScoutFormField swtScoutFormField) {
+    if (swtScoutFormField == null) {
+      return false;
+    }
+
+    if (!(swtScoutFormField.getScoutObject() instanceof IFormField)) {
+      return false;
+    }
+
+    IFormField formField = ((IFormField) swtScoutFormField.getScoutObject());
+    if (formField.getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
+      return true;
+    }
+
+    if (formField instanceof IBooleanField) {
+      return true;
+    }
+
+    return false;
   }
 
   @Override

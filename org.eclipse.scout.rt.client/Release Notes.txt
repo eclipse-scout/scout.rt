@@ -708,3 +708,13 @@ Contribution of custom locales to the JRE:
 3. Create the folder META-INF/services with two files java.text.spi.DateFormatProvider and java.text.spi.NumberFormatProvider
 4. In those files, simply put the the fully qualified name to your date/number provider
 5. Export project as JAR file and put it into \lib\ext of your JRE
+
+15.12.2011 cgu
+Bugzilla ticket 364556
+Problem:
+If a checkbox is defined in a sequence box, the label of the checkbox is shown as label of the sequence box although the checkbox itself already shows the label.
+Solution:
+Excluded BooleanFields from the computation of the compound label.
+Migration:
+- Since the checkbox is excluded the label of the next field is considered for the compound label.
+  So if you use sequenceboxes which contain a checkbox and another field you may want to override execIsLabelSuffixCandidate and return false so that no label suffix is created and only the sequencebox label is shown.

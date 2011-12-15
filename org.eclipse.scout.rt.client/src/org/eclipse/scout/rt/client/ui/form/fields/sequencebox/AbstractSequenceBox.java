@@ -327,7 +327,13 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    * {@link #execIsLabelSuffixCandidate(IFormField)} returns true.
    * </p>
    */
+  @ConfigOperation
+  @Order(210)
   protected String execCreateLabelSuffix() {
+    for (IFormField f : getFields()) {
+      f.setLabelSuppressed(false);
+    }
+
     for (IFormField formField : getFields()) {
       if (execIsLabelSuffixCandidate(formField)) {
         formField.setLabelSuppressed(true);
@@ -344,11 +350,9 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    * {@link #execCreateLabelSuffix()}.
    * </p>
    */
+  @ConfigOperation
+  @Order(211)
   protected boolean execIsLabelSuffixCandidate(IFormField formField) {
-    if (formField.isLabelSuppressed()) {
-      return true;
-    }
-
     if (!formField.isVisible()) {
       return false;
     }

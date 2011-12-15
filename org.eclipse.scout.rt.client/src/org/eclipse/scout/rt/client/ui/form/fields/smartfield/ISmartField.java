@@ -135,10 +135,10 @@ public interface ISmartField<T> extends IValueField<T> {
    * Filter selection of hierarchy browse tree. The level reported here is
    * different than the one used in
    * {@link AbstractTree#execAcceptSelection(org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode, int)} such as this
-   * level is one smaller. This is beacuase a tree smart field
+   * level is one smaller. This is because a tree smart field
    * assumes its tree to have multiple roots, but the ITree model is built as
    * single-root tree with invisible root node. level=-1 is the invisible
-   * (annonymous) root level=0 are the multiple roots of the smart tree ...
+   * (anonymous) root level=0 are the multiple roots of the smart tree ...
    */
   @ConfigOperation
   @Order(330)
