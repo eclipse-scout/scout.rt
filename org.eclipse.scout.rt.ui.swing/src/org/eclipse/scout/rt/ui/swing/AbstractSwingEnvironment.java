@@ -991,10 +991,14 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     if (form.isCacheBounds()) {
       boundsProvider = new P_FormBoundsProvider(form);
     }
-    ISwingScoutView ui = new SwingScoutInternalFrame(this, viewConstraints, boundsProvider);
+    ISwingScoutView ui = createInternalFrame(viewConstraints, form, boundsProvider);
     ui.setName("Synth.View");
     decorate(form, ui);
     return ui;
+  }
+
+  protected ISwingScoutView createInternalFrame(Object viewConstraints, IForm form, ISwingScoutBoundsProvider boundsProvider) {
+    return new SwingScoutInternalFrame(this, viewConstraints, boundsProvider);
   }
 
   @Override

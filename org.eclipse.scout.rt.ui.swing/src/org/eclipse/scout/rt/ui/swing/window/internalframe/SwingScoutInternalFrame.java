@@ -25,7 +25,6 @@ import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
-import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -122,6 +121,10 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
     m_swingView.pack();
   }
 
+  public JInternalFrame getSwingInternalFrame() {
+    return m_swingView;
+  }
+
   @Override
   public JComponent getSwingContentPane() {
     return (JComponent) m_swingView.getContentPane();
@@ -193,9 +196,6 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
       s = "";
     }
     m_swingView.setTitle(s);
-    if ("".equals(s)) {
-      ((BasicInternalFrameUI) m_swingView.getUI()).setNorthPane(null);
-    }
   }
 
   @Override
