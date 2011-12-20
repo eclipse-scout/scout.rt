@@ -1,6 +1,6 @@
 How to make the Plug-In to compile
 ==================================
-The JRE jar-file 'tools.jar' is used by 'org.eclipse.scout.jaxws216.tool.JaxWsStubGenerator' to build webservice stubs.
+The JRE jar-file 'tools.jar' is used by 'org.eclipse.scout.jaxws.tool.JaxWsStubGenerator' to build webservice stubs.
 As this jar is not part of the JRE system libraries, you manually have to add it.
 
 1. Open Eclipse Preferences

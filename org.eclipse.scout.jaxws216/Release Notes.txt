@@ -65,9 +65,9 @@ Migration:
   - Change registration in binding.xml files:
     <jaxws:bindings version="2.0" node="wsdl:definitions/wsdl:types/xsd:schema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
       <jaxb:globalBindings>
-        <xjc:javaType name="java.util.Date" xmlType="xsd:date" adapter="org.eclipse.scout.jaxws216.adapters.DateAdapterISO8601UTC"/>
-        <xjc:javaType name="java.util.Date" xmlType="xsd:time" adapter="org.eclipse.scout.jaxws216.adapters.DateAdapterISO8601UTC"/>
-        <xjc:javaType name="java.util.Date" xmlType="xsd:dateTime" adapter="org.eclipse.scout.jaxws216.adapters.DateAdapterISO8601UTC"/>
+        <xjc:javaType name="java.util.Date" xmlType="xsd:date" adapter="org.eclipse.scout.jaxws.adapters.DateAdapterISO8601UTC"/>
+        <xjc:javaType name="java.util.Date" xmlType="xsd:time" adapter="org.eclipse.scout.jaxws.adapters.DateAdapterISO8601UTC"/>
+        <xjc:javaType name="java.util.Date" xmlType="xsd:dateTime" adapter="org.eclipse.scout.jaxws.adapters.DateAdapterISO8601UTC"/>
       </jaxb:globalBindings>
     </jaxws:bindings>
 
