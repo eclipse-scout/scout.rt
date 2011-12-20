@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -16,20 +16,17 @@ import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.commons.RunnableWithException;
+import org.eclipse.scout.jaxws216.annotation.ScoutTransaction;
 import org.eclipse.scout.jaxws216.internal.ScoutTransactionDelegate;
-import org.eclipse.scout.rt.server.IServerSession;
 
 public class ScoutTransactionLogicalHandlerWrapper<T extends LogicalMessageContext> implements LogicalHandler<T>, IScoutTransactionHandlerWrapper<T> {
 
-  private ScoutTransactionDelegate m_transactionDelegate;
+  protected final ScoutTransactionDelegate m_transactionDelegate;
+  protected final LogicalHandler<T> m_logicalHandler;
 
-  private LogicalHandler<T> m_logicalHandler;
-  private IServerSession m_serverSession;
-
-  public ScoutTransactionLogicalHandlerWrapper(LogicalHandler<T> logicalHandler, IServerSession serverSession) {
-    m_transactionDelegate = createTransactionDelegate();
+  public ScoutTransactionLogicalHandlerWrapper(LogicalHandler<T> logicalHandler, ScoutTransaction scoutTransaction) {
+    m_transactionDelegate = createTransactionDelegate(scoutTransaction);
     m_logicalHandler = logicalHandler;
-    m_serverSession = serverSession;
   }
 
   @Override
@@ -41,7 +38,7 @@ public class ScoutTransactionLogicalHandlerWrapper<T extends LogicalMessageConte
         return m_logicalHandler.handleMessage(context);
       }
     };
-    return m_transactionDelegate.runInTransaction(runnable, m_serverSession);
+    return m_transactionDelegate.runInTransaction(runnable, context);
   }
 
   @Override
@@ -53,7 +50,7 @@ public class ScoutTransactionLogicalHandlerWrapper<T extends LogicalMessageConte
         return m_logicalHandler.handleFault(context);
       }
     };
-    return m_transactionDelegate.runInTransaction(runnable, m_serverSession);
+    return m_transactionDelegate.runInTransaction(runnable, context);
   }
 
   @Override
@@ -66,11 +63,11 @@ public class ScoutTransactionLogicalHandlerWrapper<T extends LogicalMessageConte
         return null;
       }
     };
-    m_transactionDelegate.runInTransaction(runnable, m_serverSession);
+    m_transactionDelegate.runInTransaction(runnable, context);
   }
 
-  protected ScoutTransactionDelegate createTransactionDelegate() {
-    return new ScoutTransactionDelegate();
+  protected ScoutTransactionDelegate createTransactionDelegate(ScoutTransaction scoutTransaction) {
+    return new ScoutTransactionDelegate(scoutTransaction);
   }
 
   @Override

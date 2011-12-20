@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -17,23 +17,20 @@ import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.commons.RunnableWithException;
+import org.eclipse.scout.jaxws216.annotation.ScoutTransaction;
 import org.eclipse.scout.jaxws216.internal.ScoutTransactionDelegate;
-import org.eclipse.scout.rt.server.IServerSession;
 
 import com.sun.xml.internal.ws.api.handler.MessageHandler;
 import com.sun.xml.internal.ws.api.handler.MessageHandlerContext;
 
 public class ScoutTransactionMessageHandlerWrapper<T extends MessageHandlerContext> implements MessageHandler<T>, IScoutTransactionHandlerWrapper<T> {
 
-  private ScoutTransactionDelegate m_transactionDelegate;
+  protected final ScoutTransactionDelegate m_transactionDelegate;
+  protected final MessageHandler<T> m_messageHandler;
 
-  private MessageHandler<T> m_messageHandler;
-  private IServerSession m_serverSession;
-
-  public ScoutTransactionMessageHandlerWrapper(MessageHandler<T> messageHandler, IServerSession serverSession) {
-    m_transactionDelegate = createTransactionDelegate();
+  public ScoutTransactionMessageHandlerWrapper(MessageHandler<T> messageHandler, ScoutTransaction scoutTransaction) {
+    m_transactionDelegate = createTransactionDelegate(scoutTransaction);
     m_messageHandler = messageHandler;
-    m_serverSession = serverSession;
   }
 
   @Override
@@ -45,7 +42,7 @@ public class ScoutTransactionMessageHandlerWrapper<T extends MessageHandlerConte
         return m_messageHandler.handleMessage(context);
       }
     };
-    return m_transactionDelegate.runInTransaction(runnable, m_serverSession);
+    return m_transactionDelegate.runInTransaction(runnable, context);
   }
 
   @Override
@@ -57,7 +54,7 @@ public class ScoutTransactionMessageHandlerWrapper<T extends MessageHandlerConte
         return m_messageHandler.handleFault(context);
       }
     };
-    return m_transactionDelegate.runInTransaction(runnable, m_serverSession);
+    return m_transactionDelegate.runInTransaction(runnable, context);
   }
 
   @Override
@@ -70,7 +67,7 @@ public class ScoutTransactionMessageHandlerWrapper<T extends MessageHandlerConte
         return null;
       }
     };
-    m_transactionDelegate.runInTransaction(runnable, m_serverSession);
+    m_transactionDelegate.runInTransaction(runnable, context);
   }
 
   @Override
@@ -78,8 +75,8 @@ public class ScoutTransactionMessageHandlerWrapper<T extends MessageHandlerConte
     return m_messageHandler.getHeaders();
   }
 
-  protected ScoutTransactionDelegate createTransactionDelegate() {
-    return new ScoutTransactionDelegate();
+  protected ScoutTransactionDelegate createTransactionDelegate(ScoutTransaction scoutTransaction) {
+    return new ScoutTransactionDelegate(scoutTransaction);
   }
 
   @Override

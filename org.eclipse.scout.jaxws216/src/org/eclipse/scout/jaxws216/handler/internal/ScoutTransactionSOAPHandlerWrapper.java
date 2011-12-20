@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -19,20 +19,17 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.commons.RunnableWithException;
+import org.eclipse.scout.jaxws216.annotation.ScoutTransaction;
 import org.eclipse.scout.jaxws216.internal.ScoutTransactionDelegate;
-import org.eclipse.scout.rt.server.IServerSession;
 
 public class ScoutTransactionSOAPHandlerWrapper<T extends SOAPMessageContext> implements SOAPHandler<T>, IScoutTransactionHandlerWrapper<T> {
 
-  private ScoutTransactionDelegate m_transactionDelegate;
+  protected final ScoutTransactionDelegate m_transactionDelegate;
+  protected final SOAPHandler<T> m_soapHandler;
 
-  private SOAPHandler<T> m_soapHandler;
-  private IServerSession m_serverSession;
-
-  public ScoutTransactionSOAPHandlerWrapper(SOAPHandler<T> soapHandler, IServerSession serverSession) {
-    m_transactionDelegate = createTransactionDelegate();
+  public ScoutTransactionSOAPHandlerWrapper(SOAPHandler<T> soapHandler, ScoutTransaction scoutTransaction) {
+    m_transactionDelegate = createTransactionDelegate(scoutTransaction);
     m_soapHandler = soapHandler;
-    m_serverSession = serverSession;
   }
 
   @Override
@@ -44,7 +41,7 @@ public class ScoutTransactionSOAPHandlerWrapper<T extends SOAPMessageContext> im
         return m_soapHandler.handleMessage(context);
       }
     };
-    return m_transactionDelegate.runInTransaction(runnable, m_serverSession);
+    return m_transactionDelegate.runInTransaction(runnable, context);
   }
 
   @Override
@@ -56,7 +53,7 @@ public class ScoutTransactionSOAPHandlerWrapper<T extends SOAPMessageContext> im
         return m_soapHandler.handleFault(context);
       }
     };
-    return m_transactionDelegate.runInTransaction(runnable, m_serverSession);
+    return m_transactionDelegate.runInTransaction(runnable, context);
   }
 
   @Override
@@ -69,7 +66,7 @@ public class ScoutTransactionSOAPHandlerWrapper<T extends SOAPMessageContext> im
         return null;
       }
     };
-    m_transactionDelegate.runInTransaction(runnable, m_serverSession);
+    m_transactionDelegate.runInTransaction(runnable, context);
   }
 
   @Override
@@ -77,8 +74,8 @@ public class ScoutTransactionSOAPHandlerWrapper<T extends SOAPMessageContext> im
     return m_soapHandler.getHeaders();
   }
 
-  protected ScoutTransactionDelegate createTransactionDelegate() {
-    return new ScoutTransactionDelegate();
+  protected ScoutTransactionDelegate createTransactionDelegate(ScoutTransaction scoutTransaction) {
+    return new ScoutTransactionDelegate(scoutTransaction);
   }
 
   @Override

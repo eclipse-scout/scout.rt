@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -28,7 +28,11 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws216.annotation.ScoutTransaction;
+import org.eclipse.scout.jaxws216.internal.ContextHelper;
+import org.eclipse.scout.jaxws216.internal.SessionHelper;
 import org.eclipse.scout.jaxws216.security.Authenticator;
+import org.eclipse.scout.jaxws216.session.IServerSessionFactory;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.service.ServiceUtility;
 
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
@@ -77,6 +81,14 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
       if (authHeader.startsWith("Basic ")) {
         try {
           if (authenticateRequest(authHeader)) {
+            // create and cache a new server session on behalf of the authenticated user by using the session factory configured on the port type.
+            // In turn, this session is used by subsequent handlers and the port type resolver.
+            IServerSessionFactory portTypeSessionFactory = ContextHelper.getPortTypeSessionFactory(context);
+            IServerSession serverSession = SessionHelper.createNewServerSession(portTypeSessionFactory);
+            if (serverSession != null) {
+              // cache session to be used by subsequent handlers and port type resolver
+              ContextHelper.setContextSession(context, portTypeSessionFactory, serverSession);
+            }
             return true;
           }
           return breakHandlerChain(context);

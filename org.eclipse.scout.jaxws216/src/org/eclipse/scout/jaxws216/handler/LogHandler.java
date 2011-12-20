@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,8 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -29,18 +31,14 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LogHandler.class);
 
-  private boolean m_sysout;
+  private int m_logLevel;
 
-  public LogHandler() {
-    this(false);
+  public LogHandler(int logLevel) {
+    initConfig();
   }
 
-  /**
-   * @param sysout
-   *          true to print log output to standard output (console)
-   */
-  public LogHandler(boolean sysout) {
-    m_sysout = sysout;
+  protected void initConfig() {
+    setLogLevel(getConfiguredLogLevel());
   }
 
   @Override
@@ -79,20 +77,35 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
 
   protected void handleLogMessage(DirectionType directionType, String soapMessage, SOAPMessageContext context) {
     String logMessage = "WS SOAP [service=" + context.get(SOAPMessageContext.WSDL_SERVICE) + ", port=" + context.get(SOAPMessageContext.WSDL_PORT) + ", operation=" + context.get(SOAPMessageContext.WSDL_OPERATION) + ", direction=" + directionType + ", message=" + soapMessage + "]";
-    if (isSysout()) {
-      System.out.println(logMessage);
-    }
-    else {
-      LOG.debug(logMessage);
+
+    switch (getLogLevel()) {
+      case IScoutLogger.LEVEL_WARN:
+        LOG.warn(logMessage);
+        break;
+      case IScoutLogger.LEVEL_DEBUG:
+        LOG.debug(logMessage);
+        break;
+      case IScoutLogger.LEVEL_TRACE:
+        LOG.trace(logMessage);
+        break;
+      default:
+        LOG.info(logMessage);
+        break;
     }
   }
 
-  public boolean isSysout() {
-    return m_sysout;
+  public int getLogLevel() {
+    return m_logLevel;
   }
 
-  public void setSysout(boolean sysout) {
-    m_sysout = sysout;
+  public void setLogLevel(int logLevel) {
+    m_logLevel = logLevel;
+  }
+
+  @Order(10.0)
+  @ConfigProperty(ConfigProperty.INTEGER)
+  protected int getConfiguredLogLevel() {
+    return IScoutLogger.LEVEL_INFO;
   }
 
   public static enum DirectionType {

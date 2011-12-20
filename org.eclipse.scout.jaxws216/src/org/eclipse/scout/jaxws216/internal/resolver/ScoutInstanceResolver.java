@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -16,16 +16,20 @@ import java.security.AccessController;
 
 import javax.security.auth.Subject;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.ObjectHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws216.annotation.ScoutWebService;
+import org.eclipse.scout.jaxws216.internal.ContextHelper;
+import org.eclipse.scout.jaxws216.internal.SessionHelper;
 import org.eclipse.scout.jaxws216.session.IServerSessionFactory;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
@@ -44,21 +48,19 @@ public class ScoutInstanceResolver extends InstanceResolver<Object> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutInstanceResolver.class);
 
-  private Class<?> m_wsImplClazz;
+  private Class<?> m_portTypeClass;
   private IServerSessionFactory m_sessionFactory;
 
-  public ScoutInstanceResolver(Class wsImplClazz) {
-    m_wsImplClazz = wsImplClazz;
-
-    if (m_wsImplClazz == null) {
-      throw new WebServiceException("No webservice implementation class configured in sun-jaxws.xml");
+  public ScoutInstanceResolver(Class portTypeClass) {
+    m_portTypeClass = portTypeClass;
+    if (m_portTypeClass == null) {
+      throw new WebServiceException("No port type class configured in sun-jaxws.xml");
     }
 
-    ScoutWebService annotation = m_wsImplClazz.getAnnotation(ScoutWebService.class);
+    ScoutWebService annotation = m_portTypeClass.getAnnotation(ScoutWebService.class);
     if (annotation == null) {
       return;
     }
-
     try {
       m_sessionFactory = annotation.sessionFactory().newInstance();
     }
@@ -70,10 +72,10 @@ public class ScoutInstanceResolver extends InstanceResolver<Object> {
   @Override
   public Object resolve(Packet packet) {
     try {
-      return m_wsImplClazz.newInstance();
+      return m_portTypeClass.newInstance();
     }
     catch (Exception e) {
-      LOG.error("could not create instance of webservice implementation class '" + m_wsImplClazz.getName() + "'");
+      LOG.error("Could not create instance of port type '" + m_portTypeClass.getName() + "'");
     }
     return null;
   }
@@ -85,61 +87,65 @@ public class ScoutInstanceResolver extends InstanceResolver<Object> {
 
   private class P_Invoker extends Invoker {
 
+    private WSWebServiceContext m_serviceContext;
+
     @Override
-    public void start(WSWebServiceContext wsc, WSEndpoint endpoint) {
+    public void start(WSWebServiceContext serviceContext, WSEndpoint endpoint) {
+      m_serviceContext = serviceContext;
     }
 
     @Override
     public Object invoke(final Packet packet, final Method method, final Object... aobj) throws InvocationTargetException, IllegalAccessException {
-      final Object wsImpl = resolve(packet);
-
-      if (wsImpl == null) {
-        throw new WebServiceException("No webservice implementation found");
+      final Object portType = resolve(packet);
+      if (portType == null) {
+        throw new WebServiceException("No port type found");
       }
 
-      if (m_sessionFactory == null) {
-        throw new WebServiceException("No session factory found.");
-      }
-
-      // get subject of the current AccessContext which is propagated from JaxWsServlet or by application server itself.
-      // If authentication is installed, the subject contains the authenticated user as principal
       Subject subject = null;
       try {
         subject = Subject.getSubject(AccessController.getContext());
       }
       catch (Exception e) {
-        LOG.error("Failed to get subject of calling acess context", e);
+        LOG.error("Failed to get subject of calling access context", e);
       }
       if (subject == null) {
-        throw new WebServiceException("webservice request was NOT dispatched due to security reasons: request must run on behalf of a subject context.");
+        throw new WebServiceException("Webservice request was NOT dispatched due to security reasons: request must run on behalf of a subject context.");
       }
 
-      // create session
-      IServerSession session = null;
-      try {
-        session = m_sessionFactory.create();
+      IServerSession serverSession = null;
+      if (m_sessionFactory != null) {
+        MessageContext context = m_serviceContext.getMessageContext();
+        // Prefer cached session over creating a new one.
+        // However, the session is only considered if created by the same type of factory.
+        // This is to ensure a proper session context which is what the user is expecting.
+        IServerSession contextSession = ContextHelper.getContextSession(context);
+        Class<? extends IServerSessionFactory> contextSessionFactory = ContextHelper.getContextSessionFactoryClass(context);
+        if (contextSession == null || !CompareUtility.equals(m_sessionFactory.getClass(), contextSessionFactory)) {
+          // create a new session
+          serverSession = SessionHelper.createNewServerSession(m_sessionFactory);
+        }
+        else {
+          // cached session
+          serverSession = contextSession;
+        }
       }
-      catch (Throwable e) {
-        LOG.error("Error occured while creating session by factory '" + m_sessionFactory.getClass().getName() + "'", e);
-      }
-      if (session == null) {
+      if (serverSession == null) {
         LOG.warn("Webservice request is not run in a session context as no server session is configured.");
-        return method.invoke(wsImpl, aobj);
+        return method.invoke(portType, aobj);
       }
 
-      // run request within server job
       try {
         final ObjectHolder resultHolder = new ObjectHolder();
         final Holder<InvocationTargetException> invocationTargetExceptionHolder = new Holder<InvocationTargetException>(InvocationTargetException.class);
         final Holder<IllegalAccessException> illegalAccessExceptionHolder = new Holder<IllegalAccessException>(IllegalAccessException.class);
         final Holder<RuntimeException> runtimeExceptionHolder = new Holder<RuntimeException>(RuntimeException.class);
         // run server job
-        ServerJob serverJob = new ServerJob("Server Job", session, subject) {
+        ServerJob serverJob = new ServerJob("Server Job", serverSession, subject) {
 
           @Override
           protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
             try {
-              resultHolder.setValue(method.invoke(wsImpl, aobj));
+              resultHolder.setValue(method.invoke(portType, aobj));
             }
             catch (InvocationTargetException e) {
               LOG.error("Failed to dispatch webservice request.", e);
@@ -171,7 +177,7 @@ public class ScoutInstanceResolver extends InstanceResolver<Object> {
         return resultHolder.getValue();
       }
       finally {
-        postInvoke(packet, wsImpl);
+        postInvoke(packet, portType);
       }
     }
   }

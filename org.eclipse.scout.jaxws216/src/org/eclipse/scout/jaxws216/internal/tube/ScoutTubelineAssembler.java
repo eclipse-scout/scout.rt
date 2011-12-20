@@ -4,42 +4,40 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.jaxws216.internal.tube;
 
 import java.lang.annotation.Annotation;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
-import javax.security.auth.Subject;
+import javax.xml.namespace.QName;
 import javax.xml.ws.Binding;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
+import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.jaxws216.Activator;
 import org.eclipse.scout.jaxws216.annotation.ScoutTransaction;
 import org.eclipse.scout.jaxws216.annotation.ScoutWebService;
 import org.eclipse.scout.jaxws216.handler.internal.ScoutTransactionLogicalHandlerWrapper;
 import org.eclipse.scout.jaxws216.handler.internal.ScoutTransactionMessageHandlerWrapper;
 import org.eclipse.scout.jaxws216.handler.internal.ScoutTransactionSOAPHandlerWrapper;
+import org.eclipse.scout.jaxws216.internal.ContextHelper;
 import org.eclipse.scout.jaxws216.security.provider.IAuthenticationHandler;
 import org.eclipse.scout.jaxws216.security.provider.ICredentialValidationStrategy;
 import org.eclipse.scout.jaxws216.session.IServerSessionFactory;
-import org.eclipse.scout.rt.server.IServerSession;
 
 import com.sun.xml.internal.ws.api.handler.MessageHandler;
 import com.sun.xml.internal.ws.api.handler.MessageHandlerContext;
@@ -73,7 +71,7 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
   public Tube createServer(ServerTubeAssemblerContext context) {
     // Installs the authentication handler
     // This must precede wrapping handlers with a transactional context
-    installAuthenticationHandler(context);
+    installServerAuthenticationHandler(context);
 
     // wrap handlers with transactional context
     wrapScoutTransactionHandlers(context.getEndpoint().getBinding());
@@ -113,55 +111,14 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
       return handler;
     }
 
-    Subject subject = null;
-    try {
-      subject = Subject.getSubject(AccessController.getContext());
-    }
-    catch (Exception e) {
-      LOG.error("Failed to get subject of calling acess context", e);
-    }
-    // in case of server tube, subject typically is null because assembler is called in bootstrap of JAX-WS
-    if (subject == null) {
-      String principalName = Activator.getDefault().getBundle().getBundleContext().getProperty(Activator.PROP_DEFAULT_PRINCIPAL);
-      if (!StringUtility.hasText(principalName)) {
-        LOG.warn("No subject found in calling AccessContext which is the expected behavor. That is why the principal 'anonymous' is registered with a new subject to create sessions for transactional handlers. This can be changed by configuring the prinicipal in '" + Activator.PROP_DEFAULT_PRINCIPAL + "' in config.ini.");
-        principalName = "anonymous";
-      }
-      subject = new Subject();
-      subject.getPrincipals().add(new SimplePrincipal(principalName));
-      subject.setReadOnly();
-    }
-
-    // create session on behalf of the created subject
-    IServerSession serverSession = null;
-    try {
-      serverSession = Subject.doAs(subject, new PrivilegedExceptionAction<IServerSession>() {
-        @Override
-        public IServerSession run() throws Exception {
-          IServerSessionFactory sessionFactory = scoutTransaction.sessionFactory().newInstance();
-          if (sessionFactory == null) {
-            LOG.error("No session factory registered on hander '" + handler.getClass().getName() + "'. Handler is not run in transactional scope.");
-            return null;
-          }
-          return sessionFactory.create();
-        }
-      });
-    }
-    catch (PrivilegedActionException e) {
-      LOG.error("Failed to create session factory / session for hander '" + handler.getClass().getName() + "'. Handler is not run in transactional scope.", e.getException());
-    }
-    if (serverSession == null) {
-      LOG.error("Session for handler '" + handler.getClass().getName() + "' nust not be null. Handler is not run in transactional scope.");
-    }
-
     if (handler instanceof LogicalHandler) {
-      return new ScoutTransactionLogicalHandlerWrapper<LogicalMessageContext>((LogicalHandler<LogicalMessageContext>) handler, serverSession);
+      return new ScoutTransactionLogicalHandlerWrapper<LogicalMessageContext>((LogicalHandler<LogicalMessageContext>) handler, scoutTransaction);
     }
     else if (handler instanceof SOAPHandler) {
-      return new ScoutTransactionSOAPHandlerWrapper<SOAPMessageContext>((SOAPHandler) handler, serverSession);
+      return new ScoutTransactionSOAPHandlerWrapper<SOAPMessageContext>((SOAPHandler) handler, scoutTransaction);
     }
     else if (handler instanceof MessageHandler) {
-      return new ScoutTransactionMessageHandlerWrapper<MessageHandlerContext>((MessageHandler<MessageHandlerContext>) handler, serverSession);
+      return new ScoutTransactionMessageHandlerWrapper<MessageHandlerContext>((MessageHandler<MessageHandlerContext>) handler, scoutTransaction);
     }
     else {
       LOG.warn("Unsupported handler type  '" + handler.getClass().getName() + "' for Scout transaction.");
@@ -169,19 +126,32 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
     }
   }
 
-  private void installAuthenticationHandler(ServerTubeAssemblerContext context) {
-    IAuthenticationHandler authenticationHandler = createAuthenticationHandler(context);
-    if (authenticationHandler == null) {
-      return;
-    }
-
+  private void installServerAuthenticationHandler(ServerTubeAssemblerContext context) {
     List<Handler> handlerChain = new LinkedList<Handler>();
 
-    // add existing handlers to chain
+    // install existing handlers
     handlerChain.addAll(context.getEndpoint().getBinding().getHandlerChain());
 
-    // add Scout security handler to chain
-    handlerChain.add(authenticationHandler);
+    // install authentication handler
+    IAuthenticationHandler authenticationHandler = createAuthenticationHandler(context);
+    if (authenticationHandler != null) {
+      handlerChain.add(authenticationHandler);
+    }
+
+    // install handler to put the session factory configured on the port type into the runnning context.
+    // This handler must be installed prior to authentication handlers
+    Class<?> portTypeClass = context.getEndpoint().getImplementationClass();
+    try {
+      if (portTypeClass != null) {
+        ScoutWebService scoutWebService = portTypeClass.getAnnotation(ScoutWebService.class);
+        if (scoutWebService != null) {
+          handlerChain.add(new P_PortTypeSessionFactoryRegistrationHandler(scoutWebService));
+        }
+      }
+    }
+    catch (Exception e) {
+      LOG.error("failed to install handler to register configured port type factory in running context", e);
+    }
 
     // set handler chain
     context.getEndpoint().getBinding().setHandlerChain(handlerChain);
@@ -245,5 +215,50 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
       return getAnnotation(type.getSuperclass(), annotationClazz);
     }
     return annotation;
+  }
+
+  /**
+   * Handler used to store the session factory configured on the port type in the calling context.
+   * This must be the first handler installed.
+   */
+  private class P_PortTypeSessionFactoryRegistrationHandler implements SOAPHandler<SOAPMessageContext> {
+
+    private ScoutWebService m_scoutWebServiceAnnotation;
+
+    private P_PortTypeSessionFactoryRegistrationHandler(ScoutWebService scoutWebServiceAnnotation) {
+      m_scoutWebServiceAnnotation = scoutWebServiceAnnotation;
+    }
+
+    @Override
+    public boolean handleMessage(SOAPMessageContext context) {
+      boolean outbound = TypeCastUtility.castValue(context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY), boolean.class);
+      if (outbound) {
+        return true; // only inbound messages are of interest
+      }
+      try {
+        // get session factory configured on port type
+        IServerSessionFactory portTypeSessionFactory = m_scoutWebServiceAnnotation.sessionFactory().newInstance();
+        // store session factory in running context
+        ContextHelper.setPortTypeSessionFactory(context, portTypeSessionFactory);
+      }
+      catch (Exception e) {
+        LOG.error("Failed to put port type session factory into the running context", e);
+      }
+      return true;
+    }
+
+    @Override
+    public boolean handleFault(SOAPMessageContext context) {
+      return true;
+    }
+
+    @Override
+    public void close(MessageContext context) {
+    }
+
+    @Override
+    public Set<QName> getHeaders() {
+      return new HashSet<QName>();
+    }
   }
 }
