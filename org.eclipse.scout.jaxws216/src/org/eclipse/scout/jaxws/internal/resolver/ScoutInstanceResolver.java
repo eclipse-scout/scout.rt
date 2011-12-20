@@ -148,7 +148,7 @@ public class ScoutInstanceResolver extends InstanceResolver<Object> {
               resultHolder.setValue(method.invoke(portType, aobj));
             }
             catch (InvocationTargetException e) {
-              LOG.error("Failed to dispatch webservice request.", e);
+              LOG.error("Webservice processing exception occured. Please handle faults by respective SOAP faults.", e);
               invocationTargetExceptionHolder.setValue(e);
             }
             catch (IllegalAccessException e) {
@@ -156,7 +156,7 @@ public class ScoutInstanceResolver extends InstanceResolver<Object> {
               illegalAccessExceptionHolder.setValue(e);
             }
             catch (RuntimeException e) {
-              LOG.warn("webservice processing exception occured. Please handle faults by respective SOAP faults.", e);
+              LOG.warn("Failed to dispatch webservice request.", e);
               runtimeExceptionHolder.setValue(e);
             }
 
