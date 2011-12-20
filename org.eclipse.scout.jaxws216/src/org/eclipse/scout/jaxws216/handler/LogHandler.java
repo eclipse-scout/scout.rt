@@ -33,7 +33,7 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
 
   private int m_logLevel;
 
-  public LogHandler(int logLevel) {
+  public LogHandler() {
     initConfig();
   }
 
