@@ -197,3 +197,16 @@ Migration Swing:
   or directly grant it to specific user roles in your database script.
 Migration SWT:
 > None because not supported yet. To enable the copy functionality, see migration notes for Swing.
+
+13.12.2011 sle
+BSI ticket: 109051
+Bugzilla:367275 RESOLVED - bug 367275: [SWT][LookAndFeelDecorations]Remove obsolete flag enabledAsReadOnly / https://bugs.eclipse.org/bugs/show_bug.cgi?id=367275
+Problem:
+The Flag enabledAsReadOnly was introduced ca. two years ago. The "true" case is
+today standard, also in all other ui reprecentations. As the naming is not
+realy clear the idea came up, to remove this flag alltogether. All internal
+projects are ok with this.
+Solution:
+Removed extension point element “enableBehaviour”.
+Plug-Ins changed: org.eclipse.scout.rt.ui.swt
+Migration: Remove extension point “enableBehaviour” in projects swt-bundle.
