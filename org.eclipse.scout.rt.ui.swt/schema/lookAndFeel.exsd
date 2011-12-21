@@ -132,7 +132,6 @@
       <complexType>
          <sequence minOccurs="0" maxOccurs="1">
             <element ref="mandatory" minOccurs="0" maxOccurs="1"/>
-            <element ref="enableBehaviour" minOccurs="0" maxOccurs="1"/>
          </sequence>
          <attribute name="scope" use="required">
             <annotation>
@@ -212,26 +211,6 @@
                   <enumeration value="beforeLabel">
                   </enumeration>
                   <enumeration value="afterLabel">
-                  </enumeration>
-               </restriction>
-            </simpleType>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="enableBehaviour">
-      <complexType>
-         <attribute name="enabled" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-            <simpleType>
-               <restriction base="string">
-                  <enumeration value="readOnly">
-                  </enumeration>
-                  <enumeration value="enabled">
                   </enumeration>
                </restriction>
             </simpleType>

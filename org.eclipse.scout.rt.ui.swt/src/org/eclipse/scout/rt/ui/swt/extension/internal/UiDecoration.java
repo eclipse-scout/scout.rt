@@ -37,7 +37,6 @@ public class UiDecoration implements IUiDecoration {
   private int m_processButtonMinWidth;
   private int m_processButtonMaxWidth;
   private String m_colorForegroundDisabled;
-  private boolean m_enabledAsReadOnly;
   private int m_messageBoxMinWidth = 400;
   private int m_messageBoxMinHeight = 100;
 
@@ -215,16 +214,6 @@ public class UiDecoration implements IUiDecoration {
 
   public void setFormFieldLabelAlignment(int propertyString) {
     m_formFieldLabelAlignment = propertyString;
-
-  }
-
-  public void setEnabledAsReadOnly(boolean enabledAsReadOnly) {
-    m_enabledAsReadOnly = enabledAsReadOnly;
-  }
-
-  @Override
-  public boolean isEnabledAsReadOnly() {
-    return m_enabledAsReadOnly;
   }
 
   @Override
@@ -244,5 +233,4 @@ public class UiDecoration implements IUiDecoration {
   public void setMessageBoxMinHeight(int messageBoxMinHeight) {
     m_messageBoxMinHeight = messageBoxMinHeight;
   }
-
 }

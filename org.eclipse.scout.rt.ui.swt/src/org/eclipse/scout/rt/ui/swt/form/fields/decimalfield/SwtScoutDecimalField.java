@@ -16,7 +16,6 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
@@ -60,15 +59,10 @@ public class SwtScoutDecimalField extends SwtScoutValueFieldComposite<IDecimalFi
 
   @Override
   protected void setFieldEnabled(Control swtField, boolean enabled) {
-    if (UiDecorationExtensionPoint.getLookAndFeel().isEnabledAsReadOnly()) {
-      if (m_editableSupport == null) {
-        m_editableSupport = new TextFieldEditableSupport(getSwtField());
-      }
-      m_editableSupport.setEditable(enabled);
+    if (m_editableSupport == null) {
+      m_editableSupport = new TextFieldEditableSupport(getSwtField());
     }
-    else {
-      super.setFieldEnabled(swtField, enabled);
-    }
+    m_editableSupport.setEditable(enabled);
   }
 
   @Override

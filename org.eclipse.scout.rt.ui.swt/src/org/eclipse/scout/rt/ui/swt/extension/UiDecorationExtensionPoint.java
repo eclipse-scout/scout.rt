@@ -45,11 +45,6 @@ public final class UiDecorationExtensionPoint {
   private static ILookAndFeelDecorations parseDecorations(IConfigurationElement decorationsElement) {
     LookAndFeelDecorations decorations = new LookAndFeelDecorations();
     decorations.setScope(getScopePriority(decorationsElement.getAttribute("scope")));
-    // read only
-    IConfigurationElement[] enableBehaviour = decorationsElement.getChildren("enableBehaviour");
-    if (enableBehaviour.length > 0) {
-      decorations.setEnableAsReadOnly(enableBehaviour[0].getAttribute("enabled").equals("readOnly"));
-    }
 
     IConfigurationElement[] mandatoryElement = decorationsElement.getChildren("mandatory");
     if (mandatoryElement.length > 0) {
@@ -172,7 +167,6 @@ public final class UiDecorationExtensionPoint {
       if (dec.getStarMarkerPosition() != ILookAndFeelDecorations.STAR_MARKER_NONE) {
         LOOK_AND_FEEL.setMandatoryStarMarkerPosition(dec.getStarMarkerPosition());
       }
-      LOOK_AND_FEEL.setEnabledAsReadOnly(dec.isEnableAsReadOnly());
     }
     // properties
     TreeMap<Integer, ILookAndFeelProperties> properties = new TreeMap<Integer, ILookAndFeelProperties>();

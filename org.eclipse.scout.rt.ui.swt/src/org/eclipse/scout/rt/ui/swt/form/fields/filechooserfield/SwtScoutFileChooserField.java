@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.ext.DropDownButton;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
@@ -117,15 +116,10 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
 
   @Override
   protected void setFieldEnabled(Control swtField, boolean enabled) {
-    if (UiDecorationExtensionPoint.getLookAndFeel().isEnabledAsReadOnly()) {
-      if (m_editableSupport == null) {
-        m_editableSupport = new TextFieldEditableSupport(getSwtField());
-      }
-      m_editableSupport.setEditable(enabled);
+    if (m_editableSupport == null) {
+      m_editableSupport = new TextFieldEditableSupport(getSwtField());
     }
-    else {
-      super.setFieldEnabled(swtField, enabled);
-    }
+    m_editableSupport.setEditable(enabled);
   }
 
   protected void setFileIconIdFromScout(String s) {

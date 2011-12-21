@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
@@ -113,15 +112,10 @@ public class SwtScoutDateField extends SwtScoutValueFieldComposite<IDateField> i
 
   @Override
   protected void setFieldEnabled(Control swtField, boolean enabled) {
-    if (UiDecorationExtensionPoint.getLookAndFeel().isEnabledAsReadOnly()) {
-      if (m_editableSupport == null) {
-        m_editableSupport = new TextFieldEditableSupport(getSwtField());
-      }
-      m_editableSupport.setEditable(enabled);
+    if (m_editableSupport == null) {
+      m_editableSupport = new TextFieldEditableSupport(getSwtField());
     }
-    else {
-      super.setFieldEnabled(swtField, enabled);
-    }
+    m_editableSupport.setEditable(enabled);
   }
 
   @Override

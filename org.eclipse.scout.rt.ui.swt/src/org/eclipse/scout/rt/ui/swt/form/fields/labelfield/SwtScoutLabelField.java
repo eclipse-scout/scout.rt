@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
 import org.eclipse.swt.SWT;
@@ -50,9 +49,6 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
 
     StyledText text = getEnvironment().getFormToolkit().createStyledText(container, style);
     text.setBackground(container.getBackground());
-    if (!UiDecorationExtensionPoint.getLookAndFeel().isEnabledAsReadOnly()) {
-      text.setEnabled(false);
-    }
     //Editing the text is never allowed at label fields
     text.setEditable(false);
 

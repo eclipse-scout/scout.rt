@@ -52,10 +52,7 @@ public interface IUiDecoration {
 
   int getFormFieldLabelAlignment();
 
-  boolean isEnabledAsReadOnly();
-
   int getMessageBoxMinHeight();
 
   int getMessageBoxMinWidth();
-
 }

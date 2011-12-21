@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,7 +19,6 @@ public class LookAndFeelDecorations implements ILookAndFeelDecorations {
   private FontSpec m_mandatoryLabelFont;
   private String m_mandatoryFieldBackgroundColor;
   private String m_mandatoryLabelTextColor;
-  private boolean m_enabledAsReadOnly;
 
   @Override
   public int getScope() {
@@ -65,14 +64,4 @@ public class LookAndFeelDecorations implements ILookAndFeelDecorations {
   public void setMandatoryLabelTextColor(String mandatoryLabelTextColor) {
     m_mandatoryLabelTextColor = mandatoryLabelTextColor;
   }
-
-  public void setEnableAsReadOnly(boolean equals) {
-    m_enabledAsReadOnly = equals;
-  }
-
-  @Override
-  public boolean isEnableAsReadOnly() {
-    return m_enabledAsReadOnly;
-  }
-
 }
