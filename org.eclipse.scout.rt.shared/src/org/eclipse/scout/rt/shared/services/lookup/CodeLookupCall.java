@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -67,6 +67,20 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
     return m_filter;
   }
 
+  /**
+   * Implementation that creates lookup rows from codes.
+   * <p>
+   * By default calls {@link #createLookupRowArray(List)}
+   */
+  protected LookupRow[] execCreateLookupRowsFromCodes(List<? extends ICode<?>> codes) {
+    return createLookupRowArray(codes);
+  }
+
+  /**
+   * Default implementation to create lookup rows from codes.
+   * <p>
+   * Called by {@link #execCreateLookupRowsFromCodes(List)}.
+   */
   public static LookupRow[] createLookupRowArray(List<? extends ICode> codes) {
     LookupRow[] a = new LookupRow[codes.size()];
     for (int i = 0; i < a.length; i++) {
