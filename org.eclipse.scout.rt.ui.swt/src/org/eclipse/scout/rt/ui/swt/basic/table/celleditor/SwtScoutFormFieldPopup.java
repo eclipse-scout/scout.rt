@@ -214,11 +214,18 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
   }
 
   /**
-   * Traverse field to force the field's value written back to the model.
-   * 
-   * @param control
+   * Touch the field to write its UI value back to the model
    */
-  private void forceInputVerification(Control control) {
+  public void touch() {
+    if (m_swtScoutPopup != null) {
+      touch(m_swtScoutPopup.getSwtContentPane());
+    }
+  }
+
+  private void touch(Control control) {
+    if (control == null || control.isDisposed()) {
+      return;
+    }
     Event event = new Event();
     event.widget = control;
     control.notifyListeners(SWT.Traverse, event);
@@ -226,7 +233,7 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
     if (control instanceof Composite) {
       Composite composite = (Composite) control;
       for (Control child : composite.getChildren()) {
-        forceInputVerification(child);
+        touch(child);
       }
     }
   }
@@ -288,11 +295,10 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
   }
 
   public void closePopup(int type) {
-    // update model with changed value
-    forceInputVerification(m_swtScoutPopup.getSwtContentPane());
-    // close popup
+    touch();
     m_swtScoutPopup.removeSwtScoutPartListener(m_popupEventListener);
     m_swtScoutPopup.closePart();
+    m_swtScoutPopup = null;
 
     // notify listeners
     notifyEventListeners(new FormFieldPopupEvent(getScoutObject(), type));
@@ -300,6 +306,10 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
 
   public SwtScoutDropDownPopup getPopup() {
     return m_swtScoutPopup;
+  }
+
+  public boolean isClosed() {
+    return m_swtScoutPopup == null || m_swtScoutPopup.getSwtContentPane() == null || m_swtScoutPopup.getSwtContentPane().isDisposed();
   }
 
   public int getMinWidth() {
