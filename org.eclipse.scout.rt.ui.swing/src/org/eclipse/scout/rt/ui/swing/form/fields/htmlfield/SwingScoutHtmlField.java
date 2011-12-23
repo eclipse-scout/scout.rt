@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swing.form.fields.htmlfield;
 /**
  *  Copyright (c) 2001,2004 BSI AG
  */
+import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,6 +28,7 @@ import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.text.View;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
@@ -197,6 +199,18 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     m_htmlView.setText(m_originalText);
     int newPos = Math.max(0, Math.min(oldPos, swingField.getDocument().getLength()));
     swingField.setCaretPosition(newPos);
+
+    updatePreferredSize(m_htmlView);
+  }
+
+  private void updatePreferredSize(JTextPane textPane) {
+    textPane.setPreferredSize(null);
+
+    int preferredWidth = textPane.getPreferredSize().width;
+    View view = textPane.getUI().getRootView(textPane);
+    view.setSize(preferredWidth, Integer.MAX_VALUE);
+    int preferredHeight = (int) view.getPreferredSpan(View.Y_AXIS);
+    textPane.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
   }
 
   private File writeTempFile(String relFullName, InputStream content) {

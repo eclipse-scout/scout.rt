@@ -458,3 +458,13 @@ Migration Swing:
   or directly grant it to specific user roles in your database script.
 Migration SWT:
 > None because not supported yet. To enable the copy functionality, see migration notes for Swing.
+
+23.12.2011 dwi [contributed by Remo Arpagaus, BSI Business Systems Integration AG]
+Bugzilla: 364473
+Problem:
+Content of HTML field does not show up anymore after UI relayout happens
+E.g. if having a detail form (that contains a HTML field) on a table page and the user clicks on another view tab and back again, the HTML content does not show up anymore.
+Solution:
+Because the preferred height of the JTextPane is only calculated when rendering for the first time, it will keep the value 0 and never show up again.
+The proposed patch includes a refresh of the preferred height every time the field's content changes. Thus the layout can dynamically change when setting a new content for the HTML field.
+Migration: None
