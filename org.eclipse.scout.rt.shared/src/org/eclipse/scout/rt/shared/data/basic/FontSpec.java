@@ -22,12 +22,9 @@ public class FontSpec implements java.io.Serializable {
   public static final int STYLE_BOLD = 0x01;
   public static final int STYLE_ITALIC = 0x02;
 
-  private String m_name;
-  private int m_style;
-  private int m_size;
-
-  private FontSpec() {
-  }
+  private final String m_name;
+  private final int m_style;
+  private final int m_size;
 
   public FontSpec(String name, int style, int size) {
     m_name = name;
@@ -84,7 +81,10 @@ public class FontSpec implements java.io.Serializable {
       return null;
     }
     else {
-      FontSpec f = new FontSpec();
+      String newName = null;
+      int newStyle = STYLE_PLAIN;
+      int newSize = 0;
+
       StringTokenizer tok = new StringTokenizer(pattern, " -_,/.;");
       while (tok.hasMoreTokens()) {
         String s = tok.nextToken().toUpperCase();
@@ -93,28 +93,28 @@ public class FontSpec implements java.io.Serializable {
           // nop
         }
         else if (s.equals("BOLD")) {
-          f.m_style = f.m_style | STYLE_BOLD;
+          newStyle = newStyle | STYLE_BOLD;
         }
         else if (s.equals("ITALIC")) {
-          f.m_style = f.m_style | STYLE_ITALIC;
+          newStyle = newStyle | STYLE_ITALIC;
         }
         else {
           // size or name
           try {
             // size
-            f.m_size = Integer.parseInt(s);
+            newSize = Integer.parseInt(s);
           }
           catch (NumberFormatException nfe) {
             // name
-            f.m_name = s;
+            newName = s;
           }
         }
       }
       //if name is "null" set it to null
-      if (f.m_name != null && f.m_name.equalsIgnoreCase("null")) {
-        f.m_name = null;
+      if (newName != null && newName.equalsIgnoreCase("null")) {
+        newName = null;
       }
-      return f;
+      return new FontSpec(newName, newStyle, newSize);
     }
   }
 

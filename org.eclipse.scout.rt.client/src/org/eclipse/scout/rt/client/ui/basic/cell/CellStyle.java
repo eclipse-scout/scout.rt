@@ -14,14 +14,14 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
  * A cell style represents the graphical properties of a particular cell. These values are kept in a
- * different class so that can be shared between {@link Cell} instances.
+ * different class so that they can be shared between {@link Cell} instances.
  */
 public class CellStyle implements ICellSpecialization {
 
   private String m_iconId;
   private String m_backgroundColor;
   private String m_foregroundColor;
-  private String m_fontPattern;
+  private FontSpec m_fontSpec;
   private int m_horizontalAlignment;
 
   public CellStyle() {
@@ -97,11 +97,11 @@ public class CellStyle implements ICellSpecialization {
   }
 
   public FontSpec getFont() {
-    return m_fontPattern != null ? FontSpec.parse(m_fontPattern) : null;
+    return m_fontSpec;
   }
 
   public void setFont(FontSpec font) {
-    m_fontPattern = font != null ? font.toPattern() : null;
+    m_fontSpec = font;
   }
 
   public int getHorizontalAlignment() {
@@ -117,7 +117,7 @@ public class CellStyle implements ICellSpecialization {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((m_backgroundColor == null) ? 0 : m_backgroundColor.hashCode());
-    result = prime * result + ((m_fontPattern == null) ? 0 : m_fontPattern.hashCode());
+    result = prime * result + ((m_fontSpec == null) ? 0 : m_fontSpec.hashCode());
     result = prime * result + ((m_foregroundColor == null) ? 0 : m_foregroundColor.hashCode());
     result = prime * result + m_horizontalAlignment;
     result = prime * result + ((m_iconId == null) ? 0 : m_iconId.hashCode());
@@ -134,10 +134,10 @@ public class CellStyle implements ICellSpecialization {
       if (other.m_backgroundColor != null) return false;
     }
     else if (!m_backgroundColor.equals(other.m_backgroundColor)) return false;
-    if (m_fontPattern == null) {
-      if (other.m_fontPattern != null) return false;
+    if (m_fontSpec == null) {
+      if (other.m_fontSpec != null) return false;
     }
-    else if (!m_fontPattern.equals(other.m_fontPattern)) return false;
+    else if (!m_fontSpec.equals(other.m_fontSpec)) return false;
     if (m_foregroundColor == null) {
       if (other.m_foregroundColor != null) return false;
     }
