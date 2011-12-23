@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.basic.table.celleditor;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -19,7 +20,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorDeactivationEvent;
-import org.eclipse.jface.viewers.ICellEditorListener;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.table.ISwtScoutTable;
 import org.eclipse.scout.rt.ui.swt.basic.table.SwtScoutTable;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
+import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport.IPopupSupportListener;
 import org.eclipse.scout.rt.ui.swt.keystroke.SwtKeyStroke;
@@ -67,7 +68,6 @@ public class SwtScoutTableCellEditor {
   private final Listener m_rowHeightListener;
 
   private P_FocusLostListener m_focusLostListener;
-  private ICellModifier m_cellModifier;
 
   public SwtScoutTableCellEditor(final ISwtScoutTable tableComposite) {
     m_focusLostListener = new P_FocusLostListener();
@@ -101,8 +101,7 @@ public class SwtScoutTableCellEditor {
         columnPropertyNames[i] = "";
       }
     }
-    m_cellModifier = new P_SwtCellModifier();
-    viewer.setCellModifier(m_cellModifier);
+    viewer.setCellModifier(new P_SwtCellModifier());
     viewer.setColumnProperties(columnPropertyNames);
     viewer.setCellEditors(newEditors);
     if (oldEditors != null && oldEditors.length > 0) {
@@ -214,6 +213,38 @@ public class SwtScoutTableCellEditor {
     // create placeholder field to represent the cell editor
     Composite cellEditorComposite = new Composite(parent, SWT.NONE);
 
+    // create popup dialog to wrap the form field
+    final SwtScoutFormFieldPopup formFieldDialog = new SwtScoutFormFieldPopup(cellEditorComposite);
+    formFieldDialog.setPrefHeight(prefHeight);
+    formFieldDialog.setPrefWidth(prefWidth);
+    formFieldDialog.setMinHeight(minHeight);
+    formFieldDialog.setMinWidth(minWidth);
+    formFieldDialog.createField(parent, formField, m_tableComposite.getEnvironment());
+
+    // register custom cell modifier to touch the field in order to write its value back to the model
+    final ICellModifier defaultCellModifier = m_tableComposite.getSwtTableViewer().getCellModifier();
+    m_tableComposite.getSwtTableViewer().setCellModifier(new P_SwtCellModifier() {
+
+      @Override
+      public void modify(Object element, String property, Object value) {
+        formFieldDialog.touch();
+        super.modify(element, property, value);
+      }
+    });
+
+    // register custom focus delegate to request the field's focus
+    final IFocusDelegate defaultFocusDelegate = cellEditor.getFocusDelegate();
+    cellEditor.setFocusDelegate(new IFocusDelegate() {
+
+      @Override
+      public void doSetFocus() {
+        ISwtScoutForm swtScoutForm = formFieldDialog.getInnerSwtScoutForm();
+        if (swtScoutForm != null) {
+            requestFocus(swtScoutForm.getSwtContainer());
+        }
+      }
+    });
+
     // listener to receive events about the popup's state
     final IFormFieldPopupEventListener popupListener = new IFormFieldPopupEventListener() {
 
@@ -237,51 +268,31 @@ public class SwtScoutTableCellEditor {
         }
       }
     };
-
-    // create popup dialog to wrap the form field
-    final SwtScoutFormFieldPopup formFieldDialog = new SwtScoutFormFieldPopup(cellEditorComposite);
-    formFieldDialog.setPrefHeight(prefHeight);
-    formFieldDialog.setPrefWidth(prefWidth);
-    formFieldDialog.setMinHeight(minHeight);
-    formFieldDialog.setMinWidth(minWidth);
-    formFieldDialog.createField(parent, formField, m_tableComposite.getEnvironment());
     formFieldDialog.addEventListener(popupListener);
 
-    // register custom cell modifier to touch the field's value prior to be written to the model
-    m_tableComposite.getSwtTableViewer().setCellModifier(new P_SwtCellModifier() {
-
-      @Override
-      public void modify(Object element, String property, Object value) {
-        formFieldDialog.touch();
-        super.modify(element, property, value);
-      }
-    });
-
     // register listener to intercept the cell editor's events in order to properly close the popup.
-    // This is crucial if the editor is deactivated programmatically or by another cell that is activated.
-    cellEditor.addListener(new ICellEditorListener() {
+    // This is crucial if the editor is deactivated programmatically or if another cell is activated.
+    cellEditor.addDeactivateListener(new IDeactivateListener() {
 
       @Override
-      public void applyEditorValue() {
+      public void canceled(ColumnViewerEditorDeactivationEvent event) {
         restoreDefault();
         closePopup(FormFieldPopupEvent.TYPE_OK);
       }
 
       @Override
-      public void cancelEditor() {
+      public void saved(ColumnViewerEditorDeactivationEvent event) {
         restoreDefault();
         closePopup(FormFieldPopupEvent.TYPE_CANCEL);
       }
 
-      @Override
-      public void editorValueChanged(boolean oldValidState, boolean newValidState) {
-      }
-
       private void restoreDefault() {
-        // remove this listener on the cell editor
-        cellEditor.removeListener(this);
+        // restore default focus delegate
+        cellEditor.setFocusDelegate(defaultFocusDelegate);
         // restore default cell modifier
-        m_tableComposite.getSwtTableViewer().setCellModifier(m_cellModifier);
+        m_tableComposite.getSwtTableViewer().setCellModifier(defaultCellModifier);
+        // remove this listener on the cell editor
+        cellEditor.removeDeactivateListener(this);
       }
 
       private void closePopup(int popupEvent) {
@@ -293,7 +304,6 @@ public class SwtScoutTableCellEditor {
         // close the popup
         formFieldDialog.closePopup(popupEvent);
       }
-
     });
 
     return formFieldDialog;
@@ -371,6 +381,28 @@ public class SwtScoutTableCellEditor {
     return null;
   }
 
+  protected P_FocusLostListener getFocusLostListener() {
+    return m_focusLostListener;
+  }
+
+  private boolean requestFocus(Control control) {
+    if (control == null || control.isDisposed()) {
+      return false;
+    }
+    if (control.setFocus()) {
+      return true;
+    }
+  
+    if (control instanceof Composite) {
+      for (Control child : ((Composite) control).getChildren()) {
+        if (requestFocus(child)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private class P_SwtCellModifier implements ICellModifier {
 
     @Override
@@ -431,9 +463,13 @@ public class SwtScoutTableCellEditor {
     private Object m_value;
     private ITableRow m_editScoutRow;
     private IColumn<?> m_editScoutCol;
+    private IFocusDelegate m_focusDelegate;
+    private ConcurrentHashMap<IDeactivateListener, Object> m_deactivateListeners;
 
     protected P_SwtCellEditor(Composite parent) {
       super(parent);
+      m_focusDelegate = new P_FocusDelegate();
+      m_deactivateListeners = new ConcurrentHashMap<IDeactivateListener, Object>();
     }
 
     @Override
@@ -468,41 +504,9 @@ public class SwtScoutTableCellEditor {
 
     @Override
     protected void doSetFocus() {
-      m_container.traverse(SWT.TRAVERSE_TAB_NEXT);
-      Control focusControl = m_container.getDisplay().getFocusControl();
-      if (focusControl != null && SwtUtility.isAncestorOf(m_container, focusControl)) {
-        focusControl.addTraverseListener(new TraverseListener() {
-          @Override
-          public void keyTraversed(TraverseEvent e) {
-            switch (e.detail) {
-              case SWT.TRAVERSE_ESCAPE:
-              case SWT.TRAVERSE_RETURN: {
-              e.doit = false;
-              break;
-            }
-            case SWT.TRAVERSE_TAB_NEXT: {
-              e.doit = false;
-              ITableRow scoutRow = m_editScoutRow;
-              IColumn<?> scoutCol = m_editScoutCol;
-              fireApplyEditorValue();
-              deactivate();
-              enqueueEditNextTableCell(scoutRow, scoutCol, true);
-              break;
-            }
-            case SWT.TRAVERSE_TAB_PREVIOUS: {
-              e.doit = false;
-              ITableRow scoutRow = m_editScoutRow;
-              IColumn<?> scoutCol = m_editScoutCol;
-              fireApplyEditorValue();
-              deactivate();
-              enqueueEditNextTableCell(scoutRow, scoutCol, false);
-              break;
-            }
-          }
-        }
-        });
+      if (m_focusDelegate != null) {
+        m_focusDelegate.doSetFocus();
       }
-      getFocusLostListener().resume(); // because listener was suspended after activation
     }
 
     @Override
@@ -549,6 +553,16 @@ public class SwtScoutTableCellEditor {
     protected void deactivate(ColumnViewerEditorDeactivationEvent e) {
       getFocusLostListener().uninstall();
 
+      // notify cell editor deactivate listeners
+      for (IDeactivateListener listener : m_deactivateListeners.keySet()) {
+        if (e.eventType == ColumnViewerEditorDeactivationEvent.EDITOR_SAVED) {
+          listener.saved(e);
+        }
+        else {
+          listener.canceled(e);
+        }
+      }
+
       m_editScoutRow = null;
       m_editScoutCol = null;
       for (Control c : m_container.getChildren()) {
@@ -568,6 +582,64 @@ public class SwtScoutTableCellEditor {
     public void cancelCellEditing() {
       fireCancelEditor();
       deactivate();
+    }
+
+    public IFocusDelegate getFocusDelegate() {
+      return m_focusDelegate;
+    }
+
+    public void setFocusDelegate(IFocusDelegate focusDelegate) {
+      m_focusDelegate = focusDelegate;
+    }
+
+    public void addDeactivateListener(IDeactivateListener listener) {
+      m_deactivateListeners.put(listener, new Object());
+    }
+
+    public void removeDeactivateListener(IDeactivateListener listener) {
+      m_deactivateListeners.remove(listener);
+    }
+
+    private class P_FocusDelegate implements IFocusDelegate {
+
+      @Override
+      public void doSetFocus() {
+        m_container.traverse(SWT.TRAVERSE_TAB_NEXT);
+        Control focusControl = m_container.getDisplay().getFocusControl();
+        if (focusControl != null && SwtUtility.isAncestorOf(m_container, focusControl)) {
+          focusControl.addTraverseListener(new TraverseListener() {
+            @Override
+            public void keyTraversed(TraverseEvent e) {
+              switch (e.detail) {
+                case SWT.TRAVERSE_ESCAPE:
+                case SWT.TRAVERSE_RETURN: {
+                e.doit = false;
+                break;
+              }
+              case SWT.TRAVERSE_TAB_NEXT: {
+                e.doit = false;
+                ITableRow scoutRow = m_editScoutRow;
+                IColumn<?> scoutCol = m_editScoutCol;
+                fireApplyEditorValue();
+                deactivate();
+                enqueueEditNextTableCell(scoutRow, scoutCol, true);
+                break;
+              }
+              case SWT.TRAVERSE_TAB_PREVIOUS: {
+                e.doit = false;
+                ITableRow scoutRow = m_editScoutRow;
+                IColumn<?> scoutCol = m_editScoutCol;
+                fireApplyEditorValue();
+                deactivate();
+                enqueueEditNextTableCell(scoutRow, scoutCol, false);
+                break;
+              }
+            }
+          }
+          });
+        }
+        getFocusLostListener().resume(); // because listener was suspended after activation
+      }
     }
   }
 
@@ -677,7 +749,19 @@ public class SwtScoutTableCellEditor {
     }
   }
 
-  public P_FocusLostListener getFocusLostListener() {
-    return m_focusLostListener;
+  /**
+   * Delegate to process focus events on cell editor
+   */
+  private interface IFocusDelegate {
+    public void doSetFocus();
+  }
+
+  /**
+   * Listener to get notified about deactivation event
+   */
+  private interface IDeactivateListener {
+    public void canceled(ColumnViewerEditorDeactivationEvent event);
+
+    public void saved(ColumnViewerEditorDeactivationEvent event);
   }
 }

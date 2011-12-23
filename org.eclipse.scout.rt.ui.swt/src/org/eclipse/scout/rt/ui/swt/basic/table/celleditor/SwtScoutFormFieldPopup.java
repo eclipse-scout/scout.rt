@@ -24,14 +24,13 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
+import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartListener;
 import org.eclipse.scout.rt.ui.swt.window.popup.SwtScoutDropDownPopup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.TraverseEvent;
@@ -49,7 +48,7 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
 
   private SwtScoutDropDownPopup m_swtScoutPopup;
 
-  private Control m_owner;
+  private Composite m_owner;
   private int m_minWidth;
   private int m_prefWidth;
   private int m_minHeight;
@@ -60,7 +59,7 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
   private List<IFormFieldPopupEventListener> m_eventListeners = new ArrayList<IFormFieldPopupEventListener>();
   private Object m_eventListenerLock = new Object();
 
-  public SwtScoutFormFieldPopup(Control owner) {
+  public SwtScoutFormFieldPopup(Composite owner) {
     m_owner = owner;
     m_style = SWT.NO_TRIM;
     m_popupEventListener = new P_PopupEventListener();
@@ -70,80 +69,97 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
   protected void initializeSwt(Composite parent) {
     super.initializeSwt(parent);
 
-    m_owner.addPaintListener(new PaintListener() {
-
+    // create form to hold the form field
+    final AtomicReference<IForm> formRef = new AtomicReference<IForm>();
+    Runnable runnable = new Runnable() {
       @Override
-      public void paintControl(PaintEvent e) {
-        // remove listener to only be called once
-        m_owner.removePaintListener(this);
-
-        // create form to hold the form field
-        final AtomicReference<IForm> formRef = new AtomicReference<IForm>();
-        Runnable runnable = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              P_Form form = new P_Form();
-              form.setAutoAddRemoveOnDesktop(false);
-              form.startForm();
-              formRef.set(form);
-            }
-            catch (Throwable t) {
-              LOG.error("failed to start popup form", t);
-            }
-            synchronized (formRef) {
-              formRef.notifyAll();
-            }
-          }
-        };
-        synchronized (formRef) {
-          getEnvironment().invokeScoutLater(runnable, 2345);
-          try {
-            formRef.wait(2345);
-          }
-          catch (InterruptedException t) {
-            //nop
-          }
-        }
-
-        IForm form = formRef.get();
-        if (form == null) {
-          LOG.error("No popup form available", e);
-          return;
-        }
-
-        // create popup in reference to cell editor (owner)
-        m_swtScoutPopup = new P_SwtScoutDropDownPopup(m_owner, m_style);
-        m_swtScoutPopup.setPopupOnField(true);
-        m_swtScoutPopup.setHeightHint(m_prefHeight);
-        m_swtScoutPopup.setWidthHint(m_prefWidth);
-        m_swtScoutPopup.getShell().setMinimumSize(m_minWidth, m_minHeight);
-
-        // install popup listener
-        m_swtScoutPopup.addSwtScoutPartListener(m_popupEventListener);
-
-        // open popup
+      public void run() {
         try {
-          m_swtScoutPopup.showForm(form);
-          // install keystrokes on inner form field
-          installTraverseKeyStrokes(m_swtScoutPopup.getSwtContentPane());
+          P_Form form = new P_Form();
+          form.setAutoAddRemoveOnDesktop(false);
+          form.startForm();
+          formRef.set(form);
         }
         catch (Throwable t) {
-          LOG.error("failed to show popup form", t);
+          LOG.error("failed to start popup form", t);
         }
+        synchronized (formRef) {
+          formRef.notifyAll();
+        }
+      }
+    };
+    synchronized (formRef) {
+      getEnvironment().invokeScoutLater(runnable, 2345);
+      try {
+        formRef.wait(2345);
+      }
+      catch (InterruptedException t) {
+        //nop
+      }
+    }
 
+    IForm form = formRef.get();
+    if (form == null) {
+      LOG.error("No popup form available");
+      return;
+    }
+
+    // create popup in reference to cell editor (owner)
+    m_swtScoutPopup = new P_SwtScoutDropDownPopup(m_owner, m_style);
+    m_swtScoutPopup.setPopupOnField(true);
+    m_swtScoutPopup.setHeightHint(m_prefHeight);
+    m_swtScoutPopup.setWidthHint(m_prefWidth);
+    m_swtScoutPopup.getShell().setMinimumSize(m_minWidth, m_minHeight);
+    m_swtScoutPopup.getShell().addTraverseListener(new TraverseListener() {
+
+      @Override
+      public void keyTraversed(TraverseEvent event) {
+        switch (event.detail) {
+          case SWT.TRAVERSE_ESCAPE: {
+            event.doit = false;
+            closePopup(FormFieldPopupEvent.TYPE_CANCEL);
+            break;
+          }
+          case SWT.TRAVERSE_RETURN: {
+            event.doit = false;
+            closePopup(FormFieldPopupEvent.TYPE_OK);
+            break;
+          }
+        }
       }
     });
+
+    // install popup listener
+    m_swtScoutPopup.addSwtScoutPartListener(m_popupEventListener);
+
+    // open popup
+    try {
+      m_swtScoutPopup.showForm(form);
+      // install traversal keystrokes on inner form
+      installTraverseKeyStrokes(m_swtScoutPopup.getSwtContentPane());
+    }
+    catch (Throwable t) {
+      LOG.error("failed to show popup form", t);
+    }
+
+    // add control listener to adjust popup location
     m_owner.addControlListener(new ControlAdapter() {
 
       @Override
       public void controlResized(ControlEvent e) {
-        if (m_swtScoutPopup != null) {
-          m_swtScoutPopup.autoAdjustBounds();
-        }
+        // invoke at next reasonable time to guarantee proper location
+        getSwtContainer().getDisplay().asyncExec(new Runnable() {
+
+          @Override
+          public void run() {
+            if (m_swtScoutPopup != null) {
+              m_swtScoutPopup.autoAdjustBounds();
+            }
+          }
+        });
       }
     });
-    setSwtField(m_owner);
+    setSwtContainer(m_owner);
   }
 
   private class P_Form extends AbstractForm {
@@ -243,14 +259,6 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
       @Override
       public void keyTraversed(TraverseEvent e) {
         switch (e.detail) {
-          case SWT.TRAVERSE_ESCAPE:
-            e.doit = false;
-            closePopup(FormFieldPopupEvent.TYPE_CANCEL);
-            break;
-          case SWT.TRAVERSE_RETURN: {
-            e.doit = true;
-            break;
-          }
           case SWT.TRAVERSE_TAB_NEXT: {
             e.doit = false;
             closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_NEXT);
@@ -310,6 +318,10 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
 
   public boolean isClosed() {
     return m_swtScoutPopup == null || m_swtScoutPopup.getSwtContentPane() == null || m_swtScoutPopup.getSwtContentPane().isDisposed();
+  }
+
+  public ISwtScoutForm getInnerSwtScoutForm() {
+    return m_swtScoutPopup.getUiForm();
   }
 
   public int getMinWidth() {
