@@ -96,11 +96,18 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     // attach drag and remove default transfer handler
     P_SwingDragAndDropTransferHandler th = new P_SwingDragAndDropTransferHandler();
     tree.setTransferHandler(th);
-    //ticket 87030
+    //ticket 87030, bug 365161
     //attach delayed resize: make selection visible
     m_swingScrollPane.addComponentListener(new ComponentAdapter() {
+      private int m_oldHeight = -1;
+
       @Override
       public void componentResized(ComponentEvent e) {
+        int newHeight = e.getComponent().getHeight();
+        if (m_oldHeight >= 0 && m_oldHeight == newHeight) {
+          return;
+        }
+        m_oldHeight = newHeight;
         ITree t = getScoutObject();
         if (t != null && t.isScrollToSelection()) {
           if (e.getComponent().isShowing()) {
