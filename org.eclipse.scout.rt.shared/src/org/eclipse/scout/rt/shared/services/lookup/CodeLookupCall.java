@@ -111,7 +111,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
   @Override
   public LookupRow[] getDataByKey() throws ProcessingException {
     Object key = getKey();
-    ArrayList<ICode> list = new ArrayList<ICode>(1);
+    ArrayList<ICode<?>> list = new ArrayList<ICode<?>>(1);
     ICodeType t = CODES.getCodeType(m_codeTypeClass);
     if (t != null) {
       ICode c = t.getCode(key);
@@ -119,7 +119,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
         list.add(c);
       }
     }
-    return createLookupRowArray(list);
+    return execCreateLookupRowsFromCodes(list);
   }
 
   /**
@@ -148,7 +148,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
     if (t != null) {
       t.visit(v, false);
     }
-    return createLookupRowArray(v.getCodes());
+    return execCreateLookupRowsFromCodes(v.getCodes());
   }
 
   /**
@@ -177,7 +177,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
     if (t != null) {
       t.visit(v, false);
     }
-    return createLookupRowArray(v.getCodes());
+    return execCreateLookupRowsFromCodes(v.getCodes());
   }
 
   /**
@@ -209,11 +209,11 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
     if (t != null) {
       t.visit(v, false);
     }
-    return createLookupRowArray(v.getCodes());
+    return execCreateLookupRowsFromCodes(v.getCodes());
   }
 
-  private abstract class P_AbstractCollectingCodeVisitor implements ICodeVisitor {
-    private ArrayList<ICode> m_list = new ArrayList<ICode>();
+  private static abstract class P_AbstractCollectingCodeVisitor implements ICodeVisitor {
+    private ArrayList<ICode<?>> m_list = new ArrayList<ICode<?>>();
 
     public P_AbstractCollectingCodeVisitor() {
     }
@@ -231,7 +231,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
       }
     }
 
-    public List<ICode> getCodes() {
+    public List<ICode<?>> getCodes() {
       return m_list;
     }
   }
