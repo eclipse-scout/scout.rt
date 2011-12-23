@@ -476,3 +476,14 @@ If disabling / enabling a table, it sometimes happens not to look like being in 
 Solution:
 The proposed patch triggers an explicit repaint of the table and its header whenever the Scout table is disabled / enabled.
 Migration: None
+
+23.12.2011 dwi
+Bugzilla: 367507
+Problem:
+If pasting a text containg multiple lines from within the clipboard into a single-line textfield (getConfiguredMultilineText=false), the newlines are only removed if leaving the field.
+The same applies for a field that allows to only contain uppercase/lowercase characters (getConfiguredFormat = IStringField#FORMAT_LOWER / IStringField#FORMAT_UPPER).
+Again, the characters are only converted if leaving the field.
+Solution:
+The configured format is applied immediately to the entered text.
+Plug-In changed: org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#P_SwingDocumentFilter]
+Migration: None

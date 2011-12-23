@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -66,6 +66,7 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
   private MouseListener m_linkTrigger;
   private boolean m_validateOnAnyKey;
   private boolean m_decorationLink;
+  private boolean m_multilineText;
 
   // DND
   private DragGestureRecognizer m_dragSource;
@@ -108,6 +109,7 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
     setFormatFromScout(f.getFormat());
     setMaxLengthFromScout(f.getMaxLength());
     setValidateOnAnyKeyFromScout(f.isValidateOnAnyKey());
+    setMultilineTextFromScout(f.isMultilineText());
     setSelectionFromScout();
     updateDragTransferTypesFromScout();
     updateDropTransferTypesFromScout();
@@ -141,6 +143,10 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
     else if (IStringField.FORMAT_LOWER.equals(s)) {
       m_lowerCase = true;
     }
+  }
+
+  protected void setMultilineTextFromScout(boolean multilineText) {
+    m_multilineText = multilineText;
   }
 
   protected void setMaxLengthFromScout(int n) {
@@ -352,6 +358,9 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
     else if (name.equals(IStringField.PROP_SELECTION_END)) {
       setSelectionFromScout();
     }
+    else if (name.equals(IStringField.PROP_MULTILINE_TEXT)) {
+      setMultilineTextFromScout(((Boolean) newValue).booleanValue());
+    }
   }
 
   protected void handleSwingLinkTrigger() {
@@ -461,18 +470,31 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
 
     @Override
     public void insertString(FilterBypass fb, int offset, String s, AttributeSet a) throws BadLocationException {
-      if (s == null) {
-        s = "";
-      }
-      //
+      s = ensureConfiguredTextFormat(s);
+      super.insertString(fb, offset, s, a);
+    }
+
+    @Override
+    public void replace(FilterBypass fb, int offset, int length, String s, AttributeSet a) throws BadLocationException {
+      s = ensureConfiguredTextFormat(s);
+      super.replace(fb, offset, length, s, a);
+    }
+
+    private String ensureConfiguredTextFormat(String s) {
+      s = StringUtility.emptyIfNull(s);
+
       if (m_upperCase) {
         s = s.toUpperCase();
       }
-      if (m_lowerCase) {
+      else if (m_lowerCase) {
         s = s.toLowerCase();
       }
-      super.insertString(fb, offset, s, a);
+      if (!m_multilineText) {
+        s = s.replaceAll("\\n\\r", " ").replaceAll("[\\n\\r]", " ");
+      }
+      return s;
     }
+
   }// end private class
 
   private class P_SwingLinkTrigger extends MouseAdapter {
@@ -485,7 +507,7 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
 
     @Override
     public void mouseReleased(MouseEvent e) {
-      if(fix!=null) {
+      if (fix != null) {
         fix.mouseReleased(this, e);
       }
     }
