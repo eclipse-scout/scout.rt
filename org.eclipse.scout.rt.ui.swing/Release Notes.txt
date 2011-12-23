@@ -468,3 +468,11 @@ Solution:
 Because the preferred height of the JTextPane is only calculated when rendering for the first time, it will keep the value 0 and never show up again.
 The proposed patch includes a refresh of the preferred height every time the field's content changes. Thus the layout can dynamically change when setting a new content for the HTML field.
 Migration: None
+
+23.12.2011 dwi [contributed by Remo Arpagaus, BSI Business Systems Integration AG]
+Bugzilla: 364121
+Problem:
+If disabling / enabling a table, it sometimes happens not to look like being in disabled / enabled state. This is only a UI refresh problem, meaning that the table effectively is enabled / disabled.
+Solution:
+The proposed patch triggers an explicit repaint of the table and its header whenever the Scout table is disabled / enabled.
+Migration: None

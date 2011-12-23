@@ -87,6 +87,14 @@ public class SwingScoutTableField extends SwingScoutFieldComposite<ITableField<?
     if (getSwingScrollPane() != null) {
       getSwingScrollPane().getViewport().setOpaque(b);
     }
+    // bugzilla 364121 >>
+    if (getSwingTable() != null) {
+      getSwingTable().repaint();
+      if (getSwingTable().getTableHeader() != null) {
+        getSwingTable().getTableHeader().repaint();
+      }
+    }
+	// << bugzilla 364121
   }
 
   protected void setTableStatusFromScout() {
