@@ -399,7 +399,7 @@ public final class MailUtility {
         // remove any VML elements
         htmlMessage = htmlMessage.replaceAll("<!--\\[if gte vml 1(.*\\r?\\n)*?.*?endif\\]-->", "");
         // remove any VML elements part2
-        htmlMessage = htmlMessage.replaceAll("<!--\\[if !vml\\]>(.*\\r?\\n)*?.*?<!\\[endif\\]-->", "$1");
+        htmlMessage = Pattern.compile("<!\\[if !vml\\]>(.*?)<!\\[endif\\]>", Pattern.DOTALL).matcher(htmlMessage).replaceAll("$1");
         // remove not referenced attachments
         for (DataSource ds : htmlDataSourceList) {
           if (!htmlMessage.contains("cid:" + ds.getName())) {
