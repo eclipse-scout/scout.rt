@@ -737,8 +737,8 @@ public final class HTMLUtility {
     if (defaultFont == null || rawHtml == null) {
       return rawHtml;
     }
-  
-    // ensure style tag
+
+    // ensure style tag to be present. Create empty style definition if not existing.
     Matcher matcherStyleTag = createMatcherForTag(rawHtml, "style", false);
     if (matcherStyleTag.find()) {
       // style tag found: ensure style-type 'text/css'
@@ -753,7 +753,7 @@ public final class HTMLUtility {
       matcherHeadTag.find();
       rawHtml = rawHtml.substring(0, matcherHeadTag.end()) + "<style type=\"text/css\"></style>" + rawHtml.substring(matcherHeadTag.end());
     }
-  
+
     // extract content of <style> tag
     matcherStyleTag = createMatcherForTag(rawHtml, "style", false);
     matcherStyleTag.find();
@@ -762,53 +762,75 @@ public final class HTMLUtility {
       LOG.warn("No closing </style> tag found");
       return rawHtml;
     }
-    String styleContent = rawHtml.substring(matcherStyleTag.end(), matcherStyleEndTag.start());
-  
-    // ensure style for <body> element
-    Pattern patternBodyStyle = Pattern.compile("(.*?body[^\\{]*?\\s*\\{)\\s*([^\\}]*?)\\s*(\\}.*)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
-    Matcher matcherBodyStyle = patternBodyStyle.matcher(styleContent);
-    if (!matcherBodyStyle.find()) {
-      styleContent = StringUtility.join("", styleContent, "body{}");
+
+    String[] tags = new String[]{"body", "table", "tr", "th", "td", "span", "p"};
+    for (String tag : tags) {
+      rawHtml = ensureDefaultFontForHtmlTag(rawHtml, defaultFont, tag);
     }
-    // extract body-style
-    matcherBodyStyle = patternBodyStyle.matcher(styleContent);
-    matcherBodyStyle.find();
-    String preBodyStyleContent = matcherBodyStyle.group(1);
-    String bodyStyleContent = StringUtility.trim(StringUtility.nvl(matcherBodyStyle.group(2), ""));
-    String postBodyStyleContent = matcherBodyStyle.group(3);
-  
-    // check if combined font formatting is configured
-    if (bodyStyleContent.contains("font:")) {
+    return rawHtml;
+  }
+
+  private static String ensureDefaultFontForHtmlTag(String rawHtml, DefaultFont defaultFont, String htmlTag) {
+    if (StringUtility.isNullOrEmpty(rawHtml) || StringUtility.isNullOrEmpty(htmlTag) || defaultFont == null) {
       return rawHtml;
     }
-  
+
+    Matcher matcherStyleTag = createMatcherForTag(rawHtml, "style", false);
+    if (!matcherStyleTag.find()) {
+      return rawHtml;
+    }
+    Matcher matcherStyleEndTag = createMatcherForTag(rawHtml, "style", true);
+    if (!matcherStyleEndTag.find()) {
+      return rawHtml;
+    }
+
+    String styleContent = rawHtml.substring(matcherStyleTag.end(), matcherStyleEndTag.start());
+
+    // ensure style to be present for the given HTML tag. Create empty style if not existing.
+    Pattern patternTagStyle = Pattern.compile("(.*?" + htmlTag + "[^\\{]*?\\s*\\{)\\s*([^\\}]*?)\\s*(\\}.*)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+    Matcher matcherTagStyle = patternTagStyle.matcher(styleContent);
+    if (!matcherTagStyle.find()) {
+      styleContent = StringUtility.join("", styleContent, htmlTag + "{}");
+    }
+    // extract style for the given HTML tag
+    matcherTagStyle = patternTagStyle.matcher(styleContent);
+    matcherTagStyle.find();
+    String preTagStyleContent = matcherTagStyle.group(1);
+    String tagStyleContent = StringUtility.trim(StringUtility.nvl(matcherTagStyle.group(2), ""));
+    String postTagStyleContent = matcherTagStyle.group(3);
+
+    // check if combined font formatting is configured. If so, do not change style definition to not loose custom style definition.
+    if (tagStyleContent.contains("font:")) {
+      return rawHtml;
+    }
+
     // assemble font formatting
     String fontFamily = defaultFont.getFamiliesConcatenated();
     // font-family
-    if (fontFamily != null && !StringUtility.contains(bodyStyleContent, "font-family")) {
-      if (StringUtility.hasText(bodyStyleContent) && !bodyStyleContent.endsWith(";")) {
-        bodyStyleContent += ";";
+    if (fontFamily != null && !StringUtility.contains(tagStyleContent, "font-family")) {
+      if (StringUtility.hasText(tagStyleContent) && !tagStyleContent.endsWith(";")) {
+        tagStyleContent += ";";
       }
-      bodyStyleContent += "font-family:" + defaultFont.getFamiliesConcatenated() + ";";
+      tagStyleContent += "font-family:" + defaultFont.getFamiliesConcatenated() + ";";
     }
     // font-size
     int fontSize = defaultFont.getSize();
-    if (fontSize > 0 && !StringUtility.contains(bodyStyleContent, "font-size")) {
-      if (StringUtility.hasText(bodyStyleContent) && !bodyStyleContent.endsWith(";")) {
-        bodyStyleContent += ";";
+    if (fontSize > 0 && !StringUtility.contains(tagStyleContent, "font-size")) {
+      if (StringUtility.hasText(tagStyleContent) && !tagStyleContent.endsWith(";")) {
+        tagStyleContent += ";";
       }
-      bodyStyleContent += "font-size:" + StringUtility.join("", String.valueOf(defaultFont.getSize()), defaultFont.getSizeUnit()) + ";";
+      tagStyleContent += "font-size:" + StringUtility.join("", String.valueOf(defaultFont.getSize()), defaultFont.getSizeUnit()) + ";";
     }
     // foreground color
-    if (!StringUtility.contains(bodyStyleContent, "[\\s;]color:")) {
-      if (StringUtility.hasText(bodyStyleContent) && !bodyStyleContent.endsWith(";")) {
-        bodyStyleContent += ";";
+    if (!StringUtility.contains(tagStyleContent, "[\\s;]color:")) {
+      if (StringUtility.hasText(tagStyleContent) && !tagStyleContent.endsWith(";")) {
+        tagStyleContent += ";";
       }
       String fgHex = Integer.toHexString(defaultFont.getForegroundColor());
-      bodyStyleContent += "color:#" + StringUtility.lpad(fgHex, "0", 6) + ";";
+      tagStyleContent += "color:#" + StringUtility.lpad(fgHex, "0", 6) + ";";
     }
-    styleContent = (preBodyStyleContent + bodyStyleContent + postBodyStyleContent);
-  
+    styleContent = (preTagStyleContent + tagStyleContent + postTagStyleContent);
+
     // replace style definition
     matcherStyleTag = createMatcherForTag(rawHtml, "style", false);
     matcherStyleTag.find();
