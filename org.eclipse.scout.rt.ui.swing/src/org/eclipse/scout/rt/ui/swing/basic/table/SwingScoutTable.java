@@ -185,10 +185,17 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       }
     });
     m_swingScrollPane.getViewport().addMouseListener(new P_SwingEmptySpaceMouseListener());
-    //ticket 87030
+    //ticket 87030, bug 365161
     m_swingScrollPane.addComponentListener(new ComponentAdapter() {
+      private int m_oldHeight = -1;
+
       @Override
       public void componentResized(ComponentEvent e) {
+        int newHeight = e.getComponent().getHeight();
+        if (m_oldHeight >= 0 && m_oldHeight == newHeight) {
+          return;
+        }
+        m_oldHeight = newHeight;
         ITable t = getScoutObject();
         if (t != null && t.isScrollToSelection()) {
           if (e.getComponent().isShowing()) {
