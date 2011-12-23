@@ -22,13 +22,13 @@ import javax.swing.SwingUtilities;
 import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
 
 /**
- * 1. Root pane with lazy size validation (minSize, maxSize) When minSize or
- * maxSize is not respected correctRootPaneSize() is called Also when
- * preferredSize is not met, correctRootPaneSize is called
+ * Root pane with lazy size validation (minSize, maxSize)
  * <p>
- * 2. Fixed bug in JRootPane.RootLayout.maximumSize uses min(widths) instead of max(widths)
+ * When minSize or maxSize or preferred height is not respected then {@link #reflow()} is called.
  * <p>
- * 3. Support for transparency by providing {@link ScreenCapture}
+ * Only the dimension that needs resize is changed (width, height).
+ * <p>
+ * https://bugs.eclipse.org/bugs/show_bug.cgi?id=363148
  */
 public class JRootPaneEx extends JRootPane {
   private static final long serialVersionUID = 1L;
@@ -76,8 +76,14 @@ public class JRootPaneEx extends JRootPane {
                         Math.min(Math.max(d.width, sizes[0].width), sizes[2].width),
                         Math.min(Math.max(d.height, sizes[0].height), sizes[2].height)
                         );
-      if (minMaxSize.width != d.width || minMaxSize.height != d.height || sizes[1].width != d.width || sizes[1].height != d.height) {
-        correctRootPaneSize(minMaxSize.width - d.width, minMaxSize.height - d.height, sizes[1].width - d.width, sizes[1].height - d.height);
+      int dw = minMaxSize.width - d.width;
+      int dh = minMaxSize.height - d.height;
+      int dwPref = sizes[1].width - d.width;
+      int dhPref = sizes[1].height - d.height;
+      //OLD: if (dw != 0 || dh != 0 || dwPref != 0 || dhPref != 0) {
+      //NEW: only force re-pack when the  in/max range is not met, forcing preferred size breaks the bugs https://bugs.eclipse.org/bugs/show_bug.cgi?id=363148 and tickets 107768, 106554
+      if (dw != 0 || dh != 0) {
+        correctRootPaneSize(dw, dh, dwPref, dhPref);
       }
     }
   }
