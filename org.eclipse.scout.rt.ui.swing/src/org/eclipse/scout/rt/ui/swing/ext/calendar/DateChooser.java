@@ -270,8 +270,7 @@ public class DateChooser {
     m_monthLabel = createCenterLabel(null);
     m_monthLabel.setFont(UIManager.getFont("Calendar.monthYear.font"));
     m_monthLabel.setForeground(UIManager.getColor("Calendar.monthYear.foreground"));
-    m_monthLabel.setBackground(UIManager.getColor("Calendar.monthYear.background"));
-    m_monthLabel.setOpaque(true);
+    m_monthLabel.setOpaque(false);
     headerPanel.add(m_monthLabel);
     //
     headerPanel.add(SwingUtility.createGlue(0, 0, true, false));
@@ -1013,18 +1012,18 @@ public class DateChooser {
     else if (m_displayMode == DISPLAY_MODE_WEEK) {
       // Calculate Startdate; go back to 1st day of week (1=sunday)
       c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - m_firstDayOfWeek + 7) % 7));
-      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
+      m_monthLabel.setText(new SimpleDateFormat("MMMMM yyyy", Locale.getDefault()).format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
     }
     else if (m_displayMode == DISPLAY_MODE_WORKWEEK) {
       c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY + 7) % 7));
-      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
+      m_monthLabel.setText(new SimpleDateFormat("MMMMM yyyy", Locale.getDefault()).format(vd) + " - " + SwingUtility.getNlsText("Week") + " " + weekNo);
     }
     else if (m_displayMode == DISPLAY_MODE_MONTH) {
       // Calculate Startdate; go back to 1st of month, then back to 1st day of
       // week (1=sunday)
       c.add(Calendar.DAY_OF_MONTH, -(c.get(Calendar.DAY_OF_MONTH) - 1));
       c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - m_firstDayOfWeek + 7) % 7));
-      m_monthLabel.setText(new SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(vd));
+      m_monthLabel.setText(new SimpleDateFormat("MMMMM yyyy", Locale.getDefault()).format(vd));
     }
     Date newViewDateStart = truncDate(c.getTime());
     c.add(Calendar.DATE, m_cell.length * m_cell[0].length);

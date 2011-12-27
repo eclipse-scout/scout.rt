@@ -48,7 +48,7 @@ public class DateTimeFormatFactory {
   }
 
   private String removeYear(String s) {
-    return s.replace("[/-,. ]*[y]+[/-,.]*", "").trim();
+    return s.replaceAll("[/\\-,. ]*[y]+[/\\-,.]*", "").trim();
   }
 
 }

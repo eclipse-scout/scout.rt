@@ -30,6 +30,7 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -253,7 +254,15 @@ public class LargeCalendarCell extends AbstractCalendarCell {
     else {
       m_weekLabel = "";
     }
-    DateFormat fmt = new DateTimeFormatFactory().getDayMonth(DateFormat.LONG);
+    DateFormat fmt = DateFormat.getDateInstance(DateFormat.LONG);
+    if (fmt instanceof SimpleDateFormat) {
+      String pattern = ((SimpleDateFormat) fmt).toPattern();
+      //remove year
+      pattern = pattern.replaceAll("[/\\-,. ]*[y]+[/\\-,.]*", "").trim();
+      //MMM instead of MMMMM
+      pattern = pattern.replaceAll("[M]+", "MMM").trim();
+      ((SimpleDateFormat) fmt).applyPattern(pattern);
+    }
     m_dateLabel = fmt.format(m_repDate);
     m_dayLabel = "" + c.get(Calendar.DATE);
     // gui
@@ -590,8 +599,7 @@ public class LargeCalendarCell extends AbstractCalendarCell {
         r.width = (int) (cc.getX1() * w) - r.x;
         r.y = yTimed + (int) (cc.getFromRelative() * hTimed / intervalMillis);
         r.height = yTimed + (int) (cc.getToRelative() * hTimed / intervalMillis) - r.y;
-        if (r.height <= 4)
-         {
+        if (r.height <= 4) {
           r.height = 4;// minimum height
         }
       }
