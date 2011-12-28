@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,77 +14,44 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.border.AbstractBorder;
 
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
 import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 
 /**
- * section with property "expanded", similar to swt section
+ * A Section component with property "expanded".
+ * <p>
+ * Similar to the swt Section component.
+ * <p>
+ * The component consists of a button (line) and a body. The button is transparented out on the bottom when the section
+ * is expanded.
  */
 public class JSection extends JPanel {
   private static final long serialVersionUID = 1L;
+  private static final int VERTICAL_GAP = 2;
 
-  private static final Color TEXT_COLOR = new Color(0x316ac5);
-  private static final Color ROLLOVER_COLOR = new Color(0x7fa9f0);
-  private static final Color BORDER_COLOR = new Color(0xb2cbf6);
-  private static final Color BACKGROUND_COLOR = new Color(0xe5edfc);
-
-  private JButtonEx m_button;
-  private JPanelEx m_body;
+  private final JButton m_button;
+  private final JPanel m_body;
   private boolean m_expandable = true;
   private boolean m_expanded = true;
 
   public JSection(Component comp) {
     setOpaque(false);
-    m_button = new JButtonEx() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      protected void paintComponent(Graphics g) {
-        // background
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setPaint(new GradientPaint(0, 2, BACKGROUND_COLOR, 0, 20, new Color(0xffffff & BACKGROUND_COLOR.getRGB(), true), false));
-        g2d.fillRect(2, 2, getWidth() - 4, getHeight() - 4);
-        super.paintComponent(g);
-      }
-    };
-    m_button.setOpaque(false);
-    m_button.setFocusable(false);
-    m_button.setBorder(new ButtonBorder());
-    m_button.setContentAreaFilled(false);
-    m_button.setHorizontalAlignment(SwingConstants.LEADING);
-    m_button.setFocusPainted(false);
-    m_button.setRolloverEnabled(true);
-    m_button.setIcon(new ExpandedIcon(TEXT_COLOR));
-    m_button.setRolloverIcon(new ExpandedIcon(ROLLOVER_COLOR));
-    m_button.setForeground(TEXT_COLOR);
-    m_button.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseEntered(MouseEvent e) {
-        m_button.setForeground(ROLLOVER_COLOR);
-      }
-
-      @Override
-      public void mouseExited(MouseEvent e) {
-        m_button.setForeground(TEXT_COLOR);
-      }
-    });
+    m_button = createButton();
+    m_button.setIcon(new ExpandedIcon(m_button.getForeground()));
+    m_button.setRolloverIcon(new ExpandedIcon(m_button.getForeground()));
     m_button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -99,6 +66,54 @@ public class JSection extends JPanel {
     setLayout(new Layout());
     add(m_button);
     add(m_body);
+  }
+
+  protected JButton createButton() {
+    JButton button = new JButtonEx() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      protected void paintComponent(Graphics g) {
+        if (isExpanded()) {
+          int w = getWidth();
+          int h = getHeight();
+          int expandedExcessHeight = getInsets().bottom;
+          g.setClip(0, 0, w, h - expandedExcessHeight);
+          super.paintComponent(g);
+          g.setClip(0, 0, w, h);
+          Graphics2D g2d = (Graphics2D) g;
+          //If expanded, cut off the second bottom part. Layout added an extra bottom part to cut off.
+          // find bg color
+          Component tmp = getParent();
+          while (tmp != null && !tmp.isOpaque()) {
+            tmp = tmp.getParent();
+          }
+          int backgroundRGB = (tmp != null ? tmp.getBackground() : Color.white).getRGB() & 0xffffff;
+          // clear area
+          for (int y = 0; y <= expandedExcessHeight; y++) {
+            int f = Math.min(0xff, 0x100 * y / expandedExcessHeight);
+            g2d.setColor(new Color((0x01000000 * f) | backgroundRGB, true));
+            g2d.drawLine(0, h - expandedExcessHeight - expandedExcessHeight + y, w, h - expandedExcessHeight - expandedExcessHeight + y);
+          }
+          g2d.setColor(new Color(0xff000000 | backgroundRGB, true));
+          g2d.fillRect(0, h - expandedExcessHeight, w, expandedExcessHeight);
+          //narrow clip again
+          g.setClip(0, 0, w, h - expandedExcessHeight);
+        }
+        else {
+          super.paintComponent(g);
+        }
+      }
+
+      @Override
+      public void paint(Graphics g) {
+        super.paint(g);
+      }
+    };
+    button.setVerticalAlignment(SwingConstants.TOP);
+    button.setHorizontalAlignment(SwingConstants.LEADING);
+    button.setFocusPainted(false);
+    return button;
   }
 
   public JComponent getContentPane() {
@@ -120,9 +135,10 @@ public class JSection extends JPanel {
   public void setExpandable(boolean expandable) {
     if (m_expandable != expandable) {
       m_expandable = expandable;
-      m_button.setIcon(m_expandable ? new ExpandedIcon(TEXT_COLOR) : null);
-      m_button.setRolloverIcon(m_expandable ? new ExpandedIcon(ROLLOVER_COLOR) : null);
+      m_button.setIcon(m_expandable ? new ExpandedIcon(m_button.getForeground()) : null);
+      m_button.setRolloverIcon(m_expandable ? new ExpandedIcon(m_button.getForeground()) : null);
       firePropertyChange("expandable", !m_expandable, m_expandable);
+      repaint();
     }
   }
 
@@ -135,11 +151,11 @@ public class JSection extends JPanel {
       m_expanded = expanded;
       m_body.setVisible(m_expanded);
       firePropertyChange("expanded", !m_expanded, m_expanded);
+      repaint();
     }
   }
 
   private class Layout extends AbstractLayoutManager2 {
-
     @Override
     protected void validateLayout(Container parent) {
     }
@@ -147,13 +163,13 @@ public class JSection extends JPanel {
     @Override
     protected Dimension getLayoutSize(Container parent, int sizeflag) {
       Dimension d = new Dimension();
-      d.height = 20 + 4;
-      d.width = m_button.getPreferredSize().width;
-      Dimension tmp = SwingLayoutUtility.getValidatedSize(m_body, sizeflag);
-      // use width of box in any case
-      d.width = Math.max(d.width, tmp.width);
+      Dimension buttonSize = m_button.getPreferredSize();
+      Dimension bodySize = SwingLayoutUtility.getValidatedSize(m_body, sizeflag);
+      d.width = Math.max(buttonSize.width, bodySize.width);
+      d.height = buttonSize.height;
       if (isExpanded()) {
-        d.height += tmp.height;
+        d.height += 4;
+        d.height += bodySize.height;
       }
       Insets insets = parent.getInsets();
       d.width += insets.left + insets.right;
@@ -165,9 +181,15 @@ public class JSection extends JPanel {
     public void layoutContainer(Container parent) {
       Insets insets = parent.getInsets();
       Dimension size = parent.getSize();
-      m_button.setBounds(insets.left, insets.top, size.width - insets.left - insets.right, 20);
+      int buttonHeight = m_button.getPreferredSize().height;
       if (isExpanded()) {
-        m_body.setBounds(insets.left, insets.top + 24, size.width - insets.left - insets.right, size.height - insets.top - insets.bottom - 24);
+        //make button larger by excess height to cut it off
+        int expandedExcessHeight = m_button.getInsets().bottom;
+        m_button.setBounds(insets.left, insets.top, size.width - insets.left - insets.right, buttonHeight + expandedExcessHeight);
+        m_body.setBounds(insets.left, insets.top + 4 + buttonHeight, size.width - insets.left - insets.right, size.height - insets.top - insets.bottom - 4 - buttonHeight);
+      }
+      else {
+        m_button.setBounds(insets.left, insets.top, size.width - insets.left - insets.right, buttonHeight);
       }
     }
   }
@@ -219,60 +241,4 @@ public class JSection extends JPanel {
     }
   }
 
-  private class ButtonBorder extends AbstractBorder {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public Insets getBorderInsets(Component c) {
-      return getBorderInsets(c, new Insets(0, 0, 0, 0));
-    }
-
-    @Override
-    public Insets getBorderInsets(Component c, Insets insets) {
-      insets.top = 3;
-      insets.left = 3;
-      insets.bottom = 0;
-      insets.right = 3;
-      return insets;
-    }
-
-    @Override
-    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-      Graphics2D g2d = (Graphics2D) g;
-      g2d.translate(x, y);
-      g2d.setClip(new Rectangle(0, 0, width, height));
-      // blue
-      g2d.setPaint(new GradientPaint(0, 0, BORDER_COLOR, 0, 20, new Color(0xffffff & BORDER_COLOR.getRGB(), true), false));
-      g2d.drawRoundRect(0, 0, width - 1, height + 10, 8, 8);
-      // white
-      g2d.setPaint(new GradientPaint(0, 0, new Color(0xffffffff, true), 0, 20, new Color(0x00ffffff, true), false));
-      g2d.drawRoundRect(1, 1, width - 3, height + 10, 8, 8);
-      //
-      g2d.translate(-x, -y);
-    }
-  }
-
-  // unit test
-  // public static void main(String[] args){
-  // JFrame f=new JFrame();
-  // f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-  // ((JComponent)f.getContentPane()).setBorder(new EmptyBorder(10, 10, 10, 10));
-  // f.getContentPane().setBackground(Color.white);
-  // //
-  // JSection s1=new JSection(new JScrollPaneEx(new JTable(new DefaultTableModel())));
-  // s1.setText("First");
-  // JSection s2=new JSection(new JScrollPaneEx(new JTable(new DefaultTableModel())));
-  // s2.setText("Second");
-  // s2.setExpanded(false);
-  // JSection s3=new JSection(new JScrollPaneEx(new JTable(new DefaultTableModel())));
-  // s3.setText("Third");
-  // //
-  // Box pane=Box.createVerticalBox();
-  // pane.add(s1);
-  // pane.add(s2);
-  // pane.add(s3);
-  // f.getContentPane().add(pane, BorderLayout.CENTER);
-  // f.pack();
-  // f.setVisible(true);
-  // }
 }
