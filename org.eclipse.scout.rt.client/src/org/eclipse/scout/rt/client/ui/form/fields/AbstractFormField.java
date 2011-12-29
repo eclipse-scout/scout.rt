@@ -156,7 +156,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * 
    * @since 17.11.2009
    */
-  @ConfigProperty(ConfigProperty.INTEGER)
+  @ConfigProperty(ConfigProperty.LABEL_POSITION)
   @Order(15)
   @ConfigPropertyValue("LABEL_POSITION_DEFAULT")
   protected int getConfiguredLabelPosition() {
@@ -180,7 +180,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * @return negative for left, 0 for center and positive for right,
    *         LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of ui
    */
-  @ConfigProperty(ConfigProperty.INTEGER)
+  @ConfigProperty(ConfigProperty.LABEL_HORIZONTAL_ALIGNMENT)
   @Order(17)
   @ConfigPropertyValue("LABEL_HORIZONTAL_ALIGNMENT_DEFAULT")
   protected int getConfiguredLabelHorizontalAlignment() {

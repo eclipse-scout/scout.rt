@@ -189,4 +189,12 @@ public @interface ConfigProperty {
    * Long, Integer, Byte
    */
   String PRIMITIVE_TYPE = "PRIMITIVE_TYPE";
+  /**
+   * Position of the label of a form field.
+   */
+  String LABEL_POSITION = "LABEL_POSITION";
+  /**
+   * Horizontal alignment of the label of a form field.
+   */
+  String LABEL_HORIZONTAL_ALIGNMENT = "LABEL_HORIZONTAL_ALIGNMENT";
 }
