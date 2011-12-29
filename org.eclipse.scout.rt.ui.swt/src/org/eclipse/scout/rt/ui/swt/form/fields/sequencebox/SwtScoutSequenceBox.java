@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
-import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
@@ -51,7 +50,7 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
       ISwtScoutFormField swtFormField = getEnvironment().createFormField(fieldContainer, scoutField);
 
       ILabelComposite childLabel = null;
-      if (swtFormField.getScoutObject() instanceof ICheckBox) {
+      if (swtFormField instanceof ISwtScoutCheckbox) {
         childLabel = ((ISwtScoutCheckbox) swtFormField).getPlaceholderLabel();
       }
       else {
