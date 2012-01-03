@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.stringfield;
 import java.net.URL;
 
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
@@ -233,7 +234,10 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
      * bsi ticket 95042
      */
     if (validValue != null && !isMultilineText()) {
-      validValue = validValue.replaceAll("[\\n\\r]", " ");
+      // omit leading and trailing newlines
+      validValue = StringUtility.trimNewLines(validValue);
+      // replace newlines by spaces
+      validValue = validValue.replaceAll("\r\n", " ").replaceAll("[\r\n]", " ");
     }
     return validValue;
   }

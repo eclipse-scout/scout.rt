@@ -278,3 +278,13 @@ However, the wrapped type must not necessarily be serializable to also be used a
 Solution:
 Changed BeanArrayHolder to implement Serializable. This only applies to the holder, not the wrapped type.
 Migration: None
+
+03.01.2012 dwi
+Bugzilla: 367507
+Problem:
+I having a single line textfield (getConfiguredMultilineText=false), leading and trailing newlines should not be replaced by spaces but omitted insted.
+Solution:
+Leading and trailing newlines are trimmed prior to replacing them by spaces.
+Plug-Ins changed:
+org.eclipse.scout.commons [StringUtility], org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#P_SwingDocumentFilter], org.eclipse.scout.rt.client [SwingScoutTextFieldComposite]
+Migration: None

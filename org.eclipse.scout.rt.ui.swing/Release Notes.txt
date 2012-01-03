@@ -487,3 +487,13 @@ Solution:
 The configured format is applied immediately to the entered text.
 Plug-In changed: org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#P_SwingDocumentFilter]
 Migration: None
+
+03.01.2012 dwi
+Bugzilla: 367507
+Problem:
+I having a single line textfield (getConfiguredMultilineText=false), leading and trailing newlines should not be replaced by spaces but omitted insted.
+Solution:
+Leading and trailing newlines are trimmed prior to replacing them by spaces.
+Plug-Ins changed:
+org.eclipse.scout.commons [StringUtility], org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#P_SwingDocumentFilter], org.eclipse.scout.rt.client [SwingScoutTextFieldComposite]
+Migration: None

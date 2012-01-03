@@ -718,3 +718,13 @@ Excluded BooleanFields from the computation of the compound label.
 Migration:
 - Since the checkbox is excluded the label of the next field is considered for the compound label.
   So if you use sequenceboxes which contain a checkbox and another field you may want to override execIsLabelSuffixCandidate and return false so that no label suffix is created and only the sequencebox label is shown.
+
+03.01.2012 dwi
+Bugzilla: 367507
+Problem:
+I having a single line textfield (getConfiguredMultilineText=false), leading and trailing newlines should not be replaced by spaces but omitted insted.
+Solution:
+Leading and trailing newlines are trimmed prior to replacing them by spaces.
+Plug-Ins changed:
+org.eclipse.scout.commons [StringUtility], org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#P_SwingDocumentFilter], org.eclipse.scout.rt.client [SwingScoutTextFieldComposite]
+Migration: None

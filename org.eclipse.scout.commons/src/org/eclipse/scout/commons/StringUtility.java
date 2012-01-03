@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.nls.NlsUtility;
 
 public final class StringUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StringUtility.class);
+  public static final Pattern PATTERN_TRIM_NEWLINES = Pattern.compile("^[\r\n]*(.*?)[\r\n]*$", Pattern.DOTALL);
 
   public static interface ITagProcessor {
     String/* tagReplacement */processTag(String tagName, String tagContent);
@@ -1039,6 +1040,23 @@ public final class StringUtility {
       return null;
     }
     return s.trim();
+  }
+
+  /**
+   * Returns a copy of the {@link String} with leading and trailing newlines omitted.
+   * 
+   * @param s
+   * @return
+   */
+  public static String trimNewLines(String s) {
+    if (s == null) {
+      return null;
+    }
+    Matcher matcher = PATTERN_TRIM_NEWLINES.matcher(s);
+    if (matcher.find()) {
+      s = matcher.group(1);
+    }
+    return s;
   }
 
   public static String lpad(String s, String fill, int len) {

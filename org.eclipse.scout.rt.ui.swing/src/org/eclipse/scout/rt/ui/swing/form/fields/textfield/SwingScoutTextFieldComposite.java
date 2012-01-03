@@ -490,7 +490,10 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
         s = s.toLowerCase();
       }
       if (!m_multilineText) {
-        s = s.replaceAll("\\n\\r", " ").replaceAll("[\\n\\r]", " ");
+        // omit leading and trailing newlines
+        s = StringUtility.trimNewLines(s);
+        // replace newlines by spaces
+        s = s.replaceAll("\r\n", " ").replaceAll("[\r\n]", " ");
       }
       return s;
     }
