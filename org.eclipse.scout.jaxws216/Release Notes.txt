@@ -155,3 +155,6 @@ Solution:
 a) changed JAX-WS resource loading to also look in subfolders for existing resources
 b) WS provider specific WSDL files should be located in the folder '/WEB-INF/wsdl/provider' whereas consumer specific WSDL files in '/WEB-INF/wsdl/consumer'. In turn, JAX-WS is instrumented to ignore all the files in the (sub-)folder '/WEB-INF/wsdl/consumer' when publishing the endpoints.
 c) WSDL file is not put into the JAR archive anymore when building the webservice stub.
+Migration:
+- Use Scout SDK (repair actions) to move WSDL files of webservice providers into folder '/WEB-INF/wsdl/provider' and of webservice consumer into folder '/WEB-INF/wsdl/consumers'
+- Rebuild webservice stubs (should automatically be done if using repair action)
