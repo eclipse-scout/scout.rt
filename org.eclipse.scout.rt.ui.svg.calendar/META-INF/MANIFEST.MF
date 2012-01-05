@@ -12,3 +12,7 @@ Require-Bundle: org.eclipse.scout.rt.client;visibility:=reexport,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .
+Export-Package: org.eclipse.scout.rt.ui.svg.calendar,
+ org.eclipse.scout.rt.ui.svg.calendar.builder,
+ org.eclipse.scout.rt.ui.svg.calendar.builder.listener,
+ org.eclipse.scout.rt.ui.svg.calendar.comp
