@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -23,7 +23,6 @@ package org.eclipse.scout.jaxws.tool;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -245,7 +244,7 @@ public class JaxWsStubGenerator {
 
       // create JAR-archive
       if (createJarFile) {
-        createJarArchive(stubOutDir, outDir, jarFileName, wsdlLocation);
+        createJarArchive(stubOutDir, outDir, jarFileName);
       }
 
       logInfo("JAX-WS stub generation completed. For debugging purpose, please see the following debug output.");
@@ -278,7 +277,7 @@ public class JaxWsStubGenerator {
     }
   }
 
-  private static void createJarArchive(File tempOutDir, String outDirPath, String jarFileName, String wsdlLocation) {
+  private static void createJarArchive(File tempOutDir, String outDirPath, String jarFileName) {
     if (jarFileName == null) {
       return;
     }
@@ -303,9 +302,6 @@ public class JaxWsStubGenerator {
       fileWriter.write("Manifest-Version: 1.0");
       fileWriter.flush();
       fileWriter.close();
-
-      // copy WSDL file into temporary directory to also be bundled with the JAR-file as expected by JAX-WS.
-      JaxWsStubGenerator.copyWsdlFileToTempDir(wsdlLocation, tempOutDir);
 
       FileUtility.compressArchive(tempOutDir, jarFile);
 
@@ -378,20 +374,6 @@ public class JaxWsStubGenerator {
       }
     }
     return files.toArray(new File[files.size()]);
-  }
-
-  private static void copyWsdlFileToTempDir(String wsdlLocation, File tempOutDir) {
-    try {
-      File wsdlFolder = new File(tempOutDir, "WEB-INF/wsdl/");
-      wsdlFolder.mkdirs();
-
-      byte[] content = IOUtility.getContent(wsdlLocation);
-      File wsdlFile = new File(wsdlFolder, new Path(wsdlLocation).lastSegment());
-      IOUtility.writeContent(new FileOutputStream(wsdlFile), content, true);
-    }
-    catch (Throwable t) {
-      logError("Failed to copy WSDL file into JAR-archive", t);
-    }
   }
 
   /**

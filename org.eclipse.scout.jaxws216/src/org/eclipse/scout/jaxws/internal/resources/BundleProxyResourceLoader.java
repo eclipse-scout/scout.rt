@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -61,7 +61,7 @@ public class BundleProxyResourceLoader implements ResourceLoader {
     public Set<String> resolve(Bundle bundle) throws ResourceNotFoundException {
       Set<String> paths = new HashSet<String>();
 
-      // Collect resources of bundle and its attached fragmentsl
+      // Collect resources of bundle and its attached fragments
       Enumeration entries = m_bundle.findEntries(m_path, "*", false);
       if (entries == null || !entries.hasMoreElements()) {
         throw new ResourceNotFoundException();
@@ -69,13 +69,27 @@ public class BundleProxyResourceLoader implements ResourceLoader {
 
       while (entries.hasMoreElements()) {
         URL url = (URL) entries.nextElement();
-        if (url != null && !url.getPath().matches("^.+/\\..+/$")) { // skip hidden files, e.g. /WEB-INF/wsdl/.svn/
-          if (isValidXml(url)) {
-            paths.add(url.getPath());
-          }
-          else {
-            LOG.info("Resource '" + url.getPath() + "' skipped for webservice resource as file is corrupt or does not contain valid XML. [bundle=" + m_bundle.getSymbolicName() + "]");
-          }
+        if (url == null) {
+          continue;
+        }
+        // Skip hidden files like /WEB-INF/wsdl/.svn/
+        if (url.getPath().matches("^.+/\\..+/$")) {
+          continue;
+        }
+        // Skip files in webservice consumer folder as they might interfere with webservice provider files.
+        // E.g. if having a consumer WSDL file whose service or port is the very same as from a provider to be published. See @{link EndpointFactory#findPrimary(List)}.
+        if (url.getPath().endsWith("/consumer/")) {
+          continue;
+        }
+
+        if (url.getPath().endsWith("/")) { // to support sub-folders. In turn, JAX-WS recursively browses those folders in @{link DeploymentDescriptorParser#collectDocs(String)} by calling this resolver anew.
+          paths.add(url.getPath());
+        }
+        else if (isValidXml(url)) {
+          paths.add(url.getPath());
+        }
+        else {
+          LOG.info("Resource '" + url.getPath() + "' skipped for webservice resource as file is corrupt or does not contain valid XML. [bundle=" + m_bundle.getSymbolicName() + "]");
         }
       }
       if (paths.size() > 0) {

@@ -145,3 +145,13 @@ Migration:
   3) Change DateAdapter to DefaultTimezoneDateAdapter or if applicable, use another one
   4) Rebuild affected webservice stubs
 
+06.01.2012 dwi
+Bugzilla: 367994
+Problem:
+a) The WSDL file of webservice providers whose WSDL file is located in a sub-folder of '/WEB-INF/wsdl' is dynamically generated at JAX-WS bootstrap instead of the existing WSDL file to be published.
+b) Webservice consumer specific WSDL files might interfere with provider specific WSDL files, e.g. if defining same services or ports. In consequence, all webservice providers of that plugin are not published.
+c) redundant WSDL file in webservice stub JAR-file.
+Solution:
+a) changed JAX-WS resource loading to also look in subfolders for existing resources
+b) WS provider specific WSDL files should be located in the folder '/WEB-INF/wsdl/provider' whereas consumer specific WSDL files in '/WEB-INF/wsdl/consumer'. In turn, JAX-WS is instrumented to ignore all the files in the (sub-)folder '/WEB-INF/wsdl/consumer' when publishing the endpoints.
+c) WSDL file is not put into the JAR archive anymore when building the webservice stub.
