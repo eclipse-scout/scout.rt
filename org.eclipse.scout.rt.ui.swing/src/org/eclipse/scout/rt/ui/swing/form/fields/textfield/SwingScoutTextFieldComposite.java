@@ -103,13 +103,18 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
 
   @Override
   protected void attachScout() {
-    super.attachScout();
     IStringField f = getScoutObject();
     setDecorationLinkFromScout(f.isDecorationLink());
     setFormatFromScout(f.getFormat());
     setMaxLengthFromScout(f.getMaxLength());
     setValidateOnAnyKeyFromScout(f.isValidateOnAnyKey());
     setMultilineTextFromScout(f.isMultilineText());
+
+    // supercall must come after reading model properties to have P_SwingDocumentFilter initialized.
+    // That is because in super call, the display text is set which in turn is intercepted by document filter
+    // to ensure proper text format.
+    super.attachScout();
+
     setSelectionFromScout();
     updateDragTransferTypesFromScout();
     updateDropTransferTypesFromScout();

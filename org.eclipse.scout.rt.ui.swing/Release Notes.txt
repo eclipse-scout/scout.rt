@@ -497,3 +497,15 @@ Leading and trailing newlines are trimmed prior to replacing them by spaces.
 Plug-Ins changed:
 org.eclipse.scout.commons [StringUtility], org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#P_SwingDocumentFilter], org.eclipse.scout.rt.client [SwingScoutTextFieldComposite]
 Migration: None
+
+03.01.2012 dwi
+Bugzilla: 367507
+Problem:
+The text format is lost when loading the initial text of an editiable cell. That is because of ticket 367507 where newlines for single-line text fields are removed.
+However, this is not about a bug of ticket 367507 but rather due to wrong initialization sequence in SwingScoutTextFieldComposite#attachScout.
+The bug occurs because the display text is set prior to the model properties be read which in turn are used by the Document filter to ensure proper text format.
+Solution:
+Changed initialization sequence to first read model properties before setting the display text.
+Plug-Ins changed:
+org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#attachScout]
+Migration: None
