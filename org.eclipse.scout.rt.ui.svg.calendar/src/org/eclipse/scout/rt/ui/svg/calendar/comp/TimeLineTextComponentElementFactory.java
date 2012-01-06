@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
-import org.eclipse.scout.rt.ui.svg.calendar.CalendarSvgHelper;
+import org.eclipse.scout.rt.ui.svg.calendar.CalendarSvgUtility;
 import org.eclipse.scout.svg.client.SVGUtility;
 import org.w3c.dom.Element;
 
@@ -24,8 +24,8 @@ public class TimeLineTextComponentElementFactory extends TimeLineComponentElemen
     float y = parentDimension.y + (parentDimension.height / 2.0f) + TEXT_Y_OFFSET;
 
     txt.setTextContent(c.getLabel(day));
-    CalendarSvgHelper.setTextPos(txt, x, y);
-    CalendarSvgHelper.setTextAlignCenter(txt);
+    CalendarSvgUtility.setTextPos(txt, x, y);
+    CalendarSvgUtility.setTextAlignCenter(txt);
 
     return txt;
   }

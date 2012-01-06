@@ -4,11 +4,12 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import org.apache.batik.util.SVGConstants;
+import org.eclipse.scout.commons.StringUtility;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.svg.SVGStylable;
 
-public final class CalendarSvgHelper {
+public final class CalendarSvgUtility {
   public final static String COLOR_PREFIX = "#";
 
   private static String ensureColorPrefix(String color) {
@@ -65,18 +66,6 @@ public final class CalendarSvgHelper {
     css.getStyle().setProperty(SVGConstants.CSS_FONT_SIZE_PROPERTY, "" + size, "");
   }
 
-/*
-  public static float getFontSize(Element element) {
-    SVGStylable css = (SVGStylable) element;
-    String fontSize = css.getStyle().getPropertyValue(SVGConstants.CSS_FONT_SIZE_PROPERTY);
-    try {
-      return Float.parseFloat(fontSize);
-    }
-    catch (NumberFormatException e) {
-      return 0.0f;
-    }
-  }
-*/
   public static void setFontColor(Element element, String color) {
     SVGStylable css = (SVGStylable) element;
     css.getStyle().setProperty(SVGConstants.CSS_FILL_PROPERTY, ensureColorPrefix(color), "");
@@ -139,8 +128,6 @@ public final class CalendarSvgHelper {
       return null;
     }
     int rgb = c.getRGB() & 0xffffff;
-    String zeros = "000000";
-    String data = Integer.toHexString(rgb);
-    return (zeros.substring(data.length()) + data);
+    return StringUtility.lpad(Integer.toHexString(rgb), "0", 6);
   }
 }

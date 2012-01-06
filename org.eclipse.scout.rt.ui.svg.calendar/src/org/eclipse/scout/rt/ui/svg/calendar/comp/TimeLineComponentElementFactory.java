@@ -25,22 +25,30 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
   private static final int START_HOUR = 7;
   private static final int END_HOUR = 19;
   private static final float PADDING = 1.5f;
-  private static final float MIN_ELEMENT_HEIGHT = 10.0f;
-  private static final float FIRST_DAY_X_OFFSET = 37.0f;
 
+  // defines the minimal height of an calendar element to ensure it can be clicked even if the linear duration scale would be smaller
+  private static final float MIN_ELEMENT_HEIGHT = 10.0f;
+
+  // Start value must be higher than the end value to ensure that end events always come first.
+  // this is important when calendar component ends at 12:00 and the next starts at 12:00
+  // if the start event would be first in the event list, then an overlap of the events would be detected.
+  // ensuring that the end event always comes first, allows us to display elements in one column if they happen serialized.
   private static final Integer EVENT_START = new Integer(2);
   private static final Integer EVENT_END = new Integer(1);
 
+  /**
+   * helper class to store meta data to a calendar component.
+   */
   private static class CalendarComponentComposite {
+    private Integer index; // defines in which column index the element will be positioned.
+    private CalendarComponent comp;
+    private Calendar start, end;
+
     private CalendarComponentComposite(CalendarComponent c, Calendar s, Calendar e) {
       comp = c;
       start = s;
       end = e;
     }
-
-    private Integer index;
-    private CalendarComponent comp;
-    private Calendar start, end;
   }
 
   @Override
@@ -124,7 +132,7 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
   private Element createComponentElement(Element container, SvgRect containerDimension, CalendarComponentComposite c,
       int numColumns, int numFullDay, HashSet<CalendarComponentComposite> list, Date day) {
 
-    Element newEl = createNewComponentElement(container, c.comp);
+    Element newEl = createNewComponentElement(container, c.comp, day);
     Element composite = container.getOwnerDocument().createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_G_TAG);
 
     SvgRect elementDimension = getCopyWithPadding(getTimeLineElementDimension(c, list, containerDimension, numColumns, numFullDay), PADDING);

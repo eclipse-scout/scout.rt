@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.svg.calendar.Activator;
-import org.eclipse.scout.rt.ui.svg.calendar.CalendarSvgHelper;
+import org.eclipse.scout.rt.ui.svg.calendar.CalendarSvgUtility;
 import org.eclipse.scout.rt.ui.svg.calendar.builder.listener.CalendarDocumentEvent;
 import org.eclipse.scout.rt.ui.svg.calendar.builder.listener.ICalendarDocumentListener;
 import org.eclipse.scout.rt.ui.svg.calendar.comp.IComponentElementFactory;
@@ -46,8 +46,9 @@ public abstract class AbstractCalendarDocumentBuilder {
   private final static float MIN_FONT_SIZE = 8; // min font size (calendar will scale the text based on the UI size until down to this min value)
   private final static float ORIG_FONT_SIZE = 12; // font size at 100%
   private final static float MAX_FONT_SIZE = 23; // max font size (calendar will scale the text based on the UI size until up to this max value)
+  private final static int NUM_TIME_LINE_ROWS = 15; // how many timeline rows exist (7:00-18:00, earlier, later, full day row)
+
   protected final static int NUM_DAYS_IN_WEEK = 7;
-  private final static int NUM_TIME_LINE_ROWS = 15;
 
   private final static String LINK_NEXT_SMALL = "http://local/arrow/nextSmall";
   private final static String LINK_NEXT_BIG = "http://local/arrow/nextBig";
@@ -63,14 +64,14 @@ public abstract class AbstractCalendarDocumentBuilder {
   private final static String LINK_DISPLAY_MODE_PREFIX = "http://local/displayMode/";
   private final static String LINK_GRID_PREFIX = "http://local/grid/";
 
-  private final static String COLOR_LINKS = CalendarSvgHelper.COLOR_PREFIX + "67a8ce";
-  private final static String COLOR_BLACK = CalendarSvgHelper.COLOR_PREFIX + "000000";
-  private final static String COLOR_WHITE = CalendarSvgHelper.COLOR_PREFIX + "ffffff";
-  private final static String COLOR_FOREIGN_MONTH_BACKGROUND = CalendarSvgHelper.COLOR_PREFIX + "eeeeee";
-  private final static String COLOR_TIME_LINE = CalendarSvgHelper.COLOR_PREFIX + "cccccc";
+  private final static String COLOR_LINKS = CalendarSvgUtility.COLOR_PREFIX + "67a8ce";
+  private final static String COLOR_BLACK = CalendarSvgUtility.COLOR_PREFIX + "000000";
+  private final static String COLOR_WHITE = CalendarSvgUtility.COLOR_PREFIX + "ffffff";
+  private final static String COLOR_FOREIGN_MONTH_BACKGROUND = CalendarSvgUtility.COLOR_PREFIX + "eeeeee";
+  private final static String COLOR_TIME_LINE = CalendarSvgUtility.COLOR_PREFIX + "cccccc";
   private final static String COLOR_MONTH_BACKGROUND = COLOR_WHITE;
   private final static String COLOR_SELECTED_DAY_BORDER = COLOR_BLACK;
-  private final static String COLOR_NOT_SELECTED_DAY_BORDER = CalendarSvgHelper.COLOR_PREFIX + "c0c0c0";
+  private final static String COLOR_NOT_SELECTED_DAY_BORDER = CalendarSvgUtility.COLOR_PREFIX + "c0c0c0";
 
   private final SVGDocument m_doc;
 
@@ -145,10 +146,17 @@ public abstract class AbstractCalendarDocumentBuilder {
     m_elMovePrevSmall = m_doc.getElementById("prevMonth");
     m_elGridBox = getGridElements("b", getNumWeekdays(), getNumWeeks());
     m_elGridText = getGridElements("t", getNumWeekdays(), getNumWeeks());
-    m_elWeekDayHeadings = new Element[]{m_doc.getElementById("Mo"), m_doc.getElementById("Tu"), m_doc.getElementById("We"),
-        m_doc.getElementById("Th"), m_doc.getElementById("Fr"), m_doc.getElementById("Sa"), m_doc.getElementById("So")};
-    m_elDisplayMode = new Element[]{m_doc.getElementById("displayModeDay"), m_doc.getElementById("displayModeWorkWeek"),
-        m_doc.getElementById("displayModeWeek"), m_doc.getElementById("displayModeMonth")};
+    m_elWeekDayHeadings = new Element[]{m_doc.getElementById("Mo"),
+        m_doc.getElementById("Tu"),
+        m_doc.getElementById("We"),
+        m_doc.getElementById("Th"),
+        m_doc.getElementById("Fr"),
+        m_doc.getElementById("Sa"),
+        m_doc.getElementById("So")};
+    m_elDisplayMode = new Element[]{m_doc.getElementById("displayModeDay"),
+        m_doc.getElementById("displayModeWorkWeek"),
+        m_doc.getElementById("displayModeWeek"),
+        m_doc.getElementById("displayModeMonth")};
     m_elMenuContainer = m_doc.getElementById("MenuLayer");
     m_elTimeLineGrid = getGridElements("tlg", getNumWeekdays(), NUM_TIME_LINE_ROWS);
     m_elTimeLineTexts = new Element[NUM_TIME_LINE_ROWS];
@@ -158,24 +166,24 @@ public abstract class AbstractCalendarDocumentBuilder {
     m_displayModeTextWidth = new float[m_elDisplayMode.length];
 
     // set fonts
-    CalendarSvgHelper.setFont(m_elTitle, FONT);
+    CalendarSvgUtility.setFont(m_elTitle, FONT);
     visitGrid(m_elGridText, new IGridVisitor() {
       @Override
       public void visit(Element element, int weekday, int week) {
         if (element != null) {
-          CalendarSvgHelper.setFont(element, FONT);
+          CalendarSvgUtility.setFont(element, FONT);
         }
       }
     });
     if (hasTimeLine()) {
       for (int i = 0; i < m_elTimeLineTexts.length; i++) {
         if (m_elTimeLineTexts[i] != null) {
-          CalendarSvgHelper.setFont(m_elTimeLineTexts[i], FONT);
+          CalendarSvgUtility.setFont(m_elTimeLineTexts[i], FONT);
         }
       }
     }
-    CalendarSvgHelper.setFontWeightBold(m_elTitle);
-    CalendarSvgHelper.setTextAlignCenter(m_elTitle);
+    CalendarSvgUtility.setFontWeightBold(m_elTitle);
+    CalendarSvgUtility.setTextAlignCenter(m_elTitle);
 
     // init elements
     SVGUtility.addHyperlink(m_elMoveNextBig, LINK_NEXT_BIG);
@@ -298,11 +306,11 @@ public abstract class AbstractCalendarDocumentBuilder {
     for (int i = 0; i < m_elDisplayMode.length; i++) {
       Element e = m_elDisplayMode[i];
       e.setTextContent(m_displayModeLabels[i]);
-      CalendarSvgHelper.setFontWeightNormal(e);
-      CalendarSvgHelper.setFont(e, FONT);
-      CalendarSvgHelper.setFontSize(e, ORIG_FONT_SIZE);
-      CalendarSvgHelper.setFontColor(e, COLOR_LINKS);
-      CalendarSvgHelper.setCalendarDisplayModeXPos(e, xPos);
+      CalendarSvgUtility.setFontWeightNormal(e);
+      CalendarSvgUtility.setFont(e, FONT);
+      CalendarSvgUtility.setFontSize(e, ORIG_FONT_SIZE);
+      CalendarSvgUtility.setFontColor(e, COLOR_LINKS);
+      CalendarSvgUtility.setCalendarDisplayModeXPos(e, xPos);
       m_displayModeTextWidth[i] = xPos; // remember the original text position to apply scaling later on.
 
       SVGUtility.addHyperlink(e, LINK_DISPLAY_MODE_PREFIX + linkMenuIds[i]);
@@ -327,8 +335,7 @@ public abstract class AbstractCalendarDocumentBuilder {
       visitGrid(m_elGridBox, new IGridVisitor() {
         @Override
         public void visit(Element element, int x, int y) {
-          for (int i = 0; i < m_elTimeLineGrid.length; i++)
-          {
+          for (int i = 0; i < m_elTimeLineGrid.length; i++) {
             SVGUtility.addHyperlink(m_elTimeLineGrid[i][x], getGridClickUrl(x, y));
           }
         }
@@ -358,9 +365,9 @@ public abstract class AbstractCalendarDocumentBuilder {
       Element e = m_elWeekDayHeadings[i];
       if (e != null) {
         e.setTextContent(label);
-        CalendarSvgHelper.setFontWeightBold(e);
-        CalendarSvgHelper.setTextAlignCenter(e);
-        CalendarSvgHelper.setFont(e, FONT);
+        CalendarSvgUtility.setFontWeightBold(e);
+        CalendarSvgUtility.setTextAlignCenter(e);
+        CalendarSvgUtility.setFont(e, FONT);
       }
     }
   }
@@ -370,14 +377,14 @@ public abstract class AbstractCalendarDocumentBuilder {
     final float newFontSize = ORIG_FONT_SIZE / ratio;
 
     // title
-    CalendarSvgHelper.setFontSize(m_elTitle, newFontSize);
+    CalendarSvgUtility.setFontSize(m_elTitle, newFontSize);
 
     // calendar grid
     visitGrid(m_elGridText, new IGridVisitor() {
       @Override
       public void visit(Element element, int weekday, int week) {
         if (element != null) {
-          CalendarSvgHelper.setFontSize(element, newFontSize);
+          CalendarSvgUtility.setFontSize(element, newFontSize);
         }
       }
     });
@@ -385,29 +392,29 @@ public abstract class AbstractCalendarDocumentBuilder {
     // week day heading
     for (Element e : m_elWeekDayHeadings) {
       if (e != null) {
-        CalendarSvgHelper.setFontSize(e, newFontSize);
+        CalendarSvgUtility.setFontSize(e, newFontSize);
       }
     }
 
     // all texts in the components container
-    for (Element e : CalendarSvgHelper.getAllChildElements(m_elComponentsContainer, SVGConstants.SVG_TEXT_TAG)) {
-      CalendarSvgHelper.setFontSize(e, newFontSize);
-      CalendarSvgHelper.setFont(e, FONT);
+    for (Element e : CalendarSvgUtility.getAllChildElements(m_elComponentsContainer, SVGConstants.SVG_TEXT_TAG)) {
+      CalendarSvgUtility.setFontSize(e, newFontSize);
+      CalendarSvgUtility.setFont(e, FONT);
     }
 
     // time line texts
     if (hasTimeLine()) {
       for (Element e : m_elTimeLineTexts) {
         if (e != null) {
-          CalendarSvgHelper.setFontSize(e, newFontSize);
+          CalendarSvgUtility.setFontSize(e, newFontSize);
         }
       }
     }
 
     // display mode links (font size and position)
     for (int i = 0; i < m_elDisplayMode.length; i++) {
-      CalendarSvgHelper.setFontSize(m_elDisplayMode[i], newFontSize);
-      CalendarSvgHelper.setCalendarDisplayModeXPos(m_elDisplayMode[i], m_displayModeTextWidth[i] / ratio);
+      CalendarSvgUtility.setFontSize(m_elDisplayMode[i], newFontSize);
+      CalendarSvgUtility.setCalendarDisplayModeXPos(m_elDisplayMode[i], m_displayModeTextWidth[i] / ratio);
     }
   }
 
@@ -464,35 +471,32 @@ public abstract class AbstractCalendarDocumentBuilder {
   }
 
   private void fireCalendarDocumentEvent(CalendarDocumentEvent event) {
-    ICalendarDocumentListener[] a = m_listenerList.getListeners(ICalendarDocumentListener.class);
-    if (a != null && a.length > 0) {
-      for (int i = 0; i < a.length; i++) {
-        try {
-          switch (event.type) {
-            case CalendarDocumentEvent.TYPE_POPUP_MENU_ACTIVATED: {
-              a[i].popupMenuActivated();
-              break;
-            }
-            case CalendarDocumentEvent.TYPE_SELECTION_CHANGED: {
-              a[i].selectionChanged(event.selectedDate, event.selectedComponent);
-              break;
-            }
-            case CalendarDocumentEvent.TYPE_VISIBLE_RANGE_CHANGED: {
-              a[i].visibleRangeChanged(event.startDate, event.endDate);
-              break;
-            }
-            case CalendarDocumentEvent.TYPE_DISPLAY_MODE_MENU_ACTIVATED: {
-              a[i].displayModeMenuActivated(event.displayMode);
-              break;
-            }
-            default: {
-              throw new InvalidParameterException(event.type + " is no valid event type.");
-            }
+    for (ICalendarDocumentListener l : m_listenerList.getListeners(ICalendarDocumentListener.class)) {
+      try {
+        switch (event.type) {
+          case CalendarDocumentEvent.TYPE_POPUP_MENU_ACTIVATED: {
+            l.popupMenuActivated();
+            break;
+          }
+          case CalendarDocumentEvent.TYPE_SELECTION_CHANGED: {
+            l.selectionChanged(event.selectedDate, event.selectedComponent);
+            break;
+          }
+          case CalendarDocumentEvent.TYPE_VISIBLE_RANGE_CHANGED: {
+            l.visibleRangeChanged(event.startDate, event.endDate);
+            break;
+          }
+          case CalendarDocumentEvent.TYPE_DISPLAY_MODE_MENU_ACTIVATED: {
+            l.displayModeMenuActivated(event.displayMode);
+            break;
+          }
+          default: {
+            throw new InvalidParameterException(event.type + " is no valid calendar document event type.");
           }
         }
-        catch (Exception ex) {
-          LOG.error("Calendar document listener error", ex);
-        }
+      }
+      catch (Exception ex) {
+        LOG.error("Calendar document listener error", ex);
       }
     }
   }
@@ -543,7 +547,7 @@ public abstract class AbstractCalendarDocumentBuilder {
           if (dayTitle != null) {
             textElement.setTextContent(dayTitle);
           }
-          CalendarSvgHelper.setTextAlignCenter(textElement);
+          CalendarSvgUtility.setTextAlignCenter(textElement);
         }
 
         // Background color
@@ -556,11 +560,11 @@ public abstract class AbstractCalendarDocumentBuilder {
         }
         if (hasTimeLine()) {
           for (int i = 0; i < m_elTimeLineGrid.length; i++) {
-            CalendarSvgHelper.setBackgroundColor(m_elTimeLineGrid[i][wd], bgColor);
+            CalendarSvgUtility.setBackgroundColor(m_elTimeLineGrid[i][wd], bgColor);
           }
         }
         else {
-          CalendarSvgHelper.setBackgroundColor(gridElement, bgColor);
+          CalendarSvgUtility.setBackgroundColor(gridElement, bgColor);
         }
 
         // tag data
@@ -682,7 +686,7 @@ public abstract class AbstractCalendarDocumentBuilder {
 
   private void refreshComponents(HashMap<Date, HashSet<CalendarComponent>> map) {
     // remove all old components from the components layer
-    CalendarSvgHelper.clearChildNodes(m_elComponentsContainer);
+    CalendarSvgUtility.clearChildNodes(m_elComponentsContainer);
 
     for (Entry<Date, HashSet<CalendarComponent>> e : map.entrySet()) {
       Point p = getPosition(e.getKey());
@@ -722,7 +726,7 @@ public abstract class AbstractCalendarDocumentBuilder {
 
   private void setBorder(Element element, boolean selected) {
     SVGStylable css = (SVGStylable) element;
-    CalendarSvgHelper.setBorderColor(element, selected ? COLOR_SELECTED_DAY_BORDER : COLOR_NOT_SELECTED_DAY_BORDER);
+    CalendarSvgUtility.setBorderColor(element, selected ? COLOR_SELECTED_DAY_BORDER : COLOR_NOT_SELECTED_DAY_BORDER);
     css.getStyle().setProperty(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "2", "");
   }
 
@@ -764,7 +768,7 @@ public abstract class AbstractCalendarDocumentBuilder {
   }
 
   private void refreshContextMenu() {
-    CalendarSvgHelper.clearChildNodes(m_elMenuContainer);
+    CalendarSvgUtility.clearChildNodes(m_elMenuContainer);
     if (getNumContextMenus() > 0) {
       // rectangle
       final float[] rectDimensions = new float[]{/*x=*/525.181f, /*y=*/448.693f,/*w=*/25.819f,/*h=*/25.819f};// dimensions of the context menu box (as defined in the svg file)
@@ -773,8 +777,8 @@ public abstract class AbstractCalendarDocumentBuilder {
       rect.setAttribute(SVGConstants.SVG_Y_ATTRIBUTE, "" + rectDimensions[1]);
       rect.setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "" + rectDimensions[2]);
       rect.setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "" + rectDimensions[3]);
-      CalendarSvgHelper.setBorderColor(rect, COLOR_BLACK);
-      CalendarSvgHelper.setBackgroundColor(rect, COLOR_WHITE);
+      CalendarSvgUtility.setBorderColor(rect, COLOR_BLACK);
+      CalendarSvgUtility.setBackgroundColor(rect, COLOR_WHITE);
       m_elMenuContainer.appendChild(rect);
       SVGUtility.addHyperlink(rect, LINK_CONTEXT_MENU);
 

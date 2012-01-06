@@ -1,8 +1,11 @@
 package org.eclipse.scout.rt.ui.svg.calendar.comp;
 
+import java.util.Date;
+
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
-import org.eclipse.scout.rt.ui.svg.calendar.CalendarSvgHelper;
+import org.eclipse.scout.rt.ui.svg.calendar.CalendarSvgUtility;
+import org.eclipse.scout.svg.client.SVGUtility;
 import org.w3c.dom.Element;
 
 public abstract class AbstractComponentElementFactory implements IComponentElementFactory {
@@ -38,15 +41,20 @@ public abstract class AbstractComponentElementFactory implements IComponentEleme
     return ret;
   }
 
-  protected Element createNewComponentElement(Element template, CalendarComponent c) {
+  protected Element createNewComponentElement(Element template, CalendarComponent c, Date day) {
     Element newEl = (Element) template.cloneNode(false);
+
+    // Tooltip
+    Element title = template.getOwnerDocument().createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_TITLE_TAG);
+    title.setTextContent(c.getTooltip(day));
+    newEl.appendChild(title);
 
     // ID
     newEl.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, "comp" + c.getItem().getId());
 
     // background and border
-    CalendarSvgHelper.removeBorder(newEl);
-    CalendarSvgHelper.setBackgroundColor(newEl, c.getItem().getColor(), getSelectedComponent() == c);
+    CalendarSvgUtility.removeBorder(newEl);
+    CalendarSvgUtility.setBackgroundColor(newEl, c.getItem().getColor(), getSelectedComponent() == c);
 
     return newEl;
   }
