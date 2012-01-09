@@ -73,11 +73,15 @@ public class ResetColumnsMenu extends AbstractMenu {
     }
 
     @Override
-    protected void execAction() {
+    protected void execAction() throws ProcessingException {
       try {
         m_table.setTableChanging(true);
         //
         m_table.resetColumnVisibilities();
+        ITableCustomizer cst = m_table.getTableCustomizer();
+        if (cst != null) {
+          cst.removeAllColumns();
+        }
       }
       finally {
         m_table.setTableChanging(false);
