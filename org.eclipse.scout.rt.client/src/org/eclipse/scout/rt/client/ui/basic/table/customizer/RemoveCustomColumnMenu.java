@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.security.DeleteCustomColumnPermission;
 
 public class RemoveCustomColumnMenu extends AbstractMenu {
   private final ITable m_table;
@@ -28,6 +29,11 @@ public class RemoveCustomColumnMenu extends AbstractMenu {
   @Override
   protected String getConfiguredText() {
     return ScoutTexts.get("RemoveCustomColumnMenu");
+  }
+
+  @Override
+  protected void execInitAction() throws ProcessingException {
+    setVisiblePermission(new DeleteCustomColumnPermission());
   }
 
   @Override
