@@ -17,6 +17,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -43,6 +44,7 @@ public class JSection extends JPanel {
   private static final int VERTICAL_GAP = 2;
 
   private final JButton m_button;
+  private final JPanel m_head;
   private final JPanel m_body;
   private boolean m_expandable = true;
   private boolean m_expanded = true;
@@ -59,57 +61,21 @@ public class JSection extends JPanel {
       }
     });
     //
+    m_head = new JPanelEx(new HeadLayout());
+    m_head.setOpaque(false);
+    m_head.add(m_button);
+    //
     m_body = new JPanelEx(new SingleLayout());
     m_body.setOpaque(false);
     m_body.add(comp);
     //
-    setLayout(new Layout());
-    add(m_button);
+    setLayout(new SectionLayout());
+    add(m_head);
     add(m_body);
   }
 
   protected JButton createButton() {
-    JButton button = new JButtonEx() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      protected void paintComponent(Graphics g) {
-        if (isExpanded()) {
-          int w = getWidth();
-          int h = getHeight();
-          int expandedExcessHeight = getInsets().bottom;
-          g.setClip(0, 0, w, h - expandedExcessHeight);
-          super.paintComponent(g);
-          g.setClip(0, 0, w, h);
-          Graphics2D g2d = (Graphics2D) g;
-          //If expanded, cut off the second bottom part. Layout added an extra bottom part to cut off.
-          // find bg color
-          Component tmp = getParent();
-          while (tmp != null && !tmp.isOpaque()) {
-            tmp = tmp.getParent();
-          }
-          int backgroundRGB = (tmp != null ? tmp.getBackground() : Color.white).getRGB() & 0xffffff;
-          // clear area
-          for (int y = 0; y <= expandedExcessHeight; y++) {
-            int f = Math.min(0xff, 0x100 * y / expandedExcessHeight);
-            g2d.setColor(new Color((0x01000000 * f) | backgroundRGB, true));
-            g2d.drawLine(0, h - expandedExcessHeight - expandedExcessHeight + y, w, h - expandedExcessHeight - expandedExcessHeight + y);
-          }
-          g2d.setColor(new Color(0xff000000 | backgroundRGB, true));
-          g2d.fillRect(0, h - expandedExcessHeight, w, expandedExcessHeight);
-          //narrow clip again
-          g.setClip(0, 0, w, h - expandedExcessHeight);
-        }
-        else {
-          super.paintComponent(g);
-        }
-      }
-
-      @Override
-      public void paint(Graphics g) {
-        super.paint(g);
-      }
-    };
+    JButton button = new SectionButton();
     button.setVerticalAlignment(SwingConstants.TOP);
     button.setHorizontalAlignment(SwingConstants.LEADING);
     button.setFocusPainted(false);
@@ -151,11 +117,91 @@ public class JSection extends JPanel {
       m_expanded = expanded;
       m_body.setVisible(m_expanded);
       firePropertyChange("expanded", !m_expanded, m_expanded);
+      m_head.revalidate();
       repaint();
     }
   }
 
-  private class Layout extends AbstractLayoutManager2 {
+  private class SectionButton extends JButtonEx {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected void paintComponent(Graphics g) {
+      if (isExpanded()) {
+        int w = getWidth();
+        int h = getHeight();
+        int expandedExcessHeight = getInsets().bottom;
+        Rectangle oldClip = g.getClipBounds();
+        Rectangle narrowedClip = oldClip.intersection(new Rectangle(0, 0, w, h - expandedExcessHeight));
+        g.setClip(narrowedClip);
+        super.paintComponent(g);
+        g.setClip(oldClip);
+        Graphics2D g2d = (Graphics2D) g;
+        //If expanded, cut off the second bottom part. Layout added an extra bottom part to cut off.
+        // find bg color
+        Component tmp = getParent();
+        while (tmp != null && !tmp.isOpaque()) {
+          tmp = tmp.getParent();
+        }
+        int backgroundRGB = (tmp != null ? tmp.getBackground() : Color.white).getRGB() & 0xffffff;
+        // clear area
+        for (int y = 0; y <= expandedExcessHeight; y++) {
+          int f = Math.min(0xff, 0x100 * y / expandedExcessHeight);
+          g2d.setColor(new Color((0x01000000 * f) | backgroundRGB, true));
+          g2d.drawLine(0, h - expandedExcessHeight - expandedExcessHeight + y, w, h - expandedExcessHeight - expandedExcessHeight + y);
+        }
+        g2d.setColor(new Color(0xff000000 | backgroundRGB, true));
+        g2d.fillRect(0, h - expandedExcessHeight, w, expandedExcessHeight);
+        //narrow clip again
+        g.setClip(narrowedClip);
+      }
+      else {
+        super.paintComponent(g);
+      }
+    }
+  }
+
+  /**
+   * Layout head and body panel
+   */
+  private class SectionLayout extends AbstractLayoutManager2 {
+    @Override
+    protected void validateLayout(Container parent) {
+    }
+
+    @Override
+    protected Dimension getLayoutSize(Container parent, int sizeflag) {
+      Dimension d = new Dimension();
+      Dimension headSize = m_head.getPreferredSize();
+      Dimension bodySize = SwingLayoutUtility.getValidatedSize(m_body, sizeflag);
+      d.width = Math.max(headSize.width, bodySize.width);
+      d.height = headSize.height;
+      if (isExpanded()) {
+        d.height += 4;
+        d.height += bodySize.height;
+      }
+      Insets insets = parent.getInsets();
+      d.width += insets.left + insets.right;
+      d.height += insets.top + insets.bottom;
+      return d;
+    }
+
+    @Override
+    public void layoutContainer(Container parent) {
+      Insets insets = parent.getInsets();
+      Dimension size = parent.getSize();
+      int headHeight = m_head.getPreferredSize().height;
+      m_head.setBounds(insets.left, insets.top, size.width - insets.left - insets.right, headHeight);
+      if (isExpanded()) {
+        m_body.setBounds(insets.left, insets.top + 4 + headHeight, size.width - insets.left - insets.right, size.height - insets.top - insets.bottom - 4 - headHeight);
+      }
+    }
+  }
+
+  /**
+   * Layout head button with excess space for border manipulationa and fade-out
+   */
+  private class HeadLayout extends AbstractLayoutManager2 {
     @Override
     protected void validateLayout(Container parent) {
     }
@@ -164,13 +210,8 @@ public class JSection extends JPanel {
     protected Dimension getLayoutSize(Container parent, int sizeflag) {
       Dimension d = new Dimension();
       Dimension buttonSize = m_button.getPreferredSize();
-      Dimension bodySize = SwingLayoutUtility.getValidatedSize(m_body, sizeflag);
-      d.width = Math.max(buttonSize.width, bodySize.width);
+      d.width = buttonSize.width;
       d.height = buttonSize.height;
-      if (isExpanded()) {
-        d.height += 4;
-        d.height += bodySize.height;
-      }
       Insets insets = parent.getInsets();
       d.width += insets.left + insets.right;
       d.height += insets.top + insets.bottom;
@@ -186,7 +227,6 @@ public class JSection extends JPanel {
         //make button larger by excess height to cut it off
         int expandedExcessHeight = m_button.getInsets().bottom;
         m_button.setBounds(insets.left, insets.top, size.width - insets.left - insets.right, buttonHeight + expandedExcessHeight);
-        m_body.setBounds(insets.left, insets.top + 4 + buttonHeight, size.width - insets.left - insets.right, size.height - insets.top - insets.bottom - 4 - buttonHeight);
       }
       else {
         m_button.setBounds(insets.left, insets.top, size.width - insets.left - insets.right, buttonHeight);
