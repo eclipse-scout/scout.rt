@@ -134,27 +134,29 @@ public class SqlFormatter {
   }
 
   private void formatStatement(Statement stm, FormatContext ctx) {
-    for (IToken t : stm.getChildren()) {
-      if (t instanceof Statement) {
-        formatStatement((Statement) t, ctx);
-      }
-      else if (t instanceof SingleStatement) {
-        formatSingleStatement((SingleStatement) t, ctx);
-      }
-      else if (t instanceof BracketExpr) {
-        formatBracketExpr((BracketExpr) t, ctx);
-      }
-      else if (t instanceof UnionToken) {
-        formatDefault(t, ctx);
-        ctx.println();
-      }
-      else if (t instanceof Unparsed) {
-        ctx.println("*** UNPARSED ***");
-        formatDefault(t, ctx);
-        ctx.println();
-      }
-      else {
-        formatDefault(t, ctx);
+    if (stm != null) {
+      for (IToken t : stm.getChildren()) {
+        if (t instanceof Statement) {
+          formatStatement((Statement) t, ctx);
+        }
+        else if (t instanceof SingleStatement) {
+          formatSingleStatement((SingleStatement) t, ctx);
+        }
+        else if (t instanceof BracketExpr) {
+          formatBracketExpr((BracketExpr) t, ctx);
+        }
+        else if (t instanceof UnionToken) {
+          formatDefault(t, ctx);
+          ctx.println();
+        }
+        else if (t instanceof Unparsed) {
+          ctx.println("*** UNPARSED ***");
+          formatDefault(t, ctx);
+          ctx.println();
+        }
+        else {
+          formatDefault(t, ctx);
+        }
       }
     }
   }
