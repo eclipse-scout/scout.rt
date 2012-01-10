@@ -182,7 +182,7 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
     }
     getHyperlinkGroup().add(hyperlink);
     adapt(hyperlink);
-    hyperlink.addListener(SWT.KeyDown, new P_HyperlinkKeyListener());
+//XXX rap    hyperlink.addListener(SWT.KeyDown, new P_HyperlinkKeyListener());
     return hyperlink;
   }
 
@@ -191,18 +191,18 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
 
     @Override
     public void handleEvent(Event event) {
-      if (event.type == SWT.KeyDown) {
-        switch (event.keyCode) {
-          case SWT.TAB:
-            //XXX rap
-            //int traversal = SWT.TRAVERSE_TAB_NEXT;
-            //if ((event.stateMask & SWT.SHIFT) != 0) {
-            //  traversal = SWT.TRAVERSE_TAB_PREVIOUS;
-            //}
-            //((Control) event.widget).traverse(traversal);
-            break;
-        }
-      }
+      //XXX rap
+//      if (event.type == SWT.KeyDown) {
+//        switch (event.keyCode) {
+//          case SWT.TAB:
+//            int traversal = SWT.TRAVERSE_TAB_NEXT;
+//            if ((event.stateMask & SWT.SHIFT) != 0) {
+//              traversal = SWT.TRAVERSE_TAB_PREVIOUS;
+//            }
+//            ((Control) event.widget).traverse(traversal);
+//            break;
+//        }
+//      }
     }
   }
 }

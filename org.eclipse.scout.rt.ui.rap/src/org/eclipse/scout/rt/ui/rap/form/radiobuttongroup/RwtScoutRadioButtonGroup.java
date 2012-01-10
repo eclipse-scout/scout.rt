@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.radiobuttongroup.layout.RadioButtonGroupLayout;
+import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -45,14 +46,20 @@ public class RwtScoutRadioButtonGroup extends RwtScoutValueFieldComposite<IRadio
     int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
     StatusLabelEx label = new StatusLabelEx(container, labelStyle);
     getUiEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
-    Composite buttonArea = new P_RadioButtonComposite(container);// getEnvironment().getFormToolkit().createComposite(container);
+    Composite buttonArea = new P_RadioButtonComposite(container);
     getUiEnvironment().getFormToolkit().adapt(buttonArea);
     for (IFormField scoutField : getScoutObject().getFields()) {
       IRwtScoutFormField uiField = getUiEnvironment().createFormField(buttonArea, scoutField);
       if (uiField.getUiField() instanceof Button) {
         Button uiButton = (Button) uiField.getUiField();
         uiButton.addListener(SWT.Selection, m_uiButtonListener);
-        uiButton.addListener(SWT.KeyDown, m_uiButtonListener);
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_DOWN));
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_RIGHT));
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_UP));
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_LEFT));
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.HOME));
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.END));
+
         m_uiRadioButtons.add(uiButton);
         if (uiButton.getSelection()) {
           buttonArea.setTabList(new Control[]{uiButton.getParent()});
@@ -100,9 +107,6 @@ public class RwtScoutRadioButtonGroup extends RwtScoutValueFieldComposite<IRadio
           Button button = (Button) event.widget;
           handleSelectionChanged(button);
           break;
-        case SWT.KeyDown:
-          handleKeyDown(event);
-          break;
       }
     }
 
@@ -110,9 +114,17 @@ public class RwtScoutRadioButtonGroup extends RwtScoutValueFieldComposite<IRadio
       getUiField().setTabList(new Control[]{selectedButton.getParent()});
     }
 
-    private void handleKeyDown(Event event) {
-      int index = m_uiRadioButtons.indexOf(event.widget);
-      switch (event.keyCode) {
+  } // end class P_RwtButtonKeyListener
+
+  private class P_KeyStroke extends RwtKeyStroke {
+    public P_KeyStroke(int keyCode) {
+      super(keyCode);
+    }
+
+    @Override
+    public void handleUiAction(Event e) {
+      int index = m_uiRadioButtons.indexOf(e.widget);
+      switch (e.keyCode) {
         case SWT.ARROW_DOWN:
         case SWT.ARROW_RIGHT:
           index++;
@@ -132,7 +144,7 @@ public class RwtScoutRadioButtonGroup extends RwtScoutValueFieldComposite<IRadio
       index = index % m_uiRadioButtons.size();
       m_uiRadioButtons.get(index).setFocus();
     }
-  } // end class P_RwtButtonKeyListener
+  }
 
   private class P_RadioButtonComposite extends Composite {
     private static final long serialVersionUID = 1L;

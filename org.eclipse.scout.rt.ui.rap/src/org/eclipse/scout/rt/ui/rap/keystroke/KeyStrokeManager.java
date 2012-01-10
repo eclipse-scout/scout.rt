@@ -62,7 +62,6 @@ public class KeyStrokeManager implements IKeyStrokeManager {
       @Override
       public void handleEvent(final Event event) {
         if (event.keyCode > 0 && event.display != null) {
-          System.out.println("Listener KeyCode: int: " + event.keyCode + " char: " + (char) event.keyCode);
           event.display.asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -78,7 +77,6 @@ public class KeyStrokeManager implements IKeyStrokeManager {
       @Override
       public void keyPressed(final KeyEvent e) {
         if (e.keyCode > 0 && e.display != null) {
-          System.out.println("Adapter KeyCode: int: " + e.keyCode + " char: " + (char) e.keyCode);
           e.display.asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -96,7 +94,6 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     synchronized (m_globalKeyStrokeListLock) {
       m_globalKeyStrokes.add(stroke);
       updateGlobalActiveKeys();
-//      updateActiveKeys();
     }
   }
 
@@ -105,7 +102,6 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     synchronized (m_globalKeyStrokeListLock) {
       boolean retVal = m_globalKeyStrokes.remove(stroke);
       updateGlobalActiveKeys();
-//      updateActiveKeys();
       return retVal;
     }
   }
@@ -178,25 +174,6 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     return keyStrokes;
   }
 
-//  private void updateActiveKeys() {
-//    Set<String> activeKeys = new HashSet<String>(m_globalKeyStrokes.size());
-//
-//    for (IRwtKeyStroke stroke : m_globalKeyStrokes) {
-//      String activeKey = resolveActiveKey(stroke);
-//
-//      activeKeys.add(activeKey);
-//    }
-//
-//    for (Entry<Widget, List<String>> entry : m_widgetKeys.entrySet()) {
-//      for (String activeKey : entry.getValue()) {
-//        activeKeys.add(activeKey);
-//      }
-//    }
-//
-//    String[] activeKeyArray = activeKeys.toArray(new String[activeKeys.size()]);
-//    m_environment.getDisplay().setData(RWT.ACTIVE_KEYS, activeKeyArray);
-//  }
-
   private void updateGlobalActiveKeys() {
     Set<String> activeKeys = new HashSet<String>(m_globalKeyStrokes.size());
 
@@ -257,19 +234,6 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     eventCopy.widget = e.widget;
 
     handleKeyEventHierarchical(eventCopy, e.display.getFocusControl());
-    if (eventCopy.doit) {
-      // handle global key strokes
-      if (isGlobalKeyStrokesActivated()) {
-        for (IRwtKeyStroke keyStroke : getGlobalKeyStrokes()) {
-          if (keyStroke.getKeyCode() == eventCopy.keyCode && keyStroke.getStateMask() == eventCopy.stateMask) {
-            keyStroke.handleUiAction(eventCopy);
-            if (!eventCopy.doit) {
-              break;
-            }
-          }
-        }
-      }
-    }
     e.doit = eventCopy.doit;
   }
 
@@ -298,7 +262,6 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     eventCopy.width = event.width;
     eventCopy.x = event.x;
     eventCopy.y = event.y;
-    handleKeyEventHierarchical(eventCopy, event.display.getFocusControl());
     if (eventCopy.doit) {
       // handle global key strokes
       if (isGlobalKeyStrokesActivated()) {

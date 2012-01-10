@@ -46,7 +46,6 @@ public abstract class AbstractTableKeyboardNavigationSupport {
   private final TableEx m_uiTable;
   private Listener m_uiTableListener;
   private int m_contextColumnIndex;
-  private static final int EVENT_TYPE_KEY = SWT.KeyDown;
 
   private DisposeListener m_disposeListener = new DisposeListener() {
     private static final long serialVersionUID = 1L;
@@ -82,7 +81,8 @@ public abstract class AbstractTableKeyboardNavigationSupport {
 
       m_uiTableListener = new P_TableListener();
       m_uiTable.addListener(SWT.MouseDown, m_uiTableListener);
-      m_uiTable.addListener(EVENT_TYPE_KEY, m_uiTableListener);
+// sle 20120110: in webui this should be made in the client. it is to costly to go to the server with every keypress
+//      m_uiTable.addListener(SWT.KeyDown, m_uiTableListener);
     }
     m_uiTable.addDisposeListener(m_disposeListener);
   }
@@ -91,7 +91,8 @@ public abstract class AbstractTableKeyboardNavigationSupport {
     if (m_uiTableListener != null) {
       if (!m_uiTable.isDisposed()) {
         m_uiTable.removeListener(SWT.MouseDown, m_uiTableListener);
-        m_uiTable.removeListener(EVENT_TYPE_KEY, m_uiTableListener);
+// sle 20120110: in webui this should be made in the client. it is to costly to go to the server with every keypress
+//        m_uiTable.removeListener(SWT.KeyDown, m_uiTableListener);
       }
       m_uiTableListener = null;
     }
@@ -197,11 +198,13 @@ public abstract class AbstractTableKeyboardNavigationSupport {
     public void handleEvent(Event event) {
       if (event.doit) {
         switch (event.type) {
-          case EVENT_TYPE_KEY:
-            if ((event.stateMask == 0 || event.stateMask == SWT.SHIFT) && Character.isLetter((char) event.keyCode) && (event.keyCode != SWT.KEYPAD_CR)) {//XXX RAP does not no the difference between KEYPAD_CR and CR
-              addChar(Character.toLowerCase((char) event.keyCode));
-            }
-            break;
+// sle 20120110: in webui this should be made in the client. it is to costly to go to the server with every keypress
+//          case SWT.KeyDown:
+//            if ((event.stateMask == 0 || event.stateMask == SWT.SHIFT)
+//                && Character.isLetter((char) event.keyCode) && (event.keyCode != SWT.KEYPAD_CR)) {//XXX RAP does not no the difference between KEYPAD_CR and CR
+//              addChar(Character.toLowerCase((char) event.keyCode));
+//            }
+//            break;
           case SWT.MouseDown:
             Point p = new Point(event.x, event.y);
             TableItem item = m_uiTable.getItem(p);

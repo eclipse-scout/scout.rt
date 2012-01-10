@@ -160,10 +160,13 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
     // listeners
     P_UiFieldListener listener = new P_UiFieldListener();
-    getUiField().addListener(SWT.KeyDown, listener);
     getUiField().addListener(SWT.Modify, listener);
     getUiField().addListener(SWT.Traverse, listener);
     getUiField().addListener(SWT.FocusOut, listener);
+    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_DOWN));
+    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_UP));
+    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_DOWN));
+    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_UP));
 
     P_RwtBrowseButtonListener browseButtonListener = new P_RwtBrowseButtonListener();
     getUiBrowseButton().addSelectionListener(browseButtonListener);
@@ -565,29 +568,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  protected void handleKeyDownFromUI(Event event) {
-    switch (event.keyCode) {
-      case SWT.ARROW_DOWN:
-      case SWT.ARROW_UP:
-      case SWT.PAGE_DOWN:
-      case SWT.PAGE_UP:
-        if (m_proposalPopup == null) {
-          requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true);
-        }
-        else {
-          Widget c = null;
-          if (c == null) {
-            c = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), Table.class);
-          }
-          if (c == null) {
-            c = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), Tree.class);
-          }
-          RwtUtility.handleNavigationKey(c, event.keyCode);
-        }
-        break;
-    }
-  }
-
   protected void handleTraverseFromUi(Event event) {
     switch (event.keyCode) {
       case SWT.ARROW_DOWN:
@@ -645,12 +625,32 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
         case SWT.Modify:
           handleTextModifiedFromUi(event);
           break;
-        case SWT.KeyDown:
-          handleKeyDownFromUI(event);
-          break;
         case SWT.Traverse:
           handleTraverseFromUi(event);
           break;
+      }
+    }
+  }
+
+  private class P_KeyListener extends RwtKeyStroke {
+    public P_KeyListener(int keyCode) {
+      super(keyCode);
+    }
+
+    @Override
+    public void handleUiAction(Event e) {
+      if (m_proposalPopup == null) {
+        requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true);
+      }
+      else {
+        Widget c = null;
+        if (c == null) {
+          c = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), Table.class);
+        }
+        if (c == null) {
+          c = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), Tree.class);
+        }
+        RwtUtility.handleNavigationKey(c, e.keyCode);
       }
     }
   }

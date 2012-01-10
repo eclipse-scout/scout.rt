@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.AbstractOpenMenuJob;
 import org.eclipse.scout.rt.ui.rap.core.RwtIcons;
 import org.eclipse.scout.rt.ui.rap.core.util.BrowserInfo;
+import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -81,14 +82,9 @@ public class DropDownButton extends Button {
         }
       }
     });
-    addListener(SWT.KeyDown, new Listener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void handleEvent(Event e) {
-        handleKeyEvent(e);
-      }
-    });
+    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(' '));
+    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(SWT.CR));
+    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(SWT.ARROW_DOWN));
 
     addFocusListener(new FocusAdapter() {
       private static final long serialVersionUID = 1L;
@@ -189,22 +185,6 @@ public class DropDownButton extends Button {
         getMenu().setLocation(toDisplay(event.x, event.y));
         getMenu().setVisible(true);
       }
-    }
-  }
-
-  protected void handleKeyEvent(Event e) {
-    switch (e.keyCode) {
-      case ' ':
-      case SWT.CR:
-        SelectionEvent selEvent = new SelectionEvent(e);
-        fireSelectionEvent(selEvent);
-        break;
-      case SWT.ARROW_DOWN:
-        if (isDropdownEnabled() && getMenu() != null) {
-          getMenu().setLocation(toDisplay(e.x, e.y));
-          getMenu().setVisible(true);
-        }
-        break;
     }
   }
 
@@ -502,6 +482,29 @@ public class DropDownButton extends Button {
     bounds.x += 1;
     int imgY = Math.max(bounds.y + GAP, bounds.y + (bounds.height - img.getBounds().height) / 2);
     gc.drawImage(img, bounds.x, imgY);
+  }
+
+  private class P_KeyStroke extends RwtKeyStroke {
+    public P_KeyStroke(int keyCode) {
+      super(keyCode);
+    }
+
+    @Override
+    public void handleUiAction(Event e) {
+      switch (e.keyCode) {
+        case ' ':
+        case SWT.CR:
+          SelectionEvent selEvent = new SelectionEvent(e);
+          fireSelectionEvent(selEvent);
+          break;
+        case SWT.ARROW_DOWN:
+          if (isDropdownEnabled() && getMenu() != null) {
+            getMenu().setLocation(toDisplay(e.x, e.y));
+            getMenu().setVisible(true);
+          }
+          break;
+      }
+    }
   }
 
   private final class P_OpenMenuJob extends AbstractOpenMenuJob {
