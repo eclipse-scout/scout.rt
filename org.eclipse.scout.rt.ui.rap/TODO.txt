@@ -1,0 +1,34 @@
+- ensure all get(Rwt)Environment are consistent. aho votes for getEnvironemnt().
+- ensure all setBlubberFromScout getting renamed to updateBlubberFromScout
+
+Refactored all stateful scout client services to manage their state based on client session instance or type accordingly
+org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkService (Done)
+org.eclipse.scout.rt.client.services.common.clientnotification.internal.ClientNotificationConsumerService (Done)
+org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy (Done)
+org.eclipse.scout.rt.client.services.common.exceptionhandler.internal.InternalClientExceptionHandlerService (Done)
+org.eclipse.scout.rt.client.services.common.security.AccessControlServiceClientProxy (Done)
+org.eclipse.scout.rt.client.services.common.security.PermissionServiceClientProxy (Done)
+org.eclipse.scout.rt.client.services.common.session.internal.ClientSessionRegistryService (Done)
+
+BSI CRM Stateful services: TODO
+  - com.bsiag.crm.server.core.services.process.AdditionalInformationValueProcessService
+  - com.bsiag.crm.client.core.services.workflow.WorkflowStepServiceClientProxy
+  - com.bsiag.crm.server.core.services.process.ProjectProcessService
+  - com.bsiag.crm.client.core.services.process.AdditionalInformationValueProcessServiceClientProxy
+  - com.bsiag.crm.server.core.services.outline.StandardOutlineService
+  - com.bsiag.crm.server.core.services.custom.orsimport.ORSimportSvc
+  - com.bsiag.crm.client.core.services.process.OptionsProcessService
+  - com.bsiag.crm.server.core.services.custom.pim.PIMSynchronizationService
+  - com.bsiag.crm.server.bsiit.services.custom.password.PronouncablePasswordGeneratorService
+  - com.bsiag.crm.server.bsiit.services.process.EjbcaCertificateProcessService
+  - com.bsiag.crm.server.bsiit.services.custom.ldap.ADUserService
+  - com.bsiag.crm.server.bsiit.services.custom.wmi.WMIService
+  - com.bsiag.crm.server.online.services.custom.sms.SMSService
+  - com.bsiag.crm.server.online.services.custom.ldap.LDAPService
+  - com.bsiag.crm.server.online.services.custom.xmlio.XMLImportExportService
+  - com.bsiag.crm.server.online.services.ws.logger.WebserviceLoggerService
+  - com.bsiag.crm.server.bsinext.services.ws.consumer.BsiNextV1WebServiceProxyService
+
+TODO:
+all applications going to RAP must migrate their services with state so that the state either uses IClientSession.getData/setData or
+if the state is on applicaiton (not instance) level then leave it as is.

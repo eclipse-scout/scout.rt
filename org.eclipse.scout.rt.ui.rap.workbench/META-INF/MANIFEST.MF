@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Workbench
+Bundle-SymbolicName: org.eclipse.scout.rt.ui.rap.workbench
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.scout.rt.ui.rap.workbench.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.ui.rap;visibility:=reexport,
+ org.eclipse.rap.ui;bundle-version="1.5.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.eclipse.scout.rt.ui.rap.workbench,
+ org.eclipse.scout.rt.ui.rap.workbench.util.listener,
+ org.eclipse.scout.rt.ui.rap.workbench.window.editor,
+ org.eclipse.scout.rt.ui.rap.workbench.window.view
