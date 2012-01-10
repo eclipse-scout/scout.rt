@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -34,6 +35,7 @@ import org.eclipse.rwt.widgets.ExternalBrowser;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.holders.BooleanHolder;
@@ -45,6 +47,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -296,6 +299,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       if (getSubject() == null) {
         throw new SecurityException("/rap request is not authenticated with a Subject");
       }
+      initLocale();
 
       final BooleanHolder newSession = new BooleanHolder(true);
       IClientSession tempClientSession = (IClientSession) RWT.getRequest().getSession().getAttribute(IClientSession.class.getName());
@@ -1264,6 +1268,16 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   public void checkThread() {
     if (!(getDisplay().getThread() == Thread.currentThread())) {
       throw new IllegalStateException("Must be called in rwt thread");
+    }
+  }
+
+  protected void initLocale() {
+    Locale locale = ClientUIPreferences.getInstance().getLocale();
+    if (locale == null) {
+      locale = RwtUtility.getBrowserInfo().getLocale();
+    }
+    if (locale != null) {
+      LocaleThreadLocal.set(locale);
     }
   }
 

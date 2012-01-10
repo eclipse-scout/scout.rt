@@ -81,6 +81,7 @@ public abstract class AbstractRwtUtility {
       String userAgent = request.getHeader("User-Agent");
 
       info = createBrowserInfo(userAgent);
+      info.setLocale(request.getLocale());
 
       if (userAgent.indexOf("Windows") != -1
           || userAgent.indexOf("Win32") != -1

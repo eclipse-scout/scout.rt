@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.core.util;
 
+import java.util.Locale;
+
 import org.osgi.framework.Version;
 
 public class BrowserInfo {
@@ -38,6 +40,7 @@ public class BrowserInfo {
   private boolean m_isTablet = false;
 
   private System m_system;
+  private Locale m_locale = null;
 
   BrowserInfo(Type type, Version version) {
     this(type, version, System.UNKNOWN);
@@ -107,6 +110,14 @@ public class BrowserInfo {
 
   public void setSystem(System system) {
     m_system = system;
+  }
+
+  public Locale getLocale() {
+    return m_locale;
+  }
+
+  public void setLocale(Locale locale) {
+    m_locale = locale;
   }
 
   public boolean isInternetExplorer() {
