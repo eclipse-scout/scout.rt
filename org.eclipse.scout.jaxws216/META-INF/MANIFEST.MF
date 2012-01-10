@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JAX-WS Scout integration
+Bundle-Name: Scout JAX-WS Version 2.1.6
 Bundle-SymbolicName: org.eclipse.scout.jaxws216;singleton:=true
 Bundle-Version: 2.1.6.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-Vendor: BSI Business Systems Integration AG
+Bundle-Vendor: Eclipse Scout Project
 Bundle-ClassPath: .
 Import-Package: javax.servlet;version="2.4.0",
  javax.servlet.http;version="2.4.0"
