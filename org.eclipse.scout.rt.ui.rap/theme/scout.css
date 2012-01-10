@@ -865,7 +865,7 @@ List-Item:even:selected:unfocused {
 
 Menu {
   background-image: none;
-  padding: 14px 0px 14px 0px;
+  padding: 4px 0px 4px 0px;
   opacity: 1;
   animation: none;
   color: #000000;
@@ -879,6 +879,12 @@ MenuItem {
   color: black;
   background-color: transparent;
   opacity: 1;
+  padding: 7px 6px 7px 6px;
+}
+
+MenuItem[SEPARATOR] {
+  color: #eaf1f6;
+  padding: 2px 0px;
 }
 
 MenuItem:hover {
