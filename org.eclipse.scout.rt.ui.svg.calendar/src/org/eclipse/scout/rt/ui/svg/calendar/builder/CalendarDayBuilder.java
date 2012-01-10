@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.ui.svg.calendar.builder;
 
 import java.util.Calendar;
 
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.svg.calendar.comp.IComponentElementFactory;
 import org.eclipse.scout.rt.ui.svg.calendar.comp.TimeLineTextComponentElementFactory;
@@ -23,9 +24,14 @@ public class CalendarDayBuilder extends AbstractCalendarDocumentBuilder {
 
   @Override
   protected String getRangeTitle(Calendar cal) {
-    return getWeekDayLabel(cal.get(Calendar.DAY_OF_WEEK)) + " " + cal.get(Calendar.DAY_OF_MONTH) + ". " +
+    return getWeekDayLabelLong(cal.get(Calendar.DAY_OF_WEEK)) + " " + cal.get(Calendar.DAY_OF_MONTH) + ". " +
         getMonthLabel(cal.get(Calendar.MONTH)) +
         " " + cal.get(Calendar.YEAR) + " - " + ScoutTexts.get("Week") + " " + cal.get(Calendar.WEEK_OF_YEAR);
+  }
+
+  @Override
+  protected int getDisplayMode() {
+    return ICalendar.DISPLAY_MODE_DAY;
   }
 
   @Override

@@ -79,6 +79,7 @@ public abstract class AbstractCalendarDocumentBuilder {
 
   private final String[] m_monthsLabels;
   private final String[] m_weekDayLabels;
+  private final String[] m_weekDayLongLabels;
   private final String[] m_displayModeLabels;
   private final int m_firstDayOfWeek;
 
@@ -131,8 +132,9 @@ public abstract class AbstractCalendarDocumentBuilder {
 
     // initialize locale dependent labels and options
     DateFormatSymbols dateSymbols = new DateFormatSymbols(LocaleThreadLocal.get());
-    m_monthsLabels = dateSymbols.getShortMonths();
+    m_monthsLabels = dateSymbols.getMonths();
     m_weekDayLabels = dateSymbols.getShortWeekdays();
+    m_weekDayLongLabels = dateSymbols.getWeekdays();
     m_displayModeLabels = new String[]{ScoutTexts.get("Day"), ScoutTexts.get("WorkWeek"), ScoutTexts.get("Week"), ScoutTexts.get("Month")};
     m_firstDayOfWeek = createCalendar().getFirstDayOfWeek();
 
@@ -211,6 +213,8 @@ public abstract class AbstractCalendarDocumentBuilder {
   protected abstract String getDayTitle(Calendar cal);
 
   protected abstract boolean hasTimeLine();
+
+  protected abstract int getDisplayMode();
 
   protected abstract IComponentElementFactory getComponentElementFactory();
 
@@ -300,22 +304,28 @@ public abstract class AbstractCalendarDocumentBuilder {
 
   private void initDisplayModeLinks() {
     final int[] linkMenuIds = new int[]{ICalendar.DISPLAY_MODE_DAY, ICalendar.DISPLAY_MODE_WORKWEEK, ICalendar.DISPLAY_MODE_WEEK, ICalendar.DISPLAY_MODE_MONTH};
-    final float MARGIN = 10.0f; // between the display mode links
+    final float MARGIN = 12.0f; // between the display mode links
 
     float xPos = 4.0f; // start position (aligned with left grid start of svg)
     for (int i = 0; i < m_elDisplayMode.length; i++) {
+      boolean isCurrentDisplayMode = linkMenuIds[i] == getDisplayMode();
       Element e = m_elDisplayMode[i];
       e.setTextContent(m_displayModeLabels[i]);
       CalendarSvgUtility.setFontWeightNormal(e);
       CalendarSvgUtility.setFont(e, FONT);
       CalendarSvgUtility.setFontSize(e, ORIG_FONT_SIZE);
-      CalendarSvgUtility.setFontColor(e, COLOR_LINKS);
+      CalendarSvgUtility.setFontColor(e, COLOR_LINKS, isCurrentDisplayMode);
       CalendarSvgUtility.setCalendarDisplayModeXPos(e, xPos);
       m_displayModeTextWidth[i] = xPos; // remember the original text position to apply scaling later on.
 
       SVGUtility.addHyperlink(e, LINK_DISPLAY_MODE_PREFIX + linkMenuIds[i]);
 
       xPos += SVGTextContentSupport.getComputedTextLength(e) + MARGIN;
+
+      // set the font to bold after the size has been calculated
+      if (isCurrentDisplayMode) {
+        CalendarSvgUtility.setFontWeightBold(e);
+      }
     }
   }
 
@@ -515,6 +525,10 @@ public abstract class AbstractCalendarDocumentBuilder {
 
   protected String getWeekDayLabel(int weekday) {
     return m_weekDayLabels[weekday];
+  }
+
+  protected String getWeekDayLabelLong(int weekday) {
+    return m_weekDayLongLabels[weekday];
   }
 
   public void setShownDate(final Date d) {
@@ -771,19 +785,19 @@ public abstract class AbstractCalendarDocumentBuilder {
     CalendarSvgUtility.clearChildNodes(m_elMenuContainer);
     if (getNumContextMenus() > 0) {
       // rectangle
-      final float[] rectDimensions = new float[]{/*x=*/525.181f, /*y=*/448.693f,/*w=*/25.819f,/*h=*/25.819f};// dimensions of the context menu box (as defined in the svg file)
+      final float[] rectDimensions = new float[]{/*x=*/536.088f, /*y=*/447.602f,/*w=*/14.912f,/*h=*/14.914f};// dimensions of the context menu box (as defined in the MonthCalendar.svg file)
       Element rect = m_doc.createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_RECT_TAG);
       rect.setAttribute(SVGConstants.SVG_X_ATTRIBUTE, "" + rectDimensions[0]);
       rect.setAttribute(SVGConstants.SVG_Y_ATTRIBUTE, "" + rectDimensions[1]);
       rect.setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "" + rectDimensions[2]);
       rect.setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "" + rectDimensions[3]);
-      CalendarSvgUtility.setBorderColor(rect, COLOR_BLACK);
+      CalendarSvgUtility.setBorderColor(rect, COLOR_NOT_SELECTED_DAY_BORDER);
       CalendarSvgUtility.setBackgroundColor(rect, COLOR_WHITE);
       m_elMenuContainer.appendChild(rect);
       SVGUtility.addHyperlink(rect, LINK_CONTEXT_MENU);
 
       // triangle
-      final String trianglePoints = "548.447,455.952 538.212,467.556 527.978,455.952";// positions of the 3 corners of the triangle (as defined in the svg file)
+      final String trianglePoints = "549.525,451.794 543.614,458.496 537.703,451.794";// positions of the 3 corners of the triangle (as defined in the MonthCalendar.svg file)
       Element triangle = m_doc.createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_POLYGON_TAG);
       triangle.setAttribute(SVGConstants.SVG_POINTS_ATTRIBUTE, trianglePoints);
       m_elMenuContainer.appendChild(triangle);

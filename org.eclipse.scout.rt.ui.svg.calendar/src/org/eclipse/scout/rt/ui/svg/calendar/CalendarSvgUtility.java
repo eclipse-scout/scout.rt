@@ -66,9 +66,16 @@ public final class CalendarSvgUtility {
     css.getStyle().setProperty(SVGConstants.CSS_FONT_SIZE_PROPERTY, "" + size, "");
   }
 
-  public static void setFontColor(Element element, String color) {
+  public static void setFontColor(Element element, String color, boolean darken) {
+    if (darken) {
+      color = getDarkerCopy(color);
+    }
     SVGStylable css = (SVGStylable) element;
     css.getStyle().setProperty(SVGConstants.CSS_FILL_PROPERTY, ensureColorPrefix(color), "");
+  }
+
+  public static void setFontColor(Element element, String color) {
+    setFontColor(element, color, false);
   }
 
   public static void setTextAlignCenter(Element element) {
@@ -97,8 +104,7 @@ public final class CalendarSvgUtility {
 
   public static void setBackgroundColor(Element element, String color, boolean darken) {
     if (darken) {
-      Color orig = Color.decode(ensureColorPrefix(color)).darker();
-      color = COLOR_PREFIX + colorToHexString(orig);
+      color = getDarkerCopy(color);
     }
     SVGStylable css = (SVGStylable) element;
     css.getStyle().setProperty(SVGConstants.CSS_FILL_PROPERTY, ensureColorPrefix(color), "");
@@ -108,6 +114,11 @@ public final class CalendarSvgUtility {
     ArrayList<Element> collector = new ArrayList<Element>();
     getAllChildElementsRec(root, tagName, collector);
     return collector.toArray(new Element[collector.size()]);
+  }
+
+  private static String getDarkerCopy(String color) {
+    Color orig = Color.decode(ensureColorPrefix(color)).darker();
+    return COLOR_PREFIX + colorToHexString(orig);
   }
 
   private static void getAllChildElementsRec(Element root, String tagName, ArrayList<Element> collector) {

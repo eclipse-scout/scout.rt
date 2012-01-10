@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.ui.svg.calendar.builder;
 
 import java.util.Calendar;
 
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.ui.svg.calendar.comp.IComponentElementFactory;
 import org.eclipse.scout.rt.ui.svg.calendar.comp.LinearFillComponentElementFactory;
 
@@ -24,6 +25,11 @@ public class CalendarMonthBuilder extends AbstractCalendarDocumentBuilder {
   @Override
   protected IComponentElementFactory getComponentElementFactory() {
     return new LinearFillComponentElementFactory();
+  }
+
+  @Override
+  protected int getDisplayMode() {
+    return ICalendar.DISPLAY_MODE_MONTH;
   }
 
   @Override

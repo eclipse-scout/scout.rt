@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.ui.svg.calendar.builder;
 
 import java.util.Calendar;
 
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.svg.calendar.comp.IComponentElementFactory;
 import org.eclipse.scout.rt.ui.svg.calendar.comp.TimeLineComponentElementFactory;
@@ -24,6 +25,11 @@ public class CalendarWeekBuilder extends AbstractCalendarDocumentBuilder {
   @Override
   protected int getNumWeeks() {
     return 1;
+  }
+
+  @Override
+  protected int getDisplayMode() {
+    return ICalendar.DISPLAY_MODE_WEEK;
   }
 
   @Override
