@@ -19,7 +19,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.http.servletfilter.ServletFilterDelegate;
 
 /**
@@ -30,6 +33,7 @@ import org.eclipse.scout.http.servletfilter.ServletFilterDelegate;
  * filters a ranking is strong requirement to support chainable security filters.
  */
 public class DelegateFilter implements Filter {
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(DelegateFilter.class);
 
   private ServletContext m_servletContext;
 
@@ -44,7 +48,28 @@ public class DelegateFilter implements Filter {
     new ServletFilterDelegate().delegateServiceMethod(request, response, new ServletFilterDelegate.IServiceCallback() {
       @Override
       public void service(ServletRequest reqInner, ServletResponse resInner) throws ServletException, IOException {
-        chain.doFilter(reqInner, resInner);
+        HttpServletRequest httpServletRequest = (HttpServletRequest) reqInner;
+        String userAgent = "";
+        String remoteAddr = "";
+        if (httpServletRequest != null) {
+          userAgent = httpServletRequest.getHeader("User-Agent");
+          remoteAddr = httpServletRequest.getRemoteAddr();
+        }
+        try {
+          chain.doFilter(reqInner, resInner);
+        }
+        catch (ServletException e) {
+          LOG.error("ServletException\n UserAgent: {0}\nRemoteIP: {1}", userAgent, remoteAddr);
+          throw e;
+        }
+        catch (IOException e) {
+          LOG.error("IOException\n UserAgent: {0}\nRemoteIP: {1}", userAgent, remoteAddr);
+          throw e;
+        }
+        catch (IllegalStateException e) {
+          LOG.error("IllegalStateException\n UserAgent: {0}\nRemoteIP: {1}", userAgent, remoteAddr);
+          throw e;
+        }
       }
 
       @Override
