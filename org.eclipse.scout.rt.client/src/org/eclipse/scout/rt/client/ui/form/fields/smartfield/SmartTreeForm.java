@@ -21,6 +21,8 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
@@ -43,24 +45,94 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainB
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.StatusField;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
 public class SmartTreeForm extends AbstractSmartFieldProposalForm {
   /**
    * Boolean marker on {@link Job#getProperty(QualifiedName)} that can be used to detect that the tree is loading some
-   * (or all) nodes.
+   * nodes.
    * <p>
-   * This can be used for example to avoid busy handling when a tree smart popup is loading its tree data.
+   * This can be used for example to avoid busy handling when a tree smart popup is loading its incremental tree data
+   * (only relevant when {@link ISmartField#isBrowseLoadIncremental()}=true.
    */
   public static final QualifiedName JOB_PROPERTY_LOAD_TREE = new QualifiedName(SmartTreeForm.class.getName(), "loadTree");
 
   private P_ActiveNodesFilter m_activeNodesFilter;
   private P_MatchingNodesFilter m_matchingNodesFilter;
+  private boolean m_selectCurrentValueRequested;
+  private boolean m_populateInitialTreeDone;
+  private JobEx m_populateInitialTreeJob;
 
   public SmartTreeForm(ISmartField<?> smartField) throws ProcessingException {
     super(smartField);
+  }
+
+  /*
+   * Operations
+   */
+
+  /**
+   * Populate initial tree using a {@link ClientAsyncJob}. Amount of tree loaded is depending on
+   * {@link ISmartField#isBrowseLoadIncremental()}.
+   * <p>
+   * loadIncremnental only loads the roots, whereas !loadIncremental loads the complete tree. Normally the latter is
+   * configured together with {@link ISmartField#isBrowseAutoExpandAll()}
+   * 
+   * @throws ProcessingException
+   */
+  private void startPopulateInitialTree() throws ProcessingException {
+    if (getSmartField().isBrowseLoadIncremental()) {
+      //do sync
+      getResultTreeField().loadRootNode();
+      commitPopulateInitialTree();
+    }
+    else {
+      //show comment that smartfield is loading
+      getStatusField().setValue(ScoutTexts.get("searchingProposals"));
+      getStatusField().setVisible(true);
+      //go async to fetch data
+      m_populateInitialTreeJob = getSmartField().callBrowseLookupInBackground(ISmartField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED, new ILookupCallFetcher() {
+        @Override
+        public void dataFetched(LookupRow[] rows, ProcessingException failed) {
+          if (failed == null) {
+            try {
+              getStatusField().setVisible(false);
+              ITreeNode[] subTree = new P_TreeNodeBuilder().createTreeNodes(rows, ITreeNode.STATUS_NON_CHANGED, true);
+              ITree tree = getResultTreeField().getTree();
+              updateSubTree(tree, tree.getRootNode(), subTree);
+              if (getSmartField().isBrowseAutoExpandAll()) {
+                tree.expandAll(getResultTreeField().getTree().getRootNode());
+              }
+              commitPopulateInitialTree();
+            }
+            catch (ProcessingException pe) {
+              failed = pe;
+            }
+          }
+          if (failed != null) {
+            getStatusField().setValue(TEXTS.get("RequestProblem"));
+            getStatusField().setVisible(true);
+            return;
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * Called when the initial tree has been loaded and the form is therefore ready to accept
+   * {@link #update(boolean, boolean)} requests.
+   * 
+   * @throws ProcessingException
+   */
+  private void commitPopulateInitialTree() throws ProcessingException {
+    m_populateInitialTreeDone = true;
+    updateActiveFilter();
+    update(m_selectCurrentValueRequested, true);
   }
 
   @Override
@@ -194,8 +266,16 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     }
   }
 
+  /*
+   * Operations
+   */
+
   @Override
   public void update(boolean selectCurrentValue, boolean synchonous) throws ProcessingException {
+    if (!m_populateInitialTreeDone) {
+      m_selectCurrentValueRequested = selectCurrentValue;
+      return;
+    }
     ITree tree = getResultTreeField().getTree();
     try {
       tree.setTreeChanging(true);
@@ -239,15 +319,12 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     structureChanged(getResultTreeField());
   }
 
-  private void updateSubTree(ITree tree, final ITreeNode parentNode, ITreeNode[] subTree, boolean expandAll) throws ProcessingException {
+  private void updateSubTree(ITree tree, final ITreeNode parentNode, ITreeNode[] subTree) throws ProcessingException {
     if (tree == null || parentNode == null || subTree == null) {
       return;
     }
     tree.removeAllChildNodes(parentNode);
     tree.addChildNodes(parentNode, subTree);
-    if (expandAll) {
-      tree.expandAll(parentNode);
-    }
   }
 
   @Override
@@ -438,32 +515,25 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       @Override
       protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
         ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
-        Job currentJob = Job.getJobManager().currentJob();
-        try {
-          if (currentJob != null) {
+        if (sf.isBrowseLoadIncremental()) {
+          Job currentJob = Job.getJobManager().currentJob();
+          try {
             currentJob.setProperty(JOB_PROPERTY_LOAD_TREE, Boolean.TRUE);
-          }
-          //
-          if (sf.isBrowseLoadIncremental()) {
+            //
             LookupRow b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
             LookupRow[] data = sf.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
             ITreeNode[] subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
-            updateSubTree(getTree(), parentNode, subTree, isAutoExpandAll());
-            return;
+            updateSubTree(getTree(), parentNode, subTree);
           }
-          if (parentNode == getTree().getRootNode()) {
-            LookupRow[] data = sf.callBrowseLookup(ISmartField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED);
-            ITreeNode[] subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, true);
-            updateSubTree(getTree(), parentNode, subTree, isAutoExpandAll());
-            return;
-          }
-          //default: nop
-        }
-        finally {
-          if (currentJob != null) {
+          finally {
             currentJob.setProperty(JOB_PROPERTY_LOAD_TREE, null);
           }
         }
+        /*
+        else {
+          //nop, since complete tree is already loaded (via async job)
+        }
+        */
       }
 
       /*
@@ -696,18 +766,19 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       getActiveStateRadioButtonGroup().setValue(getSmartField().getActiveFilter());
       getNewButton().setEnabled(getSmartField().getBrowseNewText() != null);
       getNewButton().setLabel(getSmartField().getBrowseNewText());
-      getResultTreeField().loadRootNode();
-      updateActiveFilter();
-      update(false, true);
-      if (getSmartField().isBrowseAutoExpandAll() && !getSmartField().isBrowseLoadIncremental()) {
-        ITree tree = getResultTreeField().getTree();
-        tree.expandAll(getResultTreeField().getTree().getRootNode());
-      }
+      startPopulateInitialTree();
     }
 
     @Override
     protected boolean execValidate() throws ProcessingException {
       return getAcceptedProposal() != null;
+    }
+
+    @Override
+    protected void execFinally() throws ProcessingException {
+      if (m_populateInitialTreeJob != null) {
+        m_populateInitialTreeJob.cancel();
+      }
     }
 
   }

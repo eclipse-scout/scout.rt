@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm;
 
 /**
  * <p>
@@ -105,6 +106,21 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   }
 
   /**
+   * This method is called directly before calling {@link #runBusy()} and can be used to late-check if busy handling is
+   * really necessary at that point in time.
+   * <p>
+   * The default checks if the job is in a smart tree operation and ignores busy, see
+   * {@link SmartTreeForm#JOB_PROPERTY_LOAD_TREE}.
+   */
+  protected boolean shouldRunBusy(Job job) {
+    Boolean b = (Boolean) job.getProperty(SmartTreeForm.JOB_PROPERTY_LOAD_TREE);
+    if (b != null && b.booleanValue()) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * This method is called directly from the job listener after {@link #getShortOperationMillis()}.
    * <p>
    * You may call {@link #runDefaultBusy(Object, IProgressMonitor)} to use default handling.
@@ -114,7 +130,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
    * Be careful what to do, since this might be expensive. The default starts a {@link BusyJob} or a subclass of the
    * {@link BusyJob}
    */
-  protected abstract void runBusy();
+  protected abstract void runBusy(Job job);
 
   /**
    * @retrun true if blocking is active
@@ -170,7 +186,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
       getStateLock().notifyAll();
     }
     if (oldSize == 0 && newSize == 1) {
-      runBusy();
+      runBusy(job);
     }
   }
 
@@ -212,6 +228,9 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
       }
       removeTimer(m_job);
       if (isJobActive(m_job)) {
+        if (!shouldRunBusy(m_job)) {
+          return Status.OK_STATUS;
+        }
         addBusyOperation(m_job);
       }
       //double check after queuing (avoid unnecessary locks)

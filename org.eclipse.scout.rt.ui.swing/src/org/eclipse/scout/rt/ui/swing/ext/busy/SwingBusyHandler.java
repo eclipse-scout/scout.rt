@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.ext.busy;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -35,7 +36,7 @@ public class SwingBusyHandler extends AbstractBusyHandler {
   }
 
   @Override
-  protected void runBusy() {
+  protected void runBusy(Job job) {
     new SwingBusyJob(TEXTS.get("BusyJob"), this).schedule();
   }
 

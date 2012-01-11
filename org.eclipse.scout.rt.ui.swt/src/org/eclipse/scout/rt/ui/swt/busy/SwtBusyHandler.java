@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.busy;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.AbstractBusyHandler;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -41,7 +42,7 @@ public class SwtBusyHandler extends AbstractBusyHandler {
   }
 
   @Override
-  protected void runBusy() {
+  protected void runBusy(Job job) {
     new SwtBusyStep1Job(TEXTS.get("BusyJob"), this).schedule();
   }
 }
