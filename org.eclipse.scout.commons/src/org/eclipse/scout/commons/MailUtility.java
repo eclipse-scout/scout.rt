@@ -112,11 +112,13 @@ public final class MailUtility {
         else if (part.isMimeType(CONTENT_TYPE_TEXT_HTML)) {
           bodyCollector.add(part);
         }
-        else if (part.isMimeType(CONTENT_TYPE_MESSAGE_RFC822)) {
+        else if (part.isMimeType(CONTENT_TYPE_MESSAGE_RFC822) && part.getContent() instanceof MimeMessage) {
           // its a MIME message in rfc822 format as attachment therefore we have to set the filename for the attachment correctly.
           MimeMessage msg = (MimeMessage) part.getContent();
-          part.setFileName(msg.getSubject() + ".eml");
-          attachementCollector.add(part);
+          String filteredSubjectText = StringUtility.filterText(msg.getSubject(), "a-zA-Z0-9_-", "");
+          String fileName = (StringUtility.hasText(filteredSubjectText) ? filteredSubjectText : "originalMessage") + ".eml";
+          RFCWrapperPart wrapperPart = new RFCWrapperPart(part, fileName);
+          attachementCollector.add(wrapperPart);
         }
       }
     }
