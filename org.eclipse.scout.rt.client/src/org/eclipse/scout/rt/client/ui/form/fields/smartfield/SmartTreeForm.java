@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
@@ -46,6 +48,14 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
 public class SmartTreeForm extends AbstractSmartFieldProposalForm {
+  /**
+   * Boolean marker on {@link Job#getProperty(QualifiedName)} that can be used to detect that the tree is loading some
+   * (or all) nodes.
+   * <p>
+   * This can be used for example to avoid busy handling when a tree smart popup is loading its tree data.
+   */
+  public static final QualifiedName JOB_PROPERTY_LOAD_TREE = new QualifiedName(SmartTreeForm.class.getName(), "loadTree");
+
   private P_ActiveNodesFilter m_activeNodesFilter;
   private P_MatchingNodesFilter m_matchingNodesFilter;
 
@@ -227,6 +237,17 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       tree.setTreeChanging(false);
     }
     structureChanged(getResultTreeField());
+  }
+
+  private void updateSubTree(ITree tree, final ITreeNode parentNode, ITreeNode[] subTree, boolean expandAll) throws ProcessingException {
+    if (tree == null || parentNode == null || subTree == null) {
+      return;
+    }
+    tree.removeAllChildNodes(parentNode);
+    tree.addChildNodes(parentNode, subTree);
+    if (expandAll) {
+      tree.expandAll(parentNode);
+    }
   }
 
   @Override
@@ -416,27 +437,32 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       @SuppressWarnings("unchecked")
       @Override
       protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
-        ITreeNode[] subTree;
         ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
-        if (sf.isBrowseLoadIncremental()) {
-          LookupRow b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
-          LookupRow[] data = sf.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
-          subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
+        Job currentJob = Job.getJobManager().currentJob();
+        try {
+          if (currentJob != null) {
+            currentJob.setProperty(JOB_PROPERTY_LOAD_TREE, Boolean.TRUE);
+          }
+          //
+          if (sf.isBrowseLoadIncremental()) {
+            LookupRow b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
+            LookupRow[] data = sf.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
+            ITreeNode[] subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
+            updateSubTree(getTree(), parentNode, subTree, isAutoExpandAll());
+            return;
+          }
+          if (parentNode == getTree().getRootNode()) {
+            LookupRow[] data = sf.callBrowseLookup(ISmartField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED);
+            ITreeNode[] subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, true);
+            updateSubTree(getTree(), parentNode, subTree, isAutoExpandAll());
+            return;
+          }
+          //default: nop
         }
-        else if (parentNode == getTree().getRootNode()) {
-          // called on root only
-          LookupRow[] data = sf.callBrowseLookup(ISmartField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED);
-          subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, true);
-        }
-        else {
-          subTree = parentNode.getChildNodes();
-        }
-        //add
-        getTree().removeAllChildNodes(parentNode);
-        getTree().addChildNodes(parentNode, subTree);
-        // auto-expand all
-        if (isAutoExpandAll()) {
-          getTree().expandAll(parentNode);
+        finally {
+          if (currentJob != null) {
+            currentJob.setProperty(JOB_PROPERTY_LOAD_TREE, null);
+          }
         }
       }
 
@@ -467,19 +493,6 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
         }
 
       }
-
-      private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder {
-        @Override
-        protected ITreeNode createEmptyTreeNode() throws ProcessingException {
-          ITreeNode node = ResultTreeField.this.createTreeNode();
-          if (getTree().getIconId() != null) {
-            Cell cell = node.getCellForUpdate();
-            cell.setIconId(getTree().getIconId());
-          }
-          return node;
-        }
-      }
-
     }
 
     @Override
@@ -656,6 +669,19 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     @Override
     public boolean accept(ITreeNode node, int level) {
       return execAcceptNodeByTreeFilter(m_searchPattern, node, level);
+    }
+  }
+
+  private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder {
+    @Override
+    protected ITreeNode createEmptyTreeNode() throws ProcessingException {
+      ITree tree = getResultTreeField().getTree();
+      ITreeNode node = getResultTreeField().createTreeNode();
+      if (tree.getIconId() != null) {
+        Cell cell = node.getCellForUpdate();
+        cell.setIconId(tree.getIconId());
+      }
+      return node;
     }
   }
 

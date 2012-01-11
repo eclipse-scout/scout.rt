@@ -70,6 +70,11 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements IRwt
     m_formPropertyListener = new P_ScoutPropertyChangeListener();
   }
 
+  @Override
+  public void setBusy(boolean b) {
+    //nop
+  }
+
   protected void attachScout() {
     IForm form = getScoutObject();
     setTitleFromScout(form.getTitle());

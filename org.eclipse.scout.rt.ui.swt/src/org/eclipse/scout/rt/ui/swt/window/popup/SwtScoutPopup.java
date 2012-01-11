@@ -85,6 +85,11 @@ public class SwtScoutPopup implements ISwtScoutPart {
     m_swtWindowContentPane.setLayout(new FillLayout());
   }
 
+  @Override
+  public void setBusy(boolean b) {
+    //nop
+  }
+
   public Shell getShell() {
     return m_swtWindow;
   }

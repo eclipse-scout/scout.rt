@@ -29,8 +29,8 @@ import org.eclipse.ui.forms.widgets.Form;
  * Decorates a {@link IRwtScoutPart}'s {@link IRwtScoutPart#getRwtForm()} header section with a progress bar and a
  * button
  */
-public class RwtScoutPartBusyDecorator {
-  private static final String ATTACH_MARKER_DATA = RwtScoutPartBusyDecorator.class.getName() + "#marker";
+public class RwtScoutPartBlockingDecorator {
+  private static final String ATTACH_MARKER_DATA = RwtScoutPartBlockingDecorator.class.getName() + "#marker";
 
   private final IRwtScoutPart m_part;
   private final boolean m_showCancelButton;
@@ -39,7 +39,7 @@ public class RwtScoutPartBusyDecorator {
   private Control m_oldFocus;
   private IContributionItem m_cancelAction;
 
-  public RwtScoutPartBusyDecorator(IRwtScoutPart part, boolean showCancelButton, IRwtEnvironment env) {
+  public RwtScoutPartBlockingDecorator(IRwtScoutPart part, boolean showCancelButton, IRwtEnvironment env) {
     m_part = part;
     m_showCancelButton = showCancelButton;
     m_env = env;
@@ -62,7 +62,6 @@ public class RwtScoutPartBusyDecorator {
         m_oldFocus = focusControl;
       }
     }
-    rwtForm.getBody().setEnabled(false);
     //show cancel button
     if (m_showCancelButton) {
       if (m_cancelAction != null) {
@@ -101,8 +100,9 @@ public class RwtScoutPartBusyDecorator {
       rwtForm.getToolBarManager().add(m_cancelAction);
       rwtForm.getToolBarManager().update(true);
     }
-    //there is a central busy spinner/ rwtForm.setBusy(true);
+    rwtForm.getBody().setEnabled(false);
     rwtForm.layout(true);
+    //there is a central busy spinner/ rwtForm.setBusy(true);
   }
 
   public void detach() {
@@ -115,7 +115,6 @@ public class RwtScoutPartBusyDecorator {
       return;
     }
     rwtForm.setData(ATTACH_MARKER_DATA, null);
-    rwtForm.setBusy(false);
     //hide cancel button
     if (m_cancelAction != null) {
       rwtForm.getToolBarManager().remove(m_cancelAction);

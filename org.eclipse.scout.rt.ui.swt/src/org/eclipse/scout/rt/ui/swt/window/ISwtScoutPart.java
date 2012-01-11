@@ -42,5 +42,10 @@ public interface ISwtScoutPart {
 
   boolean isActive();
 
+  /**
+   * Mark the part as busy waiting
+   */
+  void setBusy(boolean b);
+
   void setStatusLineMessage(Image image, String message);
 }

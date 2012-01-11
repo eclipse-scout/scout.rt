@@ -41,6 +41,11 @@ public abstract class AbstractRwtScoutPart implements IRwtScoutPart {
   public AbstractRwtScoutPart() {
   }
 
+  @Override
+  public void setBusy(boolean b) {
+    //nop
+  }
+
   protected void createPart(IForm scoutForm, IRwtEnvironment uiEnvironment) {
     if (m_scoutForm != null) {
       throw new IllegalArgumentException("The form dialog is already open. The form '" + scoutForm.getTitle() + " (" + scoutForm.getClass().getName() + ")' can not be opened!");

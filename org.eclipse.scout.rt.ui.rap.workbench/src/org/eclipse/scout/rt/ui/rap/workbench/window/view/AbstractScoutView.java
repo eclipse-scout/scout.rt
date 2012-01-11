@@ -67,6 +67,11 @@ public abstract class AbstractScoutView extends ViewPart implements IRwtScoutPar
     m_closeLock = new OptimisticLock();
   }
 
+  @Override
+  public void setBusy(boolean b) {
+    //nop
+  }
+
   protected void attatchListeners() {
     if (m_viewListener == null) {
       m_viewListener = new P_ViewListener();

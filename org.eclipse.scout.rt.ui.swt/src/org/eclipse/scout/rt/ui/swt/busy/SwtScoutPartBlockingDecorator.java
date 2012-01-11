@@ -29,8 +29,8 @@ import org.eclipse.ui.forms.widgets.Form;
  * Decorates a {@link ISwtScoutPart}'s {@link ISwtScoutPart#getSwtForm()} header section with a progress bar and a
  * button
  */
-public class SwtScoutPartBusyDecorator {
-  private static final String ATTACH_MARKER_DATA = SwtScoutPartBusyDecorator.class.getName() + "#marker";
+public class SwtScoutPartBlockingDecorator {
+  private static final String ATTACH_MARKER_DATA = SwtScoutPartBlockingDecorator.class.getName() + "#marker";
 
   private final ISwtScoutPart m_part;
   private final boolean m_showCancelButton;
@@ -38,7 +38,7 @@ public class SwtScoutPartBusyDecorator {
   private Control m_oldFocus;
   private IContributionItem m_cancelAction;
 
-  public SwtScoutPartBusyDecorator(ISwtScoutPart part, boolean showCancelButton) {
+  public SwtScoutPartBlockingDecorator(ISwtScoutPart part, boolean showCancelButton) {
     m_part = part;
     m_showCancelButton = showCancelButton;
   }
@@ -60,7 +60,6 @@ public class SwtScoutPartBusyDecorator {
         m_oldFocus = focusControl;
       }
     }
-    swtForm.getBody().setEnabled(false);
     //show cancel button
     if (m_showCancelButton) {
       if (m_cancelAction != null) {
@@ -96,7 +95,8 @@ public class SwtScoutPartBusyDecorator {
       swtForm.getToolBarManager().add(m_cancelAction);
       swtForm.getToolBarManager().update(true);
     }
-    swtForm.setBusy(true);
+    m_part.setBusy(true);
+    swtForm.getBody().setEnabled(false);
     swtForm.layout(true);
   }
 
@@ -110,7 +110,6 @@ public class SwtScoutPartBusyDecorator {
       return;
     }
     swtForm.setData(ATTACH_MARKER_DATA, null);
-    swtForm.setBusy(false);
     //hide cancel button
     if (m_cancelAction != null) {
       swtForm.getToolBarManager().remove(m_cancelAction);
@@ -118,6 +117,7 @@ public class SwtScoutPartBusyDecorator {
       m_cancelAction = null;
       swtForm.getToolBarManager().update(true);
     }
+    m_part.setBusy(false);
     swtForm.getBody().setEnabled(true);
     swtForm.layout(true);
     //restore focus

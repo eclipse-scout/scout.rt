@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.busy.AnimatedBusyImage;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
@@ -64,9 +65,31 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
   private PropertyChangeListener m_formPropertyListener;
   private ISwtScoutForm m_uiForm;
 
+  private AnimatedBusyImage m_busyImage;
+  private Image m_titleImageBackup;
+
   public AbstractScoutView() {
     m_formPropertyListener = new P_ScoutPropertyChangeListener();
     m_closeLock = new OptimisticLock();
+  }
+
+  @Override
+  protected void setTitleImage(Image titleImage) {
+    m_titleImageBackup = titleImage;
+    if (m_busyImage == null || !m_busyImage.isBusy()) {
+      super.setTitleImage(titleImage);
+    }
+  }
+
+  @Override
+  public void setBusy(boolean b) {
+    if (m_busyImage == null || m_busyImage.isBusy() == b) {
+      return;
+    }
+    m_busyImage.setBusy(b);
+    if (!b) {
+      super.setTitleImage(m_titleImageBackup);
+    }
   }
 
   protected void attatchListeners() {
@@ -241,6 +264,12 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
 
   @Override
   public void createPartControl(Composite parent) {
+    m_busyImage = new AnimatedBusyImage(parent.getDisplay()) {
+      @Override
+      protected void notifyImage(Image image) {
+        AbstractScoutView.super.setTitleImage(image);
+      }
+    };
     ScoutFormToolkit toolkit = getSwtEnvironment().getFormToolkit();
     m_rootForm = toolkit.createForm(parent);
     m_rootForm.setData(ISwtScoutPart.MARKER_SCOLLED_FORM, new Object());

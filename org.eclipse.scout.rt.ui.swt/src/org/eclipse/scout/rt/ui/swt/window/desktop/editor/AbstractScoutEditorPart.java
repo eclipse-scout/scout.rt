@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.busy.AnimatedBusyImage;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
@@ -61,11 +62,32 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   private PropertyChangeListener m_formPropertyListener;
   private OptimisticLock m_layoutLock;
   private ISwtScoutForm m_uiForm;
+  private Image m_titleImageBackup;
+  private AnimatedBusyImage m_busyImage;
 
   public AbstractScoutEditorPart() {
     m_layoutLock = new OptimisticLock();
     m_closeLock = new OptimisticLock();
     m_formPropertyListener = new P_ScoutPropertyChangeListener();
+  }
+
+  @Override
+  protected void setTitleImage(Image titleImage) {
+    m_titleImageBackup = titleImage;
+    if (m_busyImage == null || !m_busyImage.isBusy()) {
+      super.setTitleImage(titleImage);
+    }
+  }
+
+  @Override
+  public void setBusy(boolean b) {
+    if (m_busyImage == null || m_busyImage.isBusy() == b) {
+      return;
+    }
+    m_busyImage.setBusy(b);
+    if (!b) {
+      super.setTitleImage(m_titleImageBackup);
+    }
   }
 
   protected void attachScout() {
@@ -199,6 +221,12 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
 
   @Override
   public void createPartControl(Composite parent) {
+    m_busyImage = new AnimatedBusyImage(parent.getDisplay()) {
+      @Override
+      protected void notifyImage(Image image) {
+        AbstractScoutEditorPart.super.setTitleImage(image);
+      }
+    };
     ScoutFormToolkit toolkit = getSwtEnvironment().getFormToolkit();
     m_rootForm = toolkit.createForm(parent);
     m_rootForm.setData(ISwtScoutPart.MARKER_SCOLLED_FORM, new Object());

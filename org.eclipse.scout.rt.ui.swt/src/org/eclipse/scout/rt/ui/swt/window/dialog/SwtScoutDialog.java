@@ -66,6 +66,12 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     setShellStyle(style);
   }
 
+  @Override
+  public void setBusy(boolean b) {
+    getSwtForm().setBusy(b);
+    getSwtForm().layout(true);
+  }
+
   public void showForm(IForm scoutForm) throws ProcessingException {
     m_opened = true;
     if (m_scoutForm == null) {

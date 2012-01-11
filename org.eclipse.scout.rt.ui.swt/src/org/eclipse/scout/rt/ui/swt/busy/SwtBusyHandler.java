@@ -42,6 +42,6 @@ public class SwtBusyHandler extends AbstractBusyHandler {
 
   @Override
   protected void runBusy() {
-    new SwtBusyWaitJob(TEXTS.get("BusyJob"), this).schedule();
+    new SwtBusyStep1Job(TEXTS.get("BusyJob"), this).schedule();
   }
 }

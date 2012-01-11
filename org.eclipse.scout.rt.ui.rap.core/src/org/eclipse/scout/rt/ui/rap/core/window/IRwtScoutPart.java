@@ -35,4 +35,8 @@ public interface IRwtScoutPart {
 
   boolean setStatusLineMessage(Image image, String message);
 
+  /**
+   * Mark the part as busy waiting
+   */
+  void setBusy(boolean b);
 }

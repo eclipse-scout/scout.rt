@@ -50,6 +50,12 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
   }
 
   @Override
+  public void setBusy(boolean b) {
+    getUiForm().setBusy(b);
+    getUiForm().layout(true);
+  }
+
+  @Override
   public Form getUiForm() {
     return m_uiForm;
   }
