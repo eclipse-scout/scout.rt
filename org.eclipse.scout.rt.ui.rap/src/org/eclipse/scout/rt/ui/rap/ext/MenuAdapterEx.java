@@ -10,17 +10,15 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.ext;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
@@ -61,46 +59,31 @@ public abstract class MenuAdapterEx extends MenuAdapter {
   public void menuShown(MenuEvent e) {
     final IRwtEnvironment uiEnvironment = getUiEnvironment(e.display);
     //add escape-keystroke to close the contextmenu with esc
-    IKeyStroke scoutKeyStroke = new AbstractKeyStroke() {
-      @Override
-      protected String getConfiguredKeyStroke() {
-        return "escape";
-      }
+    RwtKeyStroke keyStroke = new RwtKeyStroke(RwtUtility.scoutToRwtKey("escape")) {
 
       @Override
-      protected void execAction() throws ProcessingException {
-        final IKeyStroke keyStroke = this;
-        uiEnvironment.invokeUiLater(new Runnable() {
+      public void handleUiAction(Event keyEvent) {
+        if (getContextMenu() != null && !getContextMenu().isDisposed()) {
+          for (MenuItem item : getContextMenu().getItems()) {
+            disposeMenuItem(item);
+          }
+          getContextMenu().dispose();
+        }
 
-          @Override
-          public void run() {
-            if (getContextMenu() != null && !getContextMenu().isDisposed()) {
-              for (MenuItem item : getContextMenu().getItems()) {
-                disposeMenuItem(item);
-              }
-              getContextMenu().dispose();
-            }
-
-            if ((getContextMenu() == null || getContextMenu().isDisposed())
+        if ((getContextMenu() == null || getContextMenu().isDisposed())
                 && !getMenuControl().isDisposed()
                 && !getMenuControl().getShell().isDisposed()) {
-              setContextMenu(new Menu(getMenuControl().getShell(), SWT.POP_UP));
-              getContextMenu().addMenuListener(MenuAdapterEx.this);
-              getMenuControl().setMenu(getContextMenu());
-            }
+          setContextMenu(new Menu(getMenuControl().getShell(), SWT.POP_UP));
+          getContextMenu().addMenuListener(MenuAdapterEx.this);
+          getMenuControl().setMenu(getContextMenu());
+        }
 
-            IRwtKeyStroke[] uiStrokes = RwtUtility.getKeyStrokes(keyStroke, uiEnvironment);
-            for (IRwtKeyStroke uiStroke : uiStrokes) {
-              uiEnvironment.removeKeyStroke(getKeyStrokeWidget(), uiStroke);
-            }
-          }
-        });
+        uiEnvironment.removeKeyStroke(getKeyStrokeWidget(), this);
+
+        keyEvent.doit = false;
       }
     };
-    IRwtKeyStroke[] uiStrokes = RwtUtility.getKeyStrokes(scoutKeyStroke, uiEnvironment);
-    for (IRwtKeyStroke uiStroke : uiStrokes) {
-      uiEnvironment.addKeyStroke(getKeyStrokeWidget(), uiStroke);
-    }
+    uiEnvironment.addKeyStroke(getKeyStrokeWidget(), keyStroke, true);
 
     // clear all previous
     // Windows BUG: fires menu hide before the selection on the menu item is

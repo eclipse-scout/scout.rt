@@ -53,12 +53,12 @@ public class RwtScoutRadioButtonGroup extends RwtScoutValueFieldComposite<IRadio
       if (uiField.getUiField() instanceof Button) {
         Button uiButton = (Button) uiField.getUiField();
         uiButton.addListener(SWT.Selection, m_uiButtonListener);
-        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_DOWN));
-        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_RIGHT));
-        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_UP));
-        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_LEFT));
-        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.HOME));
-        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.END));
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_DOWN), false);
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_RIGHT), false);
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_UP), false);
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.ARROW_LEFT), false);
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.HOME), false);
+        getUiEnvironment().addKeyStroke(uiButton, new P_KeyStroke(SWT.END), false);
 
         m_uiRadioButtons.add(uiButton);
         if (uiButton.getSelection()) {

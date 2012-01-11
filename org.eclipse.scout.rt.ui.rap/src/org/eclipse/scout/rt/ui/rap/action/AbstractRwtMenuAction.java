@@ -134,7 +134,7 @@ public class AbstractRwtMenuAction {
       IKeyStroke scoutKeyStroke = new KeyStroke(getScoutAction().getKeyStroke());
       m_uiKeyStrokes = RwtUtility.getKeyStrokes(scoutKeyStroke, getUiEnvironment());
       for (IRwtKeyStroke uiStroke : m_uiKeyStrokes) {
-        getUiEnvironment().addGlobalKeyStroke(uiStroke);
+        getUiEnvironment().addGlobalKeyStroke(uiStroke, false);
       }
     }
   }

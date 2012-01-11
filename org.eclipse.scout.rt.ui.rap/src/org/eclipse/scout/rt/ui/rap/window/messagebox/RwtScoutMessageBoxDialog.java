@@ -268,7 +268,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
         public void handleUiAction(Event e) {
           fDefaultButton.notifyListeners(SWT.Selection, null);
         }
-      });
+      }, false);
     }
     // Cancel the dialog with the ESCAPE key (workaround)
     m_uiEnvironment.addKeyStroke(getShell(), new RwtKeyStroke(SWT.ESC) {
@@ -277,7 +277,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
       public void handleUiAction(Event e) {
         cancelPressed();
       }
-    });
+    }, false);
     if (getScoutObject().getHiddenText() != null) {
       Button copyButton = createButton(buttonArea, RwtUtility.getNlsText(Display.getCurrent(), "Copy"), null, -1);
       copyButton.addSelectionListener(new SelectionAdapter() {

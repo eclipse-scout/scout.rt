@@ -341,7 +341,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         IRwtKeyStroke[] uiStrokes = RwtUtility.getKeyStrokes(scoutKeyStroke, this);
         for (IRwtKeyStroke uiStroke : uiStrokes) {
           m_desktopKeyStrokes.add(uiStroke);
-          addGlobalKeyStroke(uiStroke);
+          addGlobalKeyStroke(uiStroke, false);
         }
       }
       // notify ui available
@@ -582,8 +582,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   //keyStroke handling
   @Override
-  public void addGlobalKeyStroke(IRwtKeyStroke stroke) {
-    m_keyStrokeManager.addGlobalKeyStroke(stroke);
+  public void addGlobalKeyStroke(IRwtKeyStroke stroke, boolean exclusive) {
+    m_keyStrokeManager.addGlobalKeyStroke(stroke, exclusive);
   }
 
   @Override
@@ -592,8 +592,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   @Override
-  public void addKeyStroke(Control control, IRwtKeyStroke stoke) {
-    m_keyStrokeManager.addKeyStroke(control, stoke);
+  public void addKeyStroke(Control control, IRwtKeyStroke stoke, boolean exclusive) {
+    m_keyStrokeManager.addKeyStroke(control, stoke, exclusive);
   }
 
   @Override

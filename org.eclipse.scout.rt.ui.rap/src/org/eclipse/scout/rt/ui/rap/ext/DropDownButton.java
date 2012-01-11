@@ -82,9 +82,9 @@ public class DropDownButton extends Button {
         }
       }
     });
-    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(' '));
-    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(SWT.CR));
-    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(SWT.ARROW_DOWN));
+    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(' '), false);
+    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(SWT.CR), false);
+    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(SWT.ARROW_DOWN), false);
 
     addFocusListener(new FocusAdapter() {
       private static final long serialVersionUID = 1L;

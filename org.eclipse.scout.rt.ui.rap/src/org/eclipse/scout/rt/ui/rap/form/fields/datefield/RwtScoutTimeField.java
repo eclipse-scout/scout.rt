@@ -113,7 +113,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     container.setTabList(new Control[]{m_timeContainer});
 
     // ui key strokes
-    getUiEnvironment().addKeyStroke(container, new P_TimeChooserOpenKeyStroke());
+    getUiEnvironment().addKeyStroke(container, new P_TimeChooserOpenKeyStroke(), false);
     container.addDisposeListener(new DisposeListener() {
 
       private static final long serialVersionUID = 1L;
@@ -125,10 +125,10 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     });
 
     // listener
-    getUiEnvironment().addKeyStroke(textField, new P_ShiftNextQuarterHourKeyStroke());
-    getUiEnvironment().addKeyStroke(textField, new P_ShiftPreviousQuarterHourKeyStroke());
-    getUiEnvironment().addKeyStroke(textField, new P_ShiftNextHourKeyStroke());
-    getUiEnvironment().addKeyStroke(textField, new P_ShiftPreviousHourKeyStroke());
+    getUiEnvironment().addKeyStroke(textField, new P_ShiftNextQuarterHourKeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_ShiftPreviousQuarterHourKeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_ShiftNextHourKeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_ShiftPreviousHourKeyStroke(), false);
 
     timeChooserButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtBrowseButtonListener());
     textField.addMouseListener(new MouseAdapter() {

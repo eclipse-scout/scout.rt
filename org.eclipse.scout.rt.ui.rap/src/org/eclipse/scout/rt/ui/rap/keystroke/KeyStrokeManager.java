@@ -44,7 +44,9 @@ public class KeyStrokeManager implements IKeyStrokeManager {
   private Listener m_keyListener;
   private KeyAdapter m_keyAdapter;
   private List<IRwtKeyStroke> m_globalKeyStrokes;
-  private Map<Widget, List<String>> m_widgetKeys;
+  private List<String> m_globalCancelKeyList;
+  private Map<Widget, List<String>> m_widgetActiveKeys;
+  private Map<Widget, List<String>> m_widgetCancelKeys;
 
   private boolean m_globalKeyStrokesActivated = false;
   private Object m_globalKeyStrokeListLock;
@@ -54,7 +56,9 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     m_environment = environment;
     m_globalKeyStrokeListLock = new Object();
     m_globalKeyStrokes = new ArrayList<IRwtKeyStroke>();
-    m_widgetKeys = new HashMap<Widget, List<String>>();
+    m_globalCancelKeyList = new ArrayList<String>();
+    m_widgetActiveKeys = new HashMap<Widget, List<String>>();
+    m_widgetCancelKeys = new HashMap<Widget, List<String>>();
 
     m_keyListener = new Listener() {
       private static final long serialVersionUID = 1L;
@@ -90,10 +94,15 @@ public class KeyStrokeManager implements IKeyStrokeManager {
   }
 
   @Override
-  public void addGlobalKeyStroke(IRwtKeyStroke stroke) {
+  public void addGlobalKeyStroke(IRwtKeyStroke stroke, boolean exclusive) {
     synchronized (m_globalKeyStrokeListLock) {
       m_globalKeyStrokes.add(stroke);
       updateGlobalActiveKeys();
+
+      if (exclusive) {
+        m_globalCancelKeyList.add(resolveKeyString(stroke));
+        updateGlobalCancelKeys();
+      }
     }
   }
 
@@ -102,6 +111,9 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     synchronized (m_globalKeyStrokeListLock) {
       boolean retVal = m_globalKeyStrokes.remove(stroke);
       updateGlobalActiveKeys();
+
+      m_globalCancelKeyList.remove(resolveKeyString(stroke));
+      updateGlobalCancelKeys();
       return retVal;
     }
   }
@@ -113,7 +125,7 @@ public class KeyStrokeManager implements IKeyStrokeManager {
   }
 
   @Override
-  public void addKeyStroke(Control control, IRwtKeyStroke stroke) {
+  public void addKeyStroke(Control control, IRwtKeyStroke stroke, boolean exclusive) {
     @SuppressWarnings("unchecked")
     List<IRwtKeyStroke> keyStrokes = (List<IRwtKeyStroke>) control.getData(DATA_KEY_STROKES);
     if (keyStrokes == null) {
@@ -122,18 +134,35 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     keyStrokes.add(stroke);
     control.setData(DATA_KEY_STROKES, keyStrokes);
 
-    List<String> widgetKeys = m_widgetKeys.get(control);
-    if (widgetKeys == null) {
-      widgetKeys = new ArrayList<String>();
+    List<String> widgetActiveKeys = m_widgetActiveKeys.get(control);
+    if (widgetActiveKeys == null) {
+      widgetActiveKeys = new ArrayList<String>();
     }
-    widgetKeys.add(resolveActiveKey(stroke));
-    m_widgetKeys.put(control, widgetKeys);
+    widgetActiveKeys.add(resolveKeyString(stroke));
+    m_widgetActiveKeys.put(control, widgetActiveKeys);
     updateActiveKeys(control);
+
+    if (exclusive) {
+      List<String> widgetCancelKeys = m_widgetCancelKeys.get(control);
+      if (widgetCancelKeys == null) {
+        widgetCancelKeys = new ArrayList<String>();
+      }
+      widgetCancelKeys.add(resolveKeyString(stroke));
+      m_widgetCancelKeys.put(control, widgetCancelKeys);
+      updateCancelKeys(control);
+    }
   }
 
   @Override
   public boolean removeKeyStroke(Control control, IRwtKeyStroke stroke) {
     boolean retVal = false;
+    if (control == null
+        || control.isDisposed()) {
+      m_widgetActiveKeys.remove(control);
+      m_widgetCancelKeys.remove(control);
+      return retVal;
+    }
+
     @SuppressWarnings("unchecked")
     List<IRwtKeyStroke> keyStrokes = (List<IRwtKeyStroke>) control.getData(DATA_KEY_STROKES);
     if (keyStrokes != null) {
@@ -141,12 +170,19 @@ public class KeyStrokeManager implements IKeyStrokeManager {
       control.setData(DATA_KEY_STROKES, keyStrokes);
     }
 
-    List<String> widgetKeys = m_widgetKeys.get(control);
-    if (widgetKeys != null) {
-      widgetKeys.remove(resolveActiveKey(stroke));
-      m_widgetKeys.put(control, widgetKeys);
+    List<String> widgetActiveKeys = m_widgetActiveKeys.get(control);
+    if (widgetActiveKeys != null) {
+      widgetActiveKeys.remove(resolveKeyString(stroke));
+      m_widgetActiveKeys.put(control, widgetActiveKeys);
+    }
+
+    List<String> widgetCancelKeys = m_widgetCancelKeys.get(control);
+    if (widgetCancelKeys != null) {
+      widgetCancelKeys.remove(resolveKeyString(stroke));
+      m_widgetCancelKeys.put(control, widgetCancelKeys);
     }
     updateActiveKeys(control);
+    updateCancelKeys(control);
 
     return retVal;
   }
@@ -178,7 +214,7 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     Set<String> activeKeys = new HashSet<String>(m_globalKeyStrokes.size());
 
     for (IRwtKeyStroke stroke : m_globalKeyStrokes) {
-      String activeKey = resolveActiveKey(stroke);
+      String activeKey = resolveKeyString(stroke);
 
       activeKeys.add(activeKey);
     }
@@ -187,16 +223,28 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     m_environment.getDisplay().setData(RWT.ACTIVE_KEYS, activeKeyArray);
   }
 
+  private void updateGlobalCancelKeys() {
+    String[] cancelKeyArray = m_globalCancelKeyList.toArray(new String[m_globalCancelKeyList.size()]);
+    m_environment.getDisplay().setData(RWT.CANCEL_KEYS, cancelKeyArray);
+  }
+
   private void updateActiveKeys(Control control) {
-    List<String> activeKeys = m_widgetKeys.get(control);
+    List<String> activeKeys = m_widgetActiveKeys.get(control);
 
     String[] activeKeyArray = activeKeys.toArray(new String[activeKeys.size()]);
     control.addKeyListener(m_keyAdapter);
     control.setData(RWT.ACTIVE_KEYS, activeKeyArray);
-//    control.setData(RWT.CANCEL_KEYS, activeKeyArray);
   }
 
-  private String resolveActiveKey(IRwtKeyStroke stroke) {
+  private void updateCancelKeys(Control control) {
+    List<String> cancelKeys = m_widgetCancelKeys.get(control);
+
+    String[] cancelKeyArray = cancelKeys.toArray(new String[cancelKeys.size()]);
+    control.addKeyListener(m_keyAdapter);
+    control.setData(RWT.CANCEL_KEYS, cancelKeyArray);
+  }
+
+  private String resolveKeyString(IRwtKeyStroke stroke) {
     //resolve modifier
     String modifier = "";
     if (stroke.getStateMask() > 0) {
@@ -218,8 +266,8 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     String key = RwtUtility.getKeyTextUpper(stroke.getKeyCode());
 
     //concatenate modifier & key
-    String activeKey = StringUtility.join("+", modifier, key);
-    return activeKey;
+    String keyString = StringUtility.join("+", modifier, key);
+    return keyString;
   }
 
   private void handleKeyEvent(KeyEvent e) {

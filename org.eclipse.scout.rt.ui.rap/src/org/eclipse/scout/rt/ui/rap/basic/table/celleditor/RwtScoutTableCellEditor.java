@@ -495,7 +495,7 @@ public class RwtScoutTableCellEditor {
           e.doit = false;
           fireCancelEditor();
         }
-      });
+      }, false);
       m_uiTableComposite.getUiEnvironment().addKeyStroke(m_container, new RwtKeyStroke(SWT.CR) {
         @Override
         public void handleUiAction(Event e) {
@@ -503,7 +503,7 @@ public class RwtScoutTableCellEditor {
           fireApplyEditorValue();
           deactivate();
         }
-      });
+      }, false);
       return m_container;
     }
 

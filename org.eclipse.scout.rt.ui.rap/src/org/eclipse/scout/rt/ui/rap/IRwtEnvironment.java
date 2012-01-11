@@ -104,7 +104,7 @@ public interface IRwtEnvironment extends IRwtCoreEnvironment {
    * @param stroke
    * @return
    */
-  void addGlobalKeyStroke(IRwtKeyStroke stroke);
+  void addGlobalKeyStroke(IRwtKeyStroke stroke, boolean exclusive);
 
   /**
    * global key strokes will be executed when and only when no key stroke of the
@@ -119,7 +119,7 @@ public interface IRwtEnvironment extends IRwtCoreEnvironment {
   /**
    * @see IKeyStrokeManager#addKeyStroke(Widget, IRwtKeyStroke)
    */
-  void addKeyStroke(Control control, IRwtKeyStroke stroke);
+  void addKeyStroke(Control control, IRwtKeyStroke stroke, boolean exclusive);
 
   /**
    * @see IKeyStrokeManager#removeKeyStroke(Widget, IRwtKeyStroke)

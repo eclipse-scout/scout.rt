@@ -27,9 +27,11 @@ public interface IKeyStrokeManager {
    * (event.doit = false) the event.
    * 
    * @param stroke
+   * @param exclusive
+   *          true will cancel all other key events from the client
    * @return
    */
-  void addGlobalKeyStroke(IRwtKeyStroke stroke);
+  void addGlobalKeyStroke(IRwtKeyStroke stroke, boolean exclusive);
 
   /**
    * global key strokes will be executed when and only when no key stroke of the
@@ -46,8 +48,10 @@ public interface IKeyStrokeManager {
    * 
    * @param control
    * @param stroke
+   * @param exclusive
+   *          true will cancel all other key events from the client
    */
-  void addKeyStroke(Control control, IRwtKeyStroke stroke);
+  void addKeyStroke(Control control, IRwtKeyStroke stroke, boolean exclusive);
 
   /**
    * Commodity to access the key stroke filters set as data on the control

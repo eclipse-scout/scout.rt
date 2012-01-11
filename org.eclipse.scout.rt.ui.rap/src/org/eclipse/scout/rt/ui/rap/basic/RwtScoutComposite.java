@@ -211,7 +211,7 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
 
       // on CR validate input first
       for (IRwtKeyStroke stroke : getUiKeyStrokes()) {
-        getUiEnvironment().addKeyStroke(uiField, stroke);
+        getUiEnvironment().addKeyStroke(uiField, stroke, false);
       }
       P_RwtFieldListener listener = new P_RwtFieldListener();
       m_uiField.addListener(SWT.FocusIn, listener);

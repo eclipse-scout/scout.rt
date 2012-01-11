@@ -358,7 +358,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       if (scoutKeyStroke.isEnabled()) {
         IRwtKeyStroke[] rwtStrokes = RwtUtility.getKeyStrokes(scoutKeyStroke, getUiEnvironment());
         for (IRwtKeyStroke rwtStroke : rwtStrokes) {
-          getUiEnvironment().addKeyStroke(getUiField(), rwtStroke);
+          getUiEnvironment().addKeyStroke(getUiField(), rwtStroke, false);
           newRwtKeyStrokes.add(rwtStroke);
         }
       }

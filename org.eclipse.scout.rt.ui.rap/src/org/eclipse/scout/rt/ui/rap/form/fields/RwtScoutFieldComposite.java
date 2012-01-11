@@ -323,7 +323,7 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
       for (IKeyStroke scoutKeyStroke : scoutKeyStrokes) {
         IRwtKeyStroke[] uiStrokes = RwtUtility.getKeyStrokes(scoutKeyStroke, getUiEnvironment());
         for (IRwtKeyStroke uiStroke : uiStrokes) {
-          getUiEnvironment().addKeyStroke(widget, uiStroke);
+          getUiEnvironment().addKeyStroke(widget, uiStroke, false);
           newUiKeyStrokes.add(uiStroke);
         }
       }

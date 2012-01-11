@@ -108,7 +108,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     viewer.getTree().addListener(SWT.MouseUp, treeListener);
     viewer.getTree().addListener(SWT.KeyUp, treeListener);
 
-    getUiEnvironment().addKeyStroke(viewer.getTree(), new P_RwtKeyReturnAvoidDoubleClickListener());
+    getUiEnvironment().addKeyStroke(viewer.getTree(), new P_RwtKeyReturnAvoidDoubleClickListener(), false);
 
     // context menu
     m_contextMenu = new Menu(viewer.getTree().getShell(), SWT.POP_UP);
@@ -271,7 +271,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     for (IKeyStroke scoutKeyStroke : scoutKeyStrokes) {
       IRwtKeyStroke[] strokes = RwtUtility.getKeyStrokes(scoutKeyStroke, getUiEnvironment());
       for (IRwtKeyStroke stroke : strokes) {
-        getUiEnvironment().addKeyStroke(getUiField(), stroke);
+        getUiEnvironment().addKeyStroke(getUiField(), stroke, false);
         newKeyStrokes.add(stroke);
       }
     }

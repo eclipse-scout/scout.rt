@@ -117,7 +117,7 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     container.setTabList(new Control[]{m_dateContainer});
 
     // ui key strokes
-    getUiEnvironment().addKeyStroke(container, new P_DateChooserOpenKeyStroke());
+    getUiEnvironment().addKeyStroke(container, new P_DateChooserOpenKeyStroke(), false);
     container.addDisposeListener(new DisposeListener() {
 
       private static final long serialVersionUID = 1L;
@@ -129,12 +129,12 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     });
 
     // listener
-    getUiEnvironment().addKeyStroke(textField, new P_ShiftDayUpKeyStroke());
-    getUiEnvironment().addKeyStroke(textField, new P_ShiftDayDownKeyStroke());
-    getUiEnvironment().addKeyStroke(textField, new P_ShiftMonthUpKeyStroke());
-    getUiEnvironment().addKeyStroke(textField, new P_ShiftMonthDownKeyStroke());
-    getUiEnvironment().addKeyStroke(textField, new P_ShiftYearUpKeyStroke());
-    getUiEnvironment().addKeyStroke(textField, new P_ShiftYearDownKeyStroke());
+    getUiEnvironment().addKeyStroke(textField, new P_ShiftDayUpKeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_ShiftDayDownKeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_ShiftMonthUpKeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_ShiftMonthDownKeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_ShiftYearUpKeyStroke(), false);
+    getUiEnvironment().addKeyStroke(textField, new P_ShiftYearDownKeyStroke(), false);
 
     dateChooserButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtBrowseButtonListener());
     textField.addMouseListener(new MouseAdapter() {

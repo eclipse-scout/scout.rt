@@ -156,17 +156,17 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     m_browseButton.setMenu(m_contextMenu);
 
     // F2 key stroke
-    getUiEnvironment().addKeyStroke(getUiContainer(), new P_F2KeyStroke());
+    getUiEnvironment().addKeyStroke(getUiContainer(), new P_F2KeyStroke(), false);
 
     // listeners
     P_UiFieldListener listener = new P_UiFieldListener();
     getUiField().addListener(SWT.Modify, listener);
     getUiField().addListener(SWT.Traverse, listener);
     getUiField().addListener(SWT.FocusOut, listener);
-    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_DOWN));
-    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_UP));
-    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_DOWN));
-    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_UP));
+    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_DOWN), false);
+    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_UP), false);
+    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_DOWN), false);
+    getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_UP), false);
 
     P_RwtBrowseButtonListener browseButtonListener = new P_RwtBrowseButtonListener();
     getUiBrowseButton().addSelectionListener(browseButtonListener);
