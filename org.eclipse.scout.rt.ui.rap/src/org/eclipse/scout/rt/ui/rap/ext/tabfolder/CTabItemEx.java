@@ -14,7 +14,7 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 
 /**
- * <h3>CTabFolderEx</h3> ...
+ * <h3>CTabItemEx</h3> ...
  * 
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
