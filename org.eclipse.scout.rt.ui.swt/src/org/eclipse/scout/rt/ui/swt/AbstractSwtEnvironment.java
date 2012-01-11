@@ -609,12 +609,14 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return defaultFont;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean isBusy() {
     //replaced by SwtBusyHandler
     return false;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setBusyFromSwt(boolean b) {
     //replaced by SwtBusyHandler
