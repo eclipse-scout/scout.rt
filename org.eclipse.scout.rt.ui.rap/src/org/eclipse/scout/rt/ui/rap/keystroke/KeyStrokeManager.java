@@ -237,11 +237,12 @@ public class KeyStrokeManager implements IKeyStrokeManager {
   }
 
   private void updateCancelKeys(Control control) {
-    List<String> cancelKeys = m_widgetCancelKeys.get(control);
-
-    String[] cancelKeyArray = cancelKeys.toArray(new String[cancelKeys.size()]);
-    control.addKeyListener(m_keyAdapter);
-    control.setData(RWT.CANCEL_KEYS, cancelKeyArray);
+    List<String> widgetCancelKeys = m_widgetCancelKeys.get(control);
+    if (widgetCancelKeys != null) {
+      String[] cancelKeyArray = widgetCancelKeys.toArray(new String[widgetCancelKeys.size()]);
+      control.addKeyListener(m_keyAdapter);
+      control.setData(RWT.CANCEL_KEYS, cancelKeyArray);
+    }
   }
 
   private String resolveKeyString(IRwtKeyStroke stroke) {
