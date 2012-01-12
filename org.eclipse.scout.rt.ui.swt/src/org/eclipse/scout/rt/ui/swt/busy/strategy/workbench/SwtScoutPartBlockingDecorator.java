@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt.busy;
+package org.eclipse.scout.rt.ui.swt.busy.strategy.workbench;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.ContributionItem;
@@ -28,6 +28,9 @@ import org.eclipse.ui.forms.widgets.Form;
 /**
  * Decorates a {@link ISwtScoutPart}'s {@link ISwtScoutPart#getSwtForm()} header section with a progress bar and a
  * button
+ * 
+ * @author imo
+ * @since 3.8
  */
 public class SwtScoutPartBlockingDecorator {
   private static final String ATTACH_MARKER_DATA = SwtScoutPartBlockingDecorator.class.getName() + "#marker";

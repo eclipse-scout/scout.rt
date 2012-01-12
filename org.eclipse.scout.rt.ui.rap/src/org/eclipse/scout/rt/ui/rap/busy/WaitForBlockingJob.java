@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -31,31 +29,18 @@ import org.eclipse.swt.widgets.Display;
  * @author imo
  * @since 3.8
  */
-public class RwtBusyStep1Job extends BusyJob {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtBusyStep1Job.class);
+public class WaitForBlockingJob extends BusyJob {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(WaitForBlockingJob.class);
 
   private List<IRwtScoutPart> m_parts;
 
-  public RwtBusyStep1Job(String name, RwtBusyHandler handler) {
+  public WaitForBlockingJob(String name, RwtBusyHandler handler) {
     super(name, handler);
   }
 
   @Override
   protected RwtBusyHandler getBusyHandler() {
     return (RwtBusyHandler) super.getBusyHandler();
-  }
-
-  @Override
-  protected IStatus run(IProgressMonitor monitor) {
-    if (getBusyHandler().isBusy()) {
-      //only run busy
-      runBusy(monitor);
-      if (getBusyHandler().isBusy()) {
-        //schedule blocking job
-        new RwtBusyStep2Job(getName(), getBusyHandler(), m_parts).schedule();
-      }
-    }
-    return Status.OK_STATUS;
   }
 
   /**
@@ -92,6 +77,12 @@ public class RwtBusyStep1Job extends BusyJob {
         });
       }
     }
+  }
+
+  @Override
+  protected void runBlocking(IProgressMonitor monitor) {
+    //schedule blocking job
+    new BlockPartsJob(getName(), getBusyHandler(), m_parts).schedule();
   }
 
   /**

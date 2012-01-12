@@ -57,6 +57,6 @@ public class RwtBusyHandler extends AbstractBusyHandler {
 
   @Override
   protected void runBusy(Job job) {
-    new RwtBusyStep1Job(TEXTS.get("BusyJob"), this).schedule();
+    new WaitForBlockingJob(TEXTS.get("BusyJob"), this).schedule();
   }
 }

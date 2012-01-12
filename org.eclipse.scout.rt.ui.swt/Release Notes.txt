@@ -210,3 +210,12 @@ Solution:
 Removed extension point element “enableBehaviour”.
 Plug-Ins changed: org.eclipse.scout.rt.ui.swt
 Migration: Remove extension point “enableBehaviour” in projects swt-bundle.
+
+12.01.2012 imo
+Bugzilla: 364574
+New busy handling facility
+The default swt implementation SwtBusyHandler is attached in AbstractSwtEnvironment.attachBusyHandler
+Its runBusy method uses the factory BusyJobStrategy to create a handler (simple or workbench)
+The simple handler just shows a wait cursor and can be configured as to allow cancel.
+The workbench handler shows a wait cursor for 3 seconds and then blocks the views/dialog of the same IClientSession.
+It can be configured to block the whole workbench if no dialog is open.

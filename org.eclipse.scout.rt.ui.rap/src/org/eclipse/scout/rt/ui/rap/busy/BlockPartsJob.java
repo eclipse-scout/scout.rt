@@ -8,76 +8,75 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swt.busy;
+package org.eclipse.scout.rt.ui.rap.busy;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.BusyJob;
-import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
+import org.eclipse.scout.rt.ui.rap.core.window.IRwtScoutPart;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * Default SWT busy handler for a {@link IClientSession}
+ * Default RWT busy handler for a {@link IClientSession}
  * 
  * @author imo
  * @since 3.8
  */
-public class SwtBusyStep2Job extends BusyJob {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtBusyStep2Job.class);
+public class BlockPartsJob extends BusyJob {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BlockPartsJob.class);
 
-  private final List<ISwtScoutPart> m_parts;
+  private final List<IRwtScoutPart> m_parts;
 
-  public SwtBusyStep2Job(String name, SwtBusyHandler handler, List<ISwtScoutPart> parts) {
+  public BlockPartsJob(String name, RwtBusyHandler handler, List<IRwtScoutPart> parts) {
     super(name, handler);
     setSystem(true);
     m_parts = parts;
   }
 
   @Override
-  protected SwtBusyHandler getBusyHandler() {
-    return (SwtBusyHandler) super.getBusyHandler();
+  protected RwtBusyHandler getBusyHandler() {
+    return (RwtBusyHandler) super.getBusyHandler();
   }
 
   @Override
-  protected IStatus run(IProgressMonitor monitor) {
-    if (getBusyHandler().isBusy()) {
-      runBlocking(monitor);
-    }
-    return Status.OK_STATUS;
+  protected void runBusy(IProgressMonitor monitor) {
+    //nop
   }
 
   /**
-   * Show a stop button in the active form parts header section and block all parts of the specific session
-   * (environment).
+   * Show a stop button in the active form parts header section.
    * <p>
-   * Do not show a wait cursor anymore.
+   * Do not show a wait cursor.
    */
   @Override
   protected void runBlocking(final IProgressMonitor monitor) {
     if (m_parts == null || m_parts.size() == 0) {
       return;
     }
-    final ArrayList<SwtScoutPartBlockingDecorator> decoList = new ArrayList<SwtScoutPartBlockingDecorator>();
+    final ArrayList<RwtScoutPartBlockingDecorator> decoList = new ArrayList<RwtScoutPartBlockingDecorator>();
     final Display display = getBusyHandler().getDisplay();
+    final Control busyControl = (Control) getBusyHandler().getUiEnvironment().getClientSession().getData(RwtBusyHandler.BUSY_CONTROL_CLIENT_SESSION_KEY);
     try {
       display.syncExec(new Runnable() {
         @Override
         public void run() {
-          ISwtScoutPart activePart = m_parts.get(0);
-          for (ISwtScoutPart p : m_parts) {
+          if (busyControl != null && !busyControl.isDisposed()) {
+            busyControl.setVisible(true);
+          }
+          IRwtScoutPart activePart = m_parts.get(0);
+          for (IRwtScoutPart p : m_parts) {
             if (p == null) {
               continue;
             }
-            decoList.add(new SwtScoutPartBlockingDecorator(p, p == activePart));
+            decoList.add(new RwtScoutPartBlockingDecorator(p, p == activePart, getBusyHandler().getUiEnvironment()));
           }
-          for (SwtScoutPartBlockingDecorator deco : decoList) {
+          for (RwtScoutPartBlockingDecorator deco : decoList) {
             try {
               deco.attach(monitor);
             }
@@ -88,14 +87,17 @@ public class SwtBusyStep2Job extends BusyJob {
         }
       });
       //
-      SwtBusyStep2Job.super.runBlocking(monitor);
+      BlockPartsJob.super.runBlocking(monitor);
       //
     }
     finally {
       display.syncExec(new Runnable() {
         @Override
         public void run() {
-          for (SwtScoutPartBlockingDecorator deco : decoList) {
+          if (busyControl != null && !busyControl.isDisposed()) {
+            busyControl.setVisible(false);
+          }
+          for (RwtScoutPartBlockingDecorator deco : decoList) {
             try {
               deco.detach();
             }

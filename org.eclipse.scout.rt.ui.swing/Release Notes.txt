@@ -509,3 +509,9 @@ Changed initialization sequence to first read model properties before setting th
 Plug-Ins changed:
 org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#attachScout]
 Migration: None
+
+12.01.2012 imo
+Bugzilla: 364574
+New busy handling facility
+The default swing implementation SwingBusyHandler is attached in AbstractSwingEnvironment.attachBusyHandler
+It uses the glass pane concept and shows a wait cursor for 3 seconds, then blocks the screen allowing to cancel with the mouse.

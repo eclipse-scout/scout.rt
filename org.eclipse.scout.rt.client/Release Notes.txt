@@ -728,3 +728,9 @@ Leading and trailing newlines are trimmed prior to replacing them by spaces.
 Plug-Ins changed:
 org.eclipse.scout.commons [StringUtility], org.eclipse.scout.rt.ui.swing [SwingScoutTextFieldComposite#P_SwingDocumentFilter], org.eclipse.scout.rt.client [SwingScoutTextFieldComposite]
 Migration: None
+
+12.01.2012 imo
+Bugzilla: 364574
+New busy handling facility
+The model detects busy in ClientSyncJob and provides the IBusyManagerService with IBusyHandler.
+See swing, swt, rwt scout implemenations for more details.

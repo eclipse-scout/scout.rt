@@ -23,6 +23,9 @@ import org.osgi.framework.Bundle;
 
 /**
  * Animated busy image as defined in org.eclipse.ui.forms#$nl$/icons/progress/ani/$index$.png
+ * 
+ * @author imo
+ * @since 3.8
  */
 public class AnimatedBusyImage implements Runnable {
   private static final int IMAGE_COUNT = 8;

@@ -37,3 +37,9 @@ Solution:
 Removed extension point element “enableBehaviour”.
 Plug-Ins changed: org.eclipse.scout.rt.ui.rap
 Migration: Remove extension point “enableBehaviour” in projects rap-bundle.
+
+12.01.2012 imo
+Bugzilla: 364574
+New busy handling facility
+The default rwt implementation RwtBusyHandler is attached in AbstractRwtEnvironment.attachBusyHandler.
+It shows a wait cursor for 3 seconds and then blocks all views/dialog of the same IClientSession.

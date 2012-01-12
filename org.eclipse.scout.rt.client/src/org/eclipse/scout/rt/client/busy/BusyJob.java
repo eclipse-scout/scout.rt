@@ -21,6 +21,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * This is the default busy job that runs the process of showing busy marker, blocking and canceling.
  * <p>
  * Subclass this job for custom handling.
+ * <p>
+ * The {@link #run(IProgressMonitor)} first calls {@link #runBusy(IProgressMonitor)} and then calls
+ * {@link #runBlocking(IProgressMonitor)}
  * 
  * @author imo
  * @since 3.8
@@ -42,6 +45,9 @@ public class BusyJob extends Job {
 
   @Override
   protected IStatus run(IProgressMonitor monitor) {
+    if (!getBusyHandler().isBusy()) {
+      return Status.OK_STATUS;
+    }
     runBusy(monitor);
     if (!getBusyHandler().isBusy()) {
       return Status.OK_STATUS;
