@@ -71,9 +71,7 @@ public class WaitForBlockingJob extends BusyJob {
         WaitForBlockingJob.super.runBusy(monitor2);
       }
     };
-    System.out.println("run busy 1");//XXX
     SwtBusyUtility.showBusyIndicator(display, busyRunnable, monitor);
-    System.out.println("run busy 2");//XXX
   }
 
   @Override
