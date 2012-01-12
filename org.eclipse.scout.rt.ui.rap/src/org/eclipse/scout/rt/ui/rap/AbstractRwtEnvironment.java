@@ -583,7 +583,12 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   //keyStroke handling
   @Override
   public void addGlobalKeyStroke(IRwtKeyStroke stroke, boolean exclusive) {
-    m_keyStrokeManager.addGlobalKeyStroke(stroke, exclusive);
+    boolean internalExclusive = exclusive;
+    //If F5 is set we wan't to have this exclusive to the application, else the browser will reload the page
+    if (SWT.F5 == stroke.getKeyCode()) {
+      internalExclusive = true;
+    }
+    m_keyStrokeManager.addGlobalKeyStroke(stroke, internalExclusive);
   }
 
   @Override
