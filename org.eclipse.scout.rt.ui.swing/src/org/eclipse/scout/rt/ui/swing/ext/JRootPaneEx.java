@@ -81,8 +81,8 @@ public class JRootPaneEx extends JRootPane {
       int dwPref = sizes[1].width - d.width;
       int dhPref = sizes[1].height - d.height;
       //OLD: if (dw != 0 || dh != 0 || dwPref != 0 || dhPref != 0) {
-      //NEW: only force re-pack when the  in/max range is not met, forcing preferred size breaks the bugs https://bugs.eclipse.org/bugs/show_bug.cgi?id=363148 and tickets 107768, 106554
-      if (dw != 0 || dh != 0) {
+      //NEW: only force re-pack when min/max or at least prefHeight is not met, forcing preferred size breaks the bugs https://bugs.eclipse.org/bugs/show_bug.cgi?id=363148 and tickets 107768, 106554
+      if (dw != 0 || dh != 0 || dhPref > 0) {
         correctRootPaneSize(dw, dh, dwPref, dhPref);
       }
     }
