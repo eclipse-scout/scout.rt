@@ -25,8 +25,8 @@ BSI Business Systems Integration AG - initial API and implementation
    </license>
 
    <url>
-      <update label="Indigo" url="http://download.eclipse.org/releases/indigo"/>
-      <discovery label="Indigo" url="http://download.eclipse.org/releases/indigo"/>
+      <update label="Juno" url="http://download.eclipse.org/releases/juno"/>
+      <discovery label="Juno" url="http://download.eclipse.org/releases/juno"/>
       <discovery label="Orbit" url="http://download.eclipse.org/tools/orbit/downloads/drops/updateSite"/>
    </url>
 
