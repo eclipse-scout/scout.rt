@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Server Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.server
-Bundle-Version: 3.7.1.qualifier
+Bundle-Version: 3.7.2.qualifier
 Bundle-Activator: org.eclipse.scout.rt.testing.server.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.testing.shared;visibility:=reexport,
