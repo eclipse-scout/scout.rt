@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.scout.rt.feature"
       label="%featureName"
-      version="3.7.0.qualifier"
+      version="3.8.0.qualifier"
       provider-name="%providerName">
 
    <description>
@@ -175,98 +175,98 @@ BSI Business Systems Integration AG - initial API and implementation
          version="0.0.0"
          unpack="false"/>
 
-	<plugin
+   <plugin
          id="org.apache.batik.css"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-    <plugin
+   <plugin
          id="org.apache.batik.dom"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-    <plugin
+   <plugin
          id="org.apache.batik.dom.svg"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-    <plugin
+   <plugin
          id="org.apache.batik.dom.svg"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-     <plugin
+   <plugin
          id="org.apache.batik.dom.svg"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-     <plugin
+   <plugin
          id="org.apache.batik.ext.awt"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-     <plugin
+   <plugin
          id="org.apache.batik.dom.svg"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-     <plugin
+   <plugin
          id="org.apache.batik.ext.awt"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-     <plugin
+   <plugin
          id="org.apache.batik.parser"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-     <plugin
+   <plugin
          id="org.apache.batik.svggen"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-     <plugin
+   <plugin
          id="org.apache.batik.swing"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-     <plugin
+   <plugin
          id="org.apache.batik.transcoder"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-    <plugin
+   <plugin
          id="org.apache.batik.util"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-    <plugin
+   <plugin
          id="org.apache.batik.util.gui"
          download-size="0"
          install-size="0"
@@ -279,4 +279,5 @@ BSI Business Systems Integration AG - initial API and implementation
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
 </feature>
