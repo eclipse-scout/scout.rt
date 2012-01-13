@@ -114,11 +114,11 @@ public final class UiDecorationExtensionPoint {
 
   private static int parseStarMarkerPosition(String value) {
     int pos = ILookAndFeelDecorations.STAR_MARKER_NONE;
-    if (StringUtility.isNullOrEmpty(value) || value.equalsIgnoreCase("beforeLabel")) {
-      pos = ILookAndFeelDecorations.STAR_MARKER_BEFORE_LABEL;
-    }
-    else if (value.equalsIgnoreCase("afterLabel")) {
+    if (StringUtility.isNullOrEmpty(value) || value.equalsIgnoreCase("afterLabel")) {
       pos = ILookAndFeelDecorations.STAR_MARKER_AFTER_LABEL;
+    }
+    else if (value.equalsIgnoreCase("beforeLabel")) {
+      pos = ILookAndFeelDecorations.STAR_MARKER_BEFORE_LABEL;
     }
     return pos;
   }

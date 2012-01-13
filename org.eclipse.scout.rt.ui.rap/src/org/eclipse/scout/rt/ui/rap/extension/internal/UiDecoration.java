@@ -25,7 +25,7 @@ public class UiDecoration implements IUiDecoration {
   private FontSpec m_mandatoryLabelFont;
   private int m_dialogMinWidth;
   private int m_dialogMinHeight;
-  private boolean m_formMainBoxBorderVisible = true;
+  private boolean m_formMainBoxBorderVisible = false;
   private int m_formFieldActivationButtonHeight;
   private int m_formFieldActivationButtonWidth;
   private int m_formFieldActivationButtonWithMenuWidth;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.4"?><!--
+<?eclipse version="3.4"?>
+<!--
     Copyright (c) 2011 BSI Business Systems Integration AG.
     All rights reserved. This program and the accompanying materials
     are made available under the terms of the Eclipse Public License v1.0
@@ -282,9 +283,11 @@
       <decorations
             scope="default">
         <mandatory>
-            <labelFont
-                  font="bold">
+            <labelFont>
             </labelFont>
+            <starMarker
+                  placement="afterLabel">
+            </starMarker>
         </mandatory>
       </decorations>
       <properties
@@ -324,6 +327,10 @@
         <property
               name="formfield.activationButtonWithMenu.width"
               value="21">
+        </property>
+        <property
+              name="formMainBoxBorder.visible"
+              value="false">
         </property>
         <property
               name="processButton.height"
