@@ -221,6 +221,9 @@ public final class UiDecorationExtensionPoint {
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_DEFAULT_COLUMN_WIDTH) != 0) {
         LOOK_AND_FEEL.setLogicalGridLayoutDefaultColumnWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_DEFAULT_COLUMN_WIDTH));
       }
+      if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_DEFAULT_POPUP_WIDTH) != 0) {
+        LOOK_AND_FEEL.setLogicalGridLayoutDefaultPopupWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_DEFAULT_POPUP_WIDTH));
+      }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_HORIZONTAL_GAP) != 0) {
         LOOK_AND_FEEL.setLogicalGridLayoutHorizontalGap(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_HORIZONTAL_GAP));
       }

@@ -31,6 +31,7 @@ public class UiDecoration implements IUiDecoration {
   private int m_formFieldActivationButtonWithMenuWidth;
   private int m_formFieldLabelWidth;
   private int m_logicalGridLayoutDefaultColumnWidth;
+  private int m_logicalGridLayoutDefaultPopupWidth;
   private int m_logicalGridLayoutHorizontalGap;
   private int m_logicalGridLayoutVerticalGap;
   private int m_logicalGridLayoutRowHeight;
@@ -183,6 +184,15 @@ public class UiDecoration implements IUiDecoration {
 
   public void setLogicalGridLayoutDefaultColumnWidth(int logicalGridLayoutDefaultColumnWidth) {
     m_logicalGridLayoutDefaultColumnWidth = logicalGridLayoutDefaultColumnWidth;
+  }
+
+  @Override
+  public int getLogicalGridLayoutDefaultPopupWidth() {
+    return m_logicalGridLayoutDefaultPopupWidth;
+  }
+
+  public void setLogicalGridLayoutDefaultPopupWidth(int logicalGridLayoutDefaultPopupWidth) {
+    m_logicalGridLayoutDefaultPopupWidth = logicalGridLayoutDefaultPopupWidth;
   }
 
   @Override

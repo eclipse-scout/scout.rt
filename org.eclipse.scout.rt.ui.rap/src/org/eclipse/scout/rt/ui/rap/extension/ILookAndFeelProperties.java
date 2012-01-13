@@ -16,6 +16,7 @@ public interface ILookAndFeelProperties {
   String PROP_FORM_FIELD_LABEL_WIDTH = "formFieldLabel.width";
   String PROP_FORM_FIELD_LABEL_ALIGNMENT = "formFieldLabel.alignment";
   String PROP_LOGICAL_GRID_LAYOUT_DEFAULT_COLUMN_WIDTH = "logicalGridLayout.defaultColumnWidth";
+  String PROP_LOGICAL_GRID_LAYOUT_DEFAULT_POPUP_WIDTH = "logicalGridLayout.defaultPopupWidth";
 
   String PROP_LOGICAL_GRID_LAYOUT_ROW_HEIGHT = "logicalGridLayout.rowHeight";
   String PROP_LOGICAL_GRID_LAYOUT_HORIZONTAL_GAP = "logicalGridLayout.horizontalGap";

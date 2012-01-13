@@ -291,7 +291,11 @@
             scope="default">
         <property
               name="logicalGridLayout.defaultColumnWidth"
-              value="390">
+              value="360">
+        </property>
+        <property
+              name="logicalGridLayout.defaultPopupWidth"
+              value="230">
         </property>
         <property
               name="logicalGridLayout.verticalGap"

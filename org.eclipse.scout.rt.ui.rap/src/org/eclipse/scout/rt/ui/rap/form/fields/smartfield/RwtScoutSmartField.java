@@ -297,8 +297,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     // show new
     if (getUiField().isFocusControl()) {
       m_proposalPopup = new RwtScoutDropDownPopup();
-      m_proposalPopup.setMaxHeightHint(280);
       m_proposalPopup.createPart(form, m_smartContainer, getUiField(), SWT.RESIZE, getUiEnvironment());
+      m_proposalPopup.setMaxHeightHint(280);
       m_proposalPopup.addRwtScoutPartListener(new RwtScoutPartListener() {
         @Override
         public void partChanged(RwtScoutPartEvent e) {
@@ -333,7 +333,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       //
       try {
         // adjust size of popup every time the table/tree changes in the model
-        m_proposalPopup.getShell().setSize(new Point(getUiField().getSize().x, 200));
+        m_proposalPopup.getShell().setSize(new Point(m_smartContainer.getSize().x, 200));
         final TableEx proposalTable = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), TableEx.class);
         final TreeEx proposalTree = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), TreeEx.class);
         if (proposalTree != null || proposalTable != null) {
@@ -381,14 +381,15 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
     int minFormWidth = 0;
     if (getScoutObject().isActiveFilterEnabled()) {
-      minFormWidth = 175;
+      minFormWidth = 230;
     }
     if (proposalTable != null) {
       int scrollbarSize = proposalTable.getVerticalBar() != null ? proposalTable.getVerticalBar().getSize().x + 10 : 0;
       Point d = proposalTable.getPreferredContentSize(1000);
       d.x += scrollbarSize;
-      d.x = Math.max(Math.max(getUiField().getSize().x, minFormWidth), Math.min(d.x, 400));
+      d.x = Math.max(Math.max(m_smartContainer.getSize().x, minFormWidth), Math.min(d.x, 400));
       d.y = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight(), Math.min(d.y, 280));
+      proposalTable.setSize(d);
       popup.getShell().setSize(d);
       Composite c = proposalTable;
       while (c != null && !(c instanceof Shell)) {
@@ -400,7 +401,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       int scrollbarSize = proposalTree.getVerticalBar() != null ? proposalTree.getVerticalBar().getSize().x + 10 : 0;
       Point d = proposalTree.getPreferredContentSize(1000, null, 0);
       d.x += scrollbarSize;
-      d.x = Math.max(Math.max(getUiField().getSize().x, minFormWidth), Math.min(d.x, 400));
+      d.x = Math.max(Math.max(m_smartContainer.getSize().x, minFormWidth), Math.min(d.x, 400));
       d.y = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight(), Math.min(d.x, 280));
       popup.getShell().setSize(d);
       Composite c = proposalTree;

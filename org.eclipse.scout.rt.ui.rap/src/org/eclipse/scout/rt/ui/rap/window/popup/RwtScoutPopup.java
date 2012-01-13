@@ -18,6 +18,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
+import org.eclipse.scout.rt.ui.rap.ext.table.TableEx;
+import org.eclipse.scout.rt.ui.rap.ext.tree.TreeEx;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.AbstractRwtScoutPart;
@@ -211,10 +213,19 @@ public class RwtScoutPopup extends AbstractRwtScoutPart {
       return;
     }
     //invalidate all layouts
-    Point dim = getShell().computeSize(m_widthHint, m_heightHint, true);
+    Point dim = getShell().computeSize(0, m_heightHint, true);
+    TableEx proposalTable = RwtUtility.findChildComponent(getShell(), TableEx.class);
+    TreeEx proposalTree = RwtUtility.findChildComponent(getShell(), TreeEx.class);
+
+    if (proposalTable != null) {
+      dim = proposalTable.getSize();
+    }
+    else if (proposalTree != null) {
+      dim = proposalTree.getSize();
+    }
 
     // adjust width
-    dim.x = Math.max(dim.x, UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutDefaultColumnWidth());
+    dim.x = Math.max(dim.x, UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutDefaultPopupWidth());
     if (m_maxWidthHint != SWT.DEFAULT) {
       dim.x = Math.min(dim.x, m_maxWidthHint);
     }

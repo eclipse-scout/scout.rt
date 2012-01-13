@@ -44,6 +44,8 @@ public interface IUiDecoration {
 
   int getLogicalGridLayoutDefaultColumnWidth();
 
+  int getLogicalGridLayoutDefaultPopupWidth();
+
   int getLogicalGridLayoutHorizontalGap();
 
   int getLogicalGridLayoutVerticalGap();
