@@ -515,3 +515,12 @@ Bugzilla: 364574
 New busy handling facility
 The default swing implementation SwingBusyHandler is attached in AbstractSwingEnvironment.attachBusyHandler
 It uses the glass pane concept and shows a wait cursor for 3 seconds, then blocks the screen allowing to cancel with the mouse.
+
+12.01.2011 dwi [contributed by Remo Arpagaus, BSI Business Systems Integration AG]
+Bugzilla: 364473
+Problem:
+The previous fix for Bugzilla 364473 led to a new problem. Long text which did not contain an explicit line wrap were not automatically wrapped anymore.
+Solution:
+The proposed patch includes a refresh of the absolute size every time the field's content changes.
+As a result the preferred height is not locked on the value 0 once it has been layouted with an empty string. The preferred height will be properly recalculated.
+Migration: None
