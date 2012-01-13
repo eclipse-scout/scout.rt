@@ -389,7 +389,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       d.x += scrollbarSize;
       d.x = Math.max(Math.max(m_smartContainer.getSize().x, minFormWidth), Math.min(d.x, 400));
       d.y = Math.max(UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight(), Math.min(d.y, 280));
-      proposalTable.setSize(d);
       popup.getShell().setSize(d);
       Composite c = proposalTable;
       while (c != null && !(c instanceof Shell)) {
