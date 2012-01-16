@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.core.ext.ILabelComposite;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFormFieldGridData;
@@ -37,10 +36,7 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-
-    int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-    StatusLabelEx label = new StatusLabelEx(container, labelStyle);
-    getUiEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+    StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     Composite fieldContainer = getUiEnvironment().getFormToolkit().createComposite(container);
     int visibleCount = 0;

@@ -43,9 +43,8 @@ public class RwtScoutRadioButtonGroup extends RwtScoutValueFieldComposite<IRadio
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-    StatusLabelEx label = new StatusLabelEx(container, labelStyle);
-    getUiEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+    StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
+
     Composite buttonArea = new P_RadioButtonComposite(container);
     getUiEnvironment().getFormToolkit().adapt(buttonArea);
     for (IFormField scoutField : getScoutObject().getFields()) {

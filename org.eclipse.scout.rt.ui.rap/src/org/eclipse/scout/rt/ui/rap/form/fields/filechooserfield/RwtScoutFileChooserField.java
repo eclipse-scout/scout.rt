@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
-import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
@@ -64,9 +63,7 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
   protected void initializeUi(Composite parent) {
     super.initializeUi(parent);
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-    StatusLabelEx label = new StatusLabelEx(container, labelStyle);
-    getUiEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+    StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_fileContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
     m_fileContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FILECHOOSER);

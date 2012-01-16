@@ -108,9 +108,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     m_popupEventListenerLock = new Object();
 
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-    StatusLabelEx label = new StatusLabelEx(container, labelStyle);
-    getUiEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+    StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_smartContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
     m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_SMARTFIELD);

@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
-import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
@@ -87,10 +86,10 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
   protected void initializeUi(Composite parent) {
     m_popupEventListeners = new HashSet<IPopupSupportListener>();
     m_popupEventListenerLock = new Object();
+
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-    StatusLabelEx label = new StatusLabelEx(container, labelStyle);
-    getUiEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+    StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
+
     m_dateContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
     m_dateContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
     StyledText textField = new StyledTextEx(m_dateContainer, SWT.SINGLE) {

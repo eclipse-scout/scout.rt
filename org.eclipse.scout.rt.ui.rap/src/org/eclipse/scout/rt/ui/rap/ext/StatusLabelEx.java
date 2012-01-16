@@ -19,42 +19,53 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.comp.CLabelEx;
 import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.core.ext.ILabelComposite;
+import org.eclipse.scout.rt.ui.rap.core.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.extension.ILookAndFeelDecorations;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 public class StatusLabelEx extends Composite implements ILabelComposite {
   private static final long serialVersionUID = 1L;
-
   private IProcessingStatus m_status;
-  private CLabelEx m_label;
+  private boolean m_mandatory;
+  private Control m_label;
+
   private Label m_statusLabel;
-  private Image m_infoImg;
-  private Image m_warningImg;
-  private Image m_errorImg;
+  private final Image m_infoImg;
+  private final Image m_warningImg;
+  private final Image m_errorImg;
+
   private String m_preMarker = "";
   private String m_postMarker = "";
-
-  private Font m_uiFont;
-  protected Font mandatoryFont;
-
-  private Color m_uiLabelForeground;
-  protected Color mandatoryLabelForeground;
-  private String m_text;
+  private Font m_nonMandatoryFont;
+  protected Font m_mandatoryFont;
+  private Color m_nonMandatoryForegroundColor;
+  protected Color m_mandatoryForegroundColor;
+  private String m_nonMandatoryText = "";
 
   public StatusLabelEx(Composite parent, int style) {
-    super(parent, style | SWT.NO_FOCUS);
+    super(parent, SWT.NO_FOCUS);
     m_infoImg = getUiEnvironment().getIcon(AbstractIcons.StatusInfo);
     m_warningImg = getUiEnvironment().getIcon(AbstractIcons.StatusWarning);
     m_errorImg = getUiEnvironment().getIcon(AbstractIcons.StatusError);
+
     createContent(this, style);
+    createLayout();
+
+    m_nonMandatoryFont = m_label.getFont();
+    m_nonMandatoryForegroundColor = m_label.getForeground();
+  }
+
+  protected void createLayout() {
     GridLayout containerLayout = new GridLayout(2, false);
     containerLayout.horizontalSpacing = 0;
     containerLayout.marginHeight = 0;
@@ -64,22 +75,57 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
   }
 
   protected void createContent(Composite parent, int style) {
-    m_label = new CLabelEx(parent, style | SWT.LEFT | getUiEnvironment().getFormToolkit().getFormToolkit().getOrientation());
-    m_uiFont = m_label.getFont();
-    m_uiLabelForeground = m_label.getForeground();
+    m_label = new CLabelEx(parent, style | getUiEnvironment().getFormToolkit().getFormToolkit().getOrientation());
     getUiEnvironment().getFormToolkit().getFormToolkit().adapt(m_label, false, false);
+
     m_statusLabel = new Label(parent, SWT.NONE);
     getUiEnvironment().getFormToolkit().getFormToolkit().adapt(m_statusLabel, false, false);
-    // layout
-    GridData data = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL);
+
+    //Make sure the label composite fills the cell so that horizontal alignment of the text works well
+    GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
     m_label.setLayoutData(data);
-    GridData dataStatus = new GridData(GridData.FILL_VERTICAL);
-    dataStatus.verticalIndent = 3;
-    m_statusLabel.setLayoutData(dataStatus);
+
+    data = new GridData(SWT.RIGHT, SWT.CENTER, false, false);
+    data.verticalIndent = 3;
+    m_statusLabel.setLayoutData(data);
   }
 
-  private IRwtEnvironment getUiEnvironment() {
+  protected IRwtEnvironment getUiEnvironment() {
     return (IRwtEnvironment) getDisplay().getData(IRwtEnvironment.class.getName());
+  }
+
+  /**
+   * Reads the mandatory settings if not already read
+   */
+  protected void initMandatorySettings() {
+    if (m_mandatoryFont == null) {
+      FontSpec labelFontSpec = UiDecorationExtensionPoint.getLookAndFeel().getMandatoryLabelFont();
+      if (labelFontSpec != null) {
+        m_mandatoryFont = getUiEnvironment().getFont(labelFontSpec, getNonMandatoryFont());
+      }
+    }
+
+    if (m_mandatoryForegroundColor == null) {
+      String labelTextColor = UiDecorationExtensionPoint.getLookAndFeel().getMandatoryLabelTextColor();
+      if (labelTextColor != null) {
+        m_mandatoryForegroundColor = getUiEnvironment().getColor(labelTextColor);
+      }
+    }
+
+    if (!StringUtility.hasText(m_postMarker) && !StringUtility.hasText(m_preMarker)) {
+      int starPos = UiDecorationExtensionPoint.getLookAndFeel().getMandatoryStarMarkerPosition();
+      if (starPos != ILookAndFeelDecorations.STAR_MARKER_NONE) {
+        switch (starPos) {
+          case ILookAndFeelDecorations.STAR_MARKER_AFTER_LABEL:
+            m_postMarker = "*";
+            break;
+          case ILookAndFeelDecorations.STAR_MARKER_BEFORE_LABEL:
+            m_preMarker = "*";
+            break;
+        }
+      }
+    }
+
   }
 
   @Override
@@ -96,139 +142,137 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
    * @return if the layout has to be updated up to the top container.
    */
   @Override
-  public boolean setMandatory(boolean b) {
-    boolean updateLayout = false;
-    FontSpec labelFontString = UiDecorationExtensionPoint.getLookAndFeel().getMandatoryLabelFont();
-    if (labelFontString != null) {
-      Font f = null;
-      if (b) {
-        f = getUiEnvironment().getFont(labelFontString, m_uiFont);
-      }
-      else {
-        f = null;
-      }
-      if (mandatoryFont != f) {
-        mandatoryFont = f;
-        updateFont();
-        updateLayout = true;
-      }
+  public boolean setMandatory(boolean mandatory) {
+    if (isMandatory() == mandatory) {
+      return false;
     }
-    String labelTextColor = UiDecorationExtensionPoint.getLookAndFeel().getMandatoryLabelTextColor();
-    if (labelTextColor != null) {
-      Color c = null;
-      if (b) {
-        c = getUiEnvironment().getColor(labelTextColor);
-      }
-      else {
-        c = null;
-      }
-      if (mandatoryLabelForeground != c) {
-        mandatoryLabelForeground = c;
-        updateLabelForeground();
+    m_mandatory = mandatory;
 
-      }
+    if (mandatory) {
+      initMandatorySettings();
     }
-    int starPos = UiDecorationExtensionPoint.getLookAndFeel().getMandatoryStarMarkerPosition();
-    if (starPos != ILookAndFeelDecorations.STAR_MARKER_NONE) {
-      switch (starPos) {
-        case ILookAndFeelDecorations.STAR_MARKER_AFTER_LABEL:
-          m_postMarker = b ? "*" : "";
-          break;
-        case ILookAndFeelDecorations.STAR_MARKER_BEFORE_LABEL:
-          m_preMarker = b ? "*" : "";
-          break;
-      }
-      updateText();
-      layout(true, true);
+
+    boolean updateLayout = false;
+    if (getMandatoryFont() != null) {
+      updateLabelFont();
       updateLayout = true;
     }
+    if (getMandatoryForegroundColor() != null) {
+      updateLabelForeground();
+      updateLayout = true;
+    }
+    if (getPreMarker() != null) {
+      updateText();
+      updateLayout = true;
+    }
+    if (getPostMarker() != null) {
+      updateMandatoryStatus();
+      updateLayout = true;
+    }
+
     return updateLayout;
   }
 
-  private void updateLabelForeground() {
-    if (mandatoryLabelForeground != null) {
-      m_label.setForeground(mandatoryLabelForeground);
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+
+    if (enabled) {
+      setForeground(null);
     }
     else {
-      m_label.setForeground(m_uiLabelForeground);
+      setForeground(getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled()));
     }
   }
 
-  protected void updateFont() {
-    if (mandatoryFont != null) {
-      m_label.setFont(mandatoryFont);
+  protected void updateMandatoryStatus() {
+    if (m_status != null) {
+      return;
+    }
+    if (isMandatory()) {
+      m_statusLabel.setText(m_postMarker);
+      m_statusLabel.setVisible(true);
+      ((GridData) getStatusLabel().getLayoutData()).exclude = false;
     }
     else {
-      m_label.setFont(m_uiFont);
+      m_statusLabel.setVisible(false);
+      ((GridData) getStatusLabel().getLayoutData()).exclude = true;
+    }
+    layout(true, true);
+  }
+
+  protected void updateLabelForeground() {
+    //Update the foreground only if the field is enabled otherwise the disabled state would not be visible
+    if (isEnabled() && isMandatory()) {
+      m_label.setForeground(getMandatoryForegroundColor());
+    }
+    else {
+      m_label.setForeground(getNonMandatoryForegroundColor());
     }
   }
 
-  // delegate methods
-  @Override
-  public void setBackground(Color color) {
-    super.setBackground(color);
-    m_label.setBackground(color);
-  }
-
-  @Override
-  public void setForeground(Color color) {
-    super.setForeground(color);
-    m_label.setForeground(color);
-  }
-
-  @Override
-  public String getText() {
-    return m_text;
-  }
-
-  @Override
-  public void setText(String text) {
-    m_text = text;
-    updateText();
+  protected void updateLabelFont() {
+    if (isMandatory()) {
+      m_label.setFont(getMandatoryFont());
+    }
+    else {
+      m_label.setFont(getNonMandatoryFont());
+    }
   }
 
   protected void updateText() {
-    String text = m_text;
-    if (text == null) {
-      text = "";
+    if (isMandatory()) {
+      setLabelText(m_preMarker + getNonMandatoryText());
     }
-    m_label.setText(m_preMarker + text);
-    if (m_status == null) {
-      if (StringUtility.hasText(m_postMarker)) {
-        m_statusLabel.setText(m_postMarker);
-        ((GridData) m_statusLabel.getLayoutData()).exclude = false;
-      }
-      else {
-        ((GridData) m_statusLabel.getLayoutData()).exclude = true;
-      }
-      layout(true, true);
+    else {
+      setLabelText(getNonMandatoryText());
     }
+  }
+
+  protected void setLabelText(String text) {
+    if (m_label instanceof CLabel) {
+      ((CLabel) m_label).setText(text);
+    }
+  }
+
+  protected String getLabelText() {
+    if (m_label instanceof CLabel) {
+      return ((CLabel) m_label).getText();
+    }
+
+    return null;
   }
 
   @Override
   public void setStatus(IProcessingStatus status) {
     m_status = status;
     if (m_status == null) {
-      m_statusLabel.setToolTipText("");
-      m_statusLabel.setImage(null);
-      ((GridData) m_statusLabel.getLayoutData()).exclude = true;
+      getStatusLabel().setToolTipText("");
+      getStatusLabel().setImage(null);
+      getStatusLabel().setVisible(false);
+      if (getStatusLabel().getLayoutData() instanceof GridData) {
+        ((GridData) getStatusLabel().getLayoutData()).exclude = true;
+      }
+      if (isMandatory()) {
+        updateMandatoryStatus();
+      }
     }
     else {
       String iconId = m_status instanceof ScoutFieldStatus ? ((ScoutFieldStatus) m_status).getIconId() : null;
       if (iconId != null) {
-        m_statusLabel.setImage(getUiEnvironment().getIcon(iconId));
+        getStatusLabel().setImage(getUiEnvironment().getIcon(iconId));
       }
       else {
         switch (m_status.getSeverity()) {
           case IProcessingStatus.FATAL:
           case IProcessingStatus.ERROR:
-            m_statusLabel.setImage(m_errorImg);
+            getStatusLabel().setImage(m_errorImg);
             break;
           case IProcessingStatus.WARNING:
-            m_statusLabel.setImage(m_warningImg);
+            getStatusLabel().setImage(m_warningImg);
             break;
           default:
-            m_statusLabel.setImage(m_infoImg);
+            getStatusLabel().setImage(m_infoImg);
             break;
         }
       }
@@ -243,16 +287,52 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
         }
         buf.append(m_status.getMessage());
       }
-      m_statusLabel.setToolTipText(buf.toString());
-      ((GridData) m_statusLabel.getLayoutData()).exclude = false;
+      getStatusLabel().setToolTipText(buf.toString());
+      getStatusLabel().setVisible(true);
+      if (getStatusLabel().getLayoutData() instanceof GridData) {
+        ((GridData) getStatusLabel().getLayoutData()).exclude = false;
+      }
     }
-    layout(true, true);
+    RwtLayoutUtility.invalidateLayout(getUiEnvironment(), this);
+  }
+
+// delegate methods
+  @Override
+  public String getText() {
+    return getLabelText();
   }
 
   @Override
-  public void setFont(Font uiFont) {
-    m_uiFont = uiFont;
-    updateFont();
+  public void setText(String text) {
+    if (text == null) {
+      text = "";
+    }
+
+    m_nonMandatoryText = text;
+    updateText();
+  }
+
+  @Override
+  public void setBackground(Color color) {
+    super.setBackground(color);
+
+    m_label.setBackground(color);
+  }
+
+  @Override
+  public void setForeground(Color color) {
+    super.setForeground(color);
+
+    m_nonMandatoryForegroundColor = color;
+    updateLabelForeground();
+  }
+
+  @Override
+  public void setFont(Font font) {
+    super.setFont(font);
+
+    m_nonMandatoryFont = font;
+    updateLabelFont();
   }
 
   @Override
@@ -260,7 +340,67 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
     return m_label.getFont();
   }
 
-  public String getDisplayText() {
-    return m_label.getText();
+  public Font getNonMandatoryFont() {
+    return m_nonMandatoryFont;
+  }
+
+  public void setNonMandatoryFont(Font nonMandatoryFont) {
+    m_nonMandatoryFont = nonMandatoryFont;
+  }
+
+  public Font getMandatoryFont() {
+    return m_mandatoryFont;
+  }
+
+  public void setMandatoryFont(Font mandatoryFont) {
+    m_mandatoryFont = mandatoryFont;
+  }
+
+  public Color getNonMandatoryForegroundColor() {
+    return m_nonMandatoryForegroundColor;
+  }
+
+  public void setNonMandatoryForegroundColor(Color nonMandatoryForegroundColor) {
+    m_nonMandatoryForegroundColor = nonMandatoryForegroundColor;
+  }
+
+  public Color getMandatoryForegroundColor() {
+    return m_mandatoryForegroundColor;
+  }
+
+  public void setMandatoryForegroundColor(Color mandatoryForegroundColor) {
+    m_mandatoryForegroundColor = mandatoryForegroundColor;
+  }
+
+  public String getPreMarker() {
+    return m_preMarker;
+  }
+
+  public String getPostMarker() {
+    return m_postMarker;
+  }
+
+  public Label getStatusLabel() {
+    return m_statusLabel;
+  }
+
+  protected void setStatusLabel(Label statusLabel) {
+    m_statusLabel = statusLabel;
+  }
+
+  public boolean isMandatory() {
+    return m_mandatory;
+  }
+
+  public String getNonMandatoryText() {
+    return m_nonMandatoryText;
+  }
+
+  protected void setLabel(Control label) {
+    m_label = label;
+  }
+
+  public Control getLabel() {
+    return m_label;
   }
 }

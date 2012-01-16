@@ -16,6 +16,21 @@ import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 
 public final class LogicalGridDataBuilder {
+  /**
+   * <p>
+   * x-position of the field.
+   * </p>
+   * Position is 1 because there can be a label on the left side
+   */
+  public static final int FIELD_GRID_X = 1;
+
+  /**
+   * <p>
+   * y-position of the field.
+   * </p>
+   * Position is 1 because there can be a label on top
+   */
+  public static final int FIELD_GRID_Y = 1;
 
   private LogicalGridDataBuilder() {
   }
@@ -25,7 +40,8 @@ public final class LogicalGridDataBuilder {
    */
   public static LogicalGridData createLabel(GridData correspondingFieldData) {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 0;
+    data.gridx = FIELD_GRID_X - 1;
+    data.gridy = FIELD_GRID_Y;
     data.gridh = correspondingFieldData.h;
     data.weighty = 1.0;
     data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelWidth();
@@ -36,6 +52,19 @@ public final class LogicalGridDataBuilder {
     return data;
   }
 
+  public static LogicalGridData createLabelOnTop(GridData correspondingFieldData) {
+    LogicalGridData data = new LogicalGridData();
+    data.gridx = FIELD_GRID_X;
+    data.gridy = FIELD_GRID_Y - 1;
+    data.weighty = 0.0;
+    data.weightx = 1.0;
+    data.useUiWidth = true;
+    data.useUiHeight = true;
+    data.fillVertical = true;
+    data.fillHorizontal = true;
+    return data;
+  }
+
   /**
    * @param gd
    *          is only used for the properties useUiWidth and useUiHeight and the
@@ -43,7 +72,8 @@ public final class LogicalGridDataBuilder {
    */
   public static LogicalGridData createField(GridData gd) {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 1;
+    data.gridx = FIELD_GRID_X;
+    data.gridy = FIELD_GRID_Y;
     data.weightx = 1.0;
     data.gridh = gd.h;
     if (gd.weightY == 0 || gd.weightY < 0 && gd.h <= 1) {
@@ -59,7 +89,8 @@ public final class LogicalGridDataBuilder {
 
   public static LogicalGridData createButton1() {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 2;
+    data.gridx = FIELD_GRID_X + 1;
+    data.gridy = FIELD_GRID_Y;
     data.heightHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonHeight();
     data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonWidth();
     data.fillVertical = false;
@@ -69,7 +100,8 @@ public final class LogicalGridDataBuilder {
 
   public static LogicalGridData createButton2() {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 3;
+    data.gridx = FIELD_GRID_X + 2;
+    data.gridy = FIELD_GRID_Y;
     data.heightHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonHeight();
     data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonWidth();
     data.fillVertical = false;
@@ -79,7 +111,8 @@ public final class LogicalGridDataBuilder {
 
   public static LogicalGridData createSmartButton() {
     LogicalGridData data = new LogicalGridData();
-    data.gridx = 2;
+    data.gridx = FIELD_GRID_X + 1;
+    data.gridy = FIELD_GRID_Y;
     data.heightHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonHeight();
     data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonWithMenuWidth();
     data.fillVertical = false;

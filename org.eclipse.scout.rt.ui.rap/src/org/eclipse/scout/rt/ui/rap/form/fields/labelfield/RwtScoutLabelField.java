@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.core.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.swt.SWT;
@@ -36,9 +35,7 @@ public class RwtScoutLabelField extends RwtScoutValueFieldComposite<ILabelField>
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     // label
     if (getScoutObject().isLabelVisible()) {
-      int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-      StatusLabelEx label = new StatusLabelEx(container, labelStyle);
-      getUiEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+      StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
       setUiLabel(label);
     }
     //

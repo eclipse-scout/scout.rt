@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.ui.rap.basic.tree.IRwtScoutTree;
 import org.eclipse.scout.rt.ui.rap.basic.tree.RwtScoutTree;
 import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
@@ -35,9 +34,8 @@ public class RwtScoutComposerField extends RwtScoutFieldComposite<IComposerField
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-    StatusLabelEx label = new StatusLabelEx(container, labelStyle);
-    getUiEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+    StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
+
     // XXX create tree by using extension point (formField Extension),
     // m_treeComposite = getEnvironment().createTree(container, getScoutObject().getTree()); //FIXME AHO: please finish this pending task. I disabled this line meanwhile because it doens't works. regards MHA
     m_UiTreeComposite = new RwtScoutTree();

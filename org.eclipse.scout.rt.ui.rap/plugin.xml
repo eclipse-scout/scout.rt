@@ -348,6 +348,10 @@
               name="color.forground.disabled"
               value="2A5A76">
         </property>
+        <property
+              name="formFieldLabel.alignment"
+              value="left">
+        </property>
       </properties>
   </extension>
 

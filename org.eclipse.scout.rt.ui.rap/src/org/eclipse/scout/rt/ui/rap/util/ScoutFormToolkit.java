@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.util;
 
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.rap.basic.comp.CLabelEx;
 import org.eclipse.scout.rt.ui.rap.basic.comp.HyperlinkEx;
 import org.eclipse.scout.rt.ui.rap.core.ext.SectionContent;
@@ -19,11 +20,14 @@ import org.eclipse.scout.rt.ui.rap.ext.DropDownButton;
 import org.eclipse.scout.rt.ui.rap.ext.ImageViewer;
 import org.eclipse.scout.rt.ui.rap.ext.ScrolledFormEx;
 import org.eclipse.scout.rt.ui.rap.ext.SnapButtonMaximized;
+import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
+import org.eclipse.scout.rt.ui.rap.ext.StatusLabelTop;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.rap.ext.TextEx;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.ext.table.TableEx;
 import org.eclipse.scout.rt.ui.rap.ext.tree.TreeEx;
+import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.CTabFolder;
@@ -80,6 +84,50 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
     TableEx table = new TableEx(parent, style);
     adapt(table, false, false);
     return table;
+  }
+
+  public int computeSwtLabelHorizontalAlignment(int scoutAlign) {
+    switch (scoutAlign) {
+      case -1: {
+        return SWT.LEFT;
+      }
+      case 0: {
+        return SWT.CENTER;
+      }
+      case 1: {
+        return SWT.RIGHT;
+      }
+      default: {
+        return UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
+      }
+    }
+  }
+
+  protected int computeSwtLabelStyle(IFormField scoutObject) {
+    if (scoutObject == null) {
+      return SWT.NONE;
+    }
+
+    return computeSwtLabelHorizontalAlignment(scoutObject.getLabelHorizontalAlignment());
+  }
+
+  public StatusLabelEx createStatusLabel(Composite parent, IFormField scoutObject) {
+    int labelStyle = computeSwtLabelStyle(scoutObject);
+
+    return createStatusLabel(parent, scoutObject, labelStyle);
+  }
+
+  public StatusLabelEx createStatusLabel(Composite parent, IFormField scoutObject, int style) {
+    StatusLabelEx label = null;
+    if (scoutObject != null && scoutObject.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
+      label = new StatusLabelTop(parent, style);
+    }
+    else {
+      label = new StatusLabelEx(parent, style);
+    }
+    adapt(label, false, false);
+
+    return label;
   }
 
   public StyledText createStyledText(Composite parent, int style) {

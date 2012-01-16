@@ -42,7 +42,15 @@ public class RwtScoutFormFieldGridData extends LogicalGridData {
       gc.weighty = inheritWeightY(m_scoutField);
     }
     gc.useUiWidth = data.useUiWidth;
-    gc.useUiHeight = data.useUiHeight;
+
+    //When having the label on top the container of the field must not have a fix size but use the calculated ui height instead.
+    if (m_scoutField.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
+      gc.useUiHeight = true;
+    }
+    else {
+      gc.useUiHeight = data.useUiHeight;
+    }
+
     gc.horizontalAlignment = data.horizontalAlignment;
     gc.verticalAlignment = data.verticalAlignment;
     gc.fillHorizontal = data.fillHorizontal;

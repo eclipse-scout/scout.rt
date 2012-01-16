@@ -104,8 +104,8 @@ public class RwtScoutCheckbox extends RwtScoutValueFieldComposite<IBooleanField>
     if (getUiLabel() instanceof StatusLabelEx) {
       StatusLabelEx uiLabel = getUiLabel();
 
-      if (uiLabel.getDisplayText() != null) {
-        getUiField().setText(uiLabel.getDisplayText());
+      if (uiLabel.getText() != null) {
+        getUiField().setText(uiLabel.getText());
       }
 
       getUiField().setFont(uiLabel.getFont());

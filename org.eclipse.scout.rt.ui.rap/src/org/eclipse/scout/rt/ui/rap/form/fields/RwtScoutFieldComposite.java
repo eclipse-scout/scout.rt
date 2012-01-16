@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.core.ext.ILabelComposite;
 import org.eclipse.scout.rt.ui.rap.core.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
@@ -46,7 +47,15 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
   protected void setUiLabel(ILabelComposite label) {
     m_label = label;
     if (m_label != null && label.getLayoutData() == null) {
-      m_label.setLayoutData(LogicalGridDataBuilder.createLabel(getScoutObject().getGridData()));
+      LogicalGridData statusLabelGridData = null;
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
+        statusLabelGridData = LogicalGridDataBuilder.createLabelOnTop(getScoutObject().getGridData());
+      }
+      else {
+        statusLabelGridData = LogicalGridDataBuilder.createLabel(getScoutObject().getGridData());
+      }
+
+      m_label.setLayoutData(statusLabelGridData);
     }
   }
 
@@ -128,12 +137,6 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
       if (getUiLabel().getEnabled() != b) {
         updateLayout = true;
         getUiLabel().setEnabled(b);
-        if (b) {
-          getUiLabel().setForeground(null);
-        }
-        else {
-          getUiLabel().setForeground(getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled()));
-        }
       }
     }
     if (updateLayout && isCreated()) {
