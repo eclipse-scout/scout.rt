@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.rap.window.popup;
 
 import java.util.EventListener;
 
+import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -45,6 +46,8 @@ import org.eclipse.ui.forms.widgets.Form;
 public class RwtScoutPopup extends AbstractRwtScoutPart {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutPopup.class);
   public static final String PROP_POPUP_OWNER = "propPopupOwner";
+
+  private static final String POPUP_CUSTOM_VARIANT = "popup";
 
   private Control m_ownerComponent;
   private Rectangle m_ownerBounds;
@@ -88,6 +91,7 @@ public class RwtScoutPopup extends AbstractRwtScoutPart {
     m_window = new Shell(ownerComponent.getShell(), style);
     m_window.setData("extendedStyle", SWT.POP_UP);
     m_window.setLayout(new FillLayout());
+    m_window.setData(WidgetUtil.CUSTOM_VARIANT, POPUP_CUSTOM_VARIANT);
     //add close listener
     m_window.addDisposeListener(new P_RwtWindowDisposeListener());
 

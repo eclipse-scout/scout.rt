@@ -2323,6 +2323,15 @@ Button-FocusIndicator.tabboxButton-active, Button-FocusIndicator.tabboxButton-ac
 
 /** RwtScoutTabBox / RwtScoutTabItem  end */
 
+/* Popup (Smartfield...) */
+Shell.popup {
+  border: 2px solid #67a8ce;
+  border-radius: 0px;
+  background-color: #f4f8fc;
+}
+
+/* Popup (Smartfield...) end */
+
 /* DateChooserDialog */
 Shell.datechooser-dialog {
   border: 2px solid #67a8ce;
