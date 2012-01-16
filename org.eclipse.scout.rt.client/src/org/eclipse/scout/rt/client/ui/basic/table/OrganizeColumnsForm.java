@@ -58,6 +58,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
+import org.eclipse.scout.rt.shared.security.DeleteCustomColumnPermission;
+import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 public class OrganizeColumnsForm extends AbstractForm {
@@ -627,6 +630,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected void execInitField() throws ProcessingException {
+            setVisiblePermission(new CreateCustomColumnPermission());
             setVisible(m_table.getTableCustomizer() != null);
           }
 
@@ -697,6 +701,11 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
+          protected void execInitField() throws ProcessingException {
+            setVisiblePermission(new UpdateCustomColumnPermission());
+          }
+
+          @Override
           protected void execClickAction() throws ProcessingException {
             if (m_table != null) {
               if (m_table.getTableCustomizer() != null) {
@@ -724,6 +733,11 @@ public class OrganizeColumnsForm extends AbstractForm {
           @Override
           protected boolean getConfiguredProcessButton() {
             return false;
+          }
+
+          @Override
+          protected void execInitField() throws ProcessingException {
+            setVisiblePermission(new DeleteCustomColumnPermission());
           }
 
           @Override
