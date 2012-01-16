@@ -200,9 +200,6 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
   }
 
   protected void updateText() {
-    if (getNonMandatoryText() == null) {
-      System.out.println("StatusLabelEx.updateText()");
-    }
     if (isMandatory()) {
       setLabelText(m_preMarker + getNonMandatoryText() + m_postMarker);
     }
