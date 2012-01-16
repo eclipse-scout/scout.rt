@@ -36,10 +36,10 @@ BSI Business Systems Integration AG - initial API and implementation
          optional="true"/>
 
    <requires>
-      <import feature="org.eclipse.scout.rt.feature" version="3.8.0.qualifier"/>
-      <import feature="org.eclipse.rap.runtime" version="1.5.0.20120104-0805"/>
-      <import feature="org.eclipse.rap.runtime.requirements" version="1.5.0.20120104-0805"/>
-      <import feature="org.eclipse.rap.incubator.feature" version="1.5.0.20120104-0323"/>
+      <import feature="org.eclipse.scout.rt.feature" version="3.8.0" match="compatible"/>
+      <import feature="org.eclipse.rap.runtime" version="1.5.0" match="compatible"/>
+      <import feature="org.eclipse.rap.runtime.requirements" version="1.5.0" match="compatible"/>
+      <import feature="org.eclipse.rap.incubator.feature" version="1.5.0" match="compatible"/>
    </requires>
 
    <plugin
