@@ -294,7 +294,14 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     }
     if (selectCurrentValue) {
       if (tree.getSelectedNodeCount() == 0) {
-        selectCurrentValueInternal();
+        try {
+          tree.setTreeChanging(true);
+          //
+          selectCurrentValueInternal();
+        }
+        finally {
+          tree.setTreeChanging(false);
+        }
       }
     }
     structureChanged(getResultTreeField());
@@ -517,9 +524,13 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
         ISmartField<Object> sf = (ISmartField<Object>) getSmartField();
         if (sf.isBrowseLoadIncremental()) {
           Job currentJob = Job.getJobManager().currentJob();
+          //show loading status
+          boolean statusWasVisible = getStatusField().isVisible();
+          getStatusField().setValue(ScoutTexts.get("searchingProposals"));
+          getStatusField().setVisible(true);
           try {
             currentJob.setProperty(JOB_PROPERTY_LOAD_TREE, Boolean.TRUE);
-            //
+            //load node
             LookupRow b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
             LookupRow[] data = sf.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
             ITreeNode[] subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
@@ -528,6 +539,8 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
           finally {
             currentJob.setProperty(JOB_PROPERTY_LOAD_TREE, null);
           }
+          //hide loading status
+          getStatusField().setVisible(statusWasVisible);
         }
         /*
         else {
