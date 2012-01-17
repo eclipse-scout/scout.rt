@@ -56,14 +56,14 @@ public class FormFieldFactory implements IFormFieldFactory {
           try {
             modelClazz = loaderBundle.loadClass(extension.getModelClassName());
             if (!StringUtility.isNullOrEmpty(extension.getUiClassName())) {
-              uiClazz = loaderBundle.loadClass(extension.getUiClassName());
+              uiClazz = (Class<? extends IRwtScoutFormField>) loaderBundle.loadClass(extension.getUiClassName());
               if (!IRwtScoutFormField.class.isAssignableFrom(uiClazz)) {
                 LOG.warn("extension '" + extension.getName() + "' contributed by '" + extension.getContibuterBundleId() + "' has an ui class not instanceof " + IRwtScoutFormField.class.getName() + ".");
                 uiClazz = null;
               }
             }
             else if (!StringUtility.isNullOrEmpty(extension.getFactoryClassName())) {
-              factoryClazz = loaderBundle.loadClass(extension.getFactoryClassName());
+              factoryClazz = (Class<? extends IFormFieldFactory>) loaderBundle.loadClass(extension.getFactoryClassName());
               if (!IFormFieldFactory.class.isAssignableFrom(factoryClazz)) {
                 LOG.warn("extension '" + extension.getName() + "' contributed by '" + extension.getContibuterBundleId() + "' has a facotry class not instanceof " + IFormFieldFactory.class.getName() + ".");
                 factoryClazz = null;
