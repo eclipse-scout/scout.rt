@@ -222,10 +222,10 @@ public class RwtScoutPopup extends AbstractRwtScoutPart {
     TreeEx proposalTree = RwtUtility.findChildComponent(getShell(), TreeEx.class);
 
     if (proposalTable != null) {
-      dim = proposalTable.getSize();
+      dim.x = proposalTable.getSize().x;
     }
     else if (proposalTree != null) {
-      dim = proposalTree.getSize();
+      dim.x = proposalTree.getSize().x;
     }
 
     // adjust width
