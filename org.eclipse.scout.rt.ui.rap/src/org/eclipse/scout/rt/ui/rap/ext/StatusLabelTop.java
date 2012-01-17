@@ -78,6 +78,21 @@ public class StatusLabelTop extends StatusLabelEx {
   }
 
   @Override
+  protected void updateText() {
+    if (isMandatory()) {
+      setLabelText(getPreMarker() + getNonMandatoryText() + getPostMarker());
+    }
+    else {
+      setLabelText(getNonMandatoryText());
+    }
+  }
+
+  @Override
+  protected void updateMandatoryStatus() {
+    updateText();
+  }
+
+  @Override
   protected String getLabelText() {
     if (getLabel() instanceof StyledText) {
       return ((StyledText) getLabel()).getText();

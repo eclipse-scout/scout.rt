@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.browser.BrowserExtension;
-import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -58,9 +57,7 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
     setUiContainer(container);
 
     // create label
-    int labelStyle = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelAlignment();
-    StatusLabelEx label = new StatusLabelEx(container, labelStyle);
-    getUiEnvironment().getFormToolkit().getFormToolkit().adapt(label, false, false);
+    StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     // create browser that shows the SVG
     Browser browser = getUiEnvironment().getFormToolkit().createBrowser(container, SWT.NO_SCROLL);
