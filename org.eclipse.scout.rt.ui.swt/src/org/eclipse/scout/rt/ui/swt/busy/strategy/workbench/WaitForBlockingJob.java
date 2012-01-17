@@ -55,7 +55,7 @@ public class WaitForBlockingJob extends BusyJob {
    * Show a wait cursor until long operation timeout
    */
   @Override
-  protected void runBusy(final IProgressMonitor monitor) {
+  protected void runBusy(IProgressMonitor monitor) {
     final Display display = getBusyHandler().getDisplay();
     display.syncExec(new Runnable() {
       @Override

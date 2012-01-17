@@ -18,9 +18,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
+import org.eclipse.scout.rt.ui.swt.busy.SwtBusyUtility;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * Shows the workbench progress indicator while blocking.
@@ -49,31 +48,13 @@ public class BlockWorkbenchJob extends BusyJob {
   @Override
   protected void runBlocking(final IProgressMonitor monitor) {
     final Display display = getBusyHandler().getDisplay();
-    display.syncExec(new Runnable() {
+    IRunnableWithProgress blockingRunnable = new IRunnableWithProgress() {
       @Override
-      public void run() {
-        IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (activeWorkbenchWindow == null) {
-          return;
-        }
-        try {
-          activeWorkbenchWindow.run(true, true, new IRunnableWithProgress() {
-            @Override
-            public void run(IProgressMonitor workbenchJobMonitor) throws InvocationTargetException, InterruptedException {
-              BlockWorkbenchJob.super.runBlocking(workbenchJobMonitor);
-            }
-
-          });
-        }
-        catch (InvocationTargetException e) {
-          LOG.warn("Exception while showing workbench busy indicator.", e);
-
-        }
-        catch (InterruptedException e) {
-          LOG.warn("Exception while showing workbench busy indicator.", e);
-        }
+      public void run(IProgressMonitor monitor2) throws InvocationTargetException, InterruptedException {
+        BlockWorkbenchJob.super.runBlocking(monitor2);
       }
-    });
+    };
+    SwtBusyUtility.showWorkbenchIndicator(display, blockingRunnable);
   }
 
 }

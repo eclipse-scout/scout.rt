@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.busy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -25,6 +27,8 @@ import org.eclipse.scout.rt.ui.swt.window.desktop.view.AbstractScoutView;
 import org.eclipse.scout.rt.ui.swt.window.dialog.SwtScoutDialog;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Utilities to handle busy and blocking
@@ -38,24 +42,106 @@ public final class SwtBusyUtility {
   private SwtBusyUtility() {
   }
 
-  public static void showBusyIndicator(final Display display, final IRunnableWithProgress runnable, final IProgressMonitor monitor) {
-    display.syncExec(new Runnable() {
-      @Override
-      public void run() {
-        BusyIndicator.showWhile(display, new Runnable() {
-          @Override
-          public void run() {
-            try {
-              //use modal context to prevent freezing of the gui
-              ModalContext.run(runnable, true, monitor, display);
+  /**
+   * Must be called outside of the display thread.
+   * <p>
+   * Does NOT call {@link Display#syncExec(Runnable)} since this could lead to dead-locks.
+   * <p>
+   * Blocks and returns once the runnable has finished running.
+   * <p>
+   * Uses {@link BusyIndicator#showWhile(Display, Runnable)} and
+   * {@link ModalContext#run(IRunnableWithProgress, boolean, IProgressMonitor, Display)}
+   */
+  public static void showBusyIndicator(final Display display, final IRunnableWithProgress runnable, IProgressMonitor monitor) {
+    final Object lock = new Object();
+    synchronized (lock) {
+      display.asyncExec(new Runnable() {
+        @Override
+        public void run() {
+          BusyIndicator.showWhile(display, new Runnable() {
+            @Override
+            public void run() {
+              try {
+                //use modal context to prevent freezing of the gui
+                ModalContext.run(new IRunnableWithProgress() {
+                  @Override
+                  public void run(IProgressMonitor monitor2) throws InvocationTargetException, InterruptedException {
+                    try {
+                      runnable.run(monitor2);
+                    }
+                    finally {
+                      synchronized (lock) {
+                        lock.notifyAll();
+                      }
+                    }
+                  }
+                }, true, new NullProgressMonitor(), display);
+              }
+              catch (Throwable t) {
+                LOG.warn("run modal context", t);
+              }
             }
-            catch (Throwable t) {
-              LOG.warn("run modal context", t);
-            }
-          }
-        });
+          });
+        }
+      });
+      try {
+        lock.wait();
       }
-    });
+      catch (InterruptedException e) {
+        //nop
+      }
+    }
+  }
+
+  /**
+   * Must be called outside of the display thread.
+   * <p>
+   * Does NOT call {@link Display#syncExec(Runnable)} since this could lead to dead-locks.
+   * <p>
+   * Blocks and returns once the runnable has finished running.
+   * <p>
+   * Uses
+   */
+  public static void showWorkbenchIndicator(final Display display, final IRunnableWithProgress runnable) {
+    final Object lock = new Object();
+    synchronized (lock) {
+      display.asyncExec(new Runnable() {
+        @Override
+        public void run() {
+          IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+          if (activeWorkbenchWindow == null) {
+            return;
+          }
+          try {
+            activeWorkbenchWindow.run(true, true, new IRunnableWithProgress() {
+              @Override
+              public void run(IProgressMonitor workbenchJobMonitor) throws InvocationTargetException, InterruptedException {
+                try {
+                  runnable.run(workbenchJobMonitor);
+                }
+                finally {
+                  synchronized (lock) {
+                    lock.notifyAll();
+                  }
+                }
+              }
+            });
+          }
+          catch (InvocationTargetException e) {
+            LOG.warn("Exception while showing workbench busy indicator.", e);
+          }
+          catch (InterruptedException e) {
+            LOG.warn("Exception while showing workbench busy indicator.", e);
+          }
+        }
+      });
+      try {
+        lock.wait();
+      }
+      catch (InterruptedException e) {
+        //nop
+      }
+    }
   }
 
   public static boolean isDialogPart(ISwtScoutPart part) {

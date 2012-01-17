@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.swt.busy.strategy.simple;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -39,27 +41,16 @@ public class ShowBusyJob extends BusyJob {
   }
 
   @Override
-  protected void runBusy(IProgressMonitor monitor) {
+  protected IStatus run(IProgressMonitor monitor) {
     IRunnableWithProgress busyRunnable = new IRunnableWithProgress() {
       @Override
       public void run(IProgressMonitor monitor2) throws InvocationTargetException, InterruptedException {
-        ShowBusyJob.super.runBusy(monitor2);
+        ShowBusyJob.super.run(monitor2);
       }
     };
     final Display display = getBusyHandler().getDisplay();
     SwtBusyUtility.showBusyIndicator(display, busyRunnable, monitor);
-  }
-
-  @Override
-  protected void runBlocking(IProgressMonitor monitor) {
-    IRunnableWithProgress busyRunnable = new IRunnableWithProgress() {
-      @Override
-      public void run(IProgressMonitor monitor2) throws InvocationTargetException, InterruptedException {
-        ShowBusyJob.super.runBlocking(monitor2);
-      }
-    };
-    final Display display = getBusyHandler().getDisplay();
-    SwtBusyUtility.showBusyIndicator(display, busyRunnable, monitor);
+    return Status.OK_STATUS;
   }
 
 }
