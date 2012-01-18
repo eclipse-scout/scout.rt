@@ -118,10 +118,6 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
     }
 
     IFormField formField = ((IFormField) swingScoutFormField.getScoutObject());
-    if (formField.getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
-      return true;
-    }
-
     if (formField instanceof IBooleanField) {
       return true;
     }

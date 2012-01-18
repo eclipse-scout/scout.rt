@@ -89,9 +89,9 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
       }
       setErrorStatusFromScout(getScoutObject().getErrorStatus());
       setLabelFromScout(getScoutObject().getLabel());
+      setLabelWidthInPixelFromScout();
       setLabelVisibleFromScout();
       setLabelPositionFromScout();
-      setLabelWidthInPixelFromScout();
       setLabelHorizontalAlignmentFromScout();
       setTooltipTextFromScout(getScoutObject().getTooltipText());
       if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD && getScoutObject().getLabel() != null && getScoutObject().getTooltipText() == null) {
@@ -175,6 +175,9 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
           RwtLayoutUtility.invalidateLayout(getUiEnvironment(), getUiContainer());
         }
       }
+
+      //In case of on field labels it is necessary to recompute the label visibility if the mandatory status changes.
+      setLabelVisibleFromScout();
     }
   }
 
@@ -199,17 +202,19 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
   }
 
   protected void setLabelWidthInPixelFromScout() {
-    if (getUiLabel() != null) {
-      int w = getScoutObject().getLabelWidthInPixel();
-      if (w > 0) {
-        getUiLabel().setLayoutWidthHint(w);
-      }
-      else if (w == IFormField.LABEL_WIDTH_DEFAULT) {
-        getUiLabel().setLayoutWidthHint(UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelWidth());
-      }
-      else if (w == IFormField.LABEL_WIDTH_UI) {
-        getUiLabel().setLayoutWidthHint(0);
-      }
+    if (getUiLabel() == null) {
+      return;
+    }
+
+    int w = getScoutObject().getLabelWidthInPixel();
+    if (w > 0) {
+      getUiLabel().setLayoutWidthHint(w);
+    }
+    else if (w == IFormField.LABEL_WIDTH_DEFAULT) {
+      getUiLabel().setLayoutWidthHint(UiDecorationExtensionPoint.getLookAndFeel().getFormFieldLabelWidth());
+    }
+    else if (w == IFormField.LABEL_WIDTH_UI) {
+      getUiLabel().setLayoutWidthHint(0);
     }
   }
 
@@ -218,21 +223,36 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
   }
 
   protected void setLabelFromScout(String s) {
-    if (m_label != null && s != null) {
-      m_label.setText(s);
-    }
     if (m_onFieldLabelDecorator != null) {
       m_onFieldLabelDecorator.setLabel(s);
+    }
+    else {
+      if (m_label != null && s != null) {
+        m_label.setText(s);
+      }
     }
   }
 
   protected void setLabelVisibleFromScout() {
-    boolean b = getScoutObject().isLabelVisible() && getScoutObject().getLabelPosition() != IFormField.LABEL_POSITION_ON_FIELD;
-    if (m_label != null && b != m_label.getVisible()) {
-      m_label.setVisible(b);
-      if (getUiContainer() != null && isCreated()) {
-        getUiContainer().layout(true, true);
+    if (m_label == null) {
+      return;
+    }
+
+    boolean visible = getScoutObject().isLabelVisible();
+    if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
+      //Make the label as small as possible in order to show the mandatory marker (*).
+      m_label.setText(null);
+      m_label.setLayoutWidthHint(0);
+
+      //Unfortunately the label can't be removed completely by only setting the width hint to 0.
+      //So it is necessary to make it invisible if it is really not necessary.
+      if (!getScoutObject().isMandatory()) {
+        visible = false;
       }
+    }
+    m_label.setVisible(visible);
+    if (getUiContainer() != null) {
+      getUiContainer().layout(true, true);
     }
   }
 

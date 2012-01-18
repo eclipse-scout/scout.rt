@@ -110,10 +110,6 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
     }
 
     IFormField formField = ((IFormField) rwtScoutFormField.getScoutObject());
-    if (formField.getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
-      return true;
-    }
-
     if (formField instanceof IBooleanField) {
       return true;
     }
