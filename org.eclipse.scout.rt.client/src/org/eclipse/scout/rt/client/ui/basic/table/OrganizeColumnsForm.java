@@ -259,6 +259,9 @@ public class OrganizeColumnsForm extends AbstractForm {
 
                 // Sorting
                 getTable().getSortingColumn().setValue(row, col);
+                if (col.isSortActive()) {
+                  row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(col.isSortAscending() ? AbstractIcons.TableSortAsc : AbstractIcons.TableSortDesc);
+                }
 
                 // Filter
                 if (col.isColumnFilterActive()) {
