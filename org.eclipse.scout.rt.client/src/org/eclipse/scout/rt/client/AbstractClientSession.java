@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -21,6 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -74,12 +76,14 @@ public abstract class AbstractClientSession implements IClientSession {
   private IIconLocator m_iconLocator;
   private final HashMap<String, Object> m_clientSessionData;
   private ScoutTexts m_scoutTexts;
+  private Locale m_locale;
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
     m_sharedVariableMap = new SharedVariableMap();
     m_scoutTexts = SCOUT_TEXTS_CACHE.get(getClass());
+    m_locale = LocaleThreadLocal.get();
     if (m_scoutTexts == null) {
       m_scoutTexts = new ScoutTexts();
       SCOUT_TEXTS_CACHE.put(getClass(), m_scoutTexts);
@@ -120,6 +124,18 @@ public abstract class AbstractClientSession implements IClientSession {
   @Override
   public ScoutTexts getNlsTexts() {
     return m_scoutTexts;
+  }
+
+  @Override
+  public final Locale getLocale() {
+    return m_locale;
+  }
+
+  @Override
+  public final void setLocale(Locale locale) {
+    if (locale != null) {
+      m_locale = locale;
+    }
   }
 
   @Override

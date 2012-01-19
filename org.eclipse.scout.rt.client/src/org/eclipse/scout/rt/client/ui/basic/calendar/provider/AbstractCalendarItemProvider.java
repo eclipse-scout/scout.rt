@@ -360,7 +360,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    protected IStatus runStatus(IProgressMonitor monitor) {
       try {
         // set loading property in scout
         ClientSyncJob job = new ClientSyncJob(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " prepare", ClientSyncJob.getCurrentSession()) {

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -20,6 +21,7 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -151,9 +153,28 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
 
   /**
    * {@inheritDoc}
+   * <p/>
+   * <b>Note:</b> Do not override this method. It will be changed to final in a subsequent release. Override
+   * {@link #runStatus(IProgressMonitor)} instead.
    */
   @Override
   protected IStatus run(IProgressMonitor monitor) {
+    Locale oldLocale = LocaleThreadLocal.get();
+    try {
+      LocaleThreadLocal.set(m_session.getLocale());
+      return runStatus(monitor);
+    }
+    finally {
+      LocaleThreadLocal.set(oldLocale);
+    }
+  }
+
+  /**
+   * Executes this job. The session's locale is accessible through {@link LocaleThreadLocal}.
+   * 
+   * @see #run(IProgressMonitor)
+   */
+  protected IStatus runStatus(IProgressMonitor monitor) {
     try {
       runVoid(monitor);
       return Status.OK_STATUS;

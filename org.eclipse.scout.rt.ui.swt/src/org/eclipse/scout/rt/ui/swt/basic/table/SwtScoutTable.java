@@ -797,7 +797,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
          */
         m_storeColumnWidthsJob = new ClientSyncJob("Store column widths", getEnvironment().getClientSession()) {
           @Override
-          protected IStatus run(IProgressMonitor monitor) {
+          protected IStatus runStatus(IProgressMonitor monitor) {
             try {
               addIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
               //

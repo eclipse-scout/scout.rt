@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -175,4 +176,15 @@ public interface IClientSession {
 
   void setData(String key, Object data);
 
+  /**
+   * @return Returns the session's locale.
+   */
+  Locale getLocale();
+
+  /**
+   * Sets the session's locale used for formatting values and for translating texts.
+   * 
+   * @param l
+   */
+  void setLocale(Locale l);
 }

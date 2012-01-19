@@ -553,7 +553,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     }
     m_storeColumnWidthsJob = new ClientSyncJob("Store column widths", getSwingEnvironment().getScoutSession()) {
       @Override
-      protected IStatus run(IProgressMonitor monitor) {
+      protected IStatus runStatus(IProgressMonitor monitor) {
         if (getScoutObject() != null) {
           for (int i = 0; i < scoutCols.length; i++) {
             if (scoutCols[i] != null) {
