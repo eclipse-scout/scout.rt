@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.RowIndexComparator;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.basic.AbstractOpenMenuJob;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
@@ -561,6 +562,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     if (text == null) {
       text = "";
     }
+    if (scoutCol instanceof ICustomColumn) {
+      text = "[+] " + text;
+    }
     if (scoutCol.isColumnFilterActive()) {
       text = "(*) " + text;
     }
@@ -797,9 +801,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       }
     }
     double factor = (double) totalWidth / (double) totalWeight;
-    if (factor < 1) {
-      factor = 1;
-    }
     int i = 0;
     for (Entry<TableColumn, Integer> entry : columnWeights.entrySet()) {
       if (i < columnWeights.size() - 1) {

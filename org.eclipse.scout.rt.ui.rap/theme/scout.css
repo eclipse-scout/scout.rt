@@ -1516,11 +1516,11 @@ TableColumn-SortIndicator {
 }
 
 TableColumn-SortIndicator:up {
-  background-image: url( theme/img/column/sort-indicator-up.png );
+  background-image: url( theme/img/column/table_sort_asc.png );
 }
 
 TableColumn-SortIndicator:down {
-  background-image: url( theme/img/column/sort-indicator-down.png );
+  background-image: url( theme/img/column/table_sort_desc.png );
 }
 
 Table-Cell {
@@ -1819,11 +1819,11 @@ TreeColumn-SortIndicator {
 }
 
 TreeColumn-SortIndicator:up {
-  background-image: url( theme/img/column/sort-indicator-up.png );
+  background-image: url( theme/img/column/table_sort_asc.png );
 }
 
 TreeColumn-SortIndicator:down {
-  background-image: url( theme/img/column/sort-indicator-down.png );
+  background-image: url( theme/img/column/table_sort_desc.png );
 }
 
 Tree-Cell {
