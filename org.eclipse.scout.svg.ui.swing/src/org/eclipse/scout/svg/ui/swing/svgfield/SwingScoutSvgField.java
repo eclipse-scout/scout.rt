@@ -44,7 +44,7 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
     container.setOpaque(false);
     //
     if (getScoutObject().isLabelVisible()) {
-      JStatusLabelEx label = getSwingEnvironment().createStatusLabel();
+      JStatusLabelEx label = getSwingEnvironment().createStatusLabel(getScoutObject());
       container.add(label);
       setSwingLabel(label);
     }
