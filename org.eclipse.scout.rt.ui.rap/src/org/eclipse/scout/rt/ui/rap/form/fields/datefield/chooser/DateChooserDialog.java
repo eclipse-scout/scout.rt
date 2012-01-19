@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.ui.rap.form.fields.datefield.chooser;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.ext.table.util.TableCellRolloverSupport;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
@@ -185,7 +185,7 @@ public class DateChooserDialog extends Dialog {
     dummyColumn.setResizable(false);
     dummyColumn.setMoveable(false);
 
-    String[] wd = new DateFormatSymbols(Locale.getDefault()).getShortWeekdays();
+    String[] wd = new DateFormatSymbols(LocaleThreadLocal.get()).getShortWeekdays();
     // create the m_columns from monday to saturday
     for (int i = 2; i < 8; i++) {
       TableColumn col = new TableColumn(table, SWT.CENTER);

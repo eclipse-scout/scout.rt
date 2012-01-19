@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 
 /**
  * file path with / as delimiter
@@ -77,7 +78,7 @@ public class RemoteFile implements Serializable {
       if (ignoreFolders) {
         m_dir = null;
       }
-      m_locale = Locale.getDefault();
+      m_locale = LocaleThreadLocal.get();
       // data
       URLConnection conn;
       try {

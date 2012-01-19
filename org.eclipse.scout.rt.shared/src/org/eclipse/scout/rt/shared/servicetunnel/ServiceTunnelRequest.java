@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 
@@ -61,7 +62,7 @@ public class ServiceTunnelRequest implements Serializable {
     if (m_args == null) {
       m_args = new Object[0];
     }
-    m_locale = Locale.getDefault();
+    m_locale = LocaleThreadLocal.get();
   }
 
   /**

@@ -4,15 +4,15 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.spellchecker.forms;
 
 import java.util.Enumeration;
-import java.util.Locale;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -21,19 +21,19 @@ import org.eclipse.scout.rt.client.services.common.spellchecker.ISpellCheckerSer
 import org.eclipse.scout.rt.client.services.common.spellchecker.IUserDictionary;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.CancelButton;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.GeneralSettingsBox;
-import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.OkButton;
-import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.ResetToStandardButton;
-import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.UserDictionaryBox;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.GeneralSettingsBox.EnabledField;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.GeneralSettingsBox.IgnoreCaseField;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.GeneralSettingsBox.IgnoreDomainNamesField;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.GeneralSettingsBox.IgnoreWordsWithNumbersField;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.GeneralSettingsBox.LanguageField;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.GeneralSettingsBox.ShortcutField;
+import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.OkButton;
+import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.ResetToStandardButton;
+import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.UserDictionaryBox;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.UserDictionaryBox.EditorSequenceBox;
-import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.UserDictionaryBox.UserDictionaryTableField;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.UserDictionaryBox.EditorSequenceBox.EditorButton;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.UserDictionaryBox.EditorSequenceBox.EditorField;
+import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.UserDictionaryBox.UserDictionaryTableField;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -398,7 +398,7 @@ public class SpellCheckerOptionsForm extends AbstractForm {
       protected void execClickAction() throws ProcessingException {
         getEnabledField().setValue(true);
         getShortcutField().setValue("f7");
-        getLanguageField().setValue(Locale.getDefault().toString());
+        getLanguageField().setValue(LocaleThreadLocal.get().toString());
         getIgnoreCaseField().setValue(false);
         getIgnoreDomainNamesField().setValue(true);
         getIgnoreWordsWithNumbersField().setValue(true);

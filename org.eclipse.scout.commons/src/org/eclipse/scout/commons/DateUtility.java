@@ -32,9 +32,6 @@ public final class DateUtility {
       return "";
     }
     Locale loc = LocaleThreadLocal.get();
-    if (loc == null) {
-      loc = Locale.getDefault();
-    }
     return DateFormat.getDateInstance(DateFormat.DEFAULT, loc).format(d);
   }
 
@@ -46,9 +43,6 @@ public final class DateUtility {
       return "";
     }
     Locale loc = LocaleThreadLocal.get();
-    if (loc == null) {
-      loc = Locale.getDefault();
-    }
     return DateFormat.getTimeInstance(DateFormat.SHORT, loc).format(d);
   }
 
@@ -60,9 +54,6 @@ public final class DateUtility {
       return "";
     }
     Locale loc = LocaleThreadLocal.get();
-    if (loc == null) {
-      loc = Locale.getDefault();
-    }
     return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, loc).format(d);
   }
 

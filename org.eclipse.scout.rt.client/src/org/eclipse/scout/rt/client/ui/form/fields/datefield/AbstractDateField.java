@@ -15,11 +15,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
@@ -612,7 +612,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       return d;
     }
     //add convenience patterns for english locales
-    if (Locale.getDefault().getLanguage().equals("en")) {
+    if (LocaleThreadLocal.get().getLanguage().equals("en")) {
       d = parseHelper(new SimpleDateFormat("M / d / yy"), text, includesTime);
       if (d != null) {
         return d;
@@ -772,7 +772,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
     //date
     //add convenience patterns for english locales
-    if (Locale.getDefault().getLanguage().equals("en")) {
+    if (LocaleThreadLocal.get().getLanguage().equals("en")) {
       d = parseHelper(new SimpleDateFormat("M / d / yy"), text, includesTime);
       if (d != null) {
         return d;

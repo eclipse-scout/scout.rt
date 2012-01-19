@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,12 +42,7 @@ public final class FormattingUtility {
    */
   public static String formatObject(Object o) {
     Locale loc = LocaleThreadLocal.get();
-    if (loc == null) {
-      loc = Locale.getDefault();
-    }
-
     String ret = null;
-
     if (o instanceof String) {
       ret = (String) o;
     }

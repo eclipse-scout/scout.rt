@@ -50,9 +50,6 @@ public abstract class AbstractServerSession implements IServerSession {
 
   public AbstractServerSession(boolean autoInitConfig) {
     m_locale = LocaleThreadLocal.get();
-    if (m_locale == null) {
-      m_locale = Locale.getDefault();
-    }
     m_attributesLock = new Object();
     m_attributes = new HashMap<Object, Object>();
     m_sharedVariableMap = new SharedVariableMap();

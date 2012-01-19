@@ -140,7 +140,7 @@ public final class NlsUtility {
 
   public static Locale parseLocale(String pattern) {
     if (pattern == null) {
-      return Locale.getDefault();
+      return LocaleThreadLocal.get();
     }
     String[] a = pattern.split("_");
     switch (a.length) {
@@ -151,7 +151,7 @@ public final class NlsUtility {
       case 3:
         return new Locale(a[0], a[1], a[2]);
       default:
-        return Locale.getDefault();
+        return LocaleThreadLocal.get();
     }
   }
 
