@@ -848,7 +848,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
          */
         m_storeColumnWidthsJob = new ClientSyncJob("Store column widths", getUiEnvironment().getClientSession()) {
           @Override
-          protected IStatus run(IProgressMonitor monitor) {
+          protected IStatus runStatus(IProgressMonitor monitor) {
             try {
               addIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
               //
