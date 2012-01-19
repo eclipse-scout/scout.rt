@@ -84,7 +84,7 @@ public class MonthCellLayout extends Layout {
         MonthCellData dat = (MonthCellData) child.getLayoutData();
 
         int hSpan = Math.max(1, Math.min(dat.getHorizontalSpan(), numColumns - colIndex));
-        int vSpan = Math.max(1, Math.min(dat.getHorizontalSpan(), numLines - lineIndex));
+        int vSpan = Math.max(1, Math.min(dat.getVerticalSpan(), numLines - lineIndex));
 
         for (int v = 0; v < vSpan; v++) {
           for (int h = 0; h < hSpan; h++) {
