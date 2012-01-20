@@ -235,7 +235,9 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     @Override
     protected void execPrepareLookup(LookupCall call) throws ProcessingException {
       if (m_attribute != null) {
-        call.setActive(TriState.TRUE);
+        // if isFilterActiveRows() is true, do not use a filter to load rows
+        // the list box is only populated one time and filtering for active/inactive is done afterwards
+        call.setActive(isFilterActiveRows() ? null : TriState.TRUE);
         m_attribute.prepareLookup(call);
       }
     }
@@ -252,6 +254,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
+      setFilterActiveRows(attribute.isActiveFilterEnabled());
       LookupCall newCall = attribute.getLookupCall();
       if (getLookupCall() != newCall) {
         setLookupCall(attribute.getLookupCall());
@@ -315,7 +318,9 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     @Override
     protected void execPrepareLookup(LookupCall call, ITreeNode parent) throws ProcessingException {
       if (m_attribute != null) {
-        call.setActive(TriState.TRUE);
+        // if isFilterActiveNodes() is true, do not use a filter to load nodes
+        // the tree box is only populated one time and filtering for active/inactive is done afterwards
+        call.setActive(isFilterActiveNodes() ? null : TriState.TRUE);
         m_attribute.prepareLookup(call);
       }
     }
@@ -332,6 +337,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
+      setFilterActiveNodes(attribute.isActiveFilterEnabled());
       LookupCall newCall = attribute.getLookupCall();
       if (getLookupCall() != newCall) {
         setLookupCall(newCall);
@@ -792,7 +798,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     @Override
     protected void execPrepareLookup(LookupCall call) throws ProcessingException {
       if (m_attribute != null) {
-        call.setActive(TriState.TRUE);
+        call.setActive(isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
         m_attribute.prepareLookup(call);
       }
     }
@@ -809,6 +815,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
+      setActiveFilterEnabled(attribute.isActiveFilterEnabled());
       LookupCall newCall = attribute.getLookupCall();
       if (getLookupCall() != newCall) {
         setLookupCall(newCall);

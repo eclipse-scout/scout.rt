@@ -47,6 +47,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
   private boolean m_visible;
+  private boolean m_activeFilterEnabled;
   private IDataModelEntity m_parentEntity;
 
   public AbstractDataModelAttribute() {
@@ -120,6 +121,13 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     return true;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(120)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredActiveFilterEnabled() {
+    return false;
+  }
+
   @ConfigOperation
   @Order(10)
   protected void execInitAttribute() throws ProcessingException {
@@ -145,6 +153,8 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     setText(getConfiguredText());
     setType(getConfiguredType());
     setVisible(getConfiguredVisible());
+    setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
+
     // code type
     if (getConfiguredCodeType() != null) {
       setCodeTypeClass(getConfiguredCodeType());
@@ -346,6 +356,16 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   public void setVisible(boolean b) {
     m_visibleProperty = b;
     calculateVisible();
+  }
+
+  @Override
+  public void setActiveFilterEnabled(boolean active) {
+    m_activeFilterEnabled = active;
+  }
+
+  @Override
+  public boolean isActiveFilterEnabled() {
+    return m_activeFilterEnabled;
   }
 
   @Override

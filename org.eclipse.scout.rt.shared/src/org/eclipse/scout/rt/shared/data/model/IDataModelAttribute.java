@@ -94,6 +94,10 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
 
   void setVisible(boolean b);
 
+  boolean isActiveFilterEnabled();
+
+  void setActiveFilterEnabled(boolean active);
+
   IDataModelEntity getParentEntity();
 
   void setParentEntity(IDataModelEntity parent);
