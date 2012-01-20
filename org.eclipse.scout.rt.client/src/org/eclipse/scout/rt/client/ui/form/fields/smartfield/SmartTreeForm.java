@@ -88,7 +88,8 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     if (getSmartField().isBrowseLoadIncremental()) {
       //do sync
       getResultTreeField().loadRootNode();
-      commitPopulateInitialTree();
+      commitPopulateInitialTree(getResultTreeField().getTree());
+      structureChanged(getResultTreeField());
     }
     else {
       //show comment that smartfield is loading
@@ -103,11 +104,19 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
               getStatusField().setVisible(false);
               ITreeNode[] subTree = new P_TreeNodeBuilder().createTreeNodes(rows, ITreeNode.STATUS_NON_CHANGED, true);
               ITree tree = getResultTreeField().getTree();
-              updateSubTree(tree, tree.getRootNode(), subTree);
-              if (getSmartField().isBrowseAutoExpandAll()) {
-                tree.expandAll(getResultTreeField().getTree().getRootNode());
+              try {
+                tree.setTreeChanging(true);
+                //
+                updateSubTree(tree, tree.getRootNode(), subTree);
+                if (getSmartField().isBrowseAutoExpandAll()) {
+                  tree.expandAll(getResultTreeField().getTree().getRootNode());
+                }
+                commitPopulateInitialTree(tree);
               }
-              commitPopulateInitialTree();
+              finally {
+                tree.setTreeChanging(false);
+              }
+              structureChanged(getResultTreeField());
             }
             catch (ProcessingException pe) {
               failed = pe;
@@ -129,9 +138,14 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
    * 
    * @throws ProcessingException
    */
-  private void commitPopulateInitialTree() throws ProcessingException {
-    m_populateInitialTreeDone = true;
+  private void commitPopulateInitialTree(ITree tree) throws ProcessingException {
     updateActiveFilter();
+    if (m_selectCurrentValueRequested) {
+      if (tree.getSelectedNodeCount() == 0) {
+        selectCurrentValueInternal();
+      }
+    }
+    m_populateInitialTreeDone = true;
     update(m_selectCurrentValueRequested, true);
   }
 
@@ -291,18 +305,6 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     getStatusField().setVisible(statusText != null);
     if (getNewButton().isEnabled()) {
       getNewButton().setVisible(execGetSingleMatch() == null);
-    }
-    if (selectCurrentValue) {
-      if (tree.getSelectedNodeCount() == 0) {
-        try {
-          tree.setTreeChanging(true);
-          //
-          selectCurrentValueInternal();
-        }
-        finally {
-          tree.setTreeChanging(false);
-        }
-      }
     }
     structureChanged(getResultTreeField());
   }
