@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.stringfield;
 
 import java.beans.PropertyChangeEvent;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -27,6 +29,7 @@ import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.form.fields.AbstractRwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
+import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -139,6 +142,15 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
       m_editableSupport = new TextFieldEditableSupport(getUiField());
     }
     m_editableSupport.setEditable(enabled);
+  }
+
+  @Override
+  protected IRwtKeyStroke[] getUiKeyStrokes() {
+    List<IRwtKeyStroke> strokes = null;
+    if (getScoutObject().isMultilineText()) {
+      return CollectionUtility.toArray(strokes, IRwtKeyStroke.class);
+    }
+    return super.getUiKeyStrokes();
   }
 
   protected void setDecorationLinkFromScout(boolean b) {
