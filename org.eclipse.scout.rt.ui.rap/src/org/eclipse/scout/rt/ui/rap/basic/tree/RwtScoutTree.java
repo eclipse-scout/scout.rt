@@ -240,11 +240,13 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     else {
       exp = scoutNode.isExpanded();
     }
-    if (exp != getUiTreeViewer().getExpandedState(scoutNode)) {
+    ITreeNode[] filteredChildNodes = scoutNode.getFilteredChildNodes();
+    boolean hasChilds = filteredChildNodes.length > 0;
+    if (hasChilds && exp != getUiTreeViewer().getExpandedState(scoutNode)) {
       getUiTreeViewer().setExpandedState(scoutNode, exp);
     }
     if (exp) {
-      for (ITreeNode childNode : scoutNode.getFilteredChildNodes()) {
+      for (ITreeNode childNode : filteredChildNodes) {
         setExpansionFromScoutRec(childNode);
       }
     }

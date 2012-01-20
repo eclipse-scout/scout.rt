@@ -223,11 +223,13 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     else {
       exp = scoutNode.isExpanded();
     }
-    if (exp != getSwtTreeViewer().getExpandedState(scoutNode)) {
+    ITreeNode[] filteredChildNodes = scoutNode.getFilteredChildNodes();
+    boolean hasChilds = filteredChildNodes.length > 0;
+    if (hasChilds && exp != getSwtTreeViewer().getExpandedState(scoutNode)) {
       getSwtTreeViewer().setExpandedState(scoutNode, exp);
     }
     if (exp) {
-      for (ITreeNode childNode : scoutNode.getFilteredChildNodes()) {
+      for (ITreeNode childNode : filteredChildNodes) {
         setExpansionFromScoutRec(childNode);
       }
     }
