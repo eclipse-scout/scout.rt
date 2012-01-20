@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swt.form.fields.tabbox;
 
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.groupbox.SwtScoutGroupBox;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -67,6 +68,11 @@ public class SwtScoutTabItem extends SwtScoutGroupBox implements ISwtScoutTabIte
 
   @Override
   protected void setSaveNeededFromScout(boolean b) {
+    updateImage();
+  }
+
+  @Override
+  protected void setEnabledFromScout(boolean b) {
     updateImage();
   }
 
@@ -141,7 +147,13 @@ public class SwtScoutTabItem extends SwtScoutGroupBox implements ISwtScoutTabIte
       }
       // text
       gc.setFont(getEnvironment().getFont(getScoutObject().getFont(), getTabItem().getFont()));
-      gc.setForeground(getSwtContainer().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+      if (getScoutObject().isEnabled()) {
+        gc.setForeground(getSwtContainer().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+      }
+      else {
+        String colorDisabled = UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled();
+        gc.setForeground(getEnvironment().getColor(colorDisabled));
+      }
       gc.drawText(label, 5, 0, true);
 
     }
