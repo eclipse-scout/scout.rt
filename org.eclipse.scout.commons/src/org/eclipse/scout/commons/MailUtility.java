@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -403,9 +404,10 @@ public final class MailUtility {
         // remove any VML elements part2
         htmlMessage = Pattern.compile("<!\\[if !vml\\]>(.*?)<!\\[endif\\]>", Pattern.DOTALL).matcher(htmlMessage).replaceAll("$1");
         // remove not referenced attachments
-        for (DataSource ds : htmlDataSourceList) {
+        for (Iterator<DataSource> it = htmlDataSourceList.iterator(); it.hasNext();) {
+          DataSource ds = it.next();
           if (!htmlMessage.contains("cid:" + ds.getName())) {
-            htmlDataSourceList.remove(ds);
+            it.remove();
           }
         }
         hasHtml = StringUtility.hasText(htmlMessage);
