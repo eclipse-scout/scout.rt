@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
 
 import java.io.Serializable;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -73,7 +75,7 @@ public class StringColumnFilter implements ITableColumnFilter<String>, Serializa
 
   @Override
   public List<LookupRow> createHistogram() {
-    TreeMap<String, LookupRow> hist = new TreeMap<String, LookupRow>();
+    TreeMap<String, LookupRow> hist = new TreeMap<String, LookupRow>(Collator.getInstance(LocaleThreadLocal.get()));
     HashMap<String, Integer> countMap = new HashMap<String, Integer>();
     for (ITableRow row : m_column.getTable().getRows()) {
       String s = m_column.getDisplayText(row);
