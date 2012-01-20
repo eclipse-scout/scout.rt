@@ -158,3 +158,9 @@ c) WSDL file is not put into the JAR archive anymore when building the webservic
 Migration:
 - Use Scout SDK (repair actions) to move WSDL files of webservice providers into folder '/WEB-INF/wsdl/provider' and of webservice consumer into folder '/WEB-INF/wsdl/consumers'
 - Rebuild webservice stubs (should automatically be done if using repair action)
+
+20.01.2012 dwi
+Bugzilla: 369242
+Problem: Basic authentication of webservice providers does not work on tomcat. That is because tomcat converts all the HTTP header names to lower case. According to RFC 2616, this conversion is  eligible as header names are case-insensitive. On Jetty, basic authentication mechanism works fine as header-names are untouched. Because Scout JAX-WS RT handles header-names in a case-sensitive way the authentication fails.
+Solution: Fixed 'BasicAuthenticationHandler' to treat header names case-insensitive.
+Migration: None

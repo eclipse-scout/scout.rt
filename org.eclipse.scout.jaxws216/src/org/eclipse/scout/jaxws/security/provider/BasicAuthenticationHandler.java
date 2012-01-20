@@ -71,16 +71,17 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
       return true;
     }
 
-    if (!isAuthHeaderIncluded(context)) {
+    String[] authorizationHeader = getAuthorizationHeader(context);
+    if (authorizationHeader.length == 0) {
+      // force consumer to include authentication information
       installAuthHeader(context);
       return breakHandlerChain(context);
     }
 
-    List<String> authHeaders = getHttpRequestHeaders(context).get("Authorization");
-    for (String authHeader : authHeaders) {
-      if (authHeader.startsWith("Basic ")) {
+    for (String headerValue : authorizationHeader) {
+      if (headerValue.startsWith("Basic ")) {
         try {
-          if (authenticateRequest(authHeader)) {
+          if (authenticateRequest(headerValue)) {
             // create and cache a new server session on behalf of the authenticated user by using the session factory configured on the port type.
             // In turn, this session is used by subsequent handlers and the port type resolver.
             IServerSessionFactory portTypeSessionFactory = ContextHelper.getPortTypeSessionFactory(context);
@@ -177,9 +178,23 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
     return "Secure Area";
   }
 
-  protected boolean isAuthHeaderIncluded(SOAPMessageContext context) {
-    Map<String, List<String>> httpRequestHeaders = getHttpRequestHeaders(context);
-    return (httpRequestHeaders != null && httpRequestHeaders.get("Authorization") != null && httpRequestHeaders.get("Authorization").size() > 0);
+  protected String[] getAuthorizationHeader(SOAPMessageContext context) {
+    Map<String, List<String>> httpRequestHeaderMap = getHttpRequestHeaders(context);
+    if (httpRequestHeaderMap == null || httpRequestHeaderMap.size() == 0) {
+      return new String[0];
+    }
+
+    // According to RFC 2616 header names are case-insensitive
+    for (String headerName : httpRequestHeaderMap.keySet()) {
+      if ("authorization".equalsIgnoreCase(headerName)) {
+        List<String> headerValues = httpRequestHeaderMap.get(headerName);
+        if (headerValues != null) {
+          return headerValues.toArray(new String[headerValues.size()]);
+        }
+        return new String[0];
+      }
+    }
+    return new String[0];
   }
 
   @Override
