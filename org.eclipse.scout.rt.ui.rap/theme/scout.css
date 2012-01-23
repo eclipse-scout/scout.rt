@@ -1,5 +1,4 @@
 /* Widget - Default for all widgets */
-
 * {
   color: #000000;
   background-color: white;
@@ -11,11 +10,11 @@
   color: #CFCFCF;
 }
 
-Group-Label, CCombo, Combo, DateTime {
+Group-Label,CCombo,Combo,DateTime {
   font: bold 11px Arial, Helvetica, sans-serif;
 }
 
-DateTime-Calendar-Navbar, ToolTip-Text {
+DateTime-Calendar-Navbar,ToolTip-Text {
   font: bold 12px Arial, Helvetica, sans-serif;
 }
 
@@ -37,14 +36,12 @@ Display {
   rwt-thinborder-color: #aca899;
   rwt-selectionmarker-color: #fec83c;
   rwt-infobackground-color: #ffffff;
-
-/* Rayo no icons in messageboxes */
-/*   rwt-error-image: url( theme/img/dialog/error.png ); */
-/*   rwt-information-image: url( theme/img/dialog/information.png ); */
-/*   rwt-question-image: url( theme/img/dialog/question.png ); */
-/*   rwt-warning-image: url( theme/img/dialog/warning.png ); */
-/*   rwt-working-image: url( theme/img/dialog/information.png ); */
-
+  /* Rayo no icons in messageboxes */
+  /*   rwt-error-image: url( theme/img/dialog/error.png ); */
+  /*   rwt-information-image: url( theme/img/dialog/information.png ); */
+  /*   rwt-question-image: url( theme/img/dialog/question.png ); */
+  /*   rwt-warning-image: url( theme/img/dialog/warning.png ); */
+  /*   rwt-working-image: url( theme/img/dialog/information.png ); */
   rwt-fontlist: 12px Arial, Helvetica, sans-serif;
 
   /*
@@ -53,7 +50,6 @@ Display {
 }
 
 /* Control - Default for all controls */
-
 * {
   border: none;
   padding: 0px;
@@ -64,7 +60,6 @@ Display {
 }
 
 /* Composite - Default for all composites */
-
 Composite {
   padding: 0px;
   opacity: 1;
@@ -79,7 +74,6 @@ Composite[BORDER] {
 }
 
 /* Group */
-
 Group {
   color: #4a4a4a;
   background-color: transparent;
@@ -103,12 +97,11 @@ Group-Label {
 }
 
 /* GroupBox with empty border */
-
-Group.empty{
+Group.empty {
   color: #4a4a4a;
 }
 
-Group-Frame.empty{
+Group-Frame.empty {
   padding: 6px 12px 6px 12px;
   border: none;
 }
@@ -143,7 +136,6 @@ Browser[BORDER] {
 }
 
 /* Button */
-
 Button {
   cursor: default;
   color: white;
@@ -151,7 +143,7 @@ Button {
   background-color: transparent;
 }
 
-Button[PUSH], Button[TOGGLE], Button[BORDER] {
+Button[PUSH],Button[TOGGLE],Button[BORDER] {
   background-image: gradient(
     linear, left top, left bottom,
     from( #7ab9dd ),
@@ -164,7 +156,7 @@ Button[PUSH], Button[TOGGLE], Button[BORDER] {
   padding: 4px 5px;
 }
 
-Button[PUSH]:disabled, Button[TOGGLE]:disabled {
+Button[PUSH]:disabled,Button[TOGGLE]:disabled {
   background-image: gradient(
     linear, left top, left bottom,
     from( #dee1e7 ),
@@ -175,7 +167,7 @@ Button[PUSH]:disabled, Button[TOGGLE]:disabled {
   background-color: transparent;
 }
 
-Button[PUSH]:hover, Button[TOGGLE]:hover {
+Button[PUSH]:hover,Button[TOGGLE]:hover {
   background-image: gradient(
     linear, left top, left bottom,
     from( #55aedb ),
@@ -183,11 +175,11 @@ Button[PUSH]:hover, Button[TOGGLE]:hover {
   );
 }
 
-Button[PUSH]:pressed, Button[TOGGLE]:pressed {
+Button[PUSH]:pressed,Button[TOGGLE]:pressed {
   animation: none;
 }
 
-Button-FocusIndicator[PUSH], Button-FocusIndicator[TOGGLE] {
+Button-FocusIndicator[PUSH],Button-FocusIndicator[TOGGLE] {
   /* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
   background-color: transparent;
   border: 1px solid #b0cce3;
@@ -230,7 +222,6 @@ Button[TOGGLE]:selected:hover {
 }
 
 /* Link */
-
 Link-Hyperlink {
   /* XXX hstaudacher Theme text decorator when bug 346438 is fixed */
   color: #67A8CE;
@@ -240,16 +231,16 @@ Link-Hyperlink:disabled {
   color: #2a5a76;
 }
 
-Button[CHECK], Button[RADIO] {
+Button[CHECK],Button[RADIO] {
   color: #000000;
   font: 12px Arial, Helvetica, sans-serif; /* not bold */
 }
 
-Button[CHECK]:disabled, Button[RADIO]:disabled {
+Button[CHECK]:disabled,Button[RADIO]:disabled {
   color: #2a5a76;
 }
 
-Button[CHECK][BORDER], Button[RADIO][BORDER] {
+Button[CHECK][BORDER],Button[RADIO][BORDER] {
   background-image: none;
 }
 
@@ -292,7 +283,8 @@ Button-CheckIcon:selected {
 }
 
 Button-CheckIcon:selected:disabled {
-  background-image: url( theme/img/button/check_box_disabled_selected.png );
+  background-image:
+    url( theme/img/button/check_box_disabled_selected.png );
 }
 
 Button-RadioIcon {
@@ -308,7 +300,6 @@ Button-RadioIcon:selected {
 }
 
 /* CCombo */
-
 CCombo {
   border: none;
   background-color: #fcfcfc;
@@ -378,7 +369,6 @@ CCombo-FocusIndicator {
 }
 
 /* CLabel */
-
 CLabel {
   color: #000000;
   background-color: transparent;
@@ -405,7 +395,6 @@ CLabel[BORDER] {
 }
 
 /* Combo */
-
 Combo {
   border: 1px solid #c1c1c1;
   background-color: #fcfcfc;
@@ -467,7 +456,6 @@ Combo-FocusIndicator {
 }
 
 /* CoolBar */
-
 CoolBar {
   background-image: none;
 }
@@ -478,7 +466,6 @@ CoolItem-Handle {
 }
 
 /* CTabFolder */
-
 CTabFolder {
   border-color: #bbcddb;
   border-radius: 8px 8px 0px 0px;
@@ -511,7 +498,6 @@ CTabFolder-DropDownButton-Icon:hover {
 }
 
 /* DateTime */
-
 DateTime {
   color: #464a4e;
   background-color: #fcfcfc;
@@ -528,7 +514,7 @@ DateTime[BORDER] {
   border-radius: 2px 2px 2px 2px;
 }
 
-DateTime-Field:selected, DateTime-Calendar-Day:selected {
+DateTime-Field:selected,DateTime-Calendar-Day:selected {
   background-color: #D2D2D2;
   color: #4a4a4a;
 }
@@ -681,7 +667,6 @@ DateTime-DropDownCalendar {
 }
 
 /* ExpandBar */
-
 ExpandBar {
   color: #4a4a4a;
   background-color: white;
@@ -727,7 +712,6 @@ ExpandItem-Button:expanded:hover {
 }
 
 /* Label */
-
 Label {
   color: #000000;
   background-color: transparent;
@@ -760,7 +744,6 @@ Label-SeparatorLine[SHADOW_OUT] {
 }
 
 /* List */
-
 List {
   background-color: white;
   border: none;
@@ -835,7 +818,6 @@ List-Item:even:selected:unfocused {
 }
 
 /* Menu */
-
 Menu {
   background-image: none;
   padding: 4px 0px 4px 0px;
@@ -878,16 +860,16 @@ MenuItem-CascadeIcon {
 }
 
 /* ProgressBar */
-
 ProgressBar {
-  background-color: #ffffff;
+  background-color: white;
   background-image: none;
-  border: 1px solid #A4A4A4;
-  border-radius: 2px;
+  border: none;
+  padding: 0px 0px;
+  border-radius: 5px;
 }
 
 ProgressBar-Indicator {
-  background-color: #00589f;
+  background-color: #67A8CE;
   background-image: none;
   border: none;
   opacity: 1;
@@ -902,7 +884,6 @@ ProgressBar-Indicator:error {
 }
 
 /* Sash */
-
 Sash {
   border: none;
   background-image: none;
@@ -919,7 +900,6 @@ Sash-Handle {
 }
 
 /* Scale */
-
 Scale {
   background-color: white;
 }
@@ -929,7 +909,6 @@ Scale-Thumb {
 }
 
 /* ScrollBar */
-
 ScrollBar {
   /* XXX hstaudacher We need to set a gradient as background when bg 346618 is fixed */
   border: none;
@@ -945,7 +924,7 @@ ScrollBar-Thumb {
   background-image: none;
 }
 
-ScrollBar-UpButton, ScrollBar-DownButton {
+ScrollBar-UpButton,ScrollBar-DownButton {
   background-color: #ffffff;
   border: none;
   border-radius: 0px;
@@ -953,7 +932,6 @@ ScrollBar-UpButton, ScrollBar-DownButton {
 }
 
 /* Icons */
-
 ScrollBar-Thumb-Icon[VERTICAL] {
   background-image: none;
 }
@@ -999,7 +977,6 @@ ScrollBar-DownButton-Icon[HORIZONTAL]:hover {
 }
 
 /* Gradients */
-
 ScrollBar-Thumb[VERTICAL] {
   background-image: gradient(
     linear, left top, right top,
@@ -1017,7 +994,6 @@ ScrollBar-Thumb[HORIZONTAL] {
 }
 
 /* Shell */
-
 Shell {
   border: 1px black;
   padding: 0px;
@@ -1025,18 +1001,18 @@ Shell {
   opacity: 1;
 }
 
-Shell[TITLE], Shell[BORDER] {
+Shell[TITLE],Shell[BORDER] {
   background-color: white;
   border: 2px solid #67a8ce;
   border-radius: 0px 0px 0px 0px;
   padding: 0px 0px 0px 0px;
 }
 
-Shell[BORDER]:inactive, Shell[TITLE]:inactive {
+Shell[BORDER]:inactive,Shell[TITLE]:inactive {
   border: 2px solid #91b8cf;
 }
 
-Shell:maximized, Shell:maximized:inactive {
+Shell:maximized,Shell:maximized:inactive {
   border: none;
   border-radius: 0px 0px 0px 0px;
 }
@@ -1048,7 +1024,6 @@ Shell-DisplayOverlay {
 }
 
 /* Shell titlebar */
-
 Shell-Titlebar {
   font: bold 12px Arial, Helvetica, sans-serif;
   background-color: #67a8ce;
@@ -1064,13 +1039,12 @@ Shell-Titlebar:inactive {
   background-color: #91b8cf;
 }
 
-Shell-MinButton, Shell-MaxButton, Shell-CloseButton {
+Shell-MinButton,Shell-MaxButton,Shell-CloseButton {
   margin: 0px;
 }
 
 /* Shell buttons */
 /* Minimize button */
-
 Shell-MinButton {
   background-image: url( theme/img/window/shell-min.png );
 }
@@ -1088,7 +1062,6 @@ Shell-MinButton:inactive:hover {
 }
 
 /* Maximize button */
-
 Shell-MaxButton {
   background-image: url( theme/img/window/shell-max.png );
 }
@@ -1106,7 +1079,6 @@ Shell-MaxButton:inactive:hover {
 }
 
 /* Restore button */
-
 Shell-MaxButton:maximized {
   background-image: url( theme/img/window/shell-restore.png );
 }
@@ -1124,7 +1096,6 @@ Shell-MaxButton:maximized:inactive:hover {
 }
 
 /* Close button */
-
 Shell-CloseButton {
   background-image: url( theme/img/window/shell-close.png );
 }
@@ -1142,14 +1113,12 @@ Shell-CloseButton:inactive:hover {
 }
 
 /* Slider */
-
 Slider {
   border: none;
   background-color: #f3f3f4;
 }
 
 /* Thumb */
-
 Slider-Thumb {
   background-color: transparent;
   border: 1px solid #a4a4a4;
@@ -1196,14 +1165,13 @@ Slider-Thumb[VERTICAL]:pressed {
 }
 
 /* Buttons */
-
-Slider-UpButton, Slider-DownButton {
+Slider-UpButton,Slider-DownButton {
   background-color: transparent;
   border: 1px solid #a4a4a4;
   cursor: default;
 }
 
-Slider-UpButton[HORIZONTAL], Slider-DownButton[HORIZONTAL] {
+Slider-UpButton[HORIZONTAL],Slider-DownButton[HORIZONTAL] {
   background-image: gradient(
     linear, left top, left bottom,
     from( #ffffff ),
@@ -1213,7 +1181,7 @@ Slider-UpButton[HORIZONTAL], Slider-DownButton[HORIZONTAL] {
   );
 }
 
-Slider-UpButton[VERTICAL], Slider-DownButton[VERTICAL] {
+Slider-UpButton[VERTICAL],Slider-DownButton[VERTICAL] {
   background-image: gradient(
     linear, left top, right top,
     from( #ffffff ),
@@ -1232,7 +1200,7 @@ Slider-UpButton[HORIZONTAL]:pressed, Slider-DownButton[HORIZONTAL]:pressed {
   );
 }
 
-Slider-UpButton[VERTICAL]:pressed, Slider-DownButton[VERTICAL]:pressed {
+Slider-UpButton[VERTICAL]:pressed,Slider-DownButton[VERTICAL]:pressed {
   background-image: gradient(
     linear, left top, right top,
     from( #e0e0e0 ),
@@ -1242,7 +1210,6 @@ Slider-UpButton[VERTICAL]:pressed, Slider-DownButton[VERTICAL]:pressed {
 }
 
 /* Rounded Borders */
-
 Slider-UpButton[HORIZONTAL] {
   border-radius: 0px 2px 2px 0px;
 }
@@ -1260,7 +1227,6 @@ Slider-DownButton[VERTICAL] {
 }
 
 /* Button Icons */
-
 Slider-UpButton-Icon[HORIZONTAL] {
   background-image: url( theme/img/slider/right.png );
 }
@@ -1294,7 +1260,6 @@ Slider-DownButton-Icon[VERTICAL]:hover {
 }
 
 /* Spinner */
-
 Spinner {
   border: none;
   padding: 1px 2px;
@@ -1372,7 +1337,6 @@ Spinner-DownButton-Icon:hover {
 }
 
 /* TabFolder */
-
 TabItem {
   background-color: white;
   border-top-color: white;
@@ -1393,7 +1357,6 @@ TabItem:hover {
 }
 
 /* Table */
-
 Table {
   background-color: white;
   background-image: none;
@@ -1434,11 +1397,9 @@ Composite.tableFieldDisabled {
 /*   padding: 0px 0px 0px 0px; */
 /*   background-color: #EBF4F8; */
 /* } */
-
 Composite.wideTableStatus {
   background-color: #EBF4F8;
 }
-
 
 Label.wideTableStatus {
   color: #264159;
@@ -1456,11 +1417,9 @@ Label.wideTableStatus_error {
 /* Composite.tableStatusContainer{ */
 /*   padding: 2px 0px 0px 0px; */
 /* } */
-
 Composite.tableStatus {
   background-color: #DDEBF4;
 }
-
 
 Label.tableStatus {
   color: #264159;
@@ -1563,7 +1522,6 @@ Table-Checkbox:selected:disabled {
 }
 
 /* Text */
-
 Text {
   border: none;
   padding: 2px 3px;
@@ -1608,7 +1566,6 @@ Text-Message {
 }
 
 /* ToolBar */
-
 ToolBar {
   color: black;
   padding: 0px;
@@ -1648,7 +1605,7 @@ ToolItem:hover {
   padding: 2px 3px;
 }
 
-ToolItem:pressed, ToolItem:selected {
+ToolItem:pressed,ToolItem:selected {
   border: 1px solid #a4a4a4;
   border-radius: 2px;
   padding: 3px 2px 1px 4px;
@@ -1669,7 +1626,6 @@ ToolItem-Separator {
 }
 
 /* ToolTip */
-
 ToolTip {
   cursor: default;
   border: 1px solid #a4a4a4;
@@ -1687,15 +1643,18 @@ ToolTip {
 }
 
 ToolTip-Image[ICON_ERROR] {
-/*   background-image: url( theme/img/tooltip/error.png ); */
+  /*   background-image: url( theme/img/tooltip/error.png ); */
+
 }
 
 ToolTip-Image[ICON_INFORMATION] {
-/*   background-image: url( theme/img/tooltip/information.png ); */
+  /*   background-image: url( theme/img/tooltip/information.png ); */
+
 }
 
 ToolTip-Image[ICON_WARNING] {
-/*   background-image: url( theme/img/tooltip/warning.png ); */
+  /*   background-image: url( theme/img/tooltip/warning.png ); */
+
 }
 
 ToolTip-Text {
@@ -1707,7 +1666,6 @@ ToolTip-Message {
 }
 
 /* Tree */
-
 Tree {
   background-color: white;
   background-image: none;
@@ -1798,7 +1756,7 @@ TreeColumn {
     to( #ececec )
   );
   color: #666666;
-  border-bottom:none;
+  border-bottom: none;
 }
 
 TreeColumn:disabled {
@@ -1811,7 +1769,7 @@ TreeColumn:hover {
     from( #f4f5f6 ),
     to( #e6e6e6 )
   );
-  border-bottom:none;
+  border-bottom: none;
 }
 
 TreeColumn-SortIndicator {
@@ -2006,6 +1964,7 @@ Composite.filechooser-disabled {
 }
 
 Text.filechooser {
+  background-color: transparent;
   border-radius: 5px;
 }
 
@@ -2117,11 +2076,10 @@ Button.timefield:hover {
 }
 
 /* generated at http://www.ajaxload.info */
-Composite.busyIndicator{
+Composite.busyIndicator {
   padding: 8px;
   background-image: url( theme/img/busy/busy.gif );
 }
-
 
 Composite.viewsArea {
   background-color: #FFFFFF;
@@ -2142,11 +2100,9 @@ Composite.viewPartNoRadius {
 
 Composite.form {
   background-color: transparent;
-    /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
+  /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
   padding: 0px 0px 0px 0px;
 }
-
-
 
 Composite.toolbarContainer {
   background-color: #DDEBF4;
@@ -2162,9 +2118,8 @@ Button.menuButton {
 }
 Button.menuButton:selected, Button.menuButton:selected:hover,
 Button.menuButton:pressed, Button.menuButton:hover {
-   background-image: url( theme/img/button/icon_menu_mouse_over.png );
+  background-image: url( theme/img/button/icon_menu_mouse_over.png );
 }
-
 
 Button.viewButton {
   background-image: none;
@@ -2245,11 +2200,11 @@ Composite.toolButtonBar-active {
   border-radius: 5px 0px 0px 0px;
 }
 
-Button.toolButtonBarCollapseButton{
+Button.toolButtonBarCollapseButton {
   background-image: url( theme/img/button/icon_slider.png );
   background-color: #67a8ce;
-/*   padding: 8px 15px; */
-/*   border-radius: 0px 0px 0px 0px; */
+  /*   padding: 8px 15px; */
+  /*   border-radius: 0px 0px 0px 0px; */
 }
 Button.toolButtonBarCollapseButton:pressed, Button.toolButtonBarCollapseButton:selected,
 Button.toolButtonBarCollapseButton:selected:hover, Button.toolButtonBarCollapseButton:hover {
@@ -2417,6 +2372,7 @@ Shell.proposal-form {
 }
 
 Composite.proposal-form {
+
 }
 
 Table.proposal-form {
@@ -2467,7 +2423,7 @@ Button.formButton-active {
   background-color: #F1F7FB;
   border-radius: 0px 0px 5px 5px;
   color: #000000;
-/*   font: bold 12px Arial, Helvetica, sans-serif; */
+  /*   font: bold 12px Arial, Helvetica, sans-serif; */
   padding: 0px 15px;
 }
 
@@ -2486,7 +2442,7 @@ Composite.formTabArea {
 
 Composite.formTab {
   background-color: transparent;
-/*  border: 1px solid #bbcddb; */
+  /*  border: 1px solid #bbcddb; */
   border-radius: 8px 8px 0px 0px;
   /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
   padding: 2px 5px 0px 5px;
@@ -2494,7 +2450,7 @@ Composite.formTab {
 
 Composite.formTab-active {
   background-color: #ffffff;
-/*  border: 1px solid #bbcddb; */
+  /*  border: 1px solid #bbcddb; */
   border-radius: 8px 8px 0px 0px;
   /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
   padding: 2px 5px 0px 5px;
@@ -2515,7 +2471,7 @@ Button.formTabActivate {
   background-image: none;
   background-color: transparent;
   color: #2a5a76;
-/*   font: bold 12px Arial, Helvetica, sans-serif; */
+  /*   font: bold 12px Arial, Helvetica, sans-serif; */
   padding: 2px 5px 0px 6px;
 }
 
