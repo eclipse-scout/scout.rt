@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -242,7 +243,7 @@ public final class BookmarkUtility {
           TablePageState tablePageState = (TablePageState) parentPageState;
           if (parentPage instanceof IPageWithTable) {
             IPageWithTable tablePage = (IPageWithTable) parentPage;
-            childPage = bmLoadTablePage(tablePage, tablePageState, true);
+            childPage = bmLoadTablePage(tablePage, tablePageState, false);
           }
         }
         else if (parentPageState instanceof NodePageState) {
@@ -264,7 +265,7 @@ public final class BookmarkUtility {
       }
       if (pathFullyRestored) {
         if (parentPageState instanceof TablePageState && parentPage instanceof IPageWithTable) {
-          bmLoadTablePage((IPageWithTable) parentPage, (TablePageState) parentPageState, false);
+          bmLoadTablePage((IPageWithTable) parentPage, (TablePageState) parentPageState, true);
         }
         else if (parentPage instanceof IPageWithNodes) {
           bmLoadNodePage((IPageWithNodes) parentPage, (NodePageState) parentPageState, null);
@@ -400,13 +401,18 @@ public final class BookmarkUtility {
   }
 
   @SuppressWarnings("deprecation")
-  private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean loadChildren) throws ProcessingException {
+  private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean leafState) throws ProcessingException {
     ITable table = tablePage.getTable();
     if (tablePageState.getTableCustomizerData() != null && tablePage.getTable().getTableCustomizer() != null) {
-      tablePage.getTable().getTableCustomizer().removeAllColumns();
-      tablePage.getTable().getTableCustomizer().setSerializedData(tablePageState.getTableCustomizerData());
-      tablePage.getTable().resetColumnConfiguration();
-      tablePage.setChildrenLoaded(false);
+      byte[] newData = tablePageState.getTableCustomizerData();
+      ITableCustomizer tc = tablePage.getTable().getTableCustomizer();
+      byte[] curData = tc.getSerializedData();
+      if (!CompareUtility.equals(curData, newData)) {
+        tc.removeAllColumns();
+        tc.setSerializedData(tablePageState.getTableCustomizerData());
+        tablePage.getTable().resetColumnConfiguration();
+        tablePage.setChildrenLoaded(false);
+      }
     }
     // starts search form
     tablePage.getSearchFilter();
@@ -516,6 +522,7 @@ public final class BookmarkUtility {
       }
     }
     IPage childPage = null;
+    boolean loadChildren = !leafState;
     if (tablePage.isChildrenDirty() || tablePage.isChildrenVolatile()) {
       loadChildren = true;
       tablePage.setChildrenLoaded(false);
@@ -541,8 +548,8 @@ public final class BookmarkUtility {
         }
       }
     }
-    else {
-      // load selections
+    // load selections
+    if (leafState) {
       if (tablePageState.getSelectedChildrenPrimaryKeys().size() > 0) {
         tablePage.ensureChildrenLoaded();
         HashSet<CompositeObject> selectionSet = new HashSet<CompositeObject>(tablePageState.getSelectedChildrenPrimaryKeys());
