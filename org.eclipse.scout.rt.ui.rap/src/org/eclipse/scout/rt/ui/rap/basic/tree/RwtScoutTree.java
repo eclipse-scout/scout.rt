@@ -334,14 +334,14 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
   }
 
   private void updateTreeStructureAndKeepSelection(ITreeNode node) {
-//    if (getUiTreeViewer() != null && getUiTreeViewer().getTree() != null && !getUiTreeViewer().getTree().isDisposed()) {
-    if (node == getScoutObject().getRootNode()) {
-      getUiTreeViewer().refresh();
+    if (getUiTreeViewer() != null && getUiTreeViewer().getTree() != null && !getUiTreeViewer().getTree().isDisposed()) {
+      if (node == getScoutObject().getRootNode()) {
+        getUiTreeViewer().refresh();
+      }
+      else {
+        getUiTreeViewer().refresh(node);
+      }
     }
-    else {
-      getUiTreeViewer().refresh(node);
-    }
-//    }
   }
 
   protected void setSelectionFromRwt(final ITreeNode[] nodes) {
@@ -378,7 +378,9 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
    * @rn imo, 18.11.2009, ticket #83255
    */
   protected void scrollToSelection() {
-    getUiField().showSelection();
+    if (getUiField() != null && !getUiField().isDisposed()) {
+      getUiField().showSelection();
+    }
   }
 
   @Override
