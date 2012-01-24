@@ -1277,9 +1277,9 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   protected void initLocale() {
-    Locale locale = ClientUIPreferences.getInstance().getLocale();
+    Locale locale = RwtUtility.getBrowserInfo().getLocale();
     if (locale == null) {
-      locale = RwtUtility.getBrowserInfo().getLocale();
+      locale = ClientUIPreferences.getInstance().getLocale();
     }
     if (locale != null) {
       LocaleThreadLocal.set(locale);
