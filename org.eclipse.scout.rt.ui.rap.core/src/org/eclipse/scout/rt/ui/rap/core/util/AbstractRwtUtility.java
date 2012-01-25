@@ -98,7 +98,12 @@ public abstract class AbstractRwtUtility {
           || userAgent.indexOf("BSD") != -1) {//FIXME
         if (userAgent.indexOf("Android") != -1) {
           info.setSystem(BrowserInfo.System.ANDROID);
-          info.setMobile(true);
+          if (userAgent.indexOf("GT") != -1) {
+            info.setTablet(true);
+          }
+          else {
+            info.setMobile(true);
+          }
         }
         else {
           info.setSystem(BrowserInfo.System.UNIX);
