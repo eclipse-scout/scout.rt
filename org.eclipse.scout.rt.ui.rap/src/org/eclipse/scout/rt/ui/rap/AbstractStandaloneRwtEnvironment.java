@@ -64,7 +64,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     }
     //if not a tablet or mobile device open callback channel
     if (RwtUtility.getBrowserInfo().isDesktop()) {
-      UICallBack.activate(getClass().getName() + getClass().hashCode());//XXX sle in chrome gibts ein waiting-cursor
+      UICallBack.activate(getClass().getName() + getClass().hashCode());
     }
     m_display = Display.getDefault();
     if (m_display == null) {
