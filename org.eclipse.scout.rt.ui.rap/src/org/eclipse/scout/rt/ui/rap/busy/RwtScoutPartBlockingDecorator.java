@@ -75,6 +75,7 @@ public class RwtScoutPartBlockingDecorator {
         public void fill(ToolBar parent, int index) {
           if (m_item == null) {
             m_item = new ToolItem(parent, SWT.NONE, index);
+            m_item.setText(RwtUtility.getNlsText(Display.getCurrent(), "BusyBlockingMessage"));
             m_item.setImage(m_env.getIcon("progress_stop"));
             //[swt cannot show text right of image] m_item.setText(RwtUtility.getNlsText(Display.getCurrent(), "Cancel"));
             m_item.addSelectionListener(new SelectionAdapter() {
