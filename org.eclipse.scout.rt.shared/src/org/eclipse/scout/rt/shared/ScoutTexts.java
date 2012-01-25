@@ -18,10 +18,6 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
 
 /**
  * This is the base class for translations access in scout applications.<br>
@@ -38,26 +34,14 @@ public class ScoutTexts {
   public static final QualifiedName JOB_PROPERTY_NAME = new QualifiedName("org.eclipse.scout.commons", "DynamicNls");
   private static final ScoutTexts defaultInstance = new ScoutTexts();
 
-  protected ITextProviderService[] m_textProviderCache = null;
+  private final ITextProviderService[] m_textProviders;
 
   public ScoutTexts() {
-    if (Activator.getDefault() == null) {
-      return;
-    }
-    BundleContext c = Activator.getDefault().getBundle().getBundleContext();
-    try {
-      c.addServiceListener(new ServiceListener() {
-        @Override
-        public void serviceChanged(ServiceEvent event) {
-          if (event.getType() == ServiceEvent.REGISTERED || event.getType() == ServiceEvent.UNREGISTERING) {
-            invalidateTextProviderCache();
-          }
-        }
-      }, "(objectclass=" + ITextProviderService.class.getName() + ")");
-    }
-    catch (InvalidSyntaxException e) {
-      // cannot happen, filter has been tested.
-    }
+    this(SERVICES.getServices(ITextProviderService.class));
+  }
+
+  public ScoutTexts(ITextProviderService[] textProviders) {
+    m_textProviders = textProviders;
   }
 
   public static String get(String key, String... messageArguments) {
@@ -86,21 +70,12 @@ public class ScoutTexts {
       //performance optimization: null job is very rare
     }
 
-    //If session has not been initialized yet or does not define a ScoutTexts class, the preSessionInstance is used.
+    //If session has not been initialized yet or does not define a ScoutTexts class, the defaultInstance is used.
     if (jobInstance == null) {
       jobInstance = defaultInstance;
     }
 
     return jobInstance;
-  }
-
-  /**
-   * Clears the cached list of text provider services.<br>
-   * This list will be re-created by getting a fresh list from the ServiceRegistry when the next translation is
-   * requested.
-   */
-  public void invalidateTextProviderCache() {
-    m_textProviderCache = null;
   }
 
   public final String getText(String key, String... messageArguments) {
@@ -120,11 +95,8 @@ public class ScoutTexts {
     return map;
   }
 
-  protected synchronized ITextProviderService[] getTextProviders() {
-    if (m_textProviderCache == null) {
-      m_textProviderCache = SERVICES.getServices(ITextProviderService.class);
-    }
-    return m_textProviderCache;
+  protected ITextProviderService[] getTextProviders() {
+    return m_textProviders;
   }
 
   protected String getTextInternal(Locale locale, String key, String... messageArguments) {

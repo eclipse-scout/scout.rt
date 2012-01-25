@@ -54,7 +54,6 @@ import org.osgi.service.prefs.BackingStoreException;
 
 public abstract class AbstractClientSession implements IClientSession {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractClientSession.class);
-  private static final Map<Class<? extends IClientSession>, ScoutTexts> SCOUT_TEXTS_CACHE = new HashMap<Class<? extends IClientSession>, ScoutTexts>();
 
   // context
   private Bundle m_bundle;
@@ -82,12 +81,7 @@ public abstract class AbstractClientSession implements IClientSession {
     m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
     m_sharedVariableMap = new SharedVariableMap();
-    m_scoutTexts = SCOUT_TEXTS_CACHE.get(getClass());
     m_locale = LocaleThreadLocal.get();
-    if (m_scoutTexts == null) {
-      m_scoutTexts = new ScoutTexts();
-      SCOUT_TEXTS_CACHE.put(getClass(), m_scoutTexts);
-    }
     if (autoInitConfig) {
       initConfig();
     }
@@ -249,7 +243,7 @@ public abstract class AbstractClientSession implements IClientSession {
         setMemoryPolicy(new MediumMemoryPolicy());
       }
       m_iconLocator = createIconLocator();
-      ScoutTexts.getInstance().invalidateTextProviderCache();
+      m_scoutTexts = new ScoutTexts();
       execLoadSession();
       setActive(true);
     }
