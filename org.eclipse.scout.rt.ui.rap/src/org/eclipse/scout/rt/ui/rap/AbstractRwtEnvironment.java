@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,11 +30,9 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rwt.RWT;
+import org.eclipse.rwt.internal.widgets.JSExecutor;
 import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.service.ISessionStore;
 import org.eclipse.rwt.service.SessionStoreEvent;
@@ -255,6 +254,31 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STARTED));
       }
     }
+  }
+
+  public void logout() {
+    RWT.getRequest().getSession().setMaxInactiveInterval(1);
+
+    final HttpSession session = RWT.getSessionStore().getHttpSession();
+    new Thread() {
+      @Override
+      public void run() {
+        session.invalidate();
+      }
+    }.start();
+
+    // Note: JSExecutor access is discouraged for RAP 1.5M3. This warning
+    // should go away once we upgrade to RAP 1.5M4.
+    String defaultUrl = MessageFormat.format(
+        "{0}://{1}:{2}{3}",
+        new Object[]{RWT.getRequest().getScheme(),
+            RWT.getRequest().getLocalName(),
+            Integer.toString(RWT.getRequest().getLocalPort()),
+            RWT.getRequest().getRequestURI()});
+
+    System.out.println("Default URL: " + defaultUrl);
+    String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", defaultUrl);
+    JSExecutor.executeJS(browserText);
   }
 
   @Override
@@ -1136,6 +1160,13 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
               catch (CoreException ex) {
                 LOG.error("desktop closed", ex);
               }
+              getDisplay().asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                  logout();
+                }
+              });
             }
           };
           invokeUiLater(t);
