@@ -28,6 +28,8 @@ public class BrowserInfo {
     WINDOWS, UNIX, OSX, IOS, IPHONE, IPOD, ANDROID, UNKNOWN
   }
 
+  private String m_userAgent = "";
+
   private final Type m_type;
   private Version m_version;
 
@@ -50,6 +52,14 @@ public class BrowserInfo {
     m_type = type;
     m_version = version;
     m_system = system;
+  }
+
+  public String getUserAgent() {
+    return m_userAgent;
+  }
+
+  public void setUserAgent(String userAgent) {
+    m_userAgent = userAgent;
   }
 
   public boolean isWebkit() {
@@ -163,6 +173,7 @@ public class BrowserInfo {
     }
     sb.append("/ Browser: ").append(getType());
     sb.append("/ EngineVersion: ").append(getVersion());
+    sb.append("\nUserAgent: ").append(m_userAgent);
     return sb.toString();
   }
 }

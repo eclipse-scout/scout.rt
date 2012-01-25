@@ -58,12 +58,12 @@ import org.osgi.framework.Version;
 public abstract class AbstractRwtUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtUtility.class);
 
+  public static final String BROWSER_INFO = "browser-Info";
+
   public static final String VARIANT_PROPOSAL_FORM = "proposal-form";
   public static final String VARIANT_LISTBOX = "listbox";
   public static final String VARIANT_LISTBOX_DISABLED = "listboxDisabled";
   public static final String VARIANT_EMPTY = "empty";
-
-  static final String BROWSER_INFO = "browser-Info";
 
   public static BrowserInfo getBrowserInfo() {
     BrowserInfo info = (BrowserInfo) RWT.getSessionStore().getAttribute(BROWSER_INFO);
@@ -81,6 +81,7 @@ public abstract class AbstractRwtUtility {
       String userAgent = request.getHeader("User-Agent");
 
       info = createBrowserInfo(userAgent);
+      info.setUserAgent(userAgent);
       info.setLocale(request.getLocale());
 
       if (userAgent.indexOf("Windows") != -1

@@ -25,12 +25,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.UICallBack;
+import org.eclipse.rwt.service.ISessionStore;
+import org.eclipse.rwt.service.SessionStoreEvent;
+import org.eclipse.rwt.service.SessionStoreListener;
 import org.eclipse.rwt.widgets.ExternalBrowser;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility;
@@ -66,6 +73,8 @@ import org.eclipse.scout.rt.ui.rap.core.RwtEnvironmentEvent;
 import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.core.concurrency.RwtScoutSynchronizer;
 import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
+import org.eclipse.scout.rt.ui.rap.core.util.AbstractRwtUtility;
+import org.eclipse.scout.rt.ui.rap.core.util.BrowserInfo;
 import org.eclipse.scout.rt.ui.rap.core.util.ColorFactory;
 import org.eclipse.scout.rt.ui.rap.core.util.FontRegistry;
 import org.eclipse.scout.rt.ui.rap.core.util.RwtIconLocator;
@@ -124,6 +133,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   private Bundle m_applicationBundle;
   private RwtScoutSynchronizer m_synchronizer;
+  private SessionStoreListener m_sessionStoreListener;
 
   private final Object m_immediateUiJobsLock = new Object();
   private final List<Runnable> m_immediateUiJobs = new ArrayList<Runnable>();
@@ -161,6 +171,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   public AbstractRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     m_applicationBundle = applicationBundle;
     m_clientSessionClazz = clientSessionClazz;
+    m_sessionStoreListener = new P_SessionStoreListener();
     m_environmentListeners = new EventListenerList();
     m_openForms = new HashMap<IForm, IRwtScoutPart>();
     m_status = RwtEnvironmentEvent.INACTIVE;
@@ -302,10 +313,12 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       initLocale();
 
       final BooleanHolder newSession = new BooleanHolder(true);
-      IClientSession tempClientSession = (IClientSession) RWT.getRequest().getSession().getAttribute(IClientSession.class.getName());
+      IClientSession tempClientSession = (IClientSession) RWT.getSessionStore().getAttribute(IClientSession.class.getName());
       if (tempClientSession == null || !tempClientSession.isActive()) {
         tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString());
-        RWT.getRequest().getSession().setAttribute(IClientSession.class.getName(), tempClientSession);
+        RWT.getSessionStore().setAttribute(IClientSession.class.getName(), tempClientSession);
+        RWT.getSessionStore().addSessionStoreListener(m_sessionStoreListener);
+
         newSession.setValue(true);
       }
       else {
@@ -1320,4 +1333,24 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     m_activateDesktopCalled = activateDesktopCalled;
   }
 
+  private final class P_SessionStoreListener implements SessionStoreListener {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void beforeDestroy(SessionStoreEvent event) {
+      ISessionStore sessionStore = event.getSessionStore();
+      String userAgent = "";
+      BrowserInfo browserInfo = (BrowserInfo) sessionStore.getAttribute(AbstractRwtUtility.BROWSER_INFO);
+      if (browserInfo != null) {
+        userAgent = browserInfo.getUserAgent();
+      }
+      String msg = "Thread: {0} Session goes down...; UserAgent: {2}";
+      LOG.warn(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
+
+      IClientSession clientSession = (IClientSession) sessionStore.getAttribute(IClientSession.class.getName());
+      if (clientSession != null) {
+        clientSession.stopSession();
+      }
+    }
+  }
 }

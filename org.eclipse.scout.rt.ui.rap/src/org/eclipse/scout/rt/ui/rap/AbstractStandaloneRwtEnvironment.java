@@ -159,25 +159,32 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
 
   @Override
   public Display getDisplay() {
-    Display current = Display.getCurrent();
+    Display current = null;
+    try {
+      current = Display.getCurrent();
+    }
+    catch (Exception e) {
+      // NOP
+    }
     if (current != null && m_display != current) {
-      ScoutLogManager.getLogger(AbstractStandaloneRwtEnvironment.class).error("Different Display.\n" +
-          "m_display: {0}\n" +
-          "cur_displ: {1}",
+      ScoutLogManager.getLogger(AbstractStandaloneRwtEnvironment.class).error(
+          "Different Display.\n" +
+              "m_display: {0}\n" +
+              "cur_displ: {1}",
           new Object[]{m_display, current});
     }
-//    Display findDisp = Display.findDisplay(Thread.currentThread());
-//    if (m_display != findDisp) {
-//      ScoutLogManager.getLogger(AbstractStandaloneRwtEnvironment.class).error("Different Display.\n" +
-//          "m_display: {0}\n" +
-//          "findDisp : {1}",
-//          new Object[]{m_display, findDisp});
-//    }
-    Display defdisp = Display.getDefault();
+    Display defdisp = null;
+    try {
+      defdisp = Display.getDefault();
+    }
+    catch (Exception e) {
+      // NOP
+    }
     if (defdisp != null && m_display != defdisp) {
-      ScoutLogManager.getLogger(AbstractStandaloneRwtEnvironment.class).error("Different Display.\n" +
-          "m_display: {0}\n" +
-          "defdisp  : {1}",
+      ScoutLogManager.getLogger(AbstractStandaloneRwtEnvironment.class).error(
+          "Different Display.\n" +
+              "m_display: {0}\n" +
+              "defdisp  : {1}",
           new Object[]{m_display, defdisp});
     }
     return m_display;
