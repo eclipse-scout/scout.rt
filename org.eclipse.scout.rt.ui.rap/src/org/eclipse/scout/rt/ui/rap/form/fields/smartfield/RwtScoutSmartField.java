@@ -128,7 +128,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     textField.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_SMARTFIELD);
 
     m_browseButton = getUiEnvironment().getFormToolkit().createDropDownButton(m_smartContainer, SWT.DROP_DOWN | SWT.NO_FOCUS);
-    m_browseButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_SMARTFIELD);
     // mouseDown-handler to ensure the text is validated on a context menu call is not
     // necessary as handleUiInputVerifier is already triggered by FocusOut-event in
     // org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite.P_RwtFieldListener<T>.
