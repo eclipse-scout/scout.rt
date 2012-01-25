@@ -1924,30 +1924,30 @@ Text.smartfield[SINGLE]:disabled {
   background-color: #f4f8fc;
 }
 
-Button.smartfield {
+Button.smartfield_browse {
   background-image: url( theme/img/button/smartfield_browse.png );
   background-position: left center;
   background-repeat: no-repeat;
   border-radius: 5px;
 }
 
-Button.smartfield:disabled {
+Button.smartfield_browse:disabled {
   background-image: url( theme/img/button/smartfield_browse_disabled.png );
 }
 
-Button.smartfield:hover {
+Button.smartfield_browse:hover {
   background-image: url( theme/img/button/smartfield_browse_mouse_over.png );
 }
 
-Button.smartfield_menu {
+Button.smartfield_browse_menu {
   background-image: url( theme/img/button/smartfield_browse_menu.png );
 }
 
-Button.smartfield_menu:disabled {
+Button.smartfield_browse_menu:disabled {
   background-image: url( theme/img/button/smartfield_browse_menu_disabled.png );
 }
 
-Button.smartfield_menu:hover {
+Button.smartfield_browse_menu:hover {
   background-image: url( theme/img/button/smartfield_browse_menu_mouse_over.png );
 }
 

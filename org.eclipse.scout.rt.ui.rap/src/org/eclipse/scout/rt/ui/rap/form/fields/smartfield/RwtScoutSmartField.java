@@ -246,7 +246,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   }
 
   protected void setIconIdFromScout(String s) {
-//    m_browseButton.setImage(getEnvironment().getIcon(s));//FIXME
+    m_browseButton.setData(WidgetUtil.CUSTOM_VARIANT, s);
   }
 
   @Override
