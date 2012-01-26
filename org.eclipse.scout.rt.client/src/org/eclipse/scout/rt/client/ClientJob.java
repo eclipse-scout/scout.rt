@@ -152,6 +152,7 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
   private IStatus runTransactionWrapper(IProgressMonitor monitor) {
     Locale oldLocale = LocaleThreadLocal.get();
     ScoutTexts oldTexts = TextsThreadLocal.get();
+    IClientSession oldSession = ClientSessionThreadLocal.get();
     try {
       ClientSessionThreadLocal.set(getClientSession());
       LocaleThreadLocal.set(m_session.getLocale());
@@ -160,7 +161,7 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
       return runStatus(monitor);
     }
     finally {
-      ClientSessionThreadLocal.set(null);
+      ClientSessionThreadLocal.set(oldSession);
       LocaleThreadLocal.set(oldLocale);
       TextsThreadLocal.set(oldTexts);
     }
