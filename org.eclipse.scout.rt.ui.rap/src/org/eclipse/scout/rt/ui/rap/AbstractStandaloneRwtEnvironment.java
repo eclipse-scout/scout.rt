@@ -37,12 +37,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
-/**
- * <h3>AbstractStandaloneRwtEnvironment</h3> ...
- * 
- * @author Andreas Hoegger
- * @since 3.7.0 June 2011
- */
 public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnvironment implements IRwtStandaloneEnvironment {
 
   private Display m_display;

@@ -203,4 +203,5 @@ public interface IRwtEnvironment extends IRwtCoreEnvironment {
    */
   String styleHtmlText(IRwtScoutFormField<?> uiComposite, String rawHtml);
 
+  String getLogoutLandingUrl();
 }

@@ -256,6 +256,17 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
+  @Override
+  public String getLogoutLandingUrl() {
+    String defaultUrl = MessageFormat.format(
+        "{0}://{1}:{2}{3}/",
+        new Object[]{RWT.getRequest().getScheme(),
+            RWT.getRequest().getLocalName(),
+            Integer.toString(RWT.getRequest().getLocalPort()),
+            RWT.getRequest().getContextPath()});
+    return defaultUrl;
+  }
+
   public void logout() {
     RWT.getRequest().getSession().setMaxInactiveInterval(1);
 
@@ -267,17 +278,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       }
     }.start();
 
-    // Note: JSExecutor access is discouraged for RAP 1.5M3. This warning
-    // should go away once we upgrade to RAP 1.5M4.
-    String defaultUrl = MessageFormat.format(
-        "{0}://{1}:{2}{3}",
-        new Object[]{RWT.getRequest().getScheme(),
-            RWT.getRequest().getLocalName(),
-            Integer.toString(RWT.getRequest().getLocalPort()),
-            RWT.getRequest().getRequestURI()});
-
-    System.out.println("Default URL: " + defaultUrl);
-    String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", defaultUrl);
+    String logoutUrl = getLogoutLandingUrl();
+    String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", logoutUrl);
     JSExecutor.executeJS(browserText);
   }
 
