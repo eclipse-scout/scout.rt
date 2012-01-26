@@ -364,7 +364,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       m_clientSession.setData(ENVIRONMENT_KEY, this);
 
       //
-      RwtUtility.setNlsTextsOnDisplay(getDisplay(), m_clientSession.getNlsTexts());
+      RwtUtility.setNlsTextsOnDisplay(getDisplay(), m_clientSession.getTexts());
       m_iconLocator = createIconLocator();
       m_colorFactory = new ColorFactory(getDisplay());
       m_keyStrokeManager = new KeyStrokeManager(this);

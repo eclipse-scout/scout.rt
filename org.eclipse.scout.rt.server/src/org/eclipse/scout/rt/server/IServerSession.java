@@ -36,7 +36,7 @@ public interface IServerSession {
 
   void setLocale(Locale l);
 
-  ScoutTexts getNlsTexts();
+  ScoutTexts getTexts();
 
   Object getAttribute(Object key);
 

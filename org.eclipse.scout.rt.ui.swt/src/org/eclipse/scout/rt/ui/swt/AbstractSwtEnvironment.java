@@ -413,7 +413,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       else {
         m_clientSession = tempClientSession;
       }
-      SwtUtility.setNlsTextsOnDisplay(getDisplay(), m_clientSession.getNlsTexts());
+      SwtUtility.setNlsTextsOnDisplay(getDisplay(), m_clientSession.getTexts());
       if (m_synchronizer == null) {
         m_synchronizer = new SwtScoutSynchronizer(this);
       }

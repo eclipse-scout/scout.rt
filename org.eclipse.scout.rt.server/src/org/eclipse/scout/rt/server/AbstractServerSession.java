@@ -128,7 +128,7 @@ public abstract class AbstractServerSession implements IServerSession {
    * </p>
    */
   @Override
-  public ScoutTexts getNlsTexts() {
+  public ScoutTexts getTexts() {
     return m_scoutTexts;
   }
 

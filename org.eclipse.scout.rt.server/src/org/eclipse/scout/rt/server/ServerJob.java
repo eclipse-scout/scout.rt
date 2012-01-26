@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.server.transaction.BasicTransaction;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TextsThreadLocal;
 
 /**
  * Perform a transaction on a {@link IServerSession}<br>
@@ -70,7 +71,6 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     }
     m_serverSession = serverSession;
     m_subject = subject;
-    setProperty(ScoutTexts.JOB_PROPERTY_NAME, m_serverSession.getNlsTexts());
   }
 
   /**
@@ -191,10 +191,12 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     ITransaction transaction = createNewTransaction();
     Map<Class, Object> backup = ThreadContext.backup();
     Locale oldLocale = LocaleThreadLocal.get();
+    ScoutTexts oldTexts = TextsThreadLocal.get();
     try {
       ThreadContext.putServerSession(m_serverSession);
       ThreadContext.putTransaction(transaction);
       LocaleThreadLocal.set(m_serverSession.getLocale());
+      TextsThreadLocal.set(m_serverSession.getTexts());
       ActiveTransactionRegistry.register(transaction);
       //
       IStatus status = runTransaction(monitor);
@@ -252,20 +254,21 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
         LOG.warn(null, t);
       }
       LocaleThreadLocal.set(oldLocale);
+      TextsThreadLocal.set(oldTexts);
     }
   }
 
   protected abstract IStatus runTransaction(IProgressMonitor monitor) throws Exception;
 
   /**
-   * @return {@link IClientSession} if the current job is a {@link IClientSessionProvider}
+   * @return {@link ThreadContext#getServerSession()}
    */
   public static final IServerSession getCurrentSession() {
     return getCurrentSession(IServerSession.class);
   }
 
   /**
-   * @return {@link IClientSession} if the current job is a {@link IClientSessionProvider}
+   * @return {@link ThreadContext#getServerSession()} and check if it matches the required type
    */
   @SuppressWarnings("unchecked")
   public static final <T extends IServerSession> T getCurrentSession(Class<T> type) {

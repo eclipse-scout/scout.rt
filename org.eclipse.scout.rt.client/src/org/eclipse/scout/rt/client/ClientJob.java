@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TextsThreadLocal;
 
 /**
  * Job operating on a {@link IClientSession} Job may be sync or async. Sync jobs
@@ -72,7 +73,6 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
     m_listeners = new EventListenerList();
     setUser(false);
     setSystem(system);
-    setProperty(ScoutTexts.JOB_PROPERTY_NAME, m_session.getNlsTexts());
     m_waitForLock = new Object();
     if (sync) {
       setRule(new ClientRule(session));
@@ -138,34 +138,31 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
     }
   }
 
-  @Override
-  public final IStatus runNow(IProgressMonitor monitor) {
-    IStatus status = null;
-    try {
-      ClientSessionThreadLocal.set(getClientSession());
-      status = super.runNow(monitor);
-    }
-    finally {
-      ClientSessionThreadLocal.set(null);
-    }
-    return status;
-  }
-
   /**
    * {@inheritDoc}
    * <p/>
-   * <b>Note:</b> Do not override this method. It will be changed to final in a subsequent release. Override
+   * <h1><b>Warning:</b></h1> Do not override this method. It will be changed to final in a subsequent release. Override
    * {@link #runStatus(IProgressMonitor)} instead.
    */
   @Override
-  protected IStatus run(IProgressMonitor monitor) {
+  protected final IStatus run(IProgressMonitor monitor) {
+    return runTransactionWrapper(monitor);
+  }
+
+  private IStatus runTransactionWrapper(IProgressMonitor monitor) {
     Locale oldLocale = LocaleThreadLocal.get();
+    ScoutTexts oldTexts = TextsThreadLocal.get();
     try {
+      ClientSessionThreadLocal.set(getClientSession());
       LocaleThreadLocal.set(m_session.getLocale());
+      TextsThreadLocal.set(m_session.getTexts());
+      //
       return runStatus(monitor);
     }
     finally {
+      ClientSessionThreadLocal.set(null);
       LocaleThreadLocal.set(oldLocale);
+      TextsThreadLocal.set(oldTexts);
     }
   }
 
@@ -315,13 +312,6 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
   }
 
   /**
-   * @return {@link IClientSession} if the current job is a {@link IClientSessionProvider}
-   */
-  public static final IClientSession getCurrentSession() {
-    return getCurrentSession(IClientSession.class);
-  }
-
-  /**
    * @return true if {@link IJobManager#currentJob()} is a {@link ClientJob} and {@link ClientJob#isSync()} is true
    */
   public static final boolean isSyncClientJob() {
@@ -330,18 +320,22 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
   }
 
   /**
-   * @return {@link IClientSession} if the current job is a {@link IClientSessionProvider}
+   * @return {@link ClientSessionThreadLocal#get()}
+   */
+  public static final IClientSession getCurrentSession() {
+    return getCurrentSession(IClientSession.class);
+  }
+
+  /**
+   * @return {@link ClientSessionThreadLocal#get()} and check if it matches the required type
    */
   @SuppressWarnings("unchecked")
   public static final <T extends IClientSession> T getCurrentSession(Class<T> type) {
-    Job job = getJobManager().currentJob();
-    if (job instanceof IClientSessionProvider) {
-      IClientSession s = ((IClientSessionProvider) job).getClientSession();
-      if (s != null && type.isAssignableFrom(s.getClass())) {
-        return (T) s;
-      }
+    IClientSession s = ClientSessionThreadLocal.get();
+    if (s != null && type.isAssignableFrom(s.getClass())) {
+      return (T) s;
     }
-    return (T) ClientSessionThreadLocal.get();
+    return null;
   }
 
 }

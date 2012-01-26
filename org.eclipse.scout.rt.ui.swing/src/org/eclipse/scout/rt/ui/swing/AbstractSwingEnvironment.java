@@ -315,7 +315,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     checkThread();
     m_scoutSession = session;
     //set global text provider
-    SwingUtility.setNlsTexts(m_scoutSession.getNlsTexts());
+    SwingUtility.setNlsTexts(m_scoutSession.getTexts());
     if (m_rootFrame == null) {
       m_scoutSession.stopSession();
       return;

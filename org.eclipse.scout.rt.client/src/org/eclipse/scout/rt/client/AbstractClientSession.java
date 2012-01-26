@@ -116,7 +116,7 @@ public abstract class AbstractClientSession implements IClientSession {
    * </p>
    */
   @Override
-  public ScoutTexts getNlsTexts() {
+  public ScoutTexts getTexts() {
     return m_scoutTexts;
   }
 

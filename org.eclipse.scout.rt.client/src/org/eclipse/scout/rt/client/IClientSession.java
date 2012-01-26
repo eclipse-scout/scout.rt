@@ -53,7 +53,7 @@ public interface IClientSession {
 
   Throwable getLoadError();
 
-  ScoutTexts getNlsTexts();
+  ScoutTexts getTexts();
 
   /**
    * Start model thread with job queue<br>

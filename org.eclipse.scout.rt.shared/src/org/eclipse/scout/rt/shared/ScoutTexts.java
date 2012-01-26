@@ -15,7 +15,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -31,7 +30,12 @@ import org.eclipse.scout.service.SERVICES;
  */
 public class ScoutTexts {
 
-  public static final QualifiedName JOB_PROPERTY_NAME = new QualifiedName("org.eclipse.scout.commons", "DynamicNls");
+  /**
+   * Jop property name tha can be used when Texts should be used in associated contexts such as swt display, rwt display
+   * etc.
+   */
+  public static final QualifiedName JOB_PROPERTY_NAME = new QualifiedName(ScoutTexts.class.getName(), "ref");
+
   private static final ScoutTexts defaultInstance = new ScoutTexts();
 
   private final ITextProviderService[] m_textProviders;
@@ -53,29 +57,18 @@ public class ScoutTexts {
   }
 
   /**
-   * Queries {@link Job#getProperty(org.eclipse.core.runtime.QualifiedName)} with {@value #JOB_PROPERTY_NAME} to find
-   * the scope specific texts implementation (e.g. as defined on a session). If this one is null, then the default
-   * instance
-   * is used as global default. That way applications can override scout texts in their
+   * Queries {@link TextsThreadLocal#get()}. If this one is null, then the default
+   * instance is used as global default. That way applications can override scout texts in their
    * application sessions, without interfering with other scout applications in the same osgi/eclipse runtime.
    * 
-   * @return The <code>ScoutTexts</code> instance to use in current scope.
+   * @return the <code>ScoutTexts</code> instance to use in current scope.
    */
   public static ScoutTexts getInstance() {
-    ScoutTexts jobInstance = null;
-    try {
-      jobInstance = (ScoutTexts) Job.getJobManager().currentJob().getProperty(JOB_PROPERTY_NAME);
+    ScoutTexts t = TextsThreadLocal.get();
+    if (t == null) {
+      t = defaultInstance;
     }
-    catch (Throwable t) {
-      //performance optimization: null job is very rare
-    }
-
-    //If session has not been initialized yet or does not define a ScoutTexts class, the defaultInstance is used.
-    if (jobInstance == null) {
-      jobInstance = defaultInstance;
-    }
-
-    return jobInstance;
+    return t;
   }
 
   public final String getText(String key, String... messageArguments) {
