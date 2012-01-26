@@ -20,6 +20,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -34,6 +35,7 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
   private HashMap<IGroupBox, Integer> m_scoutGroupToIndex;
   private HashMap<Component, IGroupBox> m_swingGroupToScoutGroup;
   private PropertyChangeListener m_scoutVisiblePropertyListener;
+  private OptimisticLock m_tabAddingLock;
   private int m_oldSelectedIndex = 0;
 
   public SwingScoutTabBox() {
@@ -43,6 +45,7 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
   protected void initializeSwing() {
     m_scoutGroupToIndex = new HashMap<IGroupBox, Integer>();
     m_swingGroupToScoutGroup = new HashMap<Component, IGroupBox>();
+    m_tabAddingLock = new OptimisticLock();
     // swing layout
     JTabbedPane swingPane = new JTabbedPaneEx();
     swingPane.setOpaque(false);
@@ -91,7 +94,13 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
       if (tabComposite != null) {
         Component comp = tabComposite.getSwingContainer();
         m_swingGroupToScoutGroup.put(comp, g);
-        pane.insertTab("", tabComposite.getSwingTabIcon(), comp, null, viewIndex);
+        try {
+          getTabAddingLock().acquire();
+          pane.insertTab("", tabComposite.getSwingTabIcon(), comp, null, viewIndex);
+        }
+        finally {
+          getTabAddingLock().release();
+        }
       }
     }
     else {
@@ -160,6 +169,12 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
     updateTabItemSelected();
     //
     if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
+    if (getTabAddingLock().isAcquired()) {
+      // The m_tabAddingLock is acquired, when the current event comes from adding a new tab (make visible).
+      // In that case do not fire a setSelectedTabFromUI because there has actually nothing changed in
+      // the tab selection and you might overrule some selection changes from the model (compare bug 368991).
       return;
     }
     //
@@ -237,4 +252,7 @@ public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implemen
     }
   }
 
+  protected OptimisticLock getTabAddingLock() {
+    return m_tabAddingLock;
+  }
 }
