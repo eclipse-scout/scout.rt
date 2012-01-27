@@ -363,7 +363,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (patternHtmlCheck.matcher(text).matches()) {
           // ensure proper HTML and extract body content
           Matcher matcher = patternBodyContent.matcher(HTMLUtility.cleanupHtml(text, false, false, null));
-        if (matcher.find()) {
+          if (matcher.find()) {
             html = matcher.group(1);
           }
         }
@@ -3069,6 +3069,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       Cell cell = (Cell) tableRow.getCell(columnIndex);
       if (result.length == 1) {
         cell.setText(result[0].getText());
+        cell.setTooltipText(result[0].getTooltipText());
       }
       else if (result.length > 1) {
         StringBuffer buf = new StringBuffer();
@@ -3084,9 +3085,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           buf.append(result[i].getText());
         }
         cell.setText(buf.toString());
+        cell.setTooltipText(null);
       }
       else {
         cell.setText("");
+        cell.setTooltipText(null);
       }
     }
     finally {
