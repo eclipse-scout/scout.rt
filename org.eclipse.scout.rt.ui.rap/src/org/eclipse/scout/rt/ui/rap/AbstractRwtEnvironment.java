@@ -774,7 +774,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     String nextId = Long.toString(new Random(this.hashCode()).nextLong());
 
     if ((StringUtility.find(path, "http://") >= 0)
-        || (StringUtility.find(path, "https://") >= 0)) {
+        || (StringUtility.find(path, "https://") >= 0)
+        || (path != null && path.startsWith("mailto:"))) {
       ExternalBrowser.open(nextId, path, ExternalBrowser.STATUS | ExternalBrowser.LOCATION_BAR | ExternalBrowser.NAVIGATION_BAR);
     }
     else {
