@@ -1,0 +1,236 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.scout.rt.ui.swt" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.scout.rt.ui.swt" id="scouticons" name="Scout Icons"/>
+      </appInfo>
+      <documentation>
+         This extension point allows to contribute icons to overwrite Scout default icons.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="dropdownfield_arrowdown" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="window" minOccurs="0" maxOccurs="1"/>
+            <element ref="status_error" minOccurs="0" maxOccurs="1"/>
+            <element ref="status_info" minOccurs="0" maxOccurs="1"/>
+            <element ref="status_warning" minOccurs="0" maxOccurs="1"/>
+            <element ref="checkbox_yes" minOccurs="0" maxOccurs="1"/>
+            <element ref="checkbox_no" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="dropdownfield_arrowdown">
+      <annotation>
+         <documentation>
+            Icon that represents arrow in drop down button
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="window">
+      <annotation>
+         <appInfo>
+            <meta.element deprecated="true"/>
+         </appInfo>
+         <documentation>
+            The application icon with a dimension of 16x16 pixels
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="status_info">
+      <annotation>
+         <documentation>
+            Icon to represent an information
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="status_warning">
+      <annotation>
+         <documentation>
+            Icon to represent a warning
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="status_error">
+      <annotation>
+         <documentation>
+            Icon to represent an error
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="checkbox_yes">
+      <annotation>
+         <documentation>
+            Icon to represent &apos;checked state true&apos; in a checkable table cell
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="checkbox_no">
+      <annotation>
+         <documentation>
+            Icon to represent &apos;checked state false&apos; in a checkable table cell
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project relative path to the icon resource
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiinfo"/>
+      </appInfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

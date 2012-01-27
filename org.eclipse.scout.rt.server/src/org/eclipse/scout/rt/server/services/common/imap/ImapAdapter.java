@@ -1,0 +1,345 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.server.services.common.imap;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
+
+import javax.mail.AuthenticationFailedException;
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+
+public class ImapAdapter {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ImapAdapter.class);
+
+  public static final String TRASH_FOLDER_NAME = "Trash";
+  private boolean m_useSSL;
+  private String m_host;
+  private int m_port = 143;
+  private String m_username;
+  private String m_password;
+  private String m_defaultFolderName;
+  private Store m_store;
+  private HashMap<String, Folder> m_cachedFolders;
+  private boolean m_connected = false;
+
+  public ImapAdapter() {
+    m_cachedFolders = new HashMap<String, Folder>();
+  }
+
+  public ImapAdapter(String host, int port, String username, String password) {
+    this();
+    m_host = host;
+    m_port = port;
+    m_username = username;
+    m_password = password;
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    closeConnection();
+    super.finalize();
+  }
+
+  public Message[] getUnseenMessages() throws ProcessingException {
+    return getUnseenMessages(getDefaultFolderName());
+  }
+
+  public Message[] getUnseenMessages(String folderName) throws ProcessingException {
+    connect();
+    ArrayList<Message> messages = new ArrayList<Message>();
+    Folder folder = null;
+    try {
+      folder = findFolder(folderName);
+      if (folder != null) {
+        Message item;
+        Message[] m = folder.getMessages();
+        for (int i = 0; i < Array.getLength(m); i++) {
+          item = m[i];
+          if (!item.isSet(Flags.Flag.SEEN)) {
+            messages.add(item);
+          }
+
+        }
+      }
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException(e.getMessage(), e);
+    }
+    return messages.toArray(new Message[messages.size()]);
+  }
+
+  public Message[] getAllMessages() throws ProcessingException {
+    return getAllMessages(getDefaultFolderName());
+  }
+
+  public Message[] getAllMessages(String folderName) throws ProcessingException {
+    connect();
+    Message[] messages = new Message[0];
+    Folder folder = null;
+    try {
+      folder = findFolder(folderName);
+      if (folder != null) {
+        messages = folder.getMessages();
+      }
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException(e.getMessage(), e);
+    }
+    return messages;
+  }
+
+  public void moveToTrash(Message[] messages) throws ProcessingException {
+    moveMessages(TRASH_FOLDER_NAME, messages);
+  }
+
+  public void moveMessages(String destFolderName, Message[] messages) throws ProcessingException {
+    copyMessages(destFolderName, messages, true);
+  }
+
+  public void copyMessages(String destFolderName, Message[] messages) throws ProcessingException {
+    copyMessages(destFolderName, messages, false);
+  }
+
+  protected void copyMessages(String destFolderName, Message[] messages, boolean deleteSourceMessages) throws ProcessingException {
+    connect();
+    Folder destFolder = null;
+    try {
+      destFolder = findFolder(destFolderName);
+      if (destFolder != null) {
+        destFolder.appendMessages(messages);
+        if (deleteSourceMessages) {
+          deleteMessagesPermanently(messages);
+        }
+      }
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException(e.getMessage(), e);
+    }
+  }
+
+  public void deleteMessagesPermanently(Message[] messages) throws ProcessingException {
+    connect();
+    for (Message msg : messages) {
+      try {
+        msg.setFlag(Flags.Flag.DELETED, true);
+      }
+      catch (MessagingException e) {
+        throw new ProcessingException(e.getMessage(), e);
+      }
+    }
+  }
+
+  public void createFolder(String folderName) throws ProcessingException {
+    findFolder(folderName, true);
+  }
+
+  public void removeFolder(String folderName) throws ProcessingException {
+    connect();
+    try {
+      Folder folder = findFolder(folderName);
+      if (folder != null && folder.exists()) {
+        if (folder.isOpen()) {
+          folder.close(true);
+        }
+        folder.delete(true);
+      }
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException(e.getMessage(), e);
+    }
+  }
+
+  public void connect() throws ProcessingException {
+    if (!isConnected()) {
+      // try{
+      Properties props = new Properties();
+      props.put("mail.transport.protocol", "imap");
+      if (getHost() != null) {
+        props.put("mail.imap.host", getHost());
+      }
+      if (getPort() > 0) {
+        props.put("mail.imap.port", "" + getPort());
+      }
+      if (getUsername() != null) {
+        props.put("mail.imap.user", getUsername());
+      }
+      if (isUseSSL()) {
+        props.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.setProperty("mail.imap.socketFactory.fallback", "false");
+        props.setProperty("mail.imap.socketFactory.port", "993");
+      }
+      Session session = Session.getInstance(props, null);
+      try {
+        m_store = session.getStore("imap");
+        if (!m_store.isConnected()) {
+          if (getUsername() != null && getHost() != null) {
+            m_store.connect(System.getProperty("mail.imap.host"), getUsername(), getPassword());
+          }
+          else {
+            m_store.connect();
+          }
+        }
+      }
+      catch (AuthenticationFailedException e) {
+        throw new ProcessingException("IMAP-Authentication failed on " + (m_host == null ? "?" : m_host) + ":" + m_port);
+      }
+      catch (Exception e) {
+        throw new ProcessingException(e.getMessage(), e);
+      }
+      m_connected = true;
+    }
+  }
+
+  protected Folder findFolder(String name) throws ProcessingException {
+    return findFolder(name, false);
+  }
+
+  protected Folder findFolder(String name, boolean createNonExisting) throws ProcessingException {
+    connect();
+    Folder folder = m_cachedFolders.get(name);
+    if (folder == null) {
+      try {
+        Folder f = m_store.getFolder(name);
+        if (f.exists()) {
+          folder = f;
+        }
+        else if (createNonExisting) {
+          f.create(Folder.HOLDS_FOLDERS | Folder.HOLDS_MESSAGES);
+          folder = f;
+        }
+        if (folder != null) {
+          m_cachedFolders.put(name, folder);
+        }
+      }
+      catch (MessagingException e) {
+        throw new ProcessingException("could not find folder: " + name, e);
+      }
+    }
+    try {
+      if (folder != null && !folder.isOpen()) {
+        folder.open(Folder.READ_WRITE);
+      }
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException("could not open folder: " + name, e);
+    }
+    return folder;
+  }
+
+  public void closeConnection() throws ProcessingException {
+    if (isConnected()) {
+      List<MessagingException> exceptions = new ArrayList<MessagingException>();
+      for (Folder folder : m_cachedFolders.values()) {
+        try {
+          if (folder.isOpen()) {
+            folder.close(true);
+          }
+        }
+        catch (MessagingException e) {
+          exceptions.add(e);
+        }
+        finally {
+          try {
+            if (folder.isOpen()) {
+              folder.close(false);
+            }
+          }
+          catch (Throwable fatal) {
+          }
+        }
+      }
+      try {
+        if (m_store.isConnected()) {
+          m_store.close();
+        }
+      }
+      catch (MessagingException e) {
+        exceptions.add(e);
+      }
+      m_cachedFolders.clear();
+      m_connected = false;
+      if (exceptions.size() > 0) {
+        throw new ProcessingException(exceptions.get(0).getMessage());
+      }
+    }
+  }
+
+  public boolean isConnected() {
+    return m_connected;
+  }
+
+  public Store getStore() throws ProcessingException {
+    connect();
+    return m_store;
+  }
+
+  public String getDefaultFolderName() {
+    return m_defaultFolderName;
+  }
+
+  public void setDefaultFolderName(String defaultFolderName) {
+    m_defaultFolderName = defaultFolderName;
+  }
+
+  public String getHost() {
+    return m_host;
+  }
+
+  public void setHost(String host) {
+    m_host = host;
+  }
+
+  public int getPort() {
+    return m_port;
+  }
+
+  public void setPort(int port) {
+    m_port = port;
+  }
+
+  public String getUsername() {
+    return m_username;
+  }
+
+  public void setUsername(String username) {
+    m_username = username;
+  }
+
+  public String getPassword() {
+    return m_password;
+  }
+
+  public void setPassword(String password) {
+    m_password = password;
+  }
+
+  public boolean isUseSSL() {
+    return m_useSSL;
+  }
+
+  public void setUseSSL(boolean useSSL) {
+    m_useSSL = useSSL;
+  }
+
+}

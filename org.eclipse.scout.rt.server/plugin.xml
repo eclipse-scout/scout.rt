@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.eclipse.scout.service.services">
+     <service class="org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationService"/>
+     <service class="org.eclipse.scout.rt.server.services.common.calendar.HolidayCalendarService"/>
+     <service class="org.eclipse.scout.rt.server.services.common.code.CodeService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession"/>
+     <service class="org.eclipse.scout.rt.server.services.common.file.RemoteFileService"/>
+     <service class="org.eclipse.scout.rt.server.services.common.ping.PingService"/>
+     <service class="org.eclipse.scout.rt.server.services.common.security.PermissionService"/>
+     <service class="org.eclipse.scout.rt.server.services.common.security.LogoutService"/>
+     <service class="org.eclipse.scout.rt.server.services.common.session.ServerSessionRegistryService"/>
+     <service class="org.eclipse.scout.rt.server.services.lookup.BatchLookupService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession"/>
+     <service class="org.eclipse.scout.rt.shared.services.common.exceptionhandler.LogExceptionHandlerService"/>
+     <service class="org.eclipse.scout.rt.server.services.common.processing.ServerProcessingCancelService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession"/>
+     <service class="org.eclipse.scout.rt.shared.services.common.text.ScoutTextProviderService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession" ranking="-50"/>
+   </extension>
+  <extension id="app" name="Server Application" point="org.eclipse.core.runtime.applications">
+    <application>
+      <run class="org.eclipse.scout.rt.server.ServerApplication"/>
+    </application>
+  </extension>
+  <extension point="org.eclipse.scout.http.servletfilter.filters">
+    <filter aliases="/process" class="org.eclipse.scout.http.servletfilter.helper.DevelopmentAuthFilter" ranking="1000000">
+       <init-param
+             name="active"
+             value="true">
+       </init-param>
+    </filter>
+    <filter aliases="/process" class="org.eclipse.scout.http.servletfilter.helper.HttpAuthJaasFilter" ranking="1000010">
+       <init-param
+             name="active"
+             value="true">
+       </init-param>
+    </filter>
+    <filter aliases="/ajax" class="org.eclipse.scout.rt.server.SoapWsseJaasFilter" ranking="1000010">
+       <init-param
+             name="active"
+             value="true">
+       </init-param>
+    </filter>
+  </extension>
+</plugin>

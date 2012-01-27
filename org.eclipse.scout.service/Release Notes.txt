@@ -1,0 +1,6 @@
+30.05.2011 imo
+bsi ticket 102381: ServiceUse of osgi is re-used unless unget service is called.
+This is bad for ad-hoc proxy services that must be created every time when needed (especially on multiple parall threads)
+Fixed by adding service ref lock in SERVICES helper.
+Migration:
+None

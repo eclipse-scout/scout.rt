@@ -1,0 +1,221 @@
+28.09.2010 sle
+In our project we had the problem, that from two different Applications two KeyStrokeManager where instanciated. The KeyStrokeManager were not
+aware of the SwtEnvironment where they were instatiatetd from. This resulted that key-strokes where "used" two times.
+Problem: If one would close a SmartfieldProposal with an esc-keystroke, the whole form would close.
+Solution: The KeyStrokeManager is aware of the SwtEnvironment where it was instaciated and gives the environment to the filters.
+old:
+      getEnvironment().addKeyStrokeFilter(textField, new ISwtKeyStrokeFilter(){
+        @Override
+        public boolean accept(Event e){
+          return doSomething();
+        }
+      });
+new:
+      getEnvironment().addKeyStrokeFilter(textField, new ISwtKeyStrokeFilter(){
+        @Override
+        public boolean accept(Event e, ISwtEnvironment environment){
+          if(getEnvironment().equals(environment)){
+            return doSomething();
+          }
+          return false;
+        }
+      });
+
+10.02.2011 sle
+see Release Notes in org.eclipse.scout.rt.client
+
+26.04.2011 cgu
+[contributed by cgu Guglielmo Claudio, BSI Systems Integration AG, Switzerland]
+Problem:
+The behavior of displaying the status of a table changed sometime in 2010. In order to display the status the “old” way one needs access to the status line of every open view and editor.
+Solution:
+Extended ISwtEnvironment with a method setStatusLineMessage.
+Migration: If you used the method ISwtScoutPart.setStatus you have to adjust your code as following: part.setStatusLineMessage(null, status.getMessage());
+
+01.07.2011 aho
+Ticket 101'754 focused on some selection problems in the JFace(SWT) tree. The JFace tree forces the selection of the next (null) element when a selected tree item gets removed. This SWT event gets scheduled after the model code is executed.
+The problem was when a tree node gets removed and another node gets selected within the same model method (e.g. execAction on a menu) the selection is not visible in the UI.
+Solution:
+While updating node structures forced by a model event the SWT selection events getting ignored
+Migration:
+None
+
+11.07.2011 aho
+Ticket: 102'194 is about taking screen shots of forms. The problem is since the form is opened async the print event does not get to the form.
+Solution:
+Back event to notify the model once a screen shot is done. Furthermore a PrintApplicationAction is created to take screen shots of the whole application.
+Migration:
+none
+
+
+18.07.2011 dwi
+bugzilla 345184
+bsi ticket 102'074, 101'202, 103'927, 104'140
+Problem:18.07.2011 dwi
+bugzilla 345184
+bsi ticket 102'074, 101'202, 103'927, 104'140
+Problem:
+There is no distinct separation among the different Look And Feels. In practice, if using a L&F other than Rayo or Orson, some widgets (e.g. the header panel) partly look like Rayo, but not like the installed L&F.
+Solution:
+Scout should completely adhere the installed L&F.
+To solve this ticket, some major changes where necessary to the SwingScoutRootFrame, SwingScoutToolBar and its attached controls. Also, all Scout specific icons are moved from the org.eclipse.scout.rt.client Plug-In to the respective UI / L&F Plug-Ins to conform the UI.
+Changes:
+  - Generally, icons in Scout are strongly referenced by their icon identifier defined in SwingIcons#XX, SwtIcons#XX, RwtIcons#XX or AbtractIcons#XX.
+  - Icons are moved from org.eclipse.scout.rt.client to the respective UI Plug-Ins. The Swing and SWT Plug-In only contain OpenSource specific icons whereas L&F fragments L&F specific ones.
+  - org.eclipse.scout.rt.ui.swing does not contain any Rayo / Orson specific UI definitions anymore. Those are outsourced to the respective L&F Plugins.
+  - ISwingEnvironment is extended to install a custom NavigationWidgetPanel, ViewTabsBar and ToolTabsBar specific to the L&F. The default implementation does not draw these elements anymore, but uses native controls instead.
+  - Added extension point *.scouticons to every UI Plug-in to easily replace Scout default icons like window, tray or navigation icons.
+  - Scout icons which cannot be configured in application (by respective getConfigured method) are fetched by the UI Activator, not the environemnt anymore. Now, Swing and SWT behave the same way. Those icons can be replaced by the *.scouticons extension point.
+  - Rayo and Orson have a different JTextWithFieldTransparentIcon to meet L&F specific requirements.
+  - Rayo and Orson have a different DateField / TimeField to meet L&F specific requirements.
+  - Rayo and Orson have a different ActionInjection / UIDefaultsInjector to meet L&F specific requirements.
+  - Moved and renamed legacy UI classes to org.eclipse.scout.rt.ui.swing.orson as they only belong to Orson L&F.
+  - removed icons from org.eclipse.scout.rt.ui.swing.bsi.fragment. The icons are contained in the respective L&F fragment.
+  - added icons for Orson L&F to org.eclipse.scout.rt.ui.swing.laf.orson.fragment
+  - added icons for Orson L&F to org.eclipse.scout.rt.ui.swing.laf.rayo.fragment
+  - created Plug-In org.eclipse.scout.rt.ui.swing.orson to meet Orson specific requirements such as actions, formfields and Swing environment.
+  - moved BSI specific Icons for SWT into org.eclipse.scout.rt.ui.swt.bsi.fragment
+  - removed Plug-In com.bsiag.scout.rt.client.bsi.icons.fragment as not required anymore
+Migration:
+- Icons as CheckboxYes and CheckboxNo were removed from AbstractIcons. If required, add them to your project specific icons in your client Plug-In.
+- Product specific icons were removed from Scout UI Plug-Ins and must be installed in project yourself. Thereto, copy icons attached to this mail (window16.png, window32.png, window48.png, window256.png, tray.gif) into your Swing Plugin, e.g. /resources/icons. If folder does not exist yet, create it and register it in build.properties to be exported for production. Open plugin.xml of Swing Plug-In and register those icons in extension org.eclipse.scout.rt.ui.swing.scouticons.
+- Names of some icons in AbstractIcons were changed to gain consistency in naming: e.g. AbstractIcons.TimeFieldTime -> AbstractIcons.DateFieldTime, AbstractIcons.File -> AbstractIcons.FileChooserFieldFile
+- Remove Plug-In com.bsiag.scout.rt.client.bsi.icons.fragment if used as those icons are located in respective L&F Plug-Ins.
+If using Orson L&F:
+  - create dependency to org.eclipse.scout.rt.ui.swing.orson from your Swing-Plug-In. Also include that Plug-In in the product file.
+  - In SwingApplication, change LegacySwingEnvironment to OrsonSwingEnvironment.
+  - Remove Plug-In com.bsiag.scout.rt.client.bsi.icons.fragment as those icons are contained in com.bsiag.scout.rt.client.bsi.icons.fragment.
+
+
+10.08.2011 abr
+Bugzilla Ticket 354350
+BSI Ticket 104'974
+Problem:
+The SwtScoutHtmlField transforms the document to display into an UTF-8 encoded byte array. If the transformed document contains a meta-tag "Content-Type"
+defining an encoding other than UTF-8 or if the default encoding of the underlying (default) browser is not UTF-8, invalid characters may displayed.
+Solution:
+The document to be displayed is augmented by an UTF-8 Content-Type definition of a possibly already existing one is rewritten
+(modified org.eclipse.scout.rt.ui.swt.AbstractSwtEnvironment.styleHtmlText(Control, String)).
+Migration:
+none
+
+22.08.2011 dwi
+BSI ticket #105'026, #104'976
+Problem:
+- Failed to display corrupt HTML pages (e.g. if missing closing quote in style definition)
+- In HTML editor, no cleanup (auto-correction) should be applied to the given HTML. That is because if the user did some modifications in the HTML source and reloads the HTML in the editor anew, unwanted auto-corrections would be applied.
+Solution:
+- Accomplish consistency concerning HTML styling (cleanup) in between of Swing and SWT in regard of ScoutHtmlField and ScoutHmtEditor.
+  In more detail, this entails the following:
+  - Before passing the HTML to the respective widget (ScoutHtmlEditor, ScoutHtmlField), Abstract[Swing|Swt]Environment#styleHtmlText() is called to cleanup the given HTML.
+  - In case of HTML editor mode, no modifications are applied to the given HTML in both, Swing and SWT, respectively.
+  - However, in non-editor mode, some intelligence is applied to the HTML to ensure proper display of the HTML document.
+    - In Swing, cleanup of HTML structure and CSS definitions is done. That is crucial as Swing HTML viewer has some problems with some CSS constructs.
+    - In SWT, OS default browser is used. That is why cleanup of CSS is not necessary as done by browser itself.
+      But, because the HTML is provided as file to the browser, proper encoding and charset must be set.
+- Failsafe: if HTML text cannot be parsed for cleanup, the raw HTML text is used instead of an exception thrown.
+- Consolidation of HTML cleanup functionality in HTMLUtility for plain and simple use that is applicable for both, SWT and Swing, respectively. That is why various methods in HtmlUtility are removed.
+Plug-Ins affected:
+- org.eclipse.scout.commons (HTMLUtility
+- org.eclipse.scout.rt.client (AbstractHtmlField)
+- org.eclipse.scout.rt.ui.swing (AbstractSwingEnvironment, SwingScoutHtmlField, SwingScoutMailField)
+- org.eclipse.scout.rt.ui.swing.bsi.fragment (SwingScoutHtmlEditor)
+- org.eclipse.scout.rt.ui.swt (AbstractSwtEnvironment, SwtScoutHtmlField)
+- org.eclipse.scout.rt.ui.swt.bsi.fragment (SwtScoutHtmlEditor)
+Migration Swing / SWT:
+- In HTMLUtility, the following methods are removed.
+  - HTMLUtility#parseDocument(String) to be replaced by HTMLUtility.toHtmlDocument(String)
+  - HTMLUtility#formatDocument(String) to be replaced by HTMLUtility.toHtmlText(HTMLDocument)
+  - HTMLUtility#cleanupDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
+  - HTMLUtility#wellformDocument(HTMLDocument, String, int) to be replaced by HTMLUtility.cleanupHtml(String, boolean,boolean, DefaultFont)
+Migration SWT:
+- In AbstractSwtEnvironment, the following methods are removed as not required anymore because logic is encapsulated in HTMLUtility.
+  - AbstractSwtEnvironment#styleHtmlText(Control, String)
+  - AbstractSwtEnvironment#createCSS(Control)
+  - AbstractSwtEnvironment#createHtmlDocument(String, String)
+
+25.08.2011 dwi
+BSI ticket #105'026
+Problem:
+Default font specific issues in HTML cleanup which is applied to the HTML text prior being provided to AbstractHtmlField:
+ - Application specific default font settings should always be applied to body style definition if not specified yet
+ - default font size unit on SWT should be pt instead of px
+ - precedence of font-families should be supported in default font settings
+Solution:
+- Changed HTMLUtility#cleanupHtml(..) to ensure default font settings to be contained in CSS style definition
+- changed default font size unit in AbstractSwtEnvironment#createDefaultFontSettings(Control) to pt
+Plug-Ins changed:
+- org.eclipse.scout.commons
+- org.eclipse.scout.rt.ui.swt
+- org.eclipse.scout.rt.ui.swing
+- org.eclipse.scout.rt.ui.rap
+Migration:
+None
+
+25.10.2011 dwi
+BSI ticket #107'237
+Bugzilla 361795
+Problem:
+Decorating a Date or a Number has to use NlsLocale-Settings.
+Currently, Locale.getLocal() is used which may contradict with user-settings.
+Solution:
+NLSLocale / is considered
+Plug-Ins changed:
+- org.eclipse.scout.commons
+- org.eclipse.scout.rt.ui.swt
+- org.eclipse.scout.rt.ui.swing
+- org.eclipse.scout.rt.ui.rap
+Migration:
+None
+
+25.10.2011 dwi
+BSI ticket #99'518
+Bugzilla 347726
+Problem:
+In a table with multi-line text support, the String cell-editor should overflow the cell's dimension to enhance usability.
+It should be implemented a similar way as in Excel.
+Solution:
+When editing such a cell, a smartfield-like popup comes up to enter text. If the row already spanned multiple textlines, the popup merges with the cell-editor's dimension so you do not realize it is about a popup.
+In Swing, it is further possible to resize that popup. The default size of that popup can be changed by setting 'WidthInPixel' and 'HeightInPixel' on the String field. That would be done in the 'prepareEditInternal' method of the string column.
+Migration:
+None
+
+28.11.2011 dwi
+Bugzilla: 364019
+Problem:
+There has to be a possibility to disable the behaviour of Ctrl+C on tables. A use case for this would be an application
+with sensitive information (e.g. address data) that should not be allowed to be exported, only to be displayed to the user.
+Solution:
+> Added the method 'AbstractTable#execCopy(ITableRow[])' to return a transfer object to be put into the clipboard
+> By default, a TextTransferObject is returned with a text/plain and text/html representation of the selected rows.
+  That means that if the target understands HTML, the HTML representation is used over the plain-text representation.
+> In SWT, added copy support on tables (not implemented yet)
+> Added permission 'CopyToClipboardPermission' to enable / disable the copy functionality
+Migration Swing:
+> So far, the copy functionality was enabled by default. Because protected by a permission, it is disabled by default as of now.
+  To enable the CTRL-C behavior on tables, add the permission 'CopyToClipboardPermission' to the permission-set in AbstractAccessControlService#execLoadPermissions
+  or directly grant it to specific user roles in your database script.
+Migration SWT:
+> None because not supported yet. To enable the copy functionality, see migration notes for Swing.
+
+13.12.2011 sle
+BSI ticket: 109051
+Bugzilla:367275 RESOLVED - bug 367275: [SWT][LookAndFeelDecorations]Remove obsolete flag enabledAsReadOnly / https://bugs.eclipse.org/bugs/show_bug.cgi?id=367275
+Problem:
+The Flag enabledAsReadOnly was introduced ca. two years ago. The "true" case is
+today standard, also in all other ui reprecentations. As the naming is not
+realy clear the idea came up, to remove this flag alltogether. All internal
+projects are ok with this.
+Solution:
+Removed extension point element “enableBehaviour”.
+Plug-Ins changed: org.eclipse.scout.rt.ui.swt
+Migration: Remove extension point “enableBehaviour” in projects swt-bundle.
+
+12.01.2012 imo
+Bugzilla: 364574
+New busy handling facility
+The default swt implementation SwtBusyHandler is attached in AbstractSwtEnvironment.attachBusyHandler
+Its runBusy method uses the factory BusyJobStrategy to create a handler (simple or workbench)
+The simple handler just shows a wait cursor and can be configured as to allow cancel.
+The workbench handler shows a wait cursor for 3 seconds and then blocks the views/dialog of the same IClientSession.
+It can be configured to block the whole workbench if no dialog is open.

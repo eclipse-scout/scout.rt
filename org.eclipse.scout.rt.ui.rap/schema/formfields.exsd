@@ -1,0 +1,199 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.scout.rt.ui.rap" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.scout.rt.ui.rap" id="formfields" name="Form Fields"/>
+      </appInfo>
+      <documentation>
+         The extension bean defining a form field extension. A form field extension can have direct link to an
+            ui class (Class&lt;? extends ISwtScoutFormField&gt;) or a form field factory (Class&lt;? extends IFormFieldFactory}&gt;).
+            A IFormFieldFactory is used to dynamically decide about the UI implementation of a form field.
+            Every extension has an attribute called scope. The scope might have  one of the following values:
+           &lt;ul&gt;
+             &lt;li&gt;
+               &lt;b&gt;default&lt;/b&gt; to indicate this extension to be the default implementation.
+               Is usually used of external component providers (e.g. a PhotoShopField).
+             &lt;/li&gt;
+             &lt;li&gt;
+               &lt;b&gt;global&lt;/b&gt; to indicate this extension to have a global scope (whole eclipse).
+               Global defined extensions overwrite the default implementation.
+             &lt;/li&gt;
+             &lt;li&gt;
+               &lt;b&gt;local&lt;/b&gt; to indicate this extension to have local scope.
+               Local defined extensions overwrite the global defined implementation. Local extensions should only be declared
+               in application specific plugins (e.g. com.bsiag.crm.ui.swt).
+             &lt;/li&gt;
+           &lt;/ul&gt;
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="formField"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="formField">
+      <complexType>
+         <choice>
+            <element ref="factory"/>
+            <element ref="uiClass"/>
+         </choice>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A human readable name for the component (e.g. Smart field)
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="modelClass" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The model class linked by this extension (Class&lt;? extends org.eclipse.scout.rt.client.ui.form.fields.IFormField&gt; or a marker interface).
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="active" type="boolean" use="required">
+            <annotation>
+               <documentation>
+                  False to inactivate this extension. Only active extensions will be considered to link a model class to a certain ui class.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="scope">
+            <annotation>
+               <documentation>
+                  &lt;ul&gt;
+                   &lt;li&gt;
+                     &lt;b&gt;default&lt;/b&gt; to indicate this extension to be the default implementation.
+                     Is usually used of external component providers (e.g. a PhotoShopField).
+                   &lt;/li&gt;
+                   &lt;li&gt;
+                     &lt;b&gt;global&lt;/b&gt; to indicate this extension to have a global scope (whole eclipse).
+                     Global defined extensions overwrite the default implementation.
+                   &lt;/li&gt;
+                   &lt;li&gt;
+                     &lt;b&gt;local&lt;/b&gt; to indicate this extension to have local scope.
+                     Local defined extensions overwrite the global defined implementation. Local extensions should only be declared
+                     in application specific plugins (e.g. com.bsiag.crm.ui.swt).
+                   &lt;/li&gt;
+                 &lt;/ul&gt;
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="default">
+                  </enumeration>
+                  <enumeration value="global">
+                  </enumeration>
+                  <enumeration value="local">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="uiClass">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The UI class linked by this extension (Class&lt;? extends org.eclipse.scout.rt.ui.rap.form.fields.ISwtScoutFormField&gt;).
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.ui.rap.form.fields.ISwtScoutFormField"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="factory">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The factory class linked by this extension (Class&lt;? extends org.eclipse.scout.rt.ui.rap.extension.IFormFieldFactory&gt;).
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.ui.rap.extension.IFormFieldFactory"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiinfo"/>
+      </appInfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

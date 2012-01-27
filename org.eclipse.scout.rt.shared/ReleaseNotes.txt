@@ -1,0 +1,189 @@
+14.09.2010 imo
+Removed org.eclipse.scout.rt.shared.security.AllAccessPermission since it never worked and is not a valid jaas concept
+Migration:
+replace by java.security.AllPermission
+
+21.12.2010 imo
+Extracted DataModel with entities and attributes out of AbstractComposerField and moved to org.eclipse.scout.rt.shared.data.model
+Migration: None, sometimes organize imports is necessary.
+Legacy: There is legacy support with deprecated AbstractComposerAttribute and AbstractComposerEntity. Also inner attributes and entities of a composer field are still valid
+and wrapped in a ComposerFieldDataModel.
+Renaming:
+AbstractComposerAttribute -> AbstractDataModelAttribute
+AbstractComposerEntity -> AbstractDataModelEntity
+ComposerAttributeInjector -> DataModelAttributeInjector
+ComposerOp -> DataModelAttributeOp
+ComposerConstants -> DataModelConstants
+ComposerUtility -> DataModelUtility
+IComposerAttribute -> IDataModelAttribute
+IComposerOp -> IDataModelAttributeOp
+IComposerEntity -> IDataModelEntity
+
+10.02.2011 abr
+Ticket 98'889
+AbstractPropertyData.isValueSet() was not taken into account when importing a form data.
+
+11.02.2011 jgu
+New translations inserted for the languages bg,cs,da,el,es,fi,fr_BE,fr,hr,hu,it,nl_BE,nl,no,pl,pt_br,ru,se,sk,sl,sr,tr,zh_TW,zh.
+
+17.02.2011 imo
+added support for safe and lenient permissions transfer via service tunnel overriding serialization of Permissions object to list of serialized objects thus supporting skipping unknown permissions instead of skipping the whole Permissions class
+see ServiceTunnelInputStream, ServiceTunnelOutputStream, LenientPermissionWrapper, LenientPermissionsWrapper
+
+14.03.2011 dwi
+org.eclipse.scout.rt.shared
+- AbstractDataModelEntity
+  Bug-Fix: Initialization of child entities
+
+18.03.2011 imo
+Migration of legacy: moving remaining legacy logic from client to server
+Added TokenBasedSearchFilter, TokenBasedSearchFilterService to support token-based query building on logical level.
+Added LegacySearchFilterService to support global client side legacy handling of search behaviour.
+Migration: None
+
+01.06.2011 imo
+Internal security audit
+- server stack traces must not be sent to client
+- server log must contain all exceptions (except intended business logic exceptions)
+- enhanced access control on gui remote service calls: see enahncements on IAccessControlService.checkServiceTunnelAccess
+- adding logout service and calling it from IClientSession.stop();
+Migration: None
+
+14.10.2011 abr [contributed by Adrian Moser, BSI Business Systems Integration AG]
+bugzilla ticket: 360946
+Bookmarks do not save column visibility
+Migration: None
+
+17.10.2011 imo Iteration 2 of scout validation framwework
+In order to modularize the validation package, the following classes have moved:
+org.eclipse.scout.rt.shared.data.IValidator -> org.eclipse.scout.rt.shared.validate.IValidator
+org.eclipse.scout.rt.shared.data.DefaultValidator -> org.eclipse.scout.rt.shared.validate.DefaultValidator
+org.eclipse.scout.rt.shared.util.ValidationUtility -> org.eclipse.scout.rt.shared.validate.ValidationUtility
+org.eclipse.scout.rt.shared.data.form.InputValidation -> org.eclipse.scout.rt.shared.validate.InputValidation
+org.eclipse.scout.rt.shared.data.form.OutputValidation -> org.eclipse.scout.rt.shared.validate.OutputValidation
+org.eclipse.scout.rt.shared.data.form.ValidationStrategy -> org.eclipse.scout.rt.shared.validate.IValidationStrategy
+And the following code needs to be replaced:
+IValidationStrategy.NO_CHECK -> IValidationStrategy.NO_CHECK.class
+IValidationStrategy.QUERY -> IValidationStrategy.QUERY.class
+IValidationStrategy.PROCESS -> IValidationStrategy.PROCESS.class
+The validation now covers form data field validation using ValidationRule as well as method parameter and bean field validation using
+annotations in org.eclipse.scout.rt.shared.validate.annotations.
+These include:
+@CodeValue
+@LookupValue
+@Mandatory
+@MaxLength
+@MaxValue
+@MinLength
+@MinValue
+@RegexMatch
+@Treat0AsNull
+@FieldReference (meta)
+@ValidateAnnotationMarker (meta)
+
+The (default) input validation on server side is activated using the config.ini property
+org.eclipse.scout.rt.server.validateInput=true
+The main classes doing validation are (in call order):
+- ServiceTunnelServlet
+- DefaultTransactionDelegate
+- DefaultValidator
+- IValidateCheck (and subtypes)
+
+18.10.2011 aho
+bugzilla ticket: 361256
+To make reuse of the ServletFilters in RAP projects. The following classes
+should be moved to the 'org.eclipse.scout.http.servletfilter' bundle:
+- org.eclipse.scout.rt.server.servlet.filter.AbstractChainableSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.AnonymousSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.BasicSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.DataSourceSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.LDAPSecurityFilter
+- org.eclipse.scout.rt.server.servlet.filter.TomcatSecurityFilter
+
+All servlet filters in the 'org.eclipse.scout.rt.server' bundle were kept as @deprecated subclasses of the moved ones.
+
+Furthermore the
+'org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal' should
+be moved to the 'org.eclipse.scout.commons' bundle.
+
+Migration: change all 'org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal' imports to 'org.eclipse.scout.commons.security.SimplePrincipal'.
+
+24.10.2011 mvi
+Bugzilla ticket 361816
+Replace current NLS support with Text Provider Services
+- added ITextProviderService, IDocumentationTextProviderService, AbstractDynamicNlsTextProviderService
+- Migrated existing text providers to scout text provider services
+- TEXTS class added for consistent translation retrieval
+- Splitted org.eclipse.scout.rt.shared texts into two plugins:
+  - org.eclipse.scout.rt.shared contains text provider service with all texts that are used by the runtime
+  - org.eclipse.scout.rt.shared.legacy.texts.fragment contains all texts that are no longer used by the runtime
+- getConfiguredDoc properties moved to different ConfigProperty type for Scout SDK (support for Docs Text Providers)
+- ScoutTexts changed to use text services (cached).
+Migration:
+- Add "org.eclipse.scout.rt.shared.legacy.texts.fragment" to all products.
+- For each existing NLS Class (directly or indirectly extending "org.eclipse.scout.rt.shared.ScoutTexts" or "org.eclipse.scout.commons.nls.DynamicNls"):
+  - create a new "<YourSharedPlugin>.services.common.text.<Name>TextProviderService" extending "org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService" in the corresponding shared plugin.
+- For each created TextProvider Service:
+  - Overwrite the method "getDynamicNlsBaseName" and return the same value as in the "RESOURCE_BUNDLE_NAME" constant (stored in the corresponding Texts class) as string literal.
+  - Register the service in the corresponding plugin as scout service using the "org.eclipse.scout.service.DefaultServiceFactory", no session class and give a ranking > 0. E.g.: <service class="com.bsiag.crm.shared.core.services.common.text.CoreTextProviderService" factory="org.eclipse.scout.service.DefaultServiceFactory" ranking="100" />
+- Delete all Texts classes and replace all uses of the old Texts classes with the class "org.eclipse.scout.rt.shared.TEXTS".
+- Remove the "getNlsTexts" methods from the Session classes if existent (unless you use session-dependent translations).
+- Correct return type of "getConfiguredNlsProvider" of all SqlServices (if existent) to return the new type defined by AbstractSqlService and return "ScoutTexts.class" inside the method.
+- If somewhere the "SwingUtility.setNlsTexts" method or "SwtUtility.setNlsTextsOnDisplay" method is used, set it to "ScoutTexts.getInstance()".
+- Delete all .nls files (NLS Editor can now be accessed using the TextProviderService Node in the Scout Explorer of the Scout perspective).
+  If you want to keep the .nls files (e.g. to support key shortcuts like ctrl+shift+r) do the following:
+  - Open the .nls file in the text editor (right click -> open with).
+  - Remove the following properties: "Nls-Type", "Nls-File-Prefix", "Nls-Translation-Folder".
+  - Change the property "Nls-Class" to the fully qualified name of the Text Provider Service you would like to edit with this .nls file.
+  - Save the changes and open the .nls file again in the Multilanguage Editor (right click -> open with).
+
+26.10.2011 dwi
+Bugzilla ticket 361795
+Problem:
+Decorating a Date or a Number has to use NlsLocale-Settings.
+Currently, Locale.getLocal() is used which may contradict with user-settings.
+Solution:
+In Java 6 it is possible to contribute custom Locales (e.g. en_CH) to the JRE. That is why Scout NlsLocale is not used anymore and therefore marked as deprecated.
+The user's locale is accessed as follows:
+- On client side, the user's locale is accessed by Locale.getDefault()
+- On server side the request's locale is accessed by LocaleThreadLocal.get() (convenience accessor: ServerSession.get().getLocale())
+Eventhough the class NlsLocale is marked as deprecated for legacy support, its constructor 'NlsLocale(Locale)' was removed because NlsLocale was changed to only act as delegate to the thread's locale (if applicable) or default locale otherwise.
+Please note: A locale consists of its language and country. The country is mainly responsible for format settings as for instance the grouping separator of numbers. A very few locales already exist in the JRE. But if you like to have the application in the English language with Switzerland as its region, you have to contribute your own locale-implementation 'en_CH'. Please see Migration section for detailed instructions to extend JRE with a custom locale.
+Plug-Ins changed:
+- org.eclipse.scout.commons
+- org.eclipse.scout.rt.client
+- org.eclipse.scout.rt.server
+- org.eclipse.scout.rt.shared
+- org.eclipse.scout.rt.ui.swing
+- org.eclipse.scout.rt.oraclelite10g.core
+- org.eclipse.scout.rt.xstream.shared
+Migration:
+- removed NlsLocale(Locale) (constructor): use Locale instead of NlsLocale
+- removed IServerSession#getNlsLocale(): use IServerSession#getLocale() instead (e.g. replace all ServerSession.get().getNlsLocale().getLocale() by ServerSession.get().getLocale())
+- In client Plug-Ins: replace NlsLocale.getDefault().getLocale() by Locale.getDefault()
+- In server Plug-Ins: replace NlsLocale.getThreadDefault().getLocale() by LocaleThreadLocal.get()
+- In shared Plug-Ins: replace NlsLocale.getDefault().getLocale() by NlsUtility.getDefaultLocale()
+Contribution of custom locales to the JRE:
+1. Create a plain Java project, e.g. x.y.localeprovider.en.ch
+2. Create two classes that inherit from {@link DateFormatProvider} and {@link NumberFormatProvider} and implement the method stubs specific to your locale
+3. Create the folder META-INF/services with two files java.text.spi.DateFormatProvider and java.text.spi.NumberFormatProvider
+4. In those files, simply put the the fully qualified name to your date/number provider
+5. Export project as JAR file and put it into \lib\ext of your JRE
+
+28.11.2011 dwi
+Bugzilla: 364019
+Problem:
+There has to be a possibility to disable the behaviour of Ctrl+C on tables. A use case for this would be an application
+with sensitive information (e.g. address data) that should not be allowed to be exported, only to be displayed to the user.
+Solution:
+> Added the method 'AbstractTable#execCopy(ITableRow[])' to return a transfer object to be put into the clipboard
+> By default, a TextTransferObject is returned with a text/plain and text/html representation of the selected rows.
+  That means that if the target understands HTML, the HTML representation is used over the plain-text representation.
+> In SWT, added copy support on tables (not implemented yet)
+> Added permission 'CopyToClipboardPermission' to enable / disable the copy functionality
+Migration Swing:
+> So far, the copy functionality was enabled by default. Because protected by a permission, it is disabled by default as of now.
+  To enable the CTRL-C behavior on tables, add the permission 'CopyToClipboardPermission' to the permission-set in AbstractAccessControlService#execLoadPermissions
+  or directly grant it to specific user roles in your database script.
+Migration SWT:
+> None because not supported yet. To enable the copy functionality, see migration notes for Swing.

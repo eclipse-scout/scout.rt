@@ -1,0 +1,45 @@
+24.08.2011 imo
+bsi ticket 102089, bug 355669
+Problem:
+When a listbox or treebox is checkable=true then it shows checkmarks as icons.
+However if the listbox also has an icon defined either directly on the listbox
+or via its data provider (codetype/lookupcall), then this icon is not shown.
+Solution:
+In this (rare) case both icons are displayed as a composite icon.
+Migration:
+None
+
+25.08.2011 dwi
+BSI ticket #105'026
+Problem:
+Default font specific issues in HTML cleanup which is applied to the HTML text prior being provided to AbstractHtmlField:
+ - Application specific default font settings should always be applied to body style definition if not specified yet
+ - default font size unit on SWT should be pt instead of px
+ - precedence of font-families should be supported in default font settings
+Solution:
+- Changed HTMLUtility#cleanupHtml(..) to ensure default font settings to be contained in CSS style definition
+- changed default font size unit in AbstractSwtEnvironment#createDefaultFontSettings(Control) to pt
+Plug-Ins changed:
+- org.eclipse.scout.commons
+- org.eclipse.scout.rt.ui.swt
+- org.eclipse.scout.rt.ui.swing
+- org.eclipse.scout.rt.ui.rap
+Migration:
+None
+
+21.12.2011 sle
+Problem:
+The Flag enabledAsReadOnly was introduced ca. two years ago. The "true" case is
+today standard, also in all other ui reprecentations. As the naming is not
+realy clear the idea came up, to remove this flag alltogether. All internal
+projects are ok with this.
+Solution:
+Removed extension point element “enableBehaviour”.
+Plug-Ins changed: org.eclipse.scout.rt.ui.rap
+Migration: Remove extension point “enableBehaviour” in projects rap-bundle.
+
+12.01.2012 imo
+Bugzilla: 364574
+New busy handling facility
+The default rwt implementation RwtBusyHandler is attached in AbstractRwtEnvironment.attachBusyHandler.
+It shows a wait cursor for 3 seconds and then blocks all views/dialog of the same IClientSession.

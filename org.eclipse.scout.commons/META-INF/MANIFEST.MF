@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout Commons
+Bundle-SymbolicName: org.eclipse.scout.commons;singleton:=true
+Bundle-Version: 3.8.0.qualifier
+Bundle-Activator: org.eclipse.scout.commons.internal.Activator
+Bundle-Vendor: Eclipse Scout Project
+Import-Package: org.osgi.framework;version="1.3.0"
+Export-Package: org.eclipse.scout.commons,
+ org.eclipse.scout.commons.annotations,
+ org.eclipse.scout.commons.beans,
+ org.eclipse.scout.commons.csv,
+ org.eclipse.scout.commons.dnd,
+ org.eclipse.scout.commons.eventlistprofiler,
+ org.eclipse.scout.commons.exception,
+ org.eclipse.scout.commons.holders,
+ org.eclipse.scout.commons.job,
+ org.eclipse.scout.commons.logger,
+ org.eclipse.scout.commons.logger.analysis,
+ org.eclipse.scout.commons.nls,
+ org.eclipse.scout.commons.osgi,
+ org.eclipse.scout.commons.parsers,
+ org.eclipse.scout.commons.parsers.sql,
+ org.eclipse.scout.commons.parsers.token,
+ org.eclipse.scout.commons.prefs,
+ org.eclipse.scout.commons.runtime,
+ org.eclipse.scout.commons.security,
+ org.eclipse.scout.commons.xmlparser
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.equinox.security;bundle-version="1.0.1";visibility:=reexport,
+ org.apache.xerces;bundle-version="2.9.0";resolution:=optional
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

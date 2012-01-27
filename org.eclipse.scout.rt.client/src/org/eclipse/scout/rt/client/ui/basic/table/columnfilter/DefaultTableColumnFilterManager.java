@@ -1,0 +1,238 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
+import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
+import org.eclipse.scout.rt.client.Activator;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
+import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.osgi.framework.Bundle;
+
+/**
+ * Default implementation for {@link ITableColumnFilterManager}
+ */
+public class DefaultTableColumnFilterManager implements ITableColumnFilterManager, ITableRowFilter {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultTableColumnFilterManager.class);
+
+  private final ITable m_table;
+  private final Map<IColumn, ITableColumnFilter> m_filterMap;
+  private boolean m_enabled;
+
+  public DefaultTableColumnFilterManager(ITable table) {
+    m_table = table;
+    m_filterMap = Collections.synchronizedMap(new HashMap<IColumn, ITableColumnFilter>());
+    setEnabled(true);
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return m_enabled;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    if (m_enabled != enabled) {
+      m_enabled = enabled;
+      m_table.removeRowFilter(this);
+      if (m_enabled) {
+        m_table.addRowFilter(this);
+      }
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> ITableColumnFilter<T> getFilter(IColumn<T> col) {
+    return m_filterMap.get(col);
+  }
+
+  @Override
+  public void reset() throws ProcessingException {
+    try {
+      m_table.setTableChanging(true);
+      //
+      for (IColumn col : m_filterMap.keySet()) {
+        m_table.getColumnSet().updateColumn(col);
+      }
+      m_filterMap.clear();
+      m_table.applyRowFilters();
+      for (IColumn col : m_table.getColumns()) {
+        ClientUIPreferences.getInstance().setTableColumnPreferences(col);
+      }
+    }
+    finally {
+      m_table.setTableChanging(false);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void showFilterForm(IColumn col, boolean showAsPopupDialog) throws ProcessingException {
+    ITableColumnFilter<?> filter = m_filterMap.get(col);
+    if (filter == null) {
+      if (col instanceof ISmartColumn<?>) {
+        filter = new StringColumnFilter(col);
+      }
+      else if (String.class.isAssignableFrom(col.getDataType())) {
+        filter = new StringColumnFilter(col);
+      }
+      else if (Boolean.class.isAssignableFrom(col.getDataType())) {
+        filter = new BooleanColumnFilter(col);
+      }
+      else if (Comparable.class.isAssignableFrom(col.getDataType())) {
+        filter = new ComparableColumnFilter(col);
+      }
+    }
+    if (filter != null) {
+      ColumnFilterForm f = new ColumnFilterForm();
+      if (showAsPopupDialog) {
+        f.setDisplayHint(IForm.DISPLAY_HINT_POPUP_DIALOG);
+      }
+      f.setModal(true);
+      f.setColumnFilter(filter);
+      f.startModify();
+      f.waitFor();
+      if (f.isFormStored()) {
+        if (filter.isEmpty()) {
+          m_filterMap.remove(col);
+        }
+        else {
+          m_filterMap.put(col, filter);
+        }
+        m_table.getColumnSet().updateColumn(col);
+        m_table.applyRowFilters();
+        ClientUIPreferences.getInstance().setTableColumnPreferences(col);
+      }
+    }
+  }
+
+  @Override
+  public boolean accept(ITableRow row) {
+    for (ITableColumnFilter f : m_filterMap.values()) {
+      if (!f.accept(row)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public List<String> getDisplayTexts() {
+    ArrayList<String> list = new ArrayList<String>();
+    for (ITableColumnFilter<?> filter : m_filterMap.values()) {
+      if (filter != null && !filter.isEmpty()) {
+        list.add(ScoutTexts.get("Column") + " \"" + filter.getColumn().getHeaderCell().getText() + "\"");
+      }
+    }
+    return list;
+  }
+
+  @Override
+  public Collection<ITableColumnFilter> getFilters() {
+    return m_filterMap.values();
+  }
+
+  @Override
+  public void refresh() {
+    Collection<ITableColumnFilter> data = new ArrayList<ITableColumnFilter>();
+    data.addAll(m_filterMap.values());
+    m_filterMap.clear();
+    for (ITableColumnFilter filter : data) {
+      m_filterMap.put(filter.getColumn(), filter);
+      m_table.getColumnSet().updateColumn(filter.getColumn());
+    }
+    m_table.applyRowFilters();
+  }
+
+  @Override
+  public byte[] getSerializedFilter(IColumn col) {
+    ITableColumnFilter filter = m_filterMap.get(col);
+    if (filter != null) {
+      ObjectOutputStream out = null;
+      ByteArrayOutputStream serialData = new ByteArrayOutputStream();
+      try {
+        out = new BundleObjectOutputStream(serialData);
+        filter.setColumn(null);
+        out.writeObject(filter);
+        out.close();
+        out = null;
+      }
+      catch (Throwable t) {
+        LOG.error("Failed storing filter data for " + t);
+      }
+      finally {
+        if (out != null) {
+          try {
+            out.close();
+          }
+          catch (Throwable t) {
+            LOG.error("Failed closing ObjectOutputStream");
+          }
+        }
+        filter.setColumn(col);
+      }
+      return serialData.toByteArray();
+    }
+    return null;
+  }
+
+  @Override
+  public void setSerializedFilter(byte[] filterData, IColumn col) {
+    ObjectInputStream in = null;
+    try {
+      in = new BundleObjectInputStream(new ByteArrayInputStream(filterData), new Bundle[]{Activator.getDefault().getBundle()});
+      Object customizerData = in.readObject();
+      in.close();
+      in = null;
+      ITableColumnFilter filter = (ITableColumnFilter) customizerData;
+      if (col != null) {
+        filter.setColumn(col);
+        this.m_filterMap.put(col, filter);
+      }
+      m_table.applyRowFilters();
+    }
+    catch (Throwable t) {
+      LOG.error("Failed reading filter data: " + t);
+    }
+    finally {
+      if (in != null) {
+        try {
+          in.close();
+        }
+        catch (Throwable t) {
+          LOG.error("Failed closing ObjectInputStream");
+        }
+      }
+    }
+  }
+
+}

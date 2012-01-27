@@ -1,0 +1,55 @@
+<html>
+<head>
+  <style type="text/css">
+  body, td {
+    font-family:arial;
+    font-size:12#FONT_SIZE_UNIT#;
+    background-color:#EBF4F8;
+    margin:0;
+  }
+  a {
+  	color: #67A8CE;
+  }
+  td {
+    vertical-align: top;
+  }
+  td.bullet {
+    font-weight:bold;
+    font-size:18#FONT_SIZE_UNIT#;
+    text-align:center;
+    color:white;
+  }
+  tr.selected td {
+    background-color:#FFFFFF;
+  }
+  tr.line td {
+    background-color:#DFEEF5;
+  }
+  tr.spacerselected td {
+    background-color:#FFFFFF;
+  }
+  tr.default td.bullet {
+    background-image: url("wizard_bullet.png");
+    background-repeat: no-repeat;
+    padding-top : 2px;
+  }
+  tr.selected td.bullet {
+    background-image: url("wizard_bullet_selected.png");
+    background-repeat: no-repeat;
+    padding-top : 2px;
+  }
+  tr.disabled td.bullet {
+    background-image: url("wizard_bullet_disabled.png");
+    background-repeat: no-repeat;
+    padding-top : 2px;
+  }
+  </style>
+</head>
+<body>
+  #TOP#
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+  #LIST#
+  </table>
+  #BOTTOM#
+</body>
+</html>

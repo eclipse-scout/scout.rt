@@ -1,0 +1,22 @@
+09.08.2011
+Bugzilla ticket: 350389, improve Scout RT testing support
+BSI ticket: 103'068
+Replaced ServerSessionClass and PrincipalName annotations by a more powerful ServerTest annotation that has the following features:
+o annotation can be applied on class-level as well as on a test case level (method).
+o @BeforeClass and @AfterClass methods are executed in the same session defined on class-level
+o @Before, @Test and @After are executed per test method in the same session defined on class-level
+  or in a separate session if the @Test method is also annotated with @ServerTest
+o Tests can be executed as different users. Controlled by @ServerTest(runAs = "principal")
+o The IServerSession class can be provided by the @ServerTest(serverSessionClass = MyServerSession.class) annotation
+  or by setting the default value ScoutServerTestRunner.setDefaultServerSessionClass(MyServerSession.class). The value
+  provided by the @ServerTest annotation is used if both are provided.
+o An existing or new IServerSession is provided by an implementation of IServerSessionProvider. The default provider is
+  DefaultTestServerSessionProvider and is set on ScoutServerTestRunner.setDefaultServerSessionProvider(). It can be
+  overridden using the @ServerTest(serverSessionProvider = MyServerSessionProvider.class) annotation.
+
+Migration:
+o remove all @ServerSessionClass annotations
+o remove all @PrincipalName annotations
+o set the project's server session class in the server test application
+  ScoutServerTestRunner.setDefaultServerSessionClass(ServerSession.class);
+  ScoutServerTestRunner.setDefaultPrincipalName("defaultPrincipal");

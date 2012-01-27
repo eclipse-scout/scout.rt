@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  <extension
+         point="org.eclipse.scout.rt.ui.swt.formfields">
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.svg.client.svgfield.ISvgField"
+            name="Scout SVG field"
+            scope="default">
+           <uiClass
+           	class="org.eclipse.scout.svg.ui.swt.svgfield.SwtScoutSvgField">
+           </uiClass>
+      </formField>
+   </extension>
+
+   <extension
+         id="app"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="false">
+         <run
+               class="org.eclipse.scout.svg.ui.swt.internal.TestApplication">
+         </run>
+      </application>
+   </extension>
+
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.scout.svg.ui.swt.app"
+            name="SVG SWT Test">
+         <property
+               name="appName"
+               value="SVG SWT Test">
+         </property>
+      </product>
+   </extension>
+
+</plugin>
+
+
+
+
