@@ -49,8 +49,12 @@ public class DelegateFilter implements Filter {
       @Override
       public void service(ServletRequest reqInner, ServletResponse resInner) throws ServletException, IOException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) reqInner;
-        String userAgent = httpServletRequest.getHeader("User-Agent");
-        String remoteAddr = httpServletRequest.getRemoteAddr();
+        String userAgent = "";
+        String remoteAddr = "";
+        if (httpServletRequest != null) {
+          userAgent = httpServletRequest.getHeader("User-Agent");
+          remoteAddr = httpServletRequest.getRemoteAddr();
+        }
         try {
           chain.doFilter(reqInner, resInner);
         }
@@ -64,7 +68,6 @@ public class DelegateFilter implements Filter {
         }
         catch (IllegalStateException e) {
           LOG.error("IllegalStateException\n UserAgent: {0}\nRemoteIP: {1}", userAgent, remoteAddr);
-          httpServletRequest.getSession().invalidate();
           throw e;
         }
       }
