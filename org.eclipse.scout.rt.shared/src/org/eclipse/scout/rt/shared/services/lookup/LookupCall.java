@@ -273,12 +273,13 @@ public class LookupCall implements Cloneable, Serializable {
    * When getConfiguredService is set then delegate call to service, otherwise returns an empty array
    */
   public LookupRow[] getDataByKey() throws ProcessingException {
+    if (getKey() == null) {
+      return new LookupRow[0];
+    }
     if (getLookupService() != null) {
       return getLookupService().getDataByKey(this);
     }
-    else {
-      return new LookupRow[0];
-    }
+    return new LookupRow[0];
   }
 
   /**
