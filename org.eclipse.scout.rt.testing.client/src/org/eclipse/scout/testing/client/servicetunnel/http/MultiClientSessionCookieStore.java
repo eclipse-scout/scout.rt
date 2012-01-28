@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.IClientSessionProvider;
 
 /**
  * HTTP cookie store implementation that distinguishes between different {@link IClientSession} connecting concurrently
@@ -58,6 +60,15 @@ public class MultiClientSessionCookieStore implements CookieStore {
 
   private CookieStore getDelegate() {
     IClientSession currentSession = ClientJob.getCurrentSession();
+    if (currentSession == null) {
+      // Bugzilla 369115 changed the behavior of ClientJob.getCurrentSession, so that it is not using
+      // the currently executed job anymore for determining the client session. This fix provides the
+      // old functionality.
+      Job currentJob = Job.getJobManager().currentJob();
+      if (currentJob instanceof IClientSessionProvider) {
+        currentSession = ((IClientSessionProvider) currentJob).getClientSession();
+      }
+    }
     if (currentSession == null) {
       return m_defaultCookieStore;
     }
