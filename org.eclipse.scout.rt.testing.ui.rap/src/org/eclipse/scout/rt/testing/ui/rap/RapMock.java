@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.ext.DropDownButton;
+import org.eclipse.scout.rt.ui.rap.ext.IDropDownButtonForPatch;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.testing.client.IGuiMock;
@@ -684,7 +684,7 @@ public class RapMock implements IGuiMock {
     if (c instanceof StyledText) return FieldType.Text;
     if (c instanceof Table) return FieldType.Table;
     if (c instanceof Tree) return FieldType.Tree;
-    if (c instanceof DropDownButton) return FieldType.DropdownButton;
+    if (c instanceof IDropDownButtonForPatch) return FieldType.DropdownButton;
     if (c instanceof Button) {
       int style = c.getStyle();
       if ((style & SWT.CHECK) != 0) return FieldType.Checkbox;

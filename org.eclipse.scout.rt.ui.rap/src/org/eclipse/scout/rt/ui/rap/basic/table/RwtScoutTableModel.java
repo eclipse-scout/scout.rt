@@ -15,13 +15,8 @@ import java.util.HashMap;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.ITableColorProvider;
-import org.eclipse.jface.viewers.ITableFontProvider;
-import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.rwt.lifecycle.HtmlTextUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -34,7 +29,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
-public class RwtScoutTableModel implements IStructuredContentProvider, ITableColorProvider, ITableLabelProvider, ITableFontProvider {
+public class RwtScoutTableModel implements IRwtScoutTableModelForPatch {
   private static final long serialVersionUID = 1L;
 
   private transient ListenerList listenerList = null;
@@ -57,10 +52,12 @@ public class RwtScoutTableModel implements IStructuredContentProvider, ITableCol
     rebuildCache();
   }
 
+  @Override
   public void setMultiline(boolean multiline) {
     m_multiline = multiline;
   }
 
+  @Override
   public boolean isMultiline() {
     return m_multiline;
   }
@@ -165,13 +162,8 @@ public class RwtScoutTableModel implements IStructuredContentProvider, ITableCol
         if (text == null) {
           text = "";
         }
-        if (HtmlTextUtil.isTextWithHtmlMarkup(text)) {
-          text = m_uiTable.getUiEnvironment().adaptHtmlCell(m_uiTable, text);
-        }
-        else if (text.indexOf("\n") >= 0) {
+        if (text.indexOf("\n") >= 0) {
           if (isMultiline()) {
-            //transform to html
-            text = "<html>" + HtmlTextUtil.transformPlainTextToHtml(text) + "</html>";
             text = m_uiTable.getUiEnvironment().adaptHtmlCell(m_uiTable, text);
           }
           else {
@@ -253,6 +245,7 @@ public class RwtScoutTableModel implements IStructuredContentProvider, ITableCol
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
 
+  @Override
   public void consumeTableModelEvent(RwtScoutTableEvent uiTableEvent) {
     rebuildCache();
   }
@@ -283,6 +276,7 @@ public class RwtScoutTableModel implements IStructuredContentProvider, ITableCol
     }
   }
 
+  @Override
   public RwtScoutTable getRwtScoutTable() {
     return m_uiTable;
   }

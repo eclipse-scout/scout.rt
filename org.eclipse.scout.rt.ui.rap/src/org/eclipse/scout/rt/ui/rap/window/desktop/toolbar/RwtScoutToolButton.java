@@ -21,13 +21,7 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-/**
- * <h3>RwtScoutToolButton</h3> ...
- * 
- * @author Andreas Hoegger
- * @since 3.7.0 June 2011
- */
-public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IRwtScoutToolButton {
+public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IRwtScoutToolButtonForPatch {
 
   private final boolean m_iconVisible;
   private final boolean m_textVisible;
@@ -45,7 +39,6 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
   protected void initializeUi(Composite parent) {
     final Button tabButton = getUiEnvironment().getFormToolkit().createButton(parent, "", SWT.TOGGLE);
     tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActive);
-    tabButton.setBackgroundRepeat(SWT.BACKGROUND_REPEAT_NO_REPEAT);
     setUiField(tabButton);
     tabButton.addSelectionListener(new SelectionAdapter() {
       private static final long serialVersionUID = 1L;

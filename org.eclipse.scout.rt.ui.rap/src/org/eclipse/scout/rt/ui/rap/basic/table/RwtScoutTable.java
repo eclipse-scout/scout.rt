@@ -26,7 +26,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.rwt.lifecycle.HtmlTextUtil;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -63,8 +62,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.HyperlinkEvent;
-import org.eclipse.swt.events.HyperlinkListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
@@ -95,7 +92,7 @@ import org.eclipse.swt.widgets.TableItem;
  * 
  * @since 3.7.0 June 2011
  */
-public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScoutTable {
+public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScoutTableForPatch {
   private P_ScoutTableListener m_scoutTableListener;
   private UiRedrawHandler m_redrawHandler;
 
@@ -137,10 +134,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     if (StringUtility.hasText(m_variant)) {
       table.setData(WidgetUtil.CUSTOM_VARIANT, m_variant);
     }
-    table.setData(Table.ENABLE_HTML, Boolean.TRUE);
     table.setLinesVisible(true);
     table.setHeaderVisible(true);
-    table.setTouchEnabled(RwtUtility.getBrowserInfo().isTablet() || RwtUtility.getBrowserInfo().isMobile());
     new TableRolloverSupport(table);
     table.addDisposeListener(new DisposeListener() {
       private static final long serialVersionUID = 1L;
@@ -164,7 +159,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     // header menu
     m_headerMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
     table.addMenuDetectListener(new P_RwtHeaderMenuDetectListener());
-    table.addHyperlinkListener(new P_RwtHyperlinkListener());
 
     //columns
     initializeUiColumns();
@@ -200,10 +194,12 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     return new RwtScoutTableModel(getScoutObject(), this, m_uiColumnManager);
   }
 
+  @Override
   public TableColumnManager getUiColumnManager() {
     return m_uiColumnManager;
   }
 
+  @Override
   public void initializeUiColumns() {
     m_redrawHandler.pushControlChanging();
     try {
@@ -238,13 +234,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         if (cellText == null) {
           cellText = "";
         }
-        boolean isHtml = HtmlTextUtil.isTextWithHtmlMarkup(cellText);
-        if (!isHtml && cellText.indexOf("\n") >= 0) {
+        if (cellText.indexOf("\n") >= 0) {
           multilineHeaders = true;
-        }
-        if (isHtml) {
-          multilineHeaders = true;
-          cellText = getUiEnvironment().adaptHtmlCell(RwtScoutTable.this, cellText);
         }
         int style = RwtUtility.getHorizontalAlignment(cell.getHorizontalAlignment());
         TableColumn rwtCol = new TableColumn(getUiField(), style);
@@ -266,11 +257,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       //multiline header settings
       if (multilineHeaders) {
         getUiField().setData("multiLineHeader", Boolean.TRUE);
-      }
-      if (getScoutObject().isMultilineText()) {
-        for (TableColumn rwtCol : getUiField().getColumns()) {
-          rwtCol.setVerticalAlignment(SWT.TOP);
-        }
       }
       m_uiColumnOrder = getUiField().getColumnOrder();
       //update cell editors
@@ -321,10 +307,12 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     return m_uiViewer;
   }
 
+  @Override
   public void setUiTableViewer(TableViewer uiViewer) {
     m_uiViewer = uiViewer;
   }
 
+  @Override
   public ITableRow getUiSelectedRow() {
     ITableRow[] rows = getUiSelectedRows();
     if (rows.length > 0) {
@@ -333,6 +321,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     return null;
   }
 
+  @Override
   public ITableRow[] getUiSelectedRows() {
     StructuredSelection uiSelection = (StructuredSelection) getUiTableViewer().getSelection();
     TreeSet<ITableRow> sortedRows = new TreeSet<ITableRow>(new RowIndexComparator());
@@ -1145,15 +1134,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
   }
 
-  public class P_RwtHyperlinkListener implements HyperlinkListener {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void activated(HyperlinkEvent event) {
-      handleUiHyperlinkAction(event.url);
-    }
-  }
-
   private class P_TableColumnListener implements Listener {
     private static final long serialVersionUID = 1L;
 
@@ -1348,7 +1328,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
 
     @Override
-    void handleKeyboardNavigation(TableItem tableItem) {
+    public void handleKeyboardNavigation(TableItem tableItem) {
       handleKeyboardNavigationFromUi(tableItem);
     }
   } // P_KeyBoardNavigationSupport

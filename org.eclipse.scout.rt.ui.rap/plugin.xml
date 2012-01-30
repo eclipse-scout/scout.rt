@@ -22,6 +22,9 @@
               factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
               ranking="-1000">
     </service>
+    <service class="org.eclipse.scout.rt.ui.rap.services.common.patchedclass.PatchedClassService"
+             createImmediately="true">
+    </service>
   </extension>
 
   <extension point="org.eclipse.ui.activities">

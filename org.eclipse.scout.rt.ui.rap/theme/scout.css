@@ -1926,8 +1926,6 @@ Text.smartfield[SINGLE]:disabled {
 
 Button.smartfield_browse {
   background-image: url( theme/img/button/smartfield_browse.png );
-  background-position: left center;
-  background-repeat: no-repeat;
   border-radius: 5px;
 }
 

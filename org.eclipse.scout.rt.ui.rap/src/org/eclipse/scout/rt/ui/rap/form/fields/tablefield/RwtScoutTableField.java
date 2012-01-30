@@ -19,13 +19,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposal
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
-import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable;
 import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.core.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
+import org.eclipse.scout.rt.ui.rap.services.common.patchedclass.IPatchedClassService;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -83,10 +84,10 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
       //table
       LogicalGridData tableGridData = LogicalGridDataBuilder.createField(getScoutObject().getGridData());
       if (getScoutObject().getForm() instanceof ISmartFieldProposalForm) {
-        m_tableComposite = new RwtScoutTable(RwtUtility.VARIANT_PROPOSAL_FORM);
+        m_tableComposite = SERVICES.getService(IPatchedClassService.class).createRwtScoutTable(RwtUtility.VARIANT_PROPOSAL_FORM);
       }
       else {
-        m_tableComposite = new RwtScoutTable();
+        m_tableComposite = SERVICES.getService(IPatchedClassService.class).createRwtScoutTable();
       }
 
       IForm form = getScoutObject() == null ? null : getScoutObject().getForm();

@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
-import org.eclipse.scout.rt.ui.rap.ext.DropDownFileUpload;
+import org.eclipse.scout.rt.ui.rap.ext.IDropDownFileUploadForPatch;
 import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
@@ -68,7 +68,7 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutFileChooserField.class);
 
   private Composite m_fileContainer;
-  private DropDownFileUpload m_browseButton;
+  private IDropDownFileUploadForPatch m_browseButton;
   private ProgressBar m_progressBar;
   private Menu m_contextMenu;
   private TextFieldEditableSupport m_editableSupport;
@@ -177,7 +177,7 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
 
     final FormData buttonLayoutData = new FormData(SWT.DEFAULT, SWT.DEFAULT);
     buttonLayoutData.left = new FormAttachment(getUiField(), -4, SWT.RIGHT);
-    buttonLayoutData.bottom = new FormAttachment(getUiBrowseButton(), -6, SWT.BOTTOM);
+    buttonLayoutData.bottom = new FormAttachment((Control) getUiBrowseButton(), -6, SWT.BOTTOM);
     getUiBrowseButton().setLayoutData(buttonLayoutData);
 
     setEnabledFromScout(getScoutObject().isEnabled());
@@ -222,7 +222,7 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
   }
 
   @Override
-  public DropDownFileUpload getUiBrowseButton() {
+  public IDropDownFileUploadForPatch getUiBrowseButton() {
     return m_browseButton;
   }
 
@@ -393,7 +393,7 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
     private static final long serialVersionUID = 1L;
 
     public P_ContextMenuListener() {
-      super(RwtScoutFileChooserField.this.getUiBrowseButton(), RwtScoutFileChooserField.this.getUiBrowseButton().getParent());
+      super((Control) RwtScoutFileChooserField.this.getUiBrowseButton(), RwtScoutFileChooserField.this.getUiBrowseButton().getParent());
     }
 
     @Override

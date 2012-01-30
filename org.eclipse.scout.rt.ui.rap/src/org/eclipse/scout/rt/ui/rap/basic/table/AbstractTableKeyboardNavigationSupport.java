@@ -189,7 +189,7 @@ public abstract class AbstractTableKeyboardNavigationSupport {
     }
   } // end class P_NavigationJob
 
-  abstract void handleKeyboardNavigation(TableItem tableItem);
+  public abstract void handleKeyboardNavigation(TableItem tableItem);
 
   private class P_TableListener implements Listener {
     private static final long serialVersionUID = 1L;

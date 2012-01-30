@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
-import org.eclipse.scout.rt.ui.rap.ext.DropDownButton;
+import org.eclipse.scout.rt.ui.rap.ext.IDropDownButtonForPatch;
 import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
@@ -85,7 +85,7 @@ import org.eclipse.swt.widgets.Widget;
 public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<?>> implements IRwtScoutSmartField, IPopupSupport {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutSmartField.class);
 
-  private DropDownButton m_browseButton;
+  private IDropDownButtonForPatch m_browseButton;
   private P_PendingProposalJob m_pendingProposalJob;
   private Object m_pendingProposalJobLock;
   private Composite m_smartContainer;
@@ -149,7 +149,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
     // context menu
     m_contextMenu = new Menu(m_browseButton.getShell(), SWT.POP_UP);
-    m_contextMenu.addMenuListener(new P_ContextMenuListener(getUiBrowseButton(), getUiField()));
+    m_contextMenu.addMenuListener(new P_ContextMenuListener((Control) getUiBrowseButton(), getUiField()));
     m_browseButton.setMenu(m_contextMenu);
 
     // F2 key stroke
@@ -182,12 +182,12 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
     final FormData buttonLayoutData = new FormData(SWT.DEFAULT, SWT.DEFAULT);
     buttonLayoutData.left = new FormAttachment(textField, -1, SWT.RIGHT);
-    buttonLayoutData.bottom = new FormAttachment(m_browseButton, 1, SWT.BOTTOM);
+    buttonLayoutData.bottom = new FormAttachment((Control) m_browseButton, 1, SWT.BOTTOM);
     m_browseButton.setLayoutData(buttonLayoutData);
   }
 
   @Override
-  public DropDownButton getUiBrowseButton() {
+  public IDropDownButtonForPatch getUiBrowseButton() {
     return m_browseButton;
   }
 

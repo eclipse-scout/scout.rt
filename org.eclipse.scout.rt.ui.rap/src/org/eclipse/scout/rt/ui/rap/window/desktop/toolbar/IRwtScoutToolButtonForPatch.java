@@ -8,17 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.form.fields.smartfield;
+package org.eclipse.scout.rt.ui.rap.window.desktop.toolbar;
 
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.ui.rap.ext.IDropDownButtonForPatch;
-import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
+import org.eclipse.swt.widgets.Button;
 
-public interface IRwtScoutSmartField extends IRwtScoutFormField<ISmartField<?>> {
+public interface IRwtScoutToolButtonForPatch extends IRwtScoutToolButton {
 
-  String VARIANT_SMARTFIELD = "smartfield";
-  String VARIANT_SMARTFIELD_DISABLED = "smartfield-disabled";
-
-  IDropDownButtonForPatch getUiBrowseButton();
+  @Override
+  public Button getUiField();
 
 }

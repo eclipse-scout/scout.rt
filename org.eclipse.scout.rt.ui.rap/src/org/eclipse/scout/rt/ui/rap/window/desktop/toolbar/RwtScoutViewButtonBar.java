@@ -17,6 +17,8 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.services.common.patchedclass.IPatchedClassService;
+import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -100,7 +102,7 @@ public class RwtScoutViewButtonBar extends RwtScoutComposite<IDesktop> {
     buttonBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOLBAR_CONTAINER);
     for (IViewButton scoutButton : getScoutObject().getViewButtons()) {
       if (scoutButton.isVisible()) {
-        RwtScoutToolButton uiButton = new RwtScoutToolButton(true, false, VARIANT_VIEW_BUTTON, VARIANT_VIEW_BUTTON_ACTIVE);
+        IRwtScoutToolButtonForPatch uiButton = SERVICES.getService(IPatchedClassService.class).createRwtScoutToolButton(true, false, VARIANT_VIEW_BUTTON, VARIANT_VIEW_BUTTON_ACTIVE);
         uiButton.createUiField(buttonBar, scoutButton, getUiEnvironment());
         m_viewTabItems.put(scoutButton, uiButton);
       }

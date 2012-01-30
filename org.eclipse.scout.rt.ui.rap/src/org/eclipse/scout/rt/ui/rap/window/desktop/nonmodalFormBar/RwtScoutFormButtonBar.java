@@ -21,6 +21,8 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.services.common.patchedclass.IPatchedClassService;
+import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -72,7 +74,7 @@ public class RwtScoutFormButtonBar extends RwtScoutComposite<IDesktop> {
         });
       }
     });
-    RwtScoutFormButton uiButton = new RwtScoutFormButton(true, false, VARIANT_FORM_BUTTON, VARIANT_FORM_BUTTON_ACTIVE);
+    IRwtScoutFormButtonForPatch uiButton = SERVICES.getService(IPatchedClassService.class).createRwtScoutFormButton(true, false, VARIANT_FORM_BUTTON, VARIANT_FORM_BUTTON_ACTIVE);
     uiButton.createUiField(m_buttonBar, formButton, getUiEnvironment());
     m_formTabItems.put(form, uiButton);
   }

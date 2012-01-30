@@ -14,14 +14,16 @@ import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable;
+import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTableForPatch;
 import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.table.TableEx;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.rap.services.common.patchedclass.IPatchedClassService;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -33,7 +35,7 @@ import org.eclipse.swt.widgets.Control;
  */
 public class RwtScoutListBox extends RwtScoutValueFieldComposite<IListBox<?>> implements IRwtScoutListBox {
 
-  private RwtScoutTable m_tableComposite;
+  private IRwtScoutTableForPatch m_tableComposite;
   private Composite m_tableContainer;
 
   @Override
@@ -45,7 +47,7 @@ public class RwtScoutListBox extends RwtScoutValueFieldComposite<IListBox<?>> im
     tableContainer.setLayout(new LogicalGridLayout(1, 0));
     tableContainer.setData(WidgetUtil.CUSTOM_VARIANT, RwtUtility.VARIANT_LISTBOX);
     m_tableContainer = tableContainer;
-    m_tableComposite = new RwtScoutTable(RwtUtility.VARIANT_LISTBOX);
+    m_tableComposite = SERVICES.getService(IPatchedClassService.class).createRwtScoutTable(RwtUtility.VARIANT_LISTBOX);
     m_tableComposite.createUiField(tableContainer, getScoutObject().getTable(), getUiEnvironment());
     LogicalGridData fieldData = LogicalGridDataBuilder.createField(getScoutObject().getGridData());
     // filter box

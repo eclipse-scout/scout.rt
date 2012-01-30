@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.filechooserfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
-import org.eclipse.scout.rt.ui.rap.ext.DropDownFileUpload;
+import org.eclipse.scout.rt.ui.rap.ext.IDropDownFileUploadForPatch;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.swt.widgets.ProgressBar;
 
@@ -20,7 +20,7 @@ public interface IRwtScoutFileChooserField extends IRwtScoutFormField<IFileChoos
   String VARIANT_FILECHOOSER = "filechooser";
   String VARIANT_FILECHOOSER_DISABLED = "filechooser-disabled";
 
-  DropDownFileUpload getUiBrowseButton();
+  IDropDownFileUploadForPatch getUiBrowseButton();
 
   ProgressBar getUiProgressBar();
 

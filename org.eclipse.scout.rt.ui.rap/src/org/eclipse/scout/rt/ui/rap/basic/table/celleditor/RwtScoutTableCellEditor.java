@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
-import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable;
+import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTableForPatch;
 import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
@@ -64,12 +64,12 @@ import org.eclipse.swt.widgets.Widget;
 public class RwtScoutTableCellEditor {
   private static final String DUMMY_VALUE = "Dummy";
 
-  private final RwtScoutTable m_uiTableComposite;
+  private final IRwtScoutTableForPatch m_uiTableComposite;
   private final Listener m_rowHeightListener;
 
   private P_FocusLostListener m_focusLostListener;
 
-  public RwtScoutTableCellEditor(RwtScoutTable uiTableComposite) {
+  public RwtScoutTableCellEditor(IRwtScoutTableForPatch uiTableComposite) {
     m_focusLostListener = new P_FocusLostListener();
     m_uiTableComposite = uiTableComposite;
     m_rowHeightListener = new Listener() {
@@ -91,7 +91,7 @@ public class RwtScoutTableCellEditor {
     boolean hasEditors = false;
     for (int i = 0; i < columnPropertyNames.length; i++) {
       TableColumn rwtCol = viewer.getTable().getColumn(i);
-      IColumn<?> scoutCol = (IColumn<?>) rwtCol.getData(RwtScoutTable.KEY_SCOUT_COLUMN);
+      IColumn<?> scoutCol = (IColumn<?>) rwtCol.getData(IRwtScoutTableForPatch.KEY_SCOUT_COLUMN);
       if (scoutCol != null) {
         columnPropertyNames[i] = "" + scoutCol.getColumnIndex();
         if (scoutCol.isEditable()) {
@@ -535,7 +535,7 @@ public class RwtScoutTableCellEditor {
         ViewerCell cell = (ViewerCell) e.getSource();
         TableViewer viewer = m_uiTableComposite.getUiTableViewer();
         TableColumn rwtCol = viewer.getTable().getColumn(cell.getColumnIndex());
-        IColumn<?> scoutCol = (IColumn<?>) rwtCol.getData(RwtScoutTable.KEY_SCOUT_COLUMN);
+        IColumn<?> scoutCol = (IColumn<?>) rwtCol.getData(IRwtScoutTableForPatch.KEY_SCOUT_COLUMN);
         ITableRow scoutRow = (ITableRow) cell.getElement();
         //no edit on boolean column when mouse was clicked
         if (e.sourceEvent instanceof MouseEvent) {

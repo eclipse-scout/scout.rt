@@ -21,7 +21,9 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.services.common.patchedclass.IPatchedClassService;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -109,7 +111,7 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> {
       String activeVariant = VARIANT_TOOL_BUTTON_BUTTON_ACTIVE;
       variant += "-" + simpleClassName;
       activeVariant += "-" + simpleClassName;
-      RwtScoutToolButton uiToolButton = new RwtScoutToolButton(false, true, variant, activeVariant);
+      IRwtScoutToolButtonForPatch uiToolButton = SERVICES.getService(IPatchedClassService.class).createRwtScoutToolButton(false, true, variant, activeVariant);
       uiToolButton.createUiField(m_toolButtonContainer, scoutButton, getUiEnvironment());
       m_toolTabItems.put(scoutButton, uiToolButton);
     }

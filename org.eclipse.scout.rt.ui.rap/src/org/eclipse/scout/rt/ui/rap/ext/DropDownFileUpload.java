@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 @SuppressWarnings("restriction")
-public class DropDownFileUpload extends FileUpload {
+public class DropDownFileUpload extends FileUpload implements IDropDownFileUploadForPatch {
   private static final long serialVersionUID = 1L;
 
   private static final int BORDER = 3;
@@ -55,8 +55,6 @@ public class DropDownFileUpload extends FileUpload {
 
   public DropDownFileUpload(Composite parent, int style) {
     super(parent, style | SWT.DOUBLE_BUFFERED);
-    setBackgroundPosition(SWT.BACKGROUND_POSITION_LEFT_CENTER);
-    setBackgroundRepeat(SWT.BACKGROUND_REPEAT_NO_REPEAT);
 
     addListener(SWT.Traverse, new Listener() {
       private static final long serialVersionUID = 1L;
@@ -140,6 +138,7 @@ public class DropDownFileUpload extends FileUpload {
 //    }
   }
 
+  @Override
   public void fireSelectionEvent(SelectionEvent e) {
     if (isButtonEnabled()) {
       for (SelectionListener l : m_eventListeners.getListeners(SelectionListener.class)) {
@@ -191,6 +190,7 @@ public class DropDownFileUpload extends FileUpload {
     return m_image;
   }
 
+  @Override
   public void setDropdownEnabled(boolean enabled) {
     m_dropdownEnabled = enabled;
     if (!StringUtility.hasText(m_originalVariant)) {
@@ -202,10 +202,12 @@ public class DropDownFileUpload extends FileUpload {
     redraw();
   }
 
+  @Override
   public boolean isDropdownEnabled() {
     return m_dropdownEnabled;
   }
 
+  @Override
   public void setButtonEnabled(boolean enabled) {
     m_buttonEnabled = enabled;
 //  super.setEnabled(isButtonEnabled() || isDropdownEnabled());XXX
@@ -213,6 +215,7 @@ public class DropDownFileUpload extends FileUpload {
     redraw();
   }
 
+  @Override
   public boolean isButtonEnabled() {
     return m_buttonEnabled;
   }
@@ -259,6 +262,7 @@ public class DropDownFileUpload extends FileUpload {
     m_backgroundDisabled = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
   }
 
+  @Override
   public void freeResources() {
     if (m_dropDownIcon != null && !m_dropDownIcon.isDisposed() && m_dropDownIcon.getDevice() != null) {
       m_dropDownIcon.dispose();

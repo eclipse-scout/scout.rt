@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-public class RwtScoutFormButton extends RwtScoutComposite<IAction> implements IRwtScoutFormButton {
+public class RwtScoutFormButton extends RwtScoutComposite<IAction> implements IRwtScoutFormButtonForPatch {
   private final boolean m_iconVisible;
   private final boolean m_textVisible;
   private String m_variantInActive;
@@ -38,7 +38,6 @@ public class RwtScoutFormButton extends RwtScoutComposite<IAction> implements IR
   protected void initializeUi(Composite parent) {
     Button tabButton = getUiEnvironment().getFormToolkit().createButton(parent, "", SWT.TOGGLE);
     tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActive);
-    tabButton.setBackgroundRepeat(SWT.BACKGROUND_REPEAT_NO_REPEAT);
     setUiField(tabButton);
     makeButtonActive();
     tabButton.addSelectionListener(new SelectionAdapter() {
