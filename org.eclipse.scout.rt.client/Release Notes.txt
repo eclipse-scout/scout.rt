@@ -744,3 +744,11 @@ Migration:
 - Accessing a client's locale should always done by invoking LocaleThreadLocal.get()
 - ClientJob.run (and therefore ClientSyncJob.run as well as ClientAsyncJob.run) should not be overridden anymore. The method will be marked final in a subsequent release.
   Use ClientJob.runStatus or ClientJob.runVoid instead.
+
+30.01.2012 abr
+Bugzilla 370118
+findCodeTypeById on CodeService and CodeServiceClientProxy works for cached code types only
+Solution:
+If findCodeTypeById returns null for a non-null key, populate cache and retry.
+Migration:
+None

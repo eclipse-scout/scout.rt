@@ -377,3 +377,11 @@ default servlet filters in org.eclipse.scout.rt.server
 see javadoc on HttpAuthJaasFilter, SoapWsseJaasFilter and DevelopmentAuthFilter
 Migration:
 None
+
+30.01.2012 abr
+Bugzilla 370118
+findCodeTypeById on CodeService and CodeServiceClientProxy works for cached code types only
+Solution:
+If findCodeTypeById returns null for a non-null key, populate cache and retry.
+Migration:
+None
