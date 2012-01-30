@@ -139,6 +139,19 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
     if (id == null) {
       return null;
     }
+    ICodeType ct = findCodeTypeByIdInternal(id);
+    if (ct != null) {
+      return ct;
+    }
+    // populate code type cache
+    getAllCodeTypes("");
+    return findCodeTypeByIdInternal(id);
+  }
+
+  /**
+   * @return Returns the code type with the given id or <code>null</code> if it is not found in the cache.
+   */
+  private ICodeType findCodeTypeByIdInternal(Object id) {
     ServiceState state = getServiceState();
     synchronized (state.m_cacheLock) {
       for (ICodeType ct : state.m_cache.values()) {
@@ -155,6 +168,19 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
     if (id == null) {
       return null;
     }
+    ICodeType ct = findCodeTypeByIdInternal(partitionId, id);
+    if (ct != null) {
+      return ct;
+    }
+    // populate code type cache
+    getAllCodeTypes("");
+    return findCodeTypeByIdInternal(partitionId, id);
+  }
+
+  /**
+   * @return Returns the code type with the given id and partition or <code>null</code> if it is not found in the cache.
+   */
+  private ICodeType findCodeTypeByIdInternal(Long partitionId, Object id) {
     ServiceState state = getServiceState(partitionId);
     synchronized (state.m_cacheLock) {
       for (ICodeType ct : state.m_cache.values()) {

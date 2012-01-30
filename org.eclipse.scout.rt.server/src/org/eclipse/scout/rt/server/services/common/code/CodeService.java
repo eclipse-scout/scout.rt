@@ -62,6 +62,12 @@ public class CodeService extends AbstractService implements ICodeService {
     if (id == null) {
       return null;
     }
+    ICodeType ct = getCodeTypeCache().findCodeTypeById(id);
+    if (ct != null) {
+      return ct;
+    }
+    // populate code type cache
+    getAllCodeTypes("");
     return getCodeTypeCache().findCodeTypeById(id);
   }
 
@@ -70,6 +76,12 @@ public class CodeService extends AbstractService implements ICodeService {
     if (id == null) {
       return null;
     }
+    ICodeType ct = getCodeTypeCache(partitionId).findCodeTypeById(id);
+    if (ct != null) {
+      return ct;
+    }
+    // populate code type cache
+    getAllCodeTypes("");
     return getCodeTypeCache(partitionId).findCodeTypeById(id);
   }
 
