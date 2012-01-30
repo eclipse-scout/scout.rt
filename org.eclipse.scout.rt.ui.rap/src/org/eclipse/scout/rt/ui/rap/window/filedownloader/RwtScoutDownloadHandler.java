@@ -29,9 +29,9 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
 
   private File m_file;
   private URI m_bundleURI;
-  private String m_fileName;
-  private String m_contentType;
-  private String m_requestId;
+  private final String m_fileName;
+  private final String m_contentType;
+  private final String m_requestId;
   private RwtScoutDownloadDialog m_sdd;
 
   private RwtScoutDownloadHandler(String id, String contentType, String fileName) {
@@ -106,6 +106,18 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
       }
       finally {
         srcStream.close();
+//        if (m_file != null) {
+//          try {
+//            m_file.delete();
+//            File parentPath = new File(m_file.getParent());
+//            if (parentPath.isDirectory() && parentPath.listFiles().length == 0) {
+//              parentPath.delete();
+//            }
+//          }
+//          catch (Exception e) {
+//            // NOP
+//          }
+//        }
       }
     }
   }
