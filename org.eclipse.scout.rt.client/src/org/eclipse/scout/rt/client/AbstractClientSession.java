@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TextsThreadLocal;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
@@ -244,6 +245,8 @@ public abstract class AbstractClientSession implements IClientSession {
       }
       m_iconLocator = createIconLocator();
       m_scoutTexts = new ScoutTexts();
+      // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
+      TextsThreadLocal.set(m_scoutTexts);
       execLoadSession();
       setActive(true);
     }

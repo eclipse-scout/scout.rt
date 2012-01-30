@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFilter;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TextsThreadLocal;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -179,6 +180,8 @@ public abstract class AbstractServerSession implements IServerSession {
     m_bundle = bundle;
     m_active = true;
     m_scoutTexts = new ScoutTexts();
+    // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
+    TextsThreadLocal.set(m_scoutTexts);
     assignUserId();
     execLoadSession();
   }
