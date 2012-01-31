@@ -45,6 +45,9 @@ BSI Business Systems Integration AG - initial API and implementation
       <import plugin="org.eclipse.osgi"/>
       <import plugin="javax.servlet"/>
       <import plugin="org.eclipse.swt" version="3.6.2" match="greaterOrEqual"/>
+      <import plugin="org.apache.batik.css" version="1.6.0"/>
+      <import plugin="org.apache.batik.util.gui" version="1.6.0"/>
+      <import plugin="org.apache.batik.util" version="1.6.0"/>
    </requires>
 
    <plugin
@@ -176,42 +179,7 @@ BSI Business Systems Integration AG - initial API and implementation
          unpack="false"/>
 
    <plugin
-         id="org.apache.batik.css"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.apache.batik.dom"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.batik.dom.svg"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.batik.dom.svg"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.batik.dom.svg"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.batik.ext.awt"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -254,20 +222,6 @@ BSI Business Systems Integration AG - initial API and implementation
 
    <plugin
          id="org.apache.batik.transcoder"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.batik.util"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.batik.util.gui"
          download-size="0"
          install-size="0"
          version="0.0.0"
