@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.basic.comp.CLabelEx;
 import org.eclipse.scout.rt.ui.swt.extension.ILookAndFeelDecorations;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
-import org.eclipse.scout.rt.ui.swt.util.SwtLayoutUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Color;
@@ -269,7 +268,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
         ((GridData) getStatusLabel().getLayoutData()).exclude = false;
       }
     }
-    SwtLayoutUtility.invalidateLayout(this);
+    layout(true, true);
   }
 
 // delegate methods

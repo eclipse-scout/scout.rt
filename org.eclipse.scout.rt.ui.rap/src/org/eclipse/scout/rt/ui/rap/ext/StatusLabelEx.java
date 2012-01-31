@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.comp.CLabelEx;
 import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.core.ext.ILabelComposite;
-import org.eclipse.scout.rt.ui.rap.core.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.extension.ILookAndFeelDecorations;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.swt.SWT;
@@ -293,7 +292,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
         ((GridData) getStatusLabel().getLayoutData()).exclude = false;
       }
     }
-    RwtLayoutUtility.invalidateLayout(getUiEnvironment(), this);
+    layout(true, true);
   }
 
 // delegate methods
