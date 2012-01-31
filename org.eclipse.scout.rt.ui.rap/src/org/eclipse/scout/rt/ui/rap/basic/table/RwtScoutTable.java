@@ -520,6 +520,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
     //
     if (uiTableEvent != null) {
+      ((RwtScoutTableModel) getUiTableViewer().getContentProvider()).consumeTableModelEvent(uiTableEvent);
       getUiTableViewer().refresh();
     }
     // refresh selection, indexes might have changed
