@@ -6,7 +6,9 @@
       provider-name="%providerName">
 
    <description>
-      Scout runtime environment.
+      *** DO NOT INSTALL IN YOUR IDE ***
+This feature is only for provisioning Target Platforms.
+Contains Scout RAP runtime environment.
    </description>
 
    <copyright>
