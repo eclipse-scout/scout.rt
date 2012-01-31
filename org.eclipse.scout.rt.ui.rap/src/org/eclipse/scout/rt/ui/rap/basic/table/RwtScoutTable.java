@@ -800,9 +800,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         i++;
       }
       else {
-        //Column must not get smaller than initial width.
-        int width = Math.max(totalWidth, entry.getValue());
-        entry.getKey().setWidth(width);
+        entry.getKey().setWidth(totalWidth);
       }
     }
   }
