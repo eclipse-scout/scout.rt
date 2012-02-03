@@ -37,6 +37,7 @@ public class TextFieldEditableSupport {
 
   public TextFieldEditableSupport(Text text) {
     m_text = text;
+    m_editable = true;
   }
 
   public Control getTextField() {
