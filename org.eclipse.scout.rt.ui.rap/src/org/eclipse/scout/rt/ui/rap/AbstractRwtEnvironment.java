@@ -118,11 +118,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
-/**
- * <h3>AbstractRwtEnvironment</h3> ...
- * 
- * @since 3.7.0 June 2011
- */
 public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
 
