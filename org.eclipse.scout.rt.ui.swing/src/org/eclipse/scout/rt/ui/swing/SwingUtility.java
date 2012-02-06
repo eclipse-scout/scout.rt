@@ -43,9 +43,9 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.swing.Icon;
 import javax.swing.InputMap;
@@ -729,13 +729,15 @@ public final class SwingUtility {
    */
   public static void installDefaultFocusHandling(Container c) {
     // focus TAB
-    TreeSet<KeyStroke> set = new TreeSet<KeyStroke>();
+    HashSet<KeyStroke> set = new HashSet<KeyStroke>(1);
     set.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
     c.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, set);
+
     // focus shift-TAB
-    set = new TreeSet<KeyStroke>();
+    set = new HashSet<KeyStroke>(1);
     set.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
     c.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, set);
+
     // make input map WHEN_FOCUSED non-empty for Focus Traversal policy to work
     // correctly
     if (c instanceof JComponent) {
