@@ -21,12 +21,6 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-/**
- * <h3>RwtScoutToolButton</h3> ...
- * 
- * @author Andreas Hoegger
- * @since 3.7.0 June 2011
- */
 public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IRwtScoutToolButton {
 
   private final boolean m_iconVisible;
