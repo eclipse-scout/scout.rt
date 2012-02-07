@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.rap.ext;
 
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
 
 /**
  * <h3>StyledTextEx</h3> ...
@@ -26,8 +25,6 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class StyledTextEx extends StyledText {
   private static final long serialVersionUID = 1L;
-
-  private Menu m_copyPasteMenu;
 
   public StyledTextEx(Composite parent, int style) {
     super(parent, style);
@@ -43,24 +40,6 @@ public class StyledTextEx extends StyledText {
   public void setEnabled(boolean enabled) {
 //    super.setEnabled(enabled);
     super.setEditable(enabled);
-    if (!isDisposed()) {
-      if (enabled) {
-        setMenu(m_copyPasteMenu);
-      }
-      else {
-        setMenu(null);
-      }
-    }
-
-    Composite parent = getParent();
-    if (parent != null && !parent.isDisposed()) {
-      if (enabled) {
-        parent.setMenu(null);
-      }
-      else {
-        parent.setMenu(m_copyPasteMenu);
-      }
-    }
   }
 
   @Override

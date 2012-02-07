@@ -201,7 +201,6 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
 
   @Override
   public void disposeImpl() {
-    super.dispose();
     if (m_uploadListener != null) {
       m_handler.removeUploadListener(m_uploadListener);
       m_uploadListener = null;

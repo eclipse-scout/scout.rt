@@ -190,21 +190,27 @@ public class KeyStrokeManager implements IKeyStrokeManager {
   @Override
   public boolean removeKeyStrokes(Control control) {
     boolean retVal = false;
-    for (IRwtKeyStroke stroke : new ArrayList<IRwtKeyStroke>(getKeyStrokes(control))) {
-      retVal &= removeKeyStroke(control, stroke);
+    if (control != null && !control.isDisposed()) {
+      for (IRwtKeyStroke stroke : new ArrayList<IRwtKeyStroke>(getKeyStrokes(control))) {
+        retVal &= removeKeyStroke(control, stroke);
+      }
+      control.setData(DATA_KEY_STROKES, null);
     }
-    control.setData(DATA_KEY_STROKES, null);
+    m_widgetActiveKeys.remove(control);
+    m_widgetCancelKeys.remove(control);
     return retVal;
   }
 
   @SuppressWarnings("unchecked")
   protected List<IRwtKeyStroke> getKeyStrokes(Widget widget) {
-    Object data = widget.getData(DATA_KEY_STROKES);
     List<IRwtKeyStroke> keyStrokes = null;
-    if (data instanceof List && ((List<IRwtKeyStroke>) data).size() > 0) {
-      keyStrokes = (List<IRwtKeyStroke>) data;
+    if (widget != null) {
+      Object data = widget.getData(DATA_KEY_STROKES);
+      if (data instanceof List && ((List<IRwtKeyStroke>) data).size() > 0) {
+        keyStrokes = (List<IRwtKeyStroke>) data;
+      }
     }
-    else {
+    if (keyStrokes == null) {
       keyStrokes = Collections.emptyList();
     }
     return keyStrokes;

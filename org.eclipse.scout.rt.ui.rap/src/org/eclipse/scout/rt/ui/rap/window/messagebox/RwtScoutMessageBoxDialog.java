@@ -23,6 +23,8 @@ import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.layout.ButtonBarLayoutDa
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -270,6 +272,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
         }
       }, false);
     }
+
     // Cancel the dialog with the ESCAPE key (workaround)
     m_uiEnvironment.addKeyStroke(getShell(), new RwtKeyStroke(SWT.ESC) {
 
@@ -278,6 +281,17 @@ public class RwtScoutMessageBoxDialog extends Dialog {
         cancelPressed();
       }
     }, false);
+
+    // remove key strokes when shell is disposed
+    getShell().addDisposeListener(new DisposeListener() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetDisposed(DisposeEvent event) {
+        m_uiEnvironment.removeKeyStrokes(getShell());
+      }
+    });
+
     if (getScoutObject().getHiddenText() != null) {
       Button copyButton = createButton(buttonArea, RwtUtility.getNlsText(Display.getCurrent(), "Copy"), null, -1);
       copyButton.addSelectionListener(new SelectionAdapter() {

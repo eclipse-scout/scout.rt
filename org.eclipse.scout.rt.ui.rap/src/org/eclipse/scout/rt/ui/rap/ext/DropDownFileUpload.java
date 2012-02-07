@@ -107,6 +107,8 @@ public class DropDownFileUpload extends FileUpload {
       @Override
       public void widgetDisposed(DisposeEvent e) {
         freeResources();
+        // remove key strokes
+        getUiEnvironment().removeKeyStrokes(DropDownFileUpload.this);
       }
     });
 

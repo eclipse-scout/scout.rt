@@ -256,20 +256,17 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
     if (!m_created) {
       return;
     }
-    handleUiDispose();
     if (getUiField() != null && !getUiField().isDisposed()) {
-      getUiEnvironment().removeKeyStrokes(getUiField());
       getUiField().dispose();
     }
     if (getUiContainer() != null && !getUiContainer().isDisposed()) {
-      getUiEnvironment().removeKeyStrokes(getUiContainer());
       getUiContainer().dispose();
     }
     disposeImpl();
   }
 
   /**
-   * override thid method to do additional operations when the composite is being disposed
+   * override this method to do additional operations when the composite is being disposed
    */
   protected void disposeImpl() {
   }
@@ -335,6 +332,9 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
     }
     try {
       getUpdateUiFromScoutLock().acquire();
+      // remove possibly registered key strokes
+      getUiEnvironment().removeKeyStrokes(getUiField());
+      getUiEnvironment().removeKeyStrokes(getUiContainer());
       //
       detachScout();
     }

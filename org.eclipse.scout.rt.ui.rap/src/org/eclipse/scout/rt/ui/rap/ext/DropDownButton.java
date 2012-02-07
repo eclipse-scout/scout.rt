@@ -139,6 +139,8 @@ public class DropDownButton extends Button {
       @Override
       public void widgetDisposed(DisposeEvent e) {
         freeResources();
+        // remove key strokes
+        getUiEnvironment().removeKeyStrokes(DropDownButton.this);
       }
     });
 
