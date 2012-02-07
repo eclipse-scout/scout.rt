@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -1422,13 +1423,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void closeInternal() throws ProcessingException {
+    List<IForm> openForms = new ArrayList<IForm>();
     // remove views
     for (IForm view : getViewStack()) {
       removeForm(view);
+      openForms.add(view);
     }
     // remove forms
     for (IForm dialog : getDialogStack()) {
       removeForm(dialog);
+      openForms.add(dialog);
     }
     //extensions
     IDesktopExtension[] extensions = getDesktopExtensions();
@@ -1446,6 +1450,36 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     fireDesktopClosed();
+
+    // gather tool button forms
+    for (IToolButton toolButton : getToolButtons()) {
+      if (toolButton instanceof AbstractFormToolButton) {
+        AbstractFormToolButton formToolButton = (AbstractFormToolButton) toolButton;
+        IForm form = formToolButton.getForm();
+        if (form != null) {
+          openForms.add(form);
+          formToolButton.setForm(null);
+        }
+      }
+    }
+
+    // close open forms
+    for (IForm form : openForms) {
+      if (form != null) {
+        try {
+          form.doClose();
+        }
+        catch (ProcessingException e) {
+          LOG.error("Exception while closing form", e);
+        }
+      }
+    }
+
+    // outlines
+    for (IOutline outline : getAvailableOutlines()) {
+      outline.removeAllChildNodes(outline.getRootNode());
+      outline.disposeTree();
+    }
   }
 
   public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {
