@@ -30,6 +30,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.internal.widgets.JSExecutor;
@@ -48,6 +49,7 @@ import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.IBusyManagerService;
@@ -637,11 +639,17 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   @Override
   public boolean removeKeyStroke(Control control, IRwtKeyStroke stoke) {
+    if (m_keyStrokeManager == null) {
+      return false;
+    }
     return m_keyStrokeManager.removeKeyStroke(control, stoke);
   }
 
   @Override
   public boolean removeKeyStrokes(Control control) {
+    if (m_keyStrokeManager == null) {
+      return false;
+    }
     return m_keyStrokeManager.removeKeyStrokes(control);
   }
 
@@ -1362,7 +1370,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     m_activateDesktopCalled = activateDesktopCalled;
   }
 
-  private final class P_SessionStoreListener implements SessionStoreListener {
+  private static final class P_SessionStoreListener implements SessionStoreListener {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -1378,7 +1386,12 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
       IClientSession clientSession = (IClientSession) sessionStore.getAttribute(IClientSession.class.getName());
       if (clientSession != null) {
-        clientSession.stopSession();
+        new ClientAsyncJob("HTTP session inactivator", clientSession) {
+          @Override
+          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+            getClientSession().stopSession();
+          }
+        }.runNow(new NullProgressMonitor());
       }
     }
   }

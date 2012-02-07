@@ -33,6 +33,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
@@ -68,10 +70,25 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
 
     //XXX Workaround for rwt npe
     try {
-      Object wb = PlatformUI.getWorkbench();
-      Field f = wb.getClass().getDeclaredField("display");
+      final Object wb = PlatformUI.getWorkbench();
+      final Field f = wb.getClass().getDeclaredField("display");
       f.setAccessible(true);
       f.set(wb, m_display);
+      m_display.addListener(SWT.Dispose, new Listener() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void handleEvent(Event event) {
+          try {
+            // WORKAROUND for memory leaks
+            // workbench should be closed instead, but NPEs are thrown
+            f.set(wb, null);
+          }
+          catch (Throwable t1) {
+            // nop
+          }
+        }
+      });
     }
     catch (Throwable t) {
       //nop

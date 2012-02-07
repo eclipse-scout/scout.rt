@@ -21,6 +21,8 @@ import org.eclipse.scout.rt.ui.rap.core.util.BrowserInfo;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseAdapter;
@@ -115,6 +117,16 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
         }
         m_mouseDownPosition = null;
         redraw();
+      }
+    });
+
+    addDisposeListener(new DisposeListener() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        // remove key strokes
+        getUiEnvironment().removeKeyStrokes(DropDownButton.this);
       }
     });
   }

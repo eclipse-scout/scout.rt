@@ -33,8 +33,6 @@ import org.eclipse.scout.rt.ui.rap.form.fields.datefield.chooser.DateChooserDial
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
@@ -115,19 +113,9 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     m_dateContainer.setTabList(new Control[]{textField});
     container.setTabList(new Control[]{m_dateContainer});
 
-    // ui key strokes
+    // key strokes on container
     getUiEnvironment().addKeyStroke(container, new P_DateChooserOpenKeyStroke(), false);
-    container.addDisposeListener(new DisposeListener() {
-
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent event) {
-        getUiEnvironment().removeKeyStrokes((Control) event.getSource());
-      }
-    });
-
-    // listener
+    // key strokes on field
     getUiEnvironment().addKeyStroke(textField, new P_ShiftDayUpKeyStroke(), false);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftDayDownKeyStroke(), false);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftMonthUpKeyStroke(), false);
@@ -135,6 +123,7 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     getUiEnvironment().addKeyStroke(textField, new P_ShiftYearUpKeyStroke(), false);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftYearDownKeyStroke(), false);
 
+    // listener
     dateChooserButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtBrowseButtonListener());
     textField.addMouseListener(new MouseAdapter() {
       private static final long serialVersionUID = 1L;

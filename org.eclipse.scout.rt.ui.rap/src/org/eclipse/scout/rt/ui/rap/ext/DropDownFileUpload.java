@@ -17,6 +17,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -82,6 +84,16 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
       public void widgetSelected(SelectionEvent e) {
         handleSelectionInternal(e);
         redraw();
+      }
+    });
+
+    addDisposeListener(new DisposeListener() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        // remove key strokes
+        getUiEnvironment().removeKeyStrokes(DropDownFileUpload.this);
       }
     });
   }
