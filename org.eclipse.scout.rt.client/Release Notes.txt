@@ -752,3 +752,19 @@ Solution:
 If findCodeTypeById returns null for a non-null key, populate cache and retry.
 Migration:
 None
+
+07.02.2011 abr
+Bugzilla 370821
+last activated forms on AbstractDesktop are not released
+The AbstractDesktop manages a list of open forms, ordered descending by their last activation. The elements
+of the list are never released and the form listener tracking activation changes is not used at all. Further,
+the last active form returned is not the last, but the first which weak reference is still valid.
+Migration: None
+
+07.02.2011 abr
+Bugzilla 370830
+closing the desktop should close all open forms as well
+When the desktop is closed, all open forms are just removed from the view and dialog stacks, respectively.
+The forms however are not closed. Hence any clean-up operations must be implemented as desktop listeners.
+This approach still breaks a form's life cycle.
+Migration: None
