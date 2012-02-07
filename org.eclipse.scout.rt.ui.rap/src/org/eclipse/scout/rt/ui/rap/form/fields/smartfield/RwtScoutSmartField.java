@@ -183,6 +183,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     final FormData buttonLayoutData = new FormData(SWT.DEFAULT, SWT.DEFAULT);
     buttonLayoutData.left = new FormAttachment(textField, -1, SWT.RIGHT);
     buttonLayoutData.bottom = new FormAttachment(m_browseButton, 1, SWT.BOTTOM);
+    buttonLayoutData.height = 20;
+    buttonLayoutData.width = 20;
     m_browseButton.setLayoutData(buttonLayoutData);
   }
 
@@ -198,9 +200,10 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected void attachScout() {
-    super.attachScout();
     setIconIdFromScout(getScoutObject().getIconId());
+    getUiBrowseButton().setDropdownEnabled(getScoutObject().hasMenus());
     setProposalFormFromScout(getScoutObject().getProposalForm());
+    super.attachScout();
   }
 
   @Override

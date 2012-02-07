@@ -13,12 +13,7 @@ package org.eclipse.scout.rt.ui.rap.ext;
 import java.util.ArrayList;
 
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.core.RwtIcons;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -42,33 +37,16 @@ public class ButtonEx extends Button {
   private Object m_listenerLock = new Object();
   private Listener[] m_actionSelectionListener;
   private Listener[] m_menuSelectionListener;
-  private Image m_dropDownIcon;
 
   public ButtonEx(Composite parent, int style) {
     super(parent, style);
-    m_dropDownIcon = getUiEnvironment().getIcon(RwtIcons.DropDownFieldArrowDown);
-    // dopdown
+    // dropdown
     P_DelegateSelectionListener delegateListener = new P_DelegateSelectionListener();
     if ((style & SWT.DROP_DOWN) != 0) {
       m_hasDropDown = true;
       super.addListener(SWT.MouseUp, delegateListener);
     }
     super.addListener(SWT.Selection, delegateListener);
-    addDisposeListener(new DisposeListener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-        freeResources();
-      }
-    });
-  }
-
-  public void freeResources() {
-    if (m_dropDownIcon != null && !m_dropDownIcon.isDisposed() && m_dropDownIcon.getDevice() != null) {
-      m_dropDownIcon.dispose();
-      m_dropDownIcon = null;
-    }
   }
 
   private IRwtEnvironment getUiEnvironment() {
@@ -182,24 +160,8 @@ public class ButtonEx extends Button {
   }
 
   @Override
-  public void setEnabled(boolean enabled) {
-    // XXX dropdown support
-    super.setEnabled(enabled);
-  }
-
-  @Override
-  public Point computeSize(int hint, int hint2, boolean changed) {
-    Point computedSize = super.computeSize(hint, hint2, changed);
-    Point p = new Point(computedSize.x, computedSize.y);
-    if (m_hasDropDown) {
-      p.x += 12;
-    }
-    p.x += 10; // XXX hstaudacher the padding from the theme does not work. we need to extend the width of each button
-    return p;
-  }
-
-  @Override
   protected void checkSubclass() {
+    // allow subclassing
   }
 
   protected void handleButtonSelection(Event event) {
@@ -256,6 +218,8 @@ public class ButtonEx extends Button {
           handleButtonSelection(event);
           break;
         }
+        default:
+          break;
       }
     }
   }
