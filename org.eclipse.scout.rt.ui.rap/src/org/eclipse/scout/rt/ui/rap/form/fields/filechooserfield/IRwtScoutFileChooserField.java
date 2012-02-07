@@ -17,8 +17,8 @@ import org.eclipse.swt.widgets.ProgressBar;
 
 public interface IRwtScoutFileChooserField extends IRwtScoutFormField<IFileChooserField> {
 
-  String VARIANT_FILECHOOSER = "filechooser";
-  String VARIANT_FILECHOOSER_DISABLED = "filechooser-disabled";
+  String VARIANT_FILECHOOSER = "filechooserfield";
+  String VARIANT_DISABLED_SUFFIX = "-disabled";
 
   IDropDownFileUploadForPatch getUiBrowseButton();
 

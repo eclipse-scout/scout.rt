@@ -67,8 +67,6 @@ public interface IDropDownButtonForPatch {
 
   void setEnabled(boolean enabled);
 
-  void freeResources();
-
   Point computeSize(int hint, int hint2, boolean changed);
 
   void setBounds(Rectangle bounds);
