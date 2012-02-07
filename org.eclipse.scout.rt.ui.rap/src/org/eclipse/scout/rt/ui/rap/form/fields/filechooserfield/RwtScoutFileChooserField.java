@@ -24,6 +24,7 @@ import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.holders.Holder;
@@ -76,6 +77,8 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
   private FileUploadHandler m_handler;
   private FileUploadListener m_uploadListener;
   private File m_uploadedFile = null;
+
+  private String m_originalVariant = "";
 
   public RwtScoutFileChooserField() {
     initializeFileUpload();
@@ -176,8 +179,10 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
     });
 
     final FormData buttonLayoutData = new FormData(SWT.DEFAULT, SWT.DEFAULT);
-    buttonLayoutData.left = new FormAttachment(getUiField(), -4, SWT.RIGHT);
-    buttonLayoutData.bottom = new FormAttachment(getUiBrowseButton(), -6, SWT.BOTTOM);
+    buttonLayoutData.left = new FormAttachment(getUiField(), 0, SWT.RIGHT);
+    buttonLayoutData.bottom = new FormAttachment((Control) getUiBrowseButton(), 0, SWT.BOTTOM);
+    buttonLayoutData.height = 20;
+    buttonLayoutData.width = 20;
     getUiBrowseButton().setLayoutData(buttonLayoutData);
 
     setEnabledFromScout(getScoutObject().isEnabled());
@@ -289,14 +294,12 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
     getUiBrowseButton().setButtonEnabled(b);
     //textfield must be disabled. We can't upload the file from it for now.
     getUiField().setEnabled(false);
-    if (b) {
-      m_fileContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FILECHOOSER);
-      getUiBrowseButton().setImage(getUiEnvironment().getIcon("filechooserfield_file.png"));
+
+    if (!StringUtility.hasText(m_originalVariant)) {
+      m_originalVariant = (String) m_fileContainer.getData(WidgetUtil.CUSTOM_VARIANT);
     }
-    else {
-      m_fileContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FILECHOOSER_DISABLED);
-      getUiBrowseButton().setImage(getUiEnvironment().getIcon("filechooserfield_file_disabled.png"));
-    }
+    String customVariant = b ? m_originalVariant : m_originalVariant + VARIANT_DISABLED_SUFFIX;
+    m_fileContainer.setData(WidgetUtil.CUSTOM_VARIANT, customVariant);
   }
 
   @Override
@@ -308,7 +311,10 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
   }
 
   protected void setFileIconIdFromScout(String s) {
-    LOG.warn("IFileChooserField.getConfiguredFileIconId(\"...\") is not possible in RAP. Changing FileIcon must be done via CSS.");
+    m_originalVariant = s;
+    m_fileContainer.setData(WidgetUtil.CUSTOM_VARIANT, s);
+    getUiField().setData(WidgetUtil.CUSTOM_VARIANT, s);
+    getUiBrowseButton().setData(WidgetUtil.CUSTOM_VARIANT, s);
   }
 
   @Override
