@@ -28,12 +28,6 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.ui.rap.core.IRwtCoreEnvironment;
 import org.eclipse.scout.service.SERVICES;
 
-/**
- * <h3>RwtScoutNavigation</h3> ...
- * 
- * @author Andreas Hoegger
- * @since 3.7.0 June 2011
- */
 public class RwtScoutNavigationSupport {
 
   private final IRwtCoreEnvironment m_uiEnvironment;
@@ -112,9 +106,14 @@ public class RwtScoutNavigationSupport {
   }
 
   private String cleanNl(String s) {
-    s = s.replaceAll("(\r\n)|(\n\r)|(\n)|(\r)", "-");
+    s = s.replaceAll("(\r\n)|(\n\r)|(\n)|(\r)", " -");
+    return s;
+  }
+
+  private String cleanBrowserSpecialChars(String s) {
     s = s.replaceAll("\\s*\\-\\s*", "-");
     s = s.replaceAll("\\s+", "-");
+    s = s.replaceAll(",", "");
     return s;
   }
 
@@ -131,7 +130,7 @@ public class RwtScoutNavigationSupport {
         }
       }
     }
-    return cleanNl(key.toString());
+    return cleanBrowserSpecialChars(cleanNl(key.toString()));
   }
 
   private class P_NavigationHistoryListener implements NavigationHistoryListener {
@@ -149,5 +148,4 @@ public class RwtScoutNavigationSupport {
       }
     }
   }
-
 }
