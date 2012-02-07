@@ -53,7 +53,7 @@ public class SwingViewer {
     frame.setSize(800, 600);
     frame.setVisible(true);
     //
-    final SVGDocument doc = SVGUtility.readSVGDocument(SwingViewer.class.getResourceAsStream("sample.svg"), false);
+    final SVGDocument doc = SVGUtility.readSVGDocument(SwingViewer.class.getResourceAsStream("sample.svg"));
     canvas.setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);//IMPORTANT TO do "getIntersectionList" and dom changes (DYNAMIC)!
     canvas.setSVGDocument(doc);
   }

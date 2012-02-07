@@ -70,6 +70,13 @@ public class SwtScoutSvgField extends SwtScoutFieldComposite<ISvgField> implemen
     updateSvgDocumentFromScout();
   }
 
+  @Override
+  protected void detachScout() {
+    super.detachScout();
+    getSwtField().getJSVGCanvas().stopProcessing();
+    getSwtField().getJSVGCanvas().dispose();
+  }
+
   protected void updateSvgDocumentFromScout() {
     SVGDocument doc = getScoutObject().getSvgDocument();
     JSVGCanvas canvas = getSwtField().getJSVGCanvas();

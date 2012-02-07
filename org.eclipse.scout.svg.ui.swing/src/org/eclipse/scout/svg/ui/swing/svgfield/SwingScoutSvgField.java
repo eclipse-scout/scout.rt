@@ -76,6 +76,13 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
     setVerticalAlignmentFromScout(getScoutObject().getGridData().verticalAlignment);
   }
 
+  @Override
+  protected void detachScout() {
+    super.detachScout();
+    getSwingField().stopProcessing();
+    getSwingField().dispose();
+  }
+
   protected void updateSvgDocumentFromScout() {
     SVGDocument doc = getScoutObject().getSvgDocument();
     JSVGCanvas canvas = getSwingField();
@@ -152,5 +159,4 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
       }
     }
   }
-
 }
