@@ -54,12 +54,11 @@ public class SwtViewer extends Composite {
     JSVGCanvasSwtWrapper wrapper = new JSVGCanvasSwtWrapper(this, SWT.NONE, ua, true, false);
     //set document
     try {
-      SVGDocument svgDocument = SVGUtility.readSVGDocument(SwtViewer.class.getResourceAsStream("sample.svg"), false);
+      SVGDocument svgDocument = SVGUtility.readSVGDocument(SwtViewer.class.getResourceAsStream("sample.svg"));
       wrapper.getJSVGCanvas().setDocument(svgDocument);
     }
     catch (Exception e) {
       e.printStackTrace();
     }
   }
-
 }

@@ -64,12 +64,15 @@ public final class SVGUtility {
   }
 
   /**
+   * Parses a SVG document read by the given input stream. The document returned can be modified on XML-level. If you
+   * need to perform any CSS, text size and and bounding box operations use
+   * {@link #readSVGDocumentForGraphicalModification(InputStream)} instead.
+   * 
    * @param in
-   * @param attachGVTTree
-   *          true if a GVT tree should be attached. This is necessary if css, text size, and bounding box operations
-   *          are to be performed on the svg document
+   *          input stream the SVG document is read from.
+   * @return Returns the SVG document.
    */
-  public static SVGDocument readSVGDocument(InputStream in, boolean attachGVTTree) throws ProcessingException {
+  public static SVGDocument readSVGDocument(InputStream in) throws ProcessingException {
     String cn;
     try {
       cn = Class.forName("org.apache.xerces.parsers.SAXParser").getName();
@@ -97,15 +100,34 @@ public final class SVGUtility {
     catch (Throwable t) {
       //nop, dom level less than 3
     }
-    if (attachGVTTree) {
-      //add a gvt tree for text and alignment calculations
-      BridgeContext bc = new BridgeContext(new UserAgentAdapter());
-      bc.setDynamic(true);
-      GVTTreeBuilder treeBuilder = new GVTTreeBuilder(doc, bc);
-      treeBuilder.setPriority(Thread.MAX_PRIORITY);
-      treeBuilder.run();
-    }
     return doc;
+  }
+
+  /**
+   * Parses a SVG document read by the given input stream and attaches a GVT tree. An attached GVT tree is required for
+   * performing CSS, text size and and bounding box operations on the SVG document.
+   * <p/>
+   * The resulting bridge context holds a reference to the SVG document {@link BridgeContext#getDocument()}
+   * <p/>
+   * <h1>Important:</h1> Callers are required to invoke {@link BridgeContext#dispose()} on the returned bridge context
+   * as soon as the bridge or the document it references is not required anymore.
+   * <p/>
+   * If the documents needs not be manipulated, use {@link #readSVGDocument(InputStream)} instead.
+   * 
+   * @param in
+   *          input stream the SVG document is read from.
+   * @return Returns a bridge context that holds references to the SVG document as well as to the GVT tree wrapping
+   *         objects.
+   */
+  public static BridgeContext readSVGDocumentForGraphicalModification(InputStream in) throws ProcessingException {
+    SVGDocument doc = readSVGDocument(in);
+    //add a gvt tree for text and alignment calculations
+    BridgeContext bc = new BridgeContext(new UserAgentAdapter());
+    bc.setDynamic(true);
+    GVTTreeBuilder treeBuilder = new GVTTreeBuilder(doc, bc);
+    treeBuilder.setPriority(Thread.MAX_PRIORITY);
+    treeBuilder.run();
+    return bc;
   }
 
   public static void writeSVGDocument(SVGDocument doc, OutputStream out, String encoding) throws ProcessingException {
