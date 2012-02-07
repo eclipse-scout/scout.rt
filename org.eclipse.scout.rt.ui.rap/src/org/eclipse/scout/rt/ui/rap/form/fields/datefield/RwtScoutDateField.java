@@ -164,6 +164,8 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     final FormData buttonLayoutData = new FormData(SWT.DEFAULT, SWT.DEFAULT);
     buttonLayoutData.left = new FormAttachment(textField, 0, SWT.RIGHT);
     buttonLayoutData.bottom = new FormAttachment(dateChooserButton, 0, SWT.BOTTOM);
+    buttonLayoutData.height = 20;
+    buttonLayoutData.width = 20;
     dateChooserButton.setLayoutData(buttonLayoutData);
   }
 

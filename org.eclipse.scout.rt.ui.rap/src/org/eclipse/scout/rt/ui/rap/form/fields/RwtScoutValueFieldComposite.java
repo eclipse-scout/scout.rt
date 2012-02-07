@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.ui.rap.ext.TextEx;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.swt.widgets.Control;
 
@@ -42,28 +43,25 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
   protected void setDisplayTextFromScout(String s) {
   }
 
-  public void setOnFieldLabelFromScout(String text, final String label) {
+  public void setOnFieldLabelFromScout(String text, String label) {
     if (text == null || text.length() == 0) {
       if (getUiField() != null && getUiField() instanceof StyledText) {
-        Object length = getScoutObject().getCustomProperty(IStringField.PROP_MAX_LENGTH);
-        try {
-          if (length != null && label.length() > 0) {
-            if (length instanceof Integer && (Integer) length < label.length()) {
-              getScoutObject().setCustomProperty(IStringField.PROP_MAX_LENGTH, label.length());
-            }
-          }
-          ((StyledText) getUiField()).setOnFieldLabel(label);
-          ((Control) getUiField()).setData(WidgetUtil.CUSTOM_VARIANT, "onFieldLabel");
-        }
-        finally {
-          if (length != null && length instanceof Integer && (Integer) length < label.length()) {
-            getScoutObject().setCustomProperty(IStringField.PROP_MAX_LENGTH, length);
+        Integer length = (Integer) getScoutObject().getCustomProperty(IStringField.PROP_MAX_LENGTH);
+        if (length != null && label.length() > 0) {
+          if (length < label.length()) {
+            ((StyledText) getUiField()).setTextLimit(label.length());
           }
         }
+        ((TextEx) getUiField()).setOnFieldLabel(label);
+        getUiField().setData(WidgetUtil.CUSTOM_VARIANT, "onFieldLabel");
       }
     }
     else if (getUiField() instanceof Control) {
-      ((Control) getUiField()).setData(WidgetUtil.CUSTOM_VARIANT, null);
+      Integer length = (Integer) getScoutObject().getCustomProperty(IStringField.PROP_MAX_LENGTH);
+      if (length != null) {
+        ((TextEx) getUiField()).setTextLimit(length);
+      }
+      getUiField().setData(WidgetUtil.CUSTOM_VARIANT, null);
     }
   }
 
@@ -71,9 +69,10 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
     if (name.equals(IValueField.PROP_DISPLAY_TEXT)) {
-        setDisplayTextFromScout((String) newValue);
-    	if (getOnFieldLabelDecorator() != null && StringUtility.hasText((String) newValue) && CompareUtility.notEquals((String) newValue, getScoutObject().getLabel())) {
-        setOnFieldLabelFromScout((String) newValue, getScoutObject().getLabel());
+      String displayText = (String) newValue;
+      setDisplayTextFromScout(displayText);
+      if (getOnFieldLabelDecorator() != null && StringUtility.hasText(displayText) && CompareUtility.notEquals(displayText, getScoutObject().getLabel())) {
+        setOnFieldLabelFromScout(displayText, getScoutObject().getLabel());
       }
     }
     else if (name.equals(IValueField.PROP_VALUE)) {

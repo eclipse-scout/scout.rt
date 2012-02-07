@@ -158,6 +158,8 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     final FormData buttonLayoutData = new FormData(SWT.DEFAULT, SWT.DEFAULT);
     buttonLayoutData.left = new FormAttachment(textField, 0, SWT.RIGHT);
     buttonLayoutData.bottom = new FormAttachment(timeChooserButton, 0, SWT.BOTTOM);
+    buttonLayoutData.height = 20;
+    buttonLayoutData.width = 20;
     timeChooserButton.setLayoutData(buttonLayoutData);
   }
 
