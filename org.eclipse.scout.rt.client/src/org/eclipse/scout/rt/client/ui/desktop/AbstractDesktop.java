@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -58,6 +57,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -106,8 +106,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private IOutline m_outline;
   private boolean m_outlineChanging = false;
   private P_ActiveOutlineListener m_activeOutlineListener;
-  private P_ActivatedFormListener m_activatedFormListener;
-  private LinkedList<WeakReference<IForm>> m_lastActiveFormList;
+  private final P_ActivatedFormListener m_activatedFormListener;
+  private final LinkedList<WeakReference<IForm>> m_lastActiveFormList;
   private ITable m_pageDetailTable;
   private IOutlineTableForm m_outlineTableForm;
   private boolean m_outlineTableFormVisible;
@@ -136,6 +136,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_messageBoxStack = new ArrayList<IMessageBox>();
     m_uiFacade = new P_UIFacade();
     m_outlineTableFormVisible = true;
+    m_activatedFormListener = new P_ActivatedFormListener();
+    m_lastActiveFormList = new LinkedList<WeakReference<IForm>>();
     initConfig();
   }
 
@@ -655,9 +657,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           break;
         }
       }
-      if (m_lastActiveFormList == null) {
-        m_lastActiveFormList = new LinkedList<WeakReference<IForm>>();
-      }
       m_lastActiveFormList.add(new WeakReference<IForm>(form));
       form.addFormListener(m_activatedFormListener);
     }
@@ -666,6 +665,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void removeForm(IForm form) {
     if (form != null) {
+      // remove form from last active form list
+      if (m_lastActiveFormList != null) {
+        for (Iterator<WeakReference<IForm>> it = m_lastActiveFormList.iterator(); it.hasNext();) {
+          WeakReference<IForm> formRef = it.next();
+          if (formRef.get() == null || form.equals(formRef.get())) {
+            it.remove();
+          }
+        }
+      }
       form.removeFormListener(m_activatedFormListener);
       boolean b1 = m_dialogStack.remove(form);
       boolean b2 = m_viewStack.remove(form);
@@ -1415,10 +1423,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void closeInternal() throws ProcessingException {
+    List<IForm> openForms = new ArrayList<IForm>();
+    // remove views
     for (IForm view : getViewStack()) {
+      openForms.add(view);
       removeForm(view);
     }
+    // remove forms
     for (IForm dialog : getDialogStack()) {
+      openForms.add(dialog);
       removeForm(dialog);
     }
     //extensions
@@ -1437,6 +1450,36 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     fireDesktopClosed();
+
+    // gather tool button forms
+    for (IToolButton toolButton : getToolButtons()) {
+      if (toolButton instanceof AbstractFormToolButton) {
+        AbstractFormToolButton formToolButton = (AbstractFormToolButton) toolButton;
+        IForm form = formToolButton.getForm();
+        if (form != null) {
+          openForms.add(form);
+          formToolButton.setForm(null);
+        }
+      }
+    }
+
+    // close open forms
+    for (IForm form : openForms) {
+      if (form != null) {
+        try {
+          form.doClose();
+        }
+        catch (ProcessingException e) {
+          LOG.error("Exception while closing form", e);
+        }
+      }
+    }
+
+    // outlines
+    for (IOutline outline : getAvailableOutlines()) {
+      outline.removeAllChildNodes(outline.getRootNode());
+      outline.disposeTree();
+    }
   }
 
   public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {
@@ -1723,25 +1766,19 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private class P_ActivatedFormListener implements FormListener {
     @Override
     public void formChanged(FormEvent e) throws ProcessingException {
-      if (m_lastActiveFormList == null) {
-        m_lastActiveFormList = new LinkedList<WeakReference<IForm>>();
+      if (e.getType() != FormEvent.TYPE_ACTIVATED) {
+        return;
       }
-      List<WeakReference<IForm>> nullReferences = null;
-      WeakReference<IForm> oldReference = null;
-      for (WeakReference<IForm> formRef : m_lastActiveFormList) {
-        if (formRef.get() == null) {
-          nullReferences = CollectionUtility.appendList(nullReferences, formRef);
+      // remove garbage collected references and the one of the given form event
+      for (Iterator<WeakReference<IForm>> it = m_lastActiveFormList.iterator(); it.hasNext();) {
+        WeakReference<IForm> formRef = it.next();
+        if (formRef.get() == null || formRef.get().equals(e.getForm())) {
+          it.remove();
         }
-        else if (formRef.get().equals(e.getForm())) {
-          oldReference = formRef;
-        }
-      }
-      m_lastActiveFormList.removeAll(CollectionUtility.copyList(nullReferences));
-      if (oldReference != null) {
-        m_lastActiveFormList.remove(oldReference);
       }
 
-      m_lastActiveFormList.add(new WeakReference<IForm>(e.getForm()));
+      // add changed form at the beginning -> last activated form
+      m_lastActiveFormList.add(0, new WeakReference<IForm>(e.getForm()));
     }
   }
 
