@@ -51,3 +51,8 @@ Several Scout RWT composites register key strokes on the KeyStorkeManager. A wid
 are put into maps on the KeyStrokeManager. They are however not always removed when the widget is disposed.
 Hence the KeyStrokeManager keeps references and prevents the garbage collection of disposed UI and model objects.
 Migration: None
+
+08.02.2012 imo
+Added ui property to set minimum width of tool forms on right side
+IUIDecoration.getToolFormMinWidth
+
