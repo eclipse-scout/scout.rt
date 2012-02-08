@@ -59,4 +59,10 @@ public interface IUiDecoration {
   int getMessageBoxMinHeight();
 
   int getMessageBoxMinWidth();
+
+  /**
+   * @return the minimum width of the right area in the desktop when using standalone rwt environment
+   *         default is 330px
+   */
+  int getToolFormMinWidth();
 }
