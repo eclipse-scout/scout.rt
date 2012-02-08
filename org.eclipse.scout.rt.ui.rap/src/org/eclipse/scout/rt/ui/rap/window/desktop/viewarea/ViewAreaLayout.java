@@ -184,7 +184,7 @@ public class ViewAreaLayout extends Layout {
       boundsCenter = new Rectangle(x, y, 0, 0);
       w = computeWidth(viewArea.m_viewStacks[1]);
       boundsCenter.width = w;
-	  
+
       boundsRight = new Rectangle(x, y, 0, 0);
       w = computeWidth(viewArea.m_viewStacks[2]);
       boundsRight.width = w;
@@ -234,7 +234,7 @@ public class ViewAreaLayout extends Layout {
         int[] widths = new int[]{boundsLeft.width, boundsSashLeft.width, boundsCenter.width, boundsSashRight.width, boundsRight.width};
         int delta = adjust(width, new float[]{0, 0, 1, 0, 0}, widths, new int[]{-1, -1, -1, -1, -1});
         if (delta != 0) {
-          adjust(width, new float[]{(float) boundsRight.width / (float) totalSize, 0, 0, 0, (float) boundsRight.width / (float) totalSize}, widths, new int[]{-1, -1, -1, -1, -1});
+          adjust(width, new float[]{(float) boundsLeft.width / (float) totalSize, 0, 0, 0, (float) boundsRight.width / (float) totalSize}, widths, new int[]{-1, -1, -1, -1, -1});
         }
         boundsLeft.width = widths[0];
         boundsCenter.width = widths[2];
