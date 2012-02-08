@@ -41,6 +41,7 @@ public class UiDecoration implements IUiDecoration {
   private String m_colorForegroundDisabled;
   private int m_messageBoxMinWidth = 400;
   private int m_messageBoxMinHeight = 100;
+  private int m_toolFormMinWidth = 330;
 
   /**
    * one of SWT.RIGHT SWT.LEFT SWT.CENTER
@@ -256,5 +257,14 @@ public class UiDecoration implements IUiDecoration {
 
   public void setMessageBoxMinHeight(int messageBoxMinHeight) {
     m_messageBoxMinHeight = messageBoxMinHeight;
+  }
+
+  @Override
+  public int getToolFormMinWidth() {
+    return m_toolFormMinWidth;
+  }
+
+  public void setToolFormMinWidth(int toolFormMinWidth) {
+    m_toolFormMinWidth = toolFormMinWidth;
   }
 }
