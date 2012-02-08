@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.batik.bridge.BridgeContext;
 import org.apache.batik.dom.svg.SVGTextContentSupport;
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.scout.commons.DateUtility;
@@ -73,7 +74,7 @@ public abstract class AbstractCalendarDocumentBuilder {
   private final static String COLOR_SELECTED_DAY_BORDER = COLOR_BLACK;
   private final static String COLOR_NOT_SELECTED_DAY_BORDER = CalendarSvgUtility.COLOR_PREFIX + "c0c0c0";
 
-  private final SVGDocument m_doc;
+  private final BridgeContext m_bridgeContext;
 
   private final EventListenerList m_listenerList;
 
@@ -113,7 +114,7 @@ public abstract class AbstractCalendarDocumentBuilder {
     InputStream is = null;
     try {
       is = Activator.getDefault().getBundle().getResource(svgFile).openStream();
-      m_doc = SVGUtility.readSVGDocument(is, true);
+      m_bridgeContext = SVGUtility.readSVGDocumentForGraphicalModification(is);
     }
     catch (Exception e) {
       throw new IllegalArgumentException("Cannot find svg resource '" + svgFile + "'", e);
@@ -138,32 +139,33 @@ public abstract class AbstractCalendarDocumentBuilder {
     m_displayModeLabels = new String[]{ScoutTexts.get("Day"), ScoutTexts.get("WorkWeek"), ScoutTexts.get("Week"), ScoutTexts.get("Month")};
     m_firstDayOfWeek = createCalendar().getFirstDayOfWeek();
 
+    SVGDocument doc = getSVGDocument();
     // get named elements
-    m_elComponentsContainer = m_doc.getElementById("Components");
-    m_elTitle = m_doc.getElementById("Title");
-    m_elLinkMenuContainer = m_doc.getElementById("LinkMenuLayer");
-    m_elMoveNextBig = m_doc.getElementById("nextYear");
-    m_elMoveNextSmall = m_doc.getElementById("nextMonth");
-    m_elMovePrevBig = m_doc.getElementById("prevYear");
-    m_elMovePrevSmall = m_doc.getElementById("prevMonth");
+    m_elComponentsContainer = doc.getElementById("Components");
+    m_elTitle = doc.getElementById("Title");
+    m_elLinkMenuContainer = doc.getElementById("LinkMenuLayer");
+    m_elMoveNextBig = doc.getElementById("nextYear");
+    m_elMoveNextSmall = doc.getElementById("nextMonth");
+    m_elMovePrevBig = doc.getElementById("prevYear");
+    m_elMovePrevSmall = doc.getElementById("prevMonth");
     m_elGridBox = getGridElements("b", getNumWeekdays(), getNumWeeks());
     m_elGridText = getGridElements("t", getNumWeekdays(), getNumWeeks());
-    m_elWeekDayHeadings = new Element[]{m_doc.getElementById("Mo"),
-        m_doc.getElementById("Tu"),
-        m_doc.getElementById("We"),
-        m_doc.getElementById("Th"),
-        m_doc.getElementById("Fr"),
-        m_doc.getElementById("Sa"),
-        m_doc.getElementById("So")};
-    m_elDisplayMode = new Element[]{m_doc.getElementById("displayModeDay"),
-        m_doc.getElementById("displayModeWorkWeek"),
-        m_doc.getElementById("displayModeWeek"),
-        m_doc.getElementById("displayModeMonth")};
-    m_elMenuContainer = m_doc.getElementById("MenuLayer");
+    m_elWeekDayHeadings = new Element[]{doc.getElementById("Mo"),
+        doc.getElementById("Tu"),
+        doc.getElementById("We"),
+        doc.getElementById("Th"),
+        doc.getElementById("Fr"),
+        doc.getElementById("Sa"),
+        doc.getElementById("So")};
+    m_elDisplayMode = new Element[]{doc.getElementById("displayModeDay"),
+        doc.getElementById("displayModeWorkWeek"),
+        doc.getElementById("displayModeWeek"),
+        doc.getElementById("displayModeMonth")};
+    m_elMenuContainer = doc.getElementById("MenuLayer");
     m_elTimeLineGrid = getGridElements("tlg", getNumWeekdays(), NUM_TIME_LINE_ROWS);
     m_elTimeLineTexts = new Element[NUM_TIME_LINE_ROWS];
     for (int i = 0; i < m_elTimeLineTexts.length; i++) {
-      m_elTimeLineTexts[i] = m_doc.getElementById("tlt" + i);
+      m_elTimeLineTexts[i] = doc.getElementById("tlt" + i);
     }
     m_displayModeTextWidth = new float[m_elDisplayMode.length];
 
@@ -330,11 +332,11 @@ public abstract class AbstractCalendarDocumentBuilder {
   }
 
   private void initTimeLineText() {
-    Element early = m_doc.getElementById("tlt0");
+    Element early = getSVGDocument().getElementById("tlt0");
     if (early != null) {
       early.setTextContent(ScoutTexts.get("Calendar_earlier"));
     }
-    Element late = m_doc.getElementById("tlt13");
+    Element late = getSVGDocument().getElementById("tlt13");
     if (late != null) {
       late.setTextContent(ScoutTexts.get("Calendar_later"));
     }
@@ -433,7 +435,7 @@ public abstract class AbstractCalendarDocumentBuilder {
     visitGrid(ret, new IGridVisitor() {
       @Override
       public void visit(Element element, int weekday, int week) {
-        ret[week][weekday] = m_doc.getElementById(idPrefix + weekday + "" + week);
+        ret[week][weekday] = getSVGDocument().getElementById(idPrefix + weekday + "" + week);
       }
     });
     return ret;
@@ -765,7 +767,11 @@ public abstract class AbstractCalendarDocumentBuilder {
   }
 
   public SVGDocument getSVGDocument() {
-    return m_doc;
+    return (SVGDocument) m_bridgeContext.getDocument();
+  }
+
+  public void dispose() {
+    m_bridgeContext.dispose();
   }
 
   public void setNumContextMenus(int numContextMenus) {
@@ -786,7 +792,7 @@ public abstract class AbstractCalendarDocumentBuilder {
     if (getNumContextMenus() > 0) {
       // rectangle
       final float[] rectDimensions = new float[]{/*x=*/536.088f, /*y=*/447.602f,/*w=*/14.912f,/*h=*/14.914f};// dimensions of the context menu box (as defined in the MonthCalendar.svg file)
-      Element rect = m_doc.createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_RECT_TAG);
+      Element rect = getSVGDocument().createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_RECT_TAG);
       rect.setAttribute(SVGConstants.SVG_X_ATTRIBUTE, "" + rectDimensions[0]);
       rect.setAttribute(SVGConstants.SVG_Y_ATTRIBUTE, "" + rectDimensions[1]);
       rect.setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "" + rectDimensions[2]);
@@ -798,7 +804,7 @@ public abstract class AbstractCalendarDocumentBuilder {
 
       // triangle
       final String trianglePoints = "549.525,451.794 543.614,458.496 537.703,451.794";// positions of the 3 corners of the triangle (as defined in the MonthCalendar.svg file)
-      Element triangle = m_doc.createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_POLYGON_TAG);
+      Element triangle = getSVGDocument().createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_POLYGON_TAG);
       triangle.setAttribute(SVGConstants.SVG_POINTS_ATTRIBUTE, trianglePoints);
       m_elMenuContainer.appendChild(triangle);
       SVGUtility.addHyperlink(triangle, LINK_CONTEXT_MENU);

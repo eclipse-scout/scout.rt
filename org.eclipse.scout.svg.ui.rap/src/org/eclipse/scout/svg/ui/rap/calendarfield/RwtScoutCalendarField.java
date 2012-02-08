@@ -82,6 +82,9 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
 
     // release svg documents
     for (int i = 0; i < m_documentBuilders.length; i++) {
+      if (m_documentBuilders[i] != null) {
+        m_documentBuilders[i].dispose();
+      }
       m_documentBuilders[i] = null;
     }
     super.detachScout();
