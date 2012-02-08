@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.eclipse.rwt.widgets.ExternalBrowser;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
+import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -617,11 +619,13 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   //keyStroke handling
+  private static Collection<Integer> fKeyList = Arrays.asList(new Integer[]{SWT.F1, SWT.F2, SWT.F3, SWT.F4, SWT.F5, SWT.F6, SWT.F7, SWT.F8, SWT.F9, SWT.F10, SWT.F11, SWT.F12});
+
   @Override
   public void addGlobalKeyStroke(IRwtKeyStroke stroke, boolean exclusive) {
     boolean internalExclusive = exclusive;
-    //If F5 is set we wan't to have this exclusive to the application, else the browser will reload the page
-    if (SWT.F5 == stroke.getKeyCode()) {
+    //If F1-F12 is set we wan't to have this exclusive to the application, else the browser will reload the page
+    if (ListUtility.containsAny(fKeyList, stroke.getKeyCode())) {
       internalExclusive = true;
     }
     m_keyStrokeManager.addGlobalKeyStroke(stroke, internalExclusive);
