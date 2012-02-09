@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.rap.form.fields;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -266,70 +265,58 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
   protected void setBackgroundFromScout(String scoutColor) {
     if (getUiField() != null) {
       Control fld = getUiField();
-      Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_BACKGROUND);
-      //only set color if scoutColor is not null/empty or if color was set one time
-      if (StringUtility.hasText(scoutColor) || initCol != null) {
-        if (fld.getData(CLIENT_PROP_INITIAL_BACKGROUND) == null) {
-          initCol = fld.getBackground();
-          fld.setData(CLIENT_PROP_INITIAL_BACKGROUND, initCol);
-        }
-        Color c = getUiEnvironment().getColor(scoutColor);
-        if (getMandatoryFieldBackgroundColor() != null) {
-          c = getMandatoryFieldBackgroundColor();
-        }
-        if (c == null) {
-          c = initCol;
-          //if field is reseted to init color data can be reseted to null
-          fld.setData(CLIENT_PROP_INITIAL_BACKGROUND, null);
-        }
-        fld.setBackground(c);
+      if (fld.getData(CLIENT_PROP_INITIAL_BACKGROUND) == null) {
+        fld.setData(CLIENT_PROP_INITIAL_BACKGROUND, fld.getBackground());
       }
+      Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_BACKGROUND);
+      Color c = getUiEnvironment().getColor(scoutColor);
+      if (getMandatoryFieldBackgroundColor() != null) {
+        c = getMandatoryFieldBackgroundColor();
+      }
+      if (c == null) {
+        c = initCol;
+      }
+      fld.setBackground(c);
     }
   }
 
   protected void setForegroundFromScout(String scoutColor) {
     if (getUiField() != null) {
       Control fld = getUiField();
-      Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_FOREGROUND);
-      //only set color if scoutColor is not null/empty or if color was set one time
-      if (StringUtility.hasText(scoutColor) || initCol != null) {
-        if (initCol == null) {
-          initCol = fld.getForeground();
-          fld.setData(CLIENT_PROP_INITIAL_FOREGROUND, initCol);
-        }
-        Color c = getUiEnvironment().getColor(scoutColor);
-        if (c == null) {
-          c = initCol;
-          //if field is reseted to init color data can be reseted to null
-          fld.setData(CLIENT_PROP_INITIAL_FOREGROUND, null);
-        }
-        fld.setForeground(c);
+      if (fld.getData(CLIENT_PROP_INITIAL_FOREGROUND) == null) {
+        fld.setData(CLIENT_PROP_INITIAL_FOREGROUND, fld.getForeground());
       }
+      Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_FOREGROUND);
+      Color c = getUiEnvironment().getColor(scoutColor);
+      if (c == null) {
+        c = initCol;
+      }
+      else {
+        System.out.println("RwtScoutFieldComposite.setForegroundFromScout()" + scoutColor);
+      }
+      fld.setForeground(c);
     }
   }
 
   protected void setFontFromScout(FontSpec scoutFont) {
     if (getUiField() != null) {
       Control fld = getUiField();
+      Font currentFont = fld.getFont();
+      if (fld.getData(CLIENT_PROP_INITIAL_FONT) == null) {
+        fld.setData(CLIENT_PROP_INITIAL_FONT, currentFont);
+      }
       Font initFont = (Font) fld.getData(CLIENT_PROP_INITIAL_FONT);
-      //only set color if scoutColor is not null/empty or if color was set one time
-      if (scoutFont != null || initFont != null) {
-        if (fld.getData(CLIENT_PROP_INITIAL_FONT) == null) {
-          initFont = fld.getFont();
-          fld.setData(CLIENT_PROP_INITIAL_FONT, initFont);
-        }
-        Font f = getUiEnvironment().getFont(scoutFont, initFont);
-        if (f == null) {
-          f = initFont;
-        }
-        if (initFont == null || !initFont.equals(f)) {
-          // only set the new font if it is different to the current one
-          fld.setFont(f);
-        }
+      Font f = getUiEnvironment().getFont(scoutFont, initFont);
+      if (f == null) {
+        f = initFont;
       }
-      if (isCreated()) {
-        RwtLayoutUtility.invalidateLayout(getUiEnvironment(), getUiContainer());
+      if (currentFont == null || !currentFont.equals(f)) {
+        // only set the new font if it is different to the current one
+        fld.setFont(f);
       }
+    }
+    if (isCreated()) {
+      RwtLayoutUtility.invalidateLayout(getUiEnvironment(), getUiContainer());
     }
   }
 
