@@ -291,9 +291,6 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
       if (c == null) {
         c = initCol;
       }
-      else {
-        System.out.println("RwtScoutFieldComposite.setForegroundFromScout()" + scoutColor);
-      }
       fld.setForeground(c);
     }
   }
