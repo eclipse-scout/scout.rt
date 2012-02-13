@@ -54,6 +54,10 @@ public class DesktopEvent extends EventObject {
 	 */
   public static final int TYPE_PRINTED = 901;
   public static final int TYPE_FILE_CHOOSER_ADDED = 910;
+  /**
+   * Creates and opens a browser window to download a file or open an url via user interface (only in web ui), see
+   * {@link IDesktop#openBrowserWindow(String)}
+   */
   public static final int TYPE_OPEN_BROWSER_WINDOW = 920;
   /**
    * Send a broadcast event to find the {@link IFormField} that owns the focus
