@@ -49,10 +49,15 @@ public class RwtScoutFileChooser {
     File[] files = null;
     try {
       if (getScoutFileChooser().isFolderMode()) {
-        files = showDirecoryDialog();
+        LOG.error("IFileChooserField.isFolderMode() == true is not possible in RAP");
+        files = new File[0];
+      }
+      else if (!getScoutFileChooser().isTypeLoad()) {
+        LOG.error("IFileChooserField.isTypeLoad() == false (SAVE) is not possible in RAP, use IFileChooserField.setSaveAsContent instead");
+        files = new File[0];
       }
       else {
-        files = showFileDialog();
+        files = uploadFiles();
       }
     }
     finally {
@@ -67,7 +72,7 @@ public class RwtScoutFileChooser {
     }
   }
 
-  protected File[] showFileDialog() {
+  protected File[] uploadFiles() {
     int style = SWT.NONE;
     if (getScoutFileChooser().isTypeLoad()) {
       style |= SWT.OPEN;
@@ -101,24 +106,6 @@ public class RwtScoutFileChooser {
     else {
       return new File[0];
     }
-  }
-
-  protected File[] showDirecoryDialog() {
-    //XXX rap
-    /*DirectoryDialog dialog = new DirectoryDialog(getParentShell());
-    if (getScoutFileChooser().getDirectory() != null) {
-      dialog.setFilterPath(getScoutFileChooser().getDirectory().getAbsolutePath());
-    }
-    String selectedDirecotry = dialog.open();
-    if (selectedDirecotry != null && selectedDirecotry.length() > 0) {
-      return new File[]{new File(selectedDirecotry)};
-    }
-    else {
-      return new File[0];
-    }
-    */
-    LOG.error("IFileChooserField.isFolderMode() == true is not possible in RAP");
-    return new File[0];
   }
 
   public IFileChooser getScoutFileChooser() {
