@@ -65,8 +65,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ProgressBar;
 
-public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileChooserField> implements IRwtScoutFileChooserField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutFileChooserField.class);
+public class RwtScoutFileUploadField extends RwtScoutValueFieldComposite<IFileChooserField> implements IRwtScoutFileUploadField {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutFileUploadField.class);
 
   private Composite m_fileContainer;
   private IDropDownFileUploadForPatch m_browseButton;
@@ -80,7 +80,7 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
 
   private String m_originalVariant = "";
 
-  public RwtScoutFileChooserField() {
+  public RwtScoutFileUploadField() {
     initializeFileUpload();
   }
 
@@ -398,7 +398,7 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
     private static final long serialVersionUID = 1L;
 
     public P_ContextMenuListener() {
-      super((Control) RwtScoutFileChooserField.this.getUiBrowseButton(), RwtScoutFileChooserField.this.getUiBrowseButton().getParent());
+      super((Control) RwtScoutFileUploadField.this.getUiBrowseButton(), RwtScoutFileUploadField.this.getUiBrowseButton().getParent());
     }
 
     @Override
@@ -423,7 +423,7 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
           scoutMenusRef.set(scoutMenus);
         }
       };
-      JobEx job = RwtScoutFileChooserField.this.getUiEnvironment().invokeScoutLater(t, 1200);
+      JobEx job = RwtScoutFileUploadField.this.getUiEnvironment().invokeScoutLater(t, 1200);
       try {
         job.join(1200);
       }
@@ -433,7 +433,7 @@ public class RwtScoutFileChooserField extends RwtScoutValueFieldComposite<IFileC
       // grab the actions out of the job, when the actions are providden within
       // the scheduled time the popup will be handled.
       if (scoutMenusRef.get() != null) {
-        RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), RwtScoutFileChooserField.this.getUiEnvironment(), m_contextMenu);
+        RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), RwtScoutFileUploadField.this.getUiEnvironment(), m_contextMenu);
       }
     }
   } // end class P_ContextMenuListener

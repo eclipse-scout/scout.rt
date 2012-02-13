@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -774,7 +773,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   @Override
   public void openBrowserWindowFromScout(String path) {
-    String nextId = Long.toString(new Random(this.hashCode()).nextLong());
+    String nextId = UUID.randomUUID().toString();
 
     if ((StringUtility.find(path, "http://") >= 0)
         || (StringUtility.find(path, "https://") >= 0)
@@ -785,7 +784,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       try {
         File file = validatePath(path);
         final RwtScoutDownloadHandler handler = new RwtScoutDownloadHandler(nextId, file, "", file.getName());
-        Shell parentShell = getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS);
+        //do not use an existing shell since this one might disappear before the download completed...
+        Shell parentShell = new Shell();
         parentShell.addDisposeListener(new DisposeListener() {
           private static final long serialVersionUID = 1L;
 
