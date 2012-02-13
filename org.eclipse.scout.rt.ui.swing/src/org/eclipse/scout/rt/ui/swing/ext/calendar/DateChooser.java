@@ -1073,7 +1073,18 @@ public class DateChooser {
   public boolean isWorkDay(Date d) {
     Calendar c = Calendar.getInstance();
     c.setTime(d);
-    return (c.get(Calendar.DAY_OF_WEEK) + 7 - m_firstDayOfWeek) % 7 < m_workDayCount;
+    switch (c.get(Calendar.DAY_OF_WEEK)) {
+      case Calendar.MONDAY:
+      case Calendar.TUESDAY:
+      case Calendar.WEDNESDAY:
+      case Calendar.THURSDAY:
+      case Calendar.FRIDAY: {
+        return true;
+      }
+      default: {
+        return false;
+      }
+    }
   }
 
   public static Date nextDay(Date d) {
