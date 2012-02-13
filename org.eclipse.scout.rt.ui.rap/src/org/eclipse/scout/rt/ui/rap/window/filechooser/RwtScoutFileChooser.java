@@ -53,7 +53,7 @@ public class RwtScoutFileChooser {
         files = new File[0];
       }
       else if (!getScoutFileChooser().isTypeLoad()) {
-        LOG.error("IFileChooserField.isTypeLoad() == false (SAVE) is not possible in RAP, use IFileChooserField.setSaveAsContent instead");
+        LOG.info("IFileChooserField.isTypeLoad() == false (SAVE) is not possible in RAP, doing nothing");
         files = new File[0];
       }
       else {

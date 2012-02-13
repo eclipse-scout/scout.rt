@@ -157,9 +157,9 @@
             modelClass="org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField"
             name="File chooser field"
             scope="default">
-            <uiClass
-              class="org.eclipse.scout.rt.ui.rap.form.fields.filechooserfield.RwtScoutFileChooserField">
-            </uiClass>
+         <factory
+               class="org.eclipse.scout.rt.ui.rap.form.fields.filechooserfield.FileChooserFieldFactory">
+         </factory>
       </formField>
       <formField
             active="true"

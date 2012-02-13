@@ -35,10 +35,10 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
   private RwtScoutDownloadDialog m_sdd;
 
   private RwtScoutDownloadHandler(String id, String contentType, String fileName) {
-    m_requestId = id.replaceAll("\\s", "%20");
+    m_requestId = id;
     m_fileName = fileName;
     m_contentType = contentType;
-    RWT.getServiceManager().registerServiceHandler(id + hashCode(), this);
+    RWT.getServiceManager().registerServiceHandler(m_requestId, this);
   }
 
   public RwtScoutDownloadHandler(String id, File file, String contentType, String fileName) {
@@ -62,7 +62,8 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
     url.append(RWT.getRequest().getServletPath());
     url.append("?");
     url.append(IServiceHandler.REQUEST_PARAM);
-    url.append("=" + m_requestId + hashCode());
+    url.append("=");
+    url.append(m_requestId);
 
     String encodedURL = RWT.getResponse().encodeURL(url.toString());
     return encodedURL;
