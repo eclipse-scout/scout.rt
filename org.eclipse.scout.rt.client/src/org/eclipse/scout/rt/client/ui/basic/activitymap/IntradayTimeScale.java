@@ -29,8 +29,11 @@ public class IntradayTimeScale extends TimeScale {
     //approach in ascending order
     for (int i = 0; i < minCols.length; i++) {
       if (endTime.compareTo(minCols[i].getEndTime()) <= 0) {
-        //special handling: the minCols might contain a gap, i.e. the range is not contiguous.
-        //In that case, check whether the end date is really in that range. Otherwise, ascribe the date to the previous column.
+        // special handling: the minCols might contain a gap, i.e. the range is not contiguous.
+        // In that case, check whether the end date is really in that range. Otherwise, ascribe the date to the previous column.
+        // In this case the endTime has to be compared to the beginTime of the column and if the endTime is smaller or equal than
+        // the beginTime, the previous column is returned. Compared to the super class TimeScale the comparator <= is used here
+        // because the end boundaries of the columns contain the exact values.
         if (endTime.compareTo(minCols[i].getBeginTime()) <= 0) {
           return i > 0 ? i - 1 : null;
         }

@@ -173,6 +173,14 @@ public class TimeScale {
     //approach in ascending order
     for (int i = 0; i < minCols.length; i++) {
       if (endTime.compareTo(minCols[i].getEndTime()) <= 0) {
+        // special handling: the minCols might contain a gap, i.e. the range is not contiguous.
+        // In that case, check whether the end date is really in that range. Otherwise, ascribe the date to the previous column.
+        // In this case the endTime has to be compared to the beginTime of the column and if the endTime is strictly smaller than
+        // the beginTime, the previous column is returned. This is needed because 1ms is subtracted from the end boundary during
+        // construction of MinorColumn.
+        if (endTime.compareTo(minCols[i].getBeginTime()) < 0) {
+          return i > 0 ? i - 1 : null;
+        }
         return i;
       }
     }
