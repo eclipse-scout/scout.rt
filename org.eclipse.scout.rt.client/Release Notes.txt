@@ -752,3 +752,17 @@ Solution:
 If findCodeTypeById returns null for a non-null key, populate cache and retry.
 Migration:
 None
+
+14.02.2012 kle
+Bugzilla 352955
+Problem:
+When using modes IActivityMap.PLANNING_MODE_DAY or IActivityMap.PLANNING_MODE_WEEK
+the selected columns are not handled correctly due to the used values at the end
+boundaries of a MinorColumn object. During construction of a MinorColumn, 1ms is
+automatically subtracted from the end time.
+Solution:
+When fetching the column index for a given end time, it has to be checked if
+the given end time fits into the begin and end time interval of the column.
+Otherwise, the previous column has to be returned.
+Migration:
+None
