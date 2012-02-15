@@ -768,3 +768,17 @@ When the desktop is closed, all open forms are just removed from the view and di
 The forms however are not closed. Hence any clean-up operations must be implemented as desktop listeners.
 This approach still breaks a form's life cycle.
 Migration: None
+
+14.02.2012 kle
+Bugzilla 352955
+Problem:
+When using modes IActivityMap.PLANNING_MODE_DAY or IActivityMap.PLANNING_MODE_WEEK
+the selected columns are not handled correctly due to the used values at the end
+boundaries of a MinorColumn object. During construction of a MinorColumn, 1ms is
+automatically subtracted from the end time.
+Solution:
+When fetching the column index for a given end time, it has to be checked if
+the given end time fits into the begin and end time interval of the column.
+Otherwise, the previous column has to be returned.
+Migration:
+None
