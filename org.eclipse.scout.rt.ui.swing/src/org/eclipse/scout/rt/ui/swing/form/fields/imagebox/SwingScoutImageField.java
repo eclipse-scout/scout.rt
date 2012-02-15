@@ -38,11 +38,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.imagebox.ImageFieldEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.ImageFieldListener;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
+import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
+import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
+import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.imagebox.imageviewer.ImageTransformEvent;
 import org.eclipse.scout.rt.ui.swing.form.fields.imagebox.imageviewer.ImageTransformListener;
@@ -68,7 +71,17 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
     SwingUtility.installDefaultFocusHandling(imageViewer);
     imageViewer.addMouseListener(new P_SwingPopupListener());
     imageViewer.addImageTransformListener(new P_SwingTransformListener());
-    container.add(imageViewer);
+    if (getScoutObject().isScrollBarEnabled() && !getScoutObject().isAutoFit()) {
+      JScrollPaneEx scrollPane = new JScrollPaneEx(imageViewer);
+      scrollPane.putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, LogicalGridDataBuilder.createField(getSwingEnvironment(), getScoutObject().getGridData()));
+      scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+      scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
+      scrollPane.setBorder(null);
+      container.add(scrollPane);
+    }
+    else {
+      container.add(imageViewer);
+    }
     //
     setSwingLabel(label);
     setSwingField(imageViewer);

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -97,6 +97,13 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     return 10;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(360)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredScrollBarEnabled() {
+    return false;
+  }
+
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(400)
   @ConfigPropertyValue("0")
@@ -140,6 +147,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setZoomDelta(getConfiguredZoomDelta());
     setDragType(getConfiguredDragType());
     setDropType(getConfiguredDropType());
+    setScrollBarEnabled(getConfiguredScrollBarEnabled());
     // menus
     Class<? extends IMenu>[] a = getConfiguredMenus();
     m_menus = new IMenu[a != null ? a.length : 0];
@@ -308,6 +316,16 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public void setAutoFit(boolean b) {
     propertySupport.setPropertyBool(PROP_AUTO_FIT, b);
+  }
+  
+  @Override
+  public boolean isScrollBarEnabled() {
+    return propertySupport.getPropertyBool(PROP_SCROLL_BAR_ENABLED);
+  }
+
+  @Override
+  public void setScrollBarEnabled(boolean b) {
+    propertySupport.setPropertyBool(PROP_SCROLL_BAR_ENABLED, b);
   }
 
   @Override

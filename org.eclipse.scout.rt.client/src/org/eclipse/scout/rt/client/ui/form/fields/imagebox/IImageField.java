@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -39,6 +39,7 @@ public interface IImageField extends IFormField, IDNDSupport {
   String PROP_ANALYSIS_RECTANGLE = "analysisRectangle";
   String PROP_AUTO_FIT = "autoFit";
   String PROP_FOCUS_VISIBLE = "focusVisible";
+  String PROP_SCROLL_BAR_ENABLED = "scrollBarEnabled";
 
   String getImageId();
 
@@ -115,4 +116,7 @@ public interface IImageField extends IFormField, IDNDSupport {
 
   IImageFieldUIFacade getUIFacade();
 
+  boolean isScrollBarEnabled();
+
+  void setScrollBarEnabled(boolean b);
 }
