@@ -111,9 +111,6 @@ public class StatementProcessor implements IStatementProcessor {
       IServerSession session = ServerJob.getCurrentSession();
       if (session != null) {
         bases.add(session);
-        // add shared context by default
-        Map<String, Object> shMap = session.getSharedVariableMap();
-        bases.add(shMap);
       }
       m_bindBases = bases.toArray();
       //
