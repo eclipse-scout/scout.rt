@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -67,7 +68,7 @@ public abstract class AbstractServerSession implements IServerSession {
 
   @Override
   public Map<String, Object> getSharedVariableMap() {
-    return m_sharedVariableMap;
+    return Collections.unmodifiableMap(m_sharedVariableMap);
   }
 
   /**
