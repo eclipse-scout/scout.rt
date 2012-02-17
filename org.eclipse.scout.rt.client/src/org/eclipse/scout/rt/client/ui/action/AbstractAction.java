@@ -309,11 +309,11 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   public void setText(String text) {
     if (text != null) {
       propertySupport.setPropertyString(PROP_TEXT, StringUtility.removeMnemonic(text));
-      propertySupport.setPropertyInt(PROP_MNEMONIC, StringUtility.getMnemonic(text));
+      propertySupport.setProperty(PROP_MNEMONIC, StringUtility.getMnemonic(text));
     }
     else {
       propertySupport.setPropertyString(PROP_TEXT, null);
-      propertySupport.setPropertyInt(PROP_MNEMONIC, 0x0);
+      propertySupport.setProperty(PROP_MNEMONIC, (char) 0x0);
     }
   }
 
@@ -541,7 +541,8 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public char getMnemonic() {
-    return (char) propertySupport.getPropertyInt(PROP_MNEMONIC);
+    Character c = (Character) propertySupport.getProperty(PROP_MNEMONIC);
+    return c != null ? c.charValue() : 0x00;
   }
 
   @Override
