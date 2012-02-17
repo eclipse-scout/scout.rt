@@ -200,6 +200,10 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     // void
   }
 
+  protected void setSaveNeededFromScout(boolean modified) {
+    getShell().setModified(modified);
+  }
+
   @Override
   protected final Control createButtonBar(Composite parent) {
     // suppress default eclipse button bar
@@ -319,6 +323,9 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     }
     else if (name.equals(IForm.PROP_MAXIMIZED)) {
       setMaximizedFromScout(((Boolean) newValue).booleanValue());
+    }
+    else if (name.equals(IForm.PROP_SAVE_NEEDED)) {
+      setSaveNeededFromScout(((Boolean) newValue).booleanValue());
     }
   }
 
