@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
@@ -132,14 +133,14 @@ public abstract class AbstractLongColumn extends AbstractColumn<Long> implements
   public NumberFormat getNumberFormat() {
     if (m_fmt == null) {
       if (getFormat() != null) {
-        DecimalFormat x = (DecimalFormat) DecimalFormat.getNumberInstance();
+        DecimalFormat x = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
         x.applyPattern(getFormat());
         x.setMinimumFractionDigits(0);
         x.setMaximumFractionDigits(0);
         m_fmt = x;
       }
       else {
-        m_fmt = NumberFormat.getNumberInstance();
+        m_fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
         m_fmt.setMinimumFractionDigits(0);
         m_fmt.setMaximumFractionDigits(0);
         m_fmt.setGroupingUsed(isGroupingUsed());

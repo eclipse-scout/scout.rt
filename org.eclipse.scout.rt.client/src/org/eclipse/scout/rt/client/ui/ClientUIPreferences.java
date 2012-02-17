@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -72,10 +73,16 @@ public class ClientUIPreferences {
    */
   @Deprecated
   private static final String NLS_LOCALE_ISO = "nls_locale_iso";
+  /**
+   * @deprecated to be removed in release 3.9.0
+   */
+  @Deprecated
   private static final String NLS_LOCALE_LANGUAGE = "locale.language";
+  /**
+   * @deprecated to be removed in release 3.9.0
+   */
+  @Deprecated
   private static final String NLS_LOCALE_COUNTRY = "locale.country";
-
-  private static final Locale HOST_LOCALE = Locale.getDefault();
 
   private final IEclipsePreferences m_env;
 
@@ -659,6 +666,10 @@ public class ClientUIPreferences {
     return null;
   }
 
+  /**
+   * @deprecated use {@link LocaleThreadLocal#get()} or {@link Locale#getDefault()}
+   */
+  @Deprecated
   public Locale getLocale() {
     // >> legacy support. To be removed in release 3.9.0.
     String strLegacy = m_env.get(NLS_LOCALE_ISO, null);
@@ -680,6 +691,10 @@ public class ClientUIPreferences {
     return null;
   }
 
+  /**
+   * @deprecated use {@link LocaleThreadLocal#set(Locale)} or {@link Locale#setDefault(Locale)}
+   */
+  @Deprecated
   public void setLocale(Locale locale) {
     if (locale != null) {
       m_env.put(NLS_LOCALE_LANGUAGE, locale.getLanguage());
@@ -693,11 +708,11 @@ public class ClientUIPreferences {
   }
 
   /**
-   * @return
-   *         the startup locale of the Java Virtual Machine which typically is based on the host environment
+   * @deprecated to be removed in release 3.9.0
    */
+  @Deprecated
   public static Locale getHostLocale() {
-    return HOST_LOCALE;
+    return Locale.getDefault();
   }
 
   public void setDesktopColumnSplits(int[][] splits) {

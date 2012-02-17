@@ -19,6 +19,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -40,7 +41,7 @@ public class TimeChooser {
 
   public TimeChooser(Composite parent) {
     m_container = parent;
-    m_timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+    m_timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleThreadLocal.get());
     //table
     m_table = new Table(m_container, SWT.SINGLE | SWT.V_SCROLL | SWT.FULL_SELECTION);
     m_table.setLinesVisible(true);

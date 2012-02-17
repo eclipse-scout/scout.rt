@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
@@ -171,13 +172,13 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     }
     else {
       if (isHasDate() && !isHasTime()) {
-        df = DateFormat.getDateInstance(DateFormat.MEDIUM);
+        df = DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get());
       }
       else if (!isHasDate() && isHasTime()) {
-        df = DateFormat.getTimeInstance(DateFormat.SHORT);
+        df = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleThreadLocal.get());
       }
       else {
-        df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+        df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, LocaleThreadLocal.get());
       }
       df.setLenient(true);
     }

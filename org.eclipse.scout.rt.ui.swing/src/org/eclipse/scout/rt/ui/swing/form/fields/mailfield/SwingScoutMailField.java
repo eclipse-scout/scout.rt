@@ -24,7 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -314,7 +314,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
         subject = message.getSubject();
         Date received = message.getSentDate();
         if (received != null) {
-          receivedDate = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.FULL, SimpleDateFormat.SHORT).format(received);
+          receivedDate = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(received);
         }
         // addresses
         fromAddresses = message.getFrom();

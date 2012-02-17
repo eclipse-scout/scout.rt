@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -182,7 +183,7 @@ public final class DesktopProfiler {
       synchronized (m_listLock) {
         manageListsWithoutLocking();
         //
-        NumberFormat fmt = NumberFormat.getIntegerInstance();
+        NumberFormat fmt = NumberFormat.getIntegerInstance(LocaleThreadLocal.get());
         out.println("Max memory:   " + fmt.format(Runtime.getRuntime().maxMemory()));
         out.println("Total memory: " + fmt.format(Runtime.getRuntime().totalMemory()));
         out.println("Free memory:  " + fmt.format(Runtime.getRuntime().freeMemory()));

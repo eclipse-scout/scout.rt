@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,7 +53,6 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -332,11 +330,11 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       if (getSubject() == null) {
         throw new SecurityException("/rap request is not authenticated with a Subject");
       }
-      initLocale();
 
       final BooleanHolder newSession = new BooleanHolder(true);
       IClientSession tempClientSession = (IClientSession) RWT.getSessionStore().getAttribute(IClientSession.class.getName());
       if (tempClientSession == null || !tempClientSession.isActive()) {
+        LocaleThreadLocal.set(RwtUtility.getBrowserInfo().getLocale());
         tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString());
         RWT.getSessionStore().setAttribute(IClientSession.class.getName(), tempClientSession);
         RWT.getSessionStore().addSessionStoreListener(m_sessionStoreListener);
@@ -1323,16 +1321,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   public void checkThread() {
     if (!(getDisplay().getThread() == Thread.currentThread())) {
       throw new IllegalStateException("Must be called in rwt thread");
-    }
-  }
-
-  protected void initLocale() {
-    Locale locale = RwtUtility.getBrowserInfo().getLocale();
-    if (locale == null) {
-      locale = ClientUIPreferences.getInstance().getLocale();
-    }
-    if (locale != null) {
-      LocaleThreadLocal.set(locale);
     }
   }
 

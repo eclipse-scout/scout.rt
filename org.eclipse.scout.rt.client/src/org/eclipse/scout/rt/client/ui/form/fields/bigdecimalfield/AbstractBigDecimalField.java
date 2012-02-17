@@ -15,6 +15,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
@@ -85,7 +86,7 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
       if (p.getErrorIndex() >= 0 || p.getIndex() != text.length()) {
         throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
       }
-      NumberFormat fmt = NumberFormat.getNumberInstance();
+      NumberFormat fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
       /* add/preserve fraction digits for multiplier */
       int npc = ("" + Math.abs(getMultiplier())).length() - 1;
       fmt.setMaximumFractionDigits(getFractionDigits() + npc);

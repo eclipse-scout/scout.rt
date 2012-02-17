@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.eclipse.scout.commons.LocaleThreadLocal;
 
 /**
  * This class is Thread safe
@@ -77,7 +79,7 @@ public final class EventListenerProfiler {
       EventListenerSnapshot snapshot = new EventListenerSnapshot();
       synchronized (m_sourcesLock) {
         manageNoLock();
-        NumberFormat fmt = NumberFormat.getIntegerInstance();
+        NumberFormat fmt = NumberFormat.getIntegerInstance(LocaleThreadLocal.get());
         out.println("Max memory:   " + fmt.format(Runtime.getRuntime().maxMemory()));
         out.println("Total memory: " + fmt.format(Runtime.getRuntime().totalMemory()));
         out.println("Free memory:  " + fmt.format(Runtime.getRuntime().freeMemory()));
