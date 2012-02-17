@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -55,7 +55,7 @@ public class SwtScoutSplitBox extends SwtScoutFieldComposite<ISplitBox> implemen
     if (!StringUtility.isNullOrEmpty(propName)) {
       if (getScoutObject().isCacheSplitterPosition()) {
         try {
-          a = ClientUIPreferences.getInstance().getPropertyIntArray(propName);
+          a = ClientUIPreferences.getInstance(getEnvironment().getClientSession()).getPropertyIntArray(propName);
         }
         catch (Throwable t) {
           // nop
@@ -88,10 +88,10 @@ public class SwtScoutSplitBox extends SwtScoutFieldComposite<ISplitBox> implemen
     if (!StringUtility.isNullOrEmpty(propName)) {
       if (getScoutObject().isCacheSplitterPosition()) {
         int[] weights = getSwtContainer().getWeights();
-        ClientUIPreferences.getInstance().setPropertyIntArray(propName, weights);
+        ClientUIPreferences.getInstance(getEnvironment().getClientSession()).setPropertyIntArray(propName, weights);
       }
       else {
-        ClientUIPreferences.getInstance().setPropertyIntArray(propName, null);
+        ClientUIPreferences.getInstance(getEnvironment().getClientSession()).setPropertyIntArray(propName, null);
       }
     }
   }

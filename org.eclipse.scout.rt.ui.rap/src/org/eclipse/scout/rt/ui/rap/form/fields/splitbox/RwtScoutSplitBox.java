@@ -54,7 +54,7 @@ public class RwtScoutSplitBox extends RwtScoutFieldComposite<ISplitBox> implemen
     if (!StringUtility.isNullOrEmpty(propName)) {
       if (getScoutObject().isCacheSplitterPosition()) {
         try {
-          a = ClientUIPreferences.getInstance().getPropertyIntArray(propName);
+          a = ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).getPropertyIntArray(propName);
         }
         catch (Throwable t) {
           // nop
@@ -87,10 +87,10 @@ public class RwtScoutSplitBox extends RwtScoutFieldComposite<ISplitBox> implemen
     if (!StringUtility.isNullOrEmpty(propName)) {
       if (getScoutObject().isCacheSplitterPosition()) {
         int[] weights = getUiContainer().getWeights();
-        ClientUIPreferences.getInstance().setPropertyIntArray(propName, weights);
+        ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).setPropertyIntArray(propName, weights);
       }
       else {
-        ClientUIPreferences.getInstance().setPropertyIntArray(propName, null);
+        ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).setPropertyIntArray(propName, null);
       }
     }
   }

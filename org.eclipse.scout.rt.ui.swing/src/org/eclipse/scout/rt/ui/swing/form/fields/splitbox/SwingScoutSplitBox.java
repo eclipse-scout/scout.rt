@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -72,7 +72,7 @@ public class SwingScoutSplitBox extends SwingScoutFieldComposite<ISplitBox> impl
     if (!StringUtility.isNullOrEmpty(propName)) {
       if (getScoutObject().isCacheSplitterPosition()) {
         try {
-          a = ClientUIPreferences.getInstance().getPropertyIntArray(propName);
+          a = ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()).getPropertyIntArray(propName);
         }
         catch (Throwable t) {
           // nop
@@ -128,11 +128,11 @@ public class SwingScoutSplitBox extends SwingScoutFieldComposite<ISplitBox> impl
         if (total > 32) {
           int left = getSwingContainer().getDividerLocation();
           int right = total - left;
-          ClientUIPreferences.getInstance().setPropertyIntArray(propName, new int[]{left, right});
+          ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()).setPropertyIntArray(propName, new int[]{left, right});
         }
       }
       else {
-        ClientUIPreferences.getInstance().setPropertyIntArray(propName, null);
+        ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()).setPropertyIntArray(propName, null);
       }
     }
   }

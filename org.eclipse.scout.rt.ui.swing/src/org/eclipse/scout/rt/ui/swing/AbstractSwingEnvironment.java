@@ -1182,7 +1182,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
     @Override
     public Rectangle getBounds() {
-      Rectangle r = ClientUIPreferences.getInstance().getFormBounds(m_form);
+      Rectangle r = ClientUIPreferences.getInstance(getScoutSession()).getFormBounds(m_form);
       // ticket 78127: validate on screen to avoid out-of-screen placement
       if (r != null) {
         r = SwingUtility.validateRectangleOnScreen(r, false, false);
@@ -1192,7 +1192,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
     @Override
     public void storeBounds(Rectangle bounds) {
-      ClientUIPreferences.getInstance().setFormBounds(m_form, bounds);
+      ClientUIPreferences.getInstance(getScoutSession()).setFormBounds(m_form, bounds);
     }
   }
 }

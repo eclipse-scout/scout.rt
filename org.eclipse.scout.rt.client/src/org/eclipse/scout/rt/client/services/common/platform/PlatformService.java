@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,34 +21,28 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.service.AbstractService;
-import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
 @Priority(-1)
 public class PlatformService extends AbstractService implements IPlatformService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PlatformService.class);
 
-  private IEclipsePreferences m_props = null;
-
-  private Bundle getBundle() {
-    return ClientSyncJob.getCurrentSession().getBundle();
-  }
-
   @Override
   public boolean setProperty(String key, String value) {
-    if (m_props == null) {
-      m_props = new UserScope().getNode(getBundle().getSymbolicName());
-    }
-    String oldValue = m_props.get(key, null);
+    IClientSession session = ClientSyncJob.getCurrentSession();
+    String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
+    IEclipsePreferences prefs = new UserScope().getNode(id);
+    String oldValue = prefs.get(key, null);
     if (value == null) {
-      m_props.remove(key);
+      prefs.remove(key);
     }
     else {
-      m_props.put(key, value);
+      prefs.put(key, value);
       try {
-        m_props.flush();
+        prefs.flush();
       }
       catch (BackingStoreException e) {
         LOG.warn("storing property: " + key + "=" + value, e);
@@ -59,10 +53,10 @@ public class PlatformService extends AbstractService implements IPlatformService
 
   @Override
   public String getProperty(String key, String def) {
-    if (m_props == null) {
-      m_props = new UserScope().getNode(getBundle().getSymbolicName());
-    }
-    return m_props.get(key, def);
+    IClientSession session = ClientSyncJob.getCurrentSession();
+    String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
+    IEclipsePreferences prefs = new UserScope().getNode(id);
+    return prefs.get(key, def);
   }
 
   @Override
@@ -86,7 +80,8 @@ public class PlatformService extends AbstractService implements IPlatformService
       curPath = FileChooser.getCurrentDirectory();
       if (curPath == null) {
         try {
-          curPath = Platform.getStateLocation(getBundle()).toFile().getCanonicalPath();
+          IClientSession session = ClientSyncJob.getCurrentSession();
+          curPath = Platform.getStateLocation(session.getBundle()).toFile().getCanonicalPath();
         }
         catch (IOException io) {
           // throw new
