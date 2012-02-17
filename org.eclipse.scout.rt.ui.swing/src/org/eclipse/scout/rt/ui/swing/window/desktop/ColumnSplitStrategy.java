@@ -29,13 +29,15 @@ public class ColumnSplitStrategy implements IMultiSplitStrategy {
   protected int[][] m_location;
   protected int[][] m_definedLocation;
   private Job m_storageJob;
+  private final ClientUIPreferences m_prefs;
 
-  public ColumnSplitStrategy() {
+  public ColumnSplitStrategy(ClientUIPreferences prefs) {
+    m_prefs = prefs;
     m_span = 1000;
     m_definedLocation = new int[][]{new int[]{0, 250, 750, 1000}, new int[]{0, 250, 750, 1000}, new int[]{0, 250, 750, 1000}};
     int[][] saved = null;
     try {
-      saved = validateImportedLocations(ClientUIPreferences.getInstance().getDesktopColumnSplits(3, 4));
+      saved = validateImportedLocations(m_prefs.getDesktopColumnSplits(3, 4));
     }
     catch (Throwable t) {
       //nop
@@ -153,7 +155,7 @@ public class ColumnSplitStrategy implements IMultiSplitStrategy {
       m_storageJob = new Job("Store column splits") {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
-          ClientUIPreferences.getInstance().setDesktopColumnSplits(m_definedLocation);
+          m_prefs.setDesktopColumnSplits(m_definedLocation);
           return Status.OK_STATUS;
         }
       };

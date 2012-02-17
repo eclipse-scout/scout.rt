@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.rt.client.BlockingCondition;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -99,13 +100,15 @@ public class FileChooser implements IFileChooser {
   }
 
   public static String getCurrentDirectory() {
-    String id = ClientSyncJob.getCurrentSession().getBundle().getSymbolicName();
+    IClientSession session = ClientSyncJob.getCurrentSession();
+    String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
     IEclipsePreferences props = new UserScope().getNode(id);
     return props.get("current-dir", null);
   }
 
   public static void setCurrentDirectory(String dir) {
-    String id = ClientSyncJob.getCurrentSession().getBundle().getSymbolicName();
+    IClientSession session = ClientSyncJob.getCurrentSession();
+    String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
     IEclipsePreferences props = new UserScope().getNode(id);
     props.put("current-dir", dir);
   }

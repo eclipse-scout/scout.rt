@@ -21,6 +21,7 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -138,7 +139,7 @@ public class SwingScoutDesktop extends SwingScoutComposite<IDesktop> implements 
   }
 
   protected IMultiSplitStrategy createMultiSplitStrategy() {
-    return new ColumnSplitStrategy();
+    return new ColumnSplitStrategy(ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()));
   }
 
   /*

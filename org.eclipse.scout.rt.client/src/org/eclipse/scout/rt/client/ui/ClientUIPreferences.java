@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
@@ -27,7 +28,10 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
 import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
-import org.eclipse.scout.commons.prefs.UserScope;
+import org.eclipse.scout.rt.client.ClientAsyncJob;
+import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.IUniqueColumnFilterIdentifier;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -40,18 +44,32 @@ import org.osgi.framework.Bundle;
 /**
  * UI model customization wrapping a {@link org.eclipse.core.runtime.Preferences} object with its location Stored
  * in user area.
+ * <p>
+ * Warning: Only use this class within a ClientJob with an {@link IClientSession}.
+ * <p>
+ * Calling from outside a {@link IClientSession} {@link ClientJob} will produce a warning. In release 3.9 (TODO) will
+ * produce an error.
  */
 public class ClientUIPreferences {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientUIPreferences.class);
 
   /**
-   * @return a new instance of the {@link ClientUIPreferences} based on the {@link UserScope}s
-   *         {@link IEclipsePreferences}
+   * @return a new instance of the {@link ClientUIPreferences} based on the {@link IUserPreferencesStorageService}
    *         <p>
-   *         Exactly the same as {@link ClientUIPreferences#ClientUIPreferences()}
+   *         Warning: Only use this class within a ClientJob with an {@link IClientSession}.
+   *         <p>
+   *         Calling from outside a {@link IClientSession} {@link ClientJob} will produce a warning. Starting with
+   *         release 3.9 it will fail with an error.
    */
   public static ClientUIPreferences getInstance() {
-    return new ClientUIPreferences();
+    return new ClientUIPreferences(ClientSessionThreadLocal.get());
+  }
+
+  /**
+   * @return a new instance of the {@link ClientUIPreferences} based on the {@link IUserPreferencesStorageService}
+   */
+  public static ClientUIPreferences getInstance(IClientSession session) {
+    return new ClientUIPreferences(session);
   }
 
   private static final String TABLE_CUSTOMIZER_DATA = "table.customizer.data.";
@@ -84,10 +102,23 @@ public class ClientUIPreferences {
   @Deprecated
   private static final String NLS_LOCALE_COUNTRY = "locale.country";
 
-  private final IEclipsePreferences m_env;
+  private final IClientSession m_session;
+  private IEclipsePreferences m_env;
 
+  /**
+   * @deprecated use {@link #getInstance()}
+   */
+  @Deprecated
   public ClientUIPreferences() {
-    m_env = SERVICES.getService(IUserPreferencesStorageService.class).loadPreferences();
+    this(ClientSessionThreadLocal.get());
+  }
+
+  private ClientUIPreferences(IClientSession session) {
+    m_session = session;
+    if (m_session == null) {
+      LOG.error("No scout client session context", new Exception("Calling client preferences from outside a scout client session job"));
+    }
+    load();
   }
 
   public Rectangle getFormBounds(IForm form) {
@@ -732,7 +763,48 @@ public class ClientUIPreferences {
     }
   }
 
+  protected void load() {
+    if (m_session == null || ClientSessionThreadLocal.get() == m_session) {
+      m_env = SERVICES.getService(IUserPreferencesStorageService.class).loadPreferences();
+    }
+    else {
+      ClientAsyncJob job = new ClientAsyncJob("Load user preferences", m_session) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          m_env = SERVICES.getService(IUserPreferencesStorageService.class).loadPreferences();
+        }
+      };
+      job.schedule();
+      try {
+        job.join();
+      }
+      catch (InterruptedException e) {
+        //nop
+      }
+    }
+    if (m_env == null) {
+      throw new IllegalStateException("Could not load preferences in client job");
+    }
+  }
+
   protected void flush() {
-    SERVICES.getService(IUserPreferencesStorageService.class).storePreferences(m_env);
+    if (m_session == null || ClientSessionThreadLocal.get() == m_session) {
+      SERVICES.getService(IUserPreferencesStorageService.class).storePreferences(m_env);
+    }
+    else {
+      ClientAsyncJob job = new ClientAsyncJob("Load user preferences", m_session) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          SERVICES.getService(IUserPreferencesStorageService.class).storePreferences(m_env);
+        }
+      };
+      job.schedule();
+      try {
+        job.join();
+      }
+      catch (InterruptedException e) {
+        //nop
+      }
+    }
   }
 }

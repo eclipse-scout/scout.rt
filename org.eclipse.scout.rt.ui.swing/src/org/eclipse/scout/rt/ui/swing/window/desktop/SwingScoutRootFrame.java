@@ -176,11 +176,12 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
         }
       });
       // restore bounds and maximization
-      Rectangle r = SwingUtility.createRectangle(ClientUIPreferences.getInstance().getApplicationWindowBounds());
+      ClientUIPreferences prefs = ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession());
+      Rectangle r = SwingUtility.createRectangle(prefs.getApplicationWindowBounds());
       if (r != null) {
         r = SwingUtility.validateRectangleOnScreen(r, false, false);
       }
-      boolean maximized = ClientUIPreferences.getInstance().getApplicationWindowMaximized();
+      boolean maximized = prefs.getApplicationWindowMaximized();
       //
       if (r == null) {
         r = SwingUtility.getFullScreenBoundsFor(new Rectangle(0, 0, 1, 1), false);
@@ -390,7 +391,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
       }
     }
     // </bsh>
-    ClientUIPreferences.getInstance().setApplicationWindowPreferences(r != null ? new BoundsSpec(r.x, r.y, r.width, r.height) : null, maximized);
+    ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()).setApplicationWindowPreferences(r != null ? new BoundsSpec(r.x, r.y, r.width, r.height) : null, maximized);
     // notify Scout
     Runnable t = new Runnable() {
       @Override
