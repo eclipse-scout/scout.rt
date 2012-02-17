@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
@@ -181,14 +182,14 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractValu
   protected NumberFormat createNumberFormat() {
     NumberFormat fmt = null;
     if (getFormat() != null) {
-      DecimalFormat x = (DecimalFormat) DecimalFormat.getNumberInstance();
+      DecimalFormat x = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
       x.applyPattern(getFormat());
       x.setMinimumFractionDigits(0);
       x.setMaximumFractionDigits(0);
       fmt = x;
     }
     else {
-      fmt = NumberFormat.getNumberInstance();
+      fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
       fmt.setMinimumFractionDigits(0);
       fmt.setMaximumFractionDigits(0);
       fmt.setGroupingUsed(isGroupingUsed());

@@ -29,14 +29,15 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.scout.commons.LocaleUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
 import org.eclipse.scout.rt.ui.swing.splash.SplashProgressMonitor;
 import org.osgi.framework.BundleContext;
@@ -116,7 +117,7 @@ public abstract class AbstractSwingApplication implements IApplication {
 
   /**
    * This abstract template application creates a JAAS subject based on the system property "user.name"
-   * and sets the user language stored in {@link ClientUIPreferences#getLocale()}.
+   * and supports for initializing the {@link Locale} in {@link #execInitLocale()}
    * <p>
    * The start is then delegated to {@link #startInSubject(IApplicationContext)}
    * <p>
@@ -153,7 +154,7 @@ public abstract class AbstractSwingApplication implements IApplication {
   }
 
   protected void execInitLocale() {
-    Locale locale = ClientUIPreferences.getInstance().getLocale();
+    Locale locale = LocaleUtility.parse(new UserScope().getNode(Activator.PLUGIN_ID).get("locale", null));
     if (locale != null) {
       Locale.setDefault(locale);
     }

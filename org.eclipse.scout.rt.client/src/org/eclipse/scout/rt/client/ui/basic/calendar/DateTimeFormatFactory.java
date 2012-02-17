@@ -13,25 +13,27 @@ package org.eclipse.scout.rt.client.ui.basic.calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
+
 public class DateTimeFormatFactory {
 
   public DateTimeFormatFactory() {
   }
 
   public DateFormat getDayMonthYear(int style) {
-    return DateFormat.getDateInstance(style);
+    return DateFormat.getDateInstance(style, LocaleThreadLocal.get());
   }
 
   public DateFormat getHourMinute() {
-    return DateFormat.getTimeInstance(DateFormat.SHORT);
+    return DateFormat.getTimeInstance(DateFormat.SHORT, LocaleThreadLocal.get());
   }
 
   public DateFormat getHourMinuteSecond() {
-    return DateFormat.getTimeInstance(DateFormat.MEDIUM);
+    return DateFormat.getTimeInstance(DateFormat.MEDIUM, LocaleThreadLocal.get());
   }
 
   public DateFormat getDayMonthYearHourMinuteSecond(int dateStyle, int timeStyle) {
-    return DateFormat.getDateTimeInstance(dateStyle, timeStyle);
+    return DateFormat.getDateTimeInstance(dateStyle, timeStyle, LocaleThreadLocal.get());
   }
 
   /**
