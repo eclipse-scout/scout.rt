@@ -557,7 +557,10 @@ public final class BookmarkUtility {
         for (ITableRow row : table.getRows()) {
           CompositeObject testPk = new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues()));
           if (selectionSet.contains(testPk)) {
-            rowList.add(row);
+            //row must not be filtered out
+            if (row.isFilterAccepted()) {
+              rowList.add(row);
+            }
           }
         }
         if (rowList.size() > 0) {
