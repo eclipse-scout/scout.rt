@@ -40,7 +40,7 @@ public class TextEx extends Text {
   public boolean setFocus() {
     boolean editable = getEditable();
     if (editable) {
-      super.setFocus();
+      editable = super.setFocus();
     }
     return editable;
   }

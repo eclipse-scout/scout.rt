@@ -25,8 +25,6 @@ import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
@@ -75,7 +73,8 @@ public class DateChooserDialog extends Dialog {
     super(parentShell);
     m_model = new DatefieldTableModel();
     setDisplayDate(date);
-    setBlockOnOpen(true);
+    setBlockOnOpen(false);
+    create();
   }
 
   public IRwtEnvironment getUiEnvironment(Display display) {
@@ -87,21 +86,15 @@ public class DateChooserDialog extends Dialog {
     m_model.setNavigationDate(date);
   }
 
-  public Date openDateChooser(Control c) {
+  public void openDateChooser(Control c) {
     showDialogFor(c);
+  }
+
+  public Date getReturnDate() {
     return m_returnDate;
   }
 
   public int showDialogFor(Control field) {
-    create();
-    getShell().addShellListener(new ShellAdapter() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void shellDeactivated(ShellEvent e) {
-        close();
-      }
-    });
     // make sure that the popup fit into the application window.
     Rectangle appBounds = field.getDisplay().getBounds();
     Point absPrefPos = field.toDisplay(0, field.getSize().y);
