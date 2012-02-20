@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.TriState;
@@ -684,8 +686,8 @@ public class StatementProcessor implements IStatementProcessor {
     if (statementPlainText) {
       String p = "" + m_currentInputStm;
       ArrayList<SqlBind> bindList = new ArrayList<SqlBind>(m_currentInputBindMap.values());
+      int pos = findNextBind(p, 0);
       int bindIndex = 0;
-      int pos = p.indexOf('?');
       while (pos >= 0 && bindIndex < bindList.size()) {
         SqlBind bind = bindList.get(bindIndex);
         String replacement;
@@ -708,8 +710,8 @@ public class StatementProcessor implements IStatementProcessor {
         replacement = replacement.replace('?', ' ');
         //next
         p = p.substring(0, pos) + replacement + p.substring(pos + 1);
+        pos = findNextBind(p, pos);
         bindIndex++;
-        pos = p.indexOf('?');
       }
       if (buf.length() > 0) {
         buf.append("\n");
@@ -718,6 +720,35 @@ public class StatementProcessor implements IStatementProcessor {
       buf.append(SqlFormatter.wellform(p).trim());
     }
     return buf.toString();
+  }
+
+  private static final Pattern TEXT_SECTION_PATTERN = Pattern.compile("'([^']|'')*'", Pattern.DOTALL);
+
+  private static int findNextBind(String s, int start) {
+    if (s == null || start < 0 || start >= s.length()) {
+      return -1;
+    }
+    int candidate = s.indexOf('?', start);
+    if (candidate < 0) {
+      return -1;
+    }
+    Matcher red = TEXT_SECTION_PATTERN.matcher(s);
+    while (red.find()) {
+      if (candidate < red.start()) {
+        //outside red section
+        return candidate;
+      }
+      if (candidate >= red.start() && candidate < red.end()) {
+        //inside red section, find next candidate outside red section
+        candidate = s.indexOf('?', red.end());
+        if (candidate < 0) {
+          return -1;
+        }
+        //got next candidate after red section
+      }
+      //continue with next red section
+    }
+    return candidate;
   }
 
   protected void dump() {
