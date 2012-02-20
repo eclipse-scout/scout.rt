@@ -1434,29 +1434,13 @@ Label.tableStatus_error {
   color: #CC0000;
 }
 
-TableItem {
-  background-color: transparent;
-  color: inherit;
-  text-decoration: none;
-}
-
-TableItem:selected {
-  color: inherit;
-  background-color: #e5f3fe;
-}
-
-TableItem:selected:unfocused {
-  color: inherit;
-  background-color: #e5f3fe;
-}
-
 TableColumn {
+  font: bold 12px Arial, Helvetica, sans-serif;
   background-color: #ffffff;
   padding: 9px 4px 5px 4px;
   background-image: none;
   color: #000000;
   border-bottom: 1px solid #e1efec;
-  font: bold 12px Arial, Helvetica, sans-serif;
   /* XXX hstaudacher we need to theme the column separator when bug 347771 is fixed */
 }
 
@@ -1468,6 +1452,26 @@ TableColumn.customDisabled {
 TableColumn:hover {
   background-image: none;
   border-bottom: 1px solid #e1efec;
+}
+
+TableItem {
+  background-color: transparent;
+  color: inherit;
+  text-decoration: none;
+}
+
+TableItem:hover {
+  background-color: #f1f8fe;
+}
+
+TableItem:selected {
+  color: inherit;
+  background-color: #e5f3fe;
+}
+
+TableItem:selected:unfocused {
+  color: inherit;
+  background-color: #e5f3fe;
 }
 
 TableColumn-SortIndicator {
