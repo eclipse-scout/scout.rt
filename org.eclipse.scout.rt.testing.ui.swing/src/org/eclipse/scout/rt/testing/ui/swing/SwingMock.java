@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.testing.ui.swing;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
@@ -56,6 +57,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 import org.eclipse.scout.testing.client.IGuiMock;
@@ -510,6 +512,22 @@ public class SwingMock implements IGuiMock {
   }
 
   @Override
+  public FieldState getScoutFieldContainerState(String name) {
+    final JComponent c = waitForScoutField(name);
+    return syncExec(new MockRunnable<FieldState>() {
+      @Override
+      public FieldState run() throws Throwable {
+        ISwingScoutComposite swingScoutComposite = SwingScoutComposite.getCompositeOnWidget(c);
+        if (swingScoutComposite == null) {
+          return null;
+        }
+
+        return getFieldStateInternal(swingScoutComposite.getSwingContainer());
+      }
+    });
+  }
+
+  @Override
   public List<FieldState> getFieldStates(final FieldType type) {
     return syncExec(new MockRunnable<List<FieldState>>() {
       @Override
@@ -571,6 +589,15 @@ public class SwingMock implements IGuiMock {
     gotoPoint(x2, y2);
     m_bot.releaseLeft();
     waitForIdle();
+  }
+
+  @Override
+  public void dragWindowRightBorder(WindowState windowState, int pixelToMoveOnX) {
+    int borderSize = 2;
+
+    int xPos = windowState.x + windowState.width + borderSize;
+    int yPos = windowState.y + windowState.height / 2;
+    drag(xPos, yPos, xPos + pixelToMoveOnX, yPos);
   }
 
   @Override
@@ -655,7 +682,7 @@ public class SwingMock implements IGuiMock {
     return null;
   }
 
-  protected FieldState getFieldStateInternal(JComponent c) {
+  protected FieldState getFieldStateInternal(Container c) {
     FieldState state = new FieldState();
     //type
     state.type = getFieldTypeOf(c);
@@ -973,14 +1000,15 @@ public class SwingMock implements IGuiMock {
     return parents;
   }
 
-  protected FieldType getFieldTypeOf(JComponent c) {
+  protected FieldType getFieldTypeOf(Container c) {
     if (c == null) {
       return null;
     }
     if (!c.isShowing()) {
       return null;
     }
-    if (c.getVisibleRect().isEmpty()) {
+
+    if (c instanceof JComponent && ((JComponent) c).getVisibleRect().isEmpty()) {
       return null;
     }
     //
@@ -1013,7 +1041,7 @@ public class SwingMock implements IGuiMock {
     return null;
   }
 
-  protected String getScoutNameOf(JComponent c) {
+  protected String getScoutNameOf(Container c) {
     IPropertyObserver scoutObject = SwingScoutComposite.getScoutModelOnWidget(c);
     if (scoutObject != null) {
       return scoutObject.getClass().getName();

@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
+import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.ext.DropDownButton;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
@@ -264,6 +265,22 @@ public class SwtMock implements IGuiMock {
       @Override
       public FieldState run() throws Throwable {
         return getFieldStateInternal(c);
+      }
+    });
+  }
+
+  @Override
+  public FieldState getScoutFieldContainerState(String name) {
+    final Control c = waitForScoutField(name);
+    return syncExec(new MockRunnable<FieldState>() {
+      @Override
+      public FieldState run() throws Throwable {
+        ISwtScoutComposite swtScoutComposite = SwtScoutComposite.getCompositeOnWidget(c);
+        if (swtScoutComposite == null) {
+          return null;
+        }
+
+        return getFieldStateInternal(swtScoutComposite.getSwtContainer());
       }
     });
   }
@@ -626,6 +643,15 @@ public class SwtMock implements IGuiMock {
     gotoPoint(x2, y2);
     m_bot.releaseLeft();
     waitForIdle();
+  }
+
+  @Override
+  public void dragWindowRightBorder(WindowState windowState, int pixelToMoveOnX) {
+    int borderSize = 4;
+
+    int xPos = windowState.x + windowState.width + borderSize;
+    int yPos = windowState.y + windowState.height / 2;
+    drag(xPos, yPos, xPos + pixelToMoveOnX, yPos);
   }
 
   @Override

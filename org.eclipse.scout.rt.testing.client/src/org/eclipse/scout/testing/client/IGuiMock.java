@@ -170,6 +170,8 @@ public interface IGuiMock {
    */
   FieldState getScoutFieldState(String name);
 
+  FieldState getScoutFieldContainerState(String name);
+
   /**
    * @return all fields af that type (all fileds if type is null)
    */
@@ -214,6 +216,8 @@ public interface IGuiMock {
    * Drag the mouse
    */
   void drag(int x1, int y1, int x2, int y2);
+
+  void dragWindowRightBorder(WindowState windowState, int pixelToMoveOnX);
 
   void pressKey(Key key);
 
