@@ -154,7 +154,7 @@ public abstract class AbstractSwingApplication implements IApplication {
   }
 
   protected void execInitLocale() {
-    Locale locale = LocaleUtility.parse(new UserScope().getNode(Activator.PLUGIN_ID).get("locale", null));
+    Locale locale = LocaleUtility.parse(new UserScope().getNode(org.eclipse.scout.rt.client.Activator.PLUGIN_ID).get("locale", null));
     if (locale != null) {
       Locale.setDefault(locale);
     }
