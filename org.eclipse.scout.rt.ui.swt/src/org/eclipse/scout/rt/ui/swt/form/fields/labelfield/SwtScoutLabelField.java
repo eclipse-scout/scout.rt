@@ -12,20 +12,20 @@ package org.eclipse.scout.rt.ui.swt.form.fields.labelfield;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
-import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.swt.util.VersionUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.osgi.framework.Version;
 
 /**
  * <h3>SwtScoutLabelField</h3> ...
@@ -33,6 +33,7 @@ import org.osgi.framework.Version;
  * @since 1.0.0 28.04.2008
  */
 public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField> implements ISwtScoutLabelField {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutLabelField.class);
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -52,10 +53,7 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
     //Editing the text is never allowed at label fields
     text.setEditable(false);
 
-    //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
-    Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
-    if (frameworkVersion.getMajor() == 3
-        && frameworkVersion.getMinor() <= 5) {
+    if (VersionUtility.isEclipseVersionLessThan35()) {
       //FIXME we need a bugfix for bug 350237
     }
     else {
@@ -69,7 +67,7 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
         setMargins.invoke(text, 0, borderWidth, 0, borderWidth);
       }
       catch (Exception e) {
-        Activator.getDefault().getLog().log(new Status(Status.WARNING, Activator.PLUGIN_ID, "could not access methods 'setWrapIndent' and 'setMargins' on 'StyledText'.", e));
+        LOG.warn("could not access methods 'setWrapIndent' or 'setMargins' on 'StyledText'.", e);
       }
     }
 

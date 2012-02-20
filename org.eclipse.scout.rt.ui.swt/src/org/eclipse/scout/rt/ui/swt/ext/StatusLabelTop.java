@@ -12,17 +12,17 @@ package org.eclipse.scout.rt.ui.swt.ext;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.rt.ui.swt.Activator;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.basic.comp.CLabelEx;
+import org.eclipse.scout.rt.ui.swt.util.VersionUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.osgi.framework.Version;
 
 /**
  * <p>
@@ -35,6 +35,7 @@ import org.osgi.framework.Version;
  * </p>
  */
 public class StatusLabelTop extends StatusLabelEx {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(StatusLabelTop.class);
 
   public StatusLabelTop(Composite parent, int style, ISwtEnvironment environment) {
     super(parent, style, environment);
@@ -94,9 +95,7 @@ public class StatusLabelTop extends StatusLabelEx {
   }
 
   protected void setMarginsOnLabel(StyledText label) {
-    //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
-    Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
-    if (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() <= 5) {
+    if (VersionUtility.isEclipseVersionLessThan35()) {
       return;
     }
 
@@ -106,7 +105,7 @@ public class StatusLabelTop extends StatusLabelEx {
       setWrapIndent.invoke(label, label.getIndent());
     }
     catch (Exception e) {
-      Activator.getDefault().getLog().log(new Status(Status.WARNING, Activator.PLUGIN_ID, "could not access method 'setWrapIndent'  on 'StyledText'.", e));
+      LOG.warn("could not access method 'setWrapIndent' on 'StyledText'.", e);
     }
   }
 }

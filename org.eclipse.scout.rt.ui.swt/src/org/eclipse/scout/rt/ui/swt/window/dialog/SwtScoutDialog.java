@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swt.window.dialog;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Method;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.commons.StringUtility;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
+import org.eclipse.scout.rt.ui.swt.util.VersionUtility;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -201,7 +203,18 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   }
 
   protected void setSaveNeededFromScout(boolean modified) {
-    getShell().setModified(modified);
+    if (VersionUtility.isEclipseVersionLessThan35()) {
+      return;
+    }
+
+    try {
+      //Call getShell().setModified(modified);
+      Method setModified = Shell.class.getMethod("setModified", boolean.class);
+      setModified.invoke(getShell(), modified);
+    }
+    catch (Exception e) {
+      LOG.warn("could not access method 'setModified' on 'Shell'.", e);
+    }
   }
 
   @Override
