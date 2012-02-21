@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.ext.IDropDownButtonForPatch;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
@@ -224,6 +225,22 @@ public class RapMock implements IGuiMock {
       @Override
       public FieldState run() throws Throwable {
         return getFieldStateInternal(c);
+      }
+    });
+  }
+
+  @Override
+  public FieldState getScoutFieldContainerState(String name) {
+    final Control c = waitForScoutField(name);
+    return syncExec(new MockRunnable<FieldState>() {
+      @Override
+      public FieldState run() throws Throwable {
+        IRwtScoutComposite swtScoutComposite = RwtScoutComposite.getCompositeOnWidget(c);
+        if (swtScoutComposite == null) {
+          return null;
+        }
+
+        return getFieldStateInternal(swtScoutComposite.getUiContainer());
       }
     });
   }
@@ -527,6 +544,15 @@ public class RapMock implements IGuiMock {
     m_bot.releaseLeft();
     waitForIdle();
      */
+  }
+
+  @Override
+  public void dragWindowRightBorder(WindowState windowState, int pixelToMoveOnX) {
+    int borderSize = 4;
+
+    int xPos = windowState.x + windowState.width + borderSize;
+    int yPos = windowState.y + windowState.height / 2;
+    drag(xPos, yPos, xPos + pixelToMoveOnX, yPos);
   }
 
   @Override
