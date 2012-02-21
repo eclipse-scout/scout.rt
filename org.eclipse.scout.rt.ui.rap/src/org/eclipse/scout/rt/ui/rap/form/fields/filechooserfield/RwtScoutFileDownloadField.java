@@ -15,6 +15,7 @@ import java.io.File;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
@@ -27,6 +28,8 @@ import org.eclipse.swt.widgets.Label;
 public class RwtScoutFileDownloadField extends RwtScoutValueFieldComposite<IFileChooserField> implements IRwtScoutFileDownloadField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutFileDownloadField.class);
 
+  private Label m_dummyText;
+
   public RwtScoutFileDownloadField() {
   }
 
@@ -35,12 +38,12 @@ public class RwtScoutFileDownloadField extends RwtScoutValueFieldComposite<IFile
     super.initializeUi(parent);
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
-    Label dummyText = getUiEnvironment().getFormToolkit().createLabel(container, "(" + TEXTS.get("Automatic") + ")", SWT.NONE);
-    dummyText.setEnabled(false);
+    m_dummyText = getUiEnvironment().getFormToolkit().createLabel(container, "", SWT.NONE);
+    m_dummyText.setEnabled(false);
 
     setUiContainer(container);
     setUiLabel(label);
-    setUiField(dummyText);
+    setUiField(m_dummyText);
 
     // layout
     container.setLayout(new LogicalGridLayout(1, 0));
@@ -52,28 +55,46 @@ public class RwtScoutFileDownloadField extends RwtScoutValueFieldComposite<IFile
   }
 
   @Override
+  protected void setValueFromScout() {
+    File f = getScoutObject().getValueAsFile();
+    if (f != null) {
+      String name = f.getName();
+      if (name.endsWith(".tmp")) {
+        m_dummyText.setText("(" + TEXTS.get("Automatic") + ")");
+      }
+      else {
+        m_dummyText.setText(name);
+      }
+    }
+    else {
+      m_dummyText.setText("");
+    }
+  }
+
+  @Override
   protected void attachScout() {
     super.attachScout();
-    try {
-      String fileName = getScoutObject().getFileName();
-      if (fileName == null) {
-        String[] exts = getScoutObject().getFileExtensions();
-        fileName = "download." + (exts != null && exts.length > 0 ? exts[0] : "tmp");
-      }
-      final File tempFile = new File(IOUtility.createTempDirectory("download"), fileName);
-      tempFile.deleteOnExit();
-      // notify Scout
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
+    // notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          IFileChooser chooser = getScoutObject().getFileChooser();
+          String fileName = chooser.getFileName();
+          if (fileName == null) {
+            String[] exts = getScoutObject().getFileExtensions();
+            fileName = "download." + (exts != null && exts.length > 0 ? exts[0] : "tmp");
+          }
+          final File tempFile = new File(IOUtility.createTempDirectory("download"), fileName);
+          tempFile.deleteOnExit();
           getScoutObject().getUIFacade().setTextFromUI(tempFile.getAbsolutePath());
         }
-      };
-      getUiEnvironment().invokeScoutLater(t, 0);
-      // end notify
-    }
-    catch (Exception e) {
-      LOG.error("Failed creating temporary file for " + getScoutObject().getClass(), e);
-    }
+        catch (Exception e) {
+          LOG.error("Failed creating temporary file for " + getScoutObject().getClass(), e);
+        }
+      }
+    };
+    getUiEnvironment().invokeScoutLater(t, 0);
+    // end notify
   }
 }
