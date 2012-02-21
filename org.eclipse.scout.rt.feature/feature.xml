@@ -40,11 +40,10 @@ BSI Business Systems Integration AG - initial API and implementation
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.forms"/>
       <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="javax.servlet"/>
-      <import plugin="org.eclipse.swt" version="3.6.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.swt" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.apache.batik.css" version="1.6.0"/>
       <import plugin="org.apache.batik.util.gui" version="1.6.0"/>
       <import plugin="org.apache.batik.util" version="1.6.0"/>
