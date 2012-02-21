@@ -145,6 +145,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
         m_display.sleep();
       }
     }
+    m_display.dispose();
     return 0;
   }
 
