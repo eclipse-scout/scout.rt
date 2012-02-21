@@ -38,8 +38,19 @@ public interface IFileChooserField extends IValueField<String> {
 
   boolean isShowFileExtension();
 
+  /**
+   * Load or Save
+   * <ul>
+   * <li><code>true</code> loads the file from the file system into the application.</li>
+   * <li><code>false</code> saves the file from the application to the file system. Attention: This does not work in
+   * RAP/Web-UI</li>
+   * </ul>
+   */
   void setTypeLoad(boolean b);
 
+  /**
+   * @see #setTypeLoad(boolean)
+   */
   boolean isTypeLoad();
 
   void setFileExtensions(String[] extensions);

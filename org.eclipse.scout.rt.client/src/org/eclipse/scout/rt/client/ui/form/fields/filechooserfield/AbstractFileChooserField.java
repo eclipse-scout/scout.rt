@@ -76,6 +76,14 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     return true;
   }
 
+  /**
+   * Load or Save
+   * <ul>
+   * <li><code>true</code> loads the file from the file system into the application.</li>
+   * <li><code>false</code> saves the file from the application to the file system. Attention: This does not work in
+   * RAP/Web-UI</li>
+   * </ul>
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
   @ConfigPropertyValue("false")

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,6 +22,11 @@ public interface IFileChooser {
 
   /**
    * Load or Save
+   * <ul>
+   * <li><code>true</code> loads the file from the file system into the application.</li>
+   * <li><code>false</code> saves the file from the application to the file system. Attention: This does not work in
+   * RAP/Web-UI</li>
+   * </ul>
    */
   boolean isTypeLoad();
 
