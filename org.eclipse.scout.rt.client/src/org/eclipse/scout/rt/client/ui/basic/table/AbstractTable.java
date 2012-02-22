@@ -3073,23 +3073,27 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       else if (result.length > 1) {
         StringBuffer buf = new StringBuffer();
+        StringBuffer bufTooltip = new StringBuffer();
         for (int i = 0; i < result.length; i++) {
           if (i > 0) {
             if (isMultilineText()) {
               buf.append("\n");
+              bufTooltip.append("\n");
             }
             else {
               buf.append(", ");
+              bufTooltip.append(", ");
             }
           }
           buf.append(result[i].getText());
+          bufTooltip.append(result[i].getTooltipText());
         }
         cell.setText(buf.toString());
-        cell.setTooltipText(null);
+        cell.setTooltipText(bufTooltip.toString());
       }
       else {
         cell.setText("");
-        cell.setTooltipText(null);
+        cell.setTooltipText("");
       }
     }
     finally {
