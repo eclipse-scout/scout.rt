@@ -16,12 +16,10 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.layout.ButtonBarLayout;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.layout.ButtonBarLayoutData;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
-import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -34,7 +32,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -54,7 +51,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
 
   private Label m_imageLabel;
   private Label m_introLabel;
-  private StyledText m_actionText;
+  private Label m_actionLabel;
 
   public RwtScoutMessageBoxDialog(Shell parentShell, IMessageBox scoutObject, IRwtEnvironment uiEnvironment) {
     super(parentShell);
@@ -99,7 +96,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
         if (gridData.exclude != exclude) {
           gridData.exclude = exclude;
           m_imageLabel.getParent().getParent().layout(true, true);
-          // getShell().layout(true);
+          getShell().layout(true);
         }
       }
     }
@@ -110,6 +107,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
       titleText = "";
     }
     getShell().setText(titleText);
+    getShell().layout(true);
   }
 
   protected void setIntroTextFromScout(String introText) {
@@ -123,7 +121,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
       GridData gridData = ((GridData) m_introLabel.getLayoutData());
       if (gridData.exclude != exclude) {
         gridData.exclude = exclude;
-        // getShell().layout(true);
+        getShell().layout(true);
         m_introLabel.getParent().getParent().layout(true, true);
       }
     }
@@ -144,17 +142,17 @@ public class RwtScoutMessageBoxDialog extends Dialog {
       actionText = "";
       exclude = true;
     }
-    m_actionText.setText(actionText);
-    if (m_actionText.getLayoutData() instanceof GridData) {
-      GridData gridData = ((GridData) m_actionText.getLayoutData());
+    m_actionLabel.setText(actionText);
+    if (m_actionLabel.getLayoutData() instanceof GridData) {
+      GridData gridData = ((GridData) m_actionLabel.getLayoutData());
       if (gridData.exclude != exclude) {
         gridData.exclude = exclude;
         getShell().layout(true, true);
-        m_actionText.getParent().getParent().layout(true, true);
+        m_actionLabel.getParent().getParent().layout(true, true);
       }
     }
     // Hide empty labels
-    m_actionText.setVisible(StringUtility.hasText(m_actionText.getText()));
+    m_actionLabel.setVisible(StringUtility.hasText(m_actionLabel.getText()));
   }
 
   protected void dettachScout() {
@@ -168,8 +166,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
   protected Control createDialogArea(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     Control header = createHeaderArea(container);
-    m_actionText = getUiEnvironment().getFormToolkit().createStyledText(container, SWT.READ_ONLY | SWT.V_SCROLL);
-    //XXX rap     m_actionText.setWordWrap(true);
+    m_actionLabel = getUiEnvironment().getFormToolkit().createLabel(container, "", SWT.WRAP | SWT.LEFT);
 
     // layout
     container.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
@@ -183,7 +180,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     header.setLayoutData(gridData);
     gridData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH);
     gridData.horizontalIndent = 5;
-    m_actionText.setLayoutData(gridData);
+    m_actionLabel.setLayoutData(gridData);
 
     // No control in the dialog area should be in the tab list
     container.setTabList(new Control[]{});
@@ -196,7 +193,6 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     m_introLabel = getUiEnvironment().getFormToolkit().createLabel(container, "", SWT.WRAP | SWT.LEFT);
 
     // layout
-
     GridLayout headerLayout = new GridLayout(2, false);
     headerLayout.marginBottom = 7;
     headerLayout.marginWidth = 0;
@@ -260,8 +256,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     // Set default button
     if (defaultButton != null) {
       defaultButton.setFocus();
-      // TODO BSH This does not work - why?
-//      getShell().setDefaultButton(defaultButton);
+      getShell().setDefaultButton(defaultButton);
       final Button fDefaultButton = defaultButton;
       // Press the default button with the ENTER key (workaround)
       m_uiEnvironment.addKeyStroke(getShell(), new RwtKeyStroke(SWT.CR) {
@@ -292,41 +287,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
       }
     });
 
-    if (getScoutObject().getHiddenText() != null) {
-      Button copyButton = createButton(buttonArea, RwtUtility.getNlsText(Display.getCurrent(), "Copy"), null, -1);
-      copyButton.addSelectionListener(new SelectionAdapter() {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          //XXX rap
-          /*
-          Clipboard clipboard = null;
-          try {
-            clipboard = new Clipboard(getEnvironment().getDisplay());
-            String hiddenText = getScoutObject().getHiddenText();
-            if (hiddenText != null) {
-              clipboard.setContents(new Object[]{hiddenText}, new Transfer[]{TextTransfer.getInstance()});
-            }
-          }
-          finally {
-            if (clipboard != null) {
-              clipboard.dispose();
-              clipboard = null;
-            }
-          }
-          */
-        }
-      });
-      ButtonBarLayoutData data = new ButtonBarLayoutData();
-      data.insetTop = inset;
-      data.insetBottom = inset;
-      data.insetRight = inset;
-      copyButton.setLayoutData(data);
-    }
     // layout
-    // i would expect the container to be spaned over the whole dialog area but
-    // ... (SWT)
     GridData gridData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
     buttonArea.setLayoutData(gridData);
 
@@ -369,7 +330,6 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     }
     initializeBounds();
     return super.open();
-
   }
 
   @Override
