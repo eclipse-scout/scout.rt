@@ -305,20 +305,20 @@ public abstract class AbstractSMTPService extends AbstractService implements ISM
 
   protected Session createSession() {
     Properties props = new Properties();
-    props.put("mail.transport.protocol", getProtocol());
-    props.put("mail." + getProtocol() + ".quitwait", false);
+    props.setProperty("mail.transport.protocol", getProtocol());
+    props.setProperty("mail." + getProtocol() + ".quitwait", "false");
     if (!StringUtility.isNullOrEmpty(m_host)) {
-      props.put("mail." + getProtocol() + ".host", m_host);
+      props.setProperty("mail." + getProtocol() + ".host", m_host);
     }
     if (m_port > 0) {
-      props.put("mail." + getProtocol() + ".port", "" + m_port);
+      props.setProperty("mail." + getProtocol() + ".port", "" + m_port);
     }
     if (!StringUtility.isNullOrEmpty(m_username)) {
-      props.put("mail." + getProtocol() + ".user", m_username);
-      props.put("mail." + getProtocol() + ".auth", m_useAuthentication);
+      props.setProperty("mail." + getProtocol() + ".user", m_username);
+      props.setProperty("mail." + getProtocol() + ".auth", "" + m_useAuthentication);
     }
     if (!StringUtility.isNullOrEmpty(getSslProtocols())) {
-      props.put("mail." + getProtocol() + ".ssl.protocols", getSslProtocols());
+      props.setProperty("mail." + getProtocol() + ".ssl.protocols", getSslProtocols());
     }
     return Session.getInstance(props, null);
   }
