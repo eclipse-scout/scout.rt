@@ -14,6 +14,7 @@ import java.security.AccessController;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.security.auth.Subject;
 
@@ -95,7 +96,7 @@ public class PrincipalNameFilter implements IClientNotificationFilter {
     StringBuffer b = new StringBuffer(getClass().getSimpleName());
     b.append("[");
     b.append(m_principalName);
-    b.append(", validUntil=" + new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(m_validUntil)));
+    b.append(", validUntil=" + new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date(m_validUntil)));
     b.append("]");
     return b.toString();
   }

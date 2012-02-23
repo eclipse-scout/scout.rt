@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,17 +13,18 @@ package org.eclipse.scout.rt.shared.services.common.calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class AbstractCalendarItem implements ICalendarItem, java.io.Serializable {
   private static final long serialVersionUID = 1L;
 
   public static final DateFormat getDumpDateFormat() {
-    return new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+    return new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US);
   }
 
   public static final DateFormat getExchangeableDateFormat() {
-    return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US);
   }
 
   private boolean m_exists = true;

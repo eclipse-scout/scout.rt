@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -136,7 +137,7 @@ public final class SqlConnectionPool {
           }
         }
       }// end while
-      // move to busy pool
+       // move to busy pool
       m_idleEntries.remove(candidate);
       candidate.leaseBegin = System.currentTimeMillis();
       candidate.leaseCount++;
@@ -216,7 +217,7 @@ public final class SqlConnectionPool {
   public IServiceInventory getInventory() {
     StringBuffer buf = new StringBuffer();
     synchronized (m_poolLock) {
-      SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS");
+      SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS", Locale.US);
       buf.append("Total connections: " + (m_busyEntries.size() + m_idleEntries.size()));
       buf.append("\n");
       buf.append("Busy: " + m_busyEntries.size());

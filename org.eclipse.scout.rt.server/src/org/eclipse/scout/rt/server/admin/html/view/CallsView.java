@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -107,7 +108,7 @@ public class CallsView extends DefaultView {
 
   private void renderCallRow(HtmlComponent p, int index, final CallInspector call) {
     boolean selected = m_selectedCall != null && (m_selectedCall == call);
-    SimpleDateFormat startFmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    SimpleDateFormat startFmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US);
     String serviceShortName = call.getInfo().getService();
     int i = Math.max(serviceShortName.lastIndexOf('.'), serviceShortName.lastIndexOf('$'));
     if (i >= 0) {
@@ -164,7 +165,7 @@ public class CallsView extends DefaultView {
   }
 
   private void renderCallDetail(HtmlComponent p, CallInspector call) {
-    SimpleDateFormat startFmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    SimpleDateFormat startFmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US);
     CallInfo info = call.getInfo();
     //
     p.startTable(0);

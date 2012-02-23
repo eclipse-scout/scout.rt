@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.services.common.clientnotification;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.eclipse.scout.rt.server.ThreadContext;
 
@@ -69,7 +70,7 @@ public class SingleUserFilter implements IClientNotificationFilter {
     StringBuffer b = new StringBuffer(getClass().getSimpleName());
     b.append("[");
     b.append(m_userId);
-    b.append(", validUntil=" + new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(m_validUntil)));
+    b.append(", validUntil=" + new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date(m_validUntil)));
     b.append("]");
     return b.toString();
   }
