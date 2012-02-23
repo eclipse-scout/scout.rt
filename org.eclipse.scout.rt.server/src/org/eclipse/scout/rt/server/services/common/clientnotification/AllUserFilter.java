@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.services.common.clientnotification;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Filter to broadcast a notification to all users
@@ -56,7 +57,7 @@ public class AllUserFilter implements IClientNotificationFilter {
   public String toString() {
     StringBuffer b = new StringBuffer(getClass().getSimpleName());
     b.append("[");
-    b.append("validUntil=" + new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(m_validUntil)));
+    b.append("validUntil=" + new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date(m_validUntil)));
     b.append("]");
     return b.toString();
   }

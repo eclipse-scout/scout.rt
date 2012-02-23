@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
@@ -32,11 +33,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.shared.services.common.test.BasicTestContext;
 import org.eclipse.scout.rt.shared.services.common.test.ITest;
 import org.eclipse.scout.rt.shared.services.common.test.TestStatus;
@@ -159,7 +160,7 @@ public class TestServlet extends HttpServletEx {
           ));
     }
     //
-    String date = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date());
+    String date = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(new Date());
     String page = MessageFormat.format(
         getPageTemplate(),
         date,

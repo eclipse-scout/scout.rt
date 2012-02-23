@@ -18,6 +18,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.logging.Level;
 
 import org.eclipse.core.runtime.ILogListener;
@@ -189,7 +190,7 @@ public class EclipseScoutLogManager implements IScoutLogManager {
     private String getFormattedDate() {
       Calendar calendar = Calendar.getInstance();
       calendar.setTimeInMillis(System.currentTimeMillis());
-      return new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss").format(calendar.getTime());
+      return new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss", Locale.US).format(calendar.getTime());
     }
 
     private String getStackTrace(Throwable t) {

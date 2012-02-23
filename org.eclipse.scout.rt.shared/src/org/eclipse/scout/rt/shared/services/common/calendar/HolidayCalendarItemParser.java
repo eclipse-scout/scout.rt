@@ -65,7 +65,7 @@ public class HolidayCalendarItemParser {
   private static final String ID = "id";
   private static final String RELATIVE_TO = "relativeTo";
 
-  private SimpleDateFormat m_dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+  private SimpleDateFormat m_dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
   private SimpleXmlElement m_xml;
 
   public HolidayCalendarItemParser(URL xmlResource) throws ProcessingException {

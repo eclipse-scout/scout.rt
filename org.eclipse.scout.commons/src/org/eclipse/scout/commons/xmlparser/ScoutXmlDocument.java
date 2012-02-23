@@ -27,18 +27,13 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.xml.sax.Attributes;
 
-/**
- * Title : Scout XML Document Description: Copyright : Copyright (c) 2006-2008
- * BSI AG, ETH Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
- * 
- * @version 1.4
- */
 @SuppressWarnings("unchecked")
 public class ScoutXmlDocument {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutXmlDocument.class);
@@ -1968,7 +1963,7 @@ public class ScoutXmlDocument {
      */
     public Date getTextAsDate(String format) {
       try {
-        return new SimpleDateFormat(format).parse(this.getText());
+        return new SimpleDateFormat(format, Locale.US).parse(this.getText());
       }
       catch (Exception exception) {
         throw new ScoutXmlException("The text '" + this.getText() + "' is not a valid 'Date' value (" + ScoutXmlElement.this.getPath() + ")");
@@ -1987,7 +1982,7 @@ public class ScoutXmlDocument {
      */
     public Date getTextAsDate(String format, Date defaultValue) {
       try {
-        return new SimpleDateFormat(format).parse(this.getText());
+        return new SimpleDateFormat(format, Locale.US).parse(this.getText());
       }
       catch (Exception exception) {
         return defaultValue;
@@ -2416,7 +2411,7 @@ public class ScoutXmlDocument {
      * @since 1.1
      */
     public void setAttribute(String name, Date value, String dateFormat) {
-      this.setAttribute(name, new SimpleDateFormat(dateFormat).format(value));
+      this.setAttribute(name, new SimpleDateFormat(dateFormat, Locale.US).format(value));
     }
 
     /**
@@ -2829,7 +2824,7 @@ public class ScoutXmlDocument {
        */
       public Date getValueAsDate(String format) {
         try {
-          return new SimpleDateFormat(format).parse(this.getValueAsString());
+          return new SimpleDateFormat(format, Locale.US).parse(this.getValueAsString());
         }
         catch (Exception exception) {
           throw new ScoutXmlException("Attribute value '" + this.getValueAsString() + "' is not a valid 'Date' value (" + ScoutXmlElement.this.getPath() + "/@" + this.getNameExpanded() + ")");

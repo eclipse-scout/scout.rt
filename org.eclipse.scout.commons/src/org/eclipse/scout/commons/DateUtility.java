@@ -64,7 +64,8 @@ public final class DateUtility {
     if (d == null || !StringUtility.hasText(pattern)) {
       return "";
     }
-    return new SimpleDateFormat(pattern).format(d);
+    Locale loc = LocaleThreadLocal.get();
+    return new SimpleDateFormat(pattern, loc).format(d);
   }
 
   public static Date parse(String s, String pattern) {
@@ -72,7 +73,8 @@ public final class DateUtility {
       return null;
     }
     try {
-      return new SimpleDateFormat(pattern).parse(s);
+      Locale loc = LocaleThreadLocal.get();
+      return new SimpleDateFormat(pattern, loc).parse(s);
     }
     catch (ParseException e) {
       throw new IllegalArgumentException("parse(\"" + s + "\",\"" + pattern + "\") failed", e);

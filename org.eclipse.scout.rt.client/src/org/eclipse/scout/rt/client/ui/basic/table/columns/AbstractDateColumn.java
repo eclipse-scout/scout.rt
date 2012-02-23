@@ -168,7 +168,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   private DateFormat getDateFormat() {
     DateFormat df = null;
     if (getFormat() != null) {
-      df = new SimpleDateFormat(getFormat());
+      df = new SimpleDateFormat(getFormat(), LocaleThreadLocal.get());
     }
     else {
       if (isHasDate() && !isHasTime()) {
