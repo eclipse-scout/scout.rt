@@ -62,7 +62,7 @@ public final class FormattingUtility {
       }
     }
     else if (o instanceof Float || o instanceof Double) {
-      NumberFormat f = new DecimalFormat();
+      NumberFormat f = DecimalFormat.getInstance(loc);
       f.setMinimumFractionDigits(2);
       ret = f.format(o);
     }
