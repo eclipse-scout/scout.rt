@@ -32,9 +32,16 @@ import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.datefield.chooser.TimeChooserDialog;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -57,7 +64,8 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
   private Composite m_timeContainer;
   private boolean m_dateTimeCompositeMember;
   private String m_displayTextToVerify;
-  private TimeChooserDialog m_proposalPopup;
+  private TimeChooserDialog m_timeChooserDialog = null;
+  private FocusAdapter m_textFieldFocusAdapter = null;
 
   public void setIgnoreLabel(boolean ignoreLabel) {
     m_ignoreLabel = ignoreLabel;
@@ -166,6 +174,52 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     return (StyledTextEx) super.getUiField();
   }
 
+  private boolean isFocusInTimePicker() {
+    Control focusControl = getUiEnvironment().getDisplay().getFocusControl();
+    boolean isFocusInDatePicker = RwtUtility.isAncestorOf(m_timeChooserDialog.getShell(), focusControl);
+    return isFocusInDatePicker;
+  }
+
+  private void installFocusListenerOnTextField() {
+    if (!getUiField().isDisposed()) {
+      getUiField().setFocus();
+      if (m_textFieldFocusAdapter == null) {
+        m_textFieldFocusAdapter = new FocusAdapter() {
+          private static final long serialVersionUID = 1L;
+
+          @Override
+          public void focusLost(FocusEvent e) {
+            if (isFocusInTimePicker()) {
+              getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                  getUiField().setFocus();
+                }
+              });
+            }
+            else {
+              getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                  makeSureTimeChooserIsClosed();
+                  uninstallFocusListenerOnTextField();
+                }
+              });
+            }
+          }
+        };
+      }
+      getUiField().addFocusListener(m_textFieldFocusAdapter);
+    }
+  }
+
+  private void uninstallFocusListenerOnTextField() {
+    if (!getUiField().isDisposed() && m_textFieldFocusAdapter != null) {
+      getUiField().removeFocusListener(m_textFieldFocusAdapter);
+    }
+  }
+
   @Override
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
@@ -254,13 +308,20 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
 
   @Override
   protected void handleUiFocusGained() {
-    super.handleUiFocusGained();
     getUiField().setSelection(0, getUiField().getText().length());
   }
 
   @Override
   protected void handleUiFocusLost() {
     getUiField().setSelection(0, 0);
+  }
+
+  private void makeSureTimeChooserIsClosed() {
+    if (m_timeChooserDialog != null
+        && m_timeChooserDialog.getShell() != null
+        && !m_timeChooserDialog.getShell().isDisposed()) {
+      m_timeChooserDialog.getShell().close();
+    }
   }
 
   private void handleUiTimeChooserAction() {
@@ -270,26 +331,65 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
         oldTime = new Date();
       }
       notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
-      try {
-        TimeChooserDialog dialog = new TimeChooserDialog(getUiField().getShell(), oldTime);
-        final Date newDate = dialog.openDateChooser(getUiField());
-        if (newDate != null) {
-          // notify Scout
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              getScoutObject().getUIFacade().setDateTimeFromUI(newDate);
-            }
-          };
-          getUiEnvironment().invokeScoutLater(t, 0);
-          // end notify
+
+      makeSureTimeChooserIsClosed();
+      m_timeChooserDialog = new TimeChooserDialog(getUiField().getShell(), oldTime);
+
+      m_timeChooserDialog.getShell().addDisposeListener(new DisposeListener() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void widgetDisposed(DisposeEvent event) {
+          getTimeFromClosedDateChooserDialog();
         }
+      });
+
+      m_timeChooserDialog.openTimeChooser(getUiField());
+      installFocusListenerOnTextField();
+    }
+  }
+
+  private void getTimeFromClosedDateChooserDialog() {
+    removeListenersFromTimeChooserDialog();
+    boolean setFocusToUiField = false;
+    try {
+      final Date newDate = m_timeChooserDialog.getReturnTime();
+      if (newDate != null) {
+        setFocusToUiField = true;
+        // notify Scout
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            getScoutObject().getUIFacade().setDateTimeFromUI(newDate);
+          }
+        };
+        getUiEnvironment().invokeScoutLater(t, 0);
+        // end notify
       }
-      finally {
-        notifyPopupEventListeners(IPopupSupportListener.TYPE_CLOSED);
-        if (!getUiField().isDisposed()) {
-          getUiField().setFocus();
-        }
+    }
+    finally {
+      notifyPopupEventListeners(IPopupSupportListener.TYPE_CLOSED);
+      uninstallFocusListenerOnTextField();
+      if (setFocusToUiField
+          && !getUiField().isDisposed()) {
+        getUiField().setFocus();
+      }
+    }
+  }
+
+  private void removeListenersFromTimeChooserDialog() {
+    Object[] shellListeners = ShellEvent.getListeners(m_timeChooserDialog.getShell());
+    for (Object object : shellListeners) {
+      if (object.getClass().isInstance(this)
+            || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+        m_timeChooserDialog.getShell().removeShellListener((ShellListener) object);
+      }
+    }
+    Object[] disposeListeners = DisposeEvent.getListeners(m_timeChooserDialog.getShell());
+    for (Object object : disposeListeners) {
+      if (object.getClass().isInstance(this)
+            || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+        m_timeChooserDialog.getShell().removeDisposeListener((DisposeListener) object);
       }
     }
   }

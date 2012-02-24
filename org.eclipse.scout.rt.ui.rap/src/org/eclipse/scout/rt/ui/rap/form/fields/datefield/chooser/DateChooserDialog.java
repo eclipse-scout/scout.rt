@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.ext.table.util.TableCellRolloverSupport;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
@@ -244,7 +244,7 @@ public class DateChooserDialog extends Dialog {
     }
     Button b = new Button(parent, SWT.PUSH);
     b.setData(WidgetUtil.CUSTOM_VARIANT, variant);
-    b.addSelectionListener(new P_NavigationSelectionListener(type));
+    b.addMouseListener(new P_NavigationMouseListener(type));
     GridData data = new GridData(15, 15);
     data.horizontalAlignment = GridData.FILL;
     data.grabExcessHorizontalSpace = false;
@@ -252,16 +252,16 @@ public class DateChooserDialog extends Dialog {
     return b;
   }
 
-  private class P_NavigationSelectionListener extends SelectionAdapter {
+  private class P_NavigationMouseListener extends MouseAdapter {
     private static final long serialVersionUID = 1L;
     private int m_type;
 
-    P_NavigationSelectionListener(int type) {
+    P_NavigationMouseListener(int type) {
       m_type = type;
     }
 
     @Override
-    public void widgetSelected(SelectionEvent e) {
+    public void mouseDown(MouseEvent e) {
       switch (m_type) {
         case TYPE_BACK_YEAR:
           m_model.setNavigationDate(DateUtility.addYears(m_model.getNavigationDate(), -1));
