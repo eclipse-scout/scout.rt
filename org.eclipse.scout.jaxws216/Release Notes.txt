@@ -164,3 +164,27 @@ Bugzilla: 369242
 Problem: Basic authentication of webservice providers does not work on tomcat. That is because tomcat converts all the HTTP header names to lower case. According to RFC 2616, this conversion is  eligible as header names are case-insensitive. On Jetty, basic authentication mechanism works fine as header-names are untouched. Because Scout JAX-WS RT handles header-names in a case-sensitive way the authentication fails.
 Solution: Fixed 'BasicAuthenticationHandler' to treat header names case-insensitive.
 Migration: None
+
+06.01.2012 dwi
+Bugzilla: 367994
+Problem:
+a) The WSDL file of webservice providers whose WSDL file is located in a sub-folder of '/WEB-INF/wsdl' is dynamically generated at JAX-WS bootstrap instead of the existing WSDL file to be published.
+b) Webservice consumer specific WSDL files might interfere with provider specific WSDL files, e.g. if defining same services or ports. In consequence, all webservice providers of that plugin are not published.
+c) redundant WSDL file in webservice stub JAR-file.
+Solution:
+a) changed JAX-WS resource loading to also look in subfolders for existing resources
+b) WS provider specific WSDL files should be located in the folder '/WEB-INF/wsdl/provider' whereas consumer specific WSDL files in '/WEB-INF/wsdl/consumer'. In turn, JAX-WS is instrumented to ignore all the files in the (sub-)folder '/WEB-INF/wsdl/consumer' when publishing the endpoints.
+c) WSDL file is not put into the JAR archive anymore when building the webservice stub.
+Migration:
+- Use Scout SDK (repair actions) to move WSDL files of webservice providers into folder '/WEB-INF/wsdl/provider' and of webservice consumer into folder '/WEB-INF/wsdl/consumers'
+- Rebuild webservice stubs (should automatically be done if using repair action)
+
+24.02.2012 dwi
+Bugzilla: 372476
+Problem: If throwing an exception (SOAP fault or not) in webservice processing, the transaction is not rollbacked.
+Furthermore, SOAP faults should be logged with a severity of INFO instead of ERROR whereas unexpected errors with a severity of WARN.
+Solution:
+- Rollback of transaction (always in case of an error)
+- SOAP faults are logged with a severity of INFO
+- Runtime exceptions are logged with a severity of WARN with the note to handle such faults by respective SOAP faults. Also, the causing exception is not propagated back to the webservice client.
+Migration: None
