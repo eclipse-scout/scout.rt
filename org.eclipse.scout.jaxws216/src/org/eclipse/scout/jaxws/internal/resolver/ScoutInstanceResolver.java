@@ -33,6 +33,7 @@ import org.eclipse.scout.jaxws.internal.SessionHelper;
 import org.eclipse.scout.jaxws.session.IServerSessionFactory;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.ThreadContext;
 
 import com.sun.xml.internal.ws.api.message.Packet;
 import com.sun.xml.internal.ws.api.server.InstanceResolver;
@@ -148,15 +149,27 @@ public class ScoutInstanceResolver extends InstanceResolver<Object> {
               resultHolder.setValue(method.invoke(portType, aobj));
             }
             catch (InvocationTargetException e) {
-              LOG.error("Webservice processing exception occured. Please handle faults by respective SOAP faults.", e);
-              invocationTargetExceptionHolder.setValue(e);
+              Throwable cause = e.getCause();
+              ThreadContext.getTransaction().addFailure(cause); // rollback transaction
+
+              if (cause instanceof RuntimeException) {
+                LOG.warn("Webservice processing exception occured. Please handle faults by respective checked SOAP faults.", cause);
+                invocationTargetExceptionHolder.setValue(new InvocationTargetException(new WebServiceException("Internal Server Error")));
+              }
+              else {
+                // business exception (SOAP faults are checked exceptions)
+                LOG.info("Webservice processing exception occured.", cause);
+                invocationTargetExceptionHolder.setValue(e);
+              }
             }
             catch (IllegalAccessException e) {
+              ThreadContext.getTransaction().addFailure(e); // rollback transaction
               LOG.error("Illegal access exception occured while dispatching webservice request. This might be caused because of Java security settings.", e);
               illegalAccessExceptionHolder.setValue(e);
             }
             catch (RuntimeException e) {
-              LOG.warn("Failed to dispatch webservice request.", e);
+              ThreadContext.getTransaction().addFailure(e); // rollback transaction
+              LOG.error("Unexpected error occured while dispatching webservice request.", e);
               runtimeExceptionHolder.setValue(e);
             }
 
