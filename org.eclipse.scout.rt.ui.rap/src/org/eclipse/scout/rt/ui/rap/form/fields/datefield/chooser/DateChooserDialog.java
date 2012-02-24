@@ -155,18 +155,16 @@ public class DateChooserDialog extends Dialog {
           case SWT.MouseDown: {
             TableColumn columnAt = RwtUtility.getRwtColumnAt(table, new Point(event.x, event.y));
             TableItem item = table.getItem(new Point(event.x, event.y));
-            if (item != null) {
-              item.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
-              if (columnAt != null) {
-                Date date = ((DateRow) item.getData()).getDate(table.indexOf(columnAt) - 1);
-                m_returnDate = date;
-                getShell().getDisplay().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                    close();
-                  }
-                });
-              }
+            item.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
+            if (columnAt != null && item != null) {
+              Date date = ((DateRow) item.getData()).getDate(table.indexOf(columnAt) - 1);
+              m_returnDate = date;
+              getShell().getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                  close();
+                }
+              });
             }
             break;
           }

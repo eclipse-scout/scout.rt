@@ -23,7 +23,6 @@ import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.commons.DateUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -34,7 +33,7 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
   private List<DateRow> m_rows = new ArrayList<DateRow>();
   private Date m_navigationDate = null;
   private Date m_highLightDate = null;
-  private SimpleDateFormat m_monthYearFormat = new SimpleDateFormat("MMMMM yyyy", LocaleThreadLocal.get());
+  private SimpleDateFormat m_monthYearFormat = new SimpleDateFormat("MMMMM yyyy");
 
   // ui
   private Color m_weekendForeground;
