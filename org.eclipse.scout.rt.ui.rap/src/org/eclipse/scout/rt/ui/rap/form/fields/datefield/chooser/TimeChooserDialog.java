@@ -19,8 +19,6 @@ import javax.swing.event.ChangeListener;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -40,7 +38,7 @@ public class TimeChooserDialog extends Dialog {
   public static final int TYPE_FOREWARD_YEAR = 1 << 3;
 
   private TimeChooser m_timeChooser;
-  private Date m_returnDate = null;
+  private Date m_returnTime = null;
   private Date m_displayDate;
 
   @Override
@@ -51,13 +49,15 @@ public class TimeChooserDialog extends Dialog {
   public TimeChooserDialog(Shell parentShell, Date date) {
     super(parentShell);
     setDisplayDate(date);
-    setBlockOnOpen(true);
+    setBlockOnOpen(false);
+    create();
   }
 
   public TimeChooserDialog(Shell parentShell, Number number) {
     super(parentShell);
     setDisplayDate((Double) number);
-    setBlockOnOpen(true);
+    setBlockOnOpen(false);
+    create();
   }
 
   private void setDisplayDate(Date date) {
@@ -79,21 +79,15 @@ public class TimeChooserDialog extends Dialog {
     m_displayDate = c.getTime();
   }
 
-  public Date openDateChooser(Control c) {
+  public void openTimeChooser(Control c) {
     showDialogFor(c);
-    return m_returnDate;
+  }
+
+  public Date getReturnTime() {
+    return m_returnTime;
   }
 
   public int showDialogFor(Control field) {
-    create();
-    getShell().addShellListener(new ShellAdapter() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void shellDeactivated(ShellEvent e) {
-        close();
-      }
-    });
     // make sure that the popup fit into the application window.
     Rectangle appBounds = field.getDisplay().getBounds();
     Point absPrefPos = field.toDisplay(field.getSize().x - getShell().getSize().x, field.getSize().y);
@@ -122,7 +116,7 @@ public class TimeChooserDialog extends Dialog {
     m_timeChooser.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
-        m_returnDate = m_timeChooser.getTime();
+        m_returnTime = m_timeChooser.getTime();
         getShell().getDisplay().asyncExec(new Runnable() {
           @Override
           public void run() {

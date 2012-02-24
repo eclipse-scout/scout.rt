@@ -405,24 +405,19 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
   }
 
   private void removeListenersFromDateChooserDialog() {
-    if (m_dateChooserDialog.getShell() != null) {
-      Object[] shellListeners = ShellEvent.getListeners(m_dateChooserDialog.getShell());
-      for (Object object : shellListeners) {
-        if (object.getClass().isInstance(this)
+    Object[] shellListeners = ShellEvent.getListeners(m_dateChooserDialog.getShell());
+    for (Object object : shellListeners) {
+      if (object.getClass().isInstance(this)
             || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
-          m_dateChooserDialog.getShell().removeShellListener((ShellListener) object);
-        }
-      }
-      Object[] disposeListeners = DisposeEvent.getListeners(m_dateChooserDialog.getShell());
-      for (Object object : disposeListeners) {
-        if (object.getClass().isInstance(this)
-            || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
-          m_dateChooserDialog.getShell().removeDisposeListener((DisposeListener) object);
-        }
+        m_dateChooserDialog.getShell().removeShellListener((ShellListener) object);
       }
     }
-    else {
-      System.out.println("RwtScoutDateField.removeListenersFromDateChooserDialog()");
+    Object[] disposeListeners = DisposeEvent.getListeners(m_dateChooserDialog.getShell());
+    for (Object object : disposeListeners) {
+      if (object.getClass().isInstance(this)
+            || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+        m_dateChooserDialog.getShell().removeDisposeListener((DisposeListener) object);
+      }
     }
   }
 
