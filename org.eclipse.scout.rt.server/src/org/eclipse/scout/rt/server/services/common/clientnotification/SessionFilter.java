@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.services.common.clientnotification;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ThreadContext;
@@ -71,7 +70,7 @@ public class SessionFilter implements IClientNotificationFilter {
     if (m_sessionRef != null) {
       b.append(m_sessionRef.get());
     }
-    b.append(", validUntil=" + new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date(m_validUntil)));
+    b.append(", validUntil=" + new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(m_validUntil)));
     b.append("]");
     return b.toString();
   }

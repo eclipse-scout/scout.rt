@@ -12,7 +12,6 @@ package org.eclipse.scout.commons.logger.analysis;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,8 +32,8 @@ public abstract class AbstractLogFilter implements ILogFilter {
   private static final Pattern SIMPLE_LOG_PARSE_PATTERN = Pattern.compile("^\\[([^]]+)\\]\\s+(....-..-.....:..:..\\....)\\s+([^\\s]+)\\s+([^\\s]+)\\s+(.*)$");
   private static final Pattern ECLIPSE_LOG_PARSE_PATTERN1 = Pattern.compile("^\\!ENTRY\\s+([^\\s]+)\\s+([^\\s]+)\\s+([^\\s]+)\\s+(....-..-.....:..:..\\....)$");
   private static final Pattern ECLIPSE_LOG_PARSE_PATTERN2 = Pattern.compile("^\\!SESSION\\s+(....-..-.....:..:..\\....).*$");
-  private static final SimpleDateFormat ECLIPSE_LOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
-  private static final SimpleDateFormat SIMPLE_LOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
+  private static final SimpleDateFormat ECLIPSE_LOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+  private static final SimpleDateFormat SIMPLE_LOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
   private final String m_formatPattern;
   private final SimpleDateFormat m_dateFormat;
@@ -53,7 +52,7 @@ public abstract class AbstractLogFilter implements ILogFilter {
    */
   public AbstractLogFilter(String formatPattern, String dateFormat) {
     m_formatPattern = formatPattern;
-    m_dateFormat = new SimpleDateFormat(dateFormat, Locale.US);
+    m_dateFormat = new SimpleDateFormat(dateFormat);
   }
 
   @Override

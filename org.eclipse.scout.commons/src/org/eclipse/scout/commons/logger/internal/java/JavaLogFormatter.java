@@ -14,12 +14,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 public class JavaLogFormatter extends Formatter {
-  private final static SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS", Locale.US);
+  private final static SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
 
   private Date m_tmpDate = new Date();
 
