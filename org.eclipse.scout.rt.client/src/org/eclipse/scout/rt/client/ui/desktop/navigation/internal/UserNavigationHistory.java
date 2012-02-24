@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
@@ -47,58 +48,105 @@ public class UserNavigationHistory {
     m_bookmarks = new LinkedList<Bookmark>();
   }
 
+  public Bookmark addStep(int level, IPage page) {
+    if (!m_addStepEnabled) {
+      return null;
+    }
+
+    Bookmark bm = null;
+    try {
+      bm = ClientSyncJob.getCurrentSession().getDesktop().createBookmark(page);
+      if (bm == null) {
+        return null;
+      }
+      decorateBookmark(bm, level, page.getCell().getText(), page.getCell().getIconId());
+
+      return addStep(bm);
+    }
+    catch (Throwable t) {
+      return handleAddStepError(t, bm);
+    }
+  }
+
   public Bookmark addStep(int level, String name, String iconId) {
     if (!m_addStepEnabled) {
       return null;
     }
-    //
+
+    Bookmark bm = null;
     try {
-      Bookmark bm = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
+      bm = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
       if (bm == null) {
         return null;
       }
-      bm.setTitle(StringUtility.rpad("", " ", level * 2) + name);
-      bm.setIconId(iconId);
-      // if last position was same as new one, skip it
-      if (m_index < m_bookmarks.size()) {
-        Bookmark last = m_bookmarks.get(m_index);
-        if (isSameBookmark(last, bm)) {
-          // replace
-          m_bookmarks.set(m_index, bm);
-          fireNavigationChanged();
-          return bm;
-        }
-      }
-      int nextPos = m_index + 1;
-      // check if existing position is already same as new one (keep later
-      // objects), otherwise delete later history
-      if (nextPos < m_bookmarks.size() && bm.equals(m_bookmarks.get(nextPos))) {
-        m_bookmarks.set(nextPos, bm);
-        m_index = nextPos;
-      }
-      else {
-        while (nextPos < m_bookmarks.size()) {
-          Bookmark removedBookmark = m_bookmarks.removeLast();
-          m_index = m_index - 1;
-          fireBookmarkRemoved(removedBookmark);
-        }
-        m_bookmarks.add(bm);
-        m_index = m_bookmarks.size() - 1;
-        fireBookmarkAdded(bm);
-      }
-      // size check, if list larger than 25 entries, truncate it
-      while (m_bookmarks.size() > 25) {
-        Bookmark removedBookmark = m_bookmarks.removeFirst();
-        m_index = Math.max(0, m_index - 1);
-        fireBookmarkRemoved(removedBookmark);
-      }
-      fireNavigationChanged();
-      return bm;
+      decorateBookmark(bm, level, name, iconId);
+
+      return addStep(bm);
     }
     catch (Throwable t) {
-      LOG.warn(name, t);
+      return handleAddStepError(t, bm);
+    }
+  }
+
+  protected void decorateBookmark(Bookmark bm, int level, String name, String iconId) {
+    bm.setTitle(StringUtility.rpad("", " ", level * 2) + name);
+    bm.setIconId(iconId);
+  }
+
+  protected Bookmark handleAddStepError(Throwable t, Bookmark bm) {
+    String bookmarkTitle = "";
+    if (bm != null) {
+      bookmarkTitle = bm.getText();
+    }
+
+    LOG.warn("Exception occured while adding step to navigation history for bookmark: " + bookmarkTitle, t);
+
+    return null;
+  }
+
+  public Bookmark addStep(Bookmark bm) {
+    if (!m_addStepEnabled) {
       return null;
     }
+    if (bm == null) {
+      return null;
+    }
+
+    // if last position was same as new one, skip it
+    if (m_index < m_bookmarks.size()) {
+      Bookmark last = m_bookmarks.get(m_index);
+      if (isSameBookmark(last, bm)) {
+        // replace
+        m_bookmarks.set(m_index, bm);
+        fireNavigationChanged();
+        return bm;
+      }
+    }
+    int nextPos = m_index + 1;
+    // check if existing position is already same as new one (keep later
+    // objects), otherwise delete later history
+    if (nextPos < m_bookmarks.size() && bm.equals(m_bookmarks.get(nextPos))) {
+      m_bookmarks.set(nextPos, bm);
+      m_index = nextPos;
+    }
+    else {
+      while (nextPos < m_bookmarks.size()) {
+        Bookmark removedBookmark = m_bookmarks.removeLast();
+        m_index = m_index - 1;
+        fireBookmarkRemoved(removedBookmark);
+      }
+      m_bookmarks.add(bm);
+      m_index = m_bookmarks.size() - 1;
+      fireBookmarkAdded(bm);
+    }
+    // size check, if list larger than 25 entries, truncate it
+    while (m_bookmarks.size() > 25) {
+      Bookmark removedBookmark = m_bookmarks.removeFirst();
+      m_index = Math.max(0, m_index - 1);
+      fireBookmarkRemoved(removedBookmark);
+    }
+    fireNavigationChanged();
+    return bm;
   }
 
   private void saveCurrentStep() {

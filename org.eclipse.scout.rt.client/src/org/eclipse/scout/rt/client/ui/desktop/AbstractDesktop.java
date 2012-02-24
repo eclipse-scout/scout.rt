@@ -737,7 +737,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         if (m_outline != null) {
           IPage oldActivePage = m_outline.getActivePage();
           if (oldActivePage != null) {
-            SERVICES.getService(INavigationHistoryService.class).addStep(0, oldActivePage.getCell().getText(), oldActivePage.getCell().getIconId());
+            SERVICES.getService(INavigationHistoryService.class).addStep(0, oldActivePage);
           }
         }
         //
@@ -806,7 +806,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             newActivePage = m_outline.getActivePage();
           }
           if (newActivePage != null) {
-            SERVICES.getService(INavigationHistoryService.class).addStep(0, newActivePage.getCell().getText(), newActivePage.getCell().getIconId());
+            SERVICES.getService(INavigationHistoryService.class).addStep(0, newActivePage);
           }
         }
       }
@@ -1389,6 +1389,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public Bookmark createBookmark(IPage page) throws ProcessingException {
+    return BookmarkUtility.createBookmark(page);
+  }
+
+  @Override
   public void refreshPages(Class... pageTypes) {
     for (IOutline outline : getAvailableOutlines()) {
       outline.refreshPages(pageTypes);
@@ -1726,17 +1731,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     public void treeChanged(TreeEvent e) {
       switch (e.getType()) {
         case TreeEvent.TYPE_BEFORE_NODES_SELECTED: {
-          IPage page = m_outline.getActivePage();
-          if (page != null) {
-
-            SERVICES.getService(INavigationHistoryService.class).addStep(0, page.getCell().getText(), page.getCell().getIconId());
+          if (e.getDeselectedNode() instanceof IPage) {
+            IPage deselectedPage = (IPage) e.getDeselectedNode();
+            SERVICES.getService(INavigationHistoryService.class).addStep(0, deselectedPage);
           }
           break;
         }
         case TreeEvent.TYPE_NODES_SELECTED: {
           IPage page = m_outline.getActivePage();
           if (page != null) {
-            SERVICES.getService(INavigationHistoryService.class).addStep(0, page.getCell().getText(), page.getCell().getIconId());
+            SERVICES.getService(INavigationHistoryService.class).addStep(0, page);
           }
           try {
             ClientSyncJob.getCurrentSession().getMemoryPolicy().afterOutlineSelectionChanged(AbstractDesktop.this);

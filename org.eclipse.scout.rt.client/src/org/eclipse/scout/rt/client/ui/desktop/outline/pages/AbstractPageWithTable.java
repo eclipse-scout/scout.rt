@@ -339,7 +339,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
             IPage page = AbstractPageWithTable.this;
             if (desktop != null && desktop.getOutline() != null && desktop.getOutline().getActivePage() == page) {
-              SERVICES.getService(INavigationHistoryService.class).addStep(0, page.getCell().getText(), page.getCell().getIconId());
+              SERVICES.getService(INavigationHistoryService.class).addStep(0, page);
             }
             // do page reload to execute search
             try {

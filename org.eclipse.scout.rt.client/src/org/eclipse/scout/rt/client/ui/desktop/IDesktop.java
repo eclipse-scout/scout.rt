@@ -409,14 +409,21 @@ public interface IDesktop extends IPropertyObserver {
   void printDesktop(PrintDevice device, Map<String, Object> parameters);
 
   /**
-   * activate a bookmark
+   * Activates a bookmark
    */
   void activateBookmark(Bookmark bm, boolean forceReload) throws ProcessingException;
 
   /**
-   * activate a bookmark
+   * Creates a bookmark of the active page
    */
   Bookmark createBookmark() throws ProcessingException;
+
+  /**
+   * Creates a bookmark of the given page
+   * 
+   * @since 3.8.0
+   */
+  Bookmark createBookmark(IPage page) throws ProcessingException;
 
   /**
    * do not use this internal method.<br>

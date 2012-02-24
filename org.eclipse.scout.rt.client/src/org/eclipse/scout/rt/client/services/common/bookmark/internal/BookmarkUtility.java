@@ -299,105 +299,112 @@ public final class BookmarkUtility {
 
   public static Bookmark createBookmark(IDesktop desktop) throws ProcessingException {
     IOutline outline = desktop.getOutline();
-    if (outline != null) {
-      IPage activePage = outline.getActivePage();
-      if (activePage != null) {
-        Bookmark b = new Bookmark();
-        b.setIconId(activePage.getCell().getIconId());
-        // outline
-        b.setOutlineClassName(outline.getClass().getName());
-        ArrayList<IPage> path = new ArrayList<IPage>();
-        ArrayList<String> titleSegments = new ArrayList<String>();
-        IPage page = activePage;
-        while (page != null) {
-          path.add(0, page);
-          String s = page.getCell().getText();
-          if (s != null) {
-            titleSegments.add(0, s);
-          }
-          // next
-          page = (IPage) page.getParentNode();
-        }
-        if (outline.getTitle() != null) {
-          titleSegments.add(0, outline.getTitle());
-        }
-        // title
-        int len = 0;
-        if (titleSegments.size() > 0) {
-          len += titleSegments.get(0).length();
-        }
-        if (titleSegments.size() > 1) {
-          len += titleSegments.get(titleSegments.size() - 1).length();
-        }
-        for (int i = titleSegments.size() - 1; i > 0; i--) {
-          if (len > 200) {
-            titleSegments.remove(i);
-          }
-          else if (len + titleSegments.get(i).length() <= 200) {
-            len += titleSegments.get(i).length();
-          }
-          else {
-            titleSegments.set(i, "...");
-            len = 201;
-          }
-        }
-        StringBuilder buf = new StringBuilder();
-        for (String s : titleSegments) {
-          if (buf.length() > 0) {
-            buf.append(" - ");
-          }
-          buf.append(s);
-        }
-        b.setTitle(buf.toString());
-        // text
-        StringBuffer text = new StringBuffer();
-        // add constraints texts
-        String prefix = "";
-        for (int i = 0; i < path.size(); i++) {
-          page = path.get(i);
-          if (i > 0 || outline.isRootNodeVisible()) {
-            text.append(prefix + page.getCell().getText());
-            text.append("\n");
-            if (page instanceof IPageWithTable) {
-              IPageWithTable tablePage = (IPageWithTable) page;
-              SearchFilter search = tablePage.getSearchFilter();
-              if (search != null) {
-                for (String s : search.getDisplayTexts()) {
-                  if (s != null) {
-                    String indent = prefix + "  ";
-                    s = s.trim().replaceAll("[\\n]", "\n" + indent);
-                    if (s.length() > 0) {
-                      text.append(indent + s);
-                      text.append("\n");
-                    }
-                  }
+    if (outline == null) {
+      return null;
+    }
+
+    IPage activePage = outline.getActivePage();
+    return createBookmark(activePage);
+  }
+
+  public static Bookmark createBookmark(IPage page) throws ProcessingException {
+    if (page == null) {
+      return null;
+    }
+
+    IOutline outline = page.getOutline();
+    Bookmark b = new Bookmark();
+    b.setIconId(page.getCell().getIconId());
+    // outline
+    b.setOutlineClassName(outline.getClass().getName());
+    ArrayList<IPage> path = new ArrayList<IPage>();
+    ArrayList<String> titleSegments = new ArrayList<String>();
+    while (page != null) {
+      path.add(0, page);
+      String s = page.getCell().getText();
+      if (s != null) {
+        titleSegments.add(0, s);
+      }
+      // next
+      page = (IPage) page.getParentNode();
+    }
+    if (outline.getTitle() != null) {
+      titleSegments.add(0, outline.getTitle());
+    }
+    // title
+    int len = 0;
+    if (titleSegments.size() > 0) {
+      len += titleSegments.get(0).length();
+    }
+    if (titleSegments.size() > 1) {
+      len += titleSegments.get(titleSegments.size() - 1).length();
+    }
+    for (int i = titleSegments.size() - 1; i > 0; i--) {
+      if (len > 200) {
+        titleSegments.remove(i);
+      }
+      else if (len + titleSegments.get(i).length() <= 200) {
+        len += titleSegments.get(i).length();
+      }
+      else {
+        titleSegments.set(i, "...");
+        len = 201;
+      }
+    }
+    StringBuilder buf = new StringBuilder();
+    for (String s : titleSegments) {
+      if (buf.length() > 0) {
+        buf.append(" - ");
+      }
+      buf.append(s);
+    }
+    b.setTitle(buf.toString());
+    // text
+    StringBuffer text = new StringBuffer();
+    // add constraints texts
+    String prefix = "";
+    for (int i = 0; i < path.size(); i++) {
+      page = path.get(i);
+      if (i > 0 || outline.isRootNodeVisible()) {
+        text.append(prefix + page.getCell().getText());
+        text.append("\n");
+        if (page instanceof IPageWithTable) {
+          IPageWithTable tablePage = (IPageWithTable) page;
+          SearchFilter search = tablePage.getSearchFilter();
+          if (search != null) {
+            for (String s : search.getDisplayTexts()) {
+              if (s != null) {
+                String indent = prefix + "  ";
+                s = s.trim().replaceAll("[\\n]", "\n" + indent);
+                if (s.length() > 0) {
+                  text.append(indent + s);
+                  text.append("\n");
                 }
               }
             }
-            prefix += "  ";
           }
         }
-        b.setText(text.toString().trim());
-        // path
-        for (int i = 0; i < path.size(); i++) {
-          page = path.get(i);
-          if (page instanceof IPageWithTable) {
-            IPageWithTable tablePage = (IPageWithTable) page;
-            IPage childPage = null;
-            if (i + 1 < path.size()) {
-              childPage = path.get(i + 1);
-            }
-            b.addPathElement(bmStoreTablePage(tablePage, childPage));
-          }
-          else if (page instanceof IPageWithNodes) {
-            IPageWithNodes nodePage = (IPageWithNodes) page;
-            b.addPathElement(bmStoreNodePage(nodePage));
-          }
-        }
-        return b;
+        prefix += "  ";
       }
     }
-    return null;
+    b.setText(text.toString().trim());
+    // path
+    for (int i = 0; i < path.size(); i++) {
+      page = path.get(i);
+      if (page instanceof IPageWithTable) {
+        IPageWithTable tablePage = (IPageWithTable) page;
+        IPage childPage = null;
+        if (i + 1 < path.size()) {
+          childPage = path.get(i + 1);
+        }
+        b.addPathElement(bmStoreTablePage(tablePage, childPage));
+      }
+      else if (page instanceof IPageWithNodes) {
+        IPageWithNodes nodePage = (IPageWithNodes) page;
+        b.addPathElement(bmStoreNodePage(nodePage));
+      }
+    }
+    return b;
   }
 
   @SuppressWarnings("deprecation")

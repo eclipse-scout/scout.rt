@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.service.IService2;
 
@@ -26,6 +27,13 @@ public interface INavigationHistoryService extends IService2 {
    * add a navigation savepoint
    */
   Bookmark addStep(int level, String name, String iconId);
+
+  /**
+   * add a navigation savepoint for the given page
+   * 
+   * @since 3.8.0
+   */
+  Bookmark addStep(int level, IPage page);
 
   List<Bookmark> getBookmarks();
 
