@@ -308,7 +308,7 @@ public final class BookmarkUtility {
   }
 
   public static Bookmark createBookmark(IPage page) throws ProcessingException {
-    if (page == null) {
+    if (page == null || page.getOutline() == null) {
       return null;
     }
 
