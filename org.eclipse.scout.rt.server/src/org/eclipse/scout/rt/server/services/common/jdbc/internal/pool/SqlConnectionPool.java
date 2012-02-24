@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Locale;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -217,7 +216,7 @@ public final class SqlConnectionPool {
   public IServiceInventory getInventory() {
     StringBuffer buf = new StringBuffer();
     synchronized (m_poolLock) {
-      SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS", Locale.US);
+      SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS");
       buf.append("Total connections: " + (m_busyEntries.size() + m_idleEntries.size()));
       buf.append("\n");
       buf.append("Busy: " + m_busyEntries.size());

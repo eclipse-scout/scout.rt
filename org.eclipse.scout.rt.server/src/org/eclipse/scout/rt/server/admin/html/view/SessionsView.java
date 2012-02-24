@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.admin.html.view;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TreeMap;
 
 import javax.security.auth.Subject;
@@ -103,7 +102,7 @@ public class SessionsView extends DefaultView {
 
   private void renderSessionRow(HtmlComponent p, int index, final SessionInspector session) {
     boolean selected = m_selectedSession != null && (m_selectedSession == session);
-    SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US);
+    SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     //
     p.startTableRow();
     p.tableCell("" + index);

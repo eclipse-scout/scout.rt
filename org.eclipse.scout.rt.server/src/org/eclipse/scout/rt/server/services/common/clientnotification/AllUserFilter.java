@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.services.common.clientnotification;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Filter to broadcast a notification to all users
@@ -57,7 +56,7 @@ public class AllUserFilter implements IClientNotificationFilter {
   public String toString() {
     StringBuffer b = new StringBuffer(getClass().getSimpleName());
     b.append("[");
-    b.append("validUntil=" + new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(new Date(m_validUntil)));
+    b.append("validUntil=" + new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(m_validUntil)));
     b.append("]");
     return b.toString();
   }

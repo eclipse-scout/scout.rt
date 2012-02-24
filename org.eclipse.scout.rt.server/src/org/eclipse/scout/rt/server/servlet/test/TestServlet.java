@@ -17,7 +17,6 @@ import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
@@ -160,7 +159,7 @@ public class TestServlet extends HttpServletEx {
           ));
     }
     //
-    String date = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US).format(new Date());
+    String date = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date());
     String page = MessageFormat.format(
         getPageTemplate(),
         date,

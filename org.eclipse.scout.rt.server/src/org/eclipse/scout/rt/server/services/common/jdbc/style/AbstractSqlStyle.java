@@ -29,7 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Locale;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.TriState;
@@ -101,7 +100,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     }
     else if (value instanceof Date) {
       Date d = (Date) value;
-      SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US);
+      SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
       return "to_date('" + fmt.format(d) + "','dd.mm.yyyy hh24:mi:ss')";
     }
     else if (value instanceof Collection || value.getClass().isArray()) {
