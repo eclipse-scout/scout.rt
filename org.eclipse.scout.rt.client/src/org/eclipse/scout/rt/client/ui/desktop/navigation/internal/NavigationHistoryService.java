@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.service.AbstractService;
 
@@ -31,6 +32,11 @@ public class NavigationHistoryService extends AbstractService implements INaviga
   @Override
   public Bookmark addStep(int level, String name, String iconId) {
     return getUserNavigationHistory().addStep(level, name, iconId);
+  }
+
+  @Override
+  public Bookmark addStep(int level, IPage page) {
+    return getUserNavigationHistory().addStep(level, page);
   }
 
   @Override

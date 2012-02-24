@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
@@ -250,6 +251,11 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public Bookmark createBookmark() throws ProcessingException {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public Bookmark createBookmark(IPage page) throws ProcessingException {
     throw createUnsupportedOperationException();
   }
 
