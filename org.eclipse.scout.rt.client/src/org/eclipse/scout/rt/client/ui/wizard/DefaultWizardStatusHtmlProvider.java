@@ -39,20 +39,22 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
    */
   @Override
   public void initialize(AbstractWizardStatusField htmlField) throws ProcessingException {
-    try {
-      m_htmlTemplate = new String(IOUtility.getContent(org.eclipse.scout.rt.client.Activator.getDefault().getBundle().getResource("resources/html/defaultWizardStatus.html").openStream()), "iso-8859-1");
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Unexpected", t);
-    }
+    m_htmlTemplate = initHtmlTemplate();
 
     // collect attachments for HTML field
     List<RemoteFile> attachments = collectAttachments();
     if (attachments != null && attachments.size() > 0) {
       htmlField.setAttachments(attachments.toArray(new RemoteFile[attachments.size()]));
+    }
+  }
+
+  @Override
+  public String initHtmlTemplate() throws ProcessingException {
+    try {
+      return new String(IOUtility.getContent(org.eclipse.scout.rt.client.Activator.getDefault().getBundle().getResource("resources/html/defaultWizardStatus.html").openStream()), "iso-8859-1");
+    }
+    catch (Throwable t) {
+      throw new ProcessingException("Unexpected", t);
     }
   }
 
