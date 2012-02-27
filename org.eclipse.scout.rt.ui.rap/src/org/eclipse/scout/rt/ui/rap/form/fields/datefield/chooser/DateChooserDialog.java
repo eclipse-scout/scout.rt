@@ -18,8 +18,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.DateUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
-import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.ext.table.util.TableCellRolloverSupport;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
@@ -35,7 +33,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -71,14 +68,10 @@ public class DateChooserDialog extends Dialog {
 
   public DateChooserDialog(Shell parentShell, Date date) {
     super(parentShell);
-    m_model = new DatefieldTableModel();
+    m_model = new DatefieldTableModel(RwtUtility.getClientSessionLocale(parentShell.getDisplay()));
     setDisplayDate(date);
     setBlockOnOpen(false);
     create();
-  }
-
-  public IRwtEnvironment getUiEnvironment(Display display) {
-    return (IRwtEnvironment) display.getData(IRwtEnvironment.class.getName());
   }
 
   private void setDisplayDate(Date date) {
@@ -180,7 +173,7 @@ public class DateChooserDialog extends Dialog {
     dummyColumn.setResizable(false);
     dummyColumn.setMoveable(false);
 
-    String[] wd = new DateFormatSymbols(LocaleThreadLocal.get()).getShortWeekdays();
+    String[] wd = new DateFormatSymbols(RwtUtility.getClientSessionLocale(parent.getDisplay())).getShortWeekdays();
     // create the m_columns from monday to saturday
     for (int i = 2; i < 8; i++) {
       TableColumn col = new TableColumn(table, SWT.CENTER);
@@ -208,7 +201,7 @@ public class DateChooserDialog extends Dialog {
   }
 
   private Control createControlArea(Composite parent) {
-    Composite rootArea = getUiEnvironment(parent.getDisplay()).getFormToolkit().createComposite(parent, SWT.NO_FOCUS);
+    Composite rootArea = RwtUtility.getUiEnvironment(parent.getDisplay()).getFormToolkit().createComposite(parent, SWT.NO_FOCUS);
     rootArea.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
     createButton(rootArea, TYPE_BACK_YEAR);
     createButton(rootArea, TYPE_BACK_MONTH);

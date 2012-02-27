@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -23,7 +24,6 @@ import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.commons.DateUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -34,7 +34,7 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
   private List<DateRow> m_rows = new ArrayList<DateRow>();
   private Date m_navigationDate = null;
   private Date m_highLightDate = null;
-  private SimpleDateFormat m_monthYearFormat = new SimpleDateFormat("MMMMM yyyy", LocaleThreadLocal.get());
+  private final SimpleDateFormat m_monthYearFormat;
 
   // ui
   private Color m_weekendForeground;
@@ -44,7 +44,8 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
   private Color m_highlightForeground;
   private Font m_highlightFont;
 
-  public DatefieldTableModel() {
+  public DatefieldTableModel(Locale locale) {
+    m_monthYearFormat = new SimpleDateFormat("MMMMM yyyy", locale);
 //    m_weekendForeground = getUiEnvironment().getColor(new RGB(254, 154, 35));FIXME SLE set color via css
 //    m_outMonthForeground = getUiEnvironment().getColor(new RGB(180, 180, 180));
 //    m_outMonthForegroundWeekend = getUiEnvironment().getColor(new RGB(236, 190, 143));

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.util;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -52,7 +53,7 @@ public final class RwtUtility extends AbstractRwtUtility {
   }
 
   /**
-   * Convinience method to get the environment from the client session
+   * Convenience method to get the environment from the client session
    * 
    * @param session
    *          the clientsession from the current thread
@@ -60,6 +61,27 @@ public final class RwtUtility extends AbstractRwtUtility {
   public static IRwtEnvironment getUiEnvironment(IClientSession session) {
     IRwtEnvironment env = (IRwtEnvironment) session.getData(IRwtEnvironment.ENVIRONMENT_KEY);
     return env;
+  }
+
+  /**
+   * Convenience method to get the environment from the display
+   * 
+   * @param display
+   *          the display from the current thread
+   */
+  public static IRwtEnvironment getUiEnvironment(Display display) {
+    IRwtEnvironment env = (IRwtEnvironment) display.getData(IRwtEnvironment.class.getName());
+    return env;
+  }
+
+  /**
+   * Convenience method to get the locale from the current client session
+   * 
+   * @param display
+   *          the display from the current thread
+   */
+  public static Locale getClientSessionLocale(Display display) {
+    return getUiEnvironment(display).getClientSession().getLocale();
   }
 
   public static IRwtKeyStroke[] getKeyStrokes(IKeyStroke stroke, IRwtEnvironment uiEnvironment) {
