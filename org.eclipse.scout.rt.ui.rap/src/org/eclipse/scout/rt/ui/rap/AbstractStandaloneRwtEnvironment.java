@@ -18,6 +18,7 @@ import javax.security.auth.Subject;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.service.SettingStoreException;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -141,6 +142,9 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
       }
     });
     while (!shell.isDisposed()) {
+      if (getClientSession() != null) {
+        LocaleThreadLocal.set(getClientSession().getLocale());
+      }
       if (!m_display.readAndDispatch()) {
         m_display.sleep();
       }
