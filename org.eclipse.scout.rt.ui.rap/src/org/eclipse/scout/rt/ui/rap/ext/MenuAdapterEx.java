@@ -17,7 +17,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -39,10 +38,6 @@ public abstract class MenuAdapterEx extends MenuAdapter {
     m_keyStrokeWidget = keyStrokeWidget;
   }
 
-  public IRwtEnvironment getUiEnvironment(Display display) {
-    return (IRwtEnvironment) display.getData(IRwtEnvironment.class.getName());
-  }
-
   public Control getMenuControl() {
     return m_menuControl;
   }
@@ -57,7 +52,7 @@ public abstract class MenuAdapterEx extends MenuAdapter {
 
   @Override
   public void menuShown(MenuEvent e) {
-    final IRwtEnvironment uiEnvironment = getUiEnvironment(e.display);
+    final IRwtEnvironment uiEnvironment = RwtUtility.getUiEnvironment(e.display);
     //add escape-keystroke to close the contextmenu with esc
     RwtKeyStroke keyStroke = new RwtKeyStroke(RwtUtility.scoutToRwtKey("escape")) {
 
