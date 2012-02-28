@@ -69,63 +69,69 @@ public abstract class AbstractRwtUtility {
     BrowserInfo info = (BrowserInfo) RWT.getSessionStore().getAttribute(BROWSER_INFO);
     if (info == null) {
       HttpServletRequest request = RWT.getRequest();
-      if (LOG.isInfoEnabled()) {
-        Enumeration headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-          String headerName = (String) headerNames.nextElement();
-          String header = request.getHeader(headerName);
-          headerName = headerName + (headerName.length() <= 11 ? "\t\t" : "\t");
-          LOG.info(headerName + header);
-        }
-      }
-      String userAgent = request.getHeader("User-Agent");
+      info = createBrowserInfo(request);
+      RWT.getSessionStore().setAttribute(BROWSER_INFO, info);
+    }
+    return info;
+  }
 
-      info = createBrowserInfo(userAgent);
-      info.setUserAgent(userAgent);
-      info.setLocale(request.getLocale());
+  public static BrowserInfo createBrowserInfo(HttpServletRequest request) {
+    BrowserInfo info;
+    if (LOG.isInfoEnabled()) {
+      Enumeration headerNames = request.getHeaderNames();
+      while (headerNames.hasMoreElements()) {
+        String headerName = (String) headerNames.nextElement();
+        String header = request.getHeader(headerName);
+        headerName = headerName + (headerName.length() <= 11 ? "\t\t" : "\t");
+        LOG.info(headerName + header);
+      }
+    }
+    String userAgent = request.getHeader("User-Agent");
 
-      if (userAgent.indexOf("Windows") != -1
-          || userAgent.indexOf("Win32") != -1
-          || userAgent.indexOf("Win64") != -1) {
-        info.setSystem(BrowserInfo.System.WINDOWS);
-      }
-      else if (userAgent.indexOf("Macintosh") != -1
-          || userAgent.indexOf("MacPPC") != -1
-          || userAgent.indexOf("MacIntel") != -1) {//FIXME
-        info.setSystem(BrowserInfo.System.OSX);
-      }
-      else if (userAgent.indexOf("X11") != -1
-          || userAgent.indexOf("Linux") != -1
-          || userAgent.indexOf("BSD") != -1) {//FIXME
-        if (userAgent.indexOf("Android") != -1) {
-          info.setSystem(BrowserInfo.System.ANDROID);
-          if (userAgent.indexOf("GT") != -1) {
-            info.setTablet(true);
-          }
-          else {
-            info.setMobile(true);
-          }
+    info = createBrowserInfo(userAgent);
+    info.setUserAgent(userAgent);
+    info.setLocale(request.getLocale());
+
+    if (userAgent.indexOf("Windows") != -1
+        || userAgent.indexOf("Win32") != -1
+        || userAgent.indexOf("Win64") != -1) {
+      info.setSystem(BrowserInfo.System.WINDOWS);
+    }
+    else if (userAgent.indexOf("Macintosh") != -1
+        || userAgent.indexOf("MacPPC") != -1
+        || userAgent.indexOf("MacIntel") != -1) {//FIXME
+      info.setSystem(BrowserInfo.System.OSX);
+    }
+    else if (userAgent.indexOf("X11") != -1
+        || userAgent.indexOf("Linux") != -1
+        || userAgent.indexOf("BSD") != -1) {//FIXME
+      if (userAgent.indexOf("Android") != -1) {
+        info.setSystem(BrowserInfo.System.ANDROID);
+        if (userAgent.indexOf("GT") != -1) {
+          info.setTablet(true);
         }
         else {
-          info.setSystem(BrowserInfo.System.UNIX);
+          info.setMobile(true);
         }
       }
-      else if (userAgent.indexOf("iPad") != -1) {
-        info.setSystem(BrowserInfo.System.IOS);
-        info.setTablet(true);
-      }
-      else if (userAgent.indexOf("iPhone") != -1
-          || userAgent.indexOf("iPod") != -1) {
-        info.setSystem(BrowserInfo.System.IOS);
-        info.setMobile(true);
-      }
       else {
-        info.setSystem(BrowserInfo.System.UNKNOWN);
+        info.setSystem(BrowserInfo.System.UNIX);
       }
-      if (LOG.isInfoEnabled()) {
-        LOG.info(info.toString());
-      }
-      RWT.getSessionStore().setAttribute(BROWSER_INFO, info);
+    }
+    else if (userAgent.indexOf("iPad") != -1) {
+      info.setSystem(BrowserInfo.System.IOS);
+      info.setTablet(true);
+    }
+    else if (userAgent.indexOf("iPhone") != -1
+        || userAgent.indexOf("iPod") != -1) {
+      info.setSystem(BrowserInfo.System.IOS);
+      info.setMobile(true);
+    }
+    else {
+      info.setSystem(BrowserInfo.System.UNKNOWN);
+    }
+    if (LOG.isInfoEnabled()) {
+      LOG.info(info.toString());
     }
     return info;
   }
