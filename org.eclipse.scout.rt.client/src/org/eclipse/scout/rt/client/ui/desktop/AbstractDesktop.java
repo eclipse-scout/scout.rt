@@ -1431,13 +1431,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     List<IForm> openForms = new ArrayList<IForm>();
     // remove views
     for (IForm view : getViewStack()) {
-      openForms.add(view);
       removeForm(view);
       openForms.add(view);
     }
     // remove forms
     for (IForm dialog : getDialogStack()) {
-      openForms.add(dialog);
       removeForm(dialog);
       openForms.add(dialog);
     }
