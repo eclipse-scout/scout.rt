@@ -14,12 +14,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.rwt.RWT;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -31,6 +34,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 /**
@@ -48,6 +52,8 @@ public class KeyStrokeManager implements IKeyStrokeManager {
   private Map<Widget, List<String>> m_widgetActiveKeys;
   private Map<Widget, List<String>> m_widgetCancelKeys;
 
+  private P_KeyEventHandler m_keyEventHandler;
+
   private boolean m_globalKeyStrokesActivated = false;
   private Object m_globalKeyStrokeListLock;
   private final IRwtEnvironment m_environment;
@@ -59,34 +65,26 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     m_globalCancelKeyList = new ArrayList<String>();
     m_widgetActiveKeys = new HashMap<Widget, List<String>>();
     m_widgetCancelKeys = new HashMap<Widget, List<String>>();
-
-    m_keyListener = new Listener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void handleEvent(final Event event) {
-        if (event.keyCode > 0 && event.display != null) {
-          event.display.asyncExec(new Runnable() {
-            @Override
-            public void run() {
-              handleKeyEvent(event);
-            }
-          });
-        }
-      }
-    };
+    m_keyEventHandler = new P_KeyEventHandler();
     m_keyAdapter = new KeyAdapter() {
       private static final long serialVersionUID = 1L;
 
       @Override
       public void keyPressed(final KeyEvent e) {
         if (e.keyCode > 0 && e.display != null) {
-          e.display.asyncExec(new Runnable() {
-            @Override
-            public void run() {
-              handleKeyEvent(e);
-            }
-          });
+          m_keyEventHandler.addEvent(e);
+          e.display.asyncExec(m_keyEventHandler);
+        }
+      }
+    };
+    m_keyListener = new Listener() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void handleEvent(final Event e) {
+        if (e.keyCode > 0 && e.display != null) {
+          m_keyEventHandler.addEvent(e);
+          e.display.asyncExec(m_keyEventHandler);
         }
       }
     };
@@ -277,64 +275,48 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     return keyString;
   }
 
-  private void handleKeyEvent(KeyEvent e) {
-    // do not touch the original event
-    Event eventCopy = new Event();
-    eventCopy.character = e.character;
-    eventCopy.data = e.data;
-    eventCopy.display = e.display;
-    eventCopy.doit = e.doit;
-    eventCopy.keyCode = e.keyCode;
-    eventCopy.stateMask = e.stateMask;
-    eventCopy.widget = e.widget;
+  public boolean isGlobalKeyStrokesActivated() {
+    return m_globalKeyStrokesActivated;
+  }
 
-    handleKeyEventHierarchical(eventCopy, e.display.getFocusControl());
-    e.doit = eventCopy.doit;
+  public void setGlobalKeyStrokesActivated(boolean globalKeyStrokesActivated) {
+    m_globalKeyStrokesActivated = globalKeyStrokesActivated;
   }
 
   private void handleKeyEvent(Event event) {
-    // do not touch the original event
-    Event eventCopy = new Event();
-    eventCopy.button = event.button;
-    eventCopy.character = event.character;
-    eventCopy.count = event.count;
-    eventCopy.data = event.data;
-    eventCopy.detail = event.detail;
-    eventCopy.display = event.display;
-    eventCopy.doit = event.doit;
-    eventCopy.end = event.end;
-    eventCopy.gc = event.gc;
-    eventCopy.height = event.height;
-    eventCopy.index = event.index;
-    eventCopy.item = event.item;
-    eventCopy.keyCode = event.keyCode;
-    eventCopy.start = event.start;
-    eventCopy.stateMask = event.stateMask;
-    eventCopy.text = event.text;
-    eventCopy.time = event.time;
-    eventCopy.type = event.type;
-    eventCopy.widget = event.widget;
-    eventCopy.width = event.width;
-    eventCopy.x = event.x;
-    eventCopy.y = event.y;
-    if (eventCopy.doit) {
+    if (event.doit && event.display != null) {
+      handleKeyEventHierarchical(event, event.display.getFocusControl());
+    }
+    if (event.doit) {
       // handle global key strokes
       if (isGlobalKeyStrokesActivated()) {
         for (IRwtKeyStroke keyStroke : getGlobalKeyStrokes()) {
-          if (keyStroke.getKeyCode() == eventCopy.keyCode && keyStroke.getStateMask() == eventCopy.stateMask) {
-            keyStroke.handleUiAction(eventCopy);
-            if (!eventCopy.doit) {
+          if (keyStroke.getKeyCode() == event.keyCode && keyStroke.getStateMask() == event.stateMask) {
+            keyStroke.handleUiAction(event);
+            if (!event.doit) {
               break;
             }
           }
         }
       }
     }
-    event.doit = eventCopy.doit;
+  }
+
+  private boolean isWidgetModalDialog(Widget widget) {
+    if (widget instanceof Shell) {
+      Object data = widget.getData();
+      if (data instanceof Dialog) {
+        Dialog dialog = (Dialog) data;
+        if ((dialog.getShell().getStyle() & SWT.APPLICATION_MODAL) == SWT.APPLICATION_MODAL) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private void handleKeyEventHierarchical(Event event, Widget widget) {
-    if (widget == null) {
+    if (widget == null || widget.isDisposed()) {
       return;
     }
     // key stroke handling
@@ -347,16 +329,85 @@ public class KeyStrokeManager implements IKeyStrokeManager {
         }
       }
     }
+    if (isWidgetModalDialog(widget)) {
+      event.doit = false;
+      return;
+    }
     if (widget instanceof Control) {
       handleKeyEventHierarchical(event, ((Control) widget).getParent());
     }
   }
 
-  public boolean isGlobalKeyStrokesActivated() {
-    return m_globalKeyStrokesActivated;
-  }
+  private class P_KeyEventHandler implements Runnable {
+    private Map<CompositeObject, List<Event>> m_eventListMap = null;
 
-  public void setGlobalKeyStrokesActivated(boolean globalKeyStrokesActivated) {
-    m_globalKeyStrokesActivated = globalKeyStrokesActivated;
+    public void addEvent(KeyEvent e) {
+      // do not touch the original event
+      Event eventCopy = new Event();
+      eventCopy.character = e.character;
+      eventCopy.data = e.data;
+      eventCopy.display = e.display;
+      eventCopy.doit = e.doit;
+      eventCopy.keyCode = e.keyCode;
+      eventCopy.stateMask = e.stateMask;
+      eventCopy.widget = e.widget;
+
+      addEventInternal(eventCopy);
+    }
+
+    public void addEvent(Event e) {
+      // do not touch the original event
+      Event eventCopy = new Event();
+      eventCopy.button = e.button;
+      eventCopy.character = e.character;
+      eventCopy.count = e.count;
+      eventCopy.data = e.data;
+      eventCopy.detail = e.detail;
+      eventCopy.display = e.display;
+      eventCopy.doit = e.doit;
+      eventCopy.end = e.end;
+      eventCopy.gc = e.gc;
+      eventCopy.height = e.height;
+      eventCopy.index = e.index;
+      eventCopy.item = e.item;
+      eventCopy.keyCode = e.keyCode;
+      eventCopy.start = e.start;
+      eventCopy.stateMask = e.stateMask;
+      eventCopy.text = e.text;
+      eventCopy.time = e.time;
+      eventCopy.type = e.type;
+      eventCopy.widget = e.widget;
+      eventCopy.width = e.width;
+      eventCopy.x = e.x;
+      eventCopy.y = e.y;
+
+      addEventInternal(eventCopy);
+    }
+
+    private void addEventInternal(Event e) {
+      CompositeObject key = new CompositeObject(e.keyCode, e.stateMask);
+      List<Event> eventList = CollectionUtility.getObject(m_eventListMap, key);
+      eventList = CollectionUtility.appendList(eventList, e);
+      m_eventListMap = CollectionUtility.putObject(m_eventListMap, key, eventList);
+    }
+
+    @Override
+    public void run() {
+      CompositeObject[] keys = CollectionUtility.getKeyArray(m_eventListMap, CompositeObject.class);
+      for (CompositeObject key : keys) {
+        List<Event> eventList = CollectionUtility.getObject(m_eventListMap, key);
+
+        boolean doit = true;
+        Iterator<Event> iterator = eventList.iterator();
+        while (iterator.hasNext()) {
+          Event event = (Event) iterator.next();
+          iterator.remove();
+          event.doit = doit;
+          KeyStrokeManager.this.handleKeyEvent(event);
+          doit = event.doit;
+        }
+        m_eventListMap = CollectionUtility.putObject(m_eventListMap, key, eventList);
+      }
+    }
   }
 }
