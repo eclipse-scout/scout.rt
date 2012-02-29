@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -57,6 +58,7 @@ import org.eclipse.scout.rt.ui.rap.ext.table.TableViewerEx;
 import org.eclipse.scout.rt.ui.rap.ext.table.util.TableRolloverSupport;
 import org.eclipse.scout.rt.ui.rap.form.fields.AbstractRwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
@@ -176,8 +178,21 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     table.addListener(SWT.MouseUp, rwtTableListener);
     table.addListener(SWT.MouseDoubleClick, rwtTableListener);
     table.addListener(SWT.MenuDetect, rwtTableListener);
-    table.addListener(SWT.KeyUp, rwtTableListener);
     table.addListener(SWT.Resize, rwtTableListener);
+    getUiEnvironment().addKeyStroke(table, new RwtKeyStroke((int) ' ') {
+
+      @Override
+      public void handleUiAction(Event e) {
+        handleUiToggleAcction(e);
+      }
+    }, false);
+    getUiEnvironment().addKeyStroke(table, new RwtKeyStroke(SWT.CR) {
+
+      @Override
+      public void handleUiAction(Event e) {
+        handleUiToggleAcction(e);
+      }
+    }, false);
 
     // context menu
     Menu contextMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
@@ -362,7 +377,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       h = 40; // Enough for 2 lines fully visible (further lines are cut off) --> cannot be dynamic at the moment, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=346768
     }
     if (h >= 0) {
-      getUiField().setData(Table.ITEM_HEIGHT, h);
+      getUiField().setData(RWT.CUSTOM_ITEM_HEIGHT, h);
     }
     if (isCreated()) {
       getUiTableViewer().refresh();
@@ -899,16 +914,29 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
   }
 
   protected void handleKeyboardNavigationFromUi(TableItem item) {
-//    if (getScoutObject().isCheckable()) {
-//      //nop
-//      return;
-//    }
     getUiField().setSelection(item);
     Event selectionEvent = new Event();
     selectionEvent.type = SWT.DefaultSelection;
     selectionEvent.widget = getUiField();
     for (Listener l : getUiField().getListeners(SWT.DefaultSelection)) {
       l.handleEvent(selectionEvent);
+    }
+  }
+
+  protected void handleUiToggleAcction(Event e) {
+    if (e.doit && getScoutObject().isCheckable()) {
+      if (e.stateMask == 0) {
+        switch (e.keyCode) {
+          case ' ':
+          case SWT.CR:
+            ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getUiTableViewer().getSelection());
+            if (selectedRows != null && selectedRows.length > 0) {
+              handleUiRowClick(selectedRows[0]);
+            }
+            e.doit = false;
+            break;
+        }
+      }
     }
   }
 
@@ -1084,23 +1112,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         }
         case SWT.MenuDetect: {
           showMenu(eventPosition);
-          break;
-        }
-        case SWT.KeyUp: {
-          if (event.doit && getScoutObject().isCheckable()) {
-            if (event.stateMask == 0) {
-              switch (event.keyCode) {
-                case ' ':
-                case SWT.CR:
-                  ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getUiTableViewer().getSelection());
-                  if (selectedRows != null && selectedRows.length > 0) {
-                    handleUiRowClick(selectedRows[0]);
-                  }
-                  event.doit = false;
-                  break;
-              }
-            }
-          }
           break;
         }
       }
