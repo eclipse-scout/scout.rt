@@ -3,7 +3,8 @@
       id="org.eclipse.scout.rt.feature"
       label="%featureName"
       version="3.8.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      plugin="org.eclipse.scout.rt.feature.about">
 
    <description>
       Scout runtime environment.
@@ -245,5 +246,12 @@ BSI Business Systems Integration AG - initial API and implementation
          install-size="0"
          version="0.0.0"
          fragment="true"/>
+         
+   <plugin
+         id="org.eclipse.scout.rt.feature.about"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>
