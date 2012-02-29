@@ -191,13 +191,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         handleUiToggleAcction(e);
       }
     }, false);
-    getUiEnvironment().addKeyStroke(table, new RwtKeyStroke(SWT.CR) {
-
-      @Override
-      public void handleUiAction(Event e) {
-        handleUiToggleAcction(e);
-      }
-    }, false);
 
     // context menu
     Menu contextMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
@@ -938,7 +931,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       if (e.stateMask == 0) {
         switch (e.keyCode) {
           case ' ':
-          case SWT.CR:
             ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getUiTableViewer().getSelection());
             if (selectedRows != null && selectedRows.length > 0) {
               handleUiRowClick(selectedRows[0]);
