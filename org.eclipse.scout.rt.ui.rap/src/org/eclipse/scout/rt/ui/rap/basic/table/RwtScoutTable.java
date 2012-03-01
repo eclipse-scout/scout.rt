@@ -26,7 +26,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -138,6 +137,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
     table.setLinesVisible(true);
     table.setHeaderVisible(true);
+    table.setTouchEnabled(RwtUtility.getBrowserInfo().isTablet() || RwtUtility.getBrowserInfo().isMobile());
     new TableRolloverSupport(table);
     table.addDisposeListener(new DisposeListener() {
       private static final long serialVersionUID = 1L;
@@ -180,6 +180,13 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     table.addListener(SWT.MenuDetect, rwtTableListener);
     table.addListener(SWT.Resize, rwtTableListener);
     getUiEnvironment().addKeyStroke(table, new RwtKeyStroke((int) ' ') {
+
+      @Override
+      public void handleUiAction(Event e) {
+        handleUiToggleAcction(e);
+      }
+    }, false);
+    getUiEnvironment().addKeyStroke(table, new RwtKeyStroke(SWT.CR) {
 
       @Override
       public void handleUiAction(Event e) {
@@ -370,7 +377,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       h = 40; // Enough for 2 lines fully visible (further lines are cut off) --> cannot be dynamic at the moment, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=346768
     }
     if (h >= 0) {
-      getUiField().setData(RWT.CUSTOM_ITEM_HEIGHT, h);
+      getUiField().setData(Table.ITEM_HEIGHT, h);
     }
     if (isCreated()) {
       getUiTableViewer().refresh();
@@ -921,6 +928,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       if (e.stateMask == 0) {
         switch (e.keyCode) {
           case ' ':
+          case SWT.CR:
             ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getUiTableViewer().getSelection());
             if (selectedRows != null && selectedRows.length > 0) {
               handleUiRowClick(selectedRows[0]);
