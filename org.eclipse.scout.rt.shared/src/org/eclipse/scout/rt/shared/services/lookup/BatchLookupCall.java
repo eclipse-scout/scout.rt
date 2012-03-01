@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,9 +14,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
+
 public class BatchLookupCall implements Serializable {
   private static final long serialVersionUID = 0L;
 
+  @MaxLength(Integer.MAX_VALUE)
   private ArrayList<LookupCall> m_calls;
 
   public BatchLookupCall() {
