@@ -95,7 +95,7 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
       if (form == null
           || form instanceof ISmartFieldProposalForm
           || form instanceof IOutlineTableForm) {
-        m_tableComposite.createUiField(getUiContainer(), getScoutObject().getTable(), getUiEnvironment());
+        m_tableComposite.createUiField(getUiContainer(), table, getUiEnvironment());
         m_tableComposite.getUiField().setLayoutData(tableGridData);
       }
       //XXX somehow the tableContainer does absorb the mouse-clicks when used in the outline
@@ -103,7 +103,7 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
         Composite tableContainer = new Composite(getUiContainer(), SWT.NONE);
         tableContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TABLE_CONTAINER);
         tableContainer.setLayout(new LogicalGridLayout(1, 0));
-        m_tableComposite.createUiField(tableContainer, getScoutObject().getTable(), getUiEnvironment());
+        m_tableComposite.createUiField(tableContainer, table, getUiEnvironment());
         tableContainer.setLayoutData(tableGridData);
         m_tableContainer = tableContainer;
       }

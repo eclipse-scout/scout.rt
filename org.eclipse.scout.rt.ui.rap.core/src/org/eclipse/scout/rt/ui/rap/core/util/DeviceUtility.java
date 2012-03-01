@@ -34,4 +34,13 @@ public class DeviceUtility {
 
     return false;
   }
+
+  public static boolean isMobileDevice() {
+    DeviceType deviceType = getDeviceType();
+    if (DeviceType.MOBILE.equals(deviceType)) {
+      return true;
+    }
+
+    return false;
+  }
 }
