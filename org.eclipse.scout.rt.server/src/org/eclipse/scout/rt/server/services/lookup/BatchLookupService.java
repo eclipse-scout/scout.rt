@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.services.lookup;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -28,8 +29,9 @@ public class BatchLookupService extends AbstractService implements IBatchLookupS
   public LookupRow[][] getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
     LookupCall[] calls = batch.getCallBatch();
     LookupRow[][] resultArray = new LookupRow[calls.length][];
+    BatchLookupResultCache cache = new BatchLookupResultCache();
     for (int i = 0; i < calls.length; i++) {
-      resultArray[i] = calls[i].getDataByKey();
+      resultArray[i] = cache.getDataByKey(calls[i]);
     }
     return resultArray;
   }
@@ -38,8 +40,9 @@ public class BatchLookupService extends AbstractService implements IBatchLookupS
   public LookupRow[][] getBatchDataByText(BatchLookupCall batch) throws ProcessingException {
     LookupCall[] calls = batch.getCallBatch();
     LookupRow[][] resultArray = new LookupRow[calls.length][];
+    BatchLookupResultCache cache = new BatchLookupResultCache();
     for (int i = 0; i < calls.length; i++) {
-      resultArray[i] = calls[i].getDataByText();
+      resultArray[i] = cache.getDataByText(calls[i]);
     }
     return resultArray;
   }
@@ -48,8 +51,9 @@ public class BatchLookupService extends AbstractService implements IBatchLookupS
   public LookupRow[][] getBatchDataByAll(BatchLookupCall batch) throws ProcessingException {
     LookupCall[] calls = batch.getCallBatch();
     LookupRow[][] resultArray = new LookupRow[calls.length][];
+    BatchLookupResultCache cache = new BatchLookupResultCache();
     for (int i = 0; i < calls.length; i++) {
-      resultArray[i] = calls[i].getDataByAll();
+      resultArray[i] = cache.getDataByAll(calls[i]);
     }
     return resultArray;
   }
@@ -58,8 +62,9 @@ public class BatchLookupService extends AbstractService implements IBatchLookupS
   public LookupRow[][] getBatchDataByRec(BatchLookupCall batch) throws ProcessingException {
     LookupCall[] calls = batch.getCallBatch();
     LookupRow[][] resultArray = new LookupRow[calls.length][];
+    BatchLookupResultCache cache = new BatchLookupResultCache();
     for (int i = 0; i < calls.length; i++) {
-      resultArray[i] = calls[i].getDataByRec();
+      resultArray[i] = cache.getDataByRec(calls[i]);
     }
     return resultArray;
   }

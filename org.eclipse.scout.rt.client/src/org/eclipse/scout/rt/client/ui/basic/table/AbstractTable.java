@@ -25,7 +25,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
@@ -76,6 +75,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
@@ -2750,7 +2750,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         batchCall = new BatchLookupCall();
         tableRowList = new ArrayList<ITableRow>();
         columnIndexList = new ArrayList<Integer>();
-        HashMap<LocalLookupCall, LookupRow[]> localLookupCache = new HashMap<LocalLookupCall, LookupRow[]>();
+        BatchLookupResultCache lookupResultCache = new BatchLookupResultCache();
         for (P_CellLookup lookup : m_cellLookupBuffer) {
           ITableRow row = lookup.getRow();
           if (row.getTable() == AbstractTable.this) {
@@ -2759,19 +2759,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             if (call != null) {
               //split: local vs remote
               if (call instanceof LocalLookupCall) {
-                LookupRow[] result = null;
-                //optimize local calls by caching the results
-                result = localLookupCache.get(call);
-                if (verifyLocalLookupCallBeanQuality((LocalLookupCall) call)) {
-                  result = localLookupCache.get(call);
-                  if (result == null) {
-                    result = call.getDataByKey();
-                    localLookupCache.put((LocalLookupCall) call, result);
-                  }
-                }
-                else {
-                  result = call.getDataByKey();
-                }
+                LookupRow[] result = lookupResultCache.getDataByKey(call);
                 applyLookupResult((InternalTableRow) row, col.getColumnIndex(), result);
               }
               else {
@@ -2831,28 +2819,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         fireRowFilterChanged();
       }
     }
-  }
-
-  private static final boolean DEV = Platform.inDevelopmentMode();
-
-  /**
-   * In order to use caching of results on local lookup calls, it is crucial that the javabean concepts are valid,
-   * especially hashCode and equals.
-   * <p>
-   * Scout tries to help developers to find problems related to this issue and write a warning in development mode on
-   * all local lookup call subclasses that do not overwrite hashCode and equals.
-   */
-  private boolean verifyLocalLookupCallBeanQuality(LocalLookupCall call) {
-    if (call.getClass() == LocalLookupCall.class) {
-      return true;
-    }
-    if (ConfigurationUtility.isMethodOverwrite(LocalLookupCall.class, "equals", new Class[]{Object.class}, call.getClass())) {
-      return true;
-    }
-    if (DEV) {
-      LOG.warn("" + call.getClass() + " subclasses LocalLookupCall and should override the 'boolean equals(Object obj)' method");
-    }
-    return false;
   }
 
   private int m_processEventBufferLoopDetection;
