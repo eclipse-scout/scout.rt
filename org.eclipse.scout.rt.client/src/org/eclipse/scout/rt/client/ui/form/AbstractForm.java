@@ -1340,7 +1340,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doClose() throws ProcessingException {
-    if (!isFormOpen() || m_closeType == IButton.SYSTEM_TYPE_CLOSE) {
+    if (!isFormOpen()) {
       return;
     }
     m_closeType = IButton.SYSTEM_TYPE_CLOSE;
@@ -1351,7 +1351,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doCancel() throws ProcessingException {
-    if (!isFormOpen() || m_closeType == IButton.SYSTEM_TYPE_CANCEL) {
+    if (!isFormOpen()) {
       return;
     }
     m_closeType = IButton.SYSTEM_TYPE_CANCEL;
@@ -1448,7 +1448,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   @Override
   public void doOk() throws ProcessingException {
-    if (!isFormOpen() || m_closeType == IButton.SYSTEM_TYPE_OK) {
+    if (!isFormOpen()) {
       return;
     }
     try {
@@ -1471,7 +1471,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doSaveWithoutMarkerChange() throws ProcessingException {
-    if (!isFormOpen() || m_closeType == IButton.SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE) {
+    if (!isFormOpen()) {
       return;
     }
     try {
@@ -1491,7 +1491,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doSave() throws ProcessingException {
-    if (!isFormOpen() || m_closeType == IButton.SYSTEM_TYPE_SAVE) {
+    if (!isFormOpen()) {
       return;
     }
     try {
