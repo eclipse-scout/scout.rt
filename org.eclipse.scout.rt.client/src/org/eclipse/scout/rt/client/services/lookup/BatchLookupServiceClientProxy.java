@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -30,10 +31,11 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
   public LookupRow[][] getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
+      BatchLookupResultCache cache = new BatchLookupResultCache();
       LookupCall[] calls = split.getLocalCalls();
       LookupRow[][] resultArray = new LookupRow[calls.length][];
       for (int i = 0; i < calls.length; i++) {
-        resultArray[i] = calls[i].getDataByKey();
+        resultArray[i] = cache.getDataByKey(calls[i]);
       }
       split.setLocalResults(resultArray);
     }
@@ -48,10 +50,11 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
   public LookupRow[][] getBatchDataByText(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
+      BatchLookupResultCache cache = new BatchLookupResultCache();
       LookupCall[] calls = split.getLocalCalls();
       LookupRow[][] resultArray = new LookupRow[calls.length][];
       for (int i = 0; i < calls.length; i++) {
-        resultArray[i] = calls[i].getDataByText();
+        resultArray[i] = cache.getDataByText(calls[i]);
       }
       split.setLocalResults(resultArray);
     }
@@ -66,10 +69,11 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
   public LookupRow[][] getBatchDataByAll(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
+      BatchLookupResultCache cache = new BatchLookupResultCache();
       LookupCall[] calls = split.getLocalCalls();
       LookupRow[][] resultArray = new LookupRow[calls.length][];
       for (int i = 0; i < calls.length; i++) {
-        resultArray[i] = calls[i].getDataByAll();
+        resultArray[i] = cache.getDataByAll(calls[i]);
       }
       split.setLocalResults(resultArray);
     }
@@ -84,10 +88,11 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
   public LookupRow[][] getBatchDataByRec(BatchLookupCall batch) throws ProcessingException {
     BatchSplit split = new BatchSplit(batch);
     if (split.getLocalCallCount() > 0) {
+      BatchLookupResultCache cache = new BatchLookupResultCache();
       LookupCall[] calls = split.getLocalCalls();
       LookupRow[][] resultArray = new LookupRow[calls.length][];
       for (int i = 0; i < calls.length; i++) {
-        resultArray[i] = calls[i].getDataByRec();
+        resultArray[i] = cache.getDataByRec(calls[i]);
       }
       split.setLocalResults(resultArray);
     }
