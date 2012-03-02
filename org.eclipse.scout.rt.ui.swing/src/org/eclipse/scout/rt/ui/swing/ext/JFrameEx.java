@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.ui.swing.ext;
 
 import java.awt.AWTEvent;
 import java.awt.Frame;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.Rectangle;
 
 import javax.swing.JFrame;
@@ -78,8 +80,13 @@ public class JFrameEx extends JFrame {
       m_nonMaximizedBounds = r;
     }
     Rectangle screen = SwingUtility.getFullScreenBoundsFor(r, false);
-    screen.x = Integer.MAX_VALUE;
-    screen.y = Integer.MAX_VALUE;
+    // set correct x/y coordinate which should be relative to a single screen.
+    // therefore the native windowing system insets on the frames current screen
+    // should be evaluated
+    GraphicsDevice screenDevice = SwingUtility.getCurrentScreen(r);
+    Insets screenInsets = SwingUtility.getScreenInsets(screenDevice);
+    screen.x = screenInsets.left;
+    screen.y = screenInsets.top;
     setMaximizedBounds(screen);
     int oldState = getExtendedState();
     super.setExtendedState(state);

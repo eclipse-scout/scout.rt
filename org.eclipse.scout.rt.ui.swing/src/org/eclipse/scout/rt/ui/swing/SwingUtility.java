@@ -20,6 +20,7 @@ import java.awt.EventQueue;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -837,31 +838,79 @@ public final class SwingUtility {
    * @param includeReservedInsets
    *          if taskbar and other windowing insets should be included in the
    *          returned area
-   * @return the effective view of the monitor that the rectangle mostly coveres
+   * @return the effective view of the monitor that the rectangle mostly covers
    */
   public static Rectangle getFullScreenBoundsFor(Rectangle r, boolean includeReservedInsets) {
+    GraphicsDevice screenDevice = getCurrentScreen(r);
+
+    GraphicsConfiguration config = screenDevice.getDefaultConfiguration();
+    Rectangle bounds = config.getBounds();
+    if (!includeReservedInsets) {
+      // getting bounds excluding native windowing system insets (like task bars, ...)
+      // therefore the insets has to be calculated...
+      Insets screenInsets = getScreenInsets(screenDevice);
+      // ... and manually removed from the full screen bounds
+      bounds.x += screenInsets.left;
+      bounds.y += screenInsets.top;
+      bounds.width = bounds.width - screenInsets.left - screenInsets.right;
+      bounds.height = bounds.height - screenInsets.top - screenInsets.bottom;
+    }
+
+    return bounds;
+  }
+
+  /**
+   * @param r
+   *          the rectangle to be used for the evaluation of current screen device
+   * @return the effective screen device that the rectangle mostly covers
+   */
+  public static GraphicsDevice getCurrentScreen(Rectangle r) {
     GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    TreeMap<Integer, Rectangle> prioMap = new TreeMap<Integer, Rectangle>();
+    TreeMap<Integer, GraphicsDevice> prioMap = new TreeMap<Integer, GraphicsDevice>();
+    // add default device with lowest prio
+    prioMap.put(-1, ge.getDefaultScreenDevice());
     for (GraphicsDevice dev : ge.getScreenDevices()) {
-      Rectangle bounds;
-      if ((!includeReservedInsets) && dev == ge.getDefaultScreenDevice()) {
-        bounds = ge.getMaximumWindowBounds();
-      }
-      else {
-        bounds = dev.getDefaultConfiguration().getBounds();
-      }
+      Rectangle bounds = dev.getDefaultConfiguration().getBounds();
+
       Rectangle intersection = bounds.intersection(r);
       if (intersection.width < 0 && intersection.height < 0) {
         // (bsh 2010-11-24) make sure that the resulting factor will be negative
         intersection.width *= -1;
       }
-      prioMap.put(intersection.width * intersection.height, bounds);
-      // add default device with lowest prio
-      if (dev == ge.getDefaultScreenDevice()) {
-        prioMap.put(-1, bounds);
-      }
+      prioMap.put(intersection.width * intersection.height, dev);
     }
     return prioMap.get(prioMap.lastKey());
+  }
+
+  /**
+   * Gets the insets of the screen.
+   * <p>
+   * <b>Attention: </b>Due to <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6899304">Java bug 6899304</a>
+   * this method only returns correct insets values for the primary screen device. For other screen devices empty insets
+   * will be returned. In Windows environments these circumstances (task bar on a none primary screen) will be very rare
+   * and therefore ignored until the bug will be fixed in a future Java version.
+   * </p>
+   * 
+   * @param screenDevice
+   *          a screen thats {@link GraphicsConfiguration} will be used to determine the insets
+   * @return the insets of this toolkit's screen, in pixels, if the given screen device is the primary screen, otherwise
+   *         empty insets
+   * @see Toolkit#getScreenInsets(GraphicsConfiguration)
+   */
+  public static Insets getScreenInsets(GraphicsDevice screenDevice) {
+    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    // <bko 2012-02-29>
+    // "Fix" for Sun bug 6899304 ("java.awt.Toolkit.getScreenInsets(GraphicsConfiguration) returns incorrect values")
+    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6699851
+    if (screenDevice == ge.getDefaultScreenDevice()) {
+      // only return Toolkit.getScreenInsets for primary screen device
+      return Toolkit.getDefaultToolkit().getScreenInsets(screenDevice.getDefaultConfiguration());
+    }
+    else {
+      // return empty insets for other screen devices
+      return new Insets(0, 0, 0, 0);
+    }
+    // </bko>
   }
 
   /**
