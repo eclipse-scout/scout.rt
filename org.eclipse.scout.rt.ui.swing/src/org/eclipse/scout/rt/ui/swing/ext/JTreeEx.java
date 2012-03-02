@@ -182,4 +182,70 @@ public class JTreeEx extends JTree {
       }
     }
   }
+
+  /**
+   * Expands the given path if it is not expanded, or collapses row if it is expanded. If expanding a path and
+   * {@link JTree} scrolls on expand, {@link #ensureRowsAreVisible(int, int)} is invoked to scroll as many of the
+   * children to visible as possible (tries to scroll to last visible descendant of path).
+   */
+  public void toggleExpandState(TreePath path) {
+    if (!isExpanded(path)) {
+      expandPath(path);
+
+      int row = getRowForPath(path);
+      if (row != -1) {
+        int beginRow = row;
+        int endRow = row;
+
+        if (getScrollsOnExpand()) {
+          // calculate the number of all newly visible children (recursive, not only the direct children)
+          Enumeration<TreePath> descendantToggledPaths = getDescendantToggledPaths(path);
+          int childCount = 0;
+          while (descendantToggledPaths.hasMoreElements()) {
+            TreePath treePath = (TreePath) descendantToggledPaths.nextElement();
+            if (isExpanded(treePath)) {
+              childCount += getModel().getChildCount(treePath.getLastPathComponent());
+            }
+          }
+
+          endRow = beginRow + childCount;
+        }
+
+        ensureRowsAreVisible(beginRow, endRow);
+      }
+    }
+    else {
+      collapsePath(path);
+    }
+  }
+
+  /**
+   * Ensure that the rows identified by the given range become visible.
+   * 
+   * @param beginRow
+   *          index of the first row to be made visible
+   * @param endRow
+   *          index of the last row to be made visible
+   */
+  private void ensureRowsAreVisible(int beginRow, int endRow) {
+    if (beginRow == endRow) {
+      scrollRowToVisible(beginRow);
+    }
+    else {
+      // calculate the height of newly visible rows and ensure that these area is getting visible
+      Rectangle beginRect = getRowBounds(beginRow);
+      Rectangle visibleRect = getVisibleRect();
+      Rectangle testRect = beginRect;
+      int beginY = beginRect.y;
+      int maxY = beginY + visibleRect.height;
+
+      for (int row = beginRow + 1; row <= endRow; row++) {
+        testRect = getRowBounds(row);
+        if ((testRect.y + testRect.height) > maxY) {
+          row = endRow;
+        }
+      }
+      scrollRectToVisible(new Rectangle(visibleRect.x, beginY, 1, testRect.y + testRect.height - beginY));
+    }
+  }
 }
