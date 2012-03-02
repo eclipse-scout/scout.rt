@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,7 +27,11 @@ public class BatchSplit {
   private LookupRow[][] m_results;
 
   public BatchSplit(BatchLookupCall batch) {
-    m_calls = batch.getCallBatch();
+    this(batch.getCallBatch());
+  }
+
+  public BatchSplit(LookupCall[] calls) {
+    m_calls = calls;
     m_local = new boolean[m_calls.length];
     for (int i = 0; i < m_calls.length; i++) {
       if (m_calls[i] != null) {

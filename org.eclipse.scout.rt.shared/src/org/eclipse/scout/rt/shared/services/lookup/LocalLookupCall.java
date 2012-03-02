@@ -70,16 +70,17 @@ public class LocalLookupCall extends LookupCall {
    */
   @Override
   public LookupRow[] getDataByKey() throws ProcessingException {
-    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+    if (getKey() == null) {
+      return LookupRow.EMPTY_ARRAY;
+    }
     Object key = getKey();
-    if (key != null) {
-      for (LookupRow row : execCreateLookupRows()) {
-        if (key.equals(row.getKey())) {
-          list.add(row);
-        }
+    ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+    for (LookupRow row : execCreateLookupRows()) {
+      if (key.equals(row.getKey())) {
+        list.add(row);
       }
     }
-    return list.toArray(new LookupRow[0]);
+    return list.toArray(new LookupRow[list.size()]);
   }
 
   /**
@@ -94,7 +95,7 @@ public class LocalLookupCall extends LookupCall {
         list.add(row);
       }
     }
-    return list.toArray(new LookupRow[0]);
+    return list.toArray(new LookupRow[list.size()]);
   }
 
   /**
@@ -109,7 +110,7 @@ public class LocalLookupCall extends LookupCall {
         list.add(row);
       }
     }
-    return list.toArray(new LookupRow[0]);
+    return list.toArray(new LookupRow[list.size()]);
   }
 
   /**
@@ -118,7 +119,7 @@ public class LocalLookupCall extends LookupCall {
   @Override
   public LookupRow[] getDataByRec() throws ProcessingException {
     ArrayList<LookupRow> list = new ArrayList<LookupRow>();
-    return list.toArray(new LookupRow[0]);
+    return list.toArray(new LookupRow[list.size()]);
   }
 
 }

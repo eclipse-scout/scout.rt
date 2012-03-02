@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,8 @@ import org.eclipse.scout.rt.shared.data.basic.MemoryOptimizedObject;
 
 public class LookupRow extends MemoryOptimizedObject implements Serializable {
   private static final long serialVersionUID = 0L;
+
+  public static final LookupRow[] EMPTY_ARRAY = new LookupRow[0];
 
   public static final int KEY_BIT = 1;
   public static final int TEXT_BIT = 2;
@@ -271,7 +273,7 @@ public class LookupRow extends MemoryOptimizedObject implements Serializable {
    */
   public static LookupRow[] createLookupRowArray(Object[][] data) {
     if (data == null || data.length == 0) {
-      return new LookupRow[0];
+      return LookupRow.EMPTY_ARRAY;
     }
     else {
       LookupRow[] a = new LookupRow[data.length];

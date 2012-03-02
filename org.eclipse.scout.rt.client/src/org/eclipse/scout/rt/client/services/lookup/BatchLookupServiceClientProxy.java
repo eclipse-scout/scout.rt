@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.BatchLookupNormalizer;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
@@ -29,7 +30,14 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
 
   @Override
   public LookupRow[][] getBatchDataByKey(BatchLookupCall batch) throws ProcessingException {
-    BatchSplit split = new BatchSplit(batch);
+    LookupCall[] allCalls = batch.getCallBatch();
+    //set calls with key==null to null
+    for (int i = 0; i < allCalls.length; i++) {
+      if (allCalls[i] != null && allCalls[i].getKey() == null) {
+        allCalls[i] = null;
+      }
+    }
+    BatchSplit split = new BatchSplit(allCalls);
     if (split.getLocalCallCount() > 0) {
       BatchLookupResultCache cache = new BatchLookupResultCache();
       LookupCall[] calls = split.getLocalCalls();
@@ -40,10 +48,20 @@ public class BatchLookupServiceClientProxy extends AbstractService implements IB
       split.setLocalResults(resultArray);
     }
     if (split.getRemoteCallCount() > 0) {
-      LookupRow[][] resultArray = getTargetService().getBatchDataByKey(new BatchLookupCall(split.getRemoteCalls()));
+      BatchLookupNormalizer normalizer = new BatchLookupNormalizer();
+      LookupCall[] normCallArray = normalizer.normalizeCalls(split.getRemoteCalls());
+      LookupRow[][] normResultArray = getTargetService().getBatchDataByKey(new BatchLookupCall(normCallArray));
+      LookupRow[][] resultArray = normalizer.denormalizeResults(normResultArray);
       split.setRemoteResults(resultArray);
     }
-    return split.getCombinedResults();
+    LookupRow[][] results = split.getCombinedResults();
+    //set null results to LookupRow[0]
+    for (int i = 0; i < results.length; i++) {
+      if (results[i] == null) {
+        results[i] = LookupRow.EMPTY_ARRAY;
+      }
+    }
+    return results;
   }
 
   @Override

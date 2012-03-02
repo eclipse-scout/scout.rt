@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -26,11 +25,13 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public class BatchLookupResultCache {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BatchLookupResultCache.class);
-  private static final boolean DEV = Platform.inDevelopmentMode();
   private static final Object globalCacheableLock = new Object();
   private static final HashMap<Class<? extends LookupCall>, Boolean> globalCacheable = new HashMap<Class<? extends LookupCall>, Boolean>();
 
   private HashMap<LookupCall, LookupRow[]> m_cache = new HashMap<LookupCall, LookupRow[]>();
+
+  public BatchLookupResultCache() {
+  }
 
   /**
    * reset the result cache
@@ -43,6 +44,9 @@ public class BatchLookupResultCache {
    * @return the same as {@link LookupCall#getDataByKey()} but use the cache to lookup already fetched results
    */
   public LookupRow[] getDataByKey(LookupCall call) throws ProcessingException {
+    if (call == null || call.getKey() == null) {
+      return LookupRow.EMPTY_ARRAY;
+    }
     LookupRow[] result = getCachedResult(call);
     if (result == null) {
       result = call.getDataByKey();
@@ -154,9 +158,7 @@ public class BatchLookupResultCache {
         }
         catch (Throwable ex) {
           //not found
-          if (DEV) {
-            LOG.warn("" + clazz + " subclasses LookupCall with an additional member field '" + t.getSimpleName() + "." + f.getName() + "' and should therefore override the 'boolean equals(Object obj)' and 'int hashCode()' methods");
-          }
+          LOG.warn("" + clazz + " subclasses LookupCall with an additional member field '" + t.getSimpleName() + "." + f.getName() + "' and should therefore override the 'boolean equals(Object obj)' and 'int hashCode()' methods");
           return false;
         }
       }
