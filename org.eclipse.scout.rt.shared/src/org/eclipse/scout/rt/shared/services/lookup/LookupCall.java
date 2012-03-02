@@ -240,7 +240,7 @@ public class LookupCall implements Cloneable, Serializable {
       return false;
     }
     LookupCall other = (LookupCall) obj;
-    if (this.m_serviceCached != other.m_serviceCached) {
+    if (this.m_serviceCached != null && other.m_serviceCached != null && this.m_serviceCached != other.m_serviceCached) {
       return false;
     }
     if (!(this.m_key == other.m_key || (this.m_key != null && this.m_key.equals(other.m_key)))) {
@@ -274,12 +274,12 @@ public class LookupCall implements Cloneable, Serializable {
    */
   public LookupRow[] getDataByKey() throws ProcessingException {
     if (getKey() == null) {
-      return new LookupRow[0];
+      return LookupRow.EMPTY_ARRAY;
     }
     if (getLookupService() != null) {
       return getLookupService().getDataByKey(this);
     }
-    return new LookupRow[0];
+    return LookupRow.EMPTY_ARRAY;
   }
 
   /**
@@ -336,7 +336,7 @@ public class LookupCall implements Cloneable, Serializable {
       return getLookupService().getDataByText(this);
     }
     else {
-      return new LookupRow[0];
+      return LookupRow.EMPTY_ARRAY;
     }
   }
 
@@ -394,7 +394,7 @@ public class LookupCall implements Cloneable, Serializable {
       return getLookupService().getDataByAll(this);
     }
     else {
-      return new LookupRow[0];
+      return LookupRow.EMPTY_ARRAY;
     }
   }
 
@@ -451,7 +451,7 @@ public class LookupCall implements Cloneable, Serializable {
       return getLookupService().getDataByRec(this);
     }
     else {
-      return new LookupRow[0];
+      return LookupRow.EMPTY_ARRAY;
     }
   }
 

@@ -107,7 +107,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
       // populate table
       ResultTableField.Table table = getResultTableField().getTable();
       if (rows == null) {
-        rows = new LookupRow[0];
+        rows = LookupRow.EMPTY_ARRAY;
       }
       int n = rows.length;
       if (maxCount > 0) {

@@ -2756,7 +2756,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           if (row.getTable() == AbstractTable.this) {
             ISmartColumn<?> col = lookup.getColumn();
             LookupCall call = col.prepareLookupCall(row);
-            if (call != null) {
+            if (call != null && call.getKey() != null) {
               //split: local vs remote
               if (call instanceof LocalLookupCall) {
                 LookupRow[] result = lookupResultCache.getDataByKey(call);
