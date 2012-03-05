@@ -303,6 +303,8 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         m_scoutTableListener = null;
       }
     }
+
+    removeAutoResizeColumnListener();
   }
 
   @Override
@@ -380,15 +382,35 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         if (m_autoResizeColumnListener == null) {
           m_autoResizeColumnListener = new P_SwtResizeListener();
           parent.addListener(SWT.Resize, m_autoResizeColumnListener);
+
+          //If the parent has already been resized no event will be fired anymore.
+          //So it is necessary to request an auto resizing of the columns manually. (Bugzilla 355855)
+          scheduleHandleAutoResizeColumn();
         }
       }
       else {
-        if (m_autoResizeColumnListener != null) {
-          parent.removeListener(SWT.Resize, m_autoResizeColumnListener);
-          m_autoResizeColumnListener = null;
-        }
+        removeAutoResizeColumnListener();
       }
     }
+  }
+
+  private void scheduleHandleAutoResizeColumn() {
+    getSwtField().getDisplay().asyncExec(new Runnable() {
+      @Override
+      public void run() {
+        handleAutoSizeColumns();
+      }
+    });
+  }
+
+  private void removeAutoResizeColumnListener() {
+    if (m_autoResizeColumnListener == null) {
+      return;
+    }
+
+    Composite parent = getSwtField().getParent();
+    parent.removeListener(SWT.Resize, m_autoResizeColumnListener);
+    m_autoResizeColumnListener = null;
   }
 
   /**
@@ -722,6 +744,10 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
    * </p>
    */
   protected void handleAutoSizeColumns() {
+    if (getSwtField() == null || getSwtField().isDisposed()) {
+      return;
+    }
+
     int totalWidth = getSwtField().getClientArea().width;
     if (getSwtField().getVerticalBar() != null && getSwtField().getVerticalBar().getVisible()) {
 //      totalWidth -= getSwtField().getVerticalBar().getSize().x;
@@ -731,11 +757,13 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       return;
     }
     int totalWeight = 0;
+    int actualWidth = 0;
     HashMap<TableColumn, Integer> columnWeights = new HashMap<TableColumn, Integer>();
     for (TableColumn col : getSwtField().getColumns()) {
       if (col == null || col.isDisposed()) {
         continue;
       }
+      actualWidth += col.getWidth();
       Object data = col.getData(SwtScoutTable.KEY_SCOUT_COLUMN);
       if (data instanceof IColumn<?>) {
         int width = ((IColumn<?>) data).getInitialWidth();
@@ -746,6 +774,12 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         totalWidth -= col.getWidth();
       }
     }
+
+    //If the columns already have the correct size there is no need to recalculate it
+    if (actualWidth == totalWidth) {
+      return;
+    }
+
     double factor = (double) totalWidth / (double) totalWeight;
     if (factor < 1) {
       factor = 1;
@@ -1025,14 +1059,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     public void handleEvent(Event event) {
       //lazy column auto-fit
       if (getSwtField() != null && !getSwtField().isDisposed()) {
-        getSwtField().getDisplay().asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            if (getSwtField() != null && !getSwtField().isDisposed()) {
-              handleAutoSizeColumns();
-            }
-          }
-        });
+        scheduleHandleAutoResizeColumn();
       }
     }
   } // end class P_SwtResizeListener

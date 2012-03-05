@@ -311,7 +311,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
 
       @Override
       protected int getConfiguredWidth() {
-        return 800;
+        return 200;
       }
 
       @Override
