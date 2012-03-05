@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -128,12 +127,11 @@ public class AliasMapper {
    */
   public Map<String, String> getNodeAliases(Object node) {
     Map<String, String> map = m_nodeAliases.get(node);
-    if (map != null) {
-      return map;
+    if (map == null) {
+      map = new HashMap<String, String>();
+      m_nodeAliases.put(node, map);
     }
-    else {
-      return Collections.emptyMap();
-    }
+    return map;
   }
 
   /**
