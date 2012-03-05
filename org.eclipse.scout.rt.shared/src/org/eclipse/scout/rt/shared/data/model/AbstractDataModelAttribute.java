@@ -51,6 +51,21 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   private IDataModelEntity m_parentEntity;
 
   public AbstractDataModelAttribute() {
+    this(true);
+  }
+
+  /**
+   * @param callInitConfig
+   *          true if {@link #callInitConfig()} should automcatically be invoked, false if the subclass invokes
+   *          {@link #callInitConfig()} itself
+   */
+  public AbstractDataModelAttribute(boolean callInitConfig) {
+    if (callInitConfig) {
+      callInitConfig();
+    }
+  }
+
+  protected void callInitConfig() {
     initConfig();
   }
 

@@ -105,6 +105,12 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
   /**
    * @return meta data for the attribute, default returns null
    *         <p>
+   *         This method is useful and should be overridden when dynamic attributes are used, where multiple attributes
+   *         of the same type (Class) occur in the same {@link IDataModel}. This meta map contains the distinguishing
+   *         map of these multiple instances.
+   *         <p>
+   *         If the map is not filled or null, the comparison is only based on the type ({@link #getClass()})
+   *         <p>
    *         see {@link DataModelUtility}
    */
   Map<String, String> getMetaDataOfAttribute();
