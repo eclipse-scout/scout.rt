@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 public abstract class AbstractFileChooserField extends AbstractValueField<String> implements IFileChooserField {
@@ -176,6 +177,9 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   @Override
   public void setShowDirectory(boolean b) {
     m_showDirectory = b;
+    if (WebClientState.isWebClientInCurrentThread()) {
+      m_showDirectory = false;
+    }
     if (isInitialized()) {
       if (isAutoDisplayText()) {
         setDisplayText(execFormatValue(getValue()));
