@@ -51,10 +51,10 @@ public final class DataModelUtility {
    */
   public static String entityToExternalId(IDataModelEntity e) {
     if (e.getParentEntity() != null) {
-      return entityToExternalId(e.getParentEntity()) + "/" + e.getClass().getSimpleName();
+      return entityToExternalId(e.getParentEntity()) + "/" + e.getClass().getSimpleName() + exportMetaData(e.getMetaDataOfEntity());
     }
     else {
-      return e.getClass().getSimpleName();
+      return e.getClass().getSimpleName() + exportMetaData(e.getMetaDataOfEntity());
     }
   }
 
@@ -136,6 +136,7 @@ public final class DataModelUtility {
     }
     String folderName = m.group(2);
     String elemName = m.group(3);
+    Map<String, String> meta = importMetaData(m.group(5));
     if (folderName != null) {
       parentEntity = externalIdToEntity(f, folderName, parentEntity);
       if (parentEntity == null) {
@@ -143,10 +144,10 @@ public final class DataModelUtility {
       }
     }
     if (parentEntity != null) {
-      return findEntity(parentEntity.getEntities(), elemName);
+      return findEntity(parentEntity.getEntities(), elemName, meta);
     }
     else {
-      return findEntity(f.getEntities(), elemName);
+      return findEntity(f.getEntities(), elemName, meta);
     }
   }
 
@@ -189,6 +190,7 @@ public final class DataModelUtility {
     }
     String folderName = m.group(2);
     String elemName = m.group(3);
+    Map<String, String> meta = importMetaData(m.group(5));
     if (folderName != null) {
       parentEntity = resolveEntityPath(f, folderName, parentEntity, entityPath);
       if (parentEntity == null) {
@@ -197,10 +199,10 @@ public final class DataModelUtility {
     }
     IDataModelEntity result;
     if (parentEntity != null) {
-      result = findEntity(parentEntity.getEntities(), elemName);
+      result = findEntity(parentEntity.getEntities(), elemName, meta);
     }
     else {
-      result = findEntity(f.getEntities(), elemName);
+      result = findEntity(f.getEntities(), elemName, meta);
     }
     if (result != null) {
       entityPath.add(result);
@@ -240,14 +242,24 @@ public final class DataModelUtility {
   }
 
   /**
+   * @deprecated use {@link #findEntity(IDataModelEntity[], String, Map)} instead
+   */
+  @Deprecated
+  public static IDataModelEntity findEntity(IDataModelEntity[] array, String simpleName) {
+    return findEntity(array, simpleName, null);
+  }
+
+  /**
    * @return the entity for an external id part (no '/' characters) using
    *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
-  public static IDataModelEntity findEntity(IDataModelEntity[] array, String simpleName) {
+  public static IDataModelEntity findEntity(IDataModelEntity[] array, String simpleName, Map<String, String> metaData) {
     if (array != null) {
       for (IDataModelEntity e : array) {
         if (e.getClass().getSimpleName().equals(simpleName)) {
-          return e;
+          if (CompareUtility.equals(e.getMetaDataOfEntity(), metaData)) {
+            return e;
+          }
         }
       }
     }
@@ -259,18 +271,16 @@ public final class DataModelUtility {
    *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
   public static IDataModelAttribute findAttribute(IDataModelAttribute[] array, String simpleName, Map<String, String> metaData) {
-    IDataModelAttribute secondaryMatch = null;
     if (array != null) {
       for (IDataModelAttribute a : array) {
         if (a.getClass().getSimpleName().equals(simpleName)) {
-          secondaryMatch = a;
           if (CompareUtility.equals(a.getMetaDataOfAttribute(), metaData)) {
             return a;
           }
         }
       }
     }
-    return secondaryMatch;
+    return null;
   }
 
   /**

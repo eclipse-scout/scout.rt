@@ -47,8 +47,23 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   private boolean m_initialized;
 
   public AbstractDataModelEntity() {
+    this(true);
+  }
+
+  /**
+   * @param callInitConfig
+   *          true if {@link #callInitConfig()} should automcatically be invoked, false if the subclass invokes
+   *          {@link #callInitConfig()} itself
+   */
+  public AbstractDataModelEntity(boolean callInitConfig) {
     m_attributes = new ArrayList<IDataModelAttribute>();
     m_entities = new ArrayList<IDataModelEntity>();
+    if (callInitConfig) {
+      callInitConfig();
+    }
+  }
+
+  protected void callInitConfig() {
     initConfig();
   }
 
@@ -126,6 +141,11 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     }
     //lazy create entities at point when setParentEntity is set, this is necessary to avoid cyclic loops
     m_entities = new ArrayList<IDataModelEntity>();
+  }
+
+  @Override
+  public Map<String, String> getMetaDataOfEntity() {
+    return null;
   }
 
   /*
@@ -305,11 +325,15 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
       injectEntitiesInternal(entities);
       m_entities.clear();
       m_entities.addAll(entities);
-      for (IDataModelEntity e : newInstances) {
-        e.setParentEntity(this);
+      for (IDataModelEntity e : m_entities) {
+        if (e.getParentEntity() != this) {
+          e.setParentEntity(this);
+        }
       }
       for (IDataModelEntity e : newInstances) {
-        e.initializeChildEntities(instanceMap);
+        if (m_entities.contains(e)) {
+          e.initializeChildEntities(instanceMap);
+        }
       }
     }
   }
@@ -327,6 +351,8 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   /**
    * do not use this internal method<br>
    * Used add/remove entities
+   * <p>
+   * Note that {@link #initializeChildEntities(Map)} is <em>not</em> called on injected entities
    * 
    * @param entityList
    *          live and mutable list of configured attributes
