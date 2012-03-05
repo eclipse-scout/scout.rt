@@ -1231,7 +1231,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     //from
     if (fromPart != null) {
       //resolve aliases in from
-      // miss-using 'contrib' as a "node" because real node is not accessible
+      // mis-using 'contrib' as a "node" because real node is not accessible
       m_aliasMapper.addMissingNodeEntitiesFrom(contrib, fromPart);
       Map<String, String> aliasMap = m_aliasMapper.getNodeAliases(contrib);
       parentAliasMap.putAll(aliasMap);
