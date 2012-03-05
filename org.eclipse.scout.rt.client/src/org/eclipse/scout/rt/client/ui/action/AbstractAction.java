@@ -34,8 +34,10 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   private final EventListenerList m_listenerList = new EventListenerList();
   private final IActionUIFacade m_uiFacade;
   private boolean m_inheritAccessibility;
-  private boolean m_enabledProperty;
+  // enabled is defined as: enabledGranted && enabledProperty && enabledProcessing
   private boolean m_enabledGranted;
+  private boolean m_enabledProperty;
+  private boolean m_enabledProcessingAction;
   private boolean m_visibleProperty;
   private boolean m_visibleGranted;
   private boolean m_singleSelectionAction;
@@ -50,6 +52,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   public AbstractAction(boolean callInitializer) {
     m_uiFacade = createUIFacade();
     m_enabledGranted = true;
+    m_enabledProcessingAction = true;
     m_visibleGranted = true;
     if (callInitializer) {
       callInitializer();
@@ -287,7 +290,16 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public void doAction() throws ProcessingException {
-    execAction();
+    if (isEnabled() && isVisible()) {
+      try {
+        setEnabledProcessingAction(false);
+
+        execAction();
+      }
+      finally {
+        setEnabledProcessingAction(true);
+      }
+    }
   }
 
   @Override
@@ -468,8 +480,19 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     setEnabledInternal();
   }
 
+  @Override
+  public boolean isEnabledProcessingAction() {
+    return m_enabledProcessingAction;
+  }
+
+  @Override
+  public void setEnabledProcessingAction(boolean b) {
+    m_enabledProcessingAction = b;
+    setEnabledInternal();
+  }
+
   private void setEnabledInternal() {
-    propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty);
+    propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty && m_enabledProcessingAction);
   }
 
   @Override

@@ -59,11 +59,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   private IForm m_form;
   private boolean m_initialized;
   // special property/members
-  // enabled is defined as: enabledGranted && enabledProperty && enabledSlave
+  // enabled is defined as: enabledGranted && enabledProperty && enabledSlave && enabledProcessing
   private Permission m_enabledPermission;
   private boolean m_enabledGranted;
   private boolean m_enabledProperty;
   private boolean m_enabledSlave;
+  private boolean m_enabledProcessingButton;
   // visible is defined as: visibleGranted && visibleProperty
   private Permission m_visiblePermission;
   private boolean m_visibleGranted;
@@ -100,6 +101,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
     m_enabledGranted = true;
     m_enabledSlave = true;
+    m_enabledProcessingButton = true;
     m_visibleGranted = true;
     if (callInitializer) {
       callInitializer();
@@ -992,6 +994,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
+  public boolean isEnabledProcessingButton() {
+    return m_enabledProcessingButton;
+  }
+
+  @Override
+  public void setEnabledProcessingButton(boolean b) {
+    m_enabledProcessingButton = b;
+    calculateEnabled();
+  }
+
+  @Override
   public void setEnabled(boolean b) {
     m_enabledProperty = b;
     if (b) {
@@ -1017,10 +1030,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       }
     }
     if (applyAccessControl) {
-      propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty && m_enabledSlave);
+      propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty && m_enabledSlave && m_enabledProcessingButton);
     }
     else {
-      propertySupport.setPropertyBool(PROP_ENABLED, m_enabledProperty && m_enabledSlave);
+      propertySupport.setPropertyBool(PROP_ENABLED, m_enabledProperty && m_enabledSlave && m_enabledProcessingButton);
     }
   }
 
