@@ -120,13 +120,78 @@ public class FormDataStatementBuilder implements DataModelConstants {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormDataStatementBuilder.class);
   private static final Pattern PLAIN_ATTRIBUTE_PATTERN = Pattern.compile("(<attribute>)([a-zA-Z_][a-zA-Z0-9_]*)(</attribute>)");
 
+  /**
+   * Strategy used in
+   * {@link DataModelAttributePartDefinition#createInstance(FormDataStatementBuilder, ComposerAttributeNodeData, AttributeStrategy, String, List, List, Map)}
+   */
   public static enum AttributeStrategy {
+    /**
+     * Assuming the constraint "SALARY &gt;= 1000" and the attribute statement
+     * 
+     * <pre>
+     * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
+     * AND ACTIVE=1
+     * </pre>
+     * 
+     * this strategy only creates the contraint of the attribute part
+     * 
+     * <pre>
+     * {@link EntityContribution#getWhereParts()} = SALARY&gt;=1000
+     * </pre>
+     */
     BuildConstraintOfAttribute,
+    /**
+     * Assuming the constraint "SALARY &gt;= 1000" and the attribute statement
+     * 
+     * <pre>
+     * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
+     * AND ACTIVE=1
+     * </pre>
+     * 
+     * this strategy only creates the contraint of the context (excluding the attribute)
+     * 
+     * <pre>
+     * {@link EntityContribution#getWhereParts()} = ACTIVE=1
+     * </pre>
+     */
     BuildConstraintOfContext,
+    /**
+     * Assuming the constraint "SALARY &gt;= 1000" and the attribute statement
+     * 
+     * <pre>
+     * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
+     * AND ACTIVE=1
+     * </pre>
+     * 
+     * this strategy creates the contraint of the context and the attribute
+     * 
+     * <pre>
+     * {@link EntityContribution#getWhereParts()} = SALARY&gt;=1000 AND ACTIVE=1
+     * </pre>
+     */
     BuildConstraintOfAttributeWithContext,
+    /**
+     * Assuming the query "SALARY" and the attribute statement
+     * 
+     * <pre>
+     * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
+     * AND ACTIVE=1
+     * </pre>
+     * 
+     * this strategy creates the select query part of the attribute and adds constraints for the context
+     * 
+     * <pre>
+     * {@link EntityContribution#getSelectParts()} = SALARY
+     * {@link EntityContribution#getWhereParts()} = ACTIVE=1
+     * </pre>
+     */
     BuildQueryOfAttributeAndConstraintOfContext,
   }
 
+  /**
+   * Strategy used in
+   * {@link DataModelEntityPartDefinition#createInstance(FormDataStatementBuilder, ComposerEntityNodeData, EntityStrategy, String, Map)}
+   */
   public static enum EntityStrategy {
     BuildConstraints,
     BuildQuery,
