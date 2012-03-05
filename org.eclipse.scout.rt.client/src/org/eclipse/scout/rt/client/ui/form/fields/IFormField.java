@@ -393,6 +393,15 @@ public interface IFormField extends IPropertyObserver {
   void setEnabledGranted(boolean b);
 
   /**
+   * This property is used by buttons. Buttons set the property to false while in work.
+   * 
+   * @return true if process button is not in {@link IButton#doClick()} action
+   */
+  boolean isEnabledProcessingButton();
+
+  void setEnabledProcessingButton(boolean b);
+
+  /**
    * @return {@link #isEnabledGranted()} && {@link #getEnabledProperty()}
    */
   boolean isEnabled();

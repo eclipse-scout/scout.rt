@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -122,6 +122,15 @@ public interface IAction extends IPropertyObserver {
    * when false, enabled property cannot be set to true
    */
   void setEnabledGranted(boolean b);
+
+  /**
+   * Actions set the property to false while in work.
+   * 
+   * @return true if action is not in {@link IAction#doAction()}
+   */
+  boolean isEnabledProcessingAction();
+
+  void setEnabledProcessingAction(boolean b);
 
   /**
    * Access control<br>

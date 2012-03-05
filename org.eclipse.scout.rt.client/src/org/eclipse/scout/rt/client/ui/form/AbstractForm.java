@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StoppableThread;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -119,7 +118,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private IGroupBox m_mainBox;
   private IWrappedFormField m_wrappedFormField;
   private P_SystemButtonListener m_systemButtonListener;
-  private final OptimisticLock m_systemButtonListenerLock;
+
   private IFormHandler m_handler;
   // access control
   private boolean m_enabledGranted;
@@ -147,7 +146,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_visibleGranted = true;
     m_formLoading = true;
     m_blockingCondition = new BlockingCondition(false);
-    m_systemButtonListenerLock = new OptimisticLock();
     if (callInitializer) {
       callInitializer();
     }
@@ -401,7 +399,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       doClose();
     }
     else {
-      LOG.warn("Trying to close a form (" + getClass().getName() + " - " + getTitle() + ") with no close button! override getConfiguredAskIfNeedSave() to false to make this form is unsaveable.");
+      LOG.info("Trying to close a form (" + getClass().getName() + " - " + getTitle() + ") with no enabled close button! override getConfiguredAskIfNeedSave() to false to make this form is unsaveable.");
     }
   }
 
@@ -1374,13 +1372,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       visitFields(collector);
       if (collector.getCollectionCount() > 0 && isAskIfNeedSave()) {
         MessageBox messageBox = new MessageBox(
-            null,
-            getCancelVerificationText(),
-            null,
-            ScoutTexts.get("Yes"),
-            ScoutTexts.get("No"),
-            ScoutTexts.get("Cancel")
-            );
+                null,
+                getCancelVerificationText(),
+                null,
+                ScoutTexts.get("Yes"),
+                ScoutTexts.get("No"),
+                ScoutTexts.get("Cancel")
+                );
         messageBox.setSeverity(IProcessingStatus.INFO);
         int result = messageBox.startMessageBox();
         if (result == IMessageBox.YES_OPTION) {
@@ -1610,6 +1608,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       try {
         // check if there is an active close, cancel or finish button
         final HashSet<Integer> enabledSystemTypes = new HashSet<Integer>();
+        final HashSet<IButton> enabledSystemButtons = new HashSet<IButton>();
         IFormFieldVisitor v = new IFormFieldVisitor() {
           @Override
           public boolean visitField(IFormField field, int level, int fieldIndex) {
@@ -1617,13 +1616,24 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               IButton b = (IButton) field;
               if (b.isEnabled() && b.isVisible()) {
                 enabledSystemTypes.add(b.getSystemType());
+                enabledSystemButtons.add(b);
               }
             }
             return true;
           }
         };
-        visitFields(v);
-        execOnCloseRequest(kill, enabledSystemTypes);
+        try {
+          visitFields(v);
+          for (IButton b : enabledSystemButtons) {
+            b.setEnabledProcessingButton(false);
+          }
+          execOnCloseRequest(kill, enabledSystemTypes);
+        }
+        finally {
+          for (IButton b : enabledSystemButtons) {
+            b.setEnabledProcessingButton(true);
+          }
+        }
       }
       catch (ProcessingException se) {
         se.addContextMessage(ScoutTexts.get("FormClosing") + " " + getTitle());
@@ -2447,18 +2457,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         ((IButton) e.getSource()).removeButtonListener(this);
         return;
       }
-      /*
-       * Ticket 76711: added optimistic lock
-       */
-      try {
-        if (m_systemButtonListenerLock.acquire()) {
-          //
-          handleSystemButtonEventInternal(e);
-        }// end if optimistic lock
-      }// end try optimistic lock
-      finally {
-        m_systemButtonListenerLock.release();
-      }
+      handleSystemButtonEventInternal(e);
     }
   }// end private class
 
