@@ -303,6 +303,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         m_scoutTableListener = null;
       }
     }
+
+    removeAutoResizeColumnListener();
   }
 
   @Override
@@ -399,14 +401,33 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           m_autoResizeColumnListener = new P_RwtResizeListener();
           parent.addListener(SWT.Resize, m_autoResizeColumnListener);
         }
-      }
-      else {
-        if (m_autoResizeColumnListener != null) {
-          parent.removeListener(SWT.Resize, m_autoResizeColumnListener);
-          m_autoResizeColumnListener = null;
-        }
+        //If the parent has already been resized no event will be fired anymore.
+        //So it is necessary to request an auto resizing of the columns manually. (Bugzilla 355855)
+        scheduleHandleAutoResizeColumn();
       }
     }
+    else {
+      removeAutoResizeColumnListener();
+    }
+  }
+
+  private void scheduleHandleAutoResizeColumn() {
+    getUiField().getDisplay().asyncExec(new Runnable() {
+      @Override
+      public void run() {
+        handleAutoSizeColumns();
+      }
+    });
+  }
+
+  private void removeAutoResizeColumnListener() {
+    if (m_autoResizeColumnListener == null) {
+      return;
+    }
+
+    Composite parent = getUiField().getParent();
+    parent.removeListener(SWT.Resize, m_autoResizeColumnListener);
+    m_autoResizeColumnListener = null;
   }
 
   /**
@@ -772,6 +793,10 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
    * model. Empty space will be distributed weighted.
    */
   protected void handleAutoSizeColumns() {
+    if (getUiField() == null || getUiField().isDisposed()) {
+      return;
+    }
+
     int totalWidth = getUiField().getClientArea().width;
     /* fixed in rwt
     if (getUiField().getVerticalBar() != null && getUiField().getVerticalBar().getVisible()) {
@@ -783,11 +808,13 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       return;
     }
     int totalWeight = 0;
+    int actualWidth = 0;
     HashMap<TableColumn, Integer> columnWeights = new HashMap<TableColumn, Integer>();
     for (TableColumn col : getUiField().getColumns()) {
       if (col == null || col.isDisposed()) {
         continue;
       }
+      actualWidth += col.getWidth();
       Object data = col.getData(RwtScoutTable.KEY_SCOUT_COLUMN);
       if (data instanceof IColumn<?>) {
         int width = ((IColumn<?>) data).getInitialWidth();
@@ -798,6 +825,12 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         totalWidth -= col.getWidth();
       }
     }
+
+    //If the columns already have the correct size there is no need to recalculate it
+    if (actualWidth == totalWidth) {
+      return;
+    }
+
     double factor = (double) totalWidth / (double) totalWeight;
     int i = 0;
     for (Entry<TableColumn, Integer> entry : columnWeights.entrySet()) {
@@ -1090,14 +1123,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           //lazy column auto-fit
           if (getScoutObject().isAutoResizeColumns()) {
             if (getUiField() != null && !getUiField().isDisposed()) {
-              getUiField().getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                  if (getUiField() != null && !getUiField().isDisposed()) {
-                    handleAutoSizeColumns();
-                  }
-                }
-              });
+              scheduleHandleAutoResizeColumn();
             }
           }
           break;
@@ -1117,14 +1143,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     public void handleEvent(Event event) {
       //lazy column auto-fit
       if (getUiField() != null && !getUiField().isDisposed()) {
-        getUiField().getDisplay().asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            if (getUiField() != null && !getUiField().isDisposed()) {
-              handleAutoSizeColumns();
-            }
-          }
-        });
+        scheduleHandleAutoResizeColumn();
       }
     }
   } // end class P_SwtResizeListener
