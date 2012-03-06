@@ -171,6 +171,11 @@ public interface IRwtEnvironment extends IRwtCoreEnvironment {
 
   void showFileChooserFromScout(IFileChooser fileChooser);
 
+  /**
+   * Open a browser window with some url or address.
+   * <p>
+   * If the address is a file path, this will trigger a file download from the browser.
+   */
   void openBrowserWindowFromScout(String path);
 
   void showMessageBoxFromScout(IMessageBox messageBox);

@@ -23,6 +23,10 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>SwtScoutFileChooser</h3> ...
+ * RWT File chooser is only designed to UPLOAD files, regardless of the {@link SWT#SAVE} flag.
+ * <p>
+ * Therefore the DOWNLOAD of files is done by displaying a link to the resource and let the user click on it resp. right
+ * click "Save As..." on it. TODO sel/imo
  * 
  * @since 3.7.0 June 2011
  */
