@@ -782,3 +782,14 @@ the given end time fits into the begin and end time interval of the column.
 Otherwise, the previous column has to be returned.
 Migration:
 None
+
+06.03.2012 abr
+Bugzilla: 373358
+composer field: select parent node when a node is deleted
+Problem:
+The selection in an org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField gets lost if a node
+is removed using its corresponding delete menu. However, the previous node is selected when a node is deleted by
+the delete key stroke.
+Solution:
+Added the selection behavior to the nodes' delete menus and select previous parent node instead of previous node.
+Migration: none

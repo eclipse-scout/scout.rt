@@ -783,8 +783,6 @@ public abstract class AbstractComposerField extends AbstractFormField implements
             if (menu != null) {
               menu.prepareAction();
               if (menu.isVisible() && menu.isEnabled()) {
-                //correct selection
-                tree.selectPreviousNode();
                 menu.doAction();
               }
             }

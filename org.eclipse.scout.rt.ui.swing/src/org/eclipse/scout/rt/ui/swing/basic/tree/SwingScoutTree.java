@@ -305,9 +305,22 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       TreePath[] paths = scoutNodesToTreePaths(newScoutNodes);
       TreePath anchorPath = getSwingTree().getAnchorSelectionPath();
       TreePath leadPath = getSwingTree().getLeadSelectionPath();
+
       getSwingTree().setSelectionPaths(paths);
-      getSwingTree().setAnchorSelectionPath(anchorPath);
-      getSwingTree().setLeadSelectionPath(leadPath);
+
+      // restore anchor path if its last segment is still valid
+      ITreeNode anchorScoutNode = treePathToScoutNode(anchorPath);
+      if (anchorScoutNode != null && anchorScoutNode.getTree() != null
+          && anchorScoutNode.isVisible() && anchorScoutNode.isFilterAccepted()) {
+        getSwingTree().setAnchorSelectionPath(anchorPath);
+      }
+
+      // restore lead path if its last segment is still valid
+      ITreeNode leadScoutNode = treePathToScoutNode(leadPath);
+      if (leadScoutNode != null && leadScoutNode.getTree() != null
+          && leadScoutNode.isVisible() && leadScoutNode.isFilterAccepted()) {
+        getSwingTree().setLeadSelectionPath(leadPath);
+      }
     }
   }
 
