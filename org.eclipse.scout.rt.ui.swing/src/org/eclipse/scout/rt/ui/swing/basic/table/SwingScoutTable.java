@@ -34,6 +34,7 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventObject;
 import java.util.HashSet;
 import java.util.List;
 
@@ -1289,6 +1290,18 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       }
       return c;
+    }
+
+    @Override
+    public boolean editCellAt(int row, int column, EventObject e) {
+      //no editing for tables with multi-select, if control or shift is pressed
+      if (e instanceof MouseEvent && ListSelectionModel.MULTIPLE_INTERVAL_SELECTION == getSwingTable().getSelectionModel().getSelectionMode()) {
+        MouseEvent me = (MouseEvent) e;
+        if (me.isControlDown() || me.isShiftDown()) {
+          return false;
+        }
+      }
+      return super.editCellAt(row, column, e);
     }
   }
 
