@@ -159,6 +159,7 @@ public class EntityNode extends AbstractComposerNode {
 
     @Override
     protected void execAction() throws ProcessingException {
+      getTree().selectPreviousParentNode();
       getTree().removeNode(EntityNode.this);
     }
   }

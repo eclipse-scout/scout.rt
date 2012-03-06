@@ -524,3 +524,13 @@ Solution:
 The proposed patch includes a refresh of the absolute size every time the field's content changes.
 As a result the preferred height is not locked on the value 0 once it has been layouted with an empty string. The preferred height will be properly recalculated.
 Migration: None
+
+06.03.2012 abr
+Bugzilla: 373358
+composer field: select parent node when a node is deleted
+Problem:
+The keyboard navigation in a Swing tree does not work correctly if the selection is changed in the model and the node selected before is deleted.
+Solution:
+Check the last segment of the lead and anchor paths. Both paths are retained if the corresponding ITreeNode is still valid (not null,
+attached to a tree, visible and filter-accepted). Otherwise the paths are omitted so that they are recomputed by Swing.
+Migration: none

@@ -172,6 +172,7 @@ public class AttributeNode extends AbstractComposerNode {
 
     @Override
     protected void execAction() throws ProcessingException {
+      getTree().selectPreviousParentNode();
       getTree().removeNode(AttributeNode.this);
     }
   }
