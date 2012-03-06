@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -372,7 +373,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       h = 40; // Enough for 2 lines fully visible (further lines are cut off) --> cannot be dynamic at the moment, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=346768
     }
     if (h >= 0) {
-      getUiField().setData(Table.ITEM_HEIGHT, h);
+      getUiField().setData(RWT.CUSTOM_ITEM_HEIGHT, h);
     }
     if (isCreated()) {
       getUiTableViewer().refresh();
@@ -405,8 +406,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         //So it is necessary to request an auto resizing of the columns manually. (Bugzilla 355855)
         scheduleHandleAutoResizeColumn();
       }
-    }
-    else {
+      }
+      else {
       removeAutoResizeColumnListener();
     }
   }
@@ -416,9 +417,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       @Override
       public void run() {
         handleAutoSizeColumns();
-      }
+        }
     });
-  }
+      }
 
   private void removeAutoResizeColumnListener() {
     if (m_autoResizeColumnListener == null) {
@@ -1124,8 +1125,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           if (getScoutObject().isAutoResizeColumns()) {
             if (getUiField() != null && !getUiField().isDisposed()) {
               scheduleHandleAutoResizeColumn();
+                }
             }
-          }
           break;
         }
         case SWT.MenuDetect: {
