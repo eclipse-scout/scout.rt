@@ -1979,31 +1979,31 @@ Text.filechooserfield_file[BORDER]:disabled {
   background-color: #f4f8fc;
 }
 
-Button.filechooserfield_file {
+FileUpload.filechooserfield_file {
   background-image: url( theme/img/button/filechooserfield_file.png );
   border-radius: 5px;
   padding: 20px 10px; /* Does not work until following bug is fixed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423 */
 }
 
-Button.filechooserfield_file:hover {
+FileUpload.filechooserfield_file:hover {
   background-image: url( theme/img/button/filechooserfield_file.png );
 }
 
-Button.filechooserfield_file:disabled {
+FileUpload.filechooserfield_file:disabled {
   background-image: url( theme/img/button/filechooserfield_file_disabled.png );
 }
 
-Button.filechooserfield_file_menu {
+FileUpload.filechooserfield_file_menu {
   background-image: url( theme/img/button/filechooserfield_file_menu.png );
   border-radius: 5px;
   padding: 20px 10px; /* Does not work until following bug is fixed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423 */
 }
 
-Button.filechooserfield_file_menu:hover {
+FileUpload.filechooserfield_file_menu:hover {
   background-image: url( theme/img/button/filechooserfield_file_menu.png );
 }
 
-Button.filechooserfield_file_menu:disabled {
+FileUpload.filechooserfield_file_menu:disabled {
   background-image: url( theme/img/button/filechooserfield_file_menu_disabled.png );
 }
 /*Filechooser end*/
