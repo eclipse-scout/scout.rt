@@ -246,9 +246,6 @@ public class ScoutInfoForm extends AbstractForm {
     buf.append("<tr><td>" + ScoutTexts.get("DetailedVersion") + ":</td><td>&nbsp;</td><td>" + v.toString() + "</td></tr>");
     //
     buf.append("</table>");
-    buf.append("<p>");
-    buf.append(ScoutTexts.get("SC_Copyright"));
-    buf.append("</p>");
   }
 
   protected void createHtmlPropertyTableContent(StringBuffer buf) {
