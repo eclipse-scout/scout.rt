@@ -459,11 +459,13 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
             }
           };
           JobEx job = invokeScoutLater(t, 0);
-          try {
-            job.join(600000);
-          }
-          catch (InterruptedException e) {
-            //nop
+          if (job != null) {
+            try {
+              job.join(600000);
+            }
+            catch (InterruptedException e) {
+              //nop
+            }
           }
         }
       });
