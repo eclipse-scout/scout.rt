@@ -15,6 +15,7 @@ import java.util.HashMap;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.core.window.desktop.IViewArea;
 import org.eclipse.scout.rt.ui.rap.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutViewStack;
@@ -31,7 +32,7 @@ import org.eclipse.swt.widgets.Sash;
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
  */
-public class ViewArea extends Composite {
+public class ViewArea extends Composite implements IViewArea {
 
   private static final long serialVersionUID = 1L;
 

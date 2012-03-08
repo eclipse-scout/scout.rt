@@ -14,6 +14,7 @@ import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
+import org.eclipse.scout.rt.ui.rap.core.window.desktop.IRwtScoutToolbar;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -27,16 +28,16 @@ import org.eclipse.swt.widgets.Layout;
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
  */
-public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> {
+public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> implements IRwtScoutToolbar {
 
   private static final String VARIANT_TOOL_BUTTON_BAR = "toolButtonBar";
   private static final String VARIANT_TOOL_BUTTON_BAR_ACTIVE = "toolButtonBar-active";
   private static final String VARIANT_TOOLBAR_CONTAINER = "toolbarContainer";
   private static final String VARIANT_TOOL_BUTTON_BUTTON_ACTIVE = "toolButton-active";
   private static final String VARIANT_TOOL_BUTTON = "toolButton";
-  private RwtScoutToolButtonBar m_toolButtonBar;
+  private RwtScoutToolButtonBar m_uiToolButtonBar;
   private Composite m_busyIndicator;
-  private RwtScoutViewButtonBar m_viewButtonBar;
+  private RwtScoutViewButtonBar m_uiViewButtonBar;
 
   @Override
   protected void initializeUi(Composite parent) {
@@ -47,16 +48,33 @@ public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> {
     Control busyIndicator = createBusyIndicator(container);
     Control toolButtonBar = createToolButtonBar(container);
 
-    //layout
-    container.setLayout(RwtUtility.createGridLayoutNoSpacing(3, false));
-    viewButtonbar.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.VERTICAL_ALIGN_END));
-    busyIndicator.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.GRAB_HORIZONTAL | GridData.VERTICAL_ALIGN_CENTER));
-    toolButtonBar.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END | GridData.VERTICAL_ALIGN_END));
+    createLayout(container, viewButtonbar, busyIndicator, toolButtonBar);
+
     setUiContainer(container);
   }
 
+  protected void createLayout(Composite container, Control viewButtonbar, Control busyIndicator, Control toolButtonBar) {
+    container.setLayout(RwtUtility.createGridLayoutNoSpacing(3, false));
+
+    if (viewButtonbar != null) {
+      viewButtonbar.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.VERTICAL_ALIGN_END));
+    }
+
+    if (busyIndicator != null) {
+      busyIndicator.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.GRAB_HORIZONTAL | GridData.VERTICAL_ALIGN_CENTER));
+    }
+
+    if (toolButtonBar != null) {
+      toolButtonBar.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END | GridData.VERTICAL_ALIGN_END));
+    }
+  }
+
   public void handleRightViewPositionChanged(int rightViewX) {
-    GridData gridData = (GridData) getToolButtonBar().getUiContainer().getLayoutData();
+    if (getUiToolButtonBar() == null) {
+      return;
+    }
+
+    GridData gridData = (GridData) getUiToolButtonBar().getUiContainer().getLayoutData();
     if (rightViewX > 0) {
       gridData.widthHint = getUiContainer().getSize().x - rightViewX;
     }
@@ -68,9 +86,9 @@ public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> {
   }
 
   protected Control createViewButtonBar(Composite parent) {
-    m_viewButtonBar = new RwtScoutViewButtonBar();
-    m_viewButtonBar.createUiField(parent, getScoutObject(), getUiEnvironment());
-    return m_viewButtonBar.getUiContainer();
+    m_uiViewButtonBar = new RwtScoutViewButtonBar();
+    m_uiViewButtonBar.createUiField(parent, getScoutObject(), getUiEnvironment());
+    return m_uiViewButtonBar.getUiContainer();
   }
 
   protected Control createBusyIndicator(Composite parent) {
@@ -95,22 +113,16 @@ public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> {
   }
 
   protected Control createToolButtonBar(Composite parent) {
-    m_toolButtonBar = new RwtScoutToolButtonBar();
-    m_toolButtonBar.createUiField(parent, getScoutObject(), getUiEnvironment());
-    return m_toolButtonBar.getUiContainer();
+    m_uiToolButtonBar = new RwtScoutToolButtonBar();
+    m_uiToolButtonBar.createUiField(parent, getScoutObject(), getUiEnvironment());
+    return m_uiToolButtonBar.getUiContainer();
   }
 
-  /**
-   * @return the viewButtonBar
-   */
-  public RwtScoutViewButtonBar getViewButtonBar() {
-    return m_viewButtonBar;
+  public RwtScoutViewButtonBar getUiViewButtonBar() {
+    return m_uiViewButtonBar;
   }
 
-  /**
-   * @return the toolButtonBar
-   */
-  public RwtScoutToolButtonBar getToolButtonBar() {
-    return m_toolButtonBar;
+  public RwtScoutToolButtonBar getUiToolButtonBar() {
+    return m_uiToolButtonBar;
   }
 }

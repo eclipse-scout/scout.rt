@@ -11,12 +11,15 @@
 package org.eclipse.scout.rt.ui.rap.window.desktop;
 
 import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtStandaloneEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.core.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.core.window.desktop.IRwtDesktop;
+import org.eclipse.scout.rt.ui.rap.core.window.desktop.IRwtScoutActionBar;
 import org.eclipse.scout.rt.ui.rap.core.window.desktop.viewarea.ILayoutListener;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.desktop.toolbar.RwtScoutToolbar;
@@ -37,9 +40,11 @@ import org.eclipse.swt.widgets.Sash;
  */
 public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwtDesktop {
 
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDesktop.class);
+
   private static final String VARIANT_VIEWS_AREA = "viewsArea";
   private ViewArea m_viewArea;
-  private RwtScoutToolbar m_toolbar;
+  private RwtScoutToolbar m_uiToolbar;
 
   public RwtScoutDesktop() {
   }
@@ -47,7 +52,6 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   @Override
   protected void attachScout() {
     super.attachScout();
-
   }
 
   @Override
@@ -61,29 +65,49 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
       Composite desktopComposite = parent;
       Control toolbar = createToolBar(desktopComposite);
       Control viewsArea = createViewsArea(desktopComposite);
+      Control actionBar = createActionBar(desktopComposite);
       viewsArea.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEWS_AREA);
 
-      //layout
-      GridLayout layout = RwtUtility.createGridLayoutNoSpacing(1, true);
-      desktopComposite.setLayout(layout);
-
-      GridData toolbarData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-      toolbar.setLayoutData(toolbarData);
-
-      GridData viewsAreaData = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
-      viewsArea.setLayoutData(viewsAreaData);
+      createLayout(desktopComposite, toolbar, actionBar, viewsArea);
 
       setUiContainer(desktopComposite);
     }
     catch (Throwable t) {
-      t.printStackTrace();
+      LOG.error("Exception occured while creating ui desktop.", t);
+    }
+  }
+
+  protected void createLayout(Composite container, Control toolbar, Control actionBar, Control viewsArea) {
+    GridLayout layout = RwtUtility.createGridLayoutNoSpacing(1, true);
+    container.setLayout(layout);
+
+    if (toolbar != null) {
+      GridData toolbarData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
+      toolbar.setLayoutData(toolbarData);
+    }
+
+    if (viewsArea != null) {
+      GridData viewsAreaData = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
+      viewsArea.setLayoutData(viewsAreaData);
+    }
+
+    if (actionBar != null) {
+      GridData actionBarData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
+      actionBar.setLayoutData(actionBarData);
     }
   }
 
   protected Control createToolBar(Composite parent) {
-    m_toolbar = new RwtScoutToolbar();
-    m_toolbar.createUiField(parent, getScoutObject(), getUiEnvironment());
-    return m_toolbar.getUiContainer();
+    m_uiToolbar = new RwtScoutToolbar();
+    m_uiToolbar.createUiField(parent, getScoutObject(), getUiEnvironment());
+    return m_uiToolbar.getUiContainer();
+  }
+
+  /**
+   * There is no action bar created as default. The method is intended for being used by subclasses.
+   */
+  protected Control createActionBar(Composite parent) {
+    return null;
   }
 
   protected Control createViewsArea(Composite parent) {
@@ -97,7 +121,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
           Rectangle sashBounds = sash.getBounds();
           xOffset = sashBounds.x + sashBounds.width;
         }
-        getToolbar().handleRightViewPositionChanged(xOffset);
+        getUiToolbar().handleRightViewPositionChanged(xOffset);
       }
     });
     return m_viewArea;
@@ -106,13 +130,6 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   @Override
   public IRwtStandaloneEnvironment getUiEnvironment() {
     return (IRwtStandaloneEnvironment) super.getUiEnvironment();
-  }
-
-  /**
-   * @return the toolbar
-   */
-  public RwtScoutToolbar getToolbar() {
-    return m_toolbar;
   }
 
   @Override
@@ -128,9 +145,17 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
     m_viewArea.layout();
   }
 
-  /**
-   * @return the viewArea
-   */
+  @Override
+  public RwtScoutToolbar getUiToolbar() {
+    return m_uiToolbar;
+  }
+
+  @Override
+  public IRwtScoutActionBar getUiActionBar() {
+    return null;
+  }
+
+  @Override
   public ViewArea getViewArea() {
     return m_viewArea;
   }

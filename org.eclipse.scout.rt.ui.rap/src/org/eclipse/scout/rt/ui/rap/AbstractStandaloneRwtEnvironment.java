@@ -154,7 +154,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
   }
 
   protected void createApplicationContent(Composite parent) {
-    m_uiDesktop = new RwtScoutDesktop();
+    m_uiDesktop = createUiDesktop();
     ensureInitialized();
     if (!isInitialized()) {
       throw new SecurityException("Cannot initialize application");
@@ -166,6 +166,10 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
   protected void createNonmodalFormButtonArea(Composite parent) {
     m_uiButtonArea = new RwtScoutFormButtonBar();
     m_uiButtonArea.createUiField(parent, m_uiDesktop.getScoutObject(), this);
+  }
+
+  protected RwtScoutDesktop createUiDesktop() {
+    return new RwtScoutDesktop();
   }
 
   @Override

@@ -15,21 +15,14 @@ import java.util.HashMap;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.services.common.patchedclass.IPatchedClassService;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Menu;
 
 /**
  * <h3>ViewButtonBar</h3> ...
@@ -46,7 +39,6 @@ public class RwtScoutViewButtonBar extends RwtScoutComposite<IDesktop> {
 
   private HashMap<IViewButton, IRwtScoutToolButton> m_viewTabItems;
   private Control m_buttonBar;
-  private Button m_menuButton;
 
   public RwtScoutViewButtonBar() {
     m_viewTabItems = new HashMap<IViewButton, IRwtScoutToolButton>();
@@ -56,9 +48,11 @@ public class RwtScoutViewButtonBar extends RwtScoutComposite<IDesktop> {
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     if (getScoutObject().getMenus().length > 0) {
-      Control menu = createMenu(container);
-      RowData data = new RowData(40, 25);
-      menu.setLayoutData(data);
+      Control menu = createMainMenu(container);
+      if (menu != null) {
+        RowData data = new RowData(40, 25);
+        menu.setLayoutData(data);
+      }
     }
     if (getScoutObject().getViewButtons().length > 0) {
       m_buttonBar = createButtons(container);
@@ -75,26 +69,10 @@ public class RwtScoutViewButtonBar extends RwtScoutComposite<IDesktop> {
     setUiContainer(container);
   }
 
-  protected Control createMenu(Composite parent) {
-    m_menuButton = getUiEnvironment().getFormToolkit().createButton(parent, "", SWT.PUSH);
-    m_menuButton.addSelectionListener(new SelectionAdapter() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        Rectangle buttonBounds = m_menuButton.getBounds();
-        Point buttonLocation = m_menuButton.toDisplay(buttonBounds.x, buttonBounds.y);
-        Menu menu = m_menuButton.getMenu();
-        menu.setLocation(new Point(buttonLocation.x, buttonLocation.y + buttonBounds.height));
-        menu.setVisible(true);
-      }
-    });
-    m_menuButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOLBAR_MENU_BUTTON);
-    Menu contextMenu = new Menu(m_menuButton.getShell(), SWT.POP_UP);
-    RwtMenuUtility.fillContextMenu(getScoutObject().getMenus(), getUiEnvironment(), contextMenu);
-    m_menuButton.setMenu(contextMenu);
-
-    return m_menuButton;
+  protected Control createMainMenu(Composite parent) {
+    RwtScoutMainMenuButton uiMainMenuButton = new RwtScoutMainMenuButton();
+    uiMainMenuButton.createUiField(parent, getScoutObject(), getUiEnvironment());
+    return uiMainMenuButton.getUiContainer();
   }
 
   protected Control createButtons(Composite parent) {
