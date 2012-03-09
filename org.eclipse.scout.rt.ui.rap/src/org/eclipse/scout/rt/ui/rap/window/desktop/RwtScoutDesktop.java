@@ -68,7 +68,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
       Control actionBar = createActionBar(desktopComposite);
       viewsArea.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEWS_AREA);
 
-      createLayout(desktopComposite, toolbar, actionBar, viewsArea);
+      initLayout(desktopComposite, toolbar, actionBar, viewsArea);
 
       setUiContainer(desktopComposite);
     }
@@ -77,7 +77,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
     }
   }
 
-  protected void createLayout(Composite container, Control toolbar, Control actionBar, Control viewsArea) {
+  protected void initLayout(Composite container, Control toolbar, Control actionBar, Control viewsArea) {
     GridLayout layout = RwtUtility.createGridLayoutNoSpacing(1, true);
     container.setLayout(layout);
 

@@ -48,12 +48,12 @@ public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> implements IRwt
     Control busyIndicator = createBusyIndicator(container);
     Control toolButtonBar = createToolButtonBar(container);
 
-    createLayout(container, viewButtonbar, busyIndicator, toolButtonBar);
+    initLayout(container, viewButtonbar, busyIndicator, toolButtonBar);
 
     setUiContainer(container);
   }
 
-  protected void createLayout(Composite container, Control viewButtonbar, Control busyIndicator, Control toolButtonBar) {
+  protected void initLayout(Composite container, Control viewButtonbar, Control busyIndicator, Control toolButtonBar) {
     container.setLayout(RwtUtility.createGridLayoutNoSpacing(3, false));
 
     if (viewButtonbar != null) {

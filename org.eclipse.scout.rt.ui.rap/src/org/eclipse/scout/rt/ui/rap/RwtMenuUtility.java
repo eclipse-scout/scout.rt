@@ -17,11 +17,15 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.ui.rap.action.RwtScoutAction;
 import org.eclipse.scout.rt.ui.rap.action.RwtScoutCheckboxMenu;
 import org.eclipse.scout.rt.ui.rap.action.RwtScoutMenuAction;
@@ -152,6 +156,46 @@ public final class RwtMenuUtility {
     else {
       new RwtScoutMenuAction(menu, scoutActionNode, uiEnvironment);
     }
+  }
+
+  public static IMenu[] collectMenus(final ITree tree, IRwtEnvironment uiEnvironment) {
+    final Holder<IMenu[]> menusHolder = new Holder<IMenu[]>(IMenu[].class);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        menusHolder.setValue(tree.getUIFacade().fireNodePopupFromUI());
+      }
+    };
+
+    JobEx job = uiEnvironment.invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      LOG.warn("Exception occured while collecting menus.", ex);
+    }
+
+    return menusHolder.getValue();
+  }
+
+  public static IMenu[] collectMenus(final ITable table, IRwtEnvironment uiEnvironment) {
+    final Holder<IMenu[]> menusHolder = new Holder<IMenu[]>(IMenu[].class);
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        menusHolder.setValue(table.getUIFacade().fireRowPopupFromUI());
+      }
+    };
+
+    JobEx job = uiEnvironment.invokeScoutLater(t, 1200);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      LOG.warn("Exception occured while collecting menus.", ex);
+    }
+
+    return menusHolder.getValue();
   }
 
 }
