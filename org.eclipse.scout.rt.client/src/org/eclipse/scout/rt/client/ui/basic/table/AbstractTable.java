@@ -2689,13 +2689,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     //Order
     if (order) {
-      ArrayList<IColumn<?>> list = new ArrayList<IColumn<?>>();
+      TreeMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<CompositeObject, IColumn<?>>();
+      int index = 0;
       for (IColumn<?> col : getColumns()) {
         if (col.isDisplayable() && col.isVisible()) {
-          list.add(col);
+          orderMap.put(new CompositeObject(col.getViewOrder(), index), col);
+          index++;
         }
       }
-      getColumnSet().setVisibleColumns(list.toArray(new IColumn<?>[list.size()]));
+      getColumnSet().setVisibleColumns(orderMap.values().toArray(new IColumn[orderMap.size()]));
     }
     //Sorting
     if (sorting) {

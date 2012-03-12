@@ -74,6 +74,9 @@ public class ColumnSet {
         if (IColumn.PROP_VIEW_COLUMN_INDEX_HINT.equals(e.getPropertyName())) {
           //ignore
         }
+        else if (IColumn.PROP_VIEW_ORDER.equals(e.getPropertyName())) {
+          resetColumnsViewOrder();
+        }
         else {
           updateColumnStructure(c);
         }
@@ -103,7 +106,10 @@ public class ColumnSet {
     int viewIndex = 0;
     for (int modelIndex = 0; modelIndex < n; modelIndex++) {
       IColumn col = getColumn(modelIndex);
-      int viewHint = col.getVisibleColumnIndexHint();
+      double viewHint = col.getVisibleColumnIndexHint();
+      if (viewHint < 0) {
+        viewHint = col.getViewOrder();
+      }
       if (viewHint < 0) {
         viewHint = viewIndex;
       }
@@ -217,21 +223,25 @@ public class ColumnSet {
   }
 
   public IColumn[] getAllColumnsInUserOrder() {
-    int[] visibleIndexesSorted = getVisibleColumnIndexes();
-    Arrays.sort(visibleIndexesSorted);
-    //
-    TreeMap<Integer, IColumn> sortMap = new TreeMap<Integer, IColumn>();
+    double[] visibleOrdersSorted = new double[getVisibleColumnCount()];
     IColumn[] visibleCols = getVisibleColumns();
-    for (int i = 0; i < visibleCols.length; i++) {
-      sortMap.put(visibleIndexesSorted[i], visibleCols[i]);
+    for (int i = 0; i < visibleOrdersSorted.length; i++) {
+      visibleOrdersSorted[i] = visibleCols[i].getViewOrder();
     }
-    IColumn[] cols = getColumns();
-    for (int i = 0; i < cols.length; i++) {
-      if (cols[i].isDisplayable() && cols[i].isVisible()) {
+    Arrays.sort(visibleOrdersSorted);
+    //
+    int counter = 0;
+    TreeMap<CompositeObject, IColumn> sortMap = new TreeMap<CompositeObject, IColumn>();
+    for (int i = 0; i < visibleCols.length; i++) {
+      sortMap.put(new CompositeObject(visibleOrdersSorted[i], counter++), visibleCols[i]);
+    }
+    //
+    for (IColumn column : getColumns()) {
+      if (column.isDisplayable() && column.isVisible()) {
         //already in map
       }
       else {
-        sortMap.put(i, cols[i]);
+        sortMap.put(new CompositeObject(column.getViewOrder(), counter++), column);
       }
     }
     return sortMap.values().toArray(new IColumn[sortMap.size()]);
@@ -781,6 +791,14 @@ public class ColumnSet {
     fireColumnStructureChanged();
   }
 
+  private void resetColumnsViewOrder() {
+    for (IColumn c : getColumns()) {
+      c.setVisibleColumnIndexHint(-1);
+    }
+    reorganizeIndexes();
+    fireColumnOrderChanged();
+  }
+
   public void updateColumn(IColumn column) {
     checkMultiline();
     fireColumnHeadersUpdated(new IColumn[]{column});
@@ -917,7 +935,10 @@ public class ColumnSet {
     for (int modelIndex = 0; modelIndex < n; modelIndex++) {
       IColumn col = getColumn(modelIndex);
       if (col.isDisplayable() && col.isVisible()) {
-        int viewHint = col.getVisibleColumnIndexHint();
+        double viewHint = col.getVisibleColumnIndexHint();
+        if (viewHint < 0) {
+          viewHint = col.getViewOrder();
+        }
         if (viewHint < 0) {
           viewHint = viewIndex;
         }
