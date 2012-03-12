@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposal
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.basic.tree.RwtScoutTree;
+import org.eclipse.scout.rt.ui.rap.core.window.desktop.IRwtScoutActionBar;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
@@ -34,6 +35,7 @@ public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implem
 
   private RwtScoutTree m_treeComposite;
   private Composite m_treeContainer;
+  private IRwtScoutActionBar m_actionBar;
 
   @Override
   protected void initializeUi(Composite parent) {
@@ -57,6 +59,11 @@ public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implem
       m_treeComposite.dispose();
       m_treeComposite = null;
     }
+
+    if (m_actionBar != null) {
+      m_actionBar.dispose();
+    }
+
     if (tree != null) {
       if (getScoutObject().getForm() instanceof ISmartFieldProposalForm) {
         m_treeComposite = new RwtScoutTree(RwtUtility.VARIANT_PROPOSAL_FORM);
@@ -82,9 +89,20 @@ public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implem
         treeContainer.setLayoutData(LogicalGridDataBuilder.createField(getScoutObject().getGridData()));
         m_treeContainer = treeContainer;
       }
+
+      m_actionBar = createRwtScoutActionBar();
+
       setUiField(m_treeComposite.getUiField());
     }
     getUiContainer().layout(true, true);
+  }
+
+  /**
+   * As default there is no action bar. <br/>
+   * Subclasses can override this method to create one.
+   */
+  protected IRwtScoutActionBar createRwtScoutActionBar() {
+    return null;
   }
 
   /**

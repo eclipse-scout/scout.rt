@@ -20,7 +20,6 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -175,12 +174,17 @@ public final class RwtMenuUtility {
     }
   }
 
-  public static IMenu[] collectMenus(final ITree tree, IRwtEnvironment uiEnvironment) {
-    final Holder<IMenu[]> menusHolder = new Holder<IMenu[]>(IMenu[].class);
+  public static IMenu[] collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, IRwtEnvironment uiEnvironment) {
+    final List<IMenu> menuList = new LinkedList<IMenu>();
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        menusHolder.setValue(tree.getUIFacade().fireNodePopupFromUI());
+        if (emptySpaceActions) {
+          menuList.addAll(Arrays.asList(tree.getUIFacade().fireEmptySpacePopupFromUI()));
+        }
+        if (nodeActions) {
+          menuList.addAll(Arrays.asList(tree.getUIFacade().fireNodePopupFromUI()));
+        }
       }
     };
 
@@ -192,7 +196,7 @@ public final class RwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return menusHolder.getValue();
+    return menuList.toArray(new IMenu[menuList.size()]);
   }
 
   public static IMenu[] collectMenus(final ITable table, final boolean emptySpaceActions, final boolean rowActions, IRwtEnvironment uiEnvironment) {
@@ -226,6 +230,14 @@ public final class RwtMenuUtility {
 
   public static IMenu[] collectEmptySpaceMenus(final ITable table, IRwtEnvironment uiEnvironment) {
     return collectMenus(table, true, false, uiEnvironment);
+  }
+
+  public static IMenu[] collectNodeMenus(final ITree tree, IRwtEnvironment uiEnvironment) {
+    return collectMenus(tree, false, true, uiEnvironment);
+  }
+
+  public static IMenu[] collectEmptySpaceMenus(final ITree tree, IRwtEnvironment uiEnvironment) {
+    return collectMenus(tree, true, false, uiEnvironment);
   }
 
 }
