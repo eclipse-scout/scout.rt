@@ -448,4 +448,43 @@ public final class DataModelUtility {
     return findEntity(array, simpleName, null);
   }
 
+  /**
+   * @deprecated use {@link #attributePathToExternalId(IDataModel, AttributePath)} instead
+   */
+  @Deprecated
+  public static String attributeToExternalId(IDataModelAttribute a, IDataModelEntity... entityPath) {
+    String id = a.getClass().getSimpleName() + exportMetaData(a.getMetaDataOfAttribute());
+    for (int i = entityPath.length - 1; i >= 0; i--) {
+      IDataModelEntity e = entityPath[i];
+      id = e.getClass().getSimpleName() + "/" + id;
+    }
+    return id;
+  }
+
+  /**
+   * @deprecated use {@link #externalIdToEntityPath(IDataModel, String)} instead
+   */
+  @Deprecated
+  public static IDataModelEntity[] externalIdToEntityPath(IDataModel f, String externalId, IDataModelEntity parentEntity) {
+    EntityPath ePath = null;
+    try {
+      //try attribute
+      AttributePath aPath = externalIdToAttributePath(f, externalId);
+      if (aPath != null) {
+        ePath = aPath.getEntityPath();
+      }
+    }
+    catch (Throwable t) {
+      //nop
+    }
+    if (ePath == null) {
+      //try entity
+      ePath = externalIdToEntityPath(f, externalId);
+    }
+    if (ePath != null) {
+      return ePath.elements().toArray(new IDataModelEntity[ePath.size()]);
+    }
+    return new IDataModelEntity[0];
+  }
+
 }
