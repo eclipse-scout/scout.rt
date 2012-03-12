@@ -65,13 +65,7 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
     m_whereClause = whereClause;
     m_selectClause = selectClause;
     m_plainBind = plainBind;
-    //99%-safe check of correct usage of wherePart on non-trivial attributes
-    if (m_whereClause != null) {
-      String low = m_whereClause.toLowerCase().replaceAll("\\s", " ");
-      if (low.indexOf("<attribute") >= 0 && low.indexOf("<wherepart") < 0 && low.indexOf(" and ") >= 0) {
-        LOG.info(attributeType.getName() + " is a non-trivial attribute and should have the form <wherePart>... AND ...</wherePart> <attribute>...</attribute>: " + m_whereClause);
-      }
-    }
+    check();
   }
 
   private static String autoCreateSelectClause(String whereClause) {
@@ -89,6 +83,22 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
       return null;
     }
     return whereClause;
+  }
+
+  /**
+   * Override to do customized checks on select and where clause or to deactivate default checks.
+   * <p>
+   * Called by the constructor after calling {@link #autoCreateSelectClause(String)} and setting its member fields
+   * <p>
+   * Default does 99%-safe check of correct usage of wherePart on non-trivial attributes.
+   */
+  protected void check() {
+    if (m_whereClause != null) {
+      String low = m_whereClause.toLowerCase().replaceAll("\\s", " ");
+      if (low.indexOf("<attribute") >= 0 && low.indexOf("<wherepart") < 0 && low.indexOf(" and ") >= 0) {
+        LOG.info(m_attributeType.getName() + " is a non-trivial attribute and should have the form <wherePart>... AND ...</wherePart> <attribute>...</attribute>: " + m_whereClause);
+      }
+    }
   }
 
   public String getWhereClause() {

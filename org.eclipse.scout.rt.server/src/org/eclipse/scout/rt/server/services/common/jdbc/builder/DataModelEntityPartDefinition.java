@@ -76,21 +76,7 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
     m_entityType = entityType;
     m_whereClause = autoCompleteTags(whereClause);
     m_selectClause = autoCompleteTags(selectClause);
-    //check
-    if (m_whereClause != null) {
-      for (String tag : new String[]{"whereParts", "groupBy", "groupByParts", "havingParts"}) {
-        if (StringUtility.getTag(m_whereClause, tag) == null) {
-          throw new IllegalArgumentException("whereClause must contain a " + tag + " tag");
-        }
-      }
-    }
-    if (m_selectClause != null) {
-      for (String tag : new String[]{"selectParts", "fromParts", "whereParts", "groupBy", "groupByParts", "havingParts"}) {
-        if (StringUtility.getTag(m_selectClause, tag) == null) {
-          throw new IllegalArgumentException("selectClause must contain a " + tag + " tag");
-        }
-      }
-    }
+    check();
   }
 
   protected String autoCompleteTags(String s) {
@@ -108,6 +94,28 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
       s = s.replaceAll("([^-a-zA-Z_$]HAVING[^-a-zA-Z_$])", " <groupByParts/>\n$1");
     }
     return s;
+  }
+
+  /**
+   * Override to do customized checks on select and where clause or to deactivate default checks.
+   * <p>
+   * Called by the constructor after calling {@link #autoCompleteTags(String)} and setting its member fields
+   */
+  protected void check() {
+    if (m_whereClause != null) {
+      for (String tag : new String[]{"whereParts", "groupBy", "groupByParts", "havingParts"}) {
+        if (StringUtility.getTag(m_whereClause, tag) == null) {
+          throw new IllegalArgumentException("whereClause must contain a " + tag + " tag");
+        }
+      }
+    }
+    if (m_selectClause != null) {
+      for (String tag : new String[]{"selectParts", "fromParts", "whereParts", "groupBy", "groupByParts", "havingParts"}) {
+        if (StringUtility.getTag(m_selectClause, tag) == null) {
+          throw new IllegalArgumentException("selectClause must contain a " + tag + " tag");
+        }
+      }
+    }
   }
 
   public String getSelectClause() {
