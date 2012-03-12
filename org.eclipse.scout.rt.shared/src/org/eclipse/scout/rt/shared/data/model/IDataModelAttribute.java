@@ -98,8 +98,20 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
 
   void setActiveFilterEnabled(boolean active);
 
+  /**
+   * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure
+   * 
+   * @deprecated will be renamed to setParentEntityInternal and set to package private
+   */
+  @Deprecated
   IDataModelEntity getParentEntity();
 
+  /**
+   * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure
+   * 
+   * @deprecated will be renamed to setParentEntityInternal and set to package private
+   */
+  @Deprecated
   void setParentEntity(IDataModelEntity parent);
 
   /**

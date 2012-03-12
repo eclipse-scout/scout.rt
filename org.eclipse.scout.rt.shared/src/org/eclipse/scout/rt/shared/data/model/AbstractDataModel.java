@@ -74,6 +74,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable {
     return entities.toArray(new IDataModelEntity[entities.size()]);
   }
 
+  @SuppressWarnings("deprecation")
   protected void initConfig() {
     // attributes
     m_attributes = createAttributes();

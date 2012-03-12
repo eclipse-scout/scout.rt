@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
+@SuppressWarnings("deprecation")
 public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity, Serializable {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModelEntity.class);
@@ -305,7 +306,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   public void initializeChildEntities(Map<Class<? extends IDataModelEntity>, IDataModelEntity> instanceMap) {
     if (!m_initializedChildEntities) {
       m_initializedChildEntities = true;
-      ArrayList<IDataModelEntity> newInstances = new ArrayList<IDataModelEntity>();
+      ArrayList<IDataModelEntity> newConfiguredInstances = new ArrayList<IDataModelEntity>();
       ArrayList<IDataModelEntity> entities = new ArrayList<IDataModelEntity>();
       for (Class<? extends IDataModelEntity> c : getConfiguredEntities()) {
         try {
@@ -313,7 +314,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
           IDataModelEntity e = instanceMap.get(c);
           if (e == null) {
             e = ConfigurationUtility.newInnerInstance(this, c);
-            newInstances.add(e);
+            newConfiguredInstances.add(e);
             instanceMap.put(c, e);
           }
           entities.add(e);
@@ -330,8 +331,8 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
           e.setParentEntity(this);
         }
       }
-      for (IDataModelEntity e : newInstances) {
-        if (m_entities.contains(e)) {
+      for (IDataModelEntity e : m_entities) {
+        if (newConfiguredInstances.contains(e) || !instanceMap.containsKey(e.getClass())) {
           e.initializeChildEntities(instanceMap);
         }
       }
@@ -352,7 +353,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    * do not use this internal method<br>
    * Used add/remove entities
    * <p>
-   * Note that {@link #initializeChildEntities(Map)} is <em>not</em> called on injected entities
+   * Note that {@link #initializeChildEntities(Map)} is also called on injected entities
    * 
    * @param entityList
    *          live and mutable list of configured attributes
