@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.service.SERVICES;
 
+@SuppressWarnings("deprecation")
 public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, DataModelConstants, Serializable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModelAttribute.class);
   private static final long serialVersionUID = 1L;

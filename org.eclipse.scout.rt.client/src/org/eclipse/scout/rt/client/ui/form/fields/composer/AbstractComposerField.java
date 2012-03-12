@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -49,9 +51,11 @@ import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEitherOrNod
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
+import org.eclipse.scout.rt.shared.data.model.AttributePath;
 import org.eclipse.scout.rt.shared.data.model.DataModelAttributeOp;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.DataModelUtility;
+import org.eclipse.scout.rt.shared.data.model.EntityPath;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
@@ -87,11 +91,57 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    * Other implementations may use a data model defined in the shared area
    */
   @ConfigOperation
-  @Order(99)
+  @Order(97)
   protected IDataModel execCreateDataModel() {
     ComposerFieldDataModel m = new ComposerFieldDataModel(this);
     m.init();
     return m;
+  }
+
+  /**
+   * For {@link #exportFormFieldData(AbstractFormFieldData)}, {@link AbstractTree#exportTreeData(AbstractTreeFieldData)}
+   * and {@link #storeXML(SimpleXmlElement)} it is necessary to export {@link IDataModelEntity} and
+   * {@link IDataModelAttribute} as external strings. see {@link EntityPath}
+   * <p>
+   * This callback completes an entity path to its root. The parameter path contains the entity path represented in the
+   * composer tree of {@link EntityNode}s, the last element is the deepest tree node.
+   * <p>
+   * The default traverses the tree up to the root and collects all non-null {@link EntityNode#getEntity()}
+   */
+  @ConfigOperation
+  @Order(98)
+  protected EntityPath execResolveEntityPath(EntityNode node) {
+    LinkedList<IDataModelEntity> list = new LinkedList<IDataModelEntity>();
+    EntityNode tmp = node;
+    while (tmp != null) {
+      if (tmp.getEntity() != null) {
+        list.add(0, tmp.getEntity());
+      }
+      //next
+      tmp = tmp.getAncestorNode(EntityNode.class);
+    }
+    return new EntityPath(list);
+  }
+
+  /**
+   * see {@link #execResolveEntityPathForEntityExport(EntityNode)}, {@link AttributePath} for more details
+   */
+  @ConfigOperation
+  @Order(99)
+  protected AttributePath execResolveAttributePath(AttributeNode node) {
+    LinkedList<IDataModelEntity> list = new LinkedList<IDataModelEntity>();
+    if (node == null) {
+      return null;
+    }
+    EntityNode tmp = node.getAncestorNode(EntityNode.class);
+    while (tmp != null) {
+      if (tmp.getEntity() != null) {
+        list.add(0, tmp.getEntity());
+      }
+      //next
+      tmp = tmp.getAncestorNode(EntityNode.class);
+    }
+    return new AttributePath(list, node.getAttribute());
   }
 
   /*
@@ -378,7 +428,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           }
         }
         // find definition
-        IDataModelAttribute foundAtt = DataModelUtility.externalIdToAttribute(getDataModel(), id, null);
+        AttributePath attPath = DataModelUtility.externalIdToAttributePath(getDataModel(), id);
+        IDataModelAttribute foundAtt = (attPath != null ? attPath.getAttribute() : null);
         if (foundAtt == null) {
           LOG.warn("cannot find attribute with id=" + id);
           continue;
@@ -394,7 +445,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         boolean negated = xmlElem.getStringAttribute("negated", "false").equalsIgnoreCase("true");
         String text = xmlElem.getStringAttribute("displayValues", null);
         // find definition
-        IDataModelEntity foundEntity = DataModelUtility.externalIdToEntity(getDataModel(), id, null);
+        EntityPath entityPath = DataModelUtility.externalIdToEntityPath(getDataModel(), id);
+        IDataModelEntity foundEntity = (entityPath != null ? entityPath.lastElement() : null);
         if (foundEntity == null) {
           LOG.warn("cannot find entity with id=" + id);
           continue;
@@ -439,12 +491,15 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     storeXMLRec(x, getTree().getRootNode());
   }
 
+  private void createDataModelEntityPathRec(EntityNode node, List<IDataModelEntity> list) {
+  }
+
   private void storeXMLRec(SimpleXmlElement x, ITreeNode parent) {
     for (ITreeNode node : parent.getChildNodes()) {
       if (node instanceof EntityNode) {
         EntityNode entityNode = (EntityNode) node;
         SimpleXmlElement xEntity = new SimpleXmlElement("entity");
-        xEntity.setAttribute("id", DataModelUtility.entityToExternalId(entityNode.getEntity()));
+        xEntity.setAttribute("id", DataModelUtility.entityPathToExternalId(getDataModel(), execResolveEntityPath(entityNode)));
         xEntity.setAttribute("negated", (entityNode.isNegative() ? "true" : "false"));
         String[] texts = entityNode.getTexts();
         xEntity.setAttribute("displayValues", texts != null && texts.length > 0 ? StringUtility.emptyIfNull(texts[0]) : null);
@@ -455,7 +510,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       else if (node instanceof AttributeNode) {
         AttributeNode attNode = (AttributeNode) node;
         SimpleXmlElement xAtt = new SimpleXmlElement("attribute");
-        xAtt.setAttribute("id", DataModelUtility.attributeToExternalId(attNode.getAttribute()));
+        xAtt.setAttribute("id", DataModelUtility.attributePathToExternalId(getDataModel(), execResolveAttributePath(attNode)));
         IDataModelAttributeOp op = attNode.getOp();
         try {
           xAtt.setAttribute("op", op.getOperator());
@@ -643,7 +698,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     protected TreeNodeData exportTreeNodeData(ITreeNode node, AbstractTreeFieldData treeData) throws ProcessingException {
       if (node instanceof EntityNode) {
         EntityNode enode = (EntityNode) node;
-        String externalId = DataModelUtility.entityToExternalId(enode.getEntity());
+        String externalId = DataModelUtility.entityPathToExternalId(getDataModel(), execResolveEntityPath(enode));
         if (externalId == null) {
           if (LOG.isInfoEnabled()) {
             LOG.info("could not find entity data for: " + enode.getEntity());
@@ -657,7 +712,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       }
       else if (node instanceof AttributeNode) {
         AttributeNode anode = (AttributeNode) node;
-        String externalId = DataModelUtility.attributeToExternalId(anode.getAttribute());
+        String externalId = DataModelUtility.attributePathToExternalId(getDataModel(), execResolveAttributePath(anode));
         if (externalId == null) {
           if (LOG.isInfoEnabled()) {
             LOG.info("could not find attribute data for: " + anode.getAttribute());
@@ -689,7 +744,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       if (nodeData instanceof ComposerEntityNodeData) {
         ComposerEntityNodeData enodeData = (ComposerEntityNodeData) nodeData;
         String externalId = enodeData.getEntityExternalId();
-        IDataModelEntity e = DataModelUtility.externalIdToEntity(getDataModel(), externalId, null);
+        EntityPath entityPath = DataModelUtility.externalIdToEntityPath(getDataModel(), externalId);
+        IDataModelEntity e = (entityPath != null ? entityPath.lastElement() : null);
         if (e == null) {
           LOG.warn("could not find entity for: " + enodeData.getEntityExternalId());
           return null;
@@ -699,7 +755,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       else if (nodeData instanceof ComposerAttributeNodeData) {
         ComposerAttributeNodeData anodeData = (ComposerAttributeNodeData) nodeData;
         String externalId = anodeData.getAttributeExternalId();
-        IDataModelAttribute a = DataModelUtility.externalIdToAttribute(getDataModel(), externalId, null);
+        AttributePath attPath = DataModelUtility.externalIdToAttributePath(getDataModel(), externalId);
+        IDataModelAttribute a = (attPath != null ? attPath.getAttribute() : null);
         if (a == null) {
           LOG.warn("could not find attribute for: " + anodeData.getAttributeExternalId());
           return null;

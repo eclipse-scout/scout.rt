@@ -19,6 +19,8 @@ import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;
+import org.eclipse.scout.rt.shared.data.model.AttributePath;
+import org.eclipse.scout.rt.shared.data.model.EntityPath;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
@@ -78,11 +80,11 @@ public class FormDataStatementBuilderCheck {
     m_imports.clear();
     m_body.clear();
     m_visited.clear();
-    checkRec(o);
+    checkRec(EntityPath.EMPTY, o);
     return m_body.size() == 0;
   }
 
-  protected void checkRec(Object o) {
+  protected void checkRec(EntityPath parentPath, Object o) {
     if (m_visited.contains(o.getClass())) {
       return;
     }
@@ -90,7 +92,7 @@ public class FormDataStatementBuilderCheck {
     //
     if (o instanceof AbstractFormData) {
       for (Object f : ((AbstractFormData) o).getFields()) {
-        checkRec(f);
+        checkRec(parentPath, f);
       }
     }
     else if (o instanceof AbstractFormFieldData) {
@@ -99,29 +101,30 @@ public class FormDataStatementBuilderCheck {
       }
       //children
       for (Object f : ((AbstractFormFieldData) o).getFields()) {
-        checkRec(f);
+        checkRec(parentPath, f);
       }
     }
     else if (o instanceof AbstractDataModel) {
       for (Object a : ((AbstractDataModel) o).getAttributes()) {
-        checkRec(a);
+        checkRec(parentPath, a);
       }
       for (Object e : ((AbstractDataModel) o).getEntities()) {
-        checkRec(e);
+        checkRec(parentPath, e);
       }
     }
     else if (o instanceof IDataModelEntity) {
-      checkDataModelEntity((IDataModelEntity) o);
+      EntityPath subPath = parentPath.addToEnd((IDataModelEntity) o);
+      checkDataModelEntity(subPath);
       //only
       for (Object a : ((IDataModelEntity) o).getAttributes()) {
-        checkRec(a);
+        checkRec(subPath, a);
       }
       for (Object e : ((IDataModelEntity) o).getEntities()) {
-        checkRec(e);
+        checkRec(subPath, e);
       }
     }
     else if (o instanceof IDataModelAttribute) {
-      checkDataModelAttribute((IDataModelAttribute) o);
+      checkDataModelAttribute(parentPath.addToEnd((IDataModelAttribute) o));
     }
   }
 
@@ -157,17 +160,18 @@ public class FormDataStatementBuilderCheck {
     }
   }
 
-  protected void checkDataModelEntity(IDataModelEntity e) {
+  protected void checkDataModelEntity(EntityPath ePath) {
+    IDataModelEntity e = ePath.lastElement();
     DataModelEntityPartDefinition part = builder.getDataModelEntityPartDefinitions().get(e.getClass());
     if (part == null) {
-      String name = entityToName(e);
+      String name = entityToName(ePath);
       String sqlTableName = toSqlTable(name);
       String sqlPKName = toSqlPrimaryKey(name);
       String parentName = name;
       String parentSqlPKName = sqlPKName;
-      IDataModelEntity parentE = e.getParentEntity();
-      if (parentE != null) {
-        parentName = entityToName(parentE);
+      EntityPath parentPath = ePath.parent();
+      if (!parentPath.isEmpty()) {
+        parentName = entityToName(parentPath);
         parentSqlPKName = toSqlPrimaryKey(parentName);
       }
       String sqlTemplate =
@@ -187,7 +191,8 @@ public class FormDataStatementBuilderCheck {
     }
   }
 
-  protected void checkDataModelAttribute(IDataModelAttribute a) {
+  protected void checkDataModelAttribute(AttributePath aPath) {
+    IDataModelAttribute a = aPath.getAttribute();
     DataModelAttributePartDefinition part = builder.getDataModelAttributePartDefinitions().get(a.getClass());
     if (part == null) {
       if (a.getClass().getSimpleName().endsWith("CountAttribute")) {
@@ -195,15 +200,15 @@ public class FormDataStatementBuilderCheck {
         return;
       }
       String parentName = null;
-      IDataModelEntity parentE = a.getParentEntity();
-      if (parentE != null) {
-        parentName = entityToName(parentE);
+      EntityPath parentPath = aPath.getEntityPath();
+      if (!parentPath.isEmpty()) {
+        parentName = entityToName(parentPath);
       }
-      String name = attributeToName(parentE, a);
+      String name = attributeToName(aPath);
       String sqlColumnName = toSqlColumn(name);
       //
       String sqlTemplate;
-      if (parentE != null) {
+      if (!parentPath.isEmpty()) {
         sqlTemplate = "\"@${parentName}@.${sqlColumnName}\"";
       }
       else {
@@ -222,7 +227,11 @@ public class FormDataStatementBuilderCheck {
     return name;
   }
 
-  protected String entityToName(Object e) {
+  protected String entityToName(EntityPath ePath) {
+    if (ePath.isEmpty()) {
+      return null;
+    }
+    IDataModelEntity e = ePath.lastElement();
     String name = e.getClass().getSimpleName();
     name = name.replaceAll("^Abstract(.*)$", "$1");
     name = name.replaceAll("^(.*)Entity$", "$1");
@@ -230,9 +239,10 @@ public class FormDataStatementBuilderCheck {
     return array[array.length - 1];
   }
 
-  protected String attributeToName(Object entity, Object attribute) {
-    String ename = entityToName(entity);
-    String name = attribute.getClass().getSimpleName();
+  protected String attributeToName(AttributePath aPath) {
+    String ename = entityToName(aPath.getEntityPath());
+    IDataModelAttribute a = aPath.getAttribute();
+    String name = a.getClass().getSimpleName();
     name = name.replaceAll("^Abstract(.*)$", "$1");
     name = name.replaceAll("^(.*)Attribute", "$1");
     if (ename != null) {

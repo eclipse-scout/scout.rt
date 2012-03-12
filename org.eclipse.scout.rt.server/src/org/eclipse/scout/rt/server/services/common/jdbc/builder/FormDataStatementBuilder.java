@@ -41,8 +41,10 @@ import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEitherOrNod
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
+import org.eclipse.scout.rt.shared.data.model.AttributePath;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.DataModelUtility;
+import org.eclipse.scout.rt.shared.data.model.EntityPath;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
@@ -464,7 +466,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   public void check(Object o) {
     FormDataStatementBuilderCheck c = createCheckInstance();
-    c.checkRec(o);
+    c.check(o);
     System.out.println(c.toString());
   }
 
@@ -835,7 +837,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
     if (getDataModel() == null) {
       throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
     }
-    IDataModelEntity entity = DataModelUtility.externalIdToEntity(getDataModel(), node.getEntityExternalId(), null);
+    EntityPath entityPath = DataModelUtility.externalIdToEntityPath(getDataModel(), node.getEntityExternalId());
+    IDataModelEntity entity = (entityPath != null ? entityPath.lastElement() : null);
     if (entity == null) {
       LOG.warn("no entity for external id: " + node.getEntityExternalId());
       return null;
@@ -1013,7 +1016,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
     if (getDataModel() == null) {
       throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
     }
-    IDataModelAttribute attribute = DataModelUtility.externalIdToAttribute(getDataModel(), node.getAttributeExternalId(), null);
+    AttributePath attPath = DataModelUtility.externalIdToAttributePath(getDataModel(), node.getAttributeExternalId());
+    IDataModelAttribute attribute = (attPath != null ? attPath.getAttribute() : null);
     if (attribute == null) {
       LOG.warn("no attribute for external id: " + node.getAttributeExternalId());
       return new EntityContribution();
@@ -1126,48 +1130,50 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
     entityPart = StringUtility.removeTagBounds(entityPart, "whereParts");
     // extend the group by / having section
-    int selectGroupByDelta = contrib.getSelectParts().size() - contrib.getGroupByParts().size();
-    if ((selectGroupByDelta > 0 && contrib.getGroupByParts().size() > 0) || contrib.getHavingParts().size() > 0) {
-      entityPart = StringUtility.removeTagBounds(entityPart, "groupBy");
-      if (contrib.getGroupByParts().size() > 0) {
-        final String s = ListUtility.format(contrib.getGroupByParts(), ", ");
-        if (StringUtility.getTag(entityPart, "groupByParts") != null) {
-          entityPart = StringUtility.replaceTags(entityPart, "groupByParts", new ITagProcessor() {
-            @Override
-            public String processTag(String tagName, String tagContent) {
-              if (tagContent.length() > 0) {
-                return tagContent + ", " + s;
+    if (StringUtility.getTag(entityPart, "groupBy") != null) {
+      int selectGroupByDelta = contrib.getSelectParts().size() - contrib.getGroupByParts().size();
+      if ((selectGroupByDelta > 0 && contrib.getGroupByParts().size() > 0) || contrib.getHavingParts().size() > 0) {
+        entityPart = StringUtility.removeTagBounds(entityPart, "groupBy");
+        if (contrib.getGroupByParts().size() > 0) {
+          final String s = ListUtility.format(contrib.getGroupByParts(), ", ");
+          if (StringUtility.getTag(entityPart, "groupByParts") != null) {
+            entityPart = StringUtility.replaceTags(entityPart, "groupByParts", new ITagProcessor() {
+              @Override
+              public String processTag(String tagName, String tagContent) {
+                if (tagContent.length() > 0) {
+                  return tagContent + ", " + s;
+                }
+                return s;
               }
-              return s;
-            }
-          });
+            });
+          }
+          else {
+            throw new IllegalArgumentException("missing <groupByParts/> tag");
+          }
+        }
+        entityPart = StringUtility.removeTagBounds(entityPart, "groupByParts");
+        //
+        if (contrib.getHavingParts().size() > 0) {
+          final String s = ListUtility.format(contrib.getHavingParts(), " AND ");
+          if (StringUtility.getTag(entityPart, "havingParts") != null) {
+            entityPart = StringUtility.replaceTags(entityPart, "havingParts", new ITagProcessor() {
+              @Override
+              public String processTag(String tagName, String tagContent) {
+                return tagContent + " AND " + s;//legacy: always prefix an additional AND
+              }
+            });
+          }
+          else {
+            throw new IllegalArgumentException("missing <havingParts/> tag");
+          }
         }
         else {
-          throw new IllegalArgumentException("missing <groupByParts/> tag");
-        }
-      }
-      entityPart = StringUtility.removeTagBounds(entityPart, "groupByParts");
-      //
-      if (contrib.getHavingParts().size() > 0) {
-        final String s = ListUtility.format(contrib.getHavingParts(), " AND ");
-        if (StringUtility.getTag(entityPart, "havingParts") != null) {
-          entityPart = StringUtility.replaceTags(entityPart, "havingParts", new ITagProcessor() {
-            @Override
-            public String processTag(String tagName, String tagContent) {
-              return tagContent + " AND " + s;//legacy: always prefix an additional AND
-            }
-          });
-        }
-        else {
-          throw new IllegalArgumentException("missing <havingParts/> tag");
+          entityPart = StringUtility.removeTagBounds(entityPart, "havingParts");
         }
       }
       else {
-        entityPart = StringUtility.removeTagBounds(entityPart, "havingParts");
+        entityPart = StringUtility.removeTag(entityPart, "groupBy");
       }
-    }
-    else {
-      entityPart = StringUtility.removeTag(entityPart, "groupBy");
     }
     // negation
     if (negative) {
