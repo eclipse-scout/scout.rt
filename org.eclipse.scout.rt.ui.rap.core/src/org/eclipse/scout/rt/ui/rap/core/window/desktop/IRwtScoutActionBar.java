@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.core.window.desktop;
 
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
 
 /**
  * @since 3.8.0
  */
-public interface IRwtScoutActionBar extends IRwtScoutComposite<IDesktop> {
+public interface IRwtScoutActionBar<T extends IPropertyObserver> extends IRwtScoutComposite<T> {
 
 }

@@ -11,6 +11,9 @@
 package org.eclipse.scout.rt.ui.rap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
@@ -113,16 +116,30 @@ public final class RwtMenuUtility {
   }
 
   public static void fillContextMenu(IMenu[] scoutMenus, IRwtEnvironment uiEnvironment, Menu menu) {
-    if (scoutMenus != null && scoutMenus.length > 0) {
-      int count = scoutMenus.length;
-      int index = 0;
-      for (IMenu scoutMenu : scoutMenus) {
-        fillContextMenuRec(scoutMenu, uiEnvironment, index, count, menu);
-        index++;
-      }
-    }
-    else {
+    if (scoutMenus == null || scoutMenus.length == 0) {
       menu.setVisible(false);
+      return;
+    }
+
+    List<IActionNode> scoutActionNodes = new LinkedList<IActionNode>();
+    for (IMenu scoutMenu : scoutMenus) {
+      scoutActionNodes.add(scoutMenu);
+    }
+
+    fillContextMenu(scoutActionNodes, uiEnvironment, menu);
+  }
+
+  public static void fillContextMenu(List<? extends IActionNode> scoutActionNodes, IRwtEnvironment uiEnvironment, Menu menu) {
+    if (scoutActionNodes == null || scoutActionNodes.size() == 0) {
+      menu.setVisible(false);
+      return;
+    }
+
+    int count = scoutActionNodes.size();
+    int index = 0;
+    for (IActionNode scoutActionNode : scoutActionNodes) {
+      fillContextMenuRec(scoutActionNode, uiEnvironment, index, count, menu);
+      index++;
     }
   }
 
@@ -178,12 +195,17 @@ public final class RwtMenuUtility {
     return menusHolder.getValue();
   }
 
-  public static IMenu[] collectMenus(final ITable table, IRwtEnvironment uiEnvironment) {
-    final Holder<IMenu[]> menusHolder = new Holder<IMenu[]>(IMenu[].class);
+  public static IMenu[] collectMenus(final ITable table, final boolean emptySpaceActions, final boolean rowActions, IRwtEnvironment uiEnvironment) {
+    final List<IMenu> menuList = new LinkedList<IMenu>();
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        menusHolder.setValue(table.getUIFacade().fireRowPopupFromUI());
+        if (emptySpaceActions) {
+          menuList.addAll(Arrays.asList(table.getUIFacade().fireEmptySpacePopupFromUI()));
+        }
+        if (rowActions) {
+          menuList.addAll(Arrays.asList(table.getUIFacade().fireRowPopupFromUI()));
+        }
       }
     };
 
@@ -195,7 +217,15 @@ public final class RwtMenuUtility {
       LOG.warn("Exception occured while collecting menus.", ex);
     }
 
-    return menusHolder.getValue();
+    return menuList.toArray(new IMenu[menuList.size()]);
+  }
+
+  public static IMenu[] collectRowMenus(final ITable table, IRwtEnvironment uiEnvironment) {
+    return collectMenus(table, false, true, uiEnvironment);
+  }
+
+  public static IMenu[] collectEmptySpaceMenus(final ITable table, IRwtEnvironment uiEnvironment) {
+    return collectMenus(table, true, false, uiEnvironment);
   }
 
 }

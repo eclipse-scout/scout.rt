@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
 import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.core.util.RwtLayoutUtility;
+import org.eclipse.scout.rt.ui.rap.core.window.desktop.IRwtScoutActionBar;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
@@ -35,6 +36,7 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
 
   private IRwtScoutTable m_tableComposite;
   private IRwtTableStatus m_tableStatus;
+  private IRwtScoutActionBar m_actionBar;
   private Composite m_tableContainer;
 
   @Override
@@ -78,6 +80,11 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
     if (m_tableStatus != null) {
       m_tableStatus.dispose();
     }
+
+    if (m_actionBar != null) {
+      m_actionBar.dispose();
+    }
+
     m_tableComposite = null;
     m_tableStatus = null;
     if (table != null) {
@@ -111,6 +118,8 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
       if (getScoutObject().isTableStatusVisible()) {
         m_tableStatus = createRwtTableStatus();
       }
+      m_actionBar = createRwtScoutActionBar();
+
       setUiField(m_tableComposite.getUiField());
       setTableStatusFromScout();
     }
@@ -129,6 +138,14 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
 
   protected IRwtTableStatus createRwtTableStatus() {
     return new RwtTableStatus(getUiContainer(), getUiEnvironment(), getScoutObject());
+  }
+
+  /**
+   * As default there is no action bar. <br/>
+   * Subclasses can override this method to create one.
+   */
+  protected IRwtScoutActionBar createRwtScoutActionBar() {
+    return null;
   }
 
   @Override
