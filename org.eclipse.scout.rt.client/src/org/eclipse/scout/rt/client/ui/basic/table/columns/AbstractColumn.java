@@ -192,6 +192,13 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     return -1;
   }
 
+  @ConfigProperty(ConfigProperty.DOUBLE)
+  @Order(145)
+  @ConfigPropertyValue("-1")
+  protected double getConfiguredViewOrder() {
+    return -1;
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(150)
   @ConfigPropertyValue("true")
@@ -428,6 +435,15 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     setInitialSortAscending(getConfiguredSortAscending());
     setInitialAlwaysIncludeSortAtBegin(getConfiguredAlwaysIncludeSortAtBegin());
     setInitialAlwaysIncludeSortAtEnd(getConfiguredAlwaysIncludeSortAtEnd());
+    //
+    double viewOrder = getConfiguredViewOrder();
+    if (viewOrder < 0) {
+      if (getClass().isAnnotationPresent(Order.class)) {
+        Order order = (Order) getClass().getAnnotation(Order.class);
+        viewOrder = order.value();
+      }
+    }
+    setViewOrder(viewOrder);
     //
     setWidth(getConfiguredWidth());
     m_primaryKey = getConfiguredPrimaryKey();
@@ -1007,6 +1023,16 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   @Override
   public void setInitialWidth(int w) {
     m_initialWidth = w;
+  }
+
+  @Override
+  public double getViewOrder() {
+    return propertySupport.getPropertyDouble(PROP_VIEW_ORDER);
+  }
+
+  @Override
+  public void setViewOrder(double order) {
+    propertySupport.setPropertyDouble(PROP_VIEW_ORDER, order);
   }
 
   @Override

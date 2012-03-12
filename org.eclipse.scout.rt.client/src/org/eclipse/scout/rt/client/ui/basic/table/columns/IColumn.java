@@ -63,6 +63,8 @@ public interface IColumn<T> extends IPropertyObserver {
 
   String PROP_EDITABLE = "editable";
 
+  String PROP_VIEW_ORDER = "viewOrder";
+
   void initColumn() throws ProcessingException;
 
   void disposeColumn() throws ProcessingException;
@@ -191,6 +193,19 @@ public interface IColumn<T> extends IPropertyObserver {
   boolean isInitialVisible();
 
   void setInitialVisible(boolean b);
+
+  /**
+   * @return Returns the column's view order. It determines where this column is arranged in the view.
+   */
+  double getViewOrder();
+
+  /**
+   * Sets the column's view order used for ordering all columns of a table. It is initialized with the column's model
+   * order (given by @Order annotation), i.e. the column order values are filled into the table.
+   * 
+   * @param order
+   */
+  void setViewOrder(double order);
 
   int getInitialSortIndex();
 

@@ -793,3 +793,14 @@ the delete key stroke.
 Solution:
 Added the selection behavior to the nodes' delete menus and select previous parent node instead of previous node.
 Migration: none
+
+12.03.2012 ast, abr
+Bugzilla: 372381
+Setting up an initial order for IColumns
+Problem:
+Table columns are initially ordered in the GUI the same way as in the model, using the @Order annotation. It is not
+possible to set a different initial ordering for the GUI.
+Solution:
+Added new property viewOrder on IColumn and recompute view orders whenever the property changes for a column. As a
+side effect, view orders can be changed after the model has been initialized.
+Migration: none
