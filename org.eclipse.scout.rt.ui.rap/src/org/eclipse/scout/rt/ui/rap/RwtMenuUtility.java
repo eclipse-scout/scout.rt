@@ -240,4 +240,27 @@ public final class RwtMenuUtility {
     return collectMenus(tree, true, false, uiEnvironment);
   }
 
+  /**
+   * Splits the menus in groups, separated by the {@link IActionNode#isSeparator()}
+   */
+  public static List<List<IMenu>> split(IMenu[] unseparatedMenus) {
+    List<List<IMenu>> separatedMenus = new LinkedList<List<IMenu>>();
+
+    List<IMenu> menus = new LinkedList<IMenu>();
+    for (IMenu menu : unseparatedMenus) {
+      if (menu.isSeparator()) {
+        separatedMenus.add(menus);
+        menus = new LinkedList<IMenu>();
+      }
+      else {
+        menus.add(menu);
+      }
+    }
+
+    if (!separatedMenus.contains(menus)) {
+      separatedMenus.add(menus);
+    }
+
+    return separatedMenus;
+  }
 }
