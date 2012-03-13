@@ -21,13 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
 import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
 import org.eclipse.scout.rt.client.Activator;
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
@@ -45,11 +45,13 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
 
   private final ITable m_table;
   private final Map<IColumn, ITableColumnFilter> m_filterMap;
+  private final EventListenerList m_listenerList;
   private boolean m_enabled;
 
   public DefaultTableColumnFilterManager(ITable table) {
     m_table = table;
     m_filterMap = Collections.synchronizedMap(new HashMap<IColumn, ITableColumnFilter>());
+    m_listenerList = new EventListenerList();
     setEnabled(true);
   }
 
@@ -85,9 +87,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
       }
       m_filterMap.clear();
       m_table.applyRowFilters();
-      for (IColumn col : m_table.getColumns()) {
-        ClientUIPreferences.getInstance().setTableColumnPreferences(col);
-      }
+      fireFiltersReset();
     }
     finally {
       m_table.setTableChanging(false);
@@ -98,7 +98,9 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
   @SuppressWarnings("unchecked")
   public void showFilterForm(IColumn col, boolean showAsPopupDialog) throws ProcessingException {
     ITableColumnFilter<?> filter = m_filterMap.get(col);
+    boolean created = false;
     if (filter == null) {
+      created = true;
       if (col instanceof ISmartColumn<?>) {
         filter = new StringColumnFilter(col);
       }
@@ -124,13 +126,21 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
       if (f.isFormStored()) {
         if (filter.isEmpty()) {
           m_filterMap.remove(col);
+          if (!created) {
+            fireFilterRemoved(col);
+          }
         }
         else {
           m_filterMap.put(col, filter);
+          if (created) {
+            fireFilterAdded(col);
+          }
+          else {
+            fireFilterChanged(col);
+          }
         }
         m_table.getColumnSet().updateColumn(col);
         m_table.applyRowFilters();
-        ClientUIPreferences.getInstance().setTableColumnPreferences(col);
       }
     }
   }
@@ -235,4 +245,59 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     }
   }
 
+  @Override
+  public void addListener(TableColumnFilterListener listener) {
+    m_listenerList.add(TableColumnFilterListener.class, listener);
+  }
+
+  @Override
+  public void removeListener(TableColumnFilterListener listener) {
+    m_listenerList.remove(TableColumnFilterListener.class, listener);
+  }
+
+  private void fireFilterAdded(IColumn<?> column) throws ProcessingException {
+    fireFilterEvent(new TableColumnFilterEvent(m_table, TableColumnFilterEvent.TYPE_FILTER_ADDED, column));
+  }
+
+  private void fireFilterChanged(IColumn<?> column) throws ProcessingException {
+    fireFilterEvent(new TableColumnFilterEvent(m_table, TableColumnFilterEvent.TYPE_FILTER_CHANGED, column));
+  }
+
+  private void fireFilterRemoved(IColumn<?> column) throws ProcessingException {
+    fireFilterEvent(new TableColumnFilterEvent(m_table, TableColumnFilterEvent.TYPE_FILTER_REMOVED, column));
+  }
+
+  private void fireFiltersReset() {
+    try {
+      fireFilterEvent(new TableColumnFilterEvent(m_table, TableColumnFilterEvent.TYPE_FILTERS_RESET));
+    }
+    catch (ProcessingException e) {
+      LOG.warn(null, e);
+    }
+  }
+
+  private void fireFilterEvent(TableColumnFilterEvent e) throws ProcessingException {
+    TableColumnFilterListener[] listeners = m_listenerList.getListeners(TableColumnFilterListener.class);
+    if (listeners != null && listeners.length > 0) {
+      ProcessingException pe = null;
+      for (TableColumnFilterListener listener : listeners) {
+        try {
+          listener.tableColumnFilterChanged(e);
+        }
+        catch (ProcessingException ex) {
+          if (pe == null) {
+            pe = ex;
+          }
+        }
+        catch (Throwable t) {
+          if (pe == null) {
+            pe = new ProcessingException("Unexpected", t);
+          }
+        }
+      }
+      if (pe != null) {
+        throw pe;
+      }
+    }
+  }
 }

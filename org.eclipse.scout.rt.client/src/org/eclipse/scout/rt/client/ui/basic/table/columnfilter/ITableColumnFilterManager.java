@@ -60,4 +60,22 @@ public interface ITableColumnFilterManager {
   void showFilterForm(IColumn col, boolean showAsPopupDialog) throws ProcessingException;
 
   void reset() throws ProcessingException;
+
+  /**
+   * Adds a column filter listener.
+   * <p/>
+   * <b>Note:</b> The method does not check whether a listener is already in the listener list.
+   * 
+   * @param listener
+   * @since 3.8.0
+   */
+  void addListener(TableColumnFilterListener listener);
+
+  /**
+   * Removes the given table column listener.
+   * 
+   * @param listener
+   * @since 3.8.0
+   */
+  void removeListener(TableColumnFilterListener listener);
 }

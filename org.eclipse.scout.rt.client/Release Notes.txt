@@ -804,3 +804,15 @@ Solution:
 Added new property viewOrder on IColumn and recompute view orders whenever the property changes for a column. As a
 side effect, view orders can be changed after the model has been initialized.
 Migration: none
+
+13.03.2012 abr
+Bugzilla: 374044
+Problem:
+Currently, table column filters are persisted in user scope preferences. Hence they are reapplied after application
+restarts. They are further applied to all table instances having the same client preference context.
+Solution:
+Table filter settings behave like search form states. i.e. they are remembered as long as a Scout application runs,
+but they do not endure application restarts. Reloading pages having search constraints or filters applied, must
+apply them again. Memory constraints may limit the size of stored search constraints and filter settings.
+Added filter settings cache on IMemoryPolicy.
+Migration: none

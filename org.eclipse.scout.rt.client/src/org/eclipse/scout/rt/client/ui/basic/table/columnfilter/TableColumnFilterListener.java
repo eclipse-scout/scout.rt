@@ -8,20 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.table;
+package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
 
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import java.util.EventListener;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
- * An identifier used in {@link ClientUIPreferences} to persist column filter information for the implementing column.
+ * @since 3.8.0
  */
-public interface IUniqueColumnFilterIdentifier {
+public interface TableColumnFilterListener extends EventListener {
 
-  /**
-   * @return a unique identifier, all columns with same {@link IColumn#getColumnId()}, same Table and same identifier
-   *         will share the {@link ClientUIPreferences} for a column filter
-   */
-  String getIdentifier();
-
+  void tableColumnFilterChanged(TableColumnFilterEvent e) throws ProcessingException;
 }
