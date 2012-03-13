@@ -713,8 +713,6 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
           break;
         }
         case SWT.MouseUp: {
-          StructuredSelection sel = (StructuredSelection) getUiTreeViewer().getSelection();
-
           BrowserInfo browserInfo = RwtUtility.getBrowserInfo();
           if ((browserInfo.isTablet()
               || browserInfo.isMobile())
@@ -722,25 +720,24 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
             long mouseUpTime = new Date().getTime();
             if (mouseUpTime - m_mouseDownTime <= 500L) {
               m_openMenuJob.stopOpenJob();
-              if (sel != null && sel.size() == 1) {
-                handleUiDoubleClick(sel);
-              }
+            }
+            else {
+              return;
             }
           }
-          else {
-            ViewerCell cell = getUiTreeViewer().getCell(new Point(event.x, event.y));
-            if (cell != null && cell.getElement() instanceof ITreeNode) {
-              ITreeNode nodeToClick = (ITreeNode) cell.getElement();
-              if (getScoutObject().isCheckable()) {
-                // find checkbox area
-                Rectangle imgBounds = cell.getImageBounds();
-                if (imgBounds != null && event.x >= (imgBounds.x) && event.x <= (imgBounds.x + imgBounds.width)) {
-                  handleUiNodeClick(nodeToClick);
-                }
-              }
-              else {
+
+          ViewerCell cell = getUiTreeViewer().getCell(new Point(event.x, event.y));
+          if (cell != null && cell.getElement() instanceof ITreeNode) {
+            ITreeNode nodeToClick = (ITreeNode) cell.getElement();
+            if (getScoutObject().isCheckable()) {
+              // find checkbox area
+              Rectangle imgBounds = cell.getImageBounds();
+              if (imgBounds != null && event.x >= (imgBounds.x) && event.x <= (imgBounds.x + imgBounds.width)) {
                 handleUiNodeClick(nodeToClick);
               }
+            }
+            else {
+              handleUiNodeClick(nodeToClick);
             }
           }
           break;

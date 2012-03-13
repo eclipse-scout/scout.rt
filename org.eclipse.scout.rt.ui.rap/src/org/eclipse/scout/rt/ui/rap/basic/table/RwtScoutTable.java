@@ -406,8 +406,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         //So it is necessary to request an auto resizing of the columns manually. (Bugzilla 355855)
         scheduleHandleAutoResizeColumn();
       }
-      }
-      else {
+    }
+    else {
       removeAutoResizeColumnListener();
     }
   }
@@ -417,9 +417,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       @Override
       public void run() {
         handleAutoSizeColumns();
-        }
-    });
       }
+    });
+  }
 
   private void removeAutoResizeColumnListener() {
     if (m_autoResizeColumnListener == null) {
@@ -1098,15 +1098,13 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
             long mouseUpTime = new Date().getTime();
             if (mouseUpTime - m_mouseDownTime <= 500L) {
               m_openMenuJob.stopOpenJob();
-              if (selection != null && selection.size() == 1) {
-                handleUiRowAction((ITableRow) selection.getFirstElement());
-              }
+            }
+            else {
+              return;
             }
           }
-          else {
-            if (selection != null && selection.size() == 1) {
-              handleUiRowClick((ITableRow) selection.getFirstElement());
-            }
+          if (selection != null && selection.size() == 1) {
+            handleUiRowClick((ITableRow) selection.getFirstElement());
           }
           break;
         }
@@ -1125,8 +1123,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           if (getScoutObject().isAutoResizeColumns()) {
             if (getUiField() != null && !getUiField().isDisposed()) {
               scheduleHandleAutoResizeColumn();
-                }
             }
+          }
           break;
         }
         case SWT.MenuDetect: {
