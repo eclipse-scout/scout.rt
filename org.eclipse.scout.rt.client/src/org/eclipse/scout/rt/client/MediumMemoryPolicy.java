@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.core.runtime.jobs.Job;
@@ -18,6 +20,10 @@ import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -28,18 +34,20 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
- * cache only last 5 table page search form contents, releaseUnusedPages after every page reload and force gc do free
- * memory
+ * Cache only last 5 table page search form contents, last 5 table filter settings, releaseUnusedPages after every page
+ * reload and force gc do free memory.
  */
 public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MediumMemoryPolicy.class);
 
   private boolean m_release = false;
-  //cache last 5 search form contents
+  //cache last 5 search form contents and table filters
   private final LRUCache<String/*pageFormIdentifier*/, SearchFormState> m_searchFormCache;
+  private final LRUCache<String /*pageTableIdentifier*/, Map<String, byte[]>> m_tableColumnFilterManagerState;
 
   public MediumMemoryPolicy() {
     m_searchFormCache = new LRUCache<String, SearchFormState>(5, 0L);
+    m_tableColumnFilterManagerState = new LRUCache<String, Map<String, byte[]>>(5, 0L);
   }
 
   @Override
@@ -66,6 +74,48 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       String xml = f.getXML("UTF-8");
       SearchFilter filter = f.getSearchFilter();
       m_searchFormCache.put(pageFormIdentifier, new SearchFormState(xml, filter));
+    }
+  }
+
+  @Override
+  protected void storeColumnFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
+    ITableColumnFilterManager filterManager = t.getColumnFilterManager();
+    if (filterManager == null || filterManager.getFilters() == null || filterManager.getFilters().isEmpty()) {
+      m_tableColumnFilterManagerState.remove(pageTableIdentifier);
+      return;
+    }
+    Map<String, byte[]> state = m_tableColumnFilterManagerState.get(pageTableIdentifier);
+    if (state == null) {
+      state = new HashMap<String, byte[]>();
+      m_tableColumnFilterManagerState.put(pageTableIdentifier, state);
+    }
+    for (ITableColumnFilter<?> filter : filterManager.getFilters()) {
+      IColumn<?> col = filter.getColumn();
+      if (col.getColumnId() != null) {
+        byte[] data = filterManager.getSerializedFilter(col);
+        if (data == null || data.length == 0) {
+          state.remove(col.getColumnId());
+        }
+        else {
+          state.put(col.getColumnId(), data);
+        }
+      }
+    }
+  }
+
+  @Override
+  protected void loadColumnFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
+    if (t == null || t.getColumnFilterManager() == null) {
+      return;
+    }
+    Map<String, byte[]> state = m_tableColumnFilterManagerState.get(pageTableIdentifier);
+    if (state != null) {
+      for (Map.Entry<String, byte[]> entry : state.entrySet()) {
+        IColumn col = t.getColumnSet().getColumnById(entry.getKey());
+        if (col != null) {
+          t.getColumnFilterManager().setSerializedFilter(entry.getValue(), col);
+        }
+      }
     }
   }
 

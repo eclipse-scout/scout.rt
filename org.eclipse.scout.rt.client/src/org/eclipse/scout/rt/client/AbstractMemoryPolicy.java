@@ -19,6 +19,9 @@ import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.TableColumnFilterEvent;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.TableColumnFilterListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -43,6 +46,8 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
 
   private boolean m_active;
   private final WeakHashMap<IForm, String> m_formToIdentifierMap;
+  private final WeakHashMap<ITable, String> m_tableToIdentifierMap;
+
   private final FormListener m_formListener = new FormListener() {
     @Override
     public void formChanged(FormEvent e) throws ProcessingException {
@@ -63,8 +68,28 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
     }
   };
 
+  private final TableColumnFilterListener m_tableColumnFilterListener = new TableColumnFilterListener() {
+    @Override
+    public void tableColumnFilterChanged(TableColumnFilterEvent e) throws ProcessingException {
+      if (!m_active) {
+        e.getColumnFilterManager().removeListener(m_tableColumnFilterListener);
+        return;
+      }
+      String id = m_tableToIdentifierMap.get(e.getTable());
+      if (id != null) {
+        try {
+          handleTableFilterEvent(e, id);
+        }
+        catch (Throwable t) {
+          LOG.warn("table filter event " + e, t);
+        }
+      }
+    }
+  };
+
   public AbstractMemoryPolicy() {
     m_formToIdentifierMap = new WeakHashMap<IForm, String>();
+    m_tableToIdentifierMap = new WeakHashMap<ITable, String>();
   }
 
   @Override
@@ -78,10 +103,23 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
   }
 
   /**
-   * Attaches listener on table page search forms
+   * Attaches listener on page contents
    */
   @Override
   public void pageCreated(IPage p) throws ProcessingException {
+    if (p.getOutline() instanceof AbstractPageField.SimpleOutline) {
+      return;
+    }
+    if (p instanceof IPageWithTable) {
+      IPageWithTable<? extends ITable> pt = (IPageWithTable<?>) p;
+      ITable table = pt.getTable();
+      if (table != null) {
+        String pageTableIdentifier = registerPageTable(pt, table);
+        if (pageTableIdentifier != null) {
+          loadColumnFilterState(table, pageTableIdentifier);
+        }
+      }
+    }
   }
 
   @Override
@@ -109,12 +147,26 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
     return id;
   }
 
-  protected String createUniqueIdForPage(IPage p, IForm f) {
+  /**
+   * @return the identifier for the page table or <code>null</code> if the table does not have a column filter manager.
+   */
+  protected String registerPageTable(IPage p, ITable t) {
+    if (t.getColumnFilterManager() == null) {
+      return null;
+    }
+    String id = createUniqueIdForPage(p, t);
+    m_tableToIdentifierMap.put(t, id);
+    t.getColumnFilterManager().removeListener(m_tableColumnFilterListener);
+    t.getColumnFilterManager().addListener(m_tableColumnFilterListener);
+    return id;
+  }
+
+  protected String createUniqueIdForPage(IPage p, Object o) {
     if (p == null) {
       return null;
     }
     StringBuilder builder = new StringBuilder();
-    createIdForPage(builder, p, f);
+    createIdForPage(builder, p, o);
     IPage page = p.getParentPage();
     while (page != null) {
       createIdForPage(builder, page, null);
@@ -125,16 +177,16 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
     return "" + crc.getValue();
   }
 
-  private void createIdForPage(StringBuilder b, IPage page, IForm form) {
+  private void createIdForPage(StringBuilder b, IPage page, Object o) {
     b.append("/");
     b.append(page.getClass().getName());
     if (page.getUserPreferenceContext() != null) {
       b.append("/");
       b.append(page.getUserPreferenceContext());
     }
-    if (form != null) {
+    if (o != null) {
       b.append("/");
-      b.append(form.getClass().getName());
+      b.append(o.getClass().getName());
     }
     FastBeanInfo pi = new FastBeanInfo(page.getClass(), page.getClass().getSuperclass());
     for (FastPropertyDescriptor prop : pi.getPropertyDescriptors()) {
@@ -178,6 +230,26 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
 
   protected void storeSearchFormState(IForm f, String pageFormIdentifier) throws ProcessingException {
     //nop
+  }
+
+  protected void handleTableFilterEvent(TableColumnFilterEvent e, String id) throws ProcessingException {
+    switch (e.getType()) {
+      case TableColumnFilterEvent.TYPE_FILTER_ADDED:
+      case TableColumnFilterEvent.TYPE_FILTER_CHANGED:
+      case TableColumnFilterEvent.TYPE_FILTER_REMOVED:
+      case TableColumnFilterEvent.TYPE_FILTERS_RESET:
+        storeColumnFilterState(e.getTable(), id);
+        break;
+    }
+
+  }
+
+  protected void storeColumnFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
+    // nop
+  }
+
+  protected void loadColumnFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
+    // nop
   }
 
   @Override

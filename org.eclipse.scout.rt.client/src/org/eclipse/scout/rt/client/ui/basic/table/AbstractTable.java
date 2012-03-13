@@ -733,10 +733,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     initColumnsInternal();
     if (getColumnFilterManager() == null) {
       setColumnFilterManager(createColumnFilterManager());
-      ClientUIPreferences env = ClientUIPreferences.getInstance();
-      for (IColumn col : getColumns()) {
-        env.updateTableColumnFilter(col);
-      }
     }
   }
 

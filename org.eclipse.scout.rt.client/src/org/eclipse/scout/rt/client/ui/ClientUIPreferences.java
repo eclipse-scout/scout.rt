@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.IUniqueColumnFilterIdentifier;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
@@ -79,7 +78,6 @@ public class ClientUIPreferences {
   private static final String TABLE_COLUMN_SORT_INDEX = "table.column.sortIndex.";
   private static final String TABLE_COLUMN_SORT_ASC = "table.column.sortAsc.";
   private static final String TABLE_COLUMN_SORT_EXPLICIT = "table.column.sortExplicit.";
-  private static final String TABLE_COLUMN_FILTER = "table.column.filter.";
   private static final String APPLICATION_WINDOW_MAXIMIZED = "application.window.maximized";
   private static final String APPLICATION_WINDOW_BOUNDS = "application.window.bounds";
   private static final String CALENDAR_DISPLAY_MODE = "calendar.display.mode";
@@ -243,9 +241,6 @@ public class ClientUIPreferences {
    */
   public String getColumnKey(IColumn c) {
     String key = c.getColumnId();
-    if (c instanceof IUniqueColumnFilterIdentifier) {
-      key = ((IUniqueColumnFilterIdentifier) c).getIdentifier() + "." + key;
-    }
     if (c.getTable() != null) {
       key = getTableKey(c.getTable()) + "#" + key;
     }
@@ -265,7 +260,6 @@ public class ClientUIPreferences {
     int sortIndex = col.getSortIndex();
     boolean sortUp = col.isSortAscending();
     boolean sortExplicit = col.isSortExplicit();
-    boolean filterActive = col.isColumnFilterActive();
     //
     if (viewIndex >= 0) {
       m_env.put(key, "" + viewIndex);
@@ -313,36 +307,9 @@ public class ClientUIPreferences {
     else {
       m_env.put(key, "false");
     }
-    //
-    key = TABLE_COLUMN_FILTER + keySuffix;
-    if (filterActive) {
-      if (col.getTable().getColumnFilterManager() != null) {
-        byte[] filterData = col.getTable().getColumnFilterManager().getSerializedFilter(col);
-        m_env.putByteArray(key, filterData);
-      }
-    }
-    else {
-      m_env.remove(key);
-    }
 
     if (flush) {
       flush();
-    }
-  }
-
-  public void updateTableColumnFilter(IColumn column) {
-    if (column.getTable() != null && column.getTable().getColumnFilterManager() != null) {
-      String keySuffix = getColumnKey(column);
-      String key = TABLE_COLUMN_FILTER + keySuffix;
-      byte[] value = m_env.getByteArray(key, null);
-      if (value != null) {
-        try {
-          column.getTable().getColumnFilterManager().setSerializedFilter(value, column);
-        }
-        catch (Exception e) {
-          LOG.warn("value=" + value, e);
-        }
-      }
     }
   }
 
