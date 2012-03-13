@@ -2770,6 +2770,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
                 batchCall.addLookupCall(call);
               }
             }
+            else {
+              applyLookupResult((InternalTableRow) row, col.getColumnIndex(), LookupRow.EMPTY_ARRAY);
+            }
           }
         }
       }
