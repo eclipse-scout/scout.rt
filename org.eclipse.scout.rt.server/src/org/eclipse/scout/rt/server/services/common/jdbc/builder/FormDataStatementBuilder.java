@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -1135,6 +1136,10 @@ public class FormDataStatementBuilder implements DataModelConstants {
       if ((selectGroupByDelta > 0 && contrib.getGroupByParts().size() > 0) || contrib.getHavingParts().size() > 0) {
         entityPart = StringUtility.removeTagBounds(entityPart, "groupBy");
         if (contrib.getGroupByParts().size() > 0) {
+          //check group by parts
+          for (String s : contrib.getGroupByParts()) {
+            checkGroupByPart(s);
+          }
           final String s = ListUtility.format(contrib.getGroupByParts(), ", ");
           if (StringUtility.getTag(entityPart, "groupByParts") != null) {
             entityPart = StringUtility.replaceTags(entityPart, "groupByParts", new ITagProcessor() {
@@ -1180,6 +1185,26 @@ public class FormDataStatementBuilder implements DataModelConstants {
       entityPart = " NOT (" + entityPart + ") ";
     }
     return entityPart;
+  }
+
+  private static final Pattern CHECK_GROUP_BY_CONTAINS_SELECT_PATTERN = Pattern.compile("[^a-z0-9\"'.%$_]SELECT[^a-z0-9\"'.%$_]", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+  public static final int STATUS_CODE_INVALID_GROUP_BY_PART = 0x70000001;
+
+  /**
+   * Check if a group by part is valid, i.e. ist not a SELECT clause.
+   * 
+   * @throws ProcessingException
+   *           with {@link IStatus#getCode()} = X
+   * @since 3.8
+   */
+  protected void checkGroupByPart(String groupByPart) throws ProcessingException {
+    if (groupByPart == null) {
+      return;
+    }
+    if (CHECK_GROUP_BY_CONTAINS_SELECT_PATTERN.matcher(groupByPart).find()) {
+      throw new ProcessingException("Invalid group by clause", null, STATUS_CODE_INVALID_GROUP_BY_PART);
+    }
   }
 
   /**
