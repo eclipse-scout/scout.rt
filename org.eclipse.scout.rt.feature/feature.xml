@@ -45,9 +45,19 @@ BSI Business Systems Integration AG - initial API and implementation
       <import plugin="org.eclipse.osgi"/>
       <import plugin="javax.servlet"/>
       <import plugin="org.eclipse.swt" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.apache.batik.css" version="1.6.0"/>
-      <import plugin="org.apache.batik.util.gui" version="1.6.0"/>
-      <import plugin="org.apache.batik.util" version="1.6.0"/>
+      <import plugin="org.apache.batik.css" version="1.6.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.batik.util.gui" version="1.6.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.batik.util" version="1.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.security"/>
+      <import plugin="org.eclipse.equinox.http.registry"/>
+      <import plugin="javax.xml"/>
+      <import plugin="org.apache.xerces"/>
+      <import plugin="org.apache.xml.resolver"/>
+      <import plugin="org.apache.xml.serializer"/>
+      <import plugin="org.easymock"/>
+      <import plugin="org.eclipse.equinox.http.servlet"/>
+      <import plugin="org.eclipse.equinox.http.servletbridge"/>
+      <import plugin="org.eclipse.equinox.servletbridge"/>
    </requires>
 
    <plugin
@@ -246,7 +256,7 @@ BSI Business Systems Integration AG - initial API and implementation
          install-size="0"
          version="0.0.0"
          fragment="true"/>
-         
+
    <plugin
          id="org.eclipse.scout.rt.feature.about"
          download-size="0"
