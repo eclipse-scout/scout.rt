@@ -10,13 +10,16 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.keystroke;
 
+import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.PhaseListener;
+import org.eclipse.scout.rt.ui.rap.form.fields.stringfield.RwtScoutStringField;
 import org.eclipse.swt.SWT;
 
 public abstract class RwtKeyStroke implements IRwtKeyStroke {
 
   private final int m_stateMask;
   private final int m_keyCode;
+  private final boolean m_registerActiveKey;
   private PhaseListener m_phaseListener;
 
   public RwtKeyStroke(int keyCode) {
@@ -24,9 +27,22 @@ public abstract class RwtKeyStroke implements IRwtKeyStroke {
   }
 
   public RwtKeyStroke(int keyCode, int stateMask) {
+    this(keyCode, stateMask, true);
+  }
+
+  /**
+   * @param keyCode
+   * @param stateMask
+   * @param registerActiveKey
+   *          true (default) registers the {@link RWT#ACTIVE_KEYS} so events come up from the browser. false does not
+   *          register the active
+   *          key, so this can be used to "disable" an existing key binding.
+   *          see {@link RwtScoutStringField}
+   */
+  public RwtKeyStroke(int keyCode, int stateMask, boolean registerActiveKey) {
     m_keyCode = keyCode;
     m_stateMask = stateMask;
-
+    m_registerActiveKey = registerActiveKey;
   }
 
   @Override
@@ -37,6 +53,11 @@ public abstract class RwtKeyStroke implements IRwtKeyStroke {
   @Override
   public int getKeyCode() {
     return m_keyCode;
+  }
+
+  @Override
+  public boolean isRegisterActiveKey() {
+    return m_registerActiveKey;
   }
 
   /**

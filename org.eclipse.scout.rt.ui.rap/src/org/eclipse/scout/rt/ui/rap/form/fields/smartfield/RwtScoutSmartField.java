@@ -10,9 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.smartfield;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -21,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -464,28 +461,24 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected IRwtKeyStroke[] getUiKeyStrokes() {
-    List<IRwtKeyStroke> strokes = CollectionUtility.copyList(Arrays.asList(super.getUiKeyStrokes()));
-
-    strokes = CollectionUtility.appendList(strokes, new RwtKeyStroke(SWT.ESC) {
-      @Override
-      public void handleUiAction(Event e) {
-        if (hideProposalPopup()) {
-          e.doit = false;
-        }
-      }
-    });
-
-    strokes = CollectionUtility.appendList(strokes, new RwtKeyStroke(SWT.CR) {
-      @Override
-      public void handleUiAction(Event e) {
-        if (m_proposalPopup != null) {
-          acceptProposalFromUi();
-          e.doit = false;
-        }
-      }
-    });
-
-    return CollectionUtility.toArray(strokes, IRwtKeyStroke.class);
+    return new IRwtKeyStroke[]{
+        new RwtKeyStroke(SWT.ESC) {
+          @Override
+          public void handleUiAction(Event e) {
+            if (hideProposalPopup()) {
+              e.doit = false;
+            }
+          }
+        },
+        new RwtKeyStroke(SWT.CR) {
+          @Override
+          public void handleUiAction(Event e) {
+            if (m_proposalPopup != null) {
+              e.doit = false;
+              acceptProposalFromUi();
+            }
+          }
+        }};
   }
 
   @Override
