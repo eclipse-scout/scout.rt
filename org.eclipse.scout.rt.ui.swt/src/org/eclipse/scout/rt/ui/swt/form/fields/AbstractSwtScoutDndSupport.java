@@ -74,6 +74,8 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
   }
 
   protected void detachScout() {
+    m_scoutObject.removePropertyChangeListener(m_scoutPropertyListener);
+
     if (m_dragTransferTypes != null) {
       DragSource dragSource = (DragSource) m_control.getData(DND_DRAG_SOURCE);
       if (dragSource != null && !dragSource.isDisposed()) {

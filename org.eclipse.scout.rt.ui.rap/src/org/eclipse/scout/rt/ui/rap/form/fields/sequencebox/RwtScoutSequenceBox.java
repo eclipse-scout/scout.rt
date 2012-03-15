@@ -178,7 +178,7 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
       f.addPropertyChangeListener(IFormField.PROP_MANDATORY, m_scoutMandatoryChangeListener);
     }
 
-    // add errror status change listener on children to decorate my label same as any child with an error status
+    // add error status change listener on children to decorate my label same as any child with an error status
     m_scoutErrorStatusChangeListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
@@ -204,6 +204,14 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
       }
       m_scoutMandatoryChangeListener = null;
     }
+
+    if (m_scoutErrorStatusChangeListener != null) {
+      for (IFormField f : getScoutObject().getFields()) {
+        f.removePropertyChangeListener(IFormField.PROP_ERROR_STATUS, m_scoutErrorStatusChangeListener);
+      }
+      m_scoutErrorStatusChangeListener = null;
+    }
+
     super.detachScout();
   }
 }
