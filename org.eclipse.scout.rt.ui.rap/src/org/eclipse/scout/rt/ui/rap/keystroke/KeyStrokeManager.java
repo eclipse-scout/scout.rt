@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class KeyStrokeManager implements IKeyStrokeManager {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(KeyStrokeManager.class);
+  private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
   private Listener m_keyListener;
   private KeyAdapter m_keyAdapter;
@@ -95,12 +96,12 @@ public class KeyStrokeManager implements IKeyStrokeManager {
   public void addGlobalKeyStroke(IRwtKeyStroke stroke, boolean exclusive) {
     synchronized (m_globalKeyStrokeListLock) {
       m_globalKeyStrokes.add(stroke);
-      updateGlobalActiveKeys();
-
       if (exclusive) {
-        m_globalCancelKeyList.add(resolveKeyString(stroke));
-        updateGlobalCancelKeys();
+        if (stroke.isRegisterActiveKey()) {
+          m_globalCancelKeyList.add(resolveKeyString(stroke));
+        }
       }
+      updateGlobalKeys();
     }
   }
 
@@ -108,10 +109,8 @@ public class KeyStrokeManager implements IKeyStrokeManager {
   public boolean removeGlobalKeyStroke(IRwtKeyStroke stroke) {
     synchronized (m_globalKeyStrokeListLock) {
       boolean retVal = m_globalKeyStrokes.remove(stroke);
-      updateGlobalActiveKeys();
-
       m_globalCancelKeyList.remove(resolveKeyString(stroke));
-      updateGlobalCancelKeys();
+      updateGlobalKeys();
       return retVal;
     }
   }
@@ -136,19 +135,22 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     if (widgetActiveKeys == null) {
       widgetActiveKeys = new ArrayList<String>();
     }
-    widgetActiveKeys.add(resolveKeyString(stroke));
+    if (stroke.isRegisterActiveKey()) {
+      widgetActiveKeys.add(resolveKeyString(stroke));
+    }
     m_widgetActiveKeys.put(control, widgetActiveKeys);
-    updateActiveKeys(control);
 
     if (exclusive) {
       List<String> widgetCancelKeys = m_widgetCancelKeys.get(control);
       if (widgetCancelKeys == null) {
         widgetCancelKeys = new ArrayList<String>();
       }
-      widgetCancelKeys.add(resolveKeyString(stroke));
+      if (stroke.isRegisterActiveKey()) {
+        widgetCancelKeys.add(resolveKeyString(stroke));
+      }
       m_widgetCancelKeys.put(control, widgetCancelKeys);
-      updateCancelKeys(control);
     }
+    updateControlKeys(control);
   }
 
   @Override
@@ -179,8 +181,7 @@ public class KeyStrokeManager implements IKeyStrokeManager {
       widgetCancelKeys.remove(resolveKeyString(stroke));
       m_widgetCancelKeys.put(control, widgetCancelKeys);
     }
-    updateActiveKeys(control);
-    updateCancelKeys(control);
+    updateControlKeys(control);
 
     return retVal;
   }
@@ -214,38 +215,58 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     return keyStrokes;
   }
 
-  private void updateGlobalActiveKeys() {
+  private void updateGlobalKeys() {
+    //active keys
     Set<String> activeKeys = new HashSet<String>(m_globalKeyStrokes.size());
-
     for (IRwtKeyStroke stroke : m_globalKeyStrokes) {
-      String activeKey = resolveKeyString(stroke);
-
-      activeKeys.add(activeKey);
+      if (stroke.isRegisterActiveKey()) {
+        String activeKey = resolveKeyString(stroke);
+        activeKeys.add(activeKey);
+      }
     }
-
-    String[] activeKeyArray = activeKeys.toArray(new String[activeKeys.size()]);
-    m_environment.getDisplay().setData(RWT.ACTIVE_KEYS, activeKeyArray);
+    if (activeKeys.size() == 0) {
+      m_environment.getDisplay().setData(RWT.ACTIVE_KEYS, EMPTY_STRING_ARRAY);
+    }
+    else {
+      String[] activeKeyArray = activeKeys.toArray(new String[activeKeys.size()]);
+      m_environment.getDisplay().setData(RWT.ACTIVE_KEYS, activeKeyArray);
+    }
+    //cancel keys
+    if (m_globalCancelKeyList == null || m_globalCancelKeyList.size() == 0) {
+      m_environment.getDisplay().setData(RWT.CANCEL_KEYS, EMPTY_STRING_ARRAY);
+    }
+    else {
+      String[] cancelKeyArray = m_globalCancelKeyList.toArray(new String[m_globalCancelKeyList.size()]);
+      m_environment.getDisplay().setData(RWT.CANCEL_KEYS, cancelKeyArray);
+    }
   }
 
-  private void updateGlobalCancelKeys() {
-    String[] cancelKeyArray = m_globalCancelKeyList.toArray(new String[m_globalCancelKeyList.size()]);
-    m_environment.getDisplay().setData(RWT.CANCEL_KEYS, cancelKeyArray);
-  }
-
-  private void updateActiveKeys(Control control) {
+  private void updateControlKeys(Control control) {
+    control.removeKeyListener(m_keyAdapter);
+    //active keys
+    boolean requireListener = false;
     List<String> activeKeys = m_widgetActiveKeys.get(control);
-
-    String[] activeKeyArray = activeKeys.toArray(new String[activeKeys.size()]);
-    control.addKeyListener(m_keyAdapter);
-    control.setData(RWT.ACTIVE_KEYS, activeKeyArray);
-  }
-
-  private void updateCancelKeys(Control control) {
+    if (activeKeys == null || activeKeys.size() == 0) {
+      control.setData(RWT.ACTIVE_KEYS, EMPTY_STRING_ARRAY);
+    }
+    else {
+      String[] activeKeyArray = activeKeys.toArray(new String[activeKeys.size()]);
+      control.setData(RWT.ACTIVE_KEYS, activeKeyArray);
+      requireListener = true;
+    }
+    //cancel keys
     List<String> widgetCancelKeys = m_widgetCancelKeys.get(control);
-    if (widgetCancelKeys != null) {
+    if (widgetCancelKeys == null || widgetCancelKeys.size() == 0) {
+      control.setData(RWT.CANCEL_KEYS, EMPTY_STRING_ARRAY);
+    }
+    else {
       String[] cancelKeyArray = widgetCancelKeys.toArray(new String[widgetCancelKeys.size()]);
-      control.addKeyListener(m_keyAdapter);
       control.setData(RWT.CANCEL_KEYS, cancelKeyArray);
+      requireListener = true;
+    }
+    //
+    if (requireListener) {
+      control.addKeyListener(m_keyAdapter);
     }
   }
 

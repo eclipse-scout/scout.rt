@@ -11,9 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.stringfield;
 
 import java.beans.PropertyChangeEvent;
-import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -30,6 +28,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.AbstractRwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -48,6 +47,7 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 
 public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringField> implements IRwtScoutStringField {
 
@@ -146,9 +146,14 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
 
   @Override
   protected IRwtKeyStroke[] getUiKeyStrokes() {
-    List<IRwtKeyStroke> strokes = null;
     if (getScoutObject().isMultilineText()) {
-      return CollectionUtility.toArray(strokes, IRwtKeyStroke.class);
+      //register CR but do not set the RWT.ACTIVE_KEYS property. This would disable typing newlines in the text field
+      return new IRwtKeyStroke[]{new RwtKeyStroke(SWT.CR, SWT.NONE, false) {
+        @Override
+        public void handleUiAction(Event e) {
+          e.doit = false;
+        }
+      }};
     }
     return super.getUiKeyStrokes();
   }

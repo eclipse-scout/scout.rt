@@ -14,10 +14,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -233,17 +231,15 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
     }
   }
 
-  protected IRwtKeyStroke[] getUiKeyStrokes() {
-    List<IRwtKeyStroke> strokes = null;
+  public static final IRwtKeyStroke[] EMPTY_KEY_STROKE_ARRAY = new IRwtKeyStroke[0];
 
-    strokes = CollectionUtility.appendList(strokes, new RwtKeyStroke(SWT.CR) {
+  protected IRwtKeyStroke[] getUiKeyStrokes() {
+    return new IRwtKeyStroke[]{new RwtKeyStroke(SWT.CR) {
       @Override
       public void handleUiAction(Event e) {
         handleUiInputVerifier(e.doit);
       }
-    });
-
-    return CollectionUtility.toArray(strokes, IRwtKeyStroke.class);
+    }};
   }
 
   @Override

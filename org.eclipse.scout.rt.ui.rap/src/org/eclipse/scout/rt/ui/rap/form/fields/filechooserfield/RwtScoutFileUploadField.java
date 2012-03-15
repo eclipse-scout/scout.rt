@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.filechooserfield;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IStatus;
@@ -22,7 +20,6 @@ import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadHandler;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadListener;
 import org.eclipse.rap.rwt.supplemental.fileupload.FileUploadReceiver;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -242,25 +239,21 @@ public class RwtScoutFileUploadField extends RwtScoutValueFieldComposite<IFileCh
 
   @Override
   protected IRwtKeyStroke[] getUiKeyStrokes() {
-    List<IRwtKeyStroke> strokes = CollectionUtility.copyList(Arrays.asList(super.getUiKeyStrokes()));
-
-    strokes = CollectionUtility.appendList(strokes, new RwtKeyStroke(SWT.ESC) {
-      @Override
-      public void handleUiAction(Event e) {
-        if (cancelUpload()) {
-          e.doit = false;
-        }
-      }
-    });
-
-    strokes = CollectionUtility.appendList(strokes, new RwtKeyStroke(SWT.CR) {
-      @Override
-      public void handleUiAction(Event e) {
-        handleUiInputVerifier(e.doit);
-      }
-    });
-
-    return CollectionUtility.toArray(strokes, IRwtKeyStroke.class);
+    return new IRwtKeyStroke[]{
+        new RwtKeyStroke(SWT.ESC) {
+          @Override
+          public void handleUiAction(Event e) {
+            if (cancelUpload()) {
+              e.doit = false;
+            }
+          }
+        },
+        new RwtKeyStroke(SWT.CR) {
+          @Override
+          public void handleUiAction(Event e) {
+            handleUiInputVerifier(e.doit);
+          }
+        }};
   }
 
   /*
