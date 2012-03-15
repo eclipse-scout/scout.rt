@@ -202,7 +202,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
       }
 
       // on CR validate input first
-      getEnvironment().addKeyStrokeFilter(swtField, new ISwtKeyStrokeFilter() {
+      getEnvironment().addKeyStrokeFilter(swtField, new ISwtKeyStrokeFilter() {//TODO sle this adds many many instances, in this case better make SwtScoutComposite implements ISwtKeyStrokeFilter
         @Override
         public boolean accept(Event e, ISwtEnvironment environment) {
           if (getEnvironment() != null && getEnvironment().equals(environment)) {
