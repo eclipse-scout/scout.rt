@@ -99,6 +99,32 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   /**
+   * see {@link #execResolveEntityPath(EntityNode)}
+   */
+  @ConfigOperation
+  @Order(98)
+  protected void execResolveRootPathForTopLevelEntity(IDataModelEntity e, List<IDataModelEntity> lifeList) {
+    IDataModelEntity tmp = (e != null ? e.getParentEntity() : null);
+    while (tmp != null) {
+      lifeList.add(0, tmp);
+      tmp = tmp.getParentEntity();
+    }
+  }
+
+  /**
+   * see {@link #execResolveAttributePath(AttributeNode)}
+   */
+  @ConfigOperation
+  @Order(98)
+  protected void execResolveRootPathForTopLevelAttribute(IDataModelAttribute a, List<IDataModelEntity> lifeList) {
+    IDataModelEntity tmp = (a != null ? a.getParentEntity() : null);
+    while (tmp != null) {
+      lifeList.add(0, tmp);
+      tmp = tmp.getParentEntity();
+    }
+  }
+
+  /**
    * For {@link #exportFormFieldData(AbstractFormFieldData)}, {@link AbstractTree#exportTreeData(AbstractTreeFieldData)}
    * and {@link #storeXML(SimpleXmlElement)} it is necessary to export {@link IDataModelEntity} and
    * {@link IDataModelAttribute} as external strings. see {@link EntityPath}
@@ -107,9 +133,11 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    * composer tree of {@link EntityNode}s, the last element is the deepest tree node.
    * <p>
    * The default traverses the tree up to the root and collects all non-null {@link EntityNode#getEntity()}
+   * <p>
+   * This is prefixed with {@link #execResolveRootPathForTopLevelEntity(IDataModelEntity, List)}
    */
   @ConfigOperation
-  @Order(98)
+  @Order(99)
   protected EntityPath execResolveEntityPath(EntityNode node) {
     LinkedList<IDataModelEntity> list = new LinkedList<IDataModelEntity>();
     EntityNode tmp = node;
@@ -120,11 +148,17 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       //next
       tmp = tmp.getAncestorNode(EntityNode.class);
     }
+    if (list.size() > 0) {
+      execResolveRootPathForTopLevelEntity(list.get(0), list);
+    }
     return new EntityPath(list);
   }
 
   /**
    * see {@link #execResolveEntityPathForEntityExport(EntityNode)}, {@link AttributePath} for more details
+   * <p>
+   * The path in the composer tree is prefixed with
+   * {@link #execResolveRootPathForTopLevelAttribute(IDataModelAttribute, List)}
    */
   @ConfigOperation
   @Order(99)
@@ -140,6 +174,12 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       }
       //next
       tmp = tmp.getAncestorNode(EntityNode.class);
+    }
+    if (list.size() > 0) {
+      execResolveRootPathForTopLevelEntity(list.get(0), list);
+    }
+    else {
+      execResolveRootPathForTopLevelAttribute(node.getAttribute(), list);
     }
     return new AttributePath(list, node.getAttribute());
   }
