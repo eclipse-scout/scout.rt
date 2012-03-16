@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.rap.basic.tree;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -44,9 +43,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
-import org.eclipse.scout.rt.ui.rap.basic.AbstractOpenMenuJob;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.core.util.BrowserInfo;
 import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.scout.rt.ui.rap.ext.tree.TreeEx;
 import org.eclipse.scout.rt.ui.rap.form.fields.AbstractRwtScoutDndSupport;
@@ -685,47 +682,13 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
   }
 
-  private final class P_OpenMenuJob extends AbstractOpenMenuJob {
-
-    public P_OpenMenuJob(Control uiField) {
-      super(uiField);
-    }
-
-    @Override
-    public void showMenu(Point pt) {
-      RwtScoutTree.this.showMenu(pt);
-    }
-  }
-
   private class P_RwtTreeListener implements Listener {
     private static final long serialVersionUID = 1L;
 
-    private long m_mouseDownTime = 0;
-    private P_OpenMenuJob m_openMenuJob = new P_OpenMenuJob(getUiField());
-
     @Override
     public void handleEvent(Event event) {
-      Point eventPosition = new Point(event.x, event.y);
       switch (event.type) {
-        case SWT.MouseDown: {
-          m_mouseDownTime = new Date().getTime();
-          m_openMenuJob.startOpenJob(eventPosition);
-          break;
-        }
         case SWT.MouseUp: {
-          BrowserInfo browserInfo = RwtUtility.getBrowserInfo();
-          if ((browserInfo.isTablet()
-              || browserInfo.isMobile())
-              && event.button == 1) {
-            long mouseUpTime = new Date().getTime();
-            if (mouseUpTime - m_mouseDownTime <= 500L) {
-              m_openMenuJob.stopOpenJob();
-            }
-            else {
-              return;
-            }
-          }
-
           ViewerCell cell = getUiTreeViewer().getCell(new Point(event.x, event.y));
           if (cell != null && cell.getElement() instanceof ITreeNode) {
             ITreeNode nodeToClick = (ITreeNode) cell.getElement();

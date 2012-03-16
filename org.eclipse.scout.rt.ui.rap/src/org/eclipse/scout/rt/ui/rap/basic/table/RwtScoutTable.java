@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.rap.basic.table;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.TreeSet;
@@ -47,10 +46,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
-import org.eclipse.scout.rt.ui.rap.basic.AbstractOpenMenuJob;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.table.celleditor.RwtScoutTableCellEditor;
-import org.eclipse.scout.rt.ui.rap.core.util.BrowserInfo;
 import org.eclipse.scout.rt.ui.rap.core.util.UiRedrawHandler;
 import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.scout.rt.ui.rap.ext.table.TableEx;
@@ -1049,25 +1046,10 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     getUiField().getMenu().setVisible(true);
   }
 
-  private final class P_OpenMenuJob extends AbstractOpenMenuJob {
-
-    public P_OpenMenuJob(Control UiField) {
-      super(UiField);
-    }
-
-    @Override
-    public void showMenu(Point pt) {
-      RwtScoutTable.this.showMenu(pt);
-    }
-  }
-
   private class P_RwtTableListener implements Listener {
     private static final long serialVersionUID = 1L;
 
     private Boolean m_doubleClicked = Boolean.FALSE;
-
-    private long m_mouseDownTime = 0;
-    private P_OpenMenuJob m_openMenuJob = new P_OpenMenuJob(getUiField());
 
     @Override
     public void handleEvent(Event event) {
@@ -1079,8 +1061,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
             getUiTableViewer().setSelection(null);
             setSelectionFromUi(new StructuredSelection());
           }
-          m_mouseDownTime = new Date().getTime();
-          m_openMenuJob.startOpenJob(eventPosition);
           break;
         }
         case SWT.MouseUp: {
@@ -1091,18 +1071,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
             }
           }
           StructuredSelection selection = (StructuredSelection) getUiTableViewer().getSelection();
-          BrowserInfo browserInfo = RwtUtility.getBrowserInfo();
-          if ((browserInfo.isTablet()
-              || browserInfo.isMobile())
-              && event.button == 1) {
-            long mouseUpTime = new Date().getTime();
-            if (mouseUpTime - m_mouseDownTime <= 500L) {
-              m_openMenuJob.stopOpenJob();
-            }
-            else {
-              return;
-            }
-          }
           if (selection != null && selection.size() == 1) {
             handleUiRowClick((ITableRow) selection.getFirstElement());
           }
