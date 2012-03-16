@@ -78,10 +78,10 @@ public class SwingScoutDialog implements ISwingScoutView {
     m_listenerList = new EventListenerList();
     //
     if (m_swingParent instanceof Dialog) {
-      m_swingDialog = new JDialogEx((Dialog) m_swingParent);
+      m_swingDialog = env.createJDialogEx((Dialog) m_swingParent);
     }
     else {
-      m_swingDialog = new JDialogEx((Frame) m_swingParent);
+      m_swingDialog = env.createJDialogEx((Frame) m_swingParent);
     }
     m_swingDialog.getRootPane().putClientProperty(SwingBusyIndicator.BUSY_SUPPORTED_CLIENT_PROPERTY, true);
     JComponent contentPane = (JComponent) m_swingDialog.getContentPane();
