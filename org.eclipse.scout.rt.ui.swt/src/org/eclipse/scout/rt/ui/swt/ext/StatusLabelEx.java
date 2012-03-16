@@ -29,13 +29,14 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 public class StatusLabelEx extends Composite implements ILabelComposite {
   private final ISwtEnvironment m_environment;
   private IProcessingStatus m_status;
   private boolean m_mandatory;
-  private Composite m_label;
+  private Control m_label;
 
   private Label m_statusLabel;
   private final Image m_infoImg;
@@ -381,11 +382,11 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
     return m_nonMandatoryText;
   }
 
-  protected void setLabel(Composite label) {
+  protected void setLabel(Control label) {
     m_label = label;
   }
 
-  public Composite getLabel() {
+  public Control getLabel() {
     return m_label;
   }
 }
