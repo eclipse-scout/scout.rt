@@ -75,6 +75,7 @@ import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.concurrency.SwingScoutSynchronizer;
 import org.eclipse.scout.rt.ui.swing.ext.IEmbeddedFrameProviderService;
+import org.eclipse.scout.rt.ui.swing.ext.JDialogEx;
 import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelTop;
@@ -868,6 +869,16 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     ISwingScoutFormField ui = m_formFieldFactory.createFormField(parent, field, this);
     decorate(field, ui);
     return ui;
+  }
+
+  @Override
+  public JDialogEx createJDialogEx(Dialog swingParent) {
+    return new JDialogEx(swingParent);
+  }
+
+  @Override
+  public JDialogEx createJDialogEx(Frame swingParent) {
+    return new JDialogEx(swingParent);
   }
 
   @Override

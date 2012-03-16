@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swing;
 
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -42,6 +43,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
+import org.eclipse.scout.rt.ui.swing.ext.JDialogEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyHandler;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
@@ -378,4 +380,14 @@ public interface ISwingEnvironment {
    * environment. So the form has to fetch all print event pending for it.
    */
   FormEvent[] fetchPendingPrintEvents(IForm form);
+
+  /**
+   * Enables customization of JDialogEx by returning subtypes
+   */
+  JDialogEx createJDialogEx(Dialog swingParent);
+
+  /**
+   * Enables customization of JDialogEx by returning subtypes
+   */
+  JDialogEx createJDialogEx(Frame swingParent);
 }
