@@ -722,6 +722,10 @@ Label {
   opacity: 1;
 }
 
+Label:disabled {
+  color: #2a5a76;
+}
+
 Label[BORDER] {
   border: 1px solid #a4a4a4;
   border-radius: 2px;
