@@ -188,3 +188,15 @@ Solution:
 - SOAP faults are logged with a severity of INFO
 - Runtime exceptions are logged with a severity of WARN with the note to handle such faults by respective SOAP faults. Also, the causing exception is not propagated back to the webservice client.
 Migration: None
+
+17.03.2012 dwi
+Bugzilla: 374580
+Problem:
+The webservice endpoints installed should be accessible within Scout application to access their properties.
+Solution:
+- Moved JAX-WS bootstrapping from servlet initialization into service initialization of IJaxWsEndpointService. This service provides access to the installed JAX-WS endpoints.
+- Moved JAX-WS status page from EndpointServlet to IJaxWsEndpointService.
+Migration:
+If you are providing a custom status page for your webservice endpoints, you configured the init-parameters 'bundle-name' and 'bundle-path' in the JAX-WS servlet. Remove those two parameters and set the following properties in config.ini file accordingly:
+org.eclipse.scout.jaxws.resource.bundle-name=<resource-bundle>
+org.eclipse.scout.jaxws.resource.bundle-path=<resource-path within resource-bundle>
