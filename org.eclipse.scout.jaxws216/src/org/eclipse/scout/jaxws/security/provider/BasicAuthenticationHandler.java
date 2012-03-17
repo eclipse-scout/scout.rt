@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
@@ -140,7 +141,7 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
     httpResponseHeaders.put("WWW-Authenticate", basicAuthToken);
 
     context.put(MessageContext.HTTP_RESPONSE_HEADERS, httpResponseHeaders);
-    context.put(MessageContext.HTTP_RESPONSE_CODE, 401);
+    context.put(MessageContext.HTTP_RESPONSE_CODE, HttpServletResponse.SC_UNAUTHORIZED);
   }
 
   @SuppressWarnings("unchecked")
@@ -154,7 +155,7 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
   }
 
   protected boolean breakHandlerChain(SOAPMessageContext context) {
-    context.put(MessageContext.HTTP_RESPONSE_CODE, 401);
+    context.put(MessageContext.HTTP_RESPONSE_CODE, HttpServletResponse.SC_UNAUTHORIZED);
 
     boolean oneway = BooleanUtility.nvl((Boolean) context.get(BindingProviderProperties.ONE_WAY_OPERATION), false);
     if (oneway) {
@@ -165,7 +166,7 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
   }
 
   protected boolean breakHandlerChainWithException(SOAPMessageContext context, Exception exception) {
-    context.put(MessageContext.HTTP_RESPONSE_CODE, 500);
+    context.put(MessageContext.HTTP_RESPONSE_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     LOG.error("Internal server error  (Basic Access Authentication)", exception);
 
     if (exception instanceof WebServiceException) {

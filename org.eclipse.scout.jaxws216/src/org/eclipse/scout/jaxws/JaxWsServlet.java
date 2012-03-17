@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -17,9 +17,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
 import javax.security.auth.Subject;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -37,18 +35,6 @@ import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
  */
 public class JaxWsServlet extends EndpointServlet {
   private static final long serialVersionUID = 1L;
-
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    Activator.getDefault().getServletContextListener().contextInitialized(new ServletContextEvent(config.getServletContext()));
-    super.init(config);
-  }
-
-  @Override
-  public void destroy() {
-    JaxWsServlet.super.destroy();
-    Activator.getDefault().getServletContextListener().contextDestroyed(new ServletContextEvent(getServletContext()));
-  }
 
   @Override
   public final void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {

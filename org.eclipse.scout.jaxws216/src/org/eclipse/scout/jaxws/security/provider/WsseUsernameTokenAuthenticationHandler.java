@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPHeader;
@@ -151,7 +152,7 @@ public class WsseUsernameTokenAuthenticationHandler implements IAuthenticationHa
   }
 
   protected boolean breakHandlerChain(SOAPMessageContext context) {
-    context.put(MessageContext.HTTP_RESPONSE_CODE, 401);
+    context.put(MessageContext.HTTP_RESPONSE_CODE, HttpServletResponse.SC_UNAUTHORIZED);
 
     boolean oneway = BooleanUtility.nvl((Boolean) context.get(BindingProviderProperties.ONE_WAY_OPERATION), false);
     if (oneway) {
@@ -162,7 +163,7 @@ public class WsseUsernameTokenAuthenticationHandler implements IAuthenticationHa
   }
 
   protected boolean breakHandlerChainWithException(SOAPMessageContext context, Exception exception) {
-    context.put(MessageContext.HTTP_RESPONSE_CODE, 500);
+    context.put(MessageContext.HTTP_RESPONSE_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     LOG.error("Internal server error (Message Level WS-Security with UsernameToken authentication)", exception);
 
     if (exception instanceof WebServiceException) {
