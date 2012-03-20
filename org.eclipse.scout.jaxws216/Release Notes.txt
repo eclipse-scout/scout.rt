@@ -188,3 +188,14 @@ Solution:
 - SOAP faults are logged with a severity of INFO
 - Runtime exceptions are logged with a severity of WARN with the note to handle such faults by respective SOAP faults. Also, the causing exception is not propagated back to the webservice client.
 Migration: None
+
+20.03.2012 dwi
+Bugzilla: 374837
+Problem:
+WebServiceContext cannot be injected into port type with @Resource annotation.
+That would be necessary to access message context and security information
+relative to a request being served.
+Solution:
+Fixed instance resolver to respect JAX-WS resource injection.
+Migration:
+None
