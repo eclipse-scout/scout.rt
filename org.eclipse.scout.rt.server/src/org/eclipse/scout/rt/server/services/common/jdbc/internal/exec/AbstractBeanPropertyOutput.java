@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
@@ -108,8 +109,18 @@ abstract class AbstractBeanPropertyOutput implements IBindOutput {
             if (i < accSize) {
               value = m_accumulator.get(i);
             }
-            Object castValue = TypeCastUtility.castValue(value, desc.getPropertyType());
-            desc.getWriteMethod().invoke(bean, castValue);
+            if (IHolder.class.isAssignableFrom(desc.getPropertyType())) {
+              @SuppressWarnings("unchecked")
+              IHolder<Object> h = (IHolder<Object>) desc.getReadMethod().invoke(bean);
+              if (h != null) {
+                Object castValue = TypeCastUtility.castValue(value, h.getHolderType());
+                h.setValue(castValue);
+              }
+            }
+            else {
+              Object castValue = TypeCastUtility.castValue(value, desc.getPropertyType());
+              desc.getWriteMethod().invoke(bean, castValue);
+            }
           }
         }
         catch (Exception e) {
