@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -30,15 +31,22 @@ public final class FormattingUtility {
   }
 
   /**
-   * Formats given Object and converts to String handled are: {@link String} {@link java.util.Date} is formatted using
-   * {@link java.text.DateFormat#MEDIUM} optionally displaying time when time is
-   * other than 00:00:00 {@link Number} is formatted using {@link java.text.NumberFormat} {@link Boolean} is formatted
-   * as "X" for
-   * true, "" for false
+   * Formats the given object respecting the current thread's {@link LocaleThreadLocal} and converts it to a String.
+   * Supported types are:
+   * <ul>
+   * <li>{@link String}</li>
+   * <li>{@link java.util.Date} with empty time part is formatted using {@link java.text.DateFormat#MEDIUM}
+   * <li>{@link java.util.Date} with non-empty time part is formatted {@link java.text.DateFormat#SHORT} for date and
+   * time part, respectively</li>
+   * <li>{@link Float}, {@link Double} and {@link BigDecimal} are formatted using {@link java.text.NumberFormat} with
+   * exactly 2 fraction digits</li>
+   * <li>{@link Number} is formatted using {@link java.text.NumberFormat}</li>
+   * <li>{@link Boolean} is formatted as "X" for <code>true</code>, "" for <code>false</code></li>
+   * </ul>
    * 
-   * @param Object
-   *          o: Object to format
-   * @return String: formatted and converted Object
+   * @param o
+   *          object to format
+   * @return Returns formatted string representation, never <code>null</code>.
    */
   public static String formatObject(Object o) {
     Locale loc = LocaleThreadLocal.get();
@@ -58,12 +66,13 @@ public final class FormattingUtility {
       // if time different to 00:00:00
       // format with time
       if (hour != 0 || minute != 0 || second != 0) {
-        ret = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, loc).format(o);
+        ret = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, loc).format(o);
       }
     }
-    else if (o instanceof Float || o instanceof Double) {
+    else if (o instanceof Float || o instanceof Double || o instanceof BigDecimal) {
       NumberFormat f = DecimalFormat.getInstance(loc);
       f.setMinimumFractionDigits(2);
+      f.setMaximumFractionDigits(2);
       ret = f.format(o);
     }
     else if (o instanceof Number) {
