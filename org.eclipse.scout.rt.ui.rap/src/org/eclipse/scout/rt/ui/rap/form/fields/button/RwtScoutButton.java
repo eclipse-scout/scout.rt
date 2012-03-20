@@ -106,17 +106,14 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
       m_contextMenu = new Menu(uiFieldAsButton.getShell(), SWT.POP_UP);
       m_contextMenu.addMenuListener(new P_ContextMenuListener(uiFieldAsButton, uiFieldAsButton.getParent()));
       uiFieldAsButton.setMenu(m_contextMenu);
+
       // attach rwt listeners
       uiFieldAsButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtSelectionListener());
+
       setUiField(uiFieldAsButton);
-      //auto process button height
-      LogicalGridData gd = (LogicalGridData) uiFieldAsButton.getLayoutData();
-      //set default button height
-      if (getScoutObject().isProcessButton() && !gd.useUiHeight) {
-        gd.useUiHeight = true;
-        IUiDecoration deco = UiDecorationExtensionPoint.getLookAndFeel();
-        gd.heightHint = deco.getProcessButtonHeight();
-      }
+
+      LogicalGridData gd = (LogicalGridData) getUiField().getLayoutData();
+      adaptButtonLayoutData(gd);
     }
     else if (uiFieldAsLink != null) {
       uiFieldAsLink.addHyperlinkListener(new HyperlinkAdapter() {
@@ -130,6 +127,17 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
     }
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(0, 0));
+  }
+
+  protected void adaptButtonLayoutData(LogicalGridData gd) {
+    //set default button height
+    if (!getScoutObject().isProcessButton() || gd.useUiHeight) {
+      return;
+    }
+
+    gd.useUiHeight = true;
+    IUiDecoration deco = UiDecorationExtensionPoint.getLookAndFeel();
+    gd.heightHint = deco.getProcessButtonHeight();
   }
 
   @Override
