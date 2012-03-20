@@ -54,11 +54,17 @@ BSI Business Systems Integration AG - initial API and implementation
       <import plugin="org.apache.xerces"/>
       <import plugin="org.apache.xml.resolver"/>
       <import plugin="org.apache.xml.serializer"/>
-      <import plugin="org.easymock"/>
       <import plugin="org.eclipse.equinox.http.servlet"/>
       <import plugin="org.eclipse.equinox.http.servletbridge"/>
       <import plugin="org.eclipse.equinox.servletbridge"/>
    </requires>
+   
+   <plugin
+         id="org.easymock"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="org.eclipse.scout.commons"
