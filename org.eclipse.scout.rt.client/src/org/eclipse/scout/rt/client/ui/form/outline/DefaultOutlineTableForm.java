@@ -100,7 +100,7 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
 
       @Override
       protected int getConfiguredGridH() {
-        return 10;
+        return 2;
       }
 
       @Override
