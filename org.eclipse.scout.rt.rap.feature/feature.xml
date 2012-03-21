@@ -41,7 +41,6 @@ BSI Business Systems Integration AG - initial API and implementation
       <import feature="org.eclipse.scout.rt.feature" version="3.8.0" match="compatible"/>
       <import feature="org.eclipse.rap.runtime" version="1.5.0" match="compatible"/>
       <import feature="org.eclipse.rap.runtime.requirements" version="1.5.0" match="compatible"/>
-      <import feature="org.eclipse.rap.incubator.supplemental.fileupload.feature" version="1.5.0.20120202-0324"/>
    </requires>
 
    <plugin
