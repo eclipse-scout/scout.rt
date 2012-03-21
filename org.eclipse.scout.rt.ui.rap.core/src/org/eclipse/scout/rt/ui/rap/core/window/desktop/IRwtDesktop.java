@@ -21,7 +21,5 @@ public interface IRwtDesktop {
 
   IRwtScoutToolbar getUiToolbar();
 
-  IRwtScoutActionBar getUiActionBar();
-
   IViewArea getViewArea();
 }

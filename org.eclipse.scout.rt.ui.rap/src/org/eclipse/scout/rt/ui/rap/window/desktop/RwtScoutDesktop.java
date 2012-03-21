@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.ui.rap.IRwtStandaloneEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.core.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.core.window.desktop.IRwtDesktop;
-import org.eclipse.scout.rt.ui.rap.core.window.desktop.IRwtScoutActionBar;
 import org.eclipse.scout.rt.ui.rap.core.window.desktop.viewarea.ILayoutListener;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.desktop.toolbar.RwtScoutToolbar;
@@ -65,10 +64,9 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
       Composite desktopComposite = parent;
       Control toolbar = createToolBar(desktopComposite);
       Control viewsArea = createViewsArea(desktopComposite);
-      Control actionBar = createActionBar(desktopComposite);
       viewsArea.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEWS_AREA);
 
-      initLayout(desktopComposite, toolbar, actionBar, viewsArea);
+      initLayout(desktopComposite, toolbar, viewsArea);
 
       setUiContainer(desktopComposite);
     }
@@ -77,7 +75,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
     }
   }
 
-  protected void initLayout(Composite container, Control toolbar, Control actionBar, Control viewsArea) {
+  protected void initLayout(Composite container, Control toolbar, Control viewsArea) {
     GridLayout layout = RwtUtility.createGridLayoutNoSpacing(1, true);
     container.setLayout(layout);
 
@@ -91,23 +89,12 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
       viewsArea.setLayoutData(viewsAreaData);
     }
 
-    if (actionBar != null) {
-      GridData actionBarData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-      actionBar.setLayoutData(actionBarData);
-    }
   }
 
   protected Control createToolBar(Composite parent) {
     m_uiToolbar = new RwtScoutToolbar();
     m_uiToolbar.createUiField(parent, getScoutObject(), getUiEnvironment());
     return m_uiToolbar.getUiContainer();
-  }
-
-  /**
-   * There is no action bar created as default. The method is intended for being used by subclasses.
-   */
-  protected Control createActionBar(Composite parent) {
-    return null;
   }
 
   protected Control createViewsArea(Composite parent) {
@@ -148,11 +135,6 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   @Override
   public RwtScoutToolbar getUiToolbar() {
     return m_uiToolbar;
-  }
-
-  @Override
-  public IRwtScoutActionBar getUiActionBar() {
-    return null;
   }
 
   @Override
