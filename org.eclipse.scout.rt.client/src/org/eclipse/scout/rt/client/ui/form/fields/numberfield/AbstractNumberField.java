@@ -160,10 +160,10 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractValu
     }
     else {
       if (getMaxValue() != null && compareInternal(rawValue, getMaxValue()) > 0) {
-        throw new VetoException(ScoutTexts.get("NumberTooLargeMessageXY", "" + getMinValue(), "" + getMaxValue()));
+        throw new VetoException(ScoutTexts.get("NumberTooLargeMessageXY", "" + formatValueInternal(getMinValue()), "" + formatValueInternal(getMaxValue())));
       }
       if (getMinValue() != null && compareInternal(rawValue, getMinValue()) < 0) {
-        throw new VetoException(ScoutTexts.get("NumberTooSmallMessageXY", "" + getMinValue(), "" + getMaxValue()));
+        throw new VetoException(ScoutTexts.get("NumberTooSmallMessageXY", "" + formatValueInternal(getMinValue()), "" + formatValueInternal(getMaxValue())));
       }
       validValue = rawValue;
     }
