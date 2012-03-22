@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.Gr
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetAllButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetColumnFiltersButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetSortingButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetVisibilityButton;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.AddCustomColumnButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.DeselectAllButton;
@@ -48,7 +48,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetAllMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetColumnFiltersMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetSortingMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetVisibilityMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetViewMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -166,8 +166,8 @@ public class OrganizeColumnsForm extends AbstractForm {
     return getFieldByClass(ResetSortingButton.class);
   }
 
-  public ResetVisibilityButton getResetVisibilityButton() {
-    return getFieldByClass(ResetVisibilityButton.class);
+  public ResetViewButton getResetViewButton() {
+    return getFieldByClass(ResetViewButton.class);
   }
 
   public SelectAllButton getSelectAllButton() {
@@ -531,7 +531,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return TEXTS.get("ResetTableColumnsVisibility");
+          return TEXTS.get("ResetTableColumnsView");
         }
 
         @Order(10.0)
@@ -967,11 +967,11 @@ public class OrganizeColumnsForm extends AbstractForm {
         }
 
         @Order(20.0)
-        public class ResetVisibilityButton extends AbstractLinkButton {
+        public class ResetViewButton extends AbstractLinkButton {
 
           @Override
           protected String getConfiguredLabel() {
-            return TEXTS.get("ResetTableColumnsVisibility");
+            return TEXTS.get("ResetTableColumnsView");
           }
 
           @Override
@@ -981,7 +981,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected void execClickAction() throws ProcessingException {
-            doResetAction(ResetVisibilityMenu.class);
+            doResetAction(ResetViewMenu.class);
           }
 
         }
