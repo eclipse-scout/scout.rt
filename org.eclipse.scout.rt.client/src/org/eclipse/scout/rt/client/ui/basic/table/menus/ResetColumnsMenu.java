@@ -65,11 +65,11 @@ public class ResetColumnsMenu extends AbstractMenu {
   }
 
   @Order(30.0)
-  public class ResetVisibilityMenu extends AbstractMenu {
+  public class ResetViewMenu extends AbstractMenu {
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ResetTableColumnsVisibility");
+      return ScoutTexts.get("ResetTableColumnsView");
     }
 
     @Override
@@ -78,6 +78,8 @@ public class ResetColumnsMenu extends AbstractMenu {
         m_table.setTableChanging(true);
         //
         m_table.resetColumnVisibilities();
+        m_table.resetColumnWidths();
+        m_table.resetColumnOrder();
         ITableCustomizer cst = m_table.getTableCustomizer();
         if (cst != null) {
           cst.removeAllColumns();
