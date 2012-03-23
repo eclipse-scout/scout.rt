@@ -136,6 +136,8 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
    * <li>{@link DataModelConstants#TYPE_NUMBER_LIST}</li>
    * <li>{@link DataModelConstants#TYPE_NUMBER_TREE}</li>
    * </ul>
+   * <p>
+   * A multi valued attribute behaves same as {@link IDataModelEntity#isOneToMany()}
    * 
    * @return Returns <code>true</code> if this attribute holds multiple values. <code>false</code> otherwise.
    * @since 3.8.0
