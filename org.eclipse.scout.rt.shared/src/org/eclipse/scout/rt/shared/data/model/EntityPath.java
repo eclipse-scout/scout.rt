@@ -108,7 +108,7 @@ public final class EntityPath {
    * @return a new path containing the elements between from (inclusive) and to (exclusive)
    */
   public EntityPath subPath(int fromIndex, int toIndex) {
-    if (size() <= 1) {
+    if (size() <= 0) {
       return EMPTY;
     }
     return new EntityPath(m_entityPath.subList(fromIndex, toIndex), false);
