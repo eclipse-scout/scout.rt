@@ -220,6 +220,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   private Map<String, Object> m_bindMap;
   private AtomicInteger m_sequenceProvider;
   private StringBuffer m_where;
+  private List<IFormDataStatementBuilderInjection> m_formDataStatementBuilderInjections;
 
   /**
    * @param sqlStyle
@@ -236,6 +237,72 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   public IDataModel getDataModel() {
     return m_dataModel;
+  }
+
+  /**
+   * @return true to consume child contributions by this entity.
+   *         Default returns true. If the entity is a 1:1 or 1:0 relation to its base and its sql contribution is just a
+   *         join clause or similar, this method must return false to let the parent entity colelct all parts. Use
+   *         <code>return {@link IDataModelEntity#isOneToMany()}</code> when such behaviour is implemented.
+   */
+  protected boolean isConsumeChildContributions(EntityPath ePath) {
+    return true;
+    //return ePath.lastElement().isOneToMany();
+  }
+
+  /**
+   * add an injection that allows to manipulate every call to
+   * {@link #buildComposerAttributeNode(ComposerAttributeNodeData, AttributeStrategy)} and
+   * {@link #buildComposerEntityNodeContribution(ComposerEntityNodeData, EntityStrategy)}
+   */
+  public void addFormDataStatementBuilderInjection(IFormDataStatementBuilderInjection j) {
+    if (j == null) {
+      return;
+    }
+    if (m_formDataStatementBuilderInjections == null) {
+      m_formDataStatementBuilderInjections = new ArrayList<IFormDataStatementBuilderInjection>(1);
+    }
+    m_formDataStatementBuilderInjections.add(j);
+  }
+
+  public void removeFormDataStatementBuilderInjection(IFormDataStatementBuilderInjection j) {
+    if (j == null) {
+      return;
+    }
+    if (m_formDataStatementBuilderInjections != null) {
+      m_formDataStatementBuilderInjections.remove(j);
+      if (m_formDataStatementBuilderInjections.isEmpty()) {
+        m_formDataStatementBuilderInjections = null;
+      }
+    }
+  }
+
+  private boolean hasInjections() {
+    return (m_formDataStatementBuilderInjections != null && !m_formDataStatementBuilderInjections.isEmpty());
+  }
+
+  private void injectPreBuildEntity(ComposerEntityNodeData node, EntityStrategy entityStrategy, EntityContribution childContrib) {
+    if (m_formDataStatementBuilderInjections != null) {
+      for (IFormDataStatementBuilderInjection j : m_formDataStatementBuilderInjections) {
+        j.preBuildEntity(node, entityStrategy, childContrib);
+      }
+    }
+  }
+
+  private void injectPostBuildEntity(ComposerEntityNodeData node, EntityStrategy entityStrategy, EntityContribution parentContrib) {
+    if (m_formDataStatementBuilderInjections != null) {
+      for (IFormDataStatementBuilderInjection j : m_formDataStatementBuilderInjections) {
+        j.postBuildEntity(node, entityStrategy, parentContrib);
+      }
+    }
+  }
+
+  private void injectPostBuildAttribute(ComposerAttributeNodeData node, AttributeStrategy attributeStrategy, EntityContribution contrib) {
+    if (m_formDataStatementBuilderInjections != null) {
+      for (IFormDataStatementBuilderInjection j : m_formDataStatementBuilderInjections) {
+        j.postBuildAttribute(node, attributeStrategy, contrib);
+      }
+    }
   }
 
   public void setDataModel(IDataModel dataModel) {
@@ -554,6 +621,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return createEntityPart(stm, false, c);
   }
 
+  /**
+   * do not use or override this method, it is protected for unit test purposes
+   */
   protected boolean isZeroTraversingAttribute(int operation, Object[] values) {
     Number value1 = values != null && values.length > 0 && values[0] instanceof Number ? (Number) values[0] : null;
     Number value2 = values != null && values.length > 1 && values[1] instanceof Number ? (Number) values[1] : null;
@@ -755,15 +825,15 @@ public class FormDataStatementBuilder implements DataModelConstants {
     int i = 0;
     while (i < nodes.size()) {
       if (nodes.get(i) instanceof ComposerEntityNodeData) {
-        String s = buildComposerEntityNode((ComposerEntityNodeData) nodes.get(i), entityStrategy);
-        if (s != null) {
-          contrib.getWhereParts().add(s);
+        EntityContribution subContrib = buildComposerEntityNodeContribution((ComposerEntityNodeData) nodes.get(i), entityStrategy);
+        if (subContrib != null && !subContrib.isEmpty()) {
+          contrib.add(subContrib);
         }
         i++;
       }
       else if (nodes.get(i) instanceof ComposerAttributeNodeData) {
         EntityContribution subContrib = buildComposerAttributeNode((ComposerAttributeNodeData) nodes.get(i), attributeStrategy);
-        if (!subContrib.isEmpty()) {
+        if (subContrib != null && !subContrib.isEmpty()) {
           contrib.add(subContrib);
         }
         i++;
@@ -777,14 +847,14 @@ public class FormDataStatementBuilder implements DataModelConstants {
           k++;
         }
         EntityContribution subContrib = buildComposerOrNodes(orNodes, entityStrategy, attributeStrategy);
-        if (!subContrib.isEmpty()) {
+        if (subContrib != null && !subContrib.isEmpty()) {
           contrib.add(subContrib);
         }
         i = k + 1;
       }
       else {
         EntityContribution subContrib = buildTreeNodes(nodes.get(i).getChildNodes(), entityStrategy, attributeStrategy);
-        if (!subContrib.isEmpty()) {
+        if (subContrib != null && !subContrib.isEmpty()) {
           contrib.add(subContrib);
         }
       }
@@ -792,6 +862,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return contrib;
   }
 
+  /**
+   * do not use or override this method, it is protected for unit test purposes
+   */
   @SuppressWarnings("unchecked")
   protected EntityContribution buildComposerOrNodes(List<ComposerEitherOrNodeData> nodes, EntityStrategy entityStrategy, AttributeStrategy attributeStrategy) throws ProcessingException {
     EntityContribution contrib = new EntityContribution();
@@ -834,7 +907,30 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return contrib;
   }
 
+  /**
+   * @deprecated use {@link #buildComposerEntityNodeContribution(ComposerEntityNodeData, EntityStrategy)} instead
+   */
+  @Deprecated
   public String buildComposerEntityNode(ComposerEntityNodeData node, EntityStrategy entityStrategy) throws ProcessingException {
+    EntityContribution contrib = buildComposerEntityNodeContribution(node, entityStrategy);
+    switch (entityStrategy) {
+      case BuildConstraints: {
+        if (contrib.getWhereParts().size() > 0) {
+          return contrib.getWhereParts().get(0);
+        }
+        break;
+      }
+      case BuildQuery: {
+        if (contrib.getSelectParts().size() > 0) {
+          return contrib.getSelectParts().get(0);
+        }
+        break;
+      }
+    }
+    return null;
+  }
+
+  public EntityContribution buildComposerEntityNodeContribution(ComposerEntityNodeData node, EntityStrategy entityStrategy) throws ProcessingException {
     if (getDataModel() == null) {
       throw new ProcessingException("there is no data model set, call FormDataStatementBuilder.setDataModel to set one");
     }
@@ -874,11 +970,31 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
     m_aliasMapper.addAllNodeEntitiesFrom(node, stm);
     stm = m_aliasMapper.replaceMarkersByAliases(stm, m_aliasMapper.getNodeAliases(node), parentAliasMap);
-    String s = buildComposerEntityEitherOrSplit(entityStrategy, stm, node.isNegative(), node.getChildNodes());
-    return s;
+    switch (entityStrategy) {
+      case BuildQuery: {
+        EntityContribution resultContrib = buildComposerEntityUnitContribution(node, entityStrategy, stm, node.getChildNodes(), isConsumeChildContributions(entityPath));
+        return resultContrib;
+      }
+      case BuildConstraints: {
+        String s = buildComposerEntityEitherOrSplit(entityStrategy, stm, node.isNegative(), node.getChildNodes());
+        EntityContribution resultContrib = (s != null ? EntityContribution.create(s) : new EntityContribution());
+        return resultContrib;
+      }
+      default: {
+        return null;
+      }
+    }
   }
 
+  /**
+   * only used with strategy {@link EntityStrategy#BuildConstraints}
+   * <p>
+   * do not use or override this method, it is protected for unit test purposes
+   */
   protected String buildComposerEntityEitherOrSplit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
+    if (entityStrategy != EntityStrategy.BuildConstraints) {
+      return null;
+    }
     List<List<ComposerEitherOrNodeData>> orBlocks = new ArrayList<List<ComposerEitherOrNodeData>>();
     List<TreeNodeData> otherParts = new ArrayList<TreeNodeData>();
     List<ComposerEitherOrNodeData> currentOrBlock = new ArrayList<ComposerEitherOrNodeData>();
@@ -941,11 +1057,20 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return buildComposerEntityZeroTraversingSplit(entityStrategy, baseStm, negative, childParts);
   }
 
+  /**
+   * only used with strategy {@link EntityStrategy#BuildConstraints} and one-to-many entity relation
+   * <p>
+   * do not use or override this method, it is protected for unit test purposes
+   */
   protected String buildComposerEntityZeroTraversingSplit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
+    if (entityStrategy != EntityStrategy.BuildConstraints) {
+      return null;
+    }
     ArrayList<TreeNodeData> nonZeroChildren = new ArrayList<TreeNodeData>(2);
     for (TreeNodeData ch : childParts) {
       switch (getAttributeKind(ch)) {
         case Undefined:
+        case NonAggregation/*non-aggregations must not be handled as zero-traversal*/:
         case NonAggregationNonZeroTraversing:
         case AggregationNonZeroTraversing: {
           nonZeroChildren.add(ch);
@@ -969,8 +1094,11 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return entityPart1;
   }
 
-  protected String buildComposerEntityUnit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
-    EntityContribution contrib = new EntityContribution();
+  /**
+   * do not use or override this method, it is protected for unit test purposes
+   */
+  protected EntityContribution buildComposerEntityUnitContribution(ComposerEntityNodeData node, EntityStrategy entityStrategy, String baseStm, List<TreeNodeData> childParts, boolean consumeChildContributions) throws ProcessingException {
+    EntityContribution childContributions = new EntityContribution();
     switch (entityStrategy) {
       case BuildConstraints: {
         ArrayList<TreeNodeData> nonAggregationParts = new ArrayList<TreeNodeData>(childParts.size());
@@ -992,24 +1120,55 @@ public class FormDataStatementBuilder implements DataModelConstants {
         }
         //
         EntityContribution subContrib = buildTreeNodes(nonAggregationParts, entityStrategy, AttributeStrategy.BuildConstraintOfAttributeWithContext);
-        contrib.add(subContrib);
+        childContributions.add(subContrib);
         //
         subContrib = buildTreeNodes(aggregationParts, entityStrategy, AttributeStrategy.BuildConstraintOfContext);
-        contrib.add(subContrib);
+        childContributions.add(subContrib);
         //
         subContrib = buildTreeNodes(aggregationParts, entityStrategy, AttributeStrategy.BuildConstraintOfAttribute);
-        contrib.add(subContrib);
+        childContributions.add(subContrib);
         break;
       }
       case BuildQuery: {
         EntityContribution subContrib = buildTreeNodes(childParts, entityStrategy, AttributeStrategy.BuildQueryOfAttributeAndConstraintOfContext);
-        contrib.add(subContrib);
+        childContributions.add(subContrib);
         break;
       }
     }
-    //
-    String entityPart = createEntityPart(baseStm, negative, contrib);
-    return entityPart;
+    //legacy: node may be null from legacy calls
+    if (node != null && hasInjections()) {
+      injectPreBuildEntity(node, entityStrategy, childContributions);
+    }
+    EntityContribution parentContributions = createEntityPart(entityStrategy, baseStm, childContributions, consumeChildContributions);
+    if (node != null && hasInjections()) {
+      injectPostBuildEntity(node, entityStrategy, parentContributions);
+    }
+    return parentContributions;
+  }
+
+  /**
+   * only used with strategy {@link EntityStrategy#BuildConstraints} and one-to-many entity relation
+   * <p>
+   * do not use or override this method, it is protected for unit test purposes
+   */
+  protected String buildComposerEntityUnit(EntityStrategy entityStrategy, String baseStm, boolean negative, List<TreeNodeData> childParts) throws ProcessingException {
+    EntityContribution contrib = buildComposerEntityUnitContribution(null, entityStrategy, baseStm, childParts, true);
+    List<String> list = contrib.getWhereParts();
+    if (list.isEmpty()) {
+      list = contrib.getFromParts();
+    }
+    if (list.isEmpty()) {
+      list = contrib.getSelectParts();
+    }
+    if (list.isEmpty()) {
+      return "1=1";
+    }
+    String s = list.get(0);
+    // negation
+    if (negative) {
+      s = " NOT (" + s + ") ";
+    }
+    return s;
   }
 
   @SuppressWarnings("cast")
@@ -1069,122 +1228,268 @@ public class FormDataStatementBuilder implements DataModelConstants {
       case BuildQueryOfAttributeAndConstraintOfContext: {
         if (contrib.getSelectParts().isEmpty()) {
           contrib.getSelectParts().add("NULL");
+          contrib.getGroupByParts().add("NULL");
         }
         break;
       }
     }
+    if (hasInjections()) {
+      injectPostBuildAttribute(node, attributeStrategy, contrib);
+    }
     return contrib;
   }
 
-  public String createEntityPart(String stm, boolean negative, EntityContribution contrib) throws ProcessingException {
-    String entityPart = stm;
-    // extend the select section
-    if (contrib.getSelectParts().size() > 0) {
-      final String s = ListUtility.format(contrib.getSelectParts(), ", ");
-      if (StringUtility.getTag(entityPart, "selectParts") != null) {
-        entityPart = StringUtility.replaceTags(entityPart, "selectParts", new ITagProcessor() {
-          @Override
-          public String processTag(String tagName, String tagContent) {
-            if (tagContent.length() > 0) {
-              return tagContent + ", " + s;
+  /**
+   * Evaluates the collecting tags in the entity statement and fills in the values of the {@link EntityContribution}.
+   * If the contributing tags are missing, the complete part is treated as 'select' on {@link EntityStrategy#BuildQuery}
+   * and as 'where' on {@link EntityStrategy#BuildConstraints}
+   * <p>
+   * Before the call is processed, all {@link IFormDataStatementBuilderInjection}s are invoked.
+   * 
+   * @param entityStrategy
+   * @param entityPartWithTags
+   *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts<br/>
+   *          as well as the contributing selectPart, fromPart, wherePart, groupByPart, havingPart for the outer calling
+   *          part.
+   * @param childContributions
+   *          is the set of tags collected by all children
+   * @param consumeChildContributions
+   *          true: consume the child tags inside the entity statement. The returned entity contributions will not
+   *          contain any of these tags
+   *          <p>
+   *          false: don't consume the child tags inside the entity statement. The returned entity contribution contains
+   *          its onw plus all of these child tags (proxy)
+   */
+  public EntityContribution createEntityPart(EntityStrategy entityStrategy, final String entityPartWithTags, EntityContribution childContributions, boolean consumeChildContributions) throws ProcessingException {
+    String entityPart = entityPartWithTags;
+    EntityContribution parentContrib = new EntityContribution();
+    //PROCESS collectiong tags: selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts
+    if (!consumeChildContributions) {
+      //just proxy through to parent
+      parentContrib.add(childContributions);
+    }
+    else {
+      entityPart = autoCompleteEntityPartTags(entityPartWithTags);
+      // extend the select section
+      if (childContributions.getSelectParts().size() > 0) {
+        StringBuilder selectBuf = new StringBuilder();
+        for (String selectPart : childContributions.getSelectParts()) {
+          if (selectBuf.length() > 0) {
+            selectBuf.append(", ");
+          }
+          selectBuf.append(autoBracketSelectPart(selectPart));
+        }
+        final String s = selectBuf.toString();
+        if (StringUtility.getTag(entityPart, "selectParts") != null) {
+          entityPart = StringUtility.replaceTags(entityPart, "selectParts", new ITagProcessor() {
+            @Override
+            public String processTag(String tagName, String tagContent) {
+              if (tagContent.length() > 0) {
+                return tagContent + ", " + s;
+              }
+              return s;
             }
-            return s;
+          });
+        }
+        else {
+          throw new IllegalArgumentException("missing <selectParts/> tag");
+        }
+      }
+      entityPart = StringUtility.removeTagBounds(entityPart, "selectParts");
+      // extend the from section
+      TreeSet<String> fromParts = new TreeSet<String>(childContributions.getFromParts());
+      if (fromParts.size() > 0) {
+        final String s = ListUtility.format(fromParts, ", ");
+        if (StringUtility.getTag(entityPart, "fromParts") != null) {
+          entityPart = StringUtility.replaceTags(entityPart, "fromParts", new ITagProcessor() {
+            @Override
+            public String processTag(String tagName, String tagContent) {
+              return tagContent + ", " + s;//legacy: always prefix an additional ,
+            }
+          });
+        }
+        else {
+          throw new IllegalArgumentException("missing <fromParts/> tag");
+        }
+      }
+      entityPart = StringUtility.removeTagBounds(entityPart, "fromParts");
+      // extend the where section
+      if (childContributions.getWhereParts().size() > 0) {
+        final String s = ListUtility.format(childContributions.getWhereParts(), " AND ");
+        if (StringUtility.getTag(entityPart, "whereParts") != null) {
+          entityPart = StringUtility.replaceTags(entityPart, "whereParts", new ITagProcessor() {
+            @Override
+            public String processTag(String tagName, String tagContent) {
+              return tagContent + " AND " + s;//legacy: always prefix an additional AND
+            }
+          });
+        }
+        else {
+          entityPart = entityPart + " AND " + s;
+        }
+      }
+      entityPart = StringUtility.removeTagBounds(entityPart, "whereParts");
+      // extend the group by / having section
+      if (StringUtility.getTag(entityPart, "groupBy") != null) {
+        int selectGroupByDelta = childContributions.getSelectParts().size() - childContributions.getGroupByParts().size();
+        if ((selectGroupByDelta > 0 && childContributions.getGroupByParts().size() > 0) || childContributions.getHavingParts().size() > 0) {
+          entityPart = StringUtility.removeTagBounds(entityPart, "groupBy");
+          if (childContributions.getGroupByParts().size() > 0) {
+            //check group by parts
+            for (String s : childContributions.getGroupByParts()) {
+              checkGroupByPart(s);
+            }
+            final String s = ListUtility.format(childContributions.getGroupByParts(), ", ");
+            if (StringUtility.getTag(entityPart, "groupByParts") != null) {
+              entityPart = StringUtility.replaceTags(entityPart, "groupByParts", new ITagProcessor() {
+                @Override
+                public String processTag(String tagName, String tagContent) {
+                  if (tagContent.length() > 0) {
+                    return tagContent + ", " + s;
+                  }
+                  return s;
+                }
+              });
+            }
+            else {
+              throw new IllegalArgumentException("missing <groupByParts/> tag");
+            }
           }
-        });
-      }
-      else {
-        throw new IllegalArgumentException("missing <selectParts/> tag");
-      }
-    }
-    entityPart = StringUtility.removeTagBounds(entityPart, "selectParts");
-    // extend the from section
-    TreeSet<String> fromParts = new TreeSet<String>(contrib.getFromParts());
-    if (fromParts.size() > 0) {
-      final String s = ListUtility.format(fromParts, ", ");
-      if (StringUtility.getTag(entityPart, "fromParts") != null) {
-        entityPart = StringUtility.replaceTags(entityPart, "fromParts", new ITagProcessor() {
-          @Override
-          public String processTag(String tagName, String tagContent) {
-            return tagContent + ", " + s;//legacy: always prefix an additional ,
-          }
-        });
-      }
-      else {
-        throw new IllegalArgumentException("missing <fromParts/> tag");
-      }
-    }
-    entityPart = StringUtility.removeTagBounds(entityPart, "fromParts");
-    // extend the where section
-    if (contrib.getWhereParts().size() > 0) {
-      final String s = ListUtility.format(contrib.getWhereParts(), " AND ");
-      if (StringUtility.getTag(entityPart, "whereParts") != null) {
-        entityPart = StringUtility.replaceTags(entityPart, "whereParts", new ITagProcessor() {
-          @Override
-          public String processTag(String tagName, String tagContent) {
-            return tagContent + " AND " + s;//legacy: always prefix an additional AND
-          }
-        });
-      }
-      else {
-        entityPart = entityPart + " AND " + s;
-      }
-    }
-    entityPart = StringUtility.removeTagBounds(entityPart, "whereParts");
-    // extend the group by / having section
-    if (StringUtility.getTag(entityPart, "groupBy") != null) {
-      int selectGroupByDelta = contrib.getSelectParts().size() - contrib.getGroupByParts().size();
-      if ((selectGroupByDelta > 0 && contrib.getGroupByParts().size() > 0) || contrib.getHavingParts().size() > 0) {
-        entityPart = StringUtility.removeTagBounds(entityPart, "groupBy");
-        if (contrib.getGroupByParts().size() > 0) {
-          //check group by parts
-          for (String s : contrib.getGroupByParts()) {
-            checkGroupByPart(s);
-          }
-          final String s = ListUtility.format(contrib.getGroupByParts(), ", ");
-          if (StringUtility.getTag(entityPart, "groupByParts") != null) {
+          else {
+            //no group by parts, avoid empty GROUP BY clause
             entityPart = StringUtility.replaceTags(entityPart, "groupByParts", new ITagProcessor() {
               @Override
               public String processTag(String tagName, String tagContent) {
                 if (tagContent.length() > 0) {
-                  return tagContent + ", " + s;
+                  return tagContent;
                 }
-                return s;
+                return tagContent + " 1 ";
               }
             });
           }
-          else {
-            throw new IllegalArgumentException("missing <groupByParts/> tag");
+          entityPart = StringUtility.removeTagBounds(entityPart, "groupByParts");
+          //
+          if (childContributions.getHavingParts().size() > 0) {
+            final String s = ListUtility.format(childContributions.getHavingParts(), " AND ");
+            if (StringUtility.getTag(entityPart, "havingParts") != null) {
+              entityPart = StringUtility.replaceTags(entityPart, "havingParts", new ITagProcessor() {
+                @Override
+                public String processTag(String tagName, String tagContent) {
+                  return tagContent + " AND " + s;//legacy: always prefix an additional AND
+                }
+              });
+            }
+            else {
+              throw new IllegalArgumentException("missing <havingParts/> tag");
+            }
           }
-        }
-        entityPart = StringUtility.removeTagBounds(entityPart, "groupByParts");
-        //
-        if (contrib.getHavingParts().size() > 0) {
-          final String s = ListUtility.format(contrib.getHavingParts(), " AND ");
-          if (StringUtility.getTag(entityPart, "havingParts") != null) {
-            entityPart = StringUtility.replaceTags(entityPart, "havingParts", new ITagProcessor() {
-              @Override
-              public String processTag(String tagName, String tagContent) {
-                return tagContent + " AND " + s;//legacy: always prefix an additional AND
-              }
-            });
-          }
           else {
-            throw new IllegalArgumentException("missing <havingParts/> tag");
+            entityPart = StringUtility.removeTagBounds(entityPart, "havingParts");
           }
         }
         else {
-          entityPart = StringUtility.removeTagBounds(entityPart, "havingParts");
+          entityPart = StringUtility.removeTag(entityPart, "groupBy");
         }
       }
-      else {
-        entityPart = StringUtility.removeTag(entityPart, "groupBy");
+    }
+    //PROCESS contributing tags: selectPart, fromPart, wherePart, groupByPart, havingPart
+    String selectPart = StringUtility.getTag(entityPart, "selectPart");
+    if (selectPart != null) {
+      parentContrib.getSelectParts().add(selectPart);
+      entityPart = StringUtility.removeTag(entityPart, "selectPart").trim();
+    }
+    //
+    String fromPart = StringUtility.getTag(entityPart, "fromPart");
+    if (fromPart != null) {
+      parentContrib.getFromParts().add(fromPart);
+      entityPart = StringUtility.removeTag(entityPart, "fromPart").trim();
+    }
+    //
+    String wherePart = StringUtility.getTag(entityPart, "wherePart");
+    if (wherePart != null) {
+      parentContrib.getWhereParts().add(wherePart);
+      entityPart = StringUtility.removeTag(entityPart, "wherePart").trim();
+    }
+    //
+    String groupByPart = StringUtility.getTag(entityPart, "groupByPart");
+    if (groupByPart != null) {
+      parentContrib.getGroupByParts().add(groupByPart);
+      entityPart = StringUtility.removeTag(entityPart, "groupByPart").trim();
+    }
+    //
+    String havingPart = StringUtility.getTag(entityPart, "havingPart");
+    if (havingPart != null) {
+      parentContrib.getHavingParts().add(havingPart);
+      entityPart = StringUtility.removeTag(entityPart, "havingPart").trim();
+    }
+    //
+    if (parentContrib.isEmpty()) {
+      switch (entityStrategy) {
+        case BuildConstraints: {
+          parentContrib.getWhereParts().add(entityPart);
+          break;
+        }
+        case BuildQuery: {
+          parentContrib.getSelectParts().add(entityPart);
+          parentContrib.getGroupByParts().add("1");
+          break;
+        }
       }
     }
+    else {
+      //check for remaining dirt
+      if (entityPart.length() > 0) {
+        LOG.warn("entityPart " + entityPartWithTags + " contains content that is not wrapped in a tag: " + entityPart);
+      }
+    }
+    return parentContrib;
+  }
+
+  /**
+   * only used with strategy {@link EntityStrategy#BuildConstraints}
+   * <p>
+   * 
+   * @return the statement combined with the contributions
+   */
+  public String createEntityPart(String stm, boolean negative, EntityContribution childContributions) throws ProcessingException {
+    EntityContribution contrib = createEntityPart(EntityStrategy.BuildConstraints, stm, childContributions, true);
+    List<String> list = contrib.getWhereParts();
+    if (list.isEmpty()) {
+      list = contrib.getFromParts();
+    }
+    if (list.isEmpty()) {
+      list = contrib.getSelectParts();
+    }
+    if (list.isEmpty()) {
+      return "1=1";
+    }
+    String s = list.get(0);
     // negation
     if (negative) {
-      entityPart = " NOT (" + entityPart + ") ";
+      s = " NOT (" + s + ") ";
     }
-    return entityPart;
+    return s;
+  }
+
+  protected String autoBracketSelectPart(String s) {
+    if (s != null && !s.startsWith("(") && s.toLowerCase().contains("select")) {
+      return "(" + s + ")";
+    }
+    return s;
+  }
+
+  protected String autoCompleteEntityPartTags(String s) {
+    if (s == null) {
+      return null;
+    }
+    if (StringUtility.getTag(s, "whereParts") == null) {
+      s = s + " <whereParts/>";
+    }
+    if (StringUtility.getTag(s, "groupBy") == null) {
+      s = s + " <groupBy/>";
+    }
+    s = s.replace("<groupBy/>", "<groupBy>GROUP BY <groupByParts/> HAVING 1=1 <havingParts/></groupBy>");
+    return s;
   }
 
   private static final Pattern CHECK_GROUP_BY_CONTAINS_SELECT_PATTERN = Pattern.compile("[^a-z0-9\"'.%$_]SELECT[^a-z0-9\"'.%$_]", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
@@ -1210,6 +1515,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * adding an attribute as an entity contribution
    * <p>
+   * Evaluates the tags in the attribute statement and creates an {@link EntityContribution} based on it.
    * 
    * @param stm
    *          may contain attribute, fromPart and wherePart tags

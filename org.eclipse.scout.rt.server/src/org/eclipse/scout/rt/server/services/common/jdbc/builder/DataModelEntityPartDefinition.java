@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.services.common.jdbc.builder;
 
 import java.util.Map;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.EntityStrategy;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeData;
@@ -80,19 +79,6 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
   }
 
   protected String autoCompleteTags(String s) {
-    if (s == null) {
-      return null;
-    }
-    if (StringUtility.getTag(s, "whereParts") == null) {
-      s = s + " <whereParts/>";
-    }
-    if (StringUtility.getTag(s, "groupBy") == null) {
-      s = s + " <groupBy/>";
-    }
-    s = s.replace("<groupBy/>", "<groupBy>GROUP BY <groupByParts/> HAVING 1=1 <havingParts/></groupBy>");
-    if (StringUtility.getTag(s, "groupByParts") == null) {
-      s = s.replaceAll("([^-a-zA-Z_$]HAVING[^-a-zA-Z_$])", " <groupByParts/>\n$1");
-    }
     return s;
   }
 
@@ -102,6 +88,7 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
    * Called by the constructor after calling {@link #autoCompleteTags(String)} and setting its member fields
    */
   protected void check() {
+    /*
     if (m_whereClause != null) {
       for (String tag : new String[]{"whereParts", "groupBy", "groupByParts", "havingParts"}) {
         if (StringUtility.getTag(m_whereClause, tag) == null) {
@@ -116,6 +103,7 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
         }
       }
     }
+    */
   }
 
   public String getSelectClause() {
