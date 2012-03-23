@@ -54,6 +54,11 @@ public interface IPageWithTable<T extends ITable> extends IPage {
   ITableRow[] getTableRowsFor(ITreeNode[] childPageNodes);
 
   /**
+   * Computes the list of linked child pages for the given table rows and updates their summary cell.
+   */
+  public IPage[] getUpdatedChildPagesFor(ITableRow[] tableRows);
+
+  /**
    * @return search form that is used to filter table rows<br>
    *         Note that the form will be started at latest after being added to
    *         the outline tree inside {@link IPage#initPage()} resps in {@link IPage#execInitPage()}

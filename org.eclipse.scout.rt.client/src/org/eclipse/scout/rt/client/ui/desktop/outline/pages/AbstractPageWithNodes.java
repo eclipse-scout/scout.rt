@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -31,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
 import org.eclipse.scout.rt.shared.ContextMap;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -220,7 +220,8 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     m_pageToTableRowMap.clear();
   }
 
-  private ITreeNode getTreeNodeFor(ITableRow tableRow) {
+  @Override
+  public ITreeNode getTreeNodeFor(ITableRow tableRow) {
     if (tableRow == null) {
       return null;
     }
@@ -295,64 +296,45 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     }
   }
 
+  private OutlineMediator getOutlineMediator() {
+    if (getOutline() == null) {
+      return null;
+    }
+
+    return getOutline().getOutlineMediator();
+  }
+
   /**
    * Table listener for delegation of actions to tree
    */
   private class P_TableListener extends TableAdapter {
     @Override
     public void tableChanged(TableEvent e) {
+      OutlineMediator outlineMediator = getOutlineMediator();
+      if (outlineMediator == null) {
+        return;
+      }
+
       switch (e.getType()) {
         case TableEvent.TYPE_ROW_ACTION: {
-          if (!e.isConsumed()) {
-            ITreeNode node = getTreeNodeFor(e.getFirstRow());
-            if (node != null) {
-              e.consume();
-              getTree().getUIFacade().setNodeSelectedAndExpandedFromUI(node);
-            }
-          }
+          outlineMediator.mediateTableRowAction(e, AbstractPageWithNodes.this);
           break;
         }
         case TableEvent.TYPE_ROW_POPUP: {
-          ITreeNode node = getTreeNodeFor(e.getFirstRow());
-          if (node instanceof IPageWithTable<?>) {
-            IPageWithTable<?> tablePage = (IPageWithTable<?>) node;
-            IMenu[] menus = tablePage.getTable().fetchMenusForRowsInternal(new ITableRow[0]);
-            if (menus != null) {
-              e.addPopupMenus(menus);
-            }
-          }
-          else if (node instanceof IPageWithNodes) {
-            IMenu[] menus = getTree().fetchMenusForNodesInternal(new ITreeNode[]{node});
-            if (menus != null) {
-              e.addPopupMenus(menus);
-            }
-          }
+          outlineMediator.mediateTableRowPopup(e, AbstractPageWithNodes.this);
           break;
         }
-          /*
-           * case TableEvent.TYPE_ROWS_DRAG_REQUEST:{ ITreeNode[]
-           * nodes=getTreeNodesFor(e.getRows()); if(nodes.length>0){
-           * getTree().getUIFacade().setNodesSelectedFromUI(nodes);
-           * TransferObject
-           * t=getTree().getUIFacade().fireNodesDragRequestFromUI();
-           * if(t!=null){ e.setDragObject(t); } } break; }
-           */
         case TableEvent.TYPE_ROW_DROP_ACTION: {
-          ITreeNode node = getTreeNodeFor(e.getFirstRow());
-          if (node != null) {
-            getTree().getUIFacade().fireNodeDropActionFromUI(node, e.getDropObject());
-          }
+          outlineMediator.mediateTableRowDropAction(e, AbstractPageWithNodes.this);
           break;
         }
         case TableEvent.TYPE_ROW_FILTER_CHANGED: {
-          if (!isLeaf()) {
-            if (getTree() != null) {
-              getTree().applyNodeFilters();
-            }
-          }
+          outlineMediator.mediateTableRowFilterChanged(AbstractPageWithNodes.this);
           break;
         }
-      }// end switch
+      }
+
     }
+
   }
 }

@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -640,10 +641,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
   }
 
-  /**
-   * Computes the list of linked child pages for the given table rows and updates their summary cell.
-   */
-  private IPage[] getUpdatedChildPagesFor(ITableRow[] tableRows) {
+  @Override
+  public IPage[] getUpdatedChildPagesFor(ITableRow[] tableRows) {
     return getChildPagesFor(tableRows, true);
   }
 
@@ -726,6 +725,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return rows;
   }
 
+  private OutlineMediator getOutlineMediator() {
+    if (getOutline() == null) {
+      return null;
+    }
+
+    return getOutline().getOutlineMediator();
+  }
+
   /**
    * Table listener and tree controller<br>
    * the table is reflected in tree children only if the tree/page node is not
@@ -734,16 +741,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private class P_TableListener extends TableAdapter {
     @Override
     public void tableChanged(TableEvent e) {
+      OutlineMediator outlineMediator = getOutlineMediator();
+
       switch (e.getType()) {
         case TableEvent.TYPE_ROW_ACTION: {
-          if (!e.isConsumed()) {
-            ITreeNode node = getTreeNodeFor(e.getFirstRow());
-            if (node != null) {
-              e.consume();
-              if (getTree() != null) {
-                getTree().getUIFacade().setNodeSelectedAndExpandedFromUI(node);
-              }
-            }
+          if (outlineMediator != null) {
+            outlineMediator.mediateTableRowAction(e, AbstractPageWithTable.this);
           }
           break;
         }
@@ -755,8 +758,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             for (int i = 0; i < childNodes.length; i++) {
               unlinkTableRowWithPage(tableRows[i]);
             }
-            if (getTree() != null) {
-              getTree().removeChildNodes(AbstractPageWithTable.this, childNodes);
+
+            if (outlineMediator != null) {
+              outlineMediator.mediateTableRowsDeleted(childNodes, AbstractPageWithTable.this);
             }
           }
           break;
@@ -782,35 +786,31 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
                 SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Page " + element, t));
               }
             }
-            IPage[] childPages = childPageList.toArray(new IPage[childPageList.size()]);
-            if (getTree() != null) {
-              getTree().addChildNodes(AbstractPageWithTable.this, childPages);
-              // check if a page was revoked
-              for (ITableRow element : tableRows) {
-                IPage page = m_tableRowToPageMap.get(element);
-                if (page != null && page.getParentNode() == null) {
-                  unlinkTableRowWithPage(element);
-                }
+
+            if (outlineMediator != null) {
+              IPage[] childPages = childPageList.toArray(new IPage[childPageList.size()]);
+              outlineMediator.mediateTableRowsInserted(tableRows, childPages, AbstractPageWithTable.this);
+            }
+
+            // check if a page was revoked
+            for (ITableRow element : tableRows) {
+              IPage page = m_tableRowToPageMap.get(element);
+              if (page != null && page.getParentNode() == null) {
+                unlinkTableRowWithPage(element);
               }
             }
           }
           break;
         }
         case TableEvent.TYPE_ROWS_UPDATED: {
-          if (!isLeaf()) {
-            IPage[] childNodes = getUpdatedChildPagesFor(e.getRows());
-            if (getTree() != null) {
-              getTree().updateChildNodes(AbstractPageWithTable.this, childNodes);
-            }
+          if (outlineMediator != null) {
+            outlineMediator.mediateTableRowsUpdated(e, AbstractPageWithTable.this);
           }
           break;
         }
         case TableEvent.TYPE_ROW_ORDER_CHANGED: {
-          if (!isLeaf()) {
-            IPage[] childNodes = getUpdatedChildPagesFor(e.getRows());
-            if (getTree() != null) {
-              getTree().updateChildNodeOrder(AbstractPageWithTable.this, childNodes);
-            }
+          if (outlineMediator != null) {
+            outlineMediator.mediateTableRowOrderChanged(e, AbstractPageWithTable.this);
           }
           break;
         }
@@ -818,15 +818,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           break;
         }
         case TableEvent.TYPE_ROW_FILTER_CHANGED: {
-          if (!isLeaf()) {
-            if (getTree() != null) {
-              getTree().applyNodeFilters();
-            }
+          if (outlineMediator != null) {
+            outlineMediator.mediateTableRowFilterChanged(AbstractPageWithTable.this);
           }
           break;
         }
       }// end switch
     }
+
   }
 
 }

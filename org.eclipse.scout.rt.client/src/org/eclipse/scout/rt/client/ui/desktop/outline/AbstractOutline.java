@@ -25,7 +25,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
@@ -52,6 +51,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   private boolean m_visibleProperty;
   private IPage m_contextPage;
   private OptimisticLock m_contextPageOptimisticLock;
+  private OutlineMediator m_outlineMediator;
 
   public AbstractOutline() {
     super();
@@ -116,6 +116,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   protected void initConfig() {
     m_visibleGranted = true;
     m_contextPageOptimisticLock = new OptimisticLock();
+    m_outlineMediator = createOutlineMediator();
     addTreeListener(new P_OutlineListener());
     addNodeFilter(new P_TableFilterBasedTreeNodeFilter());
     super.initConfig();
@@ -433,6 +434,15 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   }
 
+  @Override
+  public OutlineMediator getOutlineMediator() {
+    return m_outlineMediator;
+  }
+
+  protected OutlineMediator createOutlineMediator() {
+    return new OutlineMediator();
+  }
+
   private class P_OutlineListener extends TreeAdapter {
     @Override
     public void treeChanged(TreeEvent e) {
@@ -443,8 +453,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         }
         case TreeEvent.TYPE_NODE_POPUP: {
           if (e.getNode() instanceof IPageWithTable<?>) {
-            IPageWithTable<? extends ITable> pageWithTable = (IPageWithTable<?>) e.getNode();
-            fetchEmptySpaceMenusFromTableRow(e, pageWithTable);
+            if (getOutlineMediator() != null) {
+              IPageWithTable<? extends ITable> pageWithTable = (IPageWithTable<?>) e.getNode();
+              getOutlineMediator().fetchTableEmptySpaceMenus(e, pageWithTable);
+            }
           }
           break;
         }
@@ -452,113 +464,55 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
       ITreeNode commonParentNode = e.getCommonParentNode();
       if (commonParentNode instanceof IPageWithNodes) {
-        mediatePageWithNodesTreeEvent(e, (IPageWithNodes) commonParentNode);
+        handlePageWithNodesTreeEvent(e, (IPageWithNodes) commonParentNode);
       }
       else if (commonParentNode instanceof IPageWithTable<?>) {
-        mediatePageWithTableTreeEvent(e, (IPageWithTable<?>) commonParentNode);
+        handlePageWithTableTreeEvent(e, (IPageWithTable<?>) commonParentNode);
       }
-
     }
 
-    private void mediatePageWithNodesTreeEvent(TreeEvent e, IPageWithNodes pageWithNodes) {
+    private void handlePageWithNodesTreeEvent(TreeEvent e, IPageWithNodes pageWithNodes) {
+      OutlineMediator outlineMediator = getOutlineMediator();
+      if (outlineMediator == null) {
+        return;
+      }
+
       switch (e.getType()) {
         case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
         case TreeEvent.TYPE_NODES_DELETED:
         case TreeEvent.TYPE_NODES_INSERTED:
         case TreeEvent.TYPE_NODES_UPDATED: {
-          try {
-            pageWithNodes.rebuildTableInternal();
-          }
-          catch (ProcessingException e1) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e1);
-          }
+          outlineMediator.mediateTreeNodesChanged(pageWithNodes);
           break;
         }
       }
     }
 
-    private void mediatePageWithTableTreeEvent(TreeEvent e, IPageWithTable<? extends ITable> pageWithTable) {
+    private void handlePageWithTableTreeEvent(TreeEvent e, IPageWithTable<? extends ITable> pageWithTable) {
+      OutlineMediator outlineMediator = getOutlineMediator();
+      if (outlineMediator == null) {
+        return;
+      }
+
       switch (e.getType()) {
         case TreeEvent.TYPE_NODE_POPUP: {
-          fetchRowMenusFromTableRow(e, pageWithTable);
+          outlineMediator.fetchTableRowMenus(e, pageWithTable);
           break;
         }
         case TreeEvent.TYPE_NODE_ACTION: {
-          delegateNodeActionToTableRow(e, pageWithTable);
+          outlineMediator.mediateTreeNodeAction(e, pageWithTable);
           break;
         }
         case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
-          delegateNodesDragRequestToTableRows(e, pageWithTable);
+          outlineMediator.mediateTreeNodesDragRequest(e, pageWithTable);
           break;
         }
         case TreeEvent.TYPE_NODE_DROP_ACTION: {
-          delegateNodeDropActionToTableRow(e, pageWithTable);
+          outlineMediator.mediateTreeNodeDropAction(e, pageWithTable);
           break;
         }
       }
-    }
 
-    private void delegateNodeDropActionToTableRow(TreeEvent e, IPageWithTable<? extends ITable> pageWithTable) {
-      ITableRow row = pageWithTable.getTableRowFor(e.getNode());
-      ITable table = pageWithTable.getTable();
-      if (row != null) {
-        table.getUIFacade().fireRowDropActionFromUI(row, e.getDropObject());
-      }
-    }
-
-    private void delegateNodesDragRequestToTableRows(TreeEvent e, IPageWithTable<? extends ITable> pageWithTable) {
-      ITableRow[] rows = pageWithTable.getTableRowsFor(e.getNodes());
-      ITable table = pageWithTable.getTable();
-      table.getUIFacade().setSelectedRowsFromUI(rows);
-      TransferObject t = table.getUIFacade().fireRowsDragRequestFromUI();
-      if (t != null) {
-        e.setDragObject(t);
-      }
-    }
-
-    private void delegateNodeActionToTableRow(TreeEvent e, IPageWithTable<? extends ITable> pageWithTable) {
-      if (e.isConsumed()) {
-        return;
-      }
-
-      ITableRow row = pageWithTable.getTableRowFor(e.getNode());
-      ITable table = pageWithTable.getTable();
-      if (row != null) {
-        e.consume();
-        /*
-         * ticket 78684: this line added
-         */
-        table.getUIFacade().setSelectedRowsFromUI(new ITableRow[]{row});
-        table.getUIFacade().fireRowActionFromUI(row);
-      }
-    }
-
-    private void fetchRowMenusFromTableRow(TreeEvent e, IPageWithTable<? extends ITable> pageWithTable) {
-      if (!pageWithTable.isShowTableRowMenus()) {
-        return;
-      }
-
-      ITableRow row = pageWithTable.getTableRowFor(e.getNode());
-      ITable table = pageWithTable.getTable();
-      if (row != null) {
-        table.getUIFacade().setSelectedRowsFromUI(new ITableRow[]{row});
-        IMenu[] menus = table.getUIFacade().fireRowPopupFromUI();
-        if (menus != null) {
-          e.addPopupMenus(menus);
-        }
-      }
-    }
-
-    private void fetchEmptySpaceMenusFromTableRow(TreeEvent e, IPageWithTable<? extends ITable> pageWithTable) {
-      ITable table = pageWithTable.getTable();
-      if (!pageWithTable.isShowEmptySpaceMenus()) {
-        return;
-      }
-
-      IMenu[] menus = table.getUIFacade().fireEmptySpacePopupFromUI();
-      if (menus != null) {
-        e.addPopupMenus(menus);
-      }
     }
   }
 
