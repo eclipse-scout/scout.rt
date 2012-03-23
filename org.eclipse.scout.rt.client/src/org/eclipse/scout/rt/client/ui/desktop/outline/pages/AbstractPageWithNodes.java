@@ -31,12 +31,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.shared.ContextMap;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * A page containing a list of "menu" entries<br>
@@ -51,7 +47,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   private P_Table m_table;
   private final HashMap<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
   private final HashMap<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
-  private P_ChildNodeListener m_childNodeListener;
 
   public AbstractPageWithNodes() {
     this(true, null, null);
@@ -102,22 +97,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   /*
    * Runtime
    */
-
-  /**
-   * override to add/remove local tree listener
-   */
-  @Override
-  public void setTreeInternal(ITree tree, boolean includeSubtree) {
-    if (getTree() != null && m_childNodeListener != null) {
-      getTree().removeTreeListener(m_childNodeListener);
-      m_childNodeListener = null;
-    }
-    super.setTreeInternal(tree, includeSubtree);
-    if (getTree() != null) {
-      m_childNodeListener = new P_ChildNodeListener();
-      getTree().addTreeListener(m_childNodeListener);
-    }
-  }
 
   @Override
   public ITable getInternalTable() {
@@ -203,10 +182,11 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
       }
     }
     // copy to table
-    rebuildTable();
+    rebuildTableInternal();
   }
 
-  private void rebuildTable() throws ProcessingException {
+  @Override
+  public void rebuildTableInternal() throws ProcessingException {
     ITreeNode[] childNodes = getChildNodes();
     try {
       getInternalTable().setTableChanging(true);
@@ -277,9 +257,9 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
    */
   private class P_Table extends AbstractTable {
 
-    // disable sorting
     @Override
-    public void sort() {
+    protected boolean getConfiguredSortEnabled() {
+      return false;
     }
 
     @Override
@@ -335,30 +315,16 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
         case TableEvent.TYPE_ROW_POPUP: {
           ITreeNode node = getTreeNodeFor(e.getFirstRow());
           if (node instanceof IPageWithTable<?>) {
-            try {
-              node.ensureChildrenLoaded();
-              IPageWithTable<?> tablePage = (IPageWithTable<?>) node;
-              IMenu[] menus = tablePage.getTable().fetchMenusForRowsInternal(new ITableRow[0]);
-              if (menus != null) {
-                e.addPopupMenus(menus);
-              }
-            }
-            catch (ProcessingException ex) {
-              SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+            IPageWithTable<?> tablePage = (IPageWithTable<?>) node;
+            IMenu[] menus = tablePage.getTable().fetchMenusForRowsInternal(new ITableRow[0]);
+            if (menus != null) {
+              e.addPopupMenus(menus);
             }
           }
           else if (node instanceof IPageWithNodes) {
-            IPageWithNodes nodePage = (IPageWithNodes) node;
-            try {
-              ITreeNode treeNode = getTree().resolveVirtualNode(nodePage);
-              IMenu[] menus = getTree().fetchMenusForNodesInternal(new ITreeNode[]{treeNode});
-
-              if (menus != null) {
-                e.addPopupMenus(menus);
-              }
-            }
-            catch (ProcessingException e1) {
-              SERVICES.getService(IExceptionHandlerService.class).handleException(e1);
+            IMenu[] menus = getTree().fetchMenusForNodesInternal(new ITreeNode[]{node});
+            if (menus != null) {
+              e.addPopupMenus(menus);
             }
           }
           break;
@@ -383,29 +349,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
             if (getTree() != null) {
               getTree().applyNodeFilters();
             }
-          }
-          break;
-        }
-      }// end switch
-    }
-  }
-
-  /**
-   * Tree listener on children in order to delegate changes to table rows
-   */
-  private class P_ChildNodeListener extends TreeAdapter {
-    @Override
-    public void treeChanged(TreeEvent e) {
-      switch (e.getType()) {
-        case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
-        case TreeEvent.TYPE_NODES_DELETED:
-        case TreeEvent.TYPE_NODES_INSERTED:
-        case TreeEvent.TYPE_NODES_UPDATED: {
-          try {
-            rebuildTable();
-          }
-          catch (ProcessingException e1) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e1);
           }
           break;
         }

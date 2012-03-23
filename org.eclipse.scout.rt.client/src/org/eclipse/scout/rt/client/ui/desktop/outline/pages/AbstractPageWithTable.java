@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
@@ -28,7 +27,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -37,8 +35,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
@@ -67,8 +63,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private boolean m_showTableRowMenus;
   private final HashMap<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
   private final HashMap<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
-  private P_MyNodeListener m_myNodeListener;
-  private P_ChildNodeListener m_childNodeListener;
 
   public AbstractPageWithTable() {
     this(true, null, null);
@@ -410,18 +404,22 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return m_table;
   }
 
+  @Override
   public boolean isShowEmptySpaceMenus() {
     return m_showEmptySpaceMenus;
   }
 
+  @Override
   public void setShowEmptySpaceMenus(boolean showEmptySpaceMenus) {
     m_showEmptySpaceMenus = showEmptySpaceMenus;
   }
 
+  @Override
   public boolean isShowTableRowMenus() {
     return m_showTableRowMenus;
   }
 
+  @Override
   public void setShowTableRowMenus(boolean showTableRowMenus) {
     m_showTableRowMenus = showTableRowMenus;
   }
@@ -507,30 +505,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   public void setTablePopulateStatus(IProcessingStatus status) {
     getTable().tablePopulated();
     m_tablePopulateStatus = status;
-  }
-
-  /**
-   * override to add/remove local tree listener
-   */
-  @Override
-  public void setTreeInternal(ITree tree, boolean includeSubtree) {
-    if (getTree() != null && m_myNodeListener != null) {
-      getTree().removeTreeListener(m_myNodeListener);
-      m_myNodeListener = null;
-    }
-    if (getTree() != null && m_childNodeListener != null) {
-      getTree().removeTreeListener(m_childNodeListener);
-      m_childNodeListener = null;
-    }
-    super.setTreeInternal(tree, includeSubtree);
-    if (getTree() != null) {
-      m_myNodeListener = new P_MyNodeListener();
-      getTree().addTreeListener(m_myNodeListener);
-    }
-    if (getTree() != null) {
-      m_childNodeListener = new P_ChildNodeListener();
-      getTree().addTreeListener(m_childNodeListener);
-    }
   }
 
   /**
@@ -855,88 +829,4 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
   }
 
-  /**
-   * Tree listener on myself in order to load children when selected and add
-   * "new" menus
-   */
-  private class P_MyNodeListener extends TreeAdapter {
-    @Override
-    public void treeChanged(TreeEvent e) {
-      switch (e.getType()) {
-        case TreeEvent.TYPE_NODE_POPUP: {
-          if (e.getNode() == AbstractPageWithTable.this) {
-            if (isShowEmptySpaceMenus()) {
-              IMenu[] menus = m_table.getUIFacade().fireEmptySpacePopupFromUI();
-              if (menus != null) {
-                e.addPopupMenus(menus);
-              }
-            }
-          }
-          break;
-        }
-      }// end switch
-    }
-  }
-
-  /**
-   * Tree listener on children in order to delegate events to table rows
-   */
-  private class P_ChildNodeListener extends TreeAdapter {
-    @Override
-    public void treeChanged(TreeEvent e) {
-      switch (e.getType()) {
-        case TreeEvent.TYPE_NODE_POPUP: {
-          if (e.getCommonParentNode() == AbstractPageWithTable.this) {
-            if (isShowTableRowMenus()) {
-              ITableRow row = getTableRowFor(e.getNode());
-              if (row != null) {
-                m_table.getUIFacade().setSelectedRowsFromUI(new ITableRow[]{row});
-                IMenu[] menus = m_table.getUIFacade().fireRowPopupFromUI();
-                if (menus != null) {
-                  e.addPopupMenus(menus);
-                }
-              }
-            }
-          }
-          break;
-        }
-        case TreeEvent.TYPE_NODE_ACTION: {
-          if (!e.isConsumed()) {
-            if (e.getCommonParentNode() == AbstractPageWithTable.this) {
-              ITableRow row = getTableRowFor(e.getNode());
-              if (row != null) {
-                e.consume();
-                /*
-                 * ticket 78684: this line added
-                 */
-                m_table.getUIFacade().setSelectedRowsFromUI(new ITableRow[]{row});
-                m_table.getUIFacade().fireRowActionFromUI(row);
-              }
-            }
-          }
-          break;
-        }
-        case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
-          if (e.getCommonParentNode() == AbstractPageWithTable.this) {
-            ITableRow[] rows = getTableRowsFor(e.getNodes());
-            m_table.getUIFacade().setSelectedRowsFromUI(rows);
-            TransferObject t = m_table.getUIFacade().fireRowsDragRequestFromUI();
-            if (t != null) {
-              e.setDragObject(t);
-            }
-          }
-          break;
-        }
-        case TreeEvent.TYPE_NODE_DROP_ACTION: {
-          if (e.getCommonParentNode() == AbstractPageWithTable.this) {
-            ITableRow row = getTableRowFor(e.getNode());
-            if (row != null) {
-              m_table.getUIFacade().fireRowDropActionFromUI(row, e.getDropObject());
-            }
-          }
-          break;
-        }
-      }// end switch
-    }
-  }
 }
