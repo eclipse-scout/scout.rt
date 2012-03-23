@@ -360,6 +360,14 @@ public final class DataModelUtility {
   @SuppressWarnings("deprecation")
   @Deprecated
   public static String entityToExternalId(IDataModelEntity e) {
+    //loop detection (for example CompanyCompanyEntity)
+    IDataModelEntity t = e.getParentEntity();
+    for (int i = 0; i < 5 && t != null; i++) {
+      if (t == e) {
+        return null;
+      }
+      t = t.getParentEntity();
+    }
     if (e.getParentEntity() != null) {
       return entityToExternalId(e.getParentEntity()) + "/" + e.getClass().getSimpleName() + exportMetaData(e.getMetaDataOfEntity());
     }
