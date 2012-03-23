@@ -64,12 +64,14 @@ public final class DataModelUtility {
       buf.append(exportMetaData(e.getMetaDataOfEntity()));
     }
     String externalId = buf.toString();
-    EntityPath verify = externalIdToEntityPath(f, externalId);
-    if (verify == null) {
-      LOG.warn("entity externalId " + externalId + " resolves to null");
-    }
-    else if (!verify.equals(entityPath)) {
-      LOG.warn("entity externalId " + externalId + " is not valid for " + entityPath);
+    if (LOG.isInfoEnabled()) {
+      EntityPath verify = externalIdToEntityPath(f, externalId);
+      if (verify == null) {
+        LOG.info("entity externalId " + externalId + " resolves to null");
+      }
+      else if (!verify.equals(entityPath)) {
+        LOG.info("entity externalId " + externalId + " is not valid for " + entityPath);
+      }
     }
     return externalId;
   }
@@ -94,12 +96,14 @@ public final class DataModelUtility {
     buf.append(a.getClass().getSimpleName());
     buf.append(exportMetaData(a.getMetaDataOfAttribute()));
     String externalId = buf.toString();
-    AttributePath verify = externalIdToAttributePath(f, externalId);
-    if (verify == null) {
-      LOG.warn("attribute externalId " + externalId + " resolves to null");
-    }
-    else if (!verify.equals(attributePath)) {
-      LOG.warn("attribute externalId " + externalId + " is not valid for " + attributePath);
+    if (LOG.isInfoEnabled()) {
+      AttributePath verify = externalIdToAttributePath(f, externalId);
+      if (verify == null) {
+        LOG.info("attribute externalId " + externalId + " resolves to null");
+      }
+      else if (!verify.equals(attributePath)) {
+        LOG.info("attribute externalId " + externalId + " is not valid for " + attributePath);
+      }
     }
     return externalId;
   }
@@ -168,7 +172,9 @@ public final class DataModelUtility {
       e = findEntity(f.getEntities(), elemName, meta);
     }
     if (e == null) {
-      LOG.warn("entity externalId " + externalId + " resolves to null");
+      if (LOG.isInfoEnabled()) {
+        LOG.info("entity externalId " + externalId + " resolves to null");
+      }
       return null;
     }
     return resolvedPath.addToEnd(e);
@@ -201,7 +207,9 @@ public final class DataModelUtility {
       a = findAttribute(f.getAttributes(), elemName, meta);
     }
     if (a == null) {
-      LOG.warn("attribute externalId " + externalId + " resolves to null");
+      if (LOG.isInfoEnabled()) {
+        LOG.info("attribute externalId " + externalId + " resolves to null");
+      }
       return null;
     }
     return entityPath.addToEnd(a);
