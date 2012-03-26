@@ -15,6 +15,8 @@ import java.util.Comparator;
 import java.util.TreeSet;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.services.common.icon.IconProviderService;
@@ -27,6 +29,7 @@ import org.osgi.framework.Bundle;
  *
  */
 public class IconLocator implements IIconLocator {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(IconLocator.class);
 
   private final IIconProviderService[] m_iconProviderServices;
 
@@ -72,8 +75,13 @@ public class IconLocator implements IIconLocator {
       if (o2 == null) {
         return 1;
       }
-      return o2.getRanking() - o1.getRanking();
+      int result = o2.getRanking() - o1.getRanking();
+      if (result == 0) {
+        LOG.warn("Multiple IIconProviderServices with the same ranking found. A clear definition of the rankings is necessary to properly enable the icon overriding. Affected services: " + o1 + ", " + o2);
+        return -1;
+      }
 
+      return result;
     }
   }
 

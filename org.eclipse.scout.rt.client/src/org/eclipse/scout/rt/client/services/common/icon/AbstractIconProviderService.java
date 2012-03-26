@@ -139,4 +139,9 @@ public abstract class AbstractIconProviderService extends AbstractService implem
     return m_iconExtensions;
   }
 
+  @Override
+  public String toString() {
+    return getHostBundle() + ": " + getClass().getName() + ", ranking=" + getRanking();
+  }
+
 }
