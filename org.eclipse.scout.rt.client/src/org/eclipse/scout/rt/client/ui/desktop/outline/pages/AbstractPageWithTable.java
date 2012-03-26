@@ -520,11 +520,22 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         ensureSearchFormStarted();
         execPopulateTable();
       }
-      catch (ProcessingException pe) {
-        throw pe;
-      }
       catch (Throwable t) {
-        throw new ProcessingException(t.getMessage(), t);
+        m_table.discardAllRows();
+        ProcessingException pe;
+        if (t instanceof ProcessingException) {
+          pe = (ProcessingException) t;
+        }
+        else {
+          pe = new ProcessingException(t.getMessage(), t);
+        }
+        if (pe.isInterruption()) {
+          setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("SearchWasCanceled"), ProcessingStatus.CANCEL));
+        }
+        else {
+          setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("ErrorWhileLoadingData"), ProcessingStatus.CANCEL));
+        }
+        throw pe;
       }
       finally {
         m_table.setTableChanging(false);
