@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -98,10 +99,17 @@ public class UserNavigationHistory {
     if (bm != null) {
       bookmarkTitle = bm.getText();
     }
-
     LOG.warn("Exception occured while adding step to navigation history for bookmark: " + bookmarkTitle, t);
-
     return null;
+  }
+
+  protected void activateBookmark(Bookmark b) throws ProcessingException {
+    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    desktop.activateBookmark(b, false);
+    //scroll to tree selection
+    if (desktop.getOutline() != null) {
+      desktop.getOutline().scrollToSelection();
+    }
   }
 
   public Bookmark addStep(Bookmark bm) {
@@ -264,7 +272,7 @@ public class UserNavigationHistory {
       try {
         m_addStepEnabled = false;
         //
-        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(b, false);
+        activateBookmark(b);
       }
       finally {
         m_addStepEnabled = true;
@@ -284,7 +292,7 @@ public class UserNavigationHistory {
       try {
         m_addStepEnabled = false;
         //
-        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(b, false);
+        activateBookmark(b);
       }
       finally {
         m_addStepEnabled = true;
@@ -302,7 +310,7 @@ public class UserNavigationHistory {
         try {
           m_addStepEnabled = false;
           //
-          ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(b, false);
+          activateBookmark(b);
         }
         finally {
           m_addStepEnabled = true;
