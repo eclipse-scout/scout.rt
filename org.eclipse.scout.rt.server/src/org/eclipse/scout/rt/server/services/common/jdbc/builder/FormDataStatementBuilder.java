@@ -750,7 +750,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   public String getWhereConstraints() {
-    return m_where.toString();
+    return (m_where != null ? m_where.toString() : null);
   }
 
   /**
