@@ -80,6 +80,7 @@ import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -1375,9 +1376,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
                 null,
                 getCancelVerificationText(),
                 null,
-                ScoutTexts.get("Yes"),
-                ScoutTexts.get("No"),
-                ScoutTexts.get("Cancel")
+                TEXTS.get("YesButton"),
+                TEXTS.get("NoButton"),
+                TEXTS.get("CancelButton")
                 );
         messageBox.setSeverity(IProcessingStatus.INFO);
         int result = messageBox.startMessageBox();
@@ -1964,9 +1965,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         LOG.warn("loading: " + newPath + " text: " + text + " Exception: " + e);
         new MessageBox(
             null,
-            ScoutTexts.get("LoadFormXmlFailedText"),
+            TEXTS.get("LoadFormXmlFailedText"),
             null,
-            ScoutTexts.get("Ok"),
+            TEXTS.get("OkButton"),
             null,
             null).startMessageBox();
         m_lastXmlFileForStorage = null;
