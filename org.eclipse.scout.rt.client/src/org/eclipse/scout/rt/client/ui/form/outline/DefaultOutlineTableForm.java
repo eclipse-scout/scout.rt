@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.outline;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -117,13 +118,17 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
         if (outline != null && outline.getActivePage() instanceof IPageWithTable<?>) {
           //popuplate status
           IPageWithTable<?> tablePage = (IPageWithTable<?>) outline.getActivePage();
-          setTablePopulateStatus(tablePage.getTablePopulateStatus());
+          IProcessingStatus populateStatus = tablePage.getTablePopulateStatus();
+          setTablePopulateStatus(populateStatus);
           //selection status
           if (tablePage.isSearchActive() && tablePage.getSearchFilter() != null && (!tablePage.getSearchFilter().isCompleted()) && tablePage.isSearchRequired()) {
             setTableSelectionStatus(null);
           }
+          else if (populateStatus != null && populateStatus.getSeverity() == IProcessingStatus.WARNING) {
+            setTableSelectionStatus(null);
+          }
           else {
-            setTableSelectionStatus(new ProcessingStatus(createDefaultTableStatus(), ProcessingStatus.INFO));
+            setTableSelectionStatus(new ProcessingStatus(createDefaultTableStatus(), IProcessingStatus.INFO));
           }
         }
         else {

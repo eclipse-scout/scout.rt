@@ -73,7 +73,7 @@ public class SwtTableStatus implements ISwtTableStatus {
   @Override
   public void setStatus(IProcessingStatus populateStatus, IProcessingStatus selectionStatus) {
     setStatusImpl(m_populateLabel, populateStatus, true);
-    setStatusImpl(m_selectionLabel, selectionStatus, false);
+    setStatusImpl(m_selectionLabel, selectionStatus, true);
     if (m_layoutNeeded) {
       m_layoutNeeded = false;
       m_container.layout(true, true);
@@ -109,7 +109,8 @@ public class SwtTableStatus implements ISwtTableStatus {
         field.setForeground(m_env.getColor(new RGB(0xcc, 0, 0)));
         break;
       }
-      case IProcessingStatus.WARNING: {
+      case IProcessingStatus.WARNING:
+      case IProcessingStatus.CANCEL: {
         field.setForeground(m_env.getColor(new RGB(0xfe, 0x9a, 0x23)));
         break;
       }

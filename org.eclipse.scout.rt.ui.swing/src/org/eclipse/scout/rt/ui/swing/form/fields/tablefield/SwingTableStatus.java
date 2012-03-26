@@ -112,7 +112,8 @@ public class SwingTableStatus implements ISwingTableStatus {
         field.setForeground(new Color(0xcc0000));
         break;
       }
-      case IProcessingStatus.WARNING: {
+      case IProcessingStatus.WARNING:
+      case IProcessingStatus.CANCEL: {
         field.setForeground(new Color(0xfe9a23));
         break;
       }

@@ -114,7 +114,7 @@ public class RwtTableStatus implements IRwtTableStatus {
   @Override
   public void setStatus(IProcessingStatus populateStatus, IProcessingStatus selectionStatus) {
     setStatusImpl(m_populateLabel, populateStatus, true);
-    setStatusImpl(m_selectionLabel, selectionStatus, false);
+    setStatusImpl(m_selectionLabel, selectionStatus, true);
 
     if (!m_populateLabel.getVisible() && !m_selectionLabel.getVisible() && m_labelContainer.getVisible()) {
       m_layoutNeeded = true;
@@ -169,18 +169,16 @@ public class RwtTableStatus implements IRwtTableStatus {
     switch (status.getSeverity()) {
       case IProcessingStatus.ERROR:
       case IProcessingStatus.FATAL: {
-        m_populateLabel.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant + VARIANT_POSTFIX_ERROR);
-        m_selectionLabel.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant + VARIANT_POSTFIX_ERROR);
+        field.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant + VARIANT_POSTFIX_ERROR);
         break;
       }
-      case IProcessingStatus.WARNING: {
-        m_populateLabel.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant + VARIANT_POSTFIX_WARNING);
-        m_selectionLabel.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant + VARIANT_POSTFIX_WARNING);
+      case IProcessingStatus.WARNING:
+      case IProcessingStatus.CANCEL: {
+        field.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant + VARIANT_POSTFIX_WARNING);
         break;
       }
       default: {
-        m_populateLabel.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant);
-        m_selectionLabel.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant);
+        field.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant);
       }
     }
   }

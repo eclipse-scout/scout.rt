@@ -816,3 +816,17 @@ but they do not endure application restarts. Reloading pages having search const
 apply them again. Memory constraints may limit the size of stored search constraints and filter settings.
 Added filter settings cache on IMemoryPolicy.
 Migration: none
+
+26.03.2012 sme, abr
+Bugzilla: 375152
+Problem:
+When a user cancels the search in an outline, the search form keeps its state but the displayed rows belong to the last
+executed search.
+Solution:
+o If a user cancels the search, all rows in the table should be discarded and the user show be notified of the canceled
+  search.
+o Additionally, any exception during loading the table data behaves the same: the table data is discarded and
+  the table status is set appropriately.
+o If the severity of the table population status is IProcessingStatus.CANCEL, the table selection status is hidden and
+  the population status is rendered like a warning (e.g. foreground color orange).
+Migration: none
