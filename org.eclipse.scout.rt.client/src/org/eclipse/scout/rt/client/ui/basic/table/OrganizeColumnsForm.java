@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.BooleanUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -58,6 +59,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.DeleteCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
@@ -247,9 +249,14 @@ public class OrganizeColumnsForm extends AbstractForm {
                 getTable().getVisibleColumn().setValue(row, col.isVisible());
 
                 // Column Title
-                getTable().getTitleColumn().setValue(row, headerCell.getText());
+                String columnTitle = headerCell.getText();
+                if (StringUtility.isNullOrEmpty(columnTitle)) {
+                  columnTitle = headerCell.getTooltipText();
+                  row.setFont(FontSpec.parse("ITALIC"));
+                }
+                getTable().getTitleColumn().setValue(row, columnTitle);
                 if (Platform.inDevelopmentMode() && col.isSortActive()) {
-                  getTable().getTitleColumn().setValue(row, headerCell.getText() + " (" + col.getSortIndex() + ")");
+                  getTable().getTitleColumn().setValue(row, columnTitle + " (" + col.getSortIndex() + ")");
                 }
 
                 // Custom Column
