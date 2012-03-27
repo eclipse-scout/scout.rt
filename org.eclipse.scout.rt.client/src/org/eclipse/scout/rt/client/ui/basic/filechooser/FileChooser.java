@@ -101,6 +101,9 @@ public class FileChooser implements IFileChooser {
 
   public static String getCurrentDirectory() {
     IClientSession session = ClientSyncJob.getCurrentSession();
+    if (session == null) {
+      return null;
+    }
     String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
     IEclipsePreferences props = new UserScope().getNode(id);
     return props.get("current-dir", null);
@@ -108,6 +111,9 @@ public class FileChooser implements IFileChooser {
 
   public static void setCurrentDirectory(String dir) {
     IClientSession session = ClientSyncJob.getCurrentSession();
+    if (session == null) {
+      return;
+    }
     String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
     IEclipsePreferences props = new UserScope().getNode(id);
     props.put("current-dir", dir);
