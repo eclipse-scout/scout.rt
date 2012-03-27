@@ -225,7 +225,7 @@ public class CsvHelper {
         // convert data types
         ArrayList<Object> objList = new ArrayList<Object>(cellList.size());
         for (colIndex = 0; colIndex < cellList.size(); colIndex++) {
-          if (m_ignoredColumns == null || m_ignoredColumns.length < colIndex || m_ignoredColumns[colIndex] == false) {
+          if (m_ignoredColumns == null || m_ignoredColumns.length == 0 || m_ignoredColumns.length < colIndex || m_ignoredColumns[colIndex] == false) {
             cell = cellList.get(colIndex);
             objList.add(importCell(cell, getColumnFormat(colIndex)));
           }
@@ -236,7 +236,7 @@ public class CsvHelper {
       }
     }
     catch (Exception e) {
-      throw new ProcessingException("line=" + line + " colIndex=" + colIndex + " cell=" + cell);
+      throw new ProcessingException("line=" + line + " colIndex=" + colIndex + " cell=" + cell, e);
     }
   }
 
