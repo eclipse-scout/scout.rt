@@ -117,7 +117,7 @@ public class StringColumnFilter implements ITableColumnFilter<String>, Serializa
     }
     if (m_pattern != null) {
       if (m_regexPat == null) {
-        m_regexPat = Pattern.compile(StringUtility.toRegExPattern("*" + m_pattern.toLowerCase() + "*"));
+        m_regexPat = Pattern.compile(StringUtility.toRegExPattern("*" + m_pattern.toLowerCase() + "*"), Pattern.DOTALL);
       }
       if (value == null) {
         return false;
