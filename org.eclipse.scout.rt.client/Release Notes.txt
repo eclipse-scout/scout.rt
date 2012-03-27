@@ -830,3 +830,16 @@ o Additionally, any exception during loading the table data behaves the same: th
 o If the severity of the table population status is IProcessingStatus.CANCEL, the table selection status is hidden and
   the population status is rendered like a warning (e.g. foreground color orange).
 Migration: none
+
+27.03.2012 bko,jgu
+Bugzilla: 367850
+Problem:
+XML I/O on IForm (IForm.storeXML and IForm.loadXML) does not work properly for
+IFormFields with a non-unique class name. F.e. if a SearchForm with two tabs
+which both contains a TextField with the same class name.
+Solution:
+o The IFromField provides a method getXMLFieldId() which will be used for XML I/O.
+This method will return the fields simple class name by default for fields with unique class names.
+For non-unique class names the simple class name of the parent field is added to the id, until it is unique.
+o Loading older XML files with ambiguous fields is still possible: Data is imported to the first field found (as before).
+Migration: none

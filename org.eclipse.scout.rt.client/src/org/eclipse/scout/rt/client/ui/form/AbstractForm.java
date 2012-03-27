@@ -73,6 +73,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.form.internal.FindFieldByFormDataIdVisitor;
 import org.eclipse.scout.rt.client.ui.form.internal.FindFieldBySimpleClassNameVisitor;
+import org.eclipse.scout.rt.client.ui.form.internal.FindFieldByXMLFieldIdVisitor;
 import org.eclipse.scout.rt.client.ui.form.internal.FormDataPropertyFilter;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
@@ -1880,11 +1881,17 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // load fields
     SimpleXmlElement xFields = root.getChild("fields");
     if (xFields != null) {
-      for (Iterator it = xFields.getChildren("field").iterator(); it.hasNext();) {
-        SimpleXmlElement xField = (SimpleXmlElement) it.next();
-        FindFieldBySimpleClassNameVisitor v = new FindFieldBySimpleClassNameVisitor(xField.getStringAttribute("fieldId"));
+      for (SimpleXmlElement xField : xFields.getChildren("field")) {
+        String fieldId = xField.getStringAttribute("fieldId");
+        FindFieldByXMLFieldIdVisitor v = new FindFieldByXMLFieldIdVisitor(fieldId);
         visitFields(v);
         IFormField f = v.getField();
+        if (f == null) {
+          //id not found. try find a class by simple name
+          FindFieldBySimpleClassNameVisitor simpleVisitor = new FindFieldBySimpleClassNameVisitor(fieldId);
+          visitFields(simpleVisitor);
+          f = simpleVisitor.getField();
+        }
         if (f != null) {
           f.loadXML(xField);
         }

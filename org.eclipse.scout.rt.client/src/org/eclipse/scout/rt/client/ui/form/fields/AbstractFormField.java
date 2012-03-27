@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
+import org.eclipse.scout.rt.client.ui.form.internal.FindShortestUniqueIdVisitor;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
@@ -807,9 +808,21 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /*
    * XML i/o
    */
+  /**
+   * {@inheritDoc}<br/>
+   * By default the shortest unique id based on the simple class name and ancestors class names is returned.
+   * For forms without duplicate simple class names the simple class name is returned. <br/>
+   */
+  @Override
+  public String getXMLFieldId() {
+    FindShortestUniqueIdVisitor visitor = new FindShortestUniqueIdVisitor(this);
+    getForm().visitFields(visitor);
+    return visitor.getShortestUniqueId();
+  }
+
   @Override
   public void storeXML(SimpleXmlElement x) throws ProcessingException {
-    x.setAttribute("fieldId", getClass().getSimpleName());
+    x.setAttribute("fieldId", getXMLFieldId());
   }
 
   @Override
