@@ -267,11 +267,26 @@ public final class StringUtility {
    *         blank.
    */
   public static String removeNewLines(String text) {
+    return replaceNewLines(text, " ");
+  }
+
+  /**
+   * Returns a new string resulting from replacing all new line characters ("\n", "\r\n", "\n\r" or "\r") with the given
+   * replacement string.
+   * 
+   * @param text
+   *          the {@link String} thats new line characters should be removed
+   * @param replacement
+   *          the {@link String} to be used as replacement for the new line characters
+   * @return a string derived from this string by replacing every occurrence of new line character with the replacement
+   *         string.
+   */
+  public static String replaceNewLines(String text, String replacement) {
     if (isNullOrEmpty(text)) {
       return text;
     }
-    String s = text.replaceAll("\r\n|\n\r", " ");
-    s = s.replace('\n', ' ').replace('\r', ' ');
+    String s = text.replaceAll("\r\n|\n\r", replacement);
+    s = s.replace("\n", replacement).replace("\r", replacement);
     return s;
   }
 
