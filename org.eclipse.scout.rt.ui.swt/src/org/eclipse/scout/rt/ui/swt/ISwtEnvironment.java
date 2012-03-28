@@ -281,9 +281,9 @@ public interface ISwtEnvironment {
   String styleHtmlText(ISwtScoutFormField<?> uiComposite, String rawHtml);
 
   /**
-   * if a print request is sent to a form during the async open process of a form the event will be cached on the
-   * environment. So the form has to fetch all print event pending for it.
+   * @deprecated use {@link IForm#getEventHistory()}
    */
+  @Deprecated
   FormEvent[] fetchPendingPrintEvents(IForm form);
 
 }

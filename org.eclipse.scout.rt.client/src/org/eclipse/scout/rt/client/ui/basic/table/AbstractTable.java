@@ -44,6 +44,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
@@ -126,6 +127,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private ITableRow[] m_cachedFilteredRows;
   private ITableColumnFilterManager m_columnFilterManager;
   private ITableCustomizer m_tableCustomizer;
+  private IEventHistory<TableEvent> m_eventHistory;
 
   public AbstractTable() {
     this(true);
@@ -482,6 +484,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   protected void initConfig() {
+    m_eventHistory = createEventHistory();
     m_uiFacade = createUIFacade();
     setTitle(getConfiguredTitle());
     setAutoDiscardOnDelete(getConfiguredAutoDiscardOnDelete());
@@ -547,10 +550,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       });
     }
     setKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
-    // add Convenience observer for drag & drop callbacks
+    // add Convenience observer for drag & drop callbacks and event history
     addTableListener(new TableAdapter() {
       @Override
       public void tableChanged(TableEvent e) {
+        //event history
+        IEventHistory<TableEvent> h = getEventHistory();
+        if (h != null) {
+          h.notifyEvent(e);
+        }
         //dnd
         switch (e.getType()) {
           case TableEvent.TYPE_ROWS_DRAG_REQUEST: {
@@ -1871,6 +1879,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     propertySupport.setPropertyBool(PROP_SCROLL_TO_SELECTION, b);
   }
 
+  @Override
+  public void scrollToSelection() {
+    fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_SCROLL_TO_SELECTION));
+  }
+
   /**
    * @return a copy of a row<br>
    *         when the row is changed it has to be applied to the table using
@@ -2918,6 +2931,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               sortedCoalescedMap.put(170, subList.get(lastIndex));// use last
               break;
             }
+            case TableEvent.TYPE_SCROLL_TO_SELECTION: {
+              sortedCoalescedMap.put(180, subList.get(lastIndex));// use last
+              break;
+            }
             default: {
               sortedCoalescedMap.put(-type, subList.get(lastIndex));// use last
             }
@@ -3198,6 +3215,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void addUITableListener(TableListener listener) {
     m_listenerList.insertAtFront(TableListener.class, listener);
+  }
+
+  protected IEventHistory<TableEvent> createEventHistory() {
+    return new DefaultTableEventHistory(5000L);
+  }
+
+  @Override
+  public IEventHistory<TableEvent> getEventHistory() {
+    return m_eventHistory;
   }
 
   @Override

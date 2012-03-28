@@ -140,6 +140,11 @@ public class TableEvent extends java.util.EventObject {
   public static final int TYPE_ROW_CLICK = 810;
 
   public static final int TYPE_TABLE_POPULATED = 820;
+  /**
+   * Advise to scroll to selection
+   */
+  public static final int TYPE_SCROLL_TO_SELECTION = 830;
+  //next 840, check method AbstractTable.processEventBuffer
 
   private final int m_type;
   private ITableRow[] m_rows = new ITableRow[0];

@@ -88,14 +88,6 @@ public class RwtScoutRadioButtonGroup extends RwtScoutValueFieldComposite<IRadio
     return (Composite) super.getUiField();
   }
 
-  @Override
-  protected void setFocusRequestedFromScout(boolean b) {
-    Control[] tabList = getUiField().getTabList();
-    if (b && tabList != null && tabList.length > 0) {
-      tabList[0].setFocus();
-    }
-  }
-
   private class P_RwtButtonListener implements Listener {
     private static final long serialVersionUID = 1L;
 

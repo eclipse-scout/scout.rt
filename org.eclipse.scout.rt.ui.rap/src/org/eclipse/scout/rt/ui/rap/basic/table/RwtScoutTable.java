@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
@@ -276,33 +277,46 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
   @Override
   protected void attachScout() {
     super.attachScout();
-    if (getScoutObject() != null) {
-      if (m_scoutTableListener == null) {
-        m_scoutTableListener = new P_ScoutTableListener();
-        getScoutObject().addUITableListener(m_scoutTableListener);
-      }
-      setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());
-      setSelectionFromScout(getScoutObject().getSelectedRows());
-      setKeyStrokeFormScout();
-      setRowHeightFromScout();
-      setKeyboardNavigationFromScout();
-      updateAutoResizeColumnsFromScout();
-      // dnd support
-      new P_DndSupport(getScoutObject(), getScoutObject(), getUiField());
+    if (getScoutObject() == null) {
+      return;
+    }
+    if (m_scoutTableListener == null) {
+      m_scoutTableListener = new P_ScoutTableListener();
+      getScoutObject().addUITableListener(m_scoutTableListener);
+    }
+    setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());
+    setSelectionFromScout(getScoutObject().getSelectedRows());
+    setKeyStrokeFormScout();
+    setRowHeightFromScout();
+    setKeyboardNavigationFromScout();
+    updateAutoResizeColumnsFromScout();
+    // dnd support
+    new P_DndSupport(getScoutObject(), getScoutObject(), getUiField());
+    //handle events from recent history
+    final IEventHistory<TableEvent> h = getScoutObject().getEventHistory();
+    if (h != null) {
+      getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+        @Override
+        public void run() {
+          for (TableEvent e : h.getRecentEvents()) {
+            handleScoutTableEventInUi(e);
+          }
+        }
+      });
     }
   }
 
   @Override
   protected void detachScout() {
     super.detachScout();
-    if (getScoutObject() != null) {
-      if (m_scoutTableListener != null) {
-        getScoutObject().removeTableListener(m_scoutTableListener);
-        m_scoutTableListener = null;
-      }
-    }
-
     removeAutoResizeColumnListener();
+    if (getScoutObject() == null) {
+      return;
+    }
+    if (m_scoutTableListener != null) {
+      getScoutObject().removeTableListener(m_scoutTableListener);
+      m_scoutTableListener = null;
+    }
   }
 
   @Override
@@ -448,6 +462,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     else if (propName.equals(ITable.PROP_AUTO_RESIZE_COLUMNS)) {
       updateAutoResizeColumnsFromScout();
     }
+    else if (propName.equals(ITable.PROP_SCROLL_TO_SELECTION)) {
+      updateScrollToSelectionFromScout();
+    }
   }
 
   /**
@@ -467,7 +484,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         case TableEvent.TYPE_COLUMN_ORDER_CHANGED:
         case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
         case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
-        case TableEvent.TYPE_ROWS_SELECTED: {
+        case TableEvent.TYPE_ROWS_SELECTED:
+        case TableEvent.TYPE_SCROLL_TO_SELECTION: {
           return true;
         }
       }
@@ -503,6 +521,10 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         if (scoutRow != null && swtCol >= 0) {
           getUiTableViewer().editElement(scoutRow, swtCol);
         }
+        break;
+      }
+      case TableEvent.TYPE_SCROLL_TO_SELECTION: {
+        scrollToSelection();
         break;
       }
       case TableEvent.TYPE_ROWS_INSERTED:
@@ -627,11 +649,21 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         selectedRows = new ITableRow[0];
       }
       getUiTableViewer().setSelection(new StructuredSelection(selectedRows), true);
-
-      if (selectedRows.length > 0) {
-        getUiTableViewer().reveal(selectedRows[0]);
+      //ticket 96051
+      if (getScoutObject().isScrollToSelection()) {
+        scrollToSelection();
       }
     }
+  }
+
+  private void updateScrollToSelectionFromScout() {
+    if (getScoutObject().isScrollToSelection()) {
+      scrollToSelection();
+    }
+  }
+
+  protected void scrollToSelection() {
+    getUiField().showSelection();
   }
 
   protected void setContextColumnFromUi(TableColumn uiColumn) {

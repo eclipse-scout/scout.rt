@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -236,7 +236,9 @@ public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements I
             m_focusedItem.setUiFocus(false);
           }
           m_focusedItem = item;
-          m_focusedItem.setUiFocus(true);
+          if (m_focusedItem != null) {
+            m_focusedItem.setUiFocus(true);
+          }
           break;
         default:
           break;

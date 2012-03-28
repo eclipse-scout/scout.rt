@@ -52,6 +52,42 @@ public class TableEx extends Table {
   protected void checkSubclass() {
   }
 
+  private int m_insideSetTopIndex;
+
+  /**
+   * bug fix of swt in win32 when using MeasureListener due to scrollfix in setTopIndex
+   * <p>
+   * adding loop detection to avoid stack overflow
+   * 
+   * <pre>
+   * ...
+   *   at org.eclipse.swt.widgets.Table.setTopIndex(Table.java:5223)
+   *   at org.eclipse.swt.widgets.Table.setItemHeight(Table.java:4646)
+   *   at org.eclipse.swt.widgets.Table.setItemHeight(Table.java:4700)
+   *   at org.eclipse.swt.widgets.Table.sendMeasureItemEvent(Table.java:3761)
+   *   at org.eclipse.swt.widgets.Table.hitTestSelection(Table.java:2877)
+   *   at org.eclipse.swt.widgets.Table.setTopIndex(Table.java:5223)
+   *   at org.eclipse.swt.widgets.Table.setItemHeight(Table.java:4646)
+   *   at org.eclipse.swt.widgets.Table.setItemHeight(Table.java:4700)
+   *   at org.eclipse.swt.widgets.Table.sendMeasureItemEvent(Table.java:3761)
+   *   at org.eclipse.swt.widgets.Table.hitTestSelection(Table.java:2877)
+   *   at org.eclipse.swt.widgets.Table.setTopIndex(Table.java:5223)
+   * </pre>
+   */
+  @Override
+  public void setTopIndex(int index) {
+    if (m_insideSetTopIndex > 0) {
+      return;
+    }
+    try {
+      m_insideSetTopIndex++;
+      super.setTopIndex(index);
+    }
+    finally {
+      m_insideSetTopIndex--;
+    }
+  }
+
   @Override
   public Point computeSize(int hint, int hint2, boolean changed) {
     /*

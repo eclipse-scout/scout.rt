@@ -84,14 +84,6 @@ public class SwtScoutRadioButtonGroup extends SwtScoutValueFieldComposite<IRadio
   }
 
   @Override
-  protected void setFocusRequestedFromScout(boolean b) {
-    Control[] tabList = getSwtField().getTabList();
-    if (b && tabList != null && tabList.length > 0) {
-      tabList[0].setFocus();
-    }
-  }
-
-  @Override
   protected void setBackgroundFromScout(String scoutColor) {
     if (getSwtField() != null) {
       Control fld = getSwtField();

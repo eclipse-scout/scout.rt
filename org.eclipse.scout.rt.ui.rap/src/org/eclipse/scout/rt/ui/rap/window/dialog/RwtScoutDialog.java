@@ -15,9 +15,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
@@ -103,22 +100,6 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
         }, 5432);
       }
     });
-    getUiEnvironment().invokeScoutLater(new Runnable() {
-
-      @Override
-      public void run() {
-        IFormField[] allFields = getScoutObject().getAllFields();
-        for (IFormField field : allFields) {
-          if ((field instanceof IValueField || field instanceof IButton)
-              && field.isFocusable()
-              && field.isVisible()
-              && field.isEnabled()) {
-            field.requestFocus();
-            break;
-          }
-        }
-      }
-    }, 0);
   }
 
   protected Control createContentsDelegate(Composite parent) {

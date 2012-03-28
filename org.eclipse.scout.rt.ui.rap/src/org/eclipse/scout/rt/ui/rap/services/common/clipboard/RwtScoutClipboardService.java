@@ -78,7 +78,7 @@ public class RwtScoutClipboardService extends AbstractService implements IClipbo
           try {
             Object contents = RwtUtility.createUiTransferable(transferObject);
             if (contents != null && contents instanceof String) {
-//              getUiClipboard().setContents(new Object[]{contents}, new Transfer[]{transfer});
+//TODO rap              getUiClipboard().setContents(new Object[]{contents}, new Transfer[]{transfer});
             }
           }
           catch (Throwable t) {
