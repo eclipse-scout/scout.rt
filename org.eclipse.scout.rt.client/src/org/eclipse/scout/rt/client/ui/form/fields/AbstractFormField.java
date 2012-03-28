@@ -816,8 +816,11 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public String getXMLFieldId() {
     FindShortestUniqueIdVisitor visitor = new FindShortestUniqueIdVisitor(this);
-    getForm().visitFields(visitor);
-    return visitor.getShortestUniqueId();
+    if (getForm() != null) {
+      getForm().visitFields(visitor);
+      return visitor.getShortestUniqueId();
+    }
+    return getClass().getSimpleName();
   }
 
   @Override
