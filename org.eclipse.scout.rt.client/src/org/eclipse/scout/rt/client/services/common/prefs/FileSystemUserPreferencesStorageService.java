@@ -10,14 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.prefs;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
 import org.eclipse.scout.service.AbstractService;
-import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * Default implementation for storing UI preferences (Windows, Column widths, Table Customizers, ...) on local file
@@ -28,17 +27,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractService imp
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FileSystemUserPreferencesStorageService.class);
 
   @Override
-  public void storePreferences(IEclipsePreferences data) {
-    try {
-      data.flush();
-    }
-    catch (BackingStoreException e) {
-      LOG.error("storing client ui preferences", e);
-    }
-  }
-
-  @Override
-  public IEclipsePreferences loadPreferences() {
+  public Preferences loadPreferences() {
     return new UserScope().getNode(Activator.PLUGIN_ID);
   }
 

@@ -19,7 +19,6 @@ import java.util.Map;
 import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -31,7 +30,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
@@ -48,10 +46,12 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TextsThreadLocal;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
+import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 public abstract class AbstractClientSession implements IClientSession {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractClientSession.class);
@@ -405,12 +405,13 @@ public abstract class AbstractClientSession implements IClientSession {
 
   @Override
   public void goOffline() throws ProcessingException {
-    IEclipsePreferences pref = new UserScope().getNode(Activator.PLUGIN_ID);
+    Preferences pref = SERVICES.getService(IUserPreferencesStorageService.class).loadPreferences();
     if (getUserId() != null) {
       if (OfflineState.isOnlineDefault()) {
         try {
           pref.put("offline.user", getUserId());
           pref.flush();
+          pref.sync();
         }
         catch (BackingStoreException e) {
           LOG.error("Could not write userId to preferences!");

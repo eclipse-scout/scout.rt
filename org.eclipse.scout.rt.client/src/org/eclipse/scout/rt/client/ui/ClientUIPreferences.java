@@ -20,7 +20,6 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -39,6 +38,7 @@ import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * UI model customization wrapping a {@link org.eclipse.core.runtime.Preferences} object with its location Stored
@@ -101,7 +101,7 @@ public class ClientUIPreferences {
   private static final String NLS_LOCALE_COUNTRY = "locale.country";
 
   private final IClientSession m_session;
-  private IEclipsePreferences m_env;
+  private Preferences m_env;
 
   /**
    * @deprecated use {@link #getInstance()}
@@ -755,23 +755,11 @@ public class ClientUIPreferences {
   }
 
   protected void flush() {
-    if (m_session == null || ClientSessionThreadLocal.get() == m_session) {
-      SERVICES.getService(IUserPreferencesStorageService.class).storePreferences(m_env);
+    try {
+      m_env.flush();
     }
-    else {
-      ClientAsyncJob job = new ClientAsyncJob("Load user preferences", m_session) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          SERVICES.getService(IUserPreferencesStorageService.class).storePreferences(m_env);
-        }
-      };
-      job.schedule();
-      try {
-        job.join();
-      }
-      catch (InterruptedException e) {
-        //nop
-      }
+    catch (Throwable t) {
+      t.printStackTrace();
     }
   }
 }
