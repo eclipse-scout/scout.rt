@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -30,10 +29,9 @@ import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
+import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
-import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.shared.OfflineState;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -52,8 +50,6 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
   private final IClientSession m_clientSession;
   private long m_pollInterval = -1L;
   private boolean m_analyzeNetworkLatency = true;
-  //
-  private boolean m_notifiedVersionMismatchToUser;
 
   /**
    * If the version parameter is null, the product bundle (e.g.
@@ -200,37 +196,11 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
 
   protected abstract ServiceTunnelResponse tunnelOnline(ServiceTunnelRequest call);
 
+  /**
+   * @deprecated version mismatch is handled in the {@link ErrorHandler}
+   */
+  @Deprecated
   protected void handleVersionMismatch(final VersionMismatchException ve) {
-    if (m_notifiedVersionMismatchToUser) {
-      return;
-    }
-    if (ClientSyncJob.getCurrentSession() != m_clientSession) {
-      new ClientSyncJob("Version mismatch", m_clientSession) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          handleVersionMismatch(ve);
-        }
-      }.schedule();
-      return;
-    }
-    // session thread sync
-    m_notifiedVersionMismatchToUser = true;
-    if (m_clientSession.getDesktop() != null && m_clientSession.getDesktop().isOpened()) {
-      ve.consume();
-      int response = MessageBox.showYesNoCancelMessage(ScoutTexts.get("VersionMismatchTitle"), ScoutTexts.get("VersionMismatchTextXY", ve.getOldVersion(), ve.getNewVersion()), ScoutTexts.get("VersionMismatchAction"));
-      switch (response) {
-        case MessageBox.YES_OPTION: {
-          m_clientSession.stopSession(IApplication.EXIT_RELAUNCH);
-          break;
-        }
-        case MessageBox.NO_OPTION: {
-          break;
-        }
-        case MessageBox.CANCEL_OPTION: {
-          break;
-        }
-      }
-    }
   }
 
   /**
