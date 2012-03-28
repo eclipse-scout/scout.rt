@@ -23,10 +23,14 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
@@ -107,8 +111,23 @@ public class UserNavigationHistory {
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
     desktop.activateBookmark(b, false);
     //scroll to tree selection
-    if (desktop.getOutline() != null) {
-      desktop.getOutline().scrollToSelection();
+    IOutline outline = desktop.getOutline();
+    if (outline != null) {
+      outline.scrollToSelection();
+      //scroll to table selection
+      IPage page = outline.getActivePage();
+      if (page instanceof IPageWithTable<?>) {
+        ITable table = ((IPageWithTable<?>) page).getTable();
+        if (table != null) {
+          table.scrollToSelection();
+        }
+      }
+      else if (page instanceof IPageWithNodes) {
+        ITable table = ((IPageWithNodes) page).getInternalTable();
+        if (table != null) {
+          table.scrollToSelection();
+        }
+      }
     }
   }
 

@@ -34,6 +34,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
@@ -70,6 +71,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private final ArrayList<ITreeNodeFilter> m_nodeFilters;
   private final int m_uiProcessorCount = 0;
   private IKeyStroke[] m_baseKeyStrokes;
+  private IEventHistory<TreeEvent> m_eventHistory;
 
   public AbstractTree() {
     if (DesktopProfiler.getInstance().isEnabled()) {
@@ -290,6 +292,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   protected void initConfig() {
     m_enabledGranted = true;
+    m_eventHistory = createEventHistory();
     m_uiFacade = new P_UIFacade();
     setTitle(getConfiguredTitle());
     setIconId(getConfiguredIconId());
@@ -306,10 +309,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setScrollToSelection(getConfiguredScrollToSelection());
     setRootNode(new AbstractTreeNode() {
     });
-    // add Convenience observer for drag & drop callbacks
+    // add Convenience observer for drag & drop callbacks and event history
     addTreeListener(new TreeAdapter() {
       @Override
       public void treeChanged(TreeEvent e) {
+        //event history
+        IEventHistory<TreeEvent> h = getEventHistory();
+        if (h != null) {
+          h.notifyEvent(e);
+        }
+        //dnd
         switch (e.getType()) {
           case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
             if (e.getDragObject() == null) {
@@ -1819,6 +1828,15 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public void addUITreeListener(TreeListener listener) {
     m_listenerList.insertAtFront(TreeListener.class, listener);
+  }
+
+  protected IEventHistory<TreeEvent> createEventHistory() {
+    return new DefaultTreeEventHistory(5000L);
+  }
+
+  @Override
+  public IEventHistory<TreeEvent> getEventHistory() {
+    return m_eventHistory;
   }
 
   private void fireNodesInserted(ITreeNode parent, ITreeNode[] children) {

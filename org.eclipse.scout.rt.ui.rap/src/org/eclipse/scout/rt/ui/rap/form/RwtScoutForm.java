@@ -10,21 +10,30 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form;
 
+import java.io.File;
+import java.util.WeakHashMap;
+
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.rap.core.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.rap.core.IValidateRoot;
+import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
+import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFormFieldGridData;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.widgets.Composite;
@@ -36,6 +45,7 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutForm.class);
 
   private FormListener m_scoutFormListener;
+  private WeakHashMap<FormEvent, Object> m_consumedScoutFormEvents = new WeakHashMap<FormEvent, Object>();
 
   @Override
   protected void initializeUi(Composite parent) {
@@ -62,6 +72,21 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
       m_scoutFormListener = new P_ScoutFormListener();
       getScoutObject().addFormListener(m_scoutFormListener);
     }
+    // process all pending events, except requestFocus
+    IEventHistory<FormEvent> h = getScoutObject().getEventHistory();
+    if (h != null) {
+      for (FormEvent e : h.getRecentEvents()) {
+        switch (e.getType()) {
+          case FormEvent.TYPE_TO_BACK:
+          case FormEvent.TYPE_TO_FRONT:
+          case FormEvent.TYPE_PRINT: {
+            handleScoutFormEventInUi(e);
+            break;
+          }
+        }
+      }
+    }
+    setInitialFocus();
   }
 
   @Override
@@ -85,7 +110,139 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
 
   @Override
   public void setInitialFocus() {
-    // void
+    IFormField modelField = null;
+    //check for request focus events in history
+    IEventHistory<FormEvent> h = getScoutObject().getEventHistory();
+    if (h != null) {
+      for (FormEvent e : h.getRecentEvents()) {
+        if (e.getType() == FormEvent.TYPE_REQUEST_FOCUS) {
+          modelField = e.getFormField();
+          break;
+        }
+      }
+    }
+    if (modelField == null) {
+      for (IFormField f : getScoutObject().getAllFields()) {
+        if ((f instanceof IValueField || f instanceof IButton)
+            && f.isFocusable()
+            && f.isVisible()
+            && f.isEnabled()) {
+          modelField = f;
+          break;
+        }
+      }
+    }
+    if (modelField != null) {
+      handleRequestFocusFromScout(modelField, true);
+    }
+  }
+
+  private Control findUiField(IFormField modelField) {
+    if (modelField == null) {
+      return null;
+    }
+    for (Control comp : RwtUtility.findChildComponents(getUiContainer(), Control.class)) {
+      IRwtScoutComposite<?> composite = RwtScoutFieldComposite.getCompositeOnWidget(comp);
+      if (composite != null && composite.getScoutObject() == modelField) {
+        return composite.getUiField();
+      }
+    }
+    return null;
+  }
+
+  protected void handleScoutFormEventInUi(final FormEvent e) {
+    if (m_consumedScoutFormEvents.containsKey(e)) {
+      return;
+    }
+    m_consumedScoutFormEvents.put(e, Boolean.TRUE);
+    //
+    switch (e.getType()) {
+      case FormEvent.TYPE_PRINT: {
+        handlePrintFromScout(e);
+        break;
+      }
+      case FormEvent.TYPE_TO_FRONT: {
+        Shell sh = getUiFormPane().getShell();
+        if (sh.isVisible()) {
+          // TODO rap not supported in swt: sh.toFront()
+        }
+        break;
+      }
+      case FormEvent.TYPE_TO_BACK: {
+        Shell sh = getUiFormPane().getShell();
+        if (sh.isVisible()) {
+          // TODO rap not supported in swt: sh.toBack()
+        }
+        break;
+      }
+      case FormEvent.TYPE_REQUEST_FOCUS: {
+        handleRequestFocusFromScout(e.getFormField(), false);
+        break;
+      }
+    }
+  }
+
+  protected void handlePrintFromScout(final FormEvent e) {
+    WidgetPrinter wp = null;
+    try {
+      if (getUiFormPane() != null) {
+        if (e.getFormField() != null) {
+          for (Control c : RwtUtility.findChildComponents(getUiContainer(), Control.class)) {
+            IPropertyObserver scoutModel = (IPropertyObserver) c.getData(IRwtScoutFormField.CLIENT_PROPERTY_SCOUT_OBJECT);
+            if (scoutModel == e.getFormField()) {
+              wp = new WidgetPrinter(c);
+              break;
+            }
+          }
+        }
+        if (wp == null) {
+          wp = new WidgetPrinter(getUiFormPane().getShell());
+        }
+      }
+      if (wp != null) {
+        try {
+          wp.print(e.getPrintDevice(), e.getPrintParameters());
+        }
+        catch (Throwable ex) {
+          LOG.error(null, ex);
+        }
+      }
+    }
+    finally {
+      File outputFile = null;
+      if (wp != null) {
+        outputFile = wp.getOutputFile();
+      }
+      final File outputFileFinal = outputFile;
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().fireFormPrintedFromUI(outputFileFinal);
+        }
+      };
+      getUiEnvironment().invokeScoutLater(r, 0);
+    }
+  }
+
+  protected void handleRequestFocusFromScout(IFormField modelField, boolean force) {
+    if (modelField == null) {
+      return;
+    }
+    Control comp = findUiField(modelField);
+    if (comp != null && comp.getVisible()) {
+      Control[] tabList = (comp instanceof Composite ? ((Composite) comp).getTabList() : null);
+      if (tabList != null && tabList.length > 0) {
+        comp = tabList[0];
+      }
+      if (comp != null && comp.getVisible()) {
+        if (force) {
+          comp.forceFocus();
+        }
+        else {
+          comp.setFocus();
+        }
+      }
+    }
   }
 
   private class P_ScoutFormListener implements FormListener {
@@ -96,81 +253,18 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
         return;
       }
       switch (e.getType()) {
-        case FormEvent.TYPE_PRINT: {
-          final Object lock = new Object();
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              try {
-                WidgetPrinter wp = null;
-                if (getUiFormPane() != null) {
-                  if (e.getFormField() != null) {
-                    for (Control c : RwtUtility.findChildComponents(getUiContainer(), Control.class)) {
-                      IPropertyObserver scoutModel = (IPropertyObserver) c.getData(IRwtScoutFormField.CLIENT_PROPERTY_SCOUT_OBJECT);
-                      if (scoutModel == e.getFormField()) {
-                        wp = new WidgetPrinter(c);
-                        break;
-                      }
-                    }
-                  }
-                  if (wp == null) {
-                    wp = new WidgetPrinter(getUiFormPane().getShell());
-                  }
-                }
-                if (wp != null) {
-                  try {
-                    wp.print(e.getPrintDevice(), e.getPrintParameters());
-                  }
-                  catch (Throwable ex) {
-                    LOG.error(null, ex);
-                  }
-                }
-              }
-              finally {
-                synchronized (lock) {
-                  lock.notifyAll();
-                }
-              }
-            }
-          };
-          synchronized (lock) {
-            display.asyncExec(t);
-            try {
-              lock.wait(30000L);
-            }
-            catch (InterruptedException ie) {
-            }
-          }
-          break;
-        }
         case FormEvent.TYPE_STRUCTURE_CHANGED: {
-          // XXX from imo: check if necessary in swt and implement analogous to swing implementation
           break;
         }
-        case FormEvent.TYPE_TO_FRONT: {
+        case FormEvent.TYPE_PRINT:
+        case FormEvent.TYPE_TO_FRONT:
+        case FormEvent.TYPE_TO_BACK:
+        case FormEvent.TYPE_REQUEST_FOCUS: {
           Runnable t = new Runnable() {
             @Override
             public void run() {
               if (getUiFormPane() != null && !getUiFormPane().isDisposed()) {
-                Shell sh = getUiFormPane().getShell();
-                if (sh.isVisible()) {
-                  // TODO not supported in swt: sh.toFront()
-                }
-              }
-            }
-          };
-          getUiEnvironment().invokeUiLater(t);
-          break;
-        }
-        case FormEvent.TYPE_TO_BACK: {
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              if (getUiFormPane() != null && !getUiFormPane().isDisposed()) {
-                Shell sh = getUiFormPane().getShell();
-                if (sh.isVisible()) {
-                  // TODO not supported in swt: sh.toBack()
-                }
+                handleScoutFormEventInUi(e);
               }
             }
           };

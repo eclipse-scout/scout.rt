@@ -73,6 +73,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -292,53 +293,67 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   @Override
   protected void attachScout() {
     super.attachScout();
-    if (getScoutObject() != null) {
-      if (m_scoutTableListener == null) {
-        m_scoutTableListener = new P_ScoutTableListener();
-        getScoutObject().addUITableListener(m_scoutTableListener);
-      }
-      setMultiSelectFromScout(getScoutObject().isMultiSelect());
-      setMultilineTextFromScout(getScoutObject().isMultilineText());
-      setKeyboardNavigationFromScout();
-      setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());
-      setColumnsAutoResizeFromScout(getScoutObject().isAutoResizeColumns());
-      setKeyStrokesFromScout();
+    if (getScoutObject() == null) {
+      return;
+    }
+    if (m_scoutTableListener == null) {
+      m_scoutTableListener = new P_ScoutTableListener();
+      getScoutObject().addUITableListener(m_scoutTableListener);
+    }
+    setMultiSelectFromScout(getScoutObject().isMultiSelect());
+    setMultilineTextFromScout(getScoutObject().isMultilineText());
+    setKeyboardNavigationFromScout();
+    setHeaderVisibleFromScout(getScoutObject().isHeaderVisible());
+    setColumnsAutoResizeFromScout(getScoutObject().isAutoResizeColumns());
+    setKeyStrokesFromScout();
 
-      // Install DND and CopyPaste transfer handler
+    // Install DND and CopyPaste transfer handler
 
-      // BSI ticket 104'549
-      // Even if no DND is configured, the handler must be installed to ensure equivalent copy-paste behavior with DND support installed or not.
-      // Otherwise, Swing installs @{link TableTransferHandler} whose implementation cannot be accessed which would be necessary to ensure the same copy-paste behavior in case of DND installed.
-      // Furthermore, the copy-paste output should not depend on any drag handler installed to always have the same result.
-      m_swingScrollPane.getViewport().setTransferHandler(new P_SwingEmptySpaceTransferHandler());
-      getSwingTable().setTransferHandler(new P_SwingRowTransferHandler());
-      getSwingTable().setDragEnabled(getScoutObject().getDragType() != 0 || getScoutObject().getDropType() != 0);
+    // BSI ticket 104'549
+    // Even if no DND is configured, the handler must be installed to ensure equivalent copy-paste behavior with DND support installed or not.
+    // Otherwise, Swing installs @{link TableTransferHandler} whose implementation cannot be accessed which would be necessary to ensure the same copy-paste behavior in case of DND installed.
+    // Furthermore, the copy-paste output should not depend on any drag handler installed to always have the same result.
+    m_swingScrollPane.getViewport().setTransferHandler(new P_SwingEmptySpaceTransferHandler());
+    getSwingTable().setTransferHandler(new P_SwingRowTransferHandler());
+    getSwingTable().setDragEnabled(getScoutObject().getDragType() != 0 || getScoutObject().getDropType() != 0);
 
-      setSelectionFromScout();
-      // add checkable key mappings
-      if (getScoutObject().isCheckable()) {
-        getSwingTable().getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("SPACE"), "toggleRow");
-        getSwingTable().getActionMap().put("toggleRow", new AbstractAction() {
-          private static final long serialVersionUID = 1L;
+    setSelectionFromScout();
+    // add checkable key mappings
+    if (getScoutObject().isCheckable()) {
+      getSwingTable().getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("SPACE"), "toggleRow");
+      getSwingTable().getActionMap().put("toggleRow", new AbstractAction() {
+        private static final long serialVersionUID = 1L;
 
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            handleSwingRowClick(getSwingTable().getSelectedRow());
-          }
-        });
-      }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          handleSwingRowClick(getSwingTable().getSelectedRow());
+        }
+      });
     }
     enqueueAutoOptimizeColumnWidths();
+    //handle events from recent history
+    final IEventHistory<TableEvent> h = getScoutObject().getEventHistory();
+    if (h != null) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          for (TableEvent e : h.getRecentEvents()) {
+            handleScoutTableEventInSwing(e);
+          }
+        }
+      });
+    }
   }
 
   @Override
   protected void detachScout() {
     super.detachScout();
-    if (getScoutObject() != null) {
-      if (m_scoutTableListener != null) {
-        getScoutObject().removeTableListener(m_scoutTableListener);
-        m_scoutTableListener = null;
-      }
+    if (getScoutObject() == null) {
+      return;
+    }
+    if (m_scoutTableListener != null) {
+      getScoutObject().removeTableListener(m_scoutTableListener);
+      m_scoutTableListener = null;
     }
   }
 
@@ -619,7 +634,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         case TableEvent.TYPE_COLUMN_ORDER_CHANGED:
         case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
         case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
-        case TableEvent.TYPE_ROWS_SELECTED: {
+        case TableEvent.TYPE_ROWS_SELECTED:
+        case TableEvent.TYPE_SCROLL_TO_SELECTION: {
           return true;
         }
       }
@@ -684,6 +700,10 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         break;
       }
       case TableEvent.TYPE_ROWS_SELECTED: {
+        break;
+      }
+      case TableEvent.TYPE_SCROLL_TO_SELECTION: {
+        scrollToSelection();
         break;
       }
     }

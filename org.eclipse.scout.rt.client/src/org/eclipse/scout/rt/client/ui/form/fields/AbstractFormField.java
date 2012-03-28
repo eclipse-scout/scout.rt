@@ -1311,14 +1311,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public void requestFocus() {
-    propertySupport.setPropertyAlwaysFire(PROP_FOCUS_REQUESTED, true);
+    IForm form = getForm();
+    if (form != null) {
+      form.requestFocus(this);
+    }
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean fetchFocusRequested() {
-    boolean b = propertySupport.getPropertyBool(PROP_FOCUS_REQUESTED);
-    propertySupport.setPropertyNoFire(PROP_FOCUS_REQUESTED, false);
-    return b;
+    return false;
   }
 
   @Override

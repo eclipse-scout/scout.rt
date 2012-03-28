@@ -15,17 +15,17 @@ import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 import java.io.File;
+import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
+import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
@@ -53,6 +54,7 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
   private FormListener m_scoutFormListener;
   private SwingScoutViewListener m_swingScoutViewListener;
   private ISwingScoutView m_viewComposite;
+  private WeakHashMap<FormEvent, Object> m_consumedScoutFormEvents = new WeakHashMap<FormEvent, Object>();
 
   public SwingScoutForm(ISwingEnvironment env, IForm scoutForm) {
     this(env, null, scoutForm);
@@ -86,6 +88,11 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
       m_viewComposite.getSwingContentPane().add(BorderLayout.CENTER, optimalSizePanel);
       attachSwingView();
     }
+  }
+
+  @Override
+  protected void handleSwingShowing() {
+    setInitialFocus();
   }
 
   @Override
@@ -160,17 +167,20 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
       m_scoutFormListener = new P_ScoutFormListener();
       getScoutForm().addFormListener(m_scoutFormListener);
     }
-    // process all pending print events
-    ClientSyncJob job = new ClientSyncJob("", getSwingEnvironment().getScoutSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        FormEvent[] pendingEvents = getSwingEnvironment().fetchPendingPrintEvents(getScoutObject());
-        for (FormEvent o : pendingEvents) {
-          handleScoutPrintEvent(o);
+    // process all pending events, except requestFocus
+    IEventHistory<FormEvent> h = getScoutObject().getEventHistory();
+    if (h != null) {
+      for (FormEvent e : h.getRecentEvents()) {
+        switch (e.getType()) {
+          case FormEvent.TYPE_TO_BACK:
+          case FormEvent.TYPE_TO_FRONT:
+          case FormEvent.TYPE_PRINT: {
+            handleScoutFormEventInUi(e);
+            break;
+          }
         }
       }
-    };
-    job.schedule();
+    }
   }
 
   @Override
@@ -182,23 +192,32 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     }
   }
 
-  public JComponent getDefaultFocusOwner() {
-    return getDefaultFocusOwnerRec(getSwingFormPane());
+  @Override
+  public void setInitialFocus() {
+    IFormField modelField = null;
+    //check for request focus events in history
+    IEventHistory<FormEvent> h = getScoutObject().getEventHistory();
+    if (h != null) {
+      for (FormEvent e : h.getRecentEvents()) {
+        if (e.getType() == FormEvent.TYPE_REQUEST_FOCUS) {
+          modelField = e.getFormField();
+          break;
+        }
+      }
+    }
+    if (modelField != null) {
+      handleRequestFocusFromScout(modelField, true);
+    }
   }
 
-  private JComponent getDefaultFocusOwnerRec(JComponent parent) {
-    int n = parent.getComponentCount();
-    for (int i = 0; i < n; i++) {
-      if (parent.getComponent(i) instanceof JComponent) {
-        JComponent jcomp = (JComponent) parent.getComponent(i);
-        Boolean b = (Boolean) jcomp.getClientProperty(SwingScoutFieldComposite.CLIENT_PROP_FOCUSED);
-        if (b != null && b.booleanValue()) {
-          return jcomp;
-        }
-        JComponent rec = getDefaultFocusOwnerRec(jcomp);
-        if (rec != null) {
-          return rec;
-        }
+  private Component findUiField(IFormField modelField) {
+    if (modelField == null) {
+      return null;
+    }
+    for (Component comp : SwingUtility.findChildComponents(getSwingContainer(), Component.class)) {
+      ISwingScoutComposite<?> composite = SwingScoutFieldComposite.getCompositeOnWidget(comp);
+      if (composite != null && composite.getScoutObject() == modelField) {
+        return composite.getSwingField();
       }
     }
     return null;
@@ -237,14 +256,88 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     }
   }
 
-  @Override
-  public void setInitialFocus() {
-    JComponent comp = getDefaultFocusOwner();
-    if (comp != null) {
-      comp.requestFocus();
+  protected void handleScoutFormEventInUi(final FormEvent e) {
+    if (m_consumedScoutFormEvents.containsKey(e)) {
+      return;
     }
-    else {
-      getSwingFormPane().transferFocus();
+    m_consumedScoutFormEvents.put(e, Boolean.TRUE);
+    //
+    switch (e.getType()) {
+      case FormEvent.TYPE_PRINT: {
+        handlePrintFromScout(e);
+        break;
+      }
+      case FormEvent.TYPE_TO_FRONT: {
+        Window w = SwingUtilities.getWindowAncestor(getView().getSwingContentPane());
+        if (w.isShowing()) {
+          w.toFront();
+        }
+        break;
+      }
+      case FormEvent.TYPE_TO_BACK: {
+        Window w = SwingUtilities.getWindowAncestor(getView().getSwingContentPane());
+        if (w.isShowing()) {
+          w.toBack();
+        }
+        break;
+      }
+      case FormEvent.TYPE_REQUEST_FOCUS: {
+        handleRequestFocusFromScout(e.getFormField(), false);
+        break;
+      }
+    }
+  }
+
+  protected void handlePrintFromScout(final FormEvent e) {
+    WidgetPrinter wp = null;
+    try {
+      if (m_viewComposite != null) {
+        if (e.getFormField() != null) {
+          for (JComponent c : SwingUtility.findChildComponents(m_viewComposite.getSwingContentPane(), JComponent.class)) {
+            IPropertyObserver scoutModel = SwingScoutComposite.getScoutModelOnWidget(c);
+            if (scoutModel == e.getFormField()) {
+              wp = new WidgetPrinter(c);
+              break;
+            }
+          }
+        }
+        if (wp == null) {
+          wp = new WidgetPrinter(SwingUtilities.getWindowAncestor(m_viewComposite.getSwingContentPane()));
+        }
+      }
+      if (wp != null) {
+        try {
+          wp.print(e.getPrintDevice(), e.getPrintParameters());
+        }
+        catch (Throwable ex) {
+          LOG.error(null, ex);
+        }
+      }
+
+    }
+    finally {
+      File outputFile = null;
+      if (wp != null) {
+        outputFile = wp.getOutputFile();
+      }
+      final File outputFileFinal = outputFile;
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().fireFormPrintedFromUI(outputFileFinal);
+        }
+      };
+      getSwingEnvironment().invokeScoutLater(r, 0);
+    }
+  }
+
+  protected void handleRequestFocusFromScout(IFormField modelField, boolean force) {
+    if (modelField == null) {
+      return;
+    }
+    Component comp = findUiField(modelField);
+    if (comp != null && comp.isShowing()) {
+      comp.requestFocus();
     }
   }
 
@@ -299,56 +392,6 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     }
   }
 
-  protected void handleScoutPrintEvent(final FormEvent e) {
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        WidgetPrinter wp = null;
-        try {
-          if (m_viewComposite != null) {
-            if (e.getFormField() != null) {
-              for (JComponent c : SwingUtility.findChildComponents(m_viewComposite.getSwingContentPane(), JComponent.class)) {
-                IPropertyObserver scoutModel = SwingScoutComposite.getScoutModelOnWidget(c);
-                if (scoutModel == e.getFormField()) {
-                  wp = new WidgetPrinter(c);
-                  break;
-                }
-              }
-            }
-            if (wp == null) {
-              wp = new WidgetPrinter(SwingUtilities.getWindowAncestor(m_viewComposite.getSwingContentPane()));
-            }
-          }
-          if (wp != null) {
-            try {
-              wp.print(e.getPrintDevice(), e.getPrintParameters());
-            }
-            catch (Throwable ex) {
-              LOG.error(null, ex);
-            }
-          }
-
-        }
-        finally {
-          File outputFile = null;
-          if (wp != null) {
-            outputFile = wp.getOutputFile();
-          }
-          final File outputFileFinal = outputFile;
-          Runnable r = new Runnable() {
-            @Override
-            public void run() {
-              getScoutObject().getUIFacade().fireFormPrintedFromUI(outputFileFinal);
-            }
-          };
-          getSwingEnvironment().invokeScoutLater(r, 0);
-        }
-      }
-
-    };
-    getSwingEnvironment().invokeSwingLater(t);
-  }
-
   private class P_ScoutFormListener implements FormListener {
     private Object m_structureChangeRunnableLock = new Object();
     private Runnable m_structureChangeRunnable;
@@ -356,11 +399,6 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
     @Override
     public void formChanged(final FormEvent e) {
       switch (e.getType()) {
-        case FormEvent.TYPE_PRINT: {
-
-          handleScoutPrintEvent(e);
-          break;
-        }
         case FormEvent.TYPE_STRUCTURE_CHANGED: {
           synchronized (m_structureChangeRunnableLock) {
             if (m_structureChangeRunnable == null) {
@@ -395,30 +433,15 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
           }
           break;
         }
-        case FormEvent.TYPE_TO_FRONT: {
+        case FormEvent.TYPE_PRINT:
+        case FormEvent.TYPE_TO_FRONT:
+        case FormEvent.TYPE_TO_BACK:
+        case FormEvent.TYPE_REQUEST_FOCUS: {
           Runnable t = new Runnable() {
             @Override
             public void run() {
               if (getView() != null) {
-                Window w = SwingUtilities.getWindowAncestor(getView().getSwingContentPane());
-                if (w.isShowing()) {
-                  w.toFront();
-                }
-              }
-            }
-          };
-          getSwingEnvironment().invokeSwingLater(t);
-          break;
-        }
-        case FormEvent.TYPE_TO_BACK: {
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              if (getView() != null) {
-                Window w = SwingUtilities.getWindowAncestor(getView().getSwingContentPane());
-                if (w.isShowing()) {
-                  w.toBack();
-                }
+                handleScoutFormEventInUi(e);
               }
             }
           };

@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.beans.IPropertyFilter;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -544,6 +545,11 @@ public interface IForm extends IPropertyObserver {
   void printField(IFormField field, PrintDevice device, Map<String, Object> parameters);
 
   /**
+   * Request focus for the field by sending a {@link FormEvent#TYPE_REQUEST_FOCUS} event
+   */
+  void requestFocus(IFormField f);
+
+  /**
    * Add a {@link FormListener}. These listeners will be called
    * when the form is activated, closed, discared, before loading,
    * after loading, before storing, after storing, when the structure changes, when it is
@@ -555,6 +561,17 @@ public interface IForm extends IPropertyObserver {
    * Remove a {@link FormListener} that was added to the form before.
    */
   void removeFormListener(FormListener listener);
+
+  /**
+   * @return the {@link IEventHistory} associated with this form
+   *         <p>
+   *         The default implementation is a {@link DefaultFormEventHistory} and created by
+   *         {@link AbstractForm#createEventHistory()}
+   *         <p>
+   *         This method is thread safe.
+   * @since 3.8
+   */
+  IEventHistory<FormEvent> getEventHistory();
 
   IFormUIFacade getUIFacade();
 }

@@ -40,6 +40,9 @@ public class FormEvent extends EventObject {
    * print a form using properties formField, printDevice, printParameters
    */
   public static final int TYPE_PRINT = 4000;
+  /**
+   * This event is sent once the async print job is done
+   */
   public static final int TYPE_PRINTED = 4010;
   /**
    * When the field structure changes Examples: a field changes its "visible"
@@ -48,8 +51,19 @@ public class FormEvent extends EventObject {
    * in a way that the form structure is different
    */
   public static final int TYPE_STRUCTURE_CHANGED = 5000;
+  /**
+   * see {@link IForm#toFront()}
+   */
   public static final int TYPE_TO_FRONT = 6000;
+  /**
+   * see {@link IForm#toBack()}
+   */
   public static final int TYPE_TO_BACK = 6010;
+  /**
+   * see {@link IFormField#requestFocus()}
+   */
+  public static final int TYPE_REQUEST_FOCUS = 6020;
+  //next 6030
 
   private final int m_type;
   private IFormField m_formField;

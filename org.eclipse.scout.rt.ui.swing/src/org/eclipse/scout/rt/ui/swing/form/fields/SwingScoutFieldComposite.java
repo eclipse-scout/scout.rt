@@ -24,6 +24,7 @@ import javax.swing.text.JTextComponent;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -42,6 +43,10 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
   // cache
   private IKeyStroke[] m_installedScoutKs;
 
+  /**
+   * @deprecated since 3.8, replaced by {@link FormEvent#TYPE_REQUEST_FOCUS}
+   */
+  @Deprecated
   public static final String CLIENT_PROP_FOCUSED = "scout.ui.swing.focused";
 
   public SwingScoutFieldComposite() {
@@ -103,7 +108,6 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
       setSaveNeededFromScout(scoutField.isSaveNeeded());
       setEmptyFromScout(scoutField.isEmpty());
       setFocusableFromScout(scoutField.isFocusable());
-      setFocusRequestedFromScout(scoutField.fetchFocusRequested());
       setHorizontalAlignmentFromScout(scoutField.getGridData().horizontalAlignment);
       setVerticalAlignmentFromScout(scoutField.getGridData().verticalAlignment);
       setKeyStrokesFromScout();
@@ -315,18 +319,6 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     }
   }
 
-  protected void setFocusRequestedFromScout(boolean b) {
-    if (getSwingField() != null) {
-      getSwingField().putClientProperty(CLIENT_PROP_FOCUSED, null);
-      if (b) {
-        getSwingField().putClientProperty(CLIENT_PROP_FOCUSED, true);
-        if (getSwingField().isShowing()) {
-          getSwingField().requestFocus();
-        }
-      }
-    }
-  }
-
   protected void setKeyStrokesFromScout() {
     JComponent component = getSwingContainer();
     if (component == null) {
@@ -387,10 +379,6 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     }
     else if (name.equals(IFormField.PROP_FOCUSABLE)) {
       setFocusableFromScout(((Boolean) newValue).booleanValue());
-    }
-    else if (name.equals(IFormField.PROP_FOCUS_REQUESTED)) {
-      getScoutObject().fetchFocusRequested();
-      setFocusRequestedFromScout(((Boolean) newValue).booleanValue());
     }
     else if (name.equals(IFormField.PROP_LABEL)) {
       setLabelFromScout((String) newValue);

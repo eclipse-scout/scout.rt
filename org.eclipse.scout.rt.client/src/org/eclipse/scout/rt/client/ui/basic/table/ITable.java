@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ClientRule;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -288,6 +289,14 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    */
   void setScrollToSelection(boolean b);
 
+  /**
+   * May be used when {@link #isScrollToSelection()} = false for a one-time scroll. The property scrollToVisible however
+   * remains untouched.
+   * <p>
+   * This is a one-time scroll advise to the ui
+   */
+  void scrollToSelection();
+
   /*
    * display
    */
@@ -459,6 +468,17 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    * Use {@link #addTableListener(TableListener)} in all other cases
    */
   void addUITableListener(TableListener listener);
+
+  /**
+   * @return the {@link IEventHistory} associated with this table
+   *         <p>
+   *         The default implementation is a {@link DefaultTableEventHistory} and created by
+   *         {@link AbstractTable#createEventHistory()}
+   *         <p>
+   *         This method is thread safe.
+   * @since 3.8
+   */
+  IEventHistory<TableEvent> getEventHistory();
 
   /**
    * when performing a batch mutation use this marker like try{

@@ -55,6 +55,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
@@ -134,6 +135,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private HashMap<String, P_Timer> m_scoutTimerMap;
   private String m_iconId;
   private DataChangeListener m_internalDataChangeListener;
+  private IEventHistory<FormEvent> m_eventHistory;
 
   public AbstractForm() throws ProcessingException {
     this(true);
@@ -143,6 +145,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (DesktopProfiler.getInstance().isEnabled()) {
       DesktopProfiler.getInstance().registerForm(this);
     }
+    m_eventHistory = createEventHistory();
     m_enabledGranted = true;
     m_visibleGranted = true;
     m_formLoading = true;
@@ -2004,6 +2007,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
+  public void requestFocus(IFormField f) {
+    if (f == null || f.getForm() != this) {
+      return;
+    }
+    fireRequestFocus(f);
+  }
+
   /**
    * Model Observer .
    */
@@ -2015,6 +2026,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void removeFormListener(FormListener listener) {
     m_listenerList.remove(FormListener.class, listener);
+  }
+
+  protected IEventHistory<FormEvent> createEventHistory() {
+    return new DefaultFormEventHistory(5000L);
+  }
+
+  @Override
+  public IEventHistory<FormEvent> getEventHistory() {
+    return m_eventHistory;
   }
 
   private void fireFormLoadBefore() throws ProcessingException {
@@ -2112,6 +2132,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         throw pe;
       }
     }
+    IEventHistory<FormEvent> h = getEventHistory();
+    if (h != null) {
+      h.notifyEvent(e);
+    }
   }
 
   @Override
@@ -2145,6 +2169,16 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     catch (ProcessingException e) {
       e.addContextMessage(ScoutTexts.get("FormFireToBack") + " " + getTitle());
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+    }
+  }
+
+  private void fireRequestFocus(IFormField f) {
+    try {
+      fireFormEvent(new FormEvent(this, FormEvent.TYPE_REQUEST_FOCUS, f));
+    }
+    catch (ProcessingException e) {
+      e.addContextMessage(ScoutTexts.get("FormFireRequestFocus") + " " + getTitle() + " for " + f.getLabel());
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
   }

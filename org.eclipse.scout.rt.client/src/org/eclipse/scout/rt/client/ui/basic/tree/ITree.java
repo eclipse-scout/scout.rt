@@ -16,6 +16,7 @@ import java.security.Permission;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -250,6 +251,17 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    * Use {@link #addTreeListener(TreeListener)} in all other cases
    */
   void addUITreeListener(TreeListener listener);
+
+  /**
+   * @return the {@link IEventHistory} associated with this tree
+   *         <p>
+   *         The default implementation is a {@link DefaultTreeEventHistory} and created by
+   *         {@link AbstractTree#createEventHistory()}
+   *         <p>
+   *         This method is thread safe.
+   * @since 3.8
+   */
+  IEventHistory<TreeEvent> getEventHistory();
 
   /**
    * true if multiple nodes can be selected (default false)

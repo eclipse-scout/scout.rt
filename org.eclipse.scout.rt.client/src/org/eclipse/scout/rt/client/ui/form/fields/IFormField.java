@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -82,8 +83,14 @@ public interface IFormField extends IPropertyObserver {
   String PROP_LABEL = "label";
   String PROP_LABEL_VISIBLE = "labelVisible";
   String PROP_KEY_STROKES = "keyStrokes";
-  // focus
+  /**
+   * @deprecated since 3.8, sent via {@link FormEvent#TYPE_REQUEST_FOCUS}
+   */
+  @Deprecated
   String PROP_FOCUS_REQUESTED = "focusRequested";
+  /**
+   * if the field is focusable or not, value is of type {@link Boolean}
+   */
   String PROP_FOCUSABLE = "focusable";// Build 205
 
   /**
@@ -545,16 +552,14 @@ public interface IFormField extends IPropertyObserver {
   void setFocusable(boolean b);
 
   /**
-   * Request focus for the field
+   * Convenience for {@link IForm#requestFocus(IFormField)}
    */
   void requestFocus();
 
   /**
-   * Get pending request focus state for the field.<br>
-   * Once this method is called, the pending request is immediately cleared.<br>
-   * This method is normally not called by clients, only by the implementing
-   * gui.
+   * @deprecated since 3.8
    */
+  @Deprecated
   boolean fetchFocusRequested();
 
   /**

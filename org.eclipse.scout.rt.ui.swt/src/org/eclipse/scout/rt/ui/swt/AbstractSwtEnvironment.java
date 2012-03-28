@@ -15,13 +15,11 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -49,7 +47,6 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
@@ -172,10 +169,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   private P_PerspectiveListener m_perspectiveListener;
 
-  // collect print events during forms getting opend async.
-  private Map<IForm, List<FormEvent>> m_pendingEvents;
-  private P_InitializeFormListener m_initializeFormListener;
-
   public AbstractSwtEnvironment(Bundle applicationBundle, String perspectiveId, Class<? extends IClientSession> clientSessionClass) {
     m_applicationBundle = applicationBundle;
     m_perspectiveId = perspectiveId;
@@ -188,9 +181,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     m_status = SwtEnvironmentEvent.INACTIVE;
     m_desktopKeyStrokes = new ArrayList<ISwtKeyStroke>();
     m_startDesktopCalled = false;
-    // collect pending print events
-    m_initializeFormListener = new P_InitializeFormListener();
-    m_pendingEvents = Collections.synchronizedMap(new WeakHashMap<IForm, List<FormEvent>>());
   }
 
   public Bundle getApplicationBundle() {
@@ -1178,10 +1168,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     public void desktopChanged(final DesktopEvent e) {
       switch (e.getType()) {
         case DesktopEvent.TYPE_FORM_ADDED: {
-          // add listener for print requests during the form is opened async.
-          if (e.getForm() != null) {
-            e.getForm().addFormListener(m_initializeFormListener);
-          }
           Runnable t = new Runnable() {
             @Override
             public void run() {
@@ -1192,10 +1178,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           break;
         }
         case DesktopEvent.TYPE_FORM_REMOVED: {
-          // ensure the print request collector is removed when a form closes.
-          if (e.getForm() != null) {
-            e.getForm().removeFormListener(m_initializeFormListener);
-          }
           Runnable t = new Runnable() {
             @Override
             public void run() {
@@ -1626,27 +1608,9 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     return m_perspectiveId;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public FormEvent[] fetchPendingPrintEvents(IForm form) {
-    List<FormEvent> list = m_pendingEvents.remove(form);
-    form.removeFormListener(m_initializeFormListener);
-    if (list != null) {
-      return list.toArray(new FormEvent[list.size()]);
-    }
     return new FormEvent[0];
   }
-
-  private class P_InitializeFormListener implements FormListener {
-    @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
-      if (e.getType() == FormEvent.TYPE_PRINT) {
-        List<FormEvent> events = m_pendingEvents.get(e.getForm());
-        if (events == null) {
-          events = new ArrayList<FormEvent>(3);
-          m_pendingEvents.put(e.getForm(), events);
-        }
-        events.add(e);
-      }
-    }
-  } // end class P_InitializeFormListener
 }

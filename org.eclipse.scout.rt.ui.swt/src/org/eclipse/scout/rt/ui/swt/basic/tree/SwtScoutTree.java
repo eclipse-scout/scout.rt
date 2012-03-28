@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -164,34 +165,48 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   @Override
   protected void attachScout() {
     super.attachScout();
-    if (getScoutObject() != null) {
-      if (m_scoutTreeListener == null) {
-        m_scoutTreeListener = new P_ScoutTreeListener();
-        getScoutObject().addUITreeListener(m_scoutTreeListener);
+    if (getScoutObject() == null) {
+      return;
+    }
+    if (m_scoutTreeListener == null) {
+      m_scoutTreeListener = new P_ScoutTreeListener();
+      getScoutObject().addUITreeListener(m_scoutTreeListener);
+    }
+    if (getScoutObject().isRootNodeVisible()) {
+      setExpansionFromScout(getScoutObject().getRootNode());
+    }
+    else {
+      for (ITreeNode node : getScoutObject().getRootNode().getFilteredChildNodes()) {
+        setExpansionFromScout(node);
       }
-      if (getScoutObject().isRootNodeVisible()) {
-        setExpansionFromScout(getScoutObject().getRootNode());
-      }
-      else {
-        for (ITreeNode node : getScoutObject().getRootNode().getFilteredChildNodes()) {
-          setExpansionFromScout(node);
+    }
+    setSelectionFromScout(getScoutObject().getSelectedNodes());
+    setKeyStrokeFormScout();
+    // dnd support
+    new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
+    //handle events from recent history
+    final IEventHistory<TreeEvent> h = getScoutObject().getEventHistory();
+    if (h != null) {
+      getEnvironment().getDisplay().asyncExec(new Runnable() {
+        @Override
+        public void run() {
+          for (TreeEvent e : h.getRecentEvents()) {
+            handleScoutTreeEventInSwt(e);
+          }
         }
-      }
-      setSelectionFromScout(getScoutObject().getSelectedNodes());
-      setKeyStrokeFormScout();
-      // dnd support
-      new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
+      });
     }
   }
 
   @Override
   protected void detachScout() {
     super.detachScout();
-    if (getScoutObject() != null) {
-      if (m_scoutTreeListener != null) {
-        getScoutObject().removeTreeListener(m_scoutTreeListener);
-        m_scoutTreeListener = null;
-      }
+    if (getScoutObject() == null) {
+      return;
+    }
+    if (m_scoutTreeListener != null) {
+      getScoutObject().removeTreeListener(m_scoutTreeListener);
+      m_scoutTreeListener = null;
     }
   }
 

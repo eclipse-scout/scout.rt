@@ -46,6 +46,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -173,7 +174,10 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   @Override
   protected void detachScout() {
     super.detachScout();
-    if (getScoutObject() != null && m_scoutTreeListener != null) {
+    if (getScoutObject() == null) {
+      return;
+    }
+    if (m_scoutTreeListener != null) {
       getScoutObject().removeTreeListener(m_scoutTreeListener);
       m_scoutTreeListener = null;
     }
@@ -182,29 +186,42 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   @Override
   protected void attachScout() {
     super.attachScout();
-    if (getScoutObject() != null) {
-      if (m_scoutTreeListener == null) {
-        m_scoutTreeListener = new P_ScoutTreeListener();
-        getScoutObject().addUITreeListener(m_scoutTreeListener);
-      }
-      setMultiSelectFromScout(getScoutObject().isMultiSelect());
-      setRootNodeVisibleFromScout();
-      setRootHandlesVisibleFromScout();
-      setExpansionFromScout(getScoutObject().getRootNode());
-      setSelectionFromScout(getScoutObject().getSelectedNodes());
-      setKeyStrokesFromScout();
-      // add checkable key mappings
-      if (getScoutObject().isCheckable()) {
-        getSwingTree().getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("SPACE"), "toggleRow");
-        getSwingTree().getActionMap().put("toggleRow", new AbstractAction() {
-          private static final long serialVersionUID = 1L;
+    if (getScoutObject() == null) {
+      return;
+    }
+    if (m_scoutTreeListener == null) {
+      m_scoutTreeListener = new P_ScoutTreeListener();
+      getScoutObject().addUITreeListener(m_scoutTreeListener);
+    }
+    setMultiSelectFromScout(getScoutObject().isMultiSelect());
+    setRootNodeVisibleFromScout();
+    setRootHandlesVisibleFromScout();
+    setExpansionFromScout(getScoutObject().getRootNode());
+    setSelectionFromScout(getScoutObject().getSelectedNodes());
+    setKeyStrokesFromScout();
+    // add checkable key mappings
+    if (getScoutObject().isCheckable()) {
+      getSwingTree().getInputMap(JComponent.WHEN_FOCUSED).put(SwingUtility.createKeystroke("SPACE"), "toggleRow");
+      getSwingTree().getActionMap().put("toggleRow", new AbstractAction() {
+        private static final long serialVersionUID = 1L;
 
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            handleSwingNodeClick(getSwingTree().getSelectionPath());
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          handleSwingNodeClick(getSwingTree().getSelectionPath());
+        }
+      });
+    }
+    //handle events from recent history
+    final IEventHistory<TreeEvent> h = getScoutObject().getEventHistory();
+    if (h != null) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          for (TreeEvent e : h.getRecentEvents()) {
+            handleScoutTreeEventInSwing(e);
           }
-        });
-      }
+        }
+      });
     }
   }
 
@@ -1006,9 +1023,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       m_pressedLocation = e.getPoint();
       e.getComponent().requestFocus();
       if (e.isMetaDown()) {
-          TreePath path = getPathForLocation(e.getPoint().x, e.getPoint().y);
-          ensurePathSelected(path);
-        }
+        TreePath path = getPathForLocation(e.getPoint().x, e.getPoint().y);
+        ensurePathSelected(path);
+      }
       // Mac popup
       if (e.isPopupTrigger()) {
         handleSwingNodePopup(e);

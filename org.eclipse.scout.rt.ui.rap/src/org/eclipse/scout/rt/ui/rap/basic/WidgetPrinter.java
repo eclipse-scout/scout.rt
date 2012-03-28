@@ -17,35 +17,43 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 
 public class WidgetPrinter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(WidgetPrinter.class);
 
-  private Control m_uiWidget;
+  private Control m_widget;
 
-  public WidgetPrinter(Control uiWidget) {
-    m_uiWidget = uiWidget;
+  private File m_printedFile;
+
+  public WidgetPrinter(Control w) {
+    m_widget = w;
   }
 
   public void print(PrintDevice device, Map<String, Object> parameters) throws Throwable {
-    //XXX rap
-    /*
     if (device == PrintDevice.File) {
       printToFile(createImage(), parameters);
     }
     else if (device == PrintDevice.Printer) {
+      /*
       printToPrinter(createImage(), parameters);
+       */
     }
-    */
+  }
+
+  public File getOutputFile() {
+    return m_printedFile;
   }
 
   private void printToFile(Image image, Map<String, Object> parameters) throws Throwable {
-    File file = (File) parameters.remove("file");
-    if (file == null) {
+    m_printedFile = (File) parameters.remove("file");
+    if (m_printedFile == null) {
       throw new IllegalArgumentException("parameter \"file\" must not be null");
     }
     String contentType = (String) parameters.remove("contentType");
@@ -59,20 +67,17 @@ public class WidgetPrinter {
       LOG.warn("Unknown parameter: " + n + "=" + parameters.get(n));
     }
     //
-    File tmpFile = new File(file.getAbsolutePath() + ".tmp");
+    File tmpFile = new File(m_printedFile.getAbsolutePath() + ".tmp");
     tmpFile.getParentFile().mkdirs();
     //
     ImageLoader imageLoader = new ImageLoader();
     imageLoader.data = new ImageData[]{image.getImageData()};
     imageLoader.save(tmpFile.getAbsolutePath(), SWT.IMAGE_JPEG);
-    if (image != null && !image.isDisposed() && image.getDevice() != null) {
-      image.dispose();
-    }
-    file.delete();
-    tmpFile.renameTo(file);
+    image.dispose();
+    m_printedFile.delete();
+    tmpFile.renameTo(m_printedFile);
   }
 
-//XXX rap
   /*
   private void printToPrinter(Image image, Map<String, Object> parameters) throws Throwable {
     @SuppressWarnings("unused")
@@ -100,27 +105,26 @@ public class WidgetPrinter {
         printer.dispose();
       }
     }
-  }*/
+  }
+  */
 
-  /*
-   * //XXX rap
   private Image createImage() {
-    Rectangle bounds = m_uiWidget.getBounds();
+    Rectangle bounds = m_widget.getBounds();
     int x = 0;
     int y = 0;
-    if (m_uiWidget instanceof Shell) {
-      Rectangle ca = ((Shell) m_uiWidget).getClientArea();
+    if (m_widget instanceof Shell) {
+      Rectangle ca = ((Shell) m_widget).getClientArea();
       x = (bounds.width - ca.width) / 2;
       y = (bounds.height - ca.height) - x;
     }
-    GC gc = new GC(m_uiWidget);
-    Image image = new Image(m_uiWidget.getDisplay(), bounds.width, bounds.height);
-    gc.copyArea(image, -x, -y);
+    GC gc = new GC(m_widget);
+    Image image = new Image(m_widget.getDisplay(), bounds.width, bounds.height);
+    gc.drawImage(image, -x, -y);
     gc.dispose();
     return image;
-  }*/
-/*
- *
+  }
+
+  /*
   private class DefaultPrintable {
     public void print(Printer printer, Image image) {
       if (printer.startPage()) {
@@ -135,7 +139,7 @@ public class WidgetPrinter {
           int topMargin = 0 * dpi.y + (-trim.y);
           int bottomMargin = 0 * dpi.y + (trim.y + trim.height);
           Rectangle drawBounds = new Rectangle(leftMargin, topMargin, clientArea.width - leftMargin - rightMargin, clientArea.height - topMargin - bottomMargin);
-          Rectangle widgetBounds = m_uiWidget.getBounds();
+          Rectangle widgetBounds = m_widget.getBounds();
           //
           double scaleX = 1.0 * drawBounds.width / Math.max(1, widgetBounds.width);
           double scaleY = 1.0 * drawBounds.height / Math.max(1, widgetBounds.height);
@@ -149,5 +153,5 @@ public class WidgetPrinter {
       }
     }
   }
-*/
+  */
 }

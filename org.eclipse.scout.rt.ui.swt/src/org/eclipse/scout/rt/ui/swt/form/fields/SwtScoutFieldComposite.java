@@ -97,7 +97,6 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       setFontFromScout(getScoutObject().getFont());
       setSaveNeededFromScout(getScoutObject().isSaveNeeded());
       setFocusableFromScout(getScoutObject().isFocusable());
-      setFocusRequestedFromScout(getScoutObject().fetchFocusRequested());
       updateKeyStrokesFromScout();
     }
   }
@@ -342,16 +341,6 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     }
   }
 
-  protected void setFocusRequestedFromScout(boolean b) {
-    if (getSwtField() != null) {
-      if (getSwtField().isVisible()) {
-        if (b) {
-          getSwtField().setFocus();
-        }
-      }
-    }
-  }
-
   //runs in scout job
   @Override
   protected boolean isHandleScoutPropertyChange(final String name, final Object newValue) {
@@ -376,10 +365,6 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     }
     else if (name.equals(IFormField.PROP_FOCUSABLE)) {
       setFocusableFromScout(((Boolean) newValue).booleanValue());
-    }
-    else if (name.equals(IFormField.PROP_FOCUS_REQUESTED)) {
-      getScoutObject().fetchFocusRequested();
-      setFocusRequestedFromScout(((Boolean) newValue).booleanValue());
     }
     else if (name.equals(IFormField.PROP_LABEL)) {
       setLabelFromScout((String) newValue);
