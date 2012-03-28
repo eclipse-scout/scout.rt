@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing.basic.tree;
 
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -691,7 +692,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     }
     //
     if (getScoutObject() != null) {
-      TreePath path = getSwingTree().getPathForLocation(e.getX(), e.getY());
+      TreePath path = getPathForLocation(e.getX(), e.getY());
+      ensurePathSelected(path);
+
       final ITreeNode node = path != null ? (ITreeNode) path.getLastPathComponent() : null;
       // notify Scout
       Runnable t = new Runnable() {
@@ -719,6 +722,8 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     }
     //
     if (getScoutObject() != null) {
+      ensurePathSelected(path);
+
       final ITreeNode scoutNode = treePathToScoutNode(path);
       if (scoutNode != null) {
         // notify Scout
@@ -733,6 +738,32 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         // end notify
       }
     }
+  }
+
+  /**
+   * @param path
+   *          the {@link TreePath} to be selected if it isn't selected yet
+   */
+  private void ensurePathSelected(TreePath path) {
+    if (path != null && !getSwingTree().isPathSelected(path)) {
+      getSwingTree().setSelectionPath(path);
+    }
+  }
+
+  /**
+   * Returns the path to the node thats path bounds ({@link javax.swing.JTree#getPathBounds(TreePath)}) contains the
+   * given x,y coordinates. Thereby the empty space on the left and right side of nodes will be considered too.
+   * 
+   * @see javax.swing.JTree#getClosestPathForLocation(int, int)
+   */
+  private TreePath getPathForLocation(int x, int y) {
+    TreePath closestPath = getSwingTree().getClosestPathForLocation(x, y);
+    Rectangle pathBounds = getSwingTree().getPathBounds(closestPath);
+    TreePath path = null;
+    if (pathBounds.contains(pathBounds.x, y)) {
+      path = closestPath;
+    }
+    return path;
   }
 
   protected void handleSwingNodeAction(TreePath path) {
@@ -975,11 +1006,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       m_pressedLocation = e.getPoint();
       e.getComponent().requestFocus();
       if (e.isMetaDown()) {
-        TreePath path = getSwingTree().getPathForLocation(e.getPoint().x, e.getPoint().y);
-        if (path != null && !getSwingTree().isPathSelected(path)) {
-          getSwingTree().setSelectionPath(path);
+          TreePath path = getPathForLocation(e.getPoint().x, e.getPoint().y);
+          ensurePathSelected(path);
         }
-      }
       // Mac popup
       if (e.isPopupTrigger()) {
         handleSwingNodePopup(e);
@@ -1011,7 +1040,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
       if (e.getButton() == MouseEvent.BUTTON1) {
         if (e.getClickCount() == 1) {
           // ticket 86377
-          TreePath path = getSwingTree().getPathForLocation(m_pressedLocation.x, m_pressedLocation.y);
+          TreePath path = getPathForLocation(m_pressedLocation.x, m_pressedLocation.y);
           if (path != null) {
             // no click on +/- icon
             if (e.getPoint().x >= getSwingTree().getPathBounds(path).x) {
@@ -1021,8 +1050,16 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         }
         else if (e.getClickCount() == 2) {
           // ticket 86377
-          TreePath path = getSwingTree().getPathForLocation(m_pressedLocation.x, m_pressedLocation.y);
+          TreePath path = getPathForLocation(m_pressedLocation.x, m_pressedLocation.y);
           if (path != null) {
+            Rectangle pathBounds = getSwingTree().getPathBounds(path);
+            if (m_pressedLocation.x > pathBounds.x + pathBounds.width) {
+              // double click in the empty space on the right side of a node.
+              // in this case we have to do the default double click behavior manually, because
+              // JTree only supports double clicks on the node itself and not in the empty space.
+              getSwingTree().toggleExpandState(path);
+            }
+
             handleSwingNodeAction(path);
           }
         }
