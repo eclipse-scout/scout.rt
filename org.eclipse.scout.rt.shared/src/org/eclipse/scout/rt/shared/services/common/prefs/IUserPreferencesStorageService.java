@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.prefs;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.service.IService;
+import org.osgi.service.prefs.Preferences;
 
 /**
  *
@@ -24,19 +24,10 @@ import org.eclipse.scout.service.IService;
 public interface IUserPreferencesStorageService extends IService {
 
   /**
-   * Stores UI Preferences (Windows, Column widths, Table Customizers, ...) on persistent data store.
-   * Method is called on any UI change.
-   * 
-   * @param data
-   *          preferences data
-   */
-  void storePreferences(IEclipsePreferences data);
-
-  /**
    * Loads UI Preferences (Windows, Column widths, Table Customizers, ...) from persistent data store.
    * Method is called on any UI change.
    * 
    * @return preferences data
    */
-  IEclipsePreferences loadPreferences();
+  Preferences loadPreferences();
 }
