@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Control;
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
  */
-public class RwtScoutViewButtonBar extends RwtScoutComposite<IDesktop> {
+public class RwtScoutViewButtonBar extends RwtScoutComposite<IDesktop> implements IRwtScoutViewButtonBar<IDesktop> {
 
   private static final String VARIANT_TOOLBAR_CONTAINER = "toolbarContainer";
   private static final String VARIANT_TOOLBAR_MENU_BUTTON = "menuButton";

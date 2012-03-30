@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Layout;
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
  */
-public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> implements IRwtScoutToolbar {
+public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> implements IRwtScoutToolbar<IDesktop> {
 
   private static final String VARIANT_TOOL_BUTTON_BAR = "toolButtonBar";
   private static final String VARIANT_TOOL_BUTTON_BAR_ACTIVE = "toolButtonBar-active";
@@ -69,6 +69,7 @@ public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> implements IRwt
     }
   }
 
+  @Override
   public void handleRightViewPositionChanged(int rightViewX) {
     if (getUiToolButtonBar() == null) {
       return;
@@ -118,11 +119,11 @@ public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> implements IRwt
     return m_uiToolButtonBar.getUiContainer();
   }
 
-  public RwtScoutViewButtonBar getUiViewButtonBar() {
+  public IRwtScoutViewButtonBar getUiViewButtonBar() {
     return m_uiViewButtonBar;
   }
 
-  public RwtScoutToolButtonBar getUiToolButtonBar() {
+  public IRwtScoutToolButtonBar getUiToolButtonBar() {
     return m_uiToolButtonBar;
   }
 }

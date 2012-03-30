@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Label;
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
  */
-public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> {
+public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implements IRwtScoutToolButtonBar<IDesktop> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutToolButtonBar.class);
 
   private static final String VARIANT_TOOL_BUTTON_BAR = "toolButtonBar";

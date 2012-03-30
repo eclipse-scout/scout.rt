@@ -19,6 +19,8 @@ import org.eclipse.scout.rt.ui.rap.IRwtStandaloneEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.core.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.core.window.desktop.IRwtDesktop;
+import org.eclipse.scout.rt.ui.rap.core.window.desktop.IRwtScoutToolbar;
+import org.eclipse.scout.rt.ui.rap.core.window.desktop.IViewArea;
 import org.eclipse.scout.rt.ui.rap.core.window.desktop.viewarea.ILayoutListener;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.desktop.toolbar.RwtScoutToolbar;
@@ -133,12 +135,12 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   }
 
   @Override
-  public RwtScoutToolbar getUiToolbar() {
+  public IRwtScoutToolbar getUiToolbar() {
     return m_uiToolbar;
   }
 
   @Override
-  public ViewArea getViewArea() {
+  public IViewArea getViewArea() {
     return m_viewArea;
   }
 

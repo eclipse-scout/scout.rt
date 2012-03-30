@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.core.window.desktop;
+package org.eclipse.scout.rt.ui.rap.window.desktop.toolbar;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
@@ -16,8 +16,6 @@ import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
 /**
  * @since 3.8.0
  */
-public interface IRwtScoutToolbar<T extends IPropertyObserver> extends IRwtScoutComposite<T> {
-
-  void handleRightViewPositionChanged(int rightViewX);
+public interface IRwtScoutToolButtonBar<T extends IPropertyObserver> extends IRwtScoutComposite<T> {
 
 }
