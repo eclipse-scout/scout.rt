@@ -297,6 +297,126 @@ public final class BookmarkUtility {
     }
   }
 
+  /**
+   * Constructs a list of {@link TableColumnState} objects which
+   * describe the set of columns of the given {@link ITable}.
+   * 
+   * @param table
+   *          The table with the columns to back-up.
+   * @return A {@link List} of {@link TableColumnState} objects that
+   *         can be restored via {@link #restoreTableColumns(ITable, List)}
+   */
+  public static List<TableColumnState> backupTableColumns(ITable table) {
+    ArrayList<TableColumnState> allColumns = new ArrayList<TableColumnState>();
+    ColumnSet columnSet = table.getColumnSet();
+    //add all columns but in user order
+    for (IColumn<?> c : columnSet.getAllColumnsInUserOrder()) {
+      TableColumnState colState = new TableColumnState();
+      colState.setColumnClassName(c.getColumnId());
+      colState.setDisplayable(c.isDisplayable());
+      colState.setVisible(c.isDisplayable() && c.isVisible());
+      colState.setWidth(c.getWidth());
+      if (columnSet.isUserSortColumn(c) && c.isSortExplicit()) {
+        int sortOrder = columnSet.getSortColumnIndex(c);
+        if (sortOrder >= 0) {
+          colState.setSortOrder(sortOrder);
+          colState.setSortAscending(c.isSortAscending());
+        }
+        else {
+          colState.setSortOrder(-1);
+        }
+      }
+      if (table.getColumnFilterManager() != null && c.isColumnFilterActive()) {
+        colState.setColumnFilterData(table.getColumnFilterManager().getSerializedFilter(c));
+      }
+      allColumns.add(colState);
+    }
+    return allColumns;
+  }
+
+  /**
+   * Restores a tables columns from the given list of {@link TableColumnState} objects.
+   * 
+   * @param table
+   *          The table to be restored.
+   * @param oldColumns
+   *          A {@link List} of {@link TableColumnState} objects to
+   *          restore. Such can be retrieved by the {@link #backupTableColumns(ITable)} method.
+   */
+  public static void restoreTableColumns(ITable table, List<TableColumnState> oldColumns) throws ProcessingException {
+    if (oldColumns != null && oldColumns.size() > 0 && table != null) {
+      ColumnSet columnSet = table.getColumnSet();
+      // visible columns and width
+      ArrayList<IColumn> visibleColumns = new ArrayList<IColumn>();
+      for (TableColumnState colState : oldColumns) {
+        //legacy support: null=true
+        if (colState.getVisible() == null || colState.getVisible()) {
+          IColumn col = resolveColumn(columnSet.getDisplayableColumns(), colState.getClassName());
+          if (col != null && col.isDisplayable()) {
+            if (colState.getWidth() > 0) {
+              col.setWidth(colState.getWidth());
+            }
+            visibleColumns.add(col);
+          }
+        }
+      }
+      List<IColumn> existingVisibleCols = Arrays.asList(columnSet.getVisibleColumns());
+      if (!existingVisibleCols.equals(visibleColumns)) {
+        columnSet.setVisibleColumns(visibleColumns.toArray(new IColumn[0]));
+      }
+      // filters
+      if (table.getColumnFilterManager() != null) {
+        // If a column filter was set, but did not have one before
+        // the change, it will not be reset.
+        // So reset all column filters beforehand:
+        table.getColumnFilterManager().reset();
+        for (TableColumnState colState : oldColumns) {
+          if (colState.getColumnFilterData() != null) {
+            IColumn col = BookmarkUtility.resolveColumn(columnSet.getColumns(), colState.getClassName());
+            if (col != null) {
+              table.getColumnFilterManager().setSerializedFilter(colState.getColumnFilterData(), col);
+            }
+          }
+        }
+      }
+      //sort order (only respect visible and user-sort columns)
+      boolean userSortValid = true;
+      TreeMap<Integer, IColumn> sortColMap = new TreeMap<Integer, IColumn>();
+      HashMap<IColumn, Boolean> sortColAscMap = new HashMap<IColumn, Boolean>();
+      for (TableColumnState colState : oldColumns) {
+        if (colState.getSortOrder() >= 0) {
+          IColumn col = BookmarkUtility.resolveColumn(columnSet.getColumns(), colState.getClassName());
+          if (col != null) {
+            sortColMap.put(colState.getSortOrder(), col);
+            sortColAscMap.put(col, colState.isSortAscending());
+            if (col.getSortIndex() != colState.getSortOrder()) {
+              userSortValid = false;
+            }
+            if (col.isSortAscending() != colState.isSortAscending()) {
+              userSortValid = false;
+            }
+          }
+        }
+      }
+      HashSet<IColumn<?>> existingExplicitUserSortCols = new HashSet<IColumn<?>>();
+      for (IColumn<?> c : columnSet.getUserSortColumns()) {
+        if (c.isSortExplicit()) {
+          existingExplicitUserSortCols.add(c);
+        }
+      }
+      if (!sortColMap.values().containsAll(existingExplicitUserSortCols)) {
+        userSortValid = false;
+      }
+      if (!userSortValid) {
+        columnSet.clearSortColumns();
+        for (IColumn col : sortColMap.values()) {
+          columnSet.addSortColumn(col, sortColAscMap.get(col));
+        }
+        table.sort();
+      }
+    }
+  }
+
   public static Bookmark createBookmark(IDesktop desktop) throws ProcessingException {
     IOutline outline = desktop.getOutline();
     if (outline == null) {
@@ -423,7 +543,6 @@ public final class BookmarkUtility {
     }
     // starts search form
     tablePage.getSearchFilter();
-    ColumnSet cs = table.getColumnSet();
     // setup table
     try {
       table.setTableChanging(true);
@@ -432,72 +551,7 @@ public final class BookmarkUtility {
       if (allColumns == null || allColumns.size() == 0) {
         allColumns = tablePageState.getAvailableColumns();
       }
-      if (allColumns != null && allColumns.size() > 0) {
-        // visible columns and width
-        ArrayList<IColumn> visibleColumns = new ArrayList<IColumn>();
-        for (TableColumnState colState : allColumns) {
-          //legacy support: null=true
-          if (colState.getVisible() == null || colState.getVisible()) {
-            IColumn col = resolveColumn(cs.getDisplayableColumns(), colState.getClassName());
-            if (col != null && col.isDisplayable()) {
-              if (colState.getWidth() > 0) {
-                col.setWidth(colState.getWidth());
-              }
-              visibleColumns.add(col);
-            }
-          }
-        }
-        List<IColumn> existingVisibleCols = Arrays.asList(cs.getVisibleColumns());
-        if (!existingVisibleCols.equals(visibleColumns)) {
-          cs.setVisibleColumns(visibleColumns.toArray(new IColumn[0]));
-        }
-        // filters
-        if (tablePage.getTable().getColumnFilterManager() != null) {
-          for (TableColumnState colState : allColumns) {
-            if (colState.getColumnFilterData() != null) {
-              IColumn col = BookmarkUtility.resolveColumn(cs.getColumns(), colState.getClassName());
-              if (col != null) {
-                tablePage.getTable().getColumnFilterManager().setSerializedFilter(colState.getColumnFilterData(), col);
-              }
-            }
-          }
-        }
-        //sort order (only respect visible and user-sort columns)
-        boolean userSortValid = true;
-        TreeMap<Integer, IColumn> sortColMap = new TreeMap<Integer, IColumn>();
-        HashMap<IColumn, Boolean> sortColAscMap = new HashMap<IColumn, Boolean>();
-        for (TableColumnState colState : allColumns) {
-          if (colState.getSortOrder() >= 0) {
-            IColumn col = BookmarkUtility.resolveColumn(cs.getColumns(), colState.getClassName());
-            if (col != null) {
-              sortColMap.put(colState.getSortOrder(), col);
-              sortColAscMap.put(col, colState.isSortAscending());
-              if (col.getSortIndex() != colState.getSortOrder()) {
-                userSortValid = false;
-              }
-              if (col.isSortAscending() != colState.isSortAscending()) {
-                userSortValid = false;
-              }
-            }
-          }
-        }
-        HashSet<IColumn<?>> existingExplicitUserSortCols = new HashSet<IColumn<?>>();
-        for (IColumn<?> c : cs.getUserSortColumns()) {
-          if (c.isSortExplicit()) {
-            existingExplicitUserSortCols.add(c);
-          }
-        }
-        if (!sortColMap.values().containsAll(existingExplicitUserSortCols)) {
-          userSortValid = false;
-        }
-        if (!userSortValid) {
-          cs.clearSortColumns();
-          for (IColumn col : sortColMap.values()) {
-            cs.addSortColumn(col, sortColAscMap.get(col));
-          }
-          table.sort();
-        }
-      }
+      restoreTableColumns(tablePage.getTable(), allColumns);
     }
     finally {
       table.setTableChanging(false);
@@ -592,7 +646,6 @@ public final class BookmarkUtility {
 
   private static TablePageState bmStoreTablePage(IPageWithTable page, IPage childPage) throws ProcessingException {
     ITable table = page.getTable();
-    ColumnSet cs = table.getColumnSet();
     TablePageState state = new TablePageState();
     state.setPageClassName(page.getClass().getName());
     state.setBookmarkIdentifier(page.getUserPreferenceContext());
@@ -606,29 +659,7 @@ public final class BookmarkUtility {
     if (page.getTable().getTableCustomizer() != null) {
       state.setTableCustomizerData(page.getTable().getTableCustomizer().getSerializedData());
     }
-    ArrayList<TableColumnState> allColumns = new ArrayList<TableColumnState>();
-    //add all columns but in user order
-    for (IColumn<?> c : cs.getAllColumnsInUserOrder()) {
-      TableColumnState colState = new TableColumnState();
-      colState.setColumnClassName(c.getColumnId());
-      colState.setDisplayable(c.isDisplayable());
-      colState.setVisible(c.isDisplayable() && c.isVisible());
-      colState.setWidth(c.getWidth());
-      if (cs.isUserSortColumn(c) && c.isSortExplicit()) {
-        int sortOrder = cs.getSortColumnIndex(c);
-        if (sortOrder >= 0) {
-          colState.setSortOrder(sortOrder);
-          colState.setSortAscending(c.isSortAscending());
-        }
-        else {
-          colState.setSortOrder(-1);
-        }
-      }
-      if (page.getTable().getColumnFilterManager() != null && c.isColumnFilterActive()) {
-        colState.setColumnFilterData(page.getTable().getColumnFilterManager().getSerializedFilter(c));
-      }
-      allColumns.add(colState);
-    }
+    List<TableColumnState> allColumns = backupTableColumns(page.getTable());
     state.setAvailableColumns(allColumns);
     //
     ArrayList<CompositeObject> pkList = new ArrayList<CompositeObject>();

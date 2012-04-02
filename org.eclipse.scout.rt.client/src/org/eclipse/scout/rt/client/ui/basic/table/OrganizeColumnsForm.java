@@ -11,6 +11,7 @@ import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
@@ -63,7 +64,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.DeleteCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
-import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.eclipse.scout.rt.shared.services.common.bookmark.TableColumnState;
 
 public class OrganizeColumnsForm extends AbstractForm {
 
@@ -1151,12 +1152,13 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   public class ModifyHandler extends AbstractFormHandler {
 
-    private Bookmark tableState;
+    private List<TableColumnState> m_oldColumns;
 
     @Override
     protected void execLoad() throws ProcessingException {
-      // save original state
-      tableState = getDesktop().createBookmark();
+      // Back-up the current columns so we may restore them if
+      // the "organize columns" form is canceled:
+      m_oldColumns = BookmarkUtility.backupTableColumns(m_table);
       getColumnsTableField().reloadTableData();
     }
 
@@ -1175,7 +1177,13 @@ public class OrganizeColumnsForm extends AbstractForm {
     protected void execFinally() throws ProcessingException {
       if (!isFormStored() && isSaveNeeded()) {
         // revert to original state
-        getDesktop().activateBookmark(tableState, true);
+        try {
+          m_table.setTableChanging(true);
+          BookmarkUtility.restoreTableColumns(m_table, m_oldColumns);
+        }
+        finally {
+          m_table.setTableChanging(false);
+        }
       }
     }
 
