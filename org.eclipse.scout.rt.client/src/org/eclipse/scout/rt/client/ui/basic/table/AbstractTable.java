@@ -328,7 +328,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     StringBuilder plainText = new StringBuilder();
-    StringBuilder htmlText = new StringBuilder("<html><body><table border=\"0\">");
+    StringBuilder htmlText = new StringBuilder("<html>");
+    // Adding the following MS-office specific style information will cause Excel
+    // to put all line-break-delimited entries of a <td> cell into a single Excel cell,
+    // instead of one sub-cell for each <br />
+    htmlText.append("<head><style type=\"text/css\"> br {mso-data-placement:same-cell;} </style></head>");
+    htmlText.append("<body><table border=\"0\">");
 
     IColumn<?>[] columns = getColumnSet().getVisibleColumns();
     Pattern patternHtmlCheck = Pattern.compile(".*?<\\s*html.*?>.*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
