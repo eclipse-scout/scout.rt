@@ -90,6 +90,7 @@ public class FindShortestUniqueIdVisitor implements IFormFieldVisitor {
       f = f.getParentField();
       path.add(f.getClass().getSimpleName());
     }
+    path.add(f.getForm().getClass().getSimpleName());
     return path.toArray(new String[path.size()]);
   }
 }
