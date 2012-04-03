@@ -106,9 +106,9 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
     m_toolButtonContainer = getUiEnvironment().getFormToolkit().createComposite(toolButtonBar);
     m_toolButtonContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR);
     for (IToolButton scoutButton : getScoutObject().getToolButtons()) {
-//      if (!(scoutButton instanceof AbstractFormToolButton)) {
-//        continue;
-//      }
+      if (!(scoutButton instanceof AbstractFormToolButton)) {
+        continue;
+      }
 
       String simpleClassName = scoutButton.getClass().getSimpleName();
       String variant = VARIANT_TOOL_BUTTON;
