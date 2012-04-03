@@ -89,7 +89,8 @@ import org.eclipse.scout.rt.ui.rap.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartListener;
 import org.eclipse.scout.rt.ui.rap.window.dialog.RwtScoutDialog;
-import org.eclipse.scout.rt.ui.rap.window.filechooser.RwtScoutFileChooser;
+import org.eclipse.scout.rt.ui.rap.window.filechooser.IRwtScoutFileChooser;
+import org.eclipse.scout.rt.ui.rap.window.filechooser.IRwtScoutFileChooserService;
 import org.eclipse.scout.rt.ui.rap.window.filedownloader.RwtScoutDownloadHandler;
 import org.eclipse.scout.rt.ui.rap.window.messagebox.RwtScoutMessageBoxDialog;
 import org.eclipse.scout.rt.ui.rap.window.popup.RwtScoutPopup;
@@ -753,7 +754,12 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   @Override
   public void showFileChooserFromScout(IFileChooser fileChooser) {
-    RwtScoutFileChooser sfc = new RwtScoutFileChooser(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS), fileChooser);
+    IRwtScoutFileChooserService rwtScoutFileChooserService = SERVICES.getService(IRwtScoutFileChooserService.class);
+    if (rwtScoutFileChooserService == null) {
+      LOG.warn("Missing bundle: org.eclipse.scout.rt.ui.rap.incubator.filechooser. Please activate it in your Scout perspective under Technologies.");
+      return;
+    }
+    IRwtScoutFileChooser sfc = rwtScoutFileChooserService.createFileChooser(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS), fileChooser);
     sfc.showFileChooser();
   }
 
