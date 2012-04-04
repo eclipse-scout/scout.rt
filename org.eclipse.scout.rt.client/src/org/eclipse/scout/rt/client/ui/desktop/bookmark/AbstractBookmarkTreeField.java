@@ -823,6 +823,39 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(60)
+    public class UpdateWithCurrentMenu extends AbstractMenu {
+
+      @Override
+      protected String getConfiguredText() {
+        return ScoutTexts.get("UpdateBookmarkMenu");
+      }
+
+      @Override
+      protected void execPrepareAction() throws ProcessingException {
+        // The permission to use the "update bookmark" function
+        // is the same as to delete one:
+        ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
+        ITree tree = getTree();
+        for (ITreeNode node : tree.getSelectedNodes()) {
+          if (isBookmarkNode(node)) {
+            bookmarks.add((Bookmark) node.getCell().getValue());
+          }
+        }
+        setEnabledPermission(getDeletePermission(bookmarks));
+      }
+
+      @Override
+      protected void execAction() throws ProcessingException {
+        ITreeNode node = BookmarkNode.this;
+        Bookmark bm = (Bookmark) node.getCell().getValue();
+
+        IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+        service.updateBookmark(bm);
+        service.storeBookmarks();
+      }
+    }
+
+    @Order(70)
     public class DeleteMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -866,11 +899,11 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
     }
 
-    @Order(70)
+    @Order(80)
     public class SeparatorMenu1 extends MenuSeparator {
     }
 
-    @Order(80)
+    @Order(90)
     public class PublishMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -899,7 +932,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
     }
 
-    @Order(90)
+    @Order(100)
     public class ApplyToSearchMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {

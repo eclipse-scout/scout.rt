@@ -180,6 +180,29 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   }
 
   @Override
+  public void updateBookmark(Bookmark bm) throws ProcessingException {
+
+    // Create a new bookmark from the current view:
+    Bookmark newBookmark = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
+
+    // We want to preserve certain aspects of the old bookmark:
+    int cachedKind = bm.getKind();
+    String cachedIconId = bm.getIconId();
+    String cachedTitle = bm.getTitle();
+    String cachedKeyStroke = bm.getKeyStroke();
+
+    // Fill the old bookmark with the data from the new one:
+    bm.setSerializedData(newBookmark.getSerializedData());
+    // "setSerializedData" overwrites all attributes - restore them from the old bookmark:
+    bm.setKind(cachedKind);
+    bm.setIconId(cachedIconId);
+    bm.setTitle(cachedTitle);
+    bm.setKeyStroke(cachedKeyStroke);
+    // The bookmark's "text" should not be preserved - it is not editable by
+    // the user and the only way to tell what the bookmark does.
+  }
+
+  @Override
   public void addBookmarkServiceListener(BookmarkServiceListener listener) {
     ServiceState state = getServiceState();
     state.m_listenerList.add(BookmarkServiceListener.class, listener);
