@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
@@ -741,41 +740,15 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
           disposeMenuItem(item);
         }
       }
-      // TODO clean this code with context node
-      if (getScoutObject() != null && isEnabledFromScout()) {
-        final boolean emptySpace = (getSwtField().getContextItem() == null);
-        final Holder<IMenu[]> menusHolder = new Holder<IMenu[]>(IMenu[].class);
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            if (emptySpace) {
-              menusHolder.setValue(getScoutObject().getUIFacade().fireEmptySpacePopupFromUI());
-            }
-            else {
-              menusHolder.setValue(getScoutObject().getUIFacade().fireNodePopupFromUI());
-            }
-          }
-        };
-        JobEx job = getEnvironment().invokeScoutLater(t, 1200);
-        try {
-          job.join(1200);
-        }
-        catch (InterruptedException ex) {
-          //nop
-        }
-        // grab the actions out of the job, when the actions are providden within
-        // the scheduled time the popup will be handled.
-        if (menusHolder.getValue() != null) {
-          SwtMenuUtility.fillContextMenu(menusHolder.getValue(), m_contextMenu, getEnvironment());
-        }
-      }
-    }
 
-    @Override
-    public void menuHidden(MenuEvent e) {
-      // for(MenuItem item : m_contextMenu.getItems()){
-      // disposeMenuItem(item);
-      // }
+      if (getScoutObject() == null || !isEnabledFromScout()) {
+        return;
+      }
+
+      final boolean emptySpace = (getSwtField().getContextItem() == null);
+      IMenu[] menus = SwtMenuUtility.collectMenus(getScoutObject(), emptySpace, !emptySpace, getEnvironment());
+
+      SwtMenuUtility.fillContextMenu(menus, m_contextMenu, getEnvironment());
     }
 
     private void disposeMenuItem(MenuItem item) {

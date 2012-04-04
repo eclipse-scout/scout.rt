@@ -32,7 +32,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
@@ -802,34 +801,16 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
-      if (getScoutObject() != null && isEnabledFromScout()) {
-        final boolean emptySpace = (getUiField().getContextItem() == null);
-        final Holder<IMenu[]> menusHolder = new Holder<IMenu[]>(IMenu[].class);
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            if (emptySpace) {
-              menusHolder.setValue(getScoutObject().getUIFacade().fireEmptySpacePopupFromUI());
-            }
-            else {
-              menusHolder.setValue(getScoutObject().getUIFacade().fireNodePopupFromUI());
-            }
-          }
-        };
-        JobEx job = RwtScoutTree.this.getUiEnvironment().invokeScoutLater(t, 1200);
-        try {
-          job.join(1200);
-        }
-        catch (InterruptedException ex) {
-          //nop
-        }
-        // grab the actions out of the job, when the actions are providden within
-        // the scheduled time the popup will be handled.
-        if (menusHolder.getValue() != null) {
-          RwtMenuUtility.fillContextMenu(menusHolder.getValue(), RwtScoutTree.this.getUiEnvironment(), m_contextMenu);
-        }
+      if (getScoutObject() == null || !isEnabledFromScout()) {
+        return;
       }
+
+      final boolean emptySpace = (getUiField().getContextItem() == null);
+      IMenu[] menus = RwtMenuUtility.collectMenus(getScoutObject(), emptySpace, !emptySpace, getUiEnvironment());
+
+      RwtMenuUtility.fillContextMenu(menus, getUiEnvironment(), m_contextMenu);
     }
+
   } // end class P_ContextMenuListener
 
   private class P_DndSupport extends AbstractRwtScoutDndSupport {

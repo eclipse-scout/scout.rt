@@ -41,7 +41,6 @@ public class RwtScoutGroupBoxButtonbar implements IRwtScoutGroupBoxButtonbar {
     m_uiEnvironment = (IRwtEnvironment) uiEnvironment;
     m_container = getUiEnvironment().getFormToolkit().createComposite(parent);
     m_container.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_GROUP_BOX_BUTTON_BAR);
-//    m_container.setBackground(m_container.getDisplay().getSystemColor(SWT.COLOR_BLUE));
     m_leftPart = getUiEnvironment().getFormToolkit().createComposite(m_container);
     m_rightPart = getUiEnvironment().getFormToolkit().createComposite(m_container);
 

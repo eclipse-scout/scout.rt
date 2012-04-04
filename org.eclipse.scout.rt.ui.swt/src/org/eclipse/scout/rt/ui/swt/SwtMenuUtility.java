@@ -4,24 +4,30 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutAction;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutCheckboxMenu;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuAction;
@@ -150,6 +156,72 @@ public final class SwtMenuUtility {
     else {
       new SwtScoutMenuAction(menu, scoutActionNode, environment);
     }
+  }
+
+  public static IMenu[] collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, ISwtEnvironment uiEnvironment) {
+    final List<IMenu> menuList = new LinkedList<IMenu>();
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        if (emptySpaceActions) {
+          menuList.addAll(Arrays.asList(tree.getUIFacade().fireEmptySpacePopupFromUI()));
+        }
+        if (nodeActions) {
+          menuList.addAll(Arrays.asList(tree.getUIFacade().fireNodePopupFromUI()));
+        }
+      }
+    };
+
+    JobEx job = uiEnvironment.invokeScoutLater(t, 5000);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      LOG.warn("Exception occured while collecting menus.", ex);
+    }
+
+    return menuList.toArray(new IMenu[menuList.size()]);
+  }
+
+  public static IMenu[] collectMenus(final ITable table, final boolean emptySpaceActions, final boolean rowActions, ISwtEnvironment uiEnvironment) {
+    final List<IMenu> menuList = new LinkedList<IMenu>();
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        if (emptySpaceActions) {
+          menuList.addAll(Arrays.asList(table.getUIFacade().fireEmptySpacePopupFromUI()));
+        }
+        if (rowActions) {
+          menuList.addAll(Arrays.asList(table.getUIFacade().fireRowPopupFromUI()));
+        }
+      }
+    };
+
+    JobEx job = uiEnvironment.invokeScoutLater(t, 5000);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      LOG.warn("Exception occured while collecting menus.", ex);
+    }
+
+    return menuList.toArray(new IMenu[menuList.size()]);
+  }
+
+  public static IMenu[] collectRowMenus(final ITable table, ISwtEnvironment uiEnvironment) {
+    return collectMenus(table, false, true, uiEnvironment);
+  }
+
+  public static IMenu[] collectEmptySpaceMenus(final ITable table, ISwtEnvironment uiEnvironment) {
+    return collectMenus(table, true, false, uiEnvironment);
+  }
+
+  public static IMenu[] collectNodeMenus(final ITree tree, ISwtEnvironment uiEnvironment) {
+    return collectMenus(tree, false, true, uiEnvironment);
+  }
+
+  public static IMenu[] collectEmptySpaceMenus(final ITree tree, ISwtEnvironment uiEnvironment) {
+    return collectMenus(tree, true, false, uiEnvironment);
   }
 
 }

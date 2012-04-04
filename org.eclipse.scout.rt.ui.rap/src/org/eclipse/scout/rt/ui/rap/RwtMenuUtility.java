@@ -188,7 +188,7 @@ public final class RwtMenuUtility {
       }
     };
 
-    JobEx job = uiEnvironment.invokeScoutLater(t, 1200);
+    JobEx job = uiEnvironment.invokeScoutLater(t, 5000);
     try {
       job.join(1200);
     }
@@ -213,7 +213,7 @@ public final class RwtMenuUtility {
       }
     };
 
-    JobEx job = uiEnvironment.invokeScoutLater(t, 1200);
+    JobEx job = uiEnvironment.invokeScoutLater(t, 5000);
     try {
       job.join(1200);
     }

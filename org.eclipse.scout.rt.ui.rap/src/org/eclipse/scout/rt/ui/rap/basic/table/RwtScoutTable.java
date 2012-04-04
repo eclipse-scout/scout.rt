@@ -1217,30 +1217,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       super.menuShown(e);
 
       final boolean emptySelection = getUiTableViewer().getSelection().isEmpty();
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          if (emptySelection) {
-            scoutMenusRef.set(getScoutObject().getUIFacade().fireEmptySpacePopupFromUI());
-          }
-          else {
-            scoutMenusRef.set(getScoutObject().getUIFacade().fireRowPopupFromUI());
-          }
-        }
-      };
-      JobEx job = RwtScoutTable.this.getUiEnvironment().invokeScoutLater(t, 1200);
-      try {
-        job.join(1200);
-      }
-      catch (InterruptedException ex) {
-        //nop
-      }
-      // grab the actions out of the job, when the actions are providden
-      // within the scheduled time the popup will be handled.
-      if (scoutMenusRef.get() != null) {
-        RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), RwtScoutTable.this.getUiEnvironment(), m_contextMenu);
-      }
+      IMenu[] menus = RwtMenuUtility.collectMenus(getScoutObject(), emptySelection, !emptySelection, getUiEnvironment());
+
+      RwtMenuUtility.fillContextMenu(menus, getUiEnvironment(), m_contextMenu);
     }
 
   } // end class P_ContextMenuListener

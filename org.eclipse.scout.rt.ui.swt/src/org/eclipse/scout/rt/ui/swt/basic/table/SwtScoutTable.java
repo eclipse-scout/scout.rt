@@ -1161,31 +1161,11 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           disposeMenuItem(item);
         }
       }
+
       final boolean emptySelection = getSwtTableViewer().getSelection().isEmpty();
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          if (emptySelection) {
-            scoutMenusRef.set(getScoutObject().getUIFacade().fireEmptySpacePopupFromUI());
-          }
-          else {
-            scoutMenusRef.set(getScoutObject().getUIFacade().fireRowPopupFromUI());
-          }
-        }
-      };
-      JobEx job = getEnvironment().invokeScoutLater(t, 1200);
-      try {
-        job.join(1200);
-      }
-      catch (InterruptedException ex) {
-        //nop
-      }
-      // grab the actions out of the job, when the actions are providden
-      // within the scheduled time the popup will be handled.
-      if (scoutMenusRef.get() != null) {
-        SwtMenuUtility.fillContextMenu(scoutMenusRef.get(), m_contextMenu, getEnvironment());
-      }
+      IMenu[] menus = SwtMenuUtility.collectMenus(getScoutObject(), emptySelection, !emptySelection, getEnvironment());
+
+      SwtMenuUtility.fillContextMenu(menus, m_contextMenu, getEnvironment());
     }
 
     private void disposeMenuItem(MenuItem item) {
