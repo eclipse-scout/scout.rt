@@ -106,6 +106,21 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     return 1800000L;
   }
 
+  /**
+   * Indicates whether this ActivityMap should draw the
+   * red and green bordered rectangle sections
+   * around the area selected by the mouse.
+   * 
+   * @return true if the colored sections should be displayed,
+   *         false if not. Default is true.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(140)
+  @ConfigPropertyValue("true")
+  protected boolean getConfiguredDrawSections() {
+    return true;
+  }
+
   private Class<? extends IMenu>[] getConfiguredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(dca, IMenu.class);
@@ -191,6 +206,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
     setIntradayInterval(getConfiguredIntradayInterval());
     setMinimumActivityDuration(getConfiguredMinimumActivityDuration());
     setLastHourOfDay(getConfiguredLastHourOfDay());
+    setDrawSections(getConfiguredDrawSections());
     // menus
     ArrayList<IMenu> menuList = new ArrayList<IMenu>();
     Class<? extends IMenu>[] ma = getConfiguredMenus();
@@ -548,6 +564,16 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   @Override
   public void isSelectedResourceId(Long resourceId) {
     m_selectedResourceIds.contains(resourceId);
+  }
+
+  @Override
+  public void setDrawSections(boolean drawSections) {
+    propertySupport.setProperty(PROP_DRAW_SECTIONS, drawSections);
+  }
+
+  @Override
+  public boolean isDrawSections() {
+    return propertySupport.getPropertyBool(PROP_DRAW_SECTIONS);
   }
 
   @Override
@@ -920,8 +946,7 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
 
   @Override
   public void setWorkDayCount(int n) {
-    if (n < 1 || n > 6)
-     {
+    if (n < 1 || n > 6) {
       return;// ignore it
     }
     propertySupport.setPropertyInt(PROP_WORK_DAY_COUNT, n);

@@ -30,6 +30,7 @@ public class JSelector extends JComponent {
 
   private JActivityMap m_map;
   private boolean m_mousePressed;
+  private boolean m_drawSections = true;
 
   public JSelector(JActivityMap map) {
     super();
@@ -63,6 +64,10 @@ public class JSelector extends JComponent {
         checkCursorInternal(e.getPoint());
       }
     });
+  }
+
+  public void setDrawSections(boolean drawSections) {
+    m_drawSections = drawSections;
   }
 
   private void checkCursorInternal(Point p) {
@@ -105,18 +110,20 @@ public class JSelector extends JComponent {
           }
         }
         // process sections
-        for (int i = 0; i < sortedIndexesFrom.length; i++) {
-          if (sortedIndexesFrom[i] >= 0) {
-            Rectangle r = m_map.getCellRect(sortedIndexesFrom[i], sortedIndexesTo[i], range);
-            // start
-            g.setColor(new Color(0x55ff55));
-            g.fillRect(1, r.y, 3, r.height);
-            // end
-            g.setColor(new Color(0xff5555));
-            g.fillRect(w - 3 - 1, r.y, 3, r.height);
-            // box
-            g.setColor(Color.black);
-            g.drawRect(0, r.y, w - 1, r.height);
+        if (m_drawSections) {
+          for (int i = 0; i < sortedIndexesFrom.length; i++) {
+            if (sortedIndexesFrom[i] >= 0) {
+              Rectangle r = m_map.getCellRect(sortedIndexesFrom[i], sortedIndexesTo[i], range);
+              // start
+              g.setColor(new Color(0x55ff55));
+              g.fillRect(1, r.y, 3, r.height);
+              // end
+              g.setColor(new Color(0xff5555));
+              g.fillRect(w - 3 - 1, r.y, 3, r.height);
+              // box
+              g.setColor(Color.black);
+              g.drawRect(0, r.y, w - 1, r.height);
+            }
           }
         }
       }

@@ -87,7 +87,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
                 handleSwingEditActivityPopup(e);
               }
             }
-            if(fix!=null) {
+            if (fix != null) {
               fix.mouseReleased(this, e);
             }
           }
@@ -156,7 +156,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
 
           @Override
           public void mouseReleased(MouseEvent e) {
-            if(fix!=null) {
+            if (fix != null) {
               fix.mouseReleased(this, e);
             }
           }
@@ -225,6 +225,7 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
     }
     getSwingActivityMap().setModel(new SwingActivityMapModel(getScoutActivityMap(), m_metricsTable));
     getSwingActivityMap().setColumnModel(new SwingActivityMapColumnModel(getScoutActivityMap().getTimeScale()));
+    getSwingActivityMap().getSelector().setDrawSections(getScoutActivityMap().isDrawSections());
     setSelectionFromScout();
   }
 
@@ -360,6 +361,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
     else if (name.equals(IActivityMap.PROP_SELECTED_END_TIME)) {
       return true;
     }
+    else if (name.equals(IActivityMap.PROP_DRAW_SECTIONS)) {
+      return true;
+    }
     return super.isHandleScoutPropertyChange(name, newValue);
   }
 
@@ -382,6 +386,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap> {
     }
     else if (name.equals(IActivityMap.PROP_RESOURCE_IDS)) {
       setResourceIdsFromScout((Long[]) newValue);
+    }
+    else if (name.equals(IActivityMap.PROP_DRAW_SECTIONS)) {
+      getSwingActivityMap().getSelector().setDrawSections((Boolean) newValue);
     }
   }
 

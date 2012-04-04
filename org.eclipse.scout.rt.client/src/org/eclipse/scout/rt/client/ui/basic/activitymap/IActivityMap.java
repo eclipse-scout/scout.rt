@@ -73,6 +73,10 @@ public interface IActivityMap extends IPropertyObserver {
    * {@link TimeScale}
    */
   String PROP_TIME_SCALE = "timeScale";
+  /**
+   * {@link Boolean}
+   */
+  String PROP_DRAW_SECTIONS = "drawSections";
 
   int PLANNING_MODE_INTRADAY = 0;
   int PLANNING_MODE_DAY = 1;
@@ -285,6 +289,27 @@ public interface IActivityMap extends IPropertyObserver {
   void setSelectedResourceIds(Long[] resourceIds);
 
   void isSelectedResourceId(Long resourceId);
+
+  /**
+   * Indicates whether the selected sections in the activity
+   * map should be visualized (by a rectangle with red and
+   * green borders).
+   * 
+   * @return true if the activity map draws these sections,
+   *         false if not.
+   */
+  boolean isDrawSections();
+
+  /**
+   * Sets whether the selected sections in the activity
+   * map should be visualized (by a rectangle with red and
+   * green borders).
+   * 
+   * @param drawSections
+   *          true if the activity map should draw these sections,
+   *          false if not.
+   */
+  void setDrawSections(boolean drawSections);
 
   IMenu[] getMenus();
 
