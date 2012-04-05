@@ -43,4 +43,13 @@ public class DeviceUtility {
 
     return false;
   }
+
+  public static boolean isTabletDevice() {
+    DeviceType deviceType = getDeviceType();
+    if (DeviceType.TABLET.equals(deviceType)) {
+      return true;
+    }
+
+    return false;
+  }
 }

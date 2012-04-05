@@ -251,7 +251,7 @@
             name="Button"
             scope="default">
         <factory
-              class="org.eclipse.scout.rt.ui.rap.internal.ButtonFieldFactory">
+              class="org.eclipse.scout.rt.ui.rap.form.fields.button.ButtonFieldFactory">
         </factory>
       </formField>
       <formField

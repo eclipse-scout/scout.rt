@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.internal;
+package org.eclipse.scout.rt.ui.rap.form.fields.button;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -16,8 +16,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.snapbox.ISnapBox;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.extension.IFormFieldFactory;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
-import org.eclipse.scout.rt.ui.rap.form.fields.button.IRwtScoutButton;
-import org.eclipse.scout.rt.ui.rap.form.fields.button.RwtScoutButton;
 import org.eclipse.scout.rt.ui.rap.form.fields.snapbox.button.RwtScoutSnapBoxMaximizedButton;
 import org.eclipse.swt.widgets.Composite;
 
@@ -28,14 +26,22 @@ public class ButtonFieldFactory implements IFormFieldFactory {
     IButton button = (IButton) model;
     IRwtScoutButton field = null;
     if (button.getParentField() instanceof ISnapBox) {
-      field = new RwtScoutSnapBoxMaximizedButton();
+      field = createRwtScoutSnapBoxMaximizedButton();
       field.createUiField(parent, button, uiEnvironment);
     }
     else {
-      field = new RwtScoutButton();
+      field = createRwtScoutButton();
       field.createUiField(parent, button, uiEnvironment);
     }
     return field;
+  }
+
+  protected IRwtScoutButton createRwtScoutSnapBoxMaximizedButton() {
+    return new RwtScoutSnapBoxMaximizedButton();
+  }
+
+  protected IRwtScoutButton createRwtScoutButton() {
+    return new RwtScoutButton();
   }
 
 }
