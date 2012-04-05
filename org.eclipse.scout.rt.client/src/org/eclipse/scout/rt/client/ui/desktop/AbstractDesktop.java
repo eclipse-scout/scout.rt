@@ -99,6 +99,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDesktop.class);
 
   private final IDesktopExtension m_localDesktopExtension;
+  private List<IDesktopExtension> m_desktopExtensions;
   private final EventListenerList m_listenerList;
   private final Map<Object, EventListenerList> m_dataChangeListenerList;
   private final IDesktopUIFacade m_uiFacade;
@@ -314,19 +315,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected void execAddTrayMenus(List<IMenu> menus) throws ProcessingException {
   }
 
-  /**
-   * Override to provide a set of extensions (modules) that contribute their content to this desktop.
-   * <p>
-   * The default returns an array containing only the {@link #getLocalDesktopExtension()}
-   * <p>
-   * When overriding, make sure to include the {@link #getLocalDesktopExtension()} (normally at the beginning of the
-   * list), otherwise local menus, outlines, etc. are not included.
-   * <p>
-   * The extension that are held by this desktop must call {@link IDesktopExtension#setCoreDesktop(this)} before using
-   * the extension. That way the extension can use and access this desktops methods.
-   */
-  protected IDesktopExtension[] getDesktopExtensions() {
-    return new IDesktopExtension[]{getLocalDesktopExtension()};
+  public IDesktopExtension[] getDesktopExtensions() {
+    return m_desktopExtensions.toArray(new IDesktopExtension[m_desktopExtensions.size()]);
   }
 
   /**
@@ -337,6 +327,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected void initConfig() {
+    initDesktopExtensions();
     setTitle(getConfiguredTitle());
     setTrayVisible(getConfiguredTrayVisible());
     propertySupport.setProperty(PROP_KEY_STROKES, new IKeyStroke[0]);
@@ -397,6 +388,26 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         LOG.error(null, t);
       }
     }
+  }
+
+  private void initDesktopExtensions() {
+    m_desktopExtensions = new LinkedList<IDesktopExtension>();
+    m_desktopExtensions.add(getLocalDesktopExtension());
+
+    injectDesktopExtensions(m_desktopExtensions);
+  }
+
+  /**
+   * Override to provide a set of extensions (modules) that contribute their content to this desktop.
+   * <p>
+   * The default list contains only the {@link #getLocalDesktopExtension()}
+   * </p>
+   * <p>
+   * The extension that are held by this desktop must call {@link IDesktopExtension#setCoreDesktop(this)} before using
+   * the extension. That way the extension can use and access this desktop's methods.
+   * </p>
+   */
+  protected void injectDesktopExtensions(List<IDesktopExtension> desktopExtensions) {
   }
 
   @Override
