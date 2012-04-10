@@ -2453,6 +2453,31 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  public void discardAllDeletedRows() {
+    for (Iterator<ITableRow> it = m_deletedRows.values().iterator(); it.hasNext();) {
+      ((InternalTableRow) it.next()).setTableInternal(null);
+    }
+    m_deletedRows.clear();
+  }
+
+  @Override
+  public void discardDeletedRow(ITableRow deletedRow) {
+    if (deletedRow != null) {
+      discardDeletedRows(new ITableRow[]{deletedRow});
+    }
+  }
+
+  @Override
+  public void discardDeletedRows(ITableRow[] deletedRows) {
+    if (deletedRows != null) {
+      for (ITableRow row : deletedRows) {
+        m_deletedRows.remove(new CompositeObject(getRowKeys(row)));
+        ((InternalTableRow) row).setTableInternal(null);
+      }
+    }
+  }
+
+  @Override
   public void setContextColumn(IColumn<?> col) {
     propertySupport.setProperty(PROP_CONTEXT_COLUMN, col);
   }
@@ -2462,12 +2487,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return (IColumn<?>) propertySupport.getProperty(PROP_CONTEXT_COLUMN);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void clearDeletedRows() {
-    for (Iterator<ITableRow> it = m_deletedRows.values().iterator(); it.hasNext();) {
-      ((InternalTableRow) it.next()).setTableInternal(null);
-    }
-    m_deletedRows.clear();
+    discardAllDeletedRows();
   }
 
   @Override

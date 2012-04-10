@@ -843,3 +843,15 @@ This method will return the fields simple class name by default for fields with 
 For non-unique class names the simple class name of the parent field is added to the id, until it is unique.
 o Loading older XML files with ambiguous fields is still possible: Data is imported to the first field found (as before).
 Migration: none
+
+10.04.2012 jbr
+Bugzilla: 361985
+Bug following the discussion here:
+http://www.eclipse.org/forums/index.php/t/210744/
+  •  Naming consistency:
+clearDeletedRows() => discardAllDeletedRows()
+  •  Add the possibility to discard a specific deleted row
+discardDeleteRow(TableRow deletedRow)
+discardDeleteRows(TableRow deletedRow)
+discarding a DeletedRow by index (or array of indexes) makes no sense, because if the row is deleted, the row do not have an index anymore.
+Migration: ITable#clearDeletedRows() is deprecated, use ITable#discardAllDeletedRows() instead.

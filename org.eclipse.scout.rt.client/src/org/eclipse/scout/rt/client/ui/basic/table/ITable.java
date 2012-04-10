@@ -680,6 +680,16 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
 
   void discardRows(ITableRow[] rows);
 
+  void discardAllDeletedRows();
+
+  void discardDeletedRow(ITableRow deletedRow);
+
+  void discardDeletedRows(ITableRow[] deletedRows);
+
+  /**
+   * @deprecated use {@link #discardAllDeletedRows()} instead.
+   */
+  @Deprecated
   void clearDeletedRows();
 
   /**
