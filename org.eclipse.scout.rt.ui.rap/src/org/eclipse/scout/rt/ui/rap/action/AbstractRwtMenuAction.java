@@ -111,9 +111,15 @@ public class AbstractRwtMenuAction {
   }
 
   protected void setTextFromScout(String text) {
-    if (!getUiMenuItem().isDisposed()) {
-      getUiMenuItem().setText(text);
+    if (getUiMenuItem().isDisposed()) {
+      return;
     }
+
+    if (text == null) {
+      text = "";
+    }
+
+    getUiMenuItem().setText(text);
   }
 
   protected void setEnabledFromScout(boolean enabled) {
