@@ -232,7 +232,17 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
 
   @Override
   public LookupRow getAcceptedProposal() throws ProcessingException {
-    LookupRow row = getResultTableField().getTable().getKeyColumn().getSelectedValue();
+    Table table = getResultTableField().getTable();
+    LookupRow row = null;
+    if (table.isCheckable()) {
+      ITableRow[] checkedRows = table.getCheckedRows();
+      if (checkedRows != null && checkedRows.length > 0) {
+        row = table.getKeyColumn().getValue(checkedRows[0]);
+      }
+    }
+    else {
+      row = table.getKeyColumn().getSelectedValue();
+    }
     if (row != null && row.isEnabled()) {
       return row;
     }

@@ -25,6 +25,8 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 public interface ISmartField<T> extends IValueField<T> {
 
+  static final LookupRow EMPTY_LOOKUP_ROW = new LookupRow(null, "", null, null, null, null, null, true);
+
   /**
    * {@link ISmartFieldProposalForm}
    */

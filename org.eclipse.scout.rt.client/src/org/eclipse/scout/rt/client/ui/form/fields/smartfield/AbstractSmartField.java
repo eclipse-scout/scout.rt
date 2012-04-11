@@ -61,7 +61,6 @@ import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractSmartField<T> extends AbstractValueField<T> implements ISmartField<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSmartField.class);
-  private static final LookupRow EMPTY_LOOKUP_ROW = new LookupRow(null, "", null, null, null, null, null, true);
 
   private final EventListenerList m_listenerList = new EventListenerList();
   private ISmartFieldUIFacade m_uiFacade;
