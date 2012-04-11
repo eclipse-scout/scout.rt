@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -19,6 +21,7 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -31,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadio
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.ActiveStateRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.NewButton;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.ResultTableField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm.MainBox.ResultTableField.Table;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
@@ -136,6 +140,9 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
           for (ITableRow row : table.getRows()) {
             if (CompareUtility.equals(keyToSelect, table.getKeyColumn().getValue(row).getKey())) {
               table.selectRow(row);
+              if (table.isCheckable()) {
+                table.checkRow(row, true);
+              }
               break;
             }
           }
@@ -178,7 +185,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
    * Override this method to change that behaviour of what is a single match.
    * <p>
    * By default a single match is when there is only one enabled row in the drop down table
-   * <p>
+   * </p>
    */
   @ConfigOperation
   @Order(120)
@@ -197,6 +204,30 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     else {
       return null;
     }
+  }
+
+  /**
+   * Override this method to change the behaviour when a row is clicked in the result {@link Table}.
+   * <p>
+   * By default the form is closed with {@link #doOk()}.
+   * </p>
+   * 
+   * @param row
+   * @throws ProcessingException
+   */
+  @ConfigOperation
+  @Order(130)
+  protected void execResultTableRowClicked(ITableRow row) throws ProcessingException {
+    LookupRow lrow = getResultTableField().getTable().getKeyColumn().getSelectedValue();
+    if (lrow != null && lrow.isEnabled()) {
+      doOk();
+    }
+  }
+
+  /**
+   * Override this method to adapt the menu list of the result {@link Table}
+   */
+  protected void injectResultTableMenus(List<IMenu> menuList) {
   }
 
   @Override
@@ -306,6 +337,11 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
       public class Table extends AbstractTable {
 
         @Override
+        protected void injectMenusInternal(List<IMenu> menuList) {
+          injectResultTableMenus(menuList);
+        }
+
+        @Override
         protected boolean getConfiguredAutoResizeColumns() {
           return true;
         }
@@ -321,16 +357,18 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
         }
 
         @Override
+        protected boolean getConfiguredMultiCheck() {
+          return false;
+        }
+
+        @Override
         protected boolean getConfiguredScrollToSelection() {
           return true;
         }
 
         @Override
         protected void execRowClick(ITableRow row) throws ProcessingException {
-          LookupRow lrow = getKeyColumn().getSelectedValue();
-          if (lrow != null && lrow.isEnabled()) {
-            doOk();
-          }
+          execResultTableRowClicked(row);
         }
 
         public KeyColumn getKeyColumn() {

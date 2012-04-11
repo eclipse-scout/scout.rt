@@ -46,6 +46,10 @@ public interface ISmartField<T> extends IValueField<T> {
 
   ISmartFieldProposalForm getProposalForm();
 
+  ISmartFieldProposalFormProvider getProposalFormProvider();
+
+  void setProposalFormProvider(ISmartFieldProposalFormProvider provider);
+
   /**
    * Code-Assistant Don't just allow smart field values, but also custom text as
    * valid values; smartfield is simply used as code assistent

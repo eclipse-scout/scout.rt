@@ -74,6 +74,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   private LookupRow m_currentLookupRow;
   private P_GetLookupRowByKeyJob m_currentGetLookupRowByKeyJob;
   private P_ProposalFormListener m_proposalFormListener;
+  private ISmartFieldProposalFormProvider m_proposalFormProvider;
   private int m_maxRowCount;
   private String m_browseNewText;
   private boolean m_installingRowContext = false;
@@ -403,6 +404,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setBrowseNewText(getConfiguredBrowseNewText());
     setAllowCustomText(getConfiguredAllowCustomText());
+    setProposalFormProvider(createProposalFormProvider());
     // code type
     if (getConfiguredCodeType() != null) {
       setCodeTypeClass(getConfiguredCodeType());
@@ -703,28 +705,41 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     }
   }
 
+  @Override
+  public ISmartFieldProposalFormProvider getProposalFormProvider() {
+    return m_proposalFormProvider;
+  }
+
+  @Override
+  public void setProposalFormProvider(ISmartFieldProposalFormProvider provider) {
+    m_proposalFormProvider = provider;
+  }
+
   public LookupRow getCurrentLookupRow() {
     return m_currentLookupRow;
   }
 
   /**
-   * returns the Smartfields proposal form
+   * Returns the smartfield's proposal form with the use of a {@link ISmartFieldProposalFormProvider}.
    * <p>
-   * overwrite this method to return custom proposal forms
+   * To provide a custom proposal form create a custom proposal form provider and inject it with
+   * {@link #createProposalFormProvider()} or {@link #setProposalFormProvider()}.
+   * </p>
    * 
    * @return {@link#ISmartFieldProposalForm}
    * @throws ProcessingException
    */
   protected ISmartFieldProposalForm createProposalForm() throws ProcessingException {
-    ISmartFieldProposalForm form;
-    if (isBrowseHierarchy()) {
-      form = new SmartTreeForm(this);
+    ISmartFieldProposalFormProvider proposalFormProvider = getProposalFormProvider();
+    if (proposalFormProvider == null) {
+      return null;
     }
-    else {
-      form = new SmartTableForm(this);
-    }
-    form.setAutoAddRemoveOnDesktop(false);
-    return form;
+
+    return proposalFormProvider.createProposalForm(this);
+  }
+
+  protected ISmartFieldProposalFormProvider createProposalFormProvider() {
+    return new DefaultSmartFieldProposalFormProvider();
   }
 
   @Override
