@@ -90,12 +90,7 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
     if (table != null) {
       //table
       LogicalGridData tableGridData = LogicalGridDataBuilder.createField(getScoutObject().getGridData());
-      if (getScoutObject().getForm() instanceof ISmartFieldProposalForm) {
-        m_tableComposite = SERVICES.getService(IPatchedClassService.class).createRwtScoutTable(RwtUtility.VARIANT_PROPOSAL_FORM);
-      }
-      else {
-        m_tableComposite = SERVICES.getService(IPatchedClassService.class).createRwtScoutTable();
-      }
+      m_tableComposite = createRwtScoutTable();
 
       IForm form = getScoutObject() == null ? null : getScoutObject().getForm();
       m_tableContainer = null;
@@ -125,6 +120,18 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
     }
     if (!getUiContainer().isDisposed()) {
       getUiContainer().layout(true, true);
+    }
+  }
+
+  /**
+   * @since 3.8.0
+   */
+  protected IRwtScoutTable createRwtScoutTable() {
+    if (getScoutObject().getForm() instanceof ISmartFieldProposalForm) {
+      return SERVICES.getService(IPatchedClassService.class).createRwtScoutTable(RwtUtility.VARIANT_PROPOSAL_FORM);
+    }
+    else {
+      return SERVICES.getService(IPatchedClassService.class).createRwtScoutTable();
     }
   }
 

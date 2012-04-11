@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.rap.basic.tree.IRwtScoutTree;
 import org.eclipse.scout.rt.ui.rap.basic.tree.RwtScoutTree;
 import org.eclipse.scout.rt.ui.rap.core.window.desktop.IRwtScoutActionBar;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
@@ -33,7 +34,7 @@ import org.eclipse.swt.widgets.Control;
  */
 public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implements IRwtScoutTreeField {
 
-  private RwtScoutTree m_treeComposite;
+  private IRwtScoutTree m_treeComposite;
   private Composite m_treeContainer;
   private IRwtScoutActionBar m_actionBar;
 
@@ -65,12 +66,7 @@ public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implem
     }
 
     if (tree != null) {
-      if (getScoutObject().getForm() instanceof ISmartFieldProposalForm) {
-        m_treeComposite = new RwtScoutTree(RwtUtility.VARIANT_PROPOSAL_FORM);
-      }
-      else {
-        m_treeComposite = new RwtScoutTree();
-      }
+      m_treeComposite = createRwtScoutTree();
 
       IForm form = getScoutObject() == null ? null : getScoutObject().getForm();
       m_treeContainer = null;
@@ -95,6 +91,18 @@ public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implem
       setUiField(m_treeComposite.getUiField());
     }
     getUiContainer().layout(true, true);
+  }
+
+  /**
+   * @since 3.8.0
+   */
+  protected IRwtScoutTree createRwtScoutTree() {
+    if (getScoutObject().getForm() instanceof ISmartFieldProposalForm) {
+      return new RwtScoutTree(RwtUtility.VARIANT_PROPOSAL_FORM);
+    }
+    else {
+      return new RwtScoutTree();
+    }
   }
 
   /**

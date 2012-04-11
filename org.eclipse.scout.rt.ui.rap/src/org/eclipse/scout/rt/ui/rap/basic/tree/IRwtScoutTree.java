@@ -15,4 +15,5 @@ import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
 
 public interface IRwtScoutTree extends IRwtScoutComposite<ITree> {
 
+  void setEnabledFromScout(boolean enabled);
 }
