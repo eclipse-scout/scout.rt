@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.ui.rap.core.RwtIcons;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
+import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -162,8 +163,13 @@ public class RwtScoutTableModel implements IRwtScoutTableModelForPatch {
         if (text == null) {
           text = "";
         }
-        if (text.indexOf("\n") >= 0) {
+        if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
+          text = m_uiTable.getUiEnvironment().adaptHtmlCell(m_uiTable, text);
+        }
+        else if (text.indexOf("\n") >= 0) {
           if (isMultiline()) {
+            //transform to html
+            text = "<html>" + HtmlTextUtility.transformPlainTextToHtml(text) + "</html>";
             text = m_uiTable.getUiEnvironment().adaptHtmlCell(m_uiTable, text);
           }
           else {

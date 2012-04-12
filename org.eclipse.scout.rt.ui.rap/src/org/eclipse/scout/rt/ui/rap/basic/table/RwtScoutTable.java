@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.ui.rap.ext.table.util.TableRolloverSupport;
 import org.eclipse.scout.rt.ui.rap.form.fields.AbstractRwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
@@ -71,6 +72,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.widgets.MarkupValidator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -92,6 +94,7 @@ import org.eclipse.swt.widgets.TableItem;
  * 
  * @since 3.7.0 June 2011
  */
+@SuppressWarnings("restriction")
 public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScoutTableForPatch {
   private P_ScoutTableListener m_scoutTableListener;
   private UiRedrawHandler m_redrawHandler;
@@ -134,6 +137,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     if (StringUtility.hasText(m_variant)) {
       table.setData(WidgetUtil.CUSTOM_VARIANT, m_variant);
     }
+    table.setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
+    table.setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
+
     table.setLinesVisible(true);
     table.setHeaderVisible(true);
     table.setTouchEnabled(RwtUtility.getBrowserInfo().isTablet() || RwtUtility.getBrowserInfo().isMobile());
@@ -241,8 +247,13 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         if (cellText == null) {
           cellText = "";
         }
-        if (cellText.indexOf("\n") >= 0) {
+        boolean isHtml = HtmlTextUtility.isTextWithHtmlMarkup(cellText);
+        if (!isHtml && cellText.indexOf("\n") >= 0) {
           multilineHeaders = true;
+        }
+        if (isHtml) {
+          multilineHeaders = true;
+          cellText = getUiEnvironment().adaptHtmlCell(RwtScoutTable.this, cellText);
         }
         int style = RwtUtility.getHorizontalAlignment(cell.getHorizontalAlignment());
         TableColumn rwtCol = new TableColumn(getUiField(), style);

@@ -10,11 +10,11 @@
   color: #CFCFCF;
 }
 
-Group-Label,CCombo,Combo,DateTime {
+Group-Label, CCombo, Combo, DateTime {
   font: bold 11px Arial, Helvetica, sans-serif;
 }
 
-DateTime-Calendar-Navbar,ToolTip-Text {
+DateTime-Calendar-Navbar, ToolTip-Text {
   font: bold 12px Arial, Helvetica, sans-serif;
 }
 
@@ -36,17 +36,17 @@ Display {
   rwt-thinborder-color: #aca899;
   rwt-selectionmarker-color: #fec83c;
   rwt-infobackground-color: #ffffff;
-  /* Rayo no icons in messageboxes */
-  /*   rwt-error-image: url( theme/img/dialog/error.png ); */
-  /*   rwt-information-image: url( theme/img/dialog/information.png ); */
-  /*   rwt-question-image: url( theme/img/dialog/question.png ); */
-  /*   rwt-warning-image: url( theme/img/dialog/warning.png ); */
-  /*   rwt-working-image: url( theme/img/dialog/information.png ); */
+/* Rayo no icons in messageboxes */
+/*   rwt-error-image: url( theme/img/dialog/error.png ); */
+/*   rwt-information-image: url( theme/img/dialog/information.png ); */
+/*   rwt-question-image: url( theme/img/dialog/question.png ); */
+/*   rwt-warning-image: url( theme/img/dialog/warning.png ); */
+/*   rwt-working-image: url( theme/img/dialog/information.png ); */
   rwt-fontlist: 12px Arial, Helvetica, sans-serif;
 
-  /*
-  background-image: url( theme/img/display/browser_bg.png );
-  */
+/*
+ background-image: url( theme/img/display/browser_bg.png );
+ */
 }
 
 /* Control - Default for all controls */
@@ -77,7 +77,7 @@ Composite[BORDER] {
 Group {
   color: #4a4a4a;
   background-color: transparent;
-  /* XXX hstaudacher we need to fix the border and set the border top when bug 346630 is fixed */
+/* XXX hstaudacher we need to fix the border and set the border top when bug 346630 is fixed */
   border: none;
   border-radius: 2px 2px 2px 2px;
   font: bold 12px Arial, Helvetica, sans-serif;
@@ -143,7 +143,7 @@ Button {
   background-color: transparent;
 }
 
-Button[PUSH],Button[TOGGLE],Button[BORDER] {
+Button[PUSH], Button[TOGGLE], Button[BORDER] {
   background-image: gradient(
     linear, left top, left bottom,
     from( #7ab9dd ),
@@ -156,7 +156,7 @@ Button[PUSH],Button[TOGGLE],Button[BORDER] {
   padding: 4px 5px;
 }
 
-Button[PUSH]:disabled,Button[TOGGLE]:disabled {
+Button[PUSH]:disabled, Button[TOGGLE]:disabled {
   background-image: gradient(
     linear, left top, left bottom,
     from( #dee1e7 ),
@@ -167,7 +167,7 @@ Button[PUSH]:disabled,Button[TOGGLE]:disabled {
   background-color: transparent;
 }
 
-Button[PUSH]:hover,Button[TOGGLE]:hover {
+Button[PUSH]:hover, Button[TOGGLE]:hover {
   background-image: gradient(
     linear, left top, left bottom,
     from( #55aedb ),
@@ -175,12 +175,12 @@ Button[PUSH]:hover,Button[TOGGLE]:hover {
   );
 }
 
-Button[PUSH]:pressed,Button[TOGGLE]:pressed {
+Button[PUSH]:pressed, Button[TOGGLE]:pressed {
   animation: none;
 }
 
-Button-FocusIndicator[PUSH],Button-FocusIndicator[TOGGLE] {
-  /* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
+Button-FocusIndicator[PUSH], Button-FocusIndicator[TOGGLE] {
+/* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
   background-color: transparent;
   border: 1px solid #b0cce3;
   margin: 1px;
@@ -223,7 +223,7 @@ Button[TOGGLE]:selected:hover {
 
 /* Link */
 Link-Hyperlink {
-  /* XXX hstaudacher Theme text decorator when bug 346438 is fixed */
+/* XXX hstaudacher Theme text decorator when bug 346438 is fixed */
   color: #67A8CE;
 }
 
@@ -231,16 +231,16 @@ Link-Hyperlink:disabled {
   color: #2a5a76;
 }
 
-Button[CHECK],Button[RADIO] {
+Button[CHECK], Button[RADIO] {
   color: #000000;
   font: 12px Arial, Helvetica, sans-serif; /* not bold */
 }
 
-Button[CHECK]:disabled,Button[RADIO]:disabled {
+Button[CHECK]:disabled, Button[RADIO]:disabled {
   color: #2a5a76;
 }
 
-Button[CHECK][BORDER],Button[RADIO][BORDER] {
+Button[CHECK][BORDER], Button[RADIO][BORDER] {
   background-image: none;
 }
 
@@ -249,11 +249,11 @@ Button-CheckIcon {
 }
 
 Button-FocusIndicator[CHECK] {
-  /* XXX hstaudacher Its not possible atm tochange the icon when the widget is focused.
-     we need to fix this when bug 346501 is fixed.
+/* XXX hstaudacher Its not possible atm tochange the icon when the widget is focused.
+   we need to fix this when bug 346501 is fixed.
   background-image: url( theme/img/button/check_box_focused.png );
-  */
-  /* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
+ */
+/* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
   background-color: transparent;
   border: 1px dotted #b0cce3;
   margin: 3px;
@@ -262,11 +262,11 @@ Button-FocusIndicator[CHECK] {
 }
 
 Button-FocusIndicator[RADIO] {
-  /* XXX hstaudacher Its not possible atm tochange the icon when the widget is focused.
-     we need to fix this when bug 346501 is fixed.
+/* XXX hstaudacher Its not possible atm tochange the icon when the widget is focused.
+   we need to fix this when bug 346501 is fixed.
   background-image: url( theme/img/button/check_box_focused.png );
-  */
-  /* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
+ */
+/* XXX hstaudacher we need to add a border radius when bug 346436 is fixed */
   background-color: transparent;
   border: 1px dotted #b0cce3;
   margin: 3px;
@@ -283,8 +283,7 @@ Button-CheckIcon:selected {
 }
 
 Button-CheckIcon:selected:disabled {
-  background-image:
-    url( theme/img/button/check_box_disabled_selected.png );
+  background-image: url( theme/img/button/check_box_disabled_selected.png );
 }
 
 Button-RadioIcon {
@@ -514,7 +513,7 @@ DateTime[BORDER] {
   border-radius: 2px 2px 2px 2px;
 }
 
-DateTime-Field:selected,DateTime-Calendar-Day:selected {
+DateTime-Field:selected, DateTime-Calendar-Day:selected {
   background-color: #D2D2D2;
   color: #4a4a4a;
 }
@@ -895,7 +894,7 @@ Sash {
 }
 
 Sash[BORDER] {
-  /* XXX hstaudacher we need to set the border-radius when bug 346620 is fixed */
+/* XXX hstaudacher we need to set the border-radius when bug 346620 is fixed */
   border: 1px solid #bbcddb;
 }
 
@@ -914,7 +913,7 @@ Scale-Thumb {
 
 /* ScrollBar */
 ScrollBar {
-  /* XXX hstaudacher We need to set a gradient as background when bg 346618 is fixed */
+/* XXX hstaudacher We need to set a gradient as background when bg 346618 is fixed */
   border: none;
   background-color: #d4e1e7;
   border-radius: 0px;
@@ -928,7 +927,7 @@ ScrollBar-Thumb {
   background-image: none;
 }
 
-ScrollBar-UpButton,ScrollBar-DownButton {
+ScrollBar-UpButton, ScrollBar-DownButton {
   background-color: #ffffff;
   border: none;
   border-radius: 0px;
@@ -945,12 +944,12 @@ ScrollBar-Thumb-Icon[HORIZONTAL] {
 }
 
 ScrollBar-UpButton-Icon[VERTICAL] {
-  /* XXX hstaudacher need to be changed to up button when bug 346611 is fixed */
+/* XXX hstaudacher need to be changed to up button when bug 346611 is fixed */
   background-image: url( theme/img/scrollbar/scrollbar-down-button.png );
 }
 
 ScrollBar-UpButton-Icon[VERTICAL]:hover {
-  /* XXX hstaudacher need to be changed to up button when bug 346611 is fixed */
+/* XXX hstaudacher need to be changed to up button when bug 346611 is fixed */
   background-image: url( theme/img/scrollbar/scrollbar-down-button.png );
 }
 
@@ -963,12 +962,12 @@ ScrollBar-UpButton-Icon[HORIZONTAL]:hover {
 }
 
 ScrollBar-DownButton-Icon[VERTICAL] {
-  /* XXX hstaudacher need to be changed to down button when bug 346611 is fixed */
+/* XXX hstaudacher need to be changed to down button when bug 346611 is fixed */
   background-image: url( theme/img/scrollbar/scrollbar-up-button.png );
 }
 
 ScrollBar-DownButton-Icon[VERTICAL]:hover {
-  /* XXX hstaudacher need to be changed to down button when bug 346611 is fixed */
+/* XXX hstaudacher need to be changed to down button when bug 346611 is fixed */
   background-image: url( theme/img/scrollbar/scrollbar-up-button.png );
 }
 
@@ -1005,18 +1004,18 @@ Shell {
   opacity: 1;
 }
 
-Shell[TITLE],Shell[BORDER] {
+Shell[TITLE], Shell[BORDER] {
   background-color: white;
   border: 2px solid #67a8ce;
   border-radius: 0px 0px 0px 0px;
   padding: 0px 0px 0px 0px;
 }
 
-Shell[BORDER]:inactive,Shell[TITLE]:inactive {
+Shell[BORDER]:inactive, Shell[TITLE]:inactive {
   border: 2px solid #91b8cf;
 }
 
-Shell:maximized,Shell:maximized:inactive {
+Shell:maximized, Shell:maximized:inactive {
   border: none;
   border-radius: 0px 0px 0px 0px;
 }
@@ -1043,7 +1042,7 @@ Shell-Titlebar:inactive {
   background-color: #91b8cf;
 }
 
-Shell-MinButton,Shell-MaxButton,Shell-CloseButton {
+Shell-MinButton, Shell-MaxButton, Shell-CloseButton {
   margin: 0px;
 }
 
@@ -1169,13 +1168,13 @@ Slider-Thumb[VERTICAL]:pressed {
 }
 
 /* Buttons */
-Slider-UpButton,Slider-DownButton {
+Slider-UpButton, Slider-DownButton {
   background-color: transparent;
   border: 1px solid #a4a4a4;
   cursor: default;
 }
 
-Slider-UpButton[HORIZONTAL],Slider-DownButton[HORIZONTAL] {
+Slider-UpButton[HORIZONTAL], Slider-DownButton[HORIZONTAL] {
   background-image: gradient(
     linear, left top, left bottom,
     from( #ffffff ),
@@ -1185,7 +1184,7 @@ Slider-UpButton[HORIZONTAL],Slider-DownButton[HORIZONTAL] {
   );
 }
 
-Slider-UpButton[VERTICAL],Slider-DownButton[VERTICAL] {
+Slider-UpButton[VERTICAL], Slider-DownButton[VERTICAL] {
   background-image: gradient(
     linear, left top, right top,
     from( #ffffff ),
@@ -1204,7 +1203,7 @@ Slider-UpButton[HORIZONTAL]:pressed, Slider-DownButton[HORIZONTAL]:pressed {
   );
 }
 
-Slider-UpButton[VERTICAL]:pressed,Slider-DownButton[VERTICAL]:pressed {
+Slider-UpButton[VERTICAL]:pressed, Slider-DownButton[VERTICAL]:pressed {
   background-image: gradient(
     linear, left top, right top,
     from( #e0e0e0 ),
@@ -1445,7 +1444,7 @@ TableColumn {
   background-image: none;
   color: #000000;
   border-bottom: 1px solid #e1efec;
-  /* XXX hstaudacher we need to theme the column separator when bug 347771 is fixed */
+/* XXX hstaudacher we need to theme the column separator when bug 347771 is fixed */
 }
 
 /* Workaround for malfunctioning ":disabled" behaviour, see comment in org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable.setEnabledFromScout(boolean) */
@@ -1508,10 +1507,10 @@ Table-GridLine:horizontal {
 }
 
 Table-Checkbox {
-  /*
-  For backward compatibility we have to keep the width property.
-  Deprecated, use "margin" instead.
-  */
+/**
+ * For backward compatibility we have to keep the width property.
+ * Deprecated, use "margin" instead.
+ **/
   width: 21px;
   margin: 0px;
   background-image: url( theme/img/button/check_box.png );
@@ -1615,7 +1614,7 @@ ToolItem:hover {
   padding: 2px 3px;
 }
 
-ToolItem:pressed,ToolItem:selected {
+ToolItem:pressed, ToolItem:selected {
   border: 1px solid #a4a4a4;
   border-radius: 2px;
   padding: 3px 2px 1px 4px;
@@ -1653,18 +1652,15 @@ ToolTip {
 }
 
 ToolTip-Image[ICON_ERROR] {
-  /*   background-image: url( theme/img/tooltip/error.png ); */
-
+/*   background-image: url( theme/img/tooltip/error.png ); */
 }
 
 ToolTip-Image[ICON_INFORMATION] {
-  /*   background-image: url( theme/img/tooltip/information.png ); */
-
+/*   background-image: url( theme/img/tooltip/information.png ); */
 }
 
 ToolTip-Image[ICON_WARNING] {
-  /*   background-image: url( theme/img/tooltip/warning.png ); */
-
+/*   background-image: url( theme/img/tooltip/warning.png ); */
 }
 
 ToolTip-Text {
@@ -1719,7 +1715,7 @@ TreeItem {
 }
 
 TreeItem:disabled {
-  /* XXX hstaudacher does not work atm. Should be fixed with bug 347934 */
+/* XXX hstaudacher does not work atm. Should be fixed with bug 347934 */
   background-color: transparent;
   color: #2a5a76;
   text-decoration: none;
@@ -1909,54 +1905,6 @@ Tree-Indent:first:last:expanded:hover {
   background-image: url( theme/img/tree/tree-indent-expanded-first.png );
 }
 
-/*Smartfield start*/
-Composite.smartfield {
-  padding: 1px 0px 0px 0px;
-  border: 1px solid #95b7c1;
-  border-radius: 4px;
-}
-
-Composite.smartfield-disabled {
-  padding: 1px 0px 0px 0px;
-  border: 1px solid #c9dadf;
-  border-radius: 4px;
-}
-
-Text.smartfield {
-  border-radius: 5px;
-}
-
-Text.smartfield:disabled {
-  background-color: #f4f8fc;
-}
-
-Button.smartfield_browse {
-  background-image: url( theme/img/button/smartfield_browse.png );
-  border-radius: 5px;
-}
-
-Button.smartfield_browse:disabled {
-  background-image: url( theme/img/button/smartfield_browse_disabled.png );
-}
-
-Button.smartfield_browse:hover {
-  background-image: url( theme/img/button/smartfield_browse_mouse_over.png );
-}
-
-Button.smartfield_browse_menu {
-  background-image: url( theme/img/button/smartfield_browse_menu.png );
-}
-
-Button.smartfield_browse_menu:disabled {
-  background-image: url( theme/img/button/smartfield_browse_menu_disabled.png );
-}
-
-Button.smartfield_browse_menu:hover {
-  background-image: url( theme/img/button/smartfield_browse_menu_mouse_over.png );
-}
-/*Smartfield end*/
-
-
 /*Filechooser start*/
 Composite.filechooserfield_file {
   padding: 1px 0px 0px 0px;
@@ -2123,7 +2071,7 @@ Composite.viewPartNoRadius {
 
 Composite.form {
   background-color: transparent;
-  /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
+/* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
   padding: 0px 0px 0px 0px;
 }
 
@@ -2219,15 +2167,15 @@ Composite.toolButtonBar {
 Composite.toolButtonBar-active {
   background-image: none;
   background-color: #67a8ce;
-  /* XXX hstaudacher new radius is not applied on the client. Should be fixed automatically with bug 346683 */
+/* XXX hstaudacher new radius is not applied on the client. Should be fixed automatically with bug 346683 */
   border-radius: 5px 0px 0px 0px;
 }
 
 Button.toolButtonBarCollapseButton {
   background-image: url( theme/img/button/icon_slider.png );
   background-color: #67a8ce;
-  /*   padding: 8px 15px; */
-  /*   border-radius: 0px 0px 0px 0px; */
+/*   padding: 8px 15px; */
+/*   border-radius: 0px 0px 0px 0px; */
 }
 Button.toolButtonBarCollapseButton:pressed, Button.toolButtonBarCollapseButton:selected,
 Button.toolButtonBarCollapseButton:selected:hover, Button.toolButtonBarCollapseButton:hover {
@@ -2263,8 +2211,8 @@ Button.tabboxButton-marked,
 Button.tabboxButton-marked:selected, Button.tabboxButton-marked:selected:hover,
 Button.tabboxButton-marked:pressed, Button.tabboxButton-marked:hover {
   background-image: url( theme/img/button/icon_changed.png);
-  /* background-repeat: no-repeat; /* XXX Currently not supported by RAP */
-  /* background-position: bottom right; /* XXX Currently not supported by RAP */
+/* background-repeat: no-repeat; /* XXX Currently not supported by RAP */
+/* background-position: bottom right; /* XXX Currently not supported by RAP */
   color: #295973;
   padding: 8px 15px;
   font: 12px Arial, Helvetica, sans-serif; /* not bold */
@@ -2286,9 +2234,9 @@ Button.tabboxButton-active-marked,
 Button.tabboxButton-active-marked:pressed, Button.tabboxButton-active-marked:selected,
 Button.tabboxButton-active-marked:selected:hover, Button.tabboxButton-active-marked:hover {
   background-image: url( theme/img/button/icon_changed-marked.png);
-  /* background-repeat: no-repeat; /* XXX Currently not supported by RAP */
-  /* background-position: bottom right; /* XXX Currently not supported by RAP */
-  /* background-color: #ebf4f8; /* XXX Would work in FF and Webkit, but not in IE. A svg element is generated which does not include bg color. Workaround: bg is set in image */
+/* background-repeat: no-repeat; /* XXX Currently not supported by RAP */
+/* background-position: bottom right; /* XXX Currently not supported by RAP */
+/* background-color: #ebf4f8; /* XXX Would work in FF and Webkit, but not in IE. A svg element is generated which does not include bg color. Workaround: bg is set in image */
   border-radius: 5px 5px 0px 0px;
   color: #000000;
   font: 12px Arial, Helvetica, sans-serif; /* not bold */
@@ -2331,10 +2279,10 @@ Table.datechooser-dialog {
 }
 
 Table-GridLine.datechooser-dialog:vertical {
-  /* XXX hstaudacher: This comment can be removed when bug 347755 is fixed.
-    At the moment the Gridline styling does not work and the datechooser has
-    white vertical gridlines instead of none
-  */
+/* XXX hstaudacher: This comment can be removed when bug 347755 is fixed.
+   At the moment the Gridline styling does not work and the datechooser has
+   white vertical gridlines instead of none
+ */
   color: #f4f8fc;
 }
 
@@ -2390,42 +2338,6 @@ Composite.listboxDisabled {
   padding: 2px;
 }
 
-Shell.proposal-form {
-  border: 2px solid #67A8CE;
-}
-
-Composite.proposal-form {
-
-}
-
-Table.proposal-form {
-  background-color: #F4F8FC;
-}
-
-TableItem.proposal-form:selected {
-  color: #FF9124;
-  background-color: #FAFCFE;
-}
-
-TableItem.proposal-form:selected:unfocused {
-  color: #000000;
-  background-color: #F4F8FC;
-}
-
-Tree.proposal-form {
-  background-color: #FFFFFF;
-}
-
-TreeItem.proposal-form:selected {
-  color: #FF9124;
-  background-color: #FAFCFE;
-}
-
-TreeItem.proposal-form:selected:unfocused {
-  color: #000000;
-  background-color: #F4F8FC;
-}
-
 Composite.formbarContainer {
   background-color: #DDEBF4;
 }
@@ -2446,7 +2358,7 @@ Button.formButton-active {
   background-color: #F1F7FB;
   border-radius: 0px 0px 5px 5px;
   color: #000000;
-  /*   font: bold 12px Arial, Helvetica, sans-serif; */
+/*   font: bold 12px Arial, Helvetica, sans-serif; */
   padding: 0px 15px;
 }
 
@@ -2465,17 +2377,17 @@ Composite.formTabArea {
 
 Composite.formTab {
   background-color: transparent;
-  /*  border: 1px solid #bbcddb; */
+/*  border: 1px solid #bbcddb; */
   border-radius: 8px 8px 0px 0px;
-  /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
+/* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
   padding: 2px 5px 0px 5px;
 }
 
 Composite.formTab-active {
   background-color: #ffffff;
-  /*  border: 1px solid #bbcddb; */
+/*  border: 1px solid #bbcddb; */
   border-radius: 8px 8px 0px 0px;
-  /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
+/* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
   padding: 2px 5px 0px 5px;
 }
 
@@ -2494,7 +2406,7 @@ Button.formTabActivate {
   background-image: none;
   background-color: transparent;
   color: #2a5a76;
-  /*   font: bold 12px Arial, Helvetica, sans-serif; */
+/*   font: bold 12px Arial, Helvetica, sans-serif; */
   padding: 2px 5px 0px 6px;
 }
 

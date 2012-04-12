@@ -356,6 +356,10 @@
             id="org.eclipse.scout.rt.ui.rap.theme"
             name="Scout Theme">
       </theme>
+      <themeContribution
+            file="theme/fields/smartField.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
   </extension>
 
   <extension

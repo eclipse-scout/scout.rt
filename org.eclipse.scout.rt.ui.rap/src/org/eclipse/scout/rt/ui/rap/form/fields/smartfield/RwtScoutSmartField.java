@@ -645,6 +645,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
         }
         RwtUtility.handleNavigationKey(c, e.keyCode);
       }
+      e.doit = false;
     }
   }
 

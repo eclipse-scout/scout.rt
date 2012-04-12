@@ -1,0 +1,71 @@
+/*Smartfield start*/
+Composite.smartfield {
+  padding: 1px 0px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+
+Composite.smartfield-disabled {
+  padding: 1px 0px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
+
+Text.smartfield {
+  border-radius: 5px;
+}
+
+Text.smartfield:disabled {
+  background-color: #f4f8fc;
+}
+
+Button.smartfield_browse {
+  background-image: url( theme/img/button/smartfield_browse.png );
+  border-radius: 5px;
+}
+
+Button.smartfield_browse:disabled {
+  background-image: url( theme/img/button/smartfield_browse_disabled.png );
+}
+
+Button.smartfield_browse:hover {
+  background-image: url( theme/img/button/smartfield_browse_mouse_over.png );
+}
+
+Button.smartfield_browse_menu {
+  background-image: url( theme/img/button/smartfield_browse_menu.png );
+}
+
+Button.smartfield_browse_menu:disabled {
+  background-image: url( theme/img/button/smartfield_browse_menu_disabled.png );
+}
+
+Button.smartfield_browse_menu:hover {
+  background-image: url( theme/img/button/smartfield_browse_menu_mouse_over.png );
+}
+/*Smartfield end*/
+
+Shell.proposal-form {
+  border: 2px solid #67A8CE;
+}
+
+Composite.proposal-form {
+}
+
+Table.proposal-form {
+  background-color: #F4F8FC;
+}
+
+TableItem.proposal-form:selected {
+  color: #FF9124;
+  background-color: #FAFCFE;
+}
+
+Tree.proposal-form {
+  background-color: #FFFFFF;
+}
+
+TreeItem.proposal-form:selected {
+  color: #FF9124;
+  background-color: #FAFCFE;
+}
