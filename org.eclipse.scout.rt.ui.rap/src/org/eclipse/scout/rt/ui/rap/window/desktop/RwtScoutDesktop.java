@@ -46,6 +46,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   private static final String VARIANT_VIEWS_AREA = "viewsArea";
   private ViewArea m_viewArea;
   private RwtScoutToolbar m_uiToolbar;
+  private Integer m_toolbarHeight;
 
   public RwtScoutDesktop() {
   }
@@ -83,6 +84,9 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
 
     if (toolbar != null) {
       GridData toolbarData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
+      if (getToolbarHeight() != null) {
+        toolbarData.heightHint = getToolbarHeight();
+      }
       toolbar.setLayoutData(toolbarData);
     }
 
@@ -142,6 +146,14 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   @Override
   public IViewArea getViewArea() {
     return m_viewArea;
+  }
+
+  public Integer getToolbarHeight() {
+    return m_toolbarHeight;
+  }
+
+  public void setToolbarHeight(Integer toolbarHeight) {
+    m_toolbarHeight = toolbarHeight;
   }
 
 }
