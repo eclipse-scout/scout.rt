@@ -42,6 +42,8 @@ import org.eclipse.scout.rt.ui.rap.form.fields.IPopupSupport.IPopupSupportListen
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
@@ -488,6 +490,18 @@ public class RwtScoutTableCellEditor {
           return new Point(wHint, hHint);
         }
       };
+
+      //The table does only dispose table items and columns so we have to manually dispose our container.
+      parent.addDisposeListener(new DisposeListener() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void widgetDisposed(DisposeEvent event) {
+          m_container.dispose();
+        }
+
+      });
+
       m_container.setLayout(new FillLayout());
       m_uiTableComposite.getUiEnvironment().addKeyStroke(m_container, new RwtKeyStroke(SWT.ESC) {
         @Override
@@ -504,6 +518,17 @@ public class RwtScoutTableCellEditor {
           deactivate();
         }
       }, false);
+
+      m_container.addDisposeListener(new DisposeListener() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void widgetDisposed(DisposeEvent event) {
+          m_uiTableComposite.getUiEnvironment().removeKeyStrokes(m_container);
+        }
+
+      });
+
       return m_container;
     }
 
