@@ -542,7 +542,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       buf.append("<span tabIndex=\"1\" ");
       buf.append("class=\"link\" ");
       buf.append("style=\"");
-      buf.append("text-decoration:underline;\" ");
+      buf.append("text-decoration:underline;cursor:pointer;\" ");
       buf.append(rawHtml.substring(m.start(1), m.end(1)));
       buf.append(">");
       buf.append(rawHtml.substring(m.start(2), m.end(2)));
