@@ -165,6 +165,7 @@ public class RwtScoutTableModel implements IRwtScoutTableModelForPatch {
         }
         if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
           text = m_uiTable.getUiEnvironment().adaptHtmlCell(m_uiTable, text);
+          text = m_uiTable.getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(m_uiTable, text);
         }
         else if (text.indexOf("\n") >= 0) {
           if (isMultiline()) {

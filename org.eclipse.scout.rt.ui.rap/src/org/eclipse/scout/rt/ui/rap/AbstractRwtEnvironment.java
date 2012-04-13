@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -479,7 +480,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     /*
      * HTML: <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
      * XHTML: <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-     * TODO rwt Issue as long as rwt-index.html uses HTML and not XHTML. tables and other nexted elements ignore style of div parent.
+     * TODO rwt Issue: As long as rwt-index.html uses HTML and not XHTML. tables and other nested elements ignore style of div parent.
      * Alternative is using color:inherit etc. in inner tables but this does not work in IE8.
      * Therefore we adapt the style tag of <table> and <a> tags.
      */
@@ -524,6 +525,33 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
     if (lastPos < html.length()) {
       buf.append(html.substring(lastPos));
+    }
+    return buf.toString();
+  }
+
+  private static final Pattern localLinkTagPattern = Pattern.compile("<a (href=\"" + ITable.LOCAL_URL_PREFIX + "[^>]*)>([^>]*)</a>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+  @Override
+  public String convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml) {
+    Matcher m = localLinkTagPattern.matcher(rawHtml);
+    StringBuilder buf = new StringBuilder();
+    int lastPos = 0;
+    while (m.find()) {
+      buf.append(rawHtml.substring(lastPos, m.start()));
+
+      buf.append("<span tabIndex=\"1\" ");
+      buf.append("class=\"link\" ");
+      buf.append("style=\"");
+      buf.append("text-decoration:underline;\" ");
+      buf.append(rawHtml.substring(m.start(1), m.end(1)));
+      buf.append(">");
+      buf.append(rawHtml.substring(m.start(2), m.end(2)));
+      buf.append("</span>");
+
+      lastPos = m.end();
+    }
+    if (lastPos < rawHtml.length()) {
+      buf.append(rawHtml.substring(lastPos));
     }
     return buf.toString();
   }

@@ -195,11 +195,17 @@ public interface IRwtEnvironment extends IRwtCoreEnvironment {
   void setPopupOwner(Control owner, Rectangle ownerBounds);
 
   /**
-   * @return styled partial html text (<b>no</b> document with root tag <html>) that can be used inside for example
-   *         table headers and table cells.
+   * @return styled partial html text (<b>no</b> document with root tag &lt;html&gt;) that can be used inside for
+   *         example table headers and table cells.
    *         The html, head and body tags are removed, newlines are replaced by br tags.
    */
   String adaptHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml);
+
+  /**
+   * @return converted links to local urls in html text. <b>&lt;a&gt;</b> -&gt; styled <b>&lt;span&gt;</b> as in Link
+   *         widget.
+   */
+  String convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml);
 
   /**
    * @return complete html document (root tag <html>).
