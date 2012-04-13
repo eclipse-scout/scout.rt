@@ -35,6 +35,12 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
  * The table is by default multi-select Columns are defined as inner classes for
  * every inner column class there is a generated getXYColumn method directly on
  * the table use isValueChangeTriggerEnabled() when formfieldata is being loaded
+ * <p>
+ * You can write html into the table cells.
+ * <p>
+ * You can use local urls that call back to the table itself and can be handled by overriding
+ * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}. A local URL is one of the form http://local/...
+ * <p>
  */
 public interface ITable extends IPropertyObserver, IDNDSupport {
 
@@ -95,6 +101,18 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    * Boolean
    */
   String PROP_SCROLL_TO_SELECTION = "scrollToSelection";
+
+  /**
+   * Host for local urls that call back to the table itself and can be handled by overriding
+   * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}.
+   */
+  String LOCAL_URL_HOST = "local";
+
+  /**
+   * Prefix for local urls that call back to the table itself and can be handled by overriding
+   * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}.
+   */
+  String LOCAL_URL_PREFIX = "http://" + LOCAL_URL_HOST + "/";
 
   void initTable() throws ProcessingException;
 

@@ -772,7 +772,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (col != null) {
       setContextColumn(col);
     }
-    execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
+    execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals(LOCAL_URL_HOST));
   }
 
   @Override
