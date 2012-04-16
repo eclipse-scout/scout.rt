@@ -529,7 +529,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       injectMenusInternal(menuList);
     }
     catch (Exception e) {
-      LOG.error("error occured while dynamically contribute menus.", e);
+      LOG.error("error occured while dynamically contributing menus.", e);
     }
     m_menus = menuList.toArray(new IMenu[0]);
     // key strokes

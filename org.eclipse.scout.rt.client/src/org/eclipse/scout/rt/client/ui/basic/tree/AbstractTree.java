@@ -386,8 +386,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         menuList.add(menu);
       }
       catch (Exception e) {
-        e.printStackTrace();
+        LOG.error("Exception occured while creating a new instance of " + ma[i].getName(), e);
       }
+    }
+    try {
+      injectMenusInternal(menuList);
+    }
+    catch (Exception e) {
+      LOG.error("Error occured while dynamically contributing menus.", e);
     }
     m_menus = menuList.toArray(new IMenu[0]);
   }
@@ -416,6 +422,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   protected void disposeTreeInternal() {
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br/>
+   * Used to manage menu list and add/remove menus
+   * 
+   * @param menuList
+   *          live and mutable list of configured menus
+   */
+  protected void injectMenusInternal(List<IMenu> menuList) {
   }
 
   @Override

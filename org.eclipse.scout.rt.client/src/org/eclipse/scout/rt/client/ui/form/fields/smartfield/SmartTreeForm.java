@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.QualifiedName;
@@ -24,6 +25,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNodeBuilder;
@@ -42,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadio
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.ActiveStateRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.NewButton;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.ResultTreeField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.ResultTreeField.Tree;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm.MainBox.StatusField;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -280,6 +283,16 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     }
   }
 
+  protected void execResultTreeNodeClick(ITreeNode node) throws ProcessingException {
+    doOk();
+  }
+
+  /**
+   * Override this method to adapt the menu list of the result {@link Tree}
+   */
+  protected void injectResultTreeMenus(List<IMenu> menuList) {
+  }
+
   /*
    * Operations
    */
@@ -339,7 +352,17 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
   @Override
   public LookupRow getAcceptedProposal() throws ProcessingException {
     LookupRow row = null;
-    ITreeNode node = getResultTreeField().getTree().getSelectedNode();
+    ITree tree = getResultTreeField().getTree();
+    ITreeNode node = null;
+    if (tree.isCheckable()) {
+      ITreeNode[] checkedNodes = tree.getCheckedNodes();
+      if (checkedNodes != null && checkedNodes.length > 0) {
+        node = checkedNodes[0];
+      }
+    }
+    else {
+      node = tree.getSelectedNode();
+    }
     if (node != null && node.isFilterAccepted() && node.isEnabled()) {
       row = (LookupRow) node.getCell().getValue();
     }
@@ -402,7 +425,8 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
         }
       });
       if (matchingNodes.size() > 0) {
-        tree.selectNode(matchingNodes.get(0));
+        selectValue(tree, matchingNodes.get(0));
+
         //ticket 87030
         for (int i = 1; i < matchingNodes.size(); i++) {
           ITreeNode node = matchingNodes.get(i);
@@ -415,12 +439,24 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
         //load tree
         ITreeNode node = loadNodeWithKey(selectedKey);
         if (node != null) {
-          tree.selectNode(node);
+          selectValue(tree, node);
           return true;
         }
       }
     }
     return false;
+  }
+
+  private void selectValue(ITree tree, ITreeNode node) {
+    if (tree == null || node == null) {
+      return;
+    }
+
+    tree.selectNode(node);
+
+    if (tree.isCheckable()) {
+      tree.setNodeChecked(node, true);
+    }
   }
 
   private ITreeNode loadNodeWithKey(Object key) throws ProcessingException {
@@ -558,7 +594,17 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
       public class Tree extends AbstractTree {
 
         @Override
+        protected void injectMenusInternal(List<IMenu> menuList) {
+          injectResultTreeMenus(menuList);
+        }
+
+        @Override
         protected boolean getConfiguredMultiSelect() {
+          return false;
+        }
+
+        @Override
+        protected boolean getConfiguredMultiCheck() {
           return false;
         }
 
@@ -574,7 +620,7 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
 
         @Override
         protected void execNodeClick(ITreeNode node) throws ProcessingException {
-          doOk();
+          execResultTreeNodeClick(node);
         }
 
       }
