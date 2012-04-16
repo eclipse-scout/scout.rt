@@ -55,7 +55,6 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -223,6 +222,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
   }
 
+  @Override
   public void setEnabledFromScout(boolean enabled) {
     m_enabledFromScout = enabled;
     if (getUiField() instanceof TreeEx) {
@@ -706,16 +706,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
           ViewerCell cell = getUiTreeViewer().getCell(new Point(event.x, event.y));
           if (cell != null && cell.getElement() instanceof ITreeNode) {
             ITreeNode nodeToClick = (ITreeNode) cell.getElement();
-            if (getScoutObject().isCheckable()) {
-              // find checkbox area
-              Rectangle imgBounds = cell.getImageBounds();
-              if (imgBounds != null && event.x >= (imgBounds.x) && event.x <= (imgBounds.x + imgBounds.width)) {
-                handleUiNodeClick(nodeToClick);
-              }
-            }
-            else {
-              handleUiNodeClick(nodeToClick);
-            }
+            handleUiNodeClick(nodeToClick);
           }
           break;
         }

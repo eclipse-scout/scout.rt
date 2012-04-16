@@ -122,7 +122,7 @@ public class TreeEvent extends EventObject {
     if (node != null) {
       m_nodes = new ITreeNode[]{node};
     }
-    m_commonParentNode = calculateCommonParentNode(m_nodes);
+    m_commonParentNode = TreeUtility.calculateCommonParentNode(m_nodes);
   }
 
   public TreeEvent(ITree source, int type, ITreeNode[] nodes) {
@@ -131,7 +131,7 @@ public class TreeEvent extends EventObject {
     if (nodes != null) {
       m_nodes = nodes;
     }
-    m_commonParentNode = calculateCommonParentNode(m_nodes);
+    m_commonParentNode = TreeUtility.calculateCommonParentNode(m_nodes);
   }
 
   public TreeEvent(ITree source, int type, ITreeNode parentNode, ITreeNode[] childNodes) {
@@ -142,7 +142,7 @@ public class TreeEvent extends EventObject {
     }
     m_commonParentNode = parentNode;
     if (m_commonParentNode == null) {
-      m_commonParentNode = calculateCommonParentNode(m_nodes);
+      m_commonParentNode = TreeUtility.calculateCommonParentNode(m_nodes);
     }
   }
 
@@ -295,28 +295,12 @@ public class TreeEvent extends EventObject {
     m_dropObject = t;
   }
 
+  /**
+   * @deprecated Use {@link TreeUtility#calculateCommonParentNode(ITreeNode[])};
+   */
+  @Deprecated
   public static ITreeNode calculateCommonParentNode(ITreeNode[] nodes) {
-    if (nodes != null) {
-      if (nodes.length == 0) {
-        return null;
-      }
-      else if (nodes.length == 1) {
-        return nodes[0].getParentNode();
-      }
-      else {
-        ITreeNode test = nodes[0].getParentNode();
-        for (int i = 1; i < nodes.length; i++) {
-          if (nodes[i].getParentNode() != test) {
-            test = null;
-            break;
-          }
-        }
-        return test;
-      }
-    }
-    else {
-      return null;
-    }
+    return TreeUtility.calculateCommonParentNode(nodes);
   }
 
   public boolean isConsumed() {

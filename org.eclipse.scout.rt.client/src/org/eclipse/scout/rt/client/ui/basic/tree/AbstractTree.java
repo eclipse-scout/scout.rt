@@ -993,6 +993,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         ArrayList<ITreeNode> changedNodes = new ArrayList<ITreeNode>();
         node.setCheckedInternal(b);
         changedNodes.add(node);
+
+        ITreeNode commonParent = node.getParentNode();
         //uncheck others in single-check mode
         if (b && !isMultiCheck()) {
           for (ITreeNode cn : getCheckedNodes()) {
@@ -1001,8 +1003,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
               changedNodes.add(cn);
             }
           }
+          commonParent = TreeUtility.findLowestCommonAncestorNode(changedNodes);
         }
-        fireNodesUpdated(node.getParentNode(), changedNodes.toArray(new ITreeNode[changedNodes.size()]));
+        fireNodesUpdated(commonParent, changedNodes.toArray(new ITreeNode[changedNodes.size()]));
       }
     }
   }
@@ -1947,11 +1950,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private void fireNodeClick(ITreeNode node) {
     if (node != null) {
       try {
-        //single observer for checkable trees
-        if (isCheckable() && node.isEnabled() && isEnabled()) {
-          node.setChecked(!node.isChecked());
-        }
-        //end single observer
+        interceptNodeClickSingleObserver(node);
         execNodeClick(node);
       }
       catch (ProcessingException ex) {
@@ -1960,6 +1959,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       catch (Throwable t) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
       }
+    }
+  }
+
+  protected void interceptNodeClickSingleObserver(ITreeNode node) {
+    if (isCheckable() && node.isEnabled() && isEnabled()) {
+      node.setChecked(!node.isChecked());
     }
   }
 
