@@ -48,25 +48,46 @@ public class RwtScoutSplitBox extends RwtScoutFieldComposite<ISplitBox> implemen
   @Override
   protected void attachScout() {
     super.attachScout();
-    // split position
-    int[] a = null;
-    String propName = getScoutObject().getCacheSplitterPositionPropertyName();
-    if (!StringUtility.isNullOrEmpty(propName)) {
-      if (getScoutObject().isCacheSplitterPosition()) {
-        try {
-          a = ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).getPropertyIntArray(propName);
-        }
-        catch (Throwable t) {
-          // nop
-        }
-      }
-    }
-    if (a != null && a.length == 2) {
-      setSplitterPosition(a[0], a[1]);
+
+    if (getScoutObject().isCacheSplitterPosition()) {
+      setCachedSplitterPosition();
     }
     else {
       setSplitterPositionFromScout();
     }
+  }
+
+  protected void setCachedSplitterPosition() {
+    Runnable job = new Runnable() {
+
+      @Override
+      public void run() {
+        final int[] a;
+        String propName = getScoutObject().getCacheSplitterPositionPropertyName();
+        if (!StringUtility.isNullOrEmpty(propName)) {
+          a = ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).getPropertyIntArray(propName);
+        }
+        else {
+          a = null;
+        }
+
+        getUiEnvironment().invokeUiLater(new Runnable() {
+
+          @Override
+          public void run() {
+            if (a != null && a.length == 2) {
+              setSplitterPosition(a[0], a[1]);
+            }
+            else {
+              setSplitterPositionFromScout();
+            }
+          }
+
+        });
+      }
+    };
+
+    getUiEnvironment().invokeScoutLater(job, 0);
   }
 
   @Override
@@ -84,15 +105,30 @@ public class RwtScoutSplitBox extends RwtScoutFieldComposite<ISplitBox> implemen
 
   protected void setSplitterPositionFromUi() {
     String propName = getScoutObject().getCacheSplitterPositionPropertyName();
-    if (!StringUtility.isNullOrEmpty(propName)) {
-      if (getScoutObject().isCacheSplitterPosition()) {
-        int[] weights = getUiContainer().getWeights();
+    if (StringUtility.isNullOrEmpty(propName)) {
+      return;
+    }
+
+    if (getScoutObject().isCacheSplitterPosition()) {
+      int[] weights = getUiContainer().getWeights();
+      cacheSplitterPosition(propName, weights);
+    }
+    else {
+      cacheSplitterPosition(propName, null);
+    }
+  }
+
+  protected void cacheSplitterPosition(final String propName, final int[] weights) {
+    Runnable job = new Runnable() {
+
+      @Override
+      public void run() {
         ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).setPropertyIntArray(propName, weights);
       }
-      else {
-        ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).setPropertyIntArray(propName, null);
-      }
-    }
+
+    };
+
+    getUiEnvironment().invokeScoutLater(job, 0);
   }
 
   protected void setSplitterPositionFromScout() {
