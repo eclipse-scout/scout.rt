@@ -29,7 +29,6 @@ BSI Business Systems Integration AG - initial API and implementation
    <url>
       <update label="Juno" url="http://download.eclipse.org/releases/juno"/>
       <discovery label="Juno" url="http://download.eclipse.org/releases/juno"/>
-      <discovery label="Orbit" url="http://download.eclipse.org/tools/orbit/downloads/drops/updateSite"/>
    </url>
 
    <includes
