@@ -28,7 +28,6 @@ BSI Business Systems Integration AG - initial API and implementation
    <url>
       <update label="Juno" url="http://download.eclipse.org/releases/juno"/>
       <discovery label="Juno" url="http://download.eclipse.org/releases/juno"/>
-      <discovery label="Orbit" url="http://download.eclipse.org/tools/orbit/downloads/drops/updateSite"/>
    </url>
 
    <includes
@@ -169,13 +168,6 @@ BSI Business Systems Integration AG - initial API and implementation
 
    <plugin
          id="org.eclipse.scout.svg.ui.swt"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.w3c.dom.svg"
          download-size="0"
          install-size="0"
          version="0.0.0"
