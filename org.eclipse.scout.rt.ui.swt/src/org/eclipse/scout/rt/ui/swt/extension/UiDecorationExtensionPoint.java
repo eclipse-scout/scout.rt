@@ -186,8 +186,12 @@ public final class UiDecorationExtensionPoint {
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_DIALOG_MIN_WIDTH) != 0) {
         LOOK_AND_FEEL.setDialogMinWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_DIALOG_MIN_WIDTH));
       }
-      if (props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_HEIGHT) != 0) {
-        LOOK_AND_FEEL.setFormFieldActivationButtonHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_HEIGHT));
+      int propActivationButtonHeight = props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_HEIGHT);
+      if (propActivationButtonHeight > 0) {
+        LOOK_AND_FEEL.setFormFieldActivationButtonHeight(propActivationButtonHeight);
+      }
+      else {
+        LOOK_AND_FEEL.setFormFieldActivationButtonHeight(getSystemRowHeight());
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WIDTH) != 0) {
         LOOK_AND_FEEL.setFormFieldActivationButtonWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WIDTH));
@@ -219,8 +223,12 @@ public final class UiDecorationExtensionPoint {
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_HORIZONTAL_GAP) != 0) {
         LOOK_AND_FEEL.setLogicalGridLayoutHorizontalGap(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_HORIZONTAL_GAP));
       }
-      if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_ROW_HEIGHT) != 0) {
-        LOOK_AND_FEEL.setLogicalGridLayoutRowHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_ROW_HEIGHT));
+      int gridRowHeight = props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_ROW_HEIGHT);
+      if (gridRowHeight > 1) {
+        LOOK_AND_FEEL.setLogicalGridLayoutRowHeight(gridRowHeight);
+      }
+      else {
+        LOOK_AND_FEEL.setLogicalGridLayoutRowHeight(getSystemRowHeight());
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_VERTICAL_GAP) != 0) {
         LOOK_AND_FEEL.setLogicalGridLayoutVerticalGap(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_VERTICAL_GAP));
@@ -244,6 +252,16 @@ public final class UiDecorationExtensionPoint {
       if (props.getPropertyString(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_HEIGHT) != null) {
         LOOK_AND_FEEL.setMessageBoxMinHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_HEIGHT));
       }
+    }
+  }
+
+  private static int getSystemRowHeight() {
+    String osName = Activator.getDefault().getBundle().getBundleContext().getProperty("org.osgi.framework.os.name");
+    if (StringUtility.equalsIgnoreCase("WindowsXP", osName)) {
+      return 21;
+    }
+    else {
+      return 23;
     }
   }
 
