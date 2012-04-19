@@ -1164,9 +1164,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   protected void storeStateInternal() throws ProcessingException {
     if (!m_blockingCondition.isBlocking()) {
-      // String
-      // msg="The form "+getFormId()+" was disposed. No more actions are allowed on it.";
-      String msg = ScoutTexts.get("FormDisposedMessage").replace("#1#", getTitle());
+      String msg = TEXTS.get("FormDisposedMessage", getTitle());
       LOG.error(msg);
       throw new VetoException(msg);
     }
