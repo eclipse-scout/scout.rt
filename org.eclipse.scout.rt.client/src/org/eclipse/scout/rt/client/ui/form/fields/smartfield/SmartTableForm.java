@@ -232,6 +232,19 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
 
   @Override
   public LookupRow getAcceptedProposal() throws ProcessingException {
+    LookupRow row = getSelectedLookupRow();
+    if (row != null && row.isEnabled()) {
+      return row;
+    }
+    else if (getSmartField().isAllowCustomText()) {
+      return null;
+    }
+    else {
+      return execGetSingleMatch();
+    }
+  }
+
+  public LookupRow getSelectedLookupRow() {
     Table table = getResultTableField().getTable();
     LookupRow row = null;
     if (table.isCheckable()) {
@@ -243,15 +256,8 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
     else {
       row = table.getKeyColumn().getSelectedValue();
     }
-    if (row != null && row.isEnabled()) {
-      return row;
-    }
-    else if (getSmartField().isAllowCustomText()) {
-      return null;
-    }
-    else {
-      return execGetSingleMatch();
-    }
+
+    return row;
   }
 
   /*
@@ -552,7 +558,7 @@ public class SmartTableForm extends AbstractSmartFieldProposalForm {
 
     @Override
     protected boolean execValidate() throws ProcessingException {
-      return getAcceptedProposal() != null;
+      return getAcceptedProposal() != null || getSmartField().isAllowCustomText();
     }
 
     @Override

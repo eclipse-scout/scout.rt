@@ -351,6 +351,19 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
 
   @Override
   public LookupRow getAcceptedProposal() throws ProcessingException {
+    LookupRow row = getSelectedLookupRow();
+    if (row != null && row.isEnabled()) {
+      return row;
+    }
+    else if (getSmartField().isAllowCustomText()) {
+      return null;
+    }
+    else {
+      return execGetSingleMatch();
+    }
+  }
+
+  public LookupRow getSelectedLookupRow() {
     LookupRow row = null;
     ITree tree = getResultTreeField().getTree();
     ITreeNode node = null;
@@ -366,15 +379,8 @@ public class SmartTreeForm extends AbstractSmartFieldProposalForm {
     if (node != null && node.isFilterAccepted() && node.isEnabled()) {
       row = (LookupRow) node.getCell().getValue();
     }
-    if (row != null && row.isEnabled()) {
-      return row;
-    }
-    else if (getSmartField().isAllowCustomText()) {
-      return null;
-    }
-    else {
-      return execGetSingleMatch();
-    }
+
+    return row;
   }
 
   /*
