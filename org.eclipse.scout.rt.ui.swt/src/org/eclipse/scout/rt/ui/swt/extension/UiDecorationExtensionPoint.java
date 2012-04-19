@@ -261,7 +261,7 @@ public final class UiDecorationExtensionPoint {
       return 21;
     }
     else {
-      return 23;
+      return 28;
     }
   }
 
