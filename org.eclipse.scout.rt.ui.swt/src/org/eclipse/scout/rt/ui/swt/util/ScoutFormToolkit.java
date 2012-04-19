@@ -161,7 +161,7 @@ public class ScoutFormToolkit extends WrappedFormToolkit {
   }
 
   public ButtonEx createButtonEx(Composite parent, int style) {
-    ButtonEx button = new ButtonEx(parent, style);
+    ButtonEx button = new ButtonEx(parent, style | SWT.FLAT);
     adapt(button, false, false);
     return button;
   }
