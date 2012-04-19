@@ -448,11 +448,12 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
         m_pendingProposalJob = null;
       }
     }
+    final String text = getUiField().getText();
     // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().acceptProposalFromUI();
+        getScoutObject().getUIFacade().setTextFromUI(text);
       }
     };
     getUiEnvironment().invokeScoutLater(t, 0);
