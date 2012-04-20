@@ -483,13 +483,11 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected void handleUiInputVerifier(boolean doit) {
-    if (!doit) {
-      return;
-    }
-    handleSwtTraverseVerifier();
+    // void since handle swt input verifier works with focus and not traverse events
+    return;
   }
 
-  protected boolean handleSwtTraverseVerifier() {
+  protected boolean handleUiTraverseVerifier() {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
         m_pendingProposalJob.cancel();
@@ -580,7 +578,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
         }
         break;
       default:
-        event.doit = handleSwtTraverseVerifier();
+        event.doit = handleUiTraverseVerifier();
 
     }
   }
