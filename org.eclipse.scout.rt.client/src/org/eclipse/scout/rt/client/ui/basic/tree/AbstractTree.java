@@ -2433,19 +2433,29 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
               }
             }
           }
-          // check filtered nodes
-          // add existing selected nodes that are masked by filter
           ArrayList<ITreeNode> validNodes = new ArrayList<ITreeNode>();
-          for (ITreeNode node : getSelectedNodes()) {
-            if (!node.isFilterAccepted()) {
+          if (isMultiSelect()) {
+            // When multiselection is enabled
+            // check filtered nodes
+            // add existing selected nodes that are masked by filter
+            for (ITreeNode node : getSelectedNodes()) {
+              if (!node.isFilterAccepted()) {
+                validNodes.add(node);
+              }
+            }
+            // remove all filtered from requested
+            requestedNodes.removeAll(validNodes);
+            // add remainder
+            for (ITreeNode node : requestedNodes) {
               validNodes.add(node);
             }
           }
-          // remove all filtered from requested
-          requestedNodes.removeAll(validNodes);
-          // add remainder
-          for (ITreeNode node : requestedNodes) {
-            validNodes.add(node);
+          else {
+            for (ITreeNode node : requestedNodes) {
+              if (node.isFilterAccepted()) {
+                validNodes.add(node);
+              }
+            }
           }
           selectNodes(validNodes.toArray(new ITreeNode[validNodes.size()]), false);
         }
