@@ -1259,6 +1259,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       setTreeChanging(true);
       //
       parent = resolveNode(parent);
+      if (parent == null) {
+        return;
+      }
       children = resolveNodes(children);
       deselectNodes(children);
       ((AbstractTreeNode) parent).removeChildNodesInternal(children, true);

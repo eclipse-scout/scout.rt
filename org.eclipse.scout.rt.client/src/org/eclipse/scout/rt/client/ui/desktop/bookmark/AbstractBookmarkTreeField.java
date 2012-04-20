@@ -650,11 +650,11 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         if (MessageBox.showDeleteConfirmationMessage(names.toArray(new String[names.size()]))) {
           // delete bookmarks
           for (ITreeNode bookmark : bookmarks) {
-            getTree().removeNode(bookmark);
+            tree.removeNode(bookmark);
           }
           // delete folders
           for (ITreeNode bookmark : folders) {
-            getTree().removeNode(bookmark);
+            tree.removeNode(bookmark);
           }
           refreshBookmarkModel();
         }
