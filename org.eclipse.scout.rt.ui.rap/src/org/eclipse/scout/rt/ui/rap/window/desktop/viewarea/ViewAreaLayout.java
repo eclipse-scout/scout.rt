@@ -294,14 +294,14 @@ public class ViewAreaLayout extends Layout {
       }
     }
     // sashes
-    Rectangle sashTop = new Rectangle(0, 0, 0, 0);
-    Rectangle sashBottom = new Rectangle(0, 0, 0, 0);
+    Rectangle sashTop = new Rectangle(0, 0, clientArea.width, 0);
+    Rectangle sashBottom = new Rectangle(0, 0, clientArea.width, 0);
     int pos = viewArea.getSashPosition(keyTop);
     if (pos > 0 && bounds[0].height > 0) {
       bounds[0].height = pos - clientArea.y;
     }
     pos = viewArea.getSashPosition(keyBottom);
-    if (pos > 0 && bounds[3].height > 0) {
+    if (pos > 0 && bounds[2].height > 0) {
       bounds[2].height = pos - clientArea.y;
     }
     // visibility of sashes
