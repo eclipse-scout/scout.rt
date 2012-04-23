@@ -92,6 +92,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   private Menu m_contextMenu;
   private TextFieldEditableSupport m_editableSupport;
 
+  private P_KeyListener m_tabKeyListener;
+  private P_KeyListener m_shiftTabKeyListener;
   private Set<IPopupSupportListener> m_popupEventListeners;
   private Object m_popupEventListenerLock;
 
@@ -161,6 +163,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_UP), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_DOWN), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_UP), false);
+    m_tabKeyListener = new P_KeyListener(SWT.TAB);
+    m_shiftTabKeyListener = new P_KeyListener(SWT.TAB, SWT.SHIFT);
 
     P_RwtBrowseButtonListener browseButtonListener = new P_RwtBrowseButtonListener();
     getUiBrowseButton().addSelectionListener(browseButtonListener);
@@ -255,7 +259,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       getUiField().setSelection(0, getUiField().getText().length());
     }
     if (getScoutObject().getErrorStatus() != null) {
-      requestProposalSupportFromUi(getScoutObject().getDisplayText(), false);
+      requestProposalSupportFromUi(getScoutObject().getDisplayText(), false, 0);
     }
   }
 
@@ -285,14 +289,13 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   protected void showProposalPopup(final ISmartFieldProposalForm form) {
     // close old
-    if (m_proposalPopup != null) {
-      if (m_proposalPopup.isVisible()) {
-        m_proposalPopup.closePart();
-      }
-      m_proposalPopup = null;
-    }
+    hideProposalPopup();
     // show new
     if (getUiField().isFocusControl()) {
+      // make shure tab won't go to next field
+      getUiEnvironment().addKeyStroke(getUiField(), m_tabKeyListener, true);
+      getUiEnvironment().addKeyStroke(getUiField(), m_shiftTabKeyListener, true);
+
       m_proposalPopup = new RwtScoutDropDownPopup();
       m_proposalPopup.createPart(form, m_smartContainer, getUiField(), SWT.RESIZE, getUiEnvironment());
       m_proposalPopup.setMaxHeightHint(280);
@@ -413,6 +416,9 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   protected boolean hideProposalPopup() {
     synchronized (m_popupLock) {
+      // make shure tab won't go to next field
+      getUiEnvironment().removeKeyStroke(getUiField(), m_tabKeyListener);
+      getUiEnvironment().removeKeyStroke(getUiField(), m_shiftTabKeyListener);
       if (m_proposalPopup != null && m_proposalPopup.isVisible()) {
         m_proposalPopup.closePart();
         m_proposalPopup = null;
@@ -422,7 +428,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  protected void requestProposalSupportFromUi(String text, boolean selectCurrentValue) {
+  protected void requestProposalSupportFromUi(String text, boolean selectCurrentValue, long initialDelay) {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob == null) {
         m_pendingProposalJob = new P_PendingProposalJob();
@@ -432,11 +438,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
         m_pendingProposalJob.cancel();
       }
       m_pendingProposalJob.update(text, selectCurrentValue);
-      long delay = 400;
-      if (m_proposalPopup == null) {
-        delay = 0;
-      }
-      m_pendingProposalJob.schedule(delay);
+      m_pendingProposalJob.schedule(initialDelay);
     }
   }
 
@@ -526,7 +528,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   protected void handleUiBrowseAction() {
     if (getUiBrowseButton().isVisible() && getUiBrowseButton().isEnabled()) {
-      requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true);
+      requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true, 0);
     }
   }
 
@@ -550,11 +552,11 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       if (text == null || text.length() == 0) {
         // allow empty field without proposal
         if (m_proposalPopup != null) {
-          requestProposalSupportFromUi(text, false);
+          requestProposalSupportFromUi(text, false, 0);
         }
       }
       else {
-        requestProposalSupportFromUi(text, false);
+        requestProposalSupportFromUi(text, false, m_proposalPopup != null ? 200 : 0);
       }
     }
   }
@@ -628,20 +630,33 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       super(keyCode);
     }
 
+    public P_KeyListener(int keyCode, int stateMask) {
+      super(keyCode, stateMask);
+    }
+
     @Override
     public void handleUiAction(Event e) {
-      if (m_proposalPopup == null) {
-        requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true);
-      }
-      else {
-        Widget c = null;
-        if (c == null) {
-          c = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), Table.class);
-        }
-        if (c == null) {
-          c = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), Tree.class);
-        }
-        RwtUtility.handleNavigationKey(c, e.keyCode);
+      switch (e.keyCode) {
+        case SWT.TAB:
+          getUiEnvironment().removeKeyStroke(getUiField(), m_tabKeyListener);
+          getUiEnvironment().removeKeyStroke(getUiField(), m_shiftTabKeyListener);
+          break;
+
+        default:
+          if (m_proposalPopup == null) {
+            requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true, 0);
+          }
+          else {
+            Widget c = null;
+            if (c == null) {
+              c = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), Table.class);
+            }
+            if (c == null) {
+              c = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), Tree.class);
+            }
+            RwtUtility.handleNavigationKey(c, e.keyCode);
+          }
+          break;
       }
     }
   }
