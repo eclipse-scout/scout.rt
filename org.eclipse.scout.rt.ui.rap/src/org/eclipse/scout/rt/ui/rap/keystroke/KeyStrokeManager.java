@@ -206,7 +206,7 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     if (widget != null) {
       Object data = widget.getData(DATA_KEY_STROKES);
       if (data instanceof List && ((List<IRwtKeyStroke>) data).size() > 0) {
-        keyStrokes = (List<IRwtKeyStroke>) data;
+        keyStrokes = CollectionUtility.copyList((List<IRwtKeyStroke>) data);
       }
     }
     if (keyStrokes == null) {
