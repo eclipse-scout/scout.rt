@@ -18,19 +18,35 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
 public class SplashProgressMonitor extends NullProgressMonitor {
-  private ISwingEnvironment m_env;
+  private final ISwingEnvironment m_env;
+  private final boolean m_showPercentage;
+  private int m_totalWork;
+  private int m_worked;
   private String m_name1;
   private String m_name2;
   private String m_displayText;
   private ISplashWindow m_splash;
 
   public SplashProgressMonitor(ISwingEnvironment env) {
+    this(env, false);
+  }
+
+  public SplashProgressMonitor(ISwingEnvironment env, boolean showPercentage) {
     m_env = env;
+    m_showPercentage = showPercentage;
   }
 
   @Override
   public void beginTask(String name, int totalWork) {
     m_name1 = name;
+    m_totalWork = totalWork;
+    m_worked = 0;
+    setNameInternal();
+  }
+
+  @Override
+  public void worked(int work) {
+    m_worked += work;
     setNameInternal();
   }
 
@@ -48,14 +64,18 @@ public class SplashProgressMonitor extends NullProgressMonitor {
   }
 
   private void setNameInternal() {
+    m_displayText = "";
+    if (m_showPercentage && m_totalWork > 0 && m_worked > 0) {
+      m_displayText += (int) Math.floor(100d * (double) m_worked / (double) m_totalWork) + "% ";
+    }
     if (m_name2 != null) {
-      m_displayText = m_name2;
+      m_displayText += m_name2;
     }
     else if (m_name1 != null) {
-      m_displayText = m_name1;
+      m_displayText += m_name1;
     }
     else {
-      m_displayText = "...";
+      m_displayText += "...";
     }
     SwingUtilities.invokeLater(
         new Runnable() {

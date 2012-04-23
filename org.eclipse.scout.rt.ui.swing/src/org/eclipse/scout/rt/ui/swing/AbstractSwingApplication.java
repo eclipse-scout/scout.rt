@@ -92,7 +92,7 @@ public abstract class AbstractSwingApplication implements IApplication {
       LOG.warn(null, e);
       System.exit(0);
     }
-    m_monitor = new SplashProgressMonitor(m_env);
+    m_monitor = new SplashProgressMonitor(m_env, showSplashScreenProgressInPercentage());
     // register progress as osgi service
     if (Platform.getProduct() != null && Platform.getProduct().getDefiningBundle() != null) {
       BundleContext ctx = Platform.getProduct().getDefiningBundle().getBundleContext();
@@ -103,6 +103,14 @@ public abstract class AbstractSwingApplication implements IApplication {
 
   protected ISwingEnvironment createSwingEnvironment() {
     return new DefaultSwingEnvironment();
+  }
+
+  /**
+   * @return Returns <code>true</code> if the splash screen shows the current status in percentage as well (if required
+   *         data is available). Default is <code>false</code>.
+   */
+  protected boolean showSplashScreenProgressInPercentage() {
+    return false;
   }
 
   protected abstract IClientSession getClientSession();
