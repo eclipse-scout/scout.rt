@@ -272,7 +272,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       return;
     }
     getUiTreeViewer().setSelection(new StructuredSelection(scoutNodes));
-    getUiField().showSelection();
+    updateScrollToSelectionFromScout();
   }
 
   protected void setKeyStrokeFormScout() {
@@ -382,7 +382,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
   }
 
-  protected void setScrollToSelectionFromScout() {
+  protected void updateScrollToSelectionFromScout() {
     if (getScoutObject().isScrollToSelection()) {
       scrollToSelection();
     }
@@ -404,7 +404,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       setKeyStrokeFormScout();
     }
     else if (name.equals(ITree.PROP_SCROLL_TO_SELECTION)) {
-      setScrollToSelectionFromScout();
+      updateScrollToSelectionFromScout();
     }
     super.handleScoutPropertyChange(name, newValue);
   }
@@ -776,6 +776,10 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
               }
             }
           }
+          break;
+        }
+        case SWT.Resize: {
+          updateScrollToSelectionFromScout();
           break;
         }
       }
