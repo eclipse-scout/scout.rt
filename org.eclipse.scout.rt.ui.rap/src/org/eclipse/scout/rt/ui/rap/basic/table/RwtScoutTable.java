@@ -660,10 +660,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         selectedRows = new ITableRow[0];
       }
       getUiTableViewer().setSelection(new StructuredSelection(selectedRows), true);
-      //ticket 96051
-      if (getScoutObject().isScrollToSelection()) {
-        scrollToSelection();
-      }
+      updateScrollToSelectionFromScout();
     }
   }
 
@@ -674,7 +671,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
   }
 
   protected void scrollToSelection() {
-    getUiField().showSelection();
+    if (getUiField() != null && !getUiField().isDisposed()) {
+      getUiField().showSelection();
+    }
   }
 
   protected void setContextColumnFromUi(TableColumn uiColumn) {
@@ -1131,10 +1130,11 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         }
         case SWT.Resize: {
           //lazy column auto-fit
-          if (getScoutObject().isAutoResizeColumns()) {
-            if (getUiField() != null && !getUiField().isDisposed()) {
+          if (getUiField() != null && !getUiField().isDisposed()) {
+            if (getScoutObject().isAutoResizeColumns()) {
               scheduleHandleAutoResizeColumn();
             }
+            updateScrollToSelectionFromScout();
           }
           break;
         }
@@ -1153,7 +1153,10 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     public void handleEvent(Event event) {
       //lazy column auto-fit
       if (getUiField() != null && !getUiField().isDisposed()) {
-        scheduleHandleAutoResizeColumn();
+        if (getScoutObject().isAutoResizeColumns()) {
+          scheduleHandleAutoResizeColumn();
+        }
+        updateScrollToSelectionFromScout();
       }
     }
   } // end class P_SwtResizeListener
