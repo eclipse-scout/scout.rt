@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,6 +23,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
 
@@ -30,8 +33,13 @@ public class ServerSessionRegistryService extends AbstractService implements ISe
   public static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerSessionRegistryService.class);
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject) throws ProcessingException {
+    return newServerSession(clazz, subject, UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN));
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject, UserAgent userAgent) throws ProcessingException {
     IServerSession serverSession;
     try {
       serverSession = clazz.newInstance();
@@ -39,6 +47,7 @@ public class ServerSessionRegistryService extends AbstractService implements ISe
     catch (Throwable t) {
       throw new ProcessingException("create instance of " + clazz, t);
     }
+    serverSession.setUserAgent(userAgent);
     ServerJob initJob = new ServerJob("new " + clazz.getSimpleName(), serverSession, subject) {
       @Override
       protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {

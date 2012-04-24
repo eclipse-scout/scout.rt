@@ -38,6 +38,9 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
 import org.eclipse.scout.rt.ui.swing.splash.SplashProgressMonitor;
 import org.osgi.framework.BundleContext;
@@ -166,6 +169,10 @@ public abstract class AbstractSwingApplication implements IApplication {
     if (locale != null) {
       Locale.setDefault(locale);
     }
+  }
+
+  protected UserAgent initUserAgent() {
+    return UserAgent.create(UiLayer.SWING, UiDeviceType.DESKTOP);
   }
 
   protected Object startInSubject(IApplicationContext context) throws Exception {

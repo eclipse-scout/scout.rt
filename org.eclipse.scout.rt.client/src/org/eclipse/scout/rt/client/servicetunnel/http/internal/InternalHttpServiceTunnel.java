@@ -233,6 +233,7 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
       ServiceTunnelRequest cancelCall = new ServiceTunnelRequest(getVersion(), IServerProcessingCancelService.class, IServerProcessingCancelService.class.getMethod("cancel", long.class), new Object[]{requestSequence});
       cancelCall.setClientSubject(getClientSession().getSubject());
       cancelCall.setVirtualSessionId(getClientSession().getVirtualSessionId());
+      cancelCall.setUserAgent(getClientSession().getUserAgent().createIdentifier());
       HttpBackgroundJob cancelHttpJob = new HttpBackgroundJob(ScoutTexts.get("ServerCallCancelProcessing"), cancelCall, new Object(), this);
       cancelHttpJob.setSystem(true);
       cancelHttpJob.schedule();

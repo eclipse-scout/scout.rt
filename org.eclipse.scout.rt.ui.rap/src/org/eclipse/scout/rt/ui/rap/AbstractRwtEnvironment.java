@@ -66,6 +66,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.rap.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
 import org.eclipse.scout.rt.ui.rap.core.IRwtEnvironmentListener;
@@ -77,6 +80,7 @@ import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.core.util.AbstractRwtUtility;
 import org.eclipse.scout.rt.ui.rap.core.util.BrowserInfo;
 import org.eclipse.scout.rt.ui.rap.core.util.ColorFactory;
+import org.eclipse.scout.rt.ui.rap.core.util.DeviceUtility;
 import org.eclipse.scout.rt.ui.rap.core.util.FontRegistry;
 import org.eclipse.scout.rt.ui.rap.core.util.RwtIconLocator;
 import org.eclipse.scout.rt.ui.rap.core.window.IRwtScoutPart;
@@ -336,11 +340,15 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         throw new SecurityException("/rap request is not authenticated with a Subject");
       }
 
+      UserAgent userAgent = initUserAgent();
+      DeviceUtility.setCurrentDeviceType(userAgent.getUiDeviceType());
+
       final BooleanHolder newSession = new BooleanHolder(true);
       IClientSession tempClientSession = (IClientSession) RWT.getSessionStore().getAttribute(IClientSession.class.getName());
       if (tempClientSession == null || !tempClientSession.isActive()) {
         LocaleThreadLocal.set(RwtUtility.getBrowserInfo().getLocale());
-        tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString());
+        tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString(), userAgent);
+
         RWT.getSessionStore().setAttribute(IClientSession.class.getName(), tempClientSession);
         RWT.getSessionStore().addSessionStoreListener(m_sessionStoreListener);
 
@@ -410,6 +418,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         fireEnvironmentChanged(new RwtEnvironmentEvent(this, m_status));
       }
     }
+  }
+
+  protected UserAgent initUserAgent() {
+    return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, AbstractRwtUtility.getBrowserInfo().getUserAgent());
   }
 
   protected RwtBusyHandler attachBusyHandler(IClientSession session) {

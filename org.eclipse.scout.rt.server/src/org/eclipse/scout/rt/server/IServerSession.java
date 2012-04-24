@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.osgi.framework.Bundle;
 
 /**
@@ -55,4 +56,8 @@ public interface IServerSession {
    * @return used to foce sync execution of server jobs
    */
   boolean isWebSession();
+
+  UserAgent getUserAgent();
+
+  void setUserAgent(UserAgent userAgent);
 }

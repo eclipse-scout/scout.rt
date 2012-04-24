@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.osgi.framework.Bundle;
 
 public interface IClientSession {
@@ -187,4 +188,8 @@ public interface IClientSession {
    * @param l
    */
   void setLocale(Locale l);
+
+  UserAgent getUserAgent();
+
+  void setUserAgent(UserAgent userAgent);
 }

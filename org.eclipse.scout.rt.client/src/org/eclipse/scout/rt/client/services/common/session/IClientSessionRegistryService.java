@@ -14,10 +14,13 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.IService;
 
 @Priority(-3)
 public interface IClientSessionRegistryService extends IService {
+
+  <T extends IClientSession> T getClientSession(Class<T> clazz);
 
   /**
    * @param clazz
@@ -33,7 +36,12 @@ public interface IClientSessionRegistryService extends IService {
    *         Warning: only use this method if the client environment is swt, swing, ... and therefore supports singleton
    *         user sessions. Don't use it with web apps (rap, rwt, wicket)
    */
-  <T extends IClientSession> T getClientSession(Class<T> clazz);
+  <T extends IClientSession> T getClientSession(Class<T> clazz, UserAgent userAgent);
+
+  /**
+   * @see #newClientSession(Class, Subject, String, UserAgent)
+   */
+  <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId);
 
   /**
    * @param clazz
@@ -45,6 +53,6 @@ public interface IClientSessionRegistryService extends IService {
    *         Note: If the creation of the session requires a special jaas context call it only inside a
    *         {@link Subject#doAs(Subject, java.security.PrivilegedAction)} section
    */
-  <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId);
+  <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId, UserAgent userAgent);
 
 }

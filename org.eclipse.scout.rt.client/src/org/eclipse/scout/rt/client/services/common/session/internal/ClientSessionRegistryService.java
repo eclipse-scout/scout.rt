@@ -23,6 +23,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
 
@@ -33,50 +36,95 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
   private final HashMap<String, IClientSession> m_cache = new HashMap<String, IClientSession>();
   private final Object m_cacheLock = new Object();
 
-  @Override
   @SuppressWarnings("unchecked")
-  public <T extends IClientSession> T getClientSession(Class<T> clazz) {
-    String symbolicName = clazz.getPackage().getName();
-    Bundle bundleLocator = null;
-    while (symbolicName != null) {
-      bundleLocator = Platform.getBundle(symbolicName);
-      int i = symbolicName.lastIndexOf('.');
-      if (bundleLocator != null || i < 0) {
-        break;
-      }
-      symbolicName = symbolicName.substring(0, i);
+  @Override
+  public <T extends IClientSession> T getClientSession(Class<T> clazz, UserAgent userAgent) {
+    final Bundle bundle = getDefiningBundle(clazz);
+    if (bundle == null) {
+      return null;
     }
-    final Bundle bundle = Platform.getBundle(symbolicName);
-    if (bundle != null) {
-      synchronized (m_cacheLock) {
-        IClientSession clientSession = m_cache.get(bundle.getSymbolicName());
-        if (clientSession == null || !clientSession.isActive()) {
-          try {
-            clientSession = clazz.newInstance();
-            m_cache.put(symbolicName, clientSession);
-            ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
-              @Override
-              protected void runVoid(IProgressMonitor monitor) throws Throwable {
-                getCurrentSession().startSession(bundle);
-              }
-            };
-            job.schedule();
-            job.join();
-            job.throwOnError();
-          }
-          catch (Throwable t) {
-            LOG.error("could not load session for " + symbolicName, t);
-          }
-        }
-        return (T) clientSession;
+
+    synchronized (m_cacheLock) {
+      IClientSession clientSession = m_cache.get(bundle.getSymbolicName());
+      if (clientSession == null || !clientSession.isActive()) {
+        clientSession = createAndStartClientSession(clazz, bundle, userAgent);
+        m_cache.put(bundle.getSymbolicName(), clientSession);
       }
+      return (T) clientSession;
     }
-    return null;
   }
 
   @Override
+  public <T extends IClientSession> T getClientSession(Class<T> clazz) {
+    return getClientSession(clazz, UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN));
+  }
+
   @SuppressWarnings("unchecked")
+  private <T extends IClientSession> T createAndStartClientSession(Class<T> clazz, final Bundle bundle, UserAgent userAgent) {
+    IClientSession clientSession;
+    try {
+      clientSession = clazz.newInstance();
+      clientSession.setUserAgent(userAgent);
+      ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          getCurrentSession().startSession(bundle);
+        }
+      };
+      job.schedule();
+      job.join();
+      job.throwOnError();
+
+      return (T) clientSession;
+    }
+    catch (Throwable t) {
+      LOG.error("could not load session for " + bundle.getSymbolicName(), t);
+      return null;
+    }
+  }
+
+  @Override
+  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId, UserAgent userAgent) {
+    final Bundle bundle = getDefiningBundle(clazz);
+    if (bundle == null) {
+      return null;
+    }
+
+    return createAndStartClientSession(clazz, bundle, subject, virtualSessionId, userAgent);
+  }
+
+  @Override
   public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId) {
+    return newClientSession(clazz, subject, virtualSessionId, UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN));
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends IClientSession> T createAndStartClientSession(Class<T> clazz, final Bundle bundle, Subject subject, String virtualSessionId, UserAgent userAgent) {
+    try {
+      IClientSession clientSession = clazz.newInstance();
+      clientSession.setSubject(subject);
+      if (virtualSessionId != null) {
+        clientSession.setVirtualSessionId(virtualSessionId);
+      }
+      clientSession.setUserAgent(userAgent);
+      ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          getCurrentSession().startSession(bundle);
+        }
+      };
+      //must run now to use correct jaas and subject context of calling thread
+      job.runNow(new NullProgressMonitor());
+      job.throwOnError();
+      return (T) clientSession;
+    }
+    catch (Throwable t) {
+      LOG.error("could not load session for " + bundle.getSymbolicName(), t);
+      return null;
+    }
+  }
+
+  private <T extends IClientSession> Bundle getDefiningBundle(Class<T> clazz) {
     String symbolicName = clazz.getPackage().getName();
     Bundle bundleLocator = null;
     while (symbolicName != null) {
@@ -87,29 +135,8 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
       }
       symbolicName = symbolicName.substring(0, i);
     }
-    final Bundle bundle = Platform.getBundle(symbolicName);
-    if (bundle != null) {
-      try {
-        IClientSession clientSession = clazz.newInstance();
-        clientSession.setSubject(subject);
-        if (virtualSessionId != null) {
-          clientSession.setVirtualSessionId(virtualSessionId);
-        }
-        ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
-          @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
-            getCurrentSession().startSession(bundle);
-          }
-        };
-        //must run now to use correct jaas and subject context of calling thread
-        job.runNow(new NullProgressMonitor());
-        job.throwOnError();
-        return (T) clientSession;
-      }
-      catch (Throwable t) {
-        LOG.error("could not load session for " + symbolicName, t);
-      }
-    }
-    return null;
+
+    return Platform.getBundle(symbolicName);
   }
+
 }

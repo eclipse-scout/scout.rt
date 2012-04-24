@@ -120,6 +120,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       ServiceTunnelRequest call = new ServiceTunnelRequest(getVersion(), serviceInterfaceClass, operation, serializableArgs);
       call.setClientSubject(getClientSession().getSubject());
       call.setVirtualSessionId(getClientSession().getVirtualSessionId());
+      call.setUserAgent(getClientSession().getUserAgent().createIdentifier());
       //
       ServiceTunnelResponse response = tunnel(call);
       // check if response is interrupted (incomplete /null=interrupted)

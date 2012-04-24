@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.shared.TextsThreadLocal;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 
@@ -48,6 +49,7 @@ public abstract class AbstractServerSession implements IServerSession {
   private final SharedVariableMap m_sharedVariableMap;
   private boolean m_webSession;
   private ScoutTexts m_scoutTexts;
+  private UserAgent m_userAgent;
 
   public AbstractServerSession(boolean autoInitConfig) {
     m_locale = LocaleThreadLocal.get();
@@ -210,6 +212,16 @@ public abstract class AbstractServerSession implements IServerSession {
   @Override
   public boolean isWebSession() {
     return m_webSession;
+  }
+
+  @Override
+  public UserAgent getUserAgent() {
+    return m_userAgent;
+  }
+
+  @Override
+  public void setUserAgent(UserAgent userAgent) {
+    m_userAgent = userAgent;
   }
 
 }

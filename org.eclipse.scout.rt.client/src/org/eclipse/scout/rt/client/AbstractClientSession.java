@@ -48,6 +48,9 @@ import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedN
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
@@ -77,6 +80,7 @@ public abstract class AbstractClientSession implements IClientSession {
   private final HashMap<String, Object> m_clientSessionData;
   private ScoutTexts m_scoutTexts;
   private Locale m_locale;
+  private UserAgent m_userAgent;
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
@@ -479,6 +483,20 @@ public abstract class AbstractClientSession implements IClientSession {
   @Override
   public Object getData(String key) {
     return m_clientSessionData.get(key);
+  }
+
+  @Override
+  public UserAgent getUserAgent() {
+    if (m_userAgent == null) {
+      LOG.warn("UserAgent has not been initialied correctly. Using default.");
+      m_userAgent = UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN);
+    }
+    return m_userAgent;
+  }
+
+  @Override
+  public void setUserAgent(UserAgent userAgent) {
+    m_userAgent = userAgent;
   }
 
 }

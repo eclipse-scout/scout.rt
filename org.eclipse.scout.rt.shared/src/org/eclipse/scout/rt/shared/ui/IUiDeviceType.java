@@ -8,13 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.core.util;
+package org.eclipse.scout.rt.shared.ui;
 
 /**
- *
+ * @since 3.8.0
  */
-public enum DeviceType {
-  DESKTOP,
-  TABLET,
-  MOBILE
+public interface IUiDeviceType {
+  String getIdentifier();
 }

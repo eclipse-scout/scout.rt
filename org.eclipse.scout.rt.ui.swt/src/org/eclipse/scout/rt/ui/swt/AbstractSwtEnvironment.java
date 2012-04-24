@@ -53,6 +53,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.swt.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.concurrency.SwtScoutSynchronizer;
@@ -389,11 +392,10 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     //
     try {
       m_status = SwtEnvironmentEvent.STARTING;
-
       m_clipboard = new Clipboard(getDisplay());
-
       fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
-      IClientSession tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(m_clientSessionClass);
+
+      IClientSession tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(m_clientSessionClass, initUserAgent());
       if (!tempClientSession.isActive()) {
         showClientSessionLoadError(tempClientSession.getLoadError());
         LOG.error("ClientSession is not active, there must be a problem with loading or starting");
@@ -479,6 +481,10 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
       }
     }
+  }
+
+  protected UserAgent initUserAgent() {
+    return UserAgent.create(UiLayer.SWT, UiDeviceType.DESKTOP);
   }
 
   protected SwtBusyHandler attachBusyHandler(IClientSession session) {

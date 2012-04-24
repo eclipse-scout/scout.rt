@@ -50,6 +50,9 @@ import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHand
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -198,19 +201,19 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_orderedBundleList;
   }
 
-  private IServerSession lookupScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, Subject subject) throws ProcessingException, ServletException {
+  private IServerSession lookupScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
     //external request: apply locking, this is the session initialization phase
     synchronized (req.getSession()) {
       IServerSession serverSession = (IServerSession) req.getSession().getAttribute(IServerSession.class.getName());
       if (serverSession == null) {
-        serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
+        serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
         req.getSession().setAttribute(IServerSession.class.getName(), serverSession);
       }
       return serverSession;
     }
   }
 
-  private IServerSession lookupScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxSessionId, Subject subject) throws ProcessingException, ServletException {
+  private IServerSession lookupScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxSessionId, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
     synchronized (m_ajaxSessionCache) {
       //update session timeout
       int maxInactive = req.getSession().getMaxInactiveInterval();
@@ -220,7 +223,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(1000L, 1000L * maxInactive));
       IServerSession serverSession = m_ajaxSessionCache.get(ajaxSessionId);
       if (serverSession == null) {
-        serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
+        serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
         m_ajaxSessionCache.put(ajaxSessionId, serverSession);
       }
       else {
@@ -246,7 +249,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
       ThreadContext.putHttpServletRequest(req);
       ThreadContext.putHttpServletResponse(res);
       //
-      IServerSession serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject);
+      UserAgent userAgent = UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN);
+      IServerSession serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject, userAgent);
       //
       ServerJob job = new AdminServiceJob(serverSession, subject, req, res);
       job.runNow(new NullProgressMonitor());
@@ -280,11 +284,12 @@ public class ServiceTunnelServlet extends HttpServletEx {
         //virtual or http session?
         IServerSession serverSession;
         String virtualSessionId = serviceRequest.getVirtualSessionId();
+        UserAgent userAgent = UserAgent.createByIdentifier(serviceRequest.getUserAgent());
         if (virtualSessionId != null) {
-          serverSession = lookupScoutServerSessionOnVirtualSession(req, res, virtualSessionId, subject);
+          serverSession = lookupScoutServerSessionOnVirtualSession(req, res, virtualSessionId, subject, userAgent);
         }
         else {
-          serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject);
+          serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject, userAgent);
         }
         //invoke
         AtomicReference<ServiceTunnelResponse> serviceResponseHolder = new AtomicReference<ServiceTunnelResponse>();

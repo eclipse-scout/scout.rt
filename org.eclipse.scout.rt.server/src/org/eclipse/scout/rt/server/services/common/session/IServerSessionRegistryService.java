@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,9 +14,15 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.IService;
 
 public interface IServerSessionRegistryService extends IService {
+
+  /**
+   * @see #newServerSession(Class, Subject, UserAgent)
+   */
+  <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject) throws ProcessingException;
 
   /**
    * @param clazz
@@ -27,6 +33,5 @@ public interface IServerSessionRegistryService extends IService {
    * @return a new server session The new session is created and loaded, see
    *         {@link IServerSession#loadSession(org.osgi.framework.Bundle)}
    */
-  <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject) throws ProcessingException;
-
+  <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject, UserAgent userAgent) throws ProcessingException;
 }

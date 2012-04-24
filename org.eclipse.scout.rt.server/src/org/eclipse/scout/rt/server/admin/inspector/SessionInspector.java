@@ -42,6 +42,7 @@ public class SessionInspector {
       m_info.setLastAccessedTime(httpSession.getLastAccessedTime());
     }
     m_info.setUserId(session.getUserId());
+    m_info.setUserAgent(session.getUserAgent());
     try {
       m_info.setSubject(Subject.getSubject(AccessController.getContext()));
     }

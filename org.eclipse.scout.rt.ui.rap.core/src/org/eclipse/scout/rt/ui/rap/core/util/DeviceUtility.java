@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.rap.core.util;
 
 import org.eclipse.rwt.RWT;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 
 /**
  * @since 3.8.0
@@ -18,17 +20,17 @@ import org.eclipse.rwt.RWT;
 public class DeviceUtility {
   public static final String SESSION_ATTR_DEVICE_TYPE = "device-type";
 
-  public static DeviceType getDeviceType() {
-    return (DeviceType) RWT.getSessionStore().getAttribute(SESSION_ATTR_DEVICE_TYPE);
+  public static IUiDeviceType getCurrentDeviceType() {
+    return (IUiDeviceType) RWT.getSessionStore().getAttribute(SESSION_ATTR_DEVICE_TYPE);
   }
 
-  public static void setDeviceType(DeviceType deviceType) {
-    RWT.getSessionStore().setAttribute(SESSION_ATTR_DEVICE_TYPE, deviceType);
+  public static void setCurrentDeviceType(IUiDeviceType uiDeviceType) {
+    RWT.getSessionStore().setAttribute(SESSION_ATTR_DEVICE_TYPE, uiDeviceType);
   }
 
   public static boolean isMobileOrTabletDevice() {
-    DeviceType deviceType = getDeviceType();
-    if (DeviceType.MOBILE.equals(deviceType) || DeviceType.TABLET.equals(deviceType)) {
+    IUiDeviceType currentDeviceType = getCurrentDeviceType();
+    if (UiDeviceType.MOBILE.equals(currentDeviceType) || UiDeviceType.TABLET.equals(currentDeviceType)) {
       return true;
     }
 
@@ -36,8 +38,8 @@ public class DeviceUtility {
   }
 
   public static boolean isMobileDevice() {
-    DeviceType deviceType = getDeviceType();
-    if (DeviceType.MOBILE.equals(deviceType)) {
+    IUiDeviceType currentDeviceType = getCurrentDeviceType();
+    if (UiDeviceType.MOBILE.equals(currentDeviceType)) {
       return true;
     }
 
@@ -45,8 +47,8 @@ public class DeviceUtility {
   }
 
   public static boolean isTabletDevice() {
-    DeviceType deviceType = getDeviceType();
-    if (DeviceType.TABLET.equals(deviceType)) {
+    IUiDeviceType currentDeviceType = getCurrentDeviceType();
+    if (UiDeviceType.TABLET.equals(currentDeviceType)) {
       return true;
     }
 

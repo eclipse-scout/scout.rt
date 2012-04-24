@@ -20,6 +20,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public class ServiceTunnelRequest implements Serializable {
   private static final long serialVersionUID = 0L;
@@ -30,6 +31,7 @@ public class ServiceTunnelRequest implements Serializable {
   private Class[] m_parameterTypes;
   private Object[] m_args;
   private Locale m_locale;
+  private String m_userAgent;
   private String m_version;
   private Object m_metaData;
   /**
@@ -137,6 +139,22 @@ public class ServiceTunnelRequest implements Serializable {
    */
   public void setVirtualSessionId(String virtualSessionId) {
     m_virtualSessionId = virtualSessionId;
+  }
+
+  /**
+   * Represents the user interface on client side.<br/>
+   * To parse an identifier use {@link UserAgent#createByIdentifier(String)}
+   */
+  public String getUserAgent() {
+    return m_userAgent;
+  }
+
+  /**
+   * Represents the user interface on client side.<br/>
+   * To create an identifier use {@link UserAgent#createIdentifier()}.
+   */
+  public void setUserAgent(String userAgent) {
+    m_userAgent = userAgent;
   }
 
   @Override

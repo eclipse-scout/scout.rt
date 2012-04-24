@@ -85,6 +85,7 @@ public class SessionsView extends DefaultView {
     table1.tableHeaderCell("Created");
     table1.tableHeaderCell("Last&nbsp;accessed");
     table1.tableHeaderCell("JAAS");
+    table1.tableHeaderCell("UserAgent");
     table1.endTableRow();
     SessionInspector validSelection = null;
     for (int i = sorted.length - 1; i >= 0; i--) {
@@ -173,6 +174,9 @@ public class SessionsView extends DefaultView {
       p.br();
       p.print("Exception: " + e);
     }
+    p.endTableCell();
+    p.startTableCell();
+    p.printNoBreak(session.getInfo().getUserAgent().toString());
     p.endTableCell();
     p.endTableRow();
   }
