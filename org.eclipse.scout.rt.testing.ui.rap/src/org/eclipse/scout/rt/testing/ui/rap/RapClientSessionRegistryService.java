@@ -28,6 +28,7 @@ public class RapClientSessionRegistryService extends AbstractService implements 
     m_session = session;
   }
 
+  @Deprecated
   @SuppressWarnings("unchecked")
   @Override
   public <T extends IClientSession> T getClientSession(Class<T> clazz) {
@@ -37,18 +38,19 @@ public class RapClientSessionRegistryService extends AbstractService implements 
     throw new UnsupportedOperationException("the current rap session was created using " + m_session.getClass() + "; incompatible to " + clazz);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String webSessionId) {
     throw new UnsupportedOperationException("a rap session cannot create a new client session in a junit test");
   }
 
   @Override
-  public <T extends IClientSession> T getClientSession(Class<T> clazz, UserAgent userAgent) {
+  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId, UserAgent userAgent) {
     throw new UnsupportedOperationException("a rap session cannot create a new client session in a junit test");
   }
 
   @Override
-  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId, UserAgent userAgent) {
+  public <T extends IClientSession> T newClientSession(Class<T> clazz, UserAgent userAgent) {
     throw new UnsupportedOperationException("a rap session cannot create a new client session in a junit test");
   }
 }
