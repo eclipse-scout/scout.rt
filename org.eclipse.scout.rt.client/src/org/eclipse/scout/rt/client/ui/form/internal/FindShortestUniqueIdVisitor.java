@@ -51,11 +51,15 @@ public class FindShortestUniqueIdVisitor implements IFormFieldVisitor {
   }
 
   public String getShortestUniqueId() {
-    String id = m_ancestors[m_maxMatchCount];
-    for (int i = m_maxMatchCount - 1; i >= 0; i--) {
-      id = id + "$" + m_ancestors[i];
+    if (m_maxMatchCount < m_ancestors.length) {
+      String id = m_ancestors[m_maxMatchCount];
+      for (int i = m_maxMatchCount - 1; i >= 0; i--) {
+        id = id + "$" + m_ancestors[i];
+      }
+      return id;
     }
-    return id;
+    //ignore siblings with the same name
+    return getField().getClass().getName();
   }
 
   /**
