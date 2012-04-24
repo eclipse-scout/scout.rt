@@ -439,7 +439,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
             row.setStatusNonchanged();
           }
         }
-        m_table.clearDeletedRows();
+        m_table.discardAllDeletedRows();
       }
       finally {
         m_table.setTableChanging(false);
