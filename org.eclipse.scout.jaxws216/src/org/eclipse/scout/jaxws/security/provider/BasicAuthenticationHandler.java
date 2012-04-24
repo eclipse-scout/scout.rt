@@ -140,8 +140,8 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
     basicAuthToken.add("Basic realm=\"" + getRealm() + "\"");
     httpResponseHeaders.put("WWW-Authenticate", basicAuthToken);
 
-    context.put(MessageContext.HTTP_RESPONSE_HEADERS, httpResponseHeaders);
     context.put(MessageContext.HTTP_RESPONSE_CODE, HttpServletResponse.SC_UNAUTHORIZED);
+    context.put(MessageContext.HTTP_RESPONSE_HEADERS, httpResponseHeaders);
   }
 
   @SuppressWarnings("unchecked")
