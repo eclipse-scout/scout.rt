@@ -14,6 +14,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
 
 /**
@@ -38,6 +39,16 @@ public class RapClientSessionRegistryService extends AbstractService implements 
 
   @Override
   public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String webSessionId) {
+    throw new UnsupportedOperationException("a rap session cannot create a new client session in a junit test");
+  }
+
+  @Override
+  public <T extends IClientSession> T getClientSession(Class<T> clazz, UserAgent userAgent) {
+    throw new UnsupportedOperationException("a rap session cannot create a new client session in a junit test");
+  }
+
+  @Override
+  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId, UserAgent userAgent) {
     throw new UnsupportedOperationException("a rap session cannot create a new client session in a junit test");
   }
 }
