@@ -16,5 +16,5 @@ package org.eclipse.scout.rt.shared.ui;
 public interface IUiLayer {
   String getIdentifier();
 
-  boolean isWeb();
+  boolean isWebUi();
 }

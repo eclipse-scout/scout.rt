@@ -27,7 +27,7 @@ public class DefaultUserAgentParser implements IUserAgentParser {
     String[] tokens = StringUtility.tokenize(userAgent, DELIMITER.charAt(0));
     if (tokens.length != 3) {
       LOG.warn("UserAgentIdentifier could not be parsed. Invalid number of tokens. UserAgent: " + userAgent);
-      return UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN);
+      return UserAgent.createDefault();
     }
 
     try {
@@ -39,7 +39,7 @@ public class DefaultUserAgentParser implements IUserAgentParser {
     }
     catch (Throwable t) {
       LOG.warn("UserAgentIdentifier could not be parsed. Exception occured while parsing. UserAgent: " + userAgent, t);
-      return UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN);
+      return UserAgent.createDefault();
     }
   }
 

@@ -23,10 +23,10 @@ public enum UiLayer implements IUiLayer {
   JSF(true),
   UNKNOWN;
 
-  boolean m_web;
+  boolean m_webUi;
 
-  private UiLayer(boolean web) {
-    m_web = web;
+  private UiLayer(boolean webUi) {
+    m_webUi = webUi;
   }
 
   private UiLayer() {
@@ -34,8 +34,8 @@ public enum UiLayer implements IUiLayer {
   }
 
   @Override
-  public boolean isWeb() {
-    return m_web;
+  public boolean isWebUi() {
+    return m_webUi;
   }
 
   @Override

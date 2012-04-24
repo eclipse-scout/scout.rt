@@ -14,5 +14,7 @@ package org.eclipse.scout.rt.shared.ui;
  * @since 3.8.0
  */
 public interface IUiDeviceType {
+  boolean isTouchDevice();
+
   String getIdentifier();
 }

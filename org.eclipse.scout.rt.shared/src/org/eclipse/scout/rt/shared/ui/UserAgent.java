@@ -97,6 +97,10 @@ public final class UserAgent {
     return new UserAgent(uiLayer, uiDeviceType, uiDeviceId);
   }
 
+  public static UserAgent createDefault() {
+    return create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN);
+  }
+
   public static UserAgent createByIdentifier(IUserAgentParser parser, String userAgent) {
     return parser.parseIdentifier(userAgent);
   }
