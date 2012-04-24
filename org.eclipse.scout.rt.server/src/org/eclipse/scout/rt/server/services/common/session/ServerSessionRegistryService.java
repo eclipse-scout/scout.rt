@@ -23,18 +23,19 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
-import org.eclipse.scout.rt.shared.ui.UiDeviceType;
-import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
 
-public class ServerSessionRegistryService extends AbstractService implements IServerSessionRegistryService {
+public class ServerSessionRegistryService extends AbstractService implements IServerSessionRegistryService, ISessionService {
   public static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerSessionRegistryService.class);
 
+  @SuppressWarnings("deprecation")
   @Override
   public <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject) throws ProcessingException {
-    return newServerSession(clazz, subject, UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN));
+    return newServerSession(clazz, subject, UserAgent.createDefault());
   }
 
   @Override
@@ -63,4 +64,10 @@ public class ServerSessionRegistryService extends AbstractService implements ISe
     initJob.throwOnError();
     return (T) serverSession;
   }
+
+  @Override
+  public ISession getCurrentSession() {
+    return ServerJob.getCurrentSession();
+  }
+
 }

@@ -122,7 +122,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
 
   @Override
   public boolean shouldSchedule() {
-    if (getServerSession() != null && getServerSession().isWebSession()) {
+    if (getServerSession() != null && getServerSession().isSingleThreadSession()) {
       runNow(new NullProgressMonitor());
       return false;
     }

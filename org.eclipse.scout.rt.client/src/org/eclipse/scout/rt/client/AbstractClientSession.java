@@ -48,8 +48,6 @@ import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedN
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
-import org.eclipse.scout.rt.shared.ui.UiDeviceType;
-import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
@@ -196,7 +194,7 @@ public abstract class AbstractClientSession implements IClientSession {
    */
 
   protected void initConfig() {
-    m_singleThreadSession = getConfiguredWebSession();
+    m_singleThreadSession = getConfiguredSingleThreadSession();
     m_virtualDesktop = new VirtualDesktop();
     setMemoryPolicy(new LargeMemoryPolicy());
     // add client notification listener
@@ -489,7 +487,7 @@ public abstract class AbstractClientSession implements IClientSession {
   public UserAgent getUserAgent() {
     if (m_userAgent == null) {
       LOG.warn("UserAgent has not been initialied correctly. Using default.");
-      m_userAgent = UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN);
+      m_userAgent = UserAgent.createDefault();
     }
     return m_userAgent;
   }

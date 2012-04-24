@@ -395,7 +395,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       m_clipboard = new Clipboard(getDisplay());
       fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
 
-      IClientSession tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(m_clientSessionClass, initUserAgent());
+      IClientSession tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClass, initUserAgent());
       if (!tempClientSession.isActive()) {
         showClientSessionLoadError(tempClientSession.getLoadError());
         LOG.error("ClientSession is not active, there must be a problem with loading or starting");

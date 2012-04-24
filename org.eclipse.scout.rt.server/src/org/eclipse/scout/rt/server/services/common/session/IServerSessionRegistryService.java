@@ -20,11 +20,6 @@ import org.eclipse.scout.service.IService;
 public interface IServerSessionRegistryService extends IService {
 
   /**
-   * @see #newServerSession(Class, Subject, UserAgent)
-   */
-  <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject) throws ProcessingException;
-
-  /**
    * @param clazz
    * @param subject
    *          if the creation of the session requires a special jaas context
@@ -34,4 +29,12 @@ public interface IServerSessionRegistryService extends IService {
    *         {@link IServerSession#loadSession(org.osgi.framework.Bundle)}
    */
   <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject, UserAgent userAgent) throws ProcessingException;
+
+  /**
+   * @deprecated use {@link #newServerSession(Class, Subject, UserAgent)} instead.<br/>
+   *             Will be removed in 3.9.0
+   */
+  @Deprecated
+  <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject) throws ProcessingException;
+
 }

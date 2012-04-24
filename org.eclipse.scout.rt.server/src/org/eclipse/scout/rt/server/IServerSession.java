@@ -10,54 +10,36 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
-import java.util.Locale;
-import java.util.Map;
-
-import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ISession;
 import org.osgi.framework.Bundle;
 
 /**
  * The base implementation {@link org.eclipse.scout.rt.server.servlet.DeploymentServiceConfig} uses the
  * scout.xml file for setting deployment specific service properties
  */
-public interface IServerSession {
-
-  Bundle getBundle();
-
-  /**
-   * Shared context variable containing the authenticated userId in lowercase
-   */
-  @FormData
-  String getUserId();
-
-  Locale getLocale();
-
-  void setLocale(Locale l);
-
-  ScoutTexts getTexts();
-
-  Object getAttribute(Object key);
-
-  void setAttribute(Object key, Object value);
-
-  Map<String, Object> getSharedVariableMap();
-
-  /**
-   * The session is loaded ({@link #loadSession(Bundle)} has been called)
-   */
-  boolean isActive();
+public interface IServerSession extends ISession {
 
   void loadSession(Bundle bundle) throws ProcessingException;
 
   /**
-   * @return used to foce sync execution of server jobs
+   * @deprecated Use {@link #getData(String)} instead.<br/>
+   *             Will be removed in 3.9.0
    */
+  @Deprecated
+  Object getAttribute(String key);
+
+  /**
+   * @deprecated Use {@link #setData(String, Object)} isntead.<br/>
+   *             Will be removed in 3.9.0
+   */
+  @Deprecated
+  void setAttribute(String key, Object value);
+
+  /**
+   * @deprecated Use {@link #isSingleThreadSession()} instead.<br/>
+   *             Will be removed in 3.9.0
+   */
+  @Deprecated
   boolean isWebSession();
-
-  UserAgent getUserAgent();
-
-  void setUserAgent(UserAgent userAgent);
 }

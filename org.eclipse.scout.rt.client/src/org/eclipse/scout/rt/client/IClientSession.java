@@ -10,21 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import java.util.Locale;
-import java.util.Map;
-
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ISession;
 import org.osgi.framework.Bundle;
 
-public interface IClientSession {
+public interface IClientSession extends ISession {
 
   /**
    * Monitor can be used to wait for changes of the states 'active' and 'loaded'
@@ -32,29 +27,11 @@ public interface IClientSession {
   Object getStateLock();
 
   /**
-   * @returns the reference to the immutable shared variable map
-   */
-  Map<String, Object> getSharedVariableMap();
-
-  /**
-   * Shared context variable containing the authenticated userId in lowercase
-   */
-  @FormData
-  String getUserId();
-
-  /**
-   * The session is running
-   */
-  boolean isActive();
-
-  /**
    * The session is running and was loaded
    */
   boolean isLoaded();
 
   Throwable getLoadError();
-
-  ScoutTexts getTexts();
 
   /**
    * Start model thread with job queue<br>
@@ -102,8 +79,6 @@ public interface IClientSession {
    */
   void setDesktop(IDesktop a) throws ProcessingException;
 
-  Bundle getBundle();
-
   IServiceTunnel getServiceTunnel();
 
   /**
@@ -128,13 +103,6 @@ public interface IClientSession {
    */
   @Deprecated
   boolean isWebSession();
-
-  /**
-   * @return used to force immediate (in-thread) execution of client jobs, see {@link ClientJob#shouldSchedule()}
-   *         <p>
-   *         used in apache wicket type of scout apps, NOT in rwt/rap type apps
-   */
-  boolean isSingleThreadSession();
 
   /**
    * If {@link IClientSession#getVirtualSessionId()} is not null then it is sent as part of the wsse security header to
@@ -172,24 +140,4 @@ public interface IClientSession {
    * @return
    */
   IIconLocator getIconLocator();
-
-  Object getData(String key);
-
-  void setData(String key, Object data);
-
-  /**
-   * @return Returns the session's locale.
-   */
-  Locale getLocale();
-
-  /**
-   * Sets the session's locale used for formatting values and for translating texts.
-   * 
-   * @param l
-   */
-  void setLocale(Locale l);
-
-  UserAgent getUserAgent();
-
-  void setUserAgent(UserAgent userAgent);
 }

@@ -44,27 +44,35 @@ public abstract class AbstractServerSession implements IServerSession {
   private boolean m_initialized;
   private boolean m_active;
   private Locale m_locale;
-  private final HashMap<Object, Object> m_attributes;
+  private final HashMap<String, Object> m_attributes;
   private final Object m_attributesLock;
   private final SharedVariableMap m_sharedVariableMap;
-  private boolean m_webSession;
+  private boolean m_singleThreadSession;
   private ScoutTexts m_scoutTexts;
   private UserAgent m_userAgent;
 
   public AbstractServerSession(boolean autoInitConfig) {
     m_locale = LocaleThreadLocal.get();
     m_attributesLock = new Object();
-    m_attributes = new HashMap<Object, Object>();
+    m_attributes = new HashMap<String, Object>();
     m_sharedVariableMap = new SharedVariableMap();
     if (autoInitConfig) {
       initConfig();
     }
   }
 
+  /**
+   * @deprecated use {@link #getConfiguredSingleThreadSession()} instead
+   */
+  @Deprecated
+  protected boolean getConfiguredWebSession() {
+    return getConfiguredSingleThreadSession();
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   @ConfigPropertyValue("false")
-  protected boolean getConfiguredWebSession() {
+  protected boolean getConfiguredSingleThreadSession() {
     return false;
   }
 
@@ -136,22 +144,34 @@ public abstract class AbstractServerSession implements IServerSession {
     return m_scoutTexts;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
-  public Object getAttribute(Object key) {
+  public Object getAttribute(String key) {
+    return getData(key);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void setAttribute(String key, Object value) {
+    setData(key, value);
+  }
+
+  @Override
+  public Object getData(String key) {
     synchronized (m_attributesLock) {
       return m_attributes.get(key);
     }
   }
 
   @Override
-  public void setAttribute(Object key, Object value) {
+  public void setData(String key, Object value) {
     synchronized (m_attributesLock) {
       m_attributes.put(key, value);
     }
   }
 
   protected void initConfig() {
-    m_webSession = getConfiguredWebSession();
+    m_singleThreadSession = getConfiguredSingleThreadSession();
     if (!isWebSession()) {
       m_sharedVariableMap.addPropertyChangeListener(new PropertyChangeListener() {
         @Override
@@ -210,8 +230,14 @@ public abstract class AbstractServerSession implements IServerSession {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public boolean isWebSession() {
-    return m_webSession;
+    return isSingleThreadSession();
+  }
+
+  @Override
+  public boolean isSingleThreadSession() {
+    return m_singleThreadSession;
   }
 
   @Override

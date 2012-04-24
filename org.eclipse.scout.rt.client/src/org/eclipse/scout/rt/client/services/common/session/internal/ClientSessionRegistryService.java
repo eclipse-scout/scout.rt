@@ -20,17 +20,18 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
-import org.eclipse.scout.rt.shared.ui.UiDeviceType;
-import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
 
 @Priority(-1)
-public class ClientSessionRegistryService extends AbstractService implements IClientSessionRegistryService {
+public class ClientSessionRegistryService extends AbstractService implements IClientSessionRegistryService, ISessionService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionRegistryService.class);
 
   private final HashMap<String, IClientSession> m_cache = new HashMap<String, IClientSession>();
@@ -38,7 +39,7 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends IClientSession> T getClientSession(Class<T> clazz, UserAgent userAgent) {
+  public <T extends IClientSession> T newClientSession(Class<T> clazz, UserAgent userAgent) {
     final Bundle bundle = getDefiningBundle(clazz);
     if (bundle == null) {
       return null;
@@ -54,9 +55,10 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
     }
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <T extends IClientSession> T getClientSession(Class<T> clazz) {
-    return getClientSession(clazz, UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN));
+    return newClientSession(clazz, UserAgent.createDefault());
   }
 
   @SuppressWarnings("unchecked")
@@ -93,9 +95,10 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
     return createAndStartClientSession(clazz, bundle, subject, virtualSessionId, userAgent);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId) {
-    return newClientSession(clazz, subject, virtualSessionId, UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN));
+    return newClientSession(clazz, subject, virtualSessionId, UserAgent.createDefault());
   }
 
   @SuppressWarnings("unchecked")
@@ -137,6 +140,11 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
     }
 
     return Platform.getBundle(symbolicName);
+  }
+
+  @Override
+  public ISession getCurrentSession() {
+    return ClientJob.getCurrentSession();
   }
 
 }

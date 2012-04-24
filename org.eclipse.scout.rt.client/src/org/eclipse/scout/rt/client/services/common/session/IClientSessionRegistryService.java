@@ -14,13 +14,12 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.IService;
 
 @Priority(-3)
 public interface IClientSessionRegistryService extends IService {
-
-  <T extends IClientSession> T getClientSession(Class<T> clazz);
 
   /**
    * @param clazz
@@ -36,12 +35,7 @@ public interface IClientSessionRegistryService extends IService {
    *         Warning: only use this method if the client environment is swt, swing, ... and therefore supports singleton
    *         user sessions. Don't use it with web apps (rap, rwt, wicket)
    */
-  <T extends IClientSession> T getClientSession(Class<T> clazz, UserAgent userAgent);
-
-  /**
-   * @see #newClientSession(Class, Subject, String, UserAgent)
-   */
-  <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId);
+  <T extends IClientSession> T newClientSession(Class<T> clazz, UserAgent userAgent);
 
   /**
    * @param clazz
@@ -54,5 +48,19 @@ public interface IClientSessionRegistryService extends IService {
    *         {@link Subject#doAs(Subject, java.security.PrivilegedAction)} section
    */
   <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId, UserAgent userAgent);
+
+  /**
+   * @deprecated Use {@link #newClientSession(Class, UserAgent)} or {@link ISessionService#getCurrentSession()} instead.<br/>
+   *             Will be removed in 3.9.0
+   */
+  @Deprecated
+  <T extends IClientSession> T getClientSession(Class<T> clazz);
+
+  /**
+   * @deprecated Use {@link #newClientSession(Class, Subject, String, UserAgent)} instead.<br/>
+   *             Will be removed in 3.9.0
+   */
+  @Deprecated
+  <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId);
 
 }

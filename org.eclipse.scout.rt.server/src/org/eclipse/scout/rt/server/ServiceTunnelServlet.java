@@ -50,8 +50,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHand
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.ui.UiDeviceType;
-import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
@@ -249,7 +247,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       ThreadContext.putHttpServletRequest(req);
       ThreadContext.putHttpServletResponse(res);
       //
-      UserAgent userAgent = UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN);
+      UserAgent userAgent = UserAgent.createDefault();
       IServerSession serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject, userAgent);
       //
       ServerJob job = new AdminServiceJob(serverSession, subject, req, res);
