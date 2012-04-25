@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
  *
@@ -80,7 +80,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
         index++;
       }
     }
-    html = html.replace("#FONT_SIZE_UNIT#", WebClientState.getFontSizeUnit());
+    html = html.replace("#FONT_SIZE_UNIT#", UserAgentUtility.getFontSizeUnit());
     html = html.replace("#TOP#", topPart);
     html = html.replace("#LIST#", listPart.toString());
     html = html.replace("#BOTTOM#", bottomPart);

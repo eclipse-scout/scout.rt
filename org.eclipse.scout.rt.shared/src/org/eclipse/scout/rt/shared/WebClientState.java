@@ -4,19 +4,21 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
  * Indicates whether the client is a web-client or a rich-standalone-client
  * <p>
- * see {@link IService} for description of this indicator class
+ * 
+ * @deprecated Use {@link UserAgentUtility} instead.
  */
+@Deprecated
 public final class WebClientState {
   private static boolean defaultValue = false;
   private static final ThreadLocal<Boolean> THREAD_LOCAL = new ThreadLocal<Boolean>();

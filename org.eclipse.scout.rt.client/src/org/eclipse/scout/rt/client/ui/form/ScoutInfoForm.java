@@ -17,7 +17,6 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -34,9 +33,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Version;
 
@@ -87,18 +86,9 @@ public class ScoutInfoForm extends AbstractForm {
   @Order(10.0f)
   public class MainBox extends AbstractGroupBox {
 
-    private Boolean m_isSwing = null;
-
-    private boolean isSwing() {
-      if (m_isSwing == null) {
-        m_isSwing = (Platform.getBundle("org.eclipse.scout.rt.ui.swing") != null);
-      }
-      return BooleanUtility.nvl(m_isSwing);
-    }
-
     @Override
     protected boolean getConfiguredGridUseUiWidth() {
-      if (isSwing()) {
+      if (UserAgentUtility.isSwingUi()) {
         return true;
       }
       return false;
@@ -109,7 +99,7 @@ public class ScoutInfoForm extends AbstractForm {
 
       @Override
       protected boolean getConfiguredGridUseUiWidth() {
-        if (isSwing()) {
+        if (UserAgentUtility.isSwingUi()) {
           return true;
         }
         return false;
@@ -135,7 +125,7 @@ public class ScoutInfoForm extends AbstractForm {
 
         @Override
         protected boolean getConfiguredGridUseUiWidth() {
-          if (isSwing()) {
+          if (UserAgentUtility.isSwingUi()) {
             return true;
           }
           return false;
@@ -143,7 +133,7 @@ public class ScoutInfoForm extends AbstractForm {
 
         @Override
         protected boolean getConfiguredGridUseUiHeight() {
-          if (isSwing()) {
+          if (UserAgentUtility.isSwingUi()) {
             return true;
           }
           return false;
@@ -151,7 +141,7 @@ public class ScoutInfoForm extends AbstractForm {
 
         @Override
         protected int getConfiguredGridW() {
-          if (isSwing()) {
+          if (UserAgentUtility.isSwingUi()) {
             return 1;
           }
           return 2;
@@ -159,14 +149,13 @@ public class ScoutInfoForm extends AbstractForm {
 
         @Override
         protected int getConfiguredGridH() {
-          if (isSwing()) {
+          if (UserAgentUtility.isSwingUi()) {
             return 1;
           }
-          /**
-           * If the client is a webclient (ui.rap) then some these informations must be omitted (Security) so the html
-           * field is smaller @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=365761
-           */
-          else if (WebClientState.isWebClientInCurrentThread()) {
+
+          // If the client is a webclient then some of these informations must be omitted (Security) so that the html
+          // field is smaller @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=365761
+          else if (UserAgentUtility.isWebClient()) {
             return 12;
           }
           return 20;
@@ -262,7 +251,7 @@ public class ScoutInfoForm extends AbstractForm {
      * These information must only be presented in the case of an richclient. If the client is a webclient (ui.rap) then
      * these informations must be omitted (Security) https://bugs.eclipse.org/bugs/show_bug.cgi?id=365761
      */
-    if (WebClientState.isRichClientInCurrentThread()) {
+    if (UserAgentUtility.isRichClient()) {
       buf.append("<tr><td>" + ScoutTexts.get("JavaVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.version") + "</td></tr>");
       buf.append("<tr><td>" + ScoutTexts.get("JavaVMVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.vm.version") + "</td></tr>");
       buf.append("<tr><td>" + ScoutTexts.get("OSVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("os.name") + " " + System.getProperty("os.version") + "</td></tr>");

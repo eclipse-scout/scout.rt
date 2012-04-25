@@ -17,8 +17,8 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.WebClientState;
 import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.AbstractService;
 
 /**
@@ -29,7 +29,7 @@ public class DefaultShellService extends AbstractService implements IShellServic
 
   @Override
   public void shellOpen(String path) throws ProcessingException {
-    if (WebClientState.isWebClientInCurrentThread()) {
+    if (UserAgentUtility.isWebClient()) {
       ClientSyncJob.getCurrentSession().getDesktop().openBrowserWindow(path);
     }
     else {
