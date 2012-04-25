@@ -15,6 +15,17 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
+ * This default parser is able to create a string representation (identifier) of {@link UserAgent} in the form of
+ * uiLayer|uiDeviceType|uiDeviceId. It is also able to parse such a identifier and create a {@link UserAgent}.
+ * <p>
+ * Examples of identifiers:
+ * <ul>
+ * <li>SWING|DESKTOP|Windows7</li>
+ * <li>RAP|MOBILE|Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.162
+ * Safari/535.19</li
+ * </ul>
+ * </p>
+ * 
  * @since 3.8.0
  */
 public class DefaultUserAgentParser implements IUserAgentParser {

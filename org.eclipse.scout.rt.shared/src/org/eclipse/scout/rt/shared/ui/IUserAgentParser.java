@@ -11,6 +11,9 @@
 package org.eclipse.scout.rt.shared.ui;
 
 /**
+ * Is able to create a string representation (identifier) of {@link UserAgent}. It is also able to parse a identifier
+ * and create a {@link UserAgent}.
+ * 
  * @since 3.8.0
  */
 public interface IUserAgentParser {
