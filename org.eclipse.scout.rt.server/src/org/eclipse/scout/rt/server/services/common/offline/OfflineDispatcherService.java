@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
@@ -167,7 +168,8 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       if (m_serverSession == null || subject == null || !subject.equals(m_subject)) {
         try {
           m_subject = subject;
-          m_serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject);
+          UserAgent userAgent = UserAgent.createByIdentifier(request.getUserAgent());
+          m_serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
         }
         catch (ProcessingException e) {
           return new ServiceTunnelResponse(null, null, e);

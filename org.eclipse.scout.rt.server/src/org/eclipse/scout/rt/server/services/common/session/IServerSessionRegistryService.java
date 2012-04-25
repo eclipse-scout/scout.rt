@@ -31,10 +31,8 @@ public interface IServerSessionRegistryService extends IService {
   <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject, UserAgent userAgent) throws ProcessingException;
 
   /**
-   * @deprecated use {@link #newServerSession(Class, Subject, UserAgent)} instead.<br/>
-   *             Will be removed in 3.9.0
+   * @see #newServerSession(Class, Subject, UserAgent)
    */
-  @Deprecated
   <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject) throws ProcessingException;
 
 }
