@@ -16,7 +16,6 @@ import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.rt.ui.rap.core.window.desktop.viewarea.ILayoutListener;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutViewStack;
 import org.eclipse.scout.rt.ui.rap.window.desktop.viewarea.ViewArea.SashKey;
 import org.eclipse.swt.SWT;

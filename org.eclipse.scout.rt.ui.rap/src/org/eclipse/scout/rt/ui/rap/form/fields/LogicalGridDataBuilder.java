@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.form.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
-import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
+import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 

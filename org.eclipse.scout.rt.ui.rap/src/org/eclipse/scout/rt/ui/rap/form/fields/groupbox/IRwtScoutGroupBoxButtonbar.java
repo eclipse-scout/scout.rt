@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.groupbox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
-import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 
 public interface IRwtScoutGroupBoxButtonbar extends IRwtScoutComposite<IGroupBox> {
 

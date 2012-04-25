@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.rap.form.fields.labelfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
+import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;

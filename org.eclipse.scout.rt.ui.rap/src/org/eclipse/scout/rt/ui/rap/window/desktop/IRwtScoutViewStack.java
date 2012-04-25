@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.rap.window.desktop;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.core.window.IRwtScoutPart;
+import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 
 /**
  * @since 3.8

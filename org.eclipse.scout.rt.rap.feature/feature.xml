@@ -50,13 +50,6 @@ BSI Business Systems Integration AG - initial API and implementation
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.rt.ui.rap.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.scout.rt.ui.rap.workbench"
          download-size="0"
          install-size="0"

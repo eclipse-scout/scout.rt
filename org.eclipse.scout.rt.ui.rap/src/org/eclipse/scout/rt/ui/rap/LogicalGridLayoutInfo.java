@@ -12,10 +12,9 @@ package org.eclipse.scout.rt.ui.rap;
 
 import java.util.TreeSet;
 
-import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
-import org.eclipse.scout.rt.ui.rap.core.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;

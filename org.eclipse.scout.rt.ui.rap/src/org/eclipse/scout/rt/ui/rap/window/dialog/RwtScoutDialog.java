@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
+import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.AbstractRwtScoutPart;
 import org.eclipse.swt.SWT;

@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.basic.tree;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
-import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 
 public interface IRwtScoutTree extends IRwtScoutComposite<ITree> {
 

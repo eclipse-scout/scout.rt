@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.ui.rap.form.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.core.ext.ILabelComposite;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.ext.ILabelComposite;
 
 /**
  * <h3>IRwtScoutFormField</h3> ...

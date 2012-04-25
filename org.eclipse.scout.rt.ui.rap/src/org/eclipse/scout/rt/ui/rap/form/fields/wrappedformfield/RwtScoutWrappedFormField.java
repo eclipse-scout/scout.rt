@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.ui.rap.form.fields.wrappedformfield;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
-import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
-import org.eclipse.scout.rt.ui.rap.core.util.RwtLayoutUtility;
+import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 

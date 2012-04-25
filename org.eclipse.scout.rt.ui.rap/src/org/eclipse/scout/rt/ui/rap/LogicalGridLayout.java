@@ -18,8 +18,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.core.ILogicalGridLayout;
-import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;

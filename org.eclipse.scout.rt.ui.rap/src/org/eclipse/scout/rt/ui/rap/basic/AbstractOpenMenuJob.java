@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.ui.rap.core.util.BrowserInfo;
+import org.eclipse.scout.rt.ui.rap.util.BrowserInfo;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;

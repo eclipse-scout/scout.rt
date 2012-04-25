@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.rap.form.fields;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.ui.rap.core.LogicalGridData;
+import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 
 public class RwtScoutFormFieldGridData extends LogicalGridData {
   private IFormField m_scoutField;

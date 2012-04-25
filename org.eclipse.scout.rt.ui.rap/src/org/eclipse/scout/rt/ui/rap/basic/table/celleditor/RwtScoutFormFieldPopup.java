@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
+import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartListener;
 import org.eclipse.scout.rt.ui.rap.window.popup.RwtScoutDropDownPopup;

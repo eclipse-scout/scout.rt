@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.BusyJob;
-import org.eclipse.scout.rt.ui.rap.core.window.IRwtScoutPart;
+import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.dialog.RwtScoutDialog;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;

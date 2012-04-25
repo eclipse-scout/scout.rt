@@ -14,7 +14,6 @@ import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.core.IRwtCoreEnvironment;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.layout.ButtonBarLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -36,7 +35,7 @@ public class RwtScoutGroupBoxButtonbar implements IRwtScoutGroupBoxButtonbar {
   }
 
   @Override
-  public void createUiField(Composite parent, IGroupBox scoutGroupBox, IRwtCoreEnvironment uiEnvironment) {
+  public void createUiField(Composite parent, IGroupBox scoutGroupBox, IRwtEnvironment uiEnvironment) {
     m_scoutGroupBox = scoutGroupBox;
     m_uiEnvironment = (IRwtEnvironment) uiEnvironment;
     m_container = getUiEnvironment().getFormToolkit().createComposite(parent);

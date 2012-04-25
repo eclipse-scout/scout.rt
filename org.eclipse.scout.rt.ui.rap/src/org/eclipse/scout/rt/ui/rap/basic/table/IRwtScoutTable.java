@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.rap.basic.table;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.swt.widgets.TableColumn;
 
 public interface IRwtScoutTable extends IRwtScoutComposite<ITable> {

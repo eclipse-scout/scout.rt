@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.ui.rap;
 import java.util.Collection;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -21,15 +23,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
-import org.eclipse.scout.rt.ui.rap.core.IRwtCoreEnvironment;
-import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
-import org.eclipse.scout.rt.ui.rap.core.window.IRwtScoutPart;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.keystroke.IKeyStrokeManager;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.ScoutFormToolkit;
+import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -38,6 +39,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
@@ -53,7 +55,7 @@ import org.eclipse.swt.widgets.Widget;
  * DefaultVirtualSessionSecurityFilter</li>
  * </ol>
  */
-public interface IRwtEnvironment extends IRwtCoreEnvironment {
+public interface IRwtEnvironment {
 
   /**
    * key for {@link IClientSession#setData(String, Object)} holding the environment
@@ -215,4 +217,26 @@ public interface IRwtEnvironment extends IRwtCoreEnvironment {
   String styleHtmlText(IRwtScoutFormField<?> uiComposite, String rawHtml);
 
   String getLogoutLandingUrl();
+
+  Display getDisplay();
+
+  IClientSession getClientSession();
+
+  LayoutValidateManager getLayoutValidateManager();
+
+  /**
+   * calling from swt thread
+   * <p>
+   * The job is only run when it reaches the model within the cancelTimeout. This means if the job is delayed longer
+   * than cancelTimeout millis when the model job runs it, then the job is ignored.
+   * 
+   * @return the created and scheduled job, a {@link ClientJob}
+   */
+  JobEx invokeScoutLater(Runnable job, long cancelTimeout);
+
+  void invokeUiLater(Runnable job);
+
+  void addEnvironmentListener(IRwtEnvironmentListener listener);
+
+  void removeEnvironmentListener(IRwtEnvironmentListener listener);
 }

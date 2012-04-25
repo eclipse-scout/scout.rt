@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.core.util.AbstractRwtUtility;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.workbench.util.listener.WindowListener;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbench;
@@ -46,7 +46,7 @@ public class ScoutApplicationStartup {
   }
 
   protected String getInitWorkbenchTaskText() {
-    return AbstractRwtUtility.getNlsText(m_uiEnvironment.getDisplay(), "ScoutStarting");
+    return RwtUtility.getNlsText(m_uiEnvironment.getDisplay(), "ScoutStarting");
   }
 
   private class P_HandleInitWorkbench implements Runnable {

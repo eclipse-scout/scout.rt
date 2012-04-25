@@ -69,30 +69,26 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
-import org.eclipse.scout.rt.ui.rap.core.IRwtEnvironmentListener;
-import org.eclipse.scout.rt.ui.rap.core.LayoutValidateManager;
-import org.eclipse.scout.rt.ui.rap.core.RwtEnvironmentEvent;
-import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.core.concurrency.RwtScoutSynchronizer;
-import org.eclipse.scout.rt.ui.rap.core.form.IRwtScoutForm;
-import org.eclipse.scout.rt.ui.rap.core.util.AbstractRwtUtility;
-import org.eclipse.scout.rt.ui.rap.core.util.BrowserInfo;
-import org.eclipse.scout.rt.ui.rap.core.util.ColorFactory;
-import org.eclipse.scout.rt.ui.rap.core.util.DeviceUtility;
-import org.eclipse.scout.rt.ui.rap.core.util.FontRegistry;
-import org.eclipse.scout.rt.ui.rap.core.util.RwtIconLocator;
-import org.eclipse.scout.rt.ui.rap.core.window.IRwtScoutPart;
-import org.eclipse.scout.rt.ui.rap.core.window.desktop.navigation.RwtScoutNavigationSupport;
+import org.eclipse.scout.rt.ui.rap.concurrency.RwtScoutSynchronizer;
+import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.RwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.KeyStrokeManager;
+import org.eclipse.scout.rt.ui.rap.util.BrowserInfo;
+import org.eclipse.scout.rt.ui.rap.util.ColorFactory;
+import org.eclipse.scout.rt.ui.rap.util.DeviceUtility;
+import org.eclipse.scout.rt.ui.rap.util.FontRegistry;
+import org.eclipse.scout.rt.ui.rap.util.RwtIconLocator;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.util.ScoutFormToolkit;
+import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartListener;
+import org.eclipse.scout.rt.ui.rap.window.desktop.navigation.RwtScoutNavigationSupport;
 import org.eclipse.scout.rt.ui.rap.window.dialog.RwtScoutDialog;
 import org.eclipse.scout.rt.ui.rap.window.filechooser.IRwtScoutFileChooser;
 import org.eclipse.scout.rt.ui.rap.window.filechooser.IRwtScoutFileChooserService;
@@ -421,7 +417,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   protected UserAgent initUserAgent() {
-    return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, AbstractRwtUtility.getBrowserInfo().getUserAgent());
+    return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, RwtUtility.getBrowserInfo().getUserAgent());
   }
 
   protected RwtBusyHandler attachBusyHandler(IClientSession session) {
@@ -1415,7 +1411,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     public void beforeDestroy(SessionStoreEvent event) {
       ISessionStore sessionStore = event.getSessionStore();
       String userAgent = "";
-      BrowserInfo browserInfo = (BrowserInfo) sessionStore.getAttribute(AbstractRwtUtility.BROWSER_INFO);
+      BrowserInfo browserInfo = (BrowserInfo) sessionStore.getAttribute(RwtUtility.BROWSER_INFO);
       if (browserInfo != null) {
         userAgent = browserInfo.getUserAgent();
       }

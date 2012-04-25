@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.window.desktop.toolbar;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 
 /**
  * @since 3.8.0

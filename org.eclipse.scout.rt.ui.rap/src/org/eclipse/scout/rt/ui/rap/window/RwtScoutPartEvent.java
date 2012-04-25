@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.ui.rap.window;
 
 import java.util.EventObject;
 
-import org.eclipse.scout.rt.ui.rap.core.window.IRwtScoutPart;
-
 public class RwtScoutPartEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 

@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.checkbox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
-import org.eclipse.scout.rt.ui.rap.core.ext.ILabelComposite;
+import org.eclipse.scout.rt.ui.rap.ext.ILabelComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.swt.widgets.Button;
 

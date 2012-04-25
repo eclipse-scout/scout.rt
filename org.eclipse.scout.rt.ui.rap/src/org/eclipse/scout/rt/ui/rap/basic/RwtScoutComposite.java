@@ -22,8 +22,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.core.IRwtCoreEnvironment;
-import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
@@ -131,7 +129,7 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
   }
 
   @Override
-  public final void createUiField(Composite parent, T scoutObject, IRwtCoreEnvironment uiEnvironment) {
+  public final void createUiField(Composite parent, T scoutObject, IRwtEnvironment uiEnvironment) {
     if (m_created) {
       return;
     }

@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.window.desktop.toolbar;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.ui.rap.core.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 
 public interface IRwtScoutMainMenuButton extends IRwtScoutComposite<IDesktop> {
 
