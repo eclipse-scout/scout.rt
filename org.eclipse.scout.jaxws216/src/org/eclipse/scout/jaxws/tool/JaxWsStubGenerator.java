@@ -29,6 +29,7 @@ import java.io.FilenameFilter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -44,13 +45,18 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.xml.sax.SAXParseException;
 
 import com.sun.tools.internal.ws.processor.model.Model;
 import com.sun.tools.internal.ws.processor.model.Port;
 import com.sun.tools.internal.ws.processor.model.Service;
 import com.sun.tools.internal.ws.processor.modeler.wsdl.WSDLModeler;
+import com.sun.tools.internal.ws.wscompile.AbortException;
+import com.sun.tools.internal.ws.wscompile.ErrorReceiver;
 import com.sun.tools.internal.ws.wscompile.WsimportOptions;
 import com.sun.tools.internal.ws.wscompile.WsimportTool;
+import com.sun.tools.internal.ws.wsdl.parser.MetadataFinder;
+import com.sun.tools.internal.ws.wsdl.parser.WSDLInternalizationLogic;
 
 /**
  * <p>
@@ -387,7 +393,38 @@ public class JaxWsStubGenerator {
       WsimportOptions options = new WsimportOptions();
       options.parseArguments(properties);
 
-      WSDLModeler wsdlModeler = new WSDLModeler(options, null);
+      ErrorReceiver receiver = new ErrorReceiver() {
+        @Override
+        public void warning(SAXParseException saxparseexception) throws AbortException {
+          logInfo(saxparseexception.toString());
+        }
+
+        @Override
+        public void info(SAXParseException saxparseexception) {
+          logInfo(saxparseexception.toString());
+        }
+
+        @Override
+        public void fatalError(SAXParseException saxparseexception) throws AbortException {
+          logError(saxparseexception.toString());
+        }
+
+        @Override
+        public void error(SAXParseException saxparseexception) throws AbortException {
+          logError(saxparseexception.toString());
+        }
+
+        @Override
+        public void debug(SAXParseException saxparseexception) {
+        }
+      };
+
+      MetadataFinder forest = new MetadataFinder(new WSDLInternalizationLogic(), options, receiver);
+      WSDLModeler wsdlModeler = createWsdlModeler(options, receiver, forest);
+      if (wsdlModeler == null) {
+        logInfo("WSDLModeler could not be created to display service properties");
+        return;
+      }
       Model wsdlModel = wsdlModeler.buildModel();
 
       if (wsdlModel == null) {
@@ -410,9 +447,34 @@ public class JaxWsStubGenerator {
         }
       }
     }
-    catch (Exception e) {
-      logError("WSDL model could not be parsed to display service properties");
+    catch (Throwable e) {
+      logError("WSDL model could not be parsed to display service properties: " + e.getMessage());
     }
+  }
+
+  private static WSDLModeler createWsdlModeler(WsimportOptions options, ErrorReceiver receiver, MetadataFinder forest) {
+    for (Constructor c : WSDLModeler.class.getConstructors()) {
+      try {
+        Class<?>[] paramTypes = c.getParameterTypes();
+        if (paramTypes.length == 2 &&
+            paramTypes[0].isAssignableFrom(WsimportOptions.class) &&
+            paramTypes[1].isAssignableFrom(ErrorReceiver.class)) {
+          // <= JRE6
+          return (WSDLModeler) c.newInstance(options, receiver);
+        }
+        else if (paramTypes.length == 3 &&
+            paramTypes[0].isAssignableFrom(WsimportOptions.class) &&
+            paramTypes[1].isAssignableFrom(ErrorReceiver.class) &&
+            paramTypes[2].isAssignableFrom(MetadataFinder.class)) {
+          // >= JRE7
+          return (WSDLModeler) c.newInstance(options, receiver, forest);
+        }
+      }
+      catch (Exception e) {
+        logError("Error creating WSDLModeler: " + e.getMessage());
+      }
+    }
+    return null;
   }
 
   private static void logInfo(String message) {

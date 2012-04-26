@@ -211,3 +211,13 @@ Solution:
 Fixed instance resolver to respect JAX-WS resource injection.
 Migration:
 None
+
+26.04.2012 mvi
+Bugzilla: 377831
+Problem:
+JaxWsStubGenerator crashes when creating providers or consumers under Java 7
+Solution:
+Bridge implemented that can handle both implementation versions.
+Furthermore logging has been improved to get more detailed messages.
+Migration:
+None
