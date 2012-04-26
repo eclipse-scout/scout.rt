@@ -818,36 +818,90 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   @Override
   public void openBrowserWindowFromScout(String path) {
-    String nextId = UUID.randomUUID().toString();
-    if ((StringUtility.find(path, "http://") >= 0)
-        || (StringUtility.find(path, "https://") >= 0)
-        || (path != null && path.startsWith("mailto:"))) {
-      ExternalBrowser.open(nextId, path, ExternalBrowser.STATUS | ExternalBrowser.LOCATION_BAR | ExternalBrowser.NAVIGATION_BAR);
+    if (path == null) {
+      return;
+    }
+
+    if (isEmailLink(path)) {
+      openLinkInEmailClient(path);
+    }
+    else if (isHttpLink(path)) {
+      openLinkInNewBrowserWindow(path);
     }
     else {
-      try {
-        File file = validatePath(path);
-        final RwtScoutDownloadHandler handler = new RwtScoutDownloadHandler(nextId, file, "", file.getName());
-        //do not use an existing shell since this one might disappear before the download completed...
-        Shell parentShell = new Shell();
-        parentShell.addDisposeListener(new DisposeListener() {
-          private static final long serialVersionUID = 1L;
+      downloadFile(path);
+    }
+  }
 
-          @Override
-          public void widgetDisposed(DisposeEvent event) {
-            handler.dispose();
-          }
-        });
-        handler.startDownload(parentShell);
-      }
-      catch (IOException e) {
-        LOG.error("Unexpected: " + path, e);
-      }
+  private boolean isEmailLink(String path) {
+    if (path != null && path.startsWith("mailto:")) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private boolean isHttpLink(String path) {
+    if ((StringUtility.find(path, "http://") >= 0) || (StringUtility.find(path, "https://") >= 0)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Opens the email client (without opening a separate browser window).
+   * 
+   * @param path
+   *          has to be a valid email link (must start with mailto:)
+   */
+  protected void openLinkInEmailClient(String path) {
+    if (!isEmailLink(path)) {
+      return;
+    }
+
+    JSExecutor.executeJS("window.location='" + path + "'");
+  }
+
+  protected void openLinkInNewBrowserWindow(String path) {
+    if (!isHttpLink(path)) {
+      return;
+    }
+
+    String nextId = UUID.randomUUID().toString();
+    ExternalBrowser.open(nextId, path, ExternalBrowser.STATUS | ExternalBrowser.LOCATION_BAR | ExternalBrowser.NAVIGATION_BAR);
+  }
+
+  protected void downloadFile(String path) {
+    try {
+      File file = validatePath(path);
+      String nextId = UUID.randomUUID().toString();
+      final RwtScoutDownloadHandler handler = new RwtScoutDownloadHandler(nextId, file, "", file.getName());
+      //do not use an existing shell since this one might disappear before the download completed...
+      Shell parentShell = new Shell();
+      parentShell.addDisposeListener(new DisposeListener() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void widgetDisposed(DisposeEvent event) {
+          handler.dispose();
+        }
+      });
+      handler.startDownload(parentShell);
+    }
+    catch (IOException e) {
+      LOG.error("Unexpected: " + path, e);
     }
   }
 
   @Override
   public void showMessageBoxFromScout(IMessageBox messageBox) {
+    //Never show a gui to a already closed messagebox. Otherwise it stays open forever.
+    //Because of the auto close mechanism of the messagebox it is possible that it's already closed (on model side).
+    if (!messageBox.isOpen()) {
+      return;
+    }
+
     RwtScoutMessageBoxDialog box = new RwtScoutMessageBoxDialog(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS), messageBox, this);
     box.open();
   }
@@ -1039,62 +1093,64 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   @SuppressWarnings("unused")
   protected void setStatusFromScout() {
-    if (getScoutDesktop() != null) {
-      IProcessingStatus newValue = getScoutDesktop().getStatus();
-      //when a tray item is available, use it, otherwise set status on views/dialogs
-      TrayItem trayItem = null;
+    if (getScoutDesktop() == null) {
+      return;
+    }
+
+    IProcessingStatus newValue = getScoutDesktop().getStatus();
+    //when a tray item is available, use it, otherwise set status on views/dialogs
+    TrayItem trayItem = null;
 //      if (getTrayComposite() != null) {//XXXRAP
 //        trayItem = getTrayComposite().getSwtTrayItem();
 //      }
-      if (trayItem != null) {
-        String s = newValue != null ? newValue.getMessage() : null;
-        if (newValue != null && s != null) {
-          int iconId;
-          switch (newValue.getSeverity()) {
-            case IProcessingStatus.WARNING: {
-              iconId = SWT.ICON_WARNING;
-              break;
-            }
-            case IProcessingStatus.FATAL:
-            case IProcessingStatus.ERROR: {
-              iconId = SWT.ICON_ERROR;
-              break;
-            }
-            case IProcessingStatus.CANCEL: {
-              //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
-              Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
-              if (frameworkVersion.getMajor() == 3
-                  && frameworkVersion.getMinor() <= 4) {
-                iconId = SWT.ICON_INFORMATION;
-              }
-              else {
-                iconId = 1 << 8;//SWT.ICON_CANCEL
-              }
-              break;
-            }
-            default: {
-              iconId = SWT.ICON_INFORMATION;
-              break;
-            }
+    if (trayItem != null) {
+      String s = newValue != null ? newValue.getMessage() : null;
+      if (newValue != null && s != null) {
+        int iconId;
+        switch (newValue.getSeverity()) {
+          case IProcessingStatus.WARNING: {
+            iconId = SWT.ICON_WARNING;
+            break;
           }
-          ToolTip tip = new ToolTip(getParentShellIgnoringPopups(SWT.MODELESS), SWT.BALLOON | iconId);
-          tip.setMessage(s);
-          trayItem.setToolTip(tip);
-          tip.setVisible(true);
+          case IProcessingStatus.FATAL:
+          case IProcessingStatus.ERROR: {
+            iconId = SWT.ICON_ERROR;
+            break;
+          }
+          case IProcessingStatus.CANCEL: {
+            //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
+            Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
+            if (frameworkVersion.getMajor() == 3
+                  && frameworkVersion.getMinor() <= 4) {
+              iconId = SWT.ICON_INFORMATION;
+            }
+            else {
+              iconId = 1 << 8;//SWT.ICON_CANCEL
+            }
+            break;
+          }
+          default: {
+            iconId = SWT.ICON_INFORMATION;
+            break;
+          }
         }
-        else {
-          ToolTip tip = new ToolTip(getParentShellIgnoringPopups(SWT.MODELESS), SWT.NONE);
-          trayItem.setToolTip(tip);
-          tip.setVisible(true);
-        }
+        ToolTip tip = new ToolTip(getParentShellIgnoringPopups(SWT.MODELESS), SWT.BALLOON | iconId);
+        tip.setMessage(s);
+        trayItem.setToolTip(tip);
+        tip.setVisible(true);
       }
       else {
-        String message = null;
-        if (newValue != null) {
-          message = newValue.getMessage();
-        }
-        setStatusLineMessage(null, message);
+        ToolTip tip = new ToolTip(getParentShellIgnoringPopups(SWT.MODELESS), SWT.NONE);
+        trayItem.setToolTip(tip);
+        tip.setVisible(true);
       }
+    }
+    else {
+      String message = null;
+      if (newValue != null) {
+        message = newValue.getMessage();
+      }
+      setStatusLineMessage(null, message);
     }
   }
 
