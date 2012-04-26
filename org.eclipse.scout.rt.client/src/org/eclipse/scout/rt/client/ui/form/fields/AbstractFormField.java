@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
-import org.eclipse.scout.rt.client.ui.form.internal.FindShortestUniqueIdVisitor;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
@@ -783,15 +782,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public String getFieldId() {
-    String s = getClass().getSimpleName();
-    if (s.endsWith("Field")) {
-      s = s.replaceAll("Field$", "");
-    }
-    else if (s.endsWith("Button")) {
-      s = s.replaceAll("Button$", "");
-    }
-    //do not remove box suffix, it is essential in distinguishing field data and box data types
-    return s;
+    return getClass().getSimpleName();
   }
 
   /*
@@ -808,24 +799,30 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /*
    * XML i/o
    */
-  /**
-   * {@inheritDoc}<br/>
-   * By default the shortest unique id based on the simple class name and ancestors class names is returned.
-   * For forms without duplicate simple class names the simple class name is returned. <br/>
-   */
-  @Override
-  public String getXMLFieldId() {
-    FindShortestUniqueIdVisitor visitor = new FindShortestUniqueIdVisitor(this);
-    if (getForm() != null) {
-      getForm().visitFields(visitor);
-      return visitor.getShortestUniqueId();
-    }
-    return getClass().getSimpleName();
-  }
-
   @Override
   public void storeXML(SimpleXmlElement x) throws ProcessingException {
-    x.setAttribute("fieldId", getXMLFieldId());
+    // compute enclosing field path
+    Class<?> currentEnclosingFieldType = ConfigurationUtility.getEnclosingContainerType(this);
+    ICompositeField p = getParentField();
+    while (p != null) {
+      Class<?> enclosingFieldType = ConfigurationUtility.getEnclosingContainerType(p);
+      if (enclosingFieldType != currentEnclosingFieldType) {
+        SimpleXmlElement enclosingField = new SimpleXmlElement("enclosingField");
+        setXmlFormFieldIds(enclosingField, p);
+        // Enclosing fields are traversed from inside to outside, but the path of enclosing
+        // elements should be from outside to inside. Hence add XML child at the beginning.
+        x.addChild(enclosingField, 0);
+        currentEnclosingFieldType = enclosingFieldType;
+      }
+      p = p.getParentField();
+    }
+    // set field ids
+    setXmlFormFieldIds(x, this);
+  }
+
+  private void setXmlFormFieldIds(SimpleXmlElement x, IFormField f) {
+    x.setAttribute("fieldId", f.getFieldId());
+    x.setAttribute("fieldQname", f.getClass().getName());
   }
 
   @Override

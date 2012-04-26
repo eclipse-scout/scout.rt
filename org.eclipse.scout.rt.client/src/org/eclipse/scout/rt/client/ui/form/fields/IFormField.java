@@ -221,15 +221,6 @@ public interface IFormField extends IPropertyObserver {
   /*
    * XML i/o
    */
-  /**
-   * The field ID which is used for identifying a form field during XML I/O.
-   * 
-   * @return a field ID to identify a form field during XML I/O.
-   * @see IFormField#storeXML(SimpleXmlElement)
-   * @see IForm#loadXML(SimpleXmlElement)
-   */
-  String getXMLFieldId();
-
   String getXML() throws ProcessingException;
 
   void setXML(String xml) throws ProcessingException;
@@ -301,8 +292,7 @@ public interface IFormField extends IPropertyObserver {
   void setValueChangeTriggerEnabled(boolean b);
 
   /**
-   * the field ID is the simple class name of a field without the suffixes
-   * "Box", "Field", "Button"
+   * the default field ID is the simple class name of a field
    */
   String getFieldId();
 
