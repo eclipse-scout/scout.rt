@@ -73,7 +73,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.form.internal.FindFieldByFormDataIdVisitor;
-import org.eclipse.scout.rt.client.ui.form.internal.FindFieldBySimpleClassNameVisitor;
+import org.eclipse.scout.rt.client.ui.form.internal.FindFieldByXmlIdsVisitor;
 import org.eclipse.scout.rt.client.ui.form.internal.FormDataPropertyFilter;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
@@ -1800,6 +1800,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void storeXML(SimpleXmlElement root) throws ProcessingException {
     root.setAttribute("formId", getFormId());
+    root.setAttribute("formQname", getClass().getName());
     // add custom properties
     SimpleXmlElement xProps = new SimpleXmlElement("properties");
     root.addChild(xProps);
@@ -1883,9 +1884,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // load fields
     SimpleXmlElement xFields = root.getChild("fields");
     if (xFields != null) {
-      for (Iterator it = xFields.getChildren("field").iterator(); it.hasNext();) {
-        SimpleXmlElement xField = (SimpleXmlElement) it.next();
-        FindFieldBySimpleClassNameVisitor v = new FindFieldBySimpleClassNameVisitor(xField.getStringAttribute("fieldId"));
+      for (SimpleXmlElement xField : xFields.getChildren("field")) {
+        List<String> xmlFieldIds = new LinkedList<String>();
+        // add enclosing field path to xml field IDs
+        for (SimpleXmlElement element : xField.getChildren("enclosingField")) {
+          xmlFieldIds.add(element.getStringAttribute("fieldId"));
+        }
+        xmlFieldIds.add(xField.getStringAttribute("fieldId"));
+        FindFieldByXmlIdsVisitor v = new FindFieldByXmlIdsVisitor(xmlFieldIds.toArray(new String[xmlFieldIds.size()]));
         visitFields(v);
         IFormField f = v.getField();
         if (f != null) {

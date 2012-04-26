@@ -292,8 +292,7 @@ public interface IFormField extends IPropertyObserver {
   void setValueChangeTriggerEnabled(boolean b);
 
   /**
-   * the field ID is the simple class name of a field without the suffixes
-   * "Box", "Field", "Button"
+   * the default field ID is the simple class name of a field
    */
   String getFieldId();
 

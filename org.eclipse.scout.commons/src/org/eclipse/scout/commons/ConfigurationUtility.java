@@ -173,4 +173,19 @@ public final class ConfigurationUtility {
     }
     return false;
   }
+
+  /**
+   * @return Returns the given objects enclosing container type, i.e the first class on the enclosing classes path that
+   *         is abstract or the outermost enclosing class. The latter is the primary type.
+   */
+  public static Class<?> getEnclosingContainerType(Object o) {
+    if (o == null) {
+      return null;
+    }
+    Class<?> c = o.getClass();
+    while (!Modifier.isAbstract(c.getModifiers()) && c.getEnclosingClass() != null) {
+      c = c.getEnclosingClass();
+    }
+    return c;
+  }
 }

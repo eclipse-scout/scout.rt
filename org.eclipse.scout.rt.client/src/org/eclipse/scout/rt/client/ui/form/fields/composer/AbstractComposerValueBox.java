@@ -51,7 +51,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
  * Template box containing all composer values.
  * <p>
  */
-public class AbstractComposerValueBox extends AbstractGroupBox {
+public abstract class AbstractComposerValueBox extends AbstractGroupBox {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractComposerValueBox.class);
 
   private Map<Integer/*operator*/, Map<Integer/*dataType*/, IComposerValueField>> m_opTypeToFieldMap;
@@ -861,11 +861,11 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenDateField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
-    public class FromField extends AbstractDateField {
+    public class DateFromField extends AbstractDateField {
     }
 
     @Order(20)
-    public class ToField extends AbstractDateField {
+    public class DateToField extends AbstractDateField {
     }
 
     @Override
@@ -885,14 +885,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
-        getFieldByClass(BetweenDateField.FromField.class).setValue(null);
-        getFieldByClass(BetweenDateField.ToField.class).setValue(null);
+        getFieldByClass(BetweenDateField.DateFromField.class).setValue(null);
+        getFieldByClass(BetweenDateField.DateToField.class).setValue(null);
         if (values != null && values.length == 2) {
           if (values[0] instanceof Date) {
-            getFieldByClass(BetweenDateField.FromField.class).setValue((Date) values[0]);
+            getFieldByClass(BetweenDateField.DateFromField.class).setValue((Date) values[0]);
           }
           if (values[1] instanceof Date) {
-            getFieldByClass(BetweenDateField.ToField.class).setValue((Date) values[1]);
+            getFieldByClass(BetweenDateField.DateToField.class).setValue((Date) values[1]);
           }
         }
       }
@@ -903,14 +903,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenDateField.FromField.class).setValue(null);
-      getFieldByClass(BetweenDateField.ToField.class).setValue(null);
+      getFieldByClass(BetweenDateField.DateFromField.class).setValue(null);
+      getFieldByClass(BetweenDateField.DateToField.class).setValue(null);
     }
 
     @Override
     public Object[] getValues() {
-      Object a = getFieldByClass(BetweenDateField.FromField.class).getValue();
-      Object b = getFieldByClass(BetweenDateField.ToField.class).getValue();
+      Object a = getFieldByClass(BetweenDateField.DateFromField.class).getValue();
+      Object b = getFieldByClass(BetweenDateField.DateToField.class).getValue();
       if (a != null || b != null) {
         return new Object[]{a, b};
       }
@@ -921,8 +921,8 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public String[] getTexts() {
-      String a = getFieldByClass(BetweenDateField.FromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenDateField.ToField.class).getDisplayText();
+      String a = getFieldByClass(BetweenDateField.DateFromField.class).getDisplayText();
+      String b = getFieldByClass(BetweenDateField.DateToField.class).getDisplayText();
       return new String[]{a, b};
     }
   }
@@ -931,11 +931,11 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenTimeField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
-    public class FromField extends AbstractTimeField {
+    public class TimeFromField extends AbstractTimeField {
     }
 
     @Order(20)
-    public class ToField extends AbstractTimeField {
+    public class TimeToField extends AbstractTimeField {
     }
 
     @Override
@@ -955,20 +955,20 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
-        getFieldByClass(BetweenTimeField.FromField.class).setValue(null);
-        getFieldByClass(BetweenTimeField.ToField.class).setValue(null);
+        getFieldByClass(BetweenTimeField.TimeFromField.class).setValue(null);
+        getFieldByClass(BetweenTimeField.TimeToField.class).setValue(null);
         if (values != null && values.length == 2) {
           if (values[0] instanceof Double) {
-            getFieldByClass(BetweenTimeField.FromField.class).setTimeValue((Double) values[0]);
+            getFieldByClass(BetweenTimeField.TimeFromField.class).setTimeValue((Double) values[0]);
           }
           else if (values[0] instanceof Date) {
-            getFieldByClass(BetweenTimeField.FromField.class).setValue((Date) values[0]);
+            getFieldByClass(BetweenTimeField.TimeFromField.class).setValue((Date) values[0]);
           }
           if (values[1] instanceof Double) {
-            getFieldByClass(BetweenTimeField.ToField.class).setTimeValue((Double) values[1]);
+            getFieldByClass(BetweenTimeField.TimeToField.class).setTimeValue((Double) values[1]);
           }
           else if (values[1] instanceof Date) {
-            getFieldByClass(BetweenTimeField.ToField.class).setValue((Date) values[1]);
+            getFieldByClass(BetweenTimeField.TimeToField.class).setValue((Date) values[1]);
           }
         }
       }
@@ -979,14 +979,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenTimeField.FromField.class).setValue(null);
-      getFieldByClass(BetweenTimeField.ToField.class).setValue(null);
+      getFieldByClass(BetweenTimeField.TimeFromField.class).setValue(null);
+      getFieldByClass(BetweenTimeField.TimeToField.class).setValue(null);
     }
 
     @Override
     public Object[] getValues() {
-      Object a = getFieldByClass(BetweenTimeField.FromField.class).getValue();
-      Object b = getFieldByClass(BetweenTimeField.ToField.class).getValue();
+      Object a = getFieldByClass(BetweenTimeField.TimeFromField.class).getValue();
+      Object b = getFieldByClass(BetweenTimeField.TimeToField.class).getValue();
       if (a != null || b != null) {
         return new Object[]{a, b};
       }
@@ -997,8 +997,8 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public String[] getTexts() {
-      String a = getFieldByClass(BetweenTimeField.FromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenTimeField.ToField.class).getDisplayText();
+      String a = getFieldByClass(BetweenTimeField.TimeFromField.class).getDisplayText();
+      String b = getFieldByClass(BetweenTimeField.TimeToField.class).getDisplayText();
       return new String[]{a, b};
     }
   }
@@ -1007,7 +1007,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenDateTimeField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
-    public class FromField extends AbstractDateField {
+    public class DateTimeFromField extends AbstractDateField {
       @Override
       protected boolean getConfiguredHasTime() {
         return true;
@@ -1015,7 +1015,7 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     }
 
     @Order(20)
-    public class ToField extends AbstractDateField {
+    public class DateTimeToField extends AbstractDateField {
       @Override
       protected boolean getConfiguredHasTime() {
         return true;
@@ -1039,14 +1039,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
-        getFieldByClass(BetweenDateTimeField.FromField.class).setValue(null);
-        getFieldByClass(BetweenDateTimeField.ToField.class).setValue(null);
+        getFieldByClass(BetweenDateTimeField.DateTimeFromField.class).setValue(null);
+        getFieldByClass(BetweenDateTimeField.DateTimeToField.class).setValue(null);
         if (values != null && values.length == 2) {
           if (values[0] instanceof Date) {
-            getFieldByClass(BetweenDateTimeField.FromField.class).setValue((Date) values[0]);
+            getFieldByClass(BetweenDateTimeField.DateTimeFromField.class).setValue((Date) values[0]);
           }
           if (values[1] instanceof Date) {
-            getFieldByClass(BetweenDateTimeField.ToField.class).setValue((Date) values[1]);
+            getFieldByClass(BetweenDateTimeField.DateTimeToField.class).setValue((Date) values[1]);
           }
         }
       }
@@ -1057,14 +1057,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenDateTimeField.FromField.class).setValue(null);
-      getFieldByClass(BetweenDateTimeField.ToField.class).setValue(null);
+      getFieldByClass(BetweenDateTimeField.DateTimeFromField.class).setValue(null);
+      getFieldByClass(BetweenDateTimeField.DateTimeToField.class).setValue(null);
     }
 
     @Override
     public Object[] getValues() {
-      Object a = getFieldByClass(BetweenDateTimeField.FromField.class).getValue();
-      Object b = getFieldByClass(BetweenDateTimeField.ToField.class).getValue();
+      Object a = getFieldByClass(BetweenDateTimeField.DateTimeFromField.class).getValue();
+      Object b = getFieldByClass(BetweenDateTimeField.DateTimeToField.class).getValue();
       if (a != null || b != null) {
         return new Object[]{a, b};
       }
@@ -1075,8 +1075,8 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public String[] getTexts() {
-      String a = getFieldByClass(BetweenDateTimeField.FromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenDateTimeField.ToField.class).getDisplayText();
+      String a = getFieldByClass(BetweenDateTimeField.DateTimeFromField.class).getDisplayText();
+      String b = getFieldByClass(BetweenDateTimeField.DateTimeToField.class).getDisplayText();
       return new String[]{a, b};
     }
   }
@@ -1085,11 +1085,11 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenIntegerField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
-    public class FromField extends AbstractIntegerField {
+    public class IntegerFromField extends AbstractIntegerField {
     }
 
     @Order(20)
-    public class ToField extends AbstractIntegerField {
+    public class IntegerToField extends AbstractIntegerField {
     }
 
     @Override
@@ -1109,14 +1109,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
-        getFieldByClass(BetweenIntegerField.FromField.class).setValue(null);
-        getFieldByClass(BetweenIntegerField.ToField.class).setValue(null);
+        getFieldByClass(BetweenIntegerField.IntegerFromField.class).setValue(null);
+        getFieldByClass(BetweenIntegerField.IntegerToField.class).setValue(null);
         if (values != null && values.length == 2) {
           if (values[0] instanceof Integer) {
-            getFieldByClass(BetweenIntegerField.FromField.class).setValue((Integer) values[0]);
+            getFieldByClass(BetweenIntegerField.IntegerFromField.class).setValue((Integer) values[0]);
           }
           if (values[1] instanceof Integer) {
-            getFieldByClass(BetweenIntegerField.ToField.class).setValue((Integer) values[1]);
+            getFieldByClass(BetweenIntegerField.IntegerToField.class).setValue((Integer) values[1]);
           }
         }
       }
@@ -1127,14 +1127,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenIntegerField.FromField.class).setValue(null);
-      getFieldByClass(BetweenIntegerField.ToField.class).setValue(null);
+      getFieldByClass(BetweenIntegerField.IntegerFromField.class).setValue(null);
+      getFieldByClass(BetweenIntegerField.IntegerToField.class).setValue(null);
     }
 
     @Override
     public Object[] getValues() {
-      Object a = getFieldByClass(BetweenIntegerField.FromField.class).getValue();
-      Object b = getFieldByClass(BetweenIntegerField.ToField.class).getValue();
+      Object a = getFieldByClass(BetweenIntegerField.IntegerFromField.class).getValue();
+      Object b = getFieldByClass(BetweenIntegerField.IntegerToField.class).getValue();
       if (a != null || b != null) {
         return new Object[]{a, b};
       }
@@ -1145,8 +1145,8 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public String[] getTexts() {
-      String a = getFieldByClass(BetweenIntegerField.FromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenIntegerField.ToField.class).getDisplayText();
+      String a = getFieldByClass(BetweenIntegerField.IntegerFromField.class).getDisplayText();
+      String b = getFieldByClass(BetweenIntegerField.IntegerToField.class).getDisplayText();
       return new String[]{a, b};
     }
   }
@@ -1155,11 +1155,11 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenLongField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
-    public class FromField extends AbstractLongField {
+    public class LongFromField extends AbstractLongField {
     }
 
     @Order(20)
-    public class ToField extends AbstractLongField {
+    public class LongToField extends AbstractLongField {
     }
 
     @Override
@@ -1179,14 +1179,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
-        getFieldByClass(BetweenLongField.FromField.class).setValue(null);
-        getFieldByClass(BetweenLongField.ToField.class).setValue(null);
+        getFieldByClass(BetweenLongField.LongFromField.class).setValue(null);
+        getFieldByClass(BetweenLongField.LongToField.class).setValue(null);
         if (values != null && values.length == 2) {
           if (values[0] instanceof Long) {
-            getFieldByClass(BetweenLongField.FromField.class).setValue((Long) values[0]);
+            getFieldByClass(BetweenLongField.LongFromField.class).setValue((Long) values[0]);
           }
           if (values[1] instanceof Long) {
-            getFieldByClass(BetweenLongField.ToField.class).setValue((Long) values[1]);
+            getFieldByClass(BetweenLongField.LongToField.class).setValue((Long) values[1]);
           }
         }
       }
@@ -1197,14 +1197,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenLongField.FromField.class).setValue(null);
-      getFieldByClass(BetweenLongField.ToField.class).setValue(null);
+      getFieldByClass(BetweenLongField.LongFromField.class).setValue(null);
+      getFieldByClass(BetweenLongField.LongToField.class).setValue(null);
     }
 
     @Override
     public Object[] getValues() {
-      Object a = getFieldByClass(BetweenLongField.FromField.class).getValue();
-      Object b = getFieldByClass(BetweenLongField.ToField.class).getValue();
+      Object a = getFieldByClass(BetweenLongField.LongFromField.class).getValue();
+      Object b = getFieldByClass(BetweenLongField.LongToField.class).getValue();
       if (a != null || b != null) {
         return new Object[]{a, b};
       }
@@ -1215,8 +1215,8 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public String[] getTexts() {
-      String a = getFieldByClass(BetweenLongField.FromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenLongField.ToField.class).getDisplayText();
+      String a = getFieldByClass(BetweenLongField.LongFromField.class).getDisplayText();
+      String b = getFieldByClass(BetweenLongField.LongToField.class).getDisplayText();
       return new String[]{a, b};
     }
   }
@@ -1225,11 +1225,11 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenDoubleField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
-    public class FromField extends AbstractDoubleField {
+    public class DoubleFromField extends AbstractDoubleField {
     }
 
     @Order(20)
-    public class ToField extends AbstractDoubleField {
+    public class DoubleToField extends AbstractDoubleField {
     }
 
     @Override
@@ -1249,14 +1249,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, Object[] values) {
       try {
-        getFieldByClass(BetweenDoubleField.FromField.class).setValue(null);
-        getFieldByClass(BetweenDoubleField.ToField.class).setValue(null);
+        getFieldByClass(BetweenDoubleField.DoubleFromField.class).setValue(null);
+        getFieldByClass(BetweenDoubleField.DoubleToField.class).setValue(null);
         if (values != null && values.length == 2) {
           if (values[0] instanceof Double) {
-            getFieldByClass(BetweenDoubleField.FromField.class).setValue((Double) values[0]);
+            getFieldByClass(BetweenDoubleField.DoubleFromField.class).setValue((Double) values[0]);
           }
           if (values[1] instanceof Double) {
-            getFieldByClass(BetweenDoubleField.ToField.class).setValue((Double) values[1]);
+            getFieldByClass(BetweenDoubleField.DoubleToField.class).setValue((Double) values[1]);
           }
         }
       }
@@ -1267,14 +1267,14 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenDoubleField.FromField.class).setValue(null);
-      getFieldByClass(BetweenDoubleField.ToField.class).setValue(null);
+      getFieldByClass(BetweenDoubleField.DoubleFromField.class).setValue(null);
+      getFieldByClass(BetweenDoubleField.DoubleToField.class).setValue(null);
     }
 
     @Override
     public Object[] getValues() {
-      Object a = getFieldByClass(BetweenDoubleField.FromField.class).getValue();
-      Object b = getFieldByClass(BetweenDoubleField.ToField.class).getValue();
+      Object a = getFieldByClass(BetweenDoubleField.DoubleFromField.class).getValue();
+      Object b = getFieldByClass(BetweenDoubleField.DoubleToField.class).getValue();
       if (a != null || b != null) {
         return new Object[]{a, b};
       }
@@ -1285,8 +1285,8 @@ public class AbstractComposerValueBox extends AbstractGroupBox {
 
     @Override
     public String[] getTexts() {
-      String a = getFieldByClass(BetweenDoubleField.FromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenDoubleField.ToField.class).getDisplayText();
+      String a = getFieldByClass(BetweenDoubleField.DoubleFromField.class).getDisplayText();
+      String b = getFieldByClass(BetweenDoubleField.DoubleToField.class).getDisplayText();
       return new String[]{a, b};
     }
   }

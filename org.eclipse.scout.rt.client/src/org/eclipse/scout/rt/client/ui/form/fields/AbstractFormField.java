@@ -782,15 +782,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public String getFieldId() {
-    String s = getClass().getSimpleName();
-    if (s.endsWith("Field")) {
-      s = s.replaceAll("Field$", "");
-    }
-    else if (s.endsWith("Button")) {
-      s = s.replaceAll("Button$", "");
-    }
-    //do not remove box suffix, it is essential in distinguishing field data and box data types
-    return s;
+    return getClass().getSimpleName();
   }
 
   /*
@@ -809,7 +801,28 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @Override
   public void storeXML(SimpleXmlElement x) throws ProcessingException {
-    x.setAttribute("fieldId", getClass().getSimpleName());
+    // compute enclosing field path
+    Class<?> currentEnclosingFieldType = ConfigurationUtility.getEnclosingContainerType(this);
+    ICompositeField p = getParentField();
+    while (p != null) {
+      Class<?> enclosingFieldType = ConfigurationUtility.getEnclosingContainerType(p);
+      if (enclosingFieldType != currentEnclosingFieldType) {
+        SimpleXmlElement enclosingField = new SimpleXmlElement("enclosingField");
+        setXmlFormFieldIds(enclosingField, p);
+        // Enclosing fields are traversed from inside to outside, but the path of enclosing
+        // elements should be from outside to inside. Hence add XML child at the beginning.
+        x.addChild(enclosingField, 0);
+        currentEnclosingFieldType = enclosingFieldType;
+      }
+      p = p.getParentField();
+    }
+    // set field ids
+    setXmlFormFieldIds(x, this);
+  }
+
+  private void setXmlFormFieldIds(SimpleXmlElement x, IFormField f) {
+    x.setAttribute("fieldId", f.getFieldId());
+    x.setAttribute("fieldQname", f.getClass().getName());
   }
 
   @Override
