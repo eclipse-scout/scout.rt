@@ -65,12 +65,11 @@ public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
       else {
         key = new CompositeObject(fieldIdRank, enclosingFieldPathRank, 0);
       }
-      IFormField existingMatch = m_prioMap.put(key, field);
-      if (existingMatch != null && !m_ambiguousFieldKeys.contains(key)) {
-        if (Platform.inDevelopmentMode() && LOG.isWarnEnabled()) {
-          LOG.warn("ignoring ambiguous fieldId: " + Arrays.toString(m_xmlFieldIds) + " matching fields [" + existingMatch + "] and [" + field + "]");
-        }
+      if (m_prioMap.containsKey(key)) {
         m_ambiguousFieldKeys.add(key);
+      }
+      else {
+        m_prioMap.put(key, field);
       }
     }
     return true;
@@ -135,7 +134,9 @@ public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
     }
     Entry<CompositeObject, IFormField> candidate = m_prioMap.lastEntry();
     if (m_ambiguousFieldKeys.contains(candidate.getKey())) {
-      return null;
+      if (Platform.inDevelopmentMode() && LOG.isWarnEnabled()) {
+        LOG.warn("ambiguous fieldId: " + Arrays.toString(m_xmlFieldIds) + " returning first candidate [" + candidate.getValue() + "]");
+      }
     }
     return candidate.getValue();
   }

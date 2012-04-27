@@ -17,6 +17,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 public abstract class AbstractFormFieldData implements Serializable {
@@ -125,11 +126,12 @@ public abstract class AbstractFormFieldData implements Serializable {
   }
 
   public AbstractFormFieldData getFieldById(String id) {
+    String fieldDataId = FormDataUtility.getFieldDataId(id);
     if (m_fieldMap == null) {
       return null;
     }
     for (AbstractFormFieldData f : m_fieldMap.values()) {
-      if (f.getFieldId().equals(id)) {
+      if (f.getFieldId().equals(fieldDataId)) {
         return f;
       }
     }
