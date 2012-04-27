@@ -103,8 +103,9 @@ public abstract class AbstractFormData implements Serializable, Cloneable {
   }
 
   public AbstractFormFieldData getFieldById(String id) {
+    String fieldDataId = FormDataUtility.getFieldDataId(id);
     for (AbstractFormFieldData f : m_fieldMap.values()) {
-      if (f.getFieldId().equals(id)) {
+      if (f.getFieldId().equals(fieldDataId)) {
         return f;
       }
     }
