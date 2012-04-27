@@ -12,8 +12,14 @@ package org.eclipse.scout.rt.shared.data.model;
 
 import java.io.Serializable;
 import java.security.Permission;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Date;
 import java.util.Map;
 
+import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
@@ -26,6 +32,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
 @SuppressWarnings("deprecation")
@@ -413,5 +420,260 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
       }
     }
     return false;
+  }
+
+  @Override
+  public String formatValue(Object rawValue) {
+    if (rawValue == null) {
+      return formatNullValue();
+    }
+
+    switch (getType()) {
+      case IDataModelAttribute.TYPE_CODE_LIST:
+      case IDataModelAttribute.TYPE_CODE_TREE:
+      case IDataModelAttribute.TYPE_NUMBER_LIST:
+      case IDataModelAttribute.TYPE_NUMBER_TREE:
+      case IDataModelAttribute.TYPE_SMART:
+        return formatSmart(rawValue, getCodeTypeClass(), getLookupCall());
+      case IDataModelAttribute.TYPE_DATE:
+        return formatDate(rawValue, true, false);
+      case IDataModelAttribute.TYPE_DATE_TIME:
+        return formatDate(rawValue, true, true);
+      case IDataModelAttribute.TYPE_TIME:
+        return formatDate(rawValue, false, true);
+      case IDataModelAttribute.TYPE_INTEGER:
+        return formatInteger(rawValue, true);
+      case IDataModelAttribute.TYPE_LONG:
+        return formatLong(rawValue, true);
+      case IDataModelAttribute.TYPE_DOUBLE:
+        return formatDouble(rawValue, true, false);
+      case IDataModelAttribute.TYPE_PLAIN_INTEGER:
+        return formatInteger(rawValue, false);
+      case IDataModelAttribute.TYPE_PLAIN_LONG:
+        return formatLong(rawValue, false);
+      case IDataModelAttribute.TYPE_PLAIN_DOUBLE:
+        return formatDouble(rawValue, false, false);
+      case IDataModelAttribute.TYPE_PERCENT:
+        return formatDouble(rawValue, true, true);
+      case IDataModelAttribute.TYPE_STRING:
+      case IDataModelAttribute.TYPE_FULL_TEXT:
+        return formatString(rawValue);
+      default:
+        return formatObject(rawValue);
+    }
+  }
+
+  /**
+   * Method is called in case the raw value is null.
+   * This method may be overridden by subclass in order to provide a different formatted value for null values.
+   * 
+   * @return null
+   */
+  protected String formatNullValue() {
+    return null;
+  }
+
+  /**
+   * Formats the raw value for the following attribute types:
+   * <ul>
+   * <li>{@link DataModelConstants#TYPE_DATE}</li>
+   * <li>{@link DataModelConstants#TYPE_DATE_TIME}</li>
+   * <li>{@link DataModelConstants#TYPE_TIME}</li>
+   * </ul>
+   * 
+   * @param rawValue
+   *          Raw value to format
+   * @param hasDate
+   *          True if the formatted value should show the date.
+   * @param hasTime
+   *          True if the formatted value should show the time.
+   * @return Formatted value: raw value casted to Date, date format according to date & time specification
+   */
+  protected String formatDate(Object rawValue, boolean hasDate, boolean hasTime) {
+    Date value = TypeCastUtility.castValue(rawValue, Date.class);
+
+    DateFormat df = null;
+    if (hasDate && !hasTime) {
+      df = DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get());
+    }
+    else if (!hasDate && hasTime) {
+      df = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleThreadLocal.get());
+    }
+    else {
+      df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, LocaleThreadLocal.get());
+    }
+    df.setLenient(true);
+
+    return df.format(value);
+  }
+
+  /**
+   * Formats the raw value for the following attribute types:
+   * <ul>
+   * <li>{@link DataModelConstants#TYPE_DOUBLE}</li>
+   * <li>{@link DataModelConstants#TYPE_PLAIN_DOUBLE}</li>
+   * <li>{@link DataModelConstants#TYPE_PERCENT}</li>
+   * </ul>
+   * 
+   * @param rawValue
+   *          Raw value to format
+   * @param groupingUsed
+   *          True if grouping should be used for formatting
+   * @param percent
+   *          True if a percent number format should be used for formatting
+   * @return Formatted value: raw value casted to Double, number format with 2 fraction digits
+   */
+  protected String formatDouble(Object rawValue, boolean groupingUsed, boolean percent) {
+    Double value = TypeCastUtility.castValue(rawValue, Double.class);
+
+    NumberFormat fmt = null;
+    if (percent) {
+      fmt = NumberFormat.getPercentInstance(LocaleThreadLocal.get());
+    }
+    else {
+      fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
+    }
+
+    if (fmt instanceof DecimalFormat) {
+      ((DecimalFormat) fmt).setMultiplier(1);
+    }
+
+    fmt.setMinimumFractionDigits(2);
+    fmt.setMaximumFractionDigits(2);
+    fmt.setGroupingUsed(groupingUsed);
+
+    return fmt.format(value);
+  }
+
+  /**
+   * Formats the raw value for the following attribute types:
+   * <ul>
+   * <li>{@link DataModelConstants#TYPE_INTEGER}</li>
+   * <li>{@link DataModelConstants#TYPE_PLAIN_INTEGER}</li>
+   * </ul>
+   * 
+   * @param rawValue
+   *          Raw value to format
+   * @param groupingUsed
+   *          True if grouping should be used for formatting
+   * @return Formatted value: raw value casted to Integer, number format with no fraction digits
+   */
+  protected String formatInteger(Object rawValue, boolean groupingUsed) {
+    Integer value = TypeCastUtility.castValue(rawValue, Integer.class);
+
+    NumberFormat fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
+    fmt.setMinimumFractionDigits(0);
+    fmt.setMaximumFractionDigits(0);
+    fmt.setGroupingUsed(groupingUsed);
+    return fmt.format(value);
+  }
+
+  /**
+   * Formats the raw value for the following attribute types:
+   * <ul>
+   * <li>{@link DataModelConstants#TYPE_LONG}</li>
+   * <li>{@link DataModelConstants#TYPE_PLAIN_LONG}</li>
+   * </ul>
+   * 
+   * @param rawValue
+   *          Raw value to format
+   * @param groupingUsed
+   *          True if grouping should be used for formatting
+   * @return Formatted value: raw value casted to Long, number format with no fraction digits
+   */
+  protected String formatLong(Object rawValue, boolean groupingUsed) {
+    Long value = TypeCastUtility.castValue(rawValue, Long.class);
+
+    NumberFormat fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
+    fmt.setMinimumFractionDigits(0);
+    fmt.setMaximumFractionDigits(0);
+    fmt.setGroupingUsed(groupingUsed);
+    return fmt.format(value);
+  }
+
+  /**
+   * Formats the raw value for the following attribute types:
+   * <ul>
+   * <li>{@link DataModelConstants#TYPE_CODE_LIST}</li>
+   * <li>{@link DataModelConstants#TYPE_CODE_TREE}</li>
+   * <li>{@link DataModelConstants#TYPE_NUMBER_LIST}</li>
+   * <li>{@link DataModelConstants#TYPE_NUMBER_TREE}</li>
+   * <li>{@link DataModelConstants#TYPE_SMART}</li>
+   * </ul>
+   * If whether code type class nor lookup call is set, the return value will be null.
+   * The method does not throw an exception. In case of failure, the return value is the empty string.
+   * 
+   * @param rawValue
+   *          Raw value to format
+   * @param codeTypeClass
+   *          Code type class
+   * @param lookupCall
+   *          Lookup call (not used if code type class is set)
+   * @return Formatted value: key is resolved by code type / lookup call
+   */
+  protected String formatSmart(Object rawValue, Class<? extends ICodeType> codeTypeClass, LookupCall lookupCall) {
+    if (codeTypeClass == null && lookupCall == null) {
+      return null;
+    }
+
+    LookupCall call;
+    if (codeTypeClass != null) {
+      call = new CodeLookupCall(codeTypeClass);
+    }
+    else {
+      call = (LookupCall) lookupCall.clone();
+    }
+
+    call.setKey(rawValue);
+    call.setText(null);
+    call.setAll(null);
+    call.setRec(null);
+
+    try {
+      LookupRow[] result = call.getDataByKey();
+      if (result.length == 1) {
+        return result[0].getText();
+      }
+      else if (result.length > 1) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < result.length; i++) {
+          if (i > 0) {
+            sb.append(", ");
+          }
+          sb.append(result[i].getText());
+        }
+        return sb.toString();
+      }
+    }
+    catch (ProcessingException e) {
+      LOG.warn("Execution of lookup call failed", e);
+    }
+    return "";
+  }
+
+  /**
+   * Formats the raw value for the following attribute types and in case the type did not match any known types.
+   * <ul>
+   * <li>{@link DataModelConstants#TYPE_STRING}</li>
+   * <li>{@link DataModelConstants#TYPE_FULL_TEXT}</li>
+   * </ul>
+   * 
+   * @param rawValue
+   *          Raw value to format
+   * @return Formatted value: raw value is casted to String
+   */
+  protected String formatString(Object rawValue) {
+    return TypeCastUtility.castValue(rawValue, String.class);
+  }
+
+  /**
+   * Formats the raw value for unknown attribute types
+   * 
+   * @param rawValue
+   *          Raw value to format
+   * @return Formatted value: raw value is casted to String
+   */
+  protected String formatObject(Object rawValue) {
+    return rawValue.toString();
   }
 }

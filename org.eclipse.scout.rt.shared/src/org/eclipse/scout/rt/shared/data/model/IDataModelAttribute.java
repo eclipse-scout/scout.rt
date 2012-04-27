@@ -143,4 +143,13 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
    * @since 3.8.0
    */
   boolean isMultiValued();
+
+  /**
+   * Formats the provided raw value according to the defined attribute type.
+   * 
+   * @param rawValue
+   *          Raw value to format.
+   * @return Formatted value
+   */
+  String formatValue(Object rawValue);
 }
