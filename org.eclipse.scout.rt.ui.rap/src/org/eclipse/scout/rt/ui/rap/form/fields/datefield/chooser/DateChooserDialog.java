@@ -16,6 +16,7 @@ import java.util.Date;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.rt.ui.rap.ext.table.util.TableCellRolloverSupport;
@@ -55,7 +56,10 @@ public class DateChooserDialog extends Dialog {
   public static final int TYPE_FOREWARD_MONTH = 1 << 2;
   public static final int TYPE_FOREWARD_YEAR = 1 << 3;
 
-  private static final int COLUMN_WIDTH = 35;
+  private static final int DATE_CELL_WIDTH = 35;
+  private static final int DATE_CELL_HEIGHT = SWT.DEFAULT;
+  private static final int CONTROL_BUTTON_WIDTH = 15;
+  private static final int CONTROL_BUTTON_HEIGHT = 15;
   private TableViewer m_viewer;
   private Label m_monthLabel;
   private DatefieldTableModel m_model;
@@ -71,6 +75,7 @@ public class DateChooserDialog extends Dialog {
     m_model = new DatefieldTableModel(RwtUtility.getClientSessionLocale(parentShell.getDisplay()));
     setDisplayDate(date);
     setBlockOnOpen(false);
+
     create();
   }
 
@@ -88,33 +93,52 @@ public class DateChooserDialog extends Dialog {
   }
 
   public int showDialogFor(Control field) {
+    Point location = getLocation(field);
+    if (location != null) {
+      getShell().setLocation(location);
+    }
+
+    m_viewer.refresh();
+
+    return this.open();
+  }
+
+  /**
+   * Override this method to set a custom location.
+   * <p>
+   * As default the popup is opened right under the field.
+   * </p>
+   */
+  protected Point getLocation(Control field) {
     // make sure that the popup fit into the application window.
     Rectangle appBounds = field.getDisplay().getBounds();
     Point absPrefPos = field.toDisplay(0, field.getSize().y);
     Rectangle prefBounds = new Rectangle(absPrefPos.x, absPrefPos.y, getShell().getSize().x, getShell().getSize().y);
+
     // horizontal correction
     if (prefBounds.x + prefBounds.width > appBounds.width) {
       prefBounds.x = appBounds.width - prefBounds.width;
     }
-    // vertical correciton
+    // vertical correction
     if (prefBounds.y + prefBounds.height > appBounds.height) {
       prefBounds.y = appBounds.height - prefBounds.height;
     }
-    getShell().setLocation(prefBounds.x, prefBounds.y);
-    m_viewer.refresh();
-    int ret = this.open();
-    return ret;
+
+    return new Point(prefBounds.x, prefBounds.y);
   }
 
   @Override
   protected Control createContents(Composite parent) {
-    parent.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
+    parent.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
 
     Composite rootArea = new Composite(parent, SWT.NO_FOCUS);
-    rootArea.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
-    Control navigationArea = createControlArea(rootArea);
+    rootArea.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, true);
+    rootArea.setLayoutData(gridData);
 
+    Control navigationArea = createControlArea(rootArea);
     Control calendarArea = createPickDateArea(rootArea);
+
     // layout
     rootArea.setLayout(new FormLayout());
     FormData data = new FormData();
@@ -128,12 +152,20 @@ public class DateChooserDialog extends Dialog {
     data.right = new FormAttachment(100, 0);
     data.bottom = new FormAttachment(100, -5);
     calendarArea.setLayoutData(data);
+
     return rootArea;
+  }
+
+  protected String getDialogVariant() {
+    return DATECHOOSER_DIALOG_CUSTOM_VARIANT;
   }
 
   private Control createPickDateArea(Composite parent) {
     final Table table = new Table(parent, SWT.SINGLE | SWT.NO_SCROLL | SWT.HIDE_SELECTION);
-    table.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
+    table.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    if (getDateCellHeight() != SWT.DEFAULT) {
+      table.setData(RWT.CUSTOM_ITEM_HEIGHT, getDateCellHeight());
+    }
     table.setLinesVisible(true);
     TableViewer viewer = new TableViewer(table);
     new TableCellRolloverSupport(viewer);
@@ -149,7 +181,7 @@ public class DateChooserDialog extends Dialog {
             TableColumn columnAt = RwtUtility.getRwtColumnAt(table, new Point(event.x, event.y));
             TableItem item = table.getItem(new Point(event.x, event.y));
             if (item != null) {
-              item.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
+              item.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
               if (columnAt != null) {
                 Date date = ((DateRow) item.getData()).getDate(table.indexOf(columnAt) - 1);
                 m_returnDate = date;
@@ -168,7 +200,7 @@ public class DateChooserDialog extends Dialog {
     });
 
     TableColumn dummyColumn = new TableColumn(table, SWT.RIGHT);
-    dummyColumn.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
+    dummyColumn.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
     dummyColumn.setWidth(0);
     dummyColumn.setResizable(false);
     dummyColumn.setMoveable(false);
@@ -177,16 +209,16 @@ public class DateChooserDialog extends Dialog {
     // create the m_columns from monday to saturday
     for (int i = 2; i < 8; i++) {
       TableColumn col = new TableColumn(table, SWT.CENTER);
-      col.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
-      col.setWidth(COLUMN_WIDTH);
+      col.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+      col.setWidth(getDateCellWidth());
       col.setResizable(false);
       col.setMoveable(false);
       col.setText(wd[i]);
     }
     // sunday
     TableColumn col = new TableColumn(table, SWT.CENTER);
-    col.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
-    col.setWidth(COLUMN_WIDTH);
+    col.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    col.setWidth(getDateCellWidth());
     col.setResizable(false);
     col.setMoveable(false);
     col.setText(wd[Calendar.SUNDAY]);
@@ -200,14 +232,22 @@ public class DateChooserDialog extends Dialog {
     return table;
   }
 
+  protected int getDateCellWidth() {
+    return DATE_CELL_WIDTH;
+  }
+
+  protected int getDateCellHeight() {
+    return DATE_CELL_HEIGHT;
+  }
+
   private Control createControlArea(Composite parent) {
     Composite rootArea = RwtUtility.getUiEnvironment(parent.getDisplay()).getFormToolkit().createComposite(parent, SWT.NO_FOCUS);
-    rootArea.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
+    rootArea.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
     createButton(rootArea, TYPE_BACK_YEAR);
     createButton(rootArea, TYPE_BACK_MONTH);
     m_monthLabel = new Label(rootArea, SWT.CENTER);
     m_monthLabel.setText(m_model.getMonthYearLabel());
-    m_monthLabel.setData(WidgetUtil.CUSTOM_VARIANT, DATECHOOSER_DIALOG_CUSTOM_VARIANT);
+    m_monthLabel.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
     createButton(rootArea, TYPE_FOREWARD_MONTH);
     createButton(rootArea, TYPE_FOREWARD_YEAR);
     // layout
@@ -220,29 +260,42 @@ public class DateChooserDialog extends Dialog {
   }
 
   private Button createButton(Composite parent, int type) {
-    String variant = null;
-    switch (type) {
-      case TYPE_BACK_YEAR:
-        variant = LAST_YEAR_CUSTOM_VARIANT;
-        break;
-      case TYPE_BACK_MONTH:
-        variant = LAST_MONTH_CUSTOM_VARIANT;
-        break;
-      case TYPE_FOREWARD_MONTH:
-        variant = NEXT_MONTH_CUSTOM_VARIANT;
-        break;
-      case TYPE_FOREWARD_YEAR:
-        variant = NEXT_YEAR_CUSTOM_VARIANT;
-        break;
-    }
+    String variant = getControlButtonVariant(type);
+
     Button b = new Button(parent, SWT.PUSH);
     b.setData(WidgetUtil.CUSTOM_VARIANT, variant);
     b.addMouseListener(new P_NavigationMouseListener(type));
-    GridData data = new GridData(15, 15);
+    GridData data = new GridData(getControlButtonWidth(), getControlButtonHeight());
     data.horizontalAlignment = GridData.FILL;
     data.grabExcessHorizontalSpace = false;
     b.setLayoutData(data);
     return b;
+  }
+
+  /**
+   * Override this method to set a custom variant name for the control buttons
+   */
+  protected String getControlButtonVariant(int type) {
+    switch (type) {
+      case TYPE_BACK_YEAR:
+        return LAST_YEAR_CUSTOM_VARIANT;
+      case TYPE_BACK_MONTH:
+        return LAST_MONTH_CUSTOM_VARIANT;
+      case TYPE_FOREWARD_MONTH:
+        return NEXT_MONTH_CUSTOM_VARIANT;
+      case TYPE_FOREWARD_YEAR:
+        return NEXT_YEAR_CUSTOM_VARIANT;
+      default:
+        return null;
+    }
+  }
+
+  protected int getControlButtonWidth() {
+    return CONTROL_BUTTON_WIDTH;
+  }
+
+  protected int getControlButtonHeight() {
+    return CONTROL_BUTTON_HEIGHT;
   }
 
   private class P_NavigationMouseListener extends MouseAdapter {
