@@ -37,7 +37,6 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
   private final HashMap<String, IClientSession> m_cache = new HashMap<String, IClientSession>();
   private final Object m_cacheLock = new Object();
 
-  @SuppressWarnings("unchecked")
   @Override
   public <T extends IClientSession> T newClientSession(Class<T> clazz, UserAgent userAgent) {
     final Bundle bundle = getDefiningBundle(clazz);
@@ -45,20 +44,7 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
       return null;
     }
 
-    synchronized (m_cacheLock) {
-      IClientSession clientSession = m_cache.get(bundle.getSymbolicName());
-      if (clientSession == null || !clientSession.isActive()) {
-        clientSession = createAndStartClientSession(clazz, bundle, userAgent);
-        m_cache.put(bundle.getSymbolicName(), clientSession);
-      }
-      return (T) clientSession;
-    }
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public <T extends IClientSession> T getClientSession(Class<T> clazz) {
-    return newClientSession(clazz, UserAgent.createDefault());
+    return createAndStartClientSession(clazz, bundle, userAgent);
   }
 
   @SuppressWarnings("unchecked")
@@ -93,12 +79,6 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
     }
 
     return createAndStartClientSession(clazz, bundle, subject, virtualSessionId, userAgent);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId) {
-    return newClientSession(clazz, subject, virtualSessionId, UserAgent.createDefault());
   }
 
   @SuppressWarnings("unchecked")
@@ -145,6 +125,30 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
   @Override
   public ISession getCurrentSession() {
     return ClientJob.getCurrentSession();
+  }
+
+  @SuppressWarnings({"deprecation", "unchecked"})
+  @Override
+  public <T extends IClientSession> T getClientSession(Class<T> clazz) {
+    final Bundle bundle = getDefiningBundle(clazz);
+    if (bundle == null) {
+      return null;
+    }
+
+    synchronized (m_cacheLock) {
+      IClientSession clientSession = m_cache.get(bundle.getSymbolicName());
+      if (clientSession == null || !clientSession.isActive()) {
+        clientSession = createAndStartClientSession(clazz, bundle, UserAgent.createDefault());
+        m_cache.put(bundle.getSymbolicName(), clientSession);
+      }
+      return (T) clientSession;
+    }
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId) {
+    return newClientSession(clazz, subject, virtualSessionId, UserAgent.createDefault());
   }
 
 }
