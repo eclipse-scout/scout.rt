@@ -23,6 +23,8 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -32,6 +34,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -395,7 +399,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       m_clipboard = new Clipboard(getDisplay());
       fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
 
-      IClientSession tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClass, initUserAgent());
+      IClientSession tempClientSession = createAndStartClientSession();
       if (!tempClientSession.isActive()) {
         showClientSessionLoadError(tempClientSession.getLoadError());
         LOG.error("ClientSession is not active, there must be a problem with loading or starting");
@@ -481,6 +485,34 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
         fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
       }
     }
+  }
+
+  /**
+   * Creates and starts a new client session. <br/>
+   * This is done in a separate thread to make sure that no client code is
+   * running in the ui thread.
+   */
+  private IClientSession createAndStartClientSession() {
+    final IHolder<IClientSession> holder = new Holder<IClientSession>(IClientSession.class);
+    JobEx job = new JobEx("Creating and starting client session") {
+
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        holder.setValue(SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClass, initUserAgent()));
+
+        return Status.OK_STATUS;
+      }
+
+    };
+    job.schedule();
+    try {
+      job.join();
+    }
+    catch (InterruptedException e) {
+      LOG.error("Client session startup interrupted.", e);
+    }
+
+    return holder.getValue();
   }
 
   protected UserAgent initUserAgent() {

@@ -44,31 +44,7 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
       return null;
     }
 
-    return createAndStartClientSession(clazz, bundle, userAgent);
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T extends IClientSession> T createAndStartClientSession(Class<T> clazz, final Bundle bundle, UserAgent userAgent) {
-    IClientSession clientSession;
-    try {
-      clientSession = clazz.newInstance();
-      clientSession.setUserAgent(userAgent);
-      ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          getCurrentSession().startSession(bundle);
-        }
-      };
-      job.schedule();
-      job.join();
-      job.throwOnError();
-
-      return (T) clientSession;
-    }
-    catch (Throwable t) {
-      LOG.error("could not load session for " + bundle.getSymbolicName(), t);
-      return null;
-    }
+    return createAndStartClientSession(clazz, bundle, null, null, userAgent);
   }
 
   @Override
@@ -96,7 +72,7 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
           getCurrentSession().startSession(bundle);
         }
       };
-      //must run now to use correct jaas and subject context of calling thread
+      //must run now to use correct jaas and subject context of calling thread. Especially relevant when running in a servlet thread (rwt)
       job.runNow(new NullProgressMonitor());
       job.throwOnError();
       return (T) clientSession;
@@ -142,6 +118,37 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
         m_cache.put(bundle.getSymbolicName(), clientSession);
       }
       return (T) clientSession;
+    }
+  }
+
+  /**
+   * Compared to {@link #createAndStartClientSession(Class, Bundle, Subject, String, UserAgent)} this method starts the
+   * session in a separate thread.
+   * 
+   * @deprecated Will be removed in 3.9.0
+   */
+  @SuppressWarnings("unchecked")
+  @Deprecated
+  private <T extends IClientSession> T createAndStartClientSession(Class<T> clazz, final Bundle bundle, UserAgent userAgent) {
+    IClientSession clientSession;
+    try {
+      clientSession = clazz.newInstance();
+      clientSession.setUserAgent(userAgent);
+      ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          getCurrentSession().startSession(bundle);
+        }
+      };
+      job.schedule();
+      job.join();
+      job.throwOnError();
+
+      return (T) clientSession;
+    }
+    catch (Throwable t) {
+      LOG.error("could not load session for " + bundle.getSymbolicName(), t);
+      return null;
     }
   }
 
