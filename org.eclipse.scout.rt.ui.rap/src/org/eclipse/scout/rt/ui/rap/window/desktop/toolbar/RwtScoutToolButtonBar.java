@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.services.common.patchedclass.IPatchedClassService;
-import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -121,7 +121,7 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
     }
 
     //layout
-    GridLayout toolButtonBarLayout = RwtUtility.createGridLayoutNoSpacing(3, false);
+    GridLayout toolButtonBarLayout = RwtLayoutUtility.createGridLayoutNoSpacing(3, false);
     toolButtonBarLayout.marginLeft = 10;
     toolButtonBarLayout.marginRight = 10;
     toolButtonBar.setLayout(toolButtonBarLayout);

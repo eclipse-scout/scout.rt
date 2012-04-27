@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
-import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -80,7 +80,7 @@ public class RwtTableStatus implements IRwtTableStatus {
     gd.fillHorizontal = true;
     m_labelContainer.setLayoutData(gd);
 
-    GridLayout groupCompLayout = RwtUtility.createGridLayoutNoSpacing(1, false);
+    GridLayout groupCompLayout = RwtLayoutUtility.createGridLayoutNoSpacing(1, false);
     m_labelContainer.setLayout(groupCompLayout);
 
     GridData popLabelLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);

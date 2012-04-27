@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtStandaloneEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.desktop.toolbar.RwtScoutToolbar;
 import org.eclipse.scout.rt.ui.rap.window.desktop.viewarea.ILayoutListener;
@@ -76,7 +76,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   }
 
   protected void initLayout(Composite container, Control toolbar, Control viewsArea) {
-    GridLayout layout = RwtUtility.createGridLayoutNoSpacing(1, true);
+    GridLayout layout = RwtLayoutUtility.createGridLayoutNoSpacing(1, true);
     container.setLayout(layout);
 
     if (toolbar != null) {

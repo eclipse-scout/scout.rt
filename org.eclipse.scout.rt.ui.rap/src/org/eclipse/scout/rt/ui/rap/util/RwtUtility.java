@@ -680,15 +680,6 @@ public final class RwtUtility {
     return null;
   }
 
-  public static GridLayout createGridLayoutNoSpacing(int columnCount, boolean makeColumnsEqualWidth) {
-    GridLayout layout = new GridLayout(columnCount, makeColumnsEqualWidth);
-    layout.horizontalSpacing = 0;
-    layout.marginHeight = 0;
-    layout.marginWidth = 0;
-    layout.verticalSpacing = 0;
-    return layout;
-  }
-
   public static IRwtKeyStroke[] getKeyStrokes(IKeyStroke stroke, IRwtEnvironment uiEnvironment) {
     ArrayList<IRwtKeyStroke> uiKeyStrokes = new ArrayList<IRwtKeyStroke>();
     int keycode = getRwtKeyCode(stroke);
@@ -1702,5 +1693,14 @@ public final class RwtUtility {
       return text;
     }
     return MNEMONIC_PATTERN.matcher(text).replaceAll("\\&$1");
+  }
+
+  /**
+   * @deprecated Use {@link RwtLayoutUtility#createGridLayoutNoSpacing(int, boolean)}. <br/>
+   *             Will be removed in 3.9.0
+   */
+  @Deprecated
+  public static GridLayout createGridLayoutNoSpacing(int columnCount, boolean makeColumnsEqualWidth) {
+    return RwtLayoutUtility.createGridLayoutNoSpacing(columnCount, makeColumnsEqualWidth);
   }
 }

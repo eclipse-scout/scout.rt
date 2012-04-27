@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
-import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.window.desktop.toolbar.IRwtScoutToolButtonForPatch;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
@@ -63,7 +63,7 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
     m_tabboxContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.NONE);
 
     //layout
-    container.setLayout(RwtUtility.createGridLayoutNoSpacing(1, false));
+    container.setLayout(RwtLayoutUtility.createGridLayoutNoSpacing(1, false));
 
     GridData tabboxButtonBarLayoutdata = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.GRAB_HORIZONTAL | GridData.VERTICAL_ALIGN_END);
     m_tabboxButtonbar.setLayoutData(tabboxButtonBarLayoutdata);

@@ -114,4 +114,13 @@ public final class RwtLayoutUtility {
       }
     }
   }
+
+  public static GridLayout createGridLayoutNoSpacing(int columnCount, boolean makeColumnsEqualWidth) {
+    GridLayout layout = new GridLayout(columnCount, makeColumnsEqualWidth);
+    layout.horizontalSpacing = 0;
+    layout.marginHeight = 0;
+    layout.marginWidth = 0;
+    layout.verticalSpacing = 0;
+    return layout;
+  }
 }

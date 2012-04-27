@@ -14,7 +14,7 @@ import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
-import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutToolbar;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -54,7 +54,7 @@ public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> implements IRwt
   }
 
   protected void initLayout(Composite container, Control viewButtonbar, Control busyIndicator, Control toolButtonBar) {
-    container.setLayout(RwtUtility.createGridLayoutNoSpacing(3, false));
+    container.setLayout(RwtLayoutUtility.createGridLayoutNoSpacing(3, false));
 
     if (viewButtonbar != null) {
       viewButtonbar.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.VERTICAL_ALIGN_END));
