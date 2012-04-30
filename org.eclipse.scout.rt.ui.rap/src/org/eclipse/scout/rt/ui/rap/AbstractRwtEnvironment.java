@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.ui.rap;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +35,6 @@ import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.service.ISessionStore;
 import org.eclipse.rwt.service.SessionStoreEvent;
 import org.eclipse.rwt.service.SessionStoreListener;
-import org.eclipse.rwt.widgets.ExternalBrowser;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
@@ -85,6 +82,7 @@ import org.eclipse.scout.rt.ui.rap.util.FontRegistry;
 import org.eclipse.scout.rt.ui.rap.util.RwtIconLocator;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.util.ScoutFormToolkit;
+import org.eclipse.scout.rt.ui.rap.window.BrowserWindowHandler;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartListener;
@@ -92,13 +90,10 @@ import org.eclipse.scout.rt.ui.rap.window.desktop.navigation.RwtScoutNavigationS
 import org.eclipse.scout.rt.ui.rap.window.dialog.RwtScoutDialog;
 import org.eclipse.scout.rt.ui.rap.window.filechooser.IRwtScoutFileChooser;
 import org.eclipse.scout.rt.ui.rap.window.filechooser.IRwtScoutFileChooserService;
-import org.eclipse.scout.rt.ui.rap.window.filedownloader.RwtScoutDownloadHandler;
 import org.eclipse.scout.rt.ui.rap.window.messagebox.RwtScoutMessageBoxDialog;
 import org.eclipse.scout.rt.ui.rap.window.popup.RwtScoutPopup;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
@@ -799,99 +794,18 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     sfc.showFileChooser();
   }
 
-  protected File validatePath(String path) throws IOException {
-    String px = path.replace('\\', File.separatorChar);
-    File file = new File(px);
-    if (file.exists()) {
-      px = file.getCanonicalPath();
-      String osName = System.getProperty("os.name");
-      if (osName != null && osName.startsWith("Mac OS")) {
-        //mac is not able to open files with a space, even when in quotes
-        String ext = px.substring(px.lastIndexOf('.'));
-        File f = new File(file.getParentFile(), "" + System.nanoTime() + ext);
-        file.renameTo(f);
-        f.deleteOnExit();
-      }
-    }
-    return file;
-  }
-
   @Override
   public void openBrowserWindowFromScout(String path) {
-    if (path == null) {
+    BrowserWindowHandler browserWindowHandler = createBrowserWindowHandler();
+    if (browserWindowHandler == null) {
       return;
     }
 
-    if (isEmailLink(path)) {
-      openLinkInEmailClient(path);
-    }
-    else if (isHttpLink(path)) {
-      openLinkInNewBrowserWindow(path);
-    }
-    else {
-      downloadFile(path);
-    }
+    browserWindowHandler.openLink(path);
   }
 
-  private boolean isEmailLink(String path) {
-    if (path != null && path.startsWith("mailto:")) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private boolean isHttpLink(String path) {
-    if ((StringUtility.find(path, "http://") >= 0) || (StringUtility.find(path, "https://") >= 0)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Opens the email client (without opening a separate browser window).
-   * 
-   * @param path
-   *          has to be a valid email link (must start with mailto:)
-   */
-  protected void openLinkInEmailClient(String path) {
-    if (!isEmailLink(path)) {
-      return;
-    }
-
-    JSExecutor.executeJS("window.location='" + path + "'");
-  }
-
-  protected void openLinkInNewBrowserWindow(String path) {
-    if (!isHttpLink(path)) {
-      return;
-    }
-
-    String nextId = UUID.randomUUID().toString();
-    ExternalBrowser.open(nextId, path, ExternalBrowser.STATUS | ExternalBrowser.LOCATION_BAR | ExternalBrowser.NAVIGATION_BAR);
-  }
-
-  protected void downloadFile(String path) {
-    try {
-      File file = validatePath(path);
-      String nextId = UUID.randomUUID().toString();
-      final RwtScoutDownloadHandler handler = new RwtScoutDownloadHandler(nextId, file, "", file.getName());
-      //do not use an existing shell since this one might disappear before the download completed...
-      Shell parentShell = new Shell();
-      parentShell.addDisposeListener(new DisposeListener() {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void widgetDisposed(DisposeEvent event) {
-          handler.dispose();
-        }
-      });
-      handler.startDownload(parentShell);
-    }
-    catch (IOException e) {
-      LOG.error("Unexpected: " + path, e);
-    }
+  protected BrowserWindowHandler createBrowserWindowHandler() {
+    return new BrowserWindowHandler();
   }
 
   @Override
