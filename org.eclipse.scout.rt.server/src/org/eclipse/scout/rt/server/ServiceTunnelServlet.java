@@ -374,7 +374,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
   /**
    * Create the {@link ServerJob} that runs the request as a single atomic transaction
    */
-  private ServerJob createServiceTunnelServerJob(IServerSession serverSession, ServiceTunnelRequest serviceRequest, AtomicReference<ServiceTunnelResponse> serviceResponseHolder, Subject subject) {
+  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, ServiceTunnelRequest serviceRequest, AtomicReference<ServiceTunnelResponse> serviceResponseHolder, Subject subject) {
     return new RemoteServiceJob(serverSession, serviceRequest, serviceResponseHolder, subject);
   }
 
