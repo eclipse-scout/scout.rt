@@ -763,6 +763,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       getUiField().setSortColumn(minUiSortColumn);
       getUiField().setSortDirection(minScoutSortColumn.isSortAscending() ? SWT.UP : SWT.DOWN);
     }
+    else {
+      getUiField().setSortColumn(null);
+    }
     for (TableColumn col : getUiField().getColumns()) {
       Object data = col.getData(KEY_SCOUT_COLUMN);
       if (data instanceof IColumn<?>) {

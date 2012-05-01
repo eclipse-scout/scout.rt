@@ -710,6 +710,8 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   }
 
   protected void headerUpdateFromScout() {
+    getSwtField().setSortColumn(null);
+
     for (TableColumn col : getSwtField().getColumns()) {
       Object data = col.getData(KEY_SCOUT_COLUMN);
       if (data instanceof IColumn<?>) {
