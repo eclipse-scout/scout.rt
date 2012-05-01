@@ -130,9 +130,15 @@ public class ColumnSet {
       int sortIndex = -1;
       if (col.isInitialAlwaysIncludeSortAtBegin()) {
         sortIndex = col.getInitialSortIndex();
+        if (sortIndex < 0) {
+          LOG.warn("AlwaysIncludeSortAtBegin is set but no sort index configured.");
+        }
       }
       else if (col.isInitialAlwaysIncludeSortAtEnd()) {
         sortIndex = col.getInitialSortIndex();
+        if (sortIndex < 0) {
+          LOG.warn("AlwaysIncludeSortAtEnd is set but no sort index configured.");
+        }
       }
       else {
         sortIndex = prefs.getTableColumnSortIndex(col, col.getInitialSortIndex());
