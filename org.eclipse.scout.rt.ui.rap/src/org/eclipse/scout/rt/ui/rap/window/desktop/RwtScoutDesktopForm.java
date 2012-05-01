@@ -74,9 +74,7 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
   protected void closePartImpl() {
     detachScout();
     m_button.dispose();
-
-    //FIXME CGU this crashes the whole application if the mainbox of a form is set to scrollable and the form itself is a view. This happens since 2012-04-12 because of new rap libs
-//    m_uiForm.dispose();
+    m_uiForm.dispose();
 
     m_stackComposite = null;
   }
