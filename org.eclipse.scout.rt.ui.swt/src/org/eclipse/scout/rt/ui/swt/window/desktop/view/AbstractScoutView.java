@@ -195,10 +195,16 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
   }
 
   protected void setImageFromScout(String iconId) {
+    IForm form = getForm();
+    if (form == null) {
+      return;
+    }
+
     Image img = getSwtEnvironment().getIcon(iconId);
     setTitleImage(img);
-    String sub = getForm().getSubTitle();
-    if (sub != null) {
+
+    String subTitle = form.getSubTitle();
+    if (subTitle != null) {
       getSwtForm().setImage(img);
     }
     else {
@@ -207,14 +213,17 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
   }
 
   protected void setTitleFromScout(String title) {
-    IForm f = getForm();
-    //
-    String s = f.getBasicTitle();
-    setPartName(StringUtility.removeNewLines(s != null ? s : ""));
-    //
-    s = f.getSubTitle();
-    if (s != null) {
-      getSwtForm().setText(SwtUtility.escapeMnemonics(StringUtility.removeNewLines(s != null ? s : "")));
+    IForm form = getForm();
+    if (form == null) {
+      return;
+    }
+
+    String basicTitle = form.getBasicTitle();
+    setPartName(StringUtility.removeNewLines(basicTitle != null ? basicTitle : ""));
+
+    String subTitle = form.getSubTitle();
+    if (subTitle != null) {
+      getSwtForm().setText(SwtUtility.escapeMnemonics(StringUtility.removeNewLines(subTitle != null ? subTitle : "")));
     }
     else {
       getSwtForm().setText(null);
