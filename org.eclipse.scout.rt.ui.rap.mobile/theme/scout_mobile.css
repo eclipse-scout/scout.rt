@@ -1,0 +1,33 @@
+Composite.mobileToolbarContainer {
+  background-color: #67a8ce;
+}
+
+CLabel.actionTitleBarLabel {
+  color: white;
+  font: bold 17px Arial, Helvetica, sans-serif;
+  background-color: transparent;
+}
+
+Composite.actionTitleBarContainer {
+  padding: 0px 0px 0px 0px;
+}
+
+Button.mobile-datechooser-dialog-last-year, Button.mobile-datechooser-dialog-last-year:hover {
+  background-image: url( theme/img/datetime/last-year_30x30.png );
+  border-radius: 5px;
+}
+
+Button.mobile-datechooser-dialog-last-month, Button.mobile-datechooser-dialog-last-month:hover {
+  background-image: url( theme/img/datetime/last-month_30x30.png );
+  border-radius: 5px;
+}
+
+Button.mobile-datechooser-dialog-next-year, Button.mobile-datechooser-dialog-next-year:hover {
+  background-image: url( theme/img/datetime/next-year_30x30.png );
+  border-radius: 5px;
+}
+
+Button.mobile-datechooser-dialog-next-month, Button.mobile-datechooser-dialog-next-month:hover {
+  background-image: url( theme/img/datetime/next-month_30x30.png );
+  border-radius: 5px;
+}

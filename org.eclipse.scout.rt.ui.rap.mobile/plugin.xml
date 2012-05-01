@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?><!--
+    Copyright (c) 2011 BSI Business Systems Integration AG.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+        BSI Business Systems Integration AG - initial API and implementation
+ -->
+
+<plugin>
+
+
+
+   <extension
+         point="org.eclipse.scout.service.services">
+      <service
+            class="org.eclipse.scout.rt.client.services.common.icon.IconProviderService"
+            createImmediately="false"
+            factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+            ranking="-80">
+      </service>
+   </extension>
+   <extension
+         point="org.eclipse.scout.rt.ui.rap.formfields">
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField"
+            name="Mobile table field"
+            scope="global">
+         <factory
+               class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.MobileTableFieldFactory">
+         </factory>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField"
+            name="Mobile tree field"
+            scope="global">
+         <factory
+               class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.treefield.MobileTreeFieldFactory">
+         </factory>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.button.IButton"
+            name="Mobile button field"
+            scope="global">
+         <factory
+               class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.button.MobileButtonFieldFactory">
+         </factory>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox"
+            name="Mobile group box"
+            scope="global">
+         <factory
+               class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.groupbox.MobileGroupBoxFieldFactory">
+         </factory>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField"
+            name="Mobile smart field"
+            scope="global">
+         <factory
+               class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.smartfield.MobileSmartFieldFactory">
+         </factory>
+      </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField"
+            name="Mobile date field"
+            scope="global">
+         <factory
+               class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.datefield.MobileDateFieldFactory">
+         </factory>
+      </formField>
+   </extension>
+   <extension
+         point="org.eclipse.rap.ui.themes">
+      <themeContribution
+            file="theme/scout_mobile.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+   </extension>
+
+</plugin>
