@@ -11,13 +11,16 @@
 package org.eclipse.scout.rt.ui.rap.mobile;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.rap.AbstractStandaloneRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.mobile.window.desktop.RwtScoutMobileDesktop;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
+import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.Bundle;
 
 public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractStandaloneRwtEnvironment {
@@ -34,6 +37,13 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
   @Override
   protected RwtScoutDesktop createUiDesktop() {
     return new RwtScoutMobileDesktop();
+  }
+
+  @Override
+  public IRwtScoutForm createForm(Composite parent, IForm scoutForm) {
+    RwtScoutMobileForm uiForm = new RwtScoutMobileForm();
+    uiForm.createUiField(parent, scoutForm, this);
+    return uiForm;
   }
 
 }
