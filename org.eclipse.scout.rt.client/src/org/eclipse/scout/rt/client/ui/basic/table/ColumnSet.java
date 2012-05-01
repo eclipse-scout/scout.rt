@@ -131,13 +131,13 @@ public class ColumnSet {
       if (col.isInitialAlwaysIncludeSortAtBegin()) {
         sortIndex = col.getInitialSortIndex();
         if (sortIndex < 0) {
-          LOG.warn("AlwaysIncludeSortAtBegin is set but no sort index configured.");
+          LOG.warn("AlwaysIncludeSortAtBegin is set but no sort index configured. Table: " + m_table.getClass().getName());
         }
       }
       else if (col.isInitialAlwaysIncludeSortAtEnd()) {
         sortIndex = col.getInitialSortIndex();
         if (sortIndex < 0) {
-          LOG.warn("AlwaysIncludeSortAtEnd is set but no sort index configured.");
+          LOG.warn("AlwaysIncludeSortAtEnd is set but no sort index configured. Table: " + m_table.getClass().getName());
         }
       }
       else {
