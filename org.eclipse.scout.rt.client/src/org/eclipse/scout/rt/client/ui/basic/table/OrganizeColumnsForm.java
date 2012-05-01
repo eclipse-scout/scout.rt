@@ -476,7 +476,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
             @Override
             protected int getConfiguredWidth() {
-              return 300;
+              return 200;
             }
 
           }
@@ -1079,16 +1079,16 @@ public class OrganizeColumnsForm extends AbstractForm {
     boolean selectedRowExists = selectedRow != null;
     boolean isCustomColumn = selectedRow != null && getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow) instanceof ICustomColumn<?>;
     boolean selectedRowHasFilter = selectedRowExists && getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow).isColumnFilterActive();
-
+    boolean sortEnabled = m_table.isSortEnabled();
     getModifyCustomColumnButton().setEnabled(isCustomColumn);
     getRemoveCustomColumnButton().setEnabled(isCustomColumn);
 
     getMoveDownButton().setEnabled(selectedRowExists);
     getMoveUpButton().setEnabled(selectedRowExists);
 
-    getAscendingButton().setEnabled(selectedRowExists);
-    getDescendingButton().setEnabled(selectedRowExists);
-    getWithoutButton().setEnabled(selectedRowExists);
+    getAscendingButton().setEnabled(sortEnabled && selectedRowExists);
+    getDescendingButton().setEnabled(sortEnabled && selectedRowExists);
+    getWithoutButton().setEnabled(sortEnabled && selectedRowExists);
 
     getEditFilterButton().setEnabled(selectedRowExists);
     getRemoveFilterButton().setEnabled(selectedRowHasFilter);
