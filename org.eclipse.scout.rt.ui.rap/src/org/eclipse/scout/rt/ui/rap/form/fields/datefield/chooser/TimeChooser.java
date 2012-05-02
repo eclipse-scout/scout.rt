@@ -18,6 +18,7 @@ import java.util.EventListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.eclipse.rwt.RWT;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.swt.SWT;
@@ -33,6 +34,9 @@ import org.eclipse.swt.widgets.TableItem;
  * Tabular listing of times of every half hour
  */
 public class TimeChooser {
+  private static final int TABLE_HEIGHT = 200;
+  private static final int TABLE_CELL_HEIGHT = SWT.DEFAULT;
+
   private final EventListenerList m_listenerList = new EventListenerList();
 
   private Composite m_container;
@@ -42,13 +46,21 @@ public class TimeChooser {
   public TimeChooser(Composite parent) {
     m_container = parent;
     m_timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleThreadLocal.get());
-    //table
+
     m_table = new Table(m_container, SWT.SINGLE | SWT.V_SCROLL | SWT.FULL_SELECTION);
     m_table.setLinesVisible(true);
     m_table.setHeaderVisible(false);
+
+    if (getTableCellHeight() != SWT.DEFAULT) {
+      m_table.setData(RWT.CUSTOM_ITEM_HEIGHT, getTableCellHeight());
+    }
+
     GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-    data.heightHint = 200;
+    if (getTableHeight() != SWT.DEFAULT) {
+      data.heightHint = getTableHeight();
+    }
     m_table.setLayoutData(data);
+
     TableColumn column = new TableColumn(m_table, SWT.NONE);
     column.setText("");
     for (Date value : createTableData()) {
@@ -75,6 +87,14 @@ public class TimeChooser {
 
     //initial value
     setTime(new Date());
+  }
+
+  protected int getTableHeight() {
+    return TABLE_HEIGHT;
+  }
+
+  protected int getTableCellHeight() {
+    return TABLE_CELL_HEIGHT;
   }
 
   /**

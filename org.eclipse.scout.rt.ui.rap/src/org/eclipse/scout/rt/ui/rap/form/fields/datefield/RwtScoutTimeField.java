@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 
 public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> implements IRwtScoutTimeField, IPopupSupport {
 
@@ -174,43 +175,59 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     return (StyledTextEx) super.getUiField();
   }
 
-  private boolean isFocusInTimePicker() {
+  public boolean isFocusInTimePicker() {
     Control focusControl = getUiEnvironment().getDisplay().getFocusControl();
     boolean isFocusInDatePicker = RwtUtility.isAncestorOf(m_timeChooserDialog.getShell(), focusControl);
     return isFocusInDatePicker;
   }
 
   private void installFocusListenerOnTextField() {
-    if (!getUiField().isDisposed()) {
-      getUiField().setFocus();
-      if (m_textFieldFocusAdapter == null) {
-        m_textFieldFocusAdapter = new FocusAdapter() {
-          private static final long serialVersionUID = 1L;
+    if (getUiField().isDisposed()) {
+      return;
+    }
 
-          @Override
-          public void focusLost(FocusEvent e) {
-            if (isFocusInTimePicker()) {
-              getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                  getUiField().setFocus();
-                }
-              });
-            }
-            else {
-              getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+    getUiField().setFocus();
+    if (m_textFieldFocusAdapter == null) {
+      m_textFieldFocusAdapter = new FocusAdapter() {
+        private static final long serialVersionUID = 1L;
 
-                @Override
-                public void run() {
-                  makeSureTimeChooserIsClosed();
-                  uninstallFocusListenerOnTextField();
-                }
-              });
-            }
-          }
-        };
-      }
-      getUiField().addFocusListener(m_textFieldFocusAdapter);
+        @Override
+        public void focusLost(FocusEvent e) {
+          handleUiFocusLostOnDatePickerPopup(e);
+        }
+
+      };
+    }
+    getUiField().addFocusListener(m_textFieldFocusAdapter);
+  }
+
+  /**
+   * The event is fired only if the time picker popup is open.
+   * <p>
+   * The default sets the focus on the ui field if the new focus is inside the time picker. <br/>
+   * If the new focus is outside the time picker it makes sure the time picker popup will be closed.
+   * </p>
+   */
+  protected void handleUiFocusLostOnDatePickerPopup(FocusEvent event) {
+    if (isFocusInTimePicker()) {
+      getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+
+        @Override
+        public void run() {
+          getUiField().setFocus();
+        }
+
+      });
+    }
+    else {
+      getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+
+        @Override
+        public void run() {
+          makeSureTimeChooserIsClosed();
+        }
+
+      });
     }
   }
 
@@ -316,25 +333,30 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     getUiField().setSelection(0, 0);
   }
 
-  private void makeSureTimeChooserIsClosed() {
+  protected void makeSureTimeChooserIsClosed() {
     if (m_timeChooserDialog != null
         && m_timeChooserDialog.getShell() != null
         && !m_timeChooserDialog.getShell().isDisposed()) {
       m_timeChooserDialog.getShell().close();
     }
+
+    uninstallFocusListenerOnTextField();
   }
 
   private void handleUiTimeChooserAction() {
-    if (getDropDownButton().isVisible() && getDropDownButton().isEnabled()) {
-      Date oldTime = getScoutObject().getValue();
-      if (oldTime == null) {
-        oldTime = new Date();
-      }
-      notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
+    if (!getDropDownButton().isVisible() || !getDropDownButton().isEnabled()) {
+      return;
+    }
 
-      makeSureTimeChooserIsClosed();
-      m_timeChooserDialog = new TimeChooserDialog(getUiField().getShell(), oldTime);
+    Date oldTime = getScoutObject().getValue();
+    if (oldTime == null) {
+      oldTime = new Date();
+    }
+    notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
 
+    makeSureTimeChooserIsClosed();
+    m_timeChooserDialog = createTimeChooserDialog(getUiField().getShell(), oldTime);
+    if (m_timeChooserDialog != null) {
       m_timeChooserDialog.getShell().addDisposeListener(new DisposeListener() {
         private static final long serialVersionUID = 1L;
 
@@ -347,6 +369,10 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
       m_timeChooserDialog.openTimeChooser(getUiField());
       installFocusListenerOnTextField();
     }
+  }
+
+  protected TimeChooserDialog createTimeChooserDialog(Shell parentShell, Date currentTime) {
+    return new TimeChooserDialog(parentShell, currentTime);
   }
 
   private void getTimeFromClosedDateChooserDialog() {

@@ -21,24 +21,37 @@ public class DateFieldFactory implements IFormFieldFactory {
 
   @Override
   public IRwtScoutFormField<?> createUiFormField(Composite parent, IFormField field, IRwtEnvironment uiEnvironment) {
-    if (field instanceof IDateField) {
-      IDateField d = (IDateField) field;
-      if (d.isHasDate() && d.isHasTime()) {
-        RwtScoutDateTimeCompositeField ui = new RwtScoutDateTimeCompositeField();
-        ui.createUiField(parent, d, uiEnvironment);
-        return ui;
-      }
-      else if (d.isHasDate()) {
-        RwtScoutDateField ui = new RwtScoutDateField();
-        ui.createUiField(parent, d, uiEnvironment);
-        return ui;
-      }
-      else {
-        RwtScoutTimeField ui = new RwtScoutTimeField();
-        ui.createUiField(parent, d, uiEnvironment);
-        return ui;
-      }
+    if (!(field instanceof IDateField)) {
+      return null;
     }
-    return null;
+
+    IDateField d = (IDateField) field;
+    if (d.isHasDate() && d.isHasTime()) {
+      IRwtScoutFormField<IDateField> ui = createRwtScoutDateTimeField();
+      ui.createUiField(parent, d, uiEnvironment);
+      return ui;
+    }
+    else if (d.isHasDate()) {
+      IRwtScoutDateField ui = createRwtScoutDateField();
+      ui.createUiField(parent, d, uiEnvironment);
+      return ui;
+    }
+    else {
+      IRwtScoutTimeField ui = createRwtScoutTimeField();
+      ui.createUiField(parent, d, uiEnvironment);
+      return ui;
+    }
+  }
+
+  protected IRwtScoutFormField<IDateField> createRwtScoutDateTimeField() {
+    return new RwtScoutDateTimeCompositeField();
+  }
+
+  protected IRwtScoutDateField createRwtScoutDateField() {
+    return new RwtScoutDateField();
+  }
+
+  protected IRwtScoutTimeField createRwtScoutTimeField() {
+    return new RwtScoutTimeField();
   }
 }

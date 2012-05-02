@@ -110,7 +110,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_smartContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
-    m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_SMARTFIELD);
+    m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
     StyledText textField = new StyledTextEx(m_smartContainer, SWT.SINGLE) {
       private static final long serialVersionUID = 1L;
 
@@ -124,7 +124,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     };
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     // correction to look like a normal text
-    textField.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_SMARTFIELD);
+    textField.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
 
     m_browseButton = getUiEnvironment().getFormToolkit().createDropDownButton(m_smartContainer, SWT.DROP_DOWN | SWT.NO_FOCUS);
     // mouseDown-handler to ensure the text is validated on a context menu call is not
@@ -189,6 +189,14 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     m_browseButton.setLayoutData(buttonLayoutData);
   }
 
+  protected String getSmartfieldVariant() {
+    return VARIANT_SMARTFIELD;
+  }
+
+  protected String getSmartfieldDisabledVariant() {
+    return VARIANT_SMARTFIELD_DISABLED;
+  }
+
   @Override
   public IDropDownButtonForPatch getUiBrowseButton() {
     return m_browseButton;
@@ -233,10 +241,10 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     m_browseButton.setButtonEnabled(b);
     getUiField().setEnabled(b);
     if (b) {
-      m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_SMARTFIELD);
+      m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
     }
     else {
-      m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_SMARTFIELD_DISABLED);
+      m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldDisabledVariant());
     }
   }
 

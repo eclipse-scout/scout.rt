@@ -10,33 +10,46 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.datefield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
-import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.extension.IFormFieldFactory;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
+import org.eclipse.scout.rt.ui.rap.form.fields.datefield.DateFieldFactory;
 import org.eclipse.scout.rt.ui.rap.form.fields.datefield.IRwtScoutDateField;
+import org.eclipse.scout.rt.ui.rap.form.fields.datefield.IRwtScoutTimeField;
 import org.eclipse.scout.rt.ui.rap.form.fields.datefield.RwtScoutDateField;
+import org.eclipse.scout.rt.ui.rap.form.fields.datefield.RwtScoutDateTimeCompositeField;
+import org.eclipse.scout.rt.ui.rap.form.fields.datefield.RwtScoutTimeField;
 import org.eclipse.scout.rt.ui.rap.util.DeviceUtility;
-import org.eclipse.swt.widgets.Composite;
 
-public class MobileDateFieldFactory implements IFormFieldFactory {
+public class MobileDateFieldFactory extends DateFieldFactory {
 
   @Override
-  public IRwtScoutFormField<?> createUiFormField(Composite parent, IFormField model, IRwtEnvironment uiEnvironment) {
-    IRwtScoutDateField field;
-
+  protected IRwtScoutFormField<IDateField> createRwtScoutDateTimeField() {
     if (DeviceUtility.isMobileOrTabletDevice()) {
-      field = new RwtScoutMobileDateField();
+      return new RwtScoutMobileDateTimeCompositeField();
     }
     else {
-      field = new RwtScoutDateField();
+      return new RwtScoutDateTimeCompositeField();
     }
+  }
 
-    IDateField tableField = (IDateField) model;
-    field.createUiField(parent, tableField, uiEnvironment);
+  @Override
+  protected IRwtScoutDateField createRwtScoutDateField() {
+    if (DeviceUtility.isMobileOrTabletDevice()) {
+      return new RwtScoutMobileDateField();
+    }
+    else {
+      return new RwtScoutDateField();
+    }
+  }
 
-    return field;
+  @Override
+  protected IRwtScoutTimeField createRwtScoutTimeField() {
+    if (DeviceUtility.isMobileOrTabletDevice()) {
+      return new RwtScoutMobileTimeField();
+    }
+    else {
+      return new RwtScoutTimeField();
+    }
   }
 
 }

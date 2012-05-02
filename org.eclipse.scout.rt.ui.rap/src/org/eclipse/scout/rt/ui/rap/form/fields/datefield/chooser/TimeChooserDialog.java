@@ -88,6 +88,21 @@ public class TimeChooserDialog extends Dialog {
   }
 
   public int showDialogFor(Control field) {
+    Point location = getLocation(field);
+    if (location != null) {
+      getShell().setLocation(location);
+    }
+
+    return this.open();
+  }
+
+  /**
+   * Override this method to set a custom location.
+   * <p>
+   * As default the popup is opened right under the field.
+   * </p>
+   */
+  protected Point getLocation(Control field) {
     // make sure that the popup fit into the application window.
     Rectangle appBounds = field.getDisplay().getBounds();
     Point absPrefPos = field.toDisplay(field.getSize().x - getShell().getSize().x, field.getSize().y);
@@ -100,19 +115,18 @@ public class TimeChooserDialog extends Dialog {
     if (prefBounds.y + prefBounds.height > appBounds.height) {
       prefBounds.y = appBounds.height - prefBounds.height;
     }
-    getShell().setLocation(prefBounds.x, prefBounds.y);
-    int ret = this.open();
-    return ret;
+
+    return new Point(prefBounds.x, prefBounds.y);
   }
 
   @Override
   protected Control createContents(Composite parent) {
-    parent.setData(WidgetUtil.CUSTOM_VARIANT, TIMECHOOSER_DIALOG_CUSTOM_VARIANT);
+    parent.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
 
     Composite rootArea = new Composite(parent, SWT.NONE);
-    rootArea.setData(WidgetUtil.CUSTOM_VARIANT, TIMECHOOSER_DIALOG_CUSTOM_VARIANT);
+    rootArea.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
 
-    m_timeChooser = new TimeChooser(rootArea);
+    m_timeChooser = createTimeChooser(rootArea);
     m_timeChooser.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
@@ -132,5 +146,13 @@ public class TimeChooserDialog extends Dialog {
     GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
     rootArea.setLayoutData(data);
     return rootArea;
+  }
+
+  protected TimeChooser createTimeChooser(Composite parent) {
+    return new TimeChooser(parent);
+  }
+
+  protected String getDialogVariant() {
+    return TIMECHOOSER_DIALOG_CUSTOM_VARIANT;
   }
 }

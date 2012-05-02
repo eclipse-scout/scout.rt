@@ -44,7 +44,7 @@ public class RwtScoutDateTimeCompositeField extends RwtScoutValueFieldComposite<
 
     Composite fieldContainer = getUiEnvironment().getFormToolkit().createComposite(container);
 
-    m_dateField = new RwtScoutDateField();
+    m_dateField = createRwtScoutDateField();
     m_dateField.createUiField(fieldContainer, getScoutObject(), getUiEnvironment());
     m_dateField.getUiContainer().setLayoutData(createDateFieldGridData());
     m_dateField.setIgnoreLabel(true);
@@ -55,7 +55,7 @@ public class RwtScoutDateTimeCompositeField extends RwtScoutValueFieldComposite<
       ((LogicalGridData) childLabel.getLayoutData()).widthHint = 0;
     }
 
-    m_timeField = new RwtScoutTimeField();
+    m_timeField = createRwtScoutTimeField();
     m_timeField.createUiField(fieldContainer, getScoutObject(), getUiEnvironment());
     m_timeField.getUiContainer().setLayoutData(createTimeFieldGridData());
     m_timeField.setIgnoreLabel(true);
@@ -73,6 +73,14 @@ public class RwtScoutDateTimeCompositeField extends RwtScoutValueFieldComposite<
     // layout
     fieldContainer.setLayout(new LogicalGridLayout(6, 0));
     container.setLayout(new LogicalGridLayout(1, 0));
+  }
+
+  protected RwtScoutDateField createRwtScoutDateField() {
+    return new RwtScoutDateField();
+  }
+
+  protected RwtScoutTimeField createRwtScoutTimeField() {
+    return new RwtScoutTimeField();
   }
 
   @Override
