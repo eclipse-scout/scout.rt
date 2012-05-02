@@ -29,7 +29,7 @@ public class MobileSmartFieldFactory implements IFormFieldFactory {
   public IRwtScoutFormField<?> createUiFormField(Composite parent, IFormField model, IRwtEnvironment uiEnvironment) {
     IRwtScoutSmartField field;
 
-    if (DeviceUtility.isMobileDevice()) {
+    if (DeviceUtility.isMobileOrTabletDevice()) {
       field = new RwtScoutMobileSmartField();
     }
     else {
