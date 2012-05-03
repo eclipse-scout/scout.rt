@@ -112,6 +112,25 @@ public final class StringUtility {
   }
 
   /**
+   * @param humanReadableFilterText
+   *          is not a regex and may contain *,%,? as wildcards for searching
+   * @param patternFlags
+   *          see {@link Pattern}
+   * @return a {@link Pattern} based on the input pattern. If the input pattern contains no '*' an '*' is automatically
+   *         appended. If the input pattern is null or empty then '*' is used instead
+   * @since 3.8
+   */
+  public static Pattern toRegEx(String humanReadableFilterText, int patternFlags) {
+    if (humanReadableFilterText == null) {
+      humanReadableFilterText = "";
+    }
+    if (humanReadableFilterText.indexOf('*') < 0) {
+      humanReadableFilterText += "*";
+    }
+    return Pattern.compile(StringUtility.toRegExPattern(humanReadableFilterText), patternFlags);
+  }
+
+  /**
    * Tokenize a String s by given character c. Take care about empty String
    * between two separating chars. {@link java.util.StringTokenizer} does not
    * care about empty string between separating chars.

@@ -49,15 +49,20 @@ public class LocalLookupCall extends LookupCall {
     return null;
   }
 
+  /**
+   * @param humanReadbleFilterPattern
+   *          is not a regex and may contain *,%,? as wildcards for searching
+   *          override this method for custom filter pattern creation
+   */
+  protected Pattern createSearchPattern(String humanReadbleFilterPattern) {
+    return createLowerCaseSearchPattern(humanReadbleFilterPattern);
+  }
+
+  /**
+   * alias for {@link StringUtility#toRegEx(String, int)}
+   */
   public static Pattern createLowerCaseSearchPattern(String s) {
-    if (s == null) {
-      s = "";
-    }
-    s = s.toLowerCase();
-    if (s.indexOf('*') < 0) {
-      s = s + "*";
-    }
-    return Pattern.compile(StringUtility.toRegExPattern(s), Pattern.DOTALL);
+    return StringUtility.toRegEx(s, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   }
 
   @Override
@@ -89,7 +94,7 @@ public class LocalLookupCall extends LookupCall {
   @Override
   public LookupRow[] getDataByText() throws ProcessingException {
     ArrayList<LookupRow> list = new ArrayList<LookupRow>();
-    Pattern p = createLowerCaseSearchPattern(getText());
+    Pattern p = createSearchPattern(getText());
     for (LookupRow row : execCreateLookupRows()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
         list.add(row);
@@ -104,7 +109,7 @@ public class LocalLookupCall extends LookupCall {
   @Override
   public LookupRow[] getDataByAll() throws ProcessingException {
     ArrayList<LookupRow> list = new ArrayList<LookupRow>();
-    Pattern p = createLowerCaseSearchPattern(getAll());
+    Pattern p = createSearchPattern(getAll());
     for (LookupRow row : execCreateLookupRows()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
         list.add(row);
@@ -119,6 +124,21 @@ public class LocalLookupCall extends LookupCall {
   @Override
   public LookupRow[] getDataByRec() throws ProcessingException {
     ArrayList<LookupRow> list = new ArrayList<LookupRow>();
+    Object parentKey = getRec();
+    if (parentKey == null) {
+      for (LookupRow row : execCreateLookupRows()) {
+        if (row.getParentKey() == null) {
+          list.add(row);
+        }
+      }
+    }
+    else {
+      for (LookupRow row : execCreateLookupRows()) {
+        if (parentKey.equals(row.getParentKey())) {
+          list.add(row);
+        }
+      }
+    }
     return list.toArray(new LookupRow[list.size()]);
   }
 
