@@ -36,7 +36,6 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -58,6 +57,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -80,19 +80,20 @@ import org.eclipse.scout.service.SERVICES;
 /**
  * The desktop model (may) consist of
  * <ul>
- * <li>set of available outline
+ * <li>set of available outlines
  * <li>active outline
  * <li>active table view
  * <li>active detail form
  * <li>active search form
- * <li>form stack (swing: dialogs on desktop as JInternalFrames; eclipse: editors or views)
- * <li>dialog stack of model and non-modal dialogs (swing: dialogs as JDialog, JFrame; eclipse: dialogs in a new Shell)
+ * <li>form stack (swing: dialogs on desktop as {@code JInternalFrame}s; SWT: editors or views)
+ * <li>dialog stack of modal and non-modal dialogs (swing: dialogs as {@code JDialog}, {@code JFrame}; SWT: dialogs in a
+ * new Shell)
  * <li>active message box stack
  * <li>menubar menus
  * <li>toolbar and viewbar actions
  * </ul>
- * The configurator will create a subclass of this desktop that can be used as
- * initial desktop
+ * The Eclipse Scout SDK creates a subclass of this class that can be used as
+ * initial desktop.
  */
 public abstract class AbstractDesktop extends AbstractPropertyObserver implements IDesktop {
 
@@ -145,6 +146,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   /*
    * Configuration
    */
+  /**
+   * Configures the title of this desktop. The title is typically used as title for the main application
+   * window.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return the title of this desktop
+   */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
   @ConfigPropertyValue("null")
@@ -152,6 +161,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return null;
   }
 
+  /**
+   * Configures whether this Scout application should be represented within the OS system tray.
+   * Representations in the system tray might differ for different operating systems or different UI.
+   * A system tray may not be available at all.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if this application should be visible in the system tray, {@code false} otherwise
+   * @see #execAddTrayMenus(List)
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(15)
   @ConfigPropertyValue("false")
@@ -159,6 +178,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return false;
   }
 
+  /**
+   * Configures the outlines associated with this desktop. If multiple outlines are configured,
+   * there is typically a need to provide some means of switching between different outlines,
+   * such as a {@link AbstractOutlineViewButton}.
+   * <p>
+   * Note that {@linkplain IDesktopExtension desktop extensions} might contribute additional outlines to this desktop.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return an array of outline type tokens
+   * @see IOutline
+   */
   @ConfigProperty(ConfigProperty.OUTLINES)
   @Order(20)
   @ConfigPropertyValue("null")
@@ -172,66 +203,93 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Called while desktop is constructed.
+   * Called while this desktop is initialized.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(10)
   protected void execInit() throws ProcessingException {
-
   }
 
   /**
-   * Called after desktop was opened and setup in UI.
+   * Called after this desktop was opened and displayed on the GUI.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(12)
   protected void execOpened() throws ProcessingException {
-
   }
 
   /**
-   * Called before the desktop is being closed. May be vetoed using a {@link VetoException}
+   * Called before this desktop is being closed.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(15)
   protected void execClosing() throws ProcessingException {
-
   }
 
   /**
-   * Called after a UI is attached. The desktop must not be necessarily be open.
+   * Called after a UI has been attached to this desktop. This desktop must not necessarily be open.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(20)
   protected void execGuiAttached() throws ProcessingException {
-
   }
 
   /**
-   * Called after a UI is detached. The desktop must not be necessarily be open.
+   * Called after a UI has been detached from this desktop. This desktop must not necessarily be open.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(25)
   protected void execGuiDetached() throws ProcessingException {
-
   }
 
   /**
-   * Called whenever a new outline is activated on the desktop.
+   * Called whenever a new outline has been activated on this desktop.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @param oldOutline
+   *          old outline that was active before
+   * @param newOutline
+   *          new outline that is active after the change
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(30)
   protected void execOutlineChanged(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
-
   }
 
   /**
-   * Called after an other page was selected.
+   * Called whenever a new page has been activated (selected) on this desktop.
+   * <p>
+   * Subclasses can override this method.<br/>
+   * This default implementation {@linkplain #removeForm(IForm) removes} the old form from this desktop and
+   * {@linkplain #addForm(IForm) adds} the new form to this desktop.
    * 
    * @param oldForm
-   *          is the search form of the old (not selected anymore) page or null
+   *          is the search form of the old (not selected anymore) page or {@code null}
    * @param newForm
-   *          is the search form of the new (selected) page or null
+   *          is the search form of the new (selected) page or {@code null}
+   * @throws ProcessingException
    */
   @Order(40)
   @ConfigOperation
@@ -251,12 +309,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Called after an other page was selected.
+   * Called whenever a new page has been activated (selected) on this desktop.
+   * <p>
+   * Subclasses can override this method.<br/>
+   * This default implementation {@linkplain #removeForm(IForm) removes} the old form from this desktop and
+   * {@linkplain #addForm(IForm) adds} the new form to this desktop.
    * 
    * @param oldForm
-   *          is the detail form of the old (not selected anymore) page or null
+   *          is the detail form of the old (not selected anymore) page or {@code null}
    * @param newForm
-   *          is the detail form of the new (selected) page or null
+   *          is the detail form of the new (selected) page or {@code null}
+   * @throws ProcessingException
    */
   @Order(50)
   @ConfigOperation
@@ -270,12 +333,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Called after an other page was selected.
+   * Called whenever a new page has been activated (selected) on this desktop.
+   * <p>
+   * Subclasses can override this method.<br/>
+   * This default implementation keeps track of the current outline table form and updates it accordingly (including
+   * visibility). See also {@link #getOutlineTableForm()}.
    * 
-   * @param oldForm
-   *          is the table of the old (not selected anymore) table page or null
-   * @param newForm
-   *          is the table of the new (selected) table page or null
+   * @param oldTable
+   *          is the table of the old (not selected anymore) table page or {@code null}
+   * @param newTable
+   *          is the table of the new (selected) table page or {@code null}
+   * @throws ProcessingException
    */
   @Order(60)
   @ConfigOperation
@@ -287,11 +355,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Called after a page was loaded or reloaded.
+   * Called after a table page was loaded or reloaded.
    * <p>
-   * Default minimizes page search form when data was found.
+   * Subclasses can override this method.<br/>
+   * This default implementation minimizes the page search form when data has been found.
    * 
-   * @param page
+   * @param tablePage
+   *          the table page that has been (re)loaded
+   * @throws ProcessingException
    */
   @Order(62)
   @ConfigOperation
@@ -303,12 +374,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Invoked when the tray popup is being built.
+   * Called while the tray popup is being built. This method may call {@link #getMenu(Class)} to find an existing
+   * menu on this desktop by class type.
    * <p>
-   * May use {@link #getMenu(Class)} to find an existing menu in the desktop by class type.
+   * The (potential) menus added to the {@code menus} list will be post processed. {@link IMenu#prepareAction()} is
+   * called on each and then checked if the menu is visible.
    * <p>
-   * The (potential) menus added to the list will be post processed. {@link IMenu#prepareAction()} is called on each and
-   * the checked if the menu is visible.
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @param menus
+   *          a live list to add menus to the tray
+   * @throws ProcessingException
    */
   @Order(70)
   @ConfigOperation

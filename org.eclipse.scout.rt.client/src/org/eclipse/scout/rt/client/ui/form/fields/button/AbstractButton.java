@@ -21,8 +21,10 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -52,6 +54,15 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   /*
    * Configuration
    */
+  /**
+   * Configures the system type of this button. See {@code IButton.SYSTEM_TYPE_* } constants for valid values.
+   * System buttons are buttons with pre-defined behavior (such as an 'Ok' button or a 'Cancel' button).
+   * <p>
+   * Subclasses can override this method. Default is {@code IButton.SYSTEM_TYPE_NONE}.
+   * 
+   * @return the system type for a system button, or {@code IButton.SYSTEM_TYPE_NONE} for a non-system button
+   * @see IButton
+   */
   @ConfigProperty(ConfigProperty.BUTTON_SYSTEM_TYPE)
   @Order(200)
   @ConfigPropertyValue("SYSTEM_TYPE_NONE")
@@ -59,6 +70,15 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     return SYSTEM_TYPE_NONE;
   }
 
+  /**
+   * Configures whether this button is a process button. Process buttons are typically displayed on a
+   * dedicated button bar at the bottom of a form. Non-process buttons can be placed anywhere on a form.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if this button is a process button, {@code false} otherwise
+   * @see IButton
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(220)
   @ConfigPropertyValue("true")
@@ -66,6 +86,14 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     return true;
   }
 
+  /**
+   * Configures the display style of this button. See {@code IButton.DISPLAY_STYLE_* } constants for valid values.
+   * <p>
+   * Subclasses can override this method. Default is {@code IButton.DISPLAY_STYLE_DEFAULT}.
+   * 
+   * @return the display style of this button
+   * @see IButton
+   */
   @ConfigProperty(ConfigProperty.BUTTON_DISPLAY_STYLE)
   @Order(210)
   @ConfigPropertyValue("DISPLAY_STYLE_DEFAULT")
@@ -73,30 +101,71 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     return DISPLAY_STYLE_DEFAULT;
   }
 
+  /**
+   * Configures whether this button should fill the horizontal width in the GUI grid layout. Buttons
+   * usually take as much place as is needed to display the button label, but not necessarily more.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if this button should fill the horizontal width in the GUI grid, {@code false} otherwise
+   */
   @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredFillHorizontal() {
     return false;
   }
 
+  /**
+   * Configures whether this button should fill the vertical height in the GUI grid layout. Buttons
+   * usually take as much place as is needed to display the button label, but not necessarily more.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if this button should fill the vertical height in the GUI grid, {@code false} otherwise
+   */
   @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredFillVertical() {
     return false;
   }
 
+  /**
+   * Configures whether this button should be layouted using the original preferred width by the GUI.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if this button should be using the GUI preferred width, {@code false} otherwise
+   */
   @ConfigPropertyValue("true")
   @Override
   protected boolean getConfiguredGridUseUiWidth() {
     return true;
   }
 
+  /**
+   * Configures whether this button should be layouted using the original preferred height by the GUI.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if this button should be using the GUI preferred height, {@code false} otherwise
+   */
   @ConfigPropertyValue("false")
   @Override
   protected boolean getConfiguredGridUseUiHeight() {
     return false;
   }
 
+  /**
+   * Configures the value represented by this radio button. This is the value that is
+   * returned if you query a radio button group for the current value and this button is the
+   * currently selected radio button.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return an {@code Object} representing the value of this radio button
+   * @see AbstractRadioButton
+   * @see AbstractRadioButtonGroup
+   */
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(230)
   @ConfigPropertyValue("null")
@@ -104,6 +173,17 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     return null;
   }
 
+  /**
+   * Configures the icon for this button. The icon is displayed on the button itself. Depending on UI and look and feel,
+   * this button might support icon groups to represent different states of this button, such as enabled, disabled,
+   * mouse-over etc.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return the ID (name) of the icon
+   * @see IIconGroup
+   * @see IIconProviderService
+   */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(190)
   @ConfigPropertyValue("null")
@@ -111,15 +191,31 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     return null;
   }
 
+  /**
+   * Called whenever this button is clicked. This button is disabled and cannot be clicked again
+   * until this method returns.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(190)
   protected void execClickAction() throws ProcessingException {
   }
 
+  /**
+   * Called whenever the state of a toggle button or radio button changes.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @param selected
+   *          new state of the button
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(200)
   protected void execToggleAction(boolean selected) throws ProcessingException {
-
   }
 
   private Class<? extends IMenu>[] getConfiguredMenus() {

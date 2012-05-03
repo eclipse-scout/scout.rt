@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,29 +22,66 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 
+/**
+ * An outline button is associated with an {@link IOutline} instance, a click on the
+ * button activates the outline on the desktop.
+ */
 public abstract class AbstractOutlineButton extends AbstractButton {
   private IOutline m_outline;
 
   public AbstractOutlineButton() {
   }
 
+  /**
+   * Configuration: an outline button is a toggle button.
+   * 
+   * @return {@code IButton.DISPLAY_STYLE_TOGGLE}
+   */
   @ConfigPropertyValue("DISPLAY_STYLE_TOGGLE")
   @Override
   protected int getConfiguredDisplayStyle() {
     return DISPLAY_STYLE_TOGGLE;
   }
 
+  /**
+   * Configuration: an outline button is not a process button.
+   * 
+   * @return {@code false}
+   */
   @Override
   protected boolean getConfiguredProcessButton() {
     return false;
   }
 
+  /**
+   * Configures the outline associated with this outline button.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return a type token defining an outline
+   * @see IOutline
+   */
   @ConfigProperty(ConfigProperty.OUTLINE)
   @ConfigPropertyValue("null")
   protected Class<? extends IOutline> getConfiguredOutline() {
     return null;
   }
 
+  /**
+   * Initializes this outline button.
+   * <p>
+   * This implementation does the following:
+   * <ul>
+   * <li>find an instance of {@code IOutline} on the desktop consistent with the configured outline of this button, this
+   * becomes the associated outline instance for this button
+   * <li>icon and label for this button are taken from the outline
+   * <li>a property change listener is registered with the outline such that this button can react on dynamic changes of
+   * its associated outline (label, icon, visible, enabled etc.)
+   * </ul>
+   * 
+   * @throws ProcessingException
+   *           if initialization fails
+   */
   @Override
   protected void execInitField() throws ProcessingException {
     final IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
@@ -100,6 +137,13 @@ public abstract class AbstractOutlineButton extends AbstractButton {
     }
   }
 
+  /**
+   * Activates the outline associated with this outline button (i.e. sets
+   * the outline as the active outline on the desktop) if {@code selected} is {@code true}, does nothing otherwise.
+   * 
+   * @param selected
+   *          the state of the toggle button
+   */
   @Override
   protected final void execToggleAction(boolean selected) {
     if (selected) {

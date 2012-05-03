@@ -60,6 +60,14 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   /*
    * Configuration
    */
+
+  /**
+   * Configures whether this outline is enabled.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if this outline is enabled, {@code false} otherwise
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
   @ConfigPropertyValue("true")
@@ -67,6 +75,13 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return true;
   }
 
+  /**
+   * Configures the visibility of this outline.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if this outline is visible, {@code false} otherwise
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
   @ConfigPropertyValue("true")
@@ -74,13 +89,31 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return true;
   }
 
+  /**
+   * This method is no longer used and has no effect.
+   * <p>
+   * Use {@link Order} annotations to define the sort ordering of the outlines on the desktop instead.
+   * <p>
+   * Subclasses can override this method. Default is 0.
+   * 
+   * @return the sort order of this outline.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(100)
   @ConfigPropertyValue("0")
+  @Deprecated
   protected int getConfiguredSortNo() {
     return 0;
   }
 
+  /**
+   * Provides a documentation text or description of this outline. The text is intended to be included in external
+   * documentation. This method is typically processed by a documentation generation tool or similar.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return a documentation text, suitable to be included in external documents
+   */
   @ConfigProperty(ConfigProperty.DOC)
   @Order(110)
   @ConfigPropertyValue("null")
@@ -89,9 +122,14 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
+   * Called during initialization of this outline. Allows to add child pages to the outline tree. All added pages are
+   * roots of the visible tree.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
    * @param pageList
-   *          is used to add pages to the tree. All these pages are roots of the
-   *          visible tree
+   *          live collection to add pages to the outline tree
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(90)

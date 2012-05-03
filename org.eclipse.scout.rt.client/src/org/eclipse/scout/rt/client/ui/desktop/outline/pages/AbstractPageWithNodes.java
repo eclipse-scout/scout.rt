@@ -75,6 +75,16 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   /*
    * Configuration
    */
+
+  /**
+   * Called by {@link #loadChildren()} to load data for this page. Allows to add multiple child pages to this page.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @param pageList
+   *          live collection to add child pages to this page
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(90)
   protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
@@ -103,6 +113,15 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     return m_table;
   }
 
+  /**
+   * Called whenever this page is selected in the outline tree.
+   * <p>
+   * Subclasses can override this method.<br/>
+   * This implementation sets the title of the internal table used by this page to the path from the root node to this
+   * page.
+   * 
+   * @throws ProcessingException
+   */
   @Override
   protected void execPageActivated() throws ProcessingException {
     super.execPageActivated();

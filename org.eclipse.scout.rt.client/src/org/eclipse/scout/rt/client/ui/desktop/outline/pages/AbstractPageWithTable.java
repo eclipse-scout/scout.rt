@@ -115,9 +115,16 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Configuration
    */
   /**
-   * this configuration may be overridden by another implementation (see
-   * configurator)<br>
-   * default is to use inner class search form
+   * Configures the search form to be used with this table page. The search form is lazily
+   * {@linkplain #ensureSearchFormCreated() created} and {@linkplain #ensureSearchFormStarted() started}.
+   * <p>
+   * For legacy support, the search form can also be defined as an inner class. This usage is deprecated, override this
+   * method in subclasses instead.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return a search form type token
+   * @see ISearchForm
    */
   @ConfigProperty(ConfigProperty.SEARCH_FORM)
   @Order(90)
@@ -126,6 +133,19 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return null;
   }
 
+  /**
+   * Configures whether table data is automatically loaded (through a search with default constraints)
+   * or whether loading the table data must be triggered explicitly by the user. Set this property to {@code true} if
+   * you expect large amount of data for an unconstrained search.
+   * <p>
+   * This property is read by {@link #execPopulateTable()}, if you override that method, this configuration property
+   * might not have any effect. This configuration property does not have any effect if no search form is configured for
+   * this table page.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if the table data should be loaded on explicit user interaction, {@code false} otherwise
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   @ConfigPropertyValue("false")
@@ -133,6 +153,20 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return false;
   }
 
+  /**
+   * Configures the visibility of empty space menus on this page's table. Empty space menus are typically available
+   * anywhere in a table field where no table rows are present (in the 'empty space'), as well as on the table header.
+   * Typical empty space menus will affect no (existing) row (for example a 'New row...' menu), or all rows in the table
+   * (for example a 'Clear all rows' menu).
+   * <p>
+   * Note that setting this property to {@code false} will effectively stop all empty space menus from being displayed
+   * on the GUI. However, if this property is set to {@code true}, single menus can still individually be set to
+   * invisible.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if empty space menus should generally be visible, {@code false} otherwise
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(110)
   @ConfigPropertyValue("true")
@@ -140,6 +174,18 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return true;
   }
 
+  /**
+   * Configures the visibility of table row menus on this page's table. Table row menus are typically available
+   * on each existing row. Typical table row menus will affect exactly one existing row (for example an 'Edit row...'
+   * menu or a 'Delete row' menu).
+   * <p>
+   * Note that setting this property to {@code false} will effectively stop all table row menus from being displayed on
+   * the GUI. However, if this property is set to {@code true}, single menus can still individually be set to invisible.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if table row menus should generally be visible, {@code false} otherwise
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(120)
   @ConfigPropertyValue("true")
@@ -148,12 +194,20 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * get table data (from service)
+   * Fetches and returns tabular data to be displayed in this page's table.
+   * Typically this method will query a (backend) service for the data. Make
+   * sure the returned content (including type definitions) matches the table columns.
    * <p>
-   * this method is only called when either {@link #getSearchFilter()}!=null or {@link #isSearchRequired()}==false
+   * This method is called by {@link #execPopulateTable()} and overriding this method generally is the most convenient
+   * way to populate a table page. If you need more control over populating a table page, consider overriding
+   * {@code execPopulateTable()} instead.
+   * <p>
+   * Subclasses can override this method. The default returns {@code null}.
    * 
    * @param filter
-   *          is guaranteed not to be null
+   *          a search filter, guaranteed not to be {@code null}
+   * @return an {@code Object[][]} representing tabular data to be displayed in this page's table
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(90)
@@ -162,13 +216,18 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * Populate the table<br>
-   * for most cases the override of just {@link #execLoadTableData(SearchFilter)} is sufficient
+   * Populates this page's table.
    * <p>
-   * It is good practice to populate table using ITable.replaceRows() instead of ITable.removeAllRows();
-   * ITable.addRows() because in the former case the tree structure below the changing rows is not discarded but only
-   * marked as dirty.<br>
-   * The subtree is lazily reloaded when the user clicks next time on a child node
+   * It is good practice to populate table using {@code ITable.replaceRows} instead of {@code ITable.removeAllRows();
+   * ITable.addRows} because in the former case the outline tree structure below the changing rows is not discarded but
+   * only marked as dirty. The subtree is lazily reloaded when the user clicks next time on a child node.
+   * <p>
+   * Subclasses can override this method. In most cases it is sufficient to override
+   * {@link #execLoadTableData(SearchFilter)} instead.<br/>
+   * This default implementation does the following: It queries methods {@link #isSearchActive()} and
+   * {@link #isSearchRequired()} and then calls {@code execLoadTableData} if appropriate.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(100)
@@ -198,7 +257,16 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * create a child page for every table row that was added to the table
+   * Creates a child page for every table row that was added to this page's table. This method is called when
+   * resolving a virtual tree node to a real node. Overriding this method is the recommended way to build the
+   * outline tree structure.
+   * <p>
+   * Subclasses can override this method. The default returns {@code null}.
+   * 
+   * @param row
+   *          a table row for which a new child page should be created
+   * @return a new child page for {@code row}
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(110)
@@ -207,10 +275,22 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * create a virtual child page for every table row that was added to the table
-   * The virtual page is tranformed (resolved) into the correct page when it is first time activated or selected.¨
+   * Creates a virtual child page for every table row that was added to this page's table. The virtual page
+   * is a place holder for a real page and is transformed (resolved) into the real page when it is activated for the
+   * first time. This reduces memory consumption and improves performance for large table pages, where most of the child
+   * pages are never activated, but solely displayed in the outline tree.
    * <p>
-   * This saves resources, memory and improves performance
+   * Subclasses can override this method. In most cases it is preferable to override
+   * {@link #execCreateChildPage(ITableRow)} instead.<br/>
+   * This default implementation checks whether {@code execCreateChildPage} is overridden and returns a new virtual
+   * page, or {@code null} otherwise.
+   * 
+   * @param row
+   *          a table row for which a new virtual child page should be created
+   * @return a new virtual child page for {@code row}
+   * @throws ProcessingException
+   * @see VirtualPage
+   * @see IVirtualTreeNode
    */
   @ConfigOperation
   @Order(111)
@@ -221,6 +301,21 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return null;
   }
 
+  /**
+   * Resolves a virtual tree node and returns the real tree node.
+   * <p>
+   * This implementation does the following:
+   * <ul>
+   * <li>returns {@code null} if no table row is linked to {@code node}
+   * <li>else creates a new child page by calling {@link #execCreateChildPage(ITableRow)}, links the table row to the
+   * new tree node and returns the new node.
+   * </ul>
+   * 
+   * @param node
+   *          the virtual tree node to be resolved
+   * @return a new real tree node, replacing the virtual tree node
+   * @throws ProcessingException
+   */
   @Override
   protected ITreeNode execResolveVirtualChildNode(IVirtualTreeNode node) throws ProcessingException {
     ITableRow row = getTableRowFor(node);
@@ -382,15 +477,16 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * Initialize the search form.
+   * Initializes the search form associated with this page. This method is called before the
+   * search form is used for the first time.
    * <p>
-   * This method is invoked when the search form is used for the first time. Hence implement all initialization code for
-   * the search form herein.
+   * Legacy: If the search form is defined as inner class, this method is called when this page is initialized.
    * <p>
-   * If the search form is defined as inner class then this method is called when the page is initialized. Otherwise it
-   * is invoked when the search form is used for the first time.
+   * Subclasses can override this method. The default does nothing.
    * 
-   * @see #ensureSearchFormCreated() and #ensureSearchFormStarted()
+   * @throws ProcessingException
+   * @see #ensureSearchFormCreated()
+   * @see #ensureSearchFormStarted()
    */
   @ConfigOperation
   @Order(120)

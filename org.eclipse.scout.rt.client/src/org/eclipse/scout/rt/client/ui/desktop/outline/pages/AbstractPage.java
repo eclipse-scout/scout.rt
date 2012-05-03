@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -105,6 +106,16 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   /*
    * Configuration
    */
+
+  /**
+   * Configures the visibility of this page's table. Typical subclasses of this abstract class use a tabular
+   * structure to display data, this includes {@link AbstractPageWithTable} as well as {@link AbstractPageWithNodes}.
+   * Set this property to {@code false} if you want to display a detail form within this page.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if this page's table is visible, {@code false} otherwise
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(35)
   @ConfigPropertyValue("true")
@@ -112,6 +123,14 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     return true;
   }
 
+  /**
+   * Configures the title of this page. The title is typically displayed on the GUI, e.g. as part of the representation
+   * of this page as a tree node.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return the title for this page
+   */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(40)
   @ConfigPropertyValue("null")
@@ -119,6 +138,15 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     return null;
   }
 
+  /**
+   * Configures the icon for this page. The icon is typically used to represent this page in the GUI, e.g. as part of
+   * the representation of this page as a tree node.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return the ID (name) of the icon
+   * @see IIconProviderService
+   */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(50)
   @ConfigPropertyValue("null")
@@ -126,6 +154,14 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     return null;
   }
 
+  /**
+   * Provides a documentation text or description of this page. The text is intended to be included in external
+   * documentation. This method is typically processed by a documentation generation tool or similar.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return a documentation text, suitable to be included in external documents
+   */
   @ConfigProperty(ConfigProperty.DOC)
   @Order(60)
   @ConfigPropertyValue("null")
@@ -134,35 +170,47 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   /**
-   * After the page has been added to the outline tree<br>
-   * Normally this method simply sets a detail pane or checks some parameters
+   * Called after this page has been added to the outline tree. This method may set a detail form or check
+   * some parameters.
    * <p>
-   * Do not load table data here, since this should be lazily done on IPageWithTable.execLoadTableData
+   * Do not load table data here, this should be done lazily in {@link AbstractPageWithTable.execLoadTableData}.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
+   * @see #execPageActivated()
    */
   @ConfigOperation
   @Order(40)
   protected void execInitPage() throws ProcessingException {
-
   }
 
   /**
-   * Page was just removed from outline tree
+   * Called after this page has been removed from its associated outline tree.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(50)
   protected void execDisposePage() throws ProcessingException {
-
   }
 
   /**
-   * see {@link IDesktop#dataChanged(Object...)}<br>
-   * Default implementation behaves like the following:
+   * Called by the data change listener registered with this page (and the current desktop) through
+   * {@link #registerDataChangeListener(Object...)}. Use this callback method
+   * to react to data change events by reloading current data, or throwing away cached data etc.
+   * <p>
+   * Subclasses can override this method.<br/>
+   * This default implementation does the following:
    * <ol>
-   * <li>if page is selected and in the active outline, then {@link #reloadPage()} is called
-   * <li>if page is an ancestor of the selected page and in the active outline, then its children are marked dirty
-   * {@link #setChildrenDirty(boolean)}
-   * <li>else it is marked dirty and unloaded
+   * <li>if this page is an ancestor of the selected page (or is selected itself) and this page is in the active
+   * outline, a full re-load of the page is performed
+   * <li>else the children of this page are marked dirty and the page itself is unloaded
    * </ol>
+   * 
+   * @see IDesktop#dataChanged(Object...)
    */
   @ConfigOperation
   @Order(55)
@@ -215,30 +263,40 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   /**
-   * When page data (table, tree) has (re)loaded its data
+   * Called after this page has (re)loaded its data. This method is called after {@link #loadChildren()} has been
+   * called.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(60)
   protected void execPageDataLoaded() throws ProcessingException {
-
   }
 
   /**
-   * When a page is selected in the tree it is said to be activated
+   * Called whenever this page is selected in the outline tree.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(70)
   protected void execPageActivated() throws ProcessingException {
-
   }
 
   /**
-   * When a page is deselected in the tree it is said to be deactivated
+   * Called whenever this page is de-selected in the outline tree.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(80)
   protected void execPageDeactivated() throws ProcessingException {
-
   }
 
   protected ContextMap getContextMap() {
@@ -267,7 +325,6 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   /**
-   * @deprecated
    * @deprecated use {@link #getUserPreferenceContext()} instead
    */
   @Override
