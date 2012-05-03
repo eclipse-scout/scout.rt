@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.osgi.service.prefs.BackingStoreException;
 
 public class FileChooser implements IFileChooser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FileChooser.class);
@@ -117,6 +118,12 @@ public class FileChooser implements IFileChooser {
     String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
     IEclipsePreferences props = new UserScope().getNode(id);
     props.put("current-dir", dir);
+    try {
+      props.flush();
+    }
+    catch (BackingStoreException e) {
+      //nop
+    }
   }
 
   @Override
