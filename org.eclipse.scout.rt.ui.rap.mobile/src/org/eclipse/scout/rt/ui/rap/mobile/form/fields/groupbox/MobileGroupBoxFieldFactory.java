@@ -29,7 +29,7 @@ public class MobileGroupBoxFieldFactory implements IFormFieldFactory {
   public IRwtScoutFormField<?> createUiFormField(Composite parent, IFormField model, IRwtEnvironment uiEnvironment) {
     IRwtScoutGroupBox field;
 
-    if (DeviceUtility.isMobileDevice()) {
+    if (DeviceUtility.isMobileOrTabletDevice()) {
       field = new RwtScoutMobileGroupBox();
     }
     else {
