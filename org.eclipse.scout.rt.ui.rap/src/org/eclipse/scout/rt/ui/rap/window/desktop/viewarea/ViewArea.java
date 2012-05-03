@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.rap.window.desktop.viewarea;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
@@ -99,6 +101,92 @@ public class ViewArea extends Composite implements IViewArea {
     else {
       return -1;
     }
+  }
+
+  /**
+   * Sets the sash position according to {@link RwtScoutViewStack#getHeightHint()} resp.
+   * {@link RwtScoutViewStack#getWidthHint()} of the given {@link RwtScoutViewStack}.
+   * <p>
+   * For the vertical sashes the maximum width hint of the view stacks in the column containing the given view stack is
+   * used.<br/>
+   * For the horizontal sashes the height hint of the given view stack is used.<br/>
+   * The view stacks in the center are not considered because they always get the remaining space.
+   * <p>
+   * The sash positions can be retrieved by the use of {@link #getSashPosition(SashKey)}.
+   */
+  public void updateSashPositionForViewStack(RwtScoutViewStack viewStack) {
+    updateVerticalSashPositionForViewStack(viewStack, SashKey.VERTICAL_LEFT, 0);
+    updateVerticalSashPositionForViewStack(viewStack, SashKey.VERTICAL_RIGHT, 2);
+
+    List<RwtScoutViewStack> horizontalViewStacks = getHorizontalViewStacks(0);
+    if (horizontalViewStacks.get(0) == viewStack) {
+      updateSashPositionWithViewStackHeight(viewStack, SashKey.HORIZONTAL_LEFT_TOP);
+    }
+    else if (horizontalViewStacks.get(1) == viewStack) {
+      updateSashPositionWithViewStackHeight(viewStack, SashKey.HORIZONTAL_CENTER_TOP);
+    }
+    else if (horizontalViewStacks.get(2) == viewStack) {
+      updateSashPositionWithViewStackHeight(viewStack, SashKey.HORIZONTAL_RIGHT_TOP);
+    }
+
+    horizontalViewStacks = getHorizontalViewStacks(2);
+    if (horizontalViewStacks.get(0) == viewStack) {
+      updateSashPositionWithViewStackHeight(viewStack, SashKey.HORIZONTAL_LEFT_BOTTOM);
+    }
+    else if (horizontalViewStacks.get(1) == viewStack) {
+      updateSashPositionWithViewStackHeight(viewStack, SashKey.HORIZONTAL_CENTER_BOTTOM);
+    }
+    else if (horizontalViewStacks.get(2) == viewStack) {
+      updateSashPositionWithViewStackHeight(viewStack, SashKey.HORIZONTAL_RIGHT_BOTTOM);
+    }
+
+  }
+
+  private void updateVerticalSashPositionForViewStack(RwtScoutViewStack viewStack, SashKey sashKey, int col) {
+    List<RwtScoutViewStack> verticalViewStacks = getVerticalViewStacks(col);
+    if (!verticalViewStacks.contains(viewStack)) {
+      return;
+    }
+
+    int maxWidth = -1;
+    for (RwtScoutViewStack verticalViewStack : verticalViewStacks) {
+      if (verticalViewStack.getWidthHint() > maxWidth) {
+        maxWidth = viewStack.getWidthHint();
+      }
+    }
+
+    if (maxWidth < 0) {
+      return;
+    }
+
+    m_sashPositions.put(sashKey, maxWidth);
+  }
+
+  private void updateSashPositionWithViewStackHeight(RwtScoutViewStack viewStack, SashKey sashKey) {
+    int heightHint = viewStack.getHeightHint();
+    if (heightHint < 0) {
+      return;
+    }
+
+    m_sashPositions.put(sashKey, heightHint);
+  }
+
+  private List<RwtScoutViewStack> getVerticalViewStacks(int col) {
+    List<RwtScoutViewStack> viewStacks = new LinkedList<RwtScoutViewStack>();
+    for (int j = 0; j < 3; j++) {
+      viewStacks.add(m_viewStacks[col][j]);
+    }
+
+    return viewStacks;
+  }
+
+  private List<RwtScoutViewStack> getHorizontalViewStacks(int row) {
+    List<RwtScoutViewStack> viewStacks = new LinkedList<RwtScoutViewStack>();
+    for (int i = 0; i < 3; i++) {
+      viewStacks.add(m_viewStacks[i][row]);
+    }
+
+    return viewStacks;
   }
 
   public Sash getSash(SashKey key) {

@@ -20,9 +20,12 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.util.BrowserInfo;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.rt.ui.rap.window.DefaultFormBoundsProvider;
+import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -43,6 +46,8 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
   private static final String VARIANT_FORM = "form";
   private static final String VARIANT_VIEW_TAB_AREA = "formTabArea";
 
+  private int heightHint = SWT.DEFAULT;
+  private int widthHint = SWT.DEFAULT;
   private IRwtEnvironment m_uiEnvironment;
   private HashMap<IForm, RwtScoutDesktopForm> m_openForms;
   ArrayList<RwtScoutDesktopForm> m_formStack;
@@ -106,7 +111,13 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
 
   @Override
   public IRwtScoutPart addForm(IForm form) {
-    RwtScoutDesktopForm ui = new RwtScoutDesktopForm();
+    IFormBoundsProvider boundsProvider = null;
+    if (form.isCacheBounds()) {
+      boundsProvider = createFormBoundsProvider(form, getUiEnvironment());
+      initPreferredSize(boundsProvider);
+    }
+
+    RwtScoutDesktopForm ui = new RwtScoutDesktopForm(boundsProvider);
     ViewStackTabButton button = new ViewStackTabButton(m_tabBar);
     button.setLayoutData(new RowData(SWT.DEFAULT, 22));
     button.addViewTabListener(new P_ViewTabSelectionListener(ui));
@@ -115,6 +126,22 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     m_openForms.put(form, ui);
     setPartVisibleImpl(form);
     return ui;
+  }
+
+  protected void initPreferredSize(IFormBoundsProvider boundsProvider) {
+    Rectangle formBounds = boundsProvider.getBounds();
+    if (formBounds != null) {
+      setWidthHint(formBounds.width);
+      setHeightHint(formBounds.height);
+    }
+    else {
+      setWidthHint(-1);
+      setHeightHint(-1);
+    }
+  }
+
+  protected IFormBoundsProvider createFormBoundsProvider(IForm scoutForm, IRwtEnvironment uiEnvironment) {
+    return new DefaultFormBoundsProvider(scoutForm, uiEnvironment);
   }
 
   @Override
@@ -178,6 +205,22 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
   @Override
   public boolean getVisible() {
     return m_container.getChildren().length > 0;
+  }
+
+  public int getHeightHint() {
+    return heightHint;
+  }
+
+  public void setHeightHint(int heightHint) {
+    this.heightHint = heightHint;
+  }
+
+  public int getWidthHint() {
+    return widthHint;
+  }
+
+  public void setWidthHint(int widthHint) {
+    this.widthHint = widthHint;
   }
 
   private void handleScoutDesktopEvent(DesktopEvent e) {

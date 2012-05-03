@@ -126,7 +126,10 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   public IRwtScoutPart addForm(IForm form) {
     RwtScoutViewStack stack = m_viewArea.getStackForForm(form);
     IRwtScoutPart rwtForm = stack.addForm(form);
+
+    m_viewArea.updateSashPositionForViewStack(stack);
     updateLayout();
+    
     return rwtForm;
   }
 

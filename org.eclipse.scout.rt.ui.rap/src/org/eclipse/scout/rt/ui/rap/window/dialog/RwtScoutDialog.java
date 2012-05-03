@@ -19,11 +19,13 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.AbstractRwtScoutPart;
+import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -42,8 +44,27 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
   private DialogImpl m_uiDialog;
   private Form m_uiForm;
   private Point m_uiInitialLocation;
+  private Point m_uiInitialSize;
+  private IFormBoundsProvider m_boundsProvider;
+
+  public RwtScoutDialog(IFormBoundsProvider boundsProvider) {
+    m_boundsProvider = boundsProvider;
+    initInitialBounds(m_boundsProvider);
+  }
 
   public RwtScoutDialog() {
+  }
+
+  protected void initInitialBounds(IFormBoundsProvider boundsProvider) {
+    if (boundsProvider == null) {
+      return;
+    }
+
+    Rectangle bounds = boundsProvider.getBounds();
+    if (bounds != null) {
+      setUiInitialLocation(new Point(bounds.x, bounds.y));
+      setUiInitialSize(new Point(bounds.width, bounds.height));
+    }
   }
 
   @Override
@@ -63,6 +84,14 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
 
   public Point getUiInitialLocation() {
     return m_uiInitialLocation;
+  }
+
+  public Point getUiInitialSize() {
+    return m_uiInitialSize;
+  }
+
+  public void setUiInitialSize(Point uiInitialSize) {
+    m_uiInitialSize = uiInitialSize;
   }
 
   public void createPart(IForm scoutForm, Shell parentShell, IRwtEnvironment uiEnvironment) {
@@ -138,6 +167,10 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
   @Override
   protected void closePartImpl() {
     try {
+      if (m_boundsProvider != null) {
+        m_boundsProvider.storeBounds(m_uiDialog.getShell().getBounds());
+      }
+
       // ensure the traversal is done to write eventually changes to model
       Control focusControl = m_uiDialog.getShell().getDisplay().getFocusControl();
       if (focusControl != null && !focusControl.isDisposed()) {
@@ -243,6 +276,14 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
         return m_uiInitialLocation;
       }
       return super.getInitialLocation(initialSize);
+    }
+
+    @Override
+    protected Point getInitialSize() {
+      if (m_uiInitialSize != null) {
+        return m_uiInitialSize;
+      }
+      return super.getInitialSize();
     }
   }
 
