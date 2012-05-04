@@ -293,8 +293,8 @@ public class ViewAreaLayout extends Layout {
       }
     }
     // sashes
-    Rectangle sashTop = new Rectangle(0, 0, clientArea.width, 0);
-    Rectangle sashBottom = new Rectangle(0, 0, clientArea.width, 0);
+    Rectangle sashTop = new Rectangle(clientArea.x, 0, clientArea.width, 0);
+    Rectangle sashBottom = new Rectangle(clientArea.x, 0, clientArea.width, 0);
     int pos = viewArea.getSashPosition(keyTop);
     if (pos > 0 && bounds[0].height > 0) {
       bounds[0].height = pos - clientArea.y;
