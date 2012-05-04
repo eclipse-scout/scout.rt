@@ -34,8 +34,15 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
+import org.eclipse.scout.rt.shared.ui.IUiLayer;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.Preferences;
@@ -83,6 +90,7 @@ public class ClientUIPreferences {
   private static final String CALENDAR_DISPLAY_MODE = "calendar.display.mode";
   private static final String CALENDAR_DISPLAY_CONDENSED = "calendar.display.condensed";
   private static final String DESKTOP_COLUMN_SPLITS = "desktop.columnSplits";
+  private static final String FORM_BOUNDS = "form.bounds.";
 
   /**
    * @deprecated to be removed in release 3.9.0
@@ -119,13 +127,23 @@ public class ClientUIPreferences {
     load();
   }
 
+  /**
+   * Since this property depends on the user agent it is saved separately for each combination of {@link IUiLayer} and
+   * {@link IUiDeviceType}.
+   */
   public Rectangle getFormBounds(IForm form) {
     String key = form.computeCacheBoundsKey();
     if (key == null) {
       return null;
     }
 
+    key = getUserAgentPrefix() + FORM_BOUNDS + key;
     String value = m_env.get(key, "");
+    if (StringUtility.isNullOrEmpty(value)) {
+      key = getLegacyFormBoundsKey(form);
+      value = m_env.get(key, "");
+    }
+
     if (!StringUtility.isNullOrEmpty(value)) {
       try {
         StringTokenizer tok = new StringTokenizer(value, ",");
@@ -144,12 +162,17 @@ public class ClientUIPreferences {
     return null;
   }
 
+  /**
+   * Since this property depends on the user agent it is saved separately for each combination of {@link IUiLayer} and
+   * {@link IUiDeviceType}.
+   */
   public void setFormBounds(IForm form, Rectangle bounds) {
     String key = form.computeCacheBoundsKey();
     if (key == null) {
       return;
     }
 
+    key = getUserAgentPrefix() + FORM_BOUNDS + key;
     if (bounds == null) {
       m_env.remove(key);
     }
@@ -157,6 +180,85 @@ public class ClientUIPreferences {
       m_env.put(key, bounds.x + "," + bounds.y + "," + bounds.width + "," + bounds.height);
     }
     flush();
+  }
+
+  private String getLegacyFormBoundsKey(IForm form) {
+    String key = form.computeCacheBoundsKey();
+    if (key == null) {
+      return null;
+    }
+
+    //Add prefix only if not already added.
+    //This is mainly necessary due to backward compatibility because until 3.8.0 the prefix had to be returned by computeCacheBoundsKey
+    if (!key.startsWith("form.bounds")) {
+      key = "form.bounds_" + key;
+    }
+
+    //Explicitly don't consider user agent because before 3.8.0 there was no user agent and therefore the keys didn't contain this information.
+
+    return key;
+  }
+
+  private String getUserAgentPrefix() {
+    UserAgent currentUserAgent = null;
+    if (m_session != null) {
+      currentUserAgent = m_session.getUserAgent();
+    }
+    else {
+      currentUserAgent = UserAgentUtility.getCurrentUserAgent();
+    }
+    if (currentUserAgent == null) {
+      return "";
+    }
+
+    String uiLayer = null;
+    if (!UiLayer.UNKNOWN.equals(currentUserAgent.getUiLayer())) {
+      uiLayer = currentUserAgent.getUiLayer().getIdentifier();
+    }
+    String uiDeviceType = null;
+    if (!UiDeviceType.UNKNOWN.equals(currentUserAgent.getUiDeviceType())) {
+      uiDeviceType = currentUserAgent.getUiDeviceType().getIdentifier();
+    }
+
+    return StringUtility.concatenateTokens(uiLayer, ".", uiDeviceType, ".");
+  }
+
+  /**
+   * Since this property depends on the user agent it is saved separately for each combination of {@link IUiLayer} and
+   * {@link IUiDeviceType}.
+   * 
+   * @since 3.8.0
+   */
+  public int[] getSplitterPosition(ISplitBox splitBox) {
+    String baseKey = splitBox.getCacheSplitterPositionPropertyName();
+    if (baseKey == null) {
+      return null;
+    }
+
+    String key = getUserAgentPrefix() + baseKey;
+    int[] value = getPropertyIntArray(key);
+    if (value == null) {
+      //If no value has been found try to load with the base key. Done due to backward compatibility.
+      value = getPropertyIntArray(baseKey);
+    }
+
+    return value;
+  }
+
+  /**
+   * Since this property depends on the user agent it is saved separately for each combination of {@link IUiLayer} and
+   * {@link IUiDeviceType}.
+   * 
+   * @since 3.8.0
+   */
+  public void setSplitterPosition(ISplitBox splitBox, int[] weights) {
+    String key = splitBox.getCacheSplitterPositionPropertyName();
+    if (key == null) {
+      return;
+    }
+
+    key = getUserAgentPrefix() + key;
+    setPropertyIntArray(key, weights);
   }
 
   public String getTableKey(ITable t) {
@@ -276,7 +378,7 @@ public class ClientUIPreferences {
       m_env.put(key, "yes");
     }
     //
-    key = TABLE_COLUMN_WIDTH + keySuffix;
+    key = getUserAgentPrefix() + TABLE_COLUMN_WIDTH + keySuffix;
     if (width >= 0) {
       m_env.put(key, "" + width);
     }
@@ -421,10 +523,20 @@ public class ClientUIPreferences {
     return false;
   }
 
+  /**
+   * Since this property depends on the user agent it is saved separately for each combination of {@link IUiLayer} and
+   * {@link IUiDeviceType}.
+   */
   public int getTableColumnWidth(IColumn col, int defaultWidth) {
     String keySuffix = getColumnKey(col);
-    String key = TABLE_COLUMN_WIDTH + keySuffix;
+    String baseKey = TABLE_COLUMN_WIDTH + keySuffix;
+    String key = getUserAgentPrefix() + baseKey;
+
     String value = m_env.get(key, null);
+    if (value == null) {
+      //If no value has been found try to load with the base key. Done due to backward compatibility.
+      value = m_env.get(baseKey, null);
+    }
     if (value != null) {
       try {
         return Integer.parseInt(value);
@@ -604,15 +716,16 @@ public class ClientUIPreferences {
 
   public int[] getPropertyIntArray(String propName) {
     String strVal = m_env.get(propName, null);
-    if (strVal != null) {
-      String[] split = strVal.split(";");
-      int[] val = new int[split.length];
-      for (int i = 0; i < split.length; i++) {
-        val[i] = Integer.parseInt(split[i]);
-      }
-      return val;
+    if (!StringUtility.hasText(strVal)) {
+      return null;
     }
-    return null;
+
+    String[] split = strVal.split(";");
+    int[] val = new int[split.length];
+    for (int i = 0; i < split.length; i++) {
+      val[i] = Integer.parseInt(split[i]);
+    }
+    return val;
   }
 
   public void setPropertyIntArray(String propName, int[] value) {

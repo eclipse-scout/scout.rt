@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.splitbox;
 
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
@@ -49,19 +48,17 @@ public class SwtScoutSplitBox extends SwtScoutFieldComposite<ISplitBox> implemen
   @Override
   protected void attachScout() {
     super.attachScout();
-    // split position
-    int[] a = null;
-    String propName = getScoutObject().getCacheSplitterPositionPropertyName();
-    if (!StringUtility.isNullOrEmpty(propName)) {
-      if (getScoutObject().isCacheSplitterPosition()) {
-        try {
-          a = ClientUIPreferences.getInstance(getEnvironment().getClientSession()).getPropertyIntArray(propName);
-        }
-        catch (Throwable t) {
-          // nop
-        }
-      }
+
+    if (getScoutObject().isCacheSplitterPosition()) {
+      setCachedSplitterPosition();
     }
+    else {
+      setSplitterPositionFromScout();
+    }
+  }
+
+  protected void setCachedSplitterPosition() {
+    final int[] a = ClientUIPreferences.getInstance(getEnvironment().getClientSession()).getSplitterPosition(getScoutObject());
     if (a != null && a.length == 2) {
       setSplitterPosition(a[0], a[1]);
     }
@@ -84,16 +81,26 @@ public class SwtScoutSplitBox extends SwtScoutFieldComposite<ISplitBox> implemen
   }
 
   protected void setSplitterPositionFromSwt() {
-    String propName = getScoutObject().getCacheSplitterPositionPropertyName();
-    if (!StringUtility.isNullOrEmpty(propName)) {
-      if (getScoutObject().isCacheSplitterPosition()) {
-        int[] weights = getSwtContainer().getWeights();
-        ClientUIPreferences.getInstance(getEnvironment().getClientSession()).setPropertyIntArray(propName, weights);
-      }
-      else {
-        ClientUIPreferences.getInstance(getEnvironment().getClientSession()).setPropertyIntArray(propName, null);
-      }
+    if (getScoutObject().isCacheSplitterPosition()) {
+      int[] weights = getSwtContainer().getWeights();
+      cacheSplitterPosition(weights);
     }
+    else {
+      cacheSplitterPosition(null);
+    }
+  }
+
+  protected void cacheSplitterPosition(final int[] weights) {
+    Runnable job = new Runnable() {
+
+      @Override
+      public void run() {
+        ClientUIPreferences.getInstance(getEnvironment().getClientSession()).setSplitterPosition(getScoutObject(), weights);
+      }
+
+    };
+
+    getEnvironment().invokeScoutLater(job, 0);
   }
 
   protected void setSplitterPositionFromScout() {

@@ -2339,7 +2339,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public String computeCacheBoundsKey() {
-    return "form.bounds" + "_" + getClass().getName();
+    return getClass().getName();
   }
 
   @Override

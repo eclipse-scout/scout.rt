@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.splitbox;
 
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
@@ -62,14 +61,7 @@ public class RwtScoutSplitBox extends RwtScoutFieldComposite<ISplitBox> implemen
 
       @Override
       public void run() {
-        final int[] a;
-        String propName = getScoutObject().getCacheSplitterPositionPropertyName();
-        if (!StringUtility.isNullOrEmpty(propName)) {
-          a = ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).getPropertyIntArray(propName);
-        }
-        else {
-          a = null;
-        }
+        final int[] a = ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).getSplitterPosition(getScoutObject());
 
         getUiEnvironment().invokeUiLater(new Runnable() {
 
@@ -104,26 +96,21 @@ public class RwtScoutSplitBox extends RwtScoutFieldComposite<ISplitBox> implemen
   }
 
   protected void setSplitterPositionFromUi() {
-    String propName = getScoutObject().getCacheSplitterPositionPropertyName();
-    if (StringUtility.isNullOrEmpty(propName)) {
-      return;
-    }
-
     if (getScoutObject().isCacheSplitterPosition()) {
       int[] weights = getUiContainer().getWeights();
-      cacheSplitterPosition(propName, weights);
+      cacheSplitterPosition(weights);
     }
     else {
-      cacheSplitterPosition(propName, null);
+      cacheSplitterPosition(null);
     }
   }
 
-  protected void cacheSplitterPosition(final String propName, final int[] weights) {
+  protected void cacheSplitterPosition(final int[] weights) {
     Runnable job = new Runnable() {
 
       @Override
       public void run() {
-        ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).setPropertyIntArray(propName, weights);
+        ClientUIPreferences.getInstance(getUiEnvironment().getClientSession()).setSplitterPosition(getScoutObject(), weights);
       }
 
     };

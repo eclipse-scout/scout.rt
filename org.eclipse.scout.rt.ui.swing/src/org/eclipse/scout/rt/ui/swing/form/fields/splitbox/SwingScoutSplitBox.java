@@ -16,7 +16,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JSplitPane;
 
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -66,19 +65,17 @@ public class SwingScoutSplitBox extends SwingScoutFieldComposite<ISplitBox> impl
   @Override
   protected void attachScout() {
     super.attachScout();
-    // split position
-    int[] a = null;
-    String propName = getScoutObject().getCacheSplitterPositionPropertyName();
-    if (!StringUtility.isNullOrEmpty(propName)) {
-      if (getScoutObject().isCacheSplitterPosition()) {
-        try {
-          a = ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()).getPropertyIntArray(propName);
-        }
-        catch (Throwable t) {
-          // nop
-        }
-      }
+
+    if (getScoutObject().isCacheSplitterPosition()) {
+      setCachedSplitterPosition();
     }
+    else {
+      setSplitterPositionFromScout();
+    }
+  }
+
+  protected void setCachedSplitterPosition() {
+    int[] a = ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()).getSplitterPosition(getScoutObject());
     if (a != null && a.length == 2) {
       setSplitterPosition(a[0], a[1]);
     }
@@ -121,20 +118,21 @@ public class SwingScoutSplitBox extends SwingScoutFieldComposite<ISplitBox> impl
   }
 
   protected void setSplitterPositionFromSwing() {
-    String propName = getScoutObject().getCacheSplitterPositionPropertyName();
-    if (!StringUtility.isNullOrEmpty(propName)) {
-      if (getScoutObject().isCacheSplitterPosition()) {
-        int total = (getSwingContainer().getOrientation() == JSplitPane.HORIZONTAL_SPLIT ? getSwingContainer().getWidth() : getSwingContainer().getHeight()) - getSwingContainer().getDividerSize();
-        if (total > 32) {
-          int left = getSwingContainer().getDividerLocation();
-          int right = total - left;
-          ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()).setPropertyIntArray(propName, new int[]{left, right});
-        }
-      }
-      else {
-        ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()).setPropertyIntArray(propName, null);
+    if (getScoutObject().isCacheSplitterPosition()) {
+      int total = (getSwingContainer().getOrientation() == JSplitPane.HORIZONTAL_SPLIT ? getSwingContainer().getWidth() : getSwingContainer().getHeight()) - getSwingContainer().getDividerSize();
+      if (total > 32) {
+        int left = getSwingContainer().getDividerLocation();
+        int right = total - left;
+        cacheSplitterPosition(new int[]{left, right});
       }
     }
+    else {
+      cacheSplitterPosition(null);
+    }
+  }
+
+  protected void cacheSplitterPosition(final int[] weights) {
+    ClientUIPreferences.getInstance(getSwingEnvironment().getScoutSession()).setSplitterPosition(getScoutObject(), weights);
   }
 
   @Override
