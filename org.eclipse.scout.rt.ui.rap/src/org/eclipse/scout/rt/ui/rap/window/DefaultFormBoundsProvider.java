@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.window;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
@@ -25,6 +27,7 @@ public class DefaultFormBoundsProvider implements IFormBoundsProvider {
 
   private final IForm m_form;
   private IRwtEnvironment m_uiEnvironment;
+  private ClientSyncJob m_storeBoundsJob;
 
   public DefaultFormBoundsProvider(IForm form, IRwtEnvironment uiEnvironment) {
     m_form = form;
@@ -42,7 +45,24 @@ public class DefaultFormBoundsProvider implements IFormBoundsProvider {
   }
 
   @Override
-  public void storeBounds(Rectangle bounds) {
+  public void storeBounds(final Rectangle bounds) {
+    if (m_storeBoundsJob != null) {
+      m_storeBoundsJob.cancel();
+    }
+
+    m_storeBoundsJob = new ClientSyncJob("Saving form bounds", m_uiEnvironment.getClientSession()) {
+
+      @Override
+      protected void runVoid(IProgressMonitor monitor) {
+        storeBoundsInternal(bounds);
+      }
+
+    };
+
+    m_storeBoundsJob.schedule(200);
+  }
+
+  private void storeBoundsInternal(Rectangle bounds) {
     java.awt.Rectangle awtBounds = null;
     if (bounds != null) {
       awtBounds = new java.awt.Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);

@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.AbstractRwtScoutPart;
-import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -39,14 +38,8 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
   private IRwtScoutForm m_formComposite;
   private Form m_uiForm;
   private ViewStackTabButton m_button;
-  private IFormBoundsProvider m_boundsProvider;
 
   public RwtScoutDesktopForm() {
-    this(null);
-  }
-
-  public RwtScoutDesktopForm(IFormBoundsProvider boundsProvider) {
-    m_boundsProvider = boundsProvider;
   }
 
   @Override
@@ -80,10 +73,6 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
 
   @Override
   protected void closePartImpl() {
-    if (m_boundsProvider != null) {
-      m_boundsProvider.storeBounds(m_uiForm.getBounds());
-    }
-
     detachScout();
     m_button.dispose();
     m_uiForm.dispose();

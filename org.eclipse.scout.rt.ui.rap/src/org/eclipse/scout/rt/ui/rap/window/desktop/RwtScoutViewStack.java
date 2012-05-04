@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.rap.window.desktop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -31,6 +32,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 /**
  * <h3>RwtScoutViewStack</h3> ...
@@ -51,6 +54,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
   private IRwtEnvironment m_uiEnvironment;
   private HashMap<IForm, RwtScoutDesktopForm> m_openForms;
   ArrayList<RwtScoutDesktopForm> m_formStack;
+  private Map<IForm, IFormBoundsProvider> m_formBoundsProviders;
 
   private Composite m_tabBar;
 
@@ -61,6 +65,8 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     m_uiEnvironment = uiEnvironment;
     m_openForms = new HashMap<IForm, RwtScoutDesktopForm>();
     m_formStack = new ArrayList<RwtScoutDesktopForm>(3);
+    m_formBoundsProviders = new HashMap<IForm, IFormBoundsProvider>();
+    addListener(SWT.Resize, new P_ResizeListener());
     getUiEnvironment().getScoutDesktop().addDesktopListener(new P_DesktopListner());
     BrowserInfo info = RwtUtility.getBrowserInfo();
     if (info != null && info.isMozillaFirefox()) {
@@ -111,13 +117,14 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
 
   @Override
   public IRwtScoutPart addForm(IForm form) {
-    IFormBoundsProvider boundsProvider = null;
     if (form.isCacheBounds()) {
-      boundsProvider = createFormBoundsProvider(form, getUiEnvironment());
-      initPreferredSize(boundsProvider);
+      IFormBoundsProvider formBoundsProvider = createFormBoundsProvider(form, getUiEnvironment());
+      m_formBoundsProviders.put(form, formBoundsProvider);
+
+      initPreferredSize(formBoundsProvider);
     }
 
-    RwtScoutDesktopForm ui = new RwtScoutDesktopForm(boundsProvider);
+    RwtScoutDesktopForm ui = new RwtScoutDesktopForm();
     ViewStackTabButton button = new ViewStackTabButton(m_tabBar);
     button.setLayoutData(new RowData(SWT.DEFAULT, 22));
     button.addViewTabListener(new P_ViewTabSelectionListener(ui));
@@ -175,6 +182,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
       }
       setPartVisibleImpl(topForm);
     }
+    m_formBoundsProviders.remove(form);
   }
 
   private void setPartVisibleImpl(IForm form) {
@@ -279,6 +287,29 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
         getUiEnvironment().invokeUiLater(t);
       }
     }
+  }
+
+  private class P_ResizeListener implements Listener {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void handleEvent(Event event) {
+      if (event.type == SWT.Resize) {
+        handleResized();
+      }
+    }
+
+    private void handleResized() {
+      if (isDisposed() || m_formBoundsProviders.isEmpty()) {
+        return;
+      }
+
+      for (IFormBoundsProvider formBoundsProvider : m_formBoundsProviders.values()) {
+        formBoundsProvider.storeBounds(getBounds());
+      }
+    }
+
   }
 
 }
