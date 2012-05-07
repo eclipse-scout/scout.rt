@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.rap.AbstractStandaloneRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
+import org.eclipse.scout.rt.ui.rap.mobile.window.desktop.RwtScoutMobileDesktop;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
 import org.eclipse.swt.widgets.Composite;
@@ -35,7 +36,7 @@ public abstract class AbstractTabletStandaloneRwtEnvironment extends AbstractSta
 
   @Override
   protected RwtScoutDesktop createUiDesktop() {
-    return new RwtScoutDesktop();
+    return new RwtScoutMobileDesktop();
   }
 
   @Override
