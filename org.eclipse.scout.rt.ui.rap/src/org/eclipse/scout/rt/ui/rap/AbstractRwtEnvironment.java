@@ -83,8 +83,6 @@ import org.eclipse.scout.rt.ui.rap.util.RwtIconLocator;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.rap.window.BrowserWindowHandler;
-import org.eclipse.scout.rt.ui.rap.window.DefaultFormBoundsProvider;
-import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartListener;
@@ -833,17 +831,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
-  protected IFormBoundsProvider createFormBoundsProvider(IForm scoutForm, IRwtEnvironment uiEnvironment) {
-    return new DefaultFormBoundsProvider(scoutForm, uiEnvironment);
-  }
-
   protected IRwtScoutPart createUiScoutDialog(IForm form, Shell shell, int dialogStyle) {
-    IFormBoundsProvider boundsProvider = null;
-    if (form.isCacheBounds()) {
-      boundsProvider = createFormBoundsProvider(form, this);
-    }
-
-    RwtScoutDialog ui = new RwtScoutDialog(boundsProvider);
+    RwtScoutDialog ui = new RwtScoutDialog();
     ui.createPart(form, shell, dialogStyle, this);
     return ui;
   }
