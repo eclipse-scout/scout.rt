@@ -14,7 +14,9 @@ Bundle-Vendor: Eclipse Scout Project
 Scout-Project: org.eclipse.scout.rt
 Scout-Bundle-Type: client
 Export-Package: org.eclipse.scout.rt.client.mobile,
+ org.eclipse.scout.rt.client.mobile.navigation,
  org.eclipse.scout.rt.client.mobile.services,
+ org.eclipse.scout.rt.client.mobile.transformation,
  org.eclipse.scout.rt.client.mobile.ui.basic.table,
  org.eclipse.scout.rt.client.mobile.ui.desktop,
  org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield,

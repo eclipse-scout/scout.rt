@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.client.mobile.ui.desktop;
+package org.eclipse.scout.rt.client.mobile.navigation;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;

@@ -20,7 +20,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.Icons;
+import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.services.IMobileNavigationService;
+import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformer;
+import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformer;
+import org.eclipse.scout.rt.client.mobile.transformation.TabletDeviceTransformer;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -39,7 +43,7 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 
 public class MobileDesktopExtension extends AbstractDesktopExtension {
@@ -52,7 +56,7 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   private P_SearchFormCloseListener m_searchFormCloseListener;
 
   public MobileDesktopExtension() {
-    setActive(UiDeviceType.MOBILE.equals(ClientJob.getCurrentSession().getUserAgent().getUiDeviceType()));
+    setActive(UserAgentUtility.isTouchDevice());
   }
 
   public boolean isActive() {
@@ -68,7 +72,12 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   }
 
   protected IDeviceTransformer createDeviceTransformer() {
-    return new MobileDeviceTransformer();
+    if (UserAgentUtility.isTabletDevice()) {
+      return new TabletDeviceTransformer();
+    }
+    else {
+      return new MobileDeviceTransformer();
+    }
   }
 
   @Override
@@ -94,7 +103,7 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
     }
 
     m_deviceTransformer = createDeviceTransformer();
-    SERVICES.getService(IMobileNavigationService.class).installNavigator();
+    m_deviceTransformer.transformDesktop(getCoreDesktop());
 
     if (m_desktopListener == null) {
       m_desktopListener = new P_DeskopListener();
@@ -142,7 +151,7 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
       return ContributionCommand.Stop;
     }
 
-    if (getDeviceTransformer().filterForm(form)) {
+    if (!getDeviceTransformer().acceptForm(form)) {
       formHolder.setValue(null);
       return ContributionCommand.Stop;
     }

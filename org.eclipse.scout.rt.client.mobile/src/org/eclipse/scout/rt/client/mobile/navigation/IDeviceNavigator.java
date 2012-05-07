@@ -8,19 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.ui.desktop;
+package org.eclipse.scout.rt.client.mobile.navigation;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
  * @since 3.8.0
  */
-public interface IDeviceTransformer {
+public interface IDeviceNavigator {
+  void stepBack() throws ProcessingException;
 
-  void transformForm(IForm form);
+  boolean isSteppingBackPossible();
 
-  void transformOutline(IOutline outline);
+  IForm getCurrentNavigationForm();
 
-  boolean filterForm(IForm form);
+  boolean isOutlineTreeAvailable();
 }

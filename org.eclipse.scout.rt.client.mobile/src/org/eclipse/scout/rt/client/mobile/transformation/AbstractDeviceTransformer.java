@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.ui.desktop;
+package org.eclipse.scout.rt.client.mobile.transformation;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.mobile.services.IMobileNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -34,19 +35,23 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * @since 3.8.0
  */
-public class MobileDeviceTransformer implements IDeviceTransformer {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileDeviceTransformer.class);
+public class AbstractDeviceTransformer implements IDeviceTransformer {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDeviceTransformer.class);
 
   private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
 
   @Override
-  public void transformForm(IForm form) {
-    displayFormAsView(form);
+  public void transformDesktop(IDesktop desktop) {
 
+  }
+
+  @Override
+  public void transformForm(IForm form) {
     transformFormFields(form);
   }
 
@@ -66,18 +71,18 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public boolean filterForm(IForm form) {
+  public boolean acceptForm(IForm form) {
     if (isFormAddingForbidden(form)) {
-      return true;
+      return false;
     }
 
     if (isDetailFormAndAddingForbidden(form)) {
       makeSureOutlineTableIsVisible();
 
-      return true;
+      return false;
     }
 
-    return false;
+    return true;
   }
 
   private boolean isDetailFormAndAddingForbidden(IForm form) {
@@ -92,7 +97,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   private boolean isFormAddingForbidden(IForm form) {
     if (form instanceof IOutlineTreeForm) {
-      return true;
+      return !SERVICES.getService(IMobileNavigationService.class).getDeviceNavigator().isOutlineTreeAvailable();
     }
 
     if (form instanceof IOutlineTableForm && !(form instanceof MobileOutlineTableForm)) {
@@ -116,11 +121,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     else if (activePage instanceof IPageWithTable<?>) {
       outline.setDetailTable(((IPageWithTable) activePage).getTable());
     }
-  }
-
-  protected void displayFormAsView(IForm form) {
-    form.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
-    form.setDisplayViewId(IForm.VIEW_ID_CENTER);
   }
 
   protected void transformFormFields(IForm form) {

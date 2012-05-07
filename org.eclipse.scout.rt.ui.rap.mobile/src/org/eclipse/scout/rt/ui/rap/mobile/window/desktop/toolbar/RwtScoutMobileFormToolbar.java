@@ -16,7 +16,7 @@ import java.util.List;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
-import org.eclipse.scout.rt.client.mobile.ui.desktop.AbstractMobileBackAction;
+import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;

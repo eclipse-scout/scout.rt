@@ -93,4 +93,19 @@ public class MobileDesktopUtility {
     return ClientSyncJob.getCurrentSession().getDesktop();
   }
 
+  public static boolean isAnyViewVisible(String displayViewId) {
+    if (displayViewId == null) {
+      return false;
+    }
+
+    IForm[] viewStack = getDesktop().getViewStack();
+    for (IForm form : viewStack) {
+      if (displayViewId.equals(form.getDisplayViewId())) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
 }
