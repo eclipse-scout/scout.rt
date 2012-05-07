@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.AbstractRwtScoutPart;
+import org.eclipse.scout.rt.ui.rap.window.DefaultFormBoundsProvider;
 import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellEvent;
@@ -47,11 +48,6 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
   private Point m_uiInitialSize;
   private IFormBoundsProvider m_boundsProvider;
 
-  public RwtScoutDialog(IFormBoundsProvider boundsProvider) {
-    m_boundsProvider = boundsProvider;
-    initInitialBounds(m_boundsProvider);
-  }
-
   public RwtScoutDialog() {
   }
 
@@ -67,6 +63,10 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     }
   }
 
+  protected IFormBoundsProvider createFormBoundsProvider(IForm scoutForm, IRwtEnvironment uiEnvironment) {
+    return new DefaultFormBoundsProvider(scoutForm, uiEnvironment);
+  }
+
   @Override
   public void setBusy(boolean b) {
     getUiForm().setBusy(b);
@@ -78,6 +78,11 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     return m_uiForm;
   }
 
+  /**
+   * Sets the initial location of the dialog. <br/>
+   * This property has no effect if {@link IForm#isCacheBounds()} is set because a {@link IFormBoundsProvider} is
+   * used in that case.
+   */
   public void setUiInitialLocation(Point initialLocation) {
     m_uiInitialLocation = initialLocation;
   }
@@ -90,6 +95,11 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     return m_uiInitialSize;
   }
 
+  /**
+   * Sets the initial size of the dialog. <br/>
+   * This property has no effect if {@link IForm#isCacheBounds()} is set because a {@link IFormBoundsProvider} is
+   * used in that case.
+   */
   public void setUiInitialSize(Point uiInitialSize) {
     m_uiInitialSize = uiInitialSize;
   }
@@ -100,6 +110,12 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
 
   public void createPart(IForm scoutForm, Shell parentShell, int style, IRwtEnvironment uiEnvironment) {
     super.createPart(scoutForm, uiEnvironment);
+
+    if (scoutForm.isCacheBounds()) {
+      m_boundsProvider = createFormBoundsProvider(scoutForm, getUiEnvironment());
+      initInitialBounds(m_boundsProvider);
+    }
+
     m_uiDialog = new DialogImpl((style & SWT.APPLICATION_MODAL) != 0 ? parentShell : null, style);
     m_uiDialog.create();
     m_uiDialog.getShell().addShellListener(new ShellListener() {
