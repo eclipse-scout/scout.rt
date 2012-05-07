@@ -671,11 +671,15 @@ public final class RwtUtility {
     if (table.getHorizontalBar() != null) {
       x += table.getHorizontalBar().getSelection();
     }
-    for (TableColumn c : table.getColumns()) {
-      if (x >= 0 && x <= c.getWidth()) {
-        return c;
+    // loop over all columns with respect to the current display order
+    for (int index : table.getColumnOrder()) {
+      TableColumn col = table.getColumn(index);
+      if (col != null) {
+        if (x >= 0 && x <= col.getWidth()) {
+          return col;
+        }
+        x -= col.getWidth();
       }
-      x = x - c.getWidth();
     }
     return null;
   }
