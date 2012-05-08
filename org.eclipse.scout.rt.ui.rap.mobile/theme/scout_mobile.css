@@ -1,15 +1,19 @@
-Composite.mobileToolbarContainer {
-  background-color: #67a8ce;
-}
-
-CLabel.actionTitleBarLabel {
+CLabel.actionBarContainer {
   color: white;
   font: bold 17px Arial, Helvetica, sans-serif;
   background-color: transparent;
 }
 
-Composite.actionTitleBarContainer {
-  padding: 0px 0px 0px 0px;
+Composite.mobileToolbarContainer {
+  background-color: #67a8ce;
+}
+
+Composite.mobileTableActionBarContainer {
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #DDEBF4 ),
+    to( #d4e1e7 )
+  );
 }
 
 Button.mobile-datechooser-dialog-last-year, Button.mobile-datechooser-dialog-last-year:hover {

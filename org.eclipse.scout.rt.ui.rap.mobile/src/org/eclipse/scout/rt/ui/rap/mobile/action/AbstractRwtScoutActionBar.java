@@ -30,9 +30,7 @@ import org.eclipse.swt.widgets.Composite;
  * @since 3.8.0
  */
 public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> extends RwtScoutComposite<T> implements IRwtScoutActionBar<T> {
-  protected static final String VARIANT_ACTION_BAR_CONTAINER = "actionBarContainer";
-  protected static final String VARIANT_TITLE_BAR_CONTAINER = "actionTitleBarContainer";
-  protected static final String VARIANT_TITLE_BAR_LABEL = "actionTitleBarLabel";
+  private static final String VARIANT_ACTION_BAR_CONTAINER = "actionBarContainer";
 
   private ActionButtonBar m_leftButtonBar;
   private Composite m_centerTitleBar;
@@ -46,7 +44,7 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    container.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_ACTION_BAR_CONTAINER);
+    container.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
     setUiContainer(container);
 
     addLeftButtonBar(container);
@@ -86,6 +84,10 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
       GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, true);
       m_rightButtonBar.setLayoutData(gridData);
     }
+  }
+
+  protected String getActionBarContainerVariant() {
+    return VARIANT_ACTION_BAR_CONTAINER;
   }
 
   protected void addLeftButtonBar(Composite parent) {
@@ -135,12 +137,12 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
 
   protected Composite createTitleBar(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    container.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TITLE_BAR_CONTAINER);
+    container.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
     container.setLayout(new FillLayout());
 
     m_titleField = getUiEnvironment().getFormToolkit().createCLabel(container, null, SWT.CENTER);
     //FIXME CGU ClabelEx does not automatically expand if screen gets bigger
-    m_titleField.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TITLE_BAR_LABEL);
+    m_titleField.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
 
     return container;
   }
