@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyUtility;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * Only show busy
@@ -48,8 +47,8 @@ public class ShowBusyJob extends BusyJob {
         ShowBusyJob.super.run(monitor2);
       }
     };
-    final Display display = getBusyHandler().getDisplay();
-    SwtBusyUtility.showBusyIndicator(display, busyRunnable, monitor);
+    SwtBusyHandler busyHandler = getBusyHandler();
+    SwtBusyUtility.showBusyIndicator(busyHandler, busyRunnable, monitor);
     return Status.OK_STATUS;
   }
 

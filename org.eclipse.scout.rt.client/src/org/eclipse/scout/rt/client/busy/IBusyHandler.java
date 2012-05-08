@@ -50,4 +50,8 @@ public interface IBusyHandler {
   long getShortOperationMillis();
 
   long getLongOperationMillis();
+
+  void setEnabled(boolean b);
+
+  boolean isEnabled();
 }

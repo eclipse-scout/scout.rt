@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyUtility;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * Default SWT busy handler for a {@link IClientSession}
@@ -56,8 +55,8 @@ public class WaitForBlockingJob extends BusyJob {
    */
   @Override
   protected void runBusy(IProgressMonitor monitor) {
-    final Display display = getBusyHandler().getDisplay();
-    display.syncExec(new Runnable() {
+    SwtBusyHandler busyHandler = getBusyHandler();
+    busyHandler.getDisplay().syncExec(new Runnable() {
       @Override
       public void run() {
         m_parts = SwtBusyUtility.findAffectedParts(getBusyHandler().getSwtEnvironment());
@@ -71,7 +70,7 @@ public class WaitForBlockingJob extends BusyJob {
         WaitForBlockingJob.super.runBusy(monitor2);
       }
     };
-    SwtBusyUtility.showBusyIndicator(display, busyRunnable, monitor);
+    SwtBusyUtility.showBusyIndicator(busyHandler, busyRunnable, monitor);
   }
 
   @Override

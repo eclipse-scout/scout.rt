@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyUtility;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * Shows the workbench progress indicator while blocking.
@@ -47,14 +46,13 @@ public class BlockWorkbenchJob extends BusyJob {
 
   @Override
   protected void runBlocking(final IProgressMonitor monitor) {
-    final Display display = getBusyHandler().getDisplay();
     IRunnableWithProgress blockingRunnable = new IRunnableWithProgress() {
       @Override
       public void run(IProgressMonitor monitor2) throws InvocationTargetException, InterruptedException {
         BlockWorkbenchJob.super.runBlocking(monitor2);
       }
     };
-    SwtBusyUtility.showWorkbenchIndicator(display, blockingRunnable);
+    SwtBusyUtility.showWorkbenchIndicator(getBusyHandler(), blockingRunnable);
   }
 
 }

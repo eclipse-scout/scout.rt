@@ -96,6 +96,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolTip;
@@ -468,8 +470,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
       m_status = SwtEnvironmentEvent.STARTED;
       fireEnvironmentChanged(new SwtEnvironmentEvent(this, m_status));
-
-      attachBusyHandler(m_clientSession);
+      attachBusyHandler();
     }
     finally {
       if (m_status == SwtEnvironmentEvent.STARTING) {
@@ -479,14 +480,32 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
   }
 
-  protected SwtBusyHandler attachBusyHandler(IClientSession session) {
+  protected SwtBusyHandler attachBusyHandler() {
     IBusyManagerService service = SERVICES.getService(IBusyManagerService.class);
     if (service == null) {
       return null;
     }
-    SwtBusyHandler handler = new SwtBusyHandler(session, this);
-    service.register(session, handler);
+    SwtBusyHandler handler = createBusyHandler();
+    getDisplay().addListener(SWT.Dispose, new P_BusyHandlerDisposeListener(service));
+    service.register(getClientSession(), handler);
     return handler;
+  }
+
+  private class P_BusyHandlerDisposeListener implements Listener {
+    private IBusyManagerService m_busyManagerService;
+
+    public P_BusyHandlerDisposeListener(IBusyManagerService busyManagerService) {
+      m_busyManagerService = busyManagerService;
+    }
+
+    @Override
+    public void handleEvent(Event event) {
+      m_busyManagerService.unregister(getClientSession());
+    }
+  }
+
+  protected SwtBusyHandler createBusyHandler() {
+    return new SwtBusyHandler(getClientSession(), this);
   }
 
   protected void showClientSessionLoadError(Throwable error) {
