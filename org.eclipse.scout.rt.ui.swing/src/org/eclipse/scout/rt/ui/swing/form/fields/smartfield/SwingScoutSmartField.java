@@ -320,25 +320,30 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     // end notify
   }
 
-  private void showProposalPopup(ISmartFieldProposalForm form) {
+  private void showProposalPopup(final ISmartFieldProposalForm form) {
     setInputDirty(true);
 
-    // check is need, because for inline editing tables, the swing field might be already disposed
+    // check is needed, because for inline editing tables, the swing field might be already disposed
     if (!getSwingField().isDisplayable()) {
-      /*
-       * The display text of the smartfield must be set to the initial value,
-       * because otherwise the typed (invalid) text is still there. (same behavior as for smartfields in forms directly)
-       * In order to work, set to null is required because smartfield will not
-       * refresh display text if value is null
-       */
-      getScoutObject().setDisplayText(null);
-      getScoutObject().refreshDisplayText();
+      getSwingEnvironment().invokeScoutLater(new Runnable() {
+        @Override
+        public void run() {
+          /*
+           * The display text of the smartfield must be set to the initial value,
+           * because otherwise the typed (invalid) text is still there. (same behavior as for smartfields in forms directly)
+           * In order to work, set to null is required because smartfield will not
+           * refresh display text if value is null
+           */
+          getScoutObject().setDisplayText(null);
+          getScoutObject().refreshDisplayText();
 
-      /*
-       * Unregister proposal form from UI
-       * If not, accessing the same smartfield will not open the proposal form again
-       */
-      getScoutObject().getUIFacade().unregisterProposalFormFromUI(form);
+          /*
+           * Unregister proposal form from UI
+           * If not, accessing the same smartfield will not open the proposal form again
+           */
+          getScoutObject().getUIFacade().unregisterProposalFormFromUI(form);
+        }
+      }, 0);
       return;
     }
 
