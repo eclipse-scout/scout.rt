@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.basic.table;
 
-import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
@@ -29,6 +29,6 @@ public interface IRwtScoutTable extends IRwtScoutComposite<ITable> {
 
   void setEnabledFromScout(boolean enabled);
 
-  TableViewer getUiTableViewer();
+  Viewer getUiTableViewer();
 
 }
