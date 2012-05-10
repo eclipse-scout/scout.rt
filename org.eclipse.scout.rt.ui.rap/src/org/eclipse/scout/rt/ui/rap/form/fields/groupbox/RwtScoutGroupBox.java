@@ -79,6 +79,11 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
     Composite rootPane = createContainer(parent);
     if (getScoutObject().isScrollable()) {
       m_scrolledForm = getUiEnvironment().getFormToolkit().createScrolledFormEx(rootPane, SWT.V_SCROLL);
+      
+      //Mainly necessary to better support finger scrolling. 
+      //If the flag is not set rap tries to scroll to the top of the page. This makes scrolling of scrolled composites or listboxes impossible if they are located inside a form (not fullscreen).
+      m_scrolledForm.setShowFocusedControl(true);
+      
       GridData bodyData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL);
       bodyData.horizontalIndent = 0;
       bodyData.verticalIndent = 0;
