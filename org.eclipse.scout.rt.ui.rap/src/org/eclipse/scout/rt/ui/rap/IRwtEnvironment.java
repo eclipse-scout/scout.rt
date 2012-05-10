@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
+import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.keystroke.IKeyStrokeManager;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.ScoutFormToolkit;
@@ -145,15 +146,6 @@ public interface IRwtEnvironment {
    */
   Font getFont(Font templateFont, String newName, Integer newStyle, Integer newSize);
 
-  // properties
-  // int getPropertyInt(String propertyName);
-  //
-  // String getPropertyString(String propertyName);
-  //
-  // Object getProperty(String propertyName);
-  //
-  // boolean getPropertyBool(String propertyName);
-
   IDesktop getScoutDesktop();
 
   // Gui factory
@@ -197,22 +189,17 @@ public interface IRwtEnvironment {
   void setPopupOwner(Control owner, Rectangle ownerBounds);
 
   /**
-   * @return styled partial html text (<b>no</b> document with root tag &lt;html&gt;) that can be used inside for
-   *         example table headers and table cells.
-   *         The html, head and body tags are removed, newlines are replaced by br tags.
+   * Convenience for {@link HtmlAdapter#adaptHtmlCell(IRwtScoutComposite, String)}.
    */
   String adaptHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml);
 
   /**
-   * @return converted links to local urls in html text. <b>&lt;a&gt;</b> -&gt; styled <b>&lt;span&gt;</b> as in Link
-   *         widget.
+   * Convenience for {@link HtmlAdapter#convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite, String)}
    */
   String convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml);
 
   /**
-   * @return complete html document (root tag <html>).
-   *         The raw html is completed and equipped with default style to match current style sheet (only if no head and
-   *         style section exists)
+   * Convenience for {@link HtmlAdapter#styleHtmlText(IRwtScoutFormField, String)}.
    */
   String styleHtmlText(IRwtScoutFormField<?> uiComposite, String rawHtml);
 

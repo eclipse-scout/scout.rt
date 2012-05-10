@@ -19,8 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
@@ -36,7 +34,6 @@ import org.eclipse.rwt.service.ISessionStore;
 import org.eclipse.rwt.service.SessionStoreEvent;
 import org.eclipse.rwt.service.SessionStoreListener;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -54,13 +51,11 @@ import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
@@ -73,6 +68,7 @@ import org.eclipse.scout.rt.ui.rap.concurrency.RwtScoutSynchronizer;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.RwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
+import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.KeyStrokeManager;
 import org.eclipse.scout.rt.ui.rap.util.BrowserInfo;
@@ -98,7 +94,6 @@ import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -106,7 +101,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolTip;
@@ -154,12 +148,11 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private P_ScoutDesktopPropertyListener m_desktopPropertyListener;
 
   private final Class<? extends IClientSession> m_clientSessionClazz;
-
   private IClientSession m_clientSession;
 
   private RwtScoutNavigationSupport m_historySupport;
-
   private LayoutValidateManager m_layoutValidateManager;
+  private HtmlAdapter m_htmlAdapter;
 
   public AbstractRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     m_applicationBundle = applicationBundle;
@@ -480,150 +473,37 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   @Override
   public String adaptHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml) {
-    /*
-     * HTML: <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-     * XHTML: <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-     * TODO rwt Issue: As long as rwt-index.html uses HTML and not XHTML. tables and other nested elements ignore style of div parent.
-     * Alternative is using color:inherit etc. in inner tables but this does not work in IE8.
-     * Therefore we adapt the style tag of <table> and <a> tags.
-     */
-    int size = 12;
-    if (uiComposite.getUiField() != null) {
-      FontData[] fa = uiComposite.getUiField().getFont().getFontData();
-      if (fa != null && fa.length > 0) {
-        if (fa[0].getHeight() > 0) {
-          size = fa[0].getHeight();
-        }
-      }
-    }
-    String stylePrefix = "color:inherit;background-color:inherit;font-size:" + size + "px;";
-    rawHtml = bugfixStyles(rawHtml, stylePrefix);
-    return rawHtml;
+    return getHtmlAdapter().adaptHtmlCell(uiComposite, rawHtml);
   }
-
-  private static final Pattern tableTagPattern = Pattern.compile("<table([^>]*)>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-  private static final Pattern styleAttributePattern = Pattern.compile("style\\s*=\\s*\"([^\"]*)\"", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-
-  private String bugfixStyles(String html, String stylePrefix) {
-    Matcher m = tableTagPattern.matcher(html);
-    StringBuilder buf = new StringBuilder();
-    int lastPos = 0;
-    while (m.find()) {
-      buf.append(html.substring(lastPos, m.start()));
-      String atts = m.group(1);
-      Matcher m2 = styleAttributePattern.matcher(atts);
-      if (m2.find()) {
-        buf.append(html.substring(m.start(), m.start(1) + m2.start(1)));
-        buf.append(stylePrefix);
-        buf.append(html.substring(m.start(1) + m2.start(1), m.end()));
-      }
-      else {
-        buf.append(html.substring(m.start(), m.start(1)));
-        buf.append(" style=\"");
-        buf.append(stylePrefix);
-        buf.append("\" ");
-        buf.append(html.substring(m.start(1), m.end()));
-      }
-      lastPos = m.end();
-    }
-    if (lastPos < html.length()) {
-      buf.append(html.substring(lastPos));
-    }
-    return buf.toString();
-  }
-
-  private static final Pattern localLinkTagPattern = Pattern.compile("<a (href=\"" + ITable.LOCAL_URL_PREFIX + "[^>]*)>([^>]*)</a>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
   @Override
   public String convertLinksWithLocalUrlsInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml) {
-    Matcher m = localLinkTagPattern.matcher(rawHtml);
-    StringBuilder buf = new StringBuilder();
-    int lastPos = 0;
-    while (m.find()) {
-      buf.append(rawHtml.substring(lastPos, m.start()));
-
-      buf.append("<span tabIndex=\"1\" ");
-      buf.append("class=\"link\" ");
-      buf.append("style=\"");
-      buf.append("text-decoration:underline;cursor:pointer;\" ");
-      buf.append(rawHtml.substring(m.start(1), m.end(1)));
-      buf.append(">");
-      buf.append(rawHtml.substring(m.start(2), m.end(2)));
-      buf.append("</span>");
-
-      lastPos = m.end();
-    }
-    if (lastPos < rawHtml.length()) {
-      buf.append(rawHtml.substring(lastPos));
-    }
-    return buf.toString();
+    return getHtmlAdapter().convertLinksWithLocalUrlsInHtmlCell(uiComposite, rawHtml);
   }
 
   @Override
   public String styleHtmlText(IRwtScoutFormField<?> uiComposite, String rawHtml) {
-    if (rawHtml == null) {
-      rawHtml = "";
-    }
-    String cleanHtml = rawHtml;
-
-    if (uiComposite.getScoutObject() instanceof IHtmlField) {
-      IHtmlField htmlField = (IHtmlField) uiComposite.getScoutObject();
-      if (htmlField.isHtmlEditor()) {
-        /*
-         * In HTML editor mode, the HTML is not styled except that an empty HTML skeleton is created in case the given HTML is empty.
-         * In general no extra styling should be applied because the HTML installed in the editor should be the very same as
-         * provided. Otherwise, if the user did some modifications in the HTML source and reloads the HTML in the editor anew,
-         * unwanted auto-corrections would be applied.
-         */
-        if (!StringUtility.hasText(cleanHtml)) {
-          cleanHtml = "<html><head></head><body></body></html>";
-        }
-      }
-      else {
-        /*
-         * Because @{link SwtScoutHtmlField} is file based, it is crucial to set the content-type and charset appropriately.
-         * Also, the CSS needs not to be cleaned as the native browser is used.
-         */
-        cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, true, false, createDefaultFontSettings(uiComposite));
-      }
-    }
-
-    return cleanHtml;
+    return getHtmlAdapter().styleHtmlText(uiComposite, rawHtml);
   }
 
   /**
-   * Get SWT specific default font settings
+   * @deprecated To adjust the behavior override {@link HtmlAdapter} instead. Will be removed in 3.9.0
    */
+  @Deprecated
   protected DefaultFont createDefaultFontSettings(IRwtScoutFormField<?> uiComposite) {
-    DefaultFont defaultFont = new DefaultFont();
-    defaultFont.setSize(12);
-    defaultFont.setSizeUnit("px");
-    defaultFont.setForegroundColor(0x000000);
-    defaultFont.setFamilies(new String[]{"sans-serif"});
+    return getHtmlAdapter().createDefaultFontSettings(uiComposite);
+  }
 
-    if (uiComposite != null && uiComposite.getUiField() != null) {
-      FontData[] fontData = uiComposite.getUiField().getFont().getFontData();
-      if (fontData == null || fontData.length <= 0) {
-        Label label = new Label(uiComposite.getUiContainer(), SWT.NONE);
-        fontData = label.getFont().getFontData();
-        label.dispose();
-      }
-      if (fontData != null && fontData.length > 0) {
-        int height = fontData[0].getHeight();
-        if (height > 0) {
-          defaultFont.setSize(height);
-        }
-        String fontFamily = fontData[0].getName();
-        if (StringUtility.hasText(fontFamily)) {
-          defaultFont.setFamilies(new String[]{fontFamily, "sans-serif"});
-        }
-      }
-      Color color = uiComposite.getUiField().getForeground();
-      if (color != null) {
-        defaultFont.setForegroundColor(color.getRed() * 0x10000 + color.getGreen() * 0x100 + color.getBlue());
-      }
+  protected HtmlAdapter createHtmlAdapter() {
+    return new HtmlAdapter(this);
+  }
+
+  public HtmlAdapter getHtmlAdapter() {
+    if (m_htmlAdapter == null) {
+      m_htmlAdapter = createHtmlAdapter();
     }
-    return defaultFont;
+
+    return m_htmlAdapter;
   }
 
   // icon handling
