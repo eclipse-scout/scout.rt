@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.Activator;
-import org.eclipse.scout.jaxws.internal.JaxWsEndpointService;
 import org.eclipse.scout.jaxws.service.IJaxWsEndpointService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -111,7 +110,7 @@ public abstract class EndpointServlet extends HttpServlet {
   }
 
   protected void installServletAdapters() {
-    JaxWsEndpointService endpointService = SERVICES.getService(JaxWsEndpointService.class);
+    IJaxWsEndpointService endpointService = SERVICES.getService(IJaxWsEndpointService.class);
     for (ServletAdapter servletAdapter : endpointService.getServletAdapters()) {
       String urlPattern = servletAdapter.getValidPath();
       if (urlPattern.contains("*.")) {
