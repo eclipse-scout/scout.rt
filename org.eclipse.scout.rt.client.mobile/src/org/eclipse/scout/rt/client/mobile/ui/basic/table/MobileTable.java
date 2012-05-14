@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -166,6 +168,25 @@ public class MobileTable extends AbstractTable {
   @Override
   protected boolean getConfiguredMultilineText() {
     return true;
+  }
+
+  @Override
+  protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+    if (!local) {
+      return;
+    }
+
+    String query = url.getQuery();
+    if (query == null) {
+      return;
+    }
+
+    for (String s : query.split("[\\?\\&]")) {
+      Matcher m = Pattern.compile("action=drill_down").matcher(s);
+      if (m.matches()) {
+        getUIFacade().fireRowActionFromUI(getSelectedRow());
+      }
+    }
   }
 
   public ContentColumn getContentColumn() {
@@ -625,6 +646,12 @@ public class MobileTable extends AbstractTable {
       m_originalTable.getUIFacade().setSelectedRowsFromUI(getRowMapColumn().getValues(rows));
     }
 
+    @Override
+    public void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> column, URL url) {
+      super.fireHyperlinkActionFromUI(row, column, url);
+      m_originalTable.getUIFacade().fireHyperlinkActionFromUI(getRowMapColumn().getValue(row), column, url);
+    }
+
     //------------- pass events only to original table -------------
     @Override
     public IMenu[] fireRowPopupFromUI() {
@@ -654,11 +681,6 @@ public class MobileTable extends AbstractTable {
     @Override
     public boolean fireKeyTypedFromUI(String keyStrokeText, char keyChar) {
       return m_originalTable.getUIFacade().fireKeyTypedFromUI(keyStrokeText, keyChar);
-    }
-
-    @Override
-    public void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> column, URL url) {
-      m_originalTable.getUIFacade().fireHyperlinkActionFromUI(getRowMapColumn().getValue(row), column, url);
     }
 
     //------------- do not process events --------------------------

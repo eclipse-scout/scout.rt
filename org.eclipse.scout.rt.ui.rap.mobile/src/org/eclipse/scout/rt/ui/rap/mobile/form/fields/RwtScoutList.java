@@ -37,6 +37,8 @@ import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.util.UiRedrawHandler;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.HyperlinkEvent;
+import org.eclipse.swt.events.HyperlinkListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.internal.widgets.MarkupValidator;
 import org.eclipse.swt.widgets.Composite;
@@ -107,6 +109,11 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     P_RwtTableListener rwtTableListener = new P_RwtTableListener();
     list.addListener(SWT.MouseUp, rwtTableListener);
     list.addListener(SWT.MouseDoubleClick, rwtTableListener);
+
+    //HyperlinkListener is not part of the official rap api so this line might generate compile errors
+    //See https://bugs.eclipse.org/bugs/show_bug.cgi?id=347436
+    list.addHyperlinkListener(new P_RwtHyperlinkListener());
+
     getUiEnvironment().addKeyStroke(list, new RwtKeyStroke((int) ' ') {
 
       @Override
@@ -589,6 +596,15 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     @Override
     public void selectionChanged(SelectionChangedEvent event) {
       setSelectionFromUi((StructuredSelection) event.getSelection());
+    }
+  }
+
+  public class P_RwtHyperlinkListener implements HyperlinkListener {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void activated(HyperlinkEvent event) {
+      handleUiHyperlinkAction(event.url);
     }
   }
 
