@@ -29,12 +29,18 @@ public class Activator extends AbstractUIPlugin {
   private static final String CLIENT_LOG_LEVEL = "org.eclipse.rwt.clientLogLevel";
   private static final String ALL_CLIENT_LOG_LEVEL = "ALL";
 
+  private static final String CLIENT_LIBRARY_VARIANT = "org.eclipse.rwt.clientLibraryVariant";
+  private static final String DEBUG_CLIENT_LIBRARY_VARIANT = "DEBUG";
+
   private static Activator m_plugin;
 
   private ServiceRegistration m_netAuthRegistration;
 
   public Activator() {
     System.setProperty(CLIENT_LOG_LEVEL, ALL_CLIENT_LOG_LEVEL);
+    //[imo] js patching mode. Rebuild client.js before removing these lines of code!! - SLE client.js is patched
+//    System.out.println("Debug does not use compiled client.js; Setting " + CLIENT_LIBRARY_VARIANT + "=" + DEBUG_CLIENT_LIBRARY_VARIANT);
+//    System.setProperty(CLIENT_LIBRARY_VARIANT, DEBUG_CLIENT_LIBRARY_VARIANT);
   }
 
   public static Activator getDefault() {
