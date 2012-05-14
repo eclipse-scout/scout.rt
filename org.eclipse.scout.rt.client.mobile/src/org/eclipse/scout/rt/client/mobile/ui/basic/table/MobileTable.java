@@ -14,15 +14,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.mobile.Activator;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -58,6 +59,9 @@ public class MobileTable extends AbstractTable {
   private List<IColumn> m_cellDetailColumns;
   private String m_headerName;
   private static final int ROW_HEIGHT = 18;
+  private String m_htmlCellTemplate;
+  private String m_htmlDrillDown;
+  private boolean m_drillDownPossible;
 
   private final P_TableEventListener m_eventListener;
 
@@ -65,14 +69,40 @@ public class MobileTable extends AbstractTable {
     m_eventListener = new P_TableEventListener();
     m_useBoldCellHeaderText = true;
     m_maxCellDetailColumns = 2;
+
+    try {
+      m_htmlCellTemplate = initHtmlCellTemplate();
+      m_htmlDrillDown = initHtmlDrillDown();
+    }
+    catch (ProcessingException e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+    }
   }
 
-  public void setDrillDownColumnVisible(boolean drillDownColumnVisible) {
-    getDrillDownColumn().setVisible(drillDownColumnVisible);
+  protected String initHtmlCellTemplate() throws ProcessingException {
+    try {
+      return new String(IOUtility.getContent(Activator.getDefault().getBundle().getResource("resources/html/MobileTableCellContent.html").openStream()), "iso-8859-1");
+    }
+    catch (Throwable t) {
+      throw new ProcessingException("Exception while loading html cell template for mobile table", t);
+    }
   }
 
-  public boolean isDrillDownColumnVisible() {
-    return getDrillDownColumn().isVisible();
+  protected String initHtmlDrillDown() throws ProcessingException {
+    try {
+      return new String(IOUtility.getContent(Activator.getDefault().getBundle().getResource("resources/html/MobileTableDrillDown.html").openStream()), "iso-8859-1");
+    }
+    catch (Throwable t) {
+      throw new ProcessingException("Exception while loading html cell template for mobile table", t);
+    }
+  }
+
+  public void setDrillDownPossible(boolean drillDownPossible) {
+    m_drillDownPossible = drillDownPossible;
+  }
+
+  public boolean isDrillDownPossible() {
+    return m_drillDownPossible;
   }
 
   public void installWrappedTable(ITable wrappedTable) throws ProcessingException {
@@ -146,10 +176,6 @@ public class MobileTable extends AbstractTable {
     return getColumnSet().getColumnByClass(RowMapColumn.class);
   }
 
-  public DrillDownColumn getDrillDownColumn() {
-    return getColumnSet().getColumnByClass(DrillDownColumn.class);
-  }
-
   @Order(10.0)
   public class RowMapColumn extends AbstractColumn<ITableRow> {
     @Override
@@ -168,49 +194,6 @@ public class MobileTable extends AbstractTable {
     @Override
     protected void execDecorateHeaderCell(HeaderCell cell) throws ProcessingException {
       cell.setText(m_headerName);
-    }
-  }
-
-  @Order(30.0)
-  public class DrillDownColumn extends AbstractStringColumn {
-
-    @Override
-    protected int getConfiguredWidth() {
-      return 15;
-    }
-
-    @Override
-    protected int getConfiguredHorizontalAlignment() {
-      return 0;
-    }
-
-    @Override
-    protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
-      cell.setIconId(Icons.DrillDown);
-
-      //FIXME CGU try with new rap sources if img works to horizontal align the image. Another approach would be to position the image at the right end of the summary column
-//      final StringBuilder result = new StringBuilder();
-//      result.append("<div style=\"display: table; height: 100%; width: 100%\">");
-//      result.append("<div style=\"display: table-cell; text-align:center; vertical-align: middle;\">");
-//
-//      result.append("<img src=\"drill_down.png\"/>");
-//
-//      result.append("</div>");
-//      result.append("</div>");
-//
-//      cell.setText(result.toString());
-    }
-
-  }
-
-  @Override
-  protected void execRowClick(ITableRow row) throws ProcessingException {
-    if (row == null) {
-      return;
-    }
-
-    if (getContextColumn() == getDrillDownColumn()) {
-      getUIFacade().fireRowActionFromUI(row);
     }
   }
 
@@ -312,11 +295,6 @@ public class MobileTable extends AbstractTable {
       return;
     }
 
-    String iconId = row.getIconId();
-    if (iconId == null) {
-      iconId = row.getCell(0).getIconId();
-    }
-    mobileTableRow.setIconId(iconId);
     getContentColumn().setValue(mobileTableRow, computeContentColumnValue(row));
   }
 
@@ -384,18 +362,6 @@ public class MobileTable extends AbstractTable {
     }
   }
 
-  private String createCellHtmlTemplate() {
-    final StringBuilder result = new StringBuilder();
-
-    result.append("<div style=\"display: table; height: 100%; \">");
-    result.append("<div style=\"display: table-cell; vertical-align: middle;\">");
-    result.append("#content#");
-    result.append("</div>");
-    result.append("</div>");
-
-    return result.toString();
-  }
-
   private String computeContentColumnValue(ITableRow row) {
     if (row == null) {
       return null;
@@ -409,50 +375,140 @@ public class MobileTable extends AbstractTable {
       return cellHeaderText;
     }
 
-    final StringBuilder content = new StringBuilder();
+    String content = "";
     if (StringUtility.hasText(cellHeaderText)) {
-      if (m_useBoldCellHeaderText) {
-        content.append("<b>");
-        content.append(cellHeaderText);
-        content.append("</b>");
+      content = createCellHeader(cellHeaderText);
+      content += "<br/>";
+    }
+    content += createCellDetail(row);
+
+    String output = m_htmlCellTemplate.replace("#ICON#", createCellIcon(row));
+    output = output.replace("#CONTENT#", content);
+    output = output.replace("#CONTENT_PADDING_RIGHT#", createCellContentPadding());
+    output = output.replace("#DRILL_DOWN#", createCellDrillDown());
+
+    return output;
+  }
+
+  private String createCellIcon(ITableRow row) {
+    if (row == null) {
+      return "";
+    }
+
+    String iconId = null;
+    if (row.getTable().isCheckable()) {
+      if (row.isChecked()) {
+        iconId = Icons.CheckboxYes;
       }
       else {
-        content.append(cellHeaderText);
+        iconId = Icons.CheckboxNo;
       }
-      content.append("<br/>");
     }
+    else {
+      iconId = row.getIconId();
+      if (iconId == null) {
+        iconId = row.getCell(0).getIconId();
+      }
+    }
+
+    if (iconId == null) {
+      return "";
+    }
+    else {
+      return "<img style=\"padding-left:3px\" width=\"16\" height=\"16\" src=\"cid:" + iconId + "\"/>";
+    }
+  }
+
+  private String createCellDrillDown() {
+    if (!isDrillDownPossible()) {
+      return "";
+    }
+
+    return m_htmlDrillDown;
+  }
+
+  private String createCellContentPadding() {
+    if (!isDrillDownPossible()) {
+      return "0px";
+    }
+
+    return "60px";
+  }
+
+  private String createCellHeader(String cellHeaderText) {
+    String content = "";
+
+    cellHeaderText = cleanupText(cellHeaderText);
+
+    if (m_useBoldCellHeaderText) {
+      content += "<b>";
+      content += cellHeaderText;
+      content += "</b>";
+    }
+    else {
+      content += cellHeaderText;
+    }
+
+    return content;
+  }
+
+  private String createCellDetail(ITableRow row) {
+    if (row == null) {
+      return "";
+    }
+
+    String content = "";
     int col = 0;
     for (IColumn column : m_cellDetailColumns) {
       String displayText = extractCellDisplayText(column, row);
+
       if (StringUtility.hasText(displayText)) {
         if (isHeaderdiscriptionNeeded(row, column)) {
-          content.append(extractColumnHeader(column));
-          content.append(": ");
+          content += extractColumnHeader(column);
+          content += ": ";
         }
-        content.append(displayText);
+        content += displayText;
       }
+
       if (col < m_cellDetailColumns.size() - 1) {
-        content.append("<br/>");
+        content += "<br/>";
       }
+
       col++;
     }
 
-    String template = createCellHtmlTemplate();
-    return template.replace("#content#", content);
+    return content;
+  }
+
+  private String cleanupText(String text) {
+    if (text == null) {
+      return null;
+    }
+
+    text = StringUtility.removeNewLines(text);
+    text = StringUtility.trim(text);
+    text = StringUtility.htmlEncode(text);
+
+    //See replace spaces with non breakable spaces.
+    //Can't use &nbsp; because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=379088
+    text = text.replaceAll("\\s", "&#160;");
+
+    return text;
   }
 
   private String extractCellDisplayText(IColumn column, ITableRow row) {
     String displayText = column.getDisplayText(row);
-    displayText = StringUtility.removeNewLines(displayText);
-    displayText = StringUtility.trim(displayText);
-    //FIXME CGU if content consists of html code it will be interpreted (f.e. custom columns in crm with flag "show as table" set to true. -> how should this be handled?
+
+    displayText = cleanupText(displayText);
+
     return displayText;
   }
 
   private String extractColumnHeader(IColumn column) {
     String header = column.getHeaderCell().getText();
-    header = StringUtility.removeNewLines(header);
-    header = StringUtility.trim(header);
+
+    header = cleanupText(header);
+
     return header;
   }
 

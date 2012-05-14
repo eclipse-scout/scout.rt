@@ -75,7 +75,7 @@ public class HtmlAdapter {
     return rawHtml;
   }
 
-  private static final Pattern imageCidPattern = Pattern.compile("['\"](cid:)([^\"']*)['\"]", Pattern.CASE_INSENSITIVE);
+  private static final Pattern imageCidPattern = Pattern.compile("(['\"])(cid:)([^\"']*)(['\"])", Pattern.CASE_INSENSITIVE);
 
   /**
    * Replaces the images in the raw html by the actual resource name.
@@ -90,12 +90,12 @@ public class HtmlAdapter {
     try {
       Matcher m = imageCidPattern.matcher(rawHtml);
       while (m.find()) {
-        String cidMarker = m.group(1);
-        String imageName = m.group(2);
+        String cidMarker = m.group(2);
+        String imageName = m.group(3);
         String location = resolveImageResourceName(imageName);
         if (location != null) {
           String imageUrl = getImageUrl(location);
-          rawHtml = rawHtml.replace(cidMarker + imageName, imageUrl);
+          rawHtml = rawHtml.replace(m.group(1) + cidMarker + imageName + m.group(4), m.group(1) + imageUrl + m.group(4));
         }
         else {
           LOG.warn("Image resource name could not be resolved. Image: " + imageName);

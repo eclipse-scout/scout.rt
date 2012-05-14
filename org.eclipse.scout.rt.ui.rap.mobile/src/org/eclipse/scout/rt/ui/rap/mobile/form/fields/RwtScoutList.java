@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.util.UiRedrawHandler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.internal.widgets.MarkupValidator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -57,6 +58,7 @@ import org.eclipse.swt.widgets.TableItem;
  * as only the displayed rows are rendered. On a list widget every row is rendered at beginning which makes scrolling
  * smoother. That's why it is the preferred widget on touch devices.
  */
+@SuppressWarnings("restriction")
 public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScoutList {
   private P_ScoutTableListener m_scoutTableListener;
   private UiRedrawHandler m_redrawHandler;
@@ -87,7 +89,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
       list.setData(WidgetUtil.CUSTOM_VARIANT, m_variant);
     }
     list.setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
-//    list.setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
+    list.setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
 
     ListViewer viewer = new ListViewer(list);
     viewer.setUseHashlookup(true);

@@ -750,7 +750,7 @@ Label-SeparatorLine[SHADOW_OUT] {
 List {
   background-color: white;
   border: none;
-  color: #5a86a3;
+  color: black;
 }
 
 List[BORDER] {
@@ -764,60 +764,17 @@ List-Item {
 }
 
 List-Item:hover {
-  background-color: #dae9f7;
-  background-image: gradient(
-    linear, left top, left bottom,
-    from( #dae9f7 ),
-    to( #d2e0ee )
-  );
+  background-color: #f1f8fe;
 }
 
 List-Item:selected {
-  color: white;
-  background-color: #00589f;
-  background-image: gradient(
-    linear, left top, left bottom,
-    from( #0078Bf ),
-    to( #00589f )
-  );
+  color: black;
+  background-color: #e5f3fe;
 }
 
 List-Item:selected:unfocused {
-  background-color: #959595;
-  color: white;
-  background-image: gradient(
-    linear, left top, left bottom,
-    from( #A5A5A5 ),
-    to( #858585 )
-  );
-}
-
-List-Item:even {
-  background-color: #f3f3f4;
-}
-
-List-Item:even:hover {
-  background-color: #dae9f7;
-}
-
-List-Item:even:selected {
-  color: white;
-  background-color: #00589f;
-  background-image: gradient(
-    linear, left top, left bottom,
-    from( #0078Bf ),
-    to( #00589f )
-  );
-}
-
-List-Item:even:selected:unfocused {
-  background-color: #959595;
-  color: white;
-  background-image: gradient(
-    linear, left top, left bottom,
-    from( #A5A5A5 ),
-    to( #858585 )
-  );
+  color: black;
+  background-color: #e5f3fe;
 }
 
 /* Menu */

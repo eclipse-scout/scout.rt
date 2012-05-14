@@ -24,9 +24,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
 import org.eclipse.scout.rt.ui.rap.form.fields.tablefield.RwtScoutTableField;
-import org.eclipse.scout.rt.ui.rap.services.common.patchedclass.IPatchedClassService;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutActionBar;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * @since 3.8.0
@@ -47,9 +45,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
 
   @Override
   protected IRwtScoutTable createRwtScoutTable() {
-    //Overridden to avoid setting a different variant for ISmartFieldProposalForm
-    //because their tables should not differ from the ordinary ones.
-    return SERVICES.getService(IPatchedClassService.class).createRwtScoutTable();
+    return new RwtScoutList();
   }
 
   @Override
@@ -80,7 +76,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
         MobileTable wrapperTable = new MobileTable();
         String headerName = createColumnHeaderName(table);
         wrapperTable.setHeaderName(headerName);
-        wrapperTable.setDrillDownColumnVisible(computeDrillDownColumnVisibility());
+        wrapperTable.setDrillDownPossible(computeDrillDownColumnVisibility());
         wrapperTable.installWrappedTable(table);
 
         holder.setValue(wrapperTable);

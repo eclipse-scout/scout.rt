@@ -23,5 +23,6 @@ public class Icons extends AbstractIcons {
   public static final String HomeAction = "mobile_home_action";
   public static final String DrillDown = "mobile_drill_down";
   public static final String FormToolsAction = "mobile_tools_menu";
-
+  public static final String CheckboxYes = "checkbox_yes";
+  public static final String CheckboxNo = "checkbox_no";
 }
