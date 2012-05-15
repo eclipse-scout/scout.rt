@@ -74,11 +74,26 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
     return f;
   }
 
+  /**
+   * Configures the horizontal alignment of text inside this column (including header text).
+   * <p>
+   * Subclasses can override this method. For boolean columns, the default is {@code 0} (center
+   * alignment).
+   * 
+   * @return {@code -1} for left, {@code 0} for center and {@code 1} for right alignment.
+   */
   @Override
   protected int getConfiguredHorizontalAlignment() {
     return 0; // center position
   }
 
+  /**
+   * Configures the vertical alignment of text inside this column (including header text).
+   * <p>
+   * Subclasses can override this method. Default is {@code -1} (top alignment).
+   * 
+   * @return {@code -1} for top, {@code 0} for center and {@code 1} for bottom alignment.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(200)
   @ConfigPropertyValue("-1")

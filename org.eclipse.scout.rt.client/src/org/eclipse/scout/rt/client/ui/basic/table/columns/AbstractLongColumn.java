@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
 
 /**
- * Column holding Strings
+ * Column holding Long
  */
 public abstract class AbstractLongColumn extends AbstractColumn<Long> implements ILongColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
@@ -45,6 +45,15 @@ public abstract class AbstractLongColumn extends AbstractColumn<Long> implements
   /*
    * Configuration
    */
+
+  /**
+   * Configures the format used to render the value. See {@link DecimalFormat#applyPattern(String)} for more information
+   * about the expected format.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Format of this column.
+   */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(140)
   @ConfigPropertyValue("null")
@@ -52,6 +61,14 @@ public abstract class AbstractLongColumn extends AbstractColumn<Long> implements
     return null;
   }
 
+  /**
+   * Configures whether grouping is used for this column. If grouping is used, the values may be displayed with a digit
+   * group separator.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if grouping is used for this column, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(150)
   @ConfigPropertyValue("true")

@@ -48,6 +48,15 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
   /*
    * Configuration
    */
+
+  /**
+   * Configures the format used to render the value. See {@link DecimalFormat#applyPattern(String)} for more information
+   * about the expected format.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Format of this column.
+   */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(140)
   @ConfigPropertyValue("null")
@@ -55,6 +64,14 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
     return null;
   }
 
+  /**
+   * Configures the minimum number of fraction digits used to display the value. To use an exact number of fraction
+   * digits, the same number as for {@link #getConfiguredMaxFractionDigits()} must be returned.
+   * <p>
+   * Subclasses can override this method. Default is {@code 2}.
+   * 
+   * @return Minimum number of fraction digits of this column.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(150)
   @ConfigPropertyValue("2")
@@ -62,6 +79,14 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
     return 2;
   }
 
+  /**
+   * Configures the maximum number of fraction digits used to display the value. To use an exact number of fraction
+   * digits, the same number as for {@link #getConfiguredMinFractionDigits()} must be returned.
+   * <p>
+   * Subclasses can override this method. Default is {@code 2}.
+   * 
+   * @return maximum number of fraction digits of this column.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(160)
   @ConfigPropertyValue("2")
@@ -69,6 +94,14 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
     return 2;
   }
 
+  /**
+   * Configures whether grouping is used for this column. If grouping is used, the values may be displayed with a digit
+   * group separator.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if grouping is used for this column, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(170)
   @ConfigPropertyValue("true")
@@ -76,6 +109,15 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
     return true;
   }
 
+  /**
+   * Configures whether the value is a percentage and is displayed with the appropriate sign. A value of 12 is displayed
+   * as 12 % (depending on the locale). Use {@link #getConfiguredMultiplier()} to handle the value differently (e.g.
+   * display a value of 0.12 as 12 %).
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if the column represents a percentage value, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(180)
   @ConfigPropertyValue("false")
@@ -83,6 +125,14 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
     return false;
   }
 
+  /**
+   * Configures the multiplier used to display the value. See {@link DecimalFormat#setMultiplier(int)} for more
+   * information about multipliers.
+   * <p>
+   * Subclasses can override this method. Default is {@code 1}.
+   * 
+   * @return The multiplier used to display the value.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(190)
   @ConfigPropertyValue("1")

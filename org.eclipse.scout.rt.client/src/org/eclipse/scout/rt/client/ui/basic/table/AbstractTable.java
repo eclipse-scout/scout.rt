@@ -43,7 +43,9 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -58,6 +60,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilte
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
@@ -71,6 +74,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
@@ -158,6 +162,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /*
    * Configuration
    */
+
+  /**
+   * Configures the title of this table. The title of the table is rarely used because a table is usually surrounded by
+   * an {@link AbstractTableField} having its own title / label.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Title of this table.
+   */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
   @ConfigPropertyValue("null")
@@ -165,6 +178,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return null;
   }
 
+  /**
+   * Configures the default icon for this table. The default icon is used for each row in the table.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return the ID (name) of the icon
+   * @see IIconProviderService
+   */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(20)
   @ConfigPropertyValue("null")
@@ -172,6 +193,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return null;
   }
 
+  /**
+   * Configures whether only one row can be selected at once in this table.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if more then one row in this table can be selected at once, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
   @ConfigPropertyValue("true")
@@ -179,6 +207,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return true;
   }
 
+  /**
+   * Configures whether only one row can be checked in this table. This configuration is only useful if
+   * {@link #getConfiguredCheckable()} is {@code true} .
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if more then one row in this table can be checked, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(32)
   @ConfigPropertyValue("true")
@@ -187,7 +223,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * The menu that is used on the ENTER / action key on a table row
+   * Configures the default menu that is used on the ENTER (action key) or the double click on a table row.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return The default menu to use.
    */
   @ConfigProperty(ConfigProperty.MENU_CLASS)
   @Order(35)
@@ -197,9 +237,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * @return true: deleted nodes are automatically erased<br>
-   *         false: deleted nodes are cached for later processing (service
-   *         deletion)
+   * Configures whether deleted rows are automatically erased or cached for later processing (service deletion).
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if deleted rows are automatically erased, {@code false} if deleted nodes are cached for later
+   *         processing.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(50)
@@ -208,6 +251,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return false;
   }
 
+  /**
+   * Configures whether sort is enabled for this table. If sort is enabled, the table rows are sorted based on their
+   * sort index (see {@link AbstractColumn#getConfiguredSortIndex()}) and the user might change the sorting at run time.
+   * If sort is disabled, the table rows are not sorted and the user cannot change the sorting.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if sort is enabled, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
   @ConfigPropertyValue("true")
@@ -215,6 +267,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return true;
   }
 
+  /**
+   * Configures whether the header row is visible. The header row contains the titles of each column.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if the header row is visible, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
   @ConfigPropertyValue("true")
@@ -223,8 +282,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * @return true: all columns are resized so that the table never needs
-   *         horizontal scrolling
+   * Configures whether the columns are auto resized. If true, all columns are resized so that the table never needs
+   * horizontal scrolling. This is especially useful for tables inside a form.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if the columns are auto resized, {@code false} otherwise.
+   * @see {@link AbstractColumn#getConfiguredWidth()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
@@ -233,6 +297,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return false;
   }
 
+  /**
+   * Configures whether the table supports multiline text. If multiline text is supported and a string column has set
+   * the {@link AbstractStringColumn#getConfiguredTextWrap()} property to true, the text is wrapped and uses two or more
+   * lines.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}. If the method is not overridden and at
+   * least one string column has set the {@link AbstractStringColumn#getConfiguredTextWrap()} to true, the multiline
+   * property is set automatically to true.
+   * 
+   * @return {@code true} if the table supports multiline text, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
   @ConfigPropertyValue("false")
@@ -241,11 +316,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * This is a hint for the UI iff it is not capable of
-   * having variable table row height based on cell contents (such as rap/rwt).
+   * Configures the row height hint. This is a hint for the UI if and only if it is not capable of having variable table
+   * row height based on cell contents (such as rap/rwt).
    * <p>
    * This hint defines the table row height in pixels being used as the fixed row height for all table rows of this
    * table.
+   * <p>
+   * Subclasses can override this method. Default is {@code -1}.
+   * 
+   * @return Table row height hint in pixels.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(92)
@@ -254,6 +333,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return -1;
   }
 
+  /**
+   * Configures whether the table is checkable.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if the table is checkable, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   @ConfigPropertyValue("false")
@@ -261,6 +347,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return false;
   }
 
+  /**
+   * Configures the checkable column. The checkable column represents the check state of the row, i.e. if it is checked
+   * or not. If no checkable column is configured, only the row itself represents if the row was checked or not.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return A column class extending {@link AbstractBooleanColumn} that represents the row check state.
+   */
   @ConfigProperty(ConfigProperty.TABLE_COLUMN)
   @Order(102)
   @ConfigPropertyValue("false")
@@ -268,6 +362,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return null;
   }
 
+  /**
+   * Configures the drop support of this table.
+   * <p>
+   * Subclasses can override this method. Default is {@code 0} (no drop support).
+   * 
+   * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
+   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(190)
   @ConfigPropertyValue("0")
@@ -275,6 +378,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return 0;
   }
 
+  /**
+   * Configures the drag support of this table.
+   * <p>
+   * Subclasses can override this method. Default is {@code 0} (no drag support).
+   * 
+   * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
+   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(190)
   @ConfigPropertyValue("0")
@@ -282,6 +394,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return 0;
   }
 
+  /**
+   * Configures whether the keyboard can be used for navigation in table. When activated, the user can click on a column
+   * in the table. Now starting to type some letters, the row matching the typed letters in the column will be selected.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if the keyboard navigation is supported, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(200)
   @ConfigPropertyValue("true")
@@ -289,6 +409,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return true;
   }
 
+  /**
+   * Configures whether the table always scrolls to the selection. When activated and the selection in a table changes,
+   * the table is scrolled to the selection so that the selected row is visible.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if the table scrolls to the selection, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(230)
   @ConfigPropertyValue("false")
@@ -297,7 +425,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * @return a transferable object representing the given rows
+   * Called after a drag operation was executed on one or several table rows.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @param rows
+   *          Table rows that were dragged.
+   * @return A transferable object representing the given rows.
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(10)
@@ -306,7 +441,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * process drop action, row may be null (for empty space drop)
+   * Called after a drop operation was executed on the table.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @param row
+   *          Table row on which the transferable object was dropped (row may be null for empty space drop).
+   * @param t
+   *          Transferable object that was dropped on the row.
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(20)
@@ -314,11 +457,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Is called by a <code>CTRL-C</code> event on the table to copy the given rows into the clipboard.
+   * Called by a <code>CTRL-C</code> event on the table to copy the given rows into the clipboard.
+   * <p>
+   * Subclasses can override this method. The default creates a {@link TextTransferObject} of the table content (HTML
+   * table).
    * 
    * @param rows
-   *          the rows selected
-   * @return a transferable object representing the given rows or null to not populate the clipboard.
+   *          The selected table rows to copy.
+   * @return A transferable object representing the given rows or null to not populate the clipboard.
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(30)
@@ -392,30 +539,61 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Table content changed, rows were added, removed or changed
+   * Called after the table content changed, rows were added, removed or changed.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(40)
   protected void execContentChanged() throws ProcessingException {
   }
 
+  /**
+   * Called after {@link AbstractColumn#execDecorateCell(Cell,ITableRow)} on the column to decorate the cell.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(50)
   protected void execDecorateCell(Cell view, ITableRow row, IColumn<?> col) throws ProcessingException {
   }
 
+  /**
+   * Called during initialization of this table, after the columns were initialized.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(60)
   protected void execInitTable() throws ProcessingException {
   }
 
+  /**
+   * Called when this table is disposed, after the columns were disposed.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(70)
   protected void execDisposeTable() throws ProcessingException {
   }
 
   /**
-   * row is never null
+   * Called when the user clicks on a row in this table.
+   * <p>
+   * Subclasses can override this method. The default fires a {@link TableEvent#TYPE_ROW_CLICK} event.
+   * 
+   * @param Row
+   *          that was clicked (never null).
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(80)
@@ -425,7 +603,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * row is never null
+   * Called when the row has been activated.
+   * <p>
+   * Subclasses can override this method. The default opens the configured default menu or if no default menu is
+   * configured, fires a {@link TableEvent#TYPE_ROW_ACTION} event.
+   * 
+   * @param Row
+   *          that was activated (never null).
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(90)
@@ -448,25 +633,47 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  /**
+   * Called when one or more rows are selected.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @param rows
+   *          that were selected.
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(100)
   protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
   }
 
+  /**
+   * Called when the row is going to be decorated.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @param row
+   *          that is going to be decorated.
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(110)
   protected void execDecorateRow(ITableRow row) throws ProcessingException {
   }
 
   /**
-   * The hyperlink's table row is the selected row and the column is the context column {@link #getContextColumn()}
+   * Called when a hyperlink is used within the table. The hyperlink's table row is the selected row and the column is
+   * the context column ({@link #getContextColumn()}).
+   * <p>
+   * Subclasses can override this method. The default does nothing.
    * 
    * @param url
+   *          Hyperlink to process.
    * @param path
-   *          {@link URL#getPath()}
+   *          Path of URL ({@link URL#getPath()}).
    * @param local
-   *          true if the url is not a valid external url but a local model url
-   *          (http://local/...)
+   *          {@code true} if the url is not a valid external url but a local model url (http://local/...)
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(120)
@@ -3221,7 +3428,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * reset/initialize all columns: visibilities, order, sorting, widths
+   * Called when the columns are reset.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @param visiblity
+   *          {@code true} if the visibility is reset.
+   * @param order
+   *          {@code true} if the order is reset.
+   * @param sorting
+   *          {@code true} if the sorting is reset.
+   * @param widths
+   *          {@code true} if the column widths are reset.
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(90)
@@ -3483,7 +3702,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * single observer for column organization menus
+   * Called before the header menus are displayed.
+   * <p>
+   * Subclasses can override this method. The default add menus for add, modifying and removing custom column and menus
+   * for reseting, organizing and filtering the columns.
+   * 
+   * @param e
+   *          Table event of type {@link TableEvent#TYPE_HEADER_POPUP}.
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(100)
