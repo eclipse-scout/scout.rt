@@ -21,6 +21,8 @@ import org.eclipse.scout.rt.ui.rap.mobile.window.desktop.RwtScoutMobileDesktop;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
 
 public abstract class AbstractTabletStandaloneRwtEnvironment extends AbstractStandaloneRwtEnvironment {
@@ -44,6 +46,11 @@ public abstract class AbstractTabletStandaloneRwtEnvironment extends AbstractSta
     RwtScoutMobileForm uiForm = new RwtScoutMobileForm();
     uiForm.createUiField(parent, scoutForm, this);
     return uiForm;
+  }
+
+  @Override
+  protected MobileScoutFormToolkit createScoutFormToolkit(Display display) {
+    return new MobileScoutFormToolkit(new FormToolkit(display));
   }
 
 }

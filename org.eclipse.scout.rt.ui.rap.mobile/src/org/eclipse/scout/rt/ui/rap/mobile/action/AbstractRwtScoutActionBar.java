@@ -17,7 +17,9 @@ import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.mobile.MobileScoutFormToolkit;
 import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
+import org.eclipse.scout.rt.ui.rap.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutActionBar;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -162,8 +164,14 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
   }
 
   protected ActionButtonBar createActionButtonBar(Composite parent, List<IMenu> menus, int style) {
-    IMenu[] menuArray = menus.toArray(new IMenu[menus.size()]);
-    return new ActionButtonBar(parent, getUiEnvironment(), menuArray, style);
+    ScoutFormToolkit formToolkit = getUiEnvironment().getFormToolkit();
+    //TODO check for MobileScoutFormToolkit can be removed as soon as ActionButtonBar is moved to core plugin
+    if (formToolkit instanceof MobileScoutFormToolkit) {
+      IMenu[] menuArray = menus.toArray(new IMenu[menus.size()]);
+      return ((MobileScoutFormToolkit) formToolkit).createActionButtonBar(parent, menuArray, style);
+    }
+
+    return null;
   }
 
   public void rebuildRightButtonBarFromScout() {

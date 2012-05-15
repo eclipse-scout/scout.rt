@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.window.desktop.toolbar;
 
-import org.eclipse.scout.rt.ui.rap.mobile.action.ActionButtonBar;
+import org.eclipse.scout.rt.ui.rap.mobile.MobileScoutFormToolkit;
 import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
+import org.eclipse.scout.rt.ui.rap.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.rap.window.desktop.toolbar.RwtScoutToolbar;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -59,7 +60,13 @@ public class RwtScoutMobileOutlineToolbar extends RwtScoutToolbar {
 
   @Override
   protected Control createViewButtonBar(Composite parent) {
-    return new ActionButtonBar(parent, getUiEnvironment(), getScoutObject().getMenus());
+    ScoutFormToolkit formToolkit = getUiEnvironment().getFormToolkit();
+    //TODO check for MobileScoutFormToolkit can be removed as soon as ActionButtonBar is moved to core plugin
+    if (formToolkit instanceof MobileScoutFormToolkit) {
+      return ((MobileScoutFormToolkit) formToolkit).createActionButtonBar(parent, getScoutObject().getMenus());
+    }
+
+    return null;
   }
 
 }
