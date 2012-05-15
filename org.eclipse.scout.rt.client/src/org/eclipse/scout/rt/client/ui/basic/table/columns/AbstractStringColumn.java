@@ -39,6 +39,14 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    * Configuration
    */
 
+  /**
+   * Configures the maximum length of text in this column. This configuration only limits the text length
+   * in case of editable cells.
+   * <p>
+   * Subclasses can override this method. Default is {@code 4000}.
+   * 
+   * @return Maximum length of text in an editable cell.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(130)
   @ConfigPropertyValue("4000")
@@ -46,6 +54,15 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     return 4000;
   }
 
+  /**
+   * Configures whether the input is masked (e.g. similar as when entering a password in a text field). This
+   * configuration only masks the input in the string field in case of an editable cell.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if the input in the string field in case of an editable cell is masked, {@code false}
+   *         otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)
   @ConfigPropertyValue("false")
@@ -53,6 +70,13 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     return false;
   }
 
+  /**
+   * Configures the display format of this column.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Either {@code null}, {@link IStringColumn#FORMAT_LOWER} or {@link IStringColumn#FORMAT_LOWER}.
+   */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(150)
   @ConfigPropertyValue("null")
@@ -60,6 +84,14 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     return null;
   }
 
+  /**
+   * Configures whether the text is automatically wrapped in the table cell / string field for editable cells. The text
+   * is only wrapped if the text is too long to fit in one row.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if the text is wrapped, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(160)
   @ConfigPropertyValue("false")

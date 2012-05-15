@@ -43,6 +43,14 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
   /*
    * Configuration
    */
+
+  /**
+   * Configures the lookup call used to determine the display text of the smart column value.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Lookup call class for this column.
+   */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(140)
   @ConfigPropertyValue("null")
@@ -50,6 +58,14 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
     return null;
   }
 
+  /**
+   * Configures the code type used to determine the display text of the smart column value. If a lookup call is set (
+   * {@link #getConfiguredLookupCall()}), this configuration has no effect (lookup call is used instead of code type).
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Code type class for this column.
+   */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(150)
   @ConfigPropertyValue("null")
@@ -58,8 +74,13 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
   }
 
   /**
-   * If this method is not overwritten, and the smartfield has a codeType then
-   * the value of browseHierarchy is automatically determined by {@link ICodeType#isHierarchy()}
+   * Configures whether the smartfield used for editable cells should represent the data as a list or as a tree (flat
+   * vs. hierarchical data).
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if data behind the smart column is hierarchical (and the smartfield should represent it that
+   *         way), {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
@@ -68,6 +89,15 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
     return false;
   }
 
+  /**
+   * Configures whether the values are sorted by display text or by sort code in case of a code type class. This
+   * configuration only is useful if a code type class is set (see {@link #getConfiguredCodeType()}). In case of a
+   * lookup call, the values are sorted by display text.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if values are sorted by display text, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(160)
   @ConfigPropertyValue("false")

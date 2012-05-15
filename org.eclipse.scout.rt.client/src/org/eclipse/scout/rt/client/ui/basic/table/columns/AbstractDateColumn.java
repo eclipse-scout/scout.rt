@@ -43,6 +43,15 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   /*
    * Configuration
    */
+
+  /**
+   * Configures the format used to render the value. See the {@link DateFormat} class for more information about the
+   * expected format.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Format of this column.
+   */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(140)
   @ConfigPropertyValue("null")
@@ -50,6 +59,14 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     return null;
   }
 
+  /**
+   * Configures whether the value represented by this column has a date. If {@link #getConfiguredFormat()} is set, this
+   * configuration has no effect.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if the value represented by this column has a date, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(150)
   @ConfigPropertyValue("true")
@@ -57,6 +74,14 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     return true;
   }
 
+  /**
+   * Configures whether the value represented by this column has a time. If {@link #getConfiguredFormat()} is set, this
+   * configuration has no effect.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if the value represented by this column has a time, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(151)
   @ConfigPropertyValue("false")

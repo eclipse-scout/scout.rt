@@ -72,6 +72,14 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   /*
    * Configuration
    */
+
+  /**
+   * Called when the table data is reloaded, i.e. when {@link #reloadTableData()} is called.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(190)
   protected void execReloadTableData() throws ProcessingException {
@@ -154,7 +162,13 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   /**
-   * The default calls {@link #createDefaultTableStatus()} and calls {@link #setTableStatus(String)}
+   * Called when the table status is updated, i.e. when {@link #updateTableStatus()} is called due to a change in the
+   * table (rows inserted, deleted, selected, ...).
+   * <p>
+   * Subclasses can override this method. The default calls {@link #createDefaultTableStatus()} and
+   * {@link #setTableStatus(String)} if the table status is visible.
+   * 
+   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(195)
@@ -165,21 +179,49 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     setTableStatus(createDefaultTableStatus());
   }
 
+  /**
+   * Called for batch processing when the table is saved. See {@link #doSave()} for the call order.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(200)
   protected void execSave(ITableRow[] insertedRows, ITableRow[] updatedRows, ITableRow[] deletedRows) {
   }
 
+  /**
+   * Called to handle deleted rows when the table is saved. See {@link #doSave()} for the call order.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(210)
   protected void execSaveDeletedRow(ITableRow row) throws ProcessingException {
   }
 
+  /**
+   * Called to handle inserted rows when the table is saved. See {@link #doSave()} for the call order.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(220)
   protected void execSaveInsertedRow(ITableRow row) throws ProcessingException {
   }
 
+  /**
+   * Called to handle updated rows when the table is saved. See {@link #doSave()} for the call order.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   * 
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(230)
   protected void execSaveUpdatedRow(ITableRow row) throws ProcessingException {
@@ -190,6 +232,13 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     reloadTableData();
   }
 
+  /**
+   * Configures the visibility of the table status.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if the table status is visible, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(200)
   @ConfigPropertyValue("false")
@@ -568,6 +617,15 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     }
   }
 
+  /**
+   * Saves the table. The call order is as follows:
+   * <ol>
+   * <li>{@link #execSave(ITableRow[], ITableRow[], ITableRow[])}</li>
+   * <li>{@link #execSaveDeletedRow(ITableRow)}</li>
+   * <li>{@link #execSaveInsertedRow(ITableRow)}</li>
+   * <li>{@link #execSaveUpdatedRow(ITableRow)}</li>
+   * </ol>
+   */
   @Override
   public void doSave() throws ProcessingException {
     if (m_table != null && !m_tableExternallyManaged) {
@@ -606,6 +664,11 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     markSaved();
   }
 
+  /**
+   * Reloads the table data.
+   * <p>
+   * The default implementation calls {@link #execReloadTableData()}.
+   */
   @Override
   public void reloadTableData() throws ProcessingException {
     execReloadTableData();

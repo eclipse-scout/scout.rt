@@ -45,6 +45,15 @@ public abstract class AbstractIntegerColumn extends AbstractColumn<Integer> impl
   /*
    * Configuration
    */
+
+  /**
+   * Configures the format used to render the value. See {@link DecimalFormat#applyPattern(String)} for more information
+   * about the expected format.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Format of this column.
+   */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(140)
   @ConfigPropertyValue("null")
@@ -52,6 +61,14 @@ public abstract class AbstractIntegerColumn extends AbstractColumn<Integer> impl
     return null;
   }
 
+  /**
+   * Configures whether grouping is used for this column. If grouping is used, the values may be displayed with a digit
+   * group separator.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if grouping is used for this column, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(150)
   @ConfigPropertyValue("true")
