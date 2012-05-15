@@ -169,7 +169,7 @@ public class HtmlAdapter {
     while (m.find()) {
       buf.append(rawHtml.substring(lastPos, m.start()));
 
-      buf.append("<span tabIndex=\"1\" ");
+      buf.append("<span ");
       buf.append("class=\"link\" ");
       buf.append("style=\"");
       buf.append("text-decoration:underline;cursor:pointer;\" ");
