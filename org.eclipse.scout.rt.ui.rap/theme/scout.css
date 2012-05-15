@@ -750,7 +750,7 @@ Label-SeparatorLine[SHADOW_OUT] {
 List {
   background-color: white;
   border: none;
-  color: black;
+  color: #4a4a4a;
 }
 
 List[BORDER] {
@@ -759,7 +759,7 @@ List[BORDER] {
 
 List-Item {
   background-color: transparent;
-  color: inherit;
+  color: #4a4a4a;
   background-image: none;
 }
 
@@ -768,12 +768,12 @@ List-Item:hover {
 }
 
 List-Item:selected {
-  color: black;
+  color: #4a4a4a;
   background-color: #e5f3fe;
 }
 
 List-Item:selected:unfocused {
-  color: black;
+  color: #4a4a4a;
   background-color: #e5f3fe;
 }
 
