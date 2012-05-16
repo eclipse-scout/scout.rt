@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.action;
 import java.util.List;
 
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -53,9 +54,11 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
   private boolean m_selectionAlreadyRemoved;
   private int m_menuOpeningDirection = SWT.DOWN;
   private Menu m_contextMenu;
+  private boolean m_ellipsisRemovalEnabled;
 
   public RwtScoutActionButton() {
     m_selectionLock = new OptimisticLock();
+    m_ellipsisRemovalEnabled = true;
   }
 
   @Override
@@ -145,8 +148,27 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
       text = "";
     }
 
+    if (isEllipsisRemovalEnabled()) {
+      text = removeEllipsis(text);
+    }
+
     Button button = getUiField();
     button.setText(text);
+  }
+
+  /**
+   * Removes the ellipsis at the end of the text to save space which can be essential on small screens.
+   */
+  protected String removeEllipsis(String text) {
+    if (!StringUtility.hasText(text)) {
+      return text;
+    }
+
+    if (text.endsWith("...")) {
+      text = text.substring(0, text.length() - 3);
+    }
+
+    return text;
   }
 
   protected void setTooltipTextFromScout(String tooltipText) {
@@ -155,6 +177,14 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
 
   protected void setEnabledFromScout(boolean enabled) {
     getUiField().setEnabled(enabled);
+  }
+
+  public void setEllipsisRemovalEnabled(boolean ellipsisRemovalEnabled) {
+    m_ellipsisRemovalEnabled = ellipsisRemovalEnabled;
+  }
+
+  public boolean isEllipsisRemovalEnabled() {
+    return m_ellipsisRemovalEnabled;
   }
 
   protected void handleUiSelection() {
