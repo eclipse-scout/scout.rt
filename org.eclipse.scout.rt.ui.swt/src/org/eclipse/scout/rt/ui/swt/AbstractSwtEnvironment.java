@@ -116,7 +116,6 @@ import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PerspectiveAdapter;
 import org.eclipse.ui.PlatformUI;
@@ -380,20 +379,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     if (PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {
       throw new IllegalStateException("workbench must be active");
     }
-    // close views that were opened due to workbench caching the latest layout
-    // of views
-    for (IWorkbenchWindow workbenchWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-      for (IWorkbenchPage workbenchPage : workbenchWindow.getPages()) {
-        for (IViewReference viewReference : workbenchPage.getViewReferences()) {
-          if (m_scoutPartIdToUiPartId.containsValue(viewReference.getId())) {
-            if (workbenchPage.isPartVisible(viewReference.getPart(false))) {
-              workbenchPage.hideView(viewReference);
-            }
-          }
-        }
-      }
-    }
-    //
+
     try {
       m_status = SwtEnvironmentEvent.STARTING;
       m_clipboard = new Clipboard(getDisplay());
