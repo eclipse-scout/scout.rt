@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEnterKeyStroke
 import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEscapeKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -56,6 +57,15 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return true;
   }
 
+  /**
+   * Configures the number of columns used in this group box.<br>
+   * A typical {@link IFormField} inside a group box spans one column. This behavior can be changed by setting
+   * {@link AbstractFormField#getConfiguredGridW()}.
+   * <p>
+   * Subclasses can override this method. Default is -1 which typically means 2 columns.
+   * 
+   * @return the number of columns used in this group box
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(200)
   @ConfigPropertyValue("-1")
@@ -64,7 +74,18 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   /**
-   * Show border around box
+   * Configures the border visibility for this group box. <br>
+   * If the property is set to true a border will be displayed
+   * around the group box. The style of the border is configured by {@link #getConfiguredBorderDecoration()}. If the
+   * property is set to false no border will be displayed and the margin reserved for the border will be removed.
+   * <p>
+   * <b>Hint:</b> Keep in mind that setting the border to invisible also removes the margin which could lead to a
+   * misalignment of the fields if several group boxes are used on a form. In order to preserve the correct alignment
+   * consider using {@link #getConfiguredBorderDecoration()} with {@link IGroupBox#BORDER_DECORATION_EMPTY} instead.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if the border is visible, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(230)
@@ -73,6 +94,16 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return true;
   }
 
+  /**
+   * Configures whether this group box should be expandable or not.<br>
+   * This property depends on the border decoration which can be configured by {@link #getConfiguredBorderDecoration()}.
+   * It typically only has an effect if the border decoration is set to {@link IGroupBox#BORDER_DECORATION_SECTION} or
+   * {@link IGroupBox#BORDER_DECORATION_AUTO}.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if the group box should be expandable, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(231)
   @ConfigPropertyValue("false")
@@ -80,6 +111,15 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return false;
   }
 
+  /**
+   * Configures whether this group box is initially expanded. <br>
+   * This property only has an effect if the group box is expandable which can be configured by
+   * {@link #getConfiguredExpandable()}.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   * 
+   * @return {@code true} if the group box should be initially expanded, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(232)
   @ConfigPropertyValue("true")
@@ -87,6 +127,16 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return true;
   }
 
+  /**
+   * Configures the border decoration for this group box. See {@code IGroupBox#BORDER_DECORATION_*} constants for valid
+   * values.<br>
+   * This property only has an effect if the border is visible which can be configured by
+   * {@link #getConfiguredBorderVisible()}.
+   * <p>
+   * Subclasses can override this method. Default is {@link IGroupBox#BORDER_DECORATION_AUTO}.
+   * 
+   * @return the border decoration of the group box
+   */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(233)
   @ConfigPropertyValue("BORDER_DECORATION_AUTO")
@@ -115,6 +165,14 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return 0;
   }
 
+  /**
+   * Configures whether this group box should be scrollable.</br>
+   * If the property is set to true a vertical scrollbar will appear if the content is too large to be displayed.
+   * <p>
+   * Subclasses can override this method. Default is false.
+   * 
+   * @return {@code true} if the group box should be scrollable, {@code false} otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
   @ConfigPropertyValue("false")
@@ -122,6 +180,20 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return false;
   }
 
+  /**
+   * Configures the column span of this group box.<br>
+   * The value defined by this property refers to the number of columns defined by the container of this group box. <br>
+   * The column count of the container, which actually is the parent group box, can be configured by
+   * {@link #getConfiguredGridColumnCount()} (you need to configure that in the parent group box).
+   * <p>
+   * <b>Example:</b> If the column count of the container is set to 3 and a column span of this group box is set to 2 it
+   * means 2/3 of the container width is used for this group box.
+   * <p>
+   * Subclasses can override this method. Default is {@link IFormField#FULL_WIDTH} which means it spans every column of
+   * the container.
+   * 
+   * @return the number of columns to span
+   */
   @Override
   @ConfigPropertyValue("FULL_WIDTH")
   protected int getConfiguredGridW() {
