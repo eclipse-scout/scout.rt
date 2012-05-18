@@ -35,9 +35,15 @@ public class ButtonWrappingAction extends AbstractMenu {
     super.initConfig();
 
     setVisible(getWrappedButton().isVisible());
-    setVisibleGranted(getWrappedButton().isVisibleGranted());
+    if (!getWrappedButton().isVisible()) {
+      //Since AbstractFormField#calculateVisibleInternal may ignore this property only set it if it hasn't been ignored (to not override those rules)
+      setVisibleGranted(getWrappedButton().isVisibleGranted());
+    }
     setEnabled(getWrappedButton().isEnabled());
-    setEnabledGranted(getWrappedButton().isEnabledGranted());
+    if (!getWrappedButton().isEnabled()) {
+      //Since AbstractFormField#calculateEnabled may ignore this property only set it if it hasn't been ignored (to not override those rules)
+      setEnabledGranted(getWrappedButton().isEnabledGranted());
+    }
     setIconId(getWrappedButton().getIconId());
     setText(getWrappedButton().getLabel());
     setTooltipText(getWrappedButton().getTooltipText());

@@ -8,42 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.mobile.window.desktop.toolbar;
+package org.eclipse.scout.rt.ui.rap.mobile.form;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.ui.rap.mobile.action.AbstractRwtScoutActionBar;
-import org.eclipse.scout.rt.ui.rap.mobile.action.ActionButtonBar;
 import org.eclipse.scout.rt.ui.rap.mobile.action.ActionButtonBarUtility;
-import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutToolbar;
+import org.eclipse.scout.rt.ui.rap.mobile.action.ButtonWrappingAction;
 import org.eclipse.swt.widgets.Composite;
 
 /**
  * @since 3.8.0
  */
-public class RwtScoutMobileFormToolbar extends AbstractRwtScoutActionBar<IForm> implements IRwtScoutToolbar<IForm> {
-  public static final String VARIANT_FORM_TOOLBAR_CONTAINER = RwtScoutMobileToolbarContainer.VARIANT_TOOLBAR_CONTAINER;
-
-  private P_BackAction m_backAction;
-  private P_CancelAction m_cancelAction;
+public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
+  private List<IMenu> m_leftBarActions;
   private P_FormToolsAction m_formToolsAction;
   private List<IMenu> m_rightBarActions;
+  private boolean m_autoAddBackButtonEnabled;
 
   @Override
   protected void initializeUi(Composite parent) {
-    m_backAction = new P_BackAction();
-    m_cancelAction = new P_CancelAction();
-
+    if (getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0) {
+      m_leftBarActions = createLeftBarActions();
+    }
     if (getScoutObject().getRootGroupBox().getCustomProcessButtonCount() > 0) {
       m_formToolsAction = createFormToolsAction();
     }
@@ -52,57 +45,39 @@ public class RwtScoutMobileFormToolbar extends AbstractRwtScoutActionBar<IForm> 
     }
 
     super.initializeUi(parent);
-
-    getUiContainer().setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FORM_TOOLBAR_CONTAINER);
-  }
-
-  @Override
-  protected void attachScout() {
-    super.attachScout();
-
-    setAskIfNeedSaveFromScout(getScoutObject().isAskIfNeedSave());
-    setTitle(getScoutObject().getTitle());
-  }
-
-  private void setAskIfNeedSaveFromScout(boolean askIfNeedSave) {
-    handleAskIfNeedSaveInScout(askIfNeedSave);
-  }
-
-  private void handleAskIfNeedSaveInScout(final boolean askIfNeedSave) {
-    Runnable job = new Runnable() {
-
-      @Override
-      public void run() {
-        m_backAction.setVisible(!askIfNeedSave);
-        m_backAction.setEnabled(!askIfNeedSave);
-
-        m_cancelAction.setVisible(askIfNeedSave);
-        m_cancelAction.setEnabled(askIfNeedSave);
-      }
-    };
-
-    getUiEnvironment().invokeScoutLater(job, 0);
-  }
-
-  @Override
-  public void handleRightViewPositionChanged(int rightViewX) {
-    // nothing to do on mobile because there is no view on the right side.
   }
 
   @Override
   protected void collectMenusForLeftButtonBar(List<IMenu> menuList) {
-    menuList.add(m_backAction);
-    menuList.add(m_cancelAction);
+    if (m_leftBarActions != null && m_leftBarActions.size() > 0) {
+      menuList.addAll(m_leftBarActions);
+    }
+
+    if (isAutoAddBackButtonEnabled() && !containsCloseAction()) {
+      menuList.add(new P_BackAction());
+    }
   }
 
-  @Override
-  protected void adaptLeftButtonBar(ActionButtonBar buttonBar) {
-    buttonBar.setPilingEnabled(false);
-  }
+  protected boolean containsCloseAction() {
+    if (m_leftBarActions == null) {
+      return false;
+    }
 
-  @Override
-  protected void adaptRightButtonBar(ActionButtonBar buttonBar) {
-    buttonBar.setPilingEnabled(false);
+    for (IMenu action : m_leftBarActions) {
+      if (action instanceof ButtonWrappingAction) {
+        IButton wrappedButton = ((ButtonWrappingAction) action).getWrappedButton();
+        switch (wrappedButton.getSystemType()) {
+          case IButton.SYSTEM_TYPE_CANCEL:
+          case IButton.SYSTEM_TYPE_CLOSE:
+          case IButton.SYSTEM_TYPE_OK:
+            if (wrappedButton.isVisible() && wrappedButton.isEnabled()) {
+              return true;
+            }
+        }
+      }
+    }
+
+    return false;
   }
 
   @Override
@@ -115,14 +90,13 @@ public class RwtScoutMobileFormToolbar extends AbstractRwtScoutActionBar<IForm> 
     }
   }
 
-  protected List<IMenu> createRightBarActions() {
-    IButton[] systemProcessButtons = getScoutObject().getRootGroupBox().getSystemProcessButtons();
-    if (systemProcessButtons == null || systemProcessButtons.length == 0) {
+  protected List<IMenu> convertSystemProcessButtons(List<Integer> relevantSystemTypes) {
+    if (relevantSystemTypes == null || relevantSystemTypes.size() == 0) {
       return null;
     }
 
-    List<Integer> relevantSystemTypes = getRelevantSystemTypesForRightBar();
-    if (relevantSystemTypes == null || relevantSystemTypes.size() == 0) {
+    IButton[] systemProcessButtons = getScoutObject().getRootGroupBox().getSystemProcessButtons();
+    if (systemProcessButtons == null || systemProcessButtons.length == 0) {
       return null;
     }
 
@@ -134,6 +108,21 @@ public class RwtScoutMobileFormToolbar extends AbstractRwtScoutActionBar<IForm> 
     }
 
     return actions;
+  }
+
+  protected List<IMenu> createLeftBarActions() {
+    return convertSystemProcessButtons(getRelevantSystemTypesForLeftBar());
+  }
+
+  protected List<IMenu> createRightBarActions() {
+    return convertSystemProcessButtons(getRelevantSystemTypesForRightBar());
+  }
+
+  protected List<Integer> getRelevantSystemTypesForLeftBar() {
+    List<Integer> systemTypesToConsider = new LinkedList<Integer>();
+    systemTypesToConsider.add(IButton.SYSTEM_TYPE_CANCEL);
+
+    return systemTypesToConsider;
   }
 
   protected List<Integer> getRelevantSystemTypesForRightBar() {
@@ -159,32 +148,20 @@ public class RwtScoutMobileFormToolbar extends AbstractRwtScoutActionBar<IForm> 
     return formToolsAction;
   }
 
-  private class P_BackAction extends AbstractMobileBackAction {
-
+  public boolean isAutoAddBackButtonEnabled() {
+    return m_autoAddBackButtonEnabled;
   }
 
-  private class P_CancelAction extends AbstractMenu {
+  /**
+   * If this property is set to true it automatically adds a back button if there is no other button on the left side
+   * which is able to close the form.
+   */
+  public void setAutoAddBackButtonEnabled(boolean autoAddBackButtonEnabled) {
+    m_autoAddBackButtonEnabled = autoAddBackButtonEnabled;
+  }
 
-    @Override
-    protected String getConfiguredText() {
-      return TEXTS.get("Cancel");
-    }
+  private class P_BackAction extends AbstractMobileBackAction {
 
-    @Override
-    protected String getConfiguredTooltipText() {
-      return TEXTS.get("CloseButtonTooltip");
-    }
-
-    @Override
-    protected String getConfiguredIconId() {
-      return null;
-    }
-
-    @Override
-    protected void execAction() throws ProcessingException {
-      IForm form = getScoutObject();
-      form.doClose();
-    }
   }
 
   private class P_FormToolsAction extends AbstractMenu {

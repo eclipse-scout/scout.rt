@@ -8,20 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.mobile;
+package org.eclipse.scout.rt.ui.rap.window.desktop;
 
-import org.eclipse.scout.rt.ui.rap.form.RwtScoutForm;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
  * @since 3.8.0
  */
-public class RwtScoutMobileForm extends RwtScoutForm {
-
-  @Override
-  public void setInitialFocus() {
-    // If a textfield gets the focus the keyboard pops up.
-    // This does not seem to work when opening a form, at least with iOS. The focus is set but no keyboard is shown.
-    // But a keyboard popup on the form opening isn't the wanted behaviour anyway. So that's why this function does nothing.
-  }
+public interface IRwtScoutFormHeader extends IRwtScoutActionBar<IForm> {
 
 }

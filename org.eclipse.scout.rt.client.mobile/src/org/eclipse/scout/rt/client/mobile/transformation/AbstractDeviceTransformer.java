@@ -201,7 +201,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     groupBox.setExpanded(false);
   }
 
-  private IDesktop getDesktop() {
+  protected IDesktop getDesktop() {
     return ClientSyncJob.getCurrentSession().getDesktop();
   }
 

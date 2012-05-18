@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.window.desktop;
 
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.ui.rap.mobile.window.desktop.toolbar.RwtScoutMobileToolbarContainer;
-import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutToolbar;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -21,23 +18,22 @@ import org.eclipse.swt.widgets.Control;
  * @since 3.8.0
  */
 public class RwtScoutMobileDesktop extends RwtScoutDesktop {
-  private IRwtScoutToolbar<IDesktop> m_uiToolbar;
-  private static final int TOOLBAR_HEIGHT = 43;
 
-  public RwtScoutMobileDesktop() {
-    setToolbarHeight(TOOLBAR_HEIGHT);
-  }
+  private static final String VARIANT_VIEWS_AREA = "mobileViewsArea";
 
+  /**
+   * On mobile devices every form has a form header, the outline form too, so no global toolbar is necessary because the
+   * forms
+   * take care of that.
+   */
   @Override
   protected Control createToolBar(Composite parent) {
-    m_uiToolbar = new RwtScoutMobileToolbarContainer();
-    m_uiToolbar.createUiField(parent, getScoutObject(), getUiEnvironment());
-    return m_uiToolbar.getUiContainer();
+    return null;
   }
 
   @Override
-  public IRwtScoutToolbar getUiToolbar() {
-    return m_uiToolbar;
+  protected String getViewsAreaVariant() {
+    return VARIANT_VIEWS_AREA;
   }
 
 }

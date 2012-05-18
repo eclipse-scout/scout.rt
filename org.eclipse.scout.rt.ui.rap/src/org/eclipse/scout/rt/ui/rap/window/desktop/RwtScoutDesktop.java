@@ -64,7 +64,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
       Composite desktopComposite = parent;
       Control toolbar = createToolBar(desktopComposite);
       Control viewsArea = createViewsArea(desktopComposite);
-      viewsArea.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEWS_AREA);
+      viewsArea.setData(WidgetUtil.CUSTOM_VARIANT, getViewsAreaVariant());
 
       initLayout(desktopComposite, toolbar, viewsArea);
 
@@ -73,6 +73,10 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
     catch (Throwable t) {
       LOG.error("Exception occured while creating ui desktop.", t);
     }
+  }
+
+  protected String getViewsAreaVariant() {
+    return VARIANT_VIEWS_AREA;
   }
 
   protected void initLayout(Composite container, Control toolbar, Control viewsArea) {
@@ -101,7 +105,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   }
 
   protected Control createViewsArea(Composite parent) {
-    m_viewArea = new ViewArea(parent);
+    m_viewArea = createViewArea(parent);
     m_viewArea.getLayout().addLayoutListener(new ILayoutListener() {
       @Override
       public void handleCompositeLayouted() {
@@ -111,10 +115,16 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
           Rectangle sashBounds = sash.getBounds();
           xOffset = sashBounds.x + sashBounds.width;
         }
-        getUiToolbar().handleRightViewPositionChanged(xOffset);
+        if (getUiToolbar() != null) {
+          getUiToolbar().handleRightViewPositionChanged(xOffset);
+        }
       }
     });
     return m_viewArea;
+  }
+
+  protected ViewArea createViewArea(Composite parent) {
+    return new ViewArea(parent);
   }
 
   @Override
@@ -129,7 +139,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
 
     m_viewArea.updateSashPositionForViewStack(stack);
     updateLayout();
-    
+
     return rwtForm;
   }
 

@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.ui.rap.keystroke.IKeyStrokeManager;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
+import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -150,6 +151,8 @@ public interface IRwtEnvironment {
 
   // Gui factory
   IRwtScoutForm createForm(Composite parent, IForm scoutForm);
+
+  IRwtScoutFormHeader createFormHeader(Composite parent, IForm scoutForm);
 
   IRwtScoutFormField createFormField(Composite parent, IFormField model);
 

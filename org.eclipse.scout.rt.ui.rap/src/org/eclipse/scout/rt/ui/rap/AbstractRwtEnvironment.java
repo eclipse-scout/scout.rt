@@ -82,6 +82,7 @@ import org.eclipse.scout.rt.ui.rap.window.BrowserWindowHandler;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartListener;
+import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.scout.rt.ui.rap.window.desktop.navigation.RwtScoutNavigationSupport;
 import org.eclipse.scout.rt.ui.rap.window.dialog.RwtScoutDialog;
 import org.eclipse.scout.rt.ui.rap.window.filechooser.IRwtScoutFileChooser;
@@ -1202,6 +1203,15 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     RwtScoutForm uiForm = new RwtScoutForm();
     uiForm.createUiField(parent, scoutForm, this);
     return uiForm;
+  }
+
+  /**
+   * As default there is no form header created. <br/>
+   * Subclasses can override this method to create one.
+   */
+  @Override
+  public IRwtScoutFormHeader createFormHeader(Composite parent, IForm scoutForm) {
+    return null;
   }
 
   @Override

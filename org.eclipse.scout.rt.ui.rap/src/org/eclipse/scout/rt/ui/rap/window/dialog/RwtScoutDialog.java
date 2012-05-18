@@ -17,10 +17,12 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.AbstractRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.DefaultFormBoundsProvider;
 import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
+import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
@@ -47,6 +49,8 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
   private Point m_uiInitialLocation;
   private Point m_uiInitialSize;
   private IFormBoundsProvider m_boundsProvider;
+  private IRwtScoutForm m_formComposite;
+  private IRwtScoutFormHeader m_formHeaderComposite;
 
   public RwtScoutDialog() {
   }
@@ -104,8 +108,12 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     m_uiInitialSize = uiInitialSize;
   }
 
+  protected int getDialogStyle() {
+    return SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MAX | SWT.APPLICATION_MODAL;
+  }
+
   public void createPart(IForm scoutForm, Shell parentShell, IRwtEnvironment uiEnvironment) {
-    createPart(scoutForm, parentShell, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MAX | SWT.APPLICATION_MODAL, uiEnvironment);
+    createPart(scoutForm, parentShell, getDialogStyle(), uiEnvironment);
   }
 
   public void createPart(IForm scoutForm, Shell parentShell, int style, IRwtEnvironment uiEnvironment) {
@@ -153,9 +161,10 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     //add form contents
     try {
       contentPane.setRedraw(false);
-      IRwtScoutForm rwtForm = getUiEnvironment().createForm(contentPane, getScoutObject());
-      GridData d = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-      rwtForm.getUiContainer().setLayoutData(d);
+      m_formHeaderComposite = getUiEnvironment().createFormHeader(contentPane, getScoutObject());
+      m_formComposite = getUiEnvironment().createForm(contentPane, getScoutObject());
+
+      initLayout(contentPane);
       attachScout();
     }
     finally {
@@ -171,6 +180,42 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     GridData d = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
     m_uiForm.setLayoutData(d);
     return m_uiForm;
+  }
+
+  protected void initLayout(Composite container) {
+    GridLayout layout = RwtLayoutUtility.createGridLayoutNoSpacing(1, true);
+    container.setLayout(layout);
+
+    Composite header = null;
+    if (m_formHeaderComposite != null) {
+      header = m_formHeaderComposite.getUiContainer();
+    }
+    Composite body = null;
+    if (m_formComposite != null) {
+      body = m_formComposite.getUiContainer();
+    }
+
+    if (header != null) {
+      GridData gridData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
+      if (getFormHeaderHeightHint() != null) {
+        gridData.heightHint = getFormHeaderHeightHint();
+      }
+      header.setLayoutData(gridData);
+    }
+
+    if (body != null) {
+      GridData gridData = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
+      body.setLayoutData(gridData);
+    }
+
+  }
+
+  public Integer getFormHeaderHeightHint() {
+    if (m_formHeaderComposite == null) {
+      return null;
+    }
+
+    return m_formHeaderComposite.getHeightHint();
   }
 
   @Override

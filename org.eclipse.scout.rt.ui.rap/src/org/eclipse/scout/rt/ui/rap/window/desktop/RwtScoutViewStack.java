@@ -68,14 +68,18 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     m_formBoundsProviders = new HashMap<IForm, IFormBoundsProvider>();
     addListener(SWT.Resize, new P_ResizeListener());
     getUiEnvironment().getScoutDesktop().addDesktopListener(new P_DesktopListner());
+    setData(WidgetUtil.CUSTOM_VARIANT, getVariant());
+    createContent(this);
+  }
+
+  protected String getVariant() {
     BrowserInfo info = RwtUtility.getBrowserInfo();
     if (info != null && info.isMozillaFirefox()) {
-      setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEW_PART);
+      return VARIANT_VIEW_PART;
     }
     else {
-      setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEW_PART_NO_RADIUS);
+      return VARIANT_VIEW_PART_NO_RADIUS;
     }
-    createContent(this);
   }
 
   protected void createContent(Composite parent) {

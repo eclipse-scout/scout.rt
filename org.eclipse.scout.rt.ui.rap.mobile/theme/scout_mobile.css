@@ -1,11 +1,16 @@
+Composite.mobileViewsArea {
+  background-color: #FFFFFF;
+  padding: 0px 0px 0px 0px;
+}
+
+Composite.mobileFormHeader {
+  background-color: #67a8ce;
+}
+
 CLabel.actionBarContainer {
   color: white;
   font: bold 17px Arial, Helvetica, sans-serif;
   background-color: transparent;
-}
-
-Composite.mobileToolbarContainer {
-  background-color: #67a8ce;
 }
 
 Composite.mobileTableActionBarContainer {

@@ -35,7 +35,9 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
   private static final String VARIANT_ACTION_BAR_CONTAINER = "actionBarContainer";
 
   private ActionButtonBar m_leftButtonBar;
+  private Composite m_leftContainer;
   private Composite m_centerTitleBar;
+  private Composite m_rightContainer;
   private ActionButtonBar m_rightButtonBar;
 
   private boolean m_alwaysVisible = false;
@@ -49,21 +51,21 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     container.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
     setUiContainer(container);
 
-    addLeftButtonBar(container);
-    addCenterTitleBar(container);
-    addRightButtonBar(container);
+    m_leftContainer = createLeftContainer(container);
+    addCenterContainer(container);
+    m_rightContainer = createRightContainer(container);
 
     initLayout(container);
     computeContainerVisibility();
   }
 
   private void computeContainerVisibility() {
-    if (m_leftButtonBar == null || m_centerTitleBar == null || m_rightButtonBar == null) {
+    if (m_leftContainer == null || m_centerTitleBar == null || m_rightContainer == null) {
       getUiContainer().setVisible(false);
       return;
     }
 
-    boolean makeInvisible = !isAlwaysVisible() && !m_leftButtonBar.hasButtons() && !m_rightButtonBar.hasButtons() && getTitle() == null;
+    boolean makeInvisible = !isAlwaysVisible() && !hasContentOnLeftContainer() && !hasContentOnRightContainer() && getTitle() == null;
     getUiContainer().setVisible(!makeInvisible);
   }
 
@@ -73,7 +75,7 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
 
     {
       GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, true);
-      m_leftButtonBar.setLayoutData(gridData);
+      m_leftContainer.setLayoutData(gridData);
     }
 
     {
@@ -84,12 +86,29 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
 
     {
       GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, true);
-      m_rightButtonBar.setLayoutData(gridData);
+      m_rightContainer.setLayoutData(gridData);
     }
   }
 
   protected String getActionBarContainerVariant() {
     return VARIANT_ACTION_BAR_CONTAINER;
+  }
+
+  protected Composite createLeftContainer(Composite parent) {
+    Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
+    container.setLayout(new FillLayout());
+
+    addLeftButtonBar(container);
+
+    return container;
+  }
+
+  protected boolean hasContentOnLeftContainer() {
+    if (m_leftButtonBar == null) {
+      return false;
+    }
+
+    return m_leftButtonBar.hasButtons();
   }
 
   protected void addLeftButtonBar(Composite parent) {
@@ -107,13 +126,22 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     buttonBar.setMinNumberOfAlwaysVisibleButtons(1);
   }
 
-  protected void addCenterTitleBar(Composite parent) {
+  protected void addCenterContainer(Composite parent) {
     m_centerTitleBar = createCenterTitleBar(parent, m_centerTitleBar);
 
     adaptCenterTitleBar(m_centerTitleBar);
   }
 
   protected void adaptCenterTitleBar(Composite buttonBar) {
+  }
+
+  protected Composite createRightContainer(Composite parent) {
+    Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
+    container.setLayout(new FillLayout());
+
+    addRightButtonBar(container);
+
+    return container;
   }
 
   protected void addRightButtonBar(Composite parent) {
@@ -123,6 +151,14 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     m_rightButtonBar = createButtonBar(parent, m_rightButtonBar, menuList, SWT.RIGHT | getMenuOpeningDirection());
 
     adaptRightButtonBar(m_rightButtonBar);
+  }
+
+  protected boolean hasContentOnRightContainer() {
+    if (m_rightButtonBar == null) {
+      return false;
+    }
+
+    return m_rightButtonBar.hasButtons();
   }
 
   protected void adaptRightButtonBar(ActionButtonBar buttonBar) {
@@ -185,7 +221,7 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
           return;
         }
 
-        addRightButtonBar(getUiContainer());
+        addRightButtonBar(m_rightContainer);
         initLayout(getUiContainer());
         computeContainerVisibility();
 
@@ -229,10 +265,12 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     m_alwaysVisible = alwaysVisible;
   }
 
+  @Override
   public Integer getHeightHint() {
     return m_heightHint;
   }
 
+  @Override
   public void setHeightHint(Integer heightHint) {
     m_heightHint = heightHint;
   }
@@ -249,7 +287,11 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     return m_titleField;
   }
 
-  protected abstract void collectMenusForLeftButtonBar(List<IMenu> menuList);
+  protected void collectMenusForLeftButtonBar(List<IMenu> menuList) {
 
-  protected abstract void collectMenusForRightButtonBar(List<IMenu> menuList);
+  }
+
+  protected void collectMenusForRightButtonBar(List<IMenu> menuList) {
+
+  }
 }

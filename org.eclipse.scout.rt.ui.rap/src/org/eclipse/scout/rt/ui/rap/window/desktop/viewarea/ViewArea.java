@@ -74,7 +74,7 @@ public class ViewArea extends Composite implements IViewArea {
     m_viewStacks = new RwtScoutViewStack[3][3];
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-        m_viewStacks[i][j] = new RwtScoutViewStack(parent, getUiEnvironment());
+        m_viewStacks[i][j] = createRwtScoutViewStack(parent);
       }
     }
     // sashes
@@ -91,6 +91,10 @@ public class ViewArea extends Composite implements IViewArea {
       sash.addListener(SWT.Selection, m_sashListener);
       m_sashes.put(k, sash);
     }
+  }
+
+  protected RwtScoutViewStack createRwtScoutViewStack(Composite parent) {
+    return new RwtScoutViewStack(parent, getUiEnvironment());
   }
 
   int getSashPosition(SashKey key) {

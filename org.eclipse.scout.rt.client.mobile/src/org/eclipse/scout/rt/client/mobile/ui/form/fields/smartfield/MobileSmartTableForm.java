@@ -63,7 +63,7 @@ public class MobileSmartTableForm extends SmartTableForm {
 
   @Override
   protected int getConfiguredDisplayHint() {
-    return DISPLAY_HINT_POPUP_DIALOG;
+    return DISPLAY_HINT_DIALOG;
   }
 
   @Override

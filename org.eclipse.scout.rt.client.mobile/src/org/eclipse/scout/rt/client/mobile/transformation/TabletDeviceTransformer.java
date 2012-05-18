@@ -10,14 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import java.awt.Rectangle;
-
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.services.IMobileNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.forms.FormStack;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
@@ -29,6 +25,8 @@ import org.eclipse.scout.service.SERVICES;
  * @since 3..8.0
  */
 public class TabletDeviceTransformer extends AbstractDeviceTransformer {
+  private static int EAST_FORM_WIDTH = 700;
+  private static int TOOL_FORM_WIDTH = 300;
 
   @Override
   public void transformDesktop(IDesktop desktop) {
@@ -41,6 +39,7 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
   @Override
   public void transformForm(IForm form) {
     initViewSettings(form);
+    form.setAskIfNeedSave(false);
 
     transformFormFields(form);
   }
@@ -52,7 +51,7 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
 
     if (MobileDesktopUtility.isToolForm(form)) {
       form.setDisplayViewId(IForm.VIEW_ID_E);
-      setFormWidthHint(form, 300);
+      MobileDesktopUtility.setFormWidthHint(form, TOOL_FORM_WIDTH);
     }
     else if (form instanceof IOutlineTableForm || form instanceof OutlineChooserForm) {
       form.setDisplayViewId(IForm.VIEW_ID_CENTER);
@@ -64,19 +63,8 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
       form.setDisplayViewId(IForm.VIEW_ID_E);
       form.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
 
-      setFormWidthHint(form, 700);
+      MobileDesktopUtility.setFormWidthHint(form, EAST_FORM_WIDTH);
     }
   }
 
-  protected void setFormWidthHint(IForm form, int widthHint) {
-    form.setCacheBounds(true);
-
-    Rectangle formBounds = ClientUIPreferences.getInstance(ClientJob.getCurrentSession()).getFormBounds(form);
-    if (formBounds != null) {
-      return;
-    }
-
-    formBounds = new Rectangle(-1, -1, widthHint, -1);
-    ClientUIPreferences.getInstance(ClientJob.getCurrentSession()).setFormBounds(form, formBounds);
-  }
 }

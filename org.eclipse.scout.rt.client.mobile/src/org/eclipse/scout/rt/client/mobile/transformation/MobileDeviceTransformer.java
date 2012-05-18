@@ -35,6 +35,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   public void transformForm(IForm form) {
     displayFormAsView(form);
 
+    form.setAskIfNeedSave(false);
     transformFormFields(form);
   }
 

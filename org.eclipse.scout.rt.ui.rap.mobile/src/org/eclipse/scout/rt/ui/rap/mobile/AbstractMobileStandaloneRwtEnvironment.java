@@ -11,14 +11,20 @@
 package org.eclipse.scout.rt.ui.rap.mobile;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.rap.AbstractStandaloneRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
+import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileForm;
+import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileFormHeader;
+import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileOutlineFormHeader;
 import org.eclipse.scout.rt.ui.rap.mobile.window.desktop.RwtScoutMobileDesktop;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -26,6 +32,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
 
 public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractStandaloneRwtEnvironment {
+  private static final int FORM_HEADER_HEIGHT = 43;
 
   public AbstractMobileStandaloneRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     super(applicationBundle, clientSessionClazz);
@@ -46,6 +53,23 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
     RwtScoutMobileForm uiForm = new RwtScoutMobileForm();
     uiForm.createUiField(parent, scoutForm, this);
     return uiForm;
+  }
+
+  @Override
+  public IRwtScoutFormHeader createFormHeader(Composite parent, IForm scoutForm) {
+    IRwtScoutFormHeader uiFormHeader = null;
+    if (scoutForm instanceof IOutlineTableForm || scoutForm instanceof OutlineChooserForm) {
+      uiFormHeader = new RwtScoutMobileOutlineFormHeader();
+    }
+    else {
+      RwtScoutMobileFormHeader mobileFormHeader = new RwtScoutMobileFormHeader();
+      mobileFormHeader.setAutoAddBackButtonEnabled(true);
+      uiFormHeader = mobileFormHeader;
+    }
+
+    uiFormHeader.setHeightHint(FORM_HEADER_HEIGHT);
+    uiFormHeader.createUiField(parent, scoutForm, this);
+    return uiFormHeader;
   }
 
   @Override

@@ -10,8 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
+import java.awt.Rectangle;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
@@ -106,6 +110,18 @@ public class MobileDesktopUtility {
     }
 
     return false;
+  }
+
+  public static void setFormWidthHint(IForm form, int widthHint) {
+    form.setCacheBounds(true);
+
+    Rectangle formBounds = ClientUIPreferences.getInstance(ClientJob.getCurrentSession()).getFormBounds(form);
+    if (formBounds != null && formBounds.getWidth() == widthHint) {
+      return;
+    }
+
+    formBounds = new Rectangle(-1, -1, widthHint, -1);
+    ClientUIPreferences.getInstance(ClientJob.getCurrentSession()).setFormBounds(form, formBounds);
   }
 
 }

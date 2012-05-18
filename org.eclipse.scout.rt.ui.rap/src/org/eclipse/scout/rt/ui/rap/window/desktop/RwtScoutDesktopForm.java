@@ -17,10 +17,12 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.AbstractRwtScoutPart;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.Form;
@@ -35,6 +37,7 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDesktopForm.class);
 
   private IRwtScoutViewStack m_stackComposite;
+  private IRwtScoutFormHeader m_formHeaderComposite;
   private IRwtScoutForm m_formComposite;
   private Form m_uiForm;
   private ViewStackTabButton m_button;
@@ -50,20 +53,60 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
   public void createPart(IRwtScoutViewStack stackComposite, Composite parent, ViewStackTabButton button, IForm scoutForm, IRwtEnvironment uiEnvironment) {
     m_stackComposite = stackComposite;
     m_button = button;
-    super.createPart(scoutForm, uiEnvironment);
-    //add form contents
-    m_uiForm = getUiEnvironment().getFormToolkit().createForm(parent);
 
+    super.createPart(scoutForm, uiEnvironment);
+
+    m_uiForm = getUiEnvironment().getFormToolkit().createForm(parent);
     Composite contentPane = m_uiForm.getBody();
-    contentPane.setLayout(new FillLayout());
+
     try {
       parent.setRedraw(false);
+
+      m_formHeaderComposite = getUiEnvironment().createFormHeader(contentPane, getScoutObject());
       m_formComposite = getUiEnvironment().createForm(contentPane, getScoutObject());
+
+      initLayout(contentPane);
       attachScout();
     }
     finally {
       parent.setRedraw(true);
     }
+  }
+
+  protected void initLayout(Composite container) {
+    GridLayout layout = RwtLayoutUtility.createGridLayoutNoSpacing(1, true);
+    container.setLayout(layout);
+
+    Composite header = null;
+    if (m_formHeaderComposite != null) {
+      header = m_formHeaderComposite.getUiContainer();
+    }
+    Composite body = null;
+    if (m_formComposite != null) {
+      body = m_formComposite.getUiContainer();
+    }
+
+    if (header != null) {
+      GridData gridData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
+      if (getFormHeaderHeightHint() != null) {
+        gridData.heightHint = getFormHeaderHeightHint();
+      }
+      header.setLayoutData(gridData);
+    }
+
+    if (body != null) {
+      GridData gridData = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
+      body.setLayoutData(gridData);
+    }
+
+  }
+
+  public Integer getFormHeaderHeightHint() {
+    if (m_formHeaderComposite == null) {
+      return null;
+    }
+
+    return m_formHeaderComposite.getHeightHint();
   }
 
   @Override
