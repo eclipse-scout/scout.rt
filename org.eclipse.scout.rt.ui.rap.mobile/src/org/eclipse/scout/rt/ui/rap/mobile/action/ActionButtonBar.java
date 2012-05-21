@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -367,6 +368,12 @@ public class ActionButtonBar extends Composite {
   private PileMenu createPileMenu(List<IMenu> childActions) {
     PileMenu pileMenu = new PileMenu();
     pileMenu.setChildActions(childActions);
+    if (getMenuOpeningDirection() == SWT.UP) {
+      pileMenu.setIconId(Icons.MoreActionsUp);
+    }
+    else {
+      pileMenu.setIconId(Icons.MoreActionsDown);
+    }
 
     return pileMenu;
   }
@@ -429,11 +436,6 @@ public class ActionButtonBar extends Composite {
   }
 
   private class PileMenu extends AbstractMenu {
-
-    @Override
-    protected String getConfiguredText() {
-      return " ... ";
-    }
 
   }
 
