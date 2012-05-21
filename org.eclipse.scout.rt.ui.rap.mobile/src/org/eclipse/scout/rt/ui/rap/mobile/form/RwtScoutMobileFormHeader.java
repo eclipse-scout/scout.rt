@@ -37,7 +37,7 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
     if (getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0) {
       m_leftBarActions = createLeftBarActions();
     }
-    if (getScoutObject().getRootGroupBox().getCustomProcessButtonCount() > 0) {
+    if (getScoutObject().getRootGroupBox().getCustomProcessButtonCount() > 0 || getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0) {
       m_formToolsAction = createFormToolsAction();
     }
     if (getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0) {
@@ -90,6 +90,15 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
     }
   }
 
+  protected List<IMenu> convertCustomProcessButtons() {
+    IButton[] customProcessButtons = getScoutObject().getRootGroupBox().getCustomProcessButtons();
+    if (customProcessButtons == null || customProcessButtons.length == 0) {
+      return null;
+    }
+
+    return ActionButtonBarUtility.convertButtonsToActions(getScoutObject().getRootGroupBox().getCustomProcessButtons());
+  }
+
   protected List<IMenu> convertSystemProcessButtons(List<Integer> relevantSystemTypes) {
     if (relevantSystemTypes == null || relevantSystemTypes.size() == 0) {
       return null;
@@ -125,10 +134,16 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
     return systemTypesToConsider;
   }
 
+  protected List<Integer> getRelevantSystemTypesForFormToolsAction() {
+    List<Integer> systemTypesToConsider = new LinkedList<Integer>();
+    systemTypesToConsider.add(IButton.SYSTEM_TYPE_RESET);
+
+    return systemTypesToConsider;
+  }
+
   protected List<Integer> getRelevantSystemTypesForRightBar() {
     List<Integer> systemTypesToConsider = new LinkedList<Integer>();
     systemTypesToConsider.add(IButton.SYSTEM_TYPE_OK);
-    systemTypesToConsider.add(IButton.SYSTEM_TYPE_RESET);
     systemTypesToConsider.add(IButton.SYSTEM_TYPE_SAVE);
     systemTypesToConsider.add(IButton.SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE);
 
@@ -136,16 +151,25 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
   }
 
   protected P_FormToolsAction createFormToolsAction() {
-    IButton[] customProcessButtons = getScoutObject().getRootGroupBox().getCustomProcessButtons();
-    if (customProcessButtons == null || customProcessButtons.length == 0) {
-      return null;
+    List<IMenu> actions = new LinkedList<IMenu>();
+
+    List<IMenu> customActions = convertCustomProcessButtons();
+    if (customActions != null) {
+      actions.addAll(customActions);
     }
 
-    List<IMenu> actions = ActionButtonBarUtility.convertButtonsToActions(getScoutObject().getRootGroupBox().getCustomProcessButtons());
-    P_FormToolsAction formToolsAction = new P_FormToolsAction();
-    formToolsAction.setChildActions(actions);
+    List<IMenu> systemActions = convertSystemProcessButtons(getRelevantSystemTypesForFormToolsAction());
+    if (systemActions != null) {
+      actions.addAll(systemActions);
+    }
 
-    return formToolsAction;
+    if (actions.size() > 0) {
+      P_FormToolsAction formToolsAction = new P_FormToolsAction();
+      formToolsAction.setChildActions(actions);
+      return formToolsAction;
+    }
+
+    return null;
   }
 
   public boolean isAutoAddBackButtonEnabled() {
