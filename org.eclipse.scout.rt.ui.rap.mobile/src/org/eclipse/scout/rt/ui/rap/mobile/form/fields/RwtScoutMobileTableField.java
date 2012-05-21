@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
 import org.eclipse.scout.rt.ui.rap.form.fields.tablefield.RwtScoutTableField;
@@ -158,5 +159,22 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
     };
 
     getUiEnvironment().invokeScoutLater(job, 0);
+  }
+
+  /**
+   * Returns true if the form is a {@link OutlineChooserForm} to avoid a border around the table. Otherwise calls super.
+   */
+  @Override
+  protected boolean dontCreateTableContainer() {
+    IForm form = null;
+    if (getScoutObject() != null) {
+      form = getScoutObject().getForm();
+    }
+
+    if (form instanceof OutlineChooserForm) {
+      return true;
+    }
+
+    return super.dontCreateTableContainer();
   }
 }

@@ -92,11 +92,8 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
       LogicalGridData tableGridData = LogicalGridDataBuilder.createField(getScoutObject().getGridData());
       m_tableComposite = createRwtScoutTable();
 
-      IForm form = getScoutObject() == null ? null : getScoutObject().getForm();
       m_tableContainer = null;
-      if (form == null
-          || form instanceof ISmartFieldProposalForm
-          || form instanceof IOutlineTableForm) {
+      if (dontCreateTableContainer()) {
         m_tableComposite.createUiField(getUiContainer(), table, getUiEnvironment());
         m_tableComposite.getUiField().setLayoutData(tableGridData);
       }
@@ -109,6 +106,7 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
         tableContainer.setLayoutData(tableGridData);
         m_tableContainer = tableContainer;
       }
+
       //table status
       if (getScoutObject().isTableStatusVisible()) {
         m_tableStatus = createRwtTableStatus();
@@ -121,6 +119,19 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
     if (!getUiContainer().isDisposed()) {
       getUiContainer().layout(true, true);
     }
+  }
+
+  protected boolean dontCreateTableContainer() {
+    IForm form = null;
+    if (getScoutObject() != null) {
+      form = getScoutObject().getForm();
+    }
+
+    if (form == null || form instanceof ISmartFieldProposalForm || form instanceof IOutlineTableForm) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
