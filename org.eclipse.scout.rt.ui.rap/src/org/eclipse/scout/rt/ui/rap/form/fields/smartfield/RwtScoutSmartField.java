@@ -55,10 +55,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
@@ -67,7 +71,6 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -155,10 +158,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     getUiEnvironment().addKeyStroke(getUiContainer(), new P_F2KeyStroke(), false);
 
     // listeners
-    P_UiFieldListener listener = new P_UiFieldListener();
-    getUiField().addListener(SWT.Modify, listener);
-    getUiField().addListener(SWT.Traverse, listener);
-    getUiField().addListener(SWT.FocusOut, listener);
+    getUiField().addModifyListener(new P_ModifyListener());
+    getUiField().addTraverseListener(new P_TraverseListener());
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_DOWN), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_UP), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_DOWN), false);
@@ -263,11 +264,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   @Override
   protected void handleUiFocusGained() {
     super.handleUiFocusGained();
-    if (m_proposalPopup == null) {
+    if (m_proposalPopup == null || getScoutObject().getErrorStatus() != null) {
       getUiField().setSelection(0, getUiField().getText().length());
-    }
-    if (getScoutObject().getErrorStatus() != null) {
-      requestProposalSupportFromUi(getScoutObject().getDisplayText(), false, 0);
     }
   }
 
@@ -298,54 +296,55 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   protected void showProposalPopup(final ISmartFieldProposalForm form) {
     // close old
     hideProposalPopup();
-    // show new
-    if (getUiField().isFocusControl()) {
-      // make shure tab won't go to next field
-      getUiEnvironment().addKeyStroke(getUiField(), m_tabKeyListener, true);
-      getUiEnvironment().addKeyStroke(getUiField(), m_shiftTabKeyListener, true);
 
-      m_proposalPopup = new RwtScoutDropDownPopup();
-      m_proposalPopup.createPart(form, m_smartContainer, getUiField(), SWT.RESIZE, getUiEnvironment());
-      m_proposalPopup.setMaxHeightHint(280);
-      m_proposalPopup.addRwtScoutPartListener(new RwtScoutPartListener() {
-        @Override
-        public void partChanged(RwtScoutPartEvent e) {
-          switch (e.getType()) {
-            case RwtScoutPartEvent.TYPE_OPENING: {
-              notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
-              break;
+    // show new
+
+    // make shure tab won't go to next field
+    getUiEnvironment().addKeyStroke(getUiField(), m_tabKeyListener, true);
+    getUiEnvironment().addKeyStroke(getUiField(), m_shiftTabKeyListener, true);
+
+    m_proposalPopup = new RwtScoutDropDownPopup();
+    m_proposalPopup.createPart(form, m_smartContainer, getUiField(), SWT.RESIZE, getUiEnvironment());
+    m_proposalPopup.setMaxHeightHint(280);
+    m_proposalPopup.addRwtScoutPartListener(new RwtScoutPartListener() {
+      @Override
+      public void partChanged(RwtScoutPartEvent e) {
+        switch (e.getType()) {
+          case RwtScoutPartEvent.TYPE_OPENING: {
+            notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
+            break;
+          }
+          case RwtScoutPartEvent.TYPE_CLOSING: {
+            hideProposalPopup();
+            break;
+          }
+          case RwtScoutPartEvent.TYPE_CLOSED: {
+            if (m_proposalPopup != null) {
+              m_proposalPopup = null;
+              notifyPopupEventListeners(IPopupSupportListener.TYPE_CLOSED);
             }
-            case RwtScoutPartEvent.TYPE_CLOSING: {
-              hideProposalPopup();
-              break;
-            }
-            case RwtScoutPartEvent.TYPE_CLOSED: {
-              if (m_proposalPopup != null) {
-                m_proposalPopup = null;
-                notifyPopupEventListeners(IPopupSupportListener.TYPE_CLOSED);
-              }
-              break;
-            }
+            break;
           }
         }
-      });
-      m_proposalPopup.getShell().addShellListener(new ShellAdapter() {
-        private static final long serialVersionUID = 1L;
+      }
+    });
+    m_proposalPopup.getShell().addShellListener(new ShellAdapter() {
+      private static final long serialVersionUID = 1L;
 
-        @Override
-        public void shellClosed(ShellEvent e) {
-          e.doit = false;
-        }
-      });
-      m_proposalPopup.makeNonFocusable();
-      //
-      try {
-        // adjust size of popup every time the table/tree changes in the model
-        m_proposalPopup.getShell().setSize(new Point(m_smartContainer.getSize().x, 200));
-        final TableEx proposalTable = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), TableEx.class);
-        final TreeEx proposalTree = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), TreeEx.class);
-        if (proposalTree != null || proposalTable != null) {
-          form.addFormListener(
+      @Override
+      public void shellClosed(ShellEvent e) {
+        e.doit = false;
+      }
+    });
+    m_proposalPopup.makeNonFocusable();
+    //
+    try {
+      // adjust size of popup every time the table/tree changes in the model
+      m_proposalPopup.getShell().setSize(new Point(m_smartContainer.getSize().x, 200));
+      final TableEx proposalTable = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), TableEx.class);
+      final TreeEx proposalTree = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), TreeEx.class);
+      if (proposalTree != null || proposalTable != null) {
+        form.addFormListener(
               new FormListener() {
                 @Override
                 public void formChanged(FormEvent e) throws ProcessingException {
@@ -363,23 +362,22 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
                   }
                 }
               });
-          //enqueue a later display job since there may be waiting display tasks in the queue that change the table/tree
-          getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-              optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
-            }
-          });
-          //only if table or tree is already filled up, optimize size, otherwise nop
-          if ((proposalTree != null && proposalTree.getItemCount() > 0) || (proposalTable != null && proposalTable.getItemCount() > 0)) {
+        //enqueue a later display job since there may be waiting display tasks in the queue that change the table/tree
+        getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+          @Override
+          public void run() {
             optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
           }
+        });
+        //only if table or tree is already filled up, optimize size, otherwise nop
+        if ((proposalTree != null && proposalTree.getItemCount() > 0) || (proposalTable != null && proposalTable.getItemCount() > 0)) {
+          optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
         }
-        m_proposalPopup.showPart();
       }
-      catch (Throwable e1) {
-        LOG.error(e1.getLocalizedMessage(), e1);
-      }
+      m_proposalPopup.showPart();
+    }
+    catch (Throwable e1) {
+      LOG.error(e1.getLocalizedMessage(), e1);
     }
   }
 
@@ -552,7 +550,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  protected void handleTextModifiedFromUi(Event event) {
+  protected void handleTextModifiedFromUi(ModifyEvent event) {
     if (getUpdateUiFromScoutLock().isAcquired()) {
       return;
     }
@@ -570,7 +568,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  protected void handleTraverseFromUi(Event event) {
+  protected void handleTraverseFromUi(TraverseEvent event) {
     switch (event.keyCode) {
       case SWT.ARROW_DOWN:
       case SWT.ARROW_UP:
@@ -618,19 +616,21 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
   }
 
-  private class P_UiFieldListener implements Listener {
+  private class P_TraverseListener implements TraverseListener {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void handleEvent(Event event) {
-      switch (event.type) {
-        case SWT.Modify:
-          handleTextModifiedFromUi(event);
-          break;
-        case SWT.Traverse:
-          handleTraverseFromUi(event);
-          break;
-      }
+    public void keyTraversed(TraverseEvent event) {
+      handleTraverseFromUi(event);
+    }
+  }
+
+  private class P_ModifyListener implements ModifyListener {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void modifyText(ModifyEvent event) {
+      handleTextModifiedFromUi(event);
     }
   }
 
@@ -647,8 +647,10 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     public void handleUiAction(Event e) {
       switch (e.keyCode) {
         case SWT.TAB:
-          getUiEnvironment().removeKeyStroke(getUiField(), m_tabKeyListener);
-          getUiEnvironment().removeKeyStroke(getUiField(), m_shiftTabKeyListener);
+          if (m_proposalPopup == null) {
+            getUiEnvironment().removeKeyStroke(getUiField(), m_tabKeyListener);
+            getUiEnvironment().removeKeyStroke(getUiField(), m_shiftTabKeyListener);
+          }
           break;
 
         default:
