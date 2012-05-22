@@ -75,7 +75,7 @@ public class HtmlAdapter {
     return rawHtml;
   }
 
-  private static final Pattern imageCidPattern = Pattern.compile("(['\"])(cid:)([^\"']*)(['\"])", Pattern.CASE_INSENSITIVE);
+  private static final Pattern imageCidPattern = Pattern.compile("(['\"(])(cid:)([^()\"']*)([)'\"])", Pattern.CASE_INSENSITIVE);
 
   /**
    * Replaces the images in the raw html by the actual resource name.
