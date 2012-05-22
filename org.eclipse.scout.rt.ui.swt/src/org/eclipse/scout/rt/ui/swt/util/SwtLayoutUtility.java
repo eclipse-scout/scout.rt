@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Scrollable;
+import org.eclipse.ui.forms.widgets.ILayoutExtension;
 import org.osgi.framework.Version;
 
 public final class SwtLayoutUtility {
@@ -140,5 +141,15 @@ public final class SwtLayoutUtility {
         dumpSizeTreeRec(child, prefix + "  ");
       }
     }
+  }
+
+  public static int computeMinimumWidth(Control c, boolean changed) {
+    if (c instanceof Composite) {
+      Layout layout = ((Composite) c).getLayout();
+      if (layout instanceof ILayoutExtension) {
+        return ((ILayoutExtension) layout).computeMinimumWidth((Composite) c, changed);
+      }
+    }
+    return c.computeSize(SWT.DEFAULT, SWT.DEFAULT, changed).x;
   }
 }
