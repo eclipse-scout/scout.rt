@@ -83,8 +83,8 @@
    <extension
          point="org.eclipse.rap.ui.themes">
       <themeContribution
-            file="theme/scout_mobile.css"
-            themeId="org.eclipse.scout.rt.ui.rap.theme">
+            file="theme/scout.mobile.css"
+            themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
       </themeContribution>
    </extension>
 

@@ -40,3 +40,21 @@ Button.mobile-datechooser-dialog-next-month, Button.mobile-datechooser-dialog-ne
   background-image: url( theme/img/datetime/next-month_30x30.png );
   border-radius: 5px;
 }
+
+Button[PUSH]:hover, Button[TOGGLE]:hover {
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #fe9915 ),
+    to( #be7414 )
+  );
+}
+
+Button-FocusIndicator[PUSH], Button-FocusIndicator[TOGGLE] {
+  background-color: transparent;
+  background-image: none;
+  border: 0px;
+}
+
+ScrollBar {
+  width: 0px;
+}

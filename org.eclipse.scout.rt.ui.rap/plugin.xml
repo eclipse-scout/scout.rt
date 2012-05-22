@@ -360,6 +360,15 @@
             file="theme/fields/smartField.css"
             themeId="org.eclipse.scout.rt.ui.rap.theme">
       </themeContribution>
+      <theme
+            file="theme/scout.css"
+            id="org.eclipse.scout.rt.ui.rap.mobile.theme"
+            name="Scout Mobile Theme">
+      </theme>
+      <themeContribution
+            file="theme/fields/smartField.css"
+            themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
+      </themeContribution>
   </extension>
 
   <extension
