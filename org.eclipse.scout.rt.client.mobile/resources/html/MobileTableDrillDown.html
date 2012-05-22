@@ -1,8 +1,14 @@
-<span class="link" href="http://local/scout?action=drill_down" style="
-  display:block;
-  background-image:url('cid:mobile_drill_down');
-  background-repeat:no-repeat;
-  background-position:center;
-  width:100%;height:50px;
-  cursor:pointer">
+<span
+  class="link"
+  href="http://local/scout?action=drill_down"
+  style="
+    display:block;
+    background-image:url('cid:mobile_drill_down');
+    background-repeat:no-repeat;
+    background-position:center;
+    width:100%;height:50px;
+    cursor:pointer"
+  onclick="currentElement=event.target || event.srcElement;currentElement.style.backgroundImage='url(cid:mobile_drill_down_pressed)';return false;"
+  onmouseover="currentElement=event.target || event.srcElement;currentElement.style.backgroundImage='url(cid:mobile_drill_down_pressed)';return false;"
+  onmouseout="currentElement=event.target || event.srcElement;currentElement.style.backgroundImage='url(cid:mobile_drill_down)';return false;">
 </span>
