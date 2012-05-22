@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
@@ -28,13 +29,21 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.xml.sax.Attributes;
 
-@SuppressWarnings("unchecked")
-public class ScoutXmlDocument {
+/**
+ * Title : Scout XML Document
+ * 
+ * @version 2.0
+ */
+public class ScoutXmlDocument implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutXmlDocument.class);
 
   private static final boolean DEFAULT_ACCEPT_REGEX_QUERIES = false;
@@ -49,6 +58,13 @@ public class ScoutXmlDocument {
   private static final int INITIAL_CONTENT_LIST_SIZE = 10;
   private static final int INITIAL_NAMESPACE_MAP_SIZE = 5;
 
+  private final static Pattern[] COMPILED_REGEX_PATTERNS = new Pattern[]{
+      Pattern.compile("(\\*)|(\\{\\*\\}\\*)|(\\*:\\*)"),
+      Pattern.compile("(\\{\\*\\}.*)|(\\*:.*)"),
+      Pattern.compile("\\{.*\\}\\*"),
+      Pattern.compile(".*:\\*"),
+      Pattern.compile("\\{.*\\}.*")};
+
   public static final Hashtable<String, String> XML_ENTITIES;
 
   static {
@@ -61,9 +77,9 @@ public class ScoutXmlDocument {
     XML_ENTITIES.put(">", "&gt;");
   }
 
-  private P_Registry m_nameRegistry;
-  private P_Registry m_textRegistry;
-  private P_Registry m_attvRegistry;
+  private final P_Registry m_nameRegistry;
+  private final P_Registry m_textRegistry;
+  private final P_Registry m_attvRegistry;
 
   private boolean m_acceptRegExQueries;
   private boolean m_ignoreQueryCase;
@@ -454,6 +470,7 @@ public class ScoutXmlDocument {
    * 
    * @since 1.2
    */
+  @SuppressWarnings("unchecked")
   public ArrayList[] toData() {
     ArrayList[] data = null;
     ScoutXmlElement rowElement = null;
@@ -557,15 +574,10 @@ public class ScoutXmlDocument {
     bufferedWriter.flush();
   }
 
-  /**
-   * Title : Scout XML Node Description: Private class for Scout XML Document
-   * Copyright : Copyright (c) 2006 BSI AG, ETH Zürich, Stefan Vogt Company :
-   * BSI AG www.bsiag.com
-   * 
-   * @version 1.0
-   * @since 1.0
-   */
-  private abstract class P_AbstractNode {
+  private abstract class P_AbstractNode implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     protected int m_nameID; // The name ID of this node. Is resolved in the
 
     // enclosing document.
@@ -633,15 +645,10 @@ public class ScoutXmlDocument {
     public abstract void write(Writer writer) throws IOException;
   }
 
-  /**
-   * Title : Node counter Description: Private class for Scout XML Document
-   * Copyright : Copyright (c) 2006 BSI AG, ETH Zürich, Stefan Vogt Company :
-   * BSI AG www.bsiag.com
-   * 
-   * @version 1.0
-   * @since 1.0
-   */
-  private class P_NodeCounter extends P_AbstractNodeVisitor {
+  private class P_NodeCounter extends P_AbstractNodeVisitor<Integer> implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private int m_counter = 0;
 
     public P_NodeCounter(String name) {
@@ -649,8 +656,8 @@ public class ScoutXmlDocument {
     }
 
     @Override
-    public Object getResult() {
-      return new Integer(m_counter);
+    public Integer getResult() {
+      return m_counter;
     }
 
     @Override
@@ -664,15 +671,10 @@ public class ScoutXmlDocument {
     }
   }
 
-  /**
-   * Title : Node existence checker Description: Private class for Scout XML
-   * Document Copyright : Copyright (c) 2006 BSI AG, ETH Zürich, Stefan Vogt
-   * Company : BSI AG www.bsiag.com
-   * 
-   * @version 1.0
-   * @since 1.0
-   */
-  private class P_NodeExistenceChecker extends P_AbstractNodeVisitor {
+  private class P_NodeExistenceChecker extends P_AbstractNodeVisitor<Boolean> implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private boolean m_nodeFound = false;
 
     public P_NodeExistenceChecker(String name) {
@@ -680,13 +682,13 @@ public class ScoutXmlDocument {
     }
 
     @Override
-    public Object getResult() {
-      return new Boolean(m_nodeFound);
+    public Boolean getResult() {
+      return m_nodeFound;
     }
 
     @Override
     public boolean isNotDoneYet() {
-      return (!m_nodeFound);
+      return !m_nodeFound;
     }
 
     @Override
@@ -695,16 +697,11 @@ public class ScoutXmlDocument {
     }
   }
 
-  /**
-   * Title : Multi node selector Description: Private class for Scout XML
-   * Document Copyright : Copyright (c) 2006 BSI AG, ETH Zürich, Stefan Vogt
-   * Company : BSI AG www.bsiag.com
-   * 
-   * @version 1.0
-   * @since 1.0
-   */
-  private class P_NodeSelectorMulti extends P_AbstractNodeVisitor {
-    private List m_selectedNodes = new ArrayList();
+  private class P_NodeSelectorMulti<T extends P_AbstractNode> extends P_AbstractNodeVisitor<List<T>> implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private final List<T> m_selectedNodes = new ArrayList<T>();
     private String[] m_requiredAttributeNames = null;
     private String[] m_requiredAttributeValues = null;
 
@@ -720,7 +717,7 @@ public class ScoutXmlDocument {
     }
 
     @Override
-    public Object getResult() {
+    public List<T> getResult() {
       return m_selectedNodes;
     }
 
@@ -729,6 +726,7 @@ public class ScoutXmlDocument {
       return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void nameMatched(P_AbstractNode node) {
       if (m_requiredAttributeNames != null) {
@@ -744,19 +742,14 @@ public class ScoutXmlDocument {
         }
       }
 
-      m_selectedNodes.add(node);
+      m_selectedNodes.add((T) node);
     }
   }
 
-  /**
-   * Title : Single node selector Description: Private class for Scout XML
-   * Document Copyright : Copyright (c) 2006 BSI AG, ETH Zürich, Stefan Vogt
-   * Company : BSI AG www.bsiag.com
-   * 
-   * @version 1.0
-   * @since 1.0
-   */
-  private class P_NodeSelectorSingle extends P_AbstractNodeVisitor {
+  private class P_NodeSelectorSingle extends P_AbstractNodeVisitor<P_AbstractNode> implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private P_AbstractNode m_selectedNode = null;
     private String[] m_requiredAttributeNames = null;
     private String[] m_requiredAttributeValues = null;
@@ -773,7 +766,7 @@ public class ScoutXmlDocument {
     }
 
     @Override
-    public Object getResult() {
+    public P_AbstractNode getResult() {
       return m_selectedNode;
     }
 
@@ -801,41 +794,35 @@ public class ScoutXmlDocument {
     }
   }
 
-  /**
-   * Title : Node Visitor Description: Private class for Scout XML Document
-   * Copyright : Copyright (c) 2006 BSI AG, ETH Zürich, Stefan Vogt Company :
-   * BSI AG www.bsiag.com
-   * 
-   * @version 1.0
-   * @since 1.0
-   */
-  private abstract class P_AbstractNodeVisitor {
+  private abstract class P_AbstractNodeVisitor<T> implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private int m_mode = 0;
     private String m_stringToCompare;
 
     protected P_AbstractNodeVisitor(String name) {
-      if (name.matches("(\\*)|(\\{\\*\\}\\*)|(\\*:\\*)")) // * || {*}* || *:*
+      if (COMPILED_REGEX_PATTERNS[0].matcher(name).matches()) // * || {*}* || *:*
       {
         m_mode = 0;
         m_stringToCompare = null;
       }
-      else if (name.matches("(\\{\\*\\}.*)|(\\*:.*)")) // {*}localpart ||
-      // *:localpart
+      else if (COMPILED_REGEX_PATTERNS[1].matcher(name).matches()) // {*}localpart *:localpart
       {
         m_mode = 1;
         m_stringToCompare = ScoutXmlQName.extractLocalName(name);
       }
-      else if (name.matches("\\{.*\\}\\*")) // {namespace}*
+      else if (COMPILED_REGEX_PATTERNS[2].matcher(name).matches()) // {namespace}*
       {
         m_mode = 2;
         m_stringToCompare = ScoutXmlQName.extractNamespace(name);
       }
-      else if (name.matches(".*:\\*")) // prefix:*
+      else if (COMPILED_REGEX_PATTERNS[3].matcher(name).matches()) // prefix:*
       {
         m_mode = 3;
         m_stringToCompare = ScoutXmlQName.extractPrefix(name);
       }
-      else if (name.matches("\\{.*\\}.*")) // {namespace}localpart || {}localpart
+      else if (COMPILED_REGEX_PATTERNS[4].matcher(name).matches()) // {namespace}localpart || {}localpart
       {
         m_mode = 4;
         m_stringToCompare = name.replaceAll("\\{\\}", "");
@@ -900,29 +887,23 @@ public class ScoutXmlDocument {
 
     protected abstract boolean isNotDoneYet();
 
-    protected abstract Object getResult();
+    protected abstract T getResult();
   }
 
-  /**
-   * Title : Scout XML Registry Description: Stores names and values in a
-   * central place to preserve resources. Copyright : Copyright (c) 2006 BSI AG,
-   * ETH Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
-   * 
-   * @version 1.0
-   * @since 1.0
-   */
-  private class P_Registry {
+  private class P_Registry implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     private static final int INITIAL_SIZE = 50;
 
-    private List m_values; // Maps IDs to values
-    private Map m_valuesReverse; // Maps values to IDs
+    private final List<Object> m_values; // Maps IDs to values
+    private final Map<Object, Integer> m_valuesReverse; // Maps values to IDs
 
     /**
      * @since 1.0
      */
     public P_Registry() {
-      m_values = new ArrayList(INITIAL_SIZE);
-      m_valuesReverse = new Hashtable(INITIAL_SIZE);
+      m_values = new ArrayList<Object>(INITIAL_SIZE);
+      m_valuesReverse = new Hashtable<Object, Integer>(INITIAL_SIZE);
     }
 
     /**
@@ -931,7 +912,7 @@ public class ScoutXmlDocument {
     public int getID(Object value, boolean addValueIfNotExists) {
       if (value != null) {
         if (m_valuesReverse.containsKey(value)) {
-          return ((Integer) m_valuesReverse.get(value)).intValue();
+          return (m_valuesReverse.get(value)).intValue();
         }
         else if (addValueIfNotExists) {
           m_values.add(value);
@@ -973,17 +954,12 @@ public class ScoutXmlDocument {
     }
   }
 
-  /**
-   * Title : Scout XML Element Description: Copyright : Copyright (c) 2006 BSI
-   * AG, ETH Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
-   * 
-   * @version 1.0
-   */
-  public class ScoutXmlElement extends P_AbstractNode {
-    private List m_attributes; // This element's attributes
-    private Object m_content; // This element's content (text, a child, a list
-    // of children or a mixed list)
-    private Map m_namespaces; // This element's namespace declarations
+  public class ScoutXmlElement extends P_AbstractNode implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    private List<P_Attribute> m_attributes; // This element's attributes
+    private Object m_content; // This element's content (text, a child, a list of children or a mixed list)
+    private Map<String, String> m_namespaces; // This element's namespace declarations
     private ScoutXmlElement m_parent; // This element's predecessor
 
     /**
@@ -1051,6 +1027,7 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
+    @SuppressWarnings("unchecked")
     public ScoutXmlElement addChild(ScoutXmlElement child, int position) {
       if (child.getDocument().equals(ScoutXmlDocument.this)) {
         if (child != null) {
@@ -1090,9 +1067,9 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
-    public void addChildren(List children) {
-      for (int i = 0; i < children.size(); i++) {
-        this.addChild((ScoutXmlElement) children.get(i));
+    public void addChildren(List<ScoutXmlElement> children) {
+      for (ScoutXmlElement xmlElement : children) {
+        this.addChild(xmlElement);
       }
     }
 
@@ -1111,6 +1088,7 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
+    @SuppressWarnings("unchecked")
     public void addText(String text) {
       if ((text != null) && (!text.equals(""))) {
         Integer textID = new Integer(m_textRegistry.getID(text, true));
@@ -1150,7 +1128,7 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public int countAttributes(String name) {
-      return ((Integer) this.visitAttributes(new P_NodeCounter(name))).intValue();
+      return this.visitAttributes(new P_NodeCounter(name));
     }
 
     /**
@@ -1185,7 +1163,7 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public int countChildren(String name) {
-      return ((Integer) this.visitChildren(new P_NodeCounter(name))).intValue();
+      return this.visitChildren(new P_NodeCounter(name));
     }
 
     /**
@@ -1203,7 +1181,7 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public int countDescendants(String name) {
-      return ((Integer) this.visitDescendants(new P_NodeCounter(name))).intValue();
+      return (this.visitDescendants(new P_NodeCounter(name))).intValue();
     }
 
     /**
@@ -1222,7 +1200,7 @@ public class ScoutXmlDocument {
      */
     public int countSiblings(String name) {
       if (this.hasParent()) {
-        return (((Integer) this.getParent().visitChildren(new P_NodeCounter(name))).intValue() - 1);
+        return this.getParent().visitChildren(new P_NodeCounter(name)) - 1;
       }
       else {
         return 0;
@@ -1530,8 +1508,8 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
-    private Collection getAttributeNodes(String name) {
-      return (Collection) this.visitAttributes(new P_NodeSelectorMulti(name));
+    private Collection<P_Attribute> getAttributeNodes(String name) {
+      return visitAttributes(new P_NodeSelectorMulti<P_Attribute>(name));
     }
 
     /**
@@ -1553,7 +1531,7 @@ public class ScoutXmlDocument {
     public String getNamespace(String prefix) {
       if (prefix != null) {
         if (this.hasNamespace(prefix)) {
-          return (String) m_namespaces.get(prefix);
+          return m_namespaces.get(prefix);
         }
         else if (this.hasParent()) {
           return this.getParent().getNamespace(prefix);
@@ -1570,7 +1548,7 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
-    public Map getNamespaces() {
+    public Map<String, String> getNamespaces() {
       return m_namespaces;
     }
 
@@ -1583,7 +1561,7 @@ public class ScoutXmlDocument {
           return (ScoutXmlElement) m_content;
         }
         else {
-          return (ScoutXmlElement) this.getChildren().get(index);
+          return this.getChildren().get(index);
         }
       }
       catch (Exception exception) {
@@ -1618,8 +1596,9 @@ public class ScoutXmlDocument {
      * 
      * @since 1.0
      */
-    public List getChildren() {
-      ArrayList children = new ArrayList();
+    @SuppressWarnings("unchecked")
+    public List<ScoutXmlElement> getChildren() {
+      ArrayList<ScoutXmlElement> children = new ArrayList<ScoutXmlElement>();
 
       if (m_content instanceof List) {
         if (this.hasText()) {
@@ -1627,16 +1606,16 @@ public class ScoutXmlDocument {
             Object o = ((List) m_content).get(i);
 
             if (o instanceof ScoutXmlElement) {
-              children.add(o);
+              children.add((ScoutXmlElement) o);
             }
           }
         }
         else {
-          return (List) m_content;
+          return (List<ScoutXmlElement>) m_content;
         }
       }
       else if (m_content instanceof ScoutXmlElement) {
-        children.add(m_content);
+        children.add((ScoutXmlElement) m_content);
       }
 
       return children;
@@ -1645,8 +1624,8 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
-    public List getChildren(String name) {
-      return (List) this.visitChildren(new P_NodeSelectorMulti(name));
+    public List<ScoutXmlElement> getChildren(String name) {
+      return visitChildren(new P_NodeSelectorMulti<ScoutXmlElement>(name));
     }
 
     /**
@@ -1659,8 +1638,8 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
-    public List getDescendants(String name) {
-      return (List) this.visitDescendants(new P_NodeSelectorMulti(name));
+    public List<ScoutXmlElement> getDescendants(String name) {
+      return visitDescendants(new P_NodeSelectorMulti<ScoutXmlElement>(name));
     }
 
     /**
@@ -1675,7 +1654,7 @@ public class ScoutXmlDocument {
      */
     public boolean hasAttribute(String name) {
       try {
-        return ((Boolean) this.visitAttributes(new P_NodeExistenceChecker(name))).booleanValue();
+        return (this.visitAttributes(new P_NodeExistenceChecker(name))).booleanValue();
       }
       catch (Exception exception) {
         return false;
@@ -1694,10 +1673,10 @@ public class ScoutXmlDocument {
      */
     public boolean hasAttributeExact(String name) {
       if (this.hasAttributes()) {
-        Iterator iterator = m_attributes.iterator();
+        Iterator<P_Attribute> iterator = m_attributes.iterator();
 
         for (int i = 0; iterator.hasNext(); i++) {
-          if (((P_Attribute) iterator.next()).getNamePrefixed().equals(name)) {
+          if (iterator.next().getNamePrefixed().equals(name)) {
             return true;
           }
         }
@@ -1710,14 +1689,14 @@ public class ScoutXmlDocument {
      * @since 1.0
      */
     public boolean hasAttributes() {
-      return ((m_attributes != null) && (!m_attributes.isEmpty()));
+      return (m_attributes != null && !m_attributes.isEmpty());
     }
 
     /**
      * @since 1.0
      */
     public boolean hasChild(String name) {
-      return ((Boolean) this.visitChildren(new P_NodeExistenceChecker(name))).booleanValue();
+      return this.visitChildren(new P_NodeExistenceChecker(name));
     }
 
     /**
@@ -2309,9 +2288,10 @@ public class ScoutXmlDocument {
      * @param children
      * @since 1.0
      */
-    public void removeChildren(Collection children) {
+    @SuppressWarnings("unchecked")
+    public void removeChildren(Collection<ScoutXmlElement> children) {
       try {
-        ((List) m_content).removeAll(children);
+        ((List<P_AbstractNode>) m_content).removeAll(children);
       }
       catch (Exception exception) {
         // Do nothing...
@@ -2326,7 +2306,7 @@ public class ScoutXmlDocument {
      */
     public void removeChildren(String name) {
       try {
-        this.removeChildren(this.getChildren(name));
+        removeChildren(this.getChildren(name));
       }
       catch (Exception exception) {
         // Do nothing...
@@ -2477,7 +2457,7 @@ public class ScoutXmlDocument {
     public void setAttribute(String name, String value) {
       if (value != null) {
         if (m_attributes == null) {
-          m_attributes = new ArrayList(INITIAL_ATTRIBUTE_LIST_SIZE);
+          m_attributes = new ArrayList<P_Attribute>(INITIAL_ATTRIBUTE_LIST_SIZE);
         }
 
         P_Attribute newAttribute = new P_Attribute(name, value);
@@ -2497,7 +2477,7 @@ public class ScoutXmlDocument {
     protected void setAttributes(Attributes attributes) {
       if (attributes.getLength() > 0) {
         if (m_attributes == null) {
-          m_attributes = new ArrayList(attributes.getLength());
+          m_attributes = new ArrayList<P_Attribute>(attributes.getLength());
         }
 
         for (int i = 0; i < attributes.getLength(); i++) {
@@ -2513,7 +2493,7 @@ public class ScoutXmlDocument {
      */
     public void setNamespace(String prefix, String namespaceURI) {
       if (m_namespaces == null) {
-        m_namespaces = new Hashtable(INITIAL_NAMESPACE_MAP_SIZE);
+        m_namespaces = new Hashtable<String, String>(INITIAL_NAMESPACE_MAP_SIZE);
       }
 
       m_namespaces.put((prefix != null ? prefix : ""), namespaceURI);
@@ -2522,9 +2502,9 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
-    protected void setNamespaces(Map namespaces) {
+    protected void setNamespaces(Map<String, String> namespaces) {
       if (m_namespaces == null) {
-        m_namespaces = new Hashtable(namespaces.size());
+        m_namespaces = new Hashtable<String, String>(namespaces.size());
       }
 
       m_namespaces.putAll(namespaces);
@@ -2562,12 +2542,12 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
-    protected Object visitAttributes(P_AbstractNodeVisitor visitor) {
+    protected <T> T visitAttributes(P_AbstractNodeVisitor<T> visitor) {
       if (this.hasAttributes()) {
-        Iterator iterator = m_attributes.iterator();
+        Iterator<P_Attribute> iterator = m_attributes.iterator();
 
         while (iterator.hasNext() && visitor.isNotDoneYet()) {
-          visitor.visit((P_Attribute) iterator.next());
+          visitor.visit(iterator.next());
         }
 
         return visitor.getResult();
@@ -2580,11 +2560,11 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
-    protected Object visitChildren(P_AbstractNodeVisitor visitor) {
-      Iterator iterator = this.getChildren().iterator();
+    protected <T> T visitChildren(P_AbstractNodeVisitor<T> visitor) {
+      Iterator<ScoutXmlElement> iterator = this.getChildren().iterator();
 
       while (iterator.hasNext() && visitor.isNotDoneYet()) {
-        visitor.visit((ScoutXmlElement) iterator.next());
+        visitor.visit(iterator.next());
       }
 
       return visitor.getResult();
@@ -2593,12 +2573,12 @@ public class ScoutXmlDocument {
     /**
      * @since 1.0
      */
-    protected Object visitDescendants(P_AbstractNodeVisitor visitor) {
-      Iterator iterator = this.getChildren().iterator();
+    protected <T> T visitDescendants(P_AbstractNodeVisitor<T> visitor) {
+      Iterator<ScoutXmlElement> iterator = this.getChildren().iterator();
       ScoutXmlElement child = null;
 
       while (iterator.hasNext() && visitor.isNotDoneYet()) {
-        child = (ScoutXmlElement) iterator.next();
+        child = iterator.next();
 
         visitor.visit(child);
         child.visitDescendants(visitor);
@@ -2635,20 +2615,20 @@ public class ScoutXmlDocument {
         bufferedWriter.write(this.getNamePrefixed());
 
         if (this.hasAttributes()) {
-          Iterator iterator = m_attributes.iterator();
+          Iterator<P_Attribute> iterator = m_attributes.iterator();
 
           while (iterator.hasNext()) {
             bufferedWriter.write(' ');
-            ((P_Attribute) iterator.next()).write(bufferedWriter);
+            iterator.next().write(bufferedWriter);
           }
         }
 
         if (this.hasNamespace()) {
-          Iterator iterator = m_namespaces.keySet().iterator();
+          Iterator<String> iterator = m_namespaces.keySet().iterator();
           String prefix = null;
 
           while (iterator.hasNext()) {
-            prefix = (String) iterator.next();
+            prefix = iterator.next();
 
             bufferedWriter.write(" xmlns");
             if (!prefix.equals("")) {
@@ -2737,13 +2717,10 @@ public class ScoutXmlDocument {
       }
     }
 
-    /**
-     * Title : Scout XML Attribute Description: Copyright : Copyright (c) 2006
-     * BSI AG, ETH Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
-     * 
-     * @version 1.0
-     */
-    private class P_Attribute extends P_AbstractNode {
+    private class P_Attribute extends P_AbstractNode implements Serializable {
+
+      private static final long serialVersionUID = 1L;
+
       private int m_valueID;
 
       /**
