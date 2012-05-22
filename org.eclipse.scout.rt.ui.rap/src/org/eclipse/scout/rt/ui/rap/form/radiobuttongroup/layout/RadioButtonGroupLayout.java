@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.form.radiobuttongroup.layout;
 
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
-import org.eclipse.swt.SWT;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -69,7 +69,7 @@ public class RadioButtonGroupLayout extends Layout {
     for (Control c : parent.getChildren()) {
       if (c.getVisible()) {
         m_buttons[index / colCount][index % colCount] = c;
-        Point d = c.computeSize(SWT.DEFAULT, SWT.DEFAULT, false);
+        Point d = new Point(RwtLayoutUtility.computeMinimumWidth(c, false), 0);
         m_sizes[index / colCount][index % colCount] = d;
         index++;
       }

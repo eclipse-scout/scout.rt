@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Scrollable;
+import org.eclipse.ui.forms.widgets.ILayoutExtension;
 
 public final class RwtLayoutUtility {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtLayoutUtility.class);
@@ -122,5 +123,15 @@ public final class RwtLayoutUtility {
     layout.marginWidth = 0;
     layout.verticalSpacing = 0;
     return layout;
+  }
+
+  public static int computeMinimumWidth(Control c, boolean changed) {
+    if (c instanceof Composite) {
+      Layout layout = ((Composite) c).getLayout();
+      if (layout instanceof ILayoutExtension) {
+        return ((ILayoutExtension) layout).computeMinimumWidth((Composite) c, changed);
+      }
+    }
+    return c.computeSize(SWT.DEFAULT, SWT.DEFAULT, changed).x;
   }
 }
