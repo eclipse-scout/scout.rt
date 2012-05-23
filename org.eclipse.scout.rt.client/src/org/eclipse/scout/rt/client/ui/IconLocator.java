@@ -69,6 +69,9 @@ public class IconLocator implements IIconLocator {
   private class P_ServiceComparator implements Comparator<IIconProviderService> {
     @Override
     public int compare(IIconProviderService o1, IIconProviderService o2) {
+      if (o1 == o2) {
+        return 0;
+      }
       if (o1 == null) {
         return -1;
       }
@@ -80,7 +83,6 @@ public class IconLocator implements IIconLocator {
         LOG.warn("Multiple IIconProviderServices with the same ranking found. A clear definition of the rankings is necessary to properly enable the icon overriding. Affected services: " + o1 + ", " + o2);
         return -1;
       }
-
       return result;
     }
   }
