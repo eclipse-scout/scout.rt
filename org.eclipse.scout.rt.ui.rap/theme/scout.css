@@ -1380,6 +1380,14 @@ Table[BORDER] {
   border: none;
 }
 
+/* Shouldn't actually be necessary because it's already declared in table.default.css of org.eclipse.rap.rwt.
+   But without explicitly setting it the background color is set to white which overrides selection and hover state. */
+Table-RowOverlay {
+  background-color: transparent;
+  color: inherit;
+  background-image: none;
+}
+
 Composite.tableField {
   background-color: white;
   background-image: none;
@@ -1690,6 +1698,14 @@ Tree:disabled {
 
 Tree[BORDER] {
   border: none;
+}
+
+/* Shouldn't actually be necessary because it's already declared in tree.default.css of org.eclipse.rap.rwt.
+   But without explicitly setting it the background color is set to white which overrides selection and hover state. */
+Tree-RowOverlay {
+  background-color: transparent;
+  color: inherit;
+  background-image: none;
 }
 
 Composite.treeField {
