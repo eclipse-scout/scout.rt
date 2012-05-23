@@ -957,13 +957,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
     @Override
     public boolean canDrag() {
-      TreePath[] paths = getSwingTree().getSelectionPaths();
-      if (paths != null && paths.length > 0) {
-        return handleSwingDragEnabled();
-      }
-      else {
-        return false;
-      }
+      return handleSwingDragEnabled();
     }
 
     @Override
