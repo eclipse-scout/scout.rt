@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.internal.SequenceBoxGrid;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -356,24 +357,23 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     if (!formField.isVisible()) {
       return false;
     }
-
     if (!formField.isLabelVisible()) {
       return false;
     }
-
     if (formField.getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
       return false;
     }
-
     if (formField.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
       return false;
     }
-
-    //Checkbox fields have their label on the right side of the checkbox so it is not necessary to use it for the compound label
     if (formField instanceof IBooleanField) {
+      // Checkbox fields have their label on the right side of the checkbox so it is not necessary to use it for the compound label
       return false;
     }
-
+    if (formField instanceof IButton) {
+      // Inline buttons may be contained in the sequence box. The label is usually placed directly on the button itself.
+      return false;
+    }
     return true;
   }
 
