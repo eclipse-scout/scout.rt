@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.form.fields.smartfield;
 
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield.MobileSmartFieldProposalFormProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.smartfield.RwtScoutSmartField;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -49,6 +50,22 @@ public class RwtScoutMobileSmartField extends RwtScoutSmartField {
   @Override
   protected boolean hideProposalPopup() {
     return true;
+  }
+
+  /**
+   * Does nothing because the proposal form is always opened directly in the model and automatically added to the
+   * desktop (autoAddRemoveOnDesktop is set to true by MobileSmartFieldProposalFormProvider)
+   */
+  @Override
+  protected void showProposalPopup(ISmartFieldProposalForm form) {
+  }
+
+  /**
+   * @see {@link #showProposalPopup(ISmartFieldProposalForm)} and {@link #hideProposalPopup()}
+   */
+  @Override
+  protected void setProposalFormFromScout(ISmartFieldProposalForm form) {
+
   }
 
   /**
