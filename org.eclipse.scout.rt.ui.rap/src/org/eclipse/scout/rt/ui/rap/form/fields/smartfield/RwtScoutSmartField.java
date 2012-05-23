@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartEvent;
 import org.eclipse.scout.rt.ui.rap.window.RwtScoutPartListener;
@@ -65,9 +66,7 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -174,19 +173,14 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     container.setLayout(new LogicalGridLayout(1, 0));
 
     m_smartContainer.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
-    m_smartContainer.setLayout(new FormLayout());
+    m_smartContainer.setLayout(RwtLayoutUtility.createGridLayoutNoSpacing(2, false));
 
-    final FormData textLayoutData = new FormData(SWT.DEFAULT, SWT.DEFAULT);
-    textLayoutData.right = new FormAttachment(100, -20);
-    textLayoutData.left = new FormAttachment(0, 0);
-    textLayoutData.bottom = new FormAttachment(textField, 0, SWT.BOTTOM);
+    GridData textLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
     textField.setLayoutData(textLayoutData);
 
-    final FormData buttonLayoutData = new FormData(SWT.DEFAULT, SWT.DEFAULT);
-    buttonLayoutData.left = new FormAttachment(textField, -1, SWT.RIGHT);
-    buttonLayoutData.bottom = new FormAttachment((Control) m_browseButton, 1, SWT.BOTTOM);
-    buttonLayoutData.height = 20;
-    buttonLayoutData.width = 20;
+    GridData buttonLayoutData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+    buttonLayoutData.heightHint = 20;
+    buttonLayoutData.widthHint = 20;
     m_browseButton.setLayoutData(buttonLayoutData);
   }
 

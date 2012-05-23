@@ -1935,13 +1935,13 @@ FileUpload.filechooserfield_file_menu:disabled {
 
 /*Datefield start*/
 Composite.datefield {
-  padding: 1px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
   border: 1px solid #95b7c1;
   border-radius: 4px;
 }
 
 Composite.datefield-disabled {
-  padding: 1px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
   border: 1px solid #c9dadf;
   border-radius: 4px;
 }
@@ -1978,13 +1978,13 @@ Button.datefield:hover {
 
 /*Timefield start*/
 Composite.timefield {
-  padding: 1px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
   border: 1px solid #95b7c1;
   border-radius: 4px;
 }
 
 Composite.timefield-disabled {
-  padding: 1px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
   border: 1px solid #c9dadf;
   border-radius: 4px;
 }

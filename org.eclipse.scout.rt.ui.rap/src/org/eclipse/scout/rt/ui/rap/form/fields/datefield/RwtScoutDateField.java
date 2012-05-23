@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.datefield.chooser.DateChooserDialog;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -43,9 +44,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -147,19 +146,14 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     container.setLayout(new LogicalGridLayout(1, 0));
 
     m_dateContainer.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
-    m_dateContainer.setLayout(new FormLayout());
+    m_dateContainer.setLayout(RwtLayoutUtility.createGridLayoutNoSpacing(2, false));
 
-    final FormData textLayoutData = new FormData(SWT.DEFAULT, SWT.DEFAULT);
-    textLayoutData.right = new FormAttachment(100, -20);
-    textLayoutData.left = new FormAttachment(0, 0);
-    textLayoutData.bottom = new FormAttachment(textField, -1, SWT.BOTTOM);
+    GridData textLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
     textField.setLayoutData(textLayoutData);
 
-    final FormData buttonLayoutData = new FormData(SWT.DEFAULT, SWT.DEFAULT);
-    buttonLayoutData.left = new FormAttachment(textField, 0, SWT.RIGHT);
-    buttonLayoutData.bottom = new FormAttachment(dateChooserButton, 0, SWT.BOTTOM);
-    buttonLayoutData.height = 20;
-    buttonLayoutData.width = 20;
+    GridData buttonLayoutData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+    buttonLayoutData.heightHint = 20;
+    buttonLayoutData.widthHint = 20;
     dateChooserButton.setLayoutData(buttonLayoutData);
   }
 

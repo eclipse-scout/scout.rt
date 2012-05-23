@@ -1,11 +1,13 @@
 Composite.smartfield {
-  padding: 0px 0px 0px 0px;
+  /* 2px on the right side to move the button a little bit away from the border */
+  padding: 0px 2px 0px 0px;
   border: 1px solid #95b7c1;
   border-radius: 4px;
 }
 
 Composite.smartfield-disabled {
-  padding: 0px 0px 0px 0px;
+  /* 2px on the right side to move the button a little bit away from the border */
+  padding: 0px 2px 0px 0px;
   border: 1px solid #c9dadf;
   border-radius: 4px;
 }
