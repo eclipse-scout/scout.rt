@@ -19,6 +19,8 @@ public interface ILookAndFeelDecorations {
 
   int getScope();
 
+  String getDeviceTypeIdentifier();
+
   int getStarMarkerPosition();
 
   FontSpec getMandatoryLabelFont();

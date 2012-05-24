@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.rap.extension;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -22,29 +24,41 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.ui.rap.Activator;
 import org.eclipse.scout.rt.ui.rap.extension.internal.LookAndFeelDecorations;
 import org.eclipse.scout.rt.ui.rap.extension.internal.LookAndFeelProperties;
 import org.eclipse.scout.rt.ui.rap.extension.internal.UiDecoration;
+import org.eclipse.scout.rt.ui.rap.util.DeviceUtility;
 import org.eclipse.swt.SWT;
 
 public final class UiDecorationExtensionPoint {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(UiDecorationExtensionPoint.class);
-  private static final UiDecoration LOOK_AND_FEEL;
+  private static Map<IUiDeviceType, IUiDecoration> LOOK_AND_FEEL_MAP = new HashMap<IUiDeviceType, IUiDecoration>();
 
   public static final int SCOPE_DEFAULT = 1;
-  public static final int SCOPE_GLOBAL = 2;
+  public static final int SCOPE_GLOBAL = 100;
+  private static final String ATTR_SCOPE = "scope";
+  private static final String ATTR_DEVICE_TYPE = "deviceType";
+  private static final String ATTR_DEVICE_TYPE_KEYWORD_TOUCH = "touch";
 
   private UiDecorationExtensionPoint() {
   }
 
-  public static IUiDecoration getLookAndFeel() {
-    return LOOK_AND_FEEL;
+  public static synchronized IUiDecoration getLookAndFeel() {
+    IUiDeviceType currentDeviceType = DeviceUtility.getCurrentDeviceType();
+    if (!LOOK_AND_FEEL_MAP.containsKey(currentDeviceType)) {
+      IUiDecoration uiDecoration = loadUiDecoration(currentDeviceType);
+      LOOK_AND_FEEL_MAP.put(currentDeviceType, uiDecoration);
+    }
+
+    return LOOK_AND_FEEL_MAP.get(currentDeviceType);
   }
 
   private static ILookAndFeelDecorations parseDecorations(IConfigurationElement decorationsElement) {
     LookAndFeelDecorations decorations = new LookAndFeelDecorations();
-    decorations.setScope(getScopePriority(decorationsElement.getAttribute("scope")));
+    decorations.setScope(getScopePriority(decorationsElement.getAttribute(ATTR_SCOPE)));
+    decorations.setDeviceTypeIdentifier(decorationsElement.getAttribute(ATTR_DEVICE_TYPE));
 
     IConfigurationElement[] mandatoryElement = decorationsElement.getChildren("mandatory");
     if (mandatoryElement.length > 0) {
@@ -76,7 +90,9 @@ public final class UiDecorationExtensionPoint {
 
   private static ILookAndFeelProperties parseProperties(IConfigurationElement propertiesElement) {
     LookAndFeelProperties props = new LookAndFeelProperties();
-    props.setScope(getScopePriority(propertiesElement.getAttribute("scope")));
+    props.setScope(getScopePriority(propertiesElement.getAttribute(ATTR_SCOPE)));
+    props.setDeviceTypeIdentifier(propertiesElement.getAttribute(ATTR_DEVICE_TYPE));
+
     IConfigurationElement[] properties = propertiesElement.getChildren("property");
     for (IConfigurationElement prop : properties) {
       String propName = null, propValue = null;
@@ -123,8 +139,7 @@ public final class UiDecorationExtensionPoint {
     return pos;
   }
 
-  static {
-    LOOK_AND_FEEL = new UiDecoration();
+  private static IUiDecoration loadUiDecoration(IUiDeviceType deviceType) {
 
     ArrayList<ILookAndFeelProperties> propertyExtensions = new ArrayList<ILookAndFeelProperties>();
     ArrayList<ILookAndFeelDecorations> decorationExtensions = new ArrayList<ILookAndFeelDecorations>();
@@ -144,114 +159,200 @@ public final class UiDecorationExtensionPoint {
         }
       }
     }
-    // decorations
-    TreeMap<Integer, ILookAndFeelDecorations> decorations = new TreeMap<Integer, ILookAndFeelDecorations>();
-    for (ILookAndFeelDecorations dec : decorationExtensions) {
-      int scope = dec.getScope();
-      if (decorations.get(scope) != null) {
-        LOG.warn("multiple look and feel extension found with scope '" + scope + "'");
-      }
-      else {
-        decorations.put(scope, dec);
-      }
-    }
-    if (decorations.size() > 0) {
-      ILookAndFeelDecorations dec = decorations.get(decorations.lastKey());
-      if (dec.getMandatoryFieldBackgroundColor() != null) {
-        LOOK_AND_FEEL.setMandatoryFieldBackgroundColor(dec.getMandatoryFieldBackgroundColor());
-      }
-      if (dec.getMandatoryLabelFont() != null) {
-        LOOK_AND_FEEL.setMandatoryLabelFont(dec.getMandatoryLabelFont());
-      }
-      if (dec.getMandatoryLabelTextColor() != null) {
-        LOOK_AND_FEEL.setMandatoryLabelTextColor(dec.getMandatoryLabelTextColor());
-      }
-      if (dec.getStarMarkerPosition() != ILookAndFeelDecorations.STAR_MARKER_NONE) {
-        LOOK_AND_FEEL.setMandatoryStarMarkerPosition(dec.getStarMarkerPosition());
-      }
-    }
-    // properties
+
+    UiDecoration uiDecoration = new UiDecoration();
+    loadDecorations(uiDecoration, decorationExtensions, deviceType);
+    loadProperties(uiDecoration, propertyExtensions, deviceType);
+
+    return uiDecoration;
+  }
+
+  private static void loadProperties(UiDecoration uiDecoration, ArrayList<ILookAndFeelProperties> propertyExtensions, IUiDeviceType deviceType) {
     TreeMap<Integer, ILookAndFeelProperties> properties = new TreeMap<Integer, ILookAndFeelProperties>();
     for (ILookAndFeelProperties props : propertyExtensions) {
       int scope = props.getScope();
-      if (properties.get(scope) != null) {
-        LOG.warn("multiple look and feel extension found with scope '" + scope + "'");
+      String deviceTypeIdentifier = props.getDeviceTypeIdentifier();
+      int priority = computePriority(scope, deviceTypeIdentifier);
+
+      if (isPropsAlreadLoaded(properties, priority, deviceTypeIdentifier)) {
+        LOG.warn("Multiple look and feel properties found with scope '" + scope + "' and deviceType '" + deviceTypeIdentifier + "'");
       }
-      else {
-        properties.put(scope, props);
+      else if (matchesDeviceType(deviceType, deviceTypeIdentifier)) {
+        properties.put(priority, props);
       }
     }
+
     for (ILookAndFeelProperties props : properties.values()) {
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_DIALOG_MIN_HEIGHT) != 0) {
-        LOOK_AND_FEEL.setDialogMinHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_DIALOG_MIN_HEIGHT));
+        uiDecoration.setDialogMinHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_DIALOG_MIN_HEIGHT));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_DIALOG_MIN_WIDTH) != 0) {
-        LOOK_AND_FEEL.setDialogMinWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_DIALOG_MIN_WIDTH));
+        uiDecoration.setDialogMinWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_DIALOG_MIN_WIDTH));
       }
       if (props.existsProperty(ILookAndFeelProperties.PROP_FORM_MAINBOX_BORDER_VISIBLE)) {
-        LOOK_AND_FEEL.setFormMainBoxBorderVisible(props.getPropertyBool(ILookAndFeelProperties.PROP_FORM_MAINBOX_BORDER_VISIBLE));
+        uiDecoration.setFormMainBoxBorderVisible(props.getPropertyBool(ILookAndFeelProperties.PROP_FORM_MAINBOX_BORDER_VISIBLE));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_HEIGHT) != 0) {
-        LOOK_AND_FEEL.setFormFieldActivationButtonHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_HEIGHT));
+        uiDecoration.setFormFieldActivationButtonHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_HEIGHT));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WIDTH) != 0) {
-        LOOK_AND_FEEL.setFormFieldActivationButtonWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WIDTH));
+        uiDecoration.setFormFieldActivationButtonWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WIDTH));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WITH_MENU_WIDTH) != 0) {
-        LOOK_AND_FEEL.setFormFieldActivationButtonWithMenuWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WITH_MENU_WIDTH));
+        uiDecoration.setFormFieldActivationButtonWithMenuWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WITH_MENU_WIDTH));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_LABEL_WIDTH) != 0) {
-        LOOK_AND_FEEL.setFormFieldLabelWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_LABEL_WIDTH));
+        uiDecoration.setFormFieldLabelWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_LABEL_WIDTH));
       }
       if (props.getPropertyString(ILookAndFeelProperties.PROP_FORM_FIELD_LABEL_ALIGNMENT) != null) {
         String extFormFieldAlignment = props.getPropertyString(ILookAndFeelProperties.PROP_FORM_FIELD_LABEL_ALIGNMENT);
         if ("center".equalsIgnoreCase(extFormFieldAlignment)) {
-          LOOK_AND_FEEL.setFormFieldLabelAlignment(SWT.CENTER);
+          uiDecoration.setFormFieldLabelAlignment(SWT.CENTER);
         }
         else if ("left".equalsIgnoreCase(extFormFieldAlignment)) {
-          LOOK_AND_FEEL.setFormFieldLabelAlignment(SWT.LEFT);
+          uiDecoration.setFormFieldLabelAlignment(SWT.LEFT);
         }
         else if ("right".equalsIgnoreCase(extFormFieldAlignment)) {
-          LOOK_AND_FEEL.setFormFieldLabelAlignment(SWT.RIGHT);
+          uiDecoration.setFormFieldLabelAlignment(SWT.RIGHT);
         }
         else {
           LOG.warn("the value '" + extFormFieldAlignment + "' is not valid for the property '" + ILookAndFeelProperties.PROP_FORM_FIELD_LABEL_ALIGNMENT + "'. Expected values are[right,left,center]");
         }
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_DEFAULT_COLUMN_WIDTH) != 0) {
-        LOOK_AND_FEEL.setLogicalGridLayoutDefaultColumnWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_DEFAULT_COLUMN_WIDTH));
+        uiDecoration.setLogicalGridLayoutDefaultColumnWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_DEFAULT_COLUMN_WIDTH));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_DEFAULT_POPUP_WIDTH) != 0) {
-        LOOK_AND_FEEL.setLogicalGridLayoutDefaultPopupWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_DEFAULT_POPUP_WIDTH));
+        uiDecoration.setLogicalGridLayoutDefaultPopupWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_DEFAULT_POPUP_WIDTH));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_HORIZONTAL_GAP) != 0) {
-        LOOK_AND_FEEL.setLogicalGridLayoutHorizontalGap(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_HORIZONTAL_GAP));
+        uiDecoration.setLogicalGridLayoutHorizontalGap(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_HORIZONTAL_GAP));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_ROW_HEIGHT) != 0) {
-        LOOK_AND_FEEL.setLogicalGridLayoutRowHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_ROW_HEIGHT));
+        uiDecoration.setLogicalGridLayoutRowHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_ROW_HEIGHT));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_VERTICAL_GAP) != 0) {
-        LOOK_AND_FEEL.setLogicalGridLayoutVerticalGap(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_VERTICAL_GAP));
+        uiDecoration.setLogicalGridLayoutVerticalGap(props.getPropertyInt(ILookAndFeelProperties.PROP_LOGICAL_GRID_LAYOUT_VERTICAL_GAP));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_PROCESS_BUTTON_HEIGHT) != 0) {
-        LOOK_AND_FEEL.setProcessButtonHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_PROCESS_BUTTON_HEIGHT));
+        uiDecoration.setProcessButtonHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_PROCESS_BUTTON_HEIGHT));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_PROCESS_BUTTON_MAX_WIDTH) != 0) {
-        LOOK_AND_FEEL.setProcessButtonMaxWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_PROCESS_BUTTON_MAX_WIDTH));
+        uiDecoration.setProcessButtonMaxWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_PROCESS_BUTTON_MAX_WIDTH));
       }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_PROCESS_BUTTON_MIN_WIDTH) != 0) {
-        LOOK_AND_FEEL.setProcessButtonMinWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_PROCESS_BUTTON_MIN_WIDTH));
+        uiDecoration.setProcessButtonMinWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_PROCESS_BUTTON_MIN_WIDTH));
       }
       if (props.getPropertyString(ILookAndFeelProperties.PROP_COLOR_FOREGROUND_DISABLED) != null) {
-        LOOK_AND_FEEL.setColorForegroundDisabled(props.getPropertyString(ILookAndFeelProperties.PROP_COLOR_FOREGROUND_DISABLED));
+        uiDecoration.setColorForegroundDisabled(props.getPropertyString(ILookAndFeelProperties.PROP_COLOR_FOREGROUND_DISABLED));
       }
       if (props.getPropertyString(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_WIDTH) != null) {
-        LOOK_AND_FEEL.setMessageBoxMinWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_WIDTH));
+        uiDecoration.setMessageBoxMinWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_WIDTH));
       }
       if (props.getPropertyString(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_HEIGHT) != null) {
-        LOOK_AND_FEEL.setMessageBoxMinHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_HEIGHT));
+        uiDecoration.setMessageBoxMinHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_HEIGHT));
       }
     }
+  }
+
+  private static void loadDecorations(UiDecoration uiDecoration, ArrayList<ILookAndFeelDecorations> decorationExtensions, IUiDeviceType deviceType) {
+    TreeMap<Integer, ILookAndFeelDecorations> decorations = new TreeMap<Integer, ILookAndFeelDecorations>();
+    for (ILookAndFeelDecorations dec : decorationExtensions) {
+      int scope = dec.getScope();
+      String deviceTypeIdentifier = dec.getDeviceTypeIdentifier();
+      int priority = computePriority(scope, deviceTypeIdentifier);
+
+      if (isDecosAlreadLoaded(decorations, priority, deviceTypeIdentifier)) {
+        LOG.warn("Multiple look and feel decorations found with scope '" + scope + "' and deviceType '" + deviceTypeIdentifier + "'.");
+      }
+      else if (matchesDeviceType(deviceType, deviceTypeIdentifier)) {
+        decorations.put(priority, dec);
+      }
+    }
+    if (decorations.size() > 0) {
+      ILookAndFeelDecorations dec = decorations.get(decorations.lastKey());
+      if (dec.getMandatoryFieldBackgroundColor() != null) {
+        uiDecoration.setMandatoryFieldBackgroundColor(dec.getMandatoryFieldBackgroundColor());
+      }
+      if (dec.getMandatoryLabelFont() != null) {
+        uiDecoration.setMandatoryLabelFont(dec.getMandatoryLabelFont());
+      }
+      if (dec.getMandatoryLabelTextColor() != null) {
+        uiDecoration.setMandatoryLabelTextColor(dec.getMandatoryLabelTextColor());
+      }
+      if (dec.getStarMarkerPosition() != ILookAndFeelDecorations.STAR_MARKER_NONE) {
+        uiDecoration.setMandatoryStarMarkerPosition(dec.getStarMarkerPosition());
+      }
+    }
+  }
+
+  private static boolean isPropsAlreadLoaded(TreeMap<Integer, ILookAndFeelProperties> properties, Integer priority, String deviceTypeIdentifier) {
+    ILookAndFeelProperties alreadyLoadedProps = properties.get(priority);
+    if (alreadyLoadedProps == null) {
+      return false;
+    }
+    if (deviceTypeIdentifier != null && alreadyLoadedProps.getDeviceTypeIdentifier().equalsIgnoreCase(deviceTypeIdentifier)) {
+      return true;
+    }
+
+    return true;
+  }
+
+  private static boolean isDecosAlreadLoaded(TreeMap<Integer, ILookAndFeelDecorations> docorations, Integer priority, String deviceTypeIdentifier) {
+    ILookAndFeelDecorations alreadyLoadedDecos = docorations.get(priority);
+    if (alreadyLoadedDecos == null) {
+      return false;
+    }
+    if (deviceTypeIdentifier != null && alreadyLoadedDecos.getDeviceTypeIdentifier().equalsIgnoreCase(deviceTypeIdentifier)) {
+      return true;
+    }
+
+    return true;
+  }
+
+  private static boolean matchesDeviceType(IUiDeviceType uiDeviceType, String deviceTypeIdentifier) {
+    if (deviceTypeIdentifier == null) {
+      return true;
+    }
+
+    if (uiDeviceType.getIdentifier().equalsIgnoreCase(deviceTypeIdentifier)) {
+      return true;
+    }
+
+    if (deviceTypeIdentifier.equalsIgnoreCase(ATTR_DEVICE_TYPE_KEYWORD_TOUCH) && uiDeviceType.isTouchDevice()) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Computes the priority in which the properties and decorations should be considered.<br>
+   * A greater value means higher priority and overrides values with lower priority.
+   * <p>
+   * Basically the scope is used as priority. If a deviceTypeIdentifier is specified it gets a little higher priority
+   * than scope which makes it possible to define default values for each device type. <br>
+   * If the deviceTypeIdentifier is not a concrete device type but covers more than one device types, it gets lower
+   * priority than a concrete device type.
+   */
+  private static int computePriority(int scope, String deviceTypeIdentifier) {
+    if (!StringUtility.hasText(deviceTypeIdentifier)) {
+      return scope;
+    }
+
+    if (isCombinedDeviceTypeIdentifier(deviceTypeIdentifier)) {
+      return scope + 1;
+    }
+
+    return scope + 2;
+  }
+
+  private static boolean isCombinedDeviceTypeIdentifier(String deviceTypeIdentifier) {
+    if (deviceTypeIdentifier == null) {
+      return false;
+    }
+
+    return deviceTypeIdentifier.equalsIgnoreCase(ATTR_DEVICE_TYPE_KEYWORD_TOUCH);
   }
 
 }

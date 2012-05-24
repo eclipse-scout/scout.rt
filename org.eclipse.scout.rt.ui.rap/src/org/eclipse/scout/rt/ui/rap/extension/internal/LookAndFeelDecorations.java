@@ -19,6 +19,7 @@ public class LookAndFeelDecorations implements ILookAndFeelDecorations {
   private FontSpec m_mandatoryLabelFont;
   private String m_mandatoryFieldBackgroundColor;
   private String m_mandatoryLabelTextColor;
+  private String m_deviceTypeIdentifier;
 
   @Override
   public int getScope() {
@@ -27,6 +28,15 @@ public class LookAndFeelDecorations implements ILookAndFeelDecorations {
 
   public void setScope(int scope) {
     m_scope = scope;
+  }
+
+  @Override
+  public String getDeviceTypeIdentifier() {
+    return m_deviceTypeIdentifier;
+  }
+
+  public void setDeviceTypeIdentifier(String deviceTypeIdentifier) {
+    m_deviceTypeIdentifier = deviceTypeIdentifier;
   }
 
   @Override

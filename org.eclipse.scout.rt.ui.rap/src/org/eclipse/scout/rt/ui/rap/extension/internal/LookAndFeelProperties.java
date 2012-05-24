@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.ui.rap.extension.ILookAndFeelProperties;
 public class LookAndFeelProperties implements ILookAndFeelProperties {
 
   private int m_scope;
-
-  HashMap<String, Object> m_values = new HashMap<String, Object>();
+  private String m_deviceTypeIdentifier;
+  private HashMap<String, Object> m_values = new HashMap<String, Object>();
 
   @Override
   public int getScope() {
@@ -27,6 +27,15 @@ public class LookAndFeelProperties implements ILookAndFeelProperties {
 
   public void setScope(int scope) {
     m_scope = scope;
+  }
+
+  @Override
+  public String getDeviceTypeIdentifier() {
+    return m_deviceTypeIdentifier;
+  }
+
+  public void setDeviceTypeIdentifier(String deviceTypeIdentifier) {
+    m_deviceTypeIdentifier = deviceTypeIdentifier;
   }
 
   public void setPropertyInt(String name, int value) {
@@ -75,11 +84,6 @@ public class LookAndFeelProperties implements ILookAndFeelProperties {
 
   public void setProperty(String name, String value) {
     m_values.put(name, value);
-    // if(name.equals(PROP_COLOR_FOREGROUND_DISABLED)){XXX
-    // setPropertyString(name, value);
-    // }else{
-    // setPropertyInt(name, Integer.parseInt(value));
-    // }
   }
 
 }

@@ -35,6 +35,8 @@ public interface ILookAndFeelProperties {
 
   int getScope();
 
+  String getDeviceTypeIdentifier();
+
   int getPropertyInt(String name);
 
   String getPropertyString(String name);

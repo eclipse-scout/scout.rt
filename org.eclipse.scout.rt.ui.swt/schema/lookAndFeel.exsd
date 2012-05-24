@@ -56,7 +56,15 @@
          <attribute name="scope" use="required">
             <annotation>
                <documentation>
-                  
+                  Specifies the scope for which the properties should be valid. The following values are possible:
+&lt;ul&gt;
+  &lt;li&gt;
+  &lt;b&gt;default:&lt;/b&gt; Indicates that the properties are used as default. This scope is typcially used by scout and should not be set by the application.
+  &lt;/li&gt;
+  &lt;li&gt;
+  &lt;b&gt;global:&lt;/b&gt; Indicates that the properties have a global scope. Properties with global scope override default properties.
+  &lt;/li&gt;
+&lt;/ul&gt;
                </documentation>
             </annotation>
             <simpleType>
@@ -136,7 +144,15 @@
          <attribute name="scope" use="required">
             <annotation>
                <documentation>
-                  
+                  Specifies the scope for which the decorations should be valid. The following values are possible:
+&lt;ul&gt;
+  &lt;li&gt;
+  &lt;b&gt;default:&lt;/b&gt; Indicates that the decorations are used as default. This scope is typcially used by scout and should not be set by the application.
+  &lt;/li&gt;
+  &lt;li&gt;
+  &lt;b&gt;global:&lt;/b&gt; Indicates that the decorations have a global scope. Decorations with global scope override default decorations.
+  &lt;/li&gt;
+&lt;/ul&gt;
                </documentation>
             </annotation>
             <simpleType>

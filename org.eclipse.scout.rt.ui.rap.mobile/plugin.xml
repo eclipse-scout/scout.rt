@@ -87,5 +87,16 @@
             themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
       </themeContribution>
    </extension>
+   <extension
+         point="org.eclipse.scout.rt.ui.rap.lookAndFeel">
+      <properties
+            deviceType="touch"
+            scope="default">
+         <property
+               name="logicalGridLayout.rowHeight"
+               value="28">
+         </property>
+      </properties>
+   </extension>
 
 </plugin>

@@ -98,21 +98,16 @@
          <attribute name="scope">
             <annotation>
                <documentation>
-                  &lt;ul&gt;
-                   &lt;li&gt;
-                     &lt;b&gt;default&lt;/b&gt; to indicate this extension to be the default implementation.
-                     Is usually used of external component providers (e.g. a PhotoShopField).
-                   &lt;/li&gt;
-                   &lt;li&gt;
-                     &lt;b&gt;global&lt;/b&gt; to indicate this extension to have a global scope (whole eclipse).
-                     Global defined extensions overwrite the default implementation.
-                   &lt;/li&gt;
-                   &lt;li&gt;
-                     &lt;b&gt;local&lt;/b&gt; to indicate this extension to have local scope.
-                     Local defined extensions overwrite the global defined implementation. Local extensions should only be declared
-                     in application specific plugins (e.g. com.bsiag.crm.ui.swt).
-                   &lt;/li&gt;
-                 &lt;/ul&gt;
+                  Specifies the scope for which the extension should be valid. The following values are possible:
+&lt;ul&gt;
+  &lt;li&gt;&lt;b&gt;default:&lt;/b&gt; Indicates that this extension is the default implementation. It&apos;s usually used by scout itself or external component providers (e.g. a PhotoShopField).
+  &lt;/li&gt;
+  &lt;li&gt;
+  &lt;b&gt;global:&lt;/b&gt; Indicates that this extension has global scope (whole eclipse). Global extensions override the default implementation.
+  &lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;local:&lt;/b&gt; Indicates that this extension has local scope. Local extensions override the global implementation. Local extensions should only be declared in application specific plugins (e.g. your.app.ui.swt).
+  &lt;/li&gt;
+&lt;/ul&gt;
                </documentation>
             </annotation>
             <simpleType>
