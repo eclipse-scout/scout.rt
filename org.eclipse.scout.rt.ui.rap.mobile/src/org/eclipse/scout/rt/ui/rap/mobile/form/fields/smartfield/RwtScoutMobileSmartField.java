@@ -77,13 +77,10 @@ public class RwtScoutMobileSmartField extends RwtScoutSmartField {
   }
 
   /**
-   * Selects the whole text when focus is gained. <br/>
-   * Does NOT request proposal popup as the original smartfield does if
-   * error status is set.
+   * Overridden to not select any text on focus gain
    */
   @Override
   protected void handleUiFocusGained() {
-    getUiField().setSelection(0, getUiField().getText().length());
   }
 
   private class P_FieldSelectionListener extends MouseAdapter {
@@ -94,8 +91,6 @@ public class RwtScoutMobileSmartField extends RwtScoutSmartField {
       if (!getScoutObject().isEnabled()) {
         return;
       }
-
-      getUiField().forceFocus();
 
       requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true, 0);
     }

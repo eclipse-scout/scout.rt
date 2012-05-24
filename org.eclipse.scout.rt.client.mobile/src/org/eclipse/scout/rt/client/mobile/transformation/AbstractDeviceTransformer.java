@@ -14,7 +14,6 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -34,7 +33,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -178,27 +176,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   private void transformGroupBox(IGroupBox groupBox) {
     groupBox.setGridColumnCountHint(1);
-
-    convertBorderDecorationToSection(groupBox);
-  }
-
-  private void convertBorderDecorationToSection(IGroupBox groupBox) {
-    if (groupBox.isMainBox()) {
-      return;
-    }
-    if (!groupBox.isBorderVisible() || IGroupBox.BORDER_DECORATION_EMPTY.equals(groupBox.getBorderDecoration())) {
-      return;
-    }
-    if (!StringUtility.hasText(groupBox.getLabel())) {
-      return;
-    }
-    if (groupBox.getParentField() instanceof ITabBox) {
-      return;
-    }
-
-    groupBox.setBorderDecoration(IGroupBox.BORDER_DECORATION_SECTION);
-    groupBox.setExpandable(true);
-    groupBox.setExpanded(false);
   }
 
   protected IDesktop getDesktop() {

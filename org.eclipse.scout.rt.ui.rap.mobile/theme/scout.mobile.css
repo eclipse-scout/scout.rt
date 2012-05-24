@@ -55,6 +55,42 @@ Button-FocusIndicator[PUSH], Button-FocusIndicator[TOGGLE] {
   border: 0px;
 }
 
+Button-FocusIndicator[CHECK] {
+  background-color: transparent;
+  background-image: none;
+  border: 0px;
+}
+
+Button-FocusIndicator[RADIO] {
+  background-color: transparent;
+  background-image: none;
+  border: 0px;
+}
+
+Composite.smartfield:hover {
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #f9bb6b ),
+    to( #fe9915 )
+  );
+}
+
+Composite.datefield:hover {
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #f9bb6b ),
+    to( #fe9915 )
+  );
+}
+
+Composite.timefield:hover {
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #f9bb6b ),
+    to( #fe9915 )
+  );
+}
+
 ScrollBar {
   width: 0px;
 }
