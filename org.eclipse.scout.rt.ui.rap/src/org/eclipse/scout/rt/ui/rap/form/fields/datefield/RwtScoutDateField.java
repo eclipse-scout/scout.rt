@@ -43,7 +43,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -99,19 +98,11 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
 
     m_dateContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
     m_dateContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
-    StyledText textField = new StyledTextEx(m_dateContainer, SWT.SINGLE) {
-      private static final long serialVersionUID = 1L;
 
-      @Override
-      public void setBackground(Color color) {
-        super.setBackground(color);
-        if (getDropDownButton() != null) {
-          getDropDownButton().setBackground(color);
-        }
-      }
-    };
+    StyledText textField = new StyledTextEx(m_dateContainer, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     textField.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
+
     ButtonEx dateChooserButton = getUiEnvironment().getFormToolkit().createButtonEx(m_dateContainer, SWT.PUSH | SWT.NO_FOCUS);
     dateChooserButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
     m_dateContainer.setTabList(new Control[]{textField});
@@ -119,6 +110,7 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
 
     // key strokes on container
     getUiEnvironment().addKeyStroke(container, new P_DateChooserOpenKeyStroke(), false);
+
     // key strokes on field
     getUiEnvironment().addKeyStroke(textField, new P_ShiftDayUpKeyStroke(), false);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftDayDownKeyStroke(), false);
@@ -288,6 +280,11 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
       super.handleUiFocusGained();
       getUiField().setCaretOffset(0);
     }
+  }
+
+  @Override
+  protected void setBackgroundFromScout(String scoutColor) {
+    setBackgroundFromScout(scoutColor, m_dateContainer);
   }
 
   @Override

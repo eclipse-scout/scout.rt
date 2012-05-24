@@ -1947,7 +1947,9 @@ Composite.datefield-disabled {
 }
 
 Text.datefield {
-  border-radius: 5px;
+  border-radius: 4px;
+  background-image: none;
+  background-color: transparent;
 }
 
 Text.datefield:disabled {
@@ -1990,7 +1992,9 @@ Composite.timefield-disabled {
 }
 
 Text.timefield {
-  border-radius: 5px;
+  border-radius: 4px;
+  background-image:none;
+  background-color: transparent;
 }
 
 Text.timefield:disabled {

@@ -262,36 +262,66 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
   }
 
   protected void setBackgroundFromScout(String scoutColor) {
-    if (getUiField() != null) {
-      Control fld = getUiField();
-      if (fld.getData(CLIENT_PROP_INITIAL_BACKGROUND) == null) {
-        fld.setData(CLIENT_PROP_INITIAL_BACKGROUND, fld.getBackground());
-      }
-      Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_BACKGROUND);
-      Color c = getUiEnvironment().getColor(scoutColor);
-      if (getMandatoryFieldBackgroundColor() != null) {
-        c = getMandatoryFieldBackgroundColor();
-      }
-      if (c == null) {
-        c = initCol;
-      }
-      fld.setBackground(c);
+    setBackgroundFromScout(scoutColor, getUiField());
+  }
+
+  protected void setBackgroundFromScout(String scoutColor, Control field) {
+    if (field == null) {
+      return;
     }
+
+    boolean init = false;
+    if (field.getData(CLIENT_PROP_INITIAL_BACKGROUND) == null) {
+      field.setData(CLIENT_PROP_INITIAL_BACKGROUND, field.getBackground());
+      init = true;
+    }
+
+    Color color = getMandatoryFieldBackgroundColor();
+    if (color != null) {
+      field.setBackground(color);
+      return;
+    }
+
+    //Do not change color if not explicitly requested by the scout model.
+    if (init && scoutColor == null) {
+      return;
+    }
+
+    Color initCol = (Color) field.getData(CLIENT_PROP_INITIAL_BACKGROUND);
+    color = getUiEnvironment().getColor(scoutColor);
+
+    if (color == null) {
+      color = initCol;
+    }
+    field.setBackground(color);
   }
 
   protected void setForegroundFromScout(String scoutColor) {
-    if (getUiField() != null) {
-      Control fld = getUiField();
-      if (fld.getData(CLIENT_PROP_INITIAL_FOREGROUND) == null) {
-        fld.setData(CLIENT_PROP_INITIAL_FOREGROUND, fld.getForeground());
-      }
-      Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_FOREGROUND);
-      Color c = getUiEnvironment().getColor(scoutColor);
-      if (c == null) {
-        c = initCol;
-      }
-      fld.setForeground(c);
+    setForegroundFromScout(scoutColor, getUiField());
+  }
+
+  protected void setForegroundFromScout(String scoutColor, Control field) {
+    if (field == null) {
+      return;
     }
+
+    boolean init = false;
+    if (field.getData(CLIENT_PROP_INITIAL_FOREGROUND) == null) {
+      field.setData(CLIENT_PROP_INITIAL_FOREGROUND, field.getForeground());
+      init = true;
+    }
+
+    //Do not change color if not explicitly requested by the scout model.
+    if (init && scoutColor == null) {
+      return;
+    }
+
+    Color initCol = (Color) field.getData(CLIENT_PROP_INITIAL_FOREGROUND);
+    Color color = getUiEnvironment().getColor(scoutColor);
+    if (color == null) {
+      color = initCol;
+    }
+    field.setForeground(color);
   }
 
   protected void setFontFromScout(FontSpec scoutFont) {

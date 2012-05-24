@@ -64,7 +64,6 @@ import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -113,17 +112,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
     m_smartContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
     m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
-    StyledText textField = new StyledTextEx(m_smartContainer, SWT.SINGLE) {
-      private static final long serialVersionUID = 1L;
 
-      @Override
-      public void setBackground(Color color) {
-        super.setBackground(color);
-        if (m_browseButton != null) {
-          m_browseButton.setBackground(color);
-        }
-      }
-    };
+    StyledText textField = new StyledTextEx(m_smartContainer, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     // correction to look like a normal text
     textField.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
@@ -253,6 +243,11 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   protected void setIconIdFromScout(String s) {
     m_browseButton.setData(WidgetUtil.CUSTOM_VARIANT, s);
+  }
+
+  @Override
+  protected void setBackgroundFromScout(String scoutColor) {
+    setBackgroundFromScout(scoutColor, m_smartContainer);
   }
 
   @Override
@@ -696,6 +691,10 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
           return;
         }
       }
+      if (getUiField().isDisposed()) {
+        return;
+      }
+
       if (getUiField().isFocusControl()) {
         Runnable t = new Runnable() {
           @Override

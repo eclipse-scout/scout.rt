@@ -3,6 +3,7 @@ Composite.smartfield {
   padding: 0px 2px 0px 0px;
   border: 1px solid #95b7c1;
   border-radius: 4px;
+  background-image:none;
 }
 
 Composite.smartfield-disabled {
@@ -13,7 +14,9 @@ Composite.smartfield-disabled {
 }
 
 Text.smartfield {
-  border-radius: 5px;
+  border-radius: 4px;
+  background-image:none;
+  background-color: transparent;
 }
 
 Text.smartfield:disabled {

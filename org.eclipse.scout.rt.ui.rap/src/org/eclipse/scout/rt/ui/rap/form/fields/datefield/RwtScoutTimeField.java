@@ -43,7 +43,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -99,26 +98,20 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
 
     m_timeContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
     m_timeContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
-    StyledText textField = new StyledTextEx(m_timeContainer, SWT.SINGLE) {
-      private static final long serialVersionUID = 1L;
 
-      @Override
-      public void setBackground(Color color) {
-        super.setBackground(color);
-        if (getDropDownButton() != null) {
-          getDropDownButton().setBackground(color);
-        }
-      }
-    };
+    StyledText textField = new StyledTextEx(m_timeContainer, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     textField.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
+
     ButtonEx timeChooserButton = getUiEnvironment().getFormToolkit().createButtonEx(m_timeContainer, SWT.PUSH | SWT.NO_FOCUS);
     timeChooserButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
+
     m_timeContainer.setTabList(new Control[]{textField});
     container.setTabList(new Control[]{m_timeContainer});
 
     // key strokes on container
     getUiEnvironment().addKeyStroke(container, new P_TimeChooserOpenKeyStroke(), false);
+
     // key strokes on field
     getUiEnvironment().addKeyStroke(textField, new P_ShiftNextQuarterHourKeyStroke(), false);
     getUiEnvironment().addKeyStroke(textField, new P_ShiftPreviousQuarterHourKeyStroke(), false);
@@ -140,6 +133,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     setUiLabel(label);
     setDropDownButton(timeChooserButton);
     setUiField(textField);
+
     // layout
     container.setLayout(new LogicalGridLayout(1, 0));
 
@@ -283,6 +277,11 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
       super.handleUiFocusGained();
       getUiField().setCaretOffset(0);
     }
+  }
+
+  @Override
+  protected void setBackgroundFromScout(String scoutColor) {
+    setBackgroundFromScout(scoutColor, m_timeContainer);
   }
 
   @Override
