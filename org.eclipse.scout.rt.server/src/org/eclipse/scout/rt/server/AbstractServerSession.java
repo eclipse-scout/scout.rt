@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFilter;
+import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.service.SERVICES;
@@ -226,8 +227,10 @@ public abstract class AbstractServerSession implements IServerSession {
       m_sharedVariableMap.addPropertyChangeListener(new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent e) {
-          // notify this session
-          SERVICES.getService(IClientNotificationService.class).putNotification(new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap)), new SessionFilter(AbstractServerSession.this, 60000L));
+          if (OfflineState.isOfflineDefault() == OfflineState.isOfflineInCurrentThread()) {
+            // notify this session
+            SERVICES.getService(IClientNotificationService.class).putNotification(new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap)), new SessionFilter(AbstractServerSession.this, 60000L));
+          }
         }
       });
     }

@@ -206,3 +206,20 @@ Internal security audit
 - enhanced security checks on RemoteFileService
 - ServiceTunnelServlet: renamed delegate for transaction dispatching from handleSoapServiceCall to runServerJobTransaction
 Migration: None
+
+
+23.05.2012 lhu/jgu
+Bugzilla 379721: OfflineDispatcherService: dispatcher thread should be 'offline in current thread'
+1) Server services are not found in offline mode in the following case:
+  - OfflineState: online by default, but the current thread is offline
+  - The service is created by the ServerServiceFactory
+  This is because the dispacher thread in OfflineDispatcherService is running in online mode (if online is default)
+  and a service registered with the ServerServiceFactory is only found on the FrontEnd in offline mode.
+  Solution:
+  The OfflineDispatcherService creates a dispacherThread which is always running offline.
+2) Updates on the SharedVariableMap are propagated to the client with ClientNotifications.
+  If some threads are running in online mode and some in offline mode and the state of the online and offline server is different, this leads to problems.
+  The notifications should only come from the server to which the application is connected by default.
+  Solution: Only send client notifications, if the offline state of the current thread is equal to the default.
+Migration:
+None

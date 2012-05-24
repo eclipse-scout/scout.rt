@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -57,12 +58,14 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     m_dispatcherThread = new Thread("Dispatcher for " + getClass().getName()) {
       @Override
       public void run() {
+        // offline dispatcher thread is always in offline mode
+        OfflineState.setOfflineInCurrentThread(true);
         while (true) {
           try {
             dispatchNextJob();
           }
-          catch (Throwable x) {
-            x.printStackTrace();
+          catch (Throwable t) {
+            LOG.error("Error while executing job in offline dispatcher thread.", t);
           }
         }
       }
