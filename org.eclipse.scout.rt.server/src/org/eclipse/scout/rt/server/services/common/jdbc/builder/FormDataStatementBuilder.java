@@ -547,19 +547,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
       if (def.accept(formData)) {
         Map<String, String> parentAliasMap = getAliasMapper().getRootAliases();
         EntityContribution contrib = def.createInstance(this, formData, parentAliasMap);
-        // if there are no where parts, do nothing
-        if (contrib != null && contrib.getWhereParts().size() != 0) {
-          String wherePart = ListUtility.format(contrib.getWhereParts(), " AND ");
-          if (contrib.getFromParts().size() > 0) {
-            // there are from parts
-            // create an EXISTS (SELECT 1 FROM ... WHERE ...)
-            String fromPart = ListUtility.format(contrib.getFromParts(), ", ");
-            addWhere(" AND EXISTS (SELECT 1 FROM " + fromPart + " WHERE " + wherePart + ")");
-          }
-          else {
-            // no from parts, just use the where parts
-            addWhere(" AND " + wherePart);
-          }
+        String cons = createWhereConstraint(contrib);
+        if (cons != null) {
+          addWhere(" AND " + cons);
         }
       }
     }
@@ -571,20 +561,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
           if (f instanceof AbstractTreeFieldData) {
             // composer tree with entity, attribute
             EntityContribution contrib = buildTreeNodes(((AbstractTreeFieldData) f).getRoots(), EntityStrategy.BuildConstraints, AttributeStrategy.BuildConstraintOfAttributeWithContext);
-            // if there are no where parts, do nothing
-            if (contrib.getWhereParts().size() != 0) {
-              String wherePart = ListUtility.format(contrib.getWhereParts(), " AND ");
-
-              if (contrib.getFromParts().size() > 0) {
-                // there are from parts
-                // create an EXISTS (SELECT 1 FROM ... WHERE ...)
-                String fromPart = ListUtility.format(contrib.getFromParts(), ", ");
-                addWhere(" AND EXISTS (SELECT 1 FROM " + fromPart + " WHERE " + wherePart + ")");
-              }
-              else {
-                // no from parts, just use the where parts
-                addWhere(" AND " + wherePart);
-              }
+            String cons = createWhereConstraint(contrib);
+            if (cons != null) {
+              addWhere(" AND " + cons);
             }
           }
         }
@@ -795,6 +774,34 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return null;
   }
 
+  /**
+   * Creates a where constraints based on the {@link EntityContribution}. This means that from parts etc. are wrapped
+   * inside an EXISTS (SELECT 1 FROM ... WHERE ... ) clause.
+   * 
+   * @returns a where constraint or null if the {@link EntityContribution} is empty.
+   *          <p>
+   *          The constraint does not start with "AND" and can be added with {@link #addWhere(String, NVPair...)} by
+   *          prepending "AND"
+   */
+  public static String createWhereConstraint(EntityContribution contrib) {
+    // if there are no where parts, do nothing
+    if (contrib == null) {
+      return null;
+    }
+    if (contrib.getWhereParts().isEmpty()) {
+      return null;
+    }
+    String wherePart = ListUtility.format(contrib.getWhereParts(), " AND ");
+    if (contrib.getFromParts().isEmpty()) {
+      // no from parts, just use the where parts
+      return wherePart;
+    }
+    // there are from parts
+    // create an EXISTS (SELECT 1 FROM ... WHERE ...)
+    String fromPart = ListUtility.format(contrib.getFromParts(), ", ");
+    return " EXISTS (SELECT 1 FROM " + fromPart + " WHERE " + wherePart + ")";
+  }
+
   public AttributeKind getAttributeKind(TreeNodeData node) {
     if (!(node instanceof ComposerAttributeNodeData)) {
       return AttributeKind.Undefined;
@@ -826,16 +833,12 @@ public class FormDataStatementBuilder implements DataModelConstants {
     while (i < nodes.size()) {
       if (nodes.get(i) instanceof ComposerEntityNodeData) {
         EntityContribution subContrib = buildComposerEntityNodeContribution((ComposerEntityNodeData) nodes.get(i), entityStrategy);
-        if (subContrib != null && !subContrib.isEmpty()) {
-          contrib.add(subContrib);
-        }
+        appendTreeSubContribution(contrib, subContrib, entityStrategy);
         i++;
       }
       else if (nodes.get(i) instanceof ComposerAttributeNodeData) {
         EntityContribution subContrib = buildComposerAttributeNode((ComposerAttributeNodeData) nodes.get(i), attributeStrategy);
-        if (subContrib != null && !subContrib.isEmpty()) {
-          contrib.add(subContrib);
-        }
+        appendTreeSubContribution(contrib, subContrib, entityStrategy);
         i++;
       }
       else if (nodes.get(i) instanceof ComposerEitherOrNodeData) {
@@ -847,19 +850,32 @@ public class FormDataStatementBuilder implements DataModelConstants {
           k++;
         }
         EntityContribution subContrib = buildComposerOrNodes(orNodes, entityStrategy, attributeStrategy);
-        if (subContrib != null && !subContrib.isEmpty()) {
-          contrib.add(subContrib);
-        }
+        appendTreeSubContribution(contrib, subContrib, entityStrategy);
         i = k + 1;
       }
       else {
         EntityContribution subContrib = buildTreeNodes(nodes.get(i).getChildNodes(), entityStrategy, attributeStrategy);
-        if (subContrib != null && !subContrib.isEmpty()) {
-          contrib.add(subContrib);
-        }
+        appendTreeSubContribution(contrib, subContrib, entityStrategy);
       }
     }
     return contrib;
+  }
+
+  private void appendTreeSubContribution(EntityContribution parent, EntityContribution child, EntityStrategy entityStrategy) {
+    switch (entityStrategy) {
+      case BuildConstraints: {
+        String cons = createWhereConstraint(child);
+        if (cons != null) {
+          parent.add(EntityContribution.create(cons));
+        }
+        break;
+      }
+      default: {
+        if (child != null && !child.isEmpty()) {
+          parent.add(child);
+        }
+      }
+    }
   }
 
   /**
