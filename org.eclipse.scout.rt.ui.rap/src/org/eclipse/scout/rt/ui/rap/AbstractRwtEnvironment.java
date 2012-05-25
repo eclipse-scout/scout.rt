@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.CoreException;
@@ -245,14 +246,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   @Override
-  public String getLogoutLandingUrl() {
-    String defaultUrl = MessageFormat.format(
-        "{0}://{1}:{2}{3}/",
-        new Object[]{RWT.getRequest().getScheme(),
-            RWT.getRequest().getLocalName(),
-            Integer.toString(RWT.getRequest().getLocalPort()),
-            RWT.getRequest().getContextPath()});
-    return defaultUrl;
+  public String getLogoutLandingUri() {
+    return RWT.getRequest().getRequestURI();
   }
 
   public void logout() {
@@ -266,8 +261,9 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       }
     }.start();
 
-    String logoutUrl = getLogoutLandingUrl();
-    String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", logoutUrl);
+    HttpServletResponse response = RWT.getResponse();
+    String logoutUri = response.encodeRedirectURL(getLogoutLandingUri());
+    String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", logoutUri);
     JSExecutor.executeJS(browserText);
   }
 
