@@ -23,11 +23,11 @@ import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileForm;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileFormHeader;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileOutlineFormHeader;
 import org.eclipse.scout.rt.ui.rap.mobile.window.desktop.RwtScoutMobileDesktop;
+import org.eclipse.scout.rt.ui.rap.mobile.window.dialog.RwtScoutMobileDialog;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
-import org.eclipse.scout.rt.ui.rap.window.dialog.RwtScoutDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -56,7 +56,7 @@ public abstract class AbstractTabletStandaloneRwtEnvironment extends AbstractSta
   protected IRwtScoutPart createUiScoutDialog(IForm form, Shell shell, int dialogStyle) {
     dialogStyle = SWT.APPLICATION_MODAL | SWT.BORDER;
 
-    RwtScoutDialog ui = new RwtScoutDialog();
+    RwtScoutMobileDialog ui = new RwtScoutMobileDialog();
     ui.createPart(form, shell, dialogStyle, this);
     return ui;
   }

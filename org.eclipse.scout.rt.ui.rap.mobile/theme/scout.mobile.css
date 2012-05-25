@@ -82,3 +82,15 @@ background-color: #f1f8fe;
 ScrollBar {
   width: 0px;
 }
+
+Shell[BORDER] {
+  box-shadow: 5px 5px 4px 0px #3f3f3f;
+  animation: none;
+}
+
+Shell-DisplayOverlay {
+  animation: none;
+  background-image: none;
+  background-color: #565656;
+  opacity: 0.5;
+}

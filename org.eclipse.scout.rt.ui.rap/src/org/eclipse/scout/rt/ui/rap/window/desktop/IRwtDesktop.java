@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.window.desktop;
 
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 
-public interface IRwtDesktop {
+public interface IRwtDesktop extends IRwtScoutComposite<IDesktop> {
 
   IRwtScoutPart addForm(IForm form);
 

@@ -955,7 +955,7 @@ ScrollBar-Thumb[HORIZONTAL] {
 
 /* Shell */
 Shell {
-  border: 1px black;
+  border: none;
   padding: 0px;
   background-image: none;
   opacity: 1;

@@ -50,7 +50,13 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformForm(IForm form) {
+    form.setAskIfNeedSave(false);
+    transformDisplayHintSettings(form);
     transformFormFields(form);
+  }
+
+  protected void transformDisplayHintSettings(IForm form) {
+
   }
 
   @Override

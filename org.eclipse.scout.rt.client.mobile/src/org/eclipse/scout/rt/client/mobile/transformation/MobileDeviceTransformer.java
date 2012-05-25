@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.services.IMobileNavigationService;
+import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.forms.FormStack;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -32,15 +33,12 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   @Override
-  public void transformForm(IForm form) {
-    displayFormAsView(form);
-
-    form.setAskIfNeedSave(false);
-    transformFormFields(form);
-  }
-
-  protected void displayFormAsView(IForm form) {
-    form.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
-    form.setDisplayViewId(IForm.VIEW_ID_CENTER);
+  protected void transformDisplayHintSettings(IForm form) {
+    if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
+      form.setDisplayViewId(IForm.VIEW_ID_CENTER);
+    }
+    else {
+      MobileDesktopUtility.setFormWidthHint(form, Integer.MAX_VALUE);
+    }
   }
 }

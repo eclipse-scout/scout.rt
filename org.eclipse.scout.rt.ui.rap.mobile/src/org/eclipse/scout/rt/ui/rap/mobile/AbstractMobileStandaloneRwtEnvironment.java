@@ -23,11 +23,15 @@ import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileForm;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileFormHeader;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileOutlineFormHeader;
 import org.eclipse.scout.rt.ui.rap.mobile.window.desktop.RwtScoutMobileDesktop;
+import org.eclipse.scout.rt.ui.rap.mobile.window.dialog.RwtScoutMobileDialog;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
 
@@ -46,6 +50,15 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
   @Override
   protected RwtScoutDesktop createUiDesktop() {
     return new RwtScoutMobileDesktop();
+  }
+
+  @Override
+  protected IRwtScoutPart createUiScoutDialog(IForm form, Shell shell, int dialogStyle) {
+    dialogStyle = SWT.APPLICATION_MODAL;
+
+    RwtScoutMobileDialog ui = new RwtScoutMobileDialog();
+    ui.createPart(form, shell, dialogStyle, this);
+    return ui;
   }
 
   @Override

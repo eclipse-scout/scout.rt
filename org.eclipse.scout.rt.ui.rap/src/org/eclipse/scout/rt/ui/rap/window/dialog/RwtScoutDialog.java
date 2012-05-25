@@ -295,6 +295,14 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     return false;
   }
 
+  protected Dialog getUiDialog() {
+    return m_uiDialog;
+  }
+
+  protected IFormBoundsProvider getBoundsProvider() {
+    return m_boundsProvider;
+  }
+
   private class DialogImpl extends Dialog {
     private static final long serialVersionUID = 1L;
 
