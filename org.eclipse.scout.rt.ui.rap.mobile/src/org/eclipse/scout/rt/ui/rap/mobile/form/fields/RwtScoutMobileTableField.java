@@ -56,7 +56,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
       return;
     }
 
-    disposeSingleColumnTable();
+    disposeMobileTable();
 
     if (table == null) {
       super.setTableFromScout(table);
@@ -107,7 +107,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
       return headerName;
     }
 
-    return TEXTS.get("SingleColumnTableDefaultHeader");
+    return TEXTS.get("MobileTableDefaultHeader");
   }
 
   private boolean computeDrillDownColumnVisibility() {
@@ -134,12 +134,12 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
 
   @Override
   protected void detachScout() {
-    disposeSingleColumnTable();
+    disposeMobileTable();
 
     super.detachScout();
   }
 
-  private void disposeSingleColumnTable() {
+  private void disposeMobileTable() {
     if (m_mobileTable == null) {
       return;
     }
