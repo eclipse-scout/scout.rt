@@ -68,27 +68,15 @@ Button-FocusIndicator[RADIO] {
 }
 
 Composite.smartfield:hover {
-  background-image: gradient(
-    linear, left top, left bottom,
-    from( #f9bb6b ),
-    to( #fe9915 )
-  );
+  background-color: #f1f8fe;
 }
 
 Composite.datefield:hover {
-  background-image: gradient(
-    linear, left top, left bottom,
-    from( #f9bb6b ),
-    to( #fe9915 )
-  );
+background-color: #f1f8fe;
 }
 
 Composite.timefield:hover {
-  background-image: gradient(
-    linear, left top, left bottom,
-    from( #f9bb6b ),
-    to( #fe9915 )
-  );
+background-color: #f1f8fe;
 }
 
 ScrollBar {
