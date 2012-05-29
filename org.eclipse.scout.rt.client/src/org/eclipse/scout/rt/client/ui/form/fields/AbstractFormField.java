@@ -294,9 +294,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * Configures whether this field should horizontally fill the grid cell.<br>
-   * If the property is set to true the field takes all the horizontal space and therefore is as width as the grid cell.
-   * If it's set to false the width is computed based on the properties {@link #getConfiguredGridUseUiWidth()} and
-   * {@link #getConfiguredWidthInPixel()}. If non of these are set a default value is used which typically is the width
+   * If the property is set to true, the field takes all the horizontal space and therefore is as width as the grid
+   * cell.<br>
+   * If it's set to false, the width is computed based on the properties {@link #getConfiguredGridUseUiWidth()} and
+   * {@link #getConfiguredWidthInPixel()}. If non of these are set, a default value is used which typically is the width
    * of a logical grid column.
    * <p>
    * Subclasses can override this method. Default is true.
@@ -313,9 +314,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * Configures whether this field should vertically fill the grid cell.<br>
-   * If the property is set to true the field takes all the vertical space and therefore is as height as the grid cell.
-   * If it's set to false the height is computed based on the properties {@link #getConfiguredGridUseUiHeight()} and
-   * {@link #getConfiguredHeightInPixel()}. If non of these are set a default value is used which typically is the
+   * If the property is set to true, the field takes all the vertical space and therefore is as height as the grid cell.<br>
+   * If it's set to false, the height is computed based on the properties {@link #getConfiguredGridUseUiHeight()} and
+   * {@link #getConfiguredHeightInPixel()}. If non of these are set, a default value is used which typically is the
    * height of a logical grid row.
    * <p>
    * Subclasses can override this method. Default is true.
@@ -331,8 +332,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Configures the x position of this field in the logical grid of the group box.<br>
-   * If the value is set to -1 the property will be ignored. If the value is >= 0 it's considered as grid column. <br>
+   * Configures the x position (horizontal) of this field in the logical grid of the surrounding group box.<br>
+   * If the value is set to -1, the property will be ignored. If the value is >= 0, it's considered as grid column. <br>
    * It is not necessary to explicitly set a column count by {@link AbstractGroupBox#getConfiguredGridColumnCount()}.
    * <p>
    * This property only has an effect if every field inside the group box has a fix position which means every field
@@ -352,8 +353,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Configures the y position of this field in the logical grid of the group box.<br>
-   * If the value is set to -1 the property will be ignored. If the value is >= 0 it's considered as grid row. <br>
+   * Configures the y (vertical) position of this field in the logical grid of the surrounding group box.<br>
+   * If the value is set to -1, the property will be ignored. If the value is >= 0, it's considered as grid row. <br>
    * <p>
    * This property only has an effect if every field inside the group box has a fix position which means every field
    * inside the group box need to have x and y to be set which can be configured by {@link #getConfiguredGridX()} and
@@ -376,8 +377,21 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * The value defined by this property refers to the number of columns defined by the group box which contains this
    * field. This column count can be configured by {@link AbstractGroupBox#getConfiguredGridColumnCount()}.
    * <p>
-   * <b>Example:</b> If the column count of the group box is set to 3 and a column span of this field is set to 2 it
-   * means 2/3 of the group box width is used for this field.
+   * <b>Example:</b><br>
+   * If the column count of the group box is set to 3 and a column span of this field is set to 2 it means 2/3 of the
+   * group box width is used for this field:<br>
+   * <table border="1">
+   * <colgroup align="center" width="40"/> <colgroup align="center" width="40"/> <colgroup align="center" width="40"/>
+   * <tr>
+   * <td colspan="2">this</td>
+   * <td>...</td>
+   * </tr>
+   * <tr>
+   * <td>...</td>
+   * <td>...</td>
+   * <td>...</td>
+   * </tr>
+   * </table>
    * <p>
    * Subclasses can override this method. Default is 1.
    * 
@@ -399,8 +413,18 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * number of columns defined by that group box.
    * <p>
    * <b>Example:</b> A group box with 2 columns contains 3 fields: The first 2 fields have gridW = 1 and gridH = 1 and
-   * the 3 field has gridW = 1 and gridH = 2. In this case the third field would be as height as the other 2 fields
-   * together because it spans two rows.
+   * the third field has gridW = 1 and gridH = 2. In this case the third field would be as height as the other 2 fields
+   * together because it spans two rows:<br>
+   * <table border="1">
+   * <colgroup align="center" width="40"/> <colgroup align="center" width="40"/>
+   * <tr>
+   * <td>1</td>
+   * <td rowspan="2">3</td>
+   * </tr>
+   * <tr>
+   * <td>2</td>
+   * </tr>
+   * </table>
    * <p>
    * Subclasses can override this method. Default is 1.
    * 
@@ -417,11 +441,11 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * Configures how much a grid cell should horizontally grow or shrink.<br>
    * <p>
-   * The value for this property can either be one of 0 to 1, or -1.
+   * The value for this property can either be -1 or between 0 and 1.
    * <ul>
    * <li>0 means fixed width and the grid cell won't grow or shrink.</li>
    * <li>Greater 0 means the grid cell will grab the excess horizontal space and therefore grow or shrink. If the group
-   * box contains more than one field with weightX > 0 the weight is used to specify how strong the width of the grid
+   * box contains more than one field with weightX > 0, the weight is used to specify how strong the width of the grid
    * cell should be adjusted.</li>
    * <li>-1 means the ui computes the optimal value so that the fields proportionally grab the excess space.</li>
    * </ul>
@@ -429,7 +453,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * <ul>
    * <li>A group box with 3 columns contains 3 fields: Every field has gridW = 1 and weightX = -1. This leads to 1 row
    * and 3 grid cells which would grow and shrink proportionally because weightX is automatically set to > 0.</li>
-   * <li>If the weight of these 3 fields were set to 0.1, 0.1 and 1 the first two fields would adjust the size very
+   * <li>If the weight of these 3 fields were set to 0.1, 0.1 and 1, the first two fields would adjust the size very
    * slowly and would mostly be as big as a logical grid column (because gridW is set to 1), whereas the third field
    * would adjust it's size very fast.</li>
    * </ul>
@@ -449,11 +473,11 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * Configures how much a grid cell should vertically grow or shrink.<br>
    * <p>
-   * The value for this property can either be one of 0 to 1, or -1.
+   * The value for this property can either be -1 or between 0 and 1.
    * <ul>
    * <li>0 means fixed height and the grid cell won't grow or shrink.</li>
    * <li>Greater 0 means the grid cell will grab the excess vertical space and therefore grow or shrink. If the group
-   * box contains more than one field with weightY > 0 the weight is used to specify how strong the height of the grid
+   * box contains more than one field with weightY > 0, the weight is used to specify how strong the height of the grid
    * cell should be adjusted.</li>
    * <li>-1 means the ui computes the optimal value so that the fields proportionally grab the excess space, but only if
    * gridH is > 1. If gridH is 1 a weight of 0 is set and the grid cell does not grow or shrink.</li>
@@ -462,8 +486,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * <ul>
    * <li>A group box with 1 column contains 3 fields: Every field has gridH = 1 and weightY = -1. This leads to 3 rows
    * with fixed height, no additional space is grabbed, because weightY will automatically be set to 0.</li>
-   * <li>If the weight of these 3 fields were set to 1 the fields would grow and shrink proportionally.</li>
-   * <li>If the weight of these 3 fields were set to 0.1, 0.1 and 1 the first two fields would adjust the size very
+   * <li>If the weight of these 3 fields were set to 1, the fields would grow and shrink proportionally.</li>
+   * <li>If the weight of these 3 fields were set to 0.1, 0.1 and 1, the first two fields would adjust the size very
    * slowly and would mostly be a as big as one logical grid row (because gridH is set to 1), whereas the third field
    * would adjust it's size very fast.</li>
    * </ul>

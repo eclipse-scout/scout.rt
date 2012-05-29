@@ -76,13 +76,15 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   /**
    * Configures the border visibility for this group box. <br>
-   * If the property is set to true a border will be displayed
-   * around the group box. The style of the border is configured by {@link #getConfiguredBorderDecoration()}. If the
-   * property is set to false no border will be displayed and the margin reserved for the border will be removed.
+   * If the property is set to true, a border will be displayed
+   * around the group box. The style of the border is configured by {@link #getConfiguredBorderDecoration()}.<br>
+   * If the
+   * property is set to false, no border will be displayed and the margin reserved for the border will be removed.
    * <p>
    * <b>Hint:</b> Keep in mind that setting the border to invisible also removes the margin which could lead to a
    * misalignment of the fields if several group boxes are used on a form. In order to preserve the correct alignment
-   * consider using {@link #getConfiguredBorderDecoration()} with {@link IGroupBox#BORDER_DECORATION_EMPTY} instead.
+   * consider using {@link #getConfiguredBorderDecoration()} with {@link IGroupBox#BORDER_DECORATION_EMPTY} and
+   * {@link #getConfiguredBorderVisible()} with {@code true} instead.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
    * 
@@ -194,7 +196,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   /**
    * Configures whether this group box should be scrollable.</br>
-   * If the property is set to true a vertical scrollbar will appear if the content is too large to be displayed.
+   * If the property is set to true, a vertical scrollbar will appear if the content is too large to be displayed.
    * <p>
    * Subclasses can override this method. Default is false.
    * 
