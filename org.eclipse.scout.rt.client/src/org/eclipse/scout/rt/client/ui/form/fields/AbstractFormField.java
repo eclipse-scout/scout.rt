@@ -41,8 +41,8 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
@@ -258,6 +258,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return null;
   }
 
+  /**
+   * Configures the horizontal alignment of the fields inside this group box.<br>
+   * This property typically only has an effect if fill horizontal is set to false which can be configured by
+   * {@link #getConfiguredFillHorizontal()}.
+   * <p>
+   * Subclasses can override this method. Default alignment is left.
+   * 
+   * @return -1 for left, 0 for center and 1 for right alignment
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   */
   @ConfigProperty(ConfigProperty.HORIZONTAL_ALIGNMENT)
   @Order(85)
   @ConfigPropertyValue("-1")
@@ -265,6 +275,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return -1;
   }
 
+  /**
+   * Configures the vertical alignment of the fields inside this group box.<br>
+   * This property typically only has an effect if fill vertical is set to false which can be configured by
+   * {@link #getConfiguredFillVertical()}.
+   * <p>
+   * Subclasses can override this method. Default alignment is top.
+   * 
+   * @return -1 for top, 0 for center and 1 for bottom alignment
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   */
   @ConfigProperty(ConfigProperty.VERTICAL_ALIGNMENT)
   @Order(86)
   @ConfigPropertyValue("-1")
@@ -272,6 +292,18 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return -1;
   }
 
+  /**
+   * Configures whether this field should horizontally fill the grid cell.<br>
+   * If the property is set to true the field takes all the horizontal space and therefore is as width as the grid cell.
+   * If it's set to false the width is computed based on the properties {@link #getConfiguredGridUseUiWidth()} and
+   * {@link #getConfiguredWidthInPixel()}. If non of these are set a default value is used which typically is the width
+   * of a logical grid column.
+   * <p>
+   * Subclasses can override this method. Default is true.
+   * 
+   * @return {@code true} if this field should horizontally fill the grid cell, {@code false} otherwise
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(87)
   @ConfigPropertyValue("true")
@@ -279,6 +311,18 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return true;
   }
 
+  /**
+   * Configures whether this field should vertically fill the grid cell.<br>
+   * If the property is set to true the field takes all the vertical space and therefore is as height as the grid cell.
+   * If it's set to false the height is computed based on the properties {@link #getConfiguredGridUseUiHeight()} and
+   * {@link #getConfiguredHeightInPixel()}. If non of these are set a default value is used which typically is the
+   * height of a logical grid row.
+   * <p>
+   * Subclasses can override this method. Default is true.
+   * 
+   * @return {@code true} if this field should vertically fill the grid cell, {@code false} otherwise
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(88)
   @ConfigPropertyValue("true")
@@ -287,10 +331,18 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * This sets the logical layout property hint for X. This is a hint only and
-   * can be accessed using {@link #getGridDataHints()}. The resulting
-   * (validated) grid properties that are also used in the final gui layouting
-   * are accessed using {@link #getGridData()} and are validated by {@link GridDataBuilder}
+   * Configures the x position of this field in the logical grid of the group box.<br>
+   * If the value is set to -1 the property will be ignored. If the value is >= 0 it's considered as grid column. <br>
+   * It is not necessary to explicitly set a column count by {@link AbstractGroupBox#getConfiguredGridColumnCount()}.
+   * <p>
+   * This property only has an effect if every field inside the group box has a fix position which means every field
+   * inside the group box need to have x and y to be set which can be configured by {@link #getConfiguredGridX()} and
+   * {@link #getConfiguredGridY()}.
+   * <p>
+   * Subclasses can override this method. Default is -1.
+   * 
+   * @return the x position in the grid.
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(90)
@@ -300,10 +352,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * This sets the logical layout property hint for Y. This is a hint only and
-   * can be accessed using {@link #getGridDataHints()}. The resulting
-   * (validated) grid properties that are also used in the final gui layouting
-   * are accessed using {@link #getGridData()} and are validated by {@link GridDataBuilder}
+   * Configures the y position of this field in the logical grid of the group box.<br>
+   * If the value is set to -1 the property will be ignored. If the value is >= 0 it's considered as grid row. <br>
+   * <p>
+   * This property only has an effect if every field inside the group box has a fix position which means every field
+   * inside the group box need to have x and y to be set which can be configured by {@link #getConfiguredGridX()} and
+   * {@link #getConfiguredGridY()}.
+   * <p>
+   * Subclasses can override this method. Default is -1.
+   * 
+   * @return the y position in the grid.
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(95)
@@ -313,10 +372,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * This sets the logical layout property hint for W. This is a hint only and
-   * can be accessed using {@link #getGridDataHints()}. The resulting
-   * (validated) grid properties that are also used in the final gui layouting
-   * are accessed using {@link #getGridData()} and are validated by {@link GridDataBuilder}
+   * Configures the column span of this field.<br>
+   * The value defined by this property refers to the number of columns defined by the group box which contains this
+   * field. This column count can be configured by {@link AbstractGroupBox#getConfiguredGridColumnCount()}.
+   * <p>
+   * <b>Example:</b> If the column count of the group box is set to 3 and a column span of this field is set to 2 it
+   * means 2/3 of the group box width is used for this field.
+   * <p>
+   * Subclasses can override this method. Default is 1.
+   * 
+   * @return the number of columns to span
+   * @see #getConfiguredGridWeightX(), {@link #getGridData()}, {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(100)
@@ -326,10 +392,20 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * This sets the logical layout property hint for H. This is a hint only and
-   * can be accessed using {@link #getGridDataHints()}. The resulting
-   * (validated) grid properties that are also used in the final gui layouting
-   * are accessed using {@link #getGridData()} and are validated by {@link GridDataBuilder}
+   * Configures the row span of this field.<br>
+   * Compared to the number of columns, which is a configurable value and therefore static, the number of rows is
+   * dynamic. That number depends on the number of fields used in the group box which contains this field, as well as
+   * the
+   * number of columns defined by that group box.
+   * <p>
+   * <b>Example:</b> A group box with 2 columns contains 3 fields: The first 2 fields have gridW = 1 and gridH = 1 and
+   * the 3 field has gridW = 1 and gridH = 2. In this case the third field would be as height as the other 2 fields
+   * together because it spans two rows.
+   * <p>
+   * Subclasses can override this method. Default is 1.
+   * 
+   * @return the number of rows to span
+   * @see #getConfiguredGridWeightY(), {@link #getGridData()}, {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(105)
@@ -339,12 +415,29 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * This sets the logical layout property hint for weightX. This is a hint only
-   * and can be accessed using {@link #getGridDataHints()}. The resulting
-   * (validated) grid properties that are also used in the final gui layouting
-   * are accessed using {@link #getGridData()} and are validated by {@link GridDataBuilder}
+   * Configures how much a grid cell should horizontally grow or shrink.<br>
    * <p>
-   * weightX is by default 1.0
+   * The value for this property can either be one of 0 to 1, or -1.
+   * <ul>
+   * <li>0 means fixed width and the grid cell won't grow or shrink.</li>
+   * <li>Greater 0 means the grid cell will grab the excess horizontal space and therefore grow or shrink. If the group
+   * box contains more than one field with weightX > 0 the weight is used to specify how strong the width of the grid
+   * cell should be adjusted.</li>
+   * <li>-1 means the ui computes the optimal value so that the fields proportionally grab the excess space.</li>
+   * </ul>
+   * <b>Examples:</b>
+   * <ul>
+   * <li>A group box with 3 columns contains 3 fields: Every field has gridW = 1 and weightX = -1. This leads to 1 row
+   * and 3 grid cells which would grow and shrink proportionally because weightX is automatically set to > 0.</li>
+   * <li>If the weight of these 3 fields were set to 0.1, 0.1 and 1 the first two fields would adjust the size very
+   * slowly and would mostly be as big as a logical grid column (because gridW is set to 1), whereas the third field
+   * would adjust it's size very fast.</li>
+   * </ul>
+   * <p>
+   * Subclasses can override this method. Default is -1.
+   * 
+   * @return a value between 0 and 1, or -1
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(130)
@@ -354,12 +447,31 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * This sets the logical layout property hint for weightY. This is a hint only
-   * and can be accessed using {@link #getGridDataHints()}. The resulting
-   * (validated) grid properties that are also used in the final gui layouting
-   * are accessed using {@link #getGridData()} and are validated by {@link GridDataBuilder}
+   * Configures how much a grid cell should vertically grow or shrink.<br>
    * <p>
-   * weightY is by default 0.0 when the field has H=1, and H-1 when the field H is larger than 1
+   * The value for this property can either be one of 0 to 1, or -1.
+   * <ul>
+   * <li>0 means fixed height and the grid cell won't grow or shrink.</li>
+   * <li>Greater 0 means the grid cell will grab the excess vertical space and therefore grow or shrink. If the group
+   * box contains more than one field with weightY > 0 the weight is used to specify how strong the height of the grid
+   * cell should be adjusted.</li>
+   * <li>-1 means the ui computes the optimal value so that the fields proportionally grab the excess space, but only if
+   * gridH is > 1. If gridH is 1 a weight of 0 is set and the grid cell does not grow or shrink.</li>
+   * </ul>
+   * <b>Examples:</b>
+   * <ul>
+   * <li>A group box with 1 column contains 3 fields: Every field has gridH = 1 and weightY = -1. This leads to 3 rows
+   * with fixed height, no additional space is grabbed, because weightY will automatically be set to 0.</li>
+   * <li>If the weight of these 3 fields were set to 1 the fields would grow and shrink proportionally.</li>
+   * <li>If the weight of these 3 fields were set to 0.1, 0.1 and 1 the first two fields would adjust the size very
+   * slowly and would mostly be a as big as one logical grid row (because gridH is set to 1), whereas the third field
+   * would adjust it's size very fast.</li>
+   * </ul>
+   * <p>
+   * Subclasses can override this method. Default is -1.
+   * 
+   * @return a value between 0 and 1, or -1
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(140)
@@ -369,13 +481,15 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * This sets the logical layout property hint for useUiWidth. This is a hint
-   * only and can be accessed using {@link #getGridDataHints()}. The resulting
-   * (validated) grid properties that are also used in the final gui layouting
-   * are accessed using {@link #getGridData()} and are validated by {@link GridDataBuilder}
+   * Configures whether the field should be as width as preferred by the ui. The preferred width normally is the
+   * computed width of the child fields.<br>
+   * This property typically has less priority than {@link #getConfiguredWidthInPixel()} and therefore only has an
+   * effect if no explicit width is set.
    * <p>
-   * useUiWidth is by default false. true makes the layout manager to use the ui original preferred width to layout the
-   * field in the group box
+   * Subclasses can override this method. Default is false.
+   * 
+   * @return {@code true} if this field should be as width as preferred by the ui, {@code false} otherwise
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(142)
@@ -385,13 +499,15 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * This sets the logical layout property hint for useUiHeight. This is a hint
-   * only and can be accessed using {@link #getGridDataHints()}. The resulting
-   * (validated) grid properties that are also used in the final gui layouting
-   * are accessed using {@link #getGridData()} and are validated by {@link GridDataBuilder}
+   * Configures whether the field should be as height as preferred by the ui. The preferred height normally is the
+   * computed height of the child fields.<br>
+   * This property typically has less priority than {@link #getConfiguredHeightInPixel()} and therefore only has an
+   * effect if no explicit height is set.
    * <p>
-   * useUiHeight is by default false. true makes the layout manager to use the ui original preferred height to layout
-   * the field in the group box
+   * Subclasses can override this method. Default is false.
+   * 
+   * @return {@code true} if this field should be as height as preferred by the ui, {@code false} otherwise
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(142)
@@ -400,6 +516,15 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return false;
   }
 
+  /**
+   * Configures the preferred width of the field. <br>
+   * If the value is <=0 the property will be ignored by the ui layout manager.
+   * <p>
+   * Subclasses can override this method. Default is 0.
+   * 
+   * @return the preferred width in pixel
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(150)
   @ConfigPropertyValue("0")
@@ -407,6 +532,15 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return 0;
   }
 
+  /**
+   * Configures the preferred height of the field. <br>
+   * If the value is <=0 the property will be ignored by the ui layout manager.
+   * <p>
+   * Subclasses can override this method. Default is 0.
+   * 
+   * @return the preferred height in pixel
+   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(160)
   @ConfigPropertyValue("0")

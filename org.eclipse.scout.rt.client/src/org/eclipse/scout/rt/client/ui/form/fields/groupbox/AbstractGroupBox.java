@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEnterKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEscapeKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -48,8 +49,8 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     super(callInitializer);
   }
 
-  /*
-   * Configuration
+  /**
+   * {@inheritDoc} Default for group boxes is true.
    */
   @ConfigPropertyValue("true")
   @Override
@@ -144,6 +145,14 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return BORDER_DECORATION_AUTO;
   }
 
+  /**
+   * Configures the background image for this group box.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return the ID (name) of the image
+   * @see IIconProviderService
+   */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(240)
   @ConfigPropertyValue("null")
@@ -151,6 +160,15 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return null;
   }
 
+  /**
+   * Configures the horizontal alignment of the background image.<br>
+   * This property only has an effect if the group box has a background image which can be configured by
+   * {@link #getConfiguredBackgroundImageName()}
+   * <p>
+   * Subclasses can override this method. Default alignment is center.
+   * 
+   * @return -1 for left, 0 for center and 1 for right alignment
+   */
   @ConfigProperty(ConfigProperty.HORIZONTAL_ALIGNMENT)
   @Order(250)
   @ConfigPropertyValue("0")
@@ -158,6 +176,15 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return 0;
   }
 
+  /**
+   * Configures the vertical alignment of the background image.<br>
+   * This property only has an effect if the group box has a background image which can be configured by
+   * {@link #getConfiguredBackgroundImageName()}
+   * <p>
+   * Subclasses can override this method. Default alignment is center.
+   * 
+   * @return -1 for top, 0 for center and 1 for bottom alignment
+   */
   @ConfigProperty(ConfigProperty.VERTICAL_ALIGNMENT)
   @Order(260)
   @ConfigPropertyValue("0")

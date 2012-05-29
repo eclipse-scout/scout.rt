@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
@@ -508,24 +509,25 @@ public interface IFormField extends IPropertyObserver {
 
   void setFont(FontSpec f);
 
-  /*
-   * AutoLayout
+  /**
+   * @return the grid data hints used by the {@link GridDataBuilder} to create the final grid data which can be
+   *         accessed using {@link #getGridData()}.
    */
   GridData getGridDataHints();
 
   void setGridDataHints(GridData data);
 
   /**
-   * @return GridData used by parent of this field to layout this field in a
-   *         logical grid
+   * @return the resulting (validated) grid data which is also used by the ui layout manager to layout this field
+   *         in a logical grid.
    */
   GridData getGridData();
 
   /**
-   * set life GridCell of this field, do not use this internal method, for grid
-   * layout hints use {@link #setGridDataHints(GridData)}
+   * Sets the life {@link GridData} of this field.<br>
+   * Do not use this internal method, for grid layout hints use {@link #setGridDataHints(GridData)}.
    */
-  void setGridDataInternal(GridData cell);
+  void setGridDataInternal(GridData data);
 
   /**
    * true if the field has data that requires save
