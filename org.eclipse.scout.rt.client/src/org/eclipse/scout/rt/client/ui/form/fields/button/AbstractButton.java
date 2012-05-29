@@ -102,12 +102,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
-   * Configures whether this button should fill the horizontal width in the GUI grid layout. Buttons
-   * usually take as much place as is needed to display the button label, but not necessarily more.
-   * <p>
-   * Subclasses can override this method. Default is {@code false}.
-   * 
-   * @return {@code true} if this button should fill the horizontal width in the GUI grid, {@code false} otherwise
+   * {@inheritDoc} Default for buttons is false because they usually should only take as much place as is needed to
+   * display the button label, but not necessarily more. See also {@link #getConfiguredGridUseUiWidth()}.
    */
   @ConfigPropertyValue("false")
   @Override
@@ -116,12 +112,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
-   * Configures whether this button should fill the vertical height in the GUI grid layout. Buttons
-   * usually take as much place as is needed to display the button label, but not necessarily more.
-   * <p>
-   * Subclasses can override this method. Default is {@code false}.
-   * 
-   * @return {@code true} if this button should fill the vertical height in the GUI grid, {@code false} otherwise
+   * {@inheritDoc} Default for buttons is false because they usually should only take as much place as is needed to
+   * display the button label, but not necessarily more.
    */
   @ConfigPropertyValue("false")
   @Override
@@ -130,11 +122,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
-   * Configures whether this button should be layouted using the original preferred width by the GUI.
-   * <p>
-   * Subclasses can override this method. Default is {@code true}.
-   * 
-   * @return {@code true} if this button should be using the GUI preferred width, {@code false} otherwise
+   * {@inheritDoc} Default for buttons is true because they usually should only take as much place as is needed to
+   * display the button label, but not necessarily more.
    */
   @ConfigPropertyValue("true")
   @Override
@@ -143,11 +132,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
-   * Configures whether this button should be layouted using the original preferred height by the GUI.
-   * <p>
-   * Subclasses can override this method. Default is {@code false}.
-   * 
-   * @return {@code true} if this button should be using the GUI preferred height, {@code false} otherwise
+   * {@inheritDoc}
    */
   @ConfigPropertyValue("false")
   @Override
