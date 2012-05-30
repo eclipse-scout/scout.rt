@@ -28,8 +28,6 @@ import org.eclipse.scout.rt.ui.rap.mobile.form.fields.button.RwtScoutMobileButto
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -69,16 +67,6 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
     Button uiButton = getUiEnvironment().getFormToolkit().createButton(container, "", style);
 
     uiButton.addSelectionListener(new P_RwtSelectionListener());
-    if ((style & SWT.TOGGLE) != 0) {
-      uiButton.addMouseListener(new MouseAdapter() {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void mouseDown(MouseEvent e) {
-          m_selectionAlreadyRemoved = false;
-        }
-      });
-    }
 
     m_contextMenu = new Menu(uiButton.getShell(), SWT.POP_UP);
     m_contextMenu.addMenuListener(new P_ContextMenuListener());
@@ -222,11 +210,6 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
       return;
     }
 
-    if (m_selectionAlreadyRemoved) {
-      getUiField().setSelection(false);
-      m_selectionAlreadyRemoved = false;
-    }
-
     //Toggling the selection should open or close the menu.
     if (!getUiField().getSelection()) {
       return;
@@ -238,9 +221,12 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
       @Override
       public void menuHidden(MenuEvent e) {
         try {
-          //Remove selection if menu hides (toggle state must reflect the menu state (open or close))
-          getUiField().setSelection(false);
-          m_selectionAlreadyRemoved = true;
+          //Remove selection if menu hides  (toggle state must reflect the menu state (open or close))
+          //Note: Keyboard events (ESC, Space) are not considered at the moment because it's optimized for mobile.
+          //If this class should be available for web client in the future keyboard handling should be considered to properly support toggling.
+          if (!getUiField().isFocusControl()) {
+            getUiField().setSelection(false);
+          }
         }
         finally {
           ((Menu) e.getSource()).removeMenuListener(this);

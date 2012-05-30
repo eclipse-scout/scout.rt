@@ -51,11 +51,15 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     container.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
     setUiContainer(container);
 
-    m_leftContainer = createLeftContainer(container);
-    m_centerContainer = createCenterContainer(container);
-    m_rightContainer = createRightContainer(container);
+    createContent();
+  }
 
-    initLayout(container);
+  protected void createContent() {
+    m_leftContainer = createLeftContainer(getUiContainer());
+    m_centerContainer = createCenterContainer(getUiContainer());
+    m_rightContainer = createRightContainer(getUiContainer());
+
+    initLayout(getUiContainer());
     computeContainerVisibility();
   }
 
@@ -192,11 +196,6 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
 
   private ActionButtonBar createActionButtonBar(Composite parent, ActionButtonBar existingButtonBar, List<IMenu> menuList, int style) {
     if (existingButtonBar != null) {
-      //Only create a new bar if the actions have changed (to reduce flickering)
-      if (existingButtonBar.isEqualMenuList(menuList)) {
-        return existingButtonBar;
-      }
-
       existingButtonBar.dispose();
       existingButtonBar = null;
     }
@@ -229,6 +228,25 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
         m_rightContainer = createRightContainer(getUiContainer());
         initLayout(getUiContainer());
         computeContainerVisibility();
+
+        getUiContainer().getParent().layout(true, true);
+      }
+    };
+    getUiEnvironment().invokeUiLater(job);
+  }
+
+  public void rebuildContentFromScout() {
+    if (isUiDisposed()) {
+      return;
+    }
+    Runnable job = new Runnable() {
+      @Override
+      public void run() {
+        if (isUiDisposed()) {
+          return;
+        }
+
+        createContent();
 
         getUiContainer().getParent().layout(true, true);
       }

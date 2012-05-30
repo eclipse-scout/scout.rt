@@ -46,7 +46,8 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class ActionButtonBar extends Composite {
   private static final long serialVersionUID = 1L;
-  static final String VARIANT_ACTION_BAR = "actionBar";
+  private static final String VARIANT_ACTION_BAR = "actionBar";
+  private static final int BUTTON_SPACING = 6;
 
   //TODO CGU replace with List<? extends IAction>
   private IMenu[] m_menus;
@@ -172,9 +173,9 @@ public class ActionButtonBar extends Composite {
     RowLayout layout = new RowLayout(SWT.HORIZONTAL);
     layout.marginBottom = 5;
     layout.marginTop = 5;
-    layout.marginLeft = 3;
-    layout.marginRight = 3;
-    layout.spacing = 10;
+    layout.marginLeft = 5;
+    layout.marginRight = 5;
+    layout.spacing = BUTTON_SPACING;
     layout.wrap = false;
     buttonBar.setLayout(layout);
 
@@ -224,9 +225,9 @@ public class ActionButtonBar extends Composite {
     RowLayout layout = new RowLayout(SWT.HORIZONTAL);
     layout.marginBottom = 0;
     layout.marginTop = 0;
-    layout.marginLeft = 3;
-    layout.marginRight = 3;
-    layout.spacing = 6;
+    layout.marginLeft = 0;
+    layout.marginRight = 0;
+    layout.spacing = BUTTON_SPACING;
     layout.wrap = false;
 
     buttonGroup.setLayout(layout);
