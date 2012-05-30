@@ -23,12 +23,11 @@ public class EntityContribution {
   private final List<String> m_groupByParts;
   private final List<String> m_havingParts;
 
+  /**
+   * moved to {@link EntityContributionUtility#constraintTextToContribution(String)}
+   */
   public static EntityContribution create(String wherePart) {
-    EntityContribution contrib = new EntityContribution();
-    if (wherePart != null) {
-      contrib.getWhereParts().add(wherePart);
-    }
-    return contrib;
+    return EntityContributionUtility.constraintTextToContribution(wherePart);
   }
 
   public EntityContribution() {
