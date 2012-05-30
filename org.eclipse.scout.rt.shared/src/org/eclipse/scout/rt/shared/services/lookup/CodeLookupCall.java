@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -30,9 +32,18 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
 
   private Class<? extends ICodeType> m_codeTypeClass;
   private ICodeLookupCallVisitor m_filter;
+  private Comparator<LookupRow> m_sortComparator;
 
   public CodeLookupCall(Class<? extends ICodeType> codeTypeClass) {
     m_codeTypeClass = codeTypeClass;
+  }
+
+  public Comparator<LookupRow> getSortComparator() {
+    return m_sortComparator;
+  }
+
+  public void setSortComparator(Comparator<LookupRow> comp) {
+    m_sortComparator = comp;
   }
 
   @Override
@@ -70,10 +81,23 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
   /**
    * Implementation that creates lookup rows from codes.
    * <p>
-   * By default calls {@link #createLookupRowArray(List)}
+   * By default calls {@link #execCreateLookupRowFromCode(ICode)}
    */
   protected LookupRow[] execCreateLookupRowsFromCodes(List<? extends ICode<?>> codes) {
-    return createLookupRowArray(codes);
+    LookupRow[] a = new LookupRow[codes.size()];
+    for (int i = 0; i < a.length; i++) {
+      a[i] = execCreateLookupRowFromCode(codes.get(i));
+    }
+    return a;
+  }
+
+  /**
+   * Implementation that creates lookup rows from codes.
+   * <p>
+   * By default calls {@link #createLookupRow(ICode)}
+   */
+  protected LookupRow execCreateLookupRowFromCode(ICode<?> code) {
+    return createLookupRow(code);
   }
 
   /**
@@ -84,14 +108,22 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
   public static LookupRow[] createLookupRowArray(List<? extends ICode> codes) {
     LookupRow[] a = new LookupRow[codes.size()];
     for (int i = 0; i < a.length; i++) {
-      ICode c = codes.get(i);
-      Object parentId = null;
-      if (c.getParentCode() != null) {
-        parentId = c.getParentCode().getId();
-      }
-      a[i] = new LookupRow(c.getId(), c.getText(), c.getIconId(), c.getTooltipText(), c.getBackgroundColor(), c.getForegroundColor(), c.getFont(), c.isEnabled(), parentId, c.isActive());
+      a[i] = createLookupRow(codes.get(i));
     }
     return a;
+  }
+
+  /**
+   * Default implementation to create a lookup row from a code.
+   * <p>
+   * Called by {@link #createLookupRowArray(List)}.
+   */
+  public static LookupRow createLookupRow(ICode<?> c) {
+    Object parentId = null;
+    if (c.getParentCode() != null) {
+      parentId = c.getParentCode().getId();
+    }
+    return new LookupRow(c.getId(), c.getText(), c.getIconId(), c.getTooltipText(), c.getBackgroundColor(), c.getForegroundColor(), c.getFont(), c.isEnabled(), parentId, c.isActive());
   }
 
   public static Pattern getSearchPattern(String s) {
@@ -128,17 +160,16 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
   @Override
   public LookupRow[] getDataByText() throws ProcessingException {
     final Pattern pat = getSearchPattern(getText());
-    P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
+    AbstractLookupRowCollector v = new AbstractLookupRowCollector() {
       @Override
       public boolean visit(ICode code, int treeLevel) {
         if (m_filter != null && !m_filter.visit(CodeLookupCall.this, code, treeLevel)) {
           return true;
         }
         if (getActive().isUndefined() || getActive().getBooleanValue() == code.isActive()) {
-          if (code.getText() != null) {
-            if (pat.matcher(code.getText().toLowerCase()).matches()) {
-              add(code);
-            }
+          LookupRow row = execCreateLookupRowFromCode(code);
+          if (row != null && row.getText() != null && pat.matcher(row.getText().toLowerCase()).matches()) {
+            add(row);
           }
         }
         return true;
@@ -148,7 +179,14 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
     if (t != null) {
       t.visit(v, false);
     }
-    return execCreateLookupRowsFromCodes(v.getCodes());
+    List<LookupRow> result = v.getLookupRows();
+    if (result.size() > 1) {
+      Comparator<LookupRow> comparator = getSortComparator();
+      if (comparator != null) {
+        Collections.sort(result, comparator);
+      }
+    }
+    return result.toArray(new LookupRow[result.size()]);
   }
 
   /**
@@ -157,17 +195,16 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
   @Override
   public LookupRow[] getDataByAll() throws ProcessingException {
     final Pattern pat = getSearchPattern(getAll());
-    P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
+    AbstractLookupRowCollector v = new AbstractLookupRowCollector() {
       @Override
       public boolean visit(ICode code, int treeLevel) {
         if (m_filter != null && !m_filter.visit(CodeLookupCall.this, code, treeLevel)) {
           return true;
         }
         if (getActive().isUndefined() || getActive().getBooleanValue() == code.isActive()) {
-          if (code.getText() != null) {
-            if (pat.matcher(code.getText().toLowerCase()).matches()) {
-              add(code);
-            }
+          LookupRow row = execCreateLookupRowFromCode(code);
+          if (row != null && row.getText() != null && pat.matcher(row.getText().toLowerCase()).matches()) {
+            add(row);
           }
         }
         return true;
@@ -177,7 +214,14 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
     if (t != null) {
       t.visit(v, false);
     }
-    return execCreateLookupRowsFromCodes(v.getCodes());
+    List<LookupRow> result = v.getLookupRows();
+    if (result.size() > 1) {
+      Comparator<LookupRow> comparator = getSortComparator();
+      if (comparator != null) {
+        Collections.sort(result, comparator);
+      }
+    }
+    return result.toArray(new LookupRow[result.size()]);
   }
 
   /**
@@ -190,7 +234,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
       recValue = null;
     }
     final Object key = recValue;
-    P_AbstractCollectingCodeVisitor v = new P_AbstractCollectingCodeVisitor() {
+    AbstractLookupRowCollector v = new AbstractLookupRowCollector() {
       @Override
       public boolean visit(ICode code, int treeLevel) {
         if (m_filter != null && !m_filter.visit(CodeLookupCall.this, code, treeLevel)) {
@@ -199,7 +243,10 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
         ICode parentCode = code.getParentCode();
         if (getActive().isUndefined() || getActive().getBooleanValue() == code.isActive()) {
           if (((parentCode == null && key == null) || (parentCode != null && parentCode.getId() != null && parentCode.getId().equals(key)))) {
-            add(code);
+            LookupRow row = execCreateLookupRowFromCode(code);
+            if (row != null) {
+              add(row);
+            }
           }
         }
         return true;
@@ -209,29 +256,27 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
     if (t != null) {
       t.visit(v, false);
     }
-    return execCreateLookupRowsFromCodes(v.getCodes());
+    List<LookupRow> result = v.getLookupRows();
+    if (result.size() > 1) {
+      Comparator<LookupRow> comparator = getSortComparator();
+      if (comparator != null) {
+        Collections.sort(result, comparator);
+      }
+    }
+    return result.toArray(new LookupRow[result.size()]);
   }
 
-  private static abstract class P_AbstractCollectingCodeVisitor implements ICodeVisitor {
-    private ArrayList<ICode<?>> m_list = new ArrayList<ICode<?>>();
+  private static abstract class AbstractLookupRowCollector implements ICodeVisitor {
+    private ArrayList<LookupRow> m_list = new ArrayList<LookupRow>();
 
-    public P_AbstractCollectingCodeVisitor() {
+    public AbstractLookupRowCollector() {
     }
 
-    public void add(ICode code) {
-      m_list.add(code);
+    public void add(LookupRow row) {
+      m_list.add(row);
     }
 
-    public ICode getFirstCode() {
-      if (m_list.size() > 0) {
-        return m_list.get(0);
-      }
-      else {
-        return null;
-      }
-    }
-
-    public List<ICode<?>> getCodes() {
+    public List<LookupRow> getLookupRows() {
       return m_list;
     }
   }
