@@ -207,11 +207,26 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     ScoutFormToolkit formToolkit = getUiEnvironment().getFormToolkit();
     //TODO check for MobileScoutFormToolkit can be removed as soon as ActionButtonBar is moved to core plugin
     if (formToolkit instanceof MobileScoutFormToolkit) {
-      IMenu[] menuArray = menus.toArray(new IMenu[menus.size()]);
+      IMenu[] menuArray = cleanMenus(menus);
       return ((MobileScoutFormToolkit) formToolkit).createActionButtonBar(parent, menuArray, style);
     }
 
     return null;
+  }
+
+  /**
+   * Removes duplicate menus from the list.
+   */
+  protected IMenu[] cleanMenus(List<IMenu> menus) {
+    List<IMenu> cleanedMenus = new LinkedList<IMenu>();
+
+    for (IMenu menu : menus) {
+      if (!cleanedMenus.contains(menu)) {
+        cleanedMenus.add(menu);
+      }
+    }
+
+    return cleanedMenus.toArray(new IMenu[cleanedMenus.size()]);
   }
 
   public void rebuildRightButtonBarFromScout() {

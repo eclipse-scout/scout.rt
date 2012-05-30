@@ -41,4 +41,25 @@ public class ActionButtonBarUtility {
     return new ButtonWrappingAction(button);
   }
 
+  /**
+   * If there are empty space menus distribute the row menus so that the menus alternate and the most important are on
+   * top, starting with a empty space menu
+   */
+  public static void distributeRowActions(List<IMenu> menuList, IMenu[] emptySpaceMenus, List<IMenu> rowMenuList) {
+    if (emptySpaceMenus == null) {
+      return;
+    }
+
+    for (IMenu emptySpaceMenu : emptySpaceMenus) {
+      if (rowMenuList.size() == 0) {
+        break;
+      }
+
+      int index = menuList.indexOf(emptySpaceMenu) + 1;
+      IMenu rowMenu = rowMenuList.get(0);
+      menuList.add(index, rowMenu);
+      rowMenuList.remove(rowMenu);
+    }
+  }
+
 }

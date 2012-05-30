@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.treefield;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.mobile.action.AbstractRwtScoutActionBar;
+import org.eclipse.scout.rt.ui.rap.mobile.action.ActionButtonBarUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -66,23 +68,24 @@ public class RwtScoutTreeActionBar extends AbstractRwtScoutActionBar<ITreeField>
       return;
     }
 
-    IMenu[] menus = RwtMenuUtility.collectEmptySpaceMenus(tree, getUiEnvironment());
-    if (menus != null) {
-      menuList.addAll(Arrays.asList(menus));
+    IMenu[] emptySpaceMenus = RwtMenuUtility.collectEmptySpaceMenus(tree, getUiEnvironment());
+    if (emptySpaceMenus != null) {
+      menuList.addAll(Arrays.asList(emptySpaceMenus));
+    }
+
+    IMenu[] rowMenus = RwtMenuUtility.collectNodeMenus(tree, getUiEnvironment());
+    if (rowMenus != null) {
+      List<IMenu> rowMenuList = new LinkedList<IMenu>(Arrays.asList(rowMenus));
+
+      ActionButtonBarUtility.distributeRowActions(menuList, emptySpaceMenus, rowMenuList);
+
+      //Add remaining row menus
+      menuList.addAll(rowMenuList);
     }
   }
 
   @Override
   protected void collectMenusForRightButtonBar(List<IMenu> menuList) {
-    ITree tree = getScoutObject().getTree();
-    if (tree == null) {
-      return;
-    }
-
-    IMenu[] menus = RwtMenuUtility.collectNodeMenus(tree, getUiEnvironment());
-    if (menus != null) {
-      menuList.addAll(Arrays.asList(menus));
-    }
   }
 
   @Override
