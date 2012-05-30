@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -61,6 +62,17 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
       }
     }
 
+  }
+
+  /**
+   * Only moves the label to the top if it's a tool form. Regular forms have are big enough on tablet to display it on
+   * the left side.
+   */
+  @Override
+  protected void moveLabelToTop(IFormField field) {
+    if (MobileDesktopUtility.isToolForm(field.getForm())) {
+      super.moveLabelToTop(field);
+    }
   }
 
 }

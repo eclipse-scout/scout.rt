@@ -157,7 +157,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   }
 
-  private void moveLabelToTop(IFormField field) {
+  protected void moveLabelToTop(IFormField field) {
     if (IFormField.LABEL_POSITION_ON_FIELD == field.getLabelPosition()) {
       return;
     }
