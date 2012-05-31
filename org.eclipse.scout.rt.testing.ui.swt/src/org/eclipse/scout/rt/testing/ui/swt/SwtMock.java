@@ -79,6 +79,22 @@ public class SwtMock implements IGuiMock {
   }
 
   @Override
+  public void initializeMock() {
+  }
+
+  @Override
+  public void shutdownMock() {
+  }
+
+  @Override
+  public void beforeTest() {
+  }
+
+  @Override
+  public void afterTest() {
+  }
+
+  @Override
   public GuiStrategy getStrategy() {
     return GuiStrategy.Swt;
   }
