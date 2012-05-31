@@ -124,6 +124,14 @@ public interface IGuiMock {
     public String text;
   }
 
+  void initializeMock();
+
+  void shutdownMock();
+
+  void beforeTest();
+
+  void afterTest();
+
   GuiStrategy getStrategy();
 
   int getSleepDelay();

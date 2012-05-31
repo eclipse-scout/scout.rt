@@ -121,70 +121,78 @@ public abstract class AbstractTestWithGuiScript {
    */
   @Test
   public final void test() throws Throwable {
-    clientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(getSessionClass());
-    if (SERVICES.getService(IGuiMockService.class) == null) {
+    IGuiMockService guiMockService = SERVICES.getService(IGuiMockService.class);
+    if (guiMockService == null) {
       return;
     }
-    final IGuiMock gui = SERVICES.getService(IGuiMockService.class).createMock(clientSession);
-    //
-    final ClientSyncJob runModelJob = new ClientSyncJob("Run", clientSession) {
-      @Override
-      protected void runVoid(IProgressMonitor m) throws Throwable {
-        resetSession();
-        runModel();
-      }
-    };
-    runModelJob.setUser(false);
-    runModelJob.setSystem(true);
-    //
-    final ClientSyncJob disposeModelJob = new ClientSyncJob("Dispose", clientSession) {
-      @Override
-      protected void runVoid(IProgressMonitor m) throws Throwable {
-        try {
-          disposeModel();
-        }
-        finally {
-          resetSession();
-        }
-      }
-    };
-    disposeModelJob.setUser(false);
-    disposeModelJob.setSystem(true);
-    //
-    JobEx guiScriptJob = new JobEx("Gui Script") {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        try {
-          gui.waitForIdle();
-          runGui(gui);
-          return Status.OK_STATUS;
-        }
-        catch (Throwable t) {
-          return new Status(Status.ERROR, AbstractTestWithGuiScript.this.getClass().getName(), t.getMessage(), t);
-        }
-      }
-    };
-    guiScriptJob.setUser(false);
-    guiScriptJob.setSystem(true);
-    //
+    clientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(getSessionClass());
+//    clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(getSessionClass(), guiMockService.initUserAgent());
+    final IGuiMock gui = guiMockService.createMock(clientSession);
+    gui.beforeTest();
     try {
-      m_testActive = true;
-      runModelJob.schedule();
-      while (!runModelJob.isWaitFor() && runModelJob.getState() != Job.NONE) {
-        runModelJob.join(100);
+      //
+      final ClientSyncJob runModelJob = new ClientSyncJob("Run", clientSession) {
+        @Override
+        protected void runVoid(IProgressMonitor m) throws Throwable {
+          resetSession();
+          runModel();
+        }
+      };
+      runModelJob.setUser(false);
+      runModelJob.setSystem(true);
+      //
+      final ClientSyncJob disposeModelJob = new ClientSyncJob("Dispose", clientSession) {
+        @Override
+        protected void runVoid(IProgressMonitor m) throws Throwable {
+          try {
+            disposeModel();
+          }
+          finally {
+            resetSession();
+          }
+        }
+      };
+      disposeModelJob.setUser(false);
+      disposeModelJob.setSystem(true);
+      //
+      JobEx guiScriptJob = new JobEx("Gui Script") {
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+          try {
+            gui.waitForIdle();
+            runGui(gui);
+            return Status.OK_STATUS;
+          }
+          catch (Throwable t) {
+            return new Status(Status.ERROR, AbstractTestWithGuiScript.this.getClass().getName(), t.getMessage(), t);
+          }
+        }
+      };
+      guiScriptJob.setUser(false);
+      guiScriptJob.setSystem(true);
+      //
+      try {
+        m_testActive = true;
+        runModelJob.schedule();
+        while (!runModelJob.isWaitFor() && runModelJob.getState() != Job.NONE) {
+          runModelJob.join(100);
+        }
+        guiScriptJob.schedule();
+        guiScriptJob.join();
       }
-      guiScriptJob.schedule();
-      guiScriptJob.join();
+      finally {
+        m_testActive = false;
+        disposeModelJob.schedule();
+        disposeModelJob.join();
+      }
+      runModelJob.join();
+      ScoutAssert.jobSuccessfullyCompleted(runModelJob);
+      ScoutAssert.jobSuccessfullyCompleted(guiScriptJob);
+      ScoutAssert.jobSuccessfullyCompleted(disposeModelJob);
     }
     finally {
-      m_testActive = false;
-      disposeModelJob.schedule();
-      disposeModelJob.join();
+      gui.afterTest();
     }
-    runModelJob.join();
-    ScoutAssert.jobSuccessfullyCompleted(runModelJob);
-    ScoutAssert.jobSuccessfullyCompleted(guiScriptJob);
-    ScoutAssert.jobSuccessfullyCompleted(disposeModelJob);
   }
 
   /**
