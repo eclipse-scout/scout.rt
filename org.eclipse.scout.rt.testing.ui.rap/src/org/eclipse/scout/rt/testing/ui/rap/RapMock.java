@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 BSI Business Systems Integration AG.
+ * Copyright (c) 2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.testing.ui.rap;
 
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -17,8 +20,11 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -51,19 +57,74 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.internal.seleniumemulation.ElementFinder;
+import org.openqa.selenium.internal.seleniumemulation.JavascriptLibrary;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
  *
  */
 public class RapMock implements IGuiMock {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RapMock.class);
+
   static interface MockRunnable<T> extends WaitCondition<T> {
   }
 
-  private final IClientSession m_session;
+  private static ChromeDriverService m_service;
+  private WebDriver m_driver;
+  private RAPSelenium m_bot;
+  private IClientSession m_session;
   private int m_sleepDelay = 40;
 
-  public RapMock(IClientSession session) {
+  private String m_currentWidgetId = "";
+  private boolean m_modifierPressed = false;
+  private Actions m_actionBuilder = null;
+
+  public void setClientSession(IClientSession session) {
     m_session = session;
+  }
+
+  @Override
+  public void initializeMock() {
+//    System.setProperty("webdriver.firefox.bin", "C:/FirefoxPortableTest_11/App/Firefox/firefox.exe");
+//    System.setProperty("webdriver.chrome.driver", "e:/Downloads/java/chromedriver.exe");
+    m_service = new ChromeDriverService.Builder()
+        .usingChromeDriverExecutable(new File("e:/Downloads/java/chromedriver.exe"))
+        .usingAnyFreePort()
+        .build();
+    try {
+      m_service.start();
+    }
+    catch (IOException e) {
+      throw new IllegalStateException("ChromeDriverService could not be started.", e);
+    }
+  }
+
+  @Override
+  public void shutdownMock() {
+    m_service.stop();
+  }
+
+  @Override
+  public void beforeTest() {
+    DesiredCapabilities chrome = DesiredCapabilities.chrome();
+    m_driver = new RemoteWebDriver(m_service.getUrl(), chrome);
+    m_bot = new RAPSelenium(m_driver, "http://localhost:8081");
+    m_actionBuilder = new Actions(m_bot.getWrappedDriver());
+
+    m_bot.open("http://localhost:8081/rap");
+    m_bot.waitForElementPresent("w2");
+  }
+
+  @Override
+  public void afterTest() {
+    m_driver.quit();
   }
 
   @Override
@@ -295,28 +356,20 @@ public class RapMock implements IGuiMock {
 
   @Override
   public void gotoField(FieldType type, int index) {
-    final Control c = waitForIndexedField(type, index);
-    syncExec(new MockRunnable<Object>() {
-      @Override
-      public Object run() throws Throwable {
-        Point p = c.toDisplay(c.getSize().x / 2, c.getSize().y / 2);
-        gotoPoint(p.x, p.y);
-        return null;
-      }
-    });
+    Control c = waitForIndexedField(type, index);
+    m_currentWidgetId = WidgetUtil.getAdapter(c).getId();
+    if (FieldType.Text.equals(type)) {
+      m_currentWidgetId = new StringBuffer("//*[@id=\"").append(m_currentWidgetId).append("\"]/input").toString();
+    }
   }
 
   @Override
   public void gotoScoutField(String name) {
     final Control c = waitForScoutField(name);
-    syncExec(new MockRunnable<Object>() {
-      @Override
-      public Object run() throws Throwable {
-        Point p = c.toDisplay(c.getSize().x / 2, c.getSize().y / 2);
-        gotoPoint(p.x, p.y);
-        return null;
-      }
-    });
+    m_currentWidgetId = WidgetUtil.getAdapter(c).getId();
+    if (c instanceof Text) {
+      m_currentWidgetId = new StringBuffer("//*[@id=\"").append(m_currentWidgetId).append("\"]/input").toString();
+    }
   }
 
   @Override
@@ -325,11 +378,12 @@ public class RapMock implements IGuiMock {
     syncExec(new MockRunnable<Object>() {
       @Override
       public Object run() throws Throwable {
-        TableItem item = table.getItem(rowIndex);
-        //first column is dummy column
-        Rectangle cellBounds = item.getBounds(columnIndex + 1);
-        Point p = table.toDisplay(cellBounds.x + (cellBounds.width / 2), cellBounds.y + (cellBounds.height / 2));
-        gotoPoint(p.x, p.y);
+        m_currentWidgetId = WidgetUtil.getAdapter(table).getId();
+        StringBuffer xpathWidgetId = new StringBuffer("//*[@id=\"").append(m_currentWidgetId).append("\"]/div[1]/div[").append(rowIndex + table.getColumnCount()).append("]/div");
+        if (columnIndex > 0) {
+          xpathWidgetId.append("[").append(columnIndex).append("]");
+        }
+        m_currentWidgetId = xpathWidgetId.toString();
         return null;
       }
     });
@@ -371,13 +425,15 @@ public class RapMock implements IGuiMock {
     syncExec(new MockRunnable<Object>() {
       @Override
       public Object run() throws Throwable {
-        TreeItem item = findTreeItemRec(tree.getItems(), nodeText);
-        if (item == null) {
-          throw new IllegalStateException("Cannot find tree item '" + nodeText + "'");
+        m_currentWidgetId = WidgetUtil.getAdapter(tree).getId();
+        TreeItem[] items = tree.getItems();
+        for (int i = 0; i < items.length; i++) {
+          if (nodeText.equals(items[i].getText())) {
+            StringBuffer xpathWidgetId = new StringBuffer("//*[@id=\"").append(m_currentWidgetId).append("\"]/div[1]/div[").append(i + 1).append("]/div[2]");
+            m_currentWidgetId = xpathWidgetId.toString();
+            break;
+          }
         }
-        Rectangle cellBounds = item.getBounds(0);
-        Point p = tree.toDisplay(cellBounds.x + (cellBounds.width / 2), cellBounds.y + (cellBounds.height / 2));
-        gotoPoint(p.x, p.y);
         return null;
       }
     });
@@ -503,8 +559,8 @@ public class RapMock implements IGuiMock {
 
   @Override
   public void gotoPoint(int x, int y) {
-    //XXX RAP
-    throw new UnsupportedOperationException("not implemented");
+    final Control c = waitForLocatedField(x, y);
+    m_currentWidgetId = WidgetUtil.getAdapter(c).getId();
   }
 
   @Override
@@ -515,22 +571,19 @@ public class RapMock implements IGuiMock {
 
   @Override
   public void clickLeft() {
-    //XXX RAP
-    throw new UnsupportedOperationException("not implemented");
-    /*
-    m_bot.clickLeft();
+    m_bot.clickAndWait(m_currentWidgetId);
     waitForIdle();
-     */
   }
 
   @Override
   public void clickRight() {
-    //XXX RAP
-    throw new UnsupportedOperationException("not implemented");
-    /*
-    m_bot.clickRight();
+    JavascriptLibrary javascriptLibrary = new JavascriptLibrary();
+    ElementFinder elementFinder = new ElementFinder(javascriptLibrary);
+    WebElement element = elementFinder.findElement(m_bot.getWrappedDriver(), m_currentWidgetId);
+    m_actionBuilder.contextClick(element);
+    m_actionBuilder.perform();
+//    m_bot.mouseDownRight(m_currentWidgetId);
     waitForIdle();
-     */
   }
 
   @Override
@@ -557,12 +610,13 @@ public class RapMock implements IGuiMock {
 
   @Override
   public void typeText(final String text) {
-    //XXX RAP
-    throw new UnsupportedOperationException("not implemented");
-    /*
-    m_bot.typeText(text);
+    if (m_modifierPressed) {
+      m_actionBuilder.sendKeys("a");
+    }
+    else {
+      m_bot.typeKeys(m_currentWidgetId, text);
+    }
     waitForIdle();
-     */
   }
 
   @Override
@@ -580,32 +634,70 @@ public class RapMock implements IGuiMock {
 
   @Override
   public void pressKey(Key key) {
-    //XXX RAP
-    throw new UnsupportedOperationException("not implemented");
-    /*
-    m_bot.pressKey(key);
+    switch (key) {
+      case Shift:
+        m_actionBuilder.keyDown(Keys.SHIFT);
+        m_modifierPressed = true;
+        break;
+      case Control:
+        m_actionBuilder.keyDown(Keys.CONTROL);
+        m_modifierPressed = true;
+        break;
+      case Alt:
+        m_actionBuilder.keyDown(Keys.ALT);
+        m_modifierPressed = true;
+        break;
+      case Windows:
+        m_actionBuilder.keyDown(Keys.META);
+        m_modifierPressed = true;
+        break;
+      default:
+        m_actionBuilder.sendKeys(toSeleniumKey(key).toString());
+        m_actionBuilder.perform();
+//        m_bot.keyDown(m_currentWidgetId, toSeleniumKey(key));
+        break;
+    }
     waitForIdle();
-     */
   }
 
   @Override
   public void releaseKey(Key key) {
-    //XXX RAP
-    throw new UnsupportedOperationException("not implemented");
-    /*
-    m_bot.releaseKey(key);
+    switch (key) {
+      case Shift:
+        m_actionBuilder.keyUp(Keys.SHIFT);
+        m_modifierPressed = false;
+        break;
+      case Control:
+        m_bot.controlKeyUp();
+        m_modifierPressed = false;
+        break;
+      case Alt:
+        m_bot.altKeyUp();
+        m_modifierPressed = false;
+        break;
+      case Windows:
+        m_actionBuilder.keyDown(Keys.META);
+        m_modifierPressed = false;
+        break;
+      default:
+        m_actionBuilder.keyUp(toSeleniumKey(key));
+//        m_bot.keyUp(m_currentWidgetId, toSeleniumKey(key));
+        break;
+    }
+    m_actionBuilder.perform();
     waitForIdle();
-     */
   }
 
   @Override
   public void typeKey(Key key) {
-    //XXX RAP
-    throw new UnsupportedOperationException("not implemented");
-    /*
-    m_bot.typeKey(key);
+    if (m_modifierPressed) {
+      m_actionBuilder.sendKeys(toSeleniumKey(key));
+      m_actionBuilder.perform();
+    }
+    else {
+      m_bot.keyPress(m_currentWidgetId, toSeleniumKey(key).toString());
+    }
     waitForIdle();
-     */
   }
 
   @Override
@@ -884,6 +976,29 @@ public class RapMock implements IGuiMock {
     });
   }
 
+  protected Control waitForLocatedField(final int x, final int y) {
+    return waitUntil(new WaitCondition<Control>() {
+      @Override
+      public Control run() {
+        return syncExec(new MockRunnable<Control>() {
+          @Override
+          public Control run() throws Throwable {
+            List<Composite> parents = enumerateParentContainers();
+            for (Composite parent : parents) {
+              for (Control c : RwtUtility.findChildComponents(parent, Control.class, Composite.class)) {
+                Rectangle map = getDisplay().map(c, null, c.getBounds());
+                if (map.contains(x, y)) {
+                  return c;
+                }
+              }
+            }
+            return null;
+          }
+        });
+      }
+    });
+  }
+
   protected MenuItem waitForMenuItem(final String name) {
     return waitUntil(new WaitCondition<MenuItem>() {
       @Override
@@ -995,5 +1110,199 @@ public class RapMock implements IGuiMock {
   @Override
   public void gotoTreeExpandIcon(int treeIndex, String nodeText) {
     throw new UnsupportedOperationException("not implemented");
+  }
+
+  protected Keys toSeleniumKey(Key key) {
+    switch (key) {
+      case Shift:
+        return Keys.SHIFT;
+      case Control:
+        return Keys.CONTROL;
+      case Alt:
+        return Keys.ALT;
+      case Delete:
+        return Keys.DELETE;
+      case Backspace:
+        return Keys.BACK_SPACE;
+      case Enter:
+        return Keys.ENTER;
+      case Esc:
+        return Keys.ESCAPE;
+      case Tab:
+        return Keys.TAB;
+      case ContextMenu:
+        throw new IllegalArgumentException("Unknown keyboard key: " + key);
+      case Up:
+        return Keys.UP;
+      case Down:
+        return Keys.DOWN;
+      case Left:
+        return Keys.LEFT;
+      case Right:
+        return Keys.RIGHT;
+      case Windows:
+        return Keys.META;
+      case F1:
+        return Keys.F1;
+      case F2:
+        return Keys.F2;
+      case F3:
+        return Keys.F3;
+      case F4:
+        return Keys.F4;
+      case F5:
+        return Keys.F5;
+      case F6:
+        return Keys.F6;
+      case F7:
+        return Keys.F7;
+      case F8:
+        return Keys.F8;
+      case F9:
+        return Keys.F9;
+      case F10:
+        return Keys.F10;
+      case F11:
+        return Keys.F11;
+      case F12:
+        return Keys.F12;
+      case Home:
+        return Keys.HOME;
+      case End:
+        return Keys.END;
+      case PageUp:
+        return Keys.PAGE_UP;
+      case PageDown:
+        return Keys.PAGE_DOWN;
+      case NumPad0:
+        return Keys.NUMPAD0;
+      case NumPad1:
+        return Keys.NUMPAD1;
+      case NumPad2:
+        return Keys.NUMPAD2;
+      case NumPad3:
+        return Keys.NUMPAD3;
+      case NumPad4:
+        return Keys.NUMPAD4;
+      case NumPad5:
+        return Keys.NUMPAD5;
+      case NumPad6:
+        return Keys.NUMPAD6;
+      case NumPad7:
+        return Keys.NUMPAD7;
+      case NumPad8:
+        return Keys.NUMPAD8;
+      case NumPadMultiply:
+        return Keys.MULTIPLY;
+      case NumPadDivide:
+        return Keys.DIVIDE;
+      case NumPadAdd:
+        return Keys.ADD;
+      case NumPadSubtract:
+        return Keys.SUBTRACT;
+      case NumPadDecimal:
+        return Keys.DECIMAL;
+      case NumPadSeparator:
+        return Keys.SEPARATOR;
+      default:
+        throw new IllegalArgumentException("Unknown keyboard key: " + key);
+    }
+  }
+
+  protected int toKeyCode(IGuiMock.Key key) {
+    switch (key) {
+      case Shift:
+        return KeyEvent.VK_SHIFT;
+      case Control:
+        return KeyEvent.VK_CONTROL;
+      case Alt:
+        return KeyEvent.VK_ALT;
+      case Delete:
+        return KeyEvent.VK_DELETE;
+      case Backspace:
+        return KeyEvent.VK_BACK_SPACE;
+      case Enter:
+        return KeyEvent.VK_ENTER;
+      case Esc:
+        return KeyEvent.VK_ESCAPE;
+      case Tab:
+        return KeyEvent.VK_TAB;
+      case ContextMenu:
+        return KeyEvent.VK_CONTEXT_MENU;
+      case Up:
+        return KeyEvent.VK_UP;
+      case Down:
+        return KeyEvent.VK_DOWN;
+      case Left:
+        return KeyEvent.VK_LEFT;
+      case Right:
+        return KeyEvent.VK_RIGHT;
+      case Windows:
+        return KeyEvent.VK_WINDOWS;
+      case F1:
+        return KeyEvent.VK_F1;
+      case F2:
+        return KeyEvent.VK_F2;
+      case F3:
+        return KeyEvent.VK_F3;
+      case F4:
+        return KeyEvent.VK_F4;
+      case F5:
+        return KeyEvent.VK_F5;
+      case F6:
+        return KeyEvent.VK_F6;
+      case F7:
+        return KeyEvent.VK_F7;
+      case F8:
+        return KeyEvent.VK_F8;
+      case F9:
+        return KeyEvent.VK_F9;
+      case F10:
+        return KeyEvent.VK_F10;
+      case F11:
+        return KeyEvent.VK_F11;
+      case F12:
+        return KeyEvent.VK_F12;
+      case Home:
+        return KeyEvent.VK_HOME;
+      case End:
+        return KeyEvent.VK_END;
+      case PageUp:
+        return KeyEvent.VK_PAGE_UP;
+      case PageDown:
+        return KeyEvent.VK_PAGE_DOWN;
+      case NumPad0:
+        return KeyEvent.VK_NUMPAD0;
+      case NumPad1:
+        return KeyEvent.VK_NUMPAD1;
+      case NumPad2:
+        return KeyEvent.VK_NUMPAD2;
+      case NumPad3:
+        return KeyEvent.VK_NUMPAD3;
+      case NumPad4:
+        return KeyEvent.VK_NUMPAD4;
+      case NumPad5:
+        return KeyEvent.VK_NUMPAD5;
+      case NumPad6:
+        return KeyEvent.VK_NUMPAD6;
+      case NumPad7:
+        return KeyEvent.VK_NUMPAD7;
+      case NumPad8:
+        return KeyEvent.VK_NUMPAD8;
+      case NumPadMultiply:
+        return KeyEvent.VK_MULTIPLY;
+      case NumPadDivide:
+        return KeyEvent.VK_DIVIDE;
+      case NumPadAdd:
+        return KeyEvent.VK_ADD;
+      case NumPadSubtract:
+        return KeyEvent.VK_SUBTRACT;
+      case NumPadDecimal:
+        return KeyEvent.VK_DECIMAL;
+      case NumPadSeparator:
+        return KeyEvent.VK_SEPARATOR;
+      default:
+        throw new IllegalArgumentException("Unknown keyboard key: " + key);
+    }
   }
 }
