@@ -588,7 +588,18 @@ public final class RwtUtility {
 
   public static <T extends Widget> T findChildComponent(Widget parent, Class<T> type) {
     ArrayList<T> list = new ArrayList<T>(1);
-    findChildComponentsRec(parent, type, list, 1);
+    findChildComponentsRec(parent, type, null, list, 1);
+    if (list.size() > 0) {
+      return list.get(0);
+    }
+    else {
+      return null;
+    }
+  }
+
+  public static <T extends Widget> T findChildComponent(Widget parent, Class<T> type, Class<? extends Widget> excludedType) {
+    ArrayList<T> list = new ArrayList<T>(1);
+    findChildComponentsRec(parent, type, excludedType, list, 1);
     if (list.size() > 0) {
       return list.get(0);
     }
@@ -599,13 +610,20 @@ public final class RwtUtility {
 
   public static <T extends Widget> List<T> findChildComponents(Widget parent, Class<T> type) {
     ArrayList<T> list = new ArrayList<T>();
-    findChildComponentsRec(parent, type, list, Integer.MAX_VALUE);
+    findChildComponentsRec(parent, type, null, list, Integer.MAX_VALUE);
+    return list;
+  }
+
+  public static <T extends Widget> List<T> findChildComponents(Widget parent, Class<T> type, Class<? extends Widget> excludedType) {
+    ArrayList<T> list = new ArrayList<T>();
+    findChildComponentsRec(parent, type, excludedType, list, Integer.MAX_VALUE);
     return list;
   }
 
   @SuppressWarnings("unchecked")
-  private static <T extends Widget> void findChildComponentsRec(Widget parent, Class<T> type, List<T> list, int maxCount) {
-    if (type.isAssignableFrom(parent.getClass())) {
+  private static <T extends Widget> void findChildComponentsRec(Widget parent, Class<T> type, Class<? extends Widget> excludedType, List<T> list, int maxCount) {
+    if (type.isAssignableFrom(parent.getClass())
+        && (excludedType == null || !excludedType.isAssignableFrom(parent.getClass()))) {
       list.add((T) parent);
       if (list.size() >= maxCount) {
         return;
@@ -614,7 +632,7 @@ public final class RwtUtility {
     //
     if (parent instanceof Composite) {
       for (Widget c : ((Composite) parent).getChildren()) {
-        findChildComponentsRec(c, type, list, maxCount);
+        findChildComponentsRec(c, type, excludedType, list, maxCount);
         if (list.size() >= maxCount) {
           return;
         }
