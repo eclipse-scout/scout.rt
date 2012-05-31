@@ -83,6 +83,22 @@ public class SwingMock implements IGuiMock {
   }
 
   @Override
+  public void initializeMock() {
+  }
+
+  @Override
+  public void shutdownMock() {
+  }
+
+  @Override
+  public void beforeTest() {
+  }
+
+  @Override
+  public void afterTest() {
+  }
+
+  @Override
   public GuiStrategy getStrategy() {
     return GuiStrategy.Swing;
   }
@@ -672,7 +688,7 @@ public class SwingMock implements IGuiMock {
     Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
     TransferObject o = SwingUtility.createScoutTransferable(t);
     if (o != null && o.isText()) {
-      return ((TextTransferObject) o).getText();
+      return ((TextTransferObject) o).getPlainText();
     }
     return null;
   }
