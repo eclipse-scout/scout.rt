@@ -31,7 +31,7 @@
             name="Mobile table field"
             scope="global">
          <factory
-               class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.MobileTableFieldFactory">
+               class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield.MobileTableFieldFactory">
          </factory>
       </formField>
       <formField

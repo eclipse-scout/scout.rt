@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.mobile.form.fields;
+package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 
 import java.util.HashMap;
 

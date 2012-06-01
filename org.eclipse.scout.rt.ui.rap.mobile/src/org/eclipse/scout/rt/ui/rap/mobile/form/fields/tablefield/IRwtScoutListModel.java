@@ -8,14 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.mobile.form.fields;
+package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 
-import org.eclipse.jface.viewers.ListViewer;
-import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTableEvent;
 
-public interface IRwtScoutList extends IRwtScoutTable {
+public interface IRwtScoutListModel extends IStructuredContentProvider, ILabelProvider {
 
-  @Override
-  ListViewer getUiTableViewer();
+  void setMultiline(boolean multiline);
 
+  boolean isMultiline();
+
+  void consumeTableModelEvent(RwtScoutTableEvent uiTableEvent);
+
+  IRwtScoutList getRwtScoutList();
 }
