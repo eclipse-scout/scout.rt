@@ -268,7 +268,9 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
       endIndex = Math.min(Math.max(endIndex, 0), textLength);
       swtField.setCaretOffset(caretOffset);
       m_backupSelection = new Point(startIndex, endIndex);
-      swtField.setSelection(startIndex, endIndex);
+      if (getSwtField().isFocusControl()) {
+        swtField.setSelection(startIndex, endIndex);
+      }
     }
   }
 
@@ -286,9 +288,11 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
     if (endIndex < 0) {
       endIndex = end;
     }
-    // swt sets the caret itself. If startIndex > endIndex it is placed at the beginning.
     m_backupSelection = new Point(startIndex, endIndex);
-    swtField.setSelection(startIndex, endIndex);
+    if (getSwtField().isFocusControl()) {
+      swtField.setSelection(startIndex, endIndex);
+    }
+
   }
 
   protected void setTextWrapFromScout(boolean booleanValue) {
@@ -408,21 +412,39 @@ public class SwtScoutStringField extends SwtScoutValueFieldComposite<IStringFiel
   protected void handleSwtFocusGained() {
     super.handleSwtFocusGained();
     if (getScoutObject().isSelectAllOnFocus()) {
-      getSwtField().setSelection(0, getSwtField().getText().length());
+      scheduleSelectAll();
     }
     else {
-      // restore selction
-      if (m_backupSelection == null) {
-        m_backupSelection = new Point(0, 0);
+      // restore selection, but only if there is one to not move the cursor accidentally (this is done automatically by swt)
+      if (m_backupSelection != null && m_backupSelection.x != m_backupSelection.y) {
+        getSwtField().setSelection(m_backupSelection);
       }
-      getSwtField().setSelection(m_backupSelection);
     }
+  }
+
+  protected void scheduleSelectAll() {
+    getEnvironment().getDisplay().asyncExec(new Runnable() {
+
+      @Override
+      public void run() {
+        if (getSwtField().isDisposed()) {
+          return;
+        }
+
+        getSwtField().setSelection(0, getSwtField().getText().length());
+      }
+
+    });
+
   }
 
   @Override
   protected void handleSwtFocusLost() {
     m_backupSelection = getSwtField().getSelection();
-    getSwtField().setSelection(0, 0);
+    if (getSwtField().getSelectionCount() > 0) {
+      //Clear selection to make sure only one field at a time shows a selection
+      getSwtField().setSelection(0, 0);
+    }
   }
 
   private class P_TextVerifyListener implements VerifyListener {

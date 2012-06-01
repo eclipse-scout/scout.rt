@@ -199,7 +199,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
   protected void handleSwtFocusGained() {
     super.handleSwtFocusGained();
     if (m_proposalPopup == null) {
-      getSwtField().setSelection(0, getSwtField().getText().length());
+      scheduleSelectAll();
     }
     if (getScoutObject().getErrorStatus() != null) {
       requestProposalSupportFromSwt(getScoutObject().getDisplayText(), false);
@@ -212,6 +212,22 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
     if (!getSwtField().isDisposed()) {
       getSwtField().setSelection(0, 0);
     }
+  }
+
+  protected void scheduleSelectAll() {
+    getEnvironment().getDisplay().asyncExec(new Runnable() {
+
+      @Override
+      public void run() {
+        if (getSwtField().isDisposed()) {
+          return;
+        }
+
+        getSwtField().setSelection(0, getSwtField().getText().length());
+      }
+
+    });
+
   }
 
   protected void setProposalFormFromScout(ISmartFieldProposalForm form) {

@@ -141,12 +141,29 @@ public class SwtScoutTimeField extends SwtScoutValueFieldComposite<IDateField> i
   @Override
   protected void handleSwtFocusGained() {
     super.handleSwtFocusGained();
-    getSwtField().setSelection(0, getSwtField().getText().length());
+
+    scheduleSelectAll();
   }
 
   @Override
   protected void handleSwtFocusLost() {
     getSwtField().setSelection(0, 0);
+  }
+
+  protected void scheduleSelectAll() {
+    getEnvironment().getDisplay().asyncExec(new Runnable() {
+
+      @Override
+      public void run() {
+        if (getSwtField().isDisposed()) {
+          return;
+        }
+
+        getSwtField().setSelection(0, getSwtField().getText().length());
+      }
+
+    });
+
   }
 
   private void handleSwtTimeChooserAction() {
