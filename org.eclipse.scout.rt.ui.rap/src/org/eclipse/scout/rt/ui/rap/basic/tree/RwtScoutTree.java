@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.scout.rt.ui.rap.ext.tree.TreeEx;
+import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.AbstractRwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
@@ -194,20 +195,31 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
     setSelectionFromScout(getScoutObject().getSelectedNodes());
     setKeyStrokeFormScout();
-    // dnd support
-    new P_DndSupport(getScoutObject(), getScoutObject(), getUiField());
+    attachDndSupport();
+    handleEventsFromRecentHistory();
+  }
+
+  protected void attachDndSupport() {
+    if (UiDecorationExtensionPoint.getLookAndFeel().isDndSupportEnabled()) {
+      new P_DndSupport(getScoutObject(), getScoutObject(), getUiField());
+    }
+  }
+
+  private void handleEventsFromRecentHistory() {
     //handle events from recent history
     final IEventHistory<TreeEvent> h = getScoutObject().getEventHistory();
-    if (h != null) {
-      getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          for (TreeEvent e : h.getRecentEvents()) {
-            handleScoutTreeEventInUi(e);
-          }
-        }
-      });
+    if (h == null) {
+      return;
     }
+
+    getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+      @Override
+      public void run() {
+        for (TreeEvent e : h.getRecentEvents()) {
+          handleScoutTreeEventInUi(e);
+        }
+      }
+    });
   }
 
   @Override

@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.ext.StyledTextEx;
 import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
+import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.AbstractRwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.rap.internal.TextFieldEditableSupport;
@@ -44,7 +45,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -127,8 +127,13 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
     setSelectionFromScout(f.getSelectionStart(), f.getSelectionEnd());
     setTextWrapFromScout(f.isWrapText());
 
-    // dnd support
-    new P_DndSupport(getScoutObject(), getScoutObject(), getUiField());
+    attachDndSupport();
+  }
+
+  protected void attachDndSupport() {
+    if (UiDecorationExtensionPoint.getLookAndFeel().isDndSupportEnabled()) {
+      new P_DndSupport(getScoutObject(), getScoutObject(), getUiField());
+    }
   }
 
   @Override
@@ -258,7 +263,6 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
       startIndex = Math.min(Math.max(startIndex, 0), textLength);
       endIndex = Math.min(Math.max(endIndex, 0), textLength);
       field.setCaretOffset(caretOffset);
-      m_backupSelection = new Point(startIndex, endIndex);
       field.setSelection(startIndex, endIndex);
     }
     */
@@ -278,8 +282,6 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
     if (endIndex < 0) {
       endIndex = end;
     }
-    // swt sets the caret itself. If startIndex > endIndex it is placed at the beginning.
-    m_backupSelection = new Point(startIndex, endIndex);
     field.setSelection(startIndex, endIndex);
   }
 
@@ -387,27 +389,18 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
     return;
   }
 
-  private Point m_backupSelection = null;
-
   @Override
   protected void handleUiFocusGained() {
     super.handleUiFocusGained();
-    if (getScoutObject().isSelectAllOnFocus()) {
+
+    if (isSelectAllOnFocusEnabled()) {
       getUiField().setSelection(0, getUiField().getText().length());
-    }
-    else {
-      // restore selction
-      if (m_backupSelection == null) {
-        m_backupSelection = new Point(0, 0);
-      }
-      getUiField().setSelection(m_backupSelection);
     }
   }
 
   @Override
-  protected void handleUiFocusLost() {
-    m_backupSelection = getUiField().getSelection();
-    getUiField().setSelection(0, 0);
+  protected boolean isSelectAllOnFocusEnabled() {
+    return super.isSelectAllOnFocusEnabled() && getScoutObject().isSelectAllOnFocus();
   }
 
   private class P_TextVerifyListener implements VerifyListener {

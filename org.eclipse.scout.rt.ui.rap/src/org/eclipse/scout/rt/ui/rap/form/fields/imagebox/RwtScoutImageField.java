@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.ext.ImageViewer;
 import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
+import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.AbstractRwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
@@ -99,7 +100,13 @@ public class RwtScoutImageField extends RwtScoutFieldComposite<IImageField> impl
     getUiField().setAlignmentY(RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().verticalAlignment));
     updateAutoFitFromScout();
     updateImageFromScout();
-    new P_DndSupport(getScoutObject(), getScoutObject(), getUiField());
+    attachDndSupport();
+  }
+
+  protected void attachDndSupport() {
+    if (UiDecorationExtensionPoint.getLookAndFeel().isDndSupportEnabled()) {
+      new P_DndSupport(getScoutObject(), getScoutObject(), getUiField());
+    }
   }
 
   protected void updateImageFromScout() {

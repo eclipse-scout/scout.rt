@@ -113,12 +113,11 @@ public class RwtScoutNumberField extends RwtScoutValueFieldComposite<INumberFiel
   @Override
   protected void handleUiFocusGained() {
     super.handleUiFocusGained();
-    getUiField().setSelection(0, getUiField().getText().length());
+
+    if (isSelectAllOnFocusEnabled()) {
+      getUiField().setSelection(0, getUiField().getText().length());
+    }
   }
 
-  @Override
-  protected void handleUiFocusLost() {
-    getUiField().setSelection(0, 0);
-  }
 
 }

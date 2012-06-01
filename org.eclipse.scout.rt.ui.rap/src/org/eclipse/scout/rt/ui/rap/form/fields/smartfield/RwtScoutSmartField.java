@@ -253,16 +253,11 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   @Override
   protected void handleUiFocusGained() {
     super.handleUiFocusGained();
-    if (m_proposalPopup == null || getScoutObject().getErrorStatus() != null) {
-      getUiField().setSelection(0, getUiField().getText().length());
-    }
-  }
 
-  @Override
-  protected void handleUiFocusLost() {
-    super.handleUiFocusLost();
-    if (!getUiField().isDisposed()) {
-      getUiField().setSelection(0, 0);
+    if (m_proposalPopup == null || getScoutObject().getErrorStatus() != null) {
+      if (isSelectAllOnFocusEnabled()) {
+        getUiField().setSelection(0, getUiField().getText().length());
+      }
     }
   }
 

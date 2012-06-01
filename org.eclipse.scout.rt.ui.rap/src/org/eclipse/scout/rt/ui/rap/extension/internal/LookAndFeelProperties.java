@@ -12,13 +12,17 @@ package org.eclipse.scout.rt.ui.rap.extension.internal;
 
 import java.util.HashMap;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.rap.extension.ILookAndFeelProperties;
 
 public class LookAndFeelProperties implements ILookAndFeelProperties {
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(LookAndFeelProperties.class);
 
+  private String m_contributor;
   private int m_scope;
   private String m_deviceTypeIdentifier;
-  private HashMap<String, Object> m_values = new HashMap<String, Object>();
+  private HashMap<String, String> m_values = new HashMap<String, String>();
 
   @Override
   public int getScope() {
@@ -38,43 +42,42 @@ public class LookAndFeelProperties implements ILookAndFeelProperties {
     m_deviceTypeIdentifier = deviceTypeIdentifier;
   }
 
-  public void setPropertyInt(String name, int value) {
-    m_values.put(name, value);
-  }
-
   @Override
   public int getPropertyInt(String name) {
-    Object object = m_values.get(name);
-    if (object != null) {
-      return ((Integer) object).intValue();
+    String value = m_values.get(name);
+    if (value == null) {
+      return 0;
     }
-    return 0;
+
+    try {
+      return Integer.parseInt(value);
+    }
+    catch (NumberFormatException e) {
+      LOG.error("Could not parse extension look and feel of contributor '" + m_contributor + "' property name='" + name + "' value='" + value + "'");
+      return 0;
+    }
   }
 
   public void setPropertyString(String name, String value) {
     m_values.put(name, value);
   }
 
-  @Override
-  public String getPropertyString(String name) {
-    Object object = m_values.get(name);
-    if (object != null) {
-      return (String) object;
-    }
-    return null;
+  public void setContributor(String contributor) {
+    m_contributor = contributor;
   }
 
-  public void setPropertyBool(String name, boolean value) {
-    m_values.put(name, value);
+  public String getContributor() {
+    return m_contributor;
   }
 
   @Override
   public boolean getPropertyBool(String name) {
-    Object object = m_values.get(name);
-    if (object != null) {
-      return ((Boolean) object).booleanValue();
+    String value = m_values.get(name);
+    if (value == null) {
+      return false;
     }
-    return false;
+
+    return Boolean.parseBoolean(value);
   }
 
   @Override
@@ -84,6 +87,11 @@ public class LookAndFeelProperties implements ILookAndFeelProperties {
 
   public void setProperty(String name, String value) {
     m_values.put(name, value);
+  }
+
+  @Override
+  public String getPropertyString(String name) {
+    return m_values.get(name);
   }
 
 }

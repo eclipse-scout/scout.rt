@@ -96,6 +96,14 @@
                name="logicalGridLayout.rowHeight"
                value="28">
          </property>
+         <property
+               name="dndSupport.enabled"
+               value="false">
+         </property>
+         <property
+               name="formfield.selectAllOnFocus.enabled"
+               value="false">
+         </property>
       </properties>
    </extension>
 

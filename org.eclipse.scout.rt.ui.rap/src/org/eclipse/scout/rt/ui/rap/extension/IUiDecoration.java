@@ -56,6 +56,8 @@ public interface IUiDecoration {
 
   int getFormFieldLabelAlignment();
 
+  boolean isFormFieldSelectAllOnFocusEnabled();
+
   int getMessageBoxMinHeight();
 
   int getMessageBoxMinWidth();
@@ -65,4 +67,7 @@ public interface IUiDecoration {
    *         default is 330px
    */
   int getToolFormMinWidth();
+
+  boolean isDndSupportEnabled();
+
 }

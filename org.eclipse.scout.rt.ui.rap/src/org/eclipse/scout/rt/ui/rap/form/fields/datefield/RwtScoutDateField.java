@@ -321,12 +321,9 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
 
   @Override
   protected void handleUiFocusGained() {
-    getUiField().setSelection(0, getUiField().getText().length());
-  }
-
-  @Override
-  protected void handleUiFocusLost() {
-    getUiField().setSelection(0, 0);
+    if (isSelectAllOnFocusEnabled()) {
+      getUiField().setSelection(0, getUiField().getText().length());
+    }
   }
 
   private void notifyPopupEventListeners(int eventType) {

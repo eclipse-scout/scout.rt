@@ -24,6 +24,7 @@ public interface ILookAndFeelProperties {
   String PROP_FORM_FIELD_ACTIVATION_BUTTON_WIDTH = "formfield.activationButton.width";
   String PROP_FORM_FIELD_ACTIVATION_BUTTON_HEIGHT = "formfield.activationButton.height";
   String PROP_FORM_FIELD_ACTIVATION_BUTTON_WITH_MENU_WIDTH = "formfield.activationButtonWithMenu.width";
+  String PROP_FORM_FIELD_SELECT_ALL_ON_FOCUS_ENABLED = "formfield.selectAllOnFocus.enabled";
   String PROP_PROCESS_BUTTON_HEIGHT = "processButton.height";
   String PROP_PROCESS_BUTTON_MIN_WIDTH = "processButton.minWidth";
   String PROP_PROCESS_BUTTON_MAX_WIDTH = "processButton.maxWidth";
@@ -32,6 +33,7 @@ public interface ILookAndFeelProperties {
   String PROP_COLOR_FOREGROUND_DISABLED = "color.forground.disabled";
   String PROP_MESSAGE_BOX_MIN_WIDTH = "messageBox.minWidth";
   String PROP_MESSAGE_BOX_MIN_HEIGHT = "messageBox.minHeight";
+  String PROP_DND_SUPPORT_ENABLED = "dndSupport.enabled";
 
   int getScope();
 

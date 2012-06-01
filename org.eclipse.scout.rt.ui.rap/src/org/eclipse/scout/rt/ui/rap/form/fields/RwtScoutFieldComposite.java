@@ -346,6 +346,10 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
     }
   }
 
+  protected boolean isSelectAllOnFocusEnabled() {
+    return UiDecorationExtensionPoint.getLookAndFeel().isFormFieldSelectAllOnFocusEnabled();
+  }
+
   protected void setSaveNeededFromScout(boolean b) {
   }
 

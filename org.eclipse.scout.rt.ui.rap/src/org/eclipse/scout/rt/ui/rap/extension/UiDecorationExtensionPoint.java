@@ -96,23 +96,10 @@ public final class UiDecorationExtensionPoint {
     IConfigurationElement[] properties = propertiesElement.getChildren("property");
     for (IConfigurationElement prop : properties) {
       String propName = null, propValue = null;
-      try {
-        propName = prop.getAttribute("name");
-        propValue = prop.getAttribute("value");
-        if (ILookAndFeelProperties.PROP_COLOR_FOREGROUND_DISABLED.equals(propName) ||
-            ILookAndFeelProperties.PROP_FORM_FIELD_LABEL_ALIGNMENT.equals(propName)) {
-          props.setPropertyString(propName, propValue);
-        }
-        else if (ILookAndFeelProperties.PROP_FORM_MAINBOX_BORDER_VISIBLE.equals(propName)) {
-          props.setPropertyBool(propName, Boolean.parseBoolean(propValue));
-        }
-        else {
-          props.setPropertyInt(propName, Integer.valueOf(propValue));
-        }
-      }
-      catch (Exception e) {
-        LOG.error("could not parse extension look and feel of contributor '" + propertiesElement.getContributor().getName() + "' property name='" + propName + "' value='" + propValue + "'");
-      }
+      propName = prop.getAttribute("name");
+      propValue = prop.getAttribute("value");
+      props.setProperty(propName, propValue);
+      props.setContributor(propertiesElement.getContributor().getName());
     }
     return props;
   }
@@ -252,6 +239,13 @@ public final class UiDecorationExtensionPoint {
       if (props.getPropertyString(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_HEIGHT) != null) {
         uiDecoration.setMessageBoxMinHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_HEIGHT));
       }
+      if (props.getPropertyString(ILookAndFeelProperties.PROP_FORM_FIELD_SELECT_ALL_ON_FOCUS_ENABLED) != null) {
+        uiDecoration.setFormFieldSelectAllOnFocusEnabled(props.getPropertyBool(ILookAndFeelProperties.PROP_FORM_FIELD_SELECT_ALL_ON_FOCUS_ENABLED));
+      }
+      if (props.getPropertyString(ILookAndFeelProperties.PROP_DND_SUPPORT_ENABLED) != null) {
+        uiDecoration.setDndSupportEnabled(props.getPropertyBool(ILookAndFeelProperties.PROP_DND_SUPPORT_ENABLED));
+      }
+
     }
   }
 

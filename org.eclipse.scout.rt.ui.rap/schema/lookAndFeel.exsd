@@ -24,21 +24,21 @@
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -95,18 +95,36 @@ If no value is specified the properties are valid for all device types.
          <attribute name="name" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
             <simpleType>
                <restriction base="string">
+                  <enumeration value="color.forground.disabled">
+                  </enumeration>
                   <enumeration value="dialog.minWidth">
                   </enumeration>
                   <enumeration value="dialog.minHeight">
                   </enumeration>
-                  <enumeration value="formMainBoxBorder.visible">
+                  <enumeration value="dndSupport.enabled">
+                  </enumeration>
+                  <enumeration value="formfield.activationButton.width">
+                  </enumeration>
+                  <enumeration value="formfield.activationButtonWithMenu.width">
+                  </enumeration>
+                  <enumeration value="formfield.activationButton.height">
+                  </enumeration>
+                  <enumeration value="formfield.selectAllOnFocus.enabled">
                   </enumeration>
                   <enumeration value="formFieldLabel.width">
+                  </enumeration>
+                  <enumeration value="formFieldLabel.alignment">
+                  </enumeration>
+                  <enumeration value="formMainBoxBorder.visible">
+                  </enumeration>
+                  <enumeration value="messageBox.minWidth">
+                  </enumeration>
+                  <enumeration value="messageBox.minHeight">
                   </enumeration>
                   <enumeration value="logicalGridLayout.defaultColumnWidth">
                   </enumeration>
@@ -118,25 +136,11 @@ If no value is specified the properties are valid for all device types.
                   </enumeration>
                   <enumeration value="logicalGridLayout.verticalGap">
                   </enumeration>
-                  <enumeration value="formfield.activationButton.width">
-                  </enumeration>
-                  <enumeration value="formfield.activationButtonWithMenu.width">
-                  </enumeration>
-                  <enumeration value="formfield.activationButton.height">
-                  </enumeration>
                   <enumeration value="processButton.height">
                   </enumeration>
                   <enumeration value="processButton.minWidth">
                   </enumeration>
                   <enumeration value="processButton.maxWidth">
-                  </enumeration>
-                  <enumeration value="color.forground.disabled">
-                  </enumeration>
-                  <enumeration value="formFieldLabel.alignment">
-                  </enumeration>
-                  <enumeration value="messageBox.minWidth">
-                  </enumeration>
-                  <enumeration value="messageBox.minHeight">
                   </enumeration>
                </restriction>
             </simpleType>
@@ -144,7 +148,7 @@ If no value is specified the properties are valid for all device types.
          <attribute name="value" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -209,7 +213,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="color" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -221,7 +225,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="color" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -233,7 +237,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="font" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -245,7 +249,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="placement" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
             <simpleType>
@@ -265,7 +269,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="enum" type="string" use="default" value="org.eclipse.scout.rt.shared.ui.UiDeviceType">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.shared.ui.IUiDeviceType"/>
@@ -275,7 +279,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="enumValue" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>

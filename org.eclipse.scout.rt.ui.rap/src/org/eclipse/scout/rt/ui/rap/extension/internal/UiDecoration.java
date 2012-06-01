@@ -30,6 +30,7 @@ public class UiDecoration implements IUiDecoration {
   private int m_formFieldActivationButtonWidth;
   private int m_formFieldActivationButtonWithMenuWidth;
   private int m_formFieldLabelWidth;
+  private boolean m_formFieldSelectAllOnFocusEnabled;
   private int m_logicalGridLayoutDefaultColumnWidth;
   private int m_logicalGridLayoutDefaultPopupWidth;
   private int m_logicalGridLayoutHorizontalGap;
@@ -42,6 +43,7 @@ public class UiDecoration implements IUiDecoration {
   private int m_messageBoxMinWidth = 400;
   private int m_messageBoxMinHeight = 100;
   private int m_toolFormMinWidth = 330;
+  private boolean m_dndSupportEnabled;
 
   /**
    * one of SWT.RIGHT SWT.LEFT SWT.CENTER
@@ -267,4 +269,23 @@ public class UiDecoration implements IUiDecoration {
   public void setToolFormMinWidth(int toolFormMinWidth) {
     m_toolFormMinWidth = toolFormMinWidth;
   }
+
+  @Override
+  public boolean isDndSupportEnabled() {
+    return m_dndSupportEnabled;
+  }
+
+  public void setDndSupportEnabled(boolean dndSupportEnabled) {
+    m_dndSupportEnabled = dndSupportEnabled;
+  }
+
+  @Override
+  public boolean isFormFieldSelectAllOnFocusEnabled() {
+    return m_formFieldSelectAllOnFocusEnabled;
+  }
+
+  public void setFormFieldSelectAllOnFocusEnabled(boolean formFieldSelectAllOnFocusEnabled) {
+    m_formFieldSelectAllOnFocusEnabled = formFieldSelectAllOnFocusEnabled;
+  }
+
 }

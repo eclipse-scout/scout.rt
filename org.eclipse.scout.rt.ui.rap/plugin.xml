@@ -346,6 +346,14 @@
               name="formFieldLabel.alignment"
               value="left">
         </property>
+        <property
+              name="formfield.selectAllOnFocus.enabled"
+              value="true">
+        </property>
+        <property
+              name="dndSupport.enabled"
+              value="true">
+        </property>
       </properties>
   </extension>
 

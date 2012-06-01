@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.scout.rt.ui.rap.ext.table.TableEx;
 import org.eclipse.scout.rt.ui.rap.ext.table.TableViewerEx;
 import org.eclipse.scout.rt.ui.rap.ext.table.util.TableRolloverSupport;
+import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.AbstractRwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
@@ -301,19 +302,29 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     setRowHeightFromScout();
     setKeyboardNavigationFromScout();
     updateAutoResizeColumnsFromScout();
-    // dnd support
-    new P_DndSupport(getScoutObject(), getScoutObject(), getUiField());
-    //handle events from recent history
+    attachDndSupport();
+    handleEventsFromRecentHistory();
+  }
+
+  private void handleEventsFromRecentHistory() {
     final IEventHistory<TableEvent> h = getScoutObject().getEventHistory();
-    if (h != null) {
-      getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          for (TableEvent e : h.getRecentEvents()) {
-            handleScoutTableEventInUi(e);
-          }
+    if (h == null) {
+      return;
+    }
+
+    getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+      @Override
+      public void run() {
+        for (TableEvent e : h.getRecentEvents()) {
+          handleScoutTableEventInUi(e);
         }
-      });
+      }
+    });
+  }
+
+  protected void attachDndSupport() {
+    if (UiDecorationExtensionPoint.getLookAndFeel().isDndSupportEnabled()) {
+      new P_DndSupport(getScoutObject(), getScoutObject(), getUiField());
     }
   }
 
