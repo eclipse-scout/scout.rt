@@ -65,6 +65,35 @@ public final class MailUtility {
   private MailUtility() {
   }
 
+  /**
+   * Container for the mail body in plain text and html.
+   * For the correct html representation it contains also a list of files referenced in the html.
+   */
+  public class MailMessage {
+
+    private String m_plainText;
+    private String m_htmlText;
+    private List<File> m_htmlAttachmentList;
+
+    public MailMessage(String plainText, String htmlText, List<File> htmlAttachmentList) {
+      m_plainText = plainText;
+      m_htmlText = htmlText;
+      m_htmlAttachmentList = htmlAttachmentList;
+    }
+
+    public String getPlainText() {
+      return m_plainText;
+    }
+
+    public String getHtmlText() {
+      return m_htmlText;
+    }
+
+    public List<File> getHtmlAttachmentList() {
+      return m_htmlAttachmentList;
+    }
+  }
+
   public static Part[] getBodyParts(Part message) throws ProcessingException {
     return instance.getBodyPartsImpl(message);
   }
@@ -239,32 +268,108 @@ public final class MailUtility {
     }
   }
 
+  public static MailMessage extractMailMessageFromWordArchive(File archiveFile) {
+    return instance.extractMailMessageFromWordArchiveInternal(archiveFile);
+  }
+
+  private MailMessage extractMailMessageFromWordArchiveInternal(File archiveFile) {
+    MailMessage mailMessage = null;
+    File tempDir = extractWordArchive(archiveFile);
+    String simpleName = extractSimpleNameFromWordArchive(archiveFile);
+    String messagePlainText = extractPlainTextFromWordArchiveInternal(tempDir, simpleName);
+    String messageHtml = extractHtmlFromWordArchiveInternal(tempDir, simpleName);
+    // replace directory entry
+    // replace all paths to the 'files directory' with the root directory
+    File attachmentFolder = null;
+    if (tempDir.isDirectory()) {
+      for (File file : tempDir.listFiles()) {
+        if (file.isDirectory() && file.getName().startsWith(simpleName)) {
+          attachmentFolder = file;
+          break;
+        }
+      }
+    }
+    String folderName = null;
+    if (attachmentFolder != null) {
+      folderName = attachmentFolder.getName();
+    }
+    messageHtml = messageHtml.replaceAll(folderName + "/", "");
+    messageHtml = removeWordTags(messageHtml);
+    // now loop through the directory and search all the files needed for a correct representation of the html mail
+    List<File> attachmentList = new ArrayList<File>();
+    if (attachmentFolder != null) {
+      for (File attFile : attachmentFolder.listFiles()) {
+        // exclude Microsoft Word specific directory file. This is only used to edit HTML in Word.
+        if (!attFile.isDirectory() && !isWordSpecificFile(attFile.getName())) {
+          attachmentList.add(attFile);
+        }
+      }
+    }
+    mailMessage = new MailMessage(messagePlainText, messageHtml, attachmentList);
+    return mailMessage;
+  }
+
+  private String extractHtmlFromWordArchiveInternal(File dir, String simpleName) {
+    String txt = null;
+    try {
+      txt = extractTextFromWordArchiveInternal(dir, simpleName, "html");
+    }
+    catch (Exception e) {
+      LOG.error("Error occured while trying to extract plain text file", e);
+    }
+    return txt;
+  }
+
+  private String extractSimpleNameFromWordArchive(File archiveFile) {
+    String simpleName = archiveFile.getName();
+    if (archiveFile.getName().lastIndexOf('.') != -1) {
+      simpleName = archiveFile.getName().substring(0, archiveFile.getName().lastIndexOf('.'));
+    }
+    return simpleName;
+  }
+
+  private File extractWordArchive(File archiveFile) {
+    File tempDir = null;
+    try {
+      tempDir = IOUtility.createTempDirectory("");
+      FileUtility.extractArchive(archiveFile, tempDir);
+    }
+    catch (Exception e) {
+      LOG.error("Error occured while trying to extract word archive", e);
+    }
+    return tempDir;
+  }
+
   public static String extractPlainTextFromWordArchive(File archiveFile) {
     return instance.extractPlainTextFromWordArchiveInternal(archiveFile);
   }
 
   private String extractPlainTextFromWordArchiveInternal(File archiveFile) {
+    File tempDir = extractWordArchive(archiveFile);
+    String simpleName = extractSimpleNameFromWordArchive(archiveFile);
+    return extractPlainTextFromWordArchiveInternal(tempDir, simpleName);
+  }
+
+  private String extractPlainTextFromWordArchiveInternal(File dir, String simpleName) {
     String plainText = null;
     try {
-      File tempDir = IOUtility.createTempDirectory("");
-      FileUtility.extractArchive(archiveFile, tempDir);
-
-      String simpleName = archiveFile.getName();
-      if (archiveFile.getName().lastIndexOf('.') != -1) {
-        simpleName = archiveFile.getName().substring(0, archiveFile.getName().lastIndexOf('.'));
-      }
-
-      File plainTextFile = new File(tempDir, simpleName + ".txt");
-      if (plainTextFile.exists() && plainTextFile.canRead()) {
-        Reader reader = new FileReader(plainTextFile);
-        plainText = IOUtility.getContent(reader);
-        reader.close();
-      }
+      plainText = extractTextFromWordArchiveInternal(dir, simpleName, "txt");
     }
     catch (Exception e) {
       LOG.error("Error occured while trying to extract plain text file", e);
     }
     return plainText;
+  }
+
+  private String extractTextFromWordArchiveInternal(File dir, String simpleName, String fileType) throws ProcessingException, IOException {
+    String txt = null;
+    File plainTextFile = new File(dir, simpleName + "." + fileType);
+    if (plainTextFile.exists() && plainTextFile.canRead()) {
+      Reader reader = new FileReader(plainTextFile);
+      txt = IOUtility.getContent(reader);
+      reader.close();
+    }
+    return txt;
   }
 
   /**
@@ -365,13 +470,7 @@ public final class MailUtility {
           for (File file : filesFolder.listFiles()) {
             // exclude Microsoft Word specific directory file. This is only used to edit HTML in Word.
             String filename = file.getName();
-            if (!filename.equalsIgnoreCase("filelist.xml") &&
-                !filename.equalsIgnoreCase("colorschememapping.xml") &&
-                !filename.equalsIgnoreCase("themedata.thmx") &&
-                !filename.equalsIgnoreCase("header.html") &&
-                !filename.equalsIgnoreCase("editdata.mso") &&
-                !filename.matches("item\\d{4}\\.xml") &&
-                !filename.matches("props\\d{4}\\.xml")) {
+            if (!isWordSpecificFile(filename)) {
               FileDataSource fds = new FileDataSource(file);
               htmlDataSourceList.add(fds);
             }
@@ -391,14 +490,7 @@ public final class MailUtility {
         // replace all paths to the 'files directory' with the root directory
         htmlMessage = htmlMessage.replaceAll("\"" + folderName + "/", "\"cid:");
 
-        // remove special/unused files
-        htmlMessage = htmlMessage.replaceAll("<link rel=File-List href=\"cid:filelist.xml\">", "");
-        htmlMessage = htmlMessage.replaceAll("<link rel=colorSchemeMapping href=\"cid:colorschememapping.xml\">", "");
-        htmlMessage = htmlMessage.replaceAll("<link rel=themeData href=\"cid:themedata.thmx\">", "");
-        htmlMessage = htmlMessage.replaceAll("<link rel=Edit-Time-Data href=\"cid:editdata.mso\">", "");
-
-        // remove Microsoft Word tags
-        htmlMessage = htmlMessage.replaceAll("<!--\\[if gte mso(.*\\r?\\n)*?.*?endif\\]-->", "");
+        htmlMessage = removeWordTags(htmlMessage);
         // remove any VML elements
         htmlMessage = htmlMessage.replaceAll("<!--\\[if gte vml 1(.*\\r?\\n)*?.*?endif\\]-->", "");
         // remove any VML elements part2
@@ -469,6 +561,32 @@ public final class MailUtility {
     catch (MessagingException e) {
       throw new ProcessingException("Error occured while creating MIME-message", e);
     }
+  }
+
+  private String removeWordTags(String htmlMessage) {
+    // remove special/unused files
+    htmlMessage = htmlMessage.replaceAll("<link rel=File-List href=\"cid:filelist.xml\">", "");
+    htmlMessage = htmlMessage.replaceAll("<link rel=colorSchemeMapping href=\"cid:colorschememapping.xml\">", "");
+    htmlMessage = htmlMessage.replaceAll("<link rel=themeData href=\"cid:themedata.thmx\">", "");
+    htmlMessage = htmlMessage.replaceAll("<link rel=Edit-Time-Data href=\"cid:editdata.mso\">", "");
+
+    // remove Microsoft Word tags
+    htmlMessage = htmlMessage.replaceAll("<!--\\[if gte mso(.*\\r?\\n)*?.*?endif\\]-->", "");
+
+    return htmlMessage;
+  }
+
+  /**
+   * Checks if file is a Microsoft Word specific directory file. They are only used to edit HTML in Word.
+   */
+  private boolean isWordSpecificFile(String filename) {
+    return filename.equalsIgnoreCase("filelist.xml") ||
+        filename.equalsIgnoreCase("colorschememapping.xml") ||
+        filename.equalsIgnoreCase("themedata.thmx") ||
+        filename.equalsIgnoreCase("header.html") ||
+        filename.equalsIgnoreCase("editdata.mso") ||
+        filename.matches("item\\d{4}\\.xml") ||
+        filename.matches("props\\d{4}\\.xml");
   }
 
   private static void writeHtmlBody(MimePart htmlBodyPart, String htmlMessage, List<DataSource> htmlDataSourceList) throws MessagingException {
