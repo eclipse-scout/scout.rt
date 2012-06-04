@@ -76,13 +76,6 @@ public class RwtScoutMobileSmartField extends RwtScoutSmartField {
     return true;
   }
 
-  /**
-   * Overridden to not select any text on focus gain
-   */
-  @Override
-  protected void handleUiFocusGained() {
-  }
-
   private class P_FieldSelectionListener extends MouseAdapter {
     private static final long serialVersionUID = 1L;
 
