@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.services.IMobileNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
@@ -75,31 +76,23 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void transformPageDetailTable(ITable table) {
+    if (table == null) {
+      //Do not allow closing the outline table because it breaks the navigation
+      makeSurePageDetailTableIsVisible();
+    }
+  }
+
+  @Override
   public boolean acceptForm(IForm form) {
     if (isFormAddingForbidden(form)) {
-      return false;
-    }
-
-    if (isDetailFormAndAddingForbidden(form)) {
-      makeSureOutlineTableIsVisible();
-
       return false;
     }
 
     return true;
   }
 
-  private boolean isDetailFormAndAddingForbidden(IForm form) {
-    IForm pageDetailForm = getDesktop().getPageDetailForm();
-    if (form == pageDetailForm) {
-      IOutline outline = getDesktop().getOutline();
-      return !outline.getActivePage().isLeaf();
-    }
-
-    return false;
-  }
-
-  private boolean isFormAddingForbidden(IForm form) {
+  protected boolean isFormAddingForbidden(IForm form) {
     if (form instanceof IOutlineTreeForm) {
       return !SERVICES.getService(IMobileNavigationService.class).getDeviceNavigator().isOutlineTreeAvailable();
     }
@@ -111,20 +104,29 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     return false;
   }
 
-  private void makeSureOutlineTableIsVisible() {
+  private void makeSurePageDetailTableIsVisible() {
     final IOutline outline = getDesktop().getOutline();
+    if (outline == null) {
+      return;
+    }
+
     final IPage activePage = outline.getActivePage();
-    if (activePage == null || activePage.isTableVisible() || activePage.isLeaf()) {
+    if (activePage == null || activePage.isTableVisible() || isPageDetailTableAllowedToBeClosed(activePage)) {
       return;
     }
 
     activePage.setTableVisible(true);
+
     if (activePage instanceof IPageWithNodes) {
       outline.setDetailTable(((IPageWithNodes) activePage).getInternalTable());
     }
     else if (activePage instanceof IPageWithTable<?>) {
       outline.setDetailTable(((IPageWithTable) activePage).getTable());
     }
+  }
+
+  protected boolean isPageDetailTableAllowedToBeClosed(IPage activePage) {
+    return false;
   }
 
   protected void transformFormFields(IForm form) {

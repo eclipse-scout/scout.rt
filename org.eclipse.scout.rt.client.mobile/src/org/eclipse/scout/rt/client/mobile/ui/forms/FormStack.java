@@ -25,6 +25,9 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 /**
  * @since 3.8.0
  */
+//FIXME CGU if a stacked form gets removed on the desktop it does not automatically gets removed on the stack.
+//For example crm svg is open, a tools form gets open and svg stacked.
+//Changing the page should remove the svg form which does not happen because it is not on the desktop anymore. Should we change remove FormStack and handle stacking only in UI?
 public class FormStack {
   private Stack<IForm> m_formHistory = new Stack<IForm>();
   private P_FormListener m_formListener;

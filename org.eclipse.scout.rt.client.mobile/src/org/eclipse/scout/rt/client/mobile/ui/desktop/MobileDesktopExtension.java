@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.ContributionCommand;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -141,6 +142,17 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   }
 
   @Override
+  protected ContributionCommand execPageDetailTableChanged(ITable oldTable, ITable newTable) throws ProcessingException {
+    if (!isActive()) {
+      return super.execPageDetailTableChanged(oldTable, newTable);
+    }
+
+    getDeviceTransformer().transformPageDetailTable(newTable);
+
+    return ContributionCommand.Continue;
+  }
+
+  @Override
   protected ContributionCommand execCustomFormModification(IHolder<IForm> formHolder) {
     if (!isActive()) {
       return super.execCustomFormModification(formHolder);
@@ -238,6 +250,13 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
 
     @Override
     protected void execAction() throws ProcessingException {
+      if (getCoreDesktop().getOutline() != null) {
+        getCoreDesktop().getOutline().setDetailForm(null);
+        getCoreDesktop().getOutline().setDetailTable(null);
+        getCoreDesktop().getOutline().setSearchForm(null);
+        getCoreDesktop().setOutline((IOutline) null);
+      }
+
       showOutlineChooser();
     }
   }

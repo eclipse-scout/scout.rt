@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -24,6 +25,8 @@ public interface IDeviceTransformer {
   void transformForm(IForm form);
 
   void transformOutline(IOutline outline);
+
+  void transformPageDetailTable(ITable table);
 
   boolean acceptForm(IForm form);
 }
