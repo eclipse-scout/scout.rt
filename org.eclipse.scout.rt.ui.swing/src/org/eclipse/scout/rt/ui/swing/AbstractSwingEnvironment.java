@@ -441,17 +441,21 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
         }
       }.schedule();
     }
-    attachBusyHandler(session);
+    attachBusyHandler();
   }
 
-  protected SwingBusyHandler attachBusyHandler(IClientSession session) {
+  protected SwingBusyHandler attachBusyHandler() {
     IBusyManagerService service = SERVICES.getService(IBusyManagerService.class);
     if (service == null) {
       return null;
     }
-    SwingBusyHandler handler = new SwingBusyHandler(session);
-    service.register(session, handler);
+    SwingBusyHandler handler = createBusyHandler();
+    service.register(getScoutSession(), handler);
     return handler;
+  }
+
+  protected SwingBusyHandler createBusyHandler() {
+    return new SwingBusyHandler(getScoutSession());
   }
 
   @Override

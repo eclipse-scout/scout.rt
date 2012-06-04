@@ -391,7 +391,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       m_status = RwtEnvironmentEvent.STARTED;
       fireEnvironmentChanged(new RwtEnvironmentEvent(this, m_status));
 
-      attachBusyHandler(m_clientSession);
+      attachBusyHandler();
     }
     finally {
       if (m_status == RwtEnvironmentEvent.STARTING) {
@@ -405,14 +405,18 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, RwtUtility.getBrowserInfo().getUserAgent());
   }
 
-  protected RwtBusyHandler attachBusyHandler(IClientSession session) {
+  protected RwtBusyHandler attachBusyHandler() {
     IBusyManagerService service = SERVICES.getService(IBusyManagerService.class);
     if (service == null) {
       return null;
     }
-    RwtBusyHandler handler = new RwtBusyHandler(session, this);
-    service.register(session, handler);
+    RwtBusyHandler handler = createBusyHandler();
+    service.register(getClientSession(), handler);
     return handler;
+  }
+
+  protected RwtBusyHandler createBusyHandler() {
+    return new RwtBusyHandler(getClientSession(), this);
   }
 
   protected void showClientSessionLoadError(Throwable error) {
