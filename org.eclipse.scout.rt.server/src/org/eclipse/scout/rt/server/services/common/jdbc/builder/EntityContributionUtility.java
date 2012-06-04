@@ -123,12 +123,20 @@ public final class EntityContributionUtility {
       // extend the from section
       TreeSet<String> fromParts = new TreeSet<String>(childContributions.getFromParts());
       if (fromParts.size() > 0) {
-        final String s = ListUtility.format(fromParts, ", ");
+        StringBuilder buf = new StringBuilder();
+        for (String fromPart : fromParts) {
+          if (!isAnsiJoin(fromPart)) {
+            buf.append(",");
+          }
+          buf.append(" ");
+          buf.append(fromPart);
+        }
+        final String s = buf.toString();
         if (StringUtility.getTag(entityPart, "fromParts") != null) {
           entityPart = StringUtility.replaceTags(entityPart, "fromParts", new ITagProcessor() {
             @Override
             public String processTag(String tagName, String tagContent) {
-              return tagContent + ", " + s;//legacy: always prefix an additional ,
+              return tagContent + s;
             }
           });
         }
@@ -266,6 +274,15 @@ public final class EntityContributionUtility {
       }
     }
     return parentContrib;
+  }
+
+  private static final Pattern ANSI_JOIN_PATTERN = Pattern.compile("\\s*(LEFT\\s+|RIGHT\\s+)?(OUTER\\s+|INNER\\s+)?JOIN\\s+.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+  public static boolean isAnsiJoin(String fromPart) {
+    if (fromPart == null) {
+      return false;
+    }
+    return ANSI_JOIN_PATTERN.matcher(fromPart).matches();
   }
 
   private static final Pattern CHECK_GROUP_BY_CONTAINS_SELECT_PATTERN = Pattern.compile("[^a-z0-9\"'.%$_]SELECT[^a-z0-9\"'.%$_]", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
