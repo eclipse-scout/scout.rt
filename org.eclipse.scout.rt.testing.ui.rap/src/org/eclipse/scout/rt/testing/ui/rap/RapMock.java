@@ -61,11 +61,14 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.seleniumemulation.ElementFinder;
 import org.openqa.selenium.internal.seleniumemulation.JavascriptLibrary;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.service.DriverService;
 
 /**
  *
@@ -76,15 +79,22 @@ public class RapMock implements IGuiMock {
   static interface MockRunnable<T> extends WaitCondition<T> {
   }
 
-  private static ChromeDriverService m_service;
+  private static DriverService m_service = null;
   private WebDriver m_driver;
   private RAPSelenium m_bot;
   private IClientSession m_session;
   private int m_sleepDelay = 40;
 
+  private final ElementFinder m_elementFinder = new ElementFinder(new JavascriptLibrary());
   private String m_currentWidgetId = "";
+  private WebElement m_currentElement = null;
   private boolean m_modifierPressed = false;
   private Actions m_actionBuilder = null;
+  private List<CharSequence> m_keyList = new ArrayList<CharSequence>();
+
+  private static boolean useChrome = false;
+  private static boolean useFirefox = !useChrome;
+  private static boolean useFirebug = false && useFirefox;
 
   public void setClientSession(IClientSession session) {
     m_session = session;
@@ -92,14 +102,16 @@ public class RapMock implements IGuiMock {
 
   @Override
   public void initializeMock() {
-//    System.setProperty("webdriver.firefox.bin", "C:/FirefoxPortableTest_11/App/Firefox/firefox.exe");
-//    System.setProperty("webdriver.chrome.driver", "e:/Downloads/java/chromedriver.exe");
-    m_service = new ChromeDriverService.Builder()
-        .usingChromeDriverExecutable(new File("e:/Downloads/java/chromedriver.exe"))
-        .usingAnyFreePort()
-        .build();
+    if (useChrome) {
+      m_service = new ChromeDriverService.Builder()
+          .usingDriverExecutable(new File("e:/Downloads/java/chromedriver.exe"))
+          .usingAnyFreePort()
+          .build();
+    }
     try {
-      m_service.start();
+      if (m_service != null) {
+        m_service.start();
+      }
     }
     catch (IOException e) {
       throw new IllegalStateException("ChromeDriverService could not be started.", e);
@@ -108,13 +120,42 @@ public class RapMock implements IGuiMock {
 
   @Override
   public void shutdownMock() {
-    m_service.stop();
+    if (m_service != null) {
+      m_service.stop();
+    }
   }
 
   @Override
   public void beforeTest() {
-    DesiredCapabilities chrome = DesiredCapabilities.chrome();
-    m_driver = new RemoteWebDriver(m_service.getUrl(), chrome);
+    if (m_service != null) {
+      if (useChrome) {
+        DesiredCapabilities chrome = DesiredCapabilities.chrome();
+        m_driver = new RemoteWebDriver(m_service.getUrl(), chrome);
+      }
+    }
+    else {
+      if (useFirefox) {
+        System.setProperty("webdriver.firefox.bin", "C:/FirefoxPortableTest_11/App/Firefox/firefox.exe");
+        FirefoxProfile firefoxProfile = new FirefoxProfile();
+        if (useFirebug) {
+          try {
+            firefoxProfile.addExtension(new File("E:/Downloads/java/firebug-1.9.2-fx.xpi"));
+            firefoxProfile.setPreference("extensions.firebug.currentVersion", "1.9.2"); // Avoid startup screen
+
+            firefoxProfile.addExtension(new File("E:/Downloads/java/firepath-0.9.7-fx.xpi"));
+          }
+          catch (IOException e) {
+            throw new IllegalStateException("Could not add/find firefox extensions.", e);
+          }
+        }
+
+        m_driver = new FirefoxDriver(firefoxProfile);
+//        m_driver = new FirefoxDriver(new FirefoxProfile(new File("C:/Temp/webdriver-profile")));
+      }
+    }
+    if (m_driver == null) {
+      throw new NullPointerException("no driver instantiated!");
+    }
     m_bot = new RAPSelenium(m_driver, "http://localhost:8081");
     m_actionBuilder = new Actions(m_bot.getWrappedDriver());
 
@@ -130,6 +171,20 @@ public class RapMock implements IGuiMock {
   @Override
   public GuiStrategy getStrategy() {
     return GuiStrategy.Rap;
+  }
+
+  public void setCurrentWidgetId(String currentWidgetId) {
+    m_currentWidgetId = currentWidgetId;
+
+    m_currentElement = m_elementFinder.findElement(m_bot.getWrappedDriver(), currentWidgetId);
+  }
+
+  public String getCurrentWidgetId_() {
+    return m_currentWidgetId;
+  }
+
+  public WebElement getCurrentElement() {
+    return m_currentElement;
   }
 
   @Override
@@ -357,18 +412,18 @@ public class RapMock implements IGuiMock {
   @Override
   public void gotoField(FieldType type, int index) {
     Control c = waitForIndexedField(type, index);
-    m_currentWidgetId = WidgetUtil.getAdapter(c).getId();
+    setCurrentWidgetId(WidgetUtil.getAdapter(c).getId());
     if (FieldType.Text.equals(type)) {
-      m_currentWidgetId = new StringBuffer("//*[@id=\"").append(m_currentWidgetId).append("\"]/input").toString();
+      setCurrentWidgetId(new StringBuffer("//*[@id=\"").append(getCurrentWidgetId_()).append("\"]/input").toString());
     }
   }
 
   @Override
   public void gotoScoutField(String name) {
     final Control c = waitForScoutField(name);
-    m_currentWidgetId = WidgetUtil.getAdapter(c).getId();
+    setCurrentWidgetId(WidgetUtil.getAdapter(c).getId());
     if (c instanceof Text) {
-      m_currentWidgetId = new StringBuffer("//*[@id=\"").append(m_currentWidgetId).append("\"]/input").toString();
+      setCurrentWidgetId(new StringBuffer("//*[@id=\"").append(getCurrentWidgetId_()).append("\"]/input").toString());
     }
   }
 
@@ -378,12 +433,12 @@ public class RapMock implements IGuiMock {
     syncExec(new MockRunnable<Object>() {
       @Override
       public Object run() throws Throwable {
-        m_currentWidgetId = WidgetUtil.getAdapter(table).getId();
-        StringBuffer xpathWidgetId = new StringBuffer("//*[@id=\"").append(m_currentWidgetId).append("\"]/div[1]/div[").append(rowIndex + table.getColumnCount()).append("]/div");
+        setCurrentWidgetId(WidgetUtil.getAdapter(table).getId());
+        StringBuffer xpathWidgetId = new StringBuffer("//*[@id=\"").append(getCurrentWidgetId_()).append("\"]/div[1]/div[").append(rowIndex + table.getColumnCount()).append("]/div");
         if (columnIndex > 0) {
           xpathWidgetId.append("[").append(columnIndex).append("]");
         }
-        m_currentWidgetId = xpathWidgetId.toString();
+        setCurrentWidgetId(xpathWidgetId.toString());
         return null;
       }
     });
@@ -425,12 +480,12 @@ public class RapMock implements IGuiMock {
     syncExec(new MockRunnable<Object>() {
       @Override
       public Object run() throws Throwable {
-        m_currentWidgetId = WidgetUtil.getAdapter(tree).getId();
+        setCurrentWidgetId(WidgetUtil.getAdapter(tree).getId());
         TreeItem[] items = tree.getItems();
         for (int i = 0; i < items.length; i++) {
           if (nodeText.equals(items[i].getText())) {
-            StringBuffer xpathWidgetId = new StringBuffer("//*[@id=\"").append(m_currentWidgetId).append("\"]/div[1]/div[").append(i + 1).append("]/div[2]");
-            m_currentWidgetId = xpathWidgetId.toString();
+            StringBuffer xpathWidgetId = new StringBuffer("//*[@id=\"").append(getCurrentWidgetId_()).append("\"]/div[1]/div[").append(i + 1).append("]/div[2]");
+            setCurrentWidgetId(xpathWidgetId.toString());
             break;
           }
         }
@@ -560,7 +615,7 @@ public class RapMock implements IGuiMock {
   @Override
   public void gotoPoint(int x, int y) {
     final Control c = waitForLocatedField(x, y);
-    m_currentWidgetId = WidgetUtil.getAdapter(c).getId();
+    setCurrentWidgetId(WidgetUtil.getAdapter(c).getId());
   }
 
   @Override
@@ -571,18 +626,21 @@ public class RapMock implements IGuiMock {
 
   @Override
   public void clickLeft() {
-    m_bot.clickAndWait(m_currentWidgetId);
-    waitForIdle();
+    m_bot.clickAndWait(getCurrentWidgetId_());
+    syncExec(new MockRunnable<Object>() {
+      @Override
+      public Object run() throws Throwable {
+        Control focusControl = Display.getCurrent().getFocusControl();
+        setCurrentWidgetId(WidgetUtil.getAdapter(focusControl).getId());
+        return null;
+      }
+    });
   }
 
   @Override
   public void clickRight() {
-    JavascriptLibrary javascriptLibrary = new JavascriptLibrary();
-    ElementFinder elementFinder = new ElementFinder(javascriptLibrary);
-    WebElement element = elementFinder.findElement(m_bot.getWrappedDriver(), m_currentWidgetId);
-    m_actionBuilder.contextClick(element);
+    m_actionBuilder.contextClick(getCurrentElement());
     m_actionBuilder.perform();
-//    m_bot.mouseDownRight(m_currentWidgetId);
     waitForIdle();
   }
 
@@ -611,12 +669,14 @@ public class RapMock implements IGuiMock {
   @Override
   public void typeText(final String text) {
     if (m_modifierPressed) {
-      m_actionBuilder.sendKeys("a");
+      m_actionBuilder.sendKeys(text.toUpperCase());
+//    m_bot.typeKeys(getCurrentWidgetId(), text);
+//      m_keyList.add(text);
     }
     else {
-      m_bot.typeKeys(m_currentWidgetId, text);
+      m_actionBuilder.sendKeys(text).perform();
+      waitForIdle();
     }
-    waitForIdle();
   }
 
   @Override
@@ -641,6 +701,9 @@ public class RapMock implements IGuiMock {
         break;
       case Control:
         m_actionBuilder.keyDown(Keys.CONTROL);
+//        m_bot.controlKeyDown();
+//        m_bot.keyDownNative("17");
+//        m_keyList.add(Keys.CONTROL);
         m_modifierPressed = true;
         break;
       case Alt:
@@ -655,9 +718,9 @@ public class RapMock implements IGuiMock {
         m_actionBuilder.sendKeys(toSeleniumKey(key).toString());
         m_actionBuilder.perform();
 //        m_bot.keyDown(m_currentWidgetId, toSeleniumKey(key));
+        waitForIdle();
         break;
     }
-    waitForIdle();
   }
 
   @Override
@@ -668,15 +731,21 @@ public class RapMock implements IGuiMock {
         m_modifierPressed = false;
         break;
       case Control:
-        m_bot.controlKeyUp();
+        m_actionBuilder.keyUp(Keys.CONTROL);
+//        m_bot.controlKeyUp();
+//        m_bot.keyUpNative("17");
+//        getCurrentElement().sendKeys(m_keyList.toArray(new CharSequence[m_keyList.size()]));
+//        m_keyList.clear();
+
+//        getCurrentElement().sendKeys(Keys.CONTROL, "a");
         m_modifierPressed = false;
         break;
       case Alt:
-        m_bot.altKeyUp();
+        m_actionBuilder.keyUp(Keys.ALT);
         m_modifierPressed = false;
         break;
       case Windows:
-        m_actionBuilder.keyDown(Keys.META);
+        m_actionBuilder.keyUp(Keys.META);
         m_modifierPressed = false;
         break;
       default:
@@ -691,11 +760,11 @@ public class RapMock implements IGuiMock {
   @Override
   public void typeKey(Key key) {
     if (m_modifierPressed) {
-      m_actionBuilder.sendKeys(toSeleniumKey(key));
-      m_actionBuilder.perform();
+      m_actionBuilder.sendKeys(toSeleniumKey(key)).perform();
     }
     else {
-      m_bot.keyPress(m_currentWidgetId, toSeleniumKey(key).toString());
+      m_actionBuilder.sendKeys(getCurrentElement(), toSeleniumKey(key)).perform();
+//      m_bot.keyPress(toSeleniumKey(key).toString());
     }
     waitForIdle();
   }

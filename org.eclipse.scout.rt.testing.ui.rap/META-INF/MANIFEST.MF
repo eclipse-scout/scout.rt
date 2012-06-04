@@ -13,3 +13,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: Eclipse Scout Project
 Export-Package: org.eclipse.scout.rt.testing.ui.rap
+Import-Package: com.google.common.base;version="12.0.0"
