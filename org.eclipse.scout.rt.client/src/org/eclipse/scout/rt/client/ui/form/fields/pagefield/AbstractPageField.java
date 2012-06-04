@@ -35,7 +35,11 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
   private SimpleOutline m_outline;
 
   public AbstractPageField() {
-    super();
+    this(true);
+  }
+
+  public AbstractPageField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

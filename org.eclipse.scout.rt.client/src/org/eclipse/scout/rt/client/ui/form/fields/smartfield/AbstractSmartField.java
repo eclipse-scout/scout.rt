@@ -88,7 +88,11 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   private boolean m_allowCustomText;
 
   public AbstractSmartField() {
-    super();
+    this(true);
+  }
+
+  public AbstractSmartField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

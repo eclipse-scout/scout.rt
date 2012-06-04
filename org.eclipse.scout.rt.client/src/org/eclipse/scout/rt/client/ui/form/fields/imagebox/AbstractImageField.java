@@ -38,6 +38,11 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   private double m_rotateDelta;
 
   public AbstractImageField() {
+    this(true);
+  }
+
+  public AbstractImageField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @ConfigPropertyValue("0")
@@ -317,7 +322,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   public void setAutoFit(boolean b) {
     propertySupport.setPropertyBool(PROP_AUTO_FIT, b);
   }
-  
+
   @Override
   public boolean isScrollBarEnabled() {
     return propertySupport.getPropertyBool(PROP_SCROLL_BAR_ENABLED);

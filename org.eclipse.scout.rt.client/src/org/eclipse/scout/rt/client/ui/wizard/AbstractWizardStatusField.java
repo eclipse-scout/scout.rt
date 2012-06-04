@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,6 +29,14 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   private P_WizardListener m_scoutWizardListener;
   private P_WizardStepListener m_scoutWizardStepListener;
   private boolean m_dirty;
+
+  public AbstractWizardStatusField() {
+    this(true);
+  }
+
+  public AbstractWizardStatusField(boolean callInitializer) {
+    super(callInitializer);
+  }
 
   public IWizardStatusHtmlProvider getHtmlProvider() {
     return m_htmlProvider;

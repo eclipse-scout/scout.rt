@@ -30,6 +30,11 @@ public abstract class AbstractOutlineButton extends AbstractButton {
   private IOutline m_outline;
 
   public AbstractOutlineButton() {
+    this(true);
+  }
+
+  public AbstractOutlineButton(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /**

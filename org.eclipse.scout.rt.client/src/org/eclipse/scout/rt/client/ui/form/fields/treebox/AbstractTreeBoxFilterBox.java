@@ -33,7 +33,11 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
   private PropertyChangeListener m_treeBoxPropertyListener;
 
   public AbstractTreeBoxFilterBox() {
-    super();
+    this(true);
+  }
+
+  public AbstractTreeBoxFilterBox(boolean callInitializer) {
+    super(callInitializer);
     m_treeBoxSyncLock = new OptimisticLock();
   }
 

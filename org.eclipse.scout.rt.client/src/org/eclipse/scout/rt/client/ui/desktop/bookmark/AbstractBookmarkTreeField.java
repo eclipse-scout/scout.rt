@@ -67,7 +67,11 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
   private IOpenBookmarkCommand m_openBookmarkCommand;
 
   public AbstractBookmarkTreeField() {
-    super();
+    this(true);
+  }
+
+  public AbstractBookmarkTreeField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   public BookmarkFolder getBookmarkRootFolder() {

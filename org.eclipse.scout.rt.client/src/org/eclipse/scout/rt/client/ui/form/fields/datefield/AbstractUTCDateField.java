@@ -23,6 +23,14 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractUTCFieldData;
 @FormData(value = AbstractUTCFieldData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractUTCDateField extends AbstractDateField implements IUTCDateField {
 
+  public AbstractUTCDateField() {
+    this(true);
+  }
+
+  public AbstractUTCDateField(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   public Class<Date> getHolderType() {
     return super.getHolderType();

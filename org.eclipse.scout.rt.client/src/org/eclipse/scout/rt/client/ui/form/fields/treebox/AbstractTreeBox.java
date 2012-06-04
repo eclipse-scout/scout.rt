@@ -66,7 +66,11 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
   private IFormField[] m_fields;
 
   public AbstractTreeBox() {
-    super();
+    this(true);
+  }
+
+  public AbstractTreeBox(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

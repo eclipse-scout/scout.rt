@@ -72,7 +72,11 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
   private IFormField[] m_fields;
 
   public AbstractListBox() {
-    super();
+    this(true);
+  }
+
+  public AbstractListBox(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

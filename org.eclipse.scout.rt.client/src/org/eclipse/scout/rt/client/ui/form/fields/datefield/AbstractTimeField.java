@@ -21,6 +21,11 @@ public abstract class AbstractTimeField extends AbstractDateField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTimeField.class);
 
   public AbstractTimeField() {
+    this(true);
+  }
+
+  public AbstractTimeField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @ConfigPropertyValue("true")

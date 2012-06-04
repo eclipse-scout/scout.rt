@@ -40,6 +40,11 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractVal
   private T m_maxValue;
 
   public AbstractDecimalField() {
+    this(true);
+  }
+
+  public AbstractDecimalField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

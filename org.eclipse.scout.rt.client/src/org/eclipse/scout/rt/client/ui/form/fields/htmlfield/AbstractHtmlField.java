@@ -48,6 +48,11 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   private Boolean m_monitorSpelling = null; // If null the application-wide
 
   public AbstractHtmlField() {
+    this(true);
+  }
+
+  public AbstractHtmlField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

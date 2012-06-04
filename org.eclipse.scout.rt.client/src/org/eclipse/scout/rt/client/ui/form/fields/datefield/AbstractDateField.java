@@ -49,6 +49,11 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   private long m_autoTimeMillis;
 
   public AbstractDateField() {
+    this(true);
+  }
+
+  public AbstractDateField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

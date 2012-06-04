@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,7 +18,11 @@ public abstract class AbstractSnapBox extends AbstractCompositeField implements 
   private SnapBoxGrid m_grid;
 
   public AbstractSnapBox() {
-    super();
+    this(true);
+  }
+
+  public AbstractSnapBox(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

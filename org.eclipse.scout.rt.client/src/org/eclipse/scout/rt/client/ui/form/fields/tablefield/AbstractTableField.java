@@ -66,7 +66,11 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   private P_TableStatusListener m_tableStatusListener;
 
   public AbstractTableField() {
-    super();
+    this(true);
+  }
+
+  public AbstractTableField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

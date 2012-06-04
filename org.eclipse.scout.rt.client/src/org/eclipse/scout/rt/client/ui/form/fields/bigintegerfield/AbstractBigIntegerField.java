@@ -27,6 +27,11 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBigIntegerField.class);
 
   public AbstractBigIntegerField() {
+    this(true);
+  }
+
+  public AbstractBigIntegerField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

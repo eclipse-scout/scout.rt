@@ -22,6 +22,11 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   private IBooleanFieldUIFacade m_uiFacade;
 
   public AbstractBooleanField() {
+    this(true);
+  }
+
+  public AbstractBooleanField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

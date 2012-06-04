@@ -72,7 +72,11 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   private IDataModel m_dataModel;
 
   public AbstractComposerField() {
-    super();
+    this(true);
+  }
+
+  public AbstractComposerField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

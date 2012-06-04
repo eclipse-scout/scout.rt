@@ -32,6 +32,14 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  */
 public abstract class AbstractDataModelAggregationField extends AbstractSmartField<Integer> {
 
+  public AbstractDataModelAggregationField() {
+    this(true);
+  }
+
+  public AbstractDataModelAggregationField(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   protected String getConfiguredLabel() {
     return ScoutTexts.get("ComposerFieldAggregationLabel");

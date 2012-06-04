@@ -31,6 +31,11 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
   private boolean m_scrollBarEnabled;
 
   public AbstractBrowserField() {
+    this(true);
+  }
+
+  public AbstractBrowserField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)

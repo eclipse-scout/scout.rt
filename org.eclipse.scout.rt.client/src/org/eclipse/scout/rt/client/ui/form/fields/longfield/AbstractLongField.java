@@ -26,6 +26,11 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractLongField.class);
 
   public AbstractLongField() {
+    this(true);
+  }
+
+  public AbstractLongField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

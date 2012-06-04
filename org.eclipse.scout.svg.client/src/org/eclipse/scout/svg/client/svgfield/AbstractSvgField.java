@@ -35,6 +35,11 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   private final EventListenerList m_listenerList = new EventListenerList();
 
   public AbstractSvgField() {
+    this(true);
+  }
+
+  public AbstractSvgField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @ConfigPropertyValue("0")

@@ -26,6 +26,11 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractIntegerField.class);
 
   public AbstractIntegerField() {
+    this(true);
+  }
+
+  public AbstractIntegerField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

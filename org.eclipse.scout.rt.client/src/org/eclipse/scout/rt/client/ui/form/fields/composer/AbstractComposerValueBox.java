@@ -60,6 +60,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox {
   private IComposerValueField m_selectedField;
   private PropertyChangeListener m_valueChangedListener;
 
+  public AbstractComposerValueBox() {
+    this(true);
+  }
+
+  public AbstractComposerValueBox(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   protected boolean getConfiguredBorderVisible() {
     return false;

@@ -29,6 +29,14 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
  */
 public abstract class AbstractDataModelOperatorField extends AbstractSmartField<IDataModelAttributeOp> {
 
+  public AbstractDataModelOperatorField() {
+    this(true);
+  }
+
+  public AbstractDataModelOperatorField(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   protected String getConfiguredLabel() {
     return ScoutTexts.get("Op");

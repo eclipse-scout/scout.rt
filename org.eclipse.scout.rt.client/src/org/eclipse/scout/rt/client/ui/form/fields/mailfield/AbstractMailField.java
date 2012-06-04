@@ -33,6 +33,14 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
   private boolean m_mailEditor;
   private boolean m_scrollBarEnabled;
 
+  public AbstractMailField() {
+    this(true);
+  }
+
+  public AbstractMailField(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   /*
    * Configuration
    */

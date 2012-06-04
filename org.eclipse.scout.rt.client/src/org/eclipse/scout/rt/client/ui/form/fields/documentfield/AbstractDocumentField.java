@@ -26,6 +26,14 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
   private final EventListenerList m_listenerList = new EventListenerList();
   private IDocumentFieldUIFacade m_uiFacade;
 
+  public AbstractDocumentField() {
+    this(true);
+  }
+
+  public AbstractDocumentField(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   protected double getConfiguredGridWeightX() {
     return 1;

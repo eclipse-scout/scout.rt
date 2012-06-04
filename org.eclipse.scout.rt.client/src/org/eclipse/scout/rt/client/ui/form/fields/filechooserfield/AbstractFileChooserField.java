@@ -44,6 +44,11 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   private IFileChooserFieldUIFacade m_uiFacade;
 
   public AbstractFileChooserField() {
+    this(true);
+  }
+
+  public AbstractFileChooserField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

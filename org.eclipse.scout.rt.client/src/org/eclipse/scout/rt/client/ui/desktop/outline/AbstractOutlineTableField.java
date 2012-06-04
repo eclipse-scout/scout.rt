@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -30,6 +30,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 public abstract class AbstractOutlineTableField extends AbstractTableField<ITable> {
   private DesktopListener m_desktopListener;
   private PropertyChangeListener m_tablePropertyListener;
+
+  public AbstractOutlineTableField() {
+    this(true);
+  }
+
+  public AbstractOutlineTableField(boolean callInitializer) {
+    super(callInitializer);
+  }
 
   @ConfigPropertyValue("false")
   @Override

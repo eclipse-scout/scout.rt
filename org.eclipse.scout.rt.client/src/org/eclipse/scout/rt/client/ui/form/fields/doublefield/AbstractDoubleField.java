@@ -30,6 +30,11 @@ public abstract class AbstractDoubleField extends AbstractDecimalField<Double> i
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDoubleField.class);
 
   public AbstractDoubleField() {
+    this(true);
+  }
+
+  public AbstractDoubleField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

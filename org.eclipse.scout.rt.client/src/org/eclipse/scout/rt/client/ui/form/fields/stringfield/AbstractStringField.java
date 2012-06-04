@@ -36,6 +36,11 @@ public abstract class AbstractStringField extends AbstractValueField<String> imp
   // default is used
 
   public AbstractStringField() {
+    this(true);
+  }
+
+  public AbstractStringField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

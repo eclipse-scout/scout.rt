@@ -34,7 +34,11 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   private P_InnerFormSubtreePropertyChangeListener m_innerFormSubtreePropertyListener;
 
   public AbstractWrappedFormField() {
-    super();
+    this(true);
+  }
+
+  public AbstractWrappedFormField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @ConfigPropertyValue("false")

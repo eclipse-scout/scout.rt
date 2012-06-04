@@ -24,6 +24,11 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   private ILabelFieldUIFacade m_uiFacade;
 
   public AbstractLabelField() {
+    this(true);
+  }
+
+  public AbstractLabelField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)

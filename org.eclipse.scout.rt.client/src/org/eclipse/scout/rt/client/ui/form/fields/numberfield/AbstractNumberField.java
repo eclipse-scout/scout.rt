@@ -35,6 +35,11 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractValu
   private T m_maxValue;
 
   public AbstractNumberField() {
+    this(true);
+  }
+
+  public AbstractNumberField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

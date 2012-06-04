@@ -31,6 +31,11 @@ public abstract class AbstractBigDecimalField extends AbstractDecimalField<BigDe
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBigDecimalField.class);
 
   public AbstractBigDecimalField() {
+    this(true);
+  }
+
+  public AbstractBigDecimalField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

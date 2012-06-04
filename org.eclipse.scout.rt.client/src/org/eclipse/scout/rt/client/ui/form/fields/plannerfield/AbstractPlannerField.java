@@ -44,7 +44,11 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
   private boolean m_selectionMediatorRunning;// true when mediation is running
 
   public AbstractPlannerField() {
-    super();
+    this(true);
+  }
+
+  public AbstractPlannerField(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*
