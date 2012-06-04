@@ -93,6 +93,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
     if (session == null || handler == null) {
       return;
     }
+    handler.setEnabled(true);
     session.setData(HANDLER_CLIENT_SESSION_KEY, handler);
   }
 
@@ -100,6 +101,10 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
   public synchronized void unregister(IClientSession session) {
     if (session == null) {
       return;
+    }
+    IBusyHandler handler = getHandler(session);
+    if (handler != null) {
+      handler.setEnabled(false);
     }
     session.setData(HANDLER_CLIENT_SESSION_KEY, null);
   }

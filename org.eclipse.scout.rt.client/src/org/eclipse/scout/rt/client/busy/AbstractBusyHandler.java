@@ -56,6 +56,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   private final Set<Job> m_list = Collections.synchronizedSet(new HashSet<Job>());
   private long m_shortOperationMillis = 200L;
   private long m_longOperationMillis = 3000L;
+  private boolean m_enabled = true;
 
   public AbstractBusyHandler(IClientSession session) {
     m_session = session;
@@ -158,6 +159,16 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
     m_longOperationMillis = longOperationMillis;
   }
 
+  @Override
+  public boolean isEnabled() {
+    return m_enabled;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    m_enabled = enabled;
+  }
+
   private void addTimer(Job job) {
     P_TimerJob t = new P_TimerJob(job);
     job.setProperty(TIMER_PROPERTY, t);
@@ -228,7 +239,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
       }
       removeTimer(m_job);
       if (isJobActive(m_job)) {
-        if (!shouldRunBusy(m_job)) {
+        if (!isEnabled() || !shouldRunBusy(m_job)) {
           return Status.OK_STATUS;
         }
         addBusyOperation(m_job);

@@ -52,12 +52,22 @@ public final class SwtBusyUtility {
    * Uses {@link BusyIndicator#showWhile(Display, Runnable)} and
    * {@link ModalContext#run(IRunnableWithProgress, boolean, IProgressMonitor, Display)}
    */
-  public static void showBusyIndicator(final Display display, final IRunnableWithProgress runnable, IProgressMonitor monitor) {
+  public static void showBusyIndicator(final SwtBusyHandler busyHandler, final IRunnableWithProgress runnable, IProgressMonitor monitor) {
+    if (!busyHandler.isEnabled()) {
+      return;
+    }
+
     final Object lock = new Object();
     synchronized (lock) {
+
+      final Display display = busyHandler.getDisplay();
       display.asyncExec(new Runnable() {
         @Override
         public void run() {
+          if (!busyHandler.isEnabled()) {
+            return;
+          }
+
           BusyIndicator.showWhile(display, new Runnable() {
             @Override
             public void run() {
@@ -82,8 +92,10 @@ public final class SwtBusyUtility {
               }
             }
           });
+
         }
       });
+
       try {
         lock.wait();
       }
@@ -102,16 +114,27 @@ public final class SwtBusyUtility {
    * <p>
    * Uses
    */
-  public static void showWorkbenchIndicator(final Display display, final IRunnableWithProgress runnable) {
+  public static void showWorkbenchIndicator(final SwtBusyHandler busyHandler, final IRunnableWithProgress runnable) {
+    if (!busyHandler.isEnabled()) {
+      return;
+    }
+
     final Object lock = new Object();
     synchronized (lock) {
+
+      final Display display = busyHandler.getDisplay();
       display.asyncExec(new Runnable() {
         @Override
         public void run() {
+          if (!busyHandler.isEnabled()) {
+            return;
+          }
+
           IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
           if (activeWorkbenchWindow == null) {
             return;
           }
+
           try {
             activeWorkbenchWindow.run(true, true, new IRunnableWithProgress() {
               @Override
@@ -135,12 +158,14 @@ public final class SwtBusyUtility {
           }
         }
       });
+
       try {
         lock.wait();
       }
       catch (InterruptedException e) {
         //nop
       }
+
     }
   }
 
