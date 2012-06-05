@@ -1,8 +1,9 @@
 package org.eclipse.scout.rt.client.mobile.services;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.navigation.IDeviceNavigator;
-import org.eclipse.scout.rt.client.mobile.ui.forms.FormStack;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.service.IService2;
 
@@ -26,13 +27,17 @@ public interface IMobileNavigationService extends IService2 {
    * Installs a navigator which is necessary to use this service.<br/>
    * The navigator automatically gets uninstalled when the desktop closes.
    */
-  void installNavigator(FormStack navigationFormStack);
+  void installNavigator(List<String> displayViewIds);
 
   void stepBack() throws ProcessingException;
 
-  boolean steppingBackPossible();
+  boolean isSteppingBackPossible();
 
-  IForm getCurrentForm();
+  void goHome() throws ProcessingException;
+
+  boolean isGoingHomePossible();
+
+  IForm getCurrentNavigationForm();
 
   IDeviceNavigator getDeviceNavigator();
 }

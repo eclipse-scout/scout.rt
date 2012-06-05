@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.services.IMobileNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
-import org.eclipse.scout.rt.client.mobile.ui.forms.FormStack;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -29,9 +31,9 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   @Override
   public void transformDesktop(IDesktop desktop) {
-    FormStack navigationFormStack = new FormStack(IForm.VIEW_ID_CENTER);
-
-    SERVICES.getService(IMobileNavigationService.class).installNavigator(navigationFormStack);
+    List<String> navigationFormDisplayViewIds = new LinkedList<String>();
+    navigationFormDisplayViewIds.add(IForm.VIEW_ID_CENTER);
+    SERVICES.getService(IMobileNavigationService.class).installNavigator(navigationFormDisplayViewIds);
   }
 
   @Override

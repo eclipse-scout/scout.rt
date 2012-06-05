@@ -196,7 +196,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
       stackLayout.topControl = uiForm.getUiForm();
       if (m_formStack.remove(uiForm)) {
         GridData tabBarData = (GridData) m_tabBar.getLayoutData();
-        if (m_formStack.isEmpty()) {
+        if (m_formStack.isEmpty() || alwaysHideTabBar()) {
           m_tabBar.setVisible(false);
           tabBarData.exclude = true;
         }
@@ -212,6 +212,10 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
       }
     }
     getParent().layout(true, true);
+  }
+
+  protected boolean alwaysHideTabBar() {
+    return false;
   }
 
   @Override

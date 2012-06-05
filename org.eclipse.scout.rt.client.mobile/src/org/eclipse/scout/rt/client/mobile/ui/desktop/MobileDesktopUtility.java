@@ -66,12 +66,23 @@ public class MobileDesktopUtility {
   public static void closeOpenForms() throws ProcessingException {
     final IForm[] viewStack = getDesktop().getViewStack();
     for (IForm form : viewStack) {
-      if (form.isAutoAddRemoveOnDesktop()) {
-        form.doClose();
-      }
-      else {
-        removeFormFromDesktop(form);
-      }
+      closeForm(form);
+    }
+  }
+
+  public static void closeForm(IForm form) throws ProcessingException {
+    if (form == null) {
+      return;
+    }
+
+    if (MobileDesktopUtility.isToolForm(form)) {
+      MobileDesktopUtility.closeToolForm(form);
+    }
+    else if (form.isAutoAddRemoveOnDesktop()) {
+      form.doClose();
+    }
+    else {
+      removeFormFromDesktop(form);
     }
   }
 

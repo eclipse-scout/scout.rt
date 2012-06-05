@@ -197,7 +197,7 @@ public class ViewArea extends Composite implements IViewArea {
     return m_sashes.get(key);
   }
 
-  private IRwtEnvironment getUiEnvironment() {
+  protected IRwtEnvironment getUiEnvironment() {
     return (IRwtEnvironment) getDisplay().getData(IRwtEnvironment.class.getName());
   }
 

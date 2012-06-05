@@ -19,8 +19,8 @@ import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
+import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileHomeAction;
 import org.eclipse.scout.rt.client.mobile.services.IMobileNavigationService;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformer;
 import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformer;
@@ -226,39 +226,13 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   }
 
   @Order(20)
-  public class HomeViewButton extends AbstractMenu {
-
-    @Override
-    protected String getConfiguredText() {
-      return "";
-    }
-
-    @Override
-    protected String getConfiguredTooltipText() {
-      return "Home"; //TODO rst Texts
-    }
+  public class HomeViewButton extends AbstractMobileHomeAction {
 
     @Override
     protected boolean getConfiguredVisible() {
       return false;
     }
 
-    @Override
-    protected String getConfiguredIconId() {
-      return Icons.HomeAction;
-    }
-
-    @Override
-    protected void execAction() throws ProcessingException {
-      if (getCoreDesktop().getOutline() != null) {
-        getCoreDesktop().getOutline().setDetailForm(null);
-        getCoreDesktop().getOutline().setDetailTable(null);
-        getCoreDesktop().getOutline().setSearchForm(null);
-        getCoreDesktop().setOutline((IOutline) null);
-      }
-
-      showOutlineChooser();
-    }
   }
 
   @Order(30.0)
@@ -288,11 +262,11 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   private void handleNavigationButtonEnabledState() {
     IMobileNavigationService service = SERVICES.getService(IMobileNavigationService.class);
 
-    boolean homeEnabled = service.getCurrentForm() != m_outlineChooserForm;
+    boolean homeEnabled = service.isGoingHomePossible();
     getCoreDesktop().getMenu(HomeViewButton.class).setVisible(homeEnabled);
     getCoreDesktop().getMenu(HomeViewButton.class).setEnabled(homeEnabled);
 
-    boolean backEnabled = service.steppingBackPossible();
+    boolean backEnabled = service.isSteppingBackPossible();
     getCoreDesktop().getMenu(BackViewButton.class).setVisible(backEnabled);
     getCoreDesktop().getMenu(BackViewButton.class).setEnabled(backEnabled);
   }

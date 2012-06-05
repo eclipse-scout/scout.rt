@@ -10,35 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.window.desktop;
 
-import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
+import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutViewStack;
 import org.eclipse.scout.rt.ui.rap.window.desktop.viewarea.ViewArea;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
-public class RwtScoutMobileDesktop extends RwtScoutDesktop {
+public class MobileViewArea extends ViewArea {
 
-  private static final String VARIANT_VIEWS_AREA = "mobileViewsArea";
+  private static final long serialVersionUID = 1L;
 
-  /**
-   * On mobile devices every form has a form header, the outline form too, so no global toolbar is necessary because the
-   * forms
-   * take care of that.
-   */
-  @Override
-  protected Control createToolBar(Composite parent) {
-    return null;
+  public MobileViewArea(Composite parent) {
+    super(parent);
   }
 
   @Override
-  protected String getViewsAreaVariant() {
-    return VARIANT_VIEWS_AREA;
+  protected RwtScoutViewStack createRwtScoutViewStack(Composite parent) {
+    return new MobileRwtScoutViewStack(parent, getUiEnvironment());
   }
 
-  @Override
-  protected ViewArea createViewArea(Composite parent) {
-    return new MobileViewArea(parent);
-  }
 }

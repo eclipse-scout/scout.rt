@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.services;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.mobile.navigation.IDeviceNavigator;
 import org.eclipse.scout.rt.client.mobile.navigation.MobileDeviceNavigator;
-import org.eclipse.scout.rt.client.mobile.ui.forms.FormStack;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.service.AbstractService;
 
@@ -26,17 +27,17 @@ public class MobileNavigationService extends AbstractService implements IMobileN
   private String SESSION_DATA_KEY = "MobileNavigatorData";
 
   @Override
-  public void installNavigator(FormStack navigationFormStack) {
+  public void installNavigator(List<String> displayViewIds) {
     if (getDeviceNavigator() != null) {
       return;
     }
 
     IClientSession session = ClientJob.getCurrentSession();
-    session.setData(SESSION_DATA_KEY, createDeviceNavigator(navigationFormStack));
+    session.setData(SESSION_DATA_KEY, createDeviceNavigator(displayViewIds));
   }
 
-  protected IDeviceNavigator createDeviceNavigator(FormStack navigationFormStack) {
-    return new MobileDeviceNavigator(navigationFormStack);
+  protected IDeviceNavigator createDeviceNavigator(List<String> displayViewIds) {
+    return new MobileDeviceNavigator(displayViewIds);
   }
 
   @Override
@@ -49,7 +50,7 @@ public class MobileNavigationService extends AbstractService implements IMobileN
   }
 
   @Override
-  public boolean steppingBackPossible() {
+  public boolean isSteppingBackPossible() {
     if (getDeviceNavigator() == null) {
       return false;
     }
@@ -58,7 +59,25 @@ public class MobileNavigationService extends AbstractService implements IMobileN
   }
 
   @Override
-  public IForm getCurrentForm() {
+  public void goHome() throws ProcessingException {
+    if (getDeviceNavigator() == null) {
+      return;
+    }
+
+    getDeviceNavigator().goHome();
+  }
+
+  @Override
+  public boolean isGoingHomePossible() {
+    if (getDeviceNavigator() == null) {
+      return false;
+    }
+
+    return getDeviceNavigator().isGoingHomePossible();
+  }
+
+  @Override
+  public IForm getCurrentNavigationForm() {
     if (getDeviceNavigator() == null) {
       return null;
     }
