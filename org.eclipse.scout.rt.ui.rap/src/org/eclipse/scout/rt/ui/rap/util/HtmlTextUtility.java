@@ -40,17 +40,17 @@ public final class HtmlTextUtility {
    * @returns styled html text without "html", "head" and "body" tags. Newlines are preserved.
    */
   public static String transformMarkupTextToHtml(String markupText) {
-     if ( markupText == null ) {
+    if (markupText == null) {
       return null;
     }
     String s = markupText.trim();
-    boolean replaceNewlines = !isTextWithHtmlMarkup( s );
-    s = htmlBracketPattern.matcher( s ).replaceAll( "$1" );
-    s = headBracketPattern.matcher( s ).replaceAll( "" );
-    s = bodyBracketPattern.matcher( s ).replaceAll( "$1" );
+    boolean replaceNewlines = !isTextWithHtmlMarkup(s);
+    s = htmlBracketPattern.matcher(s).replaceAll("$1");
+    s = headBracketPattern.matcher(s).replaceAll("");
+    s = bodyBracketPattern.matcher(s).replaceAll("$1");
     s = s.trim();
-    if ( replaceNewlines ) {
-      s = s.replaceAll( "[\\n]", "<br/>" );
+    if (replaceNewlines) {
+      s = s.replaceAll("[\\n]", "<br/>");
     }
     return s;
   }
@@ -99,6 +99,40 @@ public final class HtmlTextUtility {
     s = s.replaceAll("[ ][ ]+", " ");
     s = s.trim();
     return s;
+  }
+
+  public static int countLineBreaks(String htmlText) {
+    if (htmlText == null || htmlText.length() == 0) {
+      return 0;
+    }
+    int l = 1;
+    int pos = 0;
+    while ((pos = htmlText.indexOf('\n', pos)) >= 0) {
+      l++;
+      // next
+      pos++;
+    }
+    pos = 0;
+    while ((pos = htmlText.indexOf("<br/>", pos)) >= 0) {
+      l++;
+      // next
+      pos++;
+    }
+    return l;
+  }
+
+  public static int countHtmlTableRows(String htmlText) {
+    if (htmlText == null || htmlText.length() == 0) {
+      return 0;
+    }
+    int r = 0;
+    int pos = 0;
+    while ((pos = htmlText.indexOf("<tr>", pos)) >= 0) {
+      r++;
+      // next
+      pos++;
+    }
+    return r;
   }
 
 }

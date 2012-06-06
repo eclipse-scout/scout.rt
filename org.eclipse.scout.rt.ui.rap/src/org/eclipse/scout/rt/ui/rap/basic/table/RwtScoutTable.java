@@ -21,10 +21,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.CompareUtility;
@@ -112,6 +114,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
   private IRwtKeyStroke[] m_uiKeyStrokes;
   private ClientSyncJob m_storeColumnWidthsJob;
 
+  private RwtScoutColumnModel m_columnModel = null;
+
   private String m_variant = "";
 
   private AbstractTableKeyboardNavigationSupport m_keyboardNavigationSupport;
@@ -140,7 +144,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
     table.setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
     table.setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
-
     table.setLinesVisible(true);
     table.setHeaderVisible(true);
     table.setTouchEnabled(RwtUtility.getBrowserInfo().isTablet() || RwtUtility.getBrowserInfo().isMobile());
@@ -159,6 +162,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       }
     });
     TableViewer viewer = new TableViewerEx(table);
+    ColumnViewerToolTipSupport.enableFor(viewer);
     viewer.setUseHashlookup(true);
     setUiTableViewer(viewer);
     setUiField(table);
@@ -172,9 +176,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     initializeUiColumns();
 
     RwtScoutTableModel tableModel = createUiTableModel();
-    tableModel.setMultiline(getScoutObject().isMultilineText());
     viewer.setContentProvider(tableModel);
-    viewer.setLabelProvider(tableModel);
     viewer.setInput(tableModel);
 
     // ui listeners
@@ -206,6 +208,13 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
 
   protected RwtScoutTableModel createUiTableModel() {
     return new RwtScoutTableModel(getScoutObject(), this, m_uiColumnManager);
+  }
+
+  protected RwtScoutColumnModel getUiColumnModel() {
+    if (m_columnModel == null) {
+      m_columnModel = new RwtScoutColumnModel(getScoutObject(), this, m_uiColumnManager);
+    }
+    return m_columnModel;
   }
 
   @Override
@@ -258,6 +267,8 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         }
         int style = RwtUtility.getHorizontalAlignment(cell.getHorizontalAlignment());
         TableColumn rwtCol = new TableColumn(getUiField(), style);
+        TableViewerColumn rwtViewerCol = new TableViewerColumn(getUiTableViewer(), rwtCol);
+        rwtViewerCol.setLabelProvider(getUiColumnModel());
         rwtCol.setData(KEY_SCOUT_COLUMN, scoutColumn);
         rwtCol.setMoveable(true);
         rwtCol.setToolTipText(cell.getTooltipText());
@@ -402,9 +413,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
 
   protected void setRowHeightFromScout() {
     int h = getScoutObject().getRowHeightHint();
-    if (h <= 0 && getScoutObject().isMultilineText()) {
-      h = 40; // Enough for 2 lines fully visible (further lines are cut off) --> cannot be dynamic at the moment, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=346768
-    }
     if (h >= 0) {
       getUiField().setData(RWT.CUSTOM_ITEM_HEIGHT, h);
     }
@@ -580,6 +588,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
     //
     if (uiTableEvent != null) {
+      getUiColumnModel().consumeColumnModelEvent(uiTableEvent);
       ((RwtScoutTableModel) getUiTableViewer().getContentProvider()).consumeTableModelEvent(uiTableEvent);
       getUiTableViewer().refresh();
     }
