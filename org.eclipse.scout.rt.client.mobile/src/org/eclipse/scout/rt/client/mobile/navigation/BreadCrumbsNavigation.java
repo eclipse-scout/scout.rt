@@ -196,6 +196,11 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
 
   private void addNewBreadCrumb(IForm form, IPage page) {
     if (m_currentBreadCrumb != null) {
+      //Ignore attempts to insert the same bread crumb again
+      if (m_currentBreadCrumb.getForm() == form && m_currentBreadCrumb.getPage() == page) {
+        return;
+      }
+
       getBreadCrumbs().add(m_currentBreadCrumb);
       LOG.debug("Added new bread crumb: " + m_currentBreadCrumb);
 
@@ -334,9 +339,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
         addNewBreadCrumb(getDesktop().getOutlineTableForm(), page);
       }
       else if (m_currentBreadCrumb.getPage() != null) {
-        if (m_currentBreadCrumb.getPage() != page) {
-          addNewBreadCrumb(getDesktop().getOutlineTableForm(), page);
-        }
+        addNewBreadCrumb(getDesktop().getOutlineTableForm(), page);
       }
       else {
         IOutlineTableForm outlineTableForm = getDesktop().getOutlineTableForm();
