@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,11 +70,15 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
   }
 
   @Override
-  public void releasePreparedStatement(PreparedStatement ps) throws SQLException {
+  public void releasePreparedStatement(PreparedStatement ps) {
     // close statement when it is not cached
     if (ps != null) {
       if (!m_statementCache.containsValue(ps)) {
-        ps.close();
+        try {
+          ps.close();
+        }
+        catch (Throwable t) {
+        }
       }
     }
   }
@@ -98,11 +102,15 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
   }
 
   @Override
-  public void releaseCallableStatement(CallableStatement cs) throws SQLException {
+  public void releaseCallableStatement(CallableStatement cs) {
     // close statement when it is not cached
     if (cs != null) {
       if (!m_statementCache.containsValue(cs)) {
-        cs.close();
+        try {
+          cs.close();
+        }
+        catch (Throwable t) {
+        }
       }
     }
   }
