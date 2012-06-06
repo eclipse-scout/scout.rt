@@ -20,10 +20,10 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 /**
  * @since 3.9.0
  */
-public class HomeNavigationPoint extends NavigationPoint {
+public class OutlineChooserBreadCrumb extends BreadCrumb {
 
-  public HomeNavigationPoint(IDeviceNavigator deviceNavigator, IForm form, IPage page) {
-    super(deviceNavigator, form, page);
+  public OutlineChooserBreadCrumb(IBreadCrumbsNavigation breadCrumbsNavigation, IForm form, IPage page) {
+    super(breadCrumbsNavigation, form, page);
   }
 
   @Override

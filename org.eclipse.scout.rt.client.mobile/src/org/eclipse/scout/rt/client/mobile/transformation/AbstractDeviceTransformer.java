@@ -17,7 +17,7 @@ import java.util.WeakHashMap;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.mobile.services.IMobileNavigationService;
+import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -94,7 +94,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   protected boolean isFormAddingForbidden(IForm form) {
     if (form instanceof IOutlineTreeForm) {
-      return !SERVICES.getService(IMobileNavigationService.class).getDeviceNavigator().isOutlineTreeAvailable();
+      return !SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation().isOutlineTreeAvailable();
     }
 
     if (form instanceof IOutlineTableForm && !(form instanceof MobileOutlineTableForm)) {

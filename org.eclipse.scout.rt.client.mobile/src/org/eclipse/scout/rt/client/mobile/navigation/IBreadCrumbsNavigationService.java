@@ -1,9 +1,7 @@
-package org.eclipse.scout.rt.client.mobile.services;
-
-import java.util.List;
+package org.eclipse.scout.rt.client.mobile.navigation;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.mobile.navigation.IDeviceNavigator;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.service.IService2;
 
@@ -21,13 +19,7 @@ import org.eclipse.scout.service.IService2;
 /**
  * @since 3.8.0
  */
-public interface IMobileNavigationService extends IService2 {
-
-  /**
-   * Installs a navigator which is necessary to use this service.<br/>
-   * The navigator automatically gets uninstalled when the desktop closes.
-   */
-  void installNavigator(List<String> displayViewIds);
+public interface IBreadCrumbsNavigationService extends IService2 {
 
   void stepBack() throws ProcessingException;
 
@@ -39,5 +31,13 @@ public interface IMobileNavigationService extends IService2 {
 
   IForm getCurrentNavigationForm();
 
-  IDeviceNavigator getDeviceNavigator();
+  void addBreadCrumbsListener(IDesktop desktop, BreadCrumbsListener listener);
+
+  void addBreadCrumbsListener(BreadCrumbsListener listener);
+
+  void removeBreadCrumbsListener(BreadCrumbsListener listener);
+
+  IBreadCrumbsNavigation getBreadCrumbsNavigation();
+
+  void trackDisplayViewId(String displayViewId);
 }

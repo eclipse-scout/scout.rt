@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileHomeAction;
-import org.eclipse.scout.rt.client.mobile.services.IMobileNavigationService;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformer;
 import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformer;
 import org.eclipse.scout.rt.client.mobile.transformation.TabletDeviceTransformer;
@@ -36,23 +35,18 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.ContributionCommand;
-import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
-import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
-import org.eclipse.scout.service.SERVICES;
 
 public class MobileDesktopExtension extends AbstractDesktopExtension {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileDesktopExtension.class);
 
   private boolean m_active;
   private OutlineChooserForm m_outlineChooserForm;
-  private P_DeskopListener m_desktopListener;
   private IDeviceTransformer m_deviceTransformer;
   private P_SearchFormCloseListener m_searchFormCloseListener;
 
@@ -105,11 +99,6 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
 
     m_deviceTransformer = createDeviceTransformer();
     m_deviceTransformer.transformDesktop(getCoreDesktop());
-
-    if (m_desktopListener == null) {
-      m_desktopListener = new P_DeskopListener();
-      getCoreDesktop().addDesktopListener(m_desktopListener);
-    }
 
     m_outlineChooserForm = new OutlineChooserForm();
 
@@ -211,6 +200,11 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   public class BackViewButton extends AbstractMobileBackAction {
 
     @Override
+    protected void execInitAction() throws ProcessingException {
+      init(getCoreDesktop());
+    }
+
+    @Override
     protected boolean getConfiguredVisible() {
       return false;
     }
@@ -227,6 +221,11 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
 
   @Order(20)
   public class HomeViewButton extends AbstractMobileHomeAction {
+
+    @Override
+    protected void execInitAction() throws ProcessingException {
+      init(getCoreDesktop());
+    }
 
     @Override
     protected boolean getConfiguredVisible() {
@@ -256,51 +255,6 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
     @Override
     protected void execAction() throws ProcessingException {
       ClientJob.getCurrentSession().stopSession();
-    }
-  }
-
-  private void handleNavigationButtonEnabledState() {
-    IMobileNavigationService service = SERVICES.getService(IMobileNavigationService.class);
-
-    boolean homeEnabled = service.isGoingHomePossible();
-    getCoreDesktop().getMenu(HomeViewButton.class).setVisible(homeEnabled);
-    getCoreDesktop().getMenu(HomeViewButton.class).setEnabled(homeEnabled);
-
-    boolean backEnabled = service.isSteppingBackPossible();
-    getCoreDesktop().getMenu(BackViewButton.class).setVisible(backEnabled);
-    getCoreDesktop().getMenu(BackViewButton.class).setEnabled(backEnabled);
-  }
-
-  private void handleDesktopClosed(IDesktop desktop) {
-    if (m_desktopListener != null) {
-      desktop.removeDesktopListener(m_desktopListener);
-    }
-
-    m_desktopListener = null;
-  }
-
-  private class P_DeskopListener implements DesktopListener {
-
-    @Override
-    public void desktopChanged(DesktopEvent e) {
-      IDesktop desktop = e.getDesktop();
-
-      switch (e.getType()) {
-        case DesktopEvent.TYPE_FORM_REMOVED: {
-          handleNavigationButtonEnabledState();
-          break;
-        }
-        case DesktopEvent.TYPE_FORM_ADDED: {
-          handleNavigationButtonEnabledState();
-          break;
-        }
-        case DesktopEvent.TYPE_DESKTOP_CLOSED: {
-          handleDesktopClosed(desktop);
-          break;
-        }
-        default:
-          break;
-      }
     }
   }
 

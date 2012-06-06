@@ -10,18 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.navigation;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.form.IForm;
+import java.util.EventListener;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
-public interface INavigationPoint {
-
-  void activate() throws ProcessingException;
-
-  IForm getForm();
-
-  IPage getPage();
+public interface BreadCrumbsListener extends EventListener {
+  void breadCrumbsChanged(BreadCrumbsEvent e);
 }

@@ -15,7 +15,9 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -23,25 +25,33 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 /**
  * @since 3.9.0
  */
-public class NavigationPoint implements INavigationPoint {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(NavigationPoint.class);
+public class BreadCrumb implements IBreadCrumb {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BreadCrumb.class);
 
   private IForm m_form;
   private IPage m_page;
-  private IDeviceNavigator m_deviceNavigator;
+  private IBreadCrumbsNavigation m_breadCrumbsNavigation;
 
-  public NavigationPoint(IDeviceNavigator deviceNavigator, IForm form, IPage page) {
-    m_deviceNavigator = deviceNavigator;
+  public BreadCrumb(IBreadCrumbsNavigation breadCrumbsNavigation, IForm form, IPage page) {
+    m_breadCrumbsNavigation = breadCrumbsNavigation;
     m_form = form;
     m_page = page;
   }
 
   @Override
   public void activate() throws ProcessingException {
-    List<IForm> currentNavigationForms = getDeviceNavigator().getCurrentNavigationForms();
+    List<IForm> currentNavigationForms = getBreadCrumbsNavigation().getCurrentNavigationForms();
     for (IForm form : currentNavigationForms) {
-      if (form != getForm() && !getDeviceNavigator().containsFormInHistory(form)) {
+      if (form != getForm() && !getBreadCrumbsNavigation().containsFormInHistory(form)) {
         MobileDesktopUtility.closeForm(form);
+      }
+    }
+
+    //Add form to desktop if it is open but has been removed
+    if (getForm() != null) {
+      IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+      if (getForm().isFormOpen() && !desktop.isShowing(getForm())) {
+        desktop.addForm(getForm());
       }
     }
 
@@ -51,8 +61,8 @@ public class NavigationPoint implements INavigationPoint {
     }
   }
 
-  public IDeviceNavigator getDeviceNavigator() {
-    return m_deviceNavigator;
+  public IBreadCrumbsNavigation getBreadCrumbsNavigation() {
+    return m_breadCrumbsNavigation;
   }
 
   @Override

@@ -10,7 +10,7 @@
             ranking="-25">
       </service>
       <service
-            class="org.eclipse.scout.rt.client.mobile.services.MobileNavigationService"
+            class="org.eclipse.scout.rt.client.mobile.navigation.BreadCrumbsNavigationService"
             createImmediately="false"
             factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
             ranking="-1000">
