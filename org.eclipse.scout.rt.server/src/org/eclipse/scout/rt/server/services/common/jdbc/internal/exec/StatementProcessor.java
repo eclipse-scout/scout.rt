@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -215,11 +215,23 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        rs = ps.executeQuery();
-        for (Object[] row : processResultRows(rs, m_maxRowCount)) {
-          rows.add(row);
-          nextOutputBatch();
-          consumeSelectIntoRow(row);
+        try {
+          rs = ps.executeQuery();
+          for (Object[] row : processResultRows(rs, m_maxRowCount)) {
+            rows.add(row);
+            nextOutputBatch();
+            consumeSelectIntoRow(row);
+          }
+        }
+        finally {
+          /*
+           * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
+           * yet because the monitor could do some post-fetching of the data.
+           * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
+           */
+          if (hasNextInputBatch()) {
+            releasePreparedStatementAndResultSet(ps, cache, rs);
+          }
         }
       }
       finishOutputBatch();
@@ -236,17 +248,7 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      if (rs != null) try {
-        rs.close();
-      }
-      catch (Throwable t) {
-      }
-      try {
-        cache.releasePreparedStatement(ps);
-      }
-      catch (SQLException e) {
-        throw new ProcessingException(createSqlDump(true, false), e);
-      }
+      releasePreparedStatementAndResultSet(ps, cache, rs);
     }
   }
 
@@ -268,11 +270,23 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        rs = ps.executeQuery();
-        for (Object[] row : processResultRows(rs, m_maxRowCount)) {
-          nextOutputBatch();
-          consumeSelectIntoRow(row);
-          rowCount++;
+        try {
+          rs = ps.executeQuery();
+          for (Object[] row : processResultRows(rs, m_maxRowCount)) {
+            nextOutputBatch();
+            consumeSelectIntoRow(row);
+            rowCount++;
+          }
+        }
+        finally {
+          /*
+           * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
+           * yet because the monitor could do some post-fetching of the data.
+           * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
+           */
+          if (hasNextInputBatch()) {
+            releasePreparedStatementAndResultSet(ps, cache, rs);
+          }
         }
       }
       finishOutputBatch();
@@ -288,17 +302,7 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      if (rs != null) try {
-        rs.close();
-      }
-      catch (Throwable t) {
-      }
-      try {
-        cache.releasePreparedStatement(ps);
-      }
-      catch (SQLException e) {
-        throw new ProcessingException(createSqlDump(true, false), e);
-      }
+      releasePreparedStatementAndResultSet(ps, cache, rs);
     }
   }
 
@@ -314,20 +318,32 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        rs = ps.executeQuery();
-        ResultSetMetaData meta = rs.getMetaData();
-        int colCount = meta.getColumnCount();
-        while (rs.next()) {
-          ArrayList<SqlBind> row = new ArrayList<SqlBind>(colCount);
-          for (int i = 0; i < colCount; i++) {
-            int type = meta.getColumnType(i + 1);
-            Object value = sqlStyle.readBind(rs, meta, type, i + 1);
-            row.add(new SqlBind(type, value));
+        try {
+          rs = ps.executeQuery();
+          ResultSetMetaData meta = rs.getMetaData();
+          int colCount = meta.getColumnCount();
+          while (rs.next()) {
+            ArrayList<SqlBind> row = new ArrayList<SqlBind>(colCount);
+            for (int i = 0; i < colCount; i++) {
+              int type = meta.getColumnType(i + 1);
+              Object value = sqlStyle.readBind(rs, meta, type, i + 1);
+              row.add(new SqlBind(type, value));
+            }
+            handler.handleRow(conn, ps, rs, rowCount, row);
+            rowCount++;
+            if (m_maxRowCount > 0 && rowCount >= m_maxRowCount) {
+              break;
+            }
           }
-          handler.handleRow(conn, ps, rs, rowCount, row);
-          rowCount++;
-          if (m_maxRowCount > 0 && rowCount >= m_maxRowCount) {
-            break;
+        }
+        finally {
+          /*
+           * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
+           * yet because the handler could do finishing work.
+           * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
+           */
+          if (hasNextInputBatch()) {
+            releasePreparedStatementAndResultSet(ps, cache, rs);
           }
         }
       }
@@ -342,17 +358,7 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      if (rs != null) try {
-        rs.close();
-      }
-      catch (Throwable t) {
-      }
-      try {
-        cache.releasePreparedStatement(ps);
-      }
-      catch (SQLException e) {
-        throw new ProcessingException(createSqlDump(true, false), e);
-      }
+      releasePreparedStatementAndResultSet(ps, cache, rs);
     }
   }
 
@@ -373,7 +379,12 @@ public class StatementProcessor implements IStatementProcessor {
         dump();
         ps = cache.getPreparedStatement(conn, m_currentInputStm);
         bindBatch(ps);
-        rowCount = rowCount + ps.executeUpdate();
+        try {
+          rowCount = rowCount + ps.executeUpdate();
+        }
+        finally {
+          cache.releasePreparedStatement(ps);
+        }
       }
       return rowCount;
     }
@@ -385,12 +396,7 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      try {
-        cache.releasePreparedStatement(ps);
-      }
-      catch (SQLException e) {
-        throw new ProcessingException(createSqlDump(true, false), e);
-      }
+      cache.releasePreparedStatement(ps);
     }
   }
 
@@ -405,17 +411,20 @@ public class StatementProcessor implements IStatementProcessor {
     CallableStatement cs = null;
     boolean status = true;
     try {
-      int batchCount = 0;
       while (hasNextInputBatch()) {
         nextInputBatch();
         prepareInputStatementAndBinds();
         dump();
         cs = cache.getCallableStatement(conn, m_currentInputStm);
         bindBatch(cs);
-        status = status && cs.execute();
-        nextOutputBatch();
-        consumeOutputRow(cs);
-        batchCount++;
+        try {
+          status = status && cs.execute();
+          nextOutputBatch();
+          consumeOutputRow(cs);
+        }
+        finally {
+          cache.releaseCallableStatement(cs);
+        }
       }
       finishOutputBatch();
       return status;
@@ -428,12 +437,7 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      try {
-        cache.releaseCallableStatement(cs);
-      }
-      catch (SQLException e) {
-        throw new ProcessingException(createSqlDump(true, false), e);
-      }
+      cache.releaseCallableStatement(cs);
     }
   }
 
@@ -1206,4 +1210,14 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
+  private void releasePreparedStatementAndResultSet(PreparedStatement ps, IStatementCache cache, ResultSet rs) {
+    if (rs != null) {
+      try {
+        rs.close();
+      }
+      catch (Throwable t) {
+      }
+    }
+    cache.releasePreparedStatement(ps);
+  }
 }
