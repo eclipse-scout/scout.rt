@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
+import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutViewStack;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IViewArea;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutViewStack;
 import org.eclipse.swt.SWT;
@@ -118,7 +119,8 @@ public class ViewArea extends Composite implements IViewArea {
    * <p>
    * The sash positions can be retrieved by the use of {@link #getSashPosition(SashKey)}.
    */
-  public void updateSashPositionForViewStack(RwtScoutViewStack viewStack) {
+  @Override
+  public void updateSashPositionForViewStack(IRwtScoutViewStack viewStack) {
     updateVerticalSashPositionForViewStack(viewStack, SashKey.VERTICAL_LEFT, 0);
     updateVerticalSashPositionForViewStack(viewStack, SashKey.VERTICAL_RIGHT, 2);
 
@@ -146,7 +148,7 @@ public class ViewArea extends Composite implements IViewArea {
 
   }
 
-  private void updateVerticalSashPositionForViewStack(RwtScoutViewStack viewStack, SashKey sashKey, int col) {
+  private void updateVerticalSashPositionForViewStack(IRwtScoutViewStack viewStack, SashKey sashKey, int col) {
     List<RwtScoutViewStack> verticalViewStacks = getVerticalViewStacks(col);
     if (!verticalViewStacks.contains(viewStack)) {
       return;
@@ -166,7 +168,7 @@ public class ViewArea extends Composite implements IViewArea {
     m_sashPositions.put(sashKey, maxWidth);
   }
 
-  private void updateSashPositionWithViewStackHeight(RwtScoutViewStack viewStack, SashKey sashKey) {
+  private void updateSashPositionWithViewStackHeight(IRwtScoutViewStack viewStack, SashKey sashKey) {
     int heightHint = viewStack.getHeightHint();
     if (heightHint < 0) {
       return;
@@ -201,6 +203,7 @@ public class ViewArea extends Composite implements IViewArea {
     return (IRwtEnvironment) getDisplay().getData(IRwtEnvironment.class.getName());
   }
 
+  @Override
   public RwtScoutViewStack getStackForForm(IForm form) {
     String scoutId = form.getDisplayViewId();
     if (scoutId == null) {

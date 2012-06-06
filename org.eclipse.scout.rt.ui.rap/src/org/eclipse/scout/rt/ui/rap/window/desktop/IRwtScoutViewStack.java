@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 
 /**
- * @since 3.8
+ * @since 3.8.0
  */
 public interface IRwtScoutViewStack {
 
@@ -26,5 +26,13 @@ public interface IRwtScoutViewStack {
   boolean isPartVisible(IRwtScoutPart part);
 
   void setPartVisible(IRwtScoutPart part);
+
+  int getHeightHint();
+
+  void setHeightHint(int heightHint);
+
+  int getWidthHint();
+
+  void setWidthHint(int widthHint);
 
 }

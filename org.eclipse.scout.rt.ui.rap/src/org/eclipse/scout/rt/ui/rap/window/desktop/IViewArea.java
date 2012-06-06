@@ -10,9 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.window.desktop;
 
+import org.eclipse.scout.rt.client.ui.form.IForm;
+
 /**
  * @since 3.8.0
  */
 public interface IViewArea {
+  void updateSashPositionForViewStack(IRwtScoutViewStack stack);
 
+  IRwtScoutViewStack getStackForForm(IForm form);
+
+  void layout();
 }

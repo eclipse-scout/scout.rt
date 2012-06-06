@@ -27,7 +27,7 @@ public class MobileViewArea extends ViewArea {
 
   @Override
   protected RwtScoutViewStack createRwtScoutViewStack(Composite parent) {
-    return new MobileRwtScoutViewStack(parent, getUiEnvironment());
+    return new RwtScoutMobileViewStack(parent, getUiEnvironment(), this);
   }
 
 }

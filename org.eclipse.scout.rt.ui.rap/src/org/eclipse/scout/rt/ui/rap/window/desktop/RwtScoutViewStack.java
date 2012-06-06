@@ -119,6 +119,10 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     return m_uiEnvironment;
   }
 
+  protected Map<IForm, IFormBoundsProvider> getFormBoundsProviders() {
+    return m_formBoundsProviders;
+  }
+
   @Override
   public IRwtScoutPart addForm(IForm form) {
     if (form.isCacheBounds()) {
@@ -189,7 +193,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     m_formBoundsProviders.remove(form);
   }
 
-  private void setPartVisibleImpl(IForm form) {
+  protected void setPartVisibleImpl(IForm form) {
     RwtScoutDesktopForm uiForm = m_openForms.get(form);
     if (uiForm != null) {
       StackLayout stackLayout = (StackLayout) m_container.getLayout();
@@ -223,18 +227,22 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     return m_container.getChildren().length > 0;
   }
 
+  @Override
   public int getHeightHint() {
     return heightHint;
   }
 
+  @Override
   public void setHeightHint(int heightHint) {
     this.heightHint = heightHint;
   }
 
+  @Override
   public int getWidthHint() {
     return widthHint;
   }
 
+  @Override
   public void setWidthHint(int widthHint) {
     this.widthHint = widthHint;
   }

@@ -10,24 +10,46 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.window.desktop;
 
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
+import org.eclipse.scout.rt.ui.rap.window.desktop.IViewArea;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutViewStack;
 import org.eclipse.swt.widgets.Composite;
 
 /**
  * @since 3.8.0
  */
-public class MobileRwtScoutViewStack extends RwtScoutViewStack {
-
+public class RwtScoutMobileViewStack extends RwtScoutViewStack {
   private static final long serialVersionUID = 1L;
+  private IViewArea m_viewArea;
 
-  public MobileRwtScoutViewStack(Composite parent, IRwtEnvironment uiEnvironment) {
+  public RwtScoutMobileViewStack(Composite parent, IRwtEnvironment uiEnvironment, IViewArea viewArea) {
     super(parent, uiEnvironment);
+
+    m_viewArea = viewArea;
   }
 
   @Override
   protected boolean alwaysHideTabBar() {
     return true;
+  }
+
+  @Override
+  protected IFormBoundsProvider createFormBoundsProvider(IForm scoutForm, IRwtEnvironment uiEnvironment) {
+    return new MobileDesktopFormBoundsProvider(scoutForm, uiEnvironment);
+  }
+
+  @Override
+  protected void setPartVisibleImpl(IForm form) {
+    super.setPartVisibleImpl(form);
+
+    //Make sure the preferred size is updated if the visible part changes.
+    if (form != null && form.isCacheBounds()) {
+      initPreferredSize(getFormBoundsProviders().get(form));
+      m_viewArea.updateSashPositionForViewStack(this);
+      m_viewArea.layout();
+    }
   }
 
 }
