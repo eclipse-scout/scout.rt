@@ -49,6 +49,15 @@ Button[PUSH]:hover, Button[TOGGLE]:hover {
   );
 }
 
+/* Copy from scout.css. Unfortunately setting the background-image of the Button also overrides the background-image of the datefield buttons although it's defined in scout.css.*/
+Button.datefield[PUSH]:hover {
+  background-image: url( theme/img/button/datefield_date_mouse_over.png );
+}
+
+Button.timefield[PUSH]:hover {
+  background-image: url( theme/img/button/datefield_time_mouse_over.png );
+}
+
 Button-FocusIndicator[PUSH], Button-FocusIndicator[TOGGLE] {
   background-color: transparent;
   background-image: none;
