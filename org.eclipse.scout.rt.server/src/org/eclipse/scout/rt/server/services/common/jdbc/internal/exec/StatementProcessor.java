@@ -237,6 +237,14 @@ public class StatementProcessor implements IStatementProcessor {
         }
         finally {
           unregisterActiveStatement(ps);
+          /*
+           * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
+           * yet because the monitor could do some post-fetching of the data.
+           * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
+           */
+          if (hasNextInputBatch()) {
+            releasePreparedStatementAndResultSet(ps, cache, rs);
+          }
         }
       }
       finishOutputBatch();
@@ -253,19 +261,7 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      if (rs != null) {
-        try {
-          rs.close();
-        }
-        catch (Throwable t) {
-        }
-      }
-      try {
-        cache.releasePreparedStatement(ps);
-      }
-      catch (SQLException e) {
-        throw new ProcessingException(createSqlDump(true, false), e);
-      }
+      releasePreparedStatementAndResultSet(ps, cache, rs);
     }
   }
 
@@ -299,6 +295,14 @@ public class StatementProcessor implements IStatementProcessor {
         }
         finally {
           unregisterActiveStatement(ps);
+          /*
+           * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
+           * yet because the monitor could do some post-fetching of the data.
+           * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
+           */
+          if (hasNextInputBatch()) {
+            releasePreparedStatementAndResultSet(ps, cache, rs);
+          }
         }
       }
       finishOutputBatch();
@@ -314,19 +318,7 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      if (rs != null) {
-        try {
-          rs.close();
-        }
-        catch (Throwable t) {
-        }
-      }
-      try {
-        cache.releasePreparedStatement(ps);
-      }
-      catch (SQLException e) {
-        throw new ProcessingException(createSqlDump(true, false), e);
-      }
+      releasePreparedStatementAndResultSet(ps, cache, rs);
     }
   }
 
@@ -365,6 +357,14 @@ public class StatementProcessor implements IStatementProcessor {
         }
         finally {
           unregisterActiveStatement(ps);
+          /*
+           * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
+           * yet because the handler could do finishing work.
+           * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
+           */
+          if (hasNextInputBatch()) {
+            releasePreparedStatementAndResultSet(ps, cache, rs);
+          }
         }
       }
       finishOutputBatch();
@@ -378,19 +378,7 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      if (rs != null) {
-        try {
-          rs.close();
-        }
-        catch (Throwable t) {
-        }
-      }
-      try {
-        cache.releasePreparedStatement(ps);
-      }
-      catch (SQLException e) {
-        throw new ProcessingException(createSqlDump(true, false), e);
-      }
+      releasePreparedStatementAndResultSet(ps, cache, rs);
     }
   }
 
@@ -418,6 +406,7 @@ public class StatementProcessor implements IStatementProcessor {
         }
         finally {
           unregisterActiveStatement(ps);
+          cache.releasePreparedStatement(ps);
         }
       }
       return rowCount;
@@ -430,12 +419,7 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      try {
-        cache.releasePreparedStatement(ps);
-      }
-      catch (SQLException e) {
-        throw new ProcessingException(createSqlDump(true, false), e);
-      }
+      cache.releasePreparedStatement(ps);
     }
   }
 
@@ -451,7 +435,6 @@ public class StatementProcessor implements IStatementProcessor {
     CallableStatement cs = null;
     boolean status = true;
     try {
-      int batchCount = 0;
       while (hasNextInputBatch()) {
         nextInputBatch();
         prepareInputStatementAndBinds();
@@ -461,13 +444,13 @@ public class StatementProcessor implements IStatementProcessor {
         registerActiveStatement(cs);
         try {
           status = status && cs.execute();
+          nextOutputBatch();
+          consumeOutputRow(cs);
         }
         finally {
           unregisterActiveStatement(cs);
+          cache.releaseCallableStatement(cs);
         }
-        nextOutputBatch();
-        consumeOutputRow(cs);
-        batchCount++;
       }
       finishOutputBatch();
       return status;
@@ -480,12 +463,7 @@ public class StatementProcessor implements IStatementProcessor {
       throw new ProcessingException(createSqlDump(true, false), e);
     }
     finally {
-      try {
-        cache.releaseCallableStatement(cs);
-      }
-      catch (SQLException e) {
-        throw new ProcessingException(createSqlDump(true, false), e);
-      }
+      cache.releaseCallableStatement(cs);
     }
   }
 
@@ -1320,5 +1298,16 @@ public class StatementProcessor implements IStatementProcessor {
     if (member instanceof AbstractSqlTransactionMember) {
       ((AbstractSqlTransactionMember) member).unregisterActiveStatement(s);
     }
+  }
+
+  private void releasePreparedStatementAndResultSet(PreparedStatement ps, IStatementCache cache, ResultSet rs) {
+    if (rs != null) {
+      try {
+        rs.close();
+      }
+      catch (Throwable t) {
+      }
+    }
+    cache.releasePreparedStatement(ps);
   }
 }

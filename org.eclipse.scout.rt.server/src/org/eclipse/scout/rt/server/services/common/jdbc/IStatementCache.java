@@ -19,10 +19,10 @@ public interface IStatementCache {
 
   PreparedStatement getPreparedStatement(Connection conn, String s) throws SQLException;
 
-  void releasePreparedStatement(PreparedStatement ps) throws SQLException;
+  void releasePreparedStatement(PreparedStatement ps);
 
   CallableStatement getCallableStatement(Connection conn, String s) throws SQLException;
 
-  void releaseCallableStatement(CallableStatement cs) throws SQLException;
+  void releaseCallableStatement(CallableStatement cs);
 
 }
