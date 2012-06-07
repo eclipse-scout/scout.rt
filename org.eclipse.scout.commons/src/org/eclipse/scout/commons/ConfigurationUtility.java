@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
 
+import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -92,7 +93,7 @@ public final class ConfigurationUtility {
    * 
    * @param classes
    * @param filter
-   * @return first occurence of filter
+   * @return first occurence of filter, might be annotated with {@link InjectFieldTo}
    */
   @SuppressWarnings("unchecked")
   public static <T> Class<T> filterClass(Class[] classes, Class<T> filter) {
@@ -105,8 +106,25 @@ public final class ConfigurationUtility {
   }
 
   /**
+   * same as {@link #filterClass(Class[], Class)} but ignoring classes with {@link InjectFieldTo} annotation
+   * @since 3.9
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Class<T> filterClassIgnoringInjectFieldAnnotation(Class[] classes, Class<T> filter) {
+    for (Class c : classes) {
+      if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
+        if (!c.isAnnotationPresent(InjectFieldTo.class)) {
+          return c;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
    * Filters the given class array and returns all occurences of instantiatable
    * classes of filter
+   * @since 3.9
    * 
    * @param classes
    * @param filter
@@ -118,6 +136,40 @@ public final class ConfigurationUtility {
     for (Class c : classes) {
       if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
         list.add(c);
+      }
+    }
+    return list.toArray(new Class[0]);
+  }
+
+  /**
+   * same as {@link #filterClasses(Class[], Class)} but ignoring classes with {@link InjectFieldTo} annotation
+   * @since 3.9
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Class<T>[] filterClassesIgnoringInjectFieldAnnotation(Class[] classes, Class<T> filter) {
+    ArrayList<Class<T>> list = new ArrayList<Class<T>>();
+    for (Class c : classes) {
+      if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
+        if (!c.isAnnotationPresent(InjectFieldTo.class)) {
+          list.add(c);
+        }
+      }
+    }
+    return list.toArray(new Class[0]);
+  }
+
+  /**
+   * same as {@link #filterClasses(Class[], Class)} but only accepting classes with {@link InjectFieldTo} annotation
+   * @since 3.9
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Class<T>[] filterClassesWithInjectFieldAnnotation(Class[] classes, Class<T> filter) {
+    ArrayList<Class<T>> list = new ArrayList<Class<T>>();
+    for (Class c : classes) {
+      if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
+        if (c.isAnnotationPresent(InjectFieldTo.class)) {
+          list.add(c);
+        }
       }
     }
     return list.toArray(new Class[0]);

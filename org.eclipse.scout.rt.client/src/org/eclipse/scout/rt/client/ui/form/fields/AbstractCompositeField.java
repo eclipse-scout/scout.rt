@@ -16,8 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.client.ui.form.DefaultFormFieldInjection;
+import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionThreadLocal;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -60,20 +63,51 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
      */
     m_fields = new IFormField[0];
     super.initConfig();
-    // add fields
-    ArrayList<IFormField> fieldList = new ArrayList<IFormField>();
     Class<? extends IFormField>[] fieldArray = getConfiguredFields();
-    for (int i = 0; i < fieldArray.length; i++) {
-      IFormField f;
+    // prepare injected fields
+    DefaultFormFieldInjection injectedFields = null;
+    for (Class<? extends IFormField> clazz : fieldArray) {
+      if (!clazz.isAnnotationPresent(InjectFieldTo.class)) {
+        continue;
+      }
       try {
-        f = ConfigurationUtility.newInnerInstance(this, fieldArray[i]);
-        fieldList.add(f);
+        IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
+        if (f != null) {
+          if (injectedFields == null) {
+            injectedFields = new DefaultFormFieldInjection();
+          }
+          injectedFields.addField(f);
+        }
       }// end try
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + fieldArray[i].getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + clazz.getName(), t));
       }
     }
-    injectFieldsInternal(fieldList);
+    ArrayList<IFormField> fieldList = new ArrayList<IFormField>();
+    try {
+      if (injectedFields != null) {
+        FormFieldInjectionThreadLocal.push(injectedFields);
+      }
+      //
+      for (Class<? extends IFormField> clazz : fieldArray) {
+        if (clazz.isAnnotationPresent(InjectFieldTo.class)) {
+          continue;
+        }
+        try {
+          IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
+          fieldList.add(f);
+        }// end try
+        catch (Throwable t) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + clazz.getName(), t));
+        }
+      }
+      injectFieldsInternal(fieldList);
+    }
+    finally {
+      if (injectedFields != null) {
+        FormFieldInjectionThreadLocal.pop(injectedFields);
+      }
+    }
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
     }
@@ -88,12 +122,15 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   /**
    * Override this internal method only in order to make use of dynamic fields<br>
    * Used to manage field list and add/remove fields (see {@link AbstractGroupBox} with wizard buttons)
+   * <p>
+   * The default implementation checks for {@link InjectFieldTo} annotations in the enclosing (runtime) classes.
    * 
    * @param fieldList
    *          live and mutable list of configured fields, not yet initialized
    *          and added to composite field
    */
   protected void injectFieldsInternal(List<IFormField> fieldList) {
+    FormFieldInjectionThreadLocal.injectFields(this, fieldList);
   }
 
   @Override

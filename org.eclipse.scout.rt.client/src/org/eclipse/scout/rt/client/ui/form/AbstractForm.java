@@ -39,6 +39,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
@@ -445,24 +446,60 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   private Class<? extends IGroupBox> getConfiguredMainBox() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClass(dca, IGroupBox.class);
+    return ConfigurationUtility.filterClassIgnoringInjectFieldAnnotation(dca, IGroupBox.class);
+  }
+
+  private Class<? extends IFormField>[] getConfiguredInjectedFields() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    return ConfigurationUtility.filterClassesWithInjectFieldAnnotation(dca, IFormField.class);
   }
 
   protected void initConfig() throws ProcessingException {
     m_uiFacade = new P_UIFacade();
     m_scoutTimerMap = new HashMap<String, P_Timer>();
     m_autoRegisterInDesktopOnStart = true;
-    // add mainbox if getter returns null
-    IGroupBox rootBox = getRootGroupBox();
-    if (rootBox == null) {
-      Class<? extends IGroupBox> mainBoxClass = getConfiguredMainBox();
+    // prepare injected fields
+    Class<? extends IFormField>[] fieldArray = getConfiguredInjectedFields();
+    DefaultFormFieldInjection injectedFields = null;
+    for (Class<? extends IFormField> clazz : fieldArray) {
+      if (!clazz.isAnnotationPresent(InjectFieldTo.class)) {
+        continue;
+      }
       try {
-        m_mainBox = ConfigurationUtility.newInnerInstance(this, mainBoxClass);
-      }
+        IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
+        if (f != null) {
+          if (injectedFields == null) {
+            injectedFields = new DefaultFormFieldInjection();
+          }
+          injectedFields.addField(f);
+        }
+      }// end try
       catch (Throwable t) {
-        throw new ProcessingException("mainBox: " + ((mainBoxClass == null) ? "not defined." : mainBoxClass.getName()), t);
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + clazz.getName(), t));
       }
-      rootBox = getRootGroupBox();
+    }
+    IGroupBox rootBox = getRootGroupBox();
+    try {
+      if (injectedFields != null) {
+        FormFieldInjectionThreadLocal.push(injectedFields);
+      }
+      //
+      // add mainbox if getter returns null
+      if (rootBox == null) {
+        Class<? extends IGroupBox> mainBoxClass = getConfiguredMainBox();
+        try {
+          m_mainBox = ConfigurationUtility.newInnerInstance(this, mainBoxClass);
+        }
+        catch (Throwable t) {
+          throw new ProcessingException("mainBox: " + ((mainBoxClass == null) ? "not defined." : mainBoxClass.getName()), t);
+        }
+        rootBox = getRootGroupBox();
+      }
+    }
+    finally {
+      if (injectedFields != null) {
+        FormFieldInjectionThreadLocal.pop(injectedFields);
+      }
     }
     rootBox.setFormInternal(this);
     rootBox.setMainBox(true);
@@ -1023,6 +1060,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * {@link SearchFilter#addDisplayText(String)}
    * <p>
    * May call {@link #setSearchFilter(SearchFilter)}
+   * <p>
+   * Implement {@link #execCreateFormData()} to automatically attach a filled form data to the search filter (since
+   * 3.8).
    * 
    * @param searchFilter
    *          is never null
@@ -1037,6 +1077,32 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // add verbose form texts
     execAddSearchTerms(searchFilter);
     // override may add form data
+    try {
+      AbstractFormData data = execCreateFormData();
+      if (data != null) {
+        exportFormData(data);
+        getSearchFilter().setFormData(data);
+      }
+    }
+    catch (ProcessingException e) {
+      throw e;
+    }
+    catch (Throwable t) {
+      throw new ProcessingException("Create form data", t);
+    }
+  }
+
+  /**
+   * Convenience to add form data to search filter and load/store form data.
+   * override this method to create an empty search form data that can be used for example by
+   * {@link #execResetSearchFilter(SearchFilter)}
+   * 
+   * @since 3.8
+   */
+  @ConfigOperation
+  @Order(11)
+  protected AbstractFormData execCreateFormData() throws ProcessingException {
+    return null;
   }
 
   @Override
