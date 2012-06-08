@@ -84,8 +84,8 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
       }
       TableEx table = getRwtScoutTable().getUiField();
       if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-        if (m_htmlTableRows == null || m_htmlTableRows.length != m_scoutTable.getFilteredRowCount()) {
-          double[] tempArray = new double[m_scoutTable.getFilteredRowCount()];
+        if (m_htmlTableRows == null || m_htmlTableRows.length != m_scoutTable.getRowCount()) {
+          double[] tempArray = new double[m_scoutTable.getRowCount()];
           for (int i = 0; i < tempArray.length; i++) {
             tempArray[i] = 1;
           }
@@ -105,8 +105,8 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         }
       }
       else {
-        if (m_newlines == null || m_newlines.length != m_scoutTable.getFilteredRowCount()) {
-          double[] tempArray = new double[m_scoutTable.getFilteredRowCount()];
+        if (m_newlines == null || m_newlines.length != m_scoutTable.getRowCount()) {
+          double[] tempArray = new double[m_scoutTable.getRowCount()];
           for (int i = 0; i < tempArray.length; i++) {
             tempArray[i] = 1;
           }
@@ -115,6 +115,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
           }
           else {
             System.arraycopy(m_newlines, 0, tempArray, 0, m_newlines.length);
+            m_newlines = tempArray;
           }
         }
         m_newlines[((ITableRow) element).getRowIndex()] = HtmlTextUtility.countLineBreaks(text);
