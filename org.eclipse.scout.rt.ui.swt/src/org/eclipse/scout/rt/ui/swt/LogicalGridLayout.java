@@ -54,7 +54,11 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
 
   @Override
   public int computeMinimumWidth(Composite parent, boolean changed) {
-    return computeSize(parent, changed, SWT.DEFAULT, SWT.DEFAULT, MIN).x;
+    return computeMinimumSize(parent, changed).x;
+  }
+
+  public Point computeMinimumSize(Composite parent, boolean changed) {
+    return computeSize(parent, changed, SWT.DEFAULT, SWT.DEFAULT, MIN);
   }
 
   @Override

@@ -68,7 +68,7 @@ public class RadioButtonGroupLayout extends Layout {
     for (Control c : parent.getChildren()) {
       if (c.getVisible()) {
         m_buttons[index / colCount][index % colCount] = c;
-        Point d = new Point(SwtLayoutUtility.computeMinimumWidth(c, false), 0);
+        Point d = SwtLayoutUtility.computeMinimumSize(c, false);
         m_sizes[index / colCount][index % colCount] = d;
         index++;
       }

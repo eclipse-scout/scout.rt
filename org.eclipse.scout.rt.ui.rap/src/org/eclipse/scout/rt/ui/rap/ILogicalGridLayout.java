@@ -30,6 +30,8 @@ public interface ILogicalGridLayout extends ILayoutExtension {
 
   Point computeSize(Composite composite, boolean changed, int wHint, int hHint, int sizeFlag);
 
+  Point computeMinimumSize(Composite parent, boolean changed);
+
   void setDebug(boolean b);
 
   void dumpLayoutInfo(Composite parent);
