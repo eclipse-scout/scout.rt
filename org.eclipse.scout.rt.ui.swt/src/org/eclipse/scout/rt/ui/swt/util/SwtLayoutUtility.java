@@ -141,4 +141,15 @@ public final class SwtLayoutUtility {
       }
     }
   }
+
+  public static Point computeMinimumSize(Control c, boolean changed) {
+    if (c instanceof Composite) {
+      Layout layout = ((Composite) c).getLayout();
+      if (layout instanceof LogicalGridLayout) {
+        return ((LogicalGridLayout) layout).computeMinimumSize((Composite) c, changed);
+      }
+    }
+    return c.computeSize(SWT.DEFAULT, SWT.DEFAULT, changed);
+  }
+
 }
