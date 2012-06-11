@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
@@ -395,6 +396,21 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
+  public boolean isThisAndParentsEnabled() {
+    if (!isEnabled()) {
+      return false;
+    }
+    IAction temp = this;
+    while (temp instanceof IActionNode) {
+      temp = ((IActionNode) temp).getParent();
+      if (!temp.isEnabled()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public void setEnabled(boolean b) {
     m_enabledProperty = b;
     setEnabledInternal();
@@ -431,6 +447,21 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   @Override
   public boolean isVisible() {
     return propertySupport.getPropertyBool(PROP_VISIBLE);
+  }
+
+  @Override
+  public boolean isThisAndParentsVisible() {
+    if (!isVisible()) {
+      return false;
+    }
+    IAction temp = this;
+    while (temp instanceof IActionNode) {
+      temp = ((IActionNode) temp).getParent();
+      if (!temp.isVisible()) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
@@ -594,7 +625,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     @Override
     public void fireActionFromUI() {
       try {
-        if (isEnabled() && isVisible()) {
+        if (isThisAndParentsEnabled() && isThisAndParentsVisible()) {
           doAction();
         }
       }

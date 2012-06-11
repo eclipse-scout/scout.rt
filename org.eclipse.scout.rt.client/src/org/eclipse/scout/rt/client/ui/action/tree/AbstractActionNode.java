@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 
 public abstract class AbstractActionNode<T extends IActionNode> extends AbstractAction implements IActionNode<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractActionNode.class);
+  private T m_parent;
 
   public AbstractActionNode() {
     super();
@@ -50,6 +51,7 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     for (int i = 0; i < ma.length; i++) {
       try {
         IActionNode node = ConfigurationUtility.newInnerInstance(this, ma[i]);
+        node.setParent(this);
         nodeList.add((T) node);
       }
       catch (Exception e) {
@@ -81,6 +83,15 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   /*
    * Runtime
    */
+  @Override
+  public T getParent() {
+    return m_parent;
+  }
+
+  @Override
+  public void setParent(T parent) {
+    m_parent = parent;
+  }
 
   /**
    * override to prepare child menus as well

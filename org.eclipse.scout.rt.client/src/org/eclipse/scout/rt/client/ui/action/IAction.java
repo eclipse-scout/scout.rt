@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2010,2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -188,4 +188,18 @@ public interface IAction extends IPropertyObserver {
   IActionUIFacade getUIFacade();
 
   int acceptVisitor(IActionVisitor visitor);
+
+  /**
+   * Looks this action and its every parent are enabled
+   * 
+   * @since 3.8.1
+   */
+  boolean isThisAndParentsEnabled();
+
+  /**
+   * Looks this action and its every parent are visible
+   * 
+   * @since 3.8.1
+   */
+  boolean isThisAndParentsVisible();
 }
