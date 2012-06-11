@@ -12,8 +12,12 @@ package org.eclipse.scout.rt.ui.rap.basic.tree;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
+import org.eclipse.swt.widgets.Tree;
 
 public interface IRwtScoutTree extends IRwtScoutComposite<ITree> {
 
   void setEnabledFromScout(boolean enabled);
+
+  @Override
+  Tree getUiField();
 }

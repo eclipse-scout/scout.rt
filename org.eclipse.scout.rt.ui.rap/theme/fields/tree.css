@@ -85,7 +85,7 @@ TreeItem:linesvisible:even:selected {
 
 TreeItem:linesvisible:even:selected:unfocused {
   background-color: #959595;
-  color: #ffffff;
+  color: white;
 }
 
 TreeColumn {

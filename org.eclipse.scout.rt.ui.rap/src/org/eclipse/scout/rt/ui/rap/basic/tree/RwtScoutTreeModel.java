@@ -53,6 +53,10 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     return m_uiEnvironment;
   }
 
+  protected ITree getScoutTree() {
+    return m_tree;
+  }
+
   @Override
   public Object[] getChildren(Object parentElement) {
     ITreeNode scoutNode = (ITreeNode) parentElement;
@@ -73,12 +77,12 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
 
   @Override
   public Object[] getElements(Object inputElement) {
-    if (m_tree != null) {
-      if (m_tree.isRootNodeVisible()) {
-        return new Object[]{m_tree.getRootNode()};
+    if (getScoutTree() != null) {
+      if (getScoutTree().isRootNodeVisible()) {
+        return new Object[]{getScoutTree().getRootNode()};
       }
       else {
-        return m_tree.getRootNode().getFilteredChildNodes();
+        return getScoutTree().getRootNode().getFilteredChildNodes();
       }
     }
     else {
@@ -93,7 +97,7 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
       return null;
     } //check
     Image checkBoxImage = null;
-    if (m_tree.isCheckable()) {
+    if (getScoutTree().isCheckable()) {
       if (scoutNode.isChecked()) {
         checkBoxImage = m_imgCheckboxTrue;
       }
@@ -160,5 +164,4 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
-
 }

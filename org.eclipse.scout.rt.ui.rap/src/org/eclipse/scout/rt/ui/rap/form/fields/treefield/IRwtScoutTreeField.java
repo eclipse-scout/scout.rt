@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.rap.form.fields.treefield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
+import org.eclipse.swt.widgets.Tree;
 
 /**
  * <h3>IRwtScoutTreeField</h3> ...
@@ -23,11 +24,14 @@ public interface IRwtScoutTreeField extends IRwtScoutFormField<ITreeField> {
   /**
    * Custom variant for a tree's container field when placed inside a TreeField.
    */
-  public static final String VARIANT_TREE_CONTAINER = "treeField";
-  
+  String VARIANT_TREE_CONTAINER = "treeField";
+
   /**
    * Custom variant like {@link #VARIANT_TREE_CONTAINER}, but for disabled state.
    * (Workaround, because RAP does not seem to apply the ":disabled" state correctly.)
    */
-  public static final String VARIANT_TREE_CONTAINER_DISABLED = "treeFieldDisabled";
+  String VARIANT_TREE_CONTAINER_DISABLED = "treeFieldDisabled";
+
+  @Override
+  Tree getUiField();
 }

@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutActionBar;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Tree;
 
 /**
  * <h3>RwtScoutTreeBox</h3> ...
@@ -47,6 +48,11 @@ public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implem
     setUiLabel(label);
     // layout
     container.setLayout(new LogicalGridLayout(1, 0));
+  }
+
+  @Override
+  public Tree getUiField() {
+    return (Tree) super.getUiField();
   }
 
   @Override

@@ -205,7 +205,10 @@ public class ViewArea extends Composite implements IViewArea {
 
   @Override
   public RwtScoutViewStack getStackForForm(IForm form) {
-    String scoutId = form.getDisplayViewId();
+    return getStackForForm(form.getDisplayViewId());
+  }
+
+  public RwtScoutViewStack getStackForForm(String scoutId) {
     if (scoutId == null) {
       return null;
     }

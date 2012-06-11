@@ -130,7 +130,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
 
   @Override
   public IRwtScoutPart addForm(IForm form) {
-    RwtScoutViewStack stack = m_viewArea.getStackForForm(form);
+    IRwtScoutViewStack stack = getViewArea().getStackForForm(form);
     IRwtScoutPart rwtForm = stack.addForm(form);
 
     m_viewArea.updateSashPositionForViewStack(stack);
@@ -141,7 +141,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
 
   @Override
   public void updateLayout() {
-    m_viewArea.layout();
+    getViewArea().layout();
   }
 
   @Override
@@ -153,5 +153,4 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
   public IViewArea getViewArea() {
     return m_viewArea;
   }
-
 }
