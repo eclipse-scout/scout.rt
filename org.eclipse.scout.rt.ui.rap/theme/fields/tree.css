@@ -1,0 +1,241 @@
+/* Tree */
+Tree {
+  background-color: white;
+  background-image: none;
+  color: #4a4a4a;
+  border: none;
+  padding: 0px;
+}
+
+Tree:disabled {
+  background-color: #f4f8fc;
+  background-image: none;
+  color: #2a5a76;
+  border: none;
+  padding: 0px;
+}
+
+Tree[BORDER] {
+  border: none;
+}
+
+/* Shouldn't actually be necessary because it's already declared in tree.default.css of org.eclipse.rap.rwt.
+   But without explicitly setting it the background color is set to white which overrides selection and hover state. */
+Tree-RowOverlay {
+  background-color: transparent;
+  color: inherit;
+  background-image: none;
+}
+
+Composite.treeField {
+  background-color: white;
+  background-image: none;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+Composite.treeFieldDisabled {
+  background-color: white;
+  background-image: none;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+TreeItem {
+  background-color: transparent;
+  color: inherit;
+  text-decoration: none;
+}
+
+TreeItem:disabled {
+/* XXX hstaudacher does not work atm. Should be fixed with bug 347934 */
+  background-color: transparent;
+  color: #2a5a76;
+  text-decoration: none;
+}
+
+TreeItem:hover {
+  background-color: transparent;
+}
+
+TreeItem:selected {
+  background-color: #e5f3fe;
+  color: #000000;
+}
+
+TreeItem:selected:unfocused {
+  background-color: #e5f3fe;
+  color: #000000;
+}
+
+TreeItem:linesvisible:even {
+  background-color: #f3f3f4;
+}
+
+TreeItem:linesvisible:even:hover {
+  background-color: #dae9f7;
+}
+
+TreeItem:linesvisible:even:selected {
+  background-color: #00589f;
+  color: white;
+}
+
+TreeItem:linesvisible:even:selected:unfocused {
+  background-color: #959595;
+  color: #ffffff;
+}
+
+TreeColumn {
+  background-color: #f8f8ff;
+  padding: 1px 2px;
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #fbfcfd ),
+    to( #ececec )
+  );
+  color: #666666;
+  border-bottom: none;
+}
+
+TreeColumn:disabled {
+  color: #2a5a76;
+}
+
+TreeColumn:hover {
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #f4f5f6 ),
+    to( #e6e6e6 )
+  );
+  border-bottom: none;
+}
+
+TreeColumn-SortIndicator {
+  background-image: none;
+}
+
+TreeColumn-SortIndicator:up {
+  background-image: url( theme/img/column/table_sort_asc.png );
+}
+
+TreeColumn-SortIndicator:down {
+  background-image: url( theme/img/column/table_sort_desc.png );
+}
+
+Tree-Cell {
+  spacing: 3px;
+  padding: 3px;
+}
+
+Tree-GridLine {
+  color: #d0d0d0;
+}
+
+Tree-GridLine:horizontal {
+  color: transparent;
+}
+
+Tree-Checkbox {
+  margin: 0px 2px 0px 0px;
+  background-image: url( theme/img/button/check_box.png );
+}
+
+Tree-Checkbox:disabled {
+  background-image: url( theme/img/button/check_box_disabled.png );
+}
+
+Tree-Checkbox:selected {
+  background-image: url( theme/img/button/check_box_selected.png );
+}
+
+Tree-Checkbox:selected:disabled {
+  background-image: url( theme/img/button/check_box_disabled_selected.png );
+}
+
+Tree-Indent {
+  width: 20px;
+  background-image: url( theme/img/tree/tree-indent.png );
+}
+
+Tree-Indent:collapsed {
+  background-image: url( theme/img/tree/tree-indent-collapsed.png );
+}
+
+Tree-Indent:collapsed:hover {
+  background-image: url( theme/img/tree/tree-indent-collapsed.png );
+}
+
+Tree-Indent:expanded {
+  background-image: url( theme/img/tree/tree-indent-expanded.png );
+}
+
+Tree-Indent:expanded:hover {
+  background-image: url( theme/img/tree/tree-indent-expanded.png );
+}
+
+Tree-Indent:line {
+  background-image: url( theme/img/tree/tree-indent-line.png );
+}
+
+Tree-Indent:first {
+  background-image: url( theme/img/tree/tree-indent-first.png );
+}
+
+Tree-Indent:first:collapsed {
+  background-image: url( theme/img/tree/tree-indent-collapsed-first.png );
+}
+
+Tree-Indent:first:collapsed:hover {
+  background-image: url( theme/img/tree/tree-indent-collapsed-first.png );
+}
+
+Tree-Indent:first:expanded {
+  background-image: url( theme/img/tree/tree-indent-expanded-first.png );
+}
+
+Tree-Indent:first:expanded:hover {
+  background-image: url( theme/img/tree/tree-indent-expanded-first.png );
+}
+
+Tree-Indent:last {
+  background-image: url( theme/img/tree/tree-indent-last.png );
+}
+
+Tree-Indent:last:collapsed {
+  background-image: url( theme/img/tree/tree-indent-collapsed-last.png );
+}
+
+Tree-Indent:last:collapsed:hover {
+  background-image: url( theme/img/tree/tree-indent-collapsed-last.png );
+}
+
+Tree-Indent:last:expanded {
+  background-image: url( theme/img/tree/tree-indent-expanded.png );
+}
+
+Tree-Indent:last:expanded:hover {
+  background-image: url( theme/img/tree/tree-indent-expanded.png );
+}
+
+Tree-Indent:first:last {
+  background-image: none;
+}
+
+Tree-Indent:first:last:collapsed {
+  background-image: url( theme/img/tree/tree-indent-collapsed-first.png );
+}
+
+Tree-Indent:first:last:collapsed:hover {
+  background-image: url( theme/img/tree/tree-indent-collapsed-first.png );
+}
+
+Tree-Indent:first:last:expanded {
+  background-image: url( theme/img/tree/tree-indent-expanded-first.png );
+}
+
+Tree-Indent:first:last:expanded:hover {
+  background-image: url( theme/img/tree/tree-indent-expanded-first.png );
+}

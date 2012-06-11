@@ -1,0 +1,103 @@
+/* ScrollBar */
+ScrollBar {
+  background-color: transparent;
+  background-image: gradient(
+    linear, left top, right top,
+    from( #D4E1E7 ),
+    to( #C6D6DF )
+  );
+  border: none;
+  border-radius: 0px;
+  width: 15px;
+}
+
+ScrollBar-Thumb {
+  background-color: transparent;
+  border: none;
+  border-radius: 0px;
+}
+
+/* Gradients */
+ScrollBar[VERTICAL] {
+  background-image: gradient(
+    linear, left top, right top,
+    from( #D4E1E7 ),
+    to( #C6D6DF )
+  );
+}
+
+ScrollBar[HORIZONTAL] {
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #D4E1E7 ),
+    to( #C6D6DF )
+  );
+}
+
+ScrollBar-Thumb[VERTICAL] {
+  background-image: gradient(
+    linear, left top, right top,
+    from( #A9C7D8 ),
+    to( #7CB2D1 )
+  );
+}
+
+ScrollBar-Thumb[HORIZONTAL] {
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #A9C7D8 ),
+    to( #7CB2D1 )
+  );
+}
+
+ScrollBar-UpButton, ScrollBar-DownButton {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 0px;
+  cursor: default;
+}
+
+/* Icons */
+ScrollBar-Thumb-Icon[VERTICAL] {
+  background-image: none;
+}
+
+ScrollBar-Thumb-Icon[HORIZONTAL] {
+  background-image: none;
+}
+
+ScrollBar-UpButton-Icon[VERTICAL] {
+/* XXX hstaudacher need to be changed to up button when bug 346611 is fixed */
+  background-image: url( theme/img/scrollbar/scrollbar-down-button.png );
+}
+
+ScrollBar-UpButton-Icon[VERTICAL]:hover {
+/* XXX hstaudacher need to be changed to up button when bug 346611 is fixed */
+  background-image: url( theme/img/scrollbar/scrollbar-down-button.png );
+}
+
+ScrollBar-UpButton-Icon[HORIZONTAL] {
+  background-image: url( theme/img/scrollbar/scrollbar-right.png );
+}
+
+ScrollBar-UpButton-Icon[HORIZONTAL]:hover {
+  background-image: url( theme/img/scrollbar/scrollbar-right.png );
+}
+
+ScrollBar-DownButton-Icon[VERTICAL] {
+/* XXX hstaudacher need to be changed to down button when bug 346611 is fixed */
+  background-image: url( theme/img/scrollbar/scrollbar-up-button.png );
+}
+
+ScrollBar-DownButton-Icon[VERTICAL]:hover {
+/* XXX hstaudacher need to be changed to down button when bug 346611 is fixed */
+  background-image: url( theme/img/scrollbar/scrollbar-up-button.png );
+}
+
+ScrollBar-DownButton-Icon[HORIZONTAL] {
+  background-image: url( theme/img/scrollbar/scrollbar-left.png );
+}
+
+ScrollBar-DownButton-Icon[HORIZONTAL]:hover {
+  background-image: url( theme/img/scrollbar/scrollbar-left.png );
+}

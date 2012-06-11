@@ -1,0 +1,33 @@
+Composite.toolbarContainer {
+  background-color: #DDEBF4;
+}
+
+Button.viewButton {
+  background-image: none;
+  color: #000000;
+  padding: 6px 15px;
+  font: 12px Arial, Helvetica, sans-serif; /* not bold */
+}
+
+Button.viewButton:selected, Button.viewButton:selected:hover,
+Button.viewButton:pressed, Button.viewButton:hover {
+  background-image: none;
+}
+
+Button.viewButton-active {
+  background-image: none;
+  background-color: #ffffff;
+  border-radius: 5px 5px 0px 0px;
+  color: #FE9A23;
+  font: bold 12px Arial, Helvetica, sans-serif;
+  padding: 6px 15px;
+}
+
+Button-FocusIndicator.viewButton-active {
+  border: none;
+}
+
+Button.viewButton-active:pressed, Button.viewButton-active:selected,
+Button.viewButton-active:selected:hover, Button.viewButton-active:hover {
+  background-image: none;
+}

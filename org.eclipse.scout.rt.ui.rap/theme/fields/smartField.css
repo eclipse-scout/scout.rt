@@ -48,8 +48,16 @@ Button.smartfield_browse_menu:hover {
   background-image: url( theme/img/button/smartfield_browse_menu_mouse_over.png );
 }
 
+/* Popup (Smartfield...) */
+Shell.popup {
+  border: 2px solid #67a8ce;
+  border-radius: 0px;
+  background-color: #f4f8fc;
+}
+
+/* Popup (Smartfield...) end */
+
 Shell.proposal-form {
-  border: 2px solid #67A8CE;
 }
 
 Composite.proposal-form {

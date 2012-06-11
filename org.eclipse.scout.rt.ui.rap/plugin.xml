@@ -365,6 +365,34 @@
             name="Scout Theme">
       </theme>
       <themeContribution
+            file="theme/fields/busyIndicator.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/button.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/groupBox.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/label.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/menuButton.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/scrollbar.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/shell.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
             file="theme/fields/smartField.css"
             themeId="org.eclipse.scout.rt.ui.rap.theme">
       </themeContribution>
@@ -376,6 +404,30 @@
       <themeContribution
             file="theme/fields/smartField.css"
             themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/tabBox.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/table.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/text.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/tree.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/viewButtonBar.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/viewStackTab.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
       </themeContribution>
   </extension>
 
