@@ -1,7 +1,7 @@
 /* Text */
 Text {
   border: none;
-  padding: 2px 3px;
+  padding: 0px 3px;
   background-image: none;
   color: #464a4e;
   background-color: white;
@@ -9,7 +9,7 @@ Text {
 
 Text:disabled {
   border: none;
-  padding: 2px 3px;
+  padding: 0px 3px;
   background-image: none;
   background-color: #f4f8fc;
   color: #2a5a76;
