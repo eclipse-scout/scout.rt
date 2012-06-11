@@ -1,0 +1,53 @@
+/*Filechooser*/
+Composite.filechooserfield_file {
+  padding: 1px 0px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+
+Composite.filechooserfield_file-disabled {
+  padding: 1px 0px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
+
+Text.filechooserfield_file {
+  background-color: transparent;
+  border-radius: 5px;
+}
+
+Text.filechooserfield_file:disabled {
+  background-color: #f4f8fc;
+}
+
+Text.filechooserfield_file[BORDER]:disabled {
+  background-color: #f4f8fc;
+}
+
+FileUpload.filechooserfield_file {
+  background-image: url( theme/img/button/filechooserfield_file.png );
+  border-radius: 5px;
+  padding: 20px 10px; /* Does not work until following bug is fixed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423 */
+}
+
+FileUpload.filechooserfield_file:hover {
+  background-image: url( theme/img/button/filechooserfield_file.png );
+}
+
+FileUpload.filechooserfield_file:disabled {
+  background-image: url( theme/img/button/filechooserfield_file_disabled.png );
+}
+
+FileUpload.filechooserfield_file_menu {
+  background-image: url( theme/img/button/filechooserfield_file_menu.png );
+  border-radius: 5px;
+  padding: 20px 10px; /* Does not work until following bug is fixed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423 */
+}
+
+FileUpload.filechooserfield_file_menu:hover {
+  background-image: url( theme/img/button/filechooserfield_file_menu.png );
+}
+
+FileUpload.filechooserfield_file_menu:disabled {
+  background-image: url( theme/img/button/filechooserfield_file_menu_disabled.png );
+}

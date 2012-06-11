@@ -373,6 +373,14 @@
             themeId="org.eclipse.scout.rt.ui.rap.theme">
       </themeContribution>
       <themeContribution
+            file="theme/fields/datefield.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/filechooser.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
             file="theme/fields/groupBox.css"
             themeId="org.eclipse.scout.rt.ui.rap.theme">
       </themeContribution>
@@ -406,6 +414,18 @@
       </themeContribution>
       <themeContribution
             file="theme/fields/text.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/timefield.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/toolButtonBar.css"
+            themeId="org.eclipse.scout.rt.ui.rap.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/tooltip.css"
             themeId="org.eclipse.scout.rt.ui.rap.theme">
       </themeContribution>
       <themeContribution
@@ -434,6 +454,14 @@
             themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
       </themeContribution>
       <themeContribution
+            file="theme/fields/datefield.css"
+            themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/filechooser.css"
+            themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
+      </themeContribution>
+      <themeContribution
             file="theme/fields/groupBox.css"
             themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
       </themeContribution>
@@ -467,6 +495,18 @@
       </themeContribution>
       <themeContribution
             file="theme/fields/text.css"
+            themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/timefield.css"
+            themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/toolButtonBar.css"
+            themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
+      </themeContribution>
+      <themeContribution
+            file="theme/fields/tooltip.css"
             themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
       </themeContribution>
       <themeContribution

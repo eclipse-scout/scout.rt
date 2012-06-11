@@ -1,0 +1,36 @@
+/* ToolTip */
+ToolTip {
+  cursor: default;
+  border: 1px solid #a4a4a4;
+  border-radius: 5px 5px 5px 5px;
+  padding: 3px 3px 3px 3px;
+  opacity: 1;
+  color: #000000;
+  background-image : gradient(
+    linear, left top, left bottom,
+    from( #ffffff ),
+    to( #e4e5f0 )
+  );
+  background-color: #fcfcfc;
+  animation: fadeIn 200ms linear, fadeOut 600ms ease-out;
+}
+
+ToolTip-Image[ICON_ERROR] {
+/*   background-image: url( theme/img/tooltip/error.png ); */
+}
+
+ToolTip-Image[ICON_INFORMATION] {
+/*   background-image: url( theme/img/tooltip/information.png ); */
+}
+
+ToolTip-Image[ICON_WARNING] {
+/*   background-image: url( theme/img/tooltip/warning.png ); */
+}
+
+ToolTip-Text {
+  color: #003399;
+}
+
+ToolTip-Message {
+  color: #000000;
+}
