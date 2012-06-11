@@ -87,36 +87,4 @@ public final class LogicalGridDataBuilder {
     return data;
   }
 
-  public static LogicalGridData createButton1() {
-    LogicalGridData data = new LogicalGridData();
-    data.gridx = FIELD_GRID_X + 1;
-    data.gridy = FIELD_GRID_Y;
-    data.heightHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonHeight();
-    data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonWidth();
-    data.fillVertical = false;
-    data.fillHorizontal = false;
-    return data;
-  }
-
-  public static LogicalGridData createButton2() {
-    LogicalGridData data = new LogicalGridData();
-    data.gridx = FIELD_GRID_X + 2;
-    data.gridy = FIELD_GRID_Y;
-    data.heightHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonHeight();
-    data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonWidth();
-    data.fillVertical = false;
-    data.fillHorizontal = false;
-    return data;
-  }
-
-  public static LogicalGridData createSmartButton() {
-    LogicalGridData data = new LogicalGridData();
-    data.gridx = FIELD_GRID_X + 1;
-    data.gridy = FIELD_GRID_Y;
-    data.heightHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonHeight();
-    data.widthHint = UiDecorationExtensionPoint.getLookAndFeel().getFormFieldActivationButtonWithMenuWidth();
-    data.fillVertical = false;
-    data.fillHorizontal = false;
-    return data;
-  }
 }

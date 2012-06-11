@@ -26,11 +26,11 @@ public interface IUiDecoration {
 
   boolean isFormMainBoxBorderVisible();
 
-  int getFormFieldActivationButtonHeight();//XXX not used
+  int getFormFieldLabelWidth();
 
-  int getFormFieldActivationButtonWidth();
+  int getFormFieldLabelAlignment();
 
-  int getFormFieldActivationButtonWithMenuWidth();
+  boolean isFormFieldSelectAllOnFocusEnabled();
 
   String getMandatoryFieldBackgroundColor();
 
@@ -39,8 +39,6 @@ public interface IUiDecoration {
   String getMandatoryLabelTextColor();
 
   FontSpec getMandatoryLabelFont();
-
-  int getFormFieldLabelWidth();
 
   int getLogicalGridLayoutDefaultColumnWidth();
 
@@ -54,9 +52,9 @@ public interface IUiDecoration {
 
   String getColorForegroundDisabled();
 
-  int getFormFieldLabelAlignment();
+  int getTableRowHeight();
 
-  boolean isFormFieldSelectAllOnFocusEnabled();
+  int getTreeNodeHeight();
 
   int getMessageBoxMinHeight();
 

@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
-import org.eclipse.scout.rt.ui.rap.mobile.form.fields.button.RwtScoutMobileButton;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -43,7 +42,6 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements IRwtScoutActionButton {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutActionButton.class);
-  public static final int BUTTON_HEIGHT = RwtScoutMobileButton.BUTTON_HEIGHT;
 
   private ButtonListener m_scoutButtonListener;
   private OptimisticLock m_selectionLock;
@@ -82,10 +80,8 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
     container.setLayout(new LogicalGridLayout(0, 0));
 
     LogicalGridData data = new LogicalGridData();
-    data.useUiHeight = true;
     data.useUiWidth = true;
-    data.heightHint = BUTTON_HEIGHT;
-    data.fillHorizontal = true;
+    data.useUiHeight = false; // make button as height as logical grid row height
     uiButton.setLayoutData(data);
   }
 

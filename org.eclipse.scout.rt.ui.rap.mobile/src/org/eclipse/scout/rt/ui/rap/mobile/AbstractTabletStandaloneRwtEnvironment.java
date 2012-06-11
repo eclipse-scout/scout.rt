@@ -36,6 +36,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
 
 public abstract class AbstractTabletStandaloneRwtEnvironment extends AbstractStandaloneRwtEnvironment {
+  //TODO CGU move to look and feel decoration
   private static final int FORM_HEADER_HEIGHT = 43;
 
   public AbstractTabletStandaloneRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {

@@ -34,6 +34,8 @@ public interface ILookAndFeelProperties {
   String PROP_MESSAGE_BOX_MIN_WIDTH = "messageBox.minWidth";
   String PROP_MESSAGE_BOX_MIN_HEIGHT = "messageBox.minHeight";
   String PROP_DND_SUPPORT_ENABLED = "dndSupport.enabled";
+  String PROP_TABLE_ROW_HEIGHT = "table.row.height";
+  String PROP_TREE_NODE_HEIGHT = "tree.node.height";
 
   int getScope();
 

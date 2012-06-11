@@ -37,6 +37,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   private boolean m_multiline;
   private double[] m_newlines = null;
   private double[] m_htmlTableRows = null;
+  private int m_defaultRowHeight;
 
   public RwtScoutColumnModel(ITable scoutTable, IRwtScoutTableForPatch uiTable, TableColumnManager columnManager) {
     m_scoutTable = scoutTable;
@@ -45,6 +46,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     m_imgCheckboxTrue = getRwtScoutTable().getUiEnvironment().getIcon(RwtIcons.CheckboxYes);
     m_imgCheckboxFalse = getRwtScoutTable().getUiEnvironment().getIcon(RwtIcons.CheckboxNo);
     m_disabledForegroundColor = getRwtScoutTable().getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
+    m_defaultRowHeight = UiDecorationExtensionPoint.getLookAndFeel().getTableRowHeight();
     rebuildCache();
   }
 
@@ -101,7 +103,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         int htmlTableRowRowHeight = NumberUtility.toDouble(NumberUtility.round(medianHtmlTableRows, 1.0)).intValue() * 18;
         if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
             || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTableRowRowHeight) < 0) {
-          table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(23, htmlTableRowRowHeight)).intValue());
+          table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), htmlTableRowRowHeight)).intValue());
         }
       }
       else {
@@ -123,12 +125,16 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         int newLineRowHeight = NumberUtility.toDouble(NumberUtility.round(medianNewlines, 1.0)).intValue() * 15;
         if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
             || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(newLineRowHeight) < 0) {
-          table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(23, newLineRowHeight)).intValue());
+          table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), newLineRowHeight)).intValue());
         }
       }
       return text;
     }
     return "";
+  }
+
+  protected int getDefaultRowHeight() {
+    return m_defaultRowHeight;
   }
 
   public Image getColumnImage(ITableRow element, int columnIndex) {

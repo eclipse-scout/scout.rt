@@ -24,21 +24,21 @@
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -95,7 +95,7 @@ If no value is specified the properties are valid for all device types.
          <attribute name="name" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
             <simpleType>
@@ -107,12 +107,6 @@ If no value is specified the properties are valid for all device types.
                   <enumeration value="dialog.minHeight">
                   </enumeration>
                   <enumeration value="dndSupport.enabled">
-                  </enumeration>
-                  <enumeration value="formfield.activationButton.width">
-                  </enumeration>
-                  <enumeration value="formfield.activationButtonWithMenu.width">
-                  </enumeration>
-                  <enumeration value="formfield.activationButton.height">
                   </enumeration>
                   <enumeration value="formfield.selectAllOnFocus.enabled">
                   </enumeration>
@@ -142,13 +136,17 @@ If no value is specified the properties are valid for all device types.
                   </enumeration>
                   <enumeration value="processButton.maxWidth">
                   </enumeration>
+                  <enumeration value="table.row.height">
+                  </enumeration>
+                  <enumeration value="tree.node.height">
+                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>
          <attribute name="value" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
@@ -213,7 +211,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="color" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
@@ -225,7 +223,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="color" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
@@ -237,7 +235,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="font" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
@@ -249,7 +247,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="placement" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
             <simpleType>
@@ -269,7 +267,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="enum" type="string" use="default" value="org.eclipse.scout.rt.shared.ui.UiDeviceType">
             <annotation>
                <documentation>
-
+                  
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.shared.ui.IUiDeviceType"/>
@@ -279,7 +277,7 @@ If no value is specified the decorations are valid for all device types.
          <attribute name="enumValue" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>

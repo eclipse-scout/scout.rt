@@ -26,9 +26,6 @@ public class UiDecoration implements IUiDecoration {
   private int m_dialogMinWidth;
   private int m_dialogMinHeight;
   private boolean m_formMainBoxBorderVisible = false;
-  private int m_formFieldActivationButtonHeight;
-  private int m_formFieldActivationButtonWidth;
-  private int m_formFieldActivationButtonWithMenuWidth;
   private int m_formFieldLabelWidth;
   private boolean m_formFieldSelectAllOnFocusEnabled;
   private int m_logicalGridLayoutDefaultColumnWidth;
@@ -44,6 +41,8 @@ public class UiDecoration implements IUiDecoration {
   private int m_messageBoxMinHeight = 100;
   private int m_toolFormMinWidth = 330;
   private boolean m_dndSupportEnabled;
+  private int m_tableRowHeight = -1;
+  private int m_treeNodeHeight = -1;
 
   /**
    * one of SWT.RIGHT SWT.LEFT SWT.CENTER
@@ -106,33 +105,6 @@ public class UiDecoration implements IUiDecoration {
    */
   public void setFormMainBoxBorderVisible(boolean formMainBoxBorderVisible) {
     m_formMainBoxBorderVisible = formMainBoxBorderVisible;
-  }
-
-  @Override
-  public int getFormFieldActivationButtonHeight() {
-    return m_formFieldActivationButtonHeight;
-  }
-
-  public void setFormFieldActivationButtonHeight(int formFieldActivationButtonHeight) {
-    m_formFieldActivationButtonHeight = formFieldActivationButtonHeight;
-  }
-
-  @Override
-  public int getFormFieldActivationButtonWidth() {
-    return m_formFieldActivationButtonWidth;
-  }
-
-  public void setFormFieldActivationButtonWidth(int formFieldActivationButtonWidth) {
-    m_formFieldActivationButtonWidth = formFieldActivationButtonWidth;
-  }
-
-  @Override
-  public int getFormFieldActivationButtonWithMenuWidth() {
-    return m_formFieldActivationButtonWithMenuWidth;
-  }
-
-  public void setFormFieldActivationButtonWithMenuWidth(int formFieldActivationButtonWithMenuWidth) {
-    m_formFieldActivationButtonWithMenuWidth = formFieldActivationButtonWithMenuWidth;
   }
 
   @Override
@@ -286,6 +258,24 @@ public class UiDecoration implements IUiDecoration {
 
   public void setFormFieldSelectAllOnFocusEnabled(boolean formFieldSelectAllOnFocusEnabled) {
     m_formFieldSelectAllOnFocusEnabled = formFieldSelectAllOnFocusEnabled;
+  }
+
+  @Override
+  public int getTableRowHeight() {
+    return m_tableRowHeight;
+  }
+
+  public void setTableRowHeight(int tableRowHeight) {
+    m_tableRowHeight = tableRowHeight;
+  }
+
+  @Override
+  public int getTreeNodeHeight() {
+    return m_treeNodeHeight;
+  }
+
+  public void setTreeNodeHeight(int treeNodeHeight) {
+    m_treeNodeHeight = treeNodeHeight;
   }
 
 }

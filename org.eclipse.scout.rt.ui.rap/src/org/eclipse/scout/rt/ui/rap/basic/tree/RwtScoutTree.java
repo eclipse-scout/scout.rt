@@ -27,6 +27,7 @@ import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -111,6 +112,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     m_contextMenu = new Menu(viewer.getTree().getShell(), SWT.POP_UP);
     m_contextMenu.addMenuListener(new P_ContextMenuListener());
     viewer.getTree().setMenu(m_contextMenu);
+    initNodeHeight();
   }
 
   protected TreeViewer createTreeModel(Composite parent) {
@@ -173,6 +175,13 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
   @Override
   public TreeEx getUiField() {
     return (TreeEx) super.getUiField();
+  }
+  
+  protected void initNodeHeight() {
+    int height = UiDecorationExtensionPoint.getLookAndFeel().getTreeNodeHeight();
+    if (height >= 0) {
+      getUiField().setData(RWT.CUSTOM_ITEM_HEIGHT, height);
+    }
   }
 
   @Override

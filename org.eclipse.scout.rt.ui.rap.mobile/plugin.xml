@@ -45,15 +45,6 @@
       </formField>
       <formField
             active="true"
-            modelClass="org.eclipse.scout.rt.client.ui.form.fields.button.IButton"
-            name="Mobile button field"
-            scope="global">
-         <factory
-               class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.button.MobileButtonFieldFactory">
-         </factory>
-      </formField>
-      <formField
-            active="true"
             modelClass="org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox"
             name="Mobile group box"
             scope="global">
@@ -94,6 +85,18 @@
             scope="default">
          <property
                name="logicalGridLayout.rowHeight"
+               value="28">
+         </property>
+         <property
+               name="processButton.height"
+               value="28">
+         </property>
+         <property
+               name="table.row.height"
+               value="28">
+         </property>
+         <property
+               name="tree.node.height"
                value="28">
          </property>
          <property

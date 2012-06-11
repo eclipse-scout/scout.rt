@@ -179,15 +179,6 @@ public final class UiDecorationExtensionPoint {
       if (props.existsProperty(ILookAndFeelProperties.PROP_FORM_MAINBOX_BORDER_VISIBLE)) {
         uiDecoration.setFormMainBoxBorderVisible(props.getPropertyBool(ILookAndFeelProperties.PROP_FORM_MAINBOX_BORDER_VISIBLE));
       }
-      if (props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_HEIGHT) != 0) {
-        uiDecoration.setFormFieldActivationButtonHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_HEIGHT));
-      }
-      if (props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WIDTH) != 0) {
-        uiDecoration.setFormFieldActivationButtonWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WIDTH));
-      }
-      if (props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WITH_MENU_WIDTH) != 0) {
-        uiDecoration.setFormFieldActivationButtonWithMenuWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_ACTIVATION_BUTTON_WITH_MENU_WIDTH));
-      }
       if (props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_LABEL_WIDTH) != 0) {
         uiDecoration.setFormFieldLabelWidth(props.getPropertyInt(ILookAndFeelProperties.PROP_FORM_FIELD_LABEL_WIDTH));
       }
@@ -244,6 +235,12 @@ public final class UiDecorationExtensionPoint {
       }
       if (props.getPropertyString(ILookAndFeelProperties.PROP_DND_SUPPORT_ENABLED) != null) {
         uiDecoration.setDndSupportEnabled(props.getPropertyBool(ILookAndFeelProperties.PROP_DND_SUPPORT_ENABLED));
+      }
+      if (props.getPropertyString(ILookAndFeelProperties.PROP_TABLE_ROW_HEIGHT) != null) {
+        uiDecoration.setTableRowHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_TABLE_ROW_HEIGHT));
+      }
+      if (props.getPropertyString(ILookAndFeelProperties.PROP_TREE_NODE_HEIGHT) != null) {
+        uiDecoration.setTreeNodeHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_TREE_NODE_HEIGHT));
       }
 
     }

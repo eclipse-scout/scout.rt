@@ -311,18 +311,6 @@
               value="130">
         </property>
         <property
-              name="formfield.activationButton.width"
-              value="21">
-        </property>
-        <property
-              name="formfield.activationButton.height"
-              value="23">
-        </property>
-        <property
-              name="formfield.activationButtonWithMenu.width"
-              value="21">
-        </property>
-        <property
               name="formMainBoxBorder.visible"
               value="false">
         </property>
@@ -353,6 +341,14 @@
         <property
               name="dndSupport.enabled"
               value="true">
+        </property>
+        <property
+              name="table.row.height"
+              value="23">
+        </property>
+        <property
+              name="tree.node.height"
+              value="23">
         </property>
       </properties>
   </extension>
