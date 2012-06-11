@@ -458,7 +458,7 @@ public class ClientUIPreferences {
         m_env.remove(TABLE_COLUMN_SORT_EXPLICIT + keySuffix);
       }
       if (widths) {
-        m_env.remove(TABLE_COLUMN_WIDTH + keySuffix);
+        m_env.remove(getUserAgentPrefix() + TABLE_COLUMN_WIDTH + keySuffix);
       }
 
       if (flush) {
