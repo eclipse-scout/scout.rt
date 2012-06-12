@@ -194,6 +194,10 @@ public class MobileTable extends AbstractTable {
     return getColumnSet().getColumnByClass(ContentColumn.class);
   }
 
+  public SortColumn getSortColumn() {
+    return getColumnSet().getColumnByClass(SortColumn.class);
+  }
+
   public RowMapColumn getRowMapColumn() {
     return getColumnSet().getColumnByClass(RowMapColumn.class);
   }
@@ -212,6 +216,16 @@ public class MobileTable extends AbstractTable {
     @Override
     protected void execDecorateHeaderCell(HeaderCell cell) throws ProcessingException {
       cell.setText(m_headerName);
+    }
+
+  }
+
+  @Order(30.0)
+  public class SortColumn extends AbstractStringColumn {
+
+    @Override
+    protected boolean getConfiguredDisplayable() {
+      return false;
     }
 
     @Override
@@ -266,7 +280,7 @@ public class MobileTable extends AbstractTable {
       setTableChanging(true);
       for (ITableRow insertedRow : rows) {
         try {
-          addRowByArray(new Object[]{insertedRow, ""});
+          addRowByArray(new Object[]{insertedRow, "", ""});
           updateSummaryColumn(insertedRow);
         }
         catch (ProcessingException exception) {
@@ -319,7 +333,7 @@ public class MobileTable extends AbstractTable {
       return;
     }
 
-    getContentColumn().setValue(mobileTableRow, computeContentColumnValue(row));
+    getContentColumn().setValue(mobileTableRow, computeContentColumnValue(mobileTableRow));
   }
 
   /**
@@ -386,11 +400,11 @@ public class MobileTable extends AbstractTable {
     }
   }
 
-  private String computeContentColumnValue(ITableRow row) {
-    if (row == null) {
+  private String computeContentColumnValue(ITableRow mobileTableRow) throws ProcessingException {
+    if (mobileTableRow == null) {
       return null;
     }
-
+    ITableRow row = getRowMapColumn().getValue(mobileTableRow);
     String cellHeaderText = getCellHeaderText(row.getRowIndex());
 
     //Don't generate cell content if the only column contains html.
@@ -408,8 +422,9 @@ public class MobileTable extends AbstractTable {
 
     String output = m_htmlCellTemplate.replace("#ICON#", createCellIcon(row));
     output = output.replace("#CONTENT#", content);
-    output = output.replace("#CONTENT_PADDING_RIGHT#", createCellContentPadding());
     output = output.replace("#DRILL_DOWN#", createCellDrillDown());
+
+    getSortColumn().setValue(mobileTableRow, content);
 
     return output;
   }
