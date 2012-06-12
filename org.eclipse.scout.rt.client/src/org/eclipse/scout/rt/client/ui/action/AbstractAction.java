@@ -403,6 +403,9 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     IAction temp = this;
     while (temp instanceof IActionNode) {
       temp = ((IActionNode) temp).getParent();
+      if (temp == null) {
+        return true;
+      }
       if (!temp.isEnabled()) {
         return false;
       }
@@ -457,6 +460,9 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     IAction temp = this;
     while (temp instanceof IActionNode) {
       temp = ((IActionNode) temp).getParent();
+      if (temp == null) {
+        return true;
+      }
       if (!temp.isVisible()) {
         return false;
       }
