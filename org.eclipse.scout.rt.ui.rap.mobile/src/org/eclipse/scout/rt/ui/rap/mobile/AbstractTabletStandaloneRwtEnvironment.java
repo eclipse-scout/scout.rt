@@ -22,9 +22,11 @@ import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileForm;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileFormHeader;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileOutlineFormHeader;
+import org.eclipse.scout.rt.ui.rap.mobile.window.MobileBrowserWindowHandler;
 import org.eclipse.scout.rt.ui.rap.mobile.window.desktop.RwtScoutMobileDesktop;
 import org.eclipse.scout.rt.ui.rap.mobile.window.dialog.RwtScoutMobileDialog;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.scout.rt.ui.rap.window.BrowserWindowHandler;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
@@ -87,6 +89,11 @@ public abstract class AbstractTabletStandaloneRwtEnvironment extends AbstractSta
   @Override
   protected MobileScoutFormToolkit createScoutFormToolkit(Display display) {
     return new MobileScoutFormToolkit(new FormToolkit(display));
+  }
+
+  @Override
+  protected BrowserWindowHandler createBrowserWindowHandler() {
+    return new MobileBrowserWindowHandler();
   }
 
 }
