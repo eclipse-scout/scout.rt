@@ -75,11 +75,17 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
         MobileTable wrapperTable = new MobileTable();
-        String headerName = createColumnHeaderName(table);
-        wrapperTable.setHeaderName(headerName);
-        wrapperTable.setDrillDownPossible(computeDrillDownColumnVisibility());
-        wrapperTable.installWrappedTable(table);
-
+        try {
+          wrapperTable.setTableChanging(true);
+          String headerName = createColumnHeaderName(table);
+          wrapperTable.setHeaderName(headerName);
+          wrapperTable.setDrillDownPossible(computeDrillDownColumnVisibility());
+          wrapperTable.installWrappedTable(table);
+          wrapperTable.initTable();
+        }
+        finally {
+          wrapperTable.setTableChanging(false);
+        }
         holder.setValue(wrapperTable);
       }
     };

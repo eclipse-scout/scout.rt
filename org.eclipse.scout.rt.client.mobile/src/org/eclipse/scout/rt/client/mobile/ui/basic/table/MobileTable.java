@@ -133,6 +133,7 @@ public class MobileTable extends AbstractTable {
     setCheckable(wrappedTable.isCheckable());
     setMultiCheck(wrappedTable.isMultiCheck());
     setEnabled(wrappedTable.isEnabled());
+    setSortEnabled(wrappedTable.isSortEnabled());
 
     m_eventListener.initalizeWith(wrappedTable);
     m_originalTable.addTableListener(m_eventListener);
@@ -207,15 +208,17 @@ public class MobileTable extends AbstractTable {
 
   @Order(20.0)
   public class ContentColumn extends AbstractStringColumn {
-    @Override
-    protected boolean getConfiguredTextWrap() {
-      return true;
-    }
 
     @Override
     protected void execDecorateHeaderCell(HeaderCell cell) throws ProcessingException {
       cell.setText(m_headerName);
     }
+
+    @Override
+    protected int getConfiguredSortIndex() {
+      return 0;
+    }
+
   }
 
   @Override

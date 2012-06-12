@@ -106,6 +106,11 @@ public class OutlineChooserForm extends AbstractForm {
           return true;
         }
 
+        @Override
+        protected boolean getConfiguredSortEnabled() {
+          return false;
+        }
+
         public LabelColumn getLableColumn() {
           return getColumnSet().getColumnByClass(LabelColumn.class);
         }
