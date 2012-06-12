@@ -72,6 +72,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private final int m_uiProcessorCount = 0;
   private IKeyStroke[] m_baseKeyStrokes;
   private IEventHistory<TreeEvent> m_eventHistory;
+  // only do one action at a time
+  private boolean m_actionRunning;
 
   public AbstractTree() {
     if (DesktopProfiler.getInstance().isEnabled()) {
@@ -79,6 +81,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
     m_deletedNodes = new HashMap<Object, ITreeNode>();
     m_nodeFilters = new ArrayList<ITreeNodeFilter>(1);
+    m_actionRunning = false;
     initConfig();
   }
 
@@ -1988,17 +1991,25 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private void fireNodeAction(ITreeNode node) {
-    if (node != null) {
-      if (node.isLeaf()) {
-        try {
-          execNodeAction(node);
+    if (!m_actionRunning) {
+      try {
+        m_actionRunning = true;
+        if (node != null) {
+          if (node.isLeaf()) {
+            try {
+              execNodeAction(node);
+            }
+            catch (ProcessingException ex) {
+              SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+            }
+            catch (Throwable t) {
+              SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+            }
+          }
         }
-        catch (ProcessingException ex) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
-        }
-        catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
-        }
+      }
+      finally {
+        m_actionRunning = false;
       }
     }
   }
@@ -2234,9 +2245,17 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void doHyperlinkAction(ITreeNode node, URL url) throws ProcessingException {
-    if (node != null) {
-      selectNode(node);
-      execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
+    if (!m_actionRunning) {
+      try {
+        m_actionRunning = true;
+        if (node != null) {
+          selectNode(node);
+          execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
+        }
+      }
+      finally {
+        m_actionRunning = false;
+      }
     }
   }
 

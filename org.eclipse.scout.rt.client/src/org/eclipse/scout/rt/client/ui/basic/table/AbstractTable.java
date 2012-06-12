@@ -132,6 +132,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private ITableColumnFilterManager m_columnFilterManager;
   private ITableCustomizer m_tableCustomizer;
   private IEventHistory<TableEvent> m_eventHistory;
+  // only do one action at a time
+  private boolean m_actionRunning;
 
   public AbstractTable() {
     this(true);
@@ -148,6 +150,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_keyStrokeBuffer = new KeyStrokeBuffer(500L);
     m_rowFilters = new ArrayList<ITableRowFilter>(1);
     m_initLock = new OptimisticLock();
+    m_actionRunning = false;
     //add single observer listener
     addTableListener(new P_TableListener());
     if (callInitializer) {
@@ -973,13 +976,21 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void doHyperlinkAction(ITableRow row, IColumn<?> col, URL url) throws ProcessingException {
-    if (row != null) {
-      selectRow(row);
+    if (!m_actionRunning) {
+      try {
+        m_actionRunning = true;
+        if (row != null) {
+          selectRow(row);
+        }
+        if (col != null) {
+          setContextColumn(col);
+        }
+        execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals(LOCAL_URL_HOST));
+      }
+      finally {
+        m_actionRunning = false;
+      }
     }
-    if (col != null) {
-      setContextColumn(col);
-    }
-    execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals(LOCAL_URL_HOST));
   }
 
   @Override
@@ -3567,15 +3578,23 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void fireRowAction(ITableRow row) {
-    if (row != null) {
+    if (!m_actionRunning) {
       try {
-        execRowAction(row);
+        m_actionRunning = true;
+        if (row != null) {
+          try {
+            execRowAction(row);
+          }
+          catch (ProcessingException ex) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+          }
+          catch (Throwable t) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+          }
+        }
       }
-      catch (ProcessingException ex) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
-      }
-      catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      finally {
+        m_actionRunning = false;
       }
     }
   }
