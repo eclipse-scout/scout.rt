@@ -2012,3 +2012,87 @@ Button.formTabActivate-active:hover {
 Button-FocusIndicator.formTabActivate-active {
   border: none;
 }
+Composite.mobileViewsArea {
+  background-color: #FFFFFF;
+  padding: 0px 0px 0px 0px;
+}
+Composite.mobileFormHeader {
+  background-color: #67a8ce;
+}
+CLabel.actionBarContainer {
+  color: white;
+  font: bold 17px Arial, Helvetica, sans-serif;
+  background-color: transparent;
+}
+Composite.mobileTableActionBarContainer {
+  background-image: gradient(linear, left top, left bottom, from(#ddebf4), to(#d4e1e7));
+}
+Button.mobile-datechooser-dialog-last-year,
+Button.mobile-datechooser-dialog-last-year:hover {
+  background-image: url(theme/img/datetime/last-year_30x30.png);
+  border-radius: 5px;
+}
+Button.mobile-datechooser-dialog-last-month,
+Button.mobile-datechooser-dialog-last-month:hover {
+  background-image: url(theme/img/datetime/last-month_30x30.png);
+  border-radius: 5px;
+}
+Button.mobile-datechooser-dialog-next-year,
+Button.mobile-datechooser-dialog-next-year:hover {
+  background-image: url(theme/img/datetime/next-year_30x30.png);
+  border-radius: 5px;
+}
+Button.mobile-datechooser-dialog-next-month,
+Button.mobile-datechooser-dialog-next-month:hover {
+  background-image: url(theme/img/datetime/next-month_30x30.png);
+  border-radius: 5px;
+}
+Button[PUSH]:hover,
+Button[TOGGLE]:hover {
+  background-image: gradient(linear, left top, left bottom, from(#fe9915), to(#be7414));
+}
+/* Copy from scout.less. Unfortunately setting the background-image of the Button also overrides the background-image of the datefield buttons although it's defined in scout.less.*/
+Button.datefield[PUSH]:hover {
+  background-image: url(theme/img/button/datefield_date_mouse_over.png);
+}
+Button.timefield[PUSH]:hover {
+  background-image: url(theme/img/button/datefield_time_mouse_over.png);
+}
+Button-FocusIndicator[PUSH],
+Button-FocusIndicator[TOGGLE] {
+  background-color: transparent;
+  background-image: none;
+  border: 0px;
+}
+Button-FocusIndicator[CHECK] {
+  background-color: transparent;
+  background-image: none;
+  border: 0px;
+}
+Button-FocusIndicator[RADIO] {
+  background-color: transparent;
+  background-image: none;
+  border: 0px;
+}
+Composite.smartfield:hover {
+  background-color: #f1f8fe;
+}
+Composite.datefield:hover {
+  background-color: #f1f8fe;
+}
+Composite.timefield:hover {
+  background-color: #f1f8fe;
+}
+ScrollBar {
+  width: 0px;
+}
+Shell[BORDER] {
+  box-shadow: 5px 5px 4px 0px #3f3f3f;
+  animation: none;
+}
+Shell-DisplayOverlay {
+  animation: none;
+  background-image: none;
+  background-color: #565656;
+  opacity: 0.5;
+}

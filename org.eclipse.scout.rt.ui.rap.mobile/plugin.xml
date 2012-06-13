@@ -72,13 +72,6 @@
       </formField>
    </extension>
    <extension
-         point="org.eclipse.rap.ui.themes">
-      <themeContribution
-            file="theme/scout.mobile.css"
-            themeId="org.eclipse.scout.rt.ui.rap.mobile.theme">
-      </themeContribution>
-   </extension>
-   <extension
          point="org.eclipse.scout.rt.ui.rap.lookAndFeel">
       <properties
             deviceType="touch"
