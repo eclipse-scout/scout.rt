@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  <extension
+        point="org.eclipse.rap.ui.themes">
+      <theme
+            file="theme/scout.mobile.css"
+            id="org.eclipse.scout.rt.ui.rap.mobile.theme"
+            name="Scout Mobile Theme">
+      </theme>
+  </extension>
+</plugin>
