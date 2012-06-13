@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Rayo Mobile Theme in Scout
+Bundle-SymbolicName: org.eclipse.scout.rt.ui.rap.theme.rayo.mobile
+Bundle-Version: 3.8.0.qualifier
+Fragment-Host: org.eclipse.scout.rt.ui.rap.theme.rayo;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
