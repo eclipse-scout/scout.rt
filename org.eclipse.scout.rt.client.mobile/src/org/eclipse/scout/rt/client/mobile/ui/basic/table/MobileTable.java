@@ -135,6 +135,11 @@ public class MobileTable extends AbstractTable {
     setEnabled(wrappedTable.isEnabled());
     setSortEnabled(wrappedTable.isSortEnabled());
 
+    //Do not modify the sorting if it's only one column because it's probably already ok
+    if (wrappedTable.getVisibleColumnCount() > 1) {
+      getSortColumn().setInitialSortIndex(0);
+    }
+
     m_eventListener.initalizeWith(wrappedTable);
     m_originalTable.addTableListener(m_eventListener);
   }
@@ -226,11 +231,6 @@ public class MobileTable extends AbstractTable {
     @Override
     protected boolean getConfiguredDisplayable() {
       return false;
-    }
-
-    @Override
-    protected int getConfiguredSortIndex() {
-      return 0;
     }
 
   }
@@ -424,7 +424,9 @@ public class MobileTable extends AbstractTable {
     output = output.replace("#CONTENT#", content);
     output = output.replace("#DRILL_DOWN#", createCellDrillDown());
 
-    getSortColumn().setValue(mobileTableRow, content);
+    if (getSortColumn().getInitialSortIndex() > -1) {
+      getSortColumn().setValue(mobileTableRow, content);
+    }
 
     return output;
   }
