@@ -130,7 +130,7 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
   protected List<Integer> getRelevantSystemTypesForLeftBar() {
     List<Integer> systemTypesToConsider = new LinkedList<Integer>();
     systemTypesToConsider.add(IButton.SYSTEM_TYPE_CANCEL);
-
+    systemTypesToConsider.add(IButton.SYSTEM_TYPE_CLOSE);
     return systemTypesToConsider;
   }
 
