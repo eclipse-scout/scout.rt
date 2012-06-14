@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 
 import org.eclipse.rwt.RWT;
+import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.resources.IResourceManager;
 import org.eclipse.rwt.service.IServiceHandler;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -36,7 +37,7 @@ import org.eclipse.swt.browser.LocationEvent;
  * Adding support for registering/unregistering (publishing) local resources.
  * 
  * @author imo
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public class BrowserExtension {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BrowserExtension.class);
@@ -62,8 +63,13 @@ public class BrowserExtension {
     return m_serviceHandlerId;
   }
 
+  private String getUiCallbackId() {
+    return String.valueOf(hashCode());
+  }
+
   public void attach() {
     if (m_serviceHandler == null) {
+      UICallBack.activate(getUiCallbackId());
       m_serviceHandler = new IServiceHandler() {
         @Override
         public void service() throws IOException, ServletException {
@@ -79,6 +85,7 @@ public class BrowserExtension {
   }
 
   public void detach() {
+    UICallBack.deactivate(getUiCallbackId());
     clearLocalHyperlinkCache();
     clearResourceCache();
     if (m_serviceHandler != null) {
