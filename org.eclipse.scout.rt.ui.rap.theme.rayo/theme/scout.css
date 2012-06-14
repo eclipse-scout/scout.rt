@@ -1015,6 +1015,11 @@ Composite.groupBoxWithLineFrame {
   padding: 6px 12px 6px 12px;
   border: none;
 }
+Composite.groupBoxWithLineFrameContainer {
+  /* Little padding above the label */
+
+  padding: 6px 0px 0px 0px;
+}
 Label.GroupBoxLine {
   background-color: #9cc1da;
 }

@@ -43,6 +43,7 @@ import org.eclipse.ui.forms.widgets.Section;
 public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implements IRwtScoutGroupBox {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutGroupBox.class);
 
+  static final String VARIANT_GROUP_BOX_WITH_LINE_FRAME_CONTAINER = "groupBoxWithLineFrameContainer";
   static final String VARIANT_GROUP_BOX_WITH_LINE_FRAME = "groupBoxWithLineFrame";
   static final String VARIANT_LABEL = "GroupBoxLabel";
   static final String VARIANT_LINE = "GroupBoxLine";
@@ -79,11 +80,11 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
     Composite rootPane = createContainer(parent);
     if (getScoutObject().isScrollable()) {
       m_scrolledForm = getUiEnvironment().getFormToolkit().createScrolledFormEx(rootPane, SWT.V_SCROLL);
-      
-      //Mainly necessary to better support finger scrolling. 
+
+      //Mainly necessary to better support finger scrolling.
       //If the flag is not set rap tries to scroll to the top of the page. This makes scrolling of scrolled composites or listboxes impossible if they are located inside a form (not fullscreen).
       m_scrolledForm.setShowFocusedControl(true);
-      
+
       GridData bodyData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL);
       bodyData.horizontalIndent = 0;
       bodyData.verticalIndent = 0;
@@ -210,6 +211,7 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
       }
       else if (IGroupBox.BORDER_DECORATION_LINE.equals(m_borderDecoration.decoration)) {
         Composite groupComp = getUiEnvironment().getFormToolkit().createComposite(parent, SWT.NONE);
+        groupComp.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_GROUP_BOX_WITH_LINE_FRAME_CONTAINER);
         m_label = getUiEnvironment().getFormToolkit().createLabel(groupComp, "", SWT.NONE);
         m_label.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_LABEL);
         m_line = getUiEnvironment().getFormToolkit().createLabel(groupComp, "", SWT.NONE);
