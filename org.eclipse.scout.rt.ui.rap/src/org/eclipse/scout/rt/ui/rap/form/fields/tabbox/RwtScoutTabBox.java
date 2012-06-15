@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.RunnableWithData;
@@ -186,7 +185,6 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
     }
     finally {
       m_selectedTabLock.release();
-      UICallBack.deactivate(getScoutObject().getClass().getName() + getScoutObject().hashCode());
     }
   }
 

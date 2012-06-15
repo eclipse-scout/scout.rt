@@ -421,7 +421,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob == null) {
         m_pendingProposalJob = new P_PendingProposalJob();
-//        UICallBack.activate(m_pendingProposalJob.getClass().getName() + m_pendingProposalJob.hashCode());
       }
       else {
         m_pendingProposalJob.cancel();
@@ -434,7 +433,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   private void acceptProposalFromUi() {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
-//        UICallBack.deactivate(m_pendingProposalJob.getClass().getName() + m_pendingProposalJob.hashCode());
         m_pendingProposalJob.cancel();
         m_pendingProposalJob = null;
       }

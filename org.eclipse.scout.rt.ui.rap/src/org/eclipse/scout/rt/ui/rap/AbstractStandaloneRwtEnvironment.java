@@ -59,8 +59,9 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
       }
       setSubject(subject);
     }
-    //if not a tablet or mobile device open callback channel
     if (RwtUtility.getBrowserInfo().isDesktop()) {
+      //Necessary for client notifications. Disabled on mobile devices to avoid having a constant circle of doom.
+      //TODO: Make it dependent on client notification enabled state. Should actually also be enabled for mobile devices so that client notifications works.
       UICallBack.activate(getClass().getName() + getClass().hashCode());
     }
     m_display = Display.getDefault();

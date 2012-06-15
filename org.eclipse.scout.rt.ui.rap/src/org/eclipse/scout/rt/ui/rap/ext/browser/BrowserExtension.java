@@ -64,7 +64,7 @@ public class BrowserExtension {
   }
 
   private String getUiCallbackId() {
-    return String.valueOf(hashCode());
+    return getClass().getName() + "" + hashCode();
   }
 
   public void attach() {
