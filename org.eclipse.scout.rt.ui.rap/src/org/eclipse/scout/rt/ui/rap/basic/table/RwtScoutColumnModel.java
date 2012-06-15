@@ -95,7 +95,13 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
             m_htmlTableRows = tempArray;
           }
           else {
-            System.arraycopy(m_htmlTableRows, 0, tempArray, 0, m_htmlTableRows.length);
+            getRwtScoutTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+              @Override
+              public void run() {
+                getRwtScoutTable().getUiTableViewer().refresh();
+              }
+            });
+            m_htmlTableRows = tempArray;
           }
         }
         m_htmlTableRows[((ITableRow) element).getRowIndex()] = HtmlTextUtility.countHtmlTableRows(text);
@@ -116,7 +122,12 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
             m_newlines = tempArray;
           }
           else {
-            System.arraycopy(m_newlines, 0, tempArray, 0, m_newlines.length);
+            getRwtScoutTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+              @Override
+              public void run() {
+                getRwtScoutTable().getUiTableViewer().refresh();
+              }
+            });
             m_newlines = tempArray;
           }
         }
