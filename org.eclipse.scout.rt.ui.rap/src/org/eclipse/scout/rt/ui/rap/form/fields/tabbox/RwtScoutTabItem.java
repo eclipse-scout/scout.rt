@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.tabbox;
 
-import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
@@ -170,8 +169,8 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     }
     else {
       if (oldVariant == m_variantActiveMarked) {
-    tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantActive);
-  }
+        tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantActive);
+      }
       else if (oldVariant == m_variantInActiveMarked) {
         tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActive);
       }
@@ -183,7 +182,6 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
 
   protected void handleUiSelection() {
     //notify Scout
-    UICallBack.activate(m_scoutParentObject.getClass().getName() + m_scoutParentObject.hashCode());
     Runnable t = new Runnable() {
       @Override
       public void run() {

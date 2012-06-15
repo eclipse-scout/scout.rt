@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -264,7 +263,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   protected void setProposalFormFromScout(ISmartFieldProposalForm form) {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
-        UICallBack.deactivate(m_pendingProposalJob.getClass().getName() + m_pendingProposalJob.hashCode());
+//        UICallBack.deactivate(m_pendingProposalJob.getClass().getName() + m_pendingProposalJob.hashCode());
         m_pendingProposalJob.cancel();
         m_pendingProposalJob = null;
       }
@@ -422,7 +421,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob == null) {
         m_pendingProposalJob = new P_PendingProposalJob();
-        UICallBack.activate(m_pendingProposalJob.getClass().getName() + m_pendingProposalJob.hashCode());
+//        UICallBack.activate(m_pendingProposalJob.getClass().getName() + m_pendingProposalJob.hashCode());
       }
       else {
         m_pendingProposalJob.cancel();
@@ -435,7 +434,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   private void acceptProposalFromUi() {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
-        UICallBack.deactivate(m_pendingProposalJob.getClass().getName() + m_pendingProposalJob.hashCode());
+//        UICallBack.deactivate(m_pendingProposalJob.getClass().getName() + m_pendingProposalJob.hashCode());
         m_pendingProposalJob.cancel();
         m_pendingProposalJob = null;
       }

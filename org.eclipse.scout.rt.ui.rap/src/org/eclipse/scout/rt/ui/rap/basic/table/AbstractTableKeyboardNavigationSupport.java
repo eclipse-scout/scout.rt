@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -115,7 +114,6 @@ public abstract class AbstractTableKeyboardNavigationSupport {
         else {
           m_navigationJob = new P_NavigationJob();
         }
-        UICallBack.activate(m_uiTable.getClass().getName() + m_uiTable.hashCode());
         m_navigationJob.schedule(300L);
         m_timeoutTimestamp = System.currentTimeMillis() + m_delay;
       }
@@ -161,7 +159,6 @@ public abstract class AbstractTableKeyboardNavigationSupport {
             break;
           }
         }
-        UICallBack.deactivate(m_uiTable.getClass().getName() + m_uiTable.hashCode());
       }
     });
   }
