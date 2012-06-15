@@ -31,14 +31,14 @@ import org.eclipse.scout.service.IService;
  * <dictionary>sc_dict_ge-ch_02.tlx</dictionary>
  * <dictionary>sc_dict_ge-de_03.clx</dictionary> <option
  * id="ALLOW_ACCENTED_CAPS_OPT">true</option> <option
- * id="SPLIT_CONTRACTED_WORDS">false</option> <option
+ * id="SPLIT_CONTRACTED_WORDS_OPT">false</option> <option
  * id="STRIP_POSSESSIVES_OPT">true</option> <option
  * id="SPLIT_WORDS_OPT">true</option> </language> <language id="de_AT">
  * <dictionary>sc_dict_ge-at_01.tlx</dictionary>
  * <dictionary>sc_dict_ge-at_02.tlx</dictionary>
  * <dictionary>sc_dict_ge-de_03.clx</dictionary> <option
  * id="ALLOW_ACCENTED_CAPS_OPT">true</option> <option
- * id="SPLIT_CONTRACTED_WORDS" >false</option> <option
+ * id="SPLIT_CONTRACTED_WORDS_OPT" >false</option> <option
  * id="STRIP_POSSESSIVES_OPT" >true</option> <option id="SPLIT_WORDS_OPT"
  * >true</option> </language> </spellchecker> </xmp>
  */
