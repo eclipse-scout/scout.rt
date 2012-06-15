@@ -1618,7 +1618,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           public boolean visitField(IFormField field, int level, int fieldIndex) {
             if (field instanceof IButton) {
               IButton b = (IButton) field;
-              if (b.isEnabled() && b.isVisible()) {
+              if (b.isEnabled() && b.isVisible() && b.isEnabledProcessingButton()) {
                 enabledSystemTypes.add(b.getSystemType());
                 enabledSystemButtons.add(b);
               }

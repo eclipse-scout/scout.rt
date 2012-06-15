@@ -1043,10 +1043,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       }
     }
     if (applyAccessControl) {
-      propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty && m_enabledSlave && m_enabledProcessingButton);
+      propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty && m_enabledSlave);
     }
     else {
-      propertySupport.setPropertyBool(PROP_ENABLED, m_enabledProperty && m_enabledSlave && m_enabledProcessingButton);
+      propertySupport.setPropertyBool(PROP_ENABLED, m_enabledProperty && m_enabledSlave);
     }
   }
 

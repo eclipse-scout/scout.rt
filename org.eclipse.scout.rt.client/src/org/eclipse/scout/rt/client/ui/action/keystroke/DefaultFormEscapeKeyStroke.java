@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -53,7 +53,7 @@ public class DefaultFormEscapeKeyStroke extends AbstractKeyStroke {
       }
       int visibleCount = 0;
       for (IButton b : prioMap.values()) {
-        if (b.isEnabled() && b.isVisible()) {
+        if (b.isEnabled() && b.isVisible() && b.isEnabledProcessingButton()) {
           b.doClick();
           return;
         }

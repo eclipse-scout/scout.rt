@@ -206,7 +206,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   @Override
   public void doClick() throws ProcessingException {
-    if (isEnabled() && isVisible()) {
+    if (isEnabled() && isVisible() && isEnabledProcessingButton()) {
       try {
         setEnabledProcessingButton(false);
 
