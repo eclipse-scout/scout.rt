@@ -874,15 +874,19 @@ Text.datefield[BORDER]:disabled {
 Button.datefield {
   background-image: url(theme/img/button/datefield_date.png);
   border-radius: 5px;
+  border: none;
 }
 Button.datefield:selected {
   background-image: url(theme/img/button/datefield_date_selected.png);
+  border: none;
 }
 Button.datefield:disabled {
   background-image: url(theme/img/button/datefield_date_disabled.png);
+  border: none;
 }
 Button.datefield:hover {
   background-image: url(theme/img/button/datefield_date_mouse_over.png);
+  border: none;
 }
 /* DateChooserDialog */
 Shell.datechooser-dialog {
@@ -918,21 +922,25 @@ Button.datechooser-dialog-last-year,
 Button.datechooser-dialog-last-year:hover {
   background-image: url(theme/img/datetime/last-year.png);
   border-radius: 5px;
+  border: none;
 }
 Button.datechooser-dialog-last-month,
 Button.datechooser-dialog-last-month:hover {
   background-image: url(theme/img/datetime/last-month.png);
   border-radius: 5px;
+  border: none;
 }
 Button.datechooser-dialog-next-year,
 Button.datechooser-dialog-next-year:hover {
   background-image: url(theme/img/datetime/next-year.png);
   border-radius: 5px;
+  border: none;
 }
 Button.datechooser-dialog-next-month,
 Button.datechooser-dialog-next-month:hover {
   background-image: url(theme/img/datetime/next-month.png);
   border-radius: 5px;
+  border: none;
 }
 /*Filechooser*/
 Composite.filechooserfield_file {
@@ -1358,6 +1366,8 @@ Button.tabboxButton:selected:hover,
 Button.tabboxButton:pressed,
 Button.tabboxButton:hover {
   background-image: none;
+  border: none;
+  text-shadow: none;
   color: #295973;
   padding: 8px 15px;
   font: 12px Arial, Helvetica, sans-serif;
@@ -1375,6 +1385,8 @@ Button.tabboxButton-marked:hover {
 
   /* background-position: bottom right; /* XXX Currently not supported by RAP */
 
+  border: none;
+  text-shadow: none;
   color: #295973;
   padding: 8px 15px;
   font: 12px Arial, Helvetica, sans-serif;
@@ -1390,6 +1402,8 @@ Button.tabboxButton-active:hover {
   background-image: none;
   background-color: #ebf4f8;
   border-radius: 5px 5px 0px 0px;
+  border: none;
+  text-shadow: none;
   color: #000000;
   font: 12px Arial, Helvetica, sans-serif;
   /* not bold */
@@ -1409,6 +1423,8 @@ Button.tabboxButton-active-marked:hover {
   /* background-color: @light-tabbox-background-blue; /* XXX Would work in FF and Webkit, but not in IE. A svg element is generated which does not include bg color. Workaround: bg is set in image */
 
   border-radius: 5px 5px 0px 0px;
+  border: none;
+  text-shadow: none;
   color: #000000;
   font: 12px Arial, Helvetica, sans-serif;
   /* not bold */
@@ -1632,15 +1648,19 @@ Text.timefield[BORDER]:disabled {
 Button.timefield {
   background-image: url(theme/img/button/datefield_time.png);
   border-radius: 5px;
+  border: none;
 }
 Button.timefield:selected {
   background-image: url(theme/img/button/datefield_time_selected.png);
+  border: none;
 }
 Button.timefield:disabled {
   background-image: url(theme/img/button/datefield_time_disabled.png);
+  border: none;
 }
 Button.timefield:hover {
   background-image: url(theme/img/button/datefield_time_mouse_over.png);
+  border: none;
 }
 /* TimeChooserDialog */
 Shell.timechooser-dialog {
@@ -1666,6 +1686,7 @@ Composite.toolButtonBar-active {
 Button.toolButtonBarCollapseButton {
   background-image: url(theme/img/button/icon_slider.png);
   background-color: #67a8ce;
+  border: none;
   /*   padding: 8px 15px; */
 
   /*   border-radius: 0px 0px 0px 0px; */
@@ -1676,6 +1697,7 @@ Button.toolButtonBarCollapseButton:selected,
 Button.toolButtonBarCollapseButton:selected:hover,
 Button.toolButtonBarCollapseButton:hover {
   background-image: url(theme/img/button/icon_slider_mouse_over.png);
+  border: none;
 }
 Button.toolButton {
   background-image: none;
