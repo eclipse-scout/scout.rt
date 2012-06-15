@@ -146,7 +146,7 @@ public class RwtScoutTreeActionBar extends AbstractRwtScoutActionBar<ITreeField>
     }
 
     private void rowSelected() {
-      rebuildRightButtonBarFromScout();
+      rebuildContentFromScout();
     }
 
   }

@@ -229,31 +229,11 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     return cleanedMenus.toArray(new IMenu[cleanedMenus.size()]);
   }
 
-  public void rebuildRightButtonBarFromScout() {
-    if (isUiDisposed()) {
-      return;
-    }
-    Runnable job = new Runnable() {
-      @Override
-      public void run() {
-        if (isUiDisposed()) {
-          return;
-        }
-
-        m_rightContainer = createRightContainer(getUiContainer());
-        initLayout(getUiContainer());
-        computeContainerVisibility();
-
-        getUiContainer().getParent().layout(true, true);
-      }
-    };
-    getUiEnvironment().invokeUiLater(job);
-  }
-
   public void rebuildContentFromScout() {
     if (isUiDisposed()) {
       return;
     }
+
     Runnable job = new Runnable() {
       @Override
       public void run() {
@@ -262,7 +242,6 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
         }
 
         createContent();
-
         getUiContainer().getParent().layout(true, true);
       }
     };
