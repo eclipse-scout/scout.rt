@@ -2127,3 +2127,9 @@ Shell-DisplayOverlay {
   background-color: #565656;
   opacity: 0.5;
 }
+List {
+  font: 14px Arial, Helvetica, sans-serif;
+}
+List-Item {
+  font: 14px Arial, Helvetica, sans-serif;
+}

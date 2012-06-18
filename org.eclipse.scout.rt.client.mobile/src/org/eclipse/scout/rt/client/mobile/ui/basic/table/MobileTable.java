@@ -414,11 +414,14 @@ public class MobileTable extends AbstractTable {
     }
 
     String content = "";
+    boolean cellHasHeader = false;
     if (StringUtility.hasText(cellHeaderText)) {
       content = createCellHeader(cellHeaderText);
       content += "<br/>";
+      cellHasHeader = true;
     }
-    content += createCellDetail(row);
+
+    content += createCellDetail(row, cellHasHeader);
 
     String output = m_htmlCellTemplate.replace("#ICON#", createCellIcon(row));
     output = output.replace("#CONTENT#", content);
@@ -456,7 +459,7 @@ public class MobileTable extends AbstractTable {
       return "";
     }
     else {
-      return "<img style=\"padding-left:3px\" width=\"16\" height=\"16\" src=\"cid:" + iconId + "\"/>";
+      return "<img style=\" width=\"16\" height=\"16\" src=\"cid:" + iconId + "\"/>";
     }
   }
 
@@ -468,32 +471,19 @@ public class MobileTable extends AbstractTable {
     return m_htmlDrillDown;
   }
 
-  private String createCellContentPadding() {
-    if (!isDrillDownPossible()) {
-      return "0px";
-    }
-
-    return "60px";
-  }
-
   private String createCellHeader(String cellHeaderText) {
     String content = "";
 
-    cellHeaderText = cleanupText(cellHeaderText);
+    content = cleanupText(cellHeaderText);
 
     if (m_useBoldCellHeaderText) {
-      content += "<b>";
-      content += cellHeaderText;
-      content += "</b>";
-    }
-    else {
-      content += cellHeaderText;
+      content = "<b>" + content + "</b>";
     }
 
     return content;
   }
 
-  private String createCellDetail(ITableRow row) {
+  private String createCellDetail(ITableRow row, boolean cellHasHeader) {
     if (row == null) {
       return "";
     }
@@ -516,6 +506,11 @@ public class MobileTable extends AbstractTable {
       }
 
       col++;
+    }
+
+    if (cellHasHeader) {
+      //Make the font a little smaller if there is a cell header
+      content = "<span style=\"font-size:12px\">" + content + "</span>";
     }
 
     return content;
