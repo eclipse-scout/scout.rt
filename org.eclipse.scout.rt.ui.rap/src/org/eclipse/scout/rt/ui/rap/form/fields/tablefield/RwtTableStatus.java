@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.rap.form.fields.tablefield;
 
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
@@ -28,7 +29,7 @@ import org.eclipse.swt.widgets.Label;
  * Default implementation using a target label
  */
 public class RwtTableStatus implements IRwtTableStatus {
-  static final String VARIANT_WIDETABLE_STATUS = "wideTableStatus";
+  static final String VARIANT_OUTLINE_TABLE_STATUS = "outlineTableStatus";
   static final String VARIANT_TABLE_STATUS = "tableStatus";
 
   static final String VARIANT_POSTFIX_ERROR = "_error";
@@ -47,15 +48,9 @@ public class RwtTableStatus implements IRwtTableStatus {
   public RwtTableStatus(Composite parent, IRwtEnvironment uiEnvironment, ITableField<?> model) {
     m_parent = parent;
     m_uiEnvironment = uiEnvironment;
+    m_statusVariant = getVariant(model);
 
     m_labelContainer = getUiEnvironment().getFormToolkit().createComposite(m_parent);
-    IForm form = model.getForm();
-    if (IForm.VIEW_ID_PAGE_TABLE.equals(form.getDisplayViewId())) {
-      m_statusVariant = VARIANT_WIDETABLE_STATUS;
-    }
-    else {
-      m_statusVariant = VARIANT_TABLE_STATUS;
-    }
     m_labelContainer.setData(WidgetUtil.CUSTOM_VARIANT, m_statusVariant);
     //Label 1
     m_populateLabel = getUiEnvironment().getFormToolkit().createLabel(m_labelContainer, "", SWT.NONE);
@@ -92,6 +87,15 @@ public class RwtTableStatus implements IRwtTableStatus {
     selLabelLayoutData.exclude = true;
     selLabelLayoutData.verticalAlignment = SWT.CENTER;
     m_selectionLabel.setLayoutData(selLabelLayoutData);
+  }
+
+  protected String getVariant(ITableField<?> table) {
+    IForm form = table.getForm();
+    if (form instanceof IOutlineTableForm) {
+      return VARIANT_OUTLINE_TABLE_STATUS;
+    }
+
+    return VARIANT_TABLE_STATUS;
   }
 
   @Override

@@ -1475,21 +1475,17 @@ Composite.tableFieldDisabled {
   border-radius: 4px;
   padding: 2px;
 }
-/* Composite.wideTableStatusContainer{ */
-/*   padding: 0px 0px 0px 0px; */
-/*   background-color: @light-tabbox-background-blue; */
-/* } */
-Composite.wideTableStatus {
+Composite.outlineTableStatus {
   background-color: #ebf4f8;
 }
-Label.wideTableStatus {
+Label.outlineTableStatus {
   color: #264159;
   border: 3px solid transparent;
 }
-Label.wideTableStatus_warning {
+Label.outlineTableStatus_warning {
   color: #fe9a23;
 }
-Label.wideTableStatus_error {
+Label.outlineTableStatus_error {
   color: #cb2020;
 }
 /* Composite.tableStatusContainer{ */
