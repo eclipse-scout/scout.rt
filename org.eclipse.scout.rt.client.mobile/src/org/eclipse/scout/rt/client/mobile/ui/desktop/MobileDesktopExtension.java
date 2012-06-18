@@ -24,8 +24,6 @@ import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileHomeAction;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformer;
 import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformer;
 import org.eclipse.scout.rt.client.mobile.transformation.TabletDeviceTransformer;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
-import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -46,7 +44,6 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileDesktopExtension.class);
 
   private boolean m_active;
-  private OutlineChooserForm m_outlineChooserForm;
   private IDeviceTransformer m_deviceTransformer;
   private P_SearchFormCloseListener m_searchFormCloseListener;
 
@@ -100,8 +97,6 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
     m_deviceTransformer = createDeviceTransformer();
     m_deviceTransformer.transformDesktop(getCoreDesktop());
 
-    m_outlineChooserForm = new OutlineChooserForm();
-
     return ContributionCommand.Continue;
   }
 
@@ -111,10 +106,18 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
       return super.execGuiAttached();
     }
 
-    showOutlineChooser();
+    getDeviceTransformer().desktopGuiAttached();
 
-    MobileOutlineTableForm mobileOutlineTableForm = new MobileOutlineTableForm();
-    mobileOutlineTableForm.startView();
+    return ContributionCommand.Continue;
+  }
+
+  @Override
+  protected ContributionCommand execGuiDetached() throws ProcessingException {
+    if (!isActive()) {
+      return super.execGuiDetached();
+    }
+
+    getDeviceTransformer().desktopGuiDetached();
 
     return ContributionCommand.Continue;
   }
@@ -181,19 +184,6 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
     }
 
     return ContributionCommand.Continue;
-  }
-
-  private void showOutlineChooser() throws ProcessingException {
-    if (getCoreDesktop().isShowing(m_outlineChooserForm)) {
-      return;
-    }
-
-    if (!m_outlineChooserForm.isFormOpen()) {
-      m_outlineChooserForm.startView();
-    }
-    else {
-      getCoreDesktop().addForm(m_outlineChooserForm);
-    }
   }
 
   @Order(10)

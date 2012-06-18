@@ -23,13 +23,6 @@ public class MobileOutlineTableForm extends DefaultOutlineTableForm {
   }
 
   @Override
-  protected void initConfig() throws ProcessingException {
-    super.initConfig();
-
-    getOutlineTableField().setTableStatusVisible(false);
-  }
-
-  @Override
   public void setCurrentTable(ITable table) {
     if (table != null) {
       getOutlineTableField().setLabel(computeHeaderNameForSingleColumnTable());

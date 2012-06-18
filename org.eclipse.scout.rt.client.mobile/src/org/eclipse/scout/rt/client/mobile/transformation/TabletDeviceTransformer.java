@@ -60,6 +60,11 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
 
   }
 
+  @Override
+  protected boolean shouldOutlineTableStatusBeHidden() {
+    return false;
+  }
+
   /**
    * Only moves the label to the top if it's a tool form. Regular forms have are big enough on tablet to display it on
    * the left side.

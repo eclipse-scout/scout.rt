@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -20,7 +21,11 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  */
 public interface IDeviceTransformer {
 
-  public void transformDesktop(IDesktop desktop);
+  void desktopGuiAttached() throws ProcessingException;
+
+  void desktopGuiDetached() throws ProcessingException;
+
+  void transformDesktop(IDesktop desktop);
 
   void transformForm(IForm form);
 

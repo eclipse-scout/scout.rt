@@ -14,11 +14,13 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
+import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -42,11 +44,58 @@ import org.eclipse.scout.service.SERVICES;
 public class AbstractDeviceTransformer implements IDeviceTransformer {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDeviceTransformer.class);
 
+  private OutlineChooserForm m_outlineChooserForm;
+  private MobileOutlineTableForm m_outlineTableForm;
+
   private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
 
   @Override
   public void transformDesktop(IDesktop desktop) {
 
+  }
+
+  @Override
+  public void desktopGuiAttached() throws ProcessingException {
+    showOutlineChooserForm();
+    showOutlineTableForm();
+  }
+
+  @Override
+  public void desktopGuiDetached() throws ProcessingException {
+    if (m_outlineTableForm != null) {
+      m_outlineTableForm.doClose();
+    }
+    if (m_outlineChooserForm != null) {
+      m_outlineChooserForm.doClose();
+    }
+  }
+
+  protected void showOutlineChooserForm() throws ProcessingException {
+    if (m_outlineChooserForm == null) {
+      m_outlineChooserForm = new OutlineChooserForm();
+    }
+
+    if (!getDesktop().isShowing(m_outlineChooserForm)) {
+      if (!m_outlineChooserForm.isFormOpen()) {
+        m_outlineChooserForm.startView();
+      }
+      else {
+        getDesktop().addForm(m_outlineChooserForm);
+      }
+    }
+  }
+
+  protected void showOutlineTableForm() throws ProcessingException {
+    MobileOutlineTableForm mobileOutlineTableForm = new MobileOutlineTableForm();
+    if (shouldOutlineTableStatusBeHidden()) {
+      mobileOutlineTableForm.getOutlineTableField().setTableStatusVisible(false);
+    }
+
+    mobileOutlineTableForm.startView();
+  }
+
+  protected boolean shouldOutlineTableStatusBeHidden() {
+    return true;
   }
 
   @Override
