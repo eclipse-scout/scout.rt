@@ -193,10 +193,10 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected void attachScout() {
+    super.attachScout();
     setIconIdFromScout(getScoutObject().getIconId());
     getUiBrowseButton().setDropdownEnabled(getScoutObject().hasMenus());
     setProposalFormFromScout(getScoutObject().getProposalForm());
-    super.attachScout();
   }
 
   @Override

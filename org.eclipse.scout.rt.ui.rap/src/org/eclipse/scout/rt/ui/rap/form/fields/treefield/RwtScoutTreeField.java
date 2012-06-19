@@ -29,9 +29,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 
 /**
- * <h3>RwtScoutTreeBox</h3> ...
- * 
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implements IRwtScoutTreeField {
 
@@ -57,8 +55,8 @@ public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implem
 
   @Override
   protected void attachScout() {
-    setTreeFromScout(getScoutObject().getTree());
     super.attachScout();
+    setTreeFromScout(getScoutObject().getTree());
   }
 
   protected void setTreeFromScout(ITree tree) {

@@ -42,8 +42,8 @@ public class SwtScoutTreeField extends SwtScoutFieldComposite<ITreeField> implem
 
   @Override
   protected void attachScout() {
-    setTreeFromScout(getScoutObject().getTree());
     super.attachScout();
+    setTreeFromScout(getScoutObject().getTree());
   }
 
   protected void setTreeFromScout(ITree tree) {

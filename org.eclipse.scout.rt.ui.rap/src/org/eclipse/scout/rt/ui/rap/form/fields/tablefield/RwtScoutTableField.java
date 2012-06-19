@@ -69,8 +69,8 @@ public class RwtScoutTableField extends RwtScoutFieldComposite<ITableField<? ext
 
   @Override
   protected void attachScout() {
-    setTableFromScout(getScoutObject().getTable());
     super.attachScout();
+    setTableFromScout(getScoutObject().getTable());
   }
 
   protected void setTableFromScout(ITable table) {

@@ -59,8 +59,8 @@ public class SwtScoutTableField extends SwtScoutFieldComposite<ITableField<? ext
 
   @Override
   protected void attachScout() {
-    setTableFromScout(getScoutObject().getTable());
     super.attachScout();
+    setTableFromScout(getScoutObject().getTable());
   }
 
   protected synchronized void setTableFromScout(ITable table) {

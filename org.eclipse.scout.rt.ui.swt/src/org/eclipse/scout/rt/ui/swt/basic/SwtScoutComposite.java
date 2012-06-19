@@ -295,8 +295,10 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
   }
 
   /**
-   * override this method to attach listeners to scout model and initialize
-   * obsever state
+   * Attaches the {@link P_ScoutPropertyChangeListener} which calls {@link #handleScoutPropertyChange(String, Object)}.
+   * <p>
+   * Override this method to set scout model properties on ui components or to attach other model listeners. Always call
+   * super.attachScout() at the very beginning to make sure the property change listener gets attached properly.
    */
   protected void attachScout() {
     if (m_scoutObject != null) {
@@ -311,7 +313,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> implements 
   }
 
   /**
-   * override this method to remove listeners from scout model
+   * Override this method to remove listeners from scout model.
    */
   protected void detachScout() {
     if (m_scoutObject != null) {
