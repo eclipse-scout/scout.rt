@@ -542,6 +542,17 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
         if (m_proposalPopup != null) {
           requestProposalSupportFromUi(text, false, 0);
         }
+        else {
+          // notify Scout
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              getScoutObject().getUIFacade().setTextFromUI(null);
+            }
+          };
+          getUiEnvironment().invokeScoutLater(t, 0);
+          // end notify
+        }
       }
       else {
         requestProposalSupportFromUi(text, false, m_proposalPopup != null ? 200 : 0);
@@ -569,7 +580,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
         break;
       default:
         event.doit = handleUiTraverseVerifier();
-
     }
   }
 
