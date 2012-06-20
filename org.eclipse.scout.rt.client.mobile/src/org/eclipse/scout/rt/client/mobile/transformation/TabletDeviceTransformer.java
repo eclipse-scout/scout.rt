@@ -21,15 +21,25 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * @since 3..8.0
+ * @since 3.9.0
  */
 public class TabletDeviceTransformer extends AbstractDeviceTransformer {
   private static int DIALOG_FORM_WIDTH = 700;
   private static int EAST_FORM_WIDTH = 700;
   private static int TOOL_FORM_WIDTH = 300;
 
+  public TabletDeviceTransformer() {
+    super(null);
+  }
+
+  public TabletDeviceTransformer(IDesktop desktop) {
+    super(desktop);
+  }
+
   @Override
-  public void transformDesktop(IDesktop desktop) {
+  public void desktopInit(IDesktop desktop) {
+    super.desktopInit(desktop);
+
     SERVICES.getService(IBreadCrumbsNavigationService.class).trackDisplayViewId(IForm.VIEW_ID_CENTER);
   }
 

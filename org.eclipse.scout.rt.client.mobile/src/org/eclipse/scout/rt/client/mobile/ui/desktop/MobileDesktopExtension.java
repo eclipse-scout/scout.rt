@@ -28,14 +28,12 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.ContributionCommand;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
@@ -45,7 +43,6 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
 
   private boolean m_active;
   private IDeviceTransformer m_deviceTransformer;
-  private P_SearchFormCloseListener m_searchFormCloseListener;
 
   public MobileDesktopExtension() {
     setActive(UserAgentUtility.isTouchDevice());
@@ -68,7 +65,7 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
       return new TabletDeviceTransformer();
     }
     else {
-      return new MobileDeviceTransformer();
+      return new MobileDeviceTransformer(getCoreDesktop());
     }
   }
 
@@ -79,6 +76,7 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
     }
 
     //remove outline buttons, keystrokes and Menus
+    //FIXME CGU move to device transformer
     for (Iterator<IAction> iterator = actions.iterator(); iterator.hasNext();) {
       IAction action = iterator.next();
       if (action instanceof IViewButton || action instanceof IKeyStroke || action instanceof IMenu) {
@@ -95,7 +93,7 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
     }
 
     m_deviceTransformer = createDeviceTransformer();
-    m_deviceTransformer.transformDesktop(getCoreDesktop());
+    m_deviceTransformer.desktopInit(getCoreDesktop());
 
     return ContributionCommand.Continue;
   }
@@ -166,22 +164,12 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   }
 
   @Override
-  protected ContributionCommand execPageSearchFormChanged(IForm oldForm, final IForm newForm) throws ProcessingException {
+  protected ContributionCommand execTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
     if (!isActive()) {
-      return super.execPageSearchFormChanged(oldForm, newForm);
+      return super.execTablePageLoaded(tablePage);
     }
 
-    if (m_searchFormCloseListener == null) {
-      m_searchFormCloseListener = new P_SearchFormCloseListener();
-    }
-
-    if (oldForm != null) {
-      oldForm.removeFormListener(m_searchFormCloseListener);
-    }
-
-    if (newForm != null) {
-      newForm.addFormListener(m_searchFormCloseListener);
-    }
+    getDeviceTransformer().tablePageLoaded(tablePage);
 
     return ContributionCommand.Continue;
   }
@@ -248,18 +236,4 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
     }
   }
 
-  private class P_SearchFormCloseListener implements FormListener {
-    @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
-      if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
-        //after an search, the searchform is automatically removed
-        //to do that, we unselect all visible toolbuttons (one of them will be the search toolbutton)
-        for (IToolButton toolButton : getCoreDesktop().getToolButtons()) {
-          if (toolButton.isVisible()) {
-            toolButton.setSelected(false);
-          }
-        }
-      }
-    }
-  }
 }

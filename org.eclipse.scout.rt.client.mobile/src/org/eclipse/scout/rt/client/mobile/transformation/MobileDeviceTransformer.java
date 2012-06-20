@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
@@ -17,18 +18,36 @@ import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileDeviceTransformer.class);
 
+  private ToolFormHandler m_toolFormHandler;
+
+  public MobileDeviceTransformer(IDesktop desktop) {
+    super(desktop);
+
+    m_toolFormHandler = new ToolFormHandler(getDesktop());
+  }
+
   @Override
-  public void transformDesktop(IDesktop desktop) {
+  public void desktopInit(IDesktop desktop) {
+    super.desktopInit(desktop);
+
     SERVICES.getService(IBreadCrumbsNavigationService.class).trackDisplayViewId(IForm.VIEW_ID_CENTER);
+  }
+
+  @Override
+  public void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+    super.tablePageLoaded(tablePage);
+
+    m_toolFormHandler.tablePageLoaded(tablePage);
   }
 
   @Override

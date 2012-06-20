@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class MobileDesktopUtility {
 
@@ -46,6 +46,13 @@ public class MobileDesktopUtility {
     }
 
     return null;
+  }
+
+  public static void openToolForm(IForm form) throws ProcessingException {
+    IToolButton toolButton = getToolButtonFor(form);
+    if (toolButton != null) {
+      toolButton.setSelected(true);
+    }
   }
 
   public static void closeToolForm(IForm form) throws ProcessingException {

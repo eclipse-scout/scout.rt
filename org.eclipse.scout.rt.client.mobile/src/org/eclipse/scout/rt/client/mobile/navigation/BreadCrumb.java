@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.mobile.navigation;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -51,12 +52,21 @@ public class BreadCrumb implements IBreadCrumb {
     if (getForm() != null) {
       IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
       if (getForm().isFormOpen() && !desktop.isShowing(getForm())) {
-        desktop.addForm(getForm());
+        if (MobileDesktopUtility.isToolForm(getForm())) {
+          MobileDesktopUtility.openToolForm(getForm());
+        }
+        else {
+          desktop.addForm(getForm());
+        }
       }
     }
 
     if (getPage() != null) {
       IOutline outline = getPage().getOutline();
+      IDesktop desktop = getBreadCrumbsNavigation().getDesktop();
+      if (desktop.getOutline() != outline) {
+        desktop.setOutline(outline);
+      }
       outline.selectNode(getPage());
     }
   }
@@ -77,7 +87,21 @@ public class BreadCrumb implements IBreadCrumb {
 
   @Override
   public String toString() {
-    return "Form: " + getForm() + ". Page: " + getPage();
+    if (getPage() != null) {
+      return "Page: " + getPage().toString();
+    }
+    else {
+      String formName = getForm().getTitle();
+      if (StringUtility.isNullOrEmpty(formName)) {
+        formName = getForm().toString();
+      }
+      return "Form: " + formName;
+    }
+  }
+
+  @Override
+  public boolean belongsTo(IForm form, IPage page) {
+    return getForm() == form && getPage() == page;
   }
 
 }

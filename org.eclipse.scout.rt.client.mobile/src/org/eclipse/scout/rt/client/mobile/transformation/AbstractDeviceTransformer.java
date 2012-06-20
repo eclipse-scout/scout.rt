@@ -39,19 +39,36 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class AbstractDeviceTransformer implements IDeviceTransformer {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDeviceTransformer.class);
 
+  private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
   private OutlineChooserForm m_outlineChooserForm;
   private MobileOutlineTableForm m_outlineTableForm;
+  private IDesktop m_desktop;
 
-  private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
+  public AbstractDeviceTransformer(IDesktop desktop) {
+    if (desktop == null) {
+      desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    }
+    m_desktop = desktop;
+    if (m_desktop == null) {
+      throw new IllegalArgumentException("No desktop found. Cannot create device transformer.");
+    }
+  }
+
+  public AbstractDeviceTransformer() {
+    this(null);
+  }
 
   @Override
-  public void transformDesktop(IDesktop desktop) {
+  public void desktopInit(IDesktop desktop) {
+  }
 
+  @Override
+  public void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
   }
 
   @Override
@@ -236,7 +253,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   protected IDesktop getDesktop() {
-    return ClientSyncJob.getCurrentSession().getDesktop();
+    return m_desktop;
   }
 
 }

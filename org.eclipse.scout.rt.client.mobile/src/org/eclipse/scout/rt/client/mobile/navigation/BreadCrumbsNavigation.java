@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -29,10 +30,12 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BreadCrumbsNavigation.class);
@@ -42,8 +45,10 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
   private P_DesktopListener m_desktopListener;
   private List<String> m_navigationFormsDisplayViewIds;
   private P_OutlineListener m_outlineListener;
+  private P_FormListener m_formListener;
   private IOutline m_activeOutline;
   private IBreadCrumb m_currentBreadCrumb;
+  private IDesktop m_desktop;
 
   public BreadCrumbsNavigation() {
     this(null);
@@ -51,18 +56,16 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
 
   public BreadCrumbsNavigation(IDesktop desktop) {
     if (desktop == null) {
-      desktop = getDesktop();
+      desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    }
+    m_desktop = desktop;
+    if (m_desktop == null) {
+      throw new IllegalArgumentException("No desktop found. Cannot create bread crumbs navigation.");
     }
 
     m_breadCrumbs = new Stack<IBreadCrumb>();
     m_listenerList = new EventListenerList();
-
     m_desktopListener = new P_DesktopListener();
-
-    if (desktop == null) {
-      throw new IllegalArgumentException("No desktop found. Cannot create bread crumbs navigation.");
-    }
-
     desktop.addDesktopListener(m_desktopListener);
   }
 
@@ -99,6 +102,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     m_currentBreadCrumb.activate();
 
     LOG.debug("Stepped back to: " + m_currentBreadCrumb);
+    LOG.debug("Current bread crumbs way: " + toString());
 
     fireBreadCrumbsChanged();
   }
@@ -134,6 +138,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
 
     m_currentBreadCrumb.activate();
     LOG.debug("Activated bread crumb: " + m_currentBreadCrumb);
+    LOG.debug("Current bread crumbs way: " + toString());
 
     fireBreadCrumbsChanged();
   }
@@ -146,7 +151,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     for (IForm form : dialogStack) {
       navigationForms.add(form);
     }
-    
+
     IForm[] viewStack = getDesktop().getViewStack();
     for (IForm form : viewStack) {
       if (m_navigationFormsDisplayViewIds != null && m_navigationFormsDisplayViewIds.contains(form.getDisplayViewId())) {
@@ -186,8 +191,9 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     return false;
   }
 
-  protected IDesktop getDesktop() {
-    return ClientSyncJob.getCurrentSession().getDesktop();
+  @Override
+  public IDesktop getDesktop() {
+    return m_desktop;
   }
 
   private void destroy() {
@@ -199,10 +205,38 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     getBreadCrumbs().clear();
   }
 
+  private void removeExistingBreadCrumb(IForm form, IPage page) {
+    if (m_currentBreadCrumb.belongsTo(form, page)) {
+      LOG.debug("Removing existing bread crumb: " + m_currentBreadCrumb);
+
+      if (getBreadCrumbs().size() > 0) {
+        m_currentBreadCrumb = getBreadCrumbs().pop();
+      }
+      else {
+        m_currentBreadCrumb = null;
+      }
+
+      LOG.debug("Current bread crumbs way: " + toString());
+    }
+    else {
+      IBreadCrumb[] breadCrumbs = getBreadCrumbs().toArray(new IBreadCrumb[getBreadCrumbs().size()]);
+      for (IBreadCrumb breadCrumb : breadCrumbs) {
+        if (breadCrumb.belongsTo(form, page)) {
+          LOG.debug("Removing existing bread crumb: " + breadCrumb);
+
+          getBreadCrumbs().remove(breadCrumb);
+
+          LOG.debug("Current bread crumbs way: " + toString());
+          return;
+        }
+      }
+    }
+  }
+
   private void addNewBreadCrumb(IForm form, IPage page) {
     if (m_currentBreadCrumb != null) {
       //Ignore attempts to insert the same bread crumb again
-      if (m_currentBreadCrumb.getForm() == form && m_currentBreadCrumb.getPage() == page) {
+      if (m_currentBreadCrumb.belongsTo(form, page)) {
         return;
       }
 
@@ -218,6 +252,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     else {
       m_currentBreadCrumb = new BreadCrumb(this, form, page);
     }
+    LOG.debug("Current bread crumbs way: " + toString());
   }
 
   @Override
@@ -242,6 +277,22 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
         ((BreadCrumbsListener) a[i]).breadCrumbsChanged(e);
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    String breadCrumbsWay = "";
+    for (IBreadCrumb breadCrumb : getBreadCrumbs()) {
+      breadCrumbsWay += "[" + breadCrumb + "] > ";
+    }
+    if (m_currentBreadCrumb != null) {
+      breadCrumbsWay += "[" + m_currentBreadCrumb + "]";
+    }
+    else {
+      breadCrumbsWay = "empty bread crumbs navigation";
+    }
+
+    return breadCrumbsWay;
   }
 
   private class P_DesktopListener implements DesktopListener {
@@ -308,6 +359,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
         addNewBreadCrumb(form, page);
       }
 
+      attachFormListener(form);
     }
 
     private void handleFormRemoved(DesktopEvent e) {
@@ -316,10 +368,20 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
       }
 
       IForm form = e.getForm();
-      if (m_currentBreadCrumb.getForm() == form && m_currentBreadCrumb.getPage() == null) {
-        m_currentBreadCrumb = getBreadCrumbs().pop();
+      if (MobileDesktopUtility.isToolForm(form)) {
+        // Stepping back must never open a tool form -> Remove from bread crumbs
+        removeExistingBreadCrumb(form, null);
       }
     }
+
+    private void attachFormListener(IForm form) {
+      if (m_formListener == null) {
+        m_formListener = new P_FormListener();
+      }
+      form.removeFormListener(m_formListener);
+      form.addFormListener(m_formListener);
+    }
+
   }
 
   private class P_OutlineListener extends TreeAdapter {
@@ -351,6 +413,9 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
         if (m_currentBreadCrumb.getForm() == outlineTableForm) {
           //If the current form already is the outline table form then only update the current bread crumb if a page has been activated.
           m_currentBreadCrumb = new BreadCrumb(BreadCrumbsNavigation.this, outlineTableForm, page);
+
+          LOG.debug("Updated current bread crumb: " + m_currentBreadCrumb);
+          LOG.debug("Current bread crumbs way: " + BreadCrumbsNavigation.this.toString());
         }
         else {
           addNewBreadCrumb(getDesktop().getOutlineTableForm(), page);
@@ -358,5 +423,24 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
       }
     }
 
+  }
+
+  /**
+   * Makes sure closed forms get removed from the bread crumbs.
+   */
+  private class P_FormListener implements FormListener {
+
+    @Override
+    public void formChanged(FormEvent e) throws ProcessingException {
+      if (FormEvent.TYPE_CLOSED == e.getType()) {
+        IForm form = e.getForm();
+        removeExistingBreadCrumb(form, null);
+        detachFormListener(form);
+      }
+    }
+
+    private void detachFormListener(IForm form) {
+      form.removeFormListener(this);
+    }
   }
 }

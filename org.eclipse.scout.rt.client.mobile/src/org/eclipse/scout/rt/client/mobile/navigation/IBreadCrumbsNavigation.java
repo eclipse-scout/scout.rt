@@ -14,10 +14,11 @@ import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public interface IBreadCrumbsNavigation {
   void goHome() throws ProcessingException;
@@ -43,4 +44,6 @@ public interface IBreadCrumbsNavigation {
   void removeBreadCrumbsListener(BreadCrumbsListener listener);
 
   void trackDisplayViewId(String displayViewId);
+
+  IDesktop getDesktop();
 }

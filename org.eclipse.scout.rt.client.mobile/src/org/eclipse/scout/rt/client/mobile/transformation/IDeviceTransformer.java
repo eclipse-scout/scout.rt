@@ -14,18 +14,20 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public interface IDeviceTransformer {
+  void desktopInit(IDesktop desktop);
 
   void desktopGuiAttached() throws ProcessingException;
 
   void desktopGuiDetached() throws ProcessingException;
 
-  void transformDesktop(IDesktop desktop);
+  void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException;
 
   void transformForm(IForm form);
 

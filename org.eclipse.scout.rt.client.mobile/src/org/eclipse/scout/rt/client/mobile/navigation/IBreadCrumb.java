@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public interface IBreadCrumb {
 
@@ -24,4 +24,6 @@ public interface IBreadCrumb {
   IForm getForm();
 
   IPage getPage();
+
+  boolean belongsTo(IForm form, IPage page);
 }
