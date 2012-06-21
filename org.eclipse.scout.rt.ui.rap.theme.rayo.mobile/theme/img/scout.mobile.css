@@ -441,29 +441,41 @@ List-Item:selected:unfocused {
 }
 /* Menu */
 Menu {
-  background-image: none;
   padding: 4px 0px 4px 0px;
   opacity: 1;
+  color: white;
+  font: bold 12px Arial, Helvetica, sans-serif;
   animation: none;
-  color: #000000;
-  background-color: #fafdff;
-  border: 1px solid #bbcddb;
-  border-radius: 0px;
+  background-image: gradient(
+    linear, left top, left bottom,
+    from(#53a4d3),
+    to(#4890ba)
+  );
+/*   border: 1px solid #ebf4f8;bbcddb; */
+    border: 1px solid #3a7597;
+  border-radius: 5px;
 }
 MenuItem {
   background-image: none;
-  color: black;
+  color: white;
   background-color: transparent;
   opacity: 1;
   padding: 7px 6px 7px 6px;
 }
 MenuItem[SEPARATOR] {
-  color: #eaf1f6;
+  color: red;/*ebf4f8;*/
+  background-color: red;
+  border: 1px solid red;
   padding: 2px 0px;
 }
 MenuItem:hover {
-  background-color: #e5f3fe;
-  color: #000000;
+/*   background-color: #fe9915; */
+    background-image: gradient(
+    linear, left top, left bottom,
+    from( #fe9915 ),
+    to( #be7414 )
+  );
+  color: white;
 }
 MenuItem-CheckIcon {
   background-image: url(theme/img/menu/checkbox.gif);
@@ -2132,30 +2144,4 @@ List {
 }
 List-Item {
   font: 14px Arial, Helvetica, sans-serif;
-}
-Menu {
-  color: white;
-  font: bold 12px Arial, Helvetica, sans-serif;
-  background-image: gradient(linear, left top, left bottom, from(#53a4d3), to(#4890ba));
-  border: 1px solid #3a7597;
-  border-radius: 5px;
-}
-MenuItem {
-  color: white;
-}
-MenuItem:disabled {
-  color: #33637f;
-}
-MenuItem:hover {
-  background-image: gradient(linear, left top, left bottom, from(#fe9915), to(#be7414));
-  color: white;
-}
-MenuItem-CheckIcon {
-  background-image: url(theme/img/menu/checkbox-white.gif);
-}
-MenuItem-RadioIcon {
-  background-image: url(theme/img/menu/radiobutton-white.gif);
-}
-MenuItem-CascadeIcon {
-  background-image: url(theme/img/menu/arrow-white.gif);
 }
