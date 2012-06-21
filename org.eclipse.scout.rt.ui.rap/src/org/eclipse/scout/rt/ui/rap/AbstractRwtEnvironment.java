@@ -26,7 +26,6 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.internal.widgets.JSExecutor;
@@ -1285,7 +1284,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
           protected void runVoid(IProgressMonitor monitor) throws Throwable {
             getClientSession().stopSession();
           }
-        }.runNow(new NullProgressMonitor());
+        }.schedule();
       }
     }
   }
