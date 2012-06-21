@@ -36,6 +36,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
   private final ISwtEnvironment m_environment;
   private IProcessingStatus m_status;
   private boolean m_mandatory;
+  private boolean m_enabled;
   private Control m_label;
 
   private Label m_statusLabel;
@@ -170,7 +171,8 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
 
   @Override
   public void setEnabled(boolean enabled) {
-    super.setEnabled(enabled);
+    // only mark/display it disabled otherwise the tooltip caused by shortened label text is only visible in enabled state
+    m_enabled = enabled;
 
     if (enabled) {
       setForeground(null);
@@ -178,6 +180,11 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
     else {
       setForeground(getEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled()));
     }
+  }
+
+  @Override
+  public boolean getEnabled() {
+    return m_enabled;
   }
 
   protected void updateLabelForeground() {
