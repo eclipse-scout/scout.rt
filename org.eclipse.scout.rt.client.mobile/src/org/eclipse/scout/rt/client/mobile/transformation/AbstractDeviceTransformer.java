@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -19,8 +20,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
+import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
+import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -34,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.service.SERVICES;
@@ -254,6 +259,42 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   protected IDesktop getDesktop() {
     return m_desktop;
+  }
+
+  @Override
+  public void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList) {
+    if (MobileDesktopUtility.isToolForm(form) && !containsCloseAction(menuList)) {
+      menuList.add(new ToolFormCloseAction(form));
+    }
+  }
+
+  @Override
+  public void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList) {
+  }
+
+  protected boolean containsCloseAction(List<IMenu> menuList) {
+    if (menuList == null) {
+      return false;
+    }
+
+    for (IMenu action : menuList) {
+      if (action instanceof ToolFormCloseAction) {
+        return true;
+      }
+      else if (action instanceof ButtonWrappingAction) {
+        IButton wrappedButton = ((ButtonWrappingAction) action).getWrappedButton();
+        switch (wrappedButton.getSystemType()) {
+          case IButton.SYSTEM_TYPE_CANCEL:
+          case IButton.SYSTEM_TYPE_CLOSE:
+          case IButton.SYSTEM_TYPE_OK:
+            if (wrappedButton.isVisible() && wrappedButton.isEnabled()) {
+              return true;
+            }
+        }
+      }
+    }
+
+    return false;
   }
 
 }

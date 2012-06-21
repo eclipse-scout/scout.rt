@@ -26,7 +26,7 @@ import org.eclipse.scout.service.SERVICES;
 public class TabletDeviceTransformer extends AbstractDeviceTransformer {
   private static int DIALOG_FORM_WIDTH = 700;
   private static int EAST_FORM_WIDTH = 700;
-  private static int TOOL_FORM_WIDTH = 300;
+  private static int TOOL_FORM_WIDTH = 320;
 
   public TabletDeviceTransformer() {
     super(null);

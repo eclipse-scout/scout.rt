@@ -78,7 +78,6 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
     }
     else {
       RwtScoutMobileFormHeader mobileFormHeader = new RwtScoutMobileFormHeader();
-      mobileFormHeader.setAutoAddBackButtonEnabled(true);
       uiFormHeader = mobileFormHeader;
     }
 

@@ -82,27 +82,30 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
   protected void initializeUi(Composite parent) {
     Composite toolButtonBar = getUiEnvironment().getFormToolkit().createComposite(parent);
     toolButtonBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR);
-    m_toolButtonCollapseButton = getUiEnvironment().getFormToolkit().createButton(toolButtonBar, "", SWT.PUSH);
-    m_toolButtonCollapseButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR_COLLAPSE_BUTTON);
-    m_toolButtonCollapseButton.addSelectionListener(new SelectionAdapter() {
-      private static final long serialVersionUID = 1L;
+    if (isShowingCollapseButtonEnabled()) {
+      m_toolButtonCollapseButton = getUiEnvironment().getFormToolkit().createButton(toolButtonBar, "", SWT.PUSH);
+      m_toolButtonCollapseButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR_COLLAPSE_BUTTON);
+      m_toolButtonCollapseButton.addSelectionListener(new SelectionAdapter() {
+        private static final long serialVersionUID = 1L;
 
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        collapseToolView();
-      }
-    });
-    m_toolButtonsLabel = getUiEnvironment().getFormToolkit().createLabel(toolButtonBar, "", SWT.CENTER);
-    m_toolButtonsLabel.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON);
-    m_toolButtonsLabel.addMouseListener(new MouseAdapter() {
-      private static final long serialVersionUID = 1L;
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          collapseToolView();
+        }
+      });
+    }
+    if (isShowingLabelEnabled()) {
+      m_toolButtonsLabel = getUiEnvironment().getFormToolkit().createLabel(toolButtonBar, "", SWT.CENTER);
+      m_toolButtonsLabel.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON);
+      m_toolButtonsLabel.addMouseListener(new MouseAdapter() {
+        private static final long serialVersionUID = 1L;
 
-      @Override
-      public void mouseDown(MouseEvent e) {
-        // Simulate click on collapse button
-        m_toolButtonCollapseButton.notifyListeners(SWT.Selection, null);
-      }
-    });
+        @Override
+        public void mouseDown(MouseEvent e) {
+          collapseToolView();
+        }
+      });
+    }
     m_toolButtonContainer = getUiEnvironment().getFormToolkit().createComposite(toolButtonBar);
     m_toolButtonContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR);
     for (IToolButton scoutButton : getScoutObject().getToolButtons()) {
@@ -126,15 +129,19 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
     toolButtonBarLayout.marginRight = 10;
     toolButtonBar.setLayout(toolButtonBarLayout);
 
-    GridData collapseButtonLayoutData = new GridData(GridData.VERTICAL_ALIGN_CENTER);
-    collapseButtonLayoutData.heightHint = 15;
-    collapseButtonLayoutData.widthHint = 15;
-    collapseButtonLayoutData.exclude = true;
-    m_toolButtonCollapseButton.setLayoutData(collapseButtonLayoutData);
+    if (m_toolButtonCollapseButton != null) {
+      GridData collapseButtonLayoutData = new GridData(GridData.VERTICAL_ALIGN_CENTER);
+      collapseButtonLayoutData.heightHint = 15;
+      collapseButtonLayoutData.widthHint = 15;
+      collapseButtonLayoutData.exclude = true;
+      m_toolButtonCollapseButton.setLayoutData(collapseButtonLayoutData);
+    }
 
-    GridData labelData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.GRAB_HORIZONTAL | GridData.VERTICAL_ALIGN_CENTER);
-    labelData.exclude = true;
-    m_toolButtonsLabel.setLayoutData(labelData);
+    if (m_toolButtonsLabel != null) {
+      GridData labelData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.GRAB_HORIZONTAL | GridData.VERTICAL_ALIGN_CENTER);
+      labelData.exclude = true;
+      m_toolButtonsLabel.setLayoutData(labelData);
+    }
 
     GridData tabFolderLayoutData = new GridData(GridData.HORIZONTAL_ALIGN_END);
     m_toolButtonContainer.setLayoutData(tabFolderLayoutData);
@@ -200,27 +207,57 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
         m_toolButtonContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR_ACTIVE);
       }
     }
-    GridData collapseButtonData = (GridData) m_toolButtonCollapseButton.getLayoutData();
-    GridData labelData = (GridData) m_toolButtonsLabel.getLayoutData();
+    GridData collapseButtonData = null;
+    if (m_toolButtonCollapseButton != null) {
+      collapseButtonData = (GridData) m_toolButtonCollapseButton.getLayoutData();
+    }
+    GridData labelData = null;
+    if (m_toolButtonsLabel != null) {
+      labelData = (GridData) m_toolButtonsLabel.getLayoutData();
+    }
     if (label == null) {
-      collapseButtonData.exclude = true;
-      m_toolButtonCollapseButton.setVisible(false);
-      labelData.exclude = true;
-      m_toolButtonsLabel.setVisible(false);
+      if (m_toolButtonCollapseButton != null && collapseButtonData != null) {
+        m_toolButtonCollapseButton.setVisible(false);
+        collapseButtonData.exclude = true;
+      }
+      if (m_toolButtonsLabel != null && labelData != null) {
+        labelData.exclude = true;
+        m_toolButtonsLabel.setVisible(false);
+      }
       label = "";
     }
     else {
-      collapseButtonData.exclude = false;
-      m_toolButtonCollapseButton.setVisible(true);
-      labelData.exclude = false;
-      m_toolButtonsLabel.setVisible(true);
+      if (m_toolButtonCollapseButton != null && collapseButtonData != null) {
+        collapseButtonData.exclude = false;
+        m_toolButtonCollapseButton.setVisible(true);
+      }
+      if (m_toolButtonsLabel != null && labelData != null) {
+        labelData.exclude = false;
+        m_toolButtonsLabel.setVisible(true);
+      }
     }
-    m_toolButtonsLabel.setText(label);
+    if (m_toolButtonsLabel != null) {
+      m_toolButtonsLabel.setText(label);
+    }
     getUiContainer().getParent().layout(true, true);
   }
 
   protected void handleScoutToolButtonPropertyChange(String propertyName, Object newValue) {
     updateToolButtonLabel();
+  }
+
+  /**
+   * As default the collapse button is visible. May be overridden to make the button invisible.
+   */
+  public boolean isShowingCollapseButtonEnabled() {
+    return true;
+  }
+
+  /**
+   * As default the label is visible. May be overridden to make the label invisible.
+   */
+  public boolean isShowingLabelEnabled() {
+    return true;
   }
 
 }

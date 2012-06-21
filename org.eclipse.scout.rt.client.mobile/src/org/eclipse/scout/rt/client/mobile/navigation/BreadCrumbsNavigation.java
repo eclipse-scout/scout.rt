@@ -206,6 +206,10 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
   }
 
   private void removeExistingBreadCrumb(IForm form, IPage page) {
+    if (m_currentBreadCrumb == null) {
+      return;
+    }
+
     if (m_currentBreadCrumb.belongsTo(form, page)) {
       LOG.debug("Removing existing bread crumb: " + m_currentBreadCrumb);
 
@@ -217,6 +221,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
       }
 
       LOG.debug("Current bread crumbs way: " + toString());
+      fireBreadCrumbsChanged();
     }
     else {
       IBreadCrumb[] breadCrumbs = getBreadCrumbs().toArray(new IBreadCrumb[getBreadCrumbs().size()]);
@@ -227,6 +232,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
           getBreadCrumbs().remove(breadCrumb);
 
           LOG.debug("Current bread crumbs way: " + toString());
+          fireBreadCrumbsChanged();
           return;
         }
       }
@@ -242,8 +248,6 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
 
       getBreadCrumbs().add(m_currentBreadCrumb);
       LOG.debug("Added new bread crumb: " + m_currentBreadCrumb);
-
-      fireBreadCrumbsChanged();
     }
 
     if (form instanceof OutlineChooserForm) {
@@ -253,6 +257,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
       m_currentBreadCrumb = new BreadCrumb(this, form, page);
     }
     LOG.debug("Current bread crumbs way: " + toString());
+    fireBreadCrumbsChanged();
   }
 
   @Override

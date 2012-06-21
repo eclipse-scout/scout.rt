@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.rap.mobile.action;
+package org.eclipse.scout.rt.client.mobile.ui.action;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
  * A {@link IActionNode} which wraps a {@link IButton}. <br/> {@link PropertyChangeEvent}s fired by the button are delegated
  * to the action
  * 
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class ButtonWrappingAction extends AbstractMenu {
   private IButton m_wrappedButton;

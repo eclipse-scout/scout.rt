@@ -13,20 +13,27 @@ package org.eclipse.scout.rt.ui.rap.mobile.form;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.Icons;
-import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
+import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.rap.mobile.action.ActionButtonBarUtility;
-import org.eclipse.scout.rt.ui.rap.mobile.action.ButtonWrappingAction;
+import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutMobileFormHeader.class);
+
   private List<IMenu> m_leftBarActions;
   private P_FormToolsAction m_formToolsAction;
   private List<IMenu> m_rightBarActions;
@@ -48,45 +55,86 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
   }
 
   @Override
-  protected void collectMenusForLeftButtonBar(List<IMenu> menuList) {
+  protected void collectMenusForLeftButtonBar(final List<IMenu> menuList) {
+    List<IMenu> collectedMenus = new LinkedList<IMenu>(menuList);
     if (m_leftBarActions != null && m_leftBarActions.size() > 0) {
-      menuList.addAll(m_leftBarActions);
+      collectedMenus.addAll(m_leftBarActions);
     }
 
-    if (isAutoAddBackButtonEnabled() && !containsCloseAction()) {
-      menuList.add(new P_BackAction());
-    }
-  }
+    final List<IMenu> menuListToAdapt = new LinkedList<IMenu>(menuList);
+    menuListToAdapt.addAll(collectedMenus);
+    final BooleanHolder filled = new BooleanHolder(false);
+    ClientSyncJob job = new ClientSyncJob("Adapting form header left menus", getUiEnvironment().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer().adaptFormHeaderLeftActions(getScoutObject(), menuListToAdapt);
 
-  protected boolean containsCloseAction() {
-    if (m_leftBarActions == null) {
-      return false;
-    }
-
-    for (IMenu action : m_leftBarActions) {
-      if (action instanceof ButtonWrappingAction) {
-        IButton wrappedButton = ((ButtonWrappingAction) action).getWrappedButton();
-        switch (wrappedButton.getSystemType()) {
-          case IButton.SYSTEM_TYPE_CANCEL:
-          case IButton.SYSTEM_TYPE_CLOSE:
-          case IButton.SYSTEM_TYPE_OK:
-            if (wrappedButton.isVisible() && wrappedButton.isEnabled()) {
-              return true;
-            }
+        synchronized (RwtScoutMobileFormHeader.this) {
+          if (!filled.getValue()) {
+            menuList.addAll(menuListToAdapt);
+            filled.setValue(true);
+          }
         }
+      }
+    };
+    job.schedule();
+    try {
+      job.join(5000);
+    }
+    catch (InterruptedException e) {
+      LOG.warn("Failed to adapt form header left menus.", e);
+    }
+
+    synchronized (RwtScoutMobileFormHeader.this) {
+      if (!filled.getValue()) {
+        LOG.warn("Failed to adapt form header left menus, timeout reached.");
+        menuList.addAll(collectedMenus);
+        filled.setValue(true);
       }
     }
 
-    return false;
   }
 
   @Override
-  protected void collectMenusForRightButtonBar(List<IMenu> menuList) {
+  protected void collectMenusForRightButtonBar(final List<IMenu> menuList) {
+    List<IMenu> collectedMenus = new LinkedList<IMenu>(menuList);
     if (m_formToolsAction != null) {
-      menuList.add(m_formToolsAction);
+      collectedMenus.add(m_formToolsAction);
     }
     if (m_rightBarActions != null) {
-      menuList.addAll(m_rightBarActions);
+      collectedMenus.addAll(m_rightBarActions);
+    }
+
+    final List<IMenu> menuListToAdapt = new LinkedList<IMenu>(menuList);
+    menuListToAdapt.addAll(collectedMenus);
+    final BooleanHolder filled = new BooleanHolder(false);
+    ClientSyncJob job = new ClientSyncJob("Adapting form header left menus", getUiEnvironment().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer().adaptFormHeaderRightActions(getScoutObject(), menuListToAdapt);
+
+        synchronized (RwtScoutMobileFormHeader.this) {
+          if (!filled.getValue()) {
+            menuList.addAll(menuListToAdapt);
+            filled.setValue(true);
+          }
+        }
+      }
+    };
+    job.schedule();
+    try {
+      job.join(5000);
+    }
+    catch (InterruptedException e) {
+      LOG.warn("Failed to adapt form header right menus.", e);
+    }
+
+    synchronized (RwtScoutMobileFormHeader.this) {
+      if (!filled.getValue()) {
+        LOG.warn("Failed to adapt form header right menus, timeout reached.");
+        menuList.addAll(collectedMenus);
+        filled.setValue(true);
+      }
     }
   }
 
@@ -170,22 +218,6 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
     }
 
     return null;
-  }
-
-  public boolean isAutoAddBackButtonEnabled() {
-    return m_autoAddBackButtonEnabled;
-  }
-
-  /**
-   * If this property is set to true it automatically adds a back button if there is no other button on the left side
-   * which is able to close the form.
-   */
-  public void setAutoAddBackButtonEnabled(boolean autoAddBackButtonEnabled) {
-    m_autoAddBackButtonEnabled = autoAddBackButtonEnabled;
-  }
-
-  private class P_BackAction extends AbstractMobileBackAction {
-
   }
 
   private class P_FormToolsAction extends AbstractMenu {

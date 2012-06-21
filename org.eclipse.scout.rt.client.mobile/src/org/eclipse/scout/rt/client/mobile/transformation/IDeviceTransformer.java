@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -36,4 +39,8 @@ public interface IDeviceTransformer {
   void transformPageDetailTable(ITable table);
 
   boolean acceptForm(IForm form);
+
+  void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList);
+
+  void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList);
 }

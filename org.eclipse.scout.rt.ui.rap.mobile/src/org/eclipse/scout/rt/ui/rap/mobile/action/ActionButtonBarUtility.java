@@ -13,11 +13,12 @@ package org.eclipse.scout.rt.ui.rap.mobile.action;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class ActionButtonBarUtility {
 

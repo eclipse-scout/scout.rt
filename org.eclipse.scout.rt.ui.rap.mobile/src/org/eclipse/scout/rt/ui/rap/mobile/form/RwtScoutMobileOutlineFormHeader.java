@@ -23,7 +23,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutMobileOutlineFormHeader extends AbstractRwtScoutFormHeader {
   private RwtScoutToolButtonBar m_uiToolButtonBar;
@@ -47,7 +47,7 @@ public class RwtScoutMobileOutlineFormHeader extends AbstractRwtScoutFormHeader 
     GridLayout gridLayout = RwtLayoutUtility.createGridLayoutNoSpacing(1, false);
     container.setLayout(gridLayout);
 
-    m_uiToolButtonBar = new RwtScoutToolButtonBar();
+    m_uiToolButtonBar = new RwtScoutMobileToolButtonBar();
     m_uiToolButtonBar.createUiField(container, getDesktop(), getUiEnvironment());
 
     GridData gridData = new GridData(SWT.RIGHT, SWT.CENTER, true, true);

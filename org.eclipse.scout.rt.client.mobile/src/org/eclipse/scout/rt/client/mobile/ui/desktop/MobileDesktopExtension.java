@@ -21,9 +21,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileHomeAction;
+import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformer;
-import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformer;
-import org.eclipse.scout.rt.client.mobile.transformation.TabletDeviceTransformer;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -37,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
+import org.eclipse.scout.service.SERVICES;
 
 public class MobileDesktopExtension extends AbstractDesktopExtension {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileDesktopExtension.class);
@@ -57,16 +57,11 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   }
 
   public IDeviceTransformer getDeviceTransformer() {
-    return m_deviceTransformer;
-  }
+    if (m_deviceTransformer == null) {
+      m_deviceTransformer = SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer();
+    }
 
-  protected IDeviceTransformer createDeviceTransformer() {
-    if (UserAgentUtility.isTabletDevice()) {
-      return new TabletDeviceTransformer();
-    }
-    else {
-      return new MobileDeviceTransformer(getCoreDesktop());
-    }
+    return m_deviceTransformer;
   }
 
   @Override
@@ -92,8 +87,7 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
       return super.execInit();
     }
 
-    m_deviceTransformer = createDeviceTransformer();
-    m_deviceTransformer.desktopInit(getCoreDesktop());
+    getDeviceTransformer().desktopInit(getCoreDesktop());
 
     return ContributionCommand.Continue;
   }
