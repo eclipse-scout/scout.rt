@@ -67,7 +67,9 @@ public class BreadCrumb implements IBreadCrumb {
       if (desktop.getOutline() != outline) {
         desktop.setOutline(outline);
       }
-      outline.selectNode(getPage());
+      if (outline != null) {
+        outline.selectNode(getPage());
+      }
     }
   }
 
