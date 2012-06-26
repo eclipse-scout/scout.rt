@@ -53,7 +53,7 @@ public final class StringUtility {
   /**
    * Wildcard Pattern may contain only: wildcards: *,%,?,_ characters:<br>
    * A-Z,a-z,0-9 % and * are replaced by .* ? and _ are replaced by . all
-   * invalid characters are als replaced by .
+   * invalid characters are also replaced by .
    */
   public static String toRegExPattern(String wildcardPattern) {
     if (wildcardPattern == null) {
@@ -86,6 +86,10 @@ public final class StringUtility {
         case '>':
         case '=': {
           buf.append(ch[i]);
+          break;
+        }
+        case '.': {
+          buf.append("\\.");
           break;
         }
         default: {
