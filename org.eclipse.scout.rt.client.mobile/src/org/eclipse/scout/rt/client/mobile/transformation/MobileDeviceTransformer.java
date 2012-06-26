@@ -10,15 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -83,18 +80,6 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   @Override
   protected boolean isPageDetailTableAllowedToBeClosed(IPage activePage) {
     return activePage.isLeaf();
-  }
-
-  /**
-   * Adds a back button if there is no other button on the left side which is able to close the form.
-   */
-  @Override
-  public void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList) {
-    super.adaptFormHeaderLeftActions(form, menuList);
-
-    if (!containsCloseAction(menuList)) {
-      menuList.add(new P_BackAction());
-    }
   }
 
   private class P_BackAction extends AbstractMobileBackAction {
