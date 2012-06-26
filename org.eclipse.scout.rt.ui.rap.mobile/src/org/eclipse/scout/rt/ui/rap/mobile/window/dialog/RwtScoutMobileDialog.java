@@ -64,6 +64,10 @@ public class RwtScoutMobileDialog extends RwtScoutDialog {
 
     @Override
     public void handleEvent(Event event) {
+      if (getUiDialog().getShell().isDisposed()) {
+        return;
+      }
+
       getUiDialog().getShell().setBounds(getBoundsProvider().getBounds());
     }
   }
