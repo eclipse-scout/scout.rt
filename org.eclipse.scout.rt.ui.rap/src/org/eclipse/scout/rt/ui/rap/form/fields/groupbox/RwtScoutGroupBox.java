@@ -382,6 +382,11 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
     //end notify
   }
 
+  @Override
+  protected void setBackgroundFromScout(String scoutColor) {
+    setBackgroundFromScout(scoutColor, getUiContainer());
+  }
+
   private class P_ExpansionListener extends ExpansionAdapter {
     @Override
     public void expansionStateChanged(ExpansionEvent e) {
