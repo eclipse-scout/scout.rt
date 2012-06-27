@@ -777,7 +777,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     TreePath closestPath = getSwingTree().getClosestPathForLocation(x, y);
     Rectangle pathBounds = getSwingTree().getPathBounds(closestPath);
     TreePath path = null;
-    if (pathBounds.contains(pathBounds.x, y)) {
+    if (closestPath != null && pathBounds != null && pathBounds.contains(pathBounds.x, y)) {
       path = closestPath;
     }
     return path;
