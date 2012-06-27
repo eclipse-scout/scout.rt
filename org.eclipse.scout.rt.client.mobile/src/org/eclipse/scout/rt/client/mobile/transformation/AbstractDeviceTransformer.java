@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -227,6 +228,9 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     if (field instanceof IGroupBox) {
       transformGroupBox((IGroupBox) field);
     }
+    else if (field instanceof ISmartField) {
+      transformSmartField((ISmartField) field);
+    }
 
   }
 
@@ -255,6 +259,19 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   private void transformGroupBox(IGroupBox groupBox) {
     groupBox.setGridColumnCountHint(1);
+  }
+
+  private void transformSmartField(ISmartField<?> field) {
+    if (field.getBrowseMaxRowCount() > getSmartFieldBrowseMaxRowCount()) {
+      field.setBrowseMaxRowCount(getSmartFieldBrowseMaxRowCount());
+    }
+  }
+
+  /**
+   * Used to keep the row count small which speeds up the list.
+   */
+  protected int getSmartFieldBrowseMaxRowCount() {
+    return 20;
   }
 
   protected IDesktop getDesktop() {
