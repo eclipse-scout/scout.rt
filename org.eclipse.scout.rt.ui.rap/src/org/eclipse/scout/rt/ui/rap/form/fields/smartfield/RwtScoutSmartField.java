@@ -75,9 +75,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * <h3>RwtScoutSmartField</h3> ...
- * 
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<?>> implements IRwtScoutSmartField, IPopupSupport {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutSmartField.class);
@@ -181,7 +179,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     return VARIANT_SMARTFIELD_DISABLED;
   }
 
-  @Override
   public IDropDownButtonForPatch getUiBrowseButton() {
     return m_browseButton;
   }
@@ -263,7 +260,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   protected void setProposalFormFromScout(ISmartFieldProposalForm form) {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
-//        UICallBack.deactivate(m_pendingProposalJob.getClass().getName() + m_pendingProposalJob.hashCode());
         m_pendingProposalJob.cancel();
         m_pendingProposalJob = null;
       }

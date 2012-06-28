@@ -11,14 +11,11 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.smartfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.ui.rap.ext.IDropDownButtonForPatch;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 
 public interface IRwtScoutSmartField extends IRwtScoutFormField<ISmartField<?>> {
 
   String VARIANT_SMARTFIELD = "smartfield";
   String VARIANT_SMARTFIELD_DISABLED = "smartfield-disabled";
-
-  IDropDownButtonForPatch getUiBrowseButton();
 
 }

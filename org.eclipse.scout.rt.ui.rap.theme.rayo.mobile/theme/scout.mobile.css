@@ -2114,6 +2114,12 @@ Composite.datefield:hover {
 Composite.timefield:hover {
   background-color: #fef9f1;
 }
+Composite.smartfield_browse {
+  background-image: url(theme/img/button/smartfield_browse.png);
+}
+Composite.smartfield_browse:disabled {
+  background-image: url(theme/img/button/smartfield_browse_disabled.png);
+}
 ScrollBar {
   width: 0px;
 }
