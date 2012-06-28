@@ -17,6 +17,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 /**
  * This class overrides the text shortening behaviour of the CLabel
@@ -28,23 +30,16 @@ import org.eclipse.swt.widgets.Composite;
 public class CLabelEx extends CLabel {
   private static final long serialVersionUID = 1L;
 
-  private static final int DRAW_FLAGS = /*XXX rap SWT.DRAW_MNEMONIC | */SWT.DRAW_TAB | SWT.DRAW_TRANSPARENT | SWT.DRAW_DELIMITER;
-  /** a string inserted in the middle of text that has been shortened */
   private static final String ELLIPSIS = "...";
-  private boolean m_isFieldRangeLabel = false;
 
   private String m_originalText = "";
+  private String m_originalTooltip;
+  private Image m_originalImage;
 
   public CLabelEx(Composite parent, int style) {
     super(parent, style | SWT.NO_FOCUS);
-  }
 
-  public boolean isFieldRangeLabel() {
-    return m_isFieldRangeLabel;
-  }
-
-  public void setFieldRangeLabel(boolean isFieldRangeLabel) {
-    this.m_isFieldRangeLabel = isFieldRangeLabel;
+    addListener(SWT.Resize, new P_ResizeListener());
   }
 
   @Override
@@ -54,19 +49,15 @@ public class CLabelEx extends CLabel {
   }
 
   @Override
-  public void setBounds(Rectangle bounds) {
-    super.setBounds(bounds);
-    if (bounds.width > 0) {
-      updateText(bounds.width);
-    }
+  public void setToolTipText(String tooltip) {
+    super.setToolTipText(tooltip);
+    m_originalTooltip = tooltip;
   }
 
   @Override
-  public void setSize(Point size) {
-    super.setSize(size);
-    if (size.x > 0) {
-      updateText(size.x);
-    }
+  public void setImage(Image image) {
+    super.setImage(image);
+    m_originalImage = image;
   }
 
   private void updateText(int labelWidth) {
@@ -80,55 +71,71 @@ public class CLabelEx extends CLabel {
       imageWidth = r.width;
     }
     if (extent.x > availableWidth - imageWidth) {
-      setImage(null);
+      super.setImage(null);
       if (extent.x > availableWidth) {
         super.setText(shortenText(null, m_originalText, availableWidth));
-        setToolTipText(m_originalText);
+        super.setToolTipText(m_originalText);
       }
       else {
-        setToolTipText("");
+        super.setText(m_originalText);
+        super.setToolTipText(m_originalTooltip);
       }
+    }
+    else {
+      super.setText(m_originalText);
+      super.setToolTipText(m_originalTooltip);
+      super.setImage(m_originalImage);
     }
   }
 
   /**
-   * Shorten the given text <code>t</code> so that its length doesn't exceed
+   * Shorten the given text <code>text</code> so that its length doesn't exceed
    * the given width. The default implementation replaces characters in the
    * center of the original string with an ellipsis ("...").
    * Override if you need a different strategy.
    * 
    * @param gc
    *          the gc to use for text measurement
-   * @param t
+   * @param text
    *          the text to shorten
    * @param width
    *          the width to shorten the text to, in pixels
    * @return the shortened text
    */
-  public String shortenText(Object gc, String t, int width) {
-    if (t == null) {
+  public String shortenText(Object gc, String text, int width) {
+    System.out.println("width:" + width);
+    if (text == null || width <= 0) {
       return null;
     }
-    String text = t;
-    String rangeWord = "";
-    if (m_isFieldRangeLabel) {
-      text = t.substring(0, t.lastIndexOf(' '));
-      rangeWord = t.substring(t.lastIndexOf(' '));
-    }
+
     int textWidth = TextSizeUtil.stringExtent(getFont(), ELLIPSIS).x;
-    int rangeWidth = TextSizeUtil.stringExtent(getFont(), rangeWord).x;
-    // initial number of characters
-    int s = text.length();
+    int charCount = text.length();
+
     // shorten string
-    while (s >= 0) {
-      String s1 = t.substring(0, s);
-      int l1 = TextSizeUtil.stringExtent(getFont(), s1).x;
-      if (l1 + textWidth + rangeWidth < width) {
-        t = s1 + ELLIPSIS + rangeWord;
-        break;
+    while (charCount >= 0) {
+      String shortenedText = text.substring(0, charCount);
+      int l1 = TextSizeUtil.stringExtent(getFont(), shortenedText).x;
+      if (l1 + textWidth < width) {
+        return shortenedText + ELLIPSIS;
       }
-      s--;
+      if (charCount == 0) {
+        return "";
+      }
+      charCount--;
     }
-    return t;
+
+    return null;
+  }
+
+  private class P_ResizeListener implements Listener {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void handleEvent(Event event) {
+      if (event.type == SWT.Resize) {
+        updateText(getBounds().width);
+      }
+    }
   }
 }

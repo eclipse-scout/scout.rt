@@ -85,13 +85,14 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     {
       GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, true);
       m_centerContainer.setLayoutData(gridData);
-      excludeCenterContainerIfNoTitleSet();
     }
 
     {
       GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, true);
       m_rightContainer.setLayoutData(gridData);
     }
+
+    adjustGridDataBasedOnTitle();
   }
 
   protected String getActionBarContainerVariant() {
@@ -186,11 +187,8 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     container.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
     container.setLayout(new FillLayout());
-
     m_titleField = getUiEnvironment().getFormToolkit().createCLabel(container, null, SWT.CENTER);
-    //FIXME CGU ClabelEx does not automatically expand if screen gets bigger
     m_titleField.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
-
     return container;
   }
 
@@ -257,13 +255,23 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
       getTitleField().setText(title);
     }
 
-    excludeCenterContainerIfNoTitleSet();
+    adjustGridDataBasedOnTitle();
   }
 
-  protected void excludeCenterContainerIfNoTitleSet() {
+  /**
+   * If there is a title, the center part grabs the excess horizontal space, the other parts NOT. This makes sure the
+   * title always uses as much space as possible. This means action button piling is not possible anymore if a title is
+   * set.
+   * <p>
+   * If no title is set the center part will be excluded and the left and the right part grab the excess horizontal
+   * space.
+   */
+  protected void adjustGridDataBasedOnTitle() {
     boolean hasTitle = getTitle() != null;
 
+    ((GridData) m_leftContainer.getLayoutData()).grabExcessHorizontalSpace = !hasTitle;
     ((GridData) m_centerContainer.getLayoutData()).exclude = !hasTitle;
+    ((GridData) m_rightContainer.getLayoutData()).grabExcessHorizontalSpace = !hasTitle;
   }
 
   public String getTitle() {
