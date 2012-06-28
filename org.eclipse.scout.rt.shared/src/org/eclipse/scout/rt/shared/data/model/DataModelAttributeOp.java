@@ -166,7 +166,10 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public boolean equals(Object obj) {
-      return (obj == null ? false : this.getClass() == obj.getClass());
+      if (obj == null) {
+        return false;
+      }
+      return (this.getClass() == obj.getClass() && this.m_operator == ((AbstractDataModelOp) obj).m_operator);
     }
 
     @Override
