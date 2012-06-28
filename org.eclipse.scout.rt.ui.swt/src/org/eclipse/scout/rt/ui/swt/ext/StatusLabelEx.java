@@ -64,6 +64,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
 
     m_nonMandatoryFont = m_label.getFont();
     m_nonMandatoryForegroundColor = m_label.getForeground();
+    m_enabled = super.getEnabled();
   }
 
   protected void createLayout() {
