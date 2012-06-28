@@ -328,23 +328,23 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       final TreeEx proposalTree = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), TreeEx.class);
       if (proposalTree != null || proposalTable != null) {
         form.addFormListener(
-              new FormListener() {
-                @Override
-                public void formChanged(FormEvent e) throws ProcessingException {
-                  switch (e.getType()) {
-                    case FormEvent.TYPE_STRUCTURE_CHANGED: {
-                      Runnable t = new Runnable() {
-                        @Override
-                        public void run() {
-                          optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
-                        }
-                      };
-                      getUiEnvironment().invokeUiLater(t);
-                      break;
-                    }
+            new FormListener() {
+              @Override
+              public void formChanged(FormEvent e) throws ProcessingException {
+                switch (e.getType()) {
+                  case FormEvent.TYPE_STRUCTURE_CHANGED: {
+                    Runnable t = new Runnable() {
+                      @Override
+                      public void run() {
+                        optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
+                      }
+                    };
+                    getUiEnvironment().invokeUiLater(t);
+                    break;
                   }
                 }
-              });
+              }
+            });
         //enqueue a later display job since there may be waiting display tasks in the queue that change the table/tree
         getUiEnvironment().getDisplay().asyncExec(new Runnable() {
           @Override
@@ -647,6 +647,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
         default:
           if (m_proposalPopup == null) {
             requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true, 0);
+            e.doit = false;
           }
           else {
             Widget c = null;
@@ -656,9 +657,10 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
             if (c == null) {
               c = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), Tree.class);
             }
-            RwtUtility.handleNavigationKey(c, e.keyCode);
+            if (RwtUtility.handleNavigationKey(c, e.keyCode)) {
+              e.doit = false;
+            }
           }
-          e.doit = false;
           break;
       }
     }
