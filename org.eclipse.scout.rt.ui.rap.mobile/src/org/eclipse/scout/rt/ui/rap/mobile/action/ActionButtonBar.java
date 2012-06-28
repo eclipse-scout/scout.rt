@@ -86,11 +86,15 @@ public class ActionButtonBar extends Composite {
     m_displayedMenus = new LinkedList<IMenu>();
     m_displayedMenus.addAll(Arrays.asList(m_menus));
 
+    if (menus != null && menus.length > 0) {
+      // attaching the listeners must happen before creating the buttons to avoid events getting lost
+      attachScoutPropertyChangeListener();
+    }
+
     createButtonBar();
 
     if (menus != null && menus.length > 0) {
       addListener(SWT.Resize, new P_ResizeListener());
-      attachScoutPropertyChangeListener();
       scheduleHandleButtonPilingInUiThread();
     }
 
