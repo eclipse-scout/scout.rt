@@ -20,7 +20,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * Instances of this interface are used with FormFieldInjectionThreadLocal to define a context within form fields are
  * created. {@link AbstractForm} and {@link AbstractCompositeField} use this mechanism to contribute fields using the
  * {@link InjectFieldTo} annotation.
- * @since 3.9
+ * 
+ * @since 3.8.1
  */
 public interface IFormFieldInjection {
   /**

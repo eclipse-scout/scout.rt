@@ -23,7 +23,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * This thread local is used by {@link AbstractForm} and {@link AbstractFormField} to put its contributions.
  * <p>
  * The caller is responsible to call #push and #pop as in a stack manner using try...finally.
- * @since 3.9
+ * 
+ * @since 3.8.1
  */
 public final class FormFieldInjectionThreadLocal {
   private static final ThreadLocal<FormFieldInjectionThreadLocal> THREAD_LOCAL = new ThreadLocal<FormFieldInjectionThreadLocal>() {

@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 /**
  * Default implementation that inserts the fields at the right place based on their {@link Order} annotation.
  * 
- * @since 3.9
+ * @since 3.8.1
  */
 public class DefaultFormFieldInjection implements IFormFieldInjection {
   private final ArrayList<IFormField> m_list = new ArrayList<IFormField>();
