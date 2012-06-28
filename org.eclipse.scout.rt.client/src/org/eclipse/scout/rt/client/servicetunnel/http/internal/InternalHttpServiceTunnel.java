@@ -188,13 +188,14 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
     boolean sentCancelRequest = false;
     synchronized (backgroundLock) {
       backgroundJob.schedule();
+
       while (true) {
         res = backgroundJob.getResponse();
         if (res != null) {
           break;
         }
         IProgressMonitor mon = backgroundJob.getMonitor();
-        if ((!sentCancelRequest) && JobEx.isCurrentJobCanceled() || (mon != null && mon.isCanceled())) {
+        if ((!sentCancelRequest) && (JobEx.isCurrentJobCanceled() || (mon != null && mon.isCanceled()))) {
           sentCancelRequest = true;
           boolean success = sendCancelRequest(req.getRequestSequence());
           if (success) {
