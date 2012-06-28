@@ -57,9 +57,6 @@ public class BasicTransaction implements ITransaction {
 
   @Override
   public void registerMember(ITransactionMember member) throws ProcessingException {
-    if (m_cancelled) {
-      throw new ProcessingException("Interrupted", new InterruptedException());
-    }
     synchronized (m_memberMapLock) {
       String memberId = member.getMemberId();
       if (LOG.isDebugEnabled()) {
@@ -74,6 +71,10 @@ public class BasicTransaction implements ITransaction {
         old.release();
       }
       m_memberMap.put(memberId, member);
+      //throw AFTER registering the resource in order to correctly release it later-on, bug 383736.
+      if (m_cancelled) {
+        throw new ProcessingException("Interrupted", new InterruptedException());
+      }
     }
   }
 

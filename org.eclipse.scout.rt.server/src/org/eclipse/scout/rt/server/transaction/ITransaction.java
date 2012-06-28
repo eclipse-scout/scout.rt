@@ -49,6 +49,12 @@ public interface ITransaction {
   @Deprecated
   void registerResource(ITransactionMember member);
 
+  /**
+   * register the member (even if the transaction is cancelled)
+   * 
+   * @throws ProcessingException
+   *           with an {@link InterruptedException} when the transaction is cancelled
+   */
   void registerMember(ITransactionMember member) throws ProcessingException;
 
   ITransactionMember getMember(String memberId);
