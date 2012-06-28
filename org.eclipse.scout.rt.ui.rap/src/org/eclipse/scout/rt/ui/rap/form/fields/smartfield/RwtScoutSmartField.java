@@ -671,6 +671,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
         default:
           if (m_proposalPopup == null) {
             requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true, 0);
+            e.doit = false;
           }
           else {
             Widget c = null;
@@ -680,7 +681,9 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
             if (c == null) {
               c = RwtUtility.findChildComponent(m_proposalPopup.getUiContentPane(), Tree.class);
             }
-            RwtUtility.handleNavigationKey(c, e.keyCode);
+            if (RwtUtility.handleNavigationKey(c, e.keyCode)) {
+              e.doit = false;
+            }
           }
           break;
       }
