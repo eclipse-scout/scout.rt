@@ -20,6 +20,7 @@ import java.net.URL;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
@@ -39,6 +40,7 @@ public class SwtScoutHtmlField extends SwtScoutValueFieldComposite<IHtmlField> i
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutHtmlField.class);
 
   private File m_tempDir;
+  private String m_anchorName;
 
   public SwtScoutHtmlField() {
     File tempFile;
@@ -207,12 +209,30 @@ public class SwtScoutHtmlField extends SwtScoutValueFieldComposite<IHtmlField> i
 
   }
 
+  protected void setScrollToAnchorFromScout(String anchorName) {
+    if (!StringUtility.isNullOrEmpty(anchorName)) {
+      String url = getSwtField().getUrl();
+      if (!StringUtility.isNullOrEmpty(url)) {
+        String baseUrl = url.replace("#" + m_anchorName, "");
+        getSwtField().setUrl(baseUrl + "#" + anchorName);
+        getSwtField().refresh();
+      }
+      m_anchorName = anchorName;
+    }
+  }
+
   /**
    * scout property handler override
    */
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
+    if (name.equals(IHtmlField.PROP_SCROLLBAR_SCROLL_TO_END)) {
+      getSwtField().execute("window.scrollTo(0, document.body.scrollHeight)");
+    }
+    else if (name.equals(IHtmlField.PROP_SCROLLBAR_SCROLL_TO_ANCHOR)) {
+      setScrollToAnchorFromScout(TypeCastUtility.castValue(newValue, String.class));
+    }
   }
 
 }

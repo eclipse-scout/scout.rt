@@ -8,7 +8,10 @@
     margin:0;
   }
   a {
+    font-family:arial;
+    font-size:12#FONT_SIZE_UNIT#;
   	color: #67A8CE;
+  	margin:0;
   }
   td {
     vertical-align: top;
@@ -17,10 +20,19 @@
     font-weight:bold;
     font-size:18#FONT_SIZE_UNIT#;
     text-align:center;
-    color:white;
+    color:#FFFFFF;
   }
   tr.selected td {
+    font-family:arial;
+    font-size:12#FONT_SIZE_UNIT#;
     background-color:#FFFFFF;
+    margin:0;
+  }
+  tr.default td {
+    font-family:arial;
+    font-size:12#FONT_SIZE_UNIT#;
+  	background-color:#EBF4F8;
+  	margin:0;
   }
   tr.line td {
     background-color:#DFEEF5;
@@ -31,17 +43,29 @@
   tr.default td.bullet {
     background-image: url("wizard_bullet.png");
     background-repeat: no-repeat;
-    padding-top : 2px;
+    padding-top: 2px;
+    font-weight:bold;
+    font-size:18#FONT_SIZE_UNIT#;
+    text-align:center;
+    color: #FFFFFF;
   }
   tr.selected td.bullet {
     background-image: url("wizard_bullet_selected.png");
     background-repeat: no-repeat;
-    padding-top : 2px;
+    padding-top: 2px;
+    font-weight:bold;
+    font-size:18#FONT_SIZE_UNIT#;
+    text-align:center;
+    color: #FFFFFF;
   }
   tr.disabled td.bullet {
     background-image: url("wizard_bullet_disabled.png");
     background-repeat: no-repeat;
-    padding-top : 2px;
+    padding-top: 2px;
+    font-weight:bold;
+    font-size:18#FONT_SIZE_UNIT#;
+    text-align:center;
+    color: #FFFFFF;
   }
   </style>
 </head>

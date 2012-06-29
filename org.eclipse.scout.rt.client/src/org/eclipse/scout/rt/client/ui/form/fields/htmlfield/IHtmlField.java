@@ -33,14 +33,22 @@ public interface IHtmlField extends IValueField<String> {
   String PROP_MAX_LENGTH = "maxLength";
   String PROP_SCROLLBARS_ENABLED = "scrollBarsEnabled";
   String PROP_INSERT_IMAGE = "insertImage";
+  String PROP_SCROLLBAR_SCROLL_TO_END = "scrollToEnd";
+  String PROP_SCROLLBAR_SCROLL_TO_ANCHOR = "scrollToPosition";
 
   void setMaxLength(int len);
+
+  void setScrollToAnchor(String anchorName);
+
+  String getScrollToAnchor();
 
   int getMaxLength();
 
   boolean isHtmlEditor();
 
   boolean isScrollBarEnabled();
+
+  void scrollToEnd();
 
   /*
    * Runtime

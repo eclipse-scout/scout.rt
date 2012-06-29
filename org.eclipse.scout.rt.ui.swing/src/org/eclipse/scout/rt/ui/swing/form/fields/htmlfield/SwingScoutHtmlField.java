@@ -27,12 +27,14 @@ import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -82,6 +84,10 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     m_htmlView.setBorder(null);
     m_htmlView.setMargin(null);
     m_htmlView.setCaretPosition(0);
+    if (m_htmlView.getCaret() instanceof DefaultCaret) {
+      // never update caret to avoid scrolling to the beginning on every data change.
+      ((DefaultCaret) m_htmlView.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+    }
     m_htmlView.addHyperlinkListener(new HyperlinkListener() {
       @Override
       public void hyperlinkUpdate(HyperlinkEvent e) {
@@ -133,6 +139,14 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
   @Override
   protected void attachScout() {
     super.attachScout();
+    IHtmlField f = getScoutObject();
+    setScrollToAnchorFromScout(f.getScrollToAnchor());
+  }
+
+  protected void setScrollToAnchorFromScout(String anchorName) {
+    if (!StringUtility.isNullOrEmpty(anchorName)) {
+      getSwingHtmlField().scrollToReference(anchorName);
+    }
   }
 
   protected File getTempFolder(boolean autoCreate) {
@@ -258,6 +272,10 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     m_htmlView.setEditable(getScoutObject().isHtmlEditor());
+    if (m_htmlView.getCaret() instanceof DefaultCaret) {
+      // enable / disable caret update according to editability.
+      ((DefaultCaret) m_htmlView.getCaret()).setUpdatePolicy(getScoutObject().isHtmlEditor() ? DefaultCaret.UPDATE_WHEN_ON_EDT : DefaultCaret.NEVER_UPDATE);
+    }
   }
 
   protected void fireHyperlinkActionFromSwing(final URL url) {
@@ -322,5 +340,11 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
+    if (name.equals(IHtmlField.PROP_SCROLLBAR_SCROLL_TO_END)) {
+      getSwingHtmlField().setCaretPosition(getSwingHtmlField().getDocument().getLength());
+    }
+    else if (name.equals(IHtmlField.PROP_SCROLLBAR_SCROLL_TO_ANCHOR)) {
+      setScrollToAnchorFromScout(TypeCastUtility.castValue(newValue, String.class));
+    }
   }
 }

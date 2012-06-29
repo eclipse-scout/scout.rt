@@ -239,6 +239,21 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     }
   }
 
+  @Override
+  public void setScrollToAnchor(String anchorName) {
+    propertySupport.setPropertyString(PROP_SCROLLBAR_SCROLL_TO_ANCHOR, anchorName);
+  }
+
+  @Override
+  public String getScrollToAnchor() {
+    return propertySupport.getPropertyString(PROP_SCROLLBAR_SCROLL_TO_ANCHOR);
+  }
+
+  @Override
+  public void scrollToEnd() {
+    propertySupport.setPropertyAlwaysFire(PROP_SCROLLBAR_SCROLL_TO_END, null);
+  }
+
   /**
    * Returns whether this html component is spell checkable.
    */

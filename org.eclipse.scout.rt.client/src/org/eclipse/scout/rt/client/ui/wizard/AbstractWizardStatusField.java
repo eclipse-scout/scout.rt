@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,6 +29,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   private P_WizardListener m_scoutWizardListener;
   private P_WizardStepListener m_scoutWizardStepListener;
   private boolean m_dirty;
+  public static final String STEP_ANCHOR_IDENTIFIER = "STEP_";
 
   public IWizardStatusHtmlProvider getHtmlProvider() {
     return m_htmlProvider;
@@ -128,6 +129,15 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
         m_htmlProvider.initialize(this);
       }
       setValue(m_htmlProvider.createHtml(m_wizard));
+      // now scroll to the active step
+      int index = 1;
+      for (IWizardStep<?> step : m_wizard.getSteps()) {
+        if (step == m_wizard.getActiveStep()) {
+          setScrollToAnchor(STEP_ANCHOR_IDENTIFIER + index);
+          break;
+        }
+        index++;
+      }
     }
     catch (Exception e) {
       LOG.warn(null, e);
