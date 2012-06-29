@@ -17,6 +17,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.rwt.resources.IResourceManager.RegisterOptions;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
@@ -139,7 +142,7 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
     }
     else {
       try {
-        String indexFile = m_browserExtension.addResource("index.html", new ByteArrayInputStream(cleanHtml.getBytes("UTF-8")));
+        String indexFile = m_browserExtension.addResource("index.html", new ByteArrayInputStream(cleanHtml.getBytes("UTF-8")), "UTF-8", RegisterOptions.VERSION);
         getUiField().setUrl(indexFile);
       }
       catch (UnsupportedEncodingException e) {
@@ -148,4 +151,23 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
     }
   }
 
+  protected void setScrollToAnchorFromScout(String anchorName) {
+    if (!StringUtility.isNullOrEmpty(anchorName)) {
+      getUiField().setUrl(getUiField().getUrl() + "#" + anchorName);
+    }
+  }
+
+  /**
+   * scout property handler override
+   */
+  @Override
+  protected void handleScoutPropertyChange(String name, Object newValue) {
+    super.handleScoutPropertyChange(name, newValue);
+    if (name.equals(IHtmlField.PROP_SCROLLBAR_SCROLL_TO_END)) {
+      getUiField().execute("window.scrollTo(0, document.body.scrollHeight)");
+    }
+    else if (name.equals(IHtmlField.PROP_SCROLLBAR_SCROLL_TO_ANCHOR)) {
+      setScrollToAnchorFromScout(TypeCastUtility.castValue(newValue, String.class));
+    }
+  }
 }

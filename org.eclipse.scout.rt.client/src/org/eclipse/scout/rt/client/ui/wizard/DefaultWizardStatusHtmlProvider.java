@@ -109,21 +109,25 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     }
     StringBuilder buf = new StringBuilder();
     String spacerCssClass = "selected".equals(cssClass) ? "spacerselected" : "spacer";
-    appendHtmlForSpacerLine(buf, spacerCssClass, 7);
+    appendHtmlForSpacerLine(buf, spacerCssClass, 7, AbstractWizardStatusField.STEP_ANCHOR_IDENTIFIER + index);
     buf.append("<tr class=\"" + cssClass + "\">\n");
     buf.append(" <td width=\"15\"><img src=\"empty.png\" width=\"1\" height=\"30\"></td>\n");
-    buf.append(" <td width=\"24\" valign=\"top\" class=\"bullet\" style=\"padding:4px;\">" + index + "</td>\n");
+    buf.append(" <td width=\"24\" valign=\"top\" class=\"bullet\" style=\"padding:0px;padding-top:" + (UserAgentUtility.isRichClient() ? "4" : "5") + "px;\">" + index + "</td>\n");
     buf.append(" <td width=\"17\"></td>\n");
     buf.append(" <td style=\"padding-top:2px;\">" + StringUtility.nvl(step.getTitleHtml(), step.getTitle()) + "</td>\n");
     buf.append(" <td width=\"15\"></td>\n");
     buf.append("</tr>\n");
-    appendHtmlForSpacerLine(buf, spacerCssClass, 11);
-    appendHtmlForSpacerLine(buf, "line", 1);
+    appendHtmlForSpacerLine(buf, spacerCssClass, 11, null);
+    appendHtmlForSpacerLine(buf, "line", 1, null);
     return buf.toString();
   }
 
-  protected void appendHtmlForSpacerLine(StringBuilder buf, String cssClass, int height) {
-    buf.append("<tr class=\"" + cssClass + "\"><td colspan=\"5\"><img src=\"empty.png\" width=\"1\" height=\"" + height + "\"></td></tr>\n");
+  protected void appendHtmlForSpacerLine(StringBuilder buf, String cssClass, int height, String anchor) {
+    buf.append("<tr class=\"" + cssClass + "\"><td colspan=\"5\">");
+    if (!StringUtility.isNullOrEmpty(anchor)) {
+      buf.append("<a name=\"" + anchor + "\"/>");
+    }
+    buf.append("<img src=\"empty.png\" width=\"1\" height=\"" + height + "\"></td></tr>\n");
   }
 
   /**

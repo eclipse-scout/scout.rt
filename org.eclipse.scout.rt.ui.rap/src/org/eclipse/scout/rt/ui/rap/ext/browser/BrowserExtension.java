@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.resources.IResourceManager;
+import org.eclipse.rwt.resources.IResourceManager.RegisterOptions;
 import org.eclipse.rwt.service.IServiceHandler;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -98,6 +99,30 @@ public class BrowserExtension {
    * @return the web url of the resource valid for calls from outside
    */
   public String addResource(String name, InputStream content) {
+    return addResource(name, content, null, null);
+  }
+
+  /**
+   * Adds a text resource that is encoded with the given <code>charset</code>.
+   * <p>
+   * By specifying an <code>option</code> other than <code>NONE</code> the resource will be versioned and/or compressed.
+   * As compressing is only intended for resources that contain JavaScript, versioning might be useful for other
+   * resources as well. When versioning is enabled a version number is appended to the resources' name which is derived
+   * from its content.
+   * </p>
+   * <p>
+   * 
+   * @param content
+   *          the content of the resource to add.
+   * @param charset
+   *          the name of the charset which was used when the resource
+   *          was stored. If set to <code>null</code> neither charset nor options will be set.
+   * @param options
+   *          an enumeration which specifies whether the resource will
+   *          be versioned and/or compressed. If set to <code>null</code> neither charset nor options will be set.
+   * @return the web url of the resource valid for calls from outside
+   */
+  public String addResource(String name, InputStream content, String charset, RegisterOptions options) {
     name = name.replaceAll("\\\\", "/");
     if (name == null || name.length() == 0) {
       return null;
@@ -108,7 +133,12 @@ public class BrowserExtension {
     String uniqueName = m_serviceHandlerId + name;
     m_tempFileNames.add(uniqueName);
     IResourceManager resourceManager = RWT.getResourceManager();
-    resourceManager.register(uniqueName, content);
+    if (charset != null && options != null) {
+      resourceManager.register(uniqueName, content, charset, options);
+    }
+    else {
+      resourceManager.register(uniqueName, content);
+    }
     return resourceManager.getLocation(uniqueName);
   }
 

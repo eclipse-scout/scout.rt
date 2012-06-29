@@ -29,6 +29,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   private P_WizardListener m_scoutWizardListener;
   private P_WizardStepListener m_scoutWizardStepListener;
   private boolean m_dirty;
+  public static final String STEP_ANCHOR_IDENTIFIER = "STEP_";
 
   public AbstractWizardStatusField() {
     this(true);
@@ -136,6 +137,15 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
         m_htmlProvider.initialize(this);
       }
       setValue(m_htmlProvider.createHtml(m_wizard));
+      // now scroll to the active step
+      int index = 1;
+      for (IWizardStep<?> step : m_wizard.getSteps()) {
+        if (step == m_wizard.getActiveStep()) {
+          setScrollToAnchor(STEP_ANCHOR_IDENTIFIER + index);
+          break;
+        }
+        index++;
+      }
     }
     catch (Exception e) {
       LOG.warn(null, e);
