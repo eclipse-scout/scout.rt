@@ -460,6 +460,8 @@ public class RemoteFile implements Serializable {
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("dir", "application/x-director");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("dms", "application/octet-stream");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("doc", "application/msword");
+    FILE_EXTENSION_TO_MIME_TYPE_MAP.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+    FILE_EXTENSION_TO_MIME_TYPE_MAP.put("dotx", "application/vnd.openxmlformats-officedocument.wordprocessingml.template");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("drw", "application/drafting");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("dvi", "application/x-dvi");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("dwg", "application/acad");
@@ -525,9 +527,12 @@ public class RemoteFile implements Serializable {
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("png", "image/png");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("pnm", "image/x-portable-anymap");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("pot", "application/mspowerpoint");
+    FILE_EXTENSION_TO_MIME_TYPE_MAP.put("potx", "application/vnd.openxmlformats-officedocument.presentationml.template");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("ppm", "image/x-portable-pixmap");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("pps", "application/mspowerpoint");
+    FILE_EXTENSION_TO_MIME_TYPE_MAP.put("ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("ppt", "application/mspowerpoint");
+    FILE_EXTENSION_TO_MIME_TYPE_MAP.put("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("ppz", "application/mspowerpoint");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("pre", "application/x-freelance");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("prt", "application/pro_eng");
@@ -554,6 +559,7 @@ public class RemoteFile implements Serializable {
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("skm", "application/x-koan");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("skp", "application/x-koan");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("skt", "application/x-koan");
+    FILE_EXTENSION_TO_MIME_TYPE_MAP.put("sldx", "application/vnd.openxmlformats-officedocument.presentationml.slide");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("smi", "application/smil");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("smil", "application/smil");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("snd", "audio/basic");
@@ -589,10 +595,14 @@ public class RemoteFile implements Serializable {
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("wav", "audio/x-wav");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("wrl", "model/vrml");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xbm", "image/x-xbitmap");
+    FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xlam", "application/vnd.ms-excel.addin.macroEnabled.12");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xlc", "application/vnd.ms-excel");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xll", "application/vnd.ms-excel");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xlm", "application/vnd.ms-excel");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xls", "application/vnd.ms-excel");
+    FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xlsb", "application/vnd.ms-excel.sheet.binary.macroEnabled.12");
+    FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.template");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xlw", "application/vnd.ms-excel");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xml", "text/xml");
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("xpm", "image/x-xpixmap");
