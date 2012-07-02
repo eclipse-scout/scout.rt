@@ -1047,7 +1047,6 @@ CLabel:disabled {
   background-color: transparent;
   background-image: none;
   border: none;
-  padding: 3px;
   cursor: default;
   opacity: 1;
 }
@@ -2027,12 +2026,18 @@ Composite.mobileFormHeader {
 }
 CLabel.actionBarContainer {
   color: white;
+  padding: 3px 0px;
   text-shadow: 0px -1px 0px #2a78a5;
   font: bold 17px Arial, Helvetica, sans-serif;
   background-color: transparent;
 }
 Composite.mobileTableActionBarContainer {
   background-image: gradient(linear, left top, left bottom, from(#ddebf4), to(#d4e1e7));
+}
+CLabel {
+  /* Top and bottom padding depend on logical grid row height. The text of the label should be aligned with the text of the field. */
+
+  padding: 5px 3px;
 }
 Button.mobile-datechooser-dialog-last-year,
 Button.mobile-datechooser-dialog-last-year:hover {

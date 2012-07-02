@@ -45,6 +45,9 @@ public class StatusLabelTop extends StatusLabelEx {
     containerLayout.marginWidth = 0;
     containerLayout.verticalSpacing = 0;
 
+    //Margin on top to clearly separate the fields
+    containerLayout.marginTop = 6;
+
     //a little margin between the label and a field
     containerLayout.marginBottom = 2;
 
