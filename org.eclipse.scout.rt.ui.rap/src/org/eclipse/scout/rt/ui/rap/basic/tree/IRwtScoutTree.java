@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.basic.tree;
 
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.swt.widgets.Tree;
@@ -20,4 +21,6 @@ public interface IRwtScoutTree extends IRwtScoutComposite<ITree> {
 
   @Override
   Tree getUiField();
+
+  TreeViewer getUiTreeViewer();
 }

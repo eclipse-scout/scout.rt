@@ -29,7 +29,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   private transient ListenerList listenerList = null;
   private final ITable m_scoutTable;
   private HashMap<ITableRow, HashMap<IColumn<?>, ICell>> m_cachedCells;
-  private final IRwtScoutTableForPatch m_uiTable_;
+  private final IRwtScoutTableForPatch m_uiTable;
   private final TableColumnManager m_columnManager;
   private Image m_imgCheckboxFalse;
   private Image m_imgCheckboxTrue;
@@ -41,13 +41,21 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
 
   public RwtScoutColumnModel(ITable scoutTable, IRwtScoutTableForPatch uiTable, TableColumnManager columnManager) {
     m_scoutTable = scoutTable;
-    m_uiTable_ = uiTable;
+    m_uiTable = uiTable;
     m_columnManager = columnManager;
-    m_imgCheckboxTrue = getRwtScoutTable().getUiEnvironment().getIcon(RwtIcons.CheckboxYes);
-    m_imgCheckboxFalse = getRwtScoutTable().getUiEnvironment().getIcon(RwtIcons.CheckboxNo);
-    m_disabledForegroundColor = getRwtScoutTable().getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
+    m_imgCheckboxTrue = getUiTable().getUiEnvironment().getIcon(RwtIcons.CheckboxYes);
+    m_imgCheckboxFalse = getUiTable().getUiEnvironment().getIcon(RwtIcons.CheckboxNo);
+    m_disabledForegroundColor = getUiTable().getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
     m_defaultRowHeight = UiDecorationExtensionPoint.getLookAndFeel().getTableRowHeight();
     rebuildCache();
+  }
+
+  protected ITable getScoutTable() {
+    return m_scoutTable;
+  }
+
+  public IRwtScoutTableForPatch getUiTable() {
+    return m_uiTable;
   }
 
   @Override
@@ -71,23 +79,23 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         text = "";
       }
       if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-        text = getRwtScoutTable().getUiEnvironment().adaptHtmlCell(getRwtScoutTable(), text);
-        text = getRwtScoutTable().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getRwtScoutTable(), text);
+        text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
+        text = getUiTable().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getUiTable(), text);
       }
       else if (text.indexOf("\n") >= 0) {
-        if (m_scoutTable.isMultilineText()) {
+        if (getScoutTable().isMultilineText()) {
           //transform to html
           text = "<html>" + HtmlTextUtility.transformPlainTextToHtml(text) + "</html>";
-          text = getRwtScoutTable().getUiEnvironment().adaptHtmlCell(getRwtScoutTable(), text);
+          text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
         }
         else {
           text = StringUtility.replace(text, "\n", " ");
         }
       }
-      TableEx table = getRwtScoutTable().getUiField();
+      TableEx table = getUiTable().getUiField();
       if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-        if (m_htmlTableRows == null || m_htmlTableRows.length != m_scoutTable.getRowCount()) {
-          double[] tempArray = new double[m_scoutTable.getRowCount()];
+        if (m_htmlTableRows == null || m_htmlTableRows.length != getScoutTable().getRowCount()) {
+          double[] tempArray = new double[getScoutTable().getRowCount()];
           for (int i = 0; i < tempArray.length; i++) {
             tempArray[i] = 1;
           }
@@ -95,10 +103,10 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
             m_htmlTableRows = tempArray;
           }
           else {
-            getRwtScoutTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+            getUiTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
               @Override
               public void run() {
-                getRwtScoutTable().getUiTableViewer().refresh();
+                getUiTable().getUiTableViewer().refresh();
               }
             });
             m_htmlTableRows = tempArray;
@@ -113,8 +121,8 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         }
       }
       else {
-        if (m_newlines == null || m_newlines.length != m_scoutTable.getRowCount()) {
-          double[] tempArray = new double[m_scoutTable.getRowCount()];
+        if (m_newlines == null || m_newlines.length != getScoutTable().getRowCount()) {
+          double[] tempArray = new double[getScoutTable().getRowCount()];
           for (int i = 0; i < tempArray.length; i++) {
             tempArray[i] = 1;
           }
@@ -122,10 +130,10 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
             m_newlines = tempArray;
           }
           else {
-            getRwtScoutTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+            getUiTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
               @Override
               public void run() {
-                getRwtScoutTable().getUiTableViewer().refresh();
+                getUiTable().getUiTableViewer().refresh();
               }
             });
             m_newlines = tempArray;
@@ -149,7 +157,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   }
 
   public Image getColumnImage(ITableRow element, int columnIndex) {
-    int[] columnOrder = getRwtScoutTable().getUiField().getColumnOrder();
+    int[] columnOrder = getUiTable().getUiField().getColumnOrder();
     if (columnOrder.length <= 1) {
       return null;
     }
@@ -157,7 +165,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     ICell cell = getCell(element, columnIndex);
     //checkbox
     Image checkBoxImage = null;
-    if (columnOrder[1] == columnIndex && getRwtScoutTable().getScoutObject() != null && getRwtScoutTable().getScoutObject().isCheckable()) {
+    if (columnOrder[1] == columnIndex && getUiTable().getScoutObject() != null && getUiTable().getScoutObject().isCheckable()) {
       if (element.isChecked()) {
         checkBoxImage = m_imgCheckboxTrue;
       }
@@ -182,7 +190,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     else if (columnOrder[1] == columnIndex) {
       iconId = element.getIconId();
     }
-    Image decoImage = getRwtScoutTable().getUiEnvironment().getIcon(iconId);
+    Image decoImage = getUiTable().getUiEnvironment().getIcon(iconId);
     //merge
     if (checkBoxImage != null && decoImage != null) {
       //TODO rap/rwt: new GC(Image) is not possible since in rwt an image does not implement Drawable.
@@ -201,7 +209,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     if (columnIndex > 0) {
       ICell cell = getCell(element, columnIndex);
       if (cell != null) {
-        return getRwtScoutTable().getUiEnvironment().getColor(cell.getBackgroundColor());
+        return getUiTable().getUiEnvironment().getColor(cell.getBackgroundColor());
       }
     }
     return null;
@@ -211,7 +219,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     if (columnIndex > 0) {
       ICell cell = getCell(element, columnIndex);
       if (cell != null) {
-        Color col = getRwtScoutTable().getUiEnvironment().getColor(cell.getForegroundColor());
+        Color col = getUiTable().getUiEnvironment().getColor(cell.getForegroundColor());
         if (col == null) {
           if (!element.isEnabled() || !cell.isEnabled()) {
             col = m_disabledForegroundColor;
@@ -227,7 +235,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     if (columnIndex > 0) {
       ICell cell = getCell(element, columnIndex);
       if (cell != null) {
-        return getRwtScoutTable().getUiEnvironment().getFont(cell.getFont(), getRwtScoutTable().getUiField().getFont());
+        return getUiTable().getUiEnvironment().getFont(cell.getFont(), getUiTable().getUiField().getFont());
       }
     }
     return null;
@@ -235,9 +243,9 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
 
   @Override
   public String getToolTipText(Object element) {
-    Display display = getRwtScoutTable().getUiEnvironment().getDisplay();
-    Point cursorOnTable = display.map(null, getRwtScoutTable().getUiField(), display.getCursorLocation());
-    ViewerCell uiCell = getRwtScoutTable().getUiTableViewer().getCell(cursorOnTable);
+    Display display = getUiTable().getUiEnvironment().getDisplay();
+    Point cursorOnTable = display.map(null, getUiTable().getUiField(), display.getCursorLocation());
+    ViewerCell uiCell = getUiTable().getUiTableViewer().getCell(cursorOnTable);
     String text = "";
     if (uiCell != null) {
       int columnIndex = uiCell.getColumnIndex();
@@ -276,18 +284,14 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
 
   private void rebuildCache() {
     m_cachedCells = new HashMap<ITableRow, HashMap<IColumn<?>, ICell>>();
-    if (m_scoutTable != null) {
-      for (ITableRow scoutRow : m_scoutTable.getRows()) {
+    if (getScoutTable() != null) {
+      for (ITableRow scoutRow : getScoutTable().getRows()) {
         HashMap<IColumn<?>, ICell> cells = new HashMap<IColumn<?>, ICell>();
-        for (IColumn<?> col : m_scoutTable.getColumnSet().getVisibleColumns()) {
-          cells.put(col, m_scoutTable.getCell(scoutRow, col));
+        for (IColumn<?> col : getScoutTable().getColumnSet().getVisibleColumns()) {
+          cells.put(col, getScoutTable().getCell(scoutRow, col));
         }
         m_cachedCells.put(scoutRow, cells);
       }
     }
-  }
-
-  public IRwtScoutTableForPatch getRwtScoutTable() {
-    return m_uiTable_;
   }
 }

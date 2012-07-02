@@ -130,6 +130,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(46)
+  @ConfigPropertyValue("-1")
+  protected int getConfiguredNodeHeightHint() {
+    return -1;
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(50)
   @ConfigPropertyValue("false")
@@ -301,6 +308,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setIconId(getConfiguredIconId());
     setAutoTitle(getConfiguredAutoTitle());
     setCheckable(getConfiguredCheckable());
+    setNodeHeightHint(getConfiguredNodeHeightHint());
     setMultiCheck(getConfiguredMultiCheck());
     setMultiSelect(getConfiguredMultiSelect());
     setAutoDiscardOnDelete(getConfiguredAutoDiscardOnDelete());
@@ -575,6 +583,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public void setCheckable(boolean b) {
     propertySupport.setPropertyBool(PROP_CHECKABLE, b);
+  }
+
+  @Override
+  public int getNodeHeightHint() {
+    return propertySupport.getPropertyInt(PROP_NODE_HEIGHT_HINT);
+  }
+
+  @Override
+  public void setNodeHeightHint(int h) {
+    propertySupport.setPropertyInt(PROP_NODE_HEIGHT_HINT, h);
   }
 
   @Override

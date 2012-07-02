@@ -34,6 +34,10 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
   String PROP_MULTI_SELECT = "multiSelect";
   String PROP_MULTI_CHECK = "multiCheck";
   String PROP_CHECKABLE = "checkable";
+  /**
+   * Integer default -1
+   */
+  String PROP_NODE_HEIGHT_HINT = "propNodeHeightHint";
   String PROP_ROOT_NODE_VISIBLE = "rootNodeVisible";
   String PROP_ROOT_HANDLES_VISIBLE = "rootHandlesVisible";
   String PROP_KEY_STROKES = "keyStroks";
@@ -280,6 +284,21 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
   boolean isCheckable();
 
   void setCheckable(boolean b);
+
+  /**
+   * This is a hint for the UI if it is not capable of having variable node height based on node contents
+   * (such as rap/rwt).
+   * <p>
+   * This hint defines the node height in pixels being used as the fixed node height for all nodes of this tree.
+   * 
+   * @return the hint in pixels, default is -1
+   */
+  int getNodeHeightHint();
+
+  /**
+   * see {@link #getNodeHeightHint()}
+   */
+  void setNodeHeightHint(int h);
 
   boolean isAutoDiscardOnDelete();
 

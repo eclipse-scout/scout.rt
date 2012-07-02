@@ -57,6 +57,7 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.internal.widgets.MarkupValidator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -68,6 +69,7 @@ import org.eclipse.swt.widgets.Menu;
  * 
  * @since 3.7.0 June 2011
  */
+@SuppressWarnings("restriction")
 public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutTree {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutTree.class);
 
@@ -93,9 +95,13 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
   protected void initializeUi(Composite parent) {
     TreeViewer viewer = createTreeModel(parent);
     setUiTreeViewer(viewer);
-
-    initializeTreeModel();
     setUiField(viewer.getTree());
+
+    initNodeHeight();
+    initializeTreeModel();
+
+    viewer.getTree().setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
+    viewer.getTree().setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
     // listeners
     viewer.addSelectionChangedListener(new P_RwtSelectionListener());
     viewer.addTreeListener(new P_RwtExpansionListener());
@@ -112,7 +118,6 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     m_contextMenu = new Menu(viewer.getTree().getShell(), SWT.POP_UP);
     m_contextMenu.addMenuListener(new P_ContextMenuListener());
     viewer.getTree().setMenu(m_contextMenu);
-    initNodeHeight();
   }
 
   protected TreeViewer createTreeModel(Composite parent) {
@@ -148,7 +153,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
   }
 
   protected RwtScoutTreeModel createTreeModel() {
-    return new RwtScoutTreeModel(getScoutObject(), getUiEnvironment(), getUiTreeViewer());
+    return new RwtScoutTreeModel(getScoutObject(), this, getUiTreeViewer());
   }
 
   protected boolean isMultiSelect() {
@@ -164,6 +169,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     m_treeViewer = viewer;
   }
 
+  @Override
   public TreeViewer getUiTreeViewer() {
     return m_treeViewer;
   }
@@ -176,7 +182,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
   public TreeEx getUiField() {
     return (TreeEx) super.getUiField();
   }
-  
+
   protected void initNodeHeight() {
     int height = UiDecorationExtensionPoint.getLookAndFeel().getTreeNodeHeight();
     if (height >= 0) {
@@ -204,6 +210,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
     setSelectionFromScout(getScoutObject().getSelectedNodes());
     setKeyStrokeFormScout();
+    setNodeHeightFromScout();
     attachDndSupport();
     handleEventsFromRecentHistory();
   }
@@ -310,6 +317,16 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       }
     }
     m_keyStrokes = newKeyStrokes.toArray(new IRwtKeyStroke[newKeyStrokes.size()]);
+  }
+
+  protected void setNodeHeightFromScout() {
+    int h = getScoutObject().getNodeHeightHint();
+    if (h >= 0) {
+      getUiField().setData(RWT.CUSTOM_ITEM_HEIGHT, h);
+    }
+    if (isCreated()) {
+      getUiTreeViewer().refresh();
+    }
   }
 
   /**
@@ -422,6 +439,9 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
     else if (name.equals(ITree.PROP_SCROLL_TO_SELECTION)) {
       updateScrollToSelectionFromScout();
+    }
+    else if (name.equals(ITree.PROP_NODE_HEIGHT_HINT)) {
+      setNodeHeightFromScout();
     }
     super.handleScoutPropertyChange(name, newValue);
   }
