@@ -96,6 +96,24 @@ Button[RADIO][BORDER] {
 Button-CheckIcon {
   background-image: url(theme/img/button/check_box.png);
 }
+Button-CheckIcon:disabled {
+  background-image: url(theme/img/button/check_box_disabled.png);
+}
+Button-CheckIcon:selected {
+  background-image: url(theme/img/button/check_box_selected.png);
+}
+Button-CheckIcon:selected:disabled {
+  background-image: url(theme/img/button/check_box_disabled_selected.png);
+}
+Button-RadioIcon {
+  background-image: url(theme/img/button/radio_button.png);
+}
+Button-RadioIcon:disabled {
+  background-image: url(theme/img/button/radio_button_disabled.png);
+}
+Button-RadioIcon:selected {
+  background-image: url(theme/img/button/radio_button_selected.png);
+}
 Button-FocusIndicator[CHECK] {
   /* XXX hstaudacher Its not possible atm tochange the icon when the widget is focused.
    we need to fix this when bug 346501 is fixed.
@@ -123,24 +141,6 @@ Button-FocusIndicator[RADIO] {
   margin: 3px;
   padding: 0px;
   opacity: 1;
-}
-Button-CheckIcon:disabled {
-  background-image: url(theme/img/button/check_box_disabled.png);
-}
-Button-CheckIcon:selected {
-  background-image: url(theme/img/button/check_box_selected.png);
-}
-Button-CheckIcon:selected:disabled {
-  background-image: url(theme/img/button/check_box_disabled_selected.png);
-}
-Button-RadioIcon {
-  background-image: url(theme/img/button/radio_button.png);
-}
-Button-RadioIcon:disabled {
-  background-image: url(theme/img/button/radio_button_disabled.png);
-}
-Button-RadioIcon:selected {
-  background-image: url(theme/img/button/radio_button_selected.png);
 }
 /* CCombo */
 CCombo {
@@ -731,9 +731,6 @@ Composite.viewPartNoRadius {
 }
 Composite.form {
   background-color: transparent;
-  /* XXX hstaudacher We need to add the box-shadow when bug 346645 is fixed */
-
-  padding: 0px 0px 0px 0px;
 }
 Composite.listbox {
   background-color: #ffffff;
@@ -2148,4 +2145,7 @@ MenuItem-CascadeIcon {
 }
 Text {
   padding: 0px 6px;
+}
+Composite.form {
+  background-color: #ebf4f8;
 }

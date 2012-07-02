@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFormFieldGridData;
 import org.eclipse.scout.rt.ui.rap.form.fields.checkbox.IRwtScoutCheckbox;
+import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.swt.widgets.Composite;
 
 public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> implements IRwtScoutSequenceBox {
@@ -154,6 +155,21 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
       }
     }
     setErrorStatusFromScout(inheritedErrorStatus);
+  }
+
+  @Override
+  protected void setEnabledFromScout(boolean b) {
+    boolean updateLayout = false;
+    // Only change color for the label, the field container should not reflect enabled / disabled state. The child fields handle the state independently.
+    if (getUiLabel() != null) {
+      if (getUiLabel().getEnabled() != b) {
+        updateLayout = true;
+        getUiLabel().setEnabled(b);
+      }
+    }
+    if (updateLayout && isCreated()) {
+      RwtLayoutUtility.invalidateLayout(getUiEnvironment(), getUiContainer());
+    }
   }
 
   @Override

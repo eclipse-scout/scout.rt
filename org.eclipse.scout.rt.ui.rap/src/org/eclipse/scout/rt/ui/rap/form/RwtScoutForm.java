@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutForm.class);
+  private static final String VARIANT_FORM = "form";
 
   private FormListener m_scoutFormListener;
   private WeakHashMap<FormEvent, Object> m_consumedScoutFormEvents = new WeakHashMap<FormEvent, Object>();
@@ -49,6 +50,8 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
+    container.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FORM);
+
     IRwtScoutFormField group = getUiEnvironment().createFormField(container, getScoutObject().getRootGroupBox());
     Composite field = group.getUiContainer();
     setUiContainer(container);

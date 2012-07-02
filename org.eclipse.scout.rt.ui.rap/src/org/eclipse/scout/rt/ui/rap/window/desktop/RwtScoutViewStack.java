@@ -46,7 +46,6 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
 
   private static final String VARIANT_VIEW_PART = "viewPart";
   private static final String VARIANT_VIEW_PART_NO_RADIUS = "viewPartNoRadius";
-  private static final String VARIANT_FORM = "form";
   private static final String VARIANT_VIEW_TAB_AREA = "formTabArea";
 
   private int heightHint = SWT.DEFAULT;
@@ -86,7 +85,6 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     m_tabBar = getUiEnvironment().getFormToolkit().createComposite(parent);
     m_tabBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEW_TAB_AREA);
     m_container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    m_container.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FORM);
 
     // layout
     GridLayout layout = new GridLayout(1, true);
