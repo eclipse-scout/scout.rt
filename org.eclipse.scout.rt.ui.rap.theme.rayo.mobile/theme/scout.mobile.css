@@ -3,7 +3,7 @@
   color: #000000;
   background-color: #ffffff;
   background-image: none;
-  font: 12px Arial, Helvetica, sans-serif;
+  font: 14px Arial, Helvetica, sans-serif;
 }
 *:disabled {
   color: #cfcfcf;
@@ -12,11 +12,11 @@ Group-Label,
 CCombo,
 Combo,
 DateTime {
-  font: bold 11px Arial, Helvetica, sans-serif;
+  font: bold 12px Arial, Helvetica, sans-serif;
 }
 DateTime-Calendar-Navbar,
 ToolTip-Text {
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
 }
 Widget-ToolTip {
   padding: 1px 3px 2px 3px;
@@ -83,9 +83,7 @@ Browser[BORDER] {
 Button[CHECK],
 Button[RADIO] {
   color: #000000;
-  font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
+  font: 14px Arial, Helvetica, sans-serif;
 }
 Button[CHECK]:disabled,
 Button[RADIO]:disabled {
@@ -768,8 +766,6 @@ Button.formButton-active {
   background-color: #f1f7fb;
   border-radius: 0px 0px 5px 5px;
   color: #000000;
-  /*   font: bold 12px Arial, Helvetica, sans-serif; */
-
   padding: 0px 15px;
 }
 Button-FocusIndicator.formButton-active {
@@ -790,7 +786,7 @@ Composite.busyIndicator {
 Button {
   cursor: default;
   color: #ffffff;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
   background-color: transparent;
 }
 Button[PUSH],
@@ -899,7 +895,7 @@ Composite.datechooser-dialog {
 }
 Label.datechooser-dialog {
   background-color: #f4f8fc;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
 }
 Table.datechooser-dialog {
   background-color: #f4f8fc;
@@ -915,7 +911,7 @@ Table-GridLine.datechooser-dialog:vertical {
 TableColumn.datechooser-dialog {
   background-image: none;
   background-color: transparent;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
   color: #000000;
 }
 Button.datechooser-dialog-last-year,
@@ -997,7 +993,7 @@ Group {
 
   border: none;
   border-radius: 2px 2px 2px 2px;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
 }
 Group-Frame {
   margin: 8px 0px 0px 0px;
@@ -1034,7 +1030,7 @@ Label.GroupBoxLine {
 Label.GroupBoxLabel {
   background-color: transparent;
   color: #2a5a76;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
 }
 Composite.groupBoxButtonBar {
   padding: 0px 12px 6px 12px;
@@ -1096,14 +1092,14 @@ Label-SeparatorLine[SHADOW_OUT] {
 /* Label end */
 Text.onFieldLabel {
   color: gray;
-  font: italic 12px Arial, Helvetica, sans-serif;
+  font: italic 14px Arial, Helvetica, sans-serif;
 }
 Button.menuButton {
   background-image: url(theme/img/button/icon_menu.png);
   background-color: #ffffff;
   border-radius: 5px 5px 0px 0px;
   color: #fe9a23;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
   padding: 8px 15px;
 }
 Button.menuButton:selected,
@@ -1214,7 +1210,7 @@ Shell-DisplayOverlay {
 }
 /* Shell titlebar */
 Shell-Titlebar {
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
   background-color: #67a8ce;
   color: #ffffff;
   padding: 2px 0px 2px 13px;
@@ -1370,9 +1366,7 @@ Button.tabboxButton:hover {
   text-shadow: none;
   color: #295973;
   padding: 8px 15px;
-  font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
+  font: 14px Arial, Helvetica, sans-serif;
   padding: 6px 8px 7px 8px;
 }
 Button.tabboxButton-marked,
@@ -1389,9 +1383,7 @@ Button.tabboxButton-marked:hover {
   text-shadow: none;
   color: #295973;
   padding: 8px 15px;
-  font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
+  font: 14px Arial, Helvetica, sans-serif;
   padding: 6px 6px 7px 10px;
 }
 Button.tabboxButton-active,
@@ -1405,9 +1397,7 @@ Button.tabboxButton-active:hover {
   border: none;
   text-shadow: none;
   color: #000000;
-  font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
+  font: 14px Arial, Helvetica, sans-serif;
   padding: 6px 8px 7px 8px;
 }
 Button.tabboxButton-active-marked,
@@ -1426,9 +1416,7 @@ Button.tabboxButton-active-marked:hover {
   border: none;
   text-shadow: none;
   color: #000000;
-  font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
+  font: 14px Arial, Helvetica, sans-serif;
   padding: 6px 6px 7px 10px;
 }
 Button-FocusIndicator.tabboxButton-active,
@@ -1505,7 +1493,7 @@ Label.tableStatus_error {
   color: #cb2020;
 }
 TableColumn {
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
   background-color: #ffffff;
   padding: 9px 4px 5px 4px;
   background-image: none;
@@ -1710,7 +1698,7 @@ Button.toolButton-active {
   background-color: #cde3ee;
   border-radius: 5px 5px 0px 0px;
   color: #fe9a23;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
 }
 Button-FocusIndicator.toolButton-active {
   border: none;
@@ -1726,7 +1714,7 @@ Label.toolButton {
   background-color: #67a8ce;
   border-radius: 5px 0px 0px 0px;
   color: #ffffff;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
   cursor: pointer;
 }
 /* ToolTip */
@@ -1952,9 +1940,7 @@ Button.viewButton {
   background-image: none;
   color: #000000;
   padding: 6px 15px;
-  font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
+  font: 14px Arial, Helvetica, sans-serif;
 }
 Button.viewButton:selected,
 Button.viewButton:selected:hover,
@@ -1967,7 +1953,7 @@ Button.viewButton-active {
   background-color: #ffffff;
   border-radius: 5px 5px 0px 0px;
   color: #fe9a23;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
   padding: 6px 15px;
 }
 Button-FocusIndicator.viewButton-active {
@@ -2015,21 +2001,21 @@ Button.formTabActivate:hover {
   background-image: none;
   background-color: transparent;
   color: #2a5a76;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
   padding: 2px 5px 0px 6px;
 }
 Button.formTabActivate-active {
   background-image: none;
   background-color: transparent;
   color: #2a5a76;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
   padding: 2px 5px 0px 6px;
 }
 Button.formTabActivate-active:hover {
   background-image: none;
   background-color: transparent;
   color: #2a5a76;
-  font: bold 12px Arial, Helvetica, sans-serif;
+  font: bold 14px Arial, Helvetica, sans-serif;
   padding: 2px 5px 0px 6px;
 }
 Button-FocusIndicator.formTabActivate-active {
@@ -2078,6 +2064,7 @@ Button.mobile-datechooser-dialog-next-month:hover {
 Button[PUSH],
 Button[TOGGLE],
 Button[BORDER] {
+  font: bold 12px Arial, Helvetica, sans-serif;
   background-image: gradient(linear, left top, left bottom, from(#53a4d3), to(#4890ba));
   border: 1px solid #3a7597;
 }
@@ -2133,12 +2120,6 @@ Shell-DisplayOverlay {
   background-color: #565656;
   opacity: 0.5;
 }
-List {
-  font: 14px Arial, Helvetica, sans-serif;
-}
-List-Item {
-  font: 14px Arial, Helvetica, sans-serif;
-}
 Menu {
   color: white;
   font: bold 12px Arial, Helvetica, sans-serif;
@@ -2164,4 +2145,7 @@ MenuItem-RadioIcon {
 }
 MenuItem-CascadeIcon {
   background-image: url(theme/img/menu/arrow-white.gif);
+}
+Text {
+  padding: 0px 6px;
 }

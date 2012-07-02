@@ -84,8 +84,6 @@ Button[CHECK],
 Button[RADIO] {
   color: #000000;
   font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
 }
 Button[CHECK]:disabled,
 Button[RADIO]:disabled {
@@ -768,8 +766,6 @@ Button.formButton-active {
   background-color: #f1f7fb;
   border-radius: 0px 0px 5px 5px;
   color: #000000;
-  /*   font: bold 12px Arial, Helvetica, sans-serif; */
-
   padding: 0px 15px;
 }
 Button-FocusIndicator.formButton-active {
@@ -1371,8 +1367,6 @@ Button.tabboxButton:hover {
   color: #295973;
   padding: 8px 15px;
   font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
   padding: 6px 8px 7px 8px;
 }
 Button.tabboxButton-marked,
@@ -1390,8 +1384,6 @@ Button.tabboxButton-marked:hover {
   color: #295973;
   padding: 8px 15px;
   font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
   padding: 6px 6px 7px 10px;
 }
 Button.tabboxButton-active,
@@ -1406,8 +1398,6 @@ Button.tabboxButton-active:hover {
   text-shadow: none;
   color: #000000;
   font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
   padding: 6px 8px 7px 8px;
 }
 Button.tabboxButton-active-marked,
@@ -1427,8 +1417,6 @@ Button.tabboxButton-active-marked:hover {
   text-shadow: none;
   color: #000000;
   font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
   padding: 6px 6px 7px 10px;
 }
 Button-FocusIndicator.tabboxButton-active,
@@ -1953,8 +1941,6 @@ Button.viewButton {
   color: #000000;
   padding: 6px 15px;
   font: 12px Arial, Helvetica, sans-serif;
-  /* not bold */
-
 }
 Button.viewButton:selected,
 Button.viewButton:selected:hover,
