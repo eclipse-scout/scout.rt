@@ -32,11 +32,11 @@ public interface IDeviceTransformer {
 
   void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException;
 
-  void transformForm(IForm form);
+  void transformForm(IForm form) throws ProcessingException;
 
-  void transformOutline(IOutline outline);
+  void transformOutline(IOutline outline) throws ProcessingException;
 
-  void transformPageDetailTable(ITable table);
+  void transformPageDetailTable(ITable table) throws ProcessingException;
 
   boolean acceptForm(IForm form);
 

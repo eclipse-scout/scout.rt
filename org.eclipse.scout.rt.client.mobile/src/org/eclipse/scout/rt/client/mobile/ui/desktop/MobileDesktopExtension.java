@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 
@@ -152,7 +153,12 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
       return ContributionCommand.Stop;
     }
 
-    getDeviceTransformer().transformForm(form);
+    try {
+      getDeviceTransformer().transformForm(form);
+    }
+    catch (ProcessingException e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+    }
 
     return ContributionCommand.Continue;
   }

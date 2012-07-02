@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -122,7 +123,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void transformForm(IForm form) {
+  public void transformForm(IForm form) throws ProcessingException {
     form.setAskIfNeedSave(false);
     transformDisplayHintSettings(form);
     transformFormFields(form);
@@ -201,16 +202,11 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     return false;
   }
 
-  protected void transformFormFields(IForm form) {
+  protected void transformFormFields(IForm form) throws ProcessingException {
     WeakReference<IForm> formRef = m_modifiedForms.get(form);
     if (formRef != null) {
       return;
     }
-
-    //mark form as modified
-    m_modifiedForms.put(form, new WeakReference<IForm>(form));
-
-    transformMainBox(form.getRootGroupBox());
 
     form.visitFields(new IFormFieldVisitor() {
       @Override
@@ -220,6 +216,11 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
         return true;
       }
     });
+
+    transformMainBox(form.getRootGroupBox());
+    
+    //mark form as modified
+    m_modifiedForms.put(form, new WeakReference<IForm>(form));
   }
 
   private void transformFormField(IFormField field) {
@@ -253,8 +254,13 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     }
   }
 
-  private void transformMainBox(IGroupBox groupBox) {
-    groupBox.setScrollable(true);
+  private void transformMainBox(IGroupBox groupBox) throws ProcessingException {
+    if (!groupBox.isScrollable()) {
+      groupBox.setScrollable(true);
+
+      //GridDataHints have been modified by setScrollable. Update the actual gridData with those hints.
+      FormUtility.rebuildFieldGrid(groupBox.getForm(), true);
+    }
   }
 
   private void transformGroupBox(IGroupBox groupBox) {
