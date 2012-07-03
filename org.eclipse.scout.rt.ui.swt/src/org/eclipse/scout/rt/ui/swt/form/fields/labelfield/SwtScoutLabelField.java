@@ -39,7 +39,7 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
-    int style = SWT.NONE;
+    int style = SWT.NO_FOCUS;
     if (getScoutObject().isWrapText()) {
       style |= SWT.WRAP;
     }
