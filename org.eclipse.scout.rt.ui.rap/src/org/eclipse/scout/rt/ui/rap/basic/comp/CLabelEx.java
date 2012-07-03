@@ -43,6 +43,14 @@ public class CLabelEx extends CLabel {
   }
 
   @Override
+  public void setBounds(Rectangle bounds) {
+    super.setBounds(bounds);
+    if (bounds.width > 0) {
+      updateText(bounds.width);
+    }
+  }
+
+  @Override
   public void setText(String text) {
     super.setText(text);
     m_originalText = text;
@@ -103,19 +111,18 @@ public class CLabelEx extends CLabel {
    * @return the shortened text
    */
   public String shortenText(Object gc, String text, int width) {
-    System.out.println("width:" + width);
     if (text == null || width <= 0) {
       return null;
     }
 
-    int textWidth = TextSizeUtil.stringExtent(getFont(), ELLIPSIS).x;
+    int ecllipsisWidth = TextSizeUtil.stringExtent(getFont(), ELLIPSIS).x;
     int charCount = text.length();
 
     // shorten string
     while (charCount >= 0) {
       String shortenedText = text.substring(0, charCount);
-      int l1 = TextSizeUtil.stringExtent(getFont(), shortenedText).x;
-      if (l1 + textWidth < width) {
+      int textWidth = TextSizeUtil.stringExtent(getFont(), shortenedText).x;
+      if (textWidth + ecllipsisWidth < width) {
         return shortenedText + ELLIPSIS;
       }
       if (charCount == 0) {
