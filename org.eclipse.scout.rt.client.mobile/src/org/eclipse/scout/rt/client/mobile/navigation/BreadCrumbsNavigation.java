@@ -187,11 +187,6 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
   }
 
   @Override
-  public boolean isOutlineTreeAvailable() {
-    return false;
-  }
-
-  @Override
   public IDesktop getDesktop() {
     return m_desktop;
   }

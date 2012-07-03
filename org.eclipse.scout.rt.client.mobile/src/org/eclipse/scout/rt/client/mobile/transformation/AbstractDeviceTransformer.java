@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
 import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -19,13 +21,14 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -43,7 +46,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * @since 3.9.0
@@ -71,10 +73,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void desktopInit(IDesktop desktop) {
-  }
-
-  @Override
   public void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
   }
 
@@ -91,6 +89,19 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     }
     if (m_outlineChooserForm != null) {
       m_outlineChooserForm.doClose();
+    }
+  }
+
+  /**
+   * Remove outline buttons, keystrokes and menus
+   */
+  @Override
+  public void adaptDesktopActions(Collection<IAction> actions) {
+    for (Iterator<IAction> iterator = actions.iterator(); iterator.hasNext();) {
+      IAction action = iterator.next();
+      if (action instanceof IViewButton || action instanceof IKeyStroke || action instanceof IMenu) {
+        iterator.remove();
+      }
     }
   }
 
@@ -139,13 +150,8 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
       return;
     }
 
+    //Necessary to enable drilldown from top of the outline
     outline.setRootNodeVisible(true);
-    //Changing the root node cell so that the navigation history looks fine.
-    //BTW: I believe that the root node cell text/icon should always have these settings
-    //TODO CGU what is this for?
-    Cell cell = outline.getRootNode().getCellForUpdate();
-    cell.setText(outline.getTitle());
-    cell.setIconId(outline.getIconId());
   }
 
   @Override
@@ -167,7 +173,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   protected boolean isFormAddingForbidden(IForm form) {
     if (form instanceof IOutlineTreeForm) {
-      return !SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation().isOutlineTreeAvailable();
+      return true;
     }
 
     if (form instanceof IOutlineTableForm && !(form instanceof MobileOutlineTableForm)) {
@@ -218,7 +224,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     });
 
     transformMainBox(form.getRootGroupBox());
-    
+
     //mark form as modified
     m_modifiedForms.put(form, new WeakReference<IForm>(form));
   }

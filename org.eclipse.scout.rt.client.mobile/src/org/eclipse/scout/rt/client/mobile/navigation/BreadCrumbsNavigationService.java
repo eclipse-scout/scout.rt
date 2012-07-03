@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.navigation;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.service.AbstractService;
 
 /**
@@ -32,51 +30,7 @@ public class BreadCrumbsNavigationService extends AbstractService implements IBr
   }
 
   @Override
-  public void stepBack() throws ProcessingException {
-    getBreadCrumbsNavigation().stepBack();
-  }
-
-  @Override
-  public boolean isSteppingBackPossible() {
-    return getBreadCrumbsNavigation().isSteppingBackPossible();
-  }
-
-  @Override
-  public void goHome() throws ProcessingException {
-    getBreadCrumbsNavigation().goHome();
-  }
-
-  @Override
-  public boolean isGoingHomePossible() {
-    return getBreadCrumbsNavigation().isGoingHomePossible();
-  }
-
-  @Override
-  public IForm getCurrentNavigationForm() {
-    return getBreadCrumbsNavigation().getCurrentNavigationForm();
-  }
-
-  @Override
-  public void addBreadCrumbsListener(IDesktop desktop, BreadCrumbsListener listener) {
-    getBreadCrumbsNavigation(desktop).addBreadCrumbsListener(listener);
-  }
-
-  @Override
-  public void addBreadCrumbsListener(BreadCrumbsListener listener) {
-    getBreadCrumbsNavigation().addBreadCrumbsListener(listener);
-  }
-
-  @Override
-  public void removeBreadCrumbsListener(BreadCrumbsListener listener) {
-    getBreadCrumbsNavigation().removeBreadCrumbsListener(listener);
-  }
-
-  @Override
-  public void trackDisplayViewId(String displayViewId) {
-    getBreadCrumbsNavigation().trackDisplayViewId(displayViewId);
-  }
-
-  private IBreadCrumbsNavigation getBreadCrumbsNavigation(IDesktop desktop) {
+  public IBreadCrumbsNavigation getBreadCrumbsNavigation(IDesktop desktop) {
     IClientSession session = ClientJob.getCurrentSession();
     IBreadCrumbsNavigation data = (IBreadCrumbsNavigation) session.getData(SESSION_DATA_KEY);
 

@@ -49,7 +49,6 @@ public class ActionButtonBar extends Composite {
   private static final String VARIANT_ACTION_BAR = "actionBar";
   private static final int BUTTON_SPACING = 6;
 
-  //TODO CGU replace with List<? extends IAction>
   private IMenu[] m_menus;
   private List<IMenu> m_displayedMenus;
   private IRwtEnvironment m_uiEnvironment;

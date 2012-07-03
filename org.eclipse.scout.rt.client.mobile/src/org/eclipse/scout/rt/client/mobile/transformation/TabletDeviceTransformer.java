@@ -34,13 +34,8 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
 
   public TabletDeviceTransformer(IDesktop desktop) {
     super(desktop);
-  }
 
-  @Override
-  public void desktopInit(IDesktop desktop) {
-    super.desktopInit(desktop);
-
-    SERVICES.getService(IBreadCrumbsNavigationService.class).trackDisplayViewId(IForm.VIEW_ID_CENTER);
+    SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation(desktop).trackDisplayViewId(IForm.VIEW_ID_CENTER);
   }
 
   @Override

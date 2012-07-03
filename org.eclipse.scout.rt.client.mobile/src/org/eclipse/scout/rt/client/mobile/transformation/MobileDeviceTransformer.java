@@ -38,13 +38,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     super(desktop);
 
     m_toolFormHandler = new ToolFormHandler(getDesktop());
-  }
-
-  @Override
-  public void desktopInit(IDesktop desktop) {
-    super.desktopInit(desktop);
-
-    SERVICES.getService(IBreadCrumbsNavigationService.class).trackDisplayViewId(IForm.VIEW_ID_CENTER);
+    SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation(desktop).trackDisplayViewId(IForm.VIEW_ID_CENTER);
   }
 
   @Override

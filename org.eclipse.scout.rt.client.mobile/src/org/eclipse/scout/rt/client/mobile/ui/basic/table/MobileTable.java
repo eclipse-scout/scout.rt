@@ -55,7 +55,6 @@ public class MobileTable extends AbstractTable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileTable.class);
 
   private ITable m_originalTable;
-  private boolean m_useBoldCellHeaderText;
   private int m_maxCellDetailColumns;
   private IColumn m_cellHeaderColumn;
   private List<IColumn> m_cellDetailColumns;
@@ -69,7 +68,6 @@ public class MobileTable extends AbstractTable {
 
   public MobileTable() {
     m_eventListener = new P_TableEventListener();
-    m_useBoldCellHeaderText = true;
     m_maxCellDetailColumns = 2;
 
     try {
@@ -107,6 +105,7 @@ public class MobileTable extends AbstractTable {
     return m_drillDownPossible;
   }
 
+  //FIXME CGU move init to constructor, should be done like ButtonWrappingAction. Maybe create AbstractWrappingTable?
   public void installWrappedTable(ITable wrappedTable) throws ProcessingException {
     if (m_originalTable != null) {
       m_originalTable.removeTableListener(m_eventListener);
@@ -117,13 +116,11 @@ public class MobileTable extends AbstractTable {
       return;
     }
 
-    //FIXME CGU move init to constructor, should be done like ButtonWrappingAction. Maybe create AbstractWrappingTable?
-
-    //TODO cgu: calculate + 1 depends on summary column available (loop through columns and check if summary=true)
     if (wrappedTable.getRowHeightHint() != -1) {
       setRowHeightHint(wrappedTable.getRowHeightHint());
     }
     else {
+      //+1 stands for the cell header row
       setRowHeightHint((m_maxCellDetailColumns + 1) * ROW_HEIGHT);
     }
     setHeaderVisible(wrappedTable.isHeaderVisible());
@@ -475,10 +472,7 @@ public class MobileTable extends AbstractTable {
     String content = "";
 
     content = cleanupText(cellHeaderText);
-
-    if (m_useBoldCellHeaderText) {
-      content = "<b>" + content + "</b>";
-    }
+    content = "<b>" + content + "</b>";
 
     return content;
   }
@@ -610,7 +604,6 @@ public class MobileTable extends AbstractTable {
     @Override
     public void tableChanged(TableEvent e) {
       switch (e.getType()) {
-        //FIXME CGU handle more events?
         case TableEvent.TYPE_ROWS_SELECTED: {
           handleWrappedTableRowsSelected(e.getRows());
           break;

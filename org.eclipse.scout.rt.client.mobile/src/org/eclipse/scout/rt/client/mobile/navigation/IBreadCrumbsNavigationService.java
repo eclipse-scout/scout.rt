@@ -1,8 +1,6 @@
 package org.eclipse.scout.rt.client.mobile.navigation;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.service.IService2;
 
 /*******************************************************************************
@@ -21,23 +19,7 @@ import org.eclipse.scout.service.IService2;
  */
 public interface IBreadCrumbsNavigationService extends IService2 {
 
-  void stepBack() throws ProcessingException;
-
-  boolean isSteppingBackPossible();
-
-  void goHome() throws ProcessingException;
-
-  boolean isGoingHomePossible();
-
-  IForm getCurrentNavigationForm();
-
-  void addBreadCrumbsListener(IDesktop desktop, BreadCrumbsListener listener);
-
-  void addBreadCrumbsListener(BreadCrumbsListener listener);
-
-  void removeBreadCrumbsListener(BreadCrumbsListener listener);
+  IBreadCrumbsNavigation getBreadCrumbsNavigation(IDesktop desktop);
 
   IBreadCrumbsNavigation getBreadCrumbsNavigation();
-
-  void trackDisplayViewId(String displayViewId);
 }

@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -24,11 +25,11 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  * @since 3.9.0
  */
 public interface IDeviceTransformer {
-  void desktopInit(IDesktop desktop);
-
   void desktopGuiAttached() throws ProcessingException;
 
   void desktopGuiDetached() throws ProcessingException;
+
+  void adaptDesktopActions(Collection<IAction> actions);
 
   void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException;
 

@@ -12,22 +12,19 @@ package org.eclipse.scout.rt.client.mobile.ui.forms;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm.MainBox.OutlinesTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 public class OutlineChooserForm extends AbstractForm {
 
@@ -52,7 +49,7 @@ public class OutlineChooserForm extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return "Sichten";//TODO rst Texts
+    return TEXTS.get("MobileOutlineChooserTitle");
   }
 
   public void startView() throws ProcessingException {
@@ -139,58 +136,13 @@ public class OutlineChooserForm extends AbstractForm {
         @Order(20.0)
         public class LabelColumn extends AbstractStringColumn {
 
-          @Override
-          protected String getConfiguredHeaderText() {
-            return "Sichten";//TODO rst texts
-          }
         }
 
         @Override
         protected void execRowAction(ITableRow row) throws ProcessingException {
-          activateOutline(getOutlineColumn().getValue(row));
-        }
+          IOutline outline = getOutlineColumn().getValue(row);
 
-        /**
-         * Mostly copy-pasted from AbstractOutlineViewButton. Make code there reusable!
-         */
-        //FIXME CGU make it reusable in scout
-        private void activateOutline(IOutline outline) {
-          IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
-          desktop.setOutlineTableFormVisible(true);
-
-          if (desktop.getOutline() != outline) {
-            desktop.setOutline(outline);
-          }
-          //show again root node
-          ITreeNode newSelectedNode;
-          if (outline.isRootNodeVisible()) {
-            newSelectedNode = outline.getRootPage();
-          }
-          else {
-            newSelectedNode = outline.getSelectedNode();
-            while (newSelectedNode != null && newSelectedNode.getParentNode() != outline.getRootPage()) {
-              newSelectedNode = newSelectedNode.getParentNode();
-            }
-          }
-          outline.selectNode(newSelectedNode);
-          // collapse outline
-          if (outline.isRootNodeVisible()) {
-            outline.collapseAll(outline.getRootPage());
-            if (outline.getRootPage() instanceof AbstractPage && ((AbstractPage) outline.getRootPage()).isInitialExpanded()) {
-              outline.setNodeExpanded(outline.getRootPage(), true);
-            }
-          }
-          else {
-            for (IPage root : outline.getRootPage().getChildPages()) {
-              outline.collapseAll(root);
-            }
-            for (IPage root : outline.getRootPage().getChildPages()) {
-              if (root instanceof AbstractPage && ((AbstractPage) root).isInitialExpanded()) {
-                outline.setNodeExpanded(root, true);
-              }
-            }
-          }
-
+          MobileDesktopUtility.activateOutline(outline);
           getDesktop().removeForm(OutlineChooserForm.this);
         }
       }

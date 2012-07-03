@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -24,10 +23,7 @@ import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileHomeAction;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformer;
 import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.ContributionCommand;
@@ -59,7 +55,7 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
 
   public IDeviceTransformer getDeviceTransformer() {
     if (m_deviceTransformer == null) {
-      m_deviceTransformer = SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer();
+      m_deviceTransformer = SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer(getCoreDesktop());
     }
 
     return m_deviceTransformer;
@@ -71,26 +67,9 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
       return;
     }
 
-    //remove outline buttons, keystrokes and Menus
-    //FIXME CGU move to device transformer
-    for (Iterator<IAction> iterator = actions.iterator(); iterator.hasNext();) {
-      IAction action = iterator.next();
-      if (action instanceof IViewButton || action instanceof IKeyStroke || action instanceof IMenu) {
-        iterator.remove();
-      }
-    }
+    getDeviceTransformer().adaptDesktopActions(actions);
+
     super.contributeActions(actions);
-  }
-
-  @Override
-  protected ContributionCommand execInit() throws ProcessingException {
-    if (!isActive()) {
-      return super.execInit();
-    }
-
-    getDeviceTransformer().desktopInit(getCoreDesktop());
-
-    return ContributionCommand.Continue;
   }
 
   @Override
@@ -175,12 +154,7 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   }
 
   @Order(10)
-  public class BackViewButton extends AbstractMobileBackAction {
-
-    @Override
-    protected void execInitAction() throws ProcessingException {
-      init(getCoreDesktop());
-    }
+  public class BackAction extends AbstractMobileBackAction {
 
     @Override
     protected boolean getConfiguredVisible() {
@@ -189,21 +163,8 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
 
   }
 
-  @Order(15)
-  public class SeparatorMenu extends AbstractMenu {
-    @Override
-    protected boolean getConfiguredSeparator() {
-      return true;
-    }
-  }
-
   @Order(20)
-  public class HomeViewButton extends AbstractMobileHomeAction {
-
-    @Override
-    protected void execInitAction() throws ProcessingException {
-      init(getCoreDesktop());
-    }
+  public class HomeAction extends AbstractMobileHomeAction {
 
     @Override
     protected boolean getConfiguredVisible() {

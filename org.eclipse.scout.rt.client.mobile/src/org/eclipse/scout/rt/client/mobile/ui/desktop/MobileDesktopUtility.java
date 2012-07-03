@@ -19,13 +19,34 @@ import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
  * @since 3.9.0
  */
 public class MobileDesktopUtility {
+
+  public static void activateOutline(IOutline outline) {
+    IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+    desktop.setOutlineTableFormVisible(true);
+
+    if (desktop.getOutline() != outline) {
+      desktop.setOutline(outline);
+    }
+
+    if (!outline.isRootNodeVisible()) {
+      throw new IllegalStateException("Root node must be visible for this drill down approach.");
+    }
+
+    outline.selectNode(outline.getRootPage());
+    outline.collapseAll(outline.getRootPage());
+    if (outline.getRootPage() instanceof AbstractPage && ((AbstractPage) outline.getRootPage()).isInitialExpanded()) {
+      outline.setNodeExpanded(outline.getRootPage(), true);
+    }
+  }
 
   public static boolean isToolForm(IForm form) {
     if (getToolButtonFor(form) != null) {

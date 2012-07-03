@@ -21,9 +21,6 @@ public class RwtScoutMobileTreeField extends RwtScoutTreeField {
   @Override
   protected IRwtScoutActionBar createRwtScoutActionBar() {
     RwtScoutTreeActionBar actionBar = new RwtScoutTreeActionBar();
-    //TODO CGU better with fix bar?
-//    actionBar.setAlwaysVisible(true);
-//    actionBar.setHeightHint(36);
     actionBar.createUiField(getUiContainer(), getScoutObject(), getUiEnvironment());
     return actionBar;
   }

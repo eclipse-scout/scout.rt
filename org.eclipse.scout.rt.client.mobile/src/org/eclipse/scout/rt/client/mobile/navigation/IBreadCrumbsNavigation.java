@@ -33,8 +33,6 @@ public interface IBreadCrumbsNavigation {
 
   List<IForm> getCurrentNavigationForms();
 
-  boolean isOutlineTreeAvailable();
-
   Stack<IBreadCrumb> getBreadCrumbs();
 
   boolean containsFormInHistory(IForm form);
