@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.window.desktop;
 
+import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformer;
+import org.eclipse.scout.rt.client.mobile.transformation.TabletDeviceTransformer;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutViewStack;
 import org.eclipse.scout.rt.ui.rap.window.desktop.viewarea.ViewArea;
 import org.eclipse.swt.widgets.Composite;
@@ -28,6 +31,22 @@ public class MobileViewArea extends ViewArea {
   @Override
   protected RwtScoutViewStack createRwtScoutViewStack(Composite parent) {
     return new RwtScoutMobileViewStack(parent, getUiEnvironment(), this);
+  }
+
+  @Override
+  protected boolean isCreateSashesEnabled() {
+    return false;
+  }
+
+  /**
+   * On tablet devices there are at maximum two view stacks, on mobile only one. So it is not necessary to create the
+   * other ones which saves unnecessary composites and therefore loading time.
+   * 
+   * @see {@link MobileDeviceTransformer}, {@link TabletDeviceTransformer}
+   */
+  @Override
+  protected boolean acceptViewId(String viewId) {
+    return IForm.VIEW_ID_CENTER.equals(viewId) || IForm.VIEW_ID_E.equals(viewId);
   }
 
 }

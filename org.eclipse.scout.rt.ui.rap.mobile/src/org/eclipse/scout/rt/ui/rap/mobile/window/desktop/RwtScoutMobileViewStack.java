@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutViewStack;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutMobileViewStack extends RwtScoutViewStack {
   private static final long serialVersionUID = 1L;
@@ -31,8 +31,8 @@ public class RwtScoutMobileViewStack extends RwtScoutViewStack {
   }
 
   @Override
-  protected boolean alwaysHideTabBar() {
-    return true;
+  protected boolean isCreateTabBarEnabled() {
+    return false;
   }
 
   @Override
