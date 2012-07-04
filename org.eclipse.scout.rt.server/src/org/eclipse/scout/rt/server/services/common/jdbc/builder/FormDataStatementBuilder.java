@@ -842,9 +842,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
   private void appendTreeSubContribution(EntityContribution parent, EntityContribution child, EntityStrategy entityStrategy) {
     switch (entityStrategy) {
       case BuildConstraints: {
-        String cons = createWhereConstraint(child);
-        if (cons != null) {
-          parent.add(EntityContribution.create(cons));
+        EntityContribution whereConstraints = EntityContributionUtility.createConstraintsContribution(child);
+        if (whereConstraints != null) {
+          parent.add(whereConstraints);
         }
         break;
       }

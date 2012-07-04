@@ -92,4 +92,70 @@ public class EntityContribution {
     return m_havingParts;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_fromParts == null) ? 0 : m_fromParts.hashCode());
+    result = prime * result + ((m_groupByParts == null) ? 0 : m_groupByParts.hashCode());
+    result = prime * result + ((m_havingParts == null) ? 0 : m_havingParts.hashCode());
+    result = prime * result + ((m_selectParts == null) ? 0 : m_selectParts.hashCode());
+    result = prime * result + ((m_whereParts == null) ? 0 : m_whereParts.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    EntityContribution other = (EntityContribution) obj;
+    if (m_fromParts == null) {
+      if (other.m_fromParts != null) {
+        return false;
+      }
+    }
+    else if (!m_fromParts.equals(other.m_fromParts)) {
+      return false;
+    }
+    if (m_groupByParts == null) {
+      if (other.m_groupByParts != null) {
+        return false;
+      }
+    }
+    else if (!m_groupByParts.equals(other.m_groupByParts)) {
+      return false;
+    }
+    if (m_havingParts == null) {
+      if (other.m_havingParts != null) {
+        return false;
+      }
+    }
+    else if (!m_havingParts.equals(other.m_havingParts)) {
+      return false;
+    }
+    if (m_selectParts == null) {
+      if (other.m_selectParts != null) {
+        return false;
+      }
+    }
+    else if (!m_selectParts.equals(other.m_selectParts)) {
+      return false;
+    }
+    if (m_whereParts == null) {
+      if (other.m_whereParts != null) {
+        return false;
+      }
+    }
+    else if (!m_whereParts.equals(other.m_whereParts)) {
+      return false;
+    }
+    return true;
+  }
 }
