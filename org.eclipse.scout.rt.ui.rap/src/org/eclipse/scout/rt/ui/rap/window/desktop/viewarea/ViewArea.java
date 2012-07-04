@@ -52,6 +52,7 @@ public class ViewArea extends Composite implements IViewArea {
 
   private P_SashSelectionListener m_sashListener;
   private HashMap<SashKey, Integer> m_sashPositions;
+  private HashMap<String, Point> m_formPositions;
 
   RwtScoutViewStack[][] m_viewStacks;
   HashMap<SashKey, Sash> m_sashes;
@@ -60,10 +61,27 @@ public class ViewArea extends Composite implements IViewArea {
     super(parent, SWT.NONE);
     m_sashes = new HashMap<ViewArea.SashKey, Sash>();
     m_sashPositions = new HashMap<ViewArea.SashKey, Integer>();
-    m_sashListener = new P_SashSelectionListener();
+    if (isCreateSashesEnabled()) {
+      m_sashListener = new P_SashSelectionListener();
+    }
+
+    initFormPositions();
     createContent(this);
     readPreferences();
     setLayout(new ViewAreaLayout());
+  }
+
+  private void initFormPositions() {
+    m_formPositions = new HashMap<String, Point>();
+    m_formPositions.put(IForm.VIEW_ID_NW, new Point(0, 0));
+    m_formPositions.put(IForm.VIEW_ID_N, new Point(1, 0));
+    m_formPositions.put(IForm.VIEW_ID_NE, new Point(2, 0));
+    m_formPositions.put(IForm.VIEW_ID_W, new Point(0, 1));
+    m_formPositions.put(IForm.VIEW_ID_CENTER, new Point(1, 1));
+    m_formPositions.put(IForm.VIEW_ID_E, new Point(2, 1));
+    m_formPositions.put(IForm.VIEW_ID_SW, new Point(0, 2));
+    m_formPositions.put(IForm.VIEW_ID_S, new Point(1, 2));
+    m_formPositions.put(IForm.VIEW_ID_SE, new Point(2, 2));
   }
 
   private void readPreferences() {
@@ -71,11 +89,27 @@ public class ViewArea extends Composite implements IViewArea {
     m_sashPositions.put(SashKey.VERTICAL_RIGHT, deco.getLogicalGridLayoutDefaultColumnWidth());
   }
 
+  private String getViewIdForCoord(int x, int y) {
+    for (String viewId : m_formPositions.keySet()) {
+      Point point = m_formPositions.get(viewId);
+      if (point != null && point.x == x && point.y == y) {
+        return viewId;
+      }
+    }
+
+    return null;
+  }
+
   protected void createContent(Composite parent) {
     m_viewStacks = new RwtScoutViewStack[3][3];
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        m_viewStacks[i][j] = createRwtScoutViewStack(parent);
+    for (int x = 0; x < 3; x++) {
+      for (int y = 0; y < 3; y++) {
+        if (acceptViewId(getViewIdForCoord(x, y))) {
+          m_viewStacks[x][y] = createRwtScoutViewStack(parent);
+        }
+        else {
+          m_viewStacks[x][y] = null;
+        }
       }
     }
     // sashes
@@ -87,11 +121,32 @@ public class ViewArea extends Composite implements IViewArea {
           style = SWT.VERTICAL;
           break;
       }
-      Sash sash = new Sash(parent, style);
-      sash.setData("SASH_KEY", k);
-      sash.addListener(SWT.Selection, m_sashListener);
+      Sash sash = null;
+      if (isCreateSashesEnabled()) {
+        sash = new Sash(parent, style);
+        sash.setData("SASH_KEY", k);
+        sash.addListener(SWT.Selection, m_sashListener);
+      }
       m_sashes.put(k, sash);
     }
+  }
+
+  /**
+   * Controls whether a {@link RwtScoutViewStack} should be created for the given viewId.
+   * <p>
+   * The default accepts every view id. May be overridden to reduce the amount of created view stacks.
+   */
+  protected boolean acceptViewId(String viewId) {
+    return true;
+  }
+
+  /**
+   * Controls whether shashes should be created at all. May be overridden.
+   * <p>
+   * Default is true.
+   */
+  protected boolean isCreateSashesEnabled() {
+    return true;
   }
 
   protected RwtScoutViewStack createRwtScoutViewStack(Composite parent) {
@@ -100,7 +155,7 @@ public class ViewArea extends Composite implements IViewArea {
 
   int getSashPosition(SashKey key) {
     Integer pos = m_sashPositions.get(key);
-    if (pos != null && m_sashes.get(key).getVisible()) {
+    if (pos != null) {
       return pos.intValue();
     }
     else {
@@ -156,7 +211,7 @@ public class ViewArea extends Composite implements IViewArea {
 
     int maxWidth = -1;
     for (RwtScoutViewStack verticalViewStack : verticalViewStacks) {
-      if (verticalViewStack.getWidthHint() > maxWidth) {
+      if (verticalViewStack != null && verticalViewStack.getWidthHint() > maxWidth) {
         maxWidth = viewStack.getWidthHint();
       }
     }
@@ -195,6 +250,9 @@ public class ViewArea extends Composite implements IViewArea {
     return viewStacks;
   }
 
+  /**
+   * @return the Sash for the given key or null if {@link #isCreateSashesEnabled()} returns false.
+   */
   public Sash getSash(SashKey key) {
     return m_sashes.get(key);
   }
@@ -233,36 +291,12 @@ public class ViewArea extends Composite implements IViewArea {
     else if (IForm.VIEW_ID_PAGE_SEARCH.equalsIgnoreCase(scoutId)) {
       scoutId = IForm.VIEW_ID_S;
     }
-    if (IForm.VIEW_ID_NW.equals(scoutId)) {
-      return m_viewStacks[0][0];
+    Point coord = m_formPositions.get(scoutId);
+    if (coord != null) {
+      return m_viewStacks[coord.x][coord.y];
     }
-    if (IForm.VIEW_ID_N.equals(scoutId)) {
-      return m_viewStacks[1][0];
-    }
-    if (IForm.VIEW_ID_NE.equals(scoutId)) {
-      return m_viewStacks[2][0];
-    }
-    if (IForm.VIEW_ID_W.equals(scoutId)) {
-      return m_viewStacks[0][1];
-    }
-    if (IForm.VIEW_ID_CENTER.equals(scoutId)) {
-      return m_viewStacks[1][1];
-    }
-    if (IForm.VIEW_ID_E.equals(scoutId)) {
-      return m_viewStacks[2][1];
-    }
-    if (IForm.VIEW_ID_SW.equals(scoutId)) {
-      return m_viewStacks[0][2];
-    }
-    if (IForm.VIEW_ID_S.equals(scoutId)) {
-      return m_viewStacks[1][2];
-    }
-    if (IForm.VIEW_ID_SE.equals(scoutId)) {
-      return m_viewStacks[2][2];
-    }
-    else {
-      return null;
-    }
+
+    return null;
   }
 
   @Override

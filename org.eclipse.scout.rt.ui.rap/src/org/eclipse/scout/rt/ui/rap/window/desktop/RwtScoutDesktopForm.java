@@ -117,7 +117,9 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
   @Override
   protected void closePartImpl() {
     detachScout();
-    m_button.dispose();
+    if (m_button != null) {
+      m_button.dispose();
+    }
     m_uiForm.dispose();
 
     m_stackComposite = null;
@@ -175,12 +177,14 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
 
   @Override
   protected void setImageFromScout() {
-    if (m_button == null || m_button.isDisposed() || getUiForm() == null) {
+    if (getUiForm() == null || getUiForm().isDisposed()) {
       return;
     }
     String iconId = getScoutObject().getIconId();
     Image img = getUiEnvironment().getIcon(iconId);
-    m_button.setImage(img);
+    if (m_button != null && !m_button.isDisposed()) {
+      m_button.setImage(img);
+    }
     String sub = getScoutObject().getSubTitle();
     if (sub != null) {
       getUiForm().setImage(img);
@@ -192,13 +196,15 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
 
   @Override
   protected void setTitleFromScout() {
-    if (m_button == null || m_button.isDisposed() || getUiForm() == null) {
+    if (getUiForm() == null || getUiForm().isDisposed()) {
       return;
     }
     IForm f = getScoutObject();
     //
     String s = f.getBasicTitle();
-    m_button.setLabel(StringUtility.removeNewLines(s != null ? s : ""));
+    if (m_button != null && !m_button.isDisposed()) {
+      m_button.setLabel(StringUtility.removeNewLines(s != null ? s : ""));
+    }
     //
     s = f.getSubTitle();
     if (s != null) {

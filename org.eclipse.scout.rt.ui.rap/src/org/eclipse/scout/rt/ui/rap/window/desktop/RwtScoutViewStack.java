@@ -82,8 +82,10 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
   }
 
   protected void createContent(Composite parent) {
-    m_tabBar = getUiEnvironment().getFormToolkit().createComposite(parent);
-    m_tabBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEW_TAB_AREA);
+    if (isCreateTabBarEnabled()) {
+      m_tabBar = getUiEnvironment().getFormToolkit().createComposite(parent);
+      m_tabBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEW_TAB_AREA);
+    }
     m_container = getUiEnvironment().getFormToolkit().createComposite(parent);
 
     // layout
@@ -95,15 +97,17 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     layout.verticalSpacing = 0;
     parent.setLayout(layout);
 
-    GridData tabBarData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-    tabBarData.exclude = false;
-    m_tabBar.setLayoutData(tabBarData);
+    if (m_tabBar != null) {
+      GridData tabBarData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+      tabBarData.exclude = false;
+      m_tabBar.setLayoutData(tabBarData);
 
-    RowLayout tabBarLayout = new RowLayout();
-    tabBarLayout.marginBottom = 0;
-    tabBarLayout.marginLeft = 0;
-    tabBarLayout.marginTop = 0;
-    m_tabBar.setLayout(tabBarLayout);
+      RowLayout tabBarLayout = new RowLayout();
+      tabBarLayout.marginBottom = 0;
+      tabBarLayout.marginLeft = 0;
+      tabBarLayout.marginTop = 0;
+      m_tabBar.setLayout(tabBarLayout);
+    }
 
     GridData containerData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
     m_container.setLayoutData(containerData);
@@ -131,9 +135,12 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     }
 
     RwtScoutDesktopForm ui = new RwtScoutDesktopForm();
-    ViewStackTabButton button = new ViewStackTabButton(m_tabBar);
-    button.setLayoutData(new RowData(SWT.DEFAULT, 22));
-    button.addViewTabListener(new P_ViewTabSelectionListener(ui));
+    ViewStackTabButton button = null;
+    if (m_tabBar != null) {
+      button = new ViewStackTabButton(m_tabBar);
+      button.setLayoutData(new RowData(SWT.DEFAULT, 22));
+      button.addViewTabListener(new P_ViewTabSelectionListener(ui));
+    }
     ui.createPart(this, m_container, button, form, getUiEnvironment());
     m_formStack.add(0, ui);
     m_openForms.put(form, ui);
@@ -196,9 +203,9 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     if (uiForm != null) {
       StackLayout stackLayout = (StackLayout) m_container.getLayout();
       stackLayout.topControl = uiForm.getUiForm();
-      if (m_formStack.remove(uiForm)) {
+      if (m_tabBar != null && m_formStack.remove(uiForm)) {
         GridData tabBarData = (GridData) m_tabBar.getLayoutData();
-        if (m_formStack.isEmpty() || alwaysHideTabBar()) {
+        if (m_formStack.isEmpty()) {
           m_tabBar.setVisible(false);
           tabBarData.exclude = true;
         }
@@ -216,8 +223,13 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     getParent().layout(true, true);
   }
 
-  protected boolean alwaysHideTabBar() {
-    return false;
+  /**
+   * Controls whether the tab bar should be created at all. May be overridden.
+   * <p>
+   * Default is true.
+   */
+  protected boolean isCreateTabBarEnabled() {
+    return true;
   }
 
   @Override

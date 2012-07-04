@@ -107,7 +107,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
       public void handleCompositeLayouted() {
         int xOffset = -1;
         Sash sash = m_viewArea.getSash(SashKey.VERTICAL_RIGHT);
-        if (sash.getVisible()) {
+        if (sash != null && sash.getVisible()) {
           Rectangle sashBounds = sash.getBounds();
           xOffset = sashBounds.x + sashBounds.width;
         }

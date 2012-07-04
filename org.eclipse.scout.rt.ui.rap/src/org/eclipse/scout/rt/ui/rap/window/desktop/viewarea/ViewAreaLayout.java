@@ -67,7 +67,7 @@ public class ViewAreaLayout extends Layout {
     for (int x = 0; x < 3; x++) {
       for (int y = 0; y < 3; y++) {
         RwtScoutViewStack view = viewArea.m_viewStacks[x][y];
-        if (view.getVisible()) {
+        if (view != null && view.getVisible()) {
           view.setBounds(m_bounds.get(view));
         }
       }
@@ -77,21 +77,21 @@ public class ViewAreaLayout extends Layout {
     keys.remove(SashKey.VERTICAL_RIGHT);
     for (SashKey k : keys) {
       Sash s = viewArea.getSash(k);
-      if (s.getVisible()) {
+      if (s != null && s.getVisible()) {
         Rectangle bounds = m_bounds.get(s);
         s.setBounds(bounds);
       }
     }
     // sashes
     Sash verticalLeft = viewArea.getSash(SashKey.VERTICAL_LEFT);
-    if (verticalLeft.getVisible()) {
+    if (verticalLeft != null && verticalLeft.getVisible()) {
       Rectangle bounds = new Rectangle(boundsSashLeft.x, boundsSashLeft.y, boundsSashLeft.width, boundsSashLeft.height);
       bounds.height = clientArea.height;
       verticalLeft.setBounds(bounds);
     }
 
     Sash verticalRight = viewArea.getSash(SashKey.VERTICAL_RIGHT);
-    if (verticalRight.getVisible()) {
+    if (verticalLeft != null && verticalRight.getVisible()) {
       Rectangle bounds = new Rectangle(boundsSashRight.x, boundsSashRight.y, boundsSashRight.width, boundsSashRight.height);
       bounds.height = clientArea.height;
       verticalRight.setBounds(bounds);
@@ -112,7 +112,7 @@ public class ViewAreaLayout extends Layout {
       int minWidth = 0;
       for (int y = 0; y < 3; y++) {
         RwtScoutViewStack view = viewArea.m_viewStacks[x][y];
-        if (view.getVisible()) {
+        if (view != null && view.getVisible()) {
           if (minHeight > 0) {
             minHeight += SASH_WIDTH;
           }
@@ -187,39 +187,43 @@ public class ViewAreaLayout extends Layout {
       boundsRight = new Rectangle(x, y, 0, 0);
       w = computeWidth(viewArea.m_viewStacks[2]);
       boundsRight.width = w;
-      // sashes
-      Sash leftSash = viewArea.getSash(SashKey.VERTICAL_LEFT);
-      Sash rightSash = viewArea.getSash(SashKey.VERTICAL_RIGHT);
-      leftSash.setVisible(false);
-      rightSash.setVisible(false);
+
       boundsSashLeft = new Rectangle(x, y, 0, 0);
       boundsSashRight = new Rectangle(x, y, 0, 0);
 
-      // all 3 parts visible
-      if (boundsLeft.width > 0 && boundsCenter.width > 0 && boundsRight.width > 0) {
-        leftSash.setVisible(true);
-        rightSash.setVisible(true);
-        boundsSashLeft.width = SASH_WIDTH;
-        boundsSashRight.width = SASH_WIDTH;
-      }
-      // left and center visible
-      else if (boundsLeft.width > 0 && boundsCenter.width > 0) {
-        leftSash.setVisible(true);
-        rightSash.setVisible(false);
-        boundsSashLeft.width = SASH_WIDTH;
-      }
-      else if (boundsLeft.width > 0 && boundsRight.width > 0) {
-        leftSash.setVisible(true);
-        rightSash.setVisible(false);
-        boundsSashLeft.width = SASH_WIDTH;
-      }
-      else if (boundsCenter.width > 0 && boundsRight.width > 0) {
+      // sashes
+      if (viewArea.isCreateSashesEnabled()) {
+        Sash leftSash = viewArea.getSash(SashKey.VERTICAL_LEFT);
+        Sash rightSash = viewArea.getSash(SashKey.VERTICAL_RIGHT);
         leftSash.setVisible(false);
-        rightSash.setVisible(true);
-        boundsSashRight.width = SASH_WIDTH;
+        rightSash.setVisible(false);
+
+        // all 3 parts visible
+        if (boundsLeft.width > 0 && boundsCenter.width > 0 && boundsRight.width > 0) {
+          leftSash.setVisible(true);
+          rightSash.setVisible(true);
+          boundsSashLeft.width = SASH_WIDTH;
+          boundsSashRight.width = SASH_WIDTH;
+        }
+        // left and center visible
+        else if (boundsLeft.width > 0 && boundsCenter.width > 0) {
+          leftSash.setVisible(true);
+          rightSash.setVisible(false);
+          boundsSashLeft.width = SASH_WIDTH;
+        }
+        else if (boundsLeft.width > 0 && boundsRight.width > 0) {
+          leftSash.setVisible(true);
+          rightSash.setVisible(false);
+          boundsSashLeft.width = SASH_WIDTH;
+        }
+        else if (boundsCenter.width > 0 && boundsRight.width > 0) {
+          leftSash.setVisible(false);
+          rightSash.setVisible(true);
+          boundsSashRight.width = SASH_WIDTH;
+        }
       }
       int pos = viewArea.getSashPosition(SashKey.VERTICAL_LEFT);
-      if (pos > 0) {
+      if (pos > 0 && boundsLeft.width > 0) {
         boundsLeft.width = pos;
       }
       pos = viewArea.getSashPosition(SashKey.VERTICAL_RIGHT);
@@ -287,7 +291,7 @@ public class ViewAreaLayout extends Layout {
     for (int i = 0; i < 3; i++) {
       bounds[i] = new Rectangle(clientArea.x, 0, clientArea.width, 0);
       // compute
-      if (views[i].getVisible()) {
+      if (views[i] != null && views[i].getVisible()) {
         Point size = views[i].computeSize(bounds[i].width, SWT.DEFAULT);
         bounds[i].height = size.y;
       }
@@ -391,7 +395,7 @@ public class ViewAreaLayout extends Layout {
   private int computeWidth(RwtScoutViewStack[] views) {
     int w = 0;
     for (RwtScoutViewStack v : views) {
-      if (v.getVisible()) {
+      if (v != null && v.getVisible()) {
         Point size = v.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         w = Math.max(size.x, w);
       }
