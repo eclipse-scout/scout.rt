@@ -784,22 +784,58 @@ public class FormDataStatementBuilder implements DataModelConstants {
    *          prepending "AND"
    */
   public static String createWhereConstraint(EntityContribution contrib) {
-    // if there are no where parts, do nothing
+    EntityContribution whereContribution = createConstraintsContribution(contrib);
+    if (whereContribution == null) {
+      return null;
+    }
+    if (whereContribution.getWhereParts().isEmpty()) {
+      return null;
+    }
+    return ListUtility.format(whereContribution.getWhereParts(), " AND ");
+  }
+
+  /**
+   * Creates constraints based on the {@link EntityContribution}. This means that from parts etc. are wrapped
+   * inside an EXISTS (SELECT 1 FROM ... WHERE ... GROUP BY ... HAVING ...) clause.
+   * 
+   * @return Returns an {@link EntityContribution} with constraints or null if the given {@link EntityContribution} is
+   *         empty.
+   */
+  public static EntityContribution createConstraintsContribution(EntityContribution contrib) {
+    // if there are no where or having parts, do nothing
     if (contrib == null) {
       return null;
     }
-    if (contrib.getWhereParts().isEmpty()) {
+    if (contrib.getWhereParts().isEmpty() && contrib.getHavingParts().isEmpty()) {
       return null;
     }
-    String wherePart = ListUtility.format(contrib.getWhereParts(), " AND ");
     if (contrib.getFromParts().isEmpty()) {
-      // no from parts, just use the where parts
-      return wherePart;
+      // no from parts, just use where, group by and having parts
+      EntityContribution result = new EntityContribution();
+      result.getWhereParts().addAll(contrib.getWhereParts());
+      result.getGroupByParts().addAll(contrib.getGroupByParts());
+      result.getHavingParts().addAll(contrib.getHavingParts());
+      return result;
     }
     // there are from parts
-    // create an EXISTS (SELECT 1 FROM ... WHERE ...)
-    String fromPart = ListUtility.format(contrib.getFromParts(), ", ");
-    return " EXISTS (SELECT 1 FROM " + fromPart + " WHERE " + wherePart + ")";
+    // create an EXISTS (SELECT 1 FROM ... WHERE ... GROUP BY ... HAVING ...)
+    StringBuilder sb = new StringBuilder();
+    sb.append(" EXISTS (SELECT 1 FROM ");
+    sb.append(ListUtility.format(contrib.getFromParts(), ", "));
+    if (!contrib.getWhereParts().isEmpty()) {
+      sb.append(" WHERE ");
+      sb.append(ListUtility.format(contrib.getWhereParts(), " AND "));
+    }
+    if (!contrib.getGroupByParts().isEmpty()) {
+      sb.append(" GROUP BY ");
+      sb.append(ListUtility.format(contrib.getGroupByParts(), ", "));
+    }
+    if (!contrib.getHavingParts().isEmpty()) {
+      sb.append(" HAVING ");
+      sb.append(ListUtility.format(contrib.getHavingParts(), " AND "));
+    }
+    sb.append(")");
+    return EntityContribution.create(sb.toString());
   }
 
   public AttributeKind getAttributeKind(TreeNodeData node) {
@@ -864,9 +900,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
   private void appendTreeSubContribution(EntityContribution parent, EntityContribution child, EntityStrategy entityStrategy) {
     switch (entityStrategy) {
       case BuildConstraints: {
-        String cons = createWhereConstraint(child);
-        if (cons != null) {
-          parent.add(EntityContribution.create(cons));
+        EntityContribution whereConstraints = createConstraintsContribution(child);
+        if (whereConstraints != null) {
+          parent.add(whereConstraints);
         }
         break;
       }
