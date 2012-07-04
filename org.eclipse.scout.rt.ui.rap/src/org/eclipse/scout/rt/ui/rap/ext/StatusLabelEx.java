@@ -33,6 +33,9 @@ import org.eclipse.swt.widgets.Label;
 
 public class StatusLabelEx extends Composite implements ILabelComposite {
   private static final long serialVersionUID = 1L;
+  private static final String STAR_MARKER = "*";
+  private static final String WHITE_SPACE = " ";
+
   private IProcessingStatus m_status;
   private boolean m_mandatory;
   private Control m_label;
@@ -115,10 +118,10 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
       if (starPos != ILookAndFeelDecorations.STAR_MARKER_NONE) {
         switch (starPos) {
           case ILookAndFeelDecorations.STAR_MARKER_AFTER_LABEL:
-            m_postMarker = "*";
+            m_postMarker = STAR_MARKER + WHITE_SPACE;
             break;
           case ILookAndFeelDecorations.STAR_MARKER_BEFORE_LABEL:
-            m_preMarker = "*";
+            m_preMarker = STAR_MARKER + WHITE_SPACE;
             break;
         }
       }
