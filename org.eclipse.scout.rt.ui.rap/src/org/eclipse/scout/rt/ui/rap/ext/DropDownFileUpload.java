@@ -152,7 +152,7 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
     }
     String customVariant = m_dropdownEnabled ? m_originalVariant + "_menu" : m_originalVariant;
     setData(WidgetUtil.CUSTOM_VARIANT, customVariant);
-    super.setEnabled(isButtonEnabled() || isDropdownEnabled());
+    super.setEnabled(isButtonEnabled());
     redraw();
   }
 
@@ -164,7 +164,7 @@ public class DropDownFileUpload extends FileUpload implements IDropDownFileUploa
   @Override
   public void setButtonEnabled(boolean enabled) {
     m_buttonEnabled = enabled;
-    super.setEnabled(isButtonEnabled() || isDropdownEnabled());
+    super.setEnabled(isButtonEnabled());
     redraw();
   }
 
