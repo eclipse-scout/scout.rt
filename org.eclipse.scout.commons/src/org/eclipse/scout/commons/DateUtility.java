@@ -226,7 +226,6 @@ public final class DateUtility {
    * truncate the calendar to a day with time 00:00:00.000
    */
   public static void truncCalendar(Calendar c) {
-    c.set(Calendar.HOUR, 0);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.SECOND, 0);
@@ -249,7 +248,6 @@ public final class DateUtility {
     if (adjustIncrement == 0) {
       adjustIncrement = -1;
     }
-    c.set(Calendar.HOUR, 0);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.SECOND, 0);
@@ -265,7 +263,6 @@ public final class DateUtility {
    */
   public static void truncCalendarToMonth(Calendar c) {
     c.set(Calendar.DATE, 1);
-    c.set(Calendar.HOUR, 0);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.SECOND, 0);
@@ -278,7 +275,6 @@ public final class DateUtility {
   public static void truncCalendarToYear(Calendar c) {
     c.set(Calendar.MONTH, Calendar.JANUARY);
     c.set(Calendar.DATE, 1);
-    c.set(Calendar.HOUR, 0);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.SECOND, 0);
