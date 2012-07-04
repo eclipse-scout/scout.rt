@@ -23,13 +23,12 @@ import org.eclipse.scout.rt.ui.rap.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutActionBar;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> extends RwtScoutComposite<T> implements IRwtScoutActionBar<T> {
   private static final String VARIANT_ACTION_BAR_CONTAINER = "actionBarContainer";
@@ -184,12 +183,10 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
   }
 
   protected Composite createTitleBar(Composite parent) {
-    Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    container.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
-    container.setLayout(new FillLayout());
-    m_titleField = getUiEnvironment().getFormToolkit().createCLabel(container, null, SWT.CENTER);
+    m_titleField = getUiEnvironment().getFormToolkit().createCLabel(parent, null, SWT.CENTER);
     m_titleField.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
-    return container;
+
+    return m_titleField;
   }
 
   private ActionButtonBar createActionButtonBar(Composite parent, ActionButtonBar existingButtonBar, List<IMenu> menuList, int style) {

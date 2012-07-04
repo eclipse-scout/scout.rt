@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -42,7 +41,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class ActionButtonBar extends Composite {
   private static final long serialVersionUID = 1L;
@@ -201,39 +200,13 @@ public class ActionButtonBar extends Composite {
   }
 
   private void createButtons(Composite buttonBar, List<IMenu> actions) {
-    List<List<IMenu>> separatedMenus = RwtMenuUtility.split(actions.toArray(new IMenu[actions.size()]));
-    for (List<IMenu> menuGroup : separatedMenus) {
-
-      if (menuGroup.size() > 0 && isAnyActionVisible(menuGroup)) {
-        Composite buttonGroup = createButtonGroup(buttonBar);
-
-        for (IMenu menu : menuGroup) {
-          createButton(buttonGroup, menu);
-        }
-
-      }
-
+    if (actions.size() == 0 || !isAnyActionVisible(actions)) {
+      return;
     }
-  }
 
-  private Composite createButtonGroup(Composite parent) {
-    Composite buttonGroup = getUiEnvironment().getFormToolkit().createComposite(parent);
-
-    initButtonGroupLayout(buttonGroup);
-
-    return buttonGroup;
-  }
-
-  private void initButtonGroupLayout(Composite buttonGroup) {
-    RowLayout layout = new RowLayout(SWT.HORIZONTAL);
-    layout.marginBottom = 0;
-    layout.marginTop = 0;
-    layout.marginLeft = 0;
-    layout.marginRight = 0;
-    layout.spacing = BUTTON_SPACING;
-    layout.wrap = false;
-
-    buttonGroup.setLayout(layout);
+    for (IMenu menu : actions) {
+      createButton(buttonBar, menu);
+    }
   }
 
   protected void createButton(Composite parent, IAction action) {
@@ -241,6 +214,9 @@ public class ActionButtonBar extends Composite {
       return;
     }
     if (!action.isVisible()) {
+      return;
+    }
+    if (action.isSeparator()) {
       return;
     }
 

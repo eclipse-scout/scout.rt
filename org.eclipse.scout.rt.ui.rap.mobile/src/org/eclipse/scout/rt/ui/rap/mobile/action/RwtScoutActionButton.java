@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements IRwtScoutActionButton {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutActionButton.class);
@@ -63,12 +63,13 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
 
     int style = createButtonStyle();
     Button uiButton = getUiEnvironment().getFormToolkit().createButton(container, "", style);
-
     uiButton.addSelectionListener(new P_RwtSelectionListener());
 
-    m_contextMenu = new Menu(uiButton.getShell(), SWT.POP_UP);
-    m_contextMenu.addMenuListener(new P_ContextMenuListener());
-    uiButton.setMenu(m_contextMenu);
+    if (hasChildActions()) {
+      m_contextMenu = new Menu(uiButton.getShell(), SWT.POP_UP);
+      m_contextMenu.addMenuListener(new P_ContextMenuListener());
+      uiButton.setMenu(m_contextMenu);
+    }
 
     initLayout(container, uiButton);
 
