@@ -23,15 +23,15 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.AbstractSplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox;
+import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.ContentBox;
+import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.ContentBox.WrappedWizardForm;
+import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.StatusField;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardCancelButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardFinishButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardNextStepButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardPreviousStepButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardResetButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardSuspendButton;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.ContentBox;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.StatusField;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.ContentBox.WrappedWizardForm;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -45,11 +45,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
 
   public DefaultWizardContainerForm(IWizard w) throws ProcessingException {
     super(w);
-  }
-
-  @Override
-  protected String getConfiguredIconId() {
-    return AbstractIcons.Gears;
   }
 
   public MainBox getMainBox() {
