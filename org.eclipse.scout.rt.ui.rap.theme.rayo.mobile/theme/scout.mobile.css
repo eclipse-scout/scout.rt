@@ -962,12 +962,14 @@ FileUpload.filechooserfield_file {
   padding: 20px 10px;
   /* Does not work until following bug is fixed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423 */
 
+  cursor: pointer;
 }
 FileUpload.filechooserfield_file:hover {
   background-image: url(theme/img/button/filechooserfield_file.png);
 }
 FileUpload.filechooserfield_file:disabled {
   background-image: url(theme/img/button/filechooserfield_file_disabled.png);
+  cursor: default;
 }
 FileUpload.filechooserfield_file_menu {
   background-image: url(theme/img/button/filechooserfield_file_menu.png);
@@ -975,12 +977,14 @@ FileUpload.filechooserfield_file_menu {
   padding: 20px 10px;
   /* Does not work until following bug is fixed: https://bugs.eclipse.org/bugs/show_bug.cgi?id=369423 */
 
+  cursor: pointer;
 }
 FileUpload.filechooserfield_file_menu:hover {
   background-image: url(theme/img/button/filechooserfield_file_menu.png);
 }
 FileUpload.filechooserfield_file_menu:disabled {
   background-image: url(theme/img/button/filechooserfield_file_menu_disabled.png);
+  cursor: default;
 }
 /* Group */
 Group {
@@ -1302,18 +1306,22 @@ Text.smartfield:disabled {
 Button.smartfield_browse {
   background-image: url(theme/img/button/smartfield_browse.png);
   border-radius: 5px;
+  cursor: pointer;
 }
 Button.smartfield_browse:disabled {
   background-image: url(theme/img/button/smartfield_browse_disabled.png);
+  cursor: default;
 }
 Button.smartfield_browse:hover {
   background-image: url(theme/img/button/smartfield_browse_mouse_over.png);
 }
 Button.smartfield_browse_menu {
   background-image: url(theme/img/button/smartfield_browse_menu.png);
+  cursor: pointer;
 }
 Button.smartfield_browse_menu:disabled {
   background-image: url(theme/img/button/smartfield_browse_menu_disabled.png);
+  cursor: default;
 }
 Button.smartfield_browse_menu:hover {
   background-image: url(theme/img/button/smartfield_browse_menu_mouse_over.png);
