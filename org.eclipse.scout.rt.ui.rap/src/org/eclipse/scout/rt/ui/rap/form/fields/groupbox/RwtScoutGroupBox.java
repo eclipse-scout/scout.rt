@@ -140,39 +140,38 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
     deco.decoration = IGroupBox.BORDER_DECORATION_EMPTY;
     if (IGroupBox.BORDER_DECORATION_SECTION.equals(box.getBorderDecoration())) {
       deco.decoration = IGroupBox.BORDER_DECORATION_SECTION;
-      return deco;
     }
-    if (IGroupBox.BORDER_DECORATION_LINE.equals(box.getBorderDecoration())) {
+    else if (IGroupBox.BORDER_DECORATION_LINE.equals(box.getBorderDecoration())) {
       deco.decoration = IGroupBox.BORDER_DECORATION_LINE;
-      return deco;
     }
-    if (IGroupBox.BORDER_DECORATION_EMPTY.equals(box.getBorderDecoration())) {
+    else if (IGroupBox.BORDER_DECORATION_EMPTY.equals(box.getBorderDecoration())) {
       deco.decoration = IGroupBox.BORDER_DECORATION_EMPTY;
-      return deco;
     }
-    if (!IGroupBox.BORDER_DECORATION_AUTO.equals(box.getBorderDecoration())) {
+    else if (!IGroupBox.BORDER_DECORATION_AUTO.equals(box.getBorderDecoration())) {
       deco.decoration = IGroupBox.BORDER_DECORATION_EMPTY;
-      return deco;
     }
-    // auto: best guess
+    else {
+      resolveBorderDecorationAuto(box, deco);
+    }
+    return deco;
+  }
+
+  protected void resolveBorderDecorationAuto(IGroupBox box, BorderDecoration deco) {
     if (box.isExpandable()) {
       deco.decoration = IGroupBox.BORDER_DECORATION_SECTION;
-      return deco;
     }
-    if (box.isMainBox()) {
+    else if (box.isMainBox()) {
       if (UiDecorationExtensionPoint.getLookAndFeel().isFormMainBoxBorderVisible()) {
         deco.decoration = IGroupBox.BORDER_DECORATION_EMPTY;
-        return deco;
       }
       deco.visible = false;
-      return deco;
     }
-    if (box.getParentField() instanceof ITabBox) {
+    else if (box.getParentField() instanceof ITabBox) {
       deco.decoration = IGroupBox.BORDER_DECORATION_EMPTY;
-      return deco;
     }
-    deco.decoration = IGroupBox.BORDER_DECORATION_LINE;
-    return deco;
+    else {
+      deco.decoration = IGroupBox.BORDER_DECORATION_LINE;
+    }
   }
 
   protected Composite createContainer(Composite parent) {
@@ -322,8 +321,12 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
       else {
         ((GridData) m_label.getLayoutData()).exclude = true;
         m_label.setVisible(false);
-        ((GridData) m_line.getLayoutData()).exclude = true;
-        m_line.setVisible(false);
+
+        //Exclude the line too if border decoration is set to auto. If it's explicitly set to line it must not be excluded
+        if (IGroupBox.BORDER_DECORATION_AUTO.equals(getScoutObject().getBorderDecoration())) {
+          ((GridData) m_line.getLayoutData()).exclude = true;
+          m_line.setVisible(false);
+        }
       }
     }
   }
