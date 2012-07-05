@@ -34,7 +34,7 @@ public class MobileViewArea extends ViewArea {
   }
 
   @Override
-  protected boolean isCreateSashesEnabled() {
+  protected boolean isSashCreationEnabled() {
     return false;
   }
 

@@ -31,7 +31,7 @@ public class RwtScoutMobileViewStack extends RwtScoutViewStack {
   }
 
   @Override
-  protected boolean isCreateTabBarEnabled() {
+  protected boolean isTabBarCreationEnabled() {
     return false;
   }
 

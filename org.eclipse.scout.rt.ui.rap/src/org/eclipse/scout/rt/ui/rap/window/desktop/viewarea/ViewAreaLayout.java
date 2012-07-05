@@ -192,7 +192,7 @@ public class ViewAreaLayout extends Layout {
       boundsSashRight = new Rectangle(x, y, 0, 0);
 
       // sashes
-      if (viewArea.isCreateSashesEnabled()) {
+      if (viewArea.isSashCreationEnabled()) {
         Sash leftSash = viewArea.getSash(SashKey.VERTICAL_LEFT);
         Sash rightSash = viewArea.getSash(SashKey.VERTICAL_RIGHT);
         leftSash.setVisible(false);

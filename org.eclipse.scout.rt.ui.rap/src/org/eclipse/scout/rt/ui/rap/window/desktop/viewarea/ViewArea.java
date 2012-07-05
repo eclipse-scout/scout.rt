@@ -61,7 +61,7 @@ public class ViewArea extends Composite implements IViewArea {
     super(parent, SWT.NONE);
     m_sashes = new HashMap<ViewArea.SashKey, Sash>();
     m_sashPositions = new HashMap<ViewArea.SashKey, Integer>();
-    if (isCreateSashesEnabled()) {
+    if (isSashCreationEnabled()) {
       m_sashListener = new P_SashSelectionListener();
     }
 
@@ -122,7 +122,7 @@ public class ViewArea extends Composite implements IViewArea {
           break;
       }
       Sash sash = null;
-      if (isCreateSashesEnabled()) {
+      if (isSashCreationEnabled()) {
         sash = new Sash(parent, style);
         sash.setData("SASH_KEY", k);
         sash.addListener(SWT.Selection, m_sashListener);
@@ -145,7 +145,7 @@ public class ViewArea extends Composite implements IViewArea {
    * <p>
    * Default is true.
    */
-  protected boolean isCreateSashesEnabled() {
+  protected boolean isSashCreationEnabled() {
     return true;
   }
 
@@ -251,7 +251,7 @@ public class ViewArea extends Composite implements IViewArea {
   }
 
   /**
-   * @return the Sash for the given key or null if {@link #isCreateSashesEnabled()} returns false.
+   * @return the Sash for the given key or null if {@link #isSashCreationEnabled()} returns false.
    */
   public Sash getSash(SashKey key) {
     return m_sashes.get(key);

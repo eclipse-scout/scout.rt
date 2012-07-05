@@ -82,7 +82,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
   }
 
   protected void createContent(Composite parent) {
-    if (isCreateTabBarEnabled()) {
+    if (isTabBarCreationEnabled()) {
       m_tabBar = getUiEnvironment().getFormToolkit().createComposite(parent);
       m_tabBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_VIEW_TAB_AREA);
     }
@@ -228,7 +228,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
    * <p>
    * Default is true.
    */
-  protected boolean isCreateTabBarEnabled() {
+  protected boolean isTabBarCreationEnabled() {
     return true;
   }
 
