@@ -2025,7 +2025,7 @@ Button.formTabActivate-active:hover {
 Button-FocusIndicator.formTabActivate-active {
   border: none;
 }
-Composite.mobileViewsArea {
+Composite.viewsArea {
   background-color: #FFFFFF;
   padding: 0px 0px 0px 0px;
 }
@@ -2047,29 +2047,21 @@ CLabel {
 
   padding: 5px 3px;
 }
-Button.mobile-datechooser-dialog-last-year,
-Button.mobile-datechooser-dialog-last-year:hover {
+Button.datechooser-dialog-last-year,
+Button.datechooser-dialog-last-year:hover {
   background-image: url(theme/img/datetime/last-year_30x30.png);
-  border-radius: 5px;
-  border: none;
 }
-Button.mobile-datechooser-dialog-last-month,
-Button.mobile-datechooser-dialog-last-month:hover {
+Button.datechooser-dialog-last-month,
+Button.datechooser-dialog-last-month:hover {
   background-image: url(theme/img/datetime/last-month_30x30.png);
-  border-radius: 5px;
-  border: none;
 }
-Button.mobile-datechooser-dialog-next-year,
-Button.mobile-datechooser-dialog-next-year:hover {
+Button.datechooser-dialog-next-year,
+Button.datechooser-dialog-next-year:hover {
   background-image: url(theme/img/datetime/next-year_30x30.png);
-  border-radius: 5px;
-  border: none;
 }
-Button.mobile-datechooser-dialog-next-month,
-Button.mobile-datechooser-dialog-next-month:hover {
+Button.datechooser-dialog-next-month,
+Button.datechooser-dialog-next-month:hover {
   background-image: url(theme/img/datetime/next-month_30x30.png);
-  border-radius: 5px;
-  border: none;
 }
 Button[PUSH],
 Button[TOGGLE],

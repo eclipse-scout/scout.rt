@@ -16,25 +16,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutMobileDesktop extends RwtScoutDesktop {
 
-  private static final String VARIANT_VIEWS_AREA = "mobileViewsArea";
-
   /**
    * On mobile devices every form has a form header, the outline form too, so no global toolbar is necessary because the
-   * forms
-   * take care of that.
+   * forms take care of that.
    */
   @Override
   protected Control createToolBar(Composite parent) {
     return null;
-  }
-
-  @Override
-  protected String getViewsAreaVariant() {
-    return VARIANT_VIEWS_AREA;
   }
 
   @Override
