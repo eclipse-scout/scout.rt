@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
 /**
  * @since 3.9.0
@@ -288,6 +289,16 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   protected IDesktop getDesktop() {
     return m_desktop;
+  }
+
+  @Override
+  public boolean acceptMobileTabBoxTransformation(ITabBox tabBox) {
+    IGroupBox mainBox = tabBox.getForm().getRootGroupBox();
+    if (tabBox.getParentField() == mainBox) {
+      return !(mainBox.getControlFields()[0] == tabBox);
+    }
+
+    return false;
   }
 
   @Override

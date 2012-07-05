@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
 /**
  * @since 3.9.0
@@ -44,4 +45,6 @@ public interface IDeviceTransformer {
   void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList);
 
   void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList);
+
+  boolean acceptMobileTabBoxTransformation(ITabBox tabBox);
 }

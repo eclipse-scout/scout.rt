@@ -23,6 +23,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
@@ -262,5 +263,48 @@ public final class RwtMenuUtility {
     }
 
     return separatedMenus;
+  }
+
+  public static boolean hasChildActions(IAction action) {
+    if (!(action instanceof IActionNode<?>)) {
+      return false;
+    }
+
+    IActionNode<? extends IActionNode> actionNode = (IActionNode<?>) action;
+    return actionNode.hasChildActions();
+  }
+
+  public static boolean hasVisibleChildActions(IAction action) {
+    if (!(action instanceof IActionNode<?>)) {
+      return false;
+    }
+
+    IActionNode<? extends IActionNode> actionNode = (IActionNode<?>) action;
+    for (IActionNode child : actionNode.getChildActions()) {
+      if (child.isVisible()) {
+        return true;
+      }
+
+      if (child.hasChildActions()) {
+        if (hasVisibleChildActions(child)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  public static List<? extends IActionNode> getChildActions(IAction action) {
+    if (!(action instanceof IActionNode<?>)) {
+      return null;
+    }
+
+    IActionNode<? extends IActionNode> actionNode = (IActionNode<?>) action;
+    if (!actionNode.hasChildActions()) {
+      return null;
+    }
+
+    return actionNode.getChildActions();
   }
 }

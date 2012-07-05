@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.RwtScoutGroupBox;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutMobileGroupBox extends RwtScoutGroupBox {
 

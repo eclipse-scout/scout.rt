@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
-import org.eclipse.scout.rt.ui.rap.window.desktop.toolbar.IRwtScoutToolButtonForPatch;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.GridData;
@@ -36,7 +35,6 @@ import org.eclipse.swt.widgets.Listener;
 public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements IRwtScoutTabBox {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutTabBox.class);
 
-  private HashMap<IGroupBox, IRwtScoutToolButtonForPatch> m_tabboxButtonItems;
   private HashMap<Composite, RwtScoutTabItem> m_tabs;
   private Listener m_uiTabFocusListener;
   private P_TabListener m_tabListener = new P_TabListener();

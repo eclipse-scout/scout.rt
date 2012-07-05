@@ -21,5 +21,6 @@ Export-Package: org.eclipse.scout.rt.client.mobile,
  org.eclipse.scout.rt.client.mobile.ui.basic.table,
  org.eclipse.scout.rt.client.mobile.ui.desktop,
  org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield,
+ org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox,
  org.eclipse.scout.rt.client.mobile.ui.form.outline,
  org.eclipse.scout.rt.client.mobile.ui.forms

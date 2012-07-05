@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -213,10 +214,13 @@ public class ActionButtonBar extends Composite {
     if (action == null) {
       return;
     }
+    if (action.isSeparator()) {
+      return;
+    }
     if (!action.isVisible()) {
       return;
     }
-    if (action.isSeparator()) {
+    if (RwtMenuUtility.hasChildActions(action) && !RwtMenuUtility.hasVisibleChildActions(action)) {
       return;
     }
 

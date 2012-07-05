@@ -293,25 +293,11 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
   }
 
   public boolean hasChildActions() {
-    if (!(getScoutObject() instanceof IActionNode<?>)) {
-      return false;
-    }
-
-    IActionNode<? extends IActionNode> actionNode = (IActionNode<?>) getScoutObject();
-    return actionNode.hasChildActions();
+    return RwtMenuUtility.hasChildActions(getScoutObject());
   }
 
   private List<? extends IActionNode> getChildActions() {
-    if (!(getScoutObject() instanceof IActionNode<?>)) {
-      return null;
-    }
-
-    IActionNode<? extends IActionNode> actionNode = (IActionNode<?>) getScoutObject();
-    if (!actionNode.hasChildActions()) {
-      return null;
-    }
-
-    return actionNode.getChildActions();
+    return RwtMenuUtility.getChildActions(getScoutObject());
   }
 
   @Override

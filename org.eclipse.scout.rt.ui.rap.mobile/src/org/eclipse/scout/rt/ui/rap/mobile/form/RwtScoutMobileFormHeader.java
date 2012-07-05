@@ -20,6 +20,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
+import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -44,11 +46,11 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
     if (getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0) {
       m_leftBarActions = createLeftBarActions();
     }
+    if (getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0 || getScoutObject().getRootGroupBox().getCustomProcessButtonCount() > 0) {
+      m_rightBarActions = createRightBarActions();
+    }
     if (getScoutObject().getRootGroupBox().getCustomProcessButtonCount() > 0 || getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0) {
       m_formToolsAction = createFormToolsAction();
-    }
-    if (getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0) {
-      m_rightBarActions = createRightBarActions();
     }
 
     super.initializeUi(parent);
@@ -172,7 +174,21 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
   }
 
   protected List<IMenu> createRightBarActions() {
-    return convertSystemProcessButtons(getRelevantSystemTypesForRightBar());
+    List<IMenu> actions = convertSystemProcessButtons(getRelevantSystemTypesForRightBar());
+    if (actions == null || actions.isEmpty()) {
+
+      //If no appropriate buttons have been found use the first custom process button instead.
+      actions = new LinkedList<IMenu>();
+      IButton[] customProcessButtons = getScoutObject().getRootGroupBox().getCustomProcessButtons();
+      if (customProcessButtons != null && customProcessButtons.length > 0) {
+        IMenu customAction = ActionButtonBarUtility.convertButtonToAction(customProcessButtons[0]);
+        if (customAction != null) {
+          actions.add(customAction);
+        }
+      }
+    }
+
+    return actions;
   }
 
   protected List<Integer> getRelevantSystemTypesForLeftBar() {
@@ -203,7 +219,13 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
 
     List<IMenu> customActions = convertCustomProcessButtons();
     if (customActions != null) {
-      actions.addAll(customActions);
+
+      //add only if not already added to right action bar
+      for (IMenu action : customActions) {
+        if (!rightActionBarContains(action)) {
+          actions.add(action);
+        }
+      }
     }
 
     List<IMenu> systemActions = convertSystemProcessButtons(getRelevantSystemTypesForFormToolsAction());
@@ -218,6 +240,22 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
     }
 
     return null;
+  }
+
+  private boolean rightActionBarContains(IAction action) {
+    if (action instanceof ButtonWrappingAction) {
+      IButton wrappedButton = ((ButtonWrappingAction) action).getWrappedButton();
+
+      for (IAction rightAction : m_rightBarActions) {
+        if (rightAction instanceof ButtonWrappingAction) {
+          if (((ButtonWrappingAction) rightAction).getWrappedButton().equals(wrappedButton)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
   }
 
   private class P_FormToolsAction extends AbstractMenu {

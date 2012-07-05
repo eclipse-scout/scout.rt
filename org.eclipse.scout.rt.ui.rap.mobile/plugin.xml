@@ -70,6 +70,15 @@
                class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.datefield.MobileDateFieldFactory">
          </factory>
       </formField>
+      <formField
+            active="true"
+            modelClass="org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox"
+            name="Mobile tab box"
+            scope="global">
+         <factory
+               class="org.eclipse.scout.rt.ui.rap.mobile.form.fields.tabbox.MobileTabBoxFactory">
+         </factory>
+      </formField>
    </extension>
    <extension
          point="org.eclipse.scout.rt.ui.rap.lookAndFeel">
