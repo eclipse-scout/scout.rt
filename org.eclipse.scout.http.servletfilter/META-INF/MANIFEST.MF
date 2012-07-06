@@ -8,10 +8,10 @@ Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.equinox.http.registry,
  org.eclipse.scout.commons
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ActivationPolicy: lazy
+Import-Package: javax.servlet;version="[2.5.0,3.0.0)",
+ javax.servlet.http;version="[2.5.0,3.0.0)"
 Export-Package: org.eclipse.scout.http.servletfilter,
  org.eclipse.scout.http.servletfilter.helper,
  org.eclipse.scout.http.servletfilter.security
-Import-Package: javax.servlet,
- javax.servlet.http
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
