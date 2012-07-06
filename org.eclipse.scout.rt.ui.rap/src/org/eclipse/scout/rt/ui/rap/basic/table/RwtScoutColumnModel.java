@@ -114,7 +114,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         }
         m_htmlTableRows[((ITableRow) element).getRowIndex()] = HtmlTextUtility.countHtmlTableRows(text);
         double medianHtmlTableRows = NumberUtility.median(m_htmlTableRows);
-        int htmlTableRowRowHeight = NumberUtility.toDouble(NumberUtility.round(medianHtmlTableRows, 1.0)).intValue() * 18;
+        int htmlTableRowRowHeight = NumberUtility.toDouble(NumberUtility.round(medianHtmlTableRows, 1.0)).intValue() * 19;
         if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
             || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTableRowRowHeight) < 0) {
           table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), htmlTableRowRowHeight)).intValue());
@@ -255,7 +255,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         text = cell.getTooltipText();
         if (text == null) {
           text = cell.getText();
-          if (text == null || HtmlTextUtility.isTextWithHtmlMarkup(text)) {
+          if (text == null || text.indexOf("\n") <= 0 || HtmlTextUtility.isTextWithHtmlMarkup(text)) {
             text = "";
           }
         }
