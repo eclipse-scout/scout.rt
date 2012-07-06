@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -278,7 +279,7 @@ public class MobileTable extends AbstractTable {
       for (ITableRow insertedRow : rows) {
         try {
           addRowByArray(new Object[]{insertedRow, "", ""});
-          updateSummaryColumn(insertedRow);
+          updateContentColumn(insertedRow);
         }
         catch (ProcessingException exception) {
           SERVICES.getService(IExceptionHandlerService.class).handleException(exception);
@@ -298,7 +299,7 @@ public class MobileTable extends AbstractTable {
     try {
       setTableChanging(true);
       try {
-        updateSummaryColumn(rows);
+        updateContentColumn(rows);
 
         if (isCheckable()) {
           for (ITableRow row : rows) {
@@ -318,13 +319,13 @@ public class MobileTable extends AbstractTable {
     }
   }
 
-  private void updateSummaryColumn(ITableRow[] rows) throws ProcessingException {
+  private void updateContentColumn(ITableRow[] rows) throws ProcessingException {
     for (ITableRow row : rows) {
-      updateSummaryColumn(row);
+      updateContentColumn(row);
     }
   }
 
-  private void updateSummaryColumn(ITableRow row) throws ProcessingException {
+  private void updateContentColumn(ITableRow row) throws ProcessingException {
     ITableRow mobileTableRow = getRowMapColumn().findRow(row);
     if (mobileTableRow == null) {
       return;
@@ -420,7 +421,9 @@ public class MobileTable extends AbstractTable {
 
     content += createCellDetail(row, cellHasHeader);
 
-    String output = m_htmlCellTemplate.replace("#ICON#", createCellIcon(row));
+    String icon = createCellIcon(row);
+    String output = m_htmlCellTemplate.replace("#ICON#", icon);
+    output = output.replace("#ICON_COL_WIDTH#", createCellIconColWidth(row, icon));
     output = output.replace("#CONTENT#", content);
     output = output.replace("#DRILL_DOWN#", createCellDrillDown());
 
@@ -457,6 +460,16 @@ public class MobileTable extends AbstractTable {
     }
     else {
       return "<img style=\" width=\"16\" height=\"16\" src=\"cid:" + iconId + "\"/>";
+    }
+  }
+
+  private String createCellIconColWidth(ITableRow row, String icon) {
+    if (StringUtility.hasText(icon)) {
+      return "32";
+    }
+    else {
+      //If there is no icon set a small width as left padding for the text.
+      return "6";
     }
   }
 
@@ -515,9 +528,15 @@ public class MobileTable extends AbstractTable {
       return null;
     }
 
+    //Remove html tags
+    if (text.contains("<html>")) {
+      String textWithoutHtml = HTMLUtility.getPlainText(text);
+      if (textWithoutHtml != null) {
+        text = textWithoutHtml;
+      }
+    }
     text = StringUtility.removeNewLines(text);
     text = StringUtility.trim(text);
-    text = StringUtility.htmlEncode(text);
 
     //See replace spaces with non breakable spaces.
     //Can't use &nbsp; because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=379088
