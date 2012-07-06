@@ -4,11 +4,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.service.internal;
+package org.eclipse.scout.commons.runtime;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,15 +18,13 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionDelta;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.IRegistryChangeListener;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.service.CreateServiceImmediatelySchedulingRule;
 
+/**
+ * Common extension point tracker that delegates added and removed extension events to a {@link Listener}.
+ */
 public class ExtensionPointTracker {
   public interface Listener {
     /**
@@ -64,8 +62,7 @@ public class ExtensionPointTracker {
     m_registry = registry;
     m_extensionPointId = extensionPointId;
     m_listener = (listener != null) ? listener : NULL_LISTENER;
-    if (extensionPointId == null || -1 == extensionPointId.indexOf('.'))
-     {
+    if (extensionPointId == null || -1 == extensionPointId.indexOf('.')) {
       throw new IllegalArgumentException("Unexpected Extension Point Identifier: " + extensionPointId); //$NON-NLS-1$
     }
     int lastDotIndex = extensionPointId.lastIndexOf('.');
@@ -81,15 +78,21 @@ public class ExtensionPointTracker {
     return m_open;
   }
 
-  public void open() {
+  /**
+   * Opens and starts this extension point tracker. Only the first invocation and every invocation after a
+   * {@link #close()} registers this tracker.
+   * 
+   * @return Returns <code>true</code> if the tracker has been started during the current method invocation.
+   */
+  public boolean open() {
     // unsafe check (performance)
     if (m_open) {
-      return;
+      return false;
     }
     synchronized (m_trackerLock) {
       // safe check
       if (m_open) {
-        return;
+        return false;
       }
       IExtension[] extensions = null;
       m_registry.addRegistryChangeListener(m_registryChangeListener, m_namespace);
@@ -111,21 +114,7 @@ public class ExtensionPointTracker {
       }
       m_open = true;
     }
-    //wait for all "create immediately" services
-    Job job = new Job("Wait for all 'create immediately' services") {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        return Status.OK_STATUS;
-      }
-    };
-    job.setRule(new CreateServiceImmediatelySchedulingRule());
-    job.schedule();
-    try {
-      job.join();
-    }
-    catch (InterruptedException e) {
-      //nop
-    }
+    return true;
   }
 
   public void close() {

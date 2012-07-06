@@ -23,11 +23,11 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.runtime.ExtensionPointTracker.Listener;
 import org.eclipse.scout.service.DefaultServiceFactory;
 import org.eclipse.scout.service.IServiceFactory;
 import org.eclipse.scout.service.ServiceConstants;
 import org.eclipse.scout.service.ServiceUtility;
-import org.eclipse.scout.service.internal.ExtensionPointTracker.Listener;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -39,7 +39,7 @@ public class ServicesExtensionManager implements Listener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServicesExtensionManager.class);
 
   private final HashMap<IExtension, List<ServiceRegistration>> m_serviceRegistrations = new HashMap<IExtension, List<ServiceRegistration>>();
-  private ExtensionPointTracker m_tracker;
+  private ServicesExtensionPointTracker m_tracker;
   private int m_defaultProxyServiceRanking;
   private int m_defaultServiceRanking;
 
@@ -65,7 +65,7 @@ public class ServicesExtensionManager implements Listener {
         LOG.warn("could not parse defaultServiceRanking '" + defaultServiceRankingString + "'.", e);
       }
     }
-    m_tracker = new ExtensionPointTracker(registry, extensionPointId, this);
+    m_tracker = new ServicesExtensionPointTracker(registry, extensionPointId, this);
   }
 
   public void start() {
