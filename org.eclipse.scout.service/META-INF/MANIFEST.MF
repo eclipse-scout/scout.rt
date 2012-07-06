@@ -7,6 +7,6 @@ Bundle-Activator: org.eclipse.scout.service.internal.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.commons;bundle-version="1.1.2"
+Export-Package: org.eclipse.scout.service
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.scout.service
