@@ -513,6 +513,9 @@ public final class HTMLUtility {
     s = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(s).replaceAll(" ");
     //remove multiple spaces
     s = s.replaceAll("[ ]+", " ");
+    //remove spaces at the beginning and end of each line
+    s = s.replaceAll("[ ]+\n", "\n");
+    s = s.replaceAll("\n[ ]+", "\n");
     s = StringUtility.htmlDecode(s);
     s = s.trim();
     return s;
