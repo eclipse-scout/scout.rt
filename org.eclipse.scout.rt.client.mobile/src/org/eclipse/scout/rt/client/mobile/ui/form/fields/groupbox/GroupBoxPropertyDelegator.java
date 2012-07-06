@@ -23,12 +23,12 @@ public class GroupBoxPropertyDelegator extends FormFieldPropertyDelegator<IGroup
   public void init() {
     super.init();
 
-    getReceivingFormField().setBorderVisible(getSendingFormField().isBorderVisible());
-    getReceivingFormField().setBorderDecoration(getSendingFormField().getBorderDecoration());
-    getReceivingFormField().setExpanded(getSendingFormField().isExpanded());
-    getReceivingFormField().setBackgroundImageName(getSendingFormField().getBackgroundImageName());
-    getReceivingFormField().setBackgroundImageHorizontalAlignment(getSendingFormField().getBackgroundImageHorizontalAlignment());
-    getReceivingFormField().setBackgroundImageVerticalAlignment(getSendingFormField().getBackgroundImageVerticalAlignment());
+    getReceiver().setBorderVisible(getSender().isBorderVisible());
+    getReceiver().setBorderDecoration(getSender().getBorderDecoration());
+    getReceiver().setExpanded(getSender().isExpanded());
+    getReceiver().setBackgroundImageName(getSender().getBackgroundImageName());
+    getReceiver().setBackgroundImageHorizontalAlignment(getSender().getBackgroundImageHorizontalAlignment());
+    getReceiver().setBackgroundImageVerticalAlignment(getSender().getBackgroundImageVerticalAlignment());
   }
 
   @Override
@@ -36,22 +36,22 @@ public class GroupBoxPropertyDelegator extends FormFieldPropertyDelegator<IGroup
     super.handlePropertyChange(name, newValue);
 
     if (name.equals(IGroupBox.PROP_BORDER_VISIBLE)) {
-      getReceivingFormField().setBorderVisible(((Boolean) newValue).booleanValue());
+      getReceiver().setBorderVisible(((Boolean) newValue).booleanValue());
     }
     else if (name.equals(IGroupBox.PROP_BORDER_DECORATION)) {
-      getReceivingFormField().setBorderDecoration(((String) newValue));
+      getReceiver().setBorderDecoration(((String) newValue));
     }
     else if (name.equals(IGroupBox.PROP_EXPANDED)) {
-      getReceivingFormField().setExpanded(((Boolean) newValue).booleanValue());
+      getReceiver().setExpanded(((Boolean) newValue).booleanValue());
     }
     else if (name.equals(IGroupBox.PROP_BACKGROUND_IMAGE_NAME)) {
-      getReceivingFormField().setBackgroundImageName((String) newValue);
+      getReceiver().setBackgroundImageName((String) newValue);
     }
     else if (name.equals(IGroupBox.PROP_BACKGROUND_IMAGE_HORIZONTAL_ALIGNMENT)) {
-      getReceivingFormField().setBackgroundImageHorizontalAlignment((Integer) newValue);
+      getReceiver().setBackgroundImageHorizontalAlignment((Integer) newValue);
     }
     else if (name.equals(IGroupBox.PROP_BACKGROUND_IMAGE_VERTICAL_ALIGNMENT)) {
-      getReceivingFormField().setBackgroundImageVerticalAlignment((Integer) newValue);
+      getReceiver().setBackgroundImageVerticalAlignment((Integer) newValue);
     }
   }
 }

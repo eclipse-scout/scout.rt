@@ -8,18 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.ui.form.fields;
+package org.eclipse.scout.rt.client.mobile.ui.action;
 
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.PropertyDelegator;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
-public class FormFieldPropertyDelegator<SENDER extends IFormField, RECEIVER extends IFormField> extends PropertyDelegator<SENDER, RECEIVER> {
+public class ButtonToActionPropertyDelegator extends PropertyDelegator<IButton, IAction> {
 
-  public FormFieldPropertyDelegator(SENDER sendingField, RECEIVER receivingField) {
-    super(sendingField, receivingField);
+  public ButtonToActionPropertyDelegator(IButton sender, IAction receiver) {
+    super(sender, receiver);
   }
 
   @Override
   public void init() {
+    super.init();
+
     getReceiver().setVisible(getSender().isVisible());
     if (!getSender().isVisible()) {
       //Since AbstractFormField#calculateVisibleInternal may ignore this property only set it if it hasn't been ignored (to not override those rules)
@@ -30,23 +35,31 @@ public class FormFieldPropertyDelegator<SENDER extends IFormField, RECEIVER exte
       //Since AbstractFormField#calculateEnabled may ignore this property only set it if it hasn't been ignored (to not override those rules)
       getReceiver().setEnabledGranted(getSender().isEnabledGranted());
     }
-    getReceiver().setLabel(getSender().getLabel());
+    getReceiver().setIconId(getSender().getIconId());
+    getReceiver().setText(getSender().getLabel());
     getReceiver().setTooltipText(getSender().getTooltipText());
+    getReceiver().setToggleAction(getSender().getDisplayStyle() == IButton.DISPLAY_STYLE_TOGGLE);
+    getReceiver().setSelected(getSender().isSelected());
   }
 
-  @Override
-  protected void handlePropertyChange(String name, Object newValue) {
-    if (name.equals(IFormField.PROP_VISIBLE)) {
-      getReceiver().setVisible(((Boolean) newValue).booleanValue());
-    }
-    else if (name.equals(IFormField.PROP_ENABLED)) {
+  private void handleButtonPropertyChange(String name, Object newValue) {
+    if (name.equals(IFormField.PROP_ENABLED)) {
       getReceiver().setEnabled(((Boolean) newValue).booleanValue());
     }
     else if (name.equals(IFormField.PROP_LABEL)) {
-      getReceiver().setLabel(((String) newValue));
+      getReceiver().setText((String) newValue);
     }
     else if (name.equals(IFormField.PROP_TOOLTIP_TEXT)) {
       getReceiver().setTooltipText((String) newValue);
+    }
+    else if (name.equals(IFormField.PROP_VISIBLE)) {
+      getReceiver().setVisible(((Boolean) newValue).booleanValue());
+    }
+    else if (name.equals(IButton.PROP_ICON_ID)) {
+      getReceiver().setIconId((String) newValue);
+    }
+    else if (name.equals(IButton.PROP_SELECTED)) {
+      getReceiver().setSelected(((Boolean) newValue).booleanValue());
     }
   }
 

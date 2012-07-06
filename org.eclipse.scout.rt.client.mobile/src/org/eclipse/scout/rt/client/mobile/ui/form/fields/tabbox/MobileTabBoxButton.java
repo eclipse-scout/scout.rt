@@ -41,7 +41,7 @@ public class MobileTabBoxButton extends AbstractButton {
   }
 
   public IGroupBox getWrappedGroupBox() {
-    return (IGroupBox) m_propertyDelegator.getSendingFormField();
+    return (IGroupBox) m_propertyDelegator.getSender();
   }
 
   @Override
