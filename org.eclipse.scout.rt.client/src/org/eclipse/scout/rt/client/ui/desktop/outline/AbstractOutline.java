@@ -136,6 +136,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
   }
 
+  protected void createChildPagesInternal(Collection<IPage> pageList) throws ProcessingException {
+    execCreateChildPages(pageList);
+  }
+
   /**
    * By default the outline tree tries to delegate the drop to the affected
    * page.
@@ -580,7 +584,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   private class InvisibleRootPage extends AbstractPageWithNodes {
     @Override
     protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
-      AbstractOutline.this.execCreateChildPages(pageList);
+      AbstractOutline.this.createChildPagesInternal(pageList);
     }
   }
 

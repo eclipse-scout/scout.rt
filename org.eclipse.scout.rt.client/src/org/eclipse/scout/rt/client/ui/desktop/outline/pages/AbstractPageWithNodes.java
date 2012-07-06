@@ -90,6 +90,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
   }
 
+  protected void createChildPagesInternal(ArrayList<IPage> pageList) throws ProcessingException {
+    execCreateChildPages(pageList);
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -137,7 +141,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   @Override
   public void loadChildren() throws ProcessingException {
     ArrayList<IPage> pageList = new ArrayList<IPage>();
-    execCreateChildPages(pageList);
+    createChildPagesInternal(pageList);
     IPage[] pages = pageList.toArray(new IPage[pageList.size()]);
     // load tree
     ITree tree = getTree();

@@ -274,6 +274,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return null;
   }
 
+  protected IPage createChildPageInternal(ITableRow row) throws ProcessingException {
+    return execCreateChildPage(row);
+  }
+
   /**
    * Creates a virtual child page for every table row that was added to this page's table. The virtual page
    * is a place holder for a real page and is transformed (resolved) into the real page when it is activated for the
@@ -325,7 +329,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     //remove old association
     unlinkTableRowWithPage(row);
     //add new association
-    IPage childPage = execCreateChildPage(row);
+    IPage childPage = createChildPageInternal(row);
     if (childPage != null) {
       node.setResolvedNode(childPage);
       ICell tableCell = m_table.getSummaryCell(row);
