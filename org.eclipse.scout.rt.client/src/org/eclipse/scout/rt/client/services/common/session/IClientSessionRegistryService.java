@@ -15,8 +15,8 @@ import java.util.UUID;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.IService;
 
@@ -44,6 +44,15 @@ public interface IClientSessionRegistryService extends IService {
    *      {@link IClientSession#isActive()}
    */
   <T extends IClientSession> T newClientSession(Class<T> clazz, UserAgent userAgent);
+
+  /**
+   * Returns the client session which was created and cached by {@link #newClientSession(Class, UserAgent)} or
+   * {@link #newClientSession(Class, Subject, String, UserAgent)}.
+   * 
+   * @return the created client session for the given class or null if no client session for the given class could be
+   *         found
+   */
+  <T extends IClientSession> T getClientSessionFor(Class<T> clazz);
 
   /**
    * <p>
@@ -79,7 +88,8 @@ public interface IClientSessionRegistryService extends IService {
    * @return the cached (if active) client session of type clazz or a new one if
    *         none was cached
    *         <p>
-   * @deprecated Use {@link #newClientSession(Class, UserAgent)} or {@link ISessionService#getCurrentSession()} instead.<br/>
+   * @deprecated Use {@link #newClientSession(Class, UserAgent)}, {@link ClientJob#getCurrentSession()} or
+   *             {@link #getClientSessionFor(Class)} instead.
    *             Will be removed in 3.9.0
    * @see {@link IClientSession#isActive()}, {@link IClientSession#startSession(org.osgi.framework.Bundle)}
    */

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.services.common.session.internal;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.security.auth.Subject;
 
@@ -34,7 +35,7 @@ import org.osgi.framework.Bundle;
 public class ClientSessionRegistryService extends AbstractService implements IClientSessionRegistryService, ISessionService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionRegistryService.class);
 
-  private final HashMap<String, IClientSession> m_cache = new HashMap<String, IClientSession>();
+  private final Map<String, IClientSession> m_cache = java.util.Collections.synchronizedMap(new HashMap<String, IClientSession>());
   private final Object m_cacheLock = new Object();
 
   @Override
@@ -75,6 +76,8 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
       //must run now to use correct jaas and subject context of calling thread. Especially relevant when running in a servlet thread (rwt)
       job.runNow(new NullProgressMonitor());
       job.throwOnError();
+
+      m_cache.put(bundle.getSymbolicName(), clientSession);
       return (T) clientSession;
     }
     catch (Throwable t) {
@@ -101,6 +104,17 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
   @Override
   public ISession getCurrentSession() {
     return ClientJob.getCurrentSession();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T extends IClientSession> T getClientSessionFor(Class<T> clazz) {
+    final Bundle bundle = getDefiningBundle(clazz);
+    if (bundle == null) {
+      return null;
+    }
+
+    return (T) m_cache.get(bundle.getSymbolicName());
   }
 
   @SuppressWarnings({"deprecation", "unchecked"})
