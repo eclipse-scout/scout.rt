@@ -192,7 +192,7 @@ public class PageExtensionManager implements Listener {
       return null;
     }
     @SuppressWarnings("unchecked")
-    Class<T> cl = contributor.loadClass(classname);
+    Class<T> cl = (Class<T>) contributor.loadClass(classname);
     if (type != null && !type.isAssignableFrom(cl)) {
       throw new ProcessingException("class [" + classname + "] is not instance of [" + type.getName() + "]");
     }
