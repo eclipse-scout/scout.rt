@@ -1,0 +1,268 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.scout.rt.extension.client" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.scout.rt.extension.client" id="pages" name="Pages"/>
+      </appinfo>
+      <documentation>
+         This extension point allows to modify programmed outlines by contributing new pages and by removing or modifying existing pages.
+
+The extensions are processed in the following order:
+&lt;ol&gt;
+&lt;li&gt;contribute&lt;/li&gt;
+&lt;li&gt;remove&lt;/li&gt;
+&lt;li&gt;modify&lt;/li&gt;
+&lt;/ol&gt;
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="pageContribution" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="pageRemoval" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="pageModification" minOccurs="0" maxOccurs="unbounded"/>
+         </choice>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="pageContribution">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="class"/>
+         </appinfo>
+      </annotation>
+      <complexType>
+         <choice minOccurs="0" maxOccurs="1">
+            <element ref="outline"/>
+            <element ref="parentPage"/>
+         </choice>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="filter" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.page.IPageFilter"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="order" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The order defines the insertion point in the list of existing pages at which the contribution will be added. The order values of existing pages are assigned synthetically. The first child page&apos;s order is 10.0 and the order of every subsequent page is incremented by 10.0. Hence A page contribution having order 15.0 is inserted between the first and second statically configured page.
+
+The following approach is implemented for resolving ambiguous oders: An order value consists of a pair of order number. The main order assigned synthetically to pages proveide by &lt;code&gt;execCreateChildPages&lt;/code&gt; and the order value provided by this attribute for contributed pages. The second number is a counter that is incremented for every page, starting with already available pages. Hence the first static child page has order &amp;lt;10.0, 0&amp;gt, the second &amp;lt;20.0, 1&amp;gt and the n-th &amp;lt;&lt;em&gt;n*10.0&lt;/em&gt;, &lt;em&gt;n-1&lt;/em&gt;&amp;gt. The first contributed page&apos;s main order is provided by this attribute and the counter has vlaue &lt;em&gt;n&lt;/em&gt;, resulting in the order pair &amp;lt;&lt;em&gt;order&lt;/em&gt;, &lt;em&gt;n&lt;/em&gt;&amp;gt.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="active" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  Whether the contribution should be used.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="pageRemoval">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="class"/>
+         </appinfo>
+      </annotation>
+      <complexType>
+         <choice minOccurs="0" maxOccurs="1">
+            <element ref="outline"/>
+            <element ref="parentPage"/>
+         </choice>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="filter" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.page.IPageFilter"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="active" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="pageModification">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="class"/>
+         </appinfo>
+      </annotation>
+      <complexType>
+         <choice minOccurs="0" maxOccurs="1">
+            <element ref="outline"/>
+            <element ref="parentPage"/>
+         </choice>
+         <attribute name="page" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageModifier"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="filter" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.page.IPageFilter"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="active" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="parentPage">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="outline">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.IOutline"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         3.9.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         This API is experimental and still under development.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

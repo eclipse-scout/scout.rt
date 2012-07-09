@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -71,4 +71,20 @@ public final class CompareUtility {
     }
   }
 
+  /**
+   * @return Returns <code>true</code> if the given object is in the list of the given elements. The objects are
+   *         compared using {@link #equals(Object)}.
+   * @since 3.8.1
+   */
+  public static boolean isOneOf(Object o, Object... elements) {
+    if (elements == null || elements.length == 0) {
+      return false;
+    }
+    for (Object e : elements) {
+      if (CompareUtility.equals(o, e)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

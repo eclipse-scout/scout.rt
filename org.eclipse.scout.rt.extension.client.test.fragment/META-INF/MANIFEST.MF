@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout Extension Client Test Fragment
+Bundle-SymbolicName: org.eclipse.scout.rt.extension.client.test.fragment;singleton:=true
+Bundle-Version: 3.9.0.qualifier
+Fragment-Host: org.eclipse.scout.rt.extension.client
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Eclipse Scout Project
+Require-Bundle: org.eclipse.scout.rt.testing.client,
+ org.eclipse.scout.rt.testing.shared
