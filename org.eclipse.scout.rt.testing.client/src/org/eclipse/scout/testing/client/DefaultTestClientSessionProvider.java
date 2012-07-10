@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.testing.client.servicetunnel.http.MultiClientAuthenticator;
 import org.osgi.framework.Bundle;
@@ -61,6 +62,7 @@ public class DefaultTestClientSessionProvider implements ITestClientSessionProvi
           try {
             clientSession = clazz.newInstance();
             m_cache.put(cacheKey, clientSession);
+            clientSession.setUserAgent(UserAgent.createDefault());
             ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
               @Override
               protected void runVoid(IProgressMonitor monitor) throws Throwable {

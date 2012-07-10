@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.osgi.framework.Bundle;
 
 /**
@@ -33,6 +34,7 @@ public class DefaultTestServerSessionProvider implements ITestServerSessionProvi
     catch (Throwable t) {
       throw new ProcessingException("create instance of " + clazz, t);
     }
+    serverSession.setUserAgent(UserAgent.createDefault());
     ServerJob initJob = new ServerJob("new " + clazz.getSimpleName(), serverSession, subject) {
       @Override
       protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
