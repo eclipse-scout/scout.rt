@@ -18,18 +18,16 @@ import java.net.URLConnection;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.Activator;
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.IClientSessionProvider;
+import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
-public class HttpBackgroundJob extends JobEx implements IClientSessionProvider {
+public class HttpBackgroundJob extends ClientAsyncJob {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HttpBackgroundJob.class);
 
   private final Object m_callerLock;
@@ -43,7 +41,7 @@ public class HttpBackgroundJob extends JobEx implements IClientSessionProvider {
    * @param name
    */
   public HttpBackgroundJob(String name, ServiceTunnelRequest req, Object callerLock, InternalHttpServiceTunnel tunnel) {
-    super(name);
+    super(name, tunnel.getClientSession(), true);
     m_req = req;
     m_callerLock = callerLock;
     m_tunnel = tunnel;
@@ -56,17 +54,12 @@ public class HttpBackgroundJob extends JobEx implements IClientSessionProvider {
     }
   }
 
-  @Override
-  public IClientSession getClientSession() {
-    return m_tunnel.getClientSession();
-  }
-
   public ServiceTunnelResponse getResponse() {
     return m_res;
   }
 
   @Override
-  protected IStatus run(IProgressMonitor monitor) {
+  protected IStatus runStatus(IProgressMonitor monitor) {
     InputStream httpin = null;
     try {
       delayForDebug(m_req, 0);

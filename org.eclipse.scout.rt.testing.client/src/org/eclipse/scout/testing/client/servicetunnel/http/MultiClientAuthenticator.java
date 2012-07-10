@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.IClientSessionProvider;
@@ -74,15 +73,6 @@ public class MultiClientAuthenticator extends Authenticator {
   @Override
   protected PasswordAuthentication getPasswordAuthentication() {
     IClientSession currentSession = ClientJob.getCurrentSession();
-    if (currentSession == null) {
-      // Bugzilla 369115 changed the behavior of ClientJob.getCurrentSession, so that it is not using
-      // the currently executed job anymore for determining the client session. This fix provides the
-      // old functionality.
-      Job currentJob = Job.getJobManager().currentJob();
-      if (currentJob instanceof IClientSessionProvider) {
-        currentSession = ((IClientSessionProvider) currentJob).getClientSession();
-      }
-    }
     String user = LOGIN_INFOS.get(currentSession);
     if (user == null) {
       user = s_defaultUser;
