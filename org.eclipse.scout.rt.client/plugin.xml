@@ -37,5 +37,10 @@
           createImmediately="false"
           ranking="-1000">
     </service>
+    <service
+          class="org.eclipse.scout.rt.client.services.common.session.DefaultClientSessionService"
+          createImmediately="false"
+          factory="org.eclipse.scout.rt.client.services.ClientServiceFactory" >
+    </service>
   </extension>
 </plugin>

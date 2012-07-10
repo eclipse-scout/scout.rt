@@ -21,18 +21,15 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
-import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
 
 @Priority(-1)
-public class ClientSessionRegistryService extends AbstractService implements IClientSessionRegistryService, ISessionService {
+public class ClientSessionRegistryService extends AbstractService implements IClientSessionRegistryService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionRegistryService.class);
 
   private final Map<String, IClientSession> m_cache = java.util.Collections.synchronizedMap(new HashMap<String, IClientSession>());
@@ -99,11 +96,6 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
     }
 
     return Platform.getBundle(symbolicName);
-  }
-
-  @Override
-  public ISession getCurrentSession() {
-    return ClientJob.getCurrentSession();
   }
 
   @Override

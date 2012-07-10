@@ -21,6 +21,8 @@ import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.shared.services.common.session.IJobRunnable;
+import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -287,7 +289,8 @@ public class LookupCall implements Cloneable, Serializable {
 
   /**
    * Same as {@link #getDataByKey()} but in background.<br>
-   * see {@link ILookupCallFetcher}<br> {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
+   * see {@link ILookupCallFetcher}<br>
+   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called in the background thread
    * <p>
    * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
@@ -296,23 +299,24 @@ public class LookupCall implements Cloneable, Serializable {
    */
   public JobEx getDataByKeyInBackground(final ILookupCallFetcher caller) {
     if (!(LookupCall.this instanceof LocalLookupCall)) {
-      JobEx job = new JobEx(getClass().getSimpleName() + ".getDataByKeyInBackground") {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          try {
-            LookupRow[] rows = getDataByKey();
-            if (!isCurrentJobCanceled()) {
-              caller.dataFetched(rows, null);
+      JobEx job = createAsyncJob(getClass().getSimpleName() + ".getDataByKeyInBackground",
+          new IJobRunnable() {
+            @Override
+            public IStatus run(IProgressMonitor monitor) {
+              try {
+                LookupRow[] rows = getDataByKey();
+                if (!JobEx.isCurrentJobCanceled()) {
+                  caller.dataFetched(rows, null);
+                }
+              }
+              catch (ProcessingException e) {
+                if (!e.isInterruption() && !JobEx.isCurrentJobCanceled()) {
+                  caller.dataFetched(null, e);
+                }
+              }
+              return Status.OK_STATUS;
             }
-          }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !isCurrentJobCanceled()) {
-              caller.dataFetched(null, e);
-            }
-          }
-          return Status.OK_STATUS;
-        }
-      };
+          });
       job.setSystem(true);
       job.schedule();
       return job;
@@ -345,7 +349,8 @@ public class LookupCall implements Cloneable, Serializable {
 
   /**
    * Same as {@link #getDataByText()} but in background.<br>
-   * see {@link ILookupCallFetcher}<br> {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
+   * see {@link ILookupCallFetcher}<br>
+   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called in the background thread
    * <p>
    * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
@@ -354,23 +359,23 @@ public class LookupCall implements Cloneable, Serializable {
    */
   public JobEx getDataByTextInBackground(final ILookupCallFetcher caller) {
     if (!(LookupCall.this instanceof LocalLookupCall)) {
-      JobEx job = new JobEx(getClass().getSimpleName() + ".getDataByTextInBackground") {
+      JobEx job = createAsyncJob(getClass().getSimpleName() + ".getDataByTextInBackground", new IJobRunnable() {
         @Override
-        protected IStatus run(IProgressMonitor monitor) {
+        public IStatus run(IProgressMonitor monitor) {
           try {
             LookupRow[] rows = getDataByText();
-            if (!isCurrentJobCanceled()) {
+            if (!JobEx.isCurrentJobCanceled()) {
               caller.dataFetched(rows, null);
             }
           }
           catch (ProcessingException e) {
-            if (!e.isInterruption() && !isCurrentJobCanceled()) {
+            if (!e.isInterruption() && !JobEx.isCurrentJobCanceled()) {
               caller.dataFetched(null, e);
             }
           }
           return Status.OK_STATUS;
         }
-      };
+      });
       job.setSystem(true);
       job.schedule();
       return job;
@@ -403,7 +408,8 @@ public class LookupCall implements Cloneable, Serializable {
 
   /**
    * Same as {@link #getDataByAll()} but in background.<br>
-   * see {@link ILookupCallFetcher}<br> {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
+   * see {@link ILookupCallFetcher}<br>
+   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called in the background thread
    * <p>
    * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
@@ -412,23 +418,24 @@ public class LookupCall implements Cloneable, Serializable {
    */
   public JobEx getDataByAllInBackground(final ILookupCallFetcher caller) {
     if (!(LookupCall.this instanceof LocalLookupCall)) {
-      JobEx job = new JobEx(getClass().getSimpleName() + ".getDataByAllInBackground") {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          try {
-            LookupRow[] rows = getDataByAll();
-            if (!isCurrentJobCanceled()) {
-              caller.dataFetched(rows, null);
+      JobEx job = createAsyncJob(getClass().getSimpleName() + ".getDataByAllInBackground",
+          new IJobRunnable() {
+            @Override
+            public IStatus run(IProgressMonitor monitor) {
+              try {
+                LookupRow[] rows = getDataByAll();
+                if (!JobEx.isCurrentJobCanceled()) {
+                  caller.dataFetched(rows, null);
+                }
+              }
+              catch (ProcessingException e) {
+                if (!e.isInterruption() && !JobEx.isCurrentJobCanceled()) {
+                  caller.dataFetched(null, e);
+                }
+              }
+              return Status.OK_STATUS;
             }
-          }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !isCurrentJobCanceled()) {
-              caller.dataFetched(null, e);
-            }
-          }
-          return Status.OK_STATUS;
-        }
-      };
+          });
       job.setSystem(true);
       job.schedule();
       return job;
@@ -460,7 +467,8 @@ public class LookupCall implements Cloneable, Serializable {
 
   /**
    * Same as {@link #getDataByRec()} but in background.<br>
-   * see {@link ILookupCallFetcher}<br> {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
+   * see {@link ILookupCallFetcher}<br>
+   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called in the background thread
    * <p>
    * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
@@ -469,23 +477,24 @@ public class LookupCall implements Cloneable, Serializable {
    */
   public JobEx getDataByRecInBackground(final ILookupCallFetcher caller) {
     if (!(LookupCall.this instanceof LocalLookupCall)) {
-      JobEx job = new JobEx(getClass().getSimpleName() + ".getDataByRecInBackground") {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          try {
-            LookupRow[] rows = getDataByRec();
-            if (!isCurrentJobCanceled()) {
-              caller.dataFetched(rows, null);
+      JobEx job = createAsyncJob(getClass().getSimpleName() + ".getDataByRecInBackground",
+          new IJobRunnable() {
+            @Override
+            public IStatus run(IProgressMonitor monitor) {
+              try {
+                LookupRow[] rows = getDataByRec();
+                if (!JobEx.isCurrentJobCanceled()) {
+                  caller.dataFetched(rows, null);
+                }
+              }
+              catch (ProcessingException e) {
+                if (!e.isInterruption() && !JobEx.isCurrentJobCanceled()) {
+                  caller.dataFetched(null, e);
+                }
+              }
+              return Status.OK_STATUS;
             }
-          }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !isCurrentJobCanceled()) {
-              caller.dataFetched(null, e);
-            }
-          }
-          return Status.OK_STATUS;
-        }
-      };
+          });
       job.setSystem(true);
       job.schedule();
       return job;
@@ -499,6 +508,14 @@ public class LookupCall implements Cloneable, Serializable {
       }
       return null;
     }
+  }
+
+  private JobEx createAsyncJob(String name, IJobRunnable runnable) {
+    ISessionService service = SERVICES.getService(ISessionService.class);
+    if (service == null) {
+      return null;
+    }
+    return service.createAsyncJob(name, runnable);
   }
 
   @Override

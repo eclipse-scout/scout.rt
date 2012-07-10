@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.services.common.session;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.service.IService2;
 
@@ -28,4 +29,24 @@ public interface ISessionService extends IService2 {
    * </p>
    */
   ISession getCurrentSession();
+
+  /**
+   * @see ISessionService#createAsyncJob(String, IJobRunnable)
+   * @since 3.8.1
+   */
+  JobEx createAsyncJob(IJobRunnable runnable);
+
+  /**
+   * Creates a new asynchronous job that executes the given runnable. The job is attached to the current environment's
+   * {@link ISession} and implementors are required to use an appropriate {@link JobEx} extension (i.e. ClientAsyncJob
+   * or ServerJob).
+   * 
+   * @param name
+   *          the job's name or <code>null</code>.
+   * @param runnable
+   *          the runnable to execute within the created job.
+   * @return Returns a new {@link JobEx} implementation that executes the given runnable asynchronously.
+   * @since 3.8.1
+   */
+  JobEx createAsyncJob(String name, IJobRunnable runnable);
 }
