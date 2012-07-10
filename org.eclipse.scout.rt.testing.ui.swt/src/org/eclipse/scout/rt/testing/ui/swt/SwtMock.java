@@ -17,9 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -137,12 +140,27 @@ public class SwtMock implements IGuiMock {
         }
       };
       idleJob.setSystem(true);
-      idleJob.schedule();
+
+      final CountDownLatch idleJobScheduledSignal = new CountDownLatch(1);
+      JobChangeAdapter listener = new JobChangeAdapter() {
+        @Override
+        public void done(IJobChangeEvent event) {
+          idleJobScheduledSignal.countDown();
+        }
+      };
+
       try {
-        idleJob.join();
+        idleJob.addJobChangeListener(listener);
+        idleJob.schedule();
+        try {
+          idleJobScheduledSignal.await();
+        }
+        catch (InterruptedException e) {
+          throw new IllegalStateException("Interrupted");
+        }
       }
-      catch (InterruptedException e) {
-        throw new IllegalStateException("Interrupted");
+      finally {
+        idleJob.removeJobChangeListener(listener);
       }
     }
   }
