@@ -81,7 +81,13 @@ public final class UserAgentUtility {
       return UserAgent.createDefault();
     }
 
-    return session.getUserAgent();
+    UserAgent userAgent = session.getUserAgent();
+    if (userAgent == null) {
+      LOG.warn("User agent on session is null! Returning default user agent object.");
+      return UserAgent.createDefault();
+    }
+
+    return userAgent;
   }
 
   public static String getFontSizeUnit() {
