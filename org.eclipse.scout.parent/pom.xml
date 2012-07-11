@@ -105,6 +105,7 @@
     <module>../org.eclipse.scout.rt.shared</module>
     <module>../org.eclipse.scout.rt.shared.legacy.texts.fragment</module>
     <module>../org.eclipse.scout.rt.client</module>
+    <module>../org.eclipse.scout.rt.client.mobile</module>
     <module>../org.eclipse.scout.http.servletfilter</module>
     <module>../org.eclipse.scout.rt.server</module>
     <module>../org.eclipse.scout.jaxws216</module>
