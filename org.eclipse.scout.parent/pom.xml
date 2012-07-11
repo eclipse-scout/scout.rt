@@ -62,6 +62,11 @@
     <wikitext-site>http://download.eclipse.org/tools/mylyn/update/weekly</wikitext-site>
     <swtbot-site>http://download.eclipse.org/technology/swtbot/${swtbot-version-name}/dev-build/update-site</swtbot-site>
     <orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository</orbit-site>
+    <rt-jar>${java.home}/lib/rt.jar</rt-jar>
+    <tools-jar>${java.home}/../lib/tools.jar</tools-jar>
+    <jsse-jar>${java.home}/lib/jsse.jar</jsse-jar>
+    <javax-mail-jar>${java.home}/lib/endorsed/javax.mail.jre16_1.4.3.jar</javax-mail-jar>
+    <javax-jms-jar>${java.home}/lib/endorsed/javax.jms_1.1.0.jar</javax-jms-jar>
   </properties>
 
   <repositories>
@@ -172,11 +177,7 @@
             <encoding>UTF-8</encoding>
             <compilerArguments>
               <verbose />
-              <bootclasspath>${java.home}/jre/lib/rt.jar</bootclasspath>
-<!--               <bootclasspath>${java.home}/lib/tools.jar</bootclasspath> -->
-<!--               <bootclasspath>${java.home}/jre/lib/jsse.jar</bootclasspath> -->
-<!--               <bootclasspath>${java.home}/jre/lib/endorsed/javax.mail.jre16_1.4.3.jar</bootclasspath> -->
-<!--               <bootclasspath>${java.home}/jre/lib/endorsed/javax.jms_1.1.0.jar${path.separator}${java.home}/jre/lib/rt.jar</bootclasspath> -->
+              <bootclasspath>${rt-jar}${path.separator}${tools-jar}${path.separator}${jsse-jar}${path.separator}${javax-mail-jar}${path.separator}${javax-jms-jar}</bootclasspath>
             </compilerArguments>
 <!--             <useJDK>BREE</useJDK> -->
           </configuration>
