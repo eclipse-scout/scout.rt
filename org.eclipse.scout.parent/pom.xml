@@ -111,6 +111,7 @@
     <module>../org.eclipse.scout.jaxws216</module>
     <module>../org.eclipse.scout.rt.ui.swing</module>
     <module>../org.eclipse.scout.rt.ui.swt</module>
+    <module>../org.eclipse.scout.svg.client</module>
 <!--     <module>../org.eclipse.scout.target</module> -->
   </modules>
 
