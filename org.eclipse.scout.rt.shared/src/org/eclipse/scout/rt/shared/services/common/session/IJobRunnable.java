@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 
 /**
- * Interface for runnables that are executed within an ecilpse {@link Job}.
+ * Interface for runnables that are executed within an eclipse {@link Job}.
  * 
  * @since 3.8.1
  */
