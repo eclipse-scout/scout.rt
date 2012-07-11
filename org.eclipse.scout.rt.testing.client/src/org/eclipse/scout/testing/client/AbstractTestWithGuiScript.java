@@ -125,8 +125,7 @@ public abstract class AbstractTestWithGuiScript {
     if (guiMockService == null) {
       return;
     }
-    clientSession = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(getSessionClass());
-//    clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(getSessionClass(), guiMockService.initUserAgent());
+    clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(getSessionClass(), guiMockService.initUserAgent());
     final IGuiMock gui = guiMockService.createMock(clientSession);
     gui.beforeTest();
     try {

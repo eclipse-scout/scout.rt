@@ -17,6 +17,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.shared.ScoutJUnitPluginTestExecutor;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
@@ -51,7 +54,7 @@ public class JUnitSwingJob extends Job {
         @Override
         public Object run() {
           try {
-            IClientSession session = SERVICES.getService(IClientSessionRegistryService.class).getClientSession(m_clientSessionClass);
+            IClientSession session = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClass, UserAgent.create(UiLayer.SWING, UiDeviceType.DESKTOP));
             if (session != null) {
               IDesktop desktop = session.getDesktop();
               if (desktop != null) {

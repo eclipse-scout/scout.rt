@@ -32,7 +32,7 @@ import org.osgi.framework.Bundle;
 public class ClientSessionRegistryService extends AbstractService implements IClientSessionRegistryService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionRegistryService.class);
 
-  private final Map<String, IClientSession> m_cache = java.util.Collections.synchronizedMap(new HashMap<String, IClientSession>());
+  private final Map<String, IClientSession> m_cache = new HashMap<String, IClientSession>();
   private final Object m_cacheLock = new Object();
 
   @Override
@@ -74,7 +74,6 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
       job.runNow(new NullProgressMonitor());
       job.throwOnError();
 
-      m_cache.put(bundle.getSymbolicName(), clientSession);
       return (T) clientSession;
     }
     catch (Throwable t) {
@@ -96,17 +95,6 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
     }
 
     return Platform.getBundle(symbolicName);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T extends IClientSession> T getClientSessionFor(Class<T> clazz) {
-    final Bundle bundle = getDefiningBundle(clazz);
-    if (bundle == null) {
-      return null;
-    }
-
-    return (T) m_cache.get(bundle.getSymbolicName());
   }
 
   @SuppressWarnings({"deprecation", "unchecked"})

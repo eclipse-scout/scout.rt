@@ -10,18 +10,15 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.testing.ui.rap;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.testing.shared.ScoutJUnitPluginTestExecutor;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.testing.client.IGuiMockService;
-import org.osgi.framework.ServiceRegistration;
+import org.eclipse.scout.testing.client.TestingClientSessionRegistryService;
 
 /**
  * Runs all @Test annotated methods in all classes and then exit
@@ -45,10 +42,9 @@ public class JUnitRAPJob extends Job {
 
   @Override
   protected IStatus run(IProgressMonitor monitor) {
-    RapClientSessionRegistryService csrs = new RapClientSessionRegistryService();
-    List<ServiceRegistration> regs = null;
+    TestingClientSessionRegistryService testingClientSessionRegistryService = null;
     try {
-      regs = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, csrs);
+      testingClientSessionRegistryService = TestingClientSessionRegistryService.registerTestingClientSessionRegistryService();
       //
       ScoutJUnitPluginTestExecutor scoutJUnitPluginTestExecutor = new ScoutJUnitPluginTestExecutor();
       final int code = scoutJUnitPluginTestExecutor.runAllTests();
@@ -57,7 +53,7 @@ public class JUnitRAPJob extends Job {
       return Status.OK_STATUS;
     }
     finally {
-      TestingUtility.unregisterServices(regs);
+      TestingClientSessionRegistryService.unregisterTestingClientSessionRegistryService(testingClientSessionRegistryService);
     }
   }
 }

@@ -46,15 +46,6 @@ public interface IClientSessionRegistryService extends IService {
   <T extends IClientSession> T newClientSession(Class<T> clazz, UserAgent userAgent);
 
   /**
-   * Returns the client session which was created and cached by {@link #newClientSession(Class, UserAgent)} or
-   * {@link #newClientSession(Class, Subject, String, UserAgent)}.
-   * 
-   * @return the created client session for the given class or null if no client session for the given class could be
-   *         found
-   */
-  <T extends IClientSession> T getClientSessionFor(Class<T> clazz);
-
-  /**
    * <p>
    * A new session is created and started. The session is started by the caller thread.
    * </p>
