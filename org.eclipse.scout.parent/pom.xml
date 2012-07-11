@@ -106,6 +106,7 @@
     <module>../org.eclipse.scout.rt.client</module>
     <module>../org.eclipse.scout.http.servletfilter</module>
     <module>../org.eclipse.scout.rt.server</module>
+    <module>../org.eclipse.scout.jaxws216</module>
     <module>../org.eclipse.scout.rt.ui.swing</module>
     <module>../org.eclipse.scout.rt.ui.swt</module>
 <!--     <module>../org.eclipse.scout.target</module> -->
