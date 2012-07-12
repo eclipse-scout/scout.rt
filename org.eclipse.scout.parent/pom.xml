@@ -73,6 +73,7 @@
     <wikitext-site>http://download.eclipse.org/tools/mylyn/update/weekly</wikitext-site>
     <swtbot-site>http://download.eclipse.org/technology/swtbot/${swtbot-version-name}/dev-build/update-site</swtbot-site>
     <orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository</orbit-site>
+
     <rt-jar>${java.home}/lib/rt.jar</rt-jar>
     <tools-jar>${java.home}/../lib/tools.jar</tools-jar>
     <jsse-jar>${java.home}/lib/jsse.jar</jsse-jar>
@@ -151,6 +152,7 @@
     <module>../org.eclipse.scout.rt.testing.ui.swt</module>
 
     <module>../org.eclipse.scout.rt.feature.about</module>
+    <module>../org.eclipse.scout.rt.feature</module>
 <!--     <module>../org.eclipse.scout.target</module> -->
   </modules>
 

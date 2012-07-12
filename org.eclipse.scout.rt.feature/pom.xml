@@ -20,33 +20,9 @@
     <relativePath>../org.eclipse.scout.parent</relativePath>
   </parent>
 
-  <artifactId>org.apache.derby.jdbc_1053.fragment</artifactId>
-  <version>10.5.3-SNAPSHOT</version>
-  <packaging>eclipse-plugin</packaging>
+  <artifactId>org.eclipse.scout.rt</artifactId>
+  <packaging>eclipse-feature</packaging>
 
- <build>
-     <!-- workaround for https://issues.sonatype.org/browse/TYCHO-168 -->
-     <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-source-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-pmd-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+  <name>Scout Runtime Feature</name>
+
 </project>

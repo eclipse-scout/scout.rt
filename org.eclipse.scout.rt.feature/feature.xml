@@ -1,24 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.scout.rt.feature"
+      id="org.eclipse.scout.rt"
       label="%featureName"
       version="3.9.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.scout.rt.feature.about">
 
-   <description>
-      Scout runtime environment.
+   <description url="http://www.eclipse.org/scout/">
+      %description
    </description>
 
    <copyright>
-      Copyright (c) 2010 BSI Business Systems Integration AG.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the Eclipse Public License
-v1.0
-which accompanies this distribution, and is available at
-http://www.eclipse.org/legal/epl-v10.html
-Contributors:
-BSI Business Systems Integration AG - initial API and implementation
+      %copyright
    </copyright>
 
    <license url="%licenseURL">
@@ -26,14 +19,9 @@ BSI Business Systems Integration AG - initial API and implementation
    </license>
 
    <url>
-      <update label="Juno" url="http://download.eclipse.org/releases/juno"/>
-      <discovery label="Juno" url="http://download.eclipse.org/releases/juno"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/releases/juno"/>
+      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/juno"/>
    </url>
-
-   <includes
-         id="org.eclipse.scout.rt.feature.source"
-         version="0.0.0"
-         optional="true"/>
 
    <requires>
       <import plugin="javax.xml"/>
@@ -54,7 +42,7 @@ BSI Business Systems Integration AG - initial API and implementation
    </requires>
 
    <plugin
-         id="org.easymock"
+         id="org.eclipse.scout.rt.feature.about"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -146,6 +134,13 @@ BSI Business Systems Integration AG - initial API and implementation
          fragment="true"/>
 
    <plugin
+         id="org.apache.derby.jdbc_1082.fragment"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"/>
+
+   <plugin
          id="org.eclipse.scout.jaxws216"
          download-size="0"
          install-size="0"
@@ -176,6 +171,20 @@ BSI Business Systems Integration AG - initial API and implementation
 
    <plugin
          id="org.eclipse.scout.svg.ui.swt"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.rt.ui.svg.calendar"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.easymock"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -239,27 +248,6 @@ BSI Business Systems Integration AG - initial API and implementation
 
    <plugin
          id="org.apache.batik.xml"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.ui.svg.calendar"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.derby.jdbc_1082.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.feature.about"
          download-size="0"
          install-size="0"
          version="0.0.0"
