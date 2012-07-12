@@ -163,7 +163,7 @@ public abstract class AbstractTestWithGuiScript {
             return Status.OK_STATUS;
           }
           catch (Throwable t) {
-            return new Status(Status.ERROR, AbstractTestWithGuiScript.this.getClass().getName(), t.getMessage(), t);
+            return new Status(Status.WARNING, AbstractTestWithGuiScript.this.getClass().getName(), t.getMessage(), t);
           }
         }
       };
