@@ -41,12 +41,7 @@ public class BreadCrumb implements IBreadCrumb {
 
   @Override
   public void activate() throws ProcessingException {
-    List<IForm> currentNavigationForms = getBreadCrumbsNavigation().getCurrentNavigationForms();
-    for (IForm form : currentNavigationForms) {
-      if (form != getForm() && !getBreadCrumbsNavigation().containsFormInHistory(form)) {
-        MobileDesktopUtility.closeForm(form);
-      }
-    }
+    autoCloseNavigationForms();
 
     //Add form to desktop if it is open but has been removed
     if (getForm() != null) {
@@ -56,11 +51,12 @@ public class BreadCrumb implements IBreadCrumb {
           MobileDesktopUtility.openToolForm(getForm());
         }
         else {
-          desktop.addForm(getForm());
+          MobileDesktopUtility.addFormToDesktop(getForm());
         }
       }
     }
 
+    //Activate page
     if (getPage() != null) {
       IOutline outline = getPage().getOutline();
       IDesktop desktop = getBreadCrumbsNavigation().getDesktop();
@@ -69,6 +65,21 @@ public class BreadCrumb implements IBreadCrumb {
       }
       if (outline != null) {
         outline.selectNode(getPage());
+      }
+    }
+  }
+
+  private void autoCloseNavigationForms() throws ProcessingException {
+    IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+
+    List<IForm> currentNavigationForms = getBreadCrumbsNavigation().getCurrentNavigationForms();
+    for (IForm form : currentNavigationForms) {
+      //Never close the active outline table form
+      if (form == desktop.getOutlineTableForm()) {
+        continue;
+      }
+      if (form != getForm() && !getBreadCrumbsNavigation().containsFormInHistory(form)) {
+        MobileDesktopUtility.closeForm(form);
       }
     }
   }
@@ -103,6 +114,10 @@ public class BreadCrumb implements IBreadCrumb {
 
   @Override
   public boolean belongsTo(IForm form, IPage page) {
+    if (getPage() != null && page != null) {
+      return getPage() == page;
+    }
+
     return getForm() == form && getPage() == page;
   }
 

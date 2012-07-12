@@ -50,7 +50,7 @@ import org.eclipse.scout.service.SERVICES;
  * drill down button with the ability to drill down an outline.
  * </p>
  * 
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class MobileTable extends AbstractTable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileTable.class);
@@ -63,6 +63,8 @@ public class MobileTable extends AbstractTable {
   private static final int ROW_HEIGHT = 18;
   private String m_htmlCellTemplate;
   private String m_htmlDrillDown;
+  private String m_htmlDrillDownButton;
+  private boolean m_drillDownOnClickEnabled;
   private boolean m_drillDownPossible;
 
   private final P_TableEventListener m_eventListener;
@@ -74,6 +76,7 @@ public class MobileTable extends AbstractTable {
     try {
       m_htmlCellTemplate = initHtmlCellTemplate();
       m_htmlDrillDown = initHtmlDrillDown();
+      m_htmlDrillDownButton = initHtmlDrillDownButton();
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -98,12 +101,29 @@ public class MobileTable extends AbstractTable {
     }
   }
 
+  protected String initHtmlDrillDownButton() throws ProcessingException {
+    try {
+      return new String(IOUtility.getContent(Activator.getDefault().getBundle().getResource("resources/html/MobileTableDrillDownButton.html").openStream()), "iso-8859-1");
+    }
+    catch (Throwable t) {
+      throw new ProcessingException("Exception while loading html cell template for mobile table", t);
+    }
+  }
+
   public void setDrillDownPossible(boolean drillDownPossible) {
     m_drillDownPossible = drillDownPossible;
   }
 
   public boolean isDrillDownPossible() {
     return m_drillDownPossible;
+  }
+
+  public boolean isDrillDownOnClickEnabled() {
+    return m_drillDownOnClickEnabled;
+  }
+
+  public void setDrillDownOnClickEnabled(boolean drillDownOnClickEnabled) {
+    m_drillDownOnClickEnabled = drillDownOnClickEnabled;
   }
 
   //FIXME CGU move init to constructor, should be done like ButtonWrappingAction. Maybe create AbstractWrappingTable?
@@ -174,6 +194,17 @@ public class MobileTable extends AbstractTable {
     return true;
   }
 
+  private void doDrillDown() throws ProcessingException {
+    if (isDrillDownPossible()) {
+      getUIFacade().fireRowActionFromUI(getSelectedRow());
+    }
+    else {
+    	//FIXME CGU solution required for non outline tables
+//      AutoTableForm form = new AutoTableForm(m_originalTable.getSelectedRow());
+//      form.start();
+    }
+  }
+
   @Override
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
     if (!local) {
@@ -188,8 +219,18 @@ public class MobileTable extends AbstractTable {
     for (String s : query.split("[\\?\\&]")) {
       Matcher m = Pattern.compile("action=drill_down").matcher(s);
       if (m.matches()) {
-        getUIFacade().fireRowActionFromUI(getSelectedRow());
+        doDrillDown();
       }
+    }
+  }
+
+  @Override
+  protected void execRowClick(ITableRow row) throws ProcessingException {
+    if (isDrillDownOnClickEnabled()) {
+      doDrillDown();
+    }
+    else {
+      m_originalTable.getUIFacade().fireRowClickFromUI(getSelectedRow());
     }
   }
 
@@ -426,6 +467,7 @@ public class MobileTable extends AbstractTable {
     output = output.replace("#ICON_COL_WIDTH#", createCellIconColWidth(row, icon));
     output = output.replace("#CONTENT#", content);
     output = output.replace("#DRILL_DOWN#", createCellDrillDown());
+    output = output.replace("#DRILL_DOWN_COL_WIDTH#", createCellDrillDownColWidth());
 
     if (getSortColumn().getInitialSortIndex() > -1) {
       getSortColumn().setValue(mobileTableRow, content);
@@ -474,11 +516,25 @@ public class MobileTable extends AbstractTable {
   }
 
   private String createCellDrillDown() {
-    if (!isDrillDownPossible()) {
-      return "";
+    if (isDrillDownOnClickEnabled()) {
+      return m_htmlDrillDown;
+    }
+    else if (isDrillDownPossible()) {
+      return m_htmlDrillDownButton;
     }
 
-    return m_htmlDrillDown;
+    return "";
+  }
+
+  private String createCellDrillDownColWidth() {
+    if (isDrillDownOnClickEnabled()) {
+      return "32";
+    }
+    else if (isDrillDownPossible()) {
+      return "60";
+    }
+
+    return "0";
   }
 
   private String createCellHeader(String cellHeaderText) {
@@ -657,6 +713,7 @@ public class MobileTable extends AbstractTable {
     //------------- pass events to both ---------------------------
     @Override
     public void fireRowClickFromUI(ITableRow row) {
+      //FIXME CGU pass to original table if drilldown on click enabled??
       super.fireRowClickFromUI(row);
       m_originalTable.getUIFacade().fireRowClickFromUI(getRowMapColumn().getValue(row));
     }

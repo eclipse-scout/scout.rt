@@ -14,13 +14,11 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
  * @since 3.9.0
  */
 public class ButtonWrappingAction extends AbstractMenu {
-  private IButton m_wrappedButton;
   private ButtonToActionPropertyDelegator m_propertyDelegator;
 
   public ButtonWrappingAction(IButton wrappedButton) {
     super(false);
 
-    m_wrappedButton = wrappedButton;
     m_propertyDelegator = new ButtonToActionPropertyDelegator(wrappedButton, this);
 
     callInitializer();
@@ -44,7 +42,7 @@ public class ButtonWrappingAction extends AbstractMenu {
   }
 
   public IButton getWrappedButton() {
-    return m_wrappedButton;
+    return m_propertyDelegator.getSender();
   }
 
 }

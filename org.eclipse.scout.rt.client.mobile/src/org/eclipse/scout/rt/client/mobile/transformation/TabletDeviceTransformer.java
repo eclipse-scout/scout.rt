@@ -66,7 +66,7 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   @Override
-  protected boolean shouldOutlineTableStatusBeHidden() {
+  protected boolean shouldPageTableStatusBeHidden() {
     return false;
   }
 

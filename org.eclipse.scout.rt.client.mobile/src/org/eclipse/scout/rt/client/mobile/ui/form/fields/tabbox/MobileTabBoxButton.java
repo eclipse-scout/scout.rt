@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
  * @since 3.9.0
  */
 public class MobileTabBoxButton extends AbstractButton {
-  private FormFieldPropertyDelegator m_propertyDelegator;
+  private FormFieldPropertyDelegator<IGroupBox, IButton> m_propertyDelegator;
 
   public MobileTabBoxButton(IGroupBox groupBox) {
     super(false);
@@ -41,7 +41,7 @@ public class MobileTabBoxButton extends AbstractButton {
   }
 
   public IGroupBox getWrappedGroupBox() {
-    return (IGroupBox) m_propertyDelegator.getSender();
+    return m_propertyDelegator.getSender();
   }
 
   @Override

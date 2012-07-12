@@ -24,6 +24,8 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableFormMediator;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableWithDetailForm;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -56,7 +58,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
   private OutlineChooserForm m_outlineChooserForm;
-  private MobileOutlineTableForm m_outlineTableForm;
   private IDesktop m_desktop;
 
   public AbstractDeviceTransformer(IDesktop desktop) {
@@ -85,9 +86,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void desktopGuiDetached() throws ProcessingException {
-    if (m_outlineTableForm != null) {
-      m_outlineTableForm.doClose();
-    }
     if (m_outlineChooserForm != null) {
       m_outlineChooserForm.doClose();
     }
@@ -121,16 +119,17 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     }
   }
 
-  protected void showOutlineTableForm() throws ProcessingException {
-    MobileOutlineTableForm mobileOutlineTableForm = new MobileOutlineTableForm();
-    if (shouldOutlineTableStatusBeHidden()) {
-      mobileOutlineTableForm.getOutlineTableField().setTableStatusVisible(false);
-    }
-
-    mobileOutlineTableForm.startView();
+  protected boolean shouldPageDetailFormBeEmbedded() {
+    return false;
   }
 
-  protected boolean shouldOutlineTableStatusBeHidden() {
+  protected void showOutlineTableForm() throws ProcessingException {
+    MobileOutlineTableFormMediator tableFormMediator = new MobileOutlineTableFormMediator();
+    tableFormMediator.setDetailFormEmbeddingEnabled(shouldPageDetailFormBeEmbedded());
+    tableFormMediator.setTableStatusVisible(!shouldPageTableStatusBeHidden());
+  }
+
+  protected boolean shouldPageTableStatusBeHidden() {
     return true;
   }
 
@@ -177,7 +176,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
       return true;
     }
 
-    if (form instanceof IOutlineTableForm && !(form instanceof MobileOutlineTableForm)) {
+    if (form instanceof IOutlineTableForm && !((form instanceof MobileOutlineTableWithDetailForm) || (form instanceof MobileOutlineTableForm))) {
       return true;
     }
 

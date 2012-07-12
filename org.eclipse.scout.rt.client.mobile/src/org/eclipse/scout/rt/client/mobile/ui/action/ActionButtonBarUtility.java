@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.rap.mobile.action;
+package org.eclipse.scout.rt.client.mobile.ui.action;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.MainBoxActionButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
 /**
@@ -61,6 +62,23 @@ public class ActionButtonBarUtility {
       menuList.add(index, rowMenu);
       rowMenuList.remove(rowMenu);
     }
+  }
+
+  public static List<IButton> convertyTableRowActionsToButtons(ITable table) {
+    List<IButton> buttons = new LinkedList<IButton>();
+    if (table == null) {
+      return buttons;
+    }
+
+    IMenu[] actions = table.getUIFacade().fireRowPopupFromUI();
+    for (IMenu action : actions) {
+      if (!action.isSeparator()) {
+        MainBoxActionButton button = new MainBoxActionButton(action);
+        buttons.add(button);
+      }
+    }
+
+    return buttons;
   }
 
 }

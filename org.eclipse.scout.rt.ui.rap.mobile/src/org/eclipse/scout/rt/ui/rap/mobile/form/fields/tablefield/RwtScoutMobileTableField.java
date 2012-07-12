@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.MobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -80,6 +81,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
           String headerName = createColumnHeaderName(table);
           wrapperTable.setHeaderName(headerName);
           wrapperTable.setDrillDownPossible(computeDrillDownColumnVisibility());
+          wrapperTable.setDrillDownOnClickEnabled(isDrillDownOnClickEnabled());
           wrapperTable.installWrappedTable(table);
           wrapperTable.initTable();
         }
@@ -131,8 +133,20 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
     return false;
   }
 
+  public boolean isDrillDownOnClickEnabled() {
+    if ((getScoutObject() instanceof AbstractOutlineTableField || getScoutObject().getForm() instanceof OutlineChooserForm)) {
+      return true;
+    }
+
+    return false;
+  }
+
   @Override
   protected IRwtScoutActionBar createRwtScoutActionBar() {
+    if (isDrillDownOnClickEnabled()) {
+      return null;
+    }
+
     RwtScoutTableActionBar actionBar = new RwtScoutTableActionBar();
     actionBar.createUiField(getUiContainer(), getScoutObject(), getUiEnvironment());
     return actionBar;

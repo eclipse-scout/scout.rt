@@ -117,6 +117,19 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
   }
 
   @Override
+  protected ContributionCommand execPageDetailFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
+    if (!isActive()) {
+      return super.execPageDetailFormChanged(oldForm, newForm);
+    }
+
+    if (UserAgentUtility.isMobileDevice()) {
+      return ContributionCommand.Stop;
+    }
+
+    return ContributionCommand.Continue;
+  }
+
+  @Override
   protected ContributionCommand execCustomFormModification(IHolder<IForm> formHolder) {
     if (!isActive()) {
       return super.execCustomFormModification(formHolder);
@@ -127,16 +140,17 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
       return ContributionCommand.Stop;
     }
 
-    if (!getDeviceTransformer().acceptForm(form)) {
-      formHolder.setValue(null);
-      return ContributionCommand.Stop;
-    }
-
     try {
       getDeviceTransformer().transformForm(form);
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+    }
+
+    //FIXME CGU seperate into acceptTransformation and acceptAdditionToDesktop
+    if (!getDeviceTransformer().acceptForm(form)) {
+      formHolder.setValue(null);
+      return ContributionCommand.Stop;
     }
 
     return ContributionCommand.Continue;

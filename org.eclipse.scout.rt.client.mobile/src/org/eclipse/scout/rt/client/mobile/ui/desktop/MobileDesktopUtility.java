@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
@@ -125,6 +126,9 @@ public class MobileDesktopUtility {
 
   public static void addFormToDesktop(IForm form) {
     if (form instanceof IOutlineTableForm) {
+      //Make sure the outline table form is linked with the desktop
+      getDesktop().setOutlineTableForm((IOutlineTableForm) form);
+
       getDesktop().setOutlineTableFormVisible(true);
     }
     else {
@@ -161,6 +165,19 @@ public class MobileDesktopUtility {
 
     formBounds = new Rectangle(-1, -1, widthHint, -1);
     ClientUIPreferences.getInstance(ClientJob.getCurrentSession()).setFormBounds(form, formBounds);
+  }
+
+  public static IForm getActivePageDetailForm() {
+    if (getDesktop().getOutline() == null) {
+      return null;
+    }
+
+    IPage activePage = getDesktop().getOutline().getActivePage();
+    if (activePage == null) {
+      return null;
+    }
+
+    return activePage.getDetailForm();
   }
 
 }

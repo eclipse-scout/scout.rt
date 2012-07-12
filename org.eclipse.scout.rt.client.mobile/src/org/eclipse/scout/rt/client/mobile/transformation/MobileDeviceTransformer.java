@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationServi
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -59,24 +58,25 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   @Override
+  protected boolean shouldPageDetailFormBeEmbedded() {
+    return true;
+  }
+
+  @Override
   protected boolean isFormAddingForbidden(IForm form) {
     if (super.isFormAddingForbidden(form)) {
       return true;
     }
 
     //Don't allow detail forms because they would automatically replace the outline table and therefore the navigation
+    //Detail forms are handled by the MobileOutlineTableMediator
     IForm pageDetailForm = getDesktop().getPageDetailForm();
-    if (form == pageDetailForm) {
-      IOutline outline = getDesktop().getOutline();
-      return !outline.getActivePage().isLeaf();
-    }
-
-    return false;
+    return form == pageDetailForm;
   }
 
   @Override
   protected boolean isPageDetailTableAllowedToBeClosed(IPage activePage) {
-    return activePage.isLeaf();
+    return false;
   }
 
   /**

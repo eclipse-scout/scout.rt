@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.rap.AbstractStandaloneRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileForm;
+import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileFormFooter;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileFormHeader;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileOutlineFormHeader;
 import org.eclipse.scout.rt.ui.rap.mobile.window.MobileBrowserWindowHandler;
@@ -28,6 +29,7 @@ import org.eclipse.scout.rt.ui.rap.mobile.window.dialog.RwtScoutMobileDialog;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.BrowserWindowHandler;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
+import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormFooter;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
 import org.eclipse.swt.SWT;
@@ -84,6 +86,16 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
     uiFormHeader.setHeightHint(FORM_HEADER_HEIGHT);
     uiFormHeader.createUiField(parent, scoutForm, this);
     return uiFormHeader;
+  }
+
+  @Override
+  public IRwtScoutFormFooter createFormFooter(Composite parent, IForm scoutForm) {
+    if (!(scoutForm instanceof IOutlineTableForm)) {
+      return null;
+    }
+    RwtScoutMobileFormFooter mobileFormFooter = new RwtScoutMobileFormFooter();
+    mobileFormFooter.createUiField(parent, scoutForm, this);
+    return mobileFormFooter;
   }
 
   @Override

@@ -20,13 +20,13 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
+import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.ui.rap.mobile.action.ActionButtonBarUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.widgets.Composite;
 
@@ -39,7 +39,6 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
   private List<IMenu> m_leftBarActions;
   private P_FormToolsAction m_formToolsAction;
   private List<IMenu> m_rightBarActions;
-  private boolean m_autoAddBackButtonEnabled;
 
   @Override
   protected void initializeUi(Composite parent) {

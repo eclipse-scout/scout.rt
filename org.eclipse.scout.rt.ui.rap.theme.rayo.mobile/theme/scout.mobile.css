@@ -2032,6 +2032,9 @@ Composite.viewsArea {
 Composite.mobileFormHeader {
   background-color: #67a8ce;
 }
+Composite.mobileFormFooter {
+  background-image: gradient(linear, left top, left bottom, from(#ddebf4), to(#d4e1e7));
+}
 CLabel.actionBarContainer {
   color: white;
   padding: 3px 0px;
