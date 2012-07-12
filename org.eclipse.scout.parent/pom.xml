@@ -116,6 +116,7 @@
     <module>../org.eclipse.scout.svg.ui.swing</module>
     <module>../org.eclipse.scout.svg.ui.swt</module>
     <module>../org.eclipse.scout.net</module>
+    <module>../org.eclipse.scout.rt.jdbc.derby</module>
 <!--     <module>../org.eclipse.scout.target</module> -->
   </modules>
 
