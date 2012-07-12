@@ -144,6 +144,7 @@
     <module>../org.apache.derby.jdbc_1053.fragment</module>
     <module>../org.apache.derby.jdbc_1082.fragment</module>
     <module>../org.eclipse.scout.rt.testing.shared</module>
+    <module>../org.eclipse.scout.rt.testing.client</module>
 <!--     <module>../org.eclipse.scout.target</module> -->
   </modules>
 
