@@ -212,9 +212,6 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
       if (getFormHeaderHeightHint() != null) {
         gridData.heightHint = getFormHeaderHeightHint();
       }
-      if (!header.isVisible()) {
-        gridData.exclude = true;
-      }
       header.setLayoutData(gridData);
     }
 
@@ -228,9 +225,6 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
       if (getFormFooterHeightHint() != null) {
         gridData.heightHint = getFormFooterHeightHint();
       }
-      if (!footer.isVisible()) {
-        gridData.exclude = true;
-      }      
       footer.setLayoutData(gridData);
     }
 
