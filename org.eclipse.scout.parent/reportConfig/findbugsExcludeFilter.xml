@@ -1,0 +1,253 @@
+<FindBugsFilter>
+  <!-- filter those Bugs that are not used by the eclipse default settings
+    also in Hudson -->
+  <Match>
+    <Or>
+      <Bug pattern="BAC_BAD_APPLET_CONSTRUCTOR" />
+      <Bug pattern="CD_CIRCULAR_DEPENDENCY" />
+      <Bug pattern="DMI_UNSUPPORTED_METHOD" />
+      <Bug pattern="EI_EXPOSE_REP" />
+      <Bug pattern="IL_CONTAINER_ADDED_TO_ITSELF" />
+      <Bug pattern="IL_INFINITE_RECURSIVE_LOOP" />
+      <Bug pattern="IMA_INEFFICIENT_MEMBER_ACCESS" />
+      <Bug pattern="PS_PUBLIC_SEMAPHORES" />
+      <Bug pattern="OBL_UNSATISFIED_OBLIGATION" />
+      <Bug pattern="UOE_USE_OBJECT_EQUALS" />
+      <Bug pattern="USM_USELESS_ABSTRACT_METHOD" />
+      <Bug pattern="USM_USELESS_SUBCLASS_METHOD" />
+    </Or>
+  </Match>
+  <Match>
+    <Priority value="3" />
+    <Or>
+      <Bug pattern="BC_UNCONFIRMED_CAST" />
+      <Bug pattern="DE_MIGHT_IGNORE" />
+      <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+      <Bug pattern="DLS_DEAD_LOCAL_STORE_OF_NULL" />
+      <Bug pattern="ES_COMPARING_STRINGS_WITH_EQ" />
+      <Bug pattern="MS_PKGPROTECT" />
+      <Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
+      <Bug pattern="SE_INNER_CLASS" />
+      <Bug pattern="SF_SWITCH_NO_DEFAULT" />
+      <Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
+      <Bug pattern="SIC_INNER_SHOULD_BE_STATIC_NEEDS_THIS" />
+      <Bug pattern="ITA_INEFFICIENT_TO_ARRAY" />
+      <Bug pattern="RC_REF_COMPARISON" />
+      <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
+      <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
+      <Bug pattern="UW_UNCOND_WAIT" />
+    </Or>
+  </Match>
+
+  <!-- match inner classes warnings in client: forms, table pages and desktop
+    shared: codes, chart definitions -->
+  <Match>
+    <Or>
+      <Package name="~org\.eclipse\.scout\.rt\.test\.client.*" />
+      <Package name="~org\.eclipse\.scout\.james\.client\.tests\.gui.*" />
+      <Package name="~org\.eclipse\.scout\.james\.client\.ui\.*" />
+    </Or>
+    <Bug pattern="SIC_INNER_SHOULD_BE_STATIC" />
+  </Match>
+
+  <!-- in forms often formData = ...(formData); is used, but formData is not
+    used further; such instances are not reported anymore -->
+  <Match>
+    <Package name="~org\.eclipse\.scout\.rt\.test\.client.*" />
+    <Package name="~org\.eclipse\.scout\.james\.client\.tests\.gui.*" />
+    <Package name="~org\.eclipse\.scout\.james\.client\.ui\.*" />
+    <Classregex name=".*Form" />
+    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+  </Match>
+  <!-- naming in FormData depends only on client no check here -->
+  <Match>
+    <Package name="~com\.bsiag\.crm\.shared.*" />
+    <Classregex name=".*FormData" />
+    <Bug pattern="NM_CONFUSING" />
+  </Match>
+  <!-- BSI IT has webservices with mixed naming, warning must be excluded -->
+  <Match>
+    <Package name="~com\.bsiag\.crm\.server\.bsiit.*" />
+    <Bug pattern="NM_CONFUSING" />
+  </Match>
+
+  <!-- abc.valueOf(..) only available with Java 1.5 -->
+  <Match>
+    <Or>
+      <Package name="com.bsiag.crm.server.core.dbsync" />
+    </Or>
+    <Bug pattern="DM_NUMBER_CTOR,DM_BOOLEAN_CTOR,DM_NUMBER_CTOR" />
+  </Match>
+
+
+  <!-- database code -->
+  <Match>
+    <Or>
+      <Package name="com.bsiag.crm.db" />
+      <Package name="com.bsiag.crm.db.duplicatedetector" />
+    </Or>
+    <Bug
+      pattern="LI_LAZY_INIT_STATIC,LI_LAZY_INIT_UPDATE_STATIC,NM_CLASS_NAMING_CONVENTION,SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING,SBSC_USE_STRINGBUFFER_CONCATENATION,WMI_WRONG_MAP_ITERATOR" />
+  </Match>
+  <Match>
+    <Or>
+      <Package name="com.bsiag.crm.db" />
+      <Package name="com.bsiag.crm.db.duplicatedetector" />
+      <Package name="com.bsiag.crm.db.duplicatedetector.tokenfilter" />
+      <Package name="com.bsiag.crm.db.duplicatedetector.tokenparser" />
+      <Package name="com.bsiag.crm.db.duplicatedetector.model" />
+    </Or>
+    <Bug
+      pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE,DM_CONVERT_CASE,REC_CATCH_EXCEPTION,OS_OPEN_STREAM_EXCEPTION_PATH,SE_BAD_FIELD" />
+    <Priority value="3" />
+  </Match>
+
+  <!-- BSI IT, third party code, Webservices, Web services -->
+  <Match>
+    <Or>
+      <Package name="~com\.bsiag\.(crm|bsinext)(\.[a-z]*)*\.ws(\..*)*" />
+      <!-- explicit, incomplete list; replaced by the one above <Package name="com.bsiag.crm.server.bsiit.ws.gen.ejbca"
+        /> <Package name="com.bsiag.crm.server.online.ws.gen.ctiinbound" /> <Package
+        name="com.bsiag.crm.services.ws.ctiinboundservice" /> <Package name="com.bsiag.crm.services.ws.ctioutboundservice"
+        /> <Package name="com.bsiag.crm.server.bsinext.ws.gen" /> <Package name="com.bsiag.bsinext.services.ws.bsinextv1service"
+        />
+      <Package name="com.bsiag.bsinext.services.ws.bsinextv1service" />
+        -->
+      <Package name="org.ejbca.core.protocol.ws" />
+      <Package
+        name="com.bsiag.crm.server.services.wsconsumer.clustersynchronization" />
+      <Package name="com.bsiag.crm.server.services.custom.eare" />
+      <Package name="com.bsiag.crm.server.services.custom.sms.ecall" />
+      <Package name="com.jawin.wmi" />
+    </Or>
+  </Match>
+
+  <!-- Known exceptions -->
+  <Match>
+    <Class name="com.bsiag.crm.server.online.imap.internal.MailCategory" />
+    <Bug pattern="SF_SWITCH_FALLTHROUGH" />
+  </Match>
+
+  <Match>
+    <Or>
+      <Class name="com.bsiag.crm.client.core.ClientSession" />
+      <Class name="com.bsiag.crm.server.online.ServerApplication" />
+    </Or>
+    <Bug pattern="DM_EXIT" />
+  </Match>
+
+  <Match>
+    <Or>
+      <Class name="org.eclipse.scout.commons.eventlistprofiler.EventListenerProfiler" />
+      <Class name="org.eclipse.scout.rt.client.ForceGCJob" />
+      <Class name="org.eclipse.scout.rt.client.LargeMemoryPolicy" />
+      <Class name="org.eclipse.scout.rt.client.MediumMemoryPolicy" />
+      <Class name="org.eclipse.scout.rt.client.SmallMemoryPolicy" />
+      <Class name="org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler" />
+      <Class name="org.eclipse.scout.rt.shared.win32.x86.excel.ExcelAdapter" />
+      <Class name="org.eclipse.scout.rt.shared.win32.x86.swt.combridge.ComObjectProfiler" />
+
+      <Class name="com.bsiag.crm.client.core.ui.desktop.Desktop$OptimizeMemoryKeyStroke" />
+      <Class name="com.bsiag.crm.client.core.ui.forms.OptionsForm$MainBox$InfoButton" />
+    </Or>
+    <Bug pattern="DM_GC" />
+  </Match>
+
+  <Match>
+    <Or>
+      <Class name="com.bsiag.crm.server.core.dbsync.DBSyncManager" />
+      <Class name="com.bsiag.crm.server.core.dbsync.DBSyncTableInfo" />
+      <Class name="com.bsiag.crm.server.core.dbsync.ServerExtractor" />
+    </Or>
+    <Bug pattern="ODR_OPEN_DATABASE_RESOURCE" />
+  </Match>
+
+  <Match>
+    <Class
+      name="com.bsiag.crm.client.core.services.win32.domino.operation.DropContactsFromDomino" />
+    <Bug pattern="RR_NOT_CHECKED" />
+  </Match>
+
+  <Match>
+    <Or>
+      <Package name="~com\.bsiag\.crm\.server\.core\.dbsync.*" />
+    </Or>
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
+  </Match>
+
+  <Match>
+    <!-- Hardcoded path references, the listed here are for debug purposes -->
+    <Or>
+      <Class name="com.bsiag.crm.shared.core.util" />
+      <Class
+        name="com.bsiag.crm.client.core.ui.desktop.Desktop$DevMenu$DevPrintAllFormsMenu" />
+      <Class name="com.bsiag.crm.server.online.tests.SpiderApplication" />
+    </Or>
+    <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
+  </Match>
+
+  <!-- Should be fixed rather than excluded, this is a fast "workaround" to
+    get the (currently) correctly behaving classes clean. (AOT 22.02.2011) -->
+  <Match>
+    <Or>
+      <Class
+        name="com.bsiag.crm.shared.core.extensions.GenericWizardStepDataExtension" />
+      <Class
+        name="com.bsiag.crm.shared.reporting.extensions.GenericWizardStepDataExtension" />
+      <Class name="com.bsiag.crm.server.reporting.extensions.CodeTypeExtension" />
+    </Or>
+    <Bug pattern="NP_BOOLEAN_RETURN_NULL" />
+  </Match>
+
+  <!-- class name shadowing for resource classes -->
+  <Match>
+    <Or>
+      <Class name="com.bsiag.crm.shared.reporting.Icons" />
+      <Class name="com.bsiag.crm.shared.reporting.Texts" />
+      <Class name="com.bsiag.crm.shared.bsiit.Icons" />
+      <Class name="com.bsiag.crm.shared.cpm.Icons" />
+      <Class name="com.bsiag.crm.shared.bsiit.Texts" />
+      <Class name="com.bsiag.crm.server.online.ServerSession" />
+      <Class name="com.bsiag.crm.shared.bsinext.Texts" />
+    </Or>
+    <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS" />
+  </Match>
+
+  <!-- excluding one specific bug issue, where we explicitly set a variable
+    to null for performance -->
+  <Match>
+    <Class
+      name="com.bsiag.crm.client.core.ui.desktop.outlines.pages.AbstractPageWithTableLimited" />
+    <Method name="replaceTableData"
+      params="org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter"
+      returns="void" />
+    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+  </Match>
+
+  <!-- unconfirmed casts in execPrepareLookups are ignored -->
+  <Match>
+    <Or>
+      <Method name="execPrepareLookup"
+        params="org.eclipse.scout.rt.shared.services.lookup.LookupCall"
+        returns="void" />
+      <Method name="execPrepareLookup"
+        params="org.eclipse.scout.rt.shared.services.lookup.LookupCall,org.eclipse.scout.rt.client.ui.basic.table.ITableRow"
+        returns="void" />
+    </Or>
+    <Bug pattern="BC_UNCONFIRMED_CAST" />
+  </Match>
+
+  <!-- use of toUpper / toLowerCase without locale, in shared there is no
+    locale defined -->
+  <Match>
+    <Package name="~com\.bsiag\.crm\.shared\..*" />
+    <Bug pattern="DM_CONVERT_CASE" />
+  </Match>
+
+  <!-- do ignore Activator class, since it is generated -->
+  <Match>
+    <Classregex name=".*\.Activator" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+  </Match>
+
+</FindBugsFilter>

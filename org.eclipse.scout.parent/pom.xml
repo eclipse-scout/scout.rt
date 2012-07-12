@@ -56,6 +56,15 @@
   <properties>
     <scout-version>3.9.0-SNAPSHOT</scout-version>
     <tycho-version>0.15.0</tycho-version>
+    <parentdir>${basedir}/../org.eclipse.scout.parent</parentdir>
+
+    <compileSource>1.6</compileSource>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <checkstyle.config.file>${parentdir}/reportConfig/checkstyle-EclipseScout.xml</checkstyle.config.file>
+    <checkstyle.suppressions.file>${parentdir}/reportConfig/checkstyle-suppressions.xml</checkstyle.suppressions.file>
+
     <platform-version-name>indigo</platform-version-name>
     <swtbot-version-name>helios</swtbot-version-name>
     <eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
@@ -108,15 +117,15 @@
     <module>../org.eclipse.scout.rt.client.mobile</module>
     <module>../org.eclipse.scout.http.servletfilter</module>
     <module>../org.eclipse.scout.rt.server</module>
+    <module>../org.eclipse.scout.rt.jdbc.derby</module>
     <module>../org.eclipse.scout.jaxws216</module>
     <module>../org.eclipse.scout.rt.ui.swing</module>
     <module>../org.eclipse.scout.rt.ui.swt</module>
-    <module>../org.eclipse.scout.svg.client</module>
     <module>../org.eclipse.scout.rt.ui.svg.calendar</module>
+    <module>../org.eclipse.scout.svg.client</module>
     <module>../org.eclipse.scout.svg.ui.swing</module>
     <module>../org.eclipse.scout.svg.ui.swt</module>
     <module>../org.eclipse.scout.net</module>
-    <module>../org.eclipse.scout.rt.jdbc.derby</module>
     <module>../org.apache.derby.jdbc_1053.fragment</module>
     <module>../org.apache.derby.jdbc_1082.fragment</module>
 <!--     <module>../org.eclipse.scout.target</module> -->
@@ -185,6 +194,7 @@
           <artifactId>tycho-compiler-plugin</artifactId>
           <version>${tycho-version}</version>
           <configuration>
+            <source>${compileSource}</source>
             <encoding>UTF-8</encoding>
             <compilerArguments>
               <verbose />
@@ -215,7 +225,7 @@
           <artifactId>maven-resources-plugin</artifactId>
           <version>2.4.1</version>
           <configuration>
-            <encoding>ISO-8859-1</encoding>
+            <encoding>UTF-8</encoding>
           </configuration>
         </plugin>
         <plugin>
@@ -244,9 +254,9 @@
           <artifactId>maven-pmd-plugin</artifactId>
           <version>2.5</version>
           <configuration>
-            <sourceEncoding>utf-8</sourceEncoding>
+            <sourceEncoding>UTF-8</sourceEncoding>
             <minimumTokens>100</minimumTokens>
-            <targetJdk>1.5</targetJdk>
+            <targetJdk>1.6</targetJdk>
             <format>xml</format>
             <failOnViolation>false</failOnViolation>
           </configuration>
@@ -261,6 +271,54 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.4</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.3</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.9.1</version>
+        <configuration>
+          <configLocation>${checkstyle.config.file}</configLocation>
+          <suppressionsFile>${checkstyle.suppressions.file}</suppressionsFile>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>2.7.1</version>
+        <configuration>
+          <targetJdk>${compileSource}</targetJdk>
+          <rulesets>
+            <!-- Rule sets that come bundled with PMD -->
+            <ruleset>/rulesets/maven.xml</ruleset>
+            <!-- Custom local file system rule set -->
+            <ruleset>${parentdir}/reportConfig/pmd-ruleset.xml</ruleset>
+          </rulesets>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <excludeFilterFile>${parentdir}/reportConfig/findbugsExcludeFilter.xml</excludeFilterFile>
+          <includeFilterFile>${parentdir}/reportConfig/findbugsIncludeFilter.xml</includeFilterFile>
+          <jvmArgs>-Xmx1024M -XX:PermSize=128m -XX:MaxPermSize=256m</jvmArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <profiles>
     <profile>

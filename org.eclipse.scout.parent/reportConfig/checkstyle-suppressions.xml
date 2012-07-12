@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "dtds/suppressions_1_1.dtd">
+
+  <!--
+
+    Description: * files - a regular expression matched against the file
+    name associated with an audit event. It is mandatory. * checks - a
+    regular expression matched against the name of the check associated
+    with an audit event. Optional if id is specified. * id - a string
+    matched against the id of the check associated with an audit event.
+    Optional if checks is specified. * lines - a comma-separated list of
+    values, where each value is an integer or a range of integers denoted
+    by integer-integer. It is optional. * columns - a comma-separated list
+    of values, where each value is an integer or a range of integers
+    denoted by integer-integer. It is optional. Each audit event is
+    checked against each suppress element. It is suppressed if all
+    specified attributes match against the audit event.
+  -->
+
+<suppressions>
+  <!-- in com.bsiag.tapi.com -->
+  <suppress checks="[a-zA-Z0-9]*" files="com\.bsiag\.tapi[/\\]src[/\\]com.*" />
+
+  <!-- in com.bsiag.eai.server -->
+  <suppress checks="[a-zA-Z0-9]*" files="com\.bsiag\.eai\.server[/\\]src[/\\]com[/\\]enterprisedt.*" />
+
+  <!-- in org.eclipse.scout.rt.ocr.core.cardscan.win32.x86.fragment -->
+  <suppress checks="[a-zA-Z0-9]*" files="org\.eclipse\.scout\.rt\.ocr\.core\.cardscan\.win32\.x86\.fragment[/\\]src[/\\]com[/\\]bsiag[/\\]ocr[/\\]cardscan[/\\]fragment[/\\]internal.*" />
+
+  <!-- in org.eclipse.scout.rt.shared.win32.x86 -->
+  <suppress checks="[a-zA-Z0-9]*" files="org\.eclipse\.scout\.rt\.shared\.win32\.x86[/\\]src[/\\]org.*" />
+
+  <!--  in org.eclipse.scout.rt.ui.swing.laf.orson.fragment -->
+  <suppress checks="[a-zA-Z0-9]*" files="org\.eclipse\.scout\.rt\.ui\.swing\.laf\.orson\.fragment[/\\]src[/\\]org.*" />
+
+  <!-- in com.bsiag.scout.rt.ui.swing.laf.rayo.fragment -->
+  <suppress checks="[a-zA-Z0-9]*" files="org\.eclipse\.scout\.rt\.ui\.swing\.laf\.rayo\.fragment[/\\]src-synth[/\\]com.*" />
+
+  <!-- in org.eclipse.scout.rt.stresstest -->
+  <suppress checks="[a-zA-Z0-9]*" files="org\.eclipse\.scout\.rt\.stresstest[/\\]jakarta-jmeter[/\\]src.*" />
+
+  <!-- in shared components -->
+  <suppress checks="RedundantModifierCheck" files="com\.bsiag\.crm\.shared.*I.*Service" />
+  <suppress checks="RedundantThrowsCheck"   files="com\.bsiag\.crm\.shared.*FormData" />
+
+  <!-- Text Properties, we do not care about them... -->
+  <suppress checks="[a-zA-Z0-9]*" files=".*\.properties" />
+
+  <!--  File length of known big files -->
+  <!-- Example <suppress checks="FileLength" files="com\.bsiag\.crm\.client\.core[/\\]src[/\\]com[/\\]bsiag[/\\]crm[/\\]client[/\\]core[/\\]ui[/\\]forms[/\\]PersonForm.*" /> -->
+</suppressions>
