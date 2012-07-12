@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scout UI RWT
+Bundle-Name: Scout UI RAP
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.rap;singleton:=true
 Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.rt.ui.rap.Activator
