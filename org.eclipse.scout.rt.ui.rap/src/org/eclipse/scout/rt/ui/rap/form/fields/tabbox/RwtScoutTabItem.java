@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.RwtScoutGroupBox;
+import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,6 +27,7 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Widget;
 
 public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabItem {
@@ -43,6 +45,9 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
   private Composite m_tabItem;
   private boolean m_uiFocus;
   private Button m_tabButton;
+
+  private RwtScoutTabItem m_nextTabItem = null;
+  private RwtScoutTabItem m_previousTabItem = null;
 
   public RwtScoutTabItem(ITabBox scoutParentObject, Composite tabboxButtonbar, Composite tabboxContainer, String variantInActive, String variantActive, String variantInActiveMarked, String variantActiveMarked) {
     m_scoutParentObject = scoutParentObject;
@@ -68,6 +73,10 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
         setActiveButton(m_tabButton);
       }
     });
+
+    getUiEnvironment().addKeyStroke(m_tabButton, new P_KeyListener(SWT.ARROW_LEFT), false);
+    getUiEnvironment().addKeyStroke(m_tabButton, new P_KeyListener(SWT.ARROW_RIGHT), false);
+
     RowData rowData = new RowData();
     m_tabButton.setLayoutData(rowData);
 
@@ -98,6 +107,12 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     if (scoutField != null) {
       setEmptyFromScout(scoutField.isEmpty());
     }
+  }
+
+  @Override
+  protected void detachScout() {
+    super.detachScout();
+    getUiEnvironment().removeKeyStrokes(m_tabButton);
   }
 
   private boolean isValidWidget(Widget w) {
@@ -180,6 +195,11 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
     }
   }
 
+  protected void handleUiSelectionChanged() {
+    handleUiSelection();
+    setActiveButton(m_tabButton);
+  }
+
   protected void handleUiSelection() {
     //notify Scout
     Runnable t = new Runnable() {
@@ -237,5 +257,53 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
 
   public boolean setUiFocus() {
     return setActiveButton(m_tabButton);
+  }
+
+  protected RwtScoutTabItem getNextTabItem() {
+    return m_nextTabItem;
+  }
+
+  protected void setNextTabItem(RwtScoutTabItem nextTabItem) {
+    m_nextTabItem = nextTabItem;
+  }
+
+  protected RwtScoutTabItem getPreviousTabItem() {
+    return m_previousTabItem;
+  }
+
+  protected void setPreviousTabItem(RwtScoutTabItem previousTabItem) {
+    m_previousTabItem = previousTabItem;
+  }
+
+  private class P_KeyListener extends RwtKeyStroke {
+    public P_KeyListener(int keyCode) {
+      super(keyCode);
+    }
+
+    public P_KeyListener(int keyCode, int stateMask) {
+      super(keyCode, stateMask);
+    }
+
+    private void handleKeyPressed(RwtScoutTabItem tabItem) {
+      if (tabItem == null) return;
+      tabItem.getTabButton().setFocus();
+      tabItem.handleUiSelectionChanged();
+    }
+
+    @Override
+    public void handleUiAction(Event e) {
+      switch (e.keyCode) {
+        case SWT.ARROW_LEFT:
+          handleKeyPressed(getPreviousTabItem());
+          e.doit = false;
+          break;
+        case SWT.ARROW_RIGHT:
+          handleKeyPressed(getNextTabItem());
+          e.doit = false;
+          break;
+        default:
+          break;
+      }
+    }
   }
 }

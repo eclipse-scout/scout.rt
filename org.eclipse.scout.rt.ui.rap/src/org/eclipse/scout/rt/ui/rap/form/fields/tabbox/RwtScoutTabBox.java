@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.form.fields.tabbox;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.rwt.lifecycle.WidgetUtil;
@@ -117,13 +118,36 @@ public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements I
         }
       }
       m_tabs = new HashMap<Composite, RwtScoutTabItem>();
+      LinkedList<RwtScoutTabItem> tabList = new LinkedList<RwtScoutTabItem>();
       for (IGroupBox box : getScoutObject().getGroupBoxes()) {
         if (box.isVisible()) {
           RwtScoutTabItem item = new RwtScoutTabItem(getScoutObject(), m_tabboxButtonbar, m_tabboxContainer, VARIANT_TABBOX_BUTTON, VARIANT_TABBOX_BUTTON_ACTIVE, VARIANT_TABBOX_BUTTON_MARKED, VARIANT_TABBOX_BUTTON_ACTIVE_MARKED);
           item.createUiField(getUiField(), box, getUiEnvironment());
           m_tabs.put(item.getTabItem(), item);
+          tabList.add(item);
         }
       }
+
+      // link the tab items together.
+      if (tabList.size() > 0) {
+        RwtScoutTabItem previousItem = null;
+        for (RwtScoutTabItem curItem : tabList) {
+          if (previousItem != null) {
+            curItem.setPreviousTabItem(previousItem);
+            previousItem.setNextTabItem(curItem);
+          }
+          previousItem = curItem;
+        }
+
+        /* the previous item of the first one is linked to the last one 
+         * the next item of the last one is linked to the first one.
+         */
+        RwtScoutTabItem firstItem = tabList.getFirst();
+        RwtScoutTabItem lastItem = tabList.getLast();
+        firstItem.setPreviousTabItem(lastItem);
+        lastItem.setNextTabItem(firstItem);
+      }
+      
       setSelectedTabFromScout();
     }
     finally {
