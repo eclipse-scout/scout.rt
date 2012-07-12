@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scout UI RWT Plug-in
+Bundle-Name: Scout UI RWT
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.rap;singleton:=true
 Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.rt.ui.rap.Activator
@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.rap.ui;bundle-version="1.5.0";visibility:=reexport,
  org.eclipse.scout.http.servletfilter;bundle-version="3.7.0",
  org.eclipse.equinox.http.registry
-Bundle-ActivationPolicy: lazy
+Import-Package: javax.servlet,
+ javax.servlet.http
 Export-Package: org.eclipse.scout.rt.ui.rap,
  org.eclipse.scout.rt.ui.rap.action,
  org.eclipse.scout.rt.ui.rap.basic,
@@ -84,7 +85,5 @@ Export-Package: org.eclipse.scout.rt.ui.rap,
  org.eclipse.scout.rt.ui.rap.window.layout,
  org.eclipse.scout.rt.ui.rap.window.messagebox,
  org.eclipse.scout.rt.ui.rap.window.popup
-Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: javax.servlet,
- javax.servlet.http
+Bundle-ActivationPolicy: lazy

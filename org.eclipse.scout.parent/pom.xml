@@ -66,8 +66,10 @@
     <checkstyle.suppressions.file>${parentdir}/reportConfig/checkstyle-suppressions.xml</checkstyle.suppressions.file>
 
     <platform-version-name>indigo</platform-version-name>
+    <rap-version>1.5</rap-version>
     <swtbot-version-name>helios</swtbot-version-name>
     <eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
+    <rap-site>http://download.eclipse.org/rt/rap/${rap-version}/runtime</rap-site>
     <wikitext-site>http://download.eclipse.org/tools/mylyn/update/weekly</wikitext-site>
     <swtbot-site>http://download.eclipse.org/technology/swtbot/${swtbot-version-name}/dev-build/update-site</swtbot-site>
     <orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository</orbit-site>
@@ -83,6 +85,11 @@
       <id>eclipse</id>
       <layout>p2</layout>
       <url>${eclipse-site}</url>
+    </repository>
+    <repository>
+      <id>rap</id>
+      <layout>p2</layout>
+      <url>${rap-site}</url>
     </repository>
     <repository>
       <id>swtbot</id>
@@ -121,6 +128,7 @@
     <module>../org.eclipse.scout.jaxws216</module>
     <module>../org.eclipse.scout.rt.ui.swing</module>
     <module>../org.eclipse.scout.rt.ui.swt</module>
+    <module>../org.eclipse.scout.rt.ui.rap</module>
     <module>../org.eclipse.scout.rt.ui.svg.calendar</module>
     <module>../org.eclipse.scout.svg.client</module>
     <module>../org.eclipse.scout.svg.ui.swing</module>
