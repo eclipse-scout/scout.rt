@@ -149,6 +149,8 @@
     <module>../org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment</module>
     <module>../org.eclipse.scout.rt.testing.ui.swing</module>
     <module>../org.eclipse.scout.rt.testing.ui.swt</module>
+
+    <module>../org.eclipse.scout.rt.feature.about</module>
 <!--     <module>../org.eclipse.scout.target</module> -->
   </modules>
 
