@@ -134,6 +134,7 @@
     <module>../org.eclipse.scout.rt.ui.rap.mobile</module>
 -->
     <module>../org.eclipse.scout.rt.ui.rap.theme.rayo</module>
+    <module>../org.eclipse.scout.rt.ui.rap.theme.rayo.mobile</module>
     <module>../org.eclipse.scout.rt.ui.svg.calendar</module>
     <module>../org.eclipse.scout.svg.client</module>
     <module>../org.eclipse.scout.svg.ui.swing</module>
