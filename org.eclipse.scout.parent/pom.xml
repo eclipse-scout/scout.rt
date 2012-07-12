@@ -139,6 +139,7 @@
     <module>../org.eclipse.scout.svg.client</module>
     <module>../org.eclipse.scout.svg.ui.swing</module>
     <module>../org.eclipse.scout.svg.ui.swt</module>
+    <module>../org.eclipse.scout.svg.ui.rap</module>
     <module>../org.eclipse.scout.net</module>
     <module>../org.apache.derby.jdbc_1053.fragment</module>
     <module>../org.apache.derby.jdbc_1082.fragment</module>
