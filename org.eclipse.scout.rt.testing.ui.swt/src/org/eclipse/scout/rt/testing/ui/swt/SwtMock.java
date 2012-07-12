@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.testing.shared.OsUtility;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
@@ -681,7 +682,7 @@ public class SwtMock implements IGuiMock {
 
   @Override
   public void dragWindowRightBorder(WindowState windowState, int pixelToMoveOnX) {
-    int borderSize = 4;
+    int borderSize = (OsUtility.isWindows7() ? 5 : 4);
 
     int xPos = windowState.x + windowState.width + borderSize;
     int yPos = windowState.y + windowState.height / 2;
