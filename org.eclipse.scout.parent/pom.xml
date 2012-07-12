@@ -147,6 +147,7 @@
     <module>../org.eclipse.scout.rt.testing.client</module>
     <module>../org.eclipse.scout.rt.testing.server</module>
     <module>../org.eclipse.scout.rt.testing.ui.swing</module>
+    <module>../org.eclipse.scout.rt.testing.ui.swt</module>
 <!--     <module>../org.eclipse.scout.target</module> -->
   </modules>
 
