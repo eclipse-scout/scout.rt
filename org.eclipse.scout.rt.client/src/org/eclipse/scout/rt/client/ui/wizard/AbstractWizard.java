@@ -699,6 +699,10 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     return m_activeStep;
   }
 
+  protected void setActiveStepInternal(IWizardStep<? extends IForm> activeStep) {
+    m_activeStep = activeStep;
+  }
+
   @Override
   public void activateStep(IWizardStep<? extends IForm> step) throws ProcessingException {
     activateStep(step, false, false);
