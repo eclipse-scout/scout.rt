@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>org.eclipse.scout.parent</artifactId>
-    <version>3.9.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.parent</relativePath>
   </parent>
 
@@ -60,6 +60,7 @@
     <module>org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment</module>
     <module>org.eclipse.scout.rt.testing.ui.swing</module>
     <module>org.eclipse.scout.rt.testing.ui.swt</module>
+    <module>org.eclipse.scout.rt.extension.client</module>
 
     <module>org.eclipse.scout.rt.feature.about</module>
     <module>org.eclipse.scout.rt.feature</module>
