@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -76,7 +76,7 @@ public final class JavaLogUtility {
     String msg;
     if (format != null && args != null && args.length > 0) {
       Matcher m = VARIABLE_PATTERN.matcher(format);
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       int endPos = 0;
       int index = 0;
       while (m.find() && index < args.length) {

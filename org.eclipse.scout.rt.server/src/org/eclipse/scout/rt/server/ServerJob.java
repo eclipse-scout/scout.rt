@@ -231,12 +231,36 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
       ActiveTransactionRegistry.unregister(transaction);
       if (transaction.hasFailures()) {
         // xa rollback
-        transaction.rollback();
+        try {
+          transaction.rollback();
+        }
+        catch (Throwable t) {
+          LOG.error("Transaction rollback failed with exception.", t);
+        }
       }
       else {
         // xa commit
-        if (transaction.commitPhase1()) {
-          transaction.commitPhase2();
+        boolean needRollback = false;
+        try {
+          if (transaction.commitPhase1()) {
+            transaction.commitPhase2();
+          }
+          else {
+            needRollback = true;
+          }
+        }
+        catch (Throwable t) {
+          needRollback = true;
+          LOG.error("Transaction commit exception.", t);
+        }
+        if (needRollback) {
+          // rollback
+          try {
+            transaction.rollback();
+          }
+          catch (Throwable t) {
+            LOG.error("Transaction rollback failed with exception.", t);
+          }
         }
       }
       // xa release

@@ -27,7 +27,7 @@ public interface ITransactionMember {
    * Temporary commits the transaction member
    * <p>
    * 
-   * @return true without any exception iff the commit phase 1 was successful.
+   * @return true without any exception if the commit phase 1 was successful.
    *         <p>
    *         Subsequently there will be a call to {@link #commitPhase2()} or {@link #rollback()}
    */
@@ -49,7 +49,7 @@ public interface ITransactionMember {
   void release();
 
   /**
-   * When a transaction is cancelled, it calls this method on all its members
+   * When a transaction is canceled, it calls this method on all its members
    */
   void cancel();
 }

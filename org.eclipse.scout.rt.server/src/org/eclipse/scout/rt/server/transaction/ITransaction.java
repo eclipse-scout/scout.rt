@@ -26,9 +26,9 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
  * Whenever a sql statement is run, it registers/unregisters on the
  * {@link AbstractSqlTransactionMember#registerActiveStatement(java.sql.Statement)} /
  * {@link AbstractSqlTransactionMember#unregisterActiveStatement(java.sql.Statement)}.
- * Thus cancelling a {@link ITransaction#cancel()} also cancels all its members {@link ITransactionMember#cancel()} and
- * that cancells the (potentially) running statement.
- * A cancelled transaction can only do a rollback and does not accept new members.
+ * Thus canceling a {@link ITransaction#cancel()} also cancels all its members {@link ITransactionMember#cancel()} and
+ * that cancels the (potentially) running statement.
+ * A canceled transaction can only do a rollback and does not accept new members.
  * 
  * @since 3.4
  */
@@ -50,10 +50,10 @@ public interface ITransaction {
   void registerResource(ITransactionMember member);
 
   /**
-   * register the member (even if the transaction is cancelled)
+   * register the member (even if the transaction is canceled)
    * 
    * @throws ProcessingException
-   *           with an {@link InterruptedException} when the transaction is cancelled
+   *           with an {@link InterruptedException} when the transaction is canceled
    */
   void registerMember(ITransactionMember member) throws ProcessingException;
 
@@ -77,7 +77,7 @@ public interface ITransaction {
    * Temporary commits the transaction members
    * <p>
    * 
-   * @return true without any exception iff the commit phase 1 was successful on all members.
+   * @return true without any exception if the commit phase 1 was successful on all members.
    *         <p>
    *         Subsequently there will be a call to {@link #commitPhase2()} or {@link #rollback()}
    */
@@ -101,7 +101,7 @@ public interface ITransaction {
   /**
    * an external process tries to cancel the transaction
    * 
-   * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
+   * @return true if cancel was successful and transaction was in fact canceled, false otherwise
    */
   boolean cancel();
 

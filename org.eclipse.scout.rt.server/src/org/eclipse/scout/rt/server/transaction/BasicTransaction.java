@@ -60,13 +60,13 @@ public class BasicTransaction implements ITransaction {
     synchronized (m_memberMapLock) {
       String memberId = member.getMemberId();
       if (LOG.isDebugEnabled()) {
-        LOG.debug("" + memberId + "/" + member);
+        LOG.debug("register transaction member {0}", memberId);
       }
       // release existing
       ITransactionMember old = (ITransactionMember) m_memberMap.get(memberId);
       if (old != null) {
         if (LOG.isWarnEnabled()) {
-          LOG.warn("releasing overwritten " + memberId + "/" + old);
+          LOG.warn("releasing overwritten transaction member {0} / {1}.", memberId, old.getMemberId());
         }
         old.release();
       }
@@ -83,7 +83,7 @@ public class BasicTransaction implements ITransaction {
     synchronized (m_memberMapLock) {
       ITransactionMember res = (ITransactionMember) m_memberMap.get(memberId);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("" + memberId + "->" + res);
+        LOG.debug("get transaction member '{0}' -> '{1}'.", memberId, res);
       }
       return res;
     }
@@ -111,10 +111,9 @@ public class BasicTransaction implements ITransaction {
   @Override
   public void unregisterMember(String memberId) {
     synchronized (m_memberMapLock) {
-      Object o = m_memberMap.get(memberId);
       m_memberMap.remove(memberId);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("" + memberId + "->" + o);
+        LOG.debug("unregister transaction member '{0}'.", memberId);
       }
     }
   }
@@ -132,14 +131,20 @@ public class BasicTransaction implements ITransaction {
       try {
         if (mem.needsCommit()) {
           if (LOG.isDebugEnabled()) {
-            LOG.debug(" " + mem);
+            LOG.debug("commit phase 1 of transaction member '{0}'.", mem.getMemberId());
           }
           boolean b = mem.commitPhase1();
           allSuccessful = allSuccessful && b;
+          if (!allSuccessful) {
+            LOG.error("commit phase 1 failed for transaction member '{}'.", mem.getMemberId());
+            break;
+          }
         }
       }
       catch (Throwable t) {
-        LOG.error("commit phase 1" + mem, t);
+        addFailure(t);
+        LOG.error("commit phase 1 failed with exception for transaction member '" + mem.getMemberId() + "'.", t);
+        break;
       }
     }
     return allSuccessful && !hasFailures();
@@ -157,7 +162,8 @@ public class BasicTransaction implements ITransaction {
         }
       }
       catch (Throwable t) {
-        LOG.error("commit phase 2" + mem, t);
+        addFailure(t);
+        LOG.error("commit phase 2 failed for transaction member '" + mem.getMemberId() + "'.", t);
       }
     }
   }
@@ -174,7 +180,8 @@ public class BasicTransaction implements ITransaction {
         }
       }
       catch (Throwable t) {
-        LOG.error("rollback " + mem, t);
+        addFailure(t);
+        LOG.error("rollback failed for transaction member '" + mem.getMemberId() + "'.", t);
       }
     }
   }
