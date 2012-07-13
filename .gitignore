@@ -11,3 +11,7 @@ bin/**
 
 # Maven #
 target/
+
+# Root can be imported with maven, so this files do not need to be commited to git
+/.settings
+/.project
