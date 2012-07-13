@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   Copyright (C) 2012 Stephan Leicht Vogt <stephan.leicht@bsiag.com>
-
+   Copyright (c) 2012 BSI Business Systems Integration AG.
    All rights reserved. This program and the accompanying materials
    are made available under the terms of the Eclipse Public License v1.0
    which accompanies this distribution, and is available at
    http://www.eclipse.org/legal/epl-v10.html
+
+  Contributors:
+     Stephan Leicht Vogt - initial implementation
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -54,8 +56,8 @@
   </licenses>
 
   <properties>
-    <scout-version>3.9.0-SNAPSHOT</scout-version>
-    <tycho-version>0.15.0</tycho-version>
+    <tycho.version>0.16.0-SNAPSHOT</tycho.version>
+    <tycho-extras.version>0.16.0-SNAPSHOT</tycho-extras.version>
     <parentdir>${basedir}/../org.eclipse.scout.parent</parentdir>
 
     <compileSource>1.6</compileSource>
@@ -67,12 +69,12 @@
 
     <platform-version-name>indigo</platform-version-name>
     <rap-version>1.5</rap-version>
-    <swtbot-version-name>helios</swtbot-version-name>
-    <eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
-    <rap-site>http://download.eclipse.org/rt/rap/${rap-version}/runtime</rap-site>
-    <wikitext-site>http://download.eclipse.org/tools/mylyn/update/weekly</wikitext-site>
-    <swtbot-site>http://download.eclipse.org/technology/swtbot/${swtbot-version-name}/dev-build/update-site</swtbot-site>
-    <orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository</orbit-site>
+    <eclipse-repo-url>http://download.eclipse.org/releases/${platform-version-name}</eclipse-repo-url>
+    <rap-repo.url>http://download.eclipse.org/rt/rap/${rap-version}/runtime</rap-repo.url>
+    <orbit-repo.url>http://download.eclipse.org/tools/orbit/downloads/drops/R20120526062928/repository/</orbit-repo.url>
+
+    <tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
+    <eclipse-maven-repo.url>http://maven.eclipse.org/nexus/content/repositories/milestone-${platform-version-name}</eclipse-maven-repo.url>
 
     <rt-jar>${java.home}/lib/rt.jar</rt-jar>
     <tools-jar>${java.home}/../lib/tools.jar</tools-jar>
@@ -84,35 +86,31 @@
   <repositories>
     <repository>
       <id>eclipse</id>
+      <url>${eclipse-repo-url}</url>
       <layout>p2</layout>
-      <url>${eclipse-site}</url>
     </repository>
     <repository>
       <id>rap</id>
+      <url>${rap-repo.url}</url>
       <layout>p2</layout>
-      <url>${rap-site}</url>
-    </repository>
-    <repository>
-      <id>swtbot</id>
-      <layout>p2</layout>
-      <url>${swtbot-site}</url>
-    </repository>
-    <repository>
-      <id>wikitext</id>
-      <layout>p2</layout>
-      <url>${wikitext-site}</url>
     </repository>
     <repository>
       <id>orbit</id>
+      <url>${orbit-repo.url}</url>
       <layout>p2</layout>
-      <url>${orbit-site}</url>
     </repository>
   </repositories>
 
   <pluginRepositories>
     <pluginRepository>
       <id>maven.eclipse.org</id>
-      <url>http://maven.eclipse.org/nexus/content/repositories/milestone-indigo</url>
+      <url>${eclipse-maven-repo.url}</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>tycho</id>
+      <url>${tycho-repo.url}</url>
+      <releases><enabled>false</enabled></releases>
+      <snapshots><enabled>true</enabled></snapshots>
     </pluginRepository>
   </pluginRepositories>
 
@@ -125,6 +123,8 @@
     <module>../org.eclipse.scout.rt.client.mobile</module>
     <module>../org.eclipse.scout.http.servletfilter</module>
     <module>../org.eclipse.scout.rt.server</module>
+    <module>../org.apache.derby.jdbc_1053.fragment</module>
+    <module>../org.apache.derby.jdbc_1082.fragment</module>
     <module>../org.eclipse.scout.rt.jdbc.derby</module>
     <module>../org.eclipse.scout.jaxws216</module>
     <module>../org.eclipse.scout.rt.ui.swing</module>
@@ -142,8 +142,6 @@
     <module>../org.eclipse.scout.svg.ui.swt</module>
     <module>../org.eclipse.scout.svg.ui.rap</module>
     <module>../org.eclipse.scout.net</module>
-    <module>../org.apache.derby.jdbc_1053.fragment</module>
-    <module>../org.apache.derby.jdbc_1082.fragment</module>
     <module>../org.eclipse.scout.rt.testing.shared</module>
     <module>../org.eclipse.scout.rt.testing.client</module>
     <module>../org.eclipse.scout.rt.testing.server</module>
@@ -153,71 +151,97 @@
 
     <module>../org.eclipse.scout.rt.feature.about</module>
     <module>../org.eclipse.scout.rt.feature</module>
-<!--     <module>../org.eclipse.scout.target</module> -->
   </modules>
 
-
   <build>
-    <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-maven-plugin</artifactId>
-        <version>${tycho-version}</version>
+        <version>${tycho.version}</version>
         <extensions>true</extensions>
       </plugin>
+
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>target-platform-configuration</artifactId>
-        <configuration>
-          <resolver>p2</resolver>
-        </configuration>
-      </plugin>
-    </plugins>
-    <pluginManagement>
-      <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>target-platform-configuration</artifactId>
-        <version>${tycho-version}</version>
         <configuration>
           <environments>
+            <environment>
+              <os>linux</os>
+              <ws>gtk</ws>
+              <arch>x86</arch>
+            </environment>
+            <environment>
+              <os>linux</os>
+              <ws>gtk</ws>
+              <arch>x86_64</arch>
+            </environment>
             <environment>
               <os>win32</os>
               <ws>win32</ws>
               <arch>x86</arch>
             </environment>
             <environment>
-              <os>linux</os>
-              <ws>gtk</ws>
-              <arch>x86</arch>
+              <os>win32</os>
+              <ws>win32</ws>
+              <arch>x86_64</arch>
+            </environment>
+            <environment>
+              <os>macosx</os>
+              <ws>cocoa</ws>
+              <arch>x86_64</arch>
             </environment>
           </environments>
-          <filters>
-            <!-- example 1: restrict version of a bundle -->
-            <!--
-            <filter>
-              <type>eclipse-plugin</type>
-              <id>org.eclipse.osgi</id>
-              <restrictTo>
-                 <versionRange>[3.6,3.7)</versionRange>
-              </restrictTo>
-            </filter>
-            -->
-
-            <!-- work around Equinox bug 348045 -->
-            <filter>
-              <type>p2-installable-unit</type>
-              <id>org.eclipse.equinox.servletbridge.extensionbundle</id>
-              <removeAll />
-            </filter>
-          </filters>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>plugin-source</id>
+            <goals>
+              <goal>plugin-source</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>target-platform-configuration</artifactId>
+          <version>${tycho.version}</version>
+          <configuration>
+            <filters>
+              <!-- example 1: restrict version of a bundle -->
+              <!--
+              <filter>
+                <type>eclipse-plugin</type>
+                <id>org.eclipse.osgi</id>
+                <restrictTo>
+                   <versionRange>[3.6,3.7)</versionRange>
+                </restrictTo>
+              </filter>
+              -->
+
+              <!-- work around Equinox bug 348045 -->
+              <filter>
+                <type>p2-installable-unit</type>
+                <id>org.eclipse.equinox.servletbridge.extensionbundle</id>
+                <removeAll />
+              </filter>
+            </filters>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-compiler-plugin</artifactId>
-          <version>${tycho-version}</version>
+          <version>${tycho.version}</version>
           <configuration>
             <source>${compileSource}</source>
             <encoding>UTF-8</encoding>
@@ -225,38 +249,83 @@
               <verbose />
               <bootclasspath>${rt-jar}${path.separator}${tools-jar}${path.separator}${jsse-jar}${path.separator}${javax-mail-jar}${path.separator}${javax-jms-jar}</bootclasspath>
             </compilerArguments>
-<!--             <useJDK>BREE</useJDK> -->
           </configuration>
         </plugin>
+<!--
         <plugin>
-          <!-- TODO remove workaround when
-             https://issues.sonatype.org/browse/TYCHO-473
-             is fixed -->
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-packaging-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.eclipse.tycho.extras</groupId>
+              <artifactId>tycho-buildtimestamp-jgit</artifactId>
+              <version>${tycho-extras.version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <strictBinIncludes>false</strictBinIncludes>
+            <format>'v'yyyyMMdd-HHmm</format>
+            <timestampProvider>jgit</timestampProvider>
+            <jgit.ignore>
+            </jgit.ignore>
+          </configuration>
+        </plugin>
+-->
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-surefire-plugin</artifactId>
+          <version>${tycho.version}</version>
+        </plugin>
+        <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-source-plugin</artifactId>
-          <version>${tycho-version}</version>
-          <executions>
-            <execution>
-              <id>attach-source</id>
-<!--               <phase>process-classes</phase> -->
-              <goals>
-                <goal>plugin-source</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.4.1</version>
+          <version>${tycho.version}</version>
           <configuration>
-            <encoding>UTF-8</encoding>
+            <strictSrcIncludes>false</strictSrcIncludes>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-p2-director-plugin</artifactId>
+          <version>${tycho.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-p2-repository-plugin</artifactId>
+          <version>${tycho.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho.extras</groupId>
+          <artifactId>tycho-source-feature-plugin</artifactId>
+          <version>${tycho-extras.version}</version>
+        </plugin>
+<!--
+        <plugin>
+          <groupId>org.eclipse.tycho.extras</groupId>
+          <artifactId>tycho-custom-bundle-plugin</artifactId>
+          <version>${tycho-extras.version}</version>
+        </plugin>
+-->
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-p2-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <configuration>
+            <baselineMode>warn</baselineMode>
+            <baselineReplace>none</baselineReplace>
+            <baselineRepositories>
+              <repository>
+                <url>http://download.eclipse.org/eclipse/updates/4.2</url>
+              </repository>
+            </baselineRepositories>
+          </configuration>
+        </plugin>
+<!--
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.3</version>
+          <version>1.7</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -282,12 +351,14 @@
           <artifactId>maven-pmd-plugin</artifactId>
           <version>2.7.1</version>
           <configuration>
+            <sourceEncoding>UTF-8</sourceEncoding>
             <targetJdk>${compileSource}</targetJdk>
+            <format>xml</format>
             <failOnViolation>false</failOnViolation>
             <rulesets>
-              <!-- Rule sets that come bundled with PMD -->
+              # Rule sets that come bundled with PMD
               <ruleset>/rulesets/maven.xml</ruleset>
-              <!-- Custom local file system rule set -->
+              # Custom local file system rule set
               <ruleset>${parentdir}/reportConfig/pmd-ruleset.xml</ruleset>
             </rulesets>
           </configuration>
@@ -299,9 +370,130 @@
             </execution>
           </executions>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.dash.maven</groupId>
+          <artifactId>eclipse-signing-maven-plugin</artifactId>
+          <version>1.0.5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.3</version>
+        </plugin>
+-->
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>eclipse-sign</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>target-platform-configuration</artifactId>
+            <version>${tycho.version}</version>
+            <configuration>
+              <includePackedArtifacts>true</includePackedArtifacts>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-pack200a-plugin</artifactId>
+            <version>${tycho-extras.version}</version>
+            <executions>
+              <execution>
+                <id>pack200-normalize</id>
+                <goals>
+                  <goal>normalize</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.cbi.maven.plugins</groupId>
+            <artifactId>eclipse-jarsigner-plugin</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <executions>
+              <execution>
+                <id>sign</id>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-pack200b-plugin</artifactId>
+            <version>${tycho-extras.version}</version>
+            <executions>
+              <execution>
+                <id>pack200-pack</id>
+                <goals>
+                  <goal>pack</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-p2-plugin</artifactId>
+            <version>${tycho.version}</version>
+            <executions>
+              <execution>
+                <id>p2-metadata</id>
+                <goals>
+                  <goal>p2-metadata</goal>
+                </goals>
+                <phase>package</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <defaultP2Metadata>false</defaultP2Metadata>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>static-checks</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>findbugs-maven-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>coverage</id>
+      <activation>
+      </activation>
+      <modules>
+          <module>org.eclemma.runtime.equinox</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <reporting>
     <plugins>
@@ -329,6 +521,7 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <version>2.7.1</version>
         <configuration>
+          <sourceEncoding>UTF-8</sourceEncoding>
           <targetJdk>${compileSource}</targetJdk>
           <rulesets>
             <!-- Rule sets that come bundled with PMD -->
@@ -350,86 +543,5 @@
       </plugin>
     </plugins>
   </reporting>
-
-  <profiles>
-    <profile>
-      <id>platform-helios</id>
-      <activation>
-        <property>
-          <name>platform-version-name</name>
-          <value>helios</value>
-        </property>
-      </activation>
-      <properties>
-        <eclipse-site>http://download.eclipse.org/releases/helios</eclipse-site>
-        <platform-version>[3.6,3.7)</platform-version>
-        <swtbot-site>http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site</swtbot-site>
-      </properties>
-    </profile>
-    <profile>
-      <id>platform-indigo</id>
-      <activation>
-        <property>
-          <name>platform-version-name</name>
-          <value>indigo</value>
-        </property>
-      </activation>
-      <properties>
-        <eclipse-site>http://download.eclipse.org/releases/indigo</eclipse-site>
-        <platform-version>[3.7,3.8)</platform-version>
-        <swtbot-site>http://download.eclipse.org/technology/swtbot/indigo/dev-build/update-site</swtbot-site>
-      </properties>
-    </profile>
-    <profile>
-      <id>platform-juno</id>
-      <activation>
-        <property>
-          <name>platform-version-name</name>
-          <value>juno</value>
-        </property>
-      </activation>
-      <properties>
-        <eclipse-site>http://download.eclipse.org/releases/juno</eclipse-site>
-        <platform-version>[3.8,3.9)</platform-version>
-        <swtbot-site>http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site</swtbot-site>
-      </properties>
-    </profile>
-  <profile>
-    <id>checkstyle</id>
-    <activation>
-    </activation>
-    <build>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.6</version>
-          <executions>
-            <execution>
-              <id>check my sources</id>
-              <goals>
-                <goal>checkstyle</goal>
-              </goals>
-              <phase>verify</phase>
-              <configuration>
-                <failOnErrors>false</failOnErrors>
-                <consoleOutput>true</consoleOutput>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </build>
-  </profile>
-
-    <profile>
-      <id>coverage</id>
-      <activation>
-      </activation>
-      <modules>
-          <module>org.eclemma.runtime.equinox</module>
-      </modules>
-    </profile>
-  </profiles>
 
 </project>
