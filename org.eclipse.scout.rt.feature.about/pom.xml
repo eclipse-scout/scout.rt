@@ -15,10 +15,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>eclipse.scout-parent</artifactId>
-    <groupId>org.eclipse.scout</groupId>
+    <groupId>org.eclipse.scout.rt</groupId>
+    <artifactId>org.eclipse.scout.rt</artifactId>
     <version>3.9.0-SNAPSHOT</version>
-    <relativePath>../org.eclipse.scout.parent</relativePath>
   </parent>
 
   <artifactId>org.eclipse.scout.rt.feature.about</artifactId>
