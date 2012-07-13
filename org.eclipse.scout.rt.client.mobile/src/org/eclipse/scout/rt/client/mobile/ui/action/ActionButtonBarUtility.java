@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.MainBoxActionButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
 /**
@@ -64,13 +63,12 @@ public class ActionButtonBarUtility {
     }
   }
 
-  public static List<IButton> convertyTableRowActionsToButtons(ITable table) {
+  public static List<IButton> convertActionsToMainButtons(IMenu[] actions) {
     List<IButton> buttons = new LinkedList<IButton>();
-    if (table == null) {
+    if (actions == null) {
       return buttons;
     }
 
-    IMenu[] actions = table.getUIFacade().fireRowPopupFromUI();
     for (IMenu action : actions) {
       if (!action.isSeparator()) {
         MainBoxActionButton button = new MainBoxActionButton(action);
@@ -80,5 +78,4 @@ public class ActionButtonBarUtility {
 
     return buttons;
   }
-
 }

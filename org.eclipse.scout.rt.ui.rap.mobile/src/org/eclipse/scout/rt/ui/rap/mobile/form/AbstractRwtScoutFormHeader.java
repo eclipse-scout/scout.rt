@@ -50,7 +50,8 @@ public class AbstractRwtScoutFormHeader extends AbstractRwtScoutActionBar<IForm>
 
   @Override
   protected void adaptRightButtonBar(ActionButtonBar buttonBar) {
-    buttonBar.setPilingEnabled(false);
+    buttonBar.setMinNumberOfAlwaysVisibleButtons(1);
+    buttonBar.setMaxNumberOfAlwaysVisibleButtons(1);
   }
 
   @Override

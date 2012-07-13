@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.IColumnWrapper;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
@@ -84,7 +85,8 @@ public class AutoTableForm extends AbstractForm {
 
     @Override
     protected void injectFieldsInternal(List<IFormField> fieldList) {
-      fieldList.addAll(ActionButtonBarUtility.convertyTableRowActionsToButtons(getTable()));
+      IMenu[] tableRowActions = getTable().getUIFacade().fireRowPopupFromUI();
+      fieldList.addAll(ActionButtonBarUtility.convertActionsToMainButtons(tableRowActions));
       super.injectFieldsInternal(fieldList);
     }
 

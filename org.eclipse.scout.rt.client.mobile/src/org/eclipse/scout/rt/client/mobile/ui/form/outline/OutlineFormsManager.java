@@ -17,10 +17,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.ActiveOutlineObserver;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.AutoTableForm;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.MainBoxActionButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -34,7 +36,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public class MobileOutlineTableFormMediator {
+public class OutlineFormsManager {
   private IOutlineTableForm m_currentOutlineTableForm;
   private IForm m_currentPreviewForm;
 
@@ -44,9 +46,22 @@ public class MobileOutlineTableFormMediator {
 
   private boolean m_detailFormEmbeddingEnabled;
   private boolean m_tableStatusVisible;
+  private IDesktop m_desktop;
 
-  public MobileOutlineTableFormMediator() {
-    m_activeOutlineObserver = new ActiveOutlineObserver();
+  public OutlineFormsManager() {
+    this(null);
+  }
+
+  public OutlineFormsManager(IDesktop desktop) {
+    if (desktop == null) {
+      desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    }
+    m_desktop = desktop;
+    if (m_desktop == null) {
+      throw new IllegalArgumentException("No desktop found. Cannot create OutlineFormsMediator.");
+    }
+
+    m_activeOutlineObserver = new ActiveOutlineObserver(desktop);
     m_outlinePropertyChangeListener = new P_OutlinePropertyChangeListener();
     m_activeOutlineObserver.addOutlinePropertyChangeListener(m_outlinePropertyChangeListener);
   }
@@ -68,23 +83,22 @@ public class MobileOutlineTableFormMediator {
   }
 
   public void installOutlineTableForm() throws ProcessingException {
-    IDesktop desktop = m_activeOutlineObserver.getDesktop();
-    if (desktop.getOutline() == null || desktop.getOutline().getActivePage() == null) {
+    if (getDesktop().getOutline() == null || getDesktop().getOutline().getActivePage() == null) {
       return;
     }
 
-    ITable pageDetailTable = desktop.getOutline().getDetailTable();
-    IForm pageDetailForm = desktop.getOutline().getDetailForm();
+    ITable pageDetailTable = getDesktop().getOutline().getDetailTable();
+    IForm pageDetailForm = getDesktop().getOutline().getDetailForm();
 
     if (pageDetailTable != null && pageDetailForm == null) {
       ITable table = null;
-      IPage parentPage = desktop.getOutline().getActivePage().getParentPage();
+      IPage parentPage = getDesktop().getOutline().getActivePage().getParentPage();
       if (parentPage instanceof IPageWithTable) {
         table = ((IPageWithTable) parentPage).getTable();
       }
       if (table != null) {
-        pageDetailForm = createStartAutoDetailForm(table);
-        desktop.getOutline().getActivePage().setDetailForm(pageDetailForm);
+        pageDetailForm = createAndStartAutoDetailForm(table);
+        getDesktop().getOutline().getActivePage().setDetailForm(pageDetailForm);
       }
     }
 
@@ -93,7 +107,7 @@ public class MobileOutlineTableFormMediator {
       m_currentOutlineTableForm = null;
     }
     if (isDetailFormEmbeddingEnabled() && pageDetailForm != null) {
-      MobileOutlineTableWithDetailForm tableForm = new MobileOutlineTableWithDetailForm(getMainButtons(pageDetailTable));
+      MobileOutlineTableWithDetailForm tableForm = new MobileOutlineTableWithDetailForm(fetchAndConvertNodeActionsFromActivePage());
       tableForm.setDetailForm(pageDetailForm);
       tableForm.setCurrentTable(pageDetailTable);
       tableForm.getOutlineTableField().setTableStatusVisible(isTableStatusVisible());
@@ -105,7 +119,7 @@ public class MobileOutlineTableFormMediator {
       List<IButton> mainButtons = null;
       if (pageDetailForm == null) {
         //If there is a detailform the main buttons are already placed on that form.
-        mainButtons = getMainButtons(pageDetailTable);
+        mainButtons = fetchAndConvertNodeActionsFromActivePage();
       }
       MobileOutlineTableForm tableForm = new MobileOutlineTableForm(mainButtons);
       tableForm.setCurrentTable(pageDetailTable);
@@ -116,24 +130,12 @@ public class MobileOutlineTableFormMediator {
     }
   }
 
-  private List<IButton> getMainButtons(ITable table) {
-    List<IButton> buttons = new LinkedList<IButton>();
-    IDesktop desktop = m_activeOutlineObserver.getDesktop();
-    if (desktop.getOutline() == null || desktop.getOutline().getActivePage() == null) {
-      return buttons;
-    }
-
-    IMenu[] actions = desktop.getOutline().getActivePage().getTree().getUIFacade().fireNodePopupFromUI();
-    for (IMenu action : actions) {
-      if (!action.isSeparator()) {
-        MainBoxActionButton button = new MainBoxActionButton(action);
-        buttons.add(button);
-      }
-    }
-    return buttons;
+  private List<IButton> fetchAndConvertNodeActionsFromActivePage() {
+    IMenu[] treeNodeActions = fetchNodeActionsFromActivePage();
+    return ActionButtonBarUtility.convertActionsToMainButtons(treeNodeActions);
   }
 
-  private IForm createStartAutoDetailForm(ITable table) throws ProcessingException {
+  private IForm createAndStartAutoDetailForm(ITable table) throws ProcessingException {
     if (table == null) {
       return null;
     }
@@ -167,6 +169,36 @@ public class MobileOutlineTableFormMediator {
     autoCreatedDetailForm.start();
 
     return autoCreatedDetailForm;
+  }
+
+  private IDesktop getDesktop() {
+    return m_desktop;
+  }
+
+  private IMenu[] fetchNodeActionsFromActivePage() {
+    if (getDesktop().getOutline() == null || getDesktop().getOutline().getActivePage() == null) {
+      return new IMenu[0];
+    }
+
+    return getDesktop().getOutline().getActivePage().getTree().getUIFacade().fireNodePopupFromUI();
+  }
+
+  public void adaptPageDetailFormHeaderActions(IForm form, List<IMenu> menuList) {
+    IMenu[] nodeActions = fetchNodeActionsFromActivePage();
+    List<IMenu> nodeActionList = new LinkedList<IMenu>();
+
+    //Remove separators
+    for (IMenu action : nodeActions) {
+      if (!action.isSeparator()) {
+        nodeActionList.add(action);
+      }
+    }
+
+    if (!menuList.isEmpty() && !nodeActionList.isEmpty()) {
+      //Separate detailform actions and tree node actions
+      menuList.add(0, new MenuSeparator());
+    }
+    menuList.addAll(0, nodeActionList);
   }
 
   private class P_OutlinePropertyChangeListener implements PropertyChangeListener {
@@ -216,7 +248,7 @@ public class MobileOutlineTableFormMediator {
 
     private void handleRowClick(TableEvent event) {
       try {
-        createStartAutoDetailForm(event.getTable());
+        createAndStartAutoDetailForm(event.getTable());
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);

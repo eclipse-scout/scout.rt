@@ -10,23 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
-import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
-import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
-import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.ui.rap.mobile.action.ActionButtonBar;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.widgets.Composite;
 
@@ -37,19 +37,17 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutMobileFormHeader.class);
 
   private List<IMenu> m_leftBarActions;
-  private P_FormToolsAction m_formToolsAction;
   private List<IMenu> m_rightBarActions;
 
   @Override
   protected void initializeUi(Composite parent) {
+    setRightActionBarOrientation(ActionButtonBar.ORIENTATION_RIGHT_TO_LEFT);
+
     if (getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0) {
       m_leftBarActions = createLeftBarActions();
     }
     if (getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0 || getScoutObject().getRootGroupBox().getCustomProcessButtonCount() > 0) {
       m_rightBarActions = createRightBarActions();
-    }
-    if (getScoutObject().getRootGroupBox().getCustomProcessButtonCount() > 0 || getScoutObject().getRootGroupBox().getSystemProcessButtonCount() > 0) {
-      m_formToolsAction = createFormToolsAction();
     }
 
     super.initializeUi(parent);
@@ -99,9 +97,6 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
   @Override
   protected void collectMenusForRightButtonBar(final List<IMenu> menuList) {
     List<IMenu> collectedMenus = new LinkedList<IMenu>(menuList);
-    if (m_formToolsAction != null) {
-      collectedMenus.add(m_formToolsAction);
-    }
     if (m_rightBarActions != null) {
       collectedMenus.addAll(m_rightBarActions);
     }
@@ -148,7 +143,10 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
     return ActionButtonBarUtility.convertButtonsToActions(getScoutObject().getRootGroupBox().getCustomProcessButtons());
   }
 
-  protected List<IMenu> convertSystemProcessButtons(List<Integer> relevantSystemTypes) {
+  /**
+   * If there are multiple buttons with a matching system types the order given in the list is used to sort the buttons.
+   */
+  protected List<IMenu> convertSystemProcessButtons(final List<Integer> relevantSystemTypes) {
     if (relevantSystemTypes == null || relevantSystemTypes.size() == 0) {
       return null;
     }
@@ -158,8 +156,24 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
       return null;
     }
 
+    Comparator<IButton> comparator = new Comparator<IButton>() {
+      @Override
+      public int compare(IButton button1, IButton button2) {
+        int index1 = relevantSystemTypes.indexOf(button1.getSystemType());
+        int index2 = relevantSystemTypes.indexOf(button2.getSystemType());
+        if (index1 >= index2) {
+          return 1;
+        }
+        else {
+          return -1;
+        }
+      }
+    };
+
+    Set<IButton> sortedButtons = new TreeSet<IButton>(comparator);
+    sortedButtons.addAll(Arrays.asList(systemProcessButtons));
     List<IMenu> actions = new LinkedList<IMenu>();
-    for (IButton button : systemProcessButtons) {
+    for (IButton button : sortedButtons) {
       if (relevantSystemTypes.contains(button.getSystemType())) {
         actions.add(ActionButtonBarUtility.convertButtonToAction(button));
       }
@@ -173,18 +187,16 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
   }
 
   protected List<IMenu> createRightBarActions() {
-    List<IMenu> actions = convertSystemProcessButtons(getRelevantSystemTypesForRightBar());
-    if (actions == null || actions.isEmpty()) {
+    List<IMenu> actions = new LinkedList<IMenu>();
 
-      //If no appropriate buttons have been found use the first custom process button instead.
-      actions = new LinkedList<IMenu>();
-      IButton[] customProcessButtons = getScoutObject().getRootGroupBox().getCustomProcessButtons();
-      if (customProcessButtons != null && customProcessButtons.length > 0) {
-        IMenu customAction = ActionButtonBarUtility.convertButtonToAction(customProcessButtons[0]);
-        if (customAction != null) {
-          actions.add(customAction);
-        }
-      }
+    List<IMenu> systemActions = convertSystemProcessButtons(getRelevantSystemTypesForRightBar());
+    if (systemActions != null) {
+      actions.addAll(systemActions);
+    }
+
+    List<IMenu> customActions = convertCustomProcessButtons();
+    if (customActions != null) {
+      actions.addAll(customActions);
     }
 
     return actions;
@@ -197,83 +209,18 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
     return systemTypesToConsider;
   }
 
-  protected List<Integer> getRelevantSystemTypesForFormToolsAction() {
-    List<Integer> systemTypesToConsider = new LinkedList<Integer>();
-    systemTypesToConsider.add(IButton.SYSTEM_TYPE_RESET);
-
-    return systemTypesToConsider;
-  }
-
+  /**
+   * Returns the system types which are relevant for the right button bar. The order of the list is taken into account
+   * too.
+   */
   protected List<Integer> getRelevantSystemTypesForRightBar() {
     List<Integer> systemTypesToConsider = new LinkedList<Integer>();
     systemTypesToConsider.add(IButton.SYSTEM_TYPE_OK);
     systemTypesToConsider.add(IButton.SYSTEM_TYPE_SAVE);
     systemTypesToConsider.add(IButton.SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE);
+    systemTypesToConsider.add(IButton.SYSTEM_TYPE_RESET);
 
     return systemTypesToConsider;
-  }
-
-  protected P_FormToolsAction createFormToolsAction() {
-    List<IMenu> actions = new LinkedList<IMenu>();
-
-    List<IMenu> customActions = convertCustomProcessButtons();
-    if (customActions != null) {
-
-      //add only if not already added to right action bar
-      for (IMenu action : customActions) {
-        if (!rightActionBarContains(action)) {
-          actions.add(action);
-        }
-      }
-    }
-
-    List<IMenu> systemActions = convertSystemProcessButtons(getRelevantSystemTypesForFormToolsAction());
-    if (systemActions != null) {
-      actions.addAll(systemActions);
-    }
-
-    if (actions.size() > 0) {
-      P_FormToolsAction formToolsAction = new P_FormToolsAction();
-      formToolsAction.setChildActions(actions);
-      return formToolsAction;
-    }
-
-    return null;
-  }
-
-  private boolean rightActionBarContains(IAction action) {
-    if (action instanceof ButtonWrappingAction) {
-      IButton wrappedButton = ((ButtonWrappingAction) action).getWrappedButton();
-
-      for (IAction rightAction : m_rightBarActions) {
-        if (rightAction instanceof ButtonWrappingAction) {
-          if (((ButtonWrappingAction) rightAction).getWrappedButton().equals(wrappedButton)) {
-            return true;
-          }
-        }
-      }
-    }
-
-    return false;
-  }
-
-  private class P_FormToolsAction extends AbstractMenu {
-
-    @Override
-    protected String getConfiguredText() {
-      return null;
-    }
-
-    @Override
-    protected String getConfiguredTooltipText() {
-      return TEXTS.get("FormToolsButtonTooltip");
-    }
-
-    @Override
-    protected String getConfiguredIconId() {
-      return Icons.FormToolsAction;
-    }
-
   }
 
 }

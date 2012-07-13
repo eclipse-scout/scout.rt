@@ -24,8 +24,8 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableFormMediator;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableWithDetailForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.OutlineFormsManager;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -59,6 +59,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
   private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
   private OutlineChooserForm m_outlineChooserForm;
   private IDesktop m_desktop;
+  private OutlineFormsManager m_outlineFormsManager;
 
   public AbstractDeviceTransformer(IDesktop desktop) {
     if (desktop == null) {
@@ -68,6 +69,10 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     if (m_desktop == null) {
       throw new IllegalArgumentException("No desktop found. Cannot create device transformer.");
     }
+
+    m_outlineFormsManager = new OutlineFormsManager(m_desktop);
+    m_outlineFormsManager.setDetailFormEmbeddingEnabled(shouldPageDetailFormBeEmbedded());
+    m_outlineFormsManager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
   }
 
   public AbstractDeviceTransformer() {
@@ -81,7 +86,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
   @Override
   public void desktopGuiAttached() throws ProcessingException {
     showOutlineChooserForm();
-    showOutlineTableForm();
   }
 
   @Override
@@ -121,12 +125,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   protected boolean shouldPageDetailFormBeEmbedded() {
     return false;
-  }
-
-  protected void showOutlineTableForm() throws ProcessingException {
-    MobileOutlineTableFormMediator tableFormMediator = new MobileOutlineTableFormMediator();
-    tableFormMediator.setDetailFormEmbeddingEnabled(shouldPageDetailFormBeEmbedded());
-    tableFormMediator.setTableStatusVisible(!shouldPageTableStatusBeHidden());
   }
 
   protected boolean shouldPageTableStatusBeHidden() {
@@ -309,6 +307,10 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList) {
+    if (MobileDesktopUtility.isPageDeatilForm(form)) {
+      //Delegate to outline forms manager to centralize the logic concerning detail forms
+      m_outlineFormsManager.adaptPageDetailFormHeaderActions(form, menuList);
+    }
   }
 
   protected boolean containsCloseAction(List<IMenu> menuList) {

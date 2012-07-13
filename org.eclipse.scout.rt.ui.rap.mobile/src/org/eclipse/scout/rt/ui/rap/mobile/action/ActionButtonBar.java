@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.action;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,6 +46,9 @@ import org.eclipse.swt.widgets.Shell;
  * @since 3.9.0
  */
 public class ActionButtonBar extends Composite {
+  public static final int ORIENTATION_LEFT_TO_RIGHT = SWT.LEFT_TO_RIGHT;
+  public static final int ORIENTATION_RIGHT_TO_LEFT = 1 << 26;
+
   private static final long serialVersionUID = 1L;
   private static final String VARIANT_ACTION_BAR = "actionBar";
   private static final int BUTTON_SPACING = 6;
@@ -58,6 +62,7 @@ public class ActionButtonBar extends Composite {
   private int m_style;
   private boolean m_pilingEnabled;
   private int m_minNumberOfAlwaysVisibleButtons;
+  private int m_maxNumberOfAlwaysVisibleButtons;
   private P_ScoutPropertyChangeListener m_scoutPropertyChangeListener;
 
   public ActionButtonBar(Composite parent, IRwtEnvironment uiEnvironment, IMenu[] menus) {
@@ -81,6 +86,7 @@ public class ActionButtonBar extends Composite {
 
     m_pilingEnabled = true;
     m_minNumberOfAlwaysVisibleButtons = 0;
+    m_maxNumberOfAlwaysVisibleButtons = Integer.MAX_VALUE;
 
     m_displayedMenus = new LinkedList<IMenu>();
     m_displayedMenus.addAll(Arrays.asList(m_menus));
@@ -172,6 +178,14 @@ public class ActionButtonBar extends Composite {
     return buttonBar;
   }
 
+  public int getActionsOrientation() {
+    if ((m_style & ORIENTATION_RIGHT_TO_LEFT) != 0) {
+      return ORIENTATION_RIGHT_TO_LEFT;
+    }
+
+    return ORIENTATION_LEFT_TO_RIGHT;
+  }
+
   private void initButtonBarLayout(Composite buttonBar) {
     RowLayout layout = new RowLayout(SWT.HORIZONTAL);
     layout.marginBottom = 5;
@@ -205,9 +219,20 @@ public class ActionButtonBar extends Composite {
       return;
     }
 
+    if (getActionsOrientation() == ORIENTATION_RIGHT_TO_LEFT) {
+      actions = reverseActions(actions);
+    }
+
     for (IMenu menu : actions) {
       createButton(buttonBar, menu);
     }
+  }
+
+  private List<IMenu> reverseActions(List<IMenu> actions) {
+    List<IMenu> reversedMenuList = new LinkedList<IMenu>(actions);
+    Collections.reverse(reversedMenuList);
+
+    return reversedMenuList;
   }
 
   protected void createButton(Composite parent, IAction action) {
@@ -238,13 +263,12 @@ public class ActionButtonBar extends Composite {
   }
 
   public void handleButtonPiling() {
-    if (isButtonBarTooSmall(m_buttonBar)) {
+    if (isButtonBarTooSmall(m_buttonBar) || getNumberOfDisplayedButtons() > m_maxNumberOfAlwaysVisibleButtons) {
       pileButtons();
     }
     else {
       breakPileButtonsApart();
     }
-
   }
 
   private void scheduleHandleButtonPilingInUiThread() {
@@ -281,7 +305,7 @@ public class ActionButtonBar extends Composite {
     do {
       stackingSuccessful = createPileButton();
     }
-    while (stackingSuccessful && isButtonBarTooSmall(m_buttonBar));
+    while (stackingSuccessful && (isButtonBarTooSmall(m_buttonBar) || getNumberOfDisplayedButtons() > m_maxNumberOfAlwaysVisibleButtons));
   }
 
   private boolean isButtonBarTooSmall(Composite buttonBar) {
@@ -297,6 +321,10 @@ public class ActionButtonBar extends Composite {
 
   protected boolean breakPileButtonApart() {
     if (m_displayedMenus == null || m_displayedMenus.size() == 0) {
+      return false;
+    }
+
+    if (getNumberOfDisplayedButtons() >= m_maxNumberOfAlwaysVisibleButtons) {
       return false;
     }
 
@@ -429,6 +457,14 @@ public class ActionButtonBar extends Composite {
 
   public void setMinNumberOfAlwaysVisibleButtons(int minNumberOfAlwaysVisibleButtons) {
     m_minNumberOfAlwaysVisibleButtons = minNumberOfAlwaysVisibleButtons;
+  }
+
+  public void setMaxNumberOfAlwaysVisibleButtons(int maxNumberOfAlwaysVisibleButtons) {
+    m_maxNumberOfAlwaysVisibleButtons = maxNumberOfAlwaysVisibleButtons;
+  }
+
+  public int getMaxNumberOfAlwaysVisibleButtons() {
+    return m_maxNumberOfAlwaysVisibleButtons;
   }
 
   public void setPilingEnabled(boolean pilingEnabled) {

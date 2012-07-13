@@ -167,6 +167,10 @@ public class MobileDesktopUtility {
     ClientUIPreferences.getInstance(ClientJob.getCurrentSession()).setFormBounds(form, formBounds);
   }
 
+  public static boolean isPageDeatilForm(IForm form) {
+    return (form == getActivePageDetailForm());
+  }
+
   public static IForm getActivePageDetailForm() {
     if (getDesktop().getOutline() == null) {
       return null;

@@ -42,6 +42,7 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
   private boolean m_alwaysVisible = false;
   private Integer m_heightHint;
   private int m_menuOpeningDirection = SWT.DOWN;
+  private int m_rightActionBarOrientation = SWT.LEFT_TO_RIGHT;
   private CLabel m_titleField;
 
   @Override
@@ -123,9 +124,6 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
   }
 
   protected void adaptLeftButtonBar(ActionButtonBar buttonBar) {
-    // Left bar should always display a regular button.
-    // Otherwise it could happen that there is only a "..." button on the left side and at the same time some regular buttons on the right side.
-    buttonBar.setMinNumberOfAlwaysVisibleButtons(1);
   }
 
   protected Composite createCenterContainer(Composite parent) {
@@ -156,7 +154,7 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
     List<IMenu> menuList = new LinkedList<IMenu>();
     collectMenusForRightButtonBar(menuList);
 
-    ActionButtonBar rightButtonBar = createActionButtonBar(parent, existingButtonBar, menuList, SWT.RIGHT | getMenuOpeningDirection());
+    ActionButtonBar rightButtonBar = createActionButtonBar(parent, existingButtonBar, menuList, SWT.RIGHT | getMenuOpeningDirection() | getRightActionBarOrientation());
     adaptRightButtonBar(rightButtonBar);
 
     return rightButtonBar;
@@ -303,6 +301,14 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
 
   public void setMenuOpeningDirection(int menuOpeningDirection) {
     m_menuOpeningDirection = menuOpeningDirection;
+  }
+
+  public int getRightActionBarOrientation() {
+    return m_rightActionBarOrientation;
+  }
+
+  public void setRightActionBarOrientation(int orientation) {
+    m_rightActionBarOrientation = orientation;
   }
 
   public CLabel getTitleField() {
