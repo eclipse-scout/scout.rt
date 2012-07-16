@@ -348,15 +348,27 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
       if (m_currentBreadCrumb == null) {
         addNewBreadCrumb(form, null);
       }
-      else if (form != getDesktop().getOutlineTableForm()) {
-        addNewBreadCrumb(form, null);
-      }
       else if (m_currentBreadCrumb.getForm() != form) {
-        IPage page = null;
-        if (getDesktop().getOutline() != null) {
-          page = getDesktop().getOutline().getActivePage();
+        if (!(form instanceof IOutlineTableForm)) {
+          addNewBreadCrumb(form, null);
         }
-        addNewBreadCrumb(form, page);
+        else {
+          IPage page = null;
+          if (getDesktop().getOutline() != null) {
+            page = getDesktop().getOutline().getActivePage();
+          }
+          if (m_currentBreadCrumb.getForm() instanceof IOutlineTableForm) {
+            //If the current form already is the outline table form then only update the current bread crumb with the new page
+            m_currentBreadCrumb = new BreadCrumb(BreadCrumbsNavigation.this, form, page);
+
+            LOG.debug("Updated current bread crumb: " + m_currentBreadCrumb);
+            LOG.debug("Current bread crumbs way: " + BreadCrumbsNavigation.this.toString());
+
+          }
+          else {
+            addNewBreadCrumb(form, page);
+          }
+        }
       }
 
       attachFormListener(form);

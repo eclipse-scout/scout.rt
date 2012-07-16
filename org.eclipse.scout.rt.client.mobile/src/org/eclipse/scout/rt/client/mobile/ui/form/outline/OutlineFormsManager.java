@@ -97,7 +97,10 @@ public class OutlineFormsManager {
         table = ((IPageWithTable) parentPage).getTable();
       }
       if (table != null) {
-        pageDetailForm = createAndStartAutoDetailForm(table);
+        AutoTableForm autoForm = new AutoTableForm(table.getSelectedRow());
+        autoForm.setAutoAddRemoveOnDesktop(false);
+        autoForm.start();
+        pageDetailForm = autoForm;
         getDesktop().getOutline().getActivePage().setDetailForm(pageDetailForm);
       }
     }
@@ -135,7 +138,7 @@ public class OutlineFormsManager {
     return ActionButtonBarUtility.convertActionsToMainButtons(treeNodeActions);
   }
 
-  private IForm createAndStartAutoDetailForm(ITable table) throws ProcessingException {
+  private IForm createAndStartPreviewForm(ITable table) throws ProcessingException {
     if (table == null) {
       return null;
     }
@@ -184,6 +187,11 @@ public class OutlineFormsManager {
   }
 
   public void adaptPageDetailFormHeaderActions(IForm form, List<IMenu> menuList) {
+    if (form instanceof AutoTableForm) {
+      //the AutoTableForm already has the correct actions
+      return;
+    }
+
     IMenu[] nodeActions = fetchNodeActionsFromActivePage();
     List<IMenu> nodeActionList = new LinkedList<IMenu>();
 
@@ -248,7 +256,7 @@ public class OutlineFormsManager {
 
     private void handleRowClick(TableEvent event) {
       try {
-        createAndStartAutoDetailForm(event.getTable());
+        createAndStartPreviewForm(event.getTable());
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);

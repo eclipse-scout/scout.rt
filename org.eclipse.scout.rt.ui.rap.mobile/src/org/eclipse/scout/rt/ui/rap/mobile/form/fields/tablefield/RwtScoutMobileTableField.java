@@ -182,19 +182,19 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
   }
 
   /**
-   * Returns true if the form is a {@link OutlineChooserForm} to avoid a border around the table. Otherwise calls super.
+   * Returns true if the table is directly embedded in the main box. Otherwise false.
    */
   @Override
   protected boolean dontCreateTableContainer() {
-    IForm form = null;
-    if (getScoutObject() != null) {
-      form = getScoutObject().getForm();
+    if (getScoutObject() == null) {
+      return false;
     }
 
-    if (form instanceof OutlineChooserForm) {
+    IForm form = getScoutObject().getForm();
+    if (form.getRootGroupBox() == getScoutObject().getParentField()) {
       return true;
     }
 
-    return super.dontCreateTableContainer();
+    return false;
   }
 }
