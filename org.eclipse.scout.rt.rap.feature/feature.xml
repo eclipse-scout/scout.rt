@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.scout.rt.rap.feature"
+      id="org.eclipse.scout.rt.rap"
       label="%featureName"
       version="3.9.0.qualifier"
       provider-name="%providerName">
@@ -12,14 +12,7 @@ Contains Scout RAP runtime environment.
    </description>
 
    <copyright>
-      Copyright (c) 2010 BSI Business Systems Integration AG.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the Eclipse Public License
-v1.0
-which accompanies this distribution, and is available at
-http://www.eclipse.org/legal/epl-v10.html
-Contributors:
-BSI Business Systems Integration AG - initial API and implementation
+      %copyright
    </copyright>
 
    <license url="%licenseURL">
@@ -31,13 +24,8 @@ BSI Business Systems Integration AG - initial API and implementation
       <discovery label="Juno" url="http://download.eclipse.org/releases/juno"/>
    </url>
 
-   <includes
-         id="org.eclipse.scout.rt.rap.feature.source"
-         version="0.0.0"
-         optional="true"/>
-
    <requires>
-      <import feature="org.eclipse.scout.rt.feature" version="3.9.0" match="compatible"/>
+      <import feature="org.eclipse.scout.rt" version="3.9.0" match="compatible"/>
       <import feature="org.eclipse.rap.runtime" version="1.5.0" match="compatible"/>
       <import feature="org.eclipse.rap.runtime.requirements" version="1.5.0" match="compatible"/>
    </requires>

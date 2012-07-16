@@ -65,5 +65,6 @@
 
     <module>org.eclipse.scout.rt.feature.about</module>
     <module>org.eclipse.scout.rt.feature</module>
+<!--     <module>org.eclipse.scout.rt.rap.feature</module> -->
   </modules>
 </project>
