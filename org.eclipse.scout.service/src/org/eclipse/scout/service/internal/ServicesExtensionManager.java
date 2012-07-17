@@ -11,6 +11,7 @@
 package org.eclipse.scout.service.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.runtime.ExtensionPointTracker.Listener;
 import org.eclipse.scout.service.DefaultServiceFactory;
 import org.eclipse.scout.service.IServiceFactory;
+import org.eclipse.scout.service.IServiceInitializerFactory;
 import org.eclipse.scout.service.ServiceConstants;
 import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.Bundle;
@@ -34,11 +36,17 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 public class ServicesExtensionManager implements Listener {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServicesExtensionManager.class);
   public static final String PROP_DEFAULT_PROXY_SERVICE_RANKING = ServicesExtensionManager.class.getName() + ".defaultProxyServiceRanking";
   public static final String PROP_DEFAULT_SERVICE_RANKING = ServicesExtensionManager.class.getName() + ".defaultServiceRanking";
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServicesExtensionManager.class);
 
   private final HashMap<IExtension, List<ServiceRegistration>> m_serviceRegistrations = new HashMap<IExtension, List<ServiceRegistration>>();
+  private final HashMap<IExtension, IServiceInitializerFactory> m_serviceInitFactories = new HashMap<IExtension, IServiceInitializerFactory>();
+
+  public Collection<IServiceInitializerFactory> getServiceIntializerFactories() {
+    return m_serviceInitFactories.values();
+  }
+
   private ServicesExtensionPointTracker m_tracker;
   private int m_defaultProxyServiceRanking;
   private int m_defaultServiceRanking;
@@ -65,6 +73,7 @@ public class ServicesExtensionManager implements Listener {
         LOG.warn("could not parse defaultServiceRanking '" + defaultServiceRankingString + "'.", e);
       }
     }
+
     m_tracker = new ServicesExtensionPointTracker(registry, extensionPointId, this);
   }
 
@@ -175,6 +184,9 @@ public class ServicesExtensionManager implements Listener {
             ((IServiceFactory) factory).serviceRegistered(reg);
           }
         }
+        else if (serviceElement.getName().equals("serviceInitializerFactory")) {
+          loadServiceInitializerFactory(extension, serviceElement, contributorBundle);
+        }
         else {
           throw new IllegalArgumentException("unexpected element name: " + serviceElement.getName());
         }
@@ -186,8 +198,22 @@ public class ServicesExtensionManager implements Listener {
     m_serviceRegistrations.put(extension, list);
   }
 
+  @SuppressWarnings("unchecked")
+  private void loadServiceInitializerFactory(IExtension extension, IConfigurationElement serviceElement, Bundle contributorBundle) {
+    Class<IServiceInitializerFactory> initializerClass;
+    try {
+      initializerClass = contributorBundle.loadClass(serviceElement.getAttribute("class"));
+      IServiceInitializerFactory intFactory = initializerClass.newInstance();
+      m_serviceInitFactories.put(extension, intFactory);
+    }
+    catch (Throwable t) {
+      LOG.error("loading service initializer factory failed: bundle=" + contributorBundle.getSymbolicName() + "class=" + serviceElement.getAttribute("class"), t);
+    }
+  }
+
   @Override
   public void removed(IExtension extension) {
+    m_serviceInitFactories.remove(extension);
     List<ServiceRegistration> list = m_serviceRegistrations.remove(extension);
     if (list != null) {
       for (ServiceRegistration reg : list) {
