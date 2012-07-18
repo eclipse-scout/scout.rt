@@ -139,7 +139,7 @@ public class OutlineChooserForm extends AbstractForm {
         }
 
         @Override
-        protected void execRowAction(ITableRow row) throws ProcessingException {
+        protected void execRowClick(ITableRow row) throws ProcessingException {
           IOutline outline = getOutlineColumn().getValue(row);
 
           MobileDesktopUtility.activateOutline(outline);

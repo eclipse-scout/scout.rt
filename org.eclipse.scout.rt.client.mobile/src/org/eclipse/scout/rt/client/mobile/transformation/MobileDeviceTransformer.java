@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationServi
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.service.SERVICES;
@@ -72,11 +71,6 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     //Detail forms are handled by the MobileOutlineTableMediator
     IForm pageDetailForm = getDesktop().getPageDetailForm();
     return form == pageDetailForm;
-  }
-
-  @Override
-  protected boolean isPageDetailTableAllowedToBeClosed(IPage activePage) {
-    return false;
   }
 
   /**

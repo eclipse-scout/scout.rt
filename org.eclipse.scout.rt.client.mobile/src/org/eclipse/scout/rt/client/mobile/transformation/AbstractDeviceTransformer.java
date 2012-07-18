@@ -70,13 +70,19 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
       throw new IllegalArgumentException("No desktop found. Cannot create device transformer.");
     }
 
-    m_outlineFormsManager = new OutlineFormsManager(m_desktop);
-    m_outlineFormsManager.setDetailFormEmbeddingEnabled(shouldPageDetailFormBeEmbedded());
-    m_outlineFormsManager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
+    m_outlineFormsManager = createOutlineFormsManager(desktop);
   }
 
   public AbstractDeviceTransformer() {
     this(null);
+  }
+
+  protected OutlineFormsManager createOutlineFormsManager(IDesktop desktop) {
+    OutlineFormsManager manager = new OutlineFormsManager(desktop);
+    manager.setRowSelectionOnTableChangeEnabled(false);
+    manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
+
+    return manager;
   }
 
   @Override
@@ -191,7 +197,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     if (activePage == null || activePage.isTableVisible() || isPageDetailTableAllowedToBeClosed(activePage)) {
       return;
     }
-
     activePage.setTableVisible(true);
 
     if (activePage instanceof IPageWithNodes) {
@@ -203,7 +208,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   protected boolean isPageDetailTableAllowedToBeClosed(IPage activePage) {
-    return false;
+    return activePage.isLeaf();
   }
 
   protected void transformFormFields(IForm form) throws ProcessingException {
@@ -307,6 +312,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList) {
+    //FIXME CGU still necessary?
     if (MobileDesktopUtility.isPageDeatilForm(form)) {
       //Delegate to outline forms manager to centralize the logic concerning detail forms
       m_outlineFormsManager.adaptPageDetailFormHeaderActions(form, menuList);

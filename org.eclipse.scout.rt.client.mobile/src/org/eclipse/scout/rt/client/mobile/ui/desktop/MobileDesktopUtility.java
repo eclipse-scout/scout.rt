@@ -17,12 +17,17 @@ import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
@@ -176,12 +181,31 @@ public class MobileDesktopUtility {
       return null;
     }
 
-    IPage activePage = getDesktop().getOutline().getActivePage();
-    if (activePage == null) {
-      return null;
-    }
-
-    return activePage.getDetailForm();
+    return getDesktop().getOutline().getDetailForm();
   }
 
+  public static ITable getPageTable(IPage page) {
+    if (page instanceof IPageWithTable) {
+      IPageWithTable tablePage = (IPageWithTable) page;
+      return tablePage.getTable();
+    }
+    else if (page instanceof IPageWithNodes) {
+      IPageWithNodes nodePage = (IPageWithNodes) page;
+      return nodePage.getInternalTable();
+    }
+
+    return null;
+  }
+
+  public static IPage getPageFor(IPage parentPage, ITableRow tableRow) {
+    ITreeNode node = null;
+    if (parentPage instanceof IPageWithNodes) {
+      node = ((IPageWithNodes) parentPage).getTreeNodeFor(tableRow);
+    }
+    else if (parentPage instanceof IPageWithTable<?>) {
+      node = ((IPageWithTable<?>) parentPage).getTreeNodeFor(tableRow);
+    }
+
+    return (IPage) node;
+  }
 }

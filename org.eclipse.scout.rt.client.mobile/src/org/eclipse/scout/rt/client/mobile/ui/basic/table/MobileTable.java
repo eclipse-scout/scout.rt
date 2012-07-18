@@ -199,7 +199,7 @@ public class MobileTable extends AbstractTable {
       getUIFacade().fireRowActionFromUI(getSelectedRow());
     }
     else {
-    	//FIXME CGU solution required for non outline tables
+      //FIXME CGU solution required for non outline tables
 //      AutoTableForm form = new AutoTableForm(m_originalTable.getSelectedRow());
 //      form.start();
     }
@@ -227,7 +227,8 @@ public class MobileTable extends AbstractTable {
   @Override
   protected void execRowClick(ITableRow row) throws ProcessingException {
     if (isDrillDownOnClickEnabled()) {
-      doDrillDown();
+    	//FIXME CGU
+//      doDrillDown();
     }
     else {
       m_originalTable.getUIFacade().fireRowClickFromUI(getSelectedRow());
@@ -445,7 +446,9 @@ public class MobileTable extends AbstractTable {
     }
     ITableRow row = getRowMapColumn().getValue(mobileTableRow);
     String cellHeaderText = getCellHeaderText(row.getRowIndex());
-
+    if (cellHeaderText == null) {
+      cellHeaderText = "";
+    }
     //Don't generate cell content if the only column contains html.
     //It is assumed that such a column is already optimized for mobile devices.
     if (m_cellDetailColumns.size() == 0 && cellHeaderText.contains("<html>")) {

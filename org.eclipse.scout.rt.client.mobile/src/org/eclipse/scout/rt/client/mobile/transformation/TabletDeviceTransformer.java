@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.OutlineFormsManager;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
@@ -36,6 +37,15 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
     super(desktop);
 
     SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation(desktop).trackDisplayViewId(IForm.VIEW_ID_CENTER);
+  }
+
+  @Override
+  protected OutlineFormsManager createOutlineFormsManager(IDesktop desktop) {
+    OutlineFormsManager manager = new OutlineFormsManager(desktop);
+    manager.setRowSelectionOnTableChangeEnabled(true);
+    manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
+
+    return manager;
   }
 
   @Override

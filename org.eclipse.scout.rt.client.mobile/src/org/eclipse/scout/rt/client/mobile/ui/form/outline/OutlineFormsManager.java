@@ -12,24 +12,28 @@ package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.ActiveOutlineObserver;
+import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.AutoTableForm;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -39,12 +43,13 @@ import org.eclipse.scout.service.SERVICES;
 public class OutlineFormsManager {
   private IOutlineTableForm m_currentOutlineTableForm;
   private IForm m_currentPreviewForm;
+  private IOutline m_currentPreviewOutline;
 
   private P_OutlinePropertyChangeListener m_outlinePropertyChangeListener;
   private ActiveOutlineObserver m_activeOutlineObserver;
   private P_PageTableListener m_pageTableListener;
 
-  private boolean m_detailFormEmbeddingEnabled;
+  private boolean m_rowSelectionOnTableChangeEnabled;
   private boolean m_tableStatusVisible;
   private IDesktop m_desktop;
 
@@ -66,12 +71,12 @@ public class OutlineFormsManager {
     m_activeOutlineObserver.addOutlinePropertyChangeListener(m_outlinePropertyChangeListener);
   }
 
-  public boolean isDetailFormEmbeddingEnabled() {
-    return m_detailFormEmbeddingEnabled;
+  public boolean isRowSelectionOnTableChangeEnabled() {
+    return m_rowSelectionOnTableChangeEnabled;
   }
 
-  public void setDetailFormEmbeddingEnabled(boolean detailFormEmbeddingEnabled) {
-    m_detailFormEmbeddingEnabled = detailFormEmbeddingEnabled;
+  public void setRowSelectionOnTableChangeEnabled(boolean rowSelectionOnTableChangeEnabled) {
+    m_rowSelectionOnTableChangeEnabled = rowSelectionOnTableChangeEnabled;
   }
 
   public void setTableStatusVisible(boolean tableStatusVisible) {
@@ -82,6 +87,10 @@ public class OutlineFormsManager {
     return m_tableStatusVisible;
   }
 
+  private void destroy() {
+    //FIXME CGU destroying??
+  }
+
   public void installOutlineTableForm() throws ProcessingException {
     if (getDesktop().getOutline() == null || getDesktop().getOutline().getActivePage() == null) {
       return;
@@ -89,47 +98,33 @@ public class OutlineFormsManager {
 
     ITable pageDetailTable = getDesktop().getOutline().getDetailTable();
     IForm pageDetailForm = getDesktop().getOutline().getDetailForm();
-
-    if (pageDetailTable != null && pageDetailForm == null) {
-      ITable table = null;
-      IPage parentPage = getDesktop().getOutline().getActivePage().getParentPage();
-      if (parentPage instanceof IPageWithTable) {
-        table = ((IPageWithTable) parentPage).getTable();
-      }
-      if (table != null) {
-        AutoTableForm autoForm = new AutoTableForm(table.getSelectedRow());
-        autoForm.setAutoAddRemoveOnDesktop(false);
-        autoForm.start();
-        pageDetailForm = autoForm;
-        getDesktop().getOutline().getActivePage().setDetailForm(pageDetailForm);
-      }
-    }
-
     if (m_currentOutlineTableForm != null) {
       m_currentOutlineTableForm.doClose();
       m_currentOutlineTableForm = null;
     }
-    if (isDetailFormEmbeddingEnabled() && pageDetailForm != null) {
-      MobileOutlineTableWithDetailForm tableForm = new MobileOutlineTableWithDetailForm(fetchAndConvertNodeActionsFromActivePage());
-      tableForm.setDetailForm(pageDetailForm);
-      tableForm.setCurrentTable(pageDetailTable);
-      tableForm.getOutlineTableField().setTableStatusVisible(isTableStatusVisible());
-      tableForm.startAndLinkWithDesktop();
-
-      m_currentOutlineTableForm = tableForm;
+    List<IButton> mainButtons = null;
+    if (pageDetailForm == null) {
+      //If there is a detailform the main buttons are already placed on that form.
+      mainButtons = fetchAndConvertNodeActionsFromActivePage();
     }
-    else {
-      List<IButton> mainButtons = null;
-      if (pageDetailForm == null) {
-        //If there is a detailform the main buttons are already placed on that form.
-        mainButtons = fetchAndConvertNodeActionsFromActivePage();
-      }
-      MobileOutlineTableForm tableForm = new MobileOutlineTableForm(mainButtons);
-      tableForm.setCurrentTable(pageDetailTable);
-      tableForm.getOutlineTableField().setTableStatusVisible(isTableStatusVisible());
-      tableForm.startAndLinkWithDesktop();
+    MobileOutlineTableForm tableForm = new MobileOutlineTableForm(mainButtons);
+    tableForm.setCurrentTable(pageDetailTable);
+    tableForm.getOutlineTableField().setTableStatusVisible(isTableStatusVisible());
+    tableForm.startAndLinkWithDesktop();
 
-      m_currentOutlineTableForm = tableForm;
+    m_currentOutlineTableForm = tableForm;
+
+    if (pageDetailTable != null && pageDetailTable.getRowCount() > 0 && isRowSelectionOnTableChangeEnabled()) {
+      IPage activePage = getDesktop().getOutline().getActivePage();
+      IPage pageToSelect = MobileDesktopUtility.getPageFor(activePage, pageDetailTable.getRow(0));
+      if (pageDetailTable.getSelectedRow() == null) {
+        if (!isDrillDownPage(pageToSelect)) {
+          pageDetailTable.selectFirstRow();
+        }
+      }
+      else {
+        handleTableRowSelected(pageDetailTable.getSelectedRow());
+      }
     }
   }
 
@@ -138,40 +133,59 @@ public class OutlineFormsManager {
     return ActionButtonBarUtility.convertActionsToMainButtons(treeNodeActions);
   }
 
-  private IForm createAndStartPreviewForm(ITable table) throws ProcessingException {
-    if (table == null) {
-      return null;
+  private void handleTableRowSelected(final ITableRow tableRow) throws ProcessingException {
+    if (tableRow == null) {
+      return;
     }
 
-    AutoTableForm autoCreatedDetailForm = new AutoTableForm(table.getSelectedRow());
-    if (isDetailFormEmbeddingEnabled()) {
-      //AutoTableForm must not be added to desktop since it will be embedded
-      autoCreatedDetailForm.setAutoAddRemoveOnDesktop(false);
+    IOutline outline = getDesktop().getOutline();
+    IPage activePage = outline.getActivePage();
+    IPage tableRowPage = MobileDesktopUtility.getPageFor(activePage, tableRow);
+    if (tableRowPage == null) {
+      OutlinePreviewLeafPage autoPage = new OutlinePreviewLeafPage(tableRow);
+      activePage.getTree().addChildNode(activePage, autoPage);
+      tableRowPage = autoPage;
+    }
 
-      if (m_currentPreviewForm != null) {
-        m_currentPreviewForm.doClose();
-      }
-      IButton[] customProcessButtons = autoCreatedDetailForm.getRootGroupBox().getCustomProcessButtons();
-      MobileOutlineTableWithDetailForm tableForm = new MobileOutlineTableWithDetailForm(Arrays.asList(customProcessButtons));
-      tableForm.setDetailForm(autoCreatedDetailForm);
-      tableForm.setCurrentTable(null);
-      tableForm.getOutlineTableField().setTableStatusVisible(isTableStatusVisible());
-      tableForm.start();
-
-      m_currentPreviewForm = tableForm;
+    if (isDrillDownPage(tableRowPage)) {
+      tableRowPage.getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(tableRowPage);
+      clearSelection(tableRow.getTable());
     }
     else {
-      //Preview form is used if autoTableForm is not embedded but started separately (used for tablets)
-      if (m_currentPreviewForm != null) {
-        m_currentPreviewForm.doClose();
-        m_currentPreviewForm = null;
-      }
-      m_currentPreviewForm = autoCreatedDetailForm;
+      showPreviewForm(tableRowPage);
     }
 
-    autoCreatedDetailForm.start();
+    if (!isRowSelectionOnTableChangeEnabled()) {
+      clearSelection(tableRow.getTable());
+    }
+  }
 
-    return autoCreatedDetailForm;
+  private boolean isDrillDownPage(IPage page) {
+    return page instanceof IPageWithTable && page.getParentNode() instanceof IPageWithNodes;
+  }
+
+  private void clearSelection(final ITable table) {
+    ClientSyncJob job = new ClientSyncJob("Clearing selection", ClientJob.getCurrentSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        table.selectRow(null);
+      }
+    };
+    job.schedule();
+  }
+
+  private void showPreviewForm(IPage previewPage) throws ProcessingException {
+
+    OutlinePreviewForm detailFormWrapper = new OutlinePreviewForm(previewPage);
+    detailFormWrapper.start();
+
+    //Close existing form after starting the new one to prevent flickering
+    if (m_currentPreviewForm != null) {
+      m_currentPreviewForm.doClose();
+      m_currentPreviewForm = null;
+    }
+
+    m_currentPreviewForm = detailFormWrapper;
   }
 
   private IDesktop getDesktop() {
@@ -179,11 +193,16 @@ public class OutlineFormsManager {
   }
 
   private IMenu[] fetchNodeActionsFromActivePage() {
-    if (getDesktop().getOutline() == null || getDesktop().getOutline().getActivePage() == null) {
+    if (m_currentPreviewOutline == null && (getDesktop().getOutline() == null || getDesktop().getOutline().getActivePage() == null)) {
       return new IMenu[0];
     }
 
-    return getDesktop().getOutline().getActivePage().getTree().getUIFacade().fireNodePopupFromUI();
+    if (m_currentPreviewOutline != null) {
+      return m_currentPreviewOutline.getUIFacade().fireNodePopupFromUI();
+    }
+    else {
+      return getDesktop().getOutline().getUIFacade().fireNodePopupFromUI();
+    }
   }
 
   public void adaptPageDetailFormHeaderActions(IForm form, List<IMenu> menuList) {
@@ -245,22 +264,20 @@ public class OutlineFormsManager {
 
   private class P_PageTableListener extends TableAdapter {
     @Override
-    public void tableChanged(TableEvent e) {
-      switch (e.getType()) {
-        case TableEvent.TYPE_ROW_CLICK: {
-          handleRowClick(e);
+    public void tableChanged(TableEvent event) {
+      switch (event.getType()) {
+        case TableEvent.TYPE_ROWS_SELECTED: {
+          try {
+            handleTableRowSelected(event.getFirstRow());
+          }
+          catch (ProcessingException e) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          }
           break;
         }
       }
     }
 
-    private void handleRowClick(TableEvent event) {
-      try {
-        createAndStartPreviewForm(event.getTable());
-      }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      }
-    }
   }
+
 }
