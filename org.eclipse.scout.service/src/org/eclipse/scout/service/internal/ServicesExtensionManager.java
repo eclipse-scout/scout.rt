@@ -201,13 +201,14 @@ public class ServicesExtensionManager implements Listener {
   @SuppressWarnings("unchecked")
   private void loadServiceInitializerFactory(IExtension extension, IConfigurationElement serviceElement, Bundle contributorBundle) {
     Class<IServiceInitializerFactory> initializerClass;
+    String className = serviceElement.getAttribute("class");
     try {
-      initializerClass = contributorBundle.loadClass(serviceElement.getAttribute("class"));
+      initializerClass = (Class<IServiceInitializerFactory>) contributorBundle.loadClass(className);
       IServiceInitializerFactory intFactory = initializerClass.newInstance();
       m_serviceInitFactories.put(extension, intFactory);
     }
     catch (Throwable t) {
-      LOG.error("loading service initializer factory failed: bundle=" + contributorBundle.getSymbolicName() + "class=" + serviceElement.getAttribute("class"), t);
+      LOG.error("loading service initializer factory failed: bundle=" + contributorBundle.getSymbolicName() + "class=" + className, t);
     }
   }
 
