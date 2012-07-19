@@ -44,6 +44,7 @@ public class OutlinePreviewForm extends AbstractForm {
   private IPage m_parentPage;
   private P_PageTableListener m_pageTableListener;
   private PreviewOutline m_outline;
+  private boolean m_nodePageSwitchEnabled;
 
   public OutlinePreviewForm(IPage page) throws ProcessingException {
     super(false);
@@ -146,9 +147,6 @@ public class OutlinePreviewForm extends AbstractForm {
     IPage parentPage = m_parentPage;
     if (parentPage instanceof IPageWithTable) {
       table = ((IPageWithTable) parentPage).getTable();
-    }
-    else if (parentPage instanceof IPageWithNodes) {
-//      table = ((IPageWithNodes) parentPage).getInternalTable();
     }
     if (table != null && table.getSelectedRow() != null) {
       return new AutoTableForm(table.getSelectedRow());
@@ -324,13 +322,24 @@ public class OutlinePreviewForm extends AbstractForm {
     e.consume();
     IOutline outline = getDesktop().getOutline();
     if (outline != null) {
-      //If it's a page with nodes show it on the left side (tablet)
-      if (node instanceof IPageWithNodes) {
+      if (isNodePageSwitchEnabled() && node instanceof IPageWithNodes) {
+        //If it's a page with nodes show it on the left side (tablet)
         node = node.getParentNode();
       }
       node.setTreeInternal(outline, true);
       outline.getUIFacade().setNodeSelectedAndExpandedFromUI(node);
     }
+  }
+
+  /**
+   * If enabled, clicking on a page with nodes will lead to a selection of the parent node.
+   */
+  public boolean isNodePageSwitchEnabled() {
+    return m_nodePageSwitchEnabled;
+  }
+
+  public void setNodePageSwitchEnabled(boolean nodePageSwitchEnabled) {
+    m_nodePageSwitchEnabled = nodePageSwitchEnabled;
   }
 
   private class PlaceholderTable extends AbstractTable {

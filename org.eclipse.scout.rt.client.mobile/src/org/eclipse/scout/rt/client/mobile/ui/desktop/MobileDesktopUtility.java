@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
 import java.awt.Rectangle;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -207,5 +208,18 @@ public class MobileDesktopUtility {
     }
 
     return (IPage) node;
+  }
+
+  /**
+   * Schedules a job to clear the table selection
+   */
+  public static void clearTableSelection(final ITable table) {
+    ClientSyncJob job = new ClientSyncJob("Clearing selection", ClientJob.getCurrentSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        table.selectRow(null);
+      }
+    };
+    job.schedule();
   }
 }

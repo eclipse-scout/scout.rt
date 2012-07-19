@@ -42,7 +42,8 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
   @Override
   protected OutlineFormsManager createOutlineFormsManager(IDesktop desktop) {
     OutlineFormsManager manager = new OutlineFormsManager(desktop);
-    manager.setRowSelectionOnTableChangeEnabled(true);
+    manager.setPreviewRowSelectionKeepingEnabled(true);
+    manager.setNodePageSwitchEnabled(true);
     manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
 
     return manager;

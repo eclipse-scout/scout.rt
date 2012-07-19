@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableWithDetailForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.OutlineFormsManager;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -79,7 +78,8 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   protected OutlineFormsManager createOutlineFormsManager(IDesktop desktop) {
     OutlineFormsManager manager = new OutlineFormsManager(desktop);
-    manager.setRowSelectionOnTableChangeEnabled(false);
+    manager.setPreviewRowSelectionKeepingEnabled(false);
+    manager.setNodePageSwitchEnabled(false);
     manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
 
     return manager;
@@ -180,7 +180,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
       return true;
     }
 
-    if (form instanceof IOutlineTableForm && !((form instanceof MobileOutlineTableWithDetailForm) || (form instanceof MobileOutlineTableForm))) {
+    if (form instanceof IOutlineTableForm && !((form instanceof MobileOutlineTableForm))) {
       return true;
     }
 
