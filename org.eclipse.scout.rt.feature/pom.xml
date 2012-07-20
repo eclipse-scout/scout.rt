@@ -24,6 +24,8 @@
   <artifactId>org.eclipse.scout.rt</artifactId>
   <packaging>eclipse-feature</packaging>
 
+  <name>Eclipse Scout Runtime Feature</name>
+
   <build>
     <plugins>
       <plugin>
