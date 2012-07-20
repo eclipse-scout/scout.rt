@@ -7,4 +7,3 @@ Bundle-Vendor: Eclipse Scout Project
 Fragment-Host: org.apache.ant
 Require-Bundle: org.junit4,
  org.eclipse.core.runtime.compatibility
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6

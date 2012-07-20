@@ -24,29 +24,7 @@
   <artifactId>org.eclipse.scout.rt.rap</artifactId>
   <packaging>eclipse-feature</packaging>
 
-<!--   <properties> -->
-<!--     <rap-base-repo.url>http://build.eclipse.org/rt/rap/base-platforms/1.5/RC4/runtime-base</rap-base-repo.url> -->
-<!--     <eclipse-repo-url>http://build.eclipse.org/rt/rap/base-platforms/1.5/RC4/runtime-base</eclipse-repo-url> -->
-<!--     <rap-repo.url>http://build.eclipse.org/rt/rap/base-platforms/1.5/RC4/runtime-base</rap-repo.url> -->
-<!--     <rap-extra-dependencies-repo.url>http://build.eclipse.org/rt/rap/base-platforms/1.5/extra-dependencies</rap-extra-dependencies-repo.url> -->
-<!--   </properties> -->
-
-<!--   <repositories> -->
-<!--     <repository> -->
-<!--       <id>rap-base-platform-repository</id> -->
-<!--       <layout>p2</layout> -->
-      <!--
-        TODO [rst]: Because of bug 348045, we cannot add the entire platform repository to the
-                    target platform, try target definitions instead.
-        -->
-<!--       <url>${rap-base-repo.url}</url> -->
-<!--     </repository> -->
-<!--     <repository> -->
-<!--       <id>rap-extra-dependencies-repository</id> -->
-<!--       <layout>p2</layout> -->
-<!--       <url>${rap-extra-dependencies-repo.url}</url> -->
-<!--     </repository> -->
-<!--   </repositories> -->
+  <name>Eclipse Scout RAP Runtime Feature</name>
 
   <build>
     <plugins>
@@ -61,11 +39,9 @@
               <goal>source-feature</goal>
             </goals>
             <configuration>
-<!--               <excludes> -->
-<!--                 <plugin id="org.eclipse.scout.rt.feature.about" /> -->
-<!--                 <plugin id="org.apache.derby.jdbc_1053.fragment" /> -->
-<!--                 <plugin id="org.apache.derby.jdbc_1082.fragment" /> -->
-<!--               </excludes> -->
+              <excludes>
+                <plugin id="org.eclipse.scout.rt.feature.about" />
+              </excludes>
             </configuration>
           </execution>
         </executions>

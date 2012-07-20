@@ -1,4 +1,3 @@
-#Mon Aug 29 15:15:37 CEST 2011
 activeContentFilterList=*.makefile,makefile,*.Makefile,Makefile,Makefile.*,*.mk,MANIFEST.MF
 addNewLine=true
 convertActionOnSaave=AnyEdit.CnvrtTabToSpaces
@@ -13,4 +12,4 @@ replaceAllTabs=true
 saveAndAddLine=true
 saveAndConvert=true
 saveAndTrim=true
-useModulo4Tabs=true
+useModulo4Tabs=false
