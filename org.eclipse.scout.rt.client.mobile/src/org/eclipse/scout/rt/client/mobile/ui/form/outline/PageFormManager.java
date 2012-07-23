@@ -67,10 +67,12 @@ public class PageFormManager {
     m_pageFormMap = new PageFormMap();
     m_blockedForms = new LinkedList<IForm>();
     m_activeOutlineObserver = new ActiveOutlineObserver(desktop);
-    m_outlineTreeListener = new P_OutlineTreeListener();
+
     //Since the page is activated by the outline and the outline itself also listens to tree selection events,
     //a UI listener is attached to make sure this listener is called at the end and therefore after the page has been activated properly.
+    m_outlineTreeListener = new P_OutlineTreeListener();
     m_activeOutlineObserver.addOutlineUITreeListener(m_outlineTreeListener);
+
     m_desktopListener = new P_DesktopListener();
     desktop.addDesktopListener(m_desktopListener);
   }
@@ -115,7 +117,17 @@ public class PageFormManager {
   }
 
   private void destroy() {
-    //FIXME CGU destroying??
+    if (m_desktopListener != null) {
+      getDesktop().removeDesktopListener(m_desktopListener);
+      m_desktopListener = null;
+    }
+
+    if (m_outlineTreeListener != null) {
+      m_activeOutlineObserver.removeOutlineUITreeListener(m_outlineTreeListener);
+      m_outlineTreeListener = null;
+    }
+
+    m_pageFormMap.clear();
   }
 
   private void hidePage(IPage page) throws ProcessingException {
@@ -264,6 +276,18 @@ public class PageFormManager {
     showPage((IPage) selectedNode);
   }
 
+  private void handleTreeNodesDeleted(ITreeNode[] deletedNodes) {
+    if (deletedNodes == null) {
+      return;
+    }
+
+    for (ITreeNode node : deletedNodes) {
+      if (node instanceof IPage) {
+        m_pageFormMap.remove((IPage) node);
+      }
+    }
+  }
+
   public boolean acceptForm(IForm form) {
     //Outline forms are not used at all -> never show them.
     if (form instanceof IOutlineTreeForm || form instanceof IOutlineTableForm) {
@@ -319,6 +343,10 @@ public class PageFormManager {
           catch (ProcessingException e) {
             SERVICES.getService(IExceptionHandlerService.class).handleException(e);
           }
+          break;
+        }
+        case TreeEvent.TYPE_NODES_DELETED: {
+          handleTreeNodesDeleted(event.getNodes());
           break;
         }
       }

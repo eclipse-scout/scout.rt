@@ -36,13 +36,15 @@ public class PageFormMap {
     }
 
     for (List<IPageForm> pageFormList : m_pageFormMaps.values()) {
-      if (pageFormList != null) {
-        for (IPageForm pageForm : pageFormList) {
-          if (page.equals(pageForm.getPage())) {
-            IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
-            if (!onlyVisible || desktop.isShowing(pageForm)) {
-              return pageForm;
-            }
+      if (pageFormList == null) {
+        continue;
+      }
+
+      for (IPageForm pageForm : pageFormList) {
+        if (page.equals(pageForm.getPage())) {
+          IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+          if (!onlyVisible || desktop.isShowing(pageForm)) {
+            return pageForm;
           }
         }
       }
@@ -79,6 +81,24 @@ public class PageFormMap {
 
     list.add(pageForm);
     m_pageFormMaps.put(displayViewId, list);
+  }
+
+  public void remove(IPage page) {
+    for (List<IPageForm> pageFormList : m_pageFormMaps.values()) {
+      if (pageFormList == null) {
+        continue;
+      }
+
+      for (IPageForm pageForm : new LinkedList<IPageForm>(pageFormList)) {
+        if (page.equals(pageForm.getPage())) {
+          pageFormList.remove(pageForm);
+        }
+      }
+    }
+  }
+
+  public void clear() {
+    m_pageFormMaps.clear();
   }
 
 }

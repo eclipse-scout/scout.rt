@@ -66,7 +66,10 @@ public class ActiveOutlineObserver {
       getDesktop().removeDesktopListener(m_desktopListener);
       m_desktopListener = null;
     }
+
+    removeAllListeners(m_activeOutline);
     m_outlineTreeListeners.clear();
+    m_outlineUITreeListeners.clear();
     m_outlinePropertyChangeListeners.clear();
   }
 
@@ -136,6 +139,38 @@ public class ActiveOutlineObserver {
     m_outlinePropertyChangeListeners.remove(propertyChangeListener);
   }
 
+  private void removeAllListeners(IOutline outline) {
+    if (outline == null) {
+      return;
+    }
+
+    for (TreeListener treeListener : m_outlineTreeListeners) {
+      outline.removeTreeListener(treeListener);
+    }
+    for (TreeListener treeListener : m_outlineUITreeListeners) {
+      outline.removeTreeListener(treeListener);
+    }
+    for (PropertyChangeListener propertyChangeListener : m_outlinePropertyChangeListeners) {
+      outline.removePropertyChangeListener(propertyChangeListener);
+    }
+  }
+
+  private void addAllListeners(IOutline outline) {
+    if (outline == null) {
+      return;
+    }
+
+    for (TreeListener treeListener : m_outlineTreeListeners) {
+      outline.addTreeListener(treeListener);
+    }
+    for (TreeListener treeListener : m_outlineUITreeListeners) {
+      outline.addUITreeListener(treeListener);
+    }
+    for (PropertyChangeListener propertyChangeListener : m_outlinePropertyChangeListeners) {
+      outline.addPropertyChangeListener(propertyChangeListener);
+    }
+  }
+
   private class P_DesktopListener implements DesktopListener {
 
     @Override
@@ -148,6 +183,7 @@ public class ActiveOutlineObserver {
         }
         case DesktopEvent.TYPE_OUTLINE_CHANGED: {
           handleOutlineChanged(e);
+          break;
         }
         default:
           break;
@@ -158,27 +194,11 @@ public class ActiveOutlineObserver {
       IOutline outline = e.getOutline();
 
       if (m_activeOutline != null) {
-        for (TreeListener treeListener : m_outlineTreeListeners) {
-          m_activeOutline.removeTreeListener(treeListener);
-        }
-        for (TreeListener treeListener : m_outlineUITreeListeners) {
-          m_activeOutline.removeTreeListener(treeListener);
-        }
-        for (PropertyChangeListener propertyChangeListener : m_outlinePropertyChangeListeners) {
-          m_activeOutline.removePropertyChangeListener(propertyChangeListener);
-        }
+        removeAllListeners(m_activeOutline);
       }
 
       if (outline != null) {
-        for (TreeListener treeListener : m_outlineTreeListeners) {
-          outline.addTreeListener(treeListener);
-        }
-        for (TreeListener treeListener : m_outlineUITreeListeners) {
-          outline.addUITreeListener(treeListener);
-        }
-        for (PropertyChangeListener propertyChangeListener : m_outlinePropertyChangeListeners) {
-          outline.addPropertyChangeListener(propertyChangeListener);
-        }
+        addAllListeners(outline);
       }
 
       m_activeOutline = outline;
