@@ -40,6 +40,7 @@ BSI Business Systems Integration AG - initial API and implementation
       <import plugin="org.junit4"/>
       <import plugin="org.easymock"/>
       <import plugin="org.apache.ant"/>
+      <import plugin="org.junit"/>
    </requires>
 
    <plugin
