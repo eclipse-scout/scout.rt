@@ -2029,6 +2029,15 @@ Composite.viewsArea {
   background-color: #FFFFFF;
   padding: 0px 0px 0px 0px;
 }
+Composite.viewPart {
+  border: 0px;
+}
+Composite.viewPartNoRadius {
+  border: 0px;
+}
+Sash {
+  background-color: #bbcddb;
+}
 Composite.mobileFormHeader {
   background-color: #67a8ce;
 }

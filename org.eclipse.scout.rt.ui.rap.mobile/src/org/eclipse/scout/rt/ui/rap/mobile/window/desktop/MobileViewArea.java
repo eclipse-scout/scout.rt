@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutViewStack;
 import org.eclipse.scout.rt.ui.rap.window.desktop.viewarea.ViewArea;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Sash;
 
 /**
  * @since 3.9.0
@@ -34,8 +35,14 @@ public class MobileViewArea extends ViewArea {
   }
 
   @Override
-  protected boolean isSashCreationEnabled() {
-    return false;
+  protected Sash createSash(Composite parent, int style) {
+    SimpleSash simpleSash = new SimpleSash(parent, style);
+    return simpleSash;
+  }
+
+  @Override
+  protected int getSashWidth() {
+    return 1;
   }
 
   /**
