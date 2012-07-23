@@ -14,6 +14,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.Subject;
@@ -105,7 +106,9 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
       throw e;
     }
     catch (Exception e) {
-      throw new InitializationError(e);
+      List<Throwable> errors = new ArrayList<Throwable>();
+      errors.add(e);
+      throw new InitializationError(errors);
     }
   }
 
