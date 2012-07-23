@@ -2166,3 +2166,7 @@ Text {
 Composite.form {
   background-color: #ebf4f8;
 }
+/* ToolBar at the moment only used for busy decoration */
+ToolBar {
+  font: 12px Arial, Helvetica, sans-serif;
+}
