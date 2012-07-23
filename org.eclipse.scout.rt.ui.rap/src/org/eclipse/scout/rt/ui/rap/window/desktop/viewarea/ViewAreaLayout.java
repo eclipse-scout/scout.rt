@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Sash;
 public class ViewAreaLayout extends Layout {
   private static final long serialVersionUID = 1L;
 
-  private static int SASH_WIDTH = 3;
   private static int MIN_SIZE = 30;
 
   Rectangle boundsLeft;
@@ -38,9 +37,15 @@ public class ViewAreaLayout extends Layout {
   Rectangle boundsSashRight;
   Rectangle boundsRight;
   private EventListenerList m_eventListeners;
+  private int m_sashWidth;
+
+  public ViewAreaLayout(int sashWidth) {
+    m_eventListeners = new EventListenerList();
+    m_sashWidth = sashWidth;
+  }
 
   public ViewAreaLayout() {
-    m_eventListeners = new EventListenerList();
+    this(3);
   }
 
   public void addLayoutListener(ILayoutListener listener) {
@@ -114,12 +119,12 @@ public class ViewAreaLayout extends Layout {
         RwtScoutViewStack view = viewArea.m_viewStacks[x][y];
         if (view != null && view.getVisible()) {
           if (minHeight > 0) {
-            minHeight += SASH_WIDTH;
+            minHeight += m_sashWidth;
           }
           minHeight += MIN_SIZE;
           Point computedSize = view.computeSize(SWT.DEFAULT, SWT.DEFAULT);
           if (height > 0) {
-            height += SASH_WIDTH;
+            height += m_sashWidth;
           }
           height += computedSize.y;
           // width
@@ -132,11 +137,11 @@ public class ViewAreaLayout extends Layout {
       prefSize.y = Math.max(prefSize.y, height);
       // width
       if (minSize.x > 0) {
-        minSize.x += SASH_WIDTH;
+        minSize.x += m_sashWidth;
       }
       minSize.x += minWidth;
       if (prefSize.x > 0) {
-        prefSize.x += SASH_WIDTH;
+        prefSize.x += m_sashWidth;
       }
       prefSize.x += width;
     }
@@ -202,24 +207,24 @@ public class ViewAreaLayout extends Layout {
         if (boundsLeft.width > 0 && boundsCenter.width > 0 && boundsRight.width > 0) {
           leftSash.setVisible(true);
           rightSash.setVisible(true);
-          boundsSashLeft.width = SASH_WIDTH;
-          boundsSashRight.width = SASH_WIDTH;
+          boundsSashLeft.width = m_sashWidth;
+          boundsSashRight.width = m_sashWidth;
         }
         // left and center visible
         else if (boundsLeft.width > 0 && boundsCenter.width > 0) {
           leftSash.setVisible(true);
           rightSash.setVisible(false);
-          boundsSashLeft.width = SASH_WIDTH;
+          boundsSashLeft.width = m_sashWidth;
         }
         else if (boundsLeft.width > 0 && boundsRight.width > 0) {
           leftSash.setVisible(true);
           rightSash.setVisible(false);
-          boundsSashLeft.width = SASH_WIDTH;
+          boundsSashLeft.width = m_sashWidth;
         }
         else if (boundsCenter.width > 0 && boundsRight.width > 0) {
           leftSash.setVisible(false);
           rightSash.setVisible(true);
-          boundsSashRight.width = SASH_WIDTH;
+          boundsSashRight.width = m_sashWidth;
         }
       }
       int pos = viewArea.getSashPosition(SashKey.VERTICAL_LEFT);
@@ -309,21 +314,21 @@ public class ViewAreaLayout extends Layout {
     }
     // visibility of sashes
     if (bounds[0].height > 0 && bounds[1].height > 0 && bounds[2].height > 0) {
-      sashTop.height = SASH_WIDTH;
-      sashBottom.height = SASH_WIDTH;
+      sashTop.height = m_sashWidth;
+      sashBottom.height = m_sashWidth;
     }
     // left and center visible
     else if (bounds[0].height > 0 && bounds[1].height > 0) {
-      sashTop.height = SASH_WIDTH;
+      sashTop.height = m_sashWidth;
       sashBottom.height = 0;
     }
     else if (bounds[0].height > 0 && bounds[2].height > 0) {
-      sashTop.height = SASH_WIDTH;
+      sashTop.height = m_sashWidth;
       sashBottom.height = 0;
     }
     else if (bounds[1].height > 0 && bounds[2].height > 0) {
       sashTop.height = 0;
-      sashBottom.height = SASH_WIDTH;
+      sashBottom.height = m_sashWidth;
     }
     // resize
     int totalHeight = bounds[0].height + bounds[1].height + bounds[2].height + sashTop.height + sashBottom.height;

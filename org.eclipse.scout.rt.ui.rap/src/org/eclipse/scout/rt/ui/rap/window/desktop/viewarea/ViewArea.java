@@ -68,7 +68,11 @@ public class ViewArea extends Composite implements IViewArea {
     initFormPositions();
     createContent(this);
     readPreferences();
-    setLayout(new ViewAreaLayout());
+    setLayout(new ViewAreaLayout(getSashWidth()));
+  }
+
+  protected int getSashWidth() {
+    return 3;
   }
 
   private void initFormPositions() {
@@ -123,12 +127,18 @@ public class ViewArea extends Composite implements IViewArea {
       }
       Sash sash = null;
       if (isSashCreationEnabled()) {
-        sash = new Sash(parent, style);
-        sash.setData("SASH_KEY", k);
-        sash.addListener(SWT.Selection, m_sashListener);
+        sash = createSash(parent, style);
+        if (sash != null) {
+          sash.setData("SASH_KEY", k);
+          sash.addListener(SWT.Selection, m_sashListener);
+        }
       }
       m_sashes.put(k, sash);
     }
+  }
+
+  protected Sash createSash(Composite parent, int style) {
+    return new Sash(parent, style);
   }
 
   /**
