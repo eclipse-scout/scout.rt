@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
+import org.eclipse.scout.rt.ui.rap.form.fields.tablefield.IRwtTableStatus;
 import org.eclipse.scout.rt.ui.rap.form.fields.tablefield.RwtScoutTableField;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutActionBar;
 
@@ -211,5 +212,10 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
     }
 
     return true;
+  }
+
+  @Override
+  protected IRwtTableStatus createRwtTableStatus() {
+    return new RwtMobileTableStatus(getUiContainer(), getUiEnvironment(), getScoutObject());
   }
 }

@@ -23,4 +23,8 @@ public interface IPageForm extends IForm {
   void setNodePageSwitchEnabled(boolean nodePageSwitchEnabled);
 
   boolean isNodePageSwitchEnabled();
+
+  void setTableStatusVisible(boolean tableStatusVisible);
+
+  boolean isTableStatusVisible();
 }

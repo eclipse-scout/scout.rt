@@ -204,7 +204,7 @@ public class PageFormManager {
       pageForm = new MainPageForm(page, this);
     }
     pageForm.setNodePageSwitchEnabled(false);
-
+    pageForm.setTableStatusVisible(isTableStatusVisible());
     return pageForm;
   }
 

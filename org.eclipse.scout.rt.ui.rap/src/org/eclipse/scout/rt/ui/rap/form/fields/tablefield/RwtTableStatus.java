@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Label;
  * Default implementation using a target label
  */
 public class RwtTableStatus implements IRwtTableStatus {
-  static final String VARIANT_OUTLINE_TABLE_STATUS = "outlineTableStatus";
-  static final String VARIANT_TABLE_STATUS = "tableStatus";
+  protected static final String VARIANT_OUTLINE_TABLE_STATUS = "outlineTableStatus";
+  protected static final String VARIANT_TABLE_STATUS = "tableStatus";
 
   static final String VARIANT_POSTFIX_ERROR = "_error";
   static final String VARIANT_POSTFIX_WARNING = "_warning";
@@ -81,11 +81,13 @@ public class RwtTableStatus implements IRwtTableStatus {
     GridData popLabelLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
     popLabelLayoutData.exclude = true;
     popLabelLayoutData.verticalAlignment = SWT.CENTER;
+    popLabelLayoutData.horizontalAlignment = getLabelHorizontalAlignment();
     m_populateLabel.setLayoutData(popLabelLayoutData);
 
     GridData selLabelLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
     selLabelLayoutData.exclude = true;
     selLabelLayoutData.verticalAlignment = SWT.CENTER;
+    selLabelLayoutData.horizontalAlignment = getLabelHorizontalAlignment();
     m_selectionLabel.setLayoutData(selLabelLayoutData);
   }
 
@@ -96,6 +98,10 @@ public class RwtTableStatus implements IRwtTableStatus {
     }
 
     return VARIANT_TABLE_STATUS;
+  }
+
+  protected int getLabelHorizontalAlignment() {
+    return SWT.LEFT;
   }
 
   @Override

@@ -4,8 +4,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
@@ -22,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
@@ -263,12 +265,66 @@ public class PageForm extends AbstractForm implements IPageForm {
 
         @Override
         protected boolean getConfiguredGridUseUiHeight() {
-          return true;
+          //If there is a detail form make the table as height as necessary to avoid a second scrollbar.
+          //If there is no detail form make the table itself scrollable.
+          return m_detailFormVisible;
         }
 
+        @Override
+        protected void execUpdateTableStatus() {
+          execUpdatePageTableStatus();
+        }
+
+        @Override
+        public String createDefaultTableStatus() {
+          return createDefaultPageTableStatus(getTable());
+        }
       }
 
     }
+  }
+
+  protected void execUpdatePageTableStatus() {
+    if (!isTableStatusVisible()) {
+      return;
+    }
+    if (getPage() instanceof IPageWithTable<?>) {
+      //popuplate status
+      IPageWithTable<?> tablePage = (IPageWithTable<?>) getPage();
+      IProcessingStatus populateStatus = tablePage.getTablePopulateStatus();
+      getPageTableField().setTablePopulateStatus(populateStatus);
+      //selection status
+      if (tablePage.isSearchActive() && tablePage.getSearchFilter() != null && (!tablePage.getSearchFilter().isCompleted()) && tablePage.isSearchRequired()) {
+        getPageTableField().setTableSelectionStatus(null);
+      }
+      else if (populateStatus != null && populateStatus.getSeverity() == IProcessingStatus.WARNING) {
+        getPageTableField().setTableSelectionStatus(null);
+      }
+      else {
+        getPageTableField().setTableSelectionStatus(new ProcessingStatus(getPageTableField().createDefaultTableStatus(), IProcessingStatus.INFO));
+      }
+    }
+    else {
+      getPageTableField().setTablePopulateStatus(null);
+      getPageTableField().setTableSelectionStatus(null);
+    }
+  }
+
+  protected String createDefaultPageTableStatus(ITable table) {
+    StringBuilder statusText = new StringBuilder();
+    if (table != null) {
+      int nTotal = table.getFilteredRowCount();
+      if (nTotal == 1) {
+        statusText.append(ScoutTexts.get("OneRow"));
+      }
+      else {
+        statusText.append(ScoutTexts.get("XRows", NumberUtility.format(nTotal)));
+      }
+    }
+    if (statusText.length() == 0) {
+      return null;
+    }
+    return statusText.toString();
   }
 
   @Override
@@ -278,15 +334,6 @@ public class PageForm extends AbstractForm implements IPageForm {
 
   @Order(10.0f)
   public class FormHandler extends AbstractFormHandler {
-  }
-
-  private static class PreviewOutline extends AbstractOutline {
-
-    @Override
-    protected boolean getConfiguredRootNodeVisible() {
-      return true;
-    }
-
   }
 
   protected void handleTableRowSelected(ITableRow tableRow) throws ProcessingException {
@@ -335,6 +382,16 @@ public class PageForm extends AbstractForm implements IPageForm {
 
   public boolean isKeepSelection() {
     return m_keepSelection;
+  }
+
+  @Override
+  public void setTableStatusVisible(boolean tableStatusVisible) {
+    getPageTableField().setTableStatusVisible(tableStatusVisible);
+  }
+
+  @Override
+  public boolean isTableStatusVisible() {
+    return getPageTableField().isTableStatusVisible();
   }
 
   private class PlaceholderTable extends AbstractTable {
