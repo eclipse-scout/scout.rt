@@ -11,9 +11,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.AutoTableForm;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.OutlinePreviewForm.MainBox.PageDetailFormField;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.OutlinePreviewForm.MainBox.PageTableGroupBox;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.OutlinePreviewForm.MainBox.PageTableGroupBox.PageTableField;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageDetailFormField;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageTableGroupBox;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageTableGroupBox.PageTableField;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -36,19 +35,26 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
-public class OutlinePreviewForm extends AbstractForm {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(OutlinePreviewForm.class);
+public class PageForm extends AbstractForm implements IPageForm {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PageForm.class);
   private List<IButton> m_mainboxButtons;
   private IPage m_page;
-  private IPage m_parentPage;
   private P_PageTableListener m_pageTableListener;
-  private PreviewOutline m_outline;
   private boolean m_nodePageSwitchEnabled;
+  private boolean m_tablePagesAllowed;
+  private boolean m_detailFormVisible;
+  private boolean m_keepSelection;
 
-  public OutlinePreviewForm(IPage page) throws ProcessingException {
+  private PageFormManager m_pageFormManager;
+
+  public PageForm(IPage page, PageFormManager manager, boolean tablePagesAllowed, boolean detailFormVisible) throws ProcessingException {
     super(false);
-
+    m_tablePagesAllowed = tablePagesAllowed;
+    m_detailFormVisible = detailFormVisible;
+    m_pageFormManager = manager;
     //Init (order is important)
     setPageInternal(page);
     initMainButtons();
@@ -68,7 +74,7 @@ public class OutlinePreviewForm extends AbstractForm {
 
   @Override
   protected String getConfiguredDisplayViewId() {
-    return VIEW_ID_PAGE_DETAIL;
+    return VIEW_ID_CENTER;
   }
 
   public PageTableField getPageTableField() {
@@ -83,49 +89,27 @@ public class OutlinePreviewForm extends AbstractForm {
     return getFieldByClass(PageTableGroupBox.class);
   }
 
+  @Override
   public final IPage getPage() {
     return m_page;
   }
 
   private void setPageInternal(IPage page) throws ProcessingException {
-    if (m_page == page) {
-      return;
-    }
-    if (m_page != null) {
-//FIXME CGU destroy on dispose?
-      getPageDetailFormField().setInnerForm(null);
-      getPageTableField().setTable(null, true);
-      m_outline.disposeTree();
-      m_outline = null;
-      m_page = null;
-    }
-
     m_page = page;
-    if (m_page != null) {
-      m_page = (IPage) m_page.getTree().resolveVirtualNode(m_page);
-      m_parentPage = m_page.getParentPage();
+    m_page = (IPage) m_page.getTree().resolveVirtualNode(m_page);
 
-      m_outline = new PreviewOutline();
-      m_outline.setRootNode(m_page);
-      m_outline.selectNode(m_page);
-
-      if (m_page.getDetailForm() == null) {
-        AutoTableForm autoDetailForm = createAutoDetailForm();
-        if (autoDetailForm != null) {
-          m_page.setDetailForm(autoDetailForm);
-          autoDetailForm.start();
-        }
+    if (m_detailFormVisible && m_page.getDetailForm() == null) {
+      AutoTableForm autoDetailForm = createAutoDetailForm();
+      if (autoDetailForm != null) {
+        m_page.setDetailForm(autoDetailForm);
+        autoDetailForm.start();
       }
-      if (!m_page.isTableVisible()) {
-        //Make sure detail table is set on outline even if it is supposed to be invisible
-        m_page.setTableVisible(true);
-        m_outline.setDetailTable(MobileDesktopUtility.getPageTable(m_page));
-      }
-
     }
+
+    setTitle(page.getCellForUpdate().getText());
   }
 
-  private void setPageTable(ITable table) {
+  protected void setPageTable(ITable table) throws ProcessingException {
     if (m_pageTableListener == null) {
       m_pageTableListener = new P_PageTableListener();
     }
@@ -134,17 +118,18 @@ public class OutlinePreviewForm extends AbstractForm {
       getPageTableField().getTable().removeTableListener(m_pageTableListener);
     }
 
-    getPageTableField().setTable(table, true);
-    getPageTableField().setVisible(table != null && table.getRowCount() > 0);
-
     if (table != null) {
       table.addTableListener(m_pageTableListener);
     }
+
+    getPageTableField().setTable(table, true);
+    //FIXME CGU when to hide the table?
+    getPageTableField().setVisible(table != null);
   }
 
   private AutoTableForm createAutoDetailForm() throws ProcessingException {
     ITable table = null;
-    IPage parentPage = m_parentPage;
+    IPage parentPage = m_page.getParentPage();
     if (parentPage instanceof IPageWithTable) {
       table = ((IPageWithTable) parentPage).getTable();
     }
@@ -155,14 +140,14 @@ public class OutlinePreviewForm extends AbstractForm {
     return null;
   }
 
-  private void initMainButtons() {
+  private void initMainButtons() throws ProcessingException {
     List<IButton> buttonList = new LinkedList<IButton>();
     buttonList.addAll(fetchNodeActionsAndConvertToButtons());
 
-    if (m_outline.getDetailForm() != null) {
+    if (m_page.getDetailForm() != null) {
       //Buttons of the auto table form are the same as the node actions, so only the buttons of regular detail forms are added
-      if (!(m_outline.getDetailForm() instanceof AutoTableForm) || m_page instanceof OutlinePreviewLeafPage) {
-        IButton[] detailFormCustomButtons = m_outline.getDetailForm().getRootGroupBox().getCustomProcessButtons();
+      if (!(m_page.getDetailForm() instanceof AutoTableForm) || m_page instanceof AutoLeafPageWithNodes) {
+        IButton[] detailFormCustomButtons = m_page.getDetailForm().getRootGroupBox().getCustomProcessButtons();
         buttonList.addAll(Arrays.asList(detailFormCustomButtons));
       }
     }
@@ -171,16 +156,18 @@ public class OutlinePreviewForm extends AbstractForm {
   }
 
   private void initFields() throws ProcessingException {
-    getPageDetailFormField().setInnerForm(m_outline.getDetailForm());
-    getPageDetailFormField().setVisible(m_outline.getDetailForm() != null);
-    getPageTableGroupBox().setBorderVisible(m_outline.getDetailForm() != null);
-    IPage page = m_page;
+    if (m_detailFormVisible) {
+      getPageDetailFormField().setInnerForm(m_page.getDetailForm());
+    }
+    getPageDetailFormField().setVisible(getPageDetailFormField().getInnerForm() != null);
+    getPageTableGroupBox().setBorderVisible(getPageDetailFormField().getInnerForm() != null);
 
+    IPage page = m_page;
     ITable pageTable = MobileDesktopUtility.getPageTable(page);
 
     //Make sure the preview form does only contain folder pages.
-    if (m_page instanceof IPageWithTable) {
-      pageTable = new PlaceholderTable();
+    if (!m_tablePagesAllowed && m_page instanceof IPageWithTable) {
+      pageTable = new PlaceholderTable(m_page);
       pageTable.initTable();
       pageTable.addRowByArray(new Object[]{"Details"});//FIXME CGU
     }
@@ -188,9 +175,11 @@ public class OutlinePreviewForm extends AbstractForm {
     setPageTable(pageTable);
   }
 
-  private List<IButton> fetchNodeActionsAndConvertToButtons() {
+  private List<IButton> fetchNodeActionsAndConvertToButtons() throws ProcessingException {
 
-    IMenu[] nodeActions = m_outline.getUIFacade().fireNodePopupFromUI();
+//  IMenu[] nodeActions = m_page.getTree().getUIFacade().fireNodePopupFromUI();
+    ITreeNode[] nodes = m_page.getTree().resolveVirtualNodes(m_page.getTree().getSelectedNodes());
+    IMenu[] nodeActions = m_page.getTree().fetchMenusForNodesInternal(nodes);
     List<IMenu> nodeActionList = new LinkedList<IMenu>();
 
     //Remove separators
@@ -201,6 +190,22 @@ public class OutlinePreviewForm extends AbstractForm {
     }
 
     return ActionButtonBarUtility.convertActionsToMainButtons(nodeActionList.toArray(new IMenu[nodeActionList.size()]));
+  }
+
+  public static boolean isDrillDownPage(IPage page) {
+    return page instanceof IPageWithTable && page.getParentNode() instanceof IPageWithNodes;
+  }
+
+  public void formAddedNotify() throws ProcessingException {
+    if (getPageTableField().getTable() != null) {
+      ITableRow selectedRow = getPageTableField().getTable().getSelectedRow();
+      if (!isKeepSelection() || isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
+        getPageTableField().getTable().selectRow(null);
+      }
+    }
+
+    //Make sure the page which belongs to the form is active when the form is shown
+    m_page.getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(m_page);
   }
 
   @Order(10.0f)
@@ -266,6 +271,7 @@ public class OutlinePreviewForm extends AbstractForm {
     }
   }
 
+  @Override
   public void start() throws ProcessingException {
     startInternal(new FormHandler());
   }
@@ -283,66 +289,64 @@ public class OutlinePreviewForm extends AbstractForm {
 
   }
 
-  private class P_PageTableListener extends TableAdapter {
-    @Override
-    public void tableChanged(TableEvent e) {
-      switch (e.getType()) {
-        case TableEvent.TYPE_ROW_CLICK: {
-          handleRowClick(e);
-          break;
-        }
-      }
-    }
-
-    private void handleRowClick(TableEvent event) {
-      mediateTableRowClick(event, m_page);
-    }
-  }
-
-  private void mediateTableRowClick(TableEvent e, IPage page) {
-    if (e.isConsumed()) {
+  protected void handleTableRowSelected(ITableRow tableRow) throws ProcessingException {
+    LOG.debug("Table row selected: " + tableRow);
+    if (tableRow == null) {
       return;
     }
 
-    ITableRow tableRow = e.getFirstRow();
-    ITreeNode node = null;
-    if (page instanceof IPageWithNodes) {
-      node = ((IPageWithNodes) page).getTreeNodeFor(tableRow);
+    IPage rowPage = null;
+    if (tableRow.getTable() instanceof PlaceholderTable) {
+      rowPage = ((PlaceholderTable) tableRow.getTable()).getActualPage();
     }
-    else if (page instanceof IPageWithTable<?>) {
-      node = ((IPageWithTable<?>) page).getTreeNodeFor(tableRow);
+    else {
+      rowPage = MobileDesktopUtility.getPageFor(m_page, tableRow);
     }
-
-    if (node == null) {
-      OutlinePreviewLeafPage autoPage = new OutlinePreviewLeafPage(tableRow);
-      page.getTree().addChildNode(page, autoPage);
-      node = autoPage;
+    if (rowPage == null) {
+      AutoLeafPageWithNodes autoPage = new AutoLeafPageWithNodes(tableRow);
+      m_page.getTree().addChildNode(m_page, autoPage);
+      rowPage = autoPage;
     }
 
-    e.consume();
-    IOutline outline = getDesktop().getOutline();
-    if (outline != null) {
-      if (isNodePageSwitchEnabled() && node instanceof IPageWithNodes) {
-        //If it's a page with nodes show it on the left side (tablet)
-        node = node.getParentNode();
-      }
-      node.setTreeInternal(outline, true);
-      outline.getUIFacade().setNodeSelectedAndExpandedFromUI(node);
+    if (isNodePageSwitchEnabled() && (rowPage instanceof IPageWithNodes)) {
+      //If it's a page with nodes show it on the left side (tablet)
+      rowPage = rowPage.getParentPage();
     }
+
+    m_pageFormManager.pageSelectedNotify(this, rowPage);
   }
 
   /**
    * If enabled, clicking on a page with nodes will lead to a selection of the parent node.
    */
+  @Override
   public boolean isNodePageSwitchEnabled() {
     return m_nodePageSwitchEnabled;
   }
 
+  @Override
   public void setNodePageSwitchEnabled(boolean nodePageSwitchEnabled) {
     m_nodePageSwitchEnabled = nodePageSwitchEnabled;
   }
 
+  public void setKeepSelection(boolean keepSelection) {
+    m_keepSelection = keepSelection;
+  }
+
+  public boolean isKeepSelection() {
+    return m_keepSelection;
+  }
+
   private class PlaceholderTable extends AbstractTable {
+    private IPage m_actualPage;
+
+    public PlaceholderTable(IPage page) {
+      m_actualPage = page;
+    }
+
+    public IPage getActualPage() {
+      return m_actualPage;
+    }
 
     @Override
     protected boolean getConfiguredSortEnabled() {
@@ -372,5 +376,32 @@ public class OutlinePreviewForm extends AbstractForm {
       }
 
     }
+  }
+
+  private class P_PageTableListener extends TableAdapter {
+    @Override
+    public void tableChanged(TableEvent e) {
+      switch (e.getType()) {
+        case TableEvent.TYPE_ROWS_SELECTED: {
+          handleTableRowSelected(e);
+          break;
+        }
+      }
+    }
+
+    private void handleTableRowSelected(TableEvent event) {
+      if (event.isConsumed()) {
+        return;
+      }
+
+      ITableRow tableRow = event.getFirstRow();
+      try {
+        PageForm.this.handleTableRowSelected(tableRow);
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+    }
+
   }
 }

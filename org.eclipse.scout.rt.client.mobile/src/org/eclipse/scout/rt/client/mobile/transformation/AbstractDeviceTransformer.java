@@ -23,8 +23,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.MobileOutlineTableForm;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.OutlineFormsManager;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -33,8 +32,6 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -58,7 +55,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
   private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
   private OutlineChooserForm m_outlineChooserForm;
   private IDesktop m_desktop;
-  private OutlineFormsManager m_outlineFormsManager;
+  private PageFormManager m_outlineFormsManager;
 
   public AbstractDeviceTransformer(IDesktop desktop) {
     if (desktop == null) {
@@ -76,10 +73,8 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
     this(null);
   }
 
-  protected OutlineFormsManager createOutlineFormsManager(IDesktop desktop) {
-    OutlineFormsManager manager = new OutlineFormsManager(desktop);
-    manager.setPreviewRowSelectionKeepingEnabled(false);
-    manager.setNodePageSwitchEnabled(false);
+  protected PageFormManager createOutlineFormsManager(IDesktop desktop) {
+    PageFormManager manager = new PageFormManager(desktop, IForm.VIEW_ID_CENTER);
     manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
 
     return manager;
@@ -168,23 +163,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public boolean acceptForm(IForm form) {
-    if (isFormAddingForbidden(form)) {
-      return false;
-    }
-
-    return true;
-  }
-
-  protected boolean isFormAddingForbidden(IForm form) {
-    if (form instanceof IOutlineTreeForm) {
-      return true;
-    }
-
-    if (form instanceof IOutlineTableForm && !((form instanceof MobileOutlineTableForm))) {
-      return true;
-    }
-
-    return false;
+    return m_outlineFormsManager.acceptForm(form);
   }
 
   private void makeSurePageDetailTableIsVisible() {
@@ -312,11 +291,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList) {
-    //FIXME CGU still necessary?
-    if (MobileDesktopUtility.isPageDeatilForm(form)) {
-      //Delegate to outline forms manager to centralize the logic concerning detail forms
-      m_outlineFormsManager.adaptPageDetailFormHeaderActions(form, menuList);
-    }
   }
 
   protected boolean containsCloseAction(List<IMenu> menuList) {

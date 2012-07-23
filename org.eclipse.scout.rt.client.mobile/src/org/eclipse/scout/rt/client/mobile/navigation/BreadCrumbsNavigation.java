@@ -22,14 +22,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -44,9 +39,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
   private Stack<IBreadCrumb> m_breadCrumbs;
   private P_DesktopListener m_desktopListener;
   private List<String> m_navigationFormsDisplayViewIds;
-  private P_OutlineListener m_outlineListener;
   private P_FormListener m_formListener;
-  private IOutline m_activeOutline;
   private IBreadCrumb m_currentBreadCrumb;
   private IDesktop m_desktop;
 
@@ -200,12 +193,12 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     getBreadCrumbs().clear();
   }
 
-  private void removeExistingBreadCrumb(IForm form, IPage page) {
+  private void removeExistingBreadCrumb(IForm form) {
     if (m_currentBreadCrumb == null) {
       return;
     }
 
-    if (m_currentBreadCrumb.belongsTo(form, page)) {
+    if (m_currentBreadCrumb.belongsTo(form)) {
       LOG.debug("Removing existing bread crumb: " + m_currentBreadCrumb);
 
       if (getBreadCrumbs().size() > 0) {
@@ -221,7 +214,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     else {
       IBreadCrumb[] breadCrumbs = getBreadCrumbs().toArray(new IBreadCrumb[getBreadCrumbs().size()]);
       for (IBreadCrumb breadCrumb : breadCrumbs) {
-        if (breadCrumb.belongsTo(form, page)) {
+        if (breadCrumb.belongsTo(form)) {
           LOG.debug("Removing existing bread crumb: " + breadCrumb);
 
           getBreadCrumbs().remove(breadCrumb);
@@ -234,10 +227,10 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     }
   }
 
-  private void addNewBreadCrumb(IForm form, IPage page) {
+  private void addNewBreadCrumb(IForm form) {
     if (m_currentBreadCrumb != null) {
       //Ignore attempts to insert the same bread crumb again
-      if (m_currentBreadCrumb.belongsTo(form, page)) {
+      if (m_currentBreadCrumb.belongsTo(form)) {
         return;
       }
 
@@ -246,10 +239,10 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     }
 
     if (form instanceof OutlineChooserForm) {
-      m_currentBreadCrumb = new OutlineChooserBreadCrumb(this, form, page);
+      m_currentBreadCrumb = new OutlineChooserBreadCrumb(this, form);
     }
     else {
-      m_currentBreadCrumb = new BreadCrumb(this, form, page);
+      m_currentBreadCrumb = new BreadCrumb(this, form);
     }
     LOG.debug("Current bread crumbs way: " + toString());
     fireBreadCrumbsChanged();
@@ -313,30 +306,9 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
           destroy();
           break;
         }
-        case DesktopEvent.TYPE_OUTLINE_CHANGED: {
-          handleOutlineChanged(e);
-        }
         default:
           break;
       }
-    }
-
-    private void handleOutlineChanged(DesktopEvent e) {
-      IOutline outline = e.getOutline();
-
-      if (m_activeOutline != null) {
-        m_activeOutline.removeTreeListener(m_outlineListener);
-      }
-
-      if (outline != null) {
-        if (m_outlineListener == null) {
-          m_outlineListener = new P_OutlineListener();
-        }
-
-        outline.addTreeListener(m_outlineListener);
-      }
-
-      m_activeOutline = outline;
     }
 
     private void handleFormAdded(DesktopEvent e) {
@@ -346,29 +318,10 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
       }
 
       if (m_currentBreadCrumb == null) {
-        addNewBreadCrumb(form, null);
+        addNewBreadCrumb(form);
       }
       else if (m_currentBreadCrumb.getForm() != form) {
-        if (!(form instanceof IOutlineTableForm)) {
-          addNewBreadCrumb(form, null);
-        }
-        else {
-          IPage page = null;
-          if (getDesktop().getOutline() != null) {
-            page = getDesktop().getOutline().getActivePage();
-          }
-          if (m_currentBreadCrumb.getForm() instanceof IOutlineTableForm) {
-            //If the current form already is the outline table form then only update the current bread crumb with the new page
-            m_currentBreadCrumb = new BreadCrumb(BreadCrumbsNavigation.this, form, page);
-
-            LOG.debug("Updated current bread crumb: " + m_currentBreadCrumb);
-            LOG.debug("Current bread crumbs way: " + BreadCrumbsNavigation.this.toString());
-
-          }
-          else {
-            addNewBreadCrumb(form, page);
-          }
-        }
+        addNewBreadCrumb(form);
       }
 
       attachFormListener(form);
@@ -382,7 +335,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
       IForm form = e.getForm();
       if (MobileDesktopUtility.isToolForm(form)) {
         // Stepping back must never open a tool form -> Remove from bread crumbs
-        removeExistingBreadCrumb(form, null);
+        removeExistingBreadCrumb(form);
       }
     }
 
@@ -396,47 +349,6 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
 
   }
 
-  private class P_OutlineListener extends TreeAdapter {
-
-    @Override
-    public void treeChanged(TreeEvent e) {
-      switch (e.getType()) {
-        case TreeEvent.TYPE_NODES_SELECTED: {
-          handleNodesSelected(e);
-          break;
-        }
-      }
-    }
-
-    private void handleNodesSelected(TreeEvent event) {
-      IPage page = getDesktop().getOutline().getActivePage();
-      if (page == null) {
-        return;
-      }
-
-      if (m_currentBreadCrumb == null) {
-        addNewBreadCrumb(getDesktop().getOutlineTableForm(), page);
-      }
-      else if (m_currentBreadCrumb.getPage() != null) {
-        addNewBreadCrumb(getDesktop().getOutlineTableForm(), page);
-      }
-      else {
-        IOutlineTableForm outlineTableForm = getDesktop().getOutlineTableForm();
-        if (m_currentBreadCrumb.getForm() == outlineTableForm) {
-          //If the current form already is the outline table form then only update the current bread crumb if a page has been activated.
-          m_currentBreadCrumb = new BreadCrumb(BreadCrumbsNavigation.this, outlineTableForm, page);
-
-          LOG.debug("Updated current bread crumb: " + m_currentBreadCrumb);
-          LOG.debug("Current bread crumbs way: " + BreadCrumbsNavigation.this.toString());
-        }
-        else {
-          addNewBreadCrumb(getDesktop().getOutlineTableForm(), page);
-        }
-      }
-    }
-
-  }
-
   /**
    * Makes sure closed forms get removed from the bread crumbs.
    */
@@ -446,7 +358,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     public void formChanged(FormEvent e) throws ProcessingException {
       if (FormEvent.TYPE_CLOSED == e.getType()) {
         IForm form = e.getForm();
-        removeExistingBreadCrumb(form, null);
+        removeExistingBreadCrumb(form);
         detachFormListener(form);
       }
     }

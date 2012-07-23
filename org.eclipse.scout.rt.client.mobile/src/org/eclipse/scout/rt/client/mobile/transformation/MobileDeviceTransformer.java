@@ -61,18 +61,6 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     return true;
   }
 
-  @Override
-  protected boolean isFormAddingForbidden(IForm form) {
-    if (super.isFormAddingForbidden(form)) {
-      return true;
-    }
-
-    //Don't allow detail forms because they would automatically replace the outline table and therefore the navigation
-    //Detail forms are handled by the MobileOutlineTableMediator
-    IForm pageDetailForm = getDesktop().getPageDetailForm();
-    return form == pageDetailForm;
-  }
-
   /**
    * Adds a back button if there is no other button on the left side which is able to close the form.
    */

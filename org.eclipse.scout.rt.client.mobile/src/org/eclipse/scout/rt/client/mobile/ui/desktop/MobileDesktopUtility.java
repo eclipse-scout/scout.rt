@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
 import java.awt.Rectangle;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -76,17 +75,25 @@ public class MobileDesktopUtility {
     return null;
   }
 
-  public static void openToolForm(IForm form) throws ProcessingException {
+  public static void openToolForm(IForm form) {
     IToolButton toolButton = getToolButtonFor(form);
     if (toolButton != null) {
       toolButton.setSelected(true);
     }
+    //Double check to make sure it really will be added
+    if (!getDesktop().isShowing(form)) {
+      getDesktop().addForm(form);
+    }
   }
 
-  public static void closeToolForm(IForm form) throws ProcessingException {
+  public static void closeToolForm(IForm form) {
     IToolButton toolButton = getToolButtonFor(form);
     if (toolButton != null) {
       toolButton.setSelected(false);
+    }
+    //Double check to make sure it really will be removed
+    if (getDesktop().isShowing(form)) {
+      getDesktop().removeForm(form);
     }
   }
 
@@ -130,12 +137,28 @@ public class MobileDesktopUtility {
     }
   }
 
+  public static void removeFormsFromDesktop(Class<? extends IForm> formClass, String displayViewId, IForm excludedForm) {
+    if (displayViewId == null) {
+      return;
+    }
+
+    IForm[] viewStack = getDesktop().getViewStack();
+    for (IForm form : viewStack) {
+      if (form != excludedForm && formClass.isInstance(form) && displayViewId.equals(form.getDisplayViewId())) {
+        getDesktop().removeForm(form);
+      }
+    }
+  }
+
   public static void addFormToDesktop(IForm form) {
     if (form instanceof IOutlineTableForm) {
       //Make sure the outline table form is linked with the desktop
       getDesktop().setOutlineTableForm((IOutlineTableForm) form);
 
       getDesktop().setOutlineTableFormVisible(true);
+    }
+    else if (isToolForm(form)) {
+      openToolForm(form);
     }
     else {
       getDesktop().addForm(form);
@@ -173,18 +196,6 @@ public class MobileDesktopUtility {
     ClientUIPreferences.getInstance(ClientJob.getCurrentSession()).setFormBounds(form, formBounds);
   }
 
-  public static boolean isPageDeatilForm(IForm form) {
-    return (form == getActivePageDetailForm());
-  }
-
-  public static IForm getActivePageDetailForm() {
-    if (getDesktop().getOutline() == null) {
-      return null;
-    }
-
-    return getDesktop().getOutline().getDetailForm();
-  }
-
   public static ITable getPageTable(IPage page) {
     if (page instanceof IPageWithTable) {
       IPageWithTable tablePage = (IPageWithTable) page;
@@ -210,16 +221,4 @@ public class MobileDesktopUtility {
     return (IPage) node;
   }
 
-  /**
-   * Schedules a job to clear the table selection
-   */
-  public static void clearTableSelection(final ITable table) {
-    ClientSyncJob job = new ClientSyncJob("Clearing selection", ClientJob.getCurrentSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        table.selectRow(null);
-      }
-    };
-    job.schedule();
-  }
 }

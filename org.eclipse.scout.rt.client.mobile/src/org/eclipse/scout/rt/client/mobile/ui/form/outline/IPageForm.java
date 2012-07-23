@@ -8,19 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.navigation;
+package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-/**
- * @since 3.9.0
- */
-public interface IBreadCrumb {
+public interface IPageForm extends IForm {
 
-  void activate() throws ProcessingException;
+  IPage getPage();
 
-  IForm getForm();
+  void start() throws ProcessingException;
 
-  boolean belongsTo(IForm form);
+  void setNodePageSwitchEnabled(boolean nodePageSwitchEnabled);
+
+  boolean isNodePageSwitchEnabled();
 }

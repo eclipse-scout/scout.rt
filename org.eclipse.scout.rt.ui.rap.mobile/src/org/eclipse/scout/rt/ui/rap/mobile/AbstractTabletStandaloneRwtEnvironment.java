@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.ui.rap.mobile;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.IMainPageForm;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
@@ -76,7 +76,7 @@ public abstract class AbstractTabletStandaloneRwtEnvironment extends AbstractSta
   @Override
   public IRwtScoutFormHeader createFormHeader(Composite parent, IForm scoutForm) {
     IRwtScoutFormHeader uiFormHeader = null;
-    if (scoutForm instanceof IOutlineTableForm || scoutForm instanceof OutlineChooserForm) {
+    if (scoutForm instanceof IMainPageForm || scoutForm instanceof OutlineChooserForm) {
       uiFormHeader = new RwtScoutMobileOutlineFormHeader();
     }
     else {
@@ -90,7 +90,7 @@ public abstract class AbstractTabletStandaloneRwtEnvironment extends AbstractSta
 
   @Override
   public IRwtScoutFormFooter createFormFooter(Composite parent, IForm scoutForm) {
-    if (!(scoutForm instanceof IOutlineTableForm)) {
+    if (!(scoutForm instanceof IMainPageForm)) {
       return null;
     }
     RwtScoutMobileFormFooter mobileFormFooter = new RwtScoutMobileFormFooter();

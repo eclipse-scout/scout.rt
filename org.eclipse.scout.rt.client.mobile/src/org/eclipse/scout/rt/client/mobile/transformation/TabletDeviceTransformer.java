@@ -12,7 +12,8 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.OutlineFormsManager;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
 import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
@@ -40,10 +41,8 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   @Override
-  protected OutlineFormsManager createOutlineFormsManager(IDesktop desktop) {
-    OutlineFormsManager manager = new OutlineFormsManager(desktop);
-    manager.setPreviewRowSelectionKeepingEnabled(true);
-    manager.setNodePageSwitchEnabled(true);
+  protected PageFormManager createOutlineFormsManager(IDesktop desktop) {
+    PageFormManager manager = new PageFormManager(desktop, IForm.VIEW_ID_CENTER, IForm.VIEW_ID_E);
     manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
 
     return manager;
@@ -67,6 +66,10 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
         form.setDisplayViewId(IForm.VIEW_ID_CENTER);
       }
       else {
+        if (form instanceof PageForm && !IForm.VIEW_ID_E.equals(form.getDisplayViewId())) {
+          return;
+        }
+
         MobileDesktopUtility.closeAllToolForms();
 
         form.setDisplayViewId(IForm.VIEW_ID_E);

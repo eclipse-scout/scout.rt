@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
@@ -22,8 +21,8 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  */
 public class OutlineChooserBreadCrumb extends BreadCrumb {
 
-  public OutlineChooserBreadCrumb(IBreadCrumbsNavigation breadCrumbsNavigation, IForm form, IPage page) {
-    super(breadCrumbsNavigation, form, page);
+  public OutlineChooserBreadCrumb(IBreadCrumbsNavigation breadCrumbsNavigation, IForm form) {
+    super(breadCrumbsNavigation, form);
   }
 
   @Override
