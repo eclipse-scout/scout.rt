@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -11,6 +12,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.AutoTableForm;
@@ -45,18 +48,17 @@ public class PageForm extends AbstractForm implements IPageForm {
   private List<IButton> m_mainboxButtons;
   private IPage m_page;
   private P_PageTableListener m_pageTableListener;
-  private boolean m_nodePageSwitchEnabled;
-  private boolean m_tablePagesAllowed;
-  private boolean m_detailFormVisible;
-  private boolean m_keepSelection;
-
+  private PageFormConfig m_pageFormConfig;
   private PageFormManager m_pageFormManager;
 
-  public PageForm(IPage page, PageFormManager manager, boolean tablePagesAllowed, boolean detailFormVisible) throws ProcessingException {
+  public PageForm(IPage page, PageFormManager manager, PageFormConfig pageFormConfig) throws ProcessingException {
     super(false);
-    m_tablePagesAllowed = tablePagesAllowed;
-    m_detailFormVisible = detailFormVisible;
     m_pageFormManager = manager;
+    m_pageFormConfig = pageFormConfig;
+    if (m_pageFormConfig == null) {
+      m_pageFormConfig = new PageFormConfig();
+    }
+
     //Init (order is important)
     setPageInternal(page);
     initMainButtons();
@@ -100,7 +102,7 @@ public class PageForm extends AbstractForm implements IPageForm {
     m_page = page;
     m_page = (IPage) m_page.getTree().resolveVirtualNode(m_page);
 
-    if (m_detailFormVisible && m_page.getDetailForm() == null) {
+    if (m_pageFormConfig.isDetailFormVisible() && m_page.getDetailForm() == null) {
       AutoTableForm autoDetailForm = createAutoDetailForm();
       if (autoDetailForm != null) {
         m_page.setDetailForm(autoDetailForm);
@@ -112,18 +114,6 @@ public class PageForm extends AbstractForm implements IPageForm {
   }
 
   protected void setPageTable(ITable table) throws ProcessingException {
-    if (m_pageTableListener == null) {
-      m_pageTableListener = new P_PageTableListener();
-    }
-
-    if (getPageTableField().getTable() != null) {
-      getPageTableField().getTable().removeTableListener(m_pageTableListener);
-    }
-
-    if (table != null) {
-      table.addTableListener(m_pageTableListener);
-    }
-
     getPageTableField().setTable(table, true);
     //FIXME CGU when to hide the table?
     getPageTableField().setVisible(table != null);
@@ -158,7 +148,7 @@ public class PageForm extends AbstractForm implements IPageForm {
   }
 
   private void initFields() throws ProcessingException {
-    if (m_detailFormVisible) {
+    if (m_pageFormConfig.isDetailFormVisible()) {
       getPageDetailFormField().setInnerForm(m_page.getDetailForm());
     }
     getPageDetailFormField().setVisible(getPageDetailFormField().getInnerForm() != null);
@@ -168,13 +158,14 @@ public class PageForm extends AbstractForm implements IPageForm {
     ITable pageTable = MobileDesktopUtility.getPageTable(page);
 
     //Make sure the preview form does only contain folder pages.
-    if (!m_tablePagesAllowed && m_page instanceof IPageWithTable) {
+    if (!m_pageFormConfig.isTablePageAllowed() && m_page instanceof IPageWithTable) {
       pageTable = new PlaceholderTable(m_page);
       pageTable.initTable();
       pageTable.addRowByArray(new Object[]{"Details"});//FIXME CGU
     }
 
     setPageTable(pageTable);
+    getPageTableField().setTableStatusVisible(m_pageFormConfig.isTableStatusVisible());
   }
 
   private List<IButton> fetchNodeActionsAndConvertToButtons() throws ProcessingException {
@@ -199,15 +190,72 @@ public class PageForm extends AbstractForm implements IPageForm {
   }
 
   public void formAddedNotify() throws ProcessingException {
-    if (getPageTableField().getTable() != null) {
-      ITableRow selectedRow = getPageTableField().getTable().getSelectedRow();
-      if (!isKeepSelection() || isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
-        getPageTableField().getTable().selectRow(null);
-      }
-    }
+    clearTableSelectionIfNecessary();
 
     //Make sure the page which belongs to the form is active when the form is shown
     m_page.getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(m_page);
+
+    addTableListener();
+    processSelectedTableRow();
+  }
+
+  public void formRemovedNotify() throws ProcessingException {
+    removeTableListener();
+  }
+
+  private void addTableListener() {
+    if (m_pageTableListener != null) {
+      return;
+    }
+    m_pageTableListener = new P_PageTableListener();
+
+    ITable table = getPageTableField().getTable();
+    if (table != null) {
+      table.addTableListener(m_pageTableListener);
+    }
+  }
+
+  private void removeTableListener() {
+    if (m_pageTableListener == null) {
+      return;
+    }
+    ITable table = getPageTableField().getTable();
+    if (table != null) {
+      table.removeTableListener(m_pageTableListener);
+    }
+    m_pageTableListener = null;
+  }
+
+  private void clearTableSelectionIfNecessary() {
+    if (getPageTableField().getTable() == null) {
+      return;
+    }
+
+    ITableRow selectedRow = getPageTableField().getTable().getSelectedRow();
+    if (!m_pageFormConfig.isKeepSelection() || isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
+      getPageTableField().getTable().selectRow(null);
+    }
+  }
+
+  private void processSelectedTableRow() throws ProcessingException {
+    if (!m_pageFormConfig.isKeepSelection()) {
+      return;
+    }
+
+    ITable pageTable = MobileDesktopUtility.getPageTable(getPage());
+    if (pageTable == null) {
+      return;
+    }
+
+    ITableRow selectedRow = pageTable.getSelectedRow();
+    if (!isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
+      if (selectedRow != null) {
+        handleTableRowSelected(pageTable, selectedRow);
+      }
+      else {
+        selectPageTableRowIfNecessary(pageTable);
+      }
+    }
   }
 
   @Order(10.0f)
@@ -267,7 +315,7 @@ public class PageForm extends AbstractForm implements IPageForm {
         protected boolean getConfiguredGridUseUiHeight() {
           //If there is a detail form make the table as height as necessary to avoid a second scrollbar.
           //If there is no detail form make the table itself scrollable.
-          return m_detailFormVisible;
+          return m_pageFormConfig.isDetailFormVisible() && m_page.getDetailForm() != null;
         }
 
         @Override
@@ -285,7 +333,7 @@ public class PageForm extends AbstractForm implements IPageForm {
   }
 
   protected void execUpdatePageTableStatus() {
-    if (!isTableStatusVisible()) {
+    if (!m_pageFormConfig.isTableStatusVisible()) {
       return;
     }
     if (getPage() instanceof IPageWithTable<?>) {
@@ -336,26 +384,34 @@ public class PageForm extends AbstractForm implements IPageForm {
   public class FormHandler extends AbstractFormHandler {
   }
 
-  protected void handleTableRowSelected(ITableRow tableRow) throws ProcessingException {
+  protected void handleTableRowSelected(ITable table, ITableRow tableRow) throws ProcessingException {
     LOG.debug("Table row selected: " + tableRow);
     if (tableRow == null) {
+      //Make sure there always is a selected row. if NodePageSwitch is enabled the same page and therefor the is on different pageForms
+      if (m_pageFormConfig.isKeepSelection()) {
+        selectPageTableRowIfNecessary(table);
+      }
       return;
     }
 
     IPage rowPage = null;
-    if (tableRow.getTable() instanceof PlaceholderTable) {
-      rowPage = ((PlaceholderTable) tableRow.getTable()).getActualPage();
+    if (table instanceof PlaceholderTable) {
+      rowPage = ((PlaceholderTable) table).getActualPage();
     }
     else {
       rowPage = MobileDesktopUtility.getPageFor(m_page, tableRow);
     }
     if (rowPage == null) {
+      //Create auto leaf page including an outline and activate it.
+      //Adding to a "real" outline is not possible because the page to row maps in AbstractPageWithTable resp. AbstractPageWithNodes can only be modified by the page itself.
       AutoLeafPageWithNodes autoPage = new AutoLeafPageWithNodes(tableRow);
-      m_page.getTree().addChildNode(m_page, autoPage);
+      AutoOutline autoOutline = new AutoOutline();
+      autoOutline.setRootNode(autoPage);
+      autoOutline.selectNode(autoPage);
       rowPage = autoPage;
     }
 
-    if (isNodePageSwitchEnabled() && (rowPage instanceof IPageWithNodes)) {
+    if (m_pageFormConfig.isNodePageSwitchEnabled() && (rowPage instanceof IPageWithNodes)) {
       //If it's a page with nodes show it on the left side (tablet)
       rowPage = rowPage.getParentPage();
     }
@@ -363,35 +419,27 @@ public class PageForm extends AbstractForm implements IPageForm {
     m_pageFormManager.pageSelectedNotify(this, rowPage);
   }
 
-  /**
-   * If enabled, clicking on a page with nodes will lead to a selection of the parent node.
-   */
-  @Override
-  public boolean isNodePageSwitchEnabled() {
-    return m_nodePageSwitchEnabled;
-  }
+  protected void selectPageTableRowIfNecessary(final ITable pageDetailTable) throws ProcessingException {
+    if (!m_pageFormConfig.isKeepSelection() || pageDetailTable == null || pageDetailTable.getRowCount() == 0) {
+      return;
+    }
 
-  @Override
-  public void setNodePageSwitchEnabled(boolean nodePageSwitchEnabled) {
-    m_nodePageSwitchEnabled = nodePageSwitchEnabled;
-  }
+    IPage activePage = getDesktop().getOutline().getActivePage();
+    IPage pageToSelect = MobileDesktopUtility.getPageFor(activePage, pageDetailTable.getRow(0));
+    if (pageDetailTable.getSelectedRow() == null) {
+      if (!isDrillDownPage(pageToSelect)) {
+//        FIXME CGU There are some strange behaviours Without client sync job, why?
+        ClientSyncJob job = new ClientSyncJob("Auto selecting node", ClientJob.getCurrentSession()) {
+          @Override
+          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+//        FIXME CGU Does not really select the first row (MobileTable?)
+            pageDetailTable.selectFirstRow();
+          }
+        };
+        job.schedule();
+      }
+    }
 
-  public void setKeepSelection(boolean keepSelection) {
-    m_keepSelection = keepSelection;
-  }
-
-  public boolean isKeepSelection() {
-    return m_keepSelection;
-  }
-
-  @Override
-  public void setTableStatusVisible(boolean tableStatusVisible) {
-    getPageTableField().setTableStatusVisible(tableStatusVisible);
-  }
-
-  @Override
-  public boolean isTableStatusVisible() {
-    return getPageTableField().isTableStatusVisible();
   }
 
   private class PlaceholderTable extends AbstractTable {
@@ -453,7 +501,7 @@ public class PageForm extends AbstractForm implements IPageForm {
 
       ITableRow tableRow = event.getFirstRow();
       try {
-        PageForm.this.handleTableRowSelected(tableRow);
+        PageForm.this.handleTableRowSelected(event.getTable(), tableRow);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);

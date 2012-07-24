@@ -155,6 +155,10 @@ public class PageFormManager {
   }
 
   private String findPageFormSlot(IPage page) {
+    if (page instanceof AutoLeafPageWithNodes) {
+      return getMiddlePageSlotViewId();
+    }
+
     IPageForm parentPageForm = m_pageFormMap.get(page.getParentPage(), true);
     if (parentPageForm == null) {
       return getLeftPageSlotViewId();
@@ -196,23 +200,25 @@ public class PageFormManager {
   }
 
   private IMainPageForm createMainPageForm(IPage page) throws ProcessingException {
-    IMainPageForm pageForm = null;
+    PageFormConfig config = new PageFormConfig();
+    config.setTablePageAllowed(true);
+    config.setTableStatusVisible(isTableStatusVisible());
     if (hasOnlyOnePageSlot()) {
-      pageForm = new SingleMainPageForm(page, this);
+      config.setDetailFormVisible(true);
     }
     else {
-      pageForm = new MainPageForm(page, this);
+      config.setKeepSelection(true);
     }
-    pageForm.setNodePageSwitchEnabled(false);
-    pageForm.setTableStatusVisible(isTableStatusVisible());
-    return pageForm;
+
+    return new MainPageForm(page, this, config);
   }
 
   private IPageForm createPageForm(IPage page) throws ProcessingException {
-    PageForm pageForm = new PageForm(page, this, false, true);
-    pageForm.setNodePageSwitchEnabled(true);
+    PageFormConfig config = new PageFormConfig();
+    config.setNodePageSwitchEnabled(true);
+    config.setDetailFormVisible(true);
 
-    return pageForm;
+    return new PageForm(page, this, config);
   }
 
   private IDesktop getDesktop() {
@@ -224,8 +230,13 @@ public class PageFormManager {
       return;
     }
 
+    //If same page gets selected again, move it to the left.
     if (pageForm.getPage().equals(selectedPage)) {
       showPageInLeftForm(selectedPage);
+    }
+    //A AutoLeafPage is not attached to a real outline. Since it already has been activated just show it.
+    else if (selectedPage instanceof AutoLeafPageWithNodes) {
+      showPage(selectedPage);
     }
     else {
       selectAndExpandPage(selectedPage);
@@ -276,14 +287,24 @@ public class PageFormManager {
     showPage((IPage) selectedNode);
   }
 
-  private void handleTreeNodesDeleted(ITreeNode[] deletedNodes) {
+  private void handleTreeNodesDeleted(ITreeNode[] deletedNodes) throws ProcessingException {
     if (deletedNodes == null) {
       return;
     }
 
     for (ITreeNode node : deletedNodes) {
       if (node instanceof IPage) {
-        m_pageFormMap.remove((IPage) node);
+        IPage page = (IPage) node;
+        try {
+          IPageForm pageForm = m_pageFormMap.get(page);
+          if (pageForm != null) {
+            pageForm.doClose();
+            hidePage(page);
+          }
+        }
+        finally {
+          m_pageFormMap.remove(page);
+        }
       }
     }
   }
@@ -332,23 +353,32 @@ public class PageFormManager {
     pageForm.formAddedNotify();
   }
 
+  private void handlePageFormRemoved(PageForm pageForm) throws ProcessingException {
+    if (pageForm == null) {
+      return;
+    }
+
+    pageForm.formRemovedNotify();
+  }
+
   private class P_OutlineTreeListener extends TreeAdapter {
+
     @Override
     public void treeChanged(TreeEvent event) {
-      switch (event.getType()) {
-        case TreeEvent.TYPE_NODES_SELECTED: {
-          try {
+      try {
+        switch (event.getType()) {
+          case TreeEvent.TYPE_NODES_SELECTED: {
             handleTreeNodeSelected(event.getDeselectedNode(), event.getNewSelectedNode());
+            break;
           }
-          catch (ProcessingException e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          case TreeEvent.TYPE_NODES_DELETED: {
+            handleTreeNodesDeleted(event.getNodes());
+            break;
           }
-          break;
         }
-        case TreeEvent.TYPE_NODES_DELETED: {
-          handleTreeNodesDeleted(event.getNodes());
-          break;
-        }
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
     }
 
@@ -357,28 +387,39 @@ public class PageFormManager {
   private class P_DesktopListener implements DesktopListener {
 
     @Override
-    public void desktopChanged(DesktopEvent e) {
-      switch (e.getType()) {
-        case DesktopEvent.TYPE_FORM_ADDED: {
-          handleFormAdded(e);
-          break;
-        }
-        case DesktopEvent.TYPE_DESKTOP_CLOSED: {
-          destroy();
-          break;
-        }
-      }
-    }
-
-    private void handleFormAdded(DesktopEvent event) {
+    public void desktopChanged(DesktopEvent event) {
       try {
-        IForm form = event.getForm();
-        if (form instanceof PageForm) {
-          handlePageFormAdded((PageForm) form);
+        switch (event.getType()) {
+          case DesktopEvent.TYPE_FORM_ADDED: {
+            handleFormAdded(event);
+            break;
+          }
+          case DesktopEvent.TYPE_FORM_REMOVED: {
+            handleFormRemoved(event);
+            break;
+          }
+          case DesktopEvent.TYPE_DESKTOP_CLOSED: {
+            destroy();
+            break;
+          }
         }
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+    }
+
+    private void handleFormAdded(DesktopEvent event) throws ProcessingException {
+      IForm form = event.getForm();
+      if (form instanceof PageForm) {
+        handlePageFormAdded((PageForm) form);
+      }
+    }
+
+    private void handleFormRemoved(DesktopEvent event) throws ProcessingException {
+      IForm form = event.getForm();
+      if (form instanceof PageForm) {
+        handlePageFormRemoved((PageForm) form);
       }
     }
 

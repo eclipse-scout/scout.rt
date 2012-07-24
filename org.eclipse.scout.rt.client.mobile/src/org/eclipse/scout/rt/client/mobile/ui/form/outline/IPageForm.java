@@ -19,12 +19,4 @@ public interface IPageForm extends IForm {
   IPage getPage();
 
   void start() throws ProcessingException;
-
-  void setNodePageSwitchEnabled(boolean nodePageSwitchEnabled);
-
-  boolean isNodePageSwitchEnabled();
-
-  void setTableStatusVisible(boolean tableStatusVisible);
-
-  boolean isTableStatusVisible();
 }

@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 
-public class SingleMainPageForm extends PageForm implements IMainPageForm {
-
-  public SingleMainPageForm(IPage page, PageFormManager manager) throws ProcessingException {
-    super(page, manager, true, true);
+public class AutoOutline extends AbstractOutline {
+  @Override
+  protected boolean getConfiguredRootNodeVisible() {
+    return true;
   }
-
 }
