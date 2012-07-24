@@ -36,10 +36,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
 
 public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractStandaloneRwtEnvironment {
+  //TODO CGU move to look and feel decoration
   private static final int FORM_HEADER_HEIGHT = 43;
 
   public AbstractMobileStandaloneRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
@@ -79,8 +79,7 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
       uiFormHeader = new RwtScoutMobileOutlineFormHeader();
     }
     else {
-      RwtScoutMobileFormHeader mobileFormHeader = new RwtScoutMobileFormHeader();
-      uiFormHeader = mobileFormHeader;
+      uiFormHeader = new RwtScoutMobileFormHeader();
     }
 
     uiFormHeader.setHeightHint(FORM_HEADER_HEIGHT);
@@ -100,7 +99,7 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
 
   @Override
   protected MobileScoutFormToolkit createScoutFormToolkit(Display display) {
-    return new MobileScoutFormToolkit(new FormToolkit(display));
+    return new MobileScoutFormToolkit(new MobileFormToolkit(display));
   }
 
   @Override
