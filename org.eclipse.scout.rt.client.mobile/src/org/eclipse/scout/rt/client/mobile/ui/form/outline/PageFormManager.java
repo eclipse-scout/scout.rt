@@ -130,6 +130,17 @@ public class PageFormManager {
     m_pageFormMap.clear();
   }
 
+  private void hidePageForms() {
+    IPageForm[] pageForms = getDesktop().findForms(IPageForm.class);
+    if (pageForms == null) {
+      return;
+    }
+
+    for (IPageForm pageForm : pageForms) {
+      getDesktop().removeForm(pageForm);
+    }
+  }
+
   private void hidePage(IPage page) throws ProcessingException {
     if (page == null) {
       return;
@@ -280,7 +291,7 @@ public class PageFormManager {
   private void handleTreeNodeSelected(final ITreeNode deselctedNode, final ITreeNode selectedNode) throws ProcessingException {
     LOG.debug("Tree node selected: " + selectedNode);
     if (selectedNode == null) {
-      hidePage((IPage) deselctedNode);
+      hidePageForms();
       return;
     }
 
@@ -295,17 +306,29 @@ public class PageFormManager {
     for (ITreeNode node : deletedNodes) {
       if (node instanceof IPage) {
         IPage page = (IPage) node;
-        try {
-          IPageForm pageForm = m_pageFormMap.get(page);
-          if (pageForm != null) {
-            pageForm.doClose();
-            hidePage(page);
-          }
-        }
-        finally {
-          m_pageFormMap.remove(page);
-        }
+        handlePageRemoved(page);
       }
+    }
+  }
+
+  public void pageRemovedNotify(PageForm pageForm, IPage page) throws ProcessingException {
+    handlePageRemoved(page);
+  }
+
+  private void handlePageRemoved(IPage page) throws ProcessingException {
+    if (page == null) {
+      return;
+    }
+
+    try {
+      IPageForm pageForm = m_pageFormMap.get(page);
+      if (pageForm != null) {
+        pageForm.doClose();
+        hidePage(page);
+      }
+    }
+    finally {
+      m_pageFormMap.remove(page);
     }
   }
 

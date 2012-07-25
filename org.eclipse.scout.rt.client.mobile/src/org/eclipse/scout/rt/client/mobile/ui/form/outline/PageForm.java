@@ -1,8 +1,10 @@
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.NumberUtility;
@@ -27,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
@@ -50,6 +51,7 @@ public class PageForm extends AbstractForm implements IPageForm {
   private P_PageTableListener m_pageTableListener;
   private PageFormConfig m_pageFormConfig;
   private PageFormManager m_pageFormManager;
+  private Map<ITableRow, AutoLeafPageWithNodes> m_autoLeafPageMap;
 
   public PageForm(IPage page, PageFormManager manager, PageFormConfig pageFormConfig) throws ProcessingException {
     super(false);
@@ -58,6 +60,7 @@ public class PageForm extends AbstractForm implements IPageForm {
     if (m_pageFormConfig == null) {
       m_pageFormConfig = new PageFormConfig();
     }
+    m_autoLeafPageMap = new HashMap<ITableRow, AutoLeafPageWithNodes>();
 
     //Init (order is important)
     setPageInternal(page);
@@ -169,10 +172,7 @@ public class PageForm extends AbstractForm implements IPageForm {
   }
 
   private List<IButton> fetchNodeActionsAndConvertToButtons() throws ProcessingException {
-
-//  IMenu[] nodeActions = m_page.getTree().getUIFacade().fireNodePopupFromUI();
-    ITreeNode[] nodes = m_page.getTree().resolveVirtualNodes(m_page.getTree().getSelectedNodes());
-    IMenu[] nodeActions = m_page.getTree().fetchMenusForNodesInternal(nodes);
+    IMenu[] nodeActions = m_page.getTree().getUIFacade().fireNodePopupFromUI();
     List<IMenu> nodeActionList = new LinkedList<IMenu>();
 
     //Remove separators
@@ -384,7 +384,7 @@ public class PageForm extends AbstractForm implements IPageForm {
   public class FormHandler extends AbstractFormHandler {
   }
 
-  protected void handleTableRowSelected(ITable table, ITableRow tableRow) throws ProcessingException {
+  private void handleTableRowSelected(ITable table, ITableRow tableRow) throws ProcessingException {
     LOG.debug("Table row selected: " + tableRow);
     if (tableRow == null) {
       //Make sure there always is a selected row. if NodePageSwitch is enabled the same page and therefor the is on different pageForms
@@ -398,6 +398,9 @@ public class PageForm extends AbstractForm implements IPageForm {
     if (table instanceof PlaceholderTable) {
       rowPage = ((PlaceholderTable) table).getActualPage();
     }
+    else if (m_autoLeafPageMap.containsKey(tableRow)) {
+      rowPage = m_autoLeafPageMap.get(tableRow);
+    }
     else {
       rowPage = MobileDesktopUtility.getPageFor(m_page, tableRow);
     }
@@ -408,6 +411,8 @@ public class PageForm extends AbstractForm implements IPageForm {
       AutoOutline autoOutline = new AutoOutline();
       autoOutline.setRootNode(autoPage);
       autoOutline.selectNode(autoPage);
+      m_autoLeafPageMap.put(tableRow, autoPage);
+
       rowPage = autoPage;
     }
 
@@ -417,6 +422,20 @@ public class PageForm extends AbstractForm implements IPageForm {
     }
 
     m_pageFormManager.pageSelectedNotify(this, rowPage);
+  }
+
+  private void handleTableRowsDeleted(ITable table, ITableRow[] tableRows) throws ProcessingException {
+    if (tableRows == null) {
+      return;
+    }
+
+    for (ITableRow tableRow : tableRows) {
+      AutoLeafPageWithNodes autoPage = m_autoLeafPageMap.get(tableRow);
+      if (autoPage != null) {
+        m_autoLeafPageMap.remove(autoPage);
+        m_pageFormManager.pageRemovedNotify(this, autoPage);
+      }
+    }
   }
 
   protected void selectPageTableRowIfNecessary(final ITable pageDetailTable) throws ProcessingException {
@@ -485,27 +504,36 @@ public class PageForm extends AbstractForm implements IPageForm {
 
   private class P_PageTableListener extends TableAdapter {
     @Override
-    public void tableChanged(TableEvent e) {
-      switch (e.getType()) {
-        case TableEvent.TYPE_ROWS_SELECTED: {
-          handleTableRowSelected(e);
-          break;
+    public void tableChanged(TableEvent event) {
+      try {
+        switch (event.getType()) {
+          case TableEvent.TYPE_ROWS_SELECTED: {
+            handleTableRowSelected(event);
+            break;
+          }
+          case TableEvent.TYPE_ALL_ROWS_DELETED:
+          case TableEvent.TYPE_ROWS_DELETED: {
+            handleTableRowDeleted(event);
+            break;
+          }
         }
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
     }
 
-    private void handleTableRowSelected(TableEvent event) {
+    private void handleTableRowSelected(TableEvent event) throws ProcessingException {
       if (event.isConsumed()) {
         return;
       }
 
       ITableRow tableRow = event.getFirstRow();
-      try {
-        PageForm.this.handleTableRowSelected(event.getTable(), tableRow);
-      }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      }
+      PageForm.this.handleTableRowSelected(event.getTable(), tableRow);
+    }
+
+    private void handleTableRowDeleted(TableEvent event) throws ProcessingException {
+      PageForm.this.handleTableRowsDeleted(event.getTable(), event.getRows());
     }
 
   }
