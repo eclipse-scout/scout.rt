@@ -11,19 +11,23 @@
 package org.eclipse.scout.rt.client.mobile.services;
 
 import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.services.ClientServiceFactory;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
-import org.eclipse.scout.service.DefaultServiceFactory;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
 
 /**
- * @since 3.8.0
+ * Accepts the service only if the current device is a mobile or tablet.
+ * 
+ * @since 3.9.0
+ * @see {@link UserAgent}
  */
-public class MobileServiceFactory extends DefaultServiceFactory {
+public class MobileClientServiceFactory extends ClientServiceFactory {
 
-  public MobileServiceFactory(Class<?> serviceClass) {
+  public MobileClientServiceFactory(Class<?> serviceClass) {
     super(serviceClass);
   }
 
@@ -36,5 +40,4 @@ public class MobileServiceFactory extends DefaultServiceFactory {
 
     return super.getService(bundle, registration);
   }
-
 }

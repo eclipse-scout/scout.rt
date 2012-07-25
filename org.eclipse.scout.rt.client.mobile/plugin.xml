@@ -4,21 +4,21 @@
    <extension
          point="org.eclipse.scout.service.services">
       <service
-            class="org.eclipse.scout.rt.client.mobile.services.TextProviderService"
+            class="org.eclipse.scout.rt.client.mobile.services.text.TextProviderService"
             createImmediately="false"
-            factory="org.eclipse.scout.rt.client.mobile.services.MobileServiceFactory"
+            factory="org.eclipse.scout.rt.client.mobile.services.MobileClientServiceFactory"
             ranking="-25">
       </service>
       <service
             class="org.eclipse.scout.rt.client.mobile.navigation.BreadCrumbsNavigationService"
             createImmediately="false"
-            factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+            factory="org.eclipse.scout.rt.client.mobile.services.MobileClientServiceFactory"
             ranking="-1000">
       </service>
       <service
             class="org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationService"
             createImmediately="false"
-            factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+            factory="org.eclipse.scout.rt.client.mobile.services.MobileClientServiceFactory"
             ranking="-1000">
       </service>
    </extension>
