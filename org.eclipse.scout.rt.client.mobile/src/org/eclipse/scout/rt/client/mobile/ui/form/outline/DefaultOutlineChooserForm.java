@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.ui.forms;
+package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
-import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm.MainBox.OutlinesTableField;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.DefaultOutlineChooserForm.MainBox.OutlinesTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
@@ -26,9 +26,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-public class OutlineChooserForm extends AbstractForm {
+public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineChooserForm {
 
-  public OutlineChooserForm() throws ProcessingException {
+  public DefaultOutlineChooserForm() throws ProcessingException {
     super();
   }
 
@@ -143,7 +143,7 @@ public class OutlineChooserForm extends AbstractForm {
           IOutline outline = getOutlineColumn().getValue(row);
 
           MobileDesktopUtility.activateOutline(outline);
-          getDesktop().removeForm(OutlineChooserForm.this);
+          getDesktop().removeForm(DefaultOutlineChooserForm.this);
         }
       }
     }

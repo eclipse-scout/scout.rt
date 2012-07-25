@@ -35,13 +35,13 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 
-public class MobileDesktopExtension extends AbstractDesktopExtension {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileDesktopExtension.class);
+public class DeviceTransformationDesktopExtension extends AbstractDesktopExtension {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DeviceTransformationDesktopExtension.class);
 
   private boolean m_active;
   private IDeviceTransformer m_deviceTransformer;
 
-  public MobileDesktopExtension() {
+  public DeviceTransformationDesktopExtension() {
     setActive(UserAgentUtility.isTouchDevice());
   }
 
@@ -70,28 +70,6 @@ public class MobileDesktopExtension extends AbstractDesktopExtension {
     getDeviceTransformer().adaptDesktopActions(actions);
 
     super.contributeActions(actions);
-  }
-
-  @Override
-  protected ContributionCommand execGuiAttached() throws ProcessingException {
-    if (!isActive()) {
-      return super.execGuiAttached();
-    }
-
-    getDeviceTransformer().desktopGuiAttached();
-
-    return ContributionCommand.Continue;
-  }
-
-  @Override
-  protected ContributionCommand execGuiDetached() throws ProcessingException {
-    if (!isActive()) {
-      return super.execGuiDetached();
-    }
-
-    getDeviceTransformer().desktopGuiDetached();
-
-    return ContributionCommand.Continue;
   }
 
   @Override

@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
-import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -238,7 +238,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
       LOG.debug("Added new bread crumb: " + m_currentBreadCrumb);
     }
 
-    if (form instanceof OutlineChooserForm) {
+    if (form instanceof IOutlineChooserForm) {
       m_currentBreadCrumb = new OutlineChooserBreadCrumb(this, form);
     }
     else {

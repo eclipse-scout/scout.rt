@@ -26,10 +26,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
  * @since 3.9.0
  */
 public interface IDeviceTransformer {
-  void desktopGuiAttached() throws ProcessingException;
-
-  void desktopGuiDetached() throws ProcessingException;
-
   void adaptDesktopActions(Collection<IAction> actions);
 
   void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException;

@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
-import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -53,7 +52,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDeviceTransformer.class);
 
   private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
-  private OutlineChooserForm m_outlineChooserForm;
   private IDesktop m_desktop;
   private PageFormManager m_outlineFormsManager;
 
@@ -84,18 +82,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
   public void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
   }
 
-  @Override
-  public void desktopGuiAttached() throws ProcessingException {
-    showOutlineChooserForm();
-  }
-
-  @Override
-  public void desktopGuiDetached() throws ProcessingException {
-    if (m_outlineChooserForm != null) {
-      m_outlineChooserForm.doClose();
-    }
-  }
-
   /**
    * Remove outline buttons, keystrokes and menus
    */
@@ -105,21 +91,6 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
       IAction action = iterator.next();
       if (action instanceof IViewButton || action instanceof IKeyStroke || action instanceof IMenu) {
         iterator.remove();
-      }
-    }
-  }
-
-  protected void showOutlineChooserForm() throws ProcessingException {
-    if (m_outlineChooserForm == null) {
-      m_outlineChooserForm = new OutlineChooserForm();
-    }
-
-    if (!getDesktop().isShowing(m_outlineChooserForm)) {
-      if (!m_outlineChooserForm.isFormOpen()) {
-        m_outlineChooserForm.startView();
-      }
-      else {
-        getDesktop().addForm(m_outlineChooserForm);
       }
     }
   }

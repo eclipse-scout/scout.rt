@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
-import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
@@ -62,7 +62,7 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
         form.setDisplayViewId(IForm.VIEW_ID_E);
         MobileDesktopUtility.setFormWidthHint(form, TOOL_FORM_WIDTH);
       }
-      else if (form instanceof IOutlineTableForm || form instanceof OutlineChooserForm) {
+      else if (form instanceof IOutlineTableForm || form instanceof IOutlineChooserForm) {
         form.setDisplayViewId(IForm.VIEW_ID_CENTER);
       }
       else {

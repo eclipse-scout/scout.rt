@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.MobileTable;
-import org.eclipse.scout.rt.client.mobile.ui.forms.OutlineChooserForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -122,7 +122,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
   }
 
   private boolean computeDrillDownColumnVisibility() {
-    if (getScoutObject().getForm() instanceof OutlineChooserForm) {
+    if (getScoutObject().getForm() instanceof IOutlineChooserForm) {
       return true;
     }
 
@@ -137,7 +137,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
   }
 
   public boolean isDrillDownOnClickEnabled() {
-    if ((getScoutObject() instanceof AbstractOutlineTableField || getScoutObject().getForm() instanceof OutlineChooserForm)) {
+    if ((getScoutObject() instanceof AbstractOutlineTableField || getScoutObject().getForm() instanceof IOutlineChooserForm)) {
       return true;
     }
 
