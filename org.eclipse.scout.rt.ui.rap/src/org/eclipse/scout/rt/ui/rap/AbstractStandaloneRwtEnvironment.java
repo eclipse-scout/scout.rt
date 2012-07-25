@@ -20,6 +20,7 @@ import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.service.SettingStoreException;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -41,6 +42,7 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
 public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnvironment implements IRwtStandaloneEnvironment {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStandaloneRwtEnvironment.class);
 
   private Display m_display;
   private RwtScoutDesktop m_uiDesktop;
@@ -218,8 +220,13 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     }
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
       IRwtScoutPart part = m_uiDesktop.addForm(form);
-      putPart(form, part);
-      part.showPart();
+      if (part != null) {
+        putPart(form, part);
+        part.showPart();
+      }
+      else {
+        LOG.error("Form '" + form.getFormId() + "' cannot be displayed because no corresponding UI part could be found.");
+      }
     }
     super.showFormPart(form);
 
