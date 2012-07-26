@@ -1,3 +1,7 @@
+# Backupfiles from mergetools #
+*.orig
+
+# Java Class Files #
 *.class
 
 # Package Files #
