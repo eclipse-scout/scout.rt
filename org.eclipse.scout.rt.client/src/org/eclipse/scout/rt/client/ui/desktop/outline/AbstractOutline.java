@@ -50,6 +50,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
   private IPage m_contextPage;
+  private IPageChangeStrategy m_pageChangeStrategy;
   private OptimisticLock m_contextPageOptimisticLock;
   private OutlineMediator m_outlineMediator;
 
@@ -158,6 +159,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   protected void initConfig() {
     m_visibleGranted = true;
     m_contextPageOptimisticLock = new OptimisticLock();
+    setPageChangeStrategy(createPageChangeStrategy());
     m_outlineMediator = createOutlineMediator();
     addTreeListener(new P_OutlineListener());
     addNodeFilter(new P_TableFilterBasedTreeNodeFilter());
@@ -413,62 +415,14 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   }
 
-  private void handleActivePageChanged() {
+  private void handleActivePageChanged(IPage deselectedPage, IPage selectedPage) {
+    if (m_pageChangeStrategy == null) {
+      return;
+    }
+
     try {
       if (m_contextPageOptimisticLock.acquire()) {
-        clearContextPage();
-        IForm detailForm = null;
-        ITable detailTable = null;
-        ISearchForm searchForm = null;
-        // new active page
-        makeActivePageToContextPage();
-        IPage activePage = getActivePage();
-        if (activePage != null) {
-          try {
-            activePage.ensureChildrenLoaded();
-          }
-          catch (ProcessingException e1) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e1);
-          }
-          if (activePage instanceof IPageWithTable) {
-            IPageWithTable tablePage = (IPageWithTable) activePage;
-            detailForm = activePage.getDetailForm();
-            if (activePage.isTableVisible()) {
-              detailTable = tablePage.getTable();
-            }
-            if (tablePage.isSearchActive()) {
-              searchForm = tablePage.getSearchFormInternal();
-            }
-          }
-          else if (activePage instanceof IPageWithNodes) {
-            IPageWithNodes nodePage = (IPageWithNodes) activePage;
-            detailForm = activePage.getDetailForm();
-            if (activePage.isTableVisible()) {
-              detailTable = nodePage.getInternalTable();
-            }
-          }
-        }
-
-        // remove first
-        if (detailForm == null) {
-          setDetailForm(null);
-        }
-        if (detailTable == null) {
-          setDetailTable(null);
-        }
-        if (searchForm == null) {
-          setSearchForm(null);
-        }
-        // add new
-        if (detailForm != null) {
-          setDetailForm(detailForm);
-        }
-        if (detailTable != null) {
-          setDetailTable(detailTable);
-        }
-        if (searchForm != null) {
-          setSearchForm(searchForm);
-        }
+        m_pageChangeStrategy.pageChanged(this, deselectedPage, selectedPage);
       }
     }
     finally {
@@ -485,12 +439,26 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return new OutlineMediator();
   }
 
+  protected IPageChangeStrategy createPageChangeStrategy() {
+    return new DefaultPageChangeStrategy();
+  }
+
+  @Override
+  public void setPageChangeStrategy(IPageChangeStrategy pageChangeStrategy) {
+    m_pageChangeStrategy = pageChangeStrategy;
+  }
+
+  @Override
+  public IPageChangeStrategy getPageChangeStrategy() {
+    return m_pageChangeStrategy;
+  }
+
   private class P_OutlineListener extends TreeAdapter {
     @Override
     public void treeChanged(TreeEvent e) {
       switch (e.getType()) {
         case TreeEvent.TYPE_NODES_SELECTED: {
-          handleActivePageChanged();
+          handleActivePageChanged((IPage) e.getDeselectedNode(), (IPage) e.getNewSelectedNode());
           break;
         }
         case TreeEvent.TYPE_NODE_POPUP: {

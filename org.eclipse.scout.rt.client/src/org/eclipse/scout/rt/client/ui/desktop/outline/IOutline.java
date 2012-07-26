@@ -116,4 +116,8 @@ public interface IOutline extends ITree {
   IPage getRootPage();
 
   OutlineMediator getOutlineMediator();
+
+  void setPageChangeStrategy(IPageChangeStrategy pageChangeStrategy);
+
+  IPageChangeStrategy getPageChangeStrategy();
 }
