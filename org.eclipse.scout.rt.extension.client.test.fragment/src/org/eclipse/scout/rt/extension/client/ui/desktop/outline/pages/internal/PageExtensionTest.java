@@ -16,8 +16,10 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExtensionFilter;
+import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test cases for {@link AbstractPageExtension}.
@@ -27,6 +29,7 @@ import org.junit.Test;
  * 
  * @since 3.9.0
  */
+@RunWith(ScoutClientTestRunner.class)
 public class PageExtensionTest {
 
   private P_Outline m_outline;

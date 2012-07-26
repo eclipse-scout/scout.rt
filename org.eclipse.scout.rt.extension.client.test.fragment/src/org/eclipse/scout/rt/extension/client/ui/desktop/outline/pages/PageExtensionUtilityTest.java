@@ -30,12 +30,15 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageContributionExtension;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageModificationExtension;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageRemoveExtension;
+import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @since 3.9.0
  */
+@RunWith(ScoutClientTestRunner.class)
 public class PageExtensionUtilityTest {
 
   private List<IPage> m_pageList;

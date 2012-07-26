@@ -346,7 +346,7 @@ public final class BeanUtility {
    *         returns 0 for a perfect match (i.e. <code>declaredType == actualType</code> and a number &gt;0 otherwise.
    * @since 3.8.1
    */
-  private static int computeTypeDistance(Class<?> declaredType, Class<?> actualType) {
+  public static int computeTypeDistance(Class<?> declaredType, Class<?> actualType) {
     if (declaredType == null) {
       return -1;
     }

@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.extension.client.ExtensionClientUtility;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,6 +32,7 @@ public class ExtensionClientUtilityTest {
   private P_AExt m_aExt;
   private P_B m_b;
   private P_C m_c;
+  private P_D m_d;
 
   @Before
   public void before() {
@@ -40,6 +40,7 @@ public class ExtensionClientUtilityTest {
     m_aExt = new P_AExt();
     m_b = new P_B();
     m_c = new P_C();
+    m_d = new P_D();
     m_instanceList = new ArrayList<Object>();
     m_instanceList.add(m_a);
     m_instanceList.add(m_aExt);
@@ -84,9 +85,79 @@ public class ExtensionClientUtilityTest {
     assertEquals(Collections.singletonList(m_b), m_instanceList);
   }
 
+  @Test
+  public void testprocessReplaceAnnotationsNullAndEmpty() {
+    // no exceptions
+    ExtensionClientUtility.processReplaceAnnotations(null);
+    ExtensionClientUtility.processReplaceAnnotations(Collections.emptyList());
+  }
+
+  @Test
+  public void testprocessReplaceAnnotationsNoRemoveAnnotation() {
+    List<Object> list = Arrays.asList(m_a, m_b, m_c);
+    ExtensionClientUtility.processReplaceAnnotations(list);
+    assertEquals(Arrays.asList(m_a, m_b, m_c), list);
+  }
+
+  @Test
+  public void testprocessReplaceAnnotationsSuperclass() {
+    // m_a is removed
+    ExtensionClientUtility.processReplaceAnnotations(m_instanceList);
+    assertEquals(Arrays.asList(m_aExt, m_b, m_c), m_instanceList);
+
+    // no effect when processing the list a second time
+    ExtensionClientUtility.processReplaceAnnotations(m_instanceList);
+    assertEquals(Arrays.asList(m_aExt, m_b, m_c), m_instanceList);
+  }
+
+  @Test
+  public void testprocessReplaceAnnotationsCustomCalss() {
+    List<Object> list = new ArrayList<Object>();
+    list.add(m_a);
+    list.add(m_b);
+    list.add(m_c);
+    list.add(m_d);
+    ExtensionClientUtility.processReplaceAnnotations(list);
+    assertEquals(Arrays.asList(m_a, m_c, m_d), list);
+  }
+
+  @Test
+  public void testprocessReplaceAnnotationsAbstractClass1() {
+    P_E1 e1 = new P_E1();
+    P_F f = new P_F();
+    List<Object> list = new ArrayList<Object>();
+    list.add(f);
+    list.add(e1);
+    ExtensionClientUtility.processReplaceAnnotations(list);
+    assertEquals(Arrays.asList(f), list);
+  }
+
+  @Test
+  public void testprocessReplaceAnnotationsAbstractClass2() {
+    P_E1 e1 = new P_E1();
+    P_E2 e2 = new P_E2();
+    P_F f = new P_F();
+    List<Object> list = new ArrayList<Object>();
+    list.add(e2);
+    list.add(f);
+    list.add(e1);
+    ExtensionClientUtility.processReplaceAnnotations(list);
+    assertEquals(Arrays.asList(f, e1), list);
+  }
+
+  @Test
+  public void testprocessReplaceAnnotationsPrimitiveType() {
+    P_G g = new P_G();
+    List<Object> list = new ArrayList<Object>();
+    list.add(g);
+    ExtensionClientUtility.processReplaceAnnotations(list);
+    assertEquals(Arrays.asList(g), list);
+  }
+
   private static class P_A {
   }
 
+  @Replace
   private static class P_AExt extends P_A {
   }
 
@@ -94,5 +165,26 @@ public class ExtensionClientUtilityTest {
   }
 
   private static class P_C {
+  }
+
+  @Replace(P_B.class)
+  private static class P_D {
+  }
+
+  private static abstract class AbstractE {
+  }
+
+  private static class P_E1 extends AbstractE {
+  }
+
+  private static class P_E2 extends AbstractE {
+  }
+
+  @Replace(AbstractE.class)
+  private static class P_F {
+  }
+
+  @Replace(int.class)
+  private static class P_G {
   }
 }

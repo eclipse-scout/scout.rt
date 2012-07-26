@@ -9,14 +9,15 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExtensionFilter;
-import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageContributionExtension;
-import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.ParentAndOutlinePageFilter;
+import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @since 3.9.0
  */
+@RunWith(ScoutClientTestRunner.class)
 public class PageContributionExtensionAcceptTest {
 
   private PageContributionOutline m_outline;
