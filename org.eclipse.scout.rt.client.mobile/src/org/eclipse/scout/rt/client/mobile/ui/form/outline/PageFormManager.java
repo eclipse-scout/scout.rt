@@ -30,6 +30,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -116,6 +118,10 @@ public class PageFormManager {
     m_pageSelectionRunning = pageSelectionRunning;
   }
 
+  public static boolean isDrillDownPage(IPage page) {
+    return page instanceof IPageWithTable && page.getParentNode() instanceof IPageWithNodes;
+  }
+
   private void destroy() {
     if (m_desktopListener != null) {
       getDesktop().removeDesktopListener(m_desktopListener);
@@ -176,7 +182,7 @@ public class PageFormManager {
     }
 
     if (getLeftPageSlotViewId().equals(parentPageForm.getDisplayViewId())) {
-      if (PageForm.isDrillDownPage(page)) {
+      if (isDrillDownPage(page)) {
         return getLeftPageSlotViewId();
       }
       else {
@@ -247,6 +253,9 @@ public class PageFormManager {
     }
     //A AutoLeafPage is not attached to a real outline. Since it already has been activated just show it.
     else if (selectedPage instanceof AutoLeafPageWithNodes) {
+      showPage(selectedPage);
+    }
+    else if (selectedPage.isSelectedNode()) {
       showPage(selectedPage);
     }
     else {

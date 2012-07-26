@@ -53,7 +53,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
   private IDesktop m_desktop;
-  private PageFormManager m_outlineFormsManager;
+  private PageFormManager m_pageFormManager;
 
   public AbstractDeviceTransformer(IDesktop desktop) {
     if (desktop == null) {
@@ -64,14 +64,14 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
       throw new IllegalArgumentException("No desktop found. Cannot create device transformer.");
     }
 
-    m_outlineFormsManager = createOutlineFormsManager(desktop);
+    m_pageFormManager = createPageFormManager(desktop);
   }
 
   public AbstractDeviceTransformer() {
     this(null);
   }
 
-  protected PageFormManager createOutlineFormsManager(IDesktop desktop) {
+  protected PageFormManager createPageFormManager(IDesktop desktop) {
     PageFormManager manager = new PageFormManager(desktop, IForm.VIEW_ID_CENTER);
     manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
 
@@ -134,7 +134,7 @@ public class AbstractDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public boolean acceptForm(IForm form) {
-    return m_outlineFormsManager.acceptForm(form);
+    return m_pageFormManager.acceptForm(form);
   }
 
   private void makeSurePageDetailTableIsVisible() {

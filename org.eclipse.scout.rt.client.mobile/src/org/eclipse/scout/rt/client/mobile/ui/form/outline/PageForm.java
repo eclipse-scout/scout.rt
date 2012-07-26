@@ -185,10 +185,6 @@ public class PageForm extends AbstractForm implements IPageForm {
     return ActionButtonBarUtility.convertActionsToMainButtons(nodeActionList.toArray(new IMenu[nodeActionList.size()]));
   }
 
-  public static boolean isDrillDownPage(IPage page) {
-    return page instanceof IPageWithTable && page.getParentNode() instanceof IPageWithNodes;
-  }
-
   public void formAddedNotify() throws ProcessingException {
     clearTableSelectionIfNecessary();
 
@@ -232,7 +228,7 @@ public class PageForm extends AbstractForm implements IPageForm {
     }
 
     ITableRow selectedRow = getPageTableField().getTable().getSelectedRow();
-    if (!m_pageFormConfig.isKeepSelection() || isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
+    if (!m_pageFormConfig.isKeepSelection() || PageFormManager.isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
       getPageTableField().getTable().selectRow(null);
     }
   }
@@ -248,7 +244,7 @@ public class PageForm extends AbstractForm implements IPageForm {
     }
 
     ITableRow selectedRow = pageTable.getSelectedRow();
-    if (!isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
+    if (!PageFormManager.isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
       if (selectedRow != null) {
         handleTableRowSelected(pageTable, selectedRow);
       }
@@ -446,7 +442,7 @@ public class PageForm extends AbstractForm implements IPageForm {
     IPage activePage = getDesktop().getOutline().getActivePage();
     IPage pageToSelect = MobileDesktopUtility.getPageFor(activePage, pageDetailTable.getRow(0));
     if (pageDetailTable.getSelectedRow() == null) {
-      if (!isDrillDownPage(pageToSelect)) {
+      if (!PageFormManager.isDrillDownPage(pageToSelect)) {
 //        FIXME CGU There are some strange behaviours Without client sync job, why?
         ClientSyncJob job = new ClientSyncJob("Auto selecting node", ClientJob.getCurrentSession()) {
           @Override

@@ -12,12 +12,15 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.mobile.ui.desktop.MultiPageChangeStrategy;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IPageChangeStrategy;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.service.SERVICES;
@@ -41,11 +44,20 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   @Override
-  protected PageFormManager createOutlineFormsManager(IDesktop desktop) {
+  protected PageFormManager createPageFormManager(IDesktop desktop) {
     PageFormManager manager = new PageFormManager(desktop, IForm.VIEW_ID_CENTER, IForm.VIEW_ID_E);
     manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
 
+    initMultiPageChangeStrategy();
+
     return manager;
+  }
+
+  private void initMultiPageChangeStrategy() {
+    IPageChangeStrategy strategy = new MultiPageChangeStrategy();
+    for (IOutline outline : getDesktop().getAvailableOutlines()) {
+      outline.setPageChangeStrategy(strategy);
+    }
   }
 
   @Override

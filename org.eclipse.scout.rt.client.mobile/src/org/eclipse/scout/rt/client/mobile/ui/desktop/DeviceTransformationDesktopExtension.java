@@ -62,6 +62,18 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
+  protected ContributionCommand execInit() throws ProcessingException {
+    if (!isActive()) {
+      return super.execInit();
+    }
+
+    //Create transformer
+    getDeviceTransformer();
+
+    return ContributionCommand.Continue;
+  }
+
+  @Override
   public void contributeActions(Collection<IAction> actions) {
     if (!isActive()) {
       return;
@@ -125,7 +137,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
 
-    //FIXME CGU seperate into acceptTransformation and acceptAdditionToDesktop
+    //FIXME CGU separate into acceptTransformation and acceptAdditionToDesktop
     if (!getDeviceTransformer().acceptForm(form)) {
       formHolder.setValue(null);
       return ContributionCommand.Stop;
