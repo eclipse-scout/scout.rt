@@ -113,10 +113,18 @@ public class PageForm extends AbstractForm implements IPageForm {
     setTitle(page.getCellForUpdate().getText());
   }
 
-  protected void setPageTable(ITable table) throws ProcessingException {
-    getPageTableField().setTable(table, true);
-    //FIXME CGU when to hide the table?
-    getPageTableField().setVisible(table != null);
+  /**
+   * If there is a detail form the table field is visible depending on its content. If there is no detail form the table
+   * field always is visible.
+   */
+  protected void updateTableFieldVisibility() throws ProcessingException {
+    ITable table = getPageTableField().getTable();
+    boolean hasDetailForm = getPageDetailFormField().getInnerForm() != null;
+
+    if (hasDetailForm) {
+      boolean hasTableRows = table != null && table.getRowCount() > 0;
+      getPageTableField().setVisible(hasTableRows);
+    }
   }
 
   private AutoTableForm createAutoDetailForm() throws ProcessingException {
@@ -164,7 +172,8 @@ public class PageForm extends AbstractForm implements IPageForm {
       pageTable.addRowByArray(new Object[]{"Details"});//FIXME CGU
     }
 
-    setPageTable(pageTable);
+    getPageTableField().setTable(pageTable, true);
+    updateTableFieldVisibility();
     getPageTableField().setTableStatusVisible(m_pageFormConfig.isTableStatusVisible());
   }
 
@@ -501,6 +510,8 @@ public class PageForm extends AbstractForm implements IPageForm {
             handleTableRowDeleted(event);
             break;
           }
+          case TableEvent.TYPE_ROWS_INSERTED:
+            handleTableRowsInserted(event);
         }
       }
       catch (ProcessingException e) {
@@ -519,6 +530,11 @@ public class PageForm extends AbstractForm implements IPageForm {
 
     private void handleTableRowDeleted(TableEvent event) throws ProcessingException {
       PageForm.this.handleTableRowsDeleted(event.getTable(), event.getRows());
+      updateTableFieldVisibility();
+    }
+
+    private void handleTableRowsInserted(TableEvent event) throws ProcessingException {
+      updateTableFieldVisibility();
     }
 
   }
