@@ -22,8 +22,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
-import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
@@ -185,7 +183,8 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
   }
 
   /**
-   * Returns true if the table the only visible field in the main box. Otherwise false.
+   * Returns true if the table is directly embedded into the field. In other words: Returns true if there is no parent
+   * groupbox with a visible border.
    */
   @Override
   protected boolean dontCreateTableContainer() {
@@ -193,25 +192,18 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
       return false;
     }
 
-    IForm form = getScoutObject().getForm();
-    IGroupBox mainBox = form.getRootGroupBox();
-    return isSingleVisibleField(mainBox);
+    return !isAnyBorderVisible(getScoutObject().getParentGroupBox());
   }
 
-  private boolean isSingleVisibleField(IGroupBox parentGroupBox) {
-    for (IFormField field : parentGroupBox.getFields()) {
-      if (field instanceof IGroupBox) {
-        IGroupBox groupBox = (IGroupBox) field;
-        if (groupBox.isBorderVisible()) {
-          return false;
-        }
-        if (!isSingleVisibleField(groupBox)) {
-          return false;
-        }
+  private boolean isAnyBorderVisible(IGroupBox groupBox) {
+    while (groupBox != null) {
+      if (groupBox.isBorderVisible()) {
+        return true;
       }
+      groupBox = groupBox.getParentGroupBox();
     }
 
-    return true;
+    return false;
   }
 
   @Override
