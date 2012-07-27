@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -169,7 +170,8 @@ public class PageForm extends AbstractForm implements IPageForm {
     if (!m_pageFormConfig.isTablePageAllowed() && m_page instanceof IPageWithTable) {
       pageTable = new PlaceholderTable(m_page);
       pageTable.initTable();
-      pageTable.addRowByArray(new Object[]{"Details"});//FIXME CGU
+      pageTable.addRowByArray(new Object[]{TEXTS.get("MobilePlaceholderTableTitle")});
+      pageTable.setDefaultIconId(m_page.getCell().getIconId());
     }
 
     getPageTableField().setTable(pageTable, true);
@@ -388,8 +390,14 @@ public class PageForm extends AbstractForm implements IPageForm {
 
   private void handleTableRowSelected(ITable table, ITableRow tableRow) throws ProcessingException {
     LOG.debug("Table row selected: " + tableRow);
+
+    if (!m_page.isChildrenLoaded()) {
+      // If children are not loaded rowPage cannot be estimated.
+      //This is the case when the rows get replaced which restores the selection before the children are loaded (e.g. executed by a search).
+      return;
+    }
     if (tableRow == null) {
-      //Make sure there always is a selected row. if NodePageSwitch is enabled the same page and therefor the is on different pageForms
+      //Make sure there always is a selected row. if NodePageSwitch is enabled the same page and therefore the is on different pageForms
       if (m_pageFormConfig.isKeepSelection()) {
         selectPageTableRowIfNecessary(table);
       }
