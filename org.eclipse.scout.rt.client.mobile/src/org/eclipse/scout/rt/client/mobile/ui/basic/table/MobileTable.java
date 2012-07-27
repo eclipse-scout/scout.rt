@@ -49,7 +49,7 @@ import org.eclipse.scout.service.SERVICES;
  * It consists of a content column which displays the relevant information of the original table. It also provides a
  * drill down button with the ability to drill down an outline.
  * </p>
- * 
+ *
  * @since 3.9.0
  */
 public class MobileTable extends AbstractTable {
@@ -153,11 +153,6 @@ public class MobileTable extends AbstractTable {
     setEnabled(wrappedTable.isEnabled());
     setSortEnabled(wrappedTable.isSortEnabled());
 
-    //Do not modify the sorting if it's only one column because it's probably already ok
-    if (wrappedTable.getVisibleColumnCount() > 1) {
-      getSortColumn().setInitialSortIndex(0);
-    }
-
     m_eventListener.initalizeWith(wrappedTable);
     m_originalTable.addTableListener(m_eventListener);
   }
@@ -227,7 +222,7 @@ public class MobileTable extends AbstractTable {
   @Override
   protected void execRowClick(ITableRow row) throws ProcessingException {
     if (isDrillDownOnClickEnabled()) {
-    	//FIXME CGU
+      //FIXME CGU
 //      doDrillDown();
     }
     else {
@@ -237,10 +232,6 @@ public class MobileTable extends AbstractTable {
 
   public ContentColumn getContentColumn() {
     return getColumnSet().getColumnByClass(ContentColumn.class);
-  }
-
-  public SortColumn getSortColumn() {
-    return getColumnSet().getColumnByClass(SortColumn.class);
   }
 
   public RowMapColumn getRowMapColumn() {
@@ -261,16 +252,6 @@ public class MobileTable extends AbstractTable {
     @Override
     protected void execDecorateHeaderCell(HeaderCell cell) throws ProcessingException {
       cell.setText(m_headerName);
-    }
-
-  }
-
-  @Order(30.0)
-  public class SortColumn extends AbstractStringColumn {
-
-    @Override
-    protected boolean getConfiguredDisplayable() {
-      return false;
     }
 
   }
@@ -331,6 +312,11 @@ public class MobileTable extends AbstractTable {
     finally {
       setTableChanging(false);
     }
+  }
+
+  private void handleWrappedTableRowOrderChanged(ITableRow[] rows) {
+    ITableRow[] sortedMobileRows = getRowMapColumn().findRows(rows);
+    sort(sortedMobileRows);
   }
 
   private void handleWrappedTableRowsUpdated(ITableRow[] rows) {
@@ -471,10 +457,6 @@ public class MobileTable extends AbstractTable {
     output = output.replace("#CONTENT#", content);
     output = output.replace("#DRILL_DOWN#", createCellDrillDown());
     output = output.replace("#DRILL_DOWN_COL_WIDTH#", createCellDrillDownColWidth());
-
-    if (getSortColumn().getInitialSortIndex() > -1) {
-      getSortColumn().setValue(mobileTableRow, content);
-    }
 
     return output;
   }
@@ -700,6 +682,10 @@ public class MobileTable extends AbstractTable {
         }
         case TableEvent.TYPE_ROWS_UPDATED: {
           handleWrappedTableRowsUpdated(e.getRows());
+          break;
+        }
+        case TableEvent.TYPE_ROW_ORDER_CHANGED: {
+          handleWrappedTableRowOrderChanged(e.getRows());
           break;
         }
       }

@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -14,8 +13,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.AutoTableForm;
@@ -443,15 +440,7 @@ public class PageForm extends AbstractForm implements IPageForm {
     IPage pageToSelect = MobileDesktopUtility.getPageFor(activePage, pageDetailTable.getRow(0));
     if (pageDetailTable.getSelectedRow() == null) {
       if (!PageFormManager.isDrillDownPage(pageToSelect)) {
-//        FIXME CGU There are some strange behaviours Without client sync job, why?
-        ClientSyncJob job = new ClientSyncJob("Auto selecting node", ClientJob.getCurrentSession()) {
-          @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
-//        FIXME CGU Does not really select the first row (MobileTable?)
-            pageDetailTable.selectFirstRow();
-          }
-        };
-        job.schedule();
+        pageDetailTable.selectFirstRow();
       }
     }
 

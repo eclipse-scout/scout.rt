@@ -10,11 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.DefaultPageChangeStrategy;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IPageChangeStrategy;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * @since 3.9.0
@@ -69,6 +72,13 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
 
     m_subPage = selectedPage;
     m_subPage.pageActivatedNotify();
+
+    try {
+      m_subPage.ensureChildrenLoaded();
+    }
+    catch (ProcessingException e1) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e1);
+    }
   }
 
   private void deactivateSubPage() {
