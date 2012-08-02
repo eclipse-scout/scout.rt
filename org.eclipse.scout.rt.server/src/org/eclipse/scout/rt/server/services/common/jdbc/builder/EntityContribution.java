@@ -38,6 +38,15 @@ public class EntityContribution {
     m_havingParts = new ArrayList<String>(2);
   }
 
+  public EntityContribution(EntityContribution... contributions) {
+    this();
+    if (contributions != null) {
+      for (EntityContribution contrib : contributions) {
+        add(contrib);
+      }
+    }
+  }
+
   public boolean isEmpty() {
     return m_selectParts.size() + m_fromParts.size() + m_whereParts.size() + m_groupByParts.size() + m_havingParts.size() == 0;
   }
