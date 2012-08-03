@@ -11,34 +11,24 @@
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.eclipse.scout.commons.HTMLUtility;
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.mobile.Activator;
-import org.eclipse.scout.rt.client.mobile.Icons;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.PropertyBucket;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
-import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableUIFacade;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -46,188 +36,169 @@ import org.eclipse.scout.service.SERVICES;
 /**
  * A table optimized for mobile devices which wraps another table.
  * <p>
- * It consists of a content column which displays the relevant information of the original table. It also provides a
- * drill down button with the ability to drill down an outline.
- * </p>
- *
+ * It consists of a content column which displays the relevant information of the original table.
+ * 
  * @since 3.9.0
  */
-public class MobileTable extends AbstractTable {
+public class MobileTable extends AbstractMobileTable implements IMobileTable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileTable.class);
-
-  private ITable m_originalTable;
-  private int m_maxCellDetailColumns;
-  private IColumn m_cellHeaderColumn;
-  private List<IColumn> m_cellDetailColumns;
-  private String m_headerName;
   private static final int ROW_HEIGHT = 18;
-  private String m_htmlCellTemplate;
-  private String m_htmlDrillDown;
-  private String m_htmlDrillDownButton;
-  private boolean m_drillDownOnClickEnabled;
-  private boolean m_drillDownPossible;
+  private int m_maxCellDetailColumns;
+  private OptimisticLock m_selectionLock;
 
-  private final P_TableEventListener m_eventListener;
+  private TablePropertyDelegator<? extends ITable> m_propertyDelegator;
 
-  public MobileTable() {
-    m_eventListener = new P_TableEventListener();
-    m_maxCellDetailColumns = 2;
+  private P_TableEventListener m_tableListener;
+
+  public MobileTable(ITable originalTable) {
+    super(false);
+    Set<String> filter = new HashSet<String>();
+    filter.add(ITable.PROP_AUTO_RESIZE_COLUMNS);
+    filter.add(ITable.PROP_ROW_HEIGHT_HINT);
+    filter.add(ITable.PROP_DEFAULT_ICON);
+    filter.add(ITable.PROP_HEADER_VISIBLE);
+    if (originalTable instanceof IMobileTable) {
+      m_propertyDelegator = new MobileTablePropertyDelegator((IMobileTable) originalTable, this, filter);
+    }
+    else {
+      m_propertyDelegator = new TablePropertyDelegator<ITable>(originalTable, this, filter);
+    }
+    callInitializer();
 
     try {
-      m_htmlCellTemplate = initHtmlCellTemplate();
-      m_htmlDrillDown = initHtmlDrillDown();
-      m_htmlDrillDownButton = initHtmlDrillDownButton();
+      m_selectionLock = new OptimisticLock();
+      m_tableListener = new P_TableEventListener();
+
+      m_tableListener.initalizeWith(originalTable);
+      getOriginalTable().addTableListener(m_tableListener);
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
   }
 
-  protected String initHtmlCellTemplate() throws ProcessingException {
-    try {
-      return new String(IOUtility.getContent(Activator.getDefault().getBundle().getResource("resources/html/MobileTableCellContent.html").openStream()), "iso-8859-1");
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Exception while loading html cell template for mobile table", t);
-    }
-  }
+  @Override
+  protected void initConfig() {
+    super.initConfig();
 
-  protected String initHtmlDrillDown() throws ProcessingException {
-    try {
-      return new String(IOUtility.getContent(Activator.getDefault().getBundle().getResource("resources/html/MobileTableDrillDown.html").openStream()), "iso-8859-1");
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Exception while loading html cell template for mobile table", t);
-    }
-  }
+    m_propertyDelegator.init();
+    setAutoDiscardOnDelete(false);
+    setAutoResizeColumns(true);
+    setDefaultIconId(null);
+    setHeaderVisible(false);
 
-  protected String initHtmlDrillDownButton() throws ProcessingException {
-    try {
-      return new String(IOUtility.getContent(Activator.getDefault().getBundle().getResource("resources/html/MobileTableDrillDownButton.html").openStream()), "iso-8859-1");
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Exception while loading html cell template for mobile table", t);
-    }
-  }
-
-  public void setDrillDownPossible(boolean drillDownPossible) {
-    m_drillDownPossible = drillDownPossible;
-  }
-
-  public boolean isDrillDownPossible() {
-    return m_drillDownPossible;
-  }
-
-  public boolean isDrillDownOnClickEnabled() {
-    return m_drillDownOnClickEnabled;
-  }
-
-  public void setDrillDownOnClickEnabled(boolean drillDownOnClickEnabled) {
-    m_drillDownOnClickEnabled = drillDownOnClickEnabled;
-  }
-
-  //FIXME CGU move init to constructor, should be done like ButtonWrappingAction. Maybe create AbstractWrappingTable?
-  public void installWrappedTable(ITable wrappedTable) throws ProcessingException {
-    if (m_originalTable != null) {
-      m_originalTable.removeTableListener(m_eventListener);
-    }
-    m_originalTable = wrappedTable;
-
-    if (wrappedTable == null) {
-      return;
-    }
-
-    if (wrappedTable.getRowHeightHint() != -1) {
-      setRowHeightHint(wrappedTable.getRowHeightHint());
-    }
-    else {
+    m_maxCellDetailColumns = 2;
+    if (getOriginalTable().getRowHeightHint() == -1) {
       //+1 stands for the cell header row
       setRowHeightHint((m_maxCellDetailColumns + 1) * ROW_HEIGHT);
     }
-    setHeaderVisible(wrappedTable.isHeaderVisible());
-    if (isHeaderVisible()) {
-      getContentColumn().decorateHeaderCell();
-    }
-    setCheckable(wrappedTable.isCheckable());
-    setMultiCheck(wrappedTable.isMultiCheck());
-    setEnabled(wrappedTable.isEnabled());
-    setSortEnabled(wrappedTable.isSortEnabled());
 
-    m_eventListener.initalizeWith(wrappedTable);
-    m_originalTable.addTableListener(m_eventListener);
+    getContentColumn().setDefaultDrillDownStyle(execComputeDrillDownStyle());
+    setDrillDownStyleMap(getDrillDownStyleMap(getOriginalTable()));
+  }
+
+  @Override
+  protected boolean execIsAutoCreateTableRowForm() {
+    Boolean autoCreateRowForm = isAutoCreateRowForm(getOriginalTable());
+    if (autoCreateRowForm != null) {
+      return autoCreateRowForm;
+    }
+
+    if (getOriginalTable().isCheckable()) {
+      return false;
+    }
+
+    return true;
+  }
+
+  protected String execComputeDrillDownStyle() {
+    if (getOriginalTable().isCheckable()) {
+      return IRowSummaryColumn.DRILL_DOWN_STYLE_NONE;
+    }
+
+    return IRowSummaryColumn.DRILL_DOWN_STYLE_ICON;
   }
 
   public void dispose() {
+    if (m_tableListener == null) {
+      return;
+    }
+
+    getOriginalTable().removeTableListener(m_tableListener);
+    m_tableListener = null;
+  }
+
+  public ITable getOriginalTable() {
+    return m_propertyDelegator.getSender();
+  }
+
+  @Override
+  public String getDrillDownStyle(ITableRow tableRow) {
+    String drillDownStyle = super.getDrillDownStyle(tableRow);
+    if (drillDownStyle == null) {
+      drillDownStyle = getContentColumn().getDefaultDrillDownStyle();
+    }
+
+    return drillDownStyle;
+  }
+
+  @Override
+  protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
+    if (!m_selectionLock.acquire()) {
+      //Prevent loop which could happen because delegation of selection is done from this to original table and vice versa
+      return;
+    }
+
     try {
-      installWrappedTable(null);
-    }
-    catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-    }
-  }
-
-  public String getHeaderName() {
-    return m_headerName;
-  }
-
-  public void setHeaderName(String headerName) {
-    m_headerName = headerName;
-  }
-
-  @Override
-  protected boolean getConfiguredAutoDiscardOnDelete() {
-    return true;
-  }
-
-  @Override
-  protected boolean getConfiguredAutoResizeColumns() {
-    return true;
-  }
-
-  @Override
-  protected boolean getConfiguredMultilineText() {
-    return true;
-  }
-
-  private void doDrillDown() throws ProcessingException {
-    if (isDrillDownPossible()) {
-      getUIFacade().fireRowActionFromUI(getSelectedRow());
-    }
-    else {
-      //FIXME CGU solution required for non outline tables
-//      AutoTableForm form = new AutoTableForm(m_originalTable.getSelectedRow());
-//      form.start();
-    }
-  }
-
-  @Override
-  protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
-    if (!local) {
-      return;
-    }
-
-    String query = url.getQuery();
-    if (query == null) {
-      return;
-    }
-
-    for (String s : query.split("[\\?\\&]")) {
-      Matcher m = Pattern.compile("action=drill_down").matcher(s);
-      if (m.matches()) {
-        doDrillDown();
+      if (rows == null || rows.length == 0) {
+        getOriginalTable().getUIFacade().setSelectedRowsFromUI(rows);
+        return;
       }
+
+      ITableRow originalRow = getRowMapColumn().getValue(rows[0]);
+      if (IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(getDrillDownStyle(originalRow))) {
+        if (isAutoCreateTableRowForm()) {
+          startTableRowForm(originalRow);
+        }
+        else {
+          getOriginalTable().getUIFacade().setSelectedRowsFromUI(getRowMapColumn().getValues(rows));
+        }
+
+        clearSelection();
+      }
+      else {
+        getOriginalTable().getUIFacade().setSelectedRowsFromUI(getRowMapColumn().getValues(rows));
+      }
+    }
+    finally {
+      m_selectionLock.release();
     }
   }
 
   @Override
   protected void execRowClick(ITableRow row) throws ProcessingException {
-    if (isDrillDownOnClickEnabled()) {
-      //FIXME CGU
-//      doDrillDown();
+    ITableRow originalRow = getRowMapColumn().getValue(row);
+    if (IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(getDrillDownStyle(originalRow))) {
+      //nop
     }
     else {
-      m_originalTable.getUIFacade().fireRowClickFromUI(getSelectedRow());
+      //Drill down actions should be handled by listening to selection and not click events so click events are not fired in such a case
+      getOriginalTable().getUIFacade().fireRowClickFromUI(originalRow);
     }
+  }
+
+  @Override
+  protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+    if (AbstractRowSummaryColumn.isDrillDownButtonUrl(url, path, local)) {
+      execDrillDownButtonAction();
+    }
+    else {
+      getOriginalTable().getUIFacade().fireHyperlinkActionFromUI(getRowMapColumn().getValue(getSelectedRow()), null, url);
+    }
+  }
+
+  protected void execDrillDownButtonAction() throws ProcessingException {
+    // nop. No default implemented yet
   }
 
   public ContentColumn getContentColumn() {
@@ -240,19 +211,16 @@ public class MobileTable extends AbstractTable {
 
   @Order(10.0)
   public class RowMapColumn extends AbstractColumn<ITableRow> {
+
     @Override
     protected boolean getConfiguredDisplayable() {
       return false;
     }
+
   }
 
   @Order(20.0)
-  public class ContentColumn extends AbstractStringColumn {
-
-    @Override
-    protected void execDecorateHeaderCell(HeaderCell cell) throws ProcessingException {
-      cell.setText(m_headerName);
-    }
+  public class ContentColumn extends AbstractRowSummaryColumn {
 
   }
 
@@ -262,9 +230,6 @@ public class MobileTable extends AbstractTable {
   }
 
   private void reset() {
-    m_cellHeaderColumn = null;
-    m_cellDetailColumns = null;
-
     discardAllRows();
   }
 
@@ -293,16 +258,16 @@ public class MobileTable extends AbstractTable {
   }
 
   private void handleWrappedTableRowsInserted(ITableRow[] rows) {
-    if (m_cellDetailColumns == null) {
-      initializeDecorationConfiguration();
+    if (!getContentColumn().isInitialized()) {
+      getContentColumn().initializeDecorationConfiguration(getOriginalTable(), m_maxCellDetailColumns);
     }
 
     try {
       setTableChanging(true);
       for (ITableRow insertedRow : rows) {
         try {
-          addRowByArray(new Object[]{insertedRow, "", ""});
-          updateContentColumn(insertedRow);
+          ITableRow row = addRowByArray(new Object[]{insertedRow, "", ""});
+          getContentColumn().updateValue(row, insertedRow, getDrillDownStyleMap());
         }
         catch (ProcessingException exception) {
           SERVICES.getService(IExceptionHandlerService.class).handleException(exception);
@@ -320,14 +285,14 @@ public class MobileTable extends AbstractTable {
   }
 
   private void handleWrappedTableRowsUpdated(ITableRow[] rows) {
-    if (m_originalTable == null || m_originalTable.getRowCount() == 0) {
+    if (getOriginalTable() == null || getOriginalTable().getRowCount() == 0) {
       return;
     }
 
     try {
       setTableChanging(true);
       try {
-        updateContentColumn(rows);
+        getContentColumn().updateValue(getRowMapColumn().findRows(rows), rows, getDrillDownStyleMap());
 
         if (isCheckable()) {
           for (ITableRow row : rows) {
@@ -347,304 +312,20 @@ public class MobileTable extends AbstractTable {
     }
   }
 
-  private void updateContentColumn(ITableRow[] rows) throws ProcessingException {
-    for (ITableRow row : rows) {
-      updateContentColumn(row);
-    }
-  }
-
-  private void updateContentColumn(ITableRow row) throws ProcessingException {
-    ITableRow mobileTableRow = getRowMapColumn().findRow(row);
-    if (mobileTableRow == null) {
-      return;
-    }
-
-    getContentColumn().setValue(mobileTableRow, computeContentColumnValue(mobileTableRow));
-  }
-
-  /**
-   * Analyzes the content of the table to find optimal columns for the displayed texts.
-   */
-  private void initializeDecorationConfiguration() {
-    m_cellDetailColumns = new ArrayList<IColumn>(m_maxCellDetailColumns);
-
-    for (IColumn<?> column : m_originalTable.getColumnSet().getVisibleColumns()) {
-      if (m_cellDetailColumns.size() >= m_maxCellDetailColumns) {
-        break;
-      }
-
-      if (m_cellHeaderColumn == null && useColumnForCellHeader(column)) {
-        m_cellHeaderColumn = column;
-      }
-      else if (useColumnForCellDetail(column)) {
-        m_cellDetailColumns.add(column);
-      }
-
-    }
-  }
-
-  private boolean useColumnForCellHeader(IColumn<?> column) {
-    //Only use the given column if there are no summary columns defined
-    if (m_originalTable.getColumnSet().getSummaryColumns().length == 0) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private boolean useColumnForCellDetail(IColumn<?> column) {
-    boolean columnEmpty = true;
-    int maxRowsToConsider = 10;
-
-    for (int row = 0; row < Math.min(maxRowsToConsider, m_originalTable.getRowCount()); row++) {
-      final String columnDisplayText = column.getDisplayText(m_originalTable.getRow(row));
-      if (StringUtility.hasText(columnDisplayText)) {
-        columnEmpty = false;
-
-        String cellHeaderText = getCellHeaderText(row);
-        if (cellHeaderText != null && cellHeaderText.contains(columnDisplayText)) {
-          return false;
-        }
-
-      }
-
-    }
-
-    if (columnEmpty) {
-      return false;
-    }
-
-    return true;
-  }
-
-  private String getCellHeaderText(int i) {
-    if (m_cellHeaderColumn != null) {
-      return m_cellHeaderColumn.getDisplayText(m_originalTable.getRow(i));
-    }
-    else {
-      return m_originalTable.getSummaryCell(i).getText();
-    }
-  }
-
-  private String computeContentColumnValue(ITableRow mobileTableRow) throws ProcessingException {
-    if (mobileTableRow == null) {
-      return null;
-    }
-    ITableRow row = getRowMapColumn().getValue(mobileTableRow);
-    String cellHeaderText = getCellHeaderText(row.getRowIndex());
-    if (cellHeaderText == null) {
-      cellHeaderText = "";
-    }
-    //Don't generate cell content if the only column contains html.
-    //It is assumed that such a column is already optimized for mobile devices.
-    if (m_cellDetailColumns.size() == 0 && cellHeaderText.contains("<html>")) {
-      return cellHeaderText;
-    }
-
-    String content = "";
-    boolean cellHasHeader = false;
-    if (StringUtility.hasText(cellHeaderText)) {
-      content = createCellHeader(cellHeaderText);
-      content += "<br/>";
-      cellHasHeader = true;
-    }
-
-    content += createCellDetail(row, cellHasHeader);
-
-    String icon = createCellIcon(row);
-    String output = m_htmlCellTemplate.replace("#ICON#", icon);
-    output = output.replace("#ICON_COL_WIDTH#", createCellIconColWidth(row, icon));
-    output = output.replace("#CONTENT#", content);
-    output = output.replace("#DRILL_DOWN#", createCellDrillDown());
-    output = output.replace("#DRILL_DOWN_COL_WIDTH#", createCellDrillDownColWidth());
-
-    return output;
-  }
-
-  private String createCellIcon(ITableRow row) {
-    if (row == null) {
-      return "";
-    }
-
-    String iconId = null;
-    if (row.getTable().isCheckable()) {
-      if (row.isChecked()) {
-        iconId = Icons.CheckboxYes;
-      }
-      else {
-        iconId = Icons.CheckboxNo;
-      }
-    }
-    else {
-      iconId = row.getIconId();
-      if (iconId == null) {
-        iconId = row.getCell(0).getIconId();
-      }
-    }
-
-    if (iconId == null) {
-      return "";
-    }
-    else {
-      return "<img style=\" width=\"16\" height=\"16\" src=\"cid:" + iconId + "\"/>";
-    }
-  }
-
-  private String createCellIconColWidth(ITableRow row, String icon) {
-    if (StringUtility.hasText(icon)) {
-      return "32";
-    }
-    else {
-      //If there is no icon set a small width as left padding for the text.
-      return "6";
-    }
-  }
-
-  private String createCellDrillDown() {
-    if (isDrillDownOnClickEnabled()) {
-      return m_htmlDrillDown;
-    }
-    else if (isDrillDownPossible()) {
-      return m_htmlDrillDownButton;
-    }
-
-    return "";
-  }
-
-  private String createCellDrillDownColWidth() {
-    if (isDrillDownOnClickEnabled()) {
-      return "32";
-    }
-    else if (isDrillDownPossible()) {
-      return "60";
-    }
-
-    return "0";
-  }
-
-  private String createCellHeader(String cellHeaderText) {
-    String content = "";
-
-    content = cleanupText(cellHeaderText);
-    content = "<b>" + content + "</b>";
-
-    return content;
-  }
-
-  private String createCellDetail(ITableRow row, boolean cellHasHeader) {
-    if (row == null) {
-      return "";
-    }
-
-    String content = "";
-    int col = 0;
-    for (IColumn column : m_cellDetailColumns) {
-      String displayText = extractCellDisplayText(column, row);
-
-      if (StringUtility.hasText(displayText)) {
-        if (isHeaderdiscriptionNeeded(row, column)) {
-          content += extractColumnHeader(column);
-          content += ": ";
-        }
-        content += displayText;
-      }
-
-      if (col < m_cellDetailColumns.size() - 1) {
-        content += "<br/>";
-      }
-
-      col++;
-    }
-
-    if (cellHasHeader) {
-      //Make the font a little smaller if there is a cell header
-      content = "<span style=\"font-size:12px\">" + content + "</span>";
-    }
-
-    return content;
-  }
-
-  private String cleanupText(String text) {
-    if (text == null) {
-      return null;
-    }
-
-    //Remove html tags
-    if (text.contains("<html>")) {
-      String textWithoutHtml = HTMLUtility.getPlainText(text);
-      if (textWithoutHtml != null) {
-        text = textWithoutHtml;
-      }
-    }
-    text = StringUtility.removeNewLines(text);
-    text = StringUtility.trim(text);
-
-    //See replace spaces with non breakable spaces.
-    //Can't use &nbsp; because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=379088
-    text = text.replaceAll("\\s", "&#160;");
-
-    return text;
-  }
-
-  private String extractCellDisplayText(IColumn column, ITableRow row) {
-    String displayText = column.getDisplayText(row);
-
-    displayText = cleanupText(displayText);
-
-    return displayText;
-  }
-
-  private String extractColumnHeader(IColumn column) {
-    String header = column.getHeaderCell().getText();
-
-    header = cleanupText(header);
-
-    return header;
-  }
-
-  /**
-   * Columns with a reasonable text don't need the header description.
-   */
-  private boolean isHeaderdiscriptionNeeded(ITableRow row, IColumn column) {
-    if (column instanceof ISmartColumn<?>) {
-      return column.getValue(row) instanceof Boolean;
-    }
-
-    if (column instanceof IStringColumn) {
-      return isNumber(((IStringColumn) column).getValue(row));
-    }
-
-    return true;
-  }
-
-  private boolean isNumber(String value) {
-    if (value == null) {
-      return false;
-    }
-
-    try {
-      Double.parseDouble(value);
-    }
-    catch (NumberFormatException e) {
-      return false;
-    }
-    return true;
-  }
-
   private void selectRows() {
-    if (m_originalTable.getSelectedRowCount() == 0) {
+    if (getOriginalTable().getSelectedRowCount() == 0) {
       return;
     }
 
-    selectRows(getRowMapColumn().findRows(m_originalTable.getSelectedRows()));
+    selectRows(getRowMapColumn().findRows(getOriginalTable().getSelectedRows()));
   }
 
   private void checkRows() throws ProcessingException {
-    if (!isCheckable() || m_originalTable.getCheckedRows().length == 0) {
+    if (!isCheckable() || getOriginalTable().getCheckedRows().length == 0) {
       return;
     }
 
-    checkRows(getRowMapColumn().findRows(m_originalTable.getCheckedRows()), true);
+    checkRows(getRowMapColumn().findRows(getOriginalTable().getCheckedRows()), true);
   }
 
   private class P_TableEventListener extends TableAdapter {
@@ -693,67 +374,56 @@ public class MobileTable extends AbstractTable {
 
   }
 
+  public static void setAutoCreateRowForm(ITable table, Boolean autoCreateRowForm) {
+    PropertyBucket.getInstance().setPropertyBoolean(table, IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM, autoCreateRowForm);
+  }
+
+  public static Boolean isAutoCreateRowForm(ITable table) {
+    return PropertyBucket.getInstance().getPropertyBoolean(table, IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM);
+  }
+
+  public static void setDrillDownStyleMap(ITable table, DrillDownStyleMap drillDownStyles) {
+    PropertyBucket.getInstance().setProperty(table, IMobileTable.PROP_DRILL_DOWN_STYLE_MAP, drillDownStyles);
+  }
+
+  public static DrillDownStyleMap getDrillDownStyleMap(ITable table) {
+    return PropertyBucket.getInstance().getProperty(table, IMobileTable.PROP_DRILL_DOWN_STYLE_MAP);
+  }
+
   /**
-   * Dispatches ui events to the original table
-   * Normal processed Events: fireHeaderSortFromUI; setContextColumnFromUI
+   * Used to directly dispatch ui events to the original table or to completely deny certain events
    */
   protected class P_MobileTableUIFacade extends P_TableUIFacade {
-
-    //------------- pass events to both ---------------------------
-    @Override
-    public void fireRowClickFromUI(ITableRow row) {
-      //FIXME CGU pass to original table if drilldown on click enabled??
-      super.fireRowClickFromUI(row);
-      m_originalTable.getUIFacade().fireRowClickFromUI(getRowMapColumn().getValue(row));
-    }
-
-    @Override
-    public void fireRowActionFromUI(ITableRow row) {
-      super.fireRowActionFromUI(row);
-      m_originalTable.getUIFacade().fireRowActionFromUI(getRowMapColumn().getValue(row));
-    }
-
-    @Override
-    public void setSelectedRowsFromUI(ITableRow[] rows) {
-      super.setSelectedRowsFromUI(rows);
-      m_originalTable.getUIFacade().setSelectedRowsFromUI(getRowMapColumn().getValues(rows));
-    }
-
-    @Override
-    public void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> column, URL url) {
-      super.fireHyperlinkActionFromUI(row, column, url);
-      m_originalTable.getUIFacade().fireHyperlinkActionFromUI(getRowMapColumn().getValue(row), column, url);
-    }
 
     //------------- pass events only to original table -------------
     @Override
     public IMenu[] fireRowPopupFromUI() {
-      return m_originalTable.getUIFacade().fireRowPopupFromUI();
+      return getOriginalTable().getUIFacade().fireRowPopupFromUI();
     }
 
     @Override
     public IMenu[] fireEmptySpacePopupFromUI() {
-      return m_originalTable.getUIFacade().fireEmptySpacePopupFromUI();
+      return getOriginalTable().getUIFacade().fireEmptySpacePopupFromUI();
     }
 
     @Override
     public IMenu[] fireHeaderPopupFromUI() {
-      return m_originalTable.getUIFacade().fireHeaderPopupFromUI();
+      return getOriginalTable().getUIFacade().fireHeaderPopupFromUI();
     }
 
     @Override
     public TransferObject fireRowsDragRequestFromUI() {
-      return m_originalTable.getUIFacade().fireRowsDragRequestFromUI();
+      return getOriginalTable().getUIFacade().fireRowsDragRequestFromUI();
     }
 
     @Override
     public void fireRowDropActionFromUI(ITableRow row, TransferObject dropData) {
-      m_originalTable.getUIFacade().fireRowDropActionFromUI(getRowMapColumn().getValue(row), dropData);
+      getOriginalTable().getUIFacade().fireRowDropActionFromUI(getRowMapColumn().getValue(row), dropData);
     }
 
     @Override
     public boolean fireKeyTypedFromUI(String keyStrokeText, char keyChar) {
-      return m_originalTable.getUIFacade().fireKeyTypedFromUI(keyStrokeText, keyChar);
+      return getOriginalTable().getUIFacade().fireKeyTypedFromUI(keyStrokeText, keyChar);
     }
 
     //------------- do not process events --------------------------

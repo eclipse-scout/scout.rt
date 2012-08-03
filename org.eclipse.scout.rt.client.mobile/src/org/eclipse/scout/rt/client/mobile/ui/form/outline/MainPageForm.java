@@ -19,4 +19,16 @@ public class MainPageForm extends PageForm implements IMainPageForm {
     super(page, manager, config);
   }
 
+  @Override
+  protected void initConfig() throws ProcessingException {
+    super.initConfig();
+
+    getPageTableField().setActionBarVisible(false);
+  }
+
+  @Override
+  protected boolean getConfiguredFooterVisible() {
+    return true;
+  }
+
 }

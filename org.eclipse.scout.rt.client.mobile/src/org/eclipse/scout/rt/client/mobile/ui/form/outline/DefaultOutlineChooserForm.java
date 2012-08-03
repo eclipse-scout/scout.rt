@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.DefaultOutlineChooserForm.MainBox.OutlinesTableField;
-import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -86,7 +86,12 @@ public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineC
       }
 
       @Order(10.0)
-      public class Table extends AbstractTable {
+      public class Table extends AbstractMobileTable {
+
+        @Override
+        protected boolean execIsAutoCreateTableRowForm() {
+          return false;
+        }
 
         @Override
         protected boolean getConfiguredAutoDiscardOnDelete() {
@@ -140,7 +145,15 @@ public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineC
 
         @Override
         protected void execRowClick(ITableRow row) throws ProcessingException {
-          IOutline outline = getOutlineColumn().getValue(row);
+        }
+
+        @Override
+        protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
+          if (rows == null || rows.length == 0) {
+            return;
+          }
+
+          IOutline outline = getOutlineColumn().getValue(rows[0]);
 
           MobileDesktopUtility.activateOutline(outline);
           getDesktop().removeForm(DefaultOutlineChooserForm.this);

@@ -14,7 +14,12 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.DrillDownStyleMap;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.IRowSummaryColumn;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.MobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.AbstractMobileTableField;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.AutoTableForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageDetailFormField;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageTableGroupBox;
@@ -26,11 +31,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -42,7 +45,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public class PageForm extends AbstractForm implements IPageForm {
+public class PageForm extends AbstractMobileForm implements IPageForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PageForm.class);
   private List<IButton> m_mainboxButtons;
   private IPage m_page;
@@ -174,9 +177,33 @@ public class PageForm extends AbstractForm implements IPageForm {
       pageTable.setDefaultIconId(m_page.getCell().getIconId());
     }
 
+    MobileTable.setAutoCreateRowForm(pageTable, false);
+    if (pageTable != null) {
+      setTableRowDrillDownStyle(pageTable, pageTable.getRows());
+    }
+
     getPageTableField().setTable(pageTable, true);
     updateTableFieldVisibility();
     getPageTableField().setTableStatusVisible(m_pageFormConfig.isTableStatusVisible());
+  }
+
+  private void setTableRowDrillDownStyle(ITable table, ITableRow[] rows) {
+    if (rows == null) {
+      return;
+    }
+
+    DrillDownStyleMap drillDownMap = MobileTable.getDrillDownStyleMap(table);
+    if (drillDownMap == null) {
+      drillDownMap = new DrillDownStyleMap();
+      MobileTable.setDrillDownStyleMap(table, drillDownMap);
+    }
+
+    for (ITableRow row : rows) {
+      if (m_pageFormConfig.isKeepSelection() && !PageFormManager.isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), row))) {
+        drillDownMap.put(row, IRowSummaryColumn.DRILL_DOWN_STYLE_NONE);
+      }
+    }
+
   }
 
   private List<IButton> fetchNodeActionsAndConvertToButtons() throws ProcessingException {
@@ -194,8 +221,6 @@ public class PageForm extends AbstractForm implements IPageForm {
   }
 
   public void formAddedNotify() throws ProcessingException {
-    clearTableSelectionIfNecessary();
-
     //Make sure the page which belongs to the form is active when the form is shown
     m_page.getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(m_page);
 
@@ -228,17 +253,6 @@ public class PageForm extends AbstractForm implements IPageForm {
       table.removeTableListener(m_pageTableListener);
     }
     m_pageTableListener = null;
-  }
-
-  private void clearTableSelectionIfNecessary() {
-    if (getPageTableField().getTable() == null) {
-      return;
-    }
-
-    ITableRow selectedRow = getPageTableField().getTable().getSelectedRow();
-    if (!m_pageFormConfig.isKeepSelection() || PageFormManager.isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
-      getPageTableField().getTable().selectRow(null);
-    }
   }
 
   private void processSelectedTableRow() throws ProcessingException {
@@ -308,7 +322,12 @@ public class PageForm extends AbstractForm implements IPageForm {
     public class PageTableGroupBox extends AbstractGroupBox {
 
       @Order(10.0f)
-      public class PageTableField extends AbstractOutlineTableField {
+      public class PageTableField extends AbstractMobileTableField<ITable> {
+
+        @Override
+        protected boolean getConfiguredLabelVisible() {
+          return false;
+        }
 
         @Override
         protected boolean getConfiguredTableStatusVisible() {
@@ -448,6 +467,10 @@ public class PageForm extends AbstractForm implements IPageForm {
     }
   }
 
+  private void handleTableRowsInserted(ITable table, ITableRow[] tableRows) throws ProcessingException {
+    setTableRowDrillDownStyle(table, tableRows);
+  }
+
   protected void selectPageTableRowIfNecessary(final ITable pageDetailTable) throws ProcessingException {
     if (!m_pageFormConfig.isKeepSelection() || pageDetailTable == null || pageDetailTable.getRowCount() == 0) {
       return;
@@ -542,6 +565,7 @@ public class PageForm extends AbstractForm implements IPageForm {
     }
 
     private void handleTableRowsInserted(TableEvent event) throws ProcessingException {
+      PageForm.this.handleTableRowsInserted(event.getTable(), event.getRows());
       updateTableFieldVisibility();
     }
 

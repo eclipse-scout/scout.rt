@@ -11,19 +11,14 @@
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.MobileTable;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.IMobileTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.rap.basic.table.IRwtScoutTable;
 import org.eclipse.scout.rt.ui.rap.form.fields.tablefield.IRwtTableStatus;
 import org.eclipse.scout.rt.ui.rap.form.fields.tablefield.RwtScoutTableField;
@@ -76,14 +71,9 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
     ClientSyncJob job = new ClientSyncJob("", getUiEnvironment().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        MobileTable wrapperTable = new MobileTable();
+        MobileTable wrapperTable = new MobileTable(table);
         try {
           wrapperTable.setTableChanging(true);
-          String headerName = createColumnHeaderName(table);
-          wrapperTable.setHeaderName(headerName);
-          wrapperTable.setDrillDownPossible(computeDrillDownColumnVisibility());
-          wrapperTable.setDrillDownOnClickEnabled(isDrillDownOnClickEnabled());
-          wrapperTable.installWrappedTable(table);
           wrapperTable.initTable();
         }
         finally {
@@ -104,53 +94,20 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
     return holder.getValue();
   }
 
-  private String createColumnHeaderName(ITable table) {
-    String headerName = getScoutObject().getLabel();
-    if (StringUtility.hasText(headerName)) {
-      return headerName;
-    }
-    if (table.getVisibleColumnCount() == 1) {
-      headerName = table.getColumnSet().getVisibleColumn(0).getHeaderCell().getText();
-    }
-    if (StringUtility.hasText(headerName)) {
-      return headerName;
-    }
-
-    return TEXTS.get("MobileTableDefaultHeader");
-  }
-
-  private boolean computeDrillDownColumnVisibility() {
-    if (getScoutObject().getForm() instanceof IOutlineChooserForm) {
-      return true;
-    }
-
-    if (getScoutObject().getForm() instanceof IOutlineTableForm) {
-      IOutline outline = getUiEnvironment().getClientSession().getDesktop().getOutline();
-      if (outline.getActivePage() != null) {
-        return !outline.getActivePage().isLeaf();
-      }
-    }
-
-    return false;
-  }
-
-  public boolean isDrillDownOnClickEnabled() {
-    if ((getScoutObject() instanceof AbstractOutlineTableField || getScoutObject().getForm() instanceof IOutlineChooserForm)) {
-      return true;
-    }
-
-    return false;
-  }
-
   @Override
   protected IRwtScoutActionBar createRwtScoutActionBar() {
-    if (isDrillDownOnClickEnabled()) {
-      return null;
+    boolean actionBarVisible = true;
+    if (getScoutObject() instanceof IMobileTableField) {
+      actionBarVisible = ((IMobileTableField) getScoutObject()).isActionBarVisible();
     }
 
-    RwtScoutTableActionBar actionBar = new RwtScoutTableActionBar();
-    actionBar.createUiField(getUiContainer(), getScoutObject(), getUiEnvironment());
-    return actionBar;
+    if (actionBarVisible) {
+      RwtScoutTableActionBar actionBar = new RwtScoutTableActionBar();
+      actionBar.createUiField(getUiContainer(), getScoutObject(), getUiEnvironment());
+      return actionBar;
+    }
+
+    return null;
   }
 
   @Override

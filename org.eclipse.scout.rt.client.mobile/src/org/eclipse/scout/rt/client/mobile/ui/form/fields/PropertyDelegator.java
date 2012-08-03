@@ -12,18 +12,29 @@ package org.eclipse.scout.rt.client.mobile.ui.form.fields;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 
 public class PropertyDelegator<SENDER extends IPropertyObserver, RECEIVER extends IPropertyObserver> {
   private P_PropertyChangeListener m_propertyChangeListener;
+  private Set<String> m_filter;
   private SENDER m_sender;
   private RECEIVER m_receiver;
 
   public PropertyDelegator(SENDER sender, RECEIVER receiver) {
+    this(sender, receiver, null);
+  }
+
+  public PropertyDelegator(SENDER sender, RECEIVER receiver, Set<String> filteredPropertyNames) {
     m_sender = sender;
     m_receiver = receiver;
 
+    m_filter = filteredPropertyNames;
+    if (m_filter == null) {
+      m_filter = new HashSet<String>();
+    }
     m_propertyChangeListener = new P_PropertyChangeListener();
     m_sender.addPropertyChangeListener(m_propertyChangeListener);
   }
@@ -38,7 +49,7 @@ public class PropertyDelegator<SENDER extends IPropertyObserver, RECEIVER extend
 
   /**
    * Fills the properties of the receiver with the values of the sender. Typically used at the initialization of objects
-   * f.e. at initConfig() of a form field.
+   * e.g. at initConfig() of a form field.
    */
   public void init() {
   }
@@ -50,7 +61,9 @@ public class PropertyDelegator<SENDER extends IPropertyObserver, RECEIVER extend
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      handlePropertyChange(evt.getPropertyName(), evt.getNewValue());
+      if (!m_filter.contains(evt.getPropertyName())) {
+        handlePropertyChange(evt.getPropertyName(), evt.getNewValue());
+      }
     }
 
   }

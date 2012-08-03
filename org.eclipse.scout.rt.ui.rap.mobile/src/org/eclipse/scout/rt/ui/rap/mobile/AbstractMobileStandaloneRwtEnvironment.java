@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.mobile;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.IMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IMainPageForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -89,12 +90,13 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
 
   @Override
   public IRwtScoutFormFooter createFormFooter(Composite parent, IForm scoutForm) {
-    if (!(scoutForm instanceof IMainPageForm)) {
-      return null;
+    if (scoutForm instanceof IMobileForm && ((IMobileForm) scoutForm).isFooterVisible()) {
+      RwtScoutMobileFormFooter mobileFormFooter = new RwtScoutMobileFormFooter();
+      mobileFormFooter.createUiField(parent, scoutForm, this);
+      return mobileFormFooter;
     }
-    RwtScoutMobileFormFooter mobileFormFooter = new RwtScoutMobileFormFooter();
-    mobileFormFooter.createUiField(parent, scoutForm, this);
-    return mobileFormFooter;
+
+    return null;
   }
 
   @Override

@@ -76,14 +76,16 @@ public class RwtScoutTableActionBar extends AbstractRwtScoutActionBar<ITableFiel
       menuList.addAll(Arrays.asList(emptySpaceMenus));
     }
 
-    IMenu[] rowMenus = RwtMenuUtility.collectRowMenus(table, getUiEnvironment());
-    if (rowMenus != null) {
-      List<IMenu> rowMenuList = new LinkedList<IMenu>(Arrays.asList(rowMenus));
+    if (table.getSelectedRowCount() > 0) {
+      IMenu[] rowMenus = RwtMenuUtility.collectRowMenus(table, getUiEnvironment());
+      if (rowMenus != null) {
+        List<IMenu> rowMenuList = new LinkedList<IMenu>(Arrays.asList(rowMenus));
 
-      ActionButtonBarUtility.distributeRowActions(menuList, emptySpaceMenus, rowMenuList);
+        ActionButtonBarUtility.distributeRowActions(menuList, emptySpaceMenus, rowMenuList);
 
-      //Add remaining row menus
-      menuList.addAll(rowMenuList);
+        //Add remaining row menus
+        menuList.addAll(rowMenuList);
+      }
     }
   }
 
