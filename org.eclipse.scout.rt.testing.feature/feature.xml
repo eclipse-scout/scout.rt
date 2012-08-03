@@ -35,16 +35,11 @@ BSI Business Systems Integration AG - initial API and implementation
          version="0.0.0"
          optional="true"/>
 
-   <includes
-         id="org.eclipse.scout.rt.testing.dependency.feature"
-         version="0.0.0"/>
-
    <requires>
       <import feature="org.eclipse.scout.rt.feature" version="3.8.0.qualifier"/>
       <import plugin="org.junit4"/>
       <import plugin="org.junit"/>
       <import plugin="org.apache.ant"/>
-      <import plugin="org.easymock"/>
    </requires>
 
    <plugin
@@ -96,5 +91,12 @@ BSI Business Systems Integration AG - initial API and implementation
          install-size="0"
          version="0.0.0"
          fragment="true"/>
+
+   <plugin
+         id="org.easymock"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>

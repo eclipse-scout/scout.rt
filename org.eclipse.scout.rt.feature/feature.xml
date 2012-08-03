@@ -54,6 +54,13 @@ BSI Business Systems Integration AG - initial API and implementation
    </requires>
 
    <plugin
+         id="org.easymock"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.scout.commons"
          download-size="0"
          install-size="0"
