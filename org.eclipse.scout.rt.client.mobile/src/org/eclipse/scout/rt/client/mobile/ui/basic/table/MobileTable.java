@@ -143,19 +143,33 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   @Override
-  protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
-    if (!m_selectionLock.acquire()) {
-      //Prevent loop which could happen because delegation of selection is done from this to original table and vice versa
-      return;
+  protected boolean isClearingSelectionNecessary() {
+    if (getSelectedRow() == null) {
+      return false;
     }
 
+    ITableRow originalRow = getRowMapColumn().getValue(getSelectedRow());
+    String drillDownStyle = getDrillDownStyle(originalRow);
+    return IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(drillDownStyle);
+  }
+
+  @Override
+  protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
     try {
+      if (!m_selectionLock.acquire()) {
+        //Prevent loop which could happen because delegation of selection is done from this to original table and vice versa
+        return;
+      }
+
       if (rows == null || rows.length == 0) {
         getOriginalTable().getUIFacade().setSelectedRowsFromUI(rows);
         return;
       }
 
       ITableRow originalRow = getRowMapColumn().getValue(rows[0]);
+      // TODO CGU: Attention: Drill Down style may not be accurate at this time. 
+      // This may happen if the events are executed as batch and another listener sets the style on a rows inserted event (see PageForm)
+      // That's why there is a double check in clearSelection
       if (IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(getDrillDownStyle(originalRow))) {
         if (isAutoCreateTableRowForm()) {
           startTableRowForm(originalRow);

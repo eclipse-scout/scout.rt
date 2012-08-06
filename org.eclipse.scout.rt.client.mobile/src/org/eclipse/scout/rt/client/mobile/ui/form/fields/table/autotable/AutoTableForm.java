@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.IColumnWrapper;
@@ -37,6 +39,8 @@ import org.eclipse.scout.service.SERVICES;
  * @since 3.9.0
  */
 public class AutoTableForm extends AbstractForm {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AutoTableForm.class);
+
   private ITable m_table;
   private ITableRow m_row;
   private AutoTableBuilder m_autoTableBuilder;
@@ -87,6 +91,10 @@ public class AutoTableForm extends AbstractForm {
 
     @Override
     protected void injectFieldsInternal(List<IFormField> fieldList) {
+      if (getTable().isTableChanging()) {
+        //FIXME CGU Since actions are fetched by a table event the event will be postponed if table changing is set to true -> no menus returned.
+        LOG.warn("Actions might be incomplete for table " + getTable());
+      }
       IMenu[] tableRowActions = getTable().getUIFacade().fireRowPopupFromUI();
       fieldList.addAll(ActionButtonBarUtility.convertActionsToMainButtons(tableRowActions));
       super.injectFieldsInternal(fieldList);

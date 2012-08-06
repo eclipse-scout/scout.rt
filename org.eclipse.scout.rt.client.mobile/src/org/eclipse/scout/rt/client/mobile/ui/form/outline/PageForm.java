@@ -146,6 +146,10 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
   private void initMainButtons() throws ProcessingException {
     List<IButton> buttonList = new LinkedList<IButton>();
+    if (m_page.getTree().isTreeChanging()) {
+      //FIXME CGU Since actions are fetched by a tree event the event will be postponed if tree changing is set to true -> no menus returned.
+      LOG.warn("Actions might be incomplete for page " + m_page);
+    }
     buttonList.addAll(fetchNodeActionsAndConvertToButtons());
 
     if (m_page.getDetailForm() != null) {
@@ -410,9 +414,10 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   private void handleTableRowSelected(ITable table, ITableRow tableRow) throws ProcessingException {
     LOG.debug("Table row selected: " + tableRow);
 
-    if (!m_page.isChildrenLoaded()) {
+    if (!m_page.isLeaf() && !m_page.isChildrenLoaded()) {
       // If children are not loaded rowPage cannot be estimated.
       //This is the case when the rows get replaced which restores the selection before the children are loaded (e.g. executed by a search).
+      //FIXME CGU A search typically uses the BookmarkUtility which selects the node of the outline. That's why it works for non leaf pages. Is this safe?
       return;
     }
     if (tableRow == null) {

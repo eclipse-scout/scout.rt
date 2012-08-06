@@ -87,16 +87,25 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     form.start();
   }
 
+  protected boolean isClearingSelectionNecessary() {
+    if (getSelectedRow() == null) {
+      return false;
+    }
+
+    return (IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(getDrillDownStyle(getSelectedRow())));
+  }
+
   protected void clearSelection() {
     ClientSyncJob job = new ClientSyncJob("Clearing selection", ClientJob.getCurrentSession()) {
 
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        selectRow(null);
+        if (isClearingSelectionNecessary()) {
+          selectRow(null);
+        }
       }
 
     };
     job.schedule();
   }
-
 }
