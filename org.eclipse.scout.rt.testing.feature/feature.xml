@@ -38,8 +38,9 @@ BSI Business Systems Integration AG - initial API and implementation
    <requires>
       <import feature="org.eclipse.scout.rt.feature" version="3.8.0.qualifier"/>
       <import plugin="org.junit4"/>
-      <import plugin="org.junit"/>
+      <import plugin="org.easymock"/>
       <import plugin="org.apache.ant"/>
+      <import plugin="org.junit"/>
    </requires>
 
    <plugin
