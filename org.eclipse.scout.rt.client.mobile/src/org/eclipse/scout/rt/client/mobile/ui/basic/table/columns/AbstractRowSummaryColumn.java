@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.ui.basic.table;
+package org.eclipse.scout.rt.client.mobile.ui.basic.table.columns;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Activator;
 import org.eclipse.scout.rt.client.mobile.Icons;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.DrillDownStyleMap;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;

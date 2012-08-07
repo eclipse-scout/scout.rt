@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.mobile;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.IMobileForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.IMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IMainPageForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;

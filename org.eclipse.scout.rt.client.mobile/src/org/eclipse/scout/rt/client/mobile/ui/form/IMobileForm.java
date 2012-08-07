@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.ui.form.fields;
+package org.eclipse.scout.rt.client.mobile.ui.form;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
 

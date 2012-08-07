@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.mobile.ui.form;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.IMobileForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 
 /**

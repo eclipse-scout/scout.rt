@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.ui.basic.table;
+package org.eclipse.scout.rt.client.mobile.ui.basic.table.columns;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
