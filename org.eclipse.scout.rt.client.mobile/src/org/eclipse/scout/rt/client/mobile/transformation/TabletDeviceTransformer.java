@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MultiPageChangeStrategy;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.TabForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
@@ -82,13 +84,19 @@ public class TabletDeviceTransformer extends AbstractDeviceTransformer {
           return;
         }
 
-        MobileDesktopUtility.closeAllToolForms();
+        if (execCloseToolFormsOnFormOpen(form)) {
+          MobileDesktopUtility.closeAllToolForms();
+        }
 
         form.setDisplayViewId(IForm.VIEW_ID_E);
         MobileDesktopUtility.setFormWidthHint(form, EAST_FORM_WIDTH);
       }
     }
 
+  }
+
+  protected boolean execCloseToolFormsOnFormOpen(IForm form) {
+    return !(form instanceof TableRowForm) && !(form instanceof TabForm);
   }
 
   @Override

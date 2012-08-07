@@ -15,7 +15,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.MobileTabBoxGroupBox;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.TabBoxGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
@@ -47,7 +47,7 @@ public class RwtScoutMobileTabBox extends RwtScoutFieldComposite<ITabBox> implem
     ClientSyncJob job = new ClientSyncJob("", getUiEnvironment().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        MobileTabBoxGroupBox groupBox = new MobileTabBoxGroupBox(getScoutObject());
+        TabBoxGroupBox groupBox = new TabBoxGroupBox(getScoutObject());
         groupBox.initField();
 
         holder.setValue(groupBox);

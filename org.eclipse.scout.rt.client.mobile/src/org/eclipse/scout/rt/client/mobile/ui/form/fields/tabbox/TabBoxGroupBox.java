@@ -10,35 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.FormFieldPropertyDelegator;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
 /**
- * Group box which represents a {@link ITabBox} and contains {@link MobileTabBoxButton}s to represent the tab items.
+ * Group box which represents a {@link ITabBox} and contains a {@link TabBoxTableField} to represent the tab items.
  * 
  * @since 3.9.0
  */
-public class MobileTabBoxGroupBox extends AbstractGroupBox {
-  private List<IButton> m_injectedButtons;
+public class TabBoxGroupBox extends AbstractGroupBox {
   private FormFieldPropertyDelegator<ITabBox, IGroupBox> m_propertyDelegator;
 
-  public MobileTabBoxGroupBox(ITabBox tabBox) {
+  public TabBoxGroupBox(ITabBox tabBox) {
     super(false);
-
     m_propertyDelegator = new FormFieldPropertyDelegator<ITabBox, IGroupBox>(tabBox, this);
-    List<IButton> buttons = new LinkedList<IButton>();
-    for (IGroupBox groupBox : tabBox.getGroupBoxes()) {
-      IButton button = new MobileTabBoxButton(groupBox);
-      buttons.add(button);
-    }
-    m_injectedButtons = buttons;
     callInitializer();
     setFormInternal(tabBox.getForm());
     rebuildFieldGrid();
@@ -52,22 +41,26 @@ public class MobileTabBoxGroupBox extends AbstractGroupBox {
   }
 
   @Override
-  protected void injectFieldsInternal(List<IFormField> fieldList) {
-    if (m_injectedButtons != null) {
-      for (IFormField f : m_injectedButtons) {
-        fieldList.add(f);
-      }
+  protected void execInitField() throws ProcessingException {
+    getTableField().initField();
+  }
+
+  public ITabBox getTabBox() {
+    return m_propertyDelegator.getSender();
+  }
+
+  public TableField getTableField() {
+    return getFieldByClass(TableField.class);
+  }
+
+  @Order(10)
+  public class TableField extends TabBoxTableField {
+
+    @Override
+    public ITabBox getConfiguredTabBox() {
+      return TabBoxGroupBox.this.getTabBox();
     }
-  }
 
-  @Override
-  protected int getConfiguredGridColumnCount() {
-    return 2;
-  }
-
-  @Override
-  protected String getConfiguredBorderDecoration() {
-    return BORDER_DECORATION_LINE;
   }
 
 }

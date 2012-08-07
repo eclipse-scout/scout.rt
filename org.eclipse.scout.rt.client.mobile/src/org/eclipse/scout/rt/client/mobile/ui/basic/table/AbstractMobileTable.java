@@ -27,6 +27,8 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  */
 public abstract class AbstractMobileTable extends AbstractTable implements IMobileTable {
   private DrillDownStyleMap m_drillDownStyleMap;
+  private int m_tableRowFormDisplayHint;
+  private String m_tableRowFormDisplayViewId;
 
   public AbstractMobileTable() {
     this(true);
@@ -62,6 +64,22 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     return m_drillDownStyleMap.get(row);
   }
 
+  public int getTableRowFormDisplayHint() {
+    return m_tableRowFormDisplayHint;
+  }
+
+  public void setTableRowFormDisplayHint(int tableRowFormDisplayHint) {
+    m_tableRowFormDisplayHint = tableRowFormDisplayHint;
+  }
+
+  public String getTableRowFormDisplayViewId() {
+    return m_tableRowFormDisplayViewId;
+  }
+
+  public void setTableRowFormDisplayViewId(String tableRowFormDisplayViewId) {
+    m_tableRowFormDisplayViewId = tableRowFormDisplayViewId;
+  }
+
   @Override
   public void setDrillDownStyleMap(DrillDownStyleMap drillDownStyleMap) {
     m_drillDownStyleMap = drillDownStyleMap;
@@ -85,8 +103,9 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
 
   protected void startTableRowForm(ITableRow row) throws ProcessingException {
     TableRowForm form = new TableRowForm(row);
-    form.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
-    form.setModal(true);
+    form.setDisplayHint(getTableRowFormDisplayHint());
+    form.setDisplayViewId(getTableRowFormDisplayViewId());
+    form.setModal(IForm.DISPLAY_HINT_DIALOG == form.getDisplayHint());
     form.start();
     form.addFormListener(new FormListener() {
 

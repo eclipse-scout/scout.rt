@@ -74,6 +74,8 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
         MobileTable wrapperTable = new MobileTable(table);
         try {
           wrapperTable.setTableChanging(true);
+          wrapperTable.setTableRowFormDisplayHint(getScoutObject().getForm().getDisplayHint());
+          wrapperTable.setTableRowFormDisplayViewId(getScoutObject().getForm().getDisplayViewId());
           wrapperTable.initTable();
         }
         finally {
@@ -85,6 +87,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
     job.schedule();
 
     try {
+      //TODO CGU: this freezes the gui if initializing of the table takes a while. Async table creation possible?
       job.join();
     }
     catch (InterruptedException e) {

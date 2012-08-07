@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.TabForm;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -45,6 +47,14 @@ public class ToolFormHandler {
 
   public IDesktop getDesktop() {
     return m_desktop;
+  }
+
+  protected boolean execCloseToolFormsOnFormOpen(IForm form) {
+    if (IForm.DISPLAY_HINT_VIEW == form.getDisplayHint() && !MobileDesktopUtility.isToolForm(form)) {
+      return !(form instanceof TableRowForm) && !(form instanceof TabForm);
+    }
+
+    return false;
   }
 
   /**
@@ -97,7 +107,7 @@ public class ToolFormHandler {
 
     private void handleFormAdded(DesktopEvent e) {
       IForm form = e.getForm();
-      if (IForm.DISPLAY_HINT_VIEW == form.getDisplayHint() && !MobileDesktopUtility.isToolForm(form)) {
+      if (execCloseToolFormsOnFormOpen(form)) {
         //Close tool form if another view is opened
         MobileDesktopUtility.closeAllToolForms();
       }

@@ -24,10 +24,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 
-public class MobileTabBoxForm extends AbstractForm {
+public class TabForm extends AbstractForm {
   private IGroupBox m_tabGroupBox;
 
-  public MobileTabBoxForm(IGroupBox tabGroupBox) throws ProcessingException {
+  public TabForm(IGroupBox tabGroupBox) throws ProcessingException {
     super(false);
     m_tabGroupBox = tabGroupBox;
     callInitializer();
