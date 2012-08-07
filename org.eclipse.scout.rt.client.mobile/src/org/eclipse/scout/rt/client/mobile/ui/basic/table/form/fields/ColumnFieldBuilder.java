@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -22,54 +24,81 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
  * @since 3.9.0
  */
 public class ColumnFieldBuilder {
 
-  public List<IValueField> build(IColumn<?>[] columns) {
-    List<IValueField> fieldList = new LinkedList<IValueField>();
+  public Map<IColumn, IFormField> build(IColumn<?>[] columns, ITableRow row) throws ProcessingException {
+    Map<IColumn, IFormField> fields = new HashMap<IColumn, IFormField>();
     if (columns == null) {
-      return fieldList;
+      return fields;
     }
 
     for (IColumn column : columns) {
-      if (column instanceof IStringColumn) {
-        IValueField field = new StringColumnField((IStringColumn) column);
-        fieldList.add(field);
-      }
-      else if (column instanceof ISmartColumn) {
-        IValueField field = new SmartColumnField((ISmartColumn) column);
-        fieldList.add(field);
-      }
-      else if (column instanceof IDoubleColumn) {
-        IValueField field = new DoubleColumnField((IDoubleColumn) column);
-        fieldList.add(field);
-      }
-      else if (column instanceof IDateColumn) {
-        IValueField field = new DateColumnField((IDateColumn) column);
-        fieldList.add(field);
-      }
-      else if (column instanceof IBooleanColumn) {
-        IValueField field = new BooleanColumnField((IBooleanColumn) column);
-        fieldList.add(field);
-      }
-      else if (column instanceof ILongColumn) {
-        IValueField field = new LongColumnField((ILongColumn) column);
-        fieldList.add(field);
-      }
-      else if (column instanceof IIntegerColumn) {
-        IValueField field = new IntegerColumnField((IIntegerColumn) column);
-        fieldList.add(field);
-      }
-      else if (column instanceof IBigDecimalColumn) {
-        IValueField field = new BigDecimalColumnField((IBigDecimalColumn) column);
-        fieldList.add(field);
+      IFormField field = createValueField(column, row);
+      if (field != null) {
+        fields.put(column, field);
       }
     }
 
-    return fieldList;
+    return fields;
+  }
+
+  protected IFormField createValueField(IColumn<?> column, ITableRow row) throws ProcessingException {
+    if (column.isEditable()) {
+      IFormField field = createEditableField(column, row);
+      if (field != null) {
+        //Only
+        return field;
+      }
+    }
+
+    if (column instanceof IStringColumn) {
+      return new StringColumnField((IStringColumn) column);
+    }
+    if (column instanceof ISmartColumn) {
+      return new SmartColumnField((ISmartColumn) column);
+    }
+    if (column instanceof IDoubleColumn) {
+      return new DoubleColumnField((IDoubleColumn) column);
+    }
+    if (column instanceof IDateColumn) {
+      return new DateColumnField((IDateColumn) column);
+    }
+    if (column instanceof IBooleanColumn) {
+      return new BooleanColumnField((IBooleanColumn) column);
+    }
+    if (column instanceof ILongColumn) {
+      return new LongColumnField((ILongColumn) column);
+    }
+    if (column instanceof IIntegerColumn) {
+      return new IntegerColumnField((IIntegerColumn) column);
+    }
+    if (column instanceof IBigDecimalColumn) {
+      return new BigDecimalColumnField((IBigDecimalColumn) column);
+    }
+
+    return null;
+  }
+
+  protected IFormField createEditableField(IColumn<?> column, ITableRow row) throws ProcessingException {
+    IFormField field = column.prepareEdit(row);
+    if (field != null) {
+      //Revert changes which are done in AbstractColumn#prepareEdit
+      field.setLabelVisible(true);
+      GridData gd = field.getGridDataHints();
+      gd.weightY = 0;
+      field.setGridDataHints(gd);
+
+      //Set missing properties
+      field.setLabel(column.getHeaderCell().getText());
+      field.setTooltipText(column.getHeaderCell().getTooltipText());
+    }
+
+    return field;
   }
 }

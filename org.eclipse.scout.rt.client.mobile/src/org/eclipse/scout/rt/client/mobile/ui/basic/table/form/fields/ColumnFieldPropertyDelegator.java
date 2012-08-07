@@ -30,8 +30,8 @@ public class ColumnFieldPropertyDelegator<SENDER extends IColumn, RECEIVER exten
       getReceiver().setVisibleGranted(getSender().isVisibleGranted());
     }
     getReceiver().setLabel(getSender().getHeaderCell().getText());
-    getReceiver().setEnabled(getSender().isEditable());
     getReceiver().setTooltipText(getSender().getHeaderCell().getTooltipText());
+    getReceiver().setEnabled(false);
   }
 
   @Override
