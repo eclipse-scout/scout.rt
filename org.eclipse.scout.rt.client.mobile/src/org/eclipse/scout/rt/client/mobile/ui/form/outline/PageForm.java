@@ -203,11 +203,19 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
 
     for (ITableRow row : rows) {
-      if (m_pageFormConfig.isKeepSelection() && !PageFormManager.isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), row))) {
+      if (!isDrillDownRow(row)) {
         drillDownMap.put(row, IRowSummaryColumn.DRILL_DOWN_STYLE_NONE);
       }
     }
 
+  }
+
+  private boolean isDrillDownRow(ITableRow tableRow) {
+    if (!m_pageFormConfig.isKeepSelection()) {
+      return true;
+    }
+
+    return PageFormManager.isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), tableRow));
   }
 
   private List<IButton> fetchNodeActionsAndConvertToButtons() throws ProcessingException {
@@ -225,11 +233,25 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   public void formAddedNotify() throws ProcessingException {
+    //Clear selection if form gets visible again. It must not happen earlier, since the actions typically depend on the selected row.
+    clearTableSelectionIfNecessary();
+
     //Make sure the page which belongs to the form is active when the form is shown
     m_page.getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(m_page);
 
     addTableListener();
     processSelectedTableRow();
+  }
+
+  private void clearTableSelectionIfNecessary() {
+    if (getPageTableField().getTable() == null) {
+      return;
+    }
+
+    ITableRow selectedRow = getPageTableField().getTable().getSelectedRow();
+    if (isDrillDownRow(selectedRow)) {
+      getPageTableField().getTable().selectRow(null);
+    }
   }
 
   public void formRemovedNotify() throws ProcessingException {

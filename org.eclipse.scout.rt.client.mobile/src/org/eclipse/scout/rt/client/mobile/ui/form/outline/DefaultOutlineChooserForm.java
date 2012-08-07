@@ -157,6 +157,8 @@ public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineC
 
           MobileDesktopUtility.activateOutline(outline);
           getDesktop().removeForm(DefaultOutlineChooserForm.this);
+
+          clearSelectionDelayed();
         }
       }
     }

@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -29,6 +28,7 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   private DrillDownStyleMap m_drillDownStyleMap;
   private int m_tableRowFormDisplayHint;
   private String m_tableRowFormDisplayViewId;
+  private FormListener m_clearSelectionFormListener;
 
   public AbstractMobileTable() {
     this(true);
@@ -107,24 +107,27 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     form.setDisplayViewId(getTableRowFormDisplayViewId());
     form.setModal(IForm.DISPLAY_HINT_DIALOG == form.getDisplayHint());
     form.start();
-    form.addFormListener(new FormListener() {
-
-      @Override
-      public void formChanged(FormEvent e) throws ProcessingException {
-        if (FormEvent.TYPE_CLOSED == e.getType()) {
-          clearSelection();
-        }
-      }
-
-    });
+    form.addFormListener(getClearSelectionFormListener());
   }
 
-  protected boolean isClearingSelectionNecessary() {
-    if (getSelectedRow() == null) {
-      return false;
+  /**
+   * Returns a form listener which clears the selection on form closed if it is attached to a form.
+   */
+  protected FormListener getClearSelectionFormListener() {
+    if (m_clearSelectionFormListener == null) {
+      m_clearSelectionFormListener = new FormListener() {
+
+        @Override
+        public void formChanged(FormEvent e) throws ProcessingException {
+          if (FormEvent.TYPE_CLOSED == e.getType()) {
+            clearSelection();
+          }
+        }
+
+      };
     }
 
-    return (IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(getDrillDownStyle(getSelectedRow())));
+    return m_clearSelectionFormListener;
   }
 
   protected void clearSelectionDelayed() {
@@ -140,8 +143,6 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   }
 
   protected void clearSelection() {
-    if (isClearingSelectionNecessary()) {
-      selectRow(null);
-    }
+    selectRow(null);
   }
 }

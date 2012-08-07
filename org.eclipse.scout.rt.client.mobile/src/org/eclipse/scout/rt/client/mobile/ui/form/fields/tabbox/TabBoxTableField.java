@@ -102,6 +102,7 @@ public class TabBoxTableField extends AbstractTableField<Table> {
       form.setDisplayViewId(getForm().getDisplayViewId());
       form.setModal(IForm.DISPLAY_HINT_DIALOG == form.getDisplayHint());
       form.start();
+      form.addFormListener(getClearSelectionFormListener());
     }
 
     @Override
