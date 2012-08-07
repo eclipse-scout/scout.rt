@@ -10,21 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable;
 
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.ColumnToFormFieldPropertyDelegator;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.IColumnWrapper;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
-import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.SmartColumnToSmartFieldPropertyDelegator;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 
 /**
  * @since 3.9.0
  */
-public class AutoTableDateField extends AbstractDateField implements IColumnWrapper<IDateColumn> {
-  private ColumnToFormFieldPropertyDelegator<IDateColumn, IDateField> m_propertyDelegator;
+public class TableRowFormSmartField extends AbstractSmartField implements IColumnWrapper<ISmartColumn<?>> {
+  private SmartColumnToSmartFieldPropertyDelegator m_propertyDelegator;
 
-  public AutoTableDateField(IDateColumn column) {
+  public TableRowFormSmartField(ISmartColumn<?> column) {
     super(false);
-    m_propertyDelegator = new ColumnToFormFieldPropertyDelegator<IDateColumn, IDateField>(column, this);
+    m_propertyDelegator = new SmartColumnToSmartFieldPropertyDelegator(column, this);
     callInitializer();
   }
 
@@ -36,7 +35,7 @@ public class AutoTableDateField extends AbstractDateField implements IColumnWrap
   }
 
   @Override
-  public IDateColumn getWrappedObject() {
+  public ISmartColumn<?> getWrappedObject() {
     return m_propertyDelegator.getSender();
   }
 }

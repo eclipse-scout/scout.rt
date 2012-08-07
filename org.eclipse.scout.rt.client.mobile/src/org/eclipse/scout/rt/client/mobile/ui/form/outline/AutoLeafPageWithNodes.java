@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.AutoTableForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.TableRowForm;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -62,7 +62,7 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   @Override
   protected void execPageActivated() throws ProcessingException {
     if (getDetailForm() == null) {
-      AutoTableForm form = new AutoTableForm(m_tableRow);
+      TableRowForm form = new TableRowForm(m_tableRow);
       setDetailForm(form);
       form.start();
     }

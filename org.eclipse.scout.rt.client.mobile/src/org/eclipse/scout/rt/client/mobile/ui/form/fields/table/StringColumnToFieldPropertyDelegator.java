@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.table;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 
 /**
  * @since 3.9.0
  */
-public class SmartColumnToSmartFieldPropertyDelegator extends ColumnToFormFieldPropertyDelegator<ISmartColumn<?>, ISmartField<?>> {
+public class StringColumnToFieldPropertyDelegator extends ColumnToFormFieldPropertyDelegator<IStringColumn, IStringField> {
 
-  public SmartColumnToSmartFieldPropertyDelegator(ISmartColumn<?> sender, ISmartField<?> receiver) {
+  public StringColumnToFieldPropertyDelegator(IStringColumn sender, IStringField receiver) {
     super(sender, receiver);
   }
 
@@ -26,8 +26,9 @@ public class SmartColumnToSmartFieldPropertyDelegator extends ColumnToFormFieldP
   public void init() {
     super.init();
 
-    getReceiver().setCodeTypeClass(getSender().getCodeTypeClass());
-    getReceiver().setLookupCall(getSender().getLookupCall());
+    getReceiver().setInputMasked(getSender().isInputMasked());
+    getReceiver().setFormat(getSender().getDisplayFormat());
+    getReceiver().setWrapText(getSender().isTextWrap());
   }
 
 }

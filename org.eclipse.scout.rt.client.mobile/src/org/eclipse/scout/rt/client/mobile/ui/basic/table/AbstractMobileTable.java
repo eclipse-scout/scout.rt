@@ -14,9 +14,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.AutoTableForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.TableRowForm;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
@@ -81,10 +83,20 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   }
 
   protected void startTableRowForm(ITableRow row) throws ProcessingException {
-    AutoTableForm form = new AutoTableForm(row);
+    TableRowForm form = new TableRowForm(row);
     form.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
     form.setModal(true);
     form.start();
+    form.addFormListener(new FormListener() {
+
+      @Override
+      public void formChanged(FormEvent e) throws ProcessingException {
+        if (FormEvent.TYPE_CLOSED == e.getType()) {
+          clearSelection();
+        }
+      }
+
+    });
   }
 
   protected boolean isClearingSelectionNecessary() {
@@ -95,17 +107,21 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     return (IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(getDrillDownStyle(getSelectedRow())));
   }
 
-  protected void clearSelection() {
+  protected void clearSelectionDelayed() {
     ClientSyncJob job = new ClientSyncJob("Clearing selection", ClientJob.getCurrentSession()) {
 
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        if (isClearingSelectionNecessary()) {
-          selectRow(null);
-        }
+        clearSelection();
       }
 
     };
     job.schedule();
+  }
+
+  protected void clearSelection() {
+    if (isClearingSelectionNecessary()) {
+      selectRow(null);
+    }
   }
 }

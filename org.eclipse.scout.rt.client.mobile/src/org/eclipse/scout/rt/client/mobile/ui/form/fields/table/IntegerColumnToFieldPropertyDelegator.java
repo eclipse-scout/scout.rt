@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.table;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
 
 /**
  * @since 3.9.0
  */
-public class SmartColumnToSmartFieldPropertyDelegator extends ColumnToFormFieldPropertyDelegator<ISmartColumn<?>, ISmartField<?>> {
+public class IntegerColumnToFieldPropertyDelegator extends ColumnToFormFieldPropertyDelegator<IIntegerColumn, IIntegerField> {
 
-  public SmartColumnToSmartFieldPropertyDelegator(ISmartColumn<?> sender, ISmartField<?> receiver) {
+  public IntegerColumnToFieldPropertyDelegator(IIntegerColumn sender, IIntegerField receiver) {
     super(sender, receiver);
   }
 
@@ -26,8 +26,8 @@ public class SmartColumnToSmartFieldPropertyDelegator extends ColumnToFormFieldP
   public void init() {
     super.init();
 
-    getReceiver().setCodeTypeClass(getSender().getCodeTypeClass());
-    getReceiver().setLookupCall(getSender().getLookupCall());
+    getReceiver().setFormat(getSender().getFormat());
+    getReceiver().setGroupingUsed(getSender().isGroupingUsed());
   }
 
 }

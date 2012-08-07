@@ -10,21 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable;
 
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.ColumnToFormFieldPropertyDelegator;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.IColumnWrapper;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
-import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.LongColumnToFieldPropertyDelegator;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
 
 /**
  * @since 3.9.0
  */
-public class AutoTableIntegerField extends AbstractIntegerField implements IColumnWrapper<IIntegerColumn> {
-  private ColumnToFormFieldPropertyDelegator<IIntegerColumn, IIntegerField> m_propertyDelegator;
+public class TableRowFormLongField extends AbstractLongField implements IColumnWrapper<ILongColumn> {
+  private LongColumnToFieldPropertyDelegator m_propertyDelegator;
 
-  public AutoTableIntegerField(IIntegerColumn column) {
+  public TableRowFormLongField(ILongColumn column) {
     super(false);
-    m_propertyDelegator = new ColumnToFormFieldPropertyDelegator<IIntegerColumn, IIntegerField>(column, this);
+    m_propertyDelegator = new LongColumnToFieldPropertyDelegator(column, this);
     callInitializer();
   }
 
@@ -36,7 +35,7 @@ public class AutoTableIntegerField extends AbstractIntegerField implements IColu
   }
 
   @Override
-  public IIntegerColumn getWrappedObject() {
+  public ILongColumn getWrappedObject() {
     return m_propertyDelegator.getSender();
   }
 }

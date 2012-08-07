@@ -10,21 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable;
 
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.ColumnToFormFieldPropertyDelegator;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.DateColumnToFieldPropertyDelegator;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.IColumnWrapper;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
-import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 
 /**
  * @since 3.9.0
  */
-public class AutoTableBigDecimalField extends AbstractBigDecimalField implements IColumnWrapper<IBigDecimalColumn> {
-  private ColumnToFormFieldPropertyDelegator<IBigDecimalColumn, IBigDecimalField> m_propertyDelegator;
+public class TableRowFormDateField extends AbstractDateField implements IColumnWrapper<IDateColumn> {
+  private DateColumnToFieldPropertyDelegator m_propertyDelegator;
 
-  public AutoTableBigDecimalField(IBigDecimalColumn column) {
+  public TableRowFormDateField(IDateColumn column) {
     super(false);
-    m_propertyDelegator = new ColumnToFormFieldPropertyDelegator<IBigDecimalColumn, IBigDecimalField>(column, this);
+    m_propertyDelegator = new DateColumnToFieldPropertyDelegator(column, this);
     callInitializer();
   }
 
@@ -36,7 +35,7 @@ public class AutoTableBigDecimalField extends AbstractBigDecimalField implements
   }
 
   @Override
-  public IBigDecimalColumn getWrappedObject() {
+  public IDateColumn getWrappedObject() {
     return m_propertyDelegator.getSender();
   }
 }

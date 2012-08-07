@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.table;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField;
 
 /**
  * @since 3.9.0
  */
-public class SmartColumnToSmartFieldPropertyDelegator extends ColumnToFormFieldPropertyDelegator<ISmartColumn<?>, ISmartField<?>> {
+public class DoubleColumnToFieldPropertyDelegator extends ColumnToFormFieldPropertyDelegator<IDoubleColumn, IDoubleField> {
 
-  public SmartColumnToSmartFieldPropertyDelegator(ISmartColumn<?> sender, ISmartField<?> receiver) {
+  public DoubleColumnToFieldPropertyDelegator(IDoubleColumn sender, IDoubleField receiver) {
     super(sender, receiver);
   }
 
@@ -26,8 +26,12 @@ public class SmartColumnToSmartFieldPropertyDelegator extends ColumnToFormFieldP
   public void init() {
     super.init();
 
-    getReceiver().setCodeTypeClass(getSender().getCodeTypeClass());
-    getReceiver().setLookupCall(getSender().getLookupCall());
+    getReceiver().setFormat(getSender().getFormat());
+    getReceiver().setMinFractionDigits(getSender().getMinFractionDigits());
+    getReceiver().setMaxFractionDigits(getSender().getMaxFractionDigits());
+    getReceiver().setGroupingUsed(getSender().isGroupingUsed());
+    getReceiver().setPercent(getSender().isPercent());
+    getReceiver().setMultiplier(getSender().getMultiplier());
   }
 
 }

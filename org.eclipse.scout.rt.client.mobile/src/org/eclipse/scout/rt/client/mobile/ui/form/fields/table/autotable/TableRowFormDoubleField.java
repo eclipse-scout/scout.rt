@@ -10,21 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable;
 
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.ColumnToFormFieldPropertyDelegator;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.DoubleColumnToFieldPropertyDelegator;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.IColumnWrapper;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
-import org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
 
 /**
  * @since 3.9.0
  */
-public class AutoTableLongField extends AbstractLongField implements IColumnWrapper<ILongColumn> {
-  private ColumnToFormFieldPropertyDelegator<ILongColumn, ILongField> m_propertyDelegator;
+public class TableRowFormDoubleField extends AbstractDoubleField implements IColumnWrapper<IDoubleColumn> {
+  private DoubleColumnToFieldPropertyDelegator m_propertyDelegator;
 
-  public AutoTableLongField(ILongColumn column) {
+  public TableRowFormDoubleField(IDoubleColumn column) {
     super(false);
-    m_propertyDelegator = new ColumnToFormFieldPropertyDelegator<ILongColumn, ILongField>(column, this);
+    m_propertyDelegator = new DoubleColumnToFieldPropertyDelegator(column, this);
     callInitializer();
   }
 
@@ -36,7 +35,7 @@ public class AutoTableLongField extends AbstractLongField implements IColumnWrap
   }
 
   @Override
-  public ILongColumn getWrappedObject() {
+  public IDoubleColumn getWrappedObject() {
     return m_propertyDelegator.getSender();
   }
 }

@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.table;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 
 /**
  * @since 3.9.0
  */
-public class SmartColumnToSmartFieldPropertyDelegator extends ColumnToFormFieldPropertyDelegator<ISmartColumn<?>, ISmartField<?>> {
+public class DateColumnToFieldPropertyDelegator extends ColumnToFormFieldPropertyDelegator<IDateColumn, IDateField> {
 
-  public SmartColumnToSmartFieldPropertyDelegator(ISmartColumn<?> sender, ISmartField<?> receiver) {
+  public DateColumnToFieldPropertyDelegator(IDateColumn sender, IDateField receiver) {
     super(sender, receiver);
   }
 
@@ -26,8 +26,9 @@ public class SmartColumnToSmartFieldPropertyDelegator extends ColumnToFormFieldP
   public void init() {
     super.init();
 
-    getReceiver().setCodeTypeClass(getSender().getCodeTypeClass());
-    getReceiver().setLookupCall(getSender().getLookupCall());
+    getReceiver().setFormat(getSender().getFormat());
+    getReceiver().setHasDate(getSender().isHasDate());
+    getReceiver().setHasTime(getSender().isHasTime());
   }
 
 }

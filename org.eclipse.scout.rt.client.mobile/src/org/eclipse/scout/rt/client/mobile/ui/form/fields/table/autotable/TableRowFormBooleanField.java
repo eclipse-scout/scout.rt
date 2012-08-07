@@ -12,19 +12,19 @@ package org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable;
 
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.ColumnToFormFieldPropertyDelegator;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.IColumnWrapper;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 
 /**
  * @since 3.9.0
  */
-public class AutoTableStringField extends AbstractStringField implements IColumnWrapper<IStringColumn> {
-  private ColumnToFormFieldPropertyDelegator<IStringColumn, IStringField> m_propertyDelegator;
+public class TableRowFormBooleanField extends AbstractBooleanField implements IColumnWrapper<IBooleanColumn> {
+  private ColumnToFormFieldPropertyDelegator<IBooleanColumn, IBooleanField> m_propertyDelegator;
 
-  public AutoTableStringField(IStringColumn column) {
+  public TableRowFormBooleanField(IBooleanColumn column) {
     super(false);
-    m_propertyDelegator = new ColumnToFormFieldPropertyDelegator<IStringColumn, IStringField>(column, this);
+    m_propertyDelegator = new ColumnToFormFieldPropertyDelegator<IBooleanColumn, IBooleanField>(column, this);
     callInitializer();
   }
 
@@ -36,7 +36,7 @@ public class AutoTableStringField extends AbstractStringField implements IColumn
   }
 
   @Override
-  public IStringColumn getWrappedObject() {
+  public IBooleanColumn getWrappedObject() {
     return m_propertyDelegator.getSender();
   }
 }

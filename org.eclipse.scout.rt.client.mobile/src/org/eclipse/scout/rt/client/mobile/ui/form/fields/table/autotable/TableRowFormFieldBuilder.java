@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 /**
  * @since 3.9.0
  */
-public class AutoTableBuilder {
+public class TableRowFormFieldBuilder {
 
   public List<IValueField> build(IColumn<?>[] columns) {
     List<IValueField> fieldList = new LinkedList<IValueField>();
@@ -37,35 +37,35 @@ public class AutoTableBuilder {
 
     for (IColumn column : columns) {
       if (column instanceof IStringColumn) {
-        IValueField field = new AutoTableStringField((IStringColumn) column);
+        IValueField field = new TableRowFormStringField((IStringColumn) column);
         fieldList.add(field);
       }
       else if (column instanceof ISmartColumn) {
-        IValueField field = new AutoTableSmartField((ISmartColumn) column);
+        IValueField field = new TableRowFormSmartField((ISmartColumn) column);
         fieldList.add(field);
       }
       else if (column instanceof IDoubleColumn) {
-        IValueField field = new AutoTableDoubleField((IDoubleColumn) column);
+        IValueField field = new TableRowFormDoubleField((IDoubleColumn) column);
         fieldList.add(field);
       }
       else if (column instanceof IDateColumn) {
-        IValueField field = new AutoTableDateField((IDateColumn) column);
+        IValueField field = new TableRowFormDateField((IDateColumn) column);
         fieldList.add(field);
       }
       else if (column instanceof IBooleanColumn) {
-        IValueField field = new AutoTableBooleanField((IBooleanColumn) column);
+        IValueField field = new TableRowFormBooleanField((IBooleanColumn) column);
         fieldList.add(field);
       }
       else if (column instanceof ILongColumn) {
-        IValueField field = new AutoTableLongField((ILongColumn) column);
+        IValueField field = new TableRowFormLongField((ILongColumn) column);
         fieldList.add(field);
       }
       else if (column instanceof IIntegerColumn) {
-        IValueField field = new AutoTableIntegerField((IIntegerColumn) column);
+        IValueField field = new TableRowFormIntegerField((IIntegerColumn) column);
         fieldList.add(field);
       }
       else if (column instanceof IBigDecimalColumn) {
-        IValueField field = new AutoTableBigDecimalField((IBigDecimalColumn) column);
+        IValueField field = new TableRowFormBigDecimalField((IBigDecimalColumn) column);
         fieldList.add(field);
       }
     }

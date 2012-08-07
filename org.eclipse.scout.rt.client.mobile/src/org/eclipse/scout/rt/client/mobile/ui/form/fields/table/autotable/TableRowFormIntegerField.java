@@ -11,19 +11,19 @@
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable;
 
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.IColumnWrapper;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.SmartColumnToSmartFieldPropertyDelegator;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.IntegerColumnToFieldPropertyDelegator;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 
 /**
  * @since 3.9.0
  */
-public class AutoTableSmartField extends AbstractSmartField implements IColumnWrapper<ISmartColumn<?>> {
-  private SmartColumnToSmartFieldPropertyDelegator m_propertyDelegator;
+public class TableRowFormIntegerField extends AbstractIntegerField implements IColumnWrapper<IIntegerColumn> {
+  private IntegerColumnToFieldPropertyDelegator m_propertyDelegator;
 
-  public AutoTableSmartField(ISmartColumn<?> column) {
+  public TableRowFormIntegerField(IIntegerColumn column) {
     super(false);
-    m_propertyDelegator = new SmartColumnToSmartFieldPropertyDelegator(column, this);
+    m_propertyDelegator = new IntegerColumnToFieldPropertyDelegator(column, this);
     callInitializer();
   }
 
@@ -35,7 +35,7 @@ public class AutoTableSmartField extends AbstractSmartField implements IColumnWr
   }
 
   @Override
-  public ISmartColumn<?> getWrappedObject() {
+  public IIntegerColumn getWrappedObject() {
     return m_propertyDelegator.getSender();
   }
 }

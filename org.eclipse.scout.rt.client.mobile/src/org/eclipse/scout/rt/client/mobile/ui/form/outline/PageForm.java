@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.mobile.ui.basic.table.MobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.AbstractMobileTableField;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.AutoTableForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.TableRowForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageDetailFormField;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageTableGroupBox;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageTableGroupBox.PageTableField;
@@ -107,7 +107,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     m_page = (IPage) m_page.getTree().resolveVirtualNode(m_page);
 
     if (m_pageFormConfig.isDetailFormVisible() && m_page.getDetailForm() == null) {
-      AutoTableForm autoDetailForm = createAutoDetailForm();
+      TableRowForm autoDetailForm = createAutoDetailForm();
       if (autoDetailForm != null) {
         m_page.setDetailForm(autoDetailForm);
         autoDetailForm.start();
@@ -131,14 +131,14 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
   }
 
-  private AutoTableForm createAutoDetailForm() throws ProcessingException {
+  private TableRowForm createAutoDetailForm() throws ProcessingException {
     ITable table = null;
     IPage parentPage = m_page.getParentPage();
     if (parentPage instanceof IPageWithTable) {
       table = ((IPageWithTable) parentPage).getTable();
     }
     if (table != null && table.getSelectedRow() != null) {
-      return new AutoTableForm(table.getSelectedRow());
+      return new TableRowForm(table.getSelectedRow());
     }
 
     return null;
@@ -154,7 +154,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
     if (m_page.getDetailForm() != null) {
       //Buttons of the auto table form are the same as the node actions, so only the buttons of regular detail forms are added
-      if (!(m_page.getDetailForm() instanceof AutoTableForm) || m_page instanceof AutoLeafPageWithNodes) {
+      if (!(m_page.getDetailForm() instanceof TableRowForm) || m_page instanceof AutoLeafPageWithNodes) {
         IButton[] detailFormCustomButtons = m_page.getDetailForm().getRootGroupBox().getCustomProcessButtons();
         buttonList.addAll(Arrays.asList(detailFormCustomButtons));
       }
