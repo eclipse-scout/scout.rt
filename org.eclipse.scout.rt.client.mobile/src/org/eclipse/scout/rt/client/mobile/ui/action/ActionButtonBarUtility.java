@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.mobile.ui.action;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable.MainBoxActionButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 

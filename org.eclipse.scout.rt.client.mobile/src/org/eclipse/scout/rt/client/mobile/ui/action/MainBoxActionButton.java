@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.ui.form.fields.table.autotable;
+package org.eclipse.scout.rt.client.mobile.ui.action;
 
-import org.eclipse.scout.rt.client.mobile.ui.action.ActionWrappingButton;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 
 public class MainBoxActionButton extends ActionWrappingButton {
