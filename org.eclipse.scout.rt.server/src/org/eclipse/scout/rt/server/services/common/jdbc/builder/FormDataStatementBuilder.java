@@ -572,31 +572,33 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * Creates a select statement by merging the given entity contribution with the given base statement. This builder's
+   * Creates a select statement by merging the given entity contributions with the given base statement. This builder's
    * {@link #getWhereConstraints()} are added as well.
    * 
    * @param stm
    *          base statement with &lt;selectParts/&gt;, &lt;fromParts/&gt;, &lt;whereParts/&gt;, &lt;groupByParts/&gt;
    *          or &lt;havingParts/&gt; place holders.
-   * @param contribution
-   *          an entity contribution that is used to replace the markers in the given base statement.
-   * @return Returns given base statement having all place holders replaced by the given entity contribution.
+   * @param contributions
+   *          entity contributions that are used to replace markers in the given base statement.
+   * @return Returns given base statement having all place holders replaced by the given entity contributions.
    * @throws ProcessingException
-   * @since 3.8.0
+   * @since 3.8.1
    */
-  public String createSelectStatement(String stm, EntityContribution contribution) throws ProcessingException {
-    EntityContribution c = contribution;
-    if (c == null) {
-      c = new EntityContribution();
+  public String createSelectStatement(String stm, EntityContribution... contributions) throws ProcessingException {
+    EntityContribution mergedContribution = new EntityContribution();
+    if (contributions != null) {
+      for (EntityContribution c : contributions) {
+        mergedContribution.add(c);
+      }
     }
     String where = StringUtility.trim(getWhereConstraints());
     if (StringUtility.hasText(where)) {
       if (where.toUpperCase().startsWith("AND")) {
         where = where.substring(3);
       }
-      c.getWhereParts().add(where);
+      mergedContribution.getWhereParts().add(where);
     }
-    return createEntityPart(stm, false, c);
+    return createEntityPart(stm, false, mergedContribution);
   }
 
   /**
@@ -1456,7 +1458,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
       contrib.getFromParts().add(fromPart);
     }
     switch (attributeStrategy) {
-      //select ... where
+    //select ... where
       case BuildQueryOfAttributeAndConstraintOfContext: {
         //select
         if (attPart != null) {
@@ -1478,7 +1480,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
         }
         break;
       }
-        //where / having
+      //where / having
       case BuildConstraintOfAttribute: {
         if (attPart != null) {
           String sql = createSqlPart(aggregationType, attPart, positiveOperation, bindNames, bindValues, plainBind, parentAliasMap);
