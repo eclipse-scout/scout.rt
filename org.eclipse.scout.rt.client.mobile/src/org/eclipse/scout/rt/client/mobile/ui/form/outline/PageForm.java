@@ -182,13 +182,16 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
 
     MobileTable.setAutoCreateRowForm(pageTable, false);
-    if (pageTable != null) {
-      setTableRowDrillDownStyle(pageTable, pageTable.getRows());
-    }
-
     getPageTableField().setTable(pageTable, true);
     updateTableFieldVisibility();
     getPageTableField().setTableStatusVisible(m_pageFormConfig.isTableStatusVisible());
+  }
+
+  private void updateDrillDownStyle() {
+    ITable table = getPageTableField().getTable();
+    if (table != null) {
+      setTableRowDrillDownStyle(table, table.getRows());
+    }
   }
 
   private void setTableRowDrillDownStyle(ITable table, ITableRow[] rows) {
@@ -205,6 +208,9 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     for (ITableRow row : rows) {
       if (!isDrillDownRow(row)) {
         drillDownMap.put(row, IRowSummaryColumn.DRILL_DOWN_STYLE_NONE);
+      }
+      else {
+        drillDownMap.put(row, IRowSummaryColumn.DRILL_DOWN_STYLE_ICON);
       }
     }
 
@@ -235,6 +241,9 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   public void formAddedNotify() throws ProcessingException {
     //Clear selection if form gets visible again. It must not happen earlier, since the actions typically depend on the selected row.
     clearTableSelectionIfNecessary();
+
+    //Make sure the rows display the correct drill down style
+    updateDrillDownStyle();
 
     //Make sure the page which belongs to the form is active when the form is shown
     m_page.getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(m_page);
