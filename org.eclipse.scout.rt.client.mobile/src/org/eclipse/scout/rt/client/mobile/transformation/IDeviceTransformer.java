@@ -43,4 +43,10 @@ public interface IDeviceTransformer {
   void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList);
 
   boolean acceptMobileTabBoxTransformation(ITabBox tabBox);
+
+  /**
+   * @return a list of accepted view ids (IForm#VIEW_ID_* or null to accept all.
+   * @see {@link IForm}
+   */
+  List<String> getAcceptedViewIds();
 }

@@ -10,37 +10,53 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.window.desktop;
 
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
+ * Reads the width and height specified in the {@link GridData} of the main group box ({@link IForm#getRootGroupBox()}).
+ * If nothing is specified null will be returned.
+ * <p>
+ * The bounds are not cached.
+ * 
  * @since 3.9.0
  */
-public class MobileDesktopFormBoundsProvider implements IFormBoundsProvider {
+public class FormBasedDesktopFormBoundsProvider implements IFormBoundsProvider {
   private final IForm m_form;
   private IRwtEnvironment m_uiEnvironment;
 
-  public MobileDesktopFormBoundsProvider(IForm form, IRwtEnvironment uiEnvironment) {
+  public FormBasedDesktopFormBoundsProvider(IForm form, IRwtEnvironment uiEnvironment) {
     m_form = form;
     m_uiEnvironment = uiEnvironment;
   }
 
   @Override
   public Rectangle getBounds() {
-    java.awt.Rectangle awtBounds = ClientUIPreferences.getInstance(m_uiEnvironment.getClientSession()).getFormBounds(m_form);
-    if (awtBounds != null) {
-      return new Rectangle(awtBounds.x, awtBounds.y, awtBounds.width, awtBounds.height);
+    int maxWidth = -1;
+    int maxHeight = -1;
+
+    GridData gridData = m_form.getRootGroupBox().getGridData();
+    if (gridData.widthInPixel > 0) {
+      maxWidth = gridData.widthInPixel;
+    }
+    if (gridData.heightInPixel > 0) {
+      maxHeight = gridData.heightInPixel;
     }
 
-    return null;
+    if (maxWidth == -1 && maxHeight == -1) {
+      return null;
+    }
+    else {
+      return new Rectangle(-1, -1, maxWidth, maxHeight);
+    }
   }
 
   @Override
   public void storeBounds(Rectangle bounds) {
-    // Does not store any bounds to enable the possibility to have different width for different forms on the same view stack.
+    // nop
   }
 
 }

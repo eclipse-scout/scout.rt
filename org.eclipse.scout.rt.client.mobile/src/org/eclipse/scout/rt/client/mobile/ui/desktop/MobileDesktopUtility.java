@@ -10,12 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
-import java.awt.Rectangle;
-
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -29,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 
 /**
  * @since 3.9.0
@@ -185,15 +183,9 @@ public class MobileDesktopUtility {
   }
 
   public static void setFormWidthHint(IForm form, int widthHint) {
-    form.setCacheBounds(true);
-
-    Rectangle formBounds = ClientUIPreferences.getInstance(ClientJob.getCurrentSession()).getFormBounds(form);
-    if (formBounds != null && formBounds.getWidth() == widthHint) {
-      return;
-    }
-
-    formBounds = new Rectangle(-1, -1, widthHint, -1);
-    ClientUIPreferences.getInstance(ClientJob.getCurrentSession()).setFormBounds(form, formBounds);
+    GridData gridDataHints = form.getRootGroupBox().getGridDataHints();
+    gridDataHints.widthInPixel = widthHint;
+    form.getRootGroupBox().setGridDataHints(gridDataHints);
   }
 
   public static ITable getPageTable(IPage page) {

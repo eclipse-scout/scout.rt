@@ -44,7 +44,7 @@ public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineC
 
   @Override
   protected String getConfiguredDisplayViewId() {
-    return VIEW_ID_PAGE_TABLE;
+    return VIEW_ID_CENTER;
   }
 
   @Override

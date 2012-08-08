@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.window.dialog;
 
-import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
@@ -18,33 +17,37 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * Positions the form in the middle of the screen. As default the width and height are set to width and height of the
- * display which means full screen. If a form provides a width this will be considered as max width. This means if the
- * screen is smaller than the form the form will be as width as the screen. If the screen is bigger than the form the
- * form will be as width as specified with max width.
+ * Positions the form in the middle of the screen and makes it as height as the screen.
+ * <p>
+ * As default the height is set to the height of the display which means the dialog is as height as the screen.<br>
+ * The width is set to a fix value which is {@link #DIALOG_WIDTH} but only if it does not exceed the width of the
+ * screen.
+ * <p>
+ * The bounds are not cached.
  * 
- * @since 3.8.0
+ * @since 3.9.0
  */
-public class MobileDialogBoundsProvider implements IFormBoundsProvider {
+public class FixedSizeDialogBoundsProvider implements IFormBoundsProvider {
+  public static final int DIALOG_WIDTH = 700;
+
   private final IForm m_form;
+  private int m_maxWidth = DIALOG_WIDTH;
+  private int m_maxHeight = Integer.MAX_VALUE;
   private IRwtEnvironment m_uiEnvironment;
 
-  public MobileDialogBoundsProvider(IForm form, IRwtEnvironment uiEnvironment) {
+  public FixedSizeDialogBoundsProvider(IForm form, IRwtEnvironment uiEnvironment) {
     m_form = form;
     m_uiEnvironment = uiEnvironment;
   }
 
   @Override
   public Rectangle getBounds() {
-    int maxWidth = Integer.MAX_VALUE;
-    java.awt.Rectangle formBounds = ClientUIPreferences.getInstance(m_uiEnvironment.getClientSession()).getFormBounds(m_form);
-    if (formBounds != null) {
-      maxWidth = formBounds.width;
-    }
+    int maxWidth = m_maxWidth;
+    int maxHeight = m_maxHeight;
 
     Rectangle displayBounds = Display.getCurrent().getBounds();
 
-    int height = displayBounds.height;
+    int height = Math.min(maxHeight, displayBounds.height);
     int width = Math.min(maxWidth, displayBounds.width);
     int x = (displayBounds.width / 2) - (width / 2);
     int y = 0;
@@ -54,7 +57,7 @@ public class MobileDialogBoundsProvider implements IFormBoundsProvider {
 
   @Override
   public void storeBounds(Rectangle bounds) {
-
+    // nop
   }
 
 }

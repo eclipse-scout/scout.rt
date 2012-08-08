@@ -37,7 +37,7 @@ public class RwtScoutMobileViewStack extends RwtScoutViewStack {
 
   @Override
   protected IFormBoundsProvider createFormBoundsProvider(IForm scoutForm, IRwtEnvironment uiEnvironment) {
-    return new MobileDesktopFormBoundsProvider(scoutForm, uiEnvironment);
+    return new FormBasedDesktopFormBoundsProvider(scoutForm, uiEnvironment);
   }
 
   @Override
