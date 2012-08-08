@@ -101,6 +101,71 @@ public class EntityContribution {
     return m_havingParts;
   }
 
+  /**
+   * Adds the given expression to the list of select parts. If the expression is not aggregating, it is added to the
+   * group by parts as well.
+   * <p/>
+   * <b>Note</b>: The given expression represents exactly one column in the result set and it must not define an alias.
+   * 
+   * @param expression
+   *          SQL expression representing a single column in the result set without an attribute alias
+   * @param aggregating
+   *          <code>true</code> if the given expression uses a SQL aggregation, <code>false</code> otherwise.
+   * @since 3.8.1
+   */
+  public void addSelectExpression(String expression, boolean aggregating) {
+    getSelectParts().add(expression);
+    if (!aggregating) {
+      getGroupByParts().add(expression);
+    }
+  }
+
+  /**
+   * Adds the given expression to the list of from parts.
+   * 
+   * @param expression
+   *          SQL table expression (e.g. table name or subquery)
+   * @since 3.8.1
+   */
+  public void addFromExpression(String expression) {
+    getFromParts().add(expression);
+  }
+
+  /**
+   * Adds the given constraint to the list of where parts.
+   * 
+   * @param constraint
+   *          SQL where constraint
+   * @since 3.8.1
+   */
+  public void addWhereConstraint(String constraint) {
+    getWhereParts().add(constraint);
+  }
+
+  /**
+   * Adds the given expression to the list of group by parts.
+   * <p/>
+   * <b>Note</b>: The given expression represents exactly one column in the result set.
+   * 
+   * @param expression
+   *          SQL expression representing a single column in the result set
+   * @since 3.8.1
+   */
+  public void addGroupByExpression(String expression) {
+    getGroupByParts().add(expression);
+  }
+
+  /**
+   * Adds the given constraint to the list of having parts.
+   * 
+   * @param constraint
+   *          SQL having constraint
+   * @since 3.8.1
+   */
+  public void addHavingConstraint(String constraint) {
+    getHavingParts().add(constraint);
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;

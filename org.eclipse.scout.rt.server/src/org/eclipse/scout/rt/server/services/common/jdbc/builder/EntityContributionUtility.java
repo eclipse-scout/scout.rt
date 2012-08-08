@@ -257,7 +257,33 @@ public final class EntityContributionUtility {
           }
         }
         else {
-          entityPart = StringUtility.removeTag(entityPart, "groupBy");
+          entityPart = StringUtility.replaceTags(entityPart, "groupBy", new ITagProcessor() {
+            @Override
+            public String processTag(String tagName, String tagContent) {
+              if (!StringUtility.hasText(StringUtility.getTag(tagContent, "groupByParts"))
+                  && !StringUtility.hasText(StringUtility.getTag(tagContent, "havingParts"))) {
+                return "";
+              }
+
+              // preserve statically defined group-by and having parts
+              tagContent = StringUtility.replaceTags(tagContent, "groupByParts", new ITagProcessor() {
+                @Override
+                public String processTag(String innerTagName, String innerTagContent) {
+                  if (innerTagContent.length() > 0) {
+                    return innerTagContent;
+                  }
+                  return innerTagContent + " 1 ";
+                }
+              });
+              tagContent = StringUtility.replaceTags(tagContent, "havingParts", new ITagProcessor() {
+                @Override
+                public String processTag(String innerTagName, String innerTagContent) {
+                  return innerTagContent;
+                }
+              });
+              return tagContent;
+            }
+          });
         }
       }
     }
