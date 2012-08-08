@@ -20,6 +20,9 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
+ * Uses the {@link ClientUIPreferences} to load and store the form bounds, but only if {@link IForm#isCacheBounds()} is
+ * set to true.
+ * 
  * @since 3.8.0
  */
 public class DefaultFormBoundsProvider implements IFormBoundsProvider {
@@ -36,6 +39,10 @@ public class DefaultFormBoundsProvider implements IFormBoundsProvider {
 
   @Override
   public Rectangle getBounds() {
+    if (!m_form.isCacheBounds()) {
+      return null;
+    }
+
     java.awt.Rectangle awtBounds = ClientUIPreferences.getInstance(m_uiEnvironment.getClientSession()).getFormBounds(m_form);
     if (awtBounds != null) {
       return new Rectangle(awtBounds.x, awtBounds.y, awtBounds.width, awtBounds.height);
@@ -46,6 +53,10 @@ public class DefaultFormBoundsProvider implements IFormBoundsProvider {
 
   @Override
   public void storeBounds(final Rectangle bounds) {
+    if (!m_form.isCacheBounds()) {
+      return;
+    }
+
     if (m_storeBoundsJob != null) {
       m_storeBoundsJob.cancel();
     }

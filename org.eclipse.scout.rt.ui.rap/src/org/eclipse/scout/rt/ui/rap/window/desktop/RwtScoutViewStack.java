@@ -36,10 +36,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 /**
- * <h3>RwtScoutViewStack</h3> ...
- * 
  * @author Andreas Hoegger
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
   private static final long serialVersionUID = 1L;
@@ -127,12 +125,9 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
 
   @Override
   public IRwtScoutPart addForm(IForm form) {
-    if (form.isCacheBounds()) {
-      IFormBoundsProvider formBoundsProvider = createFormBoundsProvider(form, getUiEnvironment());
-      m_formBoundsProviders.put(form, formBoundsProvider);
-
-      initPreferredSize(formBoundsProvider);
-    }
+    IFormBoundsProvider formBoundsProvider = createFormBoundsProvider(form, getUiEnvironment());
+    m_formBoundsProviders.put(form, formBoundsProvider);
+    initPreferredSize(formBoundsProvider);
 
     RwtScoutDesktopForm ui = new RwtScoutDesktopForm();
     ViewStackTabButton button = null;
@@ -149,6 +144,10 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
   }
 
   protected void initPreferredSize(IFormBoundsProvider boundsProvider) {
+    if (boundsProvider == null) {
+      return;
+    }
+
     Rectangle formBounds = boundsProvider.getBounds();
     if (formBounds != null) {
       setWidthHint(formBounds.width);

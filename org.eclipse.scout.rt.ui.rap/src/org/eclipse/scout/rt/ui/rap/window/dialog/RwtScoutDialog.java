@@ -64,8 +64,12 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
 
     Rectangle bounds = boundsProvider.getBounds();
     if (bounds != null) {
-      setUiInitialLocation(new Point(bounds.x, bounds.y));
-      setUiInitialSize(new Point(bounds.width, bounds.height));
+      if (bounds.x >= 0 || bounds.y >= 0) {
+        setUiInitialLocation(new Point(bounds.x, bounds.y));
+      }
+      if (bounds.width >= 0 || bounds.height >= 0) {
+        setUiInitialSize(new Point(bounds.width, bounds.height));
+      }
     }
   }
 
@@ -86,8 +90,8 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
 
   /**
    * Sets the initial location of the dialog. <br/>
-   * This property has no effect if {@link IForm#isCacheBounds()} is set because a {@link IFormBoundsProvider} is
-   * used in that case.
+   * This property may have no effect depending on the used {@link IFormBoundsProvider}. With the default provider (
+   * {@link DefaultFormBoundsProvider}) the property has no effect if {@link IForm#isCacheBounds()} is set to true.
    */
   public void setUiInitialLocation(Point initialLocation) {
     m_uiInitialLocation = initialLocation;
@@ -103,8 +107,8 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
 
   /**
    * Sets the initial size of the dialog. <br/>
-   * This property has no effect if {@link IForm#isCacheBounds()} is set because a {@link IFormBoundsProvider} is
-   * used in that case.
+   * This property may have no effect depending on the used {@link IFormBoundsProvider}. With the default provider (
+   * {@link DefaultFormBoundsProvider}) the property has no effect if {@link IForm#isCacheBounds()} is set to true.
    */
   public void setUiInitialSize(Point uiInitialSize) {
     m_uiInitialSize = uiInitialSize;
@@ -121,10 +125,8 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
   public void createPart(IForm scoutForm, Shell parentShell, int style, IRwtEnvironment uiEnvironment) {
     super.createPart(scoutForm, uiEnvironment);
 
-    if (scoutForm.isCacheBounds()) {
-      m_boundsProvider = createFormBoundsProvider(scoutForm, getUiEnvironment());
-      initInitialBounds(m_boundsProvider);
-    }
+    m_boundsProvider = createFormBoundsProvider(scoutForm, getUiEnvironment());
+    initInitialBounds(m_boundsProvider);
 
     m_uiDialog = new DialogImpl((style & SWT.APPLICATION_MODAL) != 0 ? parentShell : null, style);
     m_uiDialog.create();
