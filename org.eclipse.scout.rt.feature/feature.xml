@@ -110,6 +110,14 @@ BSI Business Systems Integration AG - initial API and implementation
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.scout.rt.ui.swing.browser.swt.fragment"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.scout.rt.ui.swt"
          download-size="0"
          install-size="0"
