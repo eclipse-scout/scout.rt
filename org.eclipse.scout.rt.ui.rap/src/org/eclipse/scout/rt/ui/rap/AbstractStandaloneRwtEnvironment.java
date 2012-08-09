@@ -60,7 +60,9 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
       setSubject(subject);
     }
     //if not a tablet or mobile device open callback channel
-    if (RwtUtility.getBrowserInfo().isDesktop()) {
+    //ie9 shows progress forever...use system prop to avoid this.
+    String bugFix = "" + Activator.getDefault().getBundle().getBundleContext().getProperty("rwt.root.uicallback");
+    if (RwtUtility.getBrowserInfo().isDesktop() && !"false".equals(bugFix)) {
       UICallBack.activate(getClass().getName() + getClass().hashCode());
     }
     m_display = Display.getDefault();
