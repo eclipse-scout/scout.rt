@@ -31,6 +31,7 @@ import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -46,12 +47,13 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
   private static String VARIANT_DIALOG_SHELL = "dialog";
 
   private DialogImpl m_uiDialog;
-  private Form m_uiForm;
   private Point m_uiInitialLocation;
   private Point m_uiInitialSize;
   private IFormBoundsProvider m_boundsProvider;
-  private IRwtScoutForm m_formComposite;
+
+  private Composite m_container;
   private IRwtScoutFormHeader m_formHeaderComposite;
+  private Composite m_formBodyComposite;
   private IRwtScoutFormFooter m_formFooterComposite;
 
   public RwtScoutDialog() {
@@ -79,13 +81,24 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
 
   @Override
   public void setBusy(boolean b) {
-    getUiForm().setBusy(b);
-    getUiForm().layout(true);
+    if (getUiForm() != null) {
+      getUiForm().setBusy(b);
+      getUiForm().layout(true);
+    }
   }
 
   @Override
   public Form getUiForm() {
-    return m_uiForm;
+    if (m_formBodyComposite instanceof Form) {
+      return (Form) m_formBodyComposite;
+    }
+
+    return null;
+  }
+
+  @Override
+  public Composite getUiContainer() {
+    return m_container;
   }
 
   /**
@@ -164,32 +177,57 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     return VARIANT_DIALOG_SHELL;
   }
 
+  /**
+   * @return true to use a {@link Form} as container of the {@link IRwtScoutForm}. False to use a regular
+   *         {@link Composite}.
+   */
+  public boolean isEclipseFormUsed() {
+    return true;
+  }
+
+  /**
+   * Creates a {@link IRwtScoutForm} and embeds it in either a {@link Form} or a regular {@link Composite}, depending on
+   * the
+   * flag {@link #isEclipseFormUsed()}.
+   */
+  private Composite createFormBody(Composite parent) {
+    Composite body = null;
+    Composite actualBody = null;
+    if (isEclipseFormUsed()) {
+      Form eclipseForm = getUiEnvironment().getFormToolkit().createForm(parent);
+      body = eclipseForm;
+      actualBody = eclipseForm.getBody();
+    }
+    else {
+      body = getUiEnvironment().getFormToolkit().createComposite(parent);
+      actualBody = body;
+    }
+
+    actualBody.setLayout(new FillLayout());
+    getUiEnvironment().createForm(actualBody, getScoutObject());
+
+    return body;
+  }
+
   protected Control createContentsDelegate(Composite parent) {
-    m_uiForm = getUiEnvironment().getFormToolkit().createForm(parent);
-    Composite contentPane = m_uiForm.getBody();
+    m_container = getUiEnvironment().getFormToolkit().createComposite(parent);
+    m_container.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+
     //add form contents
     try {
-      contentPane.setRedraw(false);
-      m_formHeaderComposite = getUiEnvironment().createFormHeader(contentPane, getScoutObject());
-      m_formComposite = getUiEnvironment().createForm(contentPane, getScoutObject());
-      m_formFooterComposite = getUiEnvironment().createFormFooter(contentPane, getScoutObject());
+      m_container.setRedraw(false);
 
-      initLayout(contentPane);
+      m_formHeaderComposite = getUiEnvironment().createFormHeader(m_container, getScoutObject());
+      m_formBodyComposite = createFormBody(m_container);
+      m_formFooterComposite = getUiEnvironment().createFormFooter(m_container, getScoutObject());
+
+      initLayout(m_container);
       attachScout();
     }
     finally {
-      contentPane.setRedraw(true);
+      m_container.setRedraw(true);
     }
-    //set layout and parent data
-    GridLayout gridLayout = new GridLayout();
-    gridLayout.horizontalSpacing = 0;
-    gridLayout.verticalSpacing = 0;
-    gridLayout.marginWidth = 0;
-    gridLayout.marginHeight = 0;
-    contentPane.setLayout(gridLayout);
-    GridData d = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-    m_uiForm.setLayoutData(d);
-    return m_uiForm;
+    return m_container;
   }
 
   protected void initLayout(Composite container) {
@@ -200,10 +238,7 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     if (m_formHeaderComposite != null) {
       header = m_formHeaderComposite.getUiContainer();
     }
-    Composite body = null;
-    if (m_formComposite != null) {
-      body = m_formComposite.getUiContainer();
-    }
+    Composite body = m_formBodyComposite;
     Composite footer = null;
     if (m_formFooterComposite != null) {
       footer = m_formFooterComposite.getUiContainer();
@@ -280,11 +315,13 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     Image img = getUiEnvironment().getIcon(iconId);
     m_uiDialog.getShell().setImage(img);
     String sub = getScoutObject().getSubTitle();
-    if (sub != null) {
-      getUiForm().setImage(img);
-    }
-    else {
-      getUiForm().setImage(null);
+    if (getUiForm() != null && !getUiForm().isDisposed()) {
+      if (sub != null) {
+        getUiForm().setImage(img);
+      }
+      else {
+        getUiForm().setImage(null);
+      }
     }
   }
 
@@ -296,11 +333,13 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     m_uiDialog.getShell().setText(StringUtility.removeNewLines(s != null ? s : ""));
     //
     s = f.getSubTitle();
-    if (s != null) {
-      getUiForm().setText(RwtUtility.escapeMnemonics(StringUtility.removeNewLines(s != null ? s : "")));
-    }
-    else {
-      getUiForm().setText(null);
+    if (getUiForm() != null && !getUiForm().isDisposed()) {
+      if (s != null) {
+        getUiForm().setText(RwtUtility.escapeMnemonics(StringUtility.removeNewLines(s != null ? s : "")));
+      }
+      else {
+        getUiForm().setText(null);
+      }
     }
   }
 

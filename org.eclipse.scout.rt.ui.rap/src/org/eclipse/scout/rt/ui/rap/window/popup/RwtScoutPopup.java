@@ -108,6 +108,11 @@ public class RwtScoutPopup extends AbstractRwtScoutPart {
     return m_window;
   }
 
+  @Override
+  public Composite getUiContainer() {
+    return getUiContentPane();
+  }
+
   public Composite getUiContentPane() {
     return m_windowContentPane;
   }

@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IViewArea;
+import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktopForm;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutViewStack;
 import org.eclipse.swt.widgets.Composite;
 
@@ -33,6 +34,11 @@ public class RwtScoutMobileViewStack extends RwtScoutViewStack {
   @Override
   protected boolean isTabBarCreationEnabled() {
     return false;
+  }
+
+  @Override
+  protected RwtScoutDesktopForm createRwtScoutDesktopForm() {
+    return new RwtScoutMobileDesktopForm();
   }
 
   @Override

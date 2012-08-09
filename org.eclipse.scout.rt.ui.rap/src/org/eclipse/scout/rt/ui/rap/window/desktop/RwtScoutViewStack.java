@@ -50,7 +50,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
   private int widthHint = SWT.DEFAULT;
   private IRwtEnvironment m_uiEnvironment;
   private HashMap<IForm, RwtScoutDesktopForm> m_openForms;
-  ArrayList<RwtScoutDesktopForm> m_formStack;
+  private ArrayList<RwtScoutDesktopForm> m_formStack;
   private Map<IForm, IFormBoundsProvider> m_formBoundsProviders;
 
   private Composite m_tabBar;
@@ -129,7 +129,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     m_formBoundsProviders.put(form, formBoundsProvider);
     initPreferredSize(formBoundsProvider);
 
-    RwtScoutDesktopForm ui = new RwtScoutDesktopForm();
+    RwtScoutDesktopForm ui = createRwtScoutDesktopForm();
     ViewStackTabButton button = null;
     if (m_tabBar != null) {
       button = new ViewStackTabButton(m_tabBar);
@@ -141,6 +141,15 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     m_openForms.put(form, ui);
     setPartVisibleImpl(form);
     return ui;
+  }
+
+  /**
+   * Creates a new instance of {@link RwtScoutDesktopForm}.
+   * <p>
+   * May be overridden to create a custom instance.
+   */
+  protected RwtScoutDesktopForm createRwtScoutDesktopForm() {
+    return new RwtScoutDesktopForm();
   }
 
   protected void initPreferredSize(IFormBoundsProvider boundsProvider) {
@@ -171,7 +180,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
       return false;
     }
     StackLayout stackLayout = (StackLayout) m_container.getLayout();
-    return RwtUtility.isAncestorOf(stackLayout.topControl, part.getUiForm());
+    return RwtUtility.isAncestorOf(stackLayout.topControl, part.getUiContainer());
   }
 
   @Override
@@ -201,7 +210,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     RwtScoutDesktopForm uiForm = m_openForms.get(form);
     if (uiForm != null) {
       StackLayout stackLayout = (StackLayout) m_container.getLayout();
-      stackLayout.topControl = uiForm.getUiForm();
+      stackLayout.topControl = uiForm.getUiContainer();
       if (m_tabBar != null && m_formStack.remove(uiForm)) {
         GridData tabBarData = (GridData) m_tabBar.getLayoutData();
         if (m_formStack.isEmpty()) {

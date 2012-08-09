@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.AbstractRwtScoutPart;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -34,19 +35,14 @@ import org.eclipse.ui.forms.widgets.Form;
 public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDesktopForm.class);
 
+  private Composite m_container;
   private IRwtScoutViewStack m_stackComposite;
   private IRwtScoutFormHeader m_formHeaderComposite;
-  private IRwtScoutForm m_formComposite;
+  private Composite m_formBodyComposite;
   private IRwtScoutFormFooter m_formFooterComposite;
-  private Form m_uiForm;
   private ViewStackTabButton m_button;
 
   public RwtScoutDesktopForm() {
-  }
-
-  @Override
-  public Form getUiForm() {
-    return m_uiForm;
   }
 
   public void createPart(IRwtScoutViewStack stackComposite, Composite parent, ViewStackTabButton button, IForm scoutForm, IRwtEnvironment uiEnvironment) {
@@ -55,22 +51,66 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
 
     super.createPart(scoutForm, uiEnvironment);
 
-    m_uiForm = getUiEnvironment().getFormToolkit().createForm(parent);
-    Composite contentPane = m_uiForm.getBody();
-
+    m_container = getUiEnvironment().getFormToolkit().createComposite(parent);
     try {
       parent.setRedraw(false);
 
-      m_formHeaderComposite = getUiEnvironment().createFormHeader(contentPane, getScoutObject());
-      m_formComposite = getUiEnvironment().createForm(contentPane, getScoutObject());
-      m_formFooterComposite = getUiEnvironment().createFormFooter(contentPane, getScoutObject());
+      m_formHeaderComposite = getUiEnvironment().createFormHeader(m_container, getScoutObject());
+      m_formBodyComposite = createFormBody(m_container);
+      m_formFooterComposite = getUiEnvironment().createFormFooter(m_container, getScoutObject());
 
-      initLayout(contentPane);
+      initLayout(m_container);
       attachScout();
     }
     finally {
       parent.setRedraw(true);
     }
+  }
+
+  /**
+   * Creates a {@link IRwtScoutForm} and embeds it in either a {@link Form} or a regular {@link Composite}, depending on
+   * the
+   * flag {@link #isEclipseFormUsed()}.
+   */
+  private Composite createFormBody(Composite parent) {
+    Composite body = null;
+    Composite actualBody = null;
+    if (isEclipseFormUsed()) {
+      Form eclipseForm = getUiEnvironment().getFormToolkit().createForm(parent);
+      body = eclipseForm;
+      actualBody = eclipseForm.getBody();
+    }
+    else {
+      body = getUiEnvironment().getFormToolkit().createComposite(parent);
+      actualBody = body;
+    }
+
+    actualBody.setLayout(new FillLayout());
+    getUiEnvironment().createForm(actualBody, getScoutObject());
+
+    return body;
+  }
+
+  @Override
+  public Form getUiForm() {
+    if (m_formBodyComposite instanceof Form) {
+      return (Form) m_formBodyComposite;
+    }
+
+    return null;
+  }
+
+  @Override
+  public Composite getUiContainer() {
+    return m_container;
+  }
+
+  /**
+   * @return true to use a {@link Form} as container of the {@link IRwtScoutForm}. False to use a regular
+   *         {@link Composite}.
+   */
+  public boolean isEclipseFormUsed() {
+    return true;
   }
 
   protected void initLayout(Composite container) {
@@ -81,10 +121,7 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
     if (m_formHeaderComposite != null) {
       header = m_formHeaderComposite.getUiContainer();
     }
-    Composite body = null;
-    if (m_formComposite != null) {
-      body = m_formComposite.getUiContainer();
-    }
+    Composite body = m_formBodyComposite;
     Composite footer = null;
     if (m_formFooterComposite != null) {
       footer = m_formFooterComposite.getUiContainer();
@@ -146,8 +183,9 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
     if (m_button != null) {
       m_button.dispose();
     }
-    m_uiForm.dispose();
-
+    if (m_container != null && !m_container.isDisposed()) {
+      m_container.dispose();
+    }
     m_stackComposite = null;
   }
 
@@ -167,7 +205,7 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
     if (c == null) {
       return true;
     }
-    return (RwtUtility.isAncestorOf(getUiForm(), c));
+    return (RwtUtility.isAncestorOf(getUiContainer(), c));
   }
 
   @Override
@@ -203,28 +241,24 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
 
   @Override
   protected void setImageFromScout() {
-    if (getUiForm() == null || getUiForm().isDisposed()) {
-      return;
-    }
     String iconId = getScoutObject().getIconId();
     Image img = getUiEnvironment().getIcon(iconId);
     if (m_button != null && !m_button.isDisposed()) {
       m_button.setImage(img);
     }
-    String sub = getScoutObject().getSubTitle();
-    if (sub != null) {
-      getUiForm().setImage(img);
-    }
-    else {
-      getUiForm().setImage(null);
+    if (getUiForm() != null && !getUiForm().isDisposed()) {
+      String sub = getScoutObject().getSubTitle();
+      if (sub != null) {
+        getUiForm().setImage(img);
+      }
+      else {
+        getUiForm().setImage(null);
+      }
     }
   }
 
   @Override
   protected void setTitleFromScout() {
-    if (getUiForm() == null || getUiForm().isDisposed()) {
-      return;
-    }
     IForm f = getScoutObject();
     //
     String s = f.getBasicTitle();
@@ -233,11 +267,13 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
     }
     //
     s = f.getSubTitle();
-    if (s != null) {
-      getUiForm().setText(RwtUtility.escapeMnemonics(StringUtility.removeNewLines(s != null ? s : "")));
-    }
-    else {
-      getUiForm().setText(null);
+    if (getUiForm() != null && !getUiForm().isDisposed()) {
+      if (s != null) {
+        getUiForm().setText(RwtUtility.escapeMnemonics(StringUtility.removeNewLines(s != null ? s : "")));
+      }
+      else {
+        getUiForm().setText(null);
+      }
     }
   }
 

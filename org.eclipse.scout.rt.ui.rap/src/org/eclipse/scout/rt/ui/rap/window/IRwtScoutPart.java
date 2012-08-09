@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.rap.window;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Form;
 
 public interface IRwtScoutPart {
@@ -19,9 +20,14 @@ public interface IRwtScoutPart {
   IForm getScoutObject();
 
   /**
-   * @return the top-level ui form container or null
+   * @return the eclipse form inside the {@link #getUiContainer()}, may be null
    */
   Form getUiForm();
+
+  /**
+   * @return the top-level container
+   */
+  Composite getUiContainer();
 
   void showPart();
 

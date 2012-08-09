@@ -34,6 +34,13 @@ public class RwtScoutMobileDialog extends RwtScoutDialog {
   }
 
   @Override
+  public boolean isEclipseFormUsed() {
+    //Eclipse forms are too heavyweight and may even crash chrome on android.
+    //Since the mobile forms don't use any feature of the eclipse forms there is no need to create them.
+    return false;
+  }
+
+  @Override
   public void createPart(IForm scoutForm, Shell parentShell, int style, IRwtEnvironment uiEnvironment) {
     scoutForm.setCacheBounds(true);
 
