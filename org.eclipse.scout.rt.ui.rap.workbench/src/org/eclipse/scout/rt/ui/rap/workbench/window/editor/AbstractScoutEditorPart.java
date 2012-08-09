@@ -258,6 +258,11 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements IRwt
     return getRootForm();
   }
 
+  @Override
+  public Composite getUiContainer() {
+    return getUiForm();
+  }
+
   protected Form getRootForm() {
     return m_rootForm;
   }

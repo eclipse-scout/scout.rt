@@ -268,6 +268,11 @@ public abstract class AbstractScoutView extends ViewPart implements IRwtScoutPar
     return getRootForm();
   }
 
+  @Override
+  public Composite getUiContainer() {
+    return getUiForm();
+  }
+
   protected Form getRootForm() {
     return m_rootForm;
   }
