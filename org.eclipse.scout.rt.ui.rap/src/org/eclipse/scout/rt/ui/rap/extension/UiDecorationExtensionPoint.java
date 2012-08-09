@@ -236,6 +236,9 @@ public final class UiDecorationExtensionPoint {
       if (props.getPropertyString(ILookAndFeelProperties.PROP_DND_SUPPORT_ENABLED) != null) {
         uiDecoration.setDndSupportEnabled(props.getPropertyBool(ILookAndFeelProperties.PROP_DND_SUPPORT_ENABLED));
       }
+      if (props.getPropertyString(ILookAndFeelProperties.PROP_BROWSER_HISTORY_ENABLED) != null) {
+        uiDecoration.setBrowserHistoryEnabled(props.getPropertyBool(ILookAndFeelProperties.PROP_BROWSER_HISTORY_ENABLED));
+      }
       if (props.getPropertyString(ILookAndFeelProperties.PROP_TABLE_ROW_HEIGHT) != null) {
         uiDecoration.setTableRowHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_TABLE_ROW_HEIGHT));
       }

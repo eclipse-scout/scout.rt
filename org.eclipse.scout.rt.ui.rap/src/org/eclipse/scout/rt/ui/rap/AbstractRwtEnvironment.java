@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.internal.widgets.JSExecutor;
@@ -65,6 +66,7 @@ import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
 import org.eclipse.scout.rt.ui.rap.concurrency.RwtScoutSynchronizer;
+import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.RwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
@@ -359,8 +361,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       m_colorFactory = new ColorFactory(getDisplay());
       m_keyStrokeManager = new KeyStrokeManager(this);
       m_fontRegistry = new FontRegistry(getDisplay());
-      m_historySupport = new RwtScoutNavigationSupport(this);
-      m_historySupport.install();
+      if (UiDecorationExtensionPoint.getLookAndFeel().isBrowserHistoryEnabled()) {
+        m_historySupport = new RwtScoutNavigationSupport(this);
+        m_historySupport.install();
+      }
       m_layoutValidateManager = new LayoutValidateManager();
       attachScoutListeners();
       // desktop keystokes
@@ -916,7 +920,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
             //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
             Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
             if (frameworkVersion.getMajor() == 3
-                  && frameworkVersion.getMinor() <= 4) {
+                && frameworkVersion.getMinor() <= 4) {
               iconId = SWT.ICON_INFORMATION;
             }
             else {
@@ -1294,7 +1298,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
           protected void runVoid(IProgressMonitor monitor) throws Throwable {
             getClientSession().stopSession();
           }
-        }.schedule();
+        }.runNow(new NullProgressMonitor());
       }
     }
   }

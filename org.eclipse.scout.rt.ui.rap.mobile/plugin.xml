@@ -109,6 +109,10 @@
                name="formfield.selectAllOnFocus.enabled"
                value="false">
          </property>
+         <property
+               name="browserHistory.enabled"
+               value="false">
+         </property>
       </properties>
    </extension>
 

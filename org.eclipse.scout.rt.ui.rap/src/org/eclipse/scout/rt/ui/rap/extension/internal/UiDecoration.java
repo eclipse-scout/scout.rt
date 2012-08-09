@@ -41,6 +41,7 @@ public class UiDecoration implements IUiDecoration {
   private int m_messageBoxMinHeight = 100;
   private int m_toolFormMinWidth = 330;
   private boolean m_dndSupportEnabled;
+  private boolean m_browserHistoryEnabled;
   private int m_tableRowHeight = -1;
   private int m_treeNodeHeight = -1;
 
@@ -249,6 +250,15 @@ public class UiDecoration implements IUiDecoration {
 
   public void setDndSupportEnabled(boolean dndSupportEnabled) {
     m_dndSupportEnabled = dndSupportEnabled;
+  }
+
+  @Override
+  public boolean isBrowserHistoryEnabled() {
+    return m_browserHistoryEnabled;
+  }
+
+  public void setBrowserHistoryEnabled(boolean browserHistoryEnabled) {
+    m_browserHistoryEnabled = browserHistoryEnabled;
   }
 
   @Override

@@ -68,4 +68,5 @@ public interface IUiDecoration {
 
   boolean isDndSupportEnabled();
 
+  boolean isBrowserHistoryEnabled();
 }

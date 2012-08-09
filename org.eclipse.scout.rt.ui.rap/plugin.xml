@@ -350,6 +350,10 @@
               name="tree.node.height"
               value="23">
         </property>
+        <property
+              name="browserHistory.enabled"
+              value="true">
+        </property>
       </properties>
   </extension>
 
