@@ -14,7 +14,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.StringWriter;
 import java.security.Permission;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -959,23 +961,34 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   @Override
   public void storeXML(SimpleXmlElement x) throws ProcessingException {
+    List<ICompositeField> enclosingFieldList = getEnclosingFieldList();
+    for (ICompositeField field : enclosingFieldList) {
+      SimpleXmlElement enclosingField = new SimpleXmlElement("enclosingField");
+      setXmlFormFieldIds(enclosingField, field);
+      // Enclosing fields are traversed from outside to inside. Hence add XML child at the end.
+      x.addChild(enclosingField);
+    }
+    // set field ids
+    setXmlFormFieldIds(x, this);
+  }
+
+  @Override
+  public List<ICompositeField> getEnclosingFieldList() {
+    List<ICompositeField> enclosingFieldList = new ArrayList<ICompositeField>();
     // compute enclosing field path
     Class<?> currentEnclosingFieldType = ConfigurationUtility.getEnclosingContainerType(this);
     ICompositeField p = getParentField();
     while (p != null) {
       Class<?> enclosingFieldType = ConfigurationUtility.getEnclosingContainerType(p);
       if (enclosingFieldType != currentEnclosingFieldType) {
-        SimpleXmlElement enclosingField = new SimpleXmlElement("enclosingField");
-        setXmlFormFieldIds(enclosingField, p);
         // Enclosing fields are traversed from inside to outside, but the path of enclosing
         // elements should be from outside to inside. Hence add XML child at the beginning.
-        x.addChild(enclosingField, 0);
+        enclosingFieldList.add(0, p);
         currentEnclosingFieldType = enclosingFieldType;
       }
       p = p.getParentField();
     }
-    // set field ids
-    setXmlFormFieldIds(x, this);
+    return enclosingFieldList;
   }
 
   private void setXmlFormFieldIds(SimpleXmlElement x, IFormField f) {

@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.beans.PropertyChangeListener;
 import java.security.Permission;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -297,6 +299,15 @@ public interface IFormField extends IPropertyObserver {
    */
   String getFieldId();
 
+  /**
+   * @return Returns the list of fields that are enclosing this field, starting with the furthermost (from outside to
+   *         inside). An enclosing field is part of the enclosing classes path that is abstract or the outermost
+   *         enclosing class. The latter is the primary type.
+   * @see ConfigurationUtility#getEnclosingContainerType(Object)
+   * @since 3.8.1
+   */
+  List<ICompositeField> getEnclosingFieldList();
+
   String getLabel();
 
   void setLabel(String name);
@@ -537,7 +548,8 @@ public interface IFormField extends IPropertyObserver {
   void checkSaveNeeded();
 
   /**
-   * mark form so that<br> {@link IFormField#isSaveNeeded()} returns true
+   * mark form so that<br>
+   * {@link IFormField#isSaveNeeded()} returns true
    */
   void touch();
 
