@@ -1244,15 +1244,26 @@ public final class StringUtility {
   }
 
   /**
-   * Joins the given parts together, separated by the given delimiter. <code>null</code> or empty strings are neglected.
+   * Concatenates the raw input of {@link Object}s separated by <code>delimiter</code>. On
+   * each object {@link Object#toString()} is invoked.<br />
+   * <code>null</code> values or those {@link Object#toString()} is empty are neglected.
+   * 
+   * @param delimiter
+   * @param values
+   * @return never <code>null</code>, empty String in case no elements are appended
+   * @since 3.8.1
    */
-  public static String join(String delimiter, String... parts) {
-    if (parts == null) {
-      return null;
+  public static String join(String delimiter, Object... parts) {
+    if (parts == null || parts.length == 0) {
+      return "";
     }
     boolean added = false;
     StringBuilder builder = new StringBuilder();
-    for (String s : parts) {
+    for (Object o : parts) {
+      if (o == null) {
+        continue;
+      }
+      String s = o.toString();
       if (!isNullOrEmpty(s)) {
         if (added && delimiter != null) {
           builder.append(delimiter);
@@ -1265,20 +1276,18 @@ public final class StringUtility {
   }
 
   /**
-   * Concatenates the raw input of {@link Long}s separated by <code>delimiter</code>. On
-   * each long {@link Long#toString()} is invoked.<br />
-   * <code>null</code> values are accepted, no unneeded delimiters appear.
-   * 
-   * @param delimiter
-   * @param valueArrayLong
-   * @return never <code>null</code>, empty String in case no elements are appended
+   * @see #join(String, Object...)
    */
-  public static String join(String delimiter, Long[] valueArrayLong) {
-    String[] stringArray = new String[valueArrayLong.length];
-    for (int i = 0; i < valueArrayLong.length; i++) {
-      stringArray[i] = valueArrayLong[i] != null ? valueArrayLong[i].toString() : null;
-    }
-    return StringUtility.join(delimiter, stringArray);
+  public static String join(String delimiter, Long[] parts) {
+    return join(delimiter, (Object[]) parts);
+  }
+
+  /**
+   * @see #join(String, Object...)
+   * @since 3.8.1
+   */
+  public static String join(String delimiter, String[] parts) {
+    return join(delimiter, (Object[]) parts);
   }
 
   /**
