@@ -21,9 +21,9 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 /**
  * A tool button that can be used in the {@link IDesktop} to toggle a form in the tools area.
  */
-public abstract class AbstractFormToolButton extends AbstractToolButton {
+public abstract class AbstractFormToolButton<FORM extends IForm> extends AbstractToolButton implements IFormToolButton<FORM> {
 
-  private IForm m_form;
+  private FORM m_form;
   private boolean m_previousSelectionState = false;
 
   @ConfigPropertyValue("true")
@@ -32,33 +32,23 @@ public abstract class AbstractFormToolButton extends AbstractToolButton {
     return true;
   }
 
-  public final IForm getForm() {
+  @Override
+  public final FORM getForm() {
     return m_form;
   }
 
-  /**
-   * Set a new <b>started</b> form to the tool.
-   * <p>
-   * The form is shown whenever the tool button is activated.
-   */
-  public final void setForm(IForm f) {
+  @Override
+  public final void setForm(FORM f) {
     setForm(f, false);
   }
 
-  /**
-   * Set a new <b>started</b> form to the tool.
-   * <p>
-   * The form is shown whenever the tool button is activated.
-   * 
-   * @param force
-   *          set 'f' as the new form, event when it is equal to the old form
-   */
-  public final void setForm(IForm f, boolean force) {
+  @Override
+  public final void setForm(FORM f, boolean force) {
     if (force || f != m_form) {
       if (f != null) {
         decorateForm(f);
       }
-      IForm oldForm = m_form;
+      FORM oldForm = m_form;
       m_form = f;
       //single observer
       IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
@@ -119,7 +109,7 @@ public abstract class AbstractFormToolButton extends AbstractToolButton {
         }
       }
       // show form
-      IForm oldForm = getForm();
+      FORM oldForm = getForm();
       execStartForm();
       if (oldForm == m_form) {
         if (m_form != null) {
@@ -137,7 +127,7 @@ public abstract class AbstractFormToolButton extends AbstractToolButton {
     }
   }
 
-  protected void decorateForm(IForm f) {
+  protected void decorateForm(FORM f) {
     f.setAutoAddRemoveOnDesktop(false);
     f.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
     f.setDisplayViewId(IForm.VIEW_ID_E);
