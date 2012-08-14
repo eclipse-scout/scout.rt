@@ -76,11 +76,8 @@ public class DefaultShellService extends AbstractService implements IShellServic
       if (commandline == null) {
         return;
       }
-      System.out.println("EXEC1: " + commandline);
       Process process = Runtime.getRuntime().exec(commandline);
-      System.out.println("EXEC2: " + process);
-      int code = process.waitFor();
-      System.out.println("EXEC3: " + code);
+      process.waitFor();
     }
     catch (InterruptedException ie) {
       throw new ProcessingException(ScoutTexts.get("Interrupted"), ie);
