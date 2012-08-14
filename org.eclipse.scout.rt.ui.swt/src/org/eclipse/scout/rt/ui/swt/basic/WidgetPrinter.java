@@ -129,7 +129,6 @@ public class WidgetPrinter {
       if (printer.startPage()) {
         GC gc = new GC(printer);
         try {
-          System.out.println("ok");
           Rectangle clientArea = printer.getClientArea();
           Rectangle trim = printer.computeTrim(0, 0, 0, 0);
           Point dpi = printer.getDPI();
