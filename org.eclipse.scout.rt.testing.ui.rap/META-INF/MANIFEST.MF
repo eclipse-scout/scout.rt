@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Runtime RAP Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.ui.rap;singleton:=true
-Bundle-Version: 3.8.0.qualifier
+Bundle-Version: 3.8.1.qualifier
 Bundle-Activator: org.eclipse.scout.rt.testing.ui.rap.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.testing.client;bundle-version="1.0.0";visibility:=reexport,
