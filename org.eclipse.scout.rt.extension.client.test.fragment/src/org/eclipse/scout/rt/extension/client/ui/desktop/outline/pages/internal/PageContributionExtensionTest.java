@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,16 +19,13 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @since 3.9.0
  */
-@RunWith(ScoutClientTestRunner.class)
-public class PageContributionExtensionCreateInstanceTest {
+public class PageContributionExtensionTest {
 
   private P_Outline m_outline;
   private P_OtherOutline m_otherOutline;
@@ -42,6 +39,10 @@ public class PageContributionExtensionCreateInstanceTest {
     m_parentPage = new P_ParentPage();
     m_otherParentPage = new P_OtherParentPage();
   }
+
+  /////////////////////////////////////////////////////////
+  // test default constructor                            //
+  /////////////////////////////////////////////////////////
 
   @Test
   public void testCreateContributionDefaultConstructor() throws Exception {

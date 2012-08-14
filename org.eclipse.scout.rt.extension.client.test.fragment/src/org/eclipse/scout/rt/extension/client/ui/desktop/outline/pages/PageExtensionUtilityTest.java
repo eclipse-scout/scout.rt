@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -174,6 +174,22 @@ public class PageExtensionUtilityTest {
     assertEquals(2, m_pageList.size());
     assertSame(m_configuredPageA, m_pageList.get(0));
     assertSame(m_configuredPageC, m_pageList.get(1));
+  }
+
+  @Test
+  public void testRemoveTwoPagesWithoutFilter() throws Exception {
+    m_pageList.add(m_configuredPageA);
+    m_pageList.add(m_configuredPageB);
+    m_pageList.add(m_configuredPageC);
+
+    List<PageRemoveExtension> extensions = Arrays.asList(
+        new PageRemoveExtension(P_ConfiguredPageA.class),
+        new PageRemoveExtension(P_ConfiguredPageB.class));
+
+    PageExtensionUtility.removePages(null, null, extensions, m_pageList);
+
+    assertEquals(1, m_pageList.size());
+    assertSame(m_configuredPageC, m_pageList.get(0));
   }
 
   @Test

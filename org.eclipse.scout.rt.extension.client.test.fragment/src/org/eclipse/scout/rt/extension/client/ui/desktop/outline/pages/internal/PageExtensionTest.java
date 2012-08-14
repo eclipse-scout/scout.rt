@@ -13,8 +13,11 @@ package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.easymock.EasyMock;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExtensionFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Before;
@@ -57,31 +60,27 @@ public class PageExtensionTest {
   }
 
   @Test
-  public void testAcceptContextOutlineContextFilter() throws Exception {
-    P_PageExtension pageExtension = new P_PageExtension(new ParentAndOutlinePageFilter(P_Outline.class, null));
-    assertFalse(pageExtension.accept(null, null, null));
-    assertTrue(pageExtension.accept(m_outline, null, null));
-    assertFalse(pageExtension.accept(m_otherOutline, null, null));
+  public void testAcceptWithFilter() {
+    IPageExtensionFilter filter = EasyMock.createMock(IPageExtensionFilter.class);
+    EasyMock.expect(filter.accept(EasyMock.<IOutline> anyObject(), EasyMock.<IPage> anyObject(), EasyMock.<IPage> anyObject())).andStubReturn(true);
+    P_PageExtension contrib = new P_PageExtension(filter);
+    EasyMock.replay(filter);
 
-    assertFalse(pageExtension.accept(m_outline, m_page, null));
-    assertFalse(pageExtension.accept(m_outline, m_otherPage, null));
-
-    assertFalse(pageExtension.accept(m_otherOutline, m_page, null));
-    assertFalse(pageExtension.accept(m_otherOutline, m_otherPage, null));
+    assertTrue(contrib.accept(null, null, null));
+    assertTrue(contrib.accept(m_outline, null, null));
+    assertTrue(contrib.accept(null, m_page, null));
   }
 
   @Test
-  public void testAcceptContextPageContextFilter() throws Exception {
-    P_PageExtension m_pageExtension = new P_PageExtension(new ParentAndOutlinePageFilter(null, P_Page.class));
-    assertFalse(m_pageExtension.accept(null, null, null));
-    assertFalse(m_pageExtension.accept(m_outline, null, null));
-    assertFalse(m_pageExtension.accept(m_otherOutline, null, null));
+  public void testRejectWithFilter() {
+    IPageExtensionFilter filter = EasyMock.createMock(IPageExtensionFilter.class);
+    EasyMock.expect(filter.accept(EasyMock.<IOutline> anyObject(), EasyMock.<IPage> anyObject(), EasyMock.<IPage> anyObject())).andStubReturn(false);
+    P_PageExtension contrib = new P_PageExtension(filter);
+    EasyMock.replay(filter);
 
-    assertTrue(m_pageExtension.accept(m_outline, m_page, null));
-    assertFalse(m_pageExtension.accept(m_outline, m_otherPage, null));
-
-    assertTrue(m_pageExtension.accept(m_otherOutline, m_page, null));
-    assertFalse(m_pageExtension.accept(m_otherOutline, m_otherPage, null));
+    assertFalse(contrib.accept(null, null, null));
+    assertFalse(contrib.accept(m_outline, null, null));
+    assertFalse(contrib.accept(null, m_page, null));
   }
 
   private static class P_PageExtension extends AbstractPageExtension {
