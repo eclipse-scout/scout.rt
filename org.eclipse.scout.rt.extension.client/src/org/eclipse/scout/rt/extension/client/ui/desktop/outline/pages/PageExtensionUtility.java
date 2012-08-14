@@ -168,7 +168,7 @@ public final class PageExtensionUtility {
       for (PageRemoveExtension removeExtension : extensions) {
         if (removeExtension.accept(outline, parentPage, page)) {
           it.remove();
-          return;
+          break;
         }
       }
     }

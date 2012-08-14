@@ -32,21 +32,21 @@ The extensions are processed in the following order:
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -63,27 +63,18 @@ The extensions are processed in the following order:
          </appinfo>
       </annotation>
       <complexType>
-         <choice minOccurs="0" maxOccurs="1">
-            <element ref="outline"/>
-            <element ref="parentPage"/>
-         </choice>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="outline" minOccurs="0" maxOccurs="1"/>
+            <element ref="parentPage" minOccurs="0" maxOccurs="1"/>
+            <element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="filter" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.page.IPageFilter"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -113,34 +104,25 @@ The following approach is implemented for resolving ambiguous oders: An order va
          </appinfo>
       </annotation>
       <complexType>
-         <choice minOccurs="0" maxOccurs="1">
-            <element ref="outline"/>
-            <element ref="parentPage"/>
-         </choice>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="outline" minOccurs="0" maxOccurs="1"/>
+            <element ref="parentPage" minOccurs="0" maxOccurs="1"/>
+            <element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="filter" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.page.IPageFilter"/>
-               </appinfo>
-            </annotation>
-         </attribute>
          <attribute name="active" type="boolean" use="default" value="true">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -150,18 +132,19 @@ The following approach is implemented for resolving ambiguous oders: An order va
    <element name="pageModification">
       <annotation>
          <appinfo>
-            <meta.element labelAttribute="class"/>
+            <meta.element labelAttribute="page"/>
          </appinfo>
       </annotation>
       <complexType>
-         <choice minOccurs="0" maxOccurs="1">
-            <element ref="outline"/>
-            <element ref="parentPage"/>
-         </choice>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="outline" minOccurs="0" maxOccurs="1"/>
+            <element ref="parentPage" minOccurs="0" maxOccurs="1"/>
+            <element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
          <attribute name="page" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
@@ -171,27 +154,17 @@ The following approach is implemented for resolving ambiguous oders: An order va
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageModifier"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="filter" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.page.IPageFilter"/>
-               </appinfo>
-            </annotation>
-         </attribute>
          <attribute name="active" type="boolean" use="default" value="true">
             <annotation>
                <documentation>
-                  
+
                </documentation>
             </annotation>
          </attribute>
@@ -203,7 +176,7 @@ The following approach is implemented for resolving ambiguous oders: An order va
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
@@ -218,10 +191,25 @@ The following approach is implemented for resolving ambiguous oders: An order va
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.IOutline"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="filter">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExtensionFilter"/>
                </appinfo>
             </annotation>
          </attribute>

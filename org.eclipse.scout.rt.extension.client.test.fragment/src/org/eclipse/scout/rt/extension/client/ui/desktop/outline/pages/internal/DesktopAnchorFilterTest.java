@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,10 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExtensionFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +24,7 @@ import org.junit.runner.RunWith;
  * @since 3.9.0
  */
 @RunWith(ScoutClientTestRunner.class)
-public class ParentAndOutlinePageFilterTest {
+public class DesktopAnchorFilterTest {
 
   private P_Outline m_outline;
   private P_OtherOutline m_otherOutline;
@@ -44,7 +41,7 @@ public class ParentAndOutlinePageFilterTest {
 
   @Test
   public void testAcceptNoFilters() {
-    ParentAndOutlinePageFilter filter = new ParentAndOutlinePageFilter(null, null);
+    DesktopAnchorFilter filter = new DesktopAnchorFilter(null, null);
     assertTrue(filter.accept(null, null, null));
     assertTrue(filter.accept(m_outline, null, null));
     assertTrue(filter.accept(null, m_page, null));
@@ -53,7 +50,7 @@ public class ParentAndOutlinePageFilterTest {
 
   @Test
   public void testAcceptOutlineFilterClass() {
-    ParentAndOutlinePageFilter filter = new ParentAndOutlinePageFilter(P_Outline.class, null);
+    DesktopAnchorFilter filter = new DesktopAnchorFilter(P_Outline.class, null);
     assertFalse(filter.accept(null, null, null));
     assertTrue(filter.accept(m_outline, null, null));
     assertFalse(filter.accept(m_otherOutline, null, null));
@@ -63,43 +60,12 @@ public class ParentAndOutlinePageFilterTest {
 
   @Test
   public void testAcceptPageFilterClass() {
-    ParentAndOutlinePageFilter filter = new ParentAndOutlinePageFilter(null, P_Page.class);
+    DesktopAnchorFilter filter = new DesktopAnchorFilter(null, P_Page.class);
     assertFalse(filter.accept(null, null, null));
     assertFalse(filter.accept(m_outline, null, null));
     assertTrue(filter.accept(null, m_page, null));
     assertFalse(filter.accept(null, m_otherPage, null));
     assertTrue(filter.accept(m_outline, m_page, null));
-  }
-
-  @Test
-  public void testAcceptPageFilterClassAndFilter() {
-    ParentAndOutlinePageFilter filter = new ParentAndOutlinePageFilter(null, P_Page.class, new P_AlwaysAcceptingPageFilter());
-    assertFalse(filter.accept(null, null, null));
-    assertFalse(filter.accept(m_outline, null, null));
-    assertTrue(filter.accept(null, m_page, null));
-    assertFalse(filter.accept(null, m_otherPage, null));
-    assertTrue(filter.accept(m_outline, m_page, null));
-
-    filter = new ParentAndOutlinePageFilter(null, P_Page.class, new P_AlwaysRejectingPageFilter());
-    assertFalse(filter.accept(null, null, null));
-    assertFalse(filter.accept(m_outline, null, null));
-    assertFalse(filter.accept(null, m_page, null));
-    assertFalse(filter.accept(null, m_otherPage, null));
-    assertFalse(filter.accept(m_outline, m_page, null));
-  }
-
-  public static class P_AlwaysAcceptingPageFilter implements IPageExtensionFilter {
-    @Override
-    public boolean accept(IOutline outline, IPage parentPage, IPage affectedPage) {
-      return true;
-    }
-  }
-
-  public static class P_AlwaysRejectingPageFilter implements IPageExtensionFilter {
-    @Override
-    public boolean accept(IOutline outline, IPage parentPage, IPage affectedPage) {
-      return false;
-    }
   }
 
   private static class P_Outline extends AbstractOutline {

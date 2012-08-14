@@ -17,20 +17,14 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExten
 /**
  * @since 3.9.0
  */
-public class ParentAndOutlinePageFilter implements IPageExtensionFilter {
+public class DesktopAnchorFilter implements IPageExtensionFilter {
 
   private final Class<? extends IOutline> m_outlineFilterClass;
   private final Class<? extends IPage> m_parentPageFilterClass;
-  private final IPageExtensionFilter m_additionalFilter;
 
-  public ParentAndOutlinePageFilter(Class<? extends IOutline> outlineFilterClass, Class<? extends IPage> parentPageFilterClass) {
-    this(outlineFilterClass, parentPageFilterClass, null);
-  }
-
-  public ParentAndOutlinePageFilter(Class<? extends IOutline> outlineFilterClass, Class<? extends IPage> parentPageFilterClass, IPageExtensionFilter additionalFilter) {
+  public DesktopAnchorFilter(Class<? extends IOutline> outlineFilterClass, Class<? extends IPage> parentPageFilterClass) {
     m_outlineFilterClass = outlineFilterClass;
     m_parentPageFilterClass = parentPageFilterClass;
-    m_additionalFilter = additionalFilter;
   }
 
   public Class<? extends IOutline> getOutlineFilterClass() {
@@ -41,28 +35,13 @@ public class ParentAndOutlinePageFilter implements IPageExtensionFilter {
     return m_parentPageFilterClass;
   }
 
-  public IPageExtensionFilter getAdditionalFilter() {
-    return m_additionalFilter;
-  }
-
   @Override
   public boolean accept(IOutline outline, IPage parentPage, IPage affectedPage) {
-    return acceptParentAndOutlineFilterClasses(outline, parentPage) && acceptAdditionalFilter(outline, parentPage, affectedPage);
-  }
-
-  private boolean acceptParentAndOutlineFilterClasses(IOutline outline, IPage parentPage) {
     if (getParentPageFilterClass() != null) {
       return parentPage != null && getParentPageFilterClass().isInstance(parentPage);
     }
     if (getOutlineFilterClass() != null) {
       return outline != null && parentPage == null && getOutlineFilterClass().isInstance(outline);
-    }
-    return true;
-  }
-
-  private boolean acceptAdditionalFilter(IOutline outline, IPage parentPage, IPage affectedPage) {
-    if (getAdditionalFilter() != null) {
-      return getAdditionalFilter().accept(outline, parentPage, affectedPage);
     }
     return true;
   }

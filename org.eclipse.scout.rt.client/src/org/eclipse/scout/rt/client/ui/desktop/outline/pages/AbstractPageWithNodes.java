@@ -90,7 +90,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   protected void execCreateChildPages(Collection<IPage> pageList) throws ProcessingException {
   }
 
-  protected void createChildPagesInternal(ArrayList<IPage> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(Collection<IPage> pageList) throws ProcessingException {
     execCreateChildPages(pageList);
   }
 

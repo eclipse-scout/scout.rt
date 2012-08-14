@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.runtime.ExtensionPointTracker;
 import org.eclipse.scout.commons.runtime.ExtensionPointTracker.Listener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.CompositePageFilter;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExtensionFilter;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageModifier;
 import org.osgi.framework.Bundle;
@@ -115,7 +116,7 @@ public class PageExtensionManager implements Listener {
         if (PAGE_CONTRIBUTION_ELEMENT.equals(element.getName())) {
           Double order = TypeCastUtility.castValue(element.getAttribute("order"), Double.class);
           Class<? extends IPage> pageClass = loadClass(contributor, IPage.class, element.getAttribute("class"));
-          IPageExtensionFilter pageFilter = parseOutlineAndParentPageFilter(contributor, element);
+          IPageExtensionFilter pageFilter = parseAndCreatePageFilters(contributor, element);
           PageContributionExtension pageContribution = new PageContributionExtension(pageFilter, pageClass, NumberUtility.nvl(order, 123456789.0));
           m_pageContributionExtensions.add(pageContribution);
           contributions.add(pageContribution);
@@ -127,14 +128,14 @@ public class PageExtensionManager implements Listener {
           if (modifierClass == null) {
             continue;
           }
-          IPageExtensionFilter pageFilter = parseOutlineAndParentPageFilter(contributor, element);
+          IPageExtensionFilter pageFilter = parseAndCreatePageFilters(contributor, element);
           PageModificationExtension pageModification = new PageModificationExtension(pageFilter, pageClass, modifierClass);
           m_pageModificationExtensions.add(pageModification);
           contributions.add(pageModification);
         }
         else if (PAGE_REMOVAL_ELEMENT.equals(element.getName())) {
-          Class<? extends IPage> pageClass = loadClass(contributor, IPage.class, element.getAttribute("page"));
-          IPageExtensionFilter pageFilter = parseOutlineAndParentPageFilter(contributor, element);
+          Class<? extends IPage> pageClass = loadClass(contributor, IPage.class, element.getAttribute("class"));
+          IPageExtensionFilter pageFilter = parseAndCreatePageFilters(contributor, element);
           PageRemoveExtension pageRemoveExtension = new PageRemoveExtension(pageFilter, pageClass);
           m_pageRemoveExtensions.add(pageRemoveExtension);
           contributions.add(pageRemoveExtension);
@@ -154,9 +155,10 @@ public class PageExtensionManager implements Listener {
     }
   }
 
-  private IPageExtensionFilter parseOutlineAndParentPageFilter(Bundle contributor, IConfigurationElement element) throws Exception {
+  private IPageExtensionFilter parseAndCreatePageFilters(Bundle contributor, IConfigurationElement element) throws Exception {
     Class<? extends IOutline> outlineFilterClass = null;
     Class<? extends IPage> parentPageFilterClass = null;
+    CompositePageFilter compositeFilter = new CompositePageFilter();
 
     for (IConfigurationElement child : element.getChildren()) {
       if ("outline".equals(child.getName())) {
@@ -165,9 +167,26 @@ public class PageExtensionManager implements Listener {
       else if ("parentPage".equals(child.getName())) {
         parentPageFilterClass = loadClass(contributor, IPage.class, child.getAttribute("class"));
       }
+      else if ("filter".equals(child.getName())) {
+        try {
+          IPageExtensionFilter filter = (IPageExtensionFilter) child.createExecutableExtension("class");
+          compositeFilter.addFilter(filter);
+        }
+        catch (Exception e) {
+          LOG.error("Exception while creating filter class [" + element.getAttribute("class") + "]", e);
+        }
+      }
     }
-
-    return new ParentAndOutlinePageFilter(outlineFilterClass, parentPageFilterClass);
+    DesktopAnchorFilter desktopAnchorFilter = null;
+    if (outlineFilterClass != null || parentPageFilterClass != null) {
+      desktopAnchorFilter = new DesktopAnchorFilter(outlineFilterClass, parentPageFilterClass);
+      compositeFilter.addFilterAtBegin(desktopAnchorFilter);
+    }
+    //
+    if (!compositeFilter.isEmpty()) {
+      return compositeFilter;
+    }
+    return null;
   }
 
   @Override

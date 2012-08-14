@@ -21,13 +21,6 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExten
  */
 public abstract class AbstractPageExtension {
 
-  public static final IPageExtensionFilter NULL_PAGE_FILTER = new IPageExtensionFilter() {
-    @Override
-    public boolean accept(IOutline outline, IPage parentPage, IPage affectedPage) {
-      return true;
-    }
-  };
-
   private final IPageExtensionFilter m_pageFilter;
 
   public AbstractPageExtension() {
@@ -35,12 +28,7 @@ public abstract class AbstractPageExtension {
   }
 
   public AbstractPageExtension(IPageExtensionFilter pageFilter) {
-    if (pageFilter == null) {
-      m_pageFilter = NULL_PAGE_FILTER;
-    }
-    else {
-      m_pageFilter = pageFilter;
-    }
+    m_pageFilter = pageFilter;
   }
 
   public IPageExtensionFilter getPageFilter() {
@@ -64,8 +52,9 @@ public abstract class AbstractPageExtension {
    *         page extension.
    */
   public boolean accept(IOutline outline, IPage parentPage, IPage affectedPage) {
-    if (getPageFilter() != null) {
-      return getPageFilter().accept(outline, parentPage, affectedPage);
+    IPageExtensionFilter filter = getPageFilter();
+    if (filter != null) {
+      return filter.accept(outline, parentPage, affectedPage);
     }
     return true;
   }
