@@ -40,6 +40,7 @@
     <module>org.eclipse.scout.rt.jdbc.derby</module>
     <module>org.eclipse.scout.jaxws216</module>
     <module>org.eclipse.scout.rt.ui.swing</module>
+    <module>org.eclipse.scout.rt.ui.swing.browser.swt.fragment</module>
     <module>org.eclipse.scout.rt.ui.swt</module>
     <module>org.eclipse.scout.rt.ui.rap</module>
     <module>org.eclipse.scout.rt.ui.rap.workbench</module>
