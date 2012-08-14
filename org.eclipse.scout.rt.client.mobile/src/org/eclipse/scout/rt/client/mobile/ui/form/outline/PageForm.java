@@ -512,8 +512,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       return;
     }
 
-    IPage activePage = getDesktop().getOutline().getActivePage();
-    IPage pageToSelect = MobileDesktopUtility.getPageFor(activePage, pageDetailTable.getRow(0));
+    IPage pageToSelect = MobileDesktopUtility.getPageFor(m_page, pageDetailTable.getRow(0));
     if (pageDetailTable.getSelectedRow() == null) {
       if (!PageFormManager.isDrillDownPage(pageToSelect)) {
         pageDetailTable.selectFirstRow();

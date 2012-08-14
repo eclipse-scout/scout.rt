@@ -21,7 +21,7 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class MobileScoutFormToolkit extends ScoutFormToolkit {
 

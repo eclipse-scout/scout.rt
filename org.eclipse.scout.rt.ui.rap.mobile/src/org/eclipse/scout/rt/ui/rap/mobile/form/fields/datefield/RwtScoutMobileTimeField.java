@@ -19,7 +19,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutMobileTimeField extends RwtScoutTimeField {
 

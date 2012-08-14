@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class AbstractRwtScoutFormHeader extends AbstractRwtScoutActionBar<IForm> implements IRwtScoutFormHeader {
 

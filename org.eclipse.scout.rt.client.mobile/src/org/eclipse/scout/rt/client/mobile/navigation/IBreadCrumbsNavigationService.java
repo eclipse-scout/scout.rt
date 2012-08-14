@@ -15,7 +15,7 @@ import org.eclipse.scout.service.IService2;
  ******************************************************************************/
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public interface IBreadCrumbsNavigationService extends IService2 {
 

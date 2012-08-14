@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.datefield.chooser.TimeChooser;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class MobileTimeChooser extends TimeChooser {
   private static final int TABLE_CELL_HEIGHT = 30;

@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposal
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalFormProvider;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class MobileSmartFieldProposalFormProvider implements ISmartFieldProposalFormProvider {
 

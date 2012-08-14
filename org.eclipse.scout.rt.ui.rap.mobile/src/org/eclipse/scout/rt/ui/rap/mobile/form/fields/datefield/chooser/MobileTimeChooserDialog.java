@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class MobileTimeChooserDialog extends TimeChooserDialog {
 

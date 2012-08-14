@@ -107,19 +107,6 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
-  protected ContributionCommand execPageDetailFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
-    if (!isActive()) {
-      return super.execPageDetailFormChanged(oldForm, newForm);
-    }
-
-    if (UserAgentUtility.isMobileDevice()) {
-      return ContributionCommand.Stop;
-    }
-
-    return ContributionCommand.Continue;
-  }
-
-  @Override
   protected ContributionCommand execCustomFormModification(IHolder<IForm> formHolder) {
     if (!isActive()) {
       return super.execCustomFormModification(formHolder);

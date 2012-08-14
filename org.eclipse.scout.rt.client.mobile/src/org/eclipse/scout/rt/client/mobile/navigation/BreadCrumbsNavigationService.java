@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.service.AbstractService;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class BreadCrumbsNavigationService extends AbstractService implements IBreadCrumbsNavigationService {
   private String SESSION_DATA_KEY = "BreadCrumbsNavigationData";
