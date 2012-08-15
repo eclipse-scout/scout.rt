@@ -1182,6 +1182,14 @@ public final class SwingUtility {
     Dimension tipSize = tip.getPreferredSize();
     // Tool tip will be positioned within the bounds of the specified component (+ 5px inset)
     Rectangle frameR = frame.getBounds();
+    if (frame instanceof Container) {
+      Container container = (Container) frame;
+      Insets insets = container.getInsets();
+      frameR.x += insets.left;
+      frameR.y += insets.top;
+      frameR.width -= (insets.left + insets.right);
+      frameR.height -= (insets.top + insets.bottom);
+    }
     frameR.x += 5;
     frameR.y += 5;
     frameR.width -= 10;
