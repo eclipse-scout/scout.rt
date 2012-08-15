@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -150,11 +150,24 @@ public class MultiSplitLayout extends AbstractLayoutManager2 {
 
   @Override
   protected void validateLayout(Container parent) {
-    // validate row splits
+    //avoid negative values
+    int height = Math.max(0, parent.getHeight());
+    // validate row splits (for each column isolated)
     for (int c = 0; c < m_rowSplits[0].length; c++) {
-      // adapt to parent height
       int curHeight = m_rowSplits[m_rowSplits.length - 1][c].getLocation();
-      int height = parent.getHeight();
+      //sanity check
+      int minLoc = (m_rowSplits.length - 1) * 20;
+      int maxLoc = Math.max(minLoc, curHeight);
+      for (int k = m_rowSplits.length - 1; k > 0; k--) {
+        //must be between minLoc and maxLoc
+        int pos = m_rowSplits[k][c].getLocation();
+        pos = Math.max(minLoc, Math.min(pos, maxLoc));
+        m_rowSplits[k][c].setLocation(pos);
+        //next
+        maxLoc -= 20;
+        minLoc -= 20;
+      }
+      // adapt to parent height
       if (height > curHeight) {
         int dy = height - curHeight;
         for (int k = m_rowSplits.length - 2; k < m_rowSplits.length; k++) {
@@ -163,20 +176,25 @@ public class MultiSplitLayout extends AbstractLayoutManager2 {
         }
       }
       else if (height < curHeight) {
-        int maxLoc = height;
-        for (int r = m_rowSplits.length - 1; r > 0; r--) {
-          if (m_rowSplits[r][c].getLocation() > maxLoc) {
-            m_rowSplits[r][c].setLocation(maxLoc);
-          }
-          else {
-            break;
-          }
-          maxLoc = Math.max(0, maxLoc - 20);
+        int lastSectionSize = Math.max(20, m_rowSplits[m_rowSplits.length - 1][c].getLocation() - m_rowSplits[m_rowSplits.length - 2][c].getLocation());
+        minLoc = (m_rowSplits.length - 1) * 20;
+        maxLoc = Math.max(minLoc, height);
+        //last index
+        m_rowSplits[m_rowSplits.length - 1][c].setLocation(maxLoc);
+        //other
+        minLoc -= 20;
+        maxLoc = Math.max(minLoc, maxLoc - lastSectionSize);
+        for (int k = m_rowSplits.length - 2; k > 0; k--) {
+          int pos = m_rowSplits[k][c].getLocation();
+          pos = Math.max(minLoc, Math.min(pos, maxLoc));
+          m_rowSplits[k][c].setLocation(pos);
+          minLoc -= 20;
+          maxLoc -= 20;
         }
       }
     }
     //validate column splits
-    m_columnSplitStrategy.updateSpan(parent.getWidth());
+    m_columnSplitStrategy.updateSpan(Math.max(0, parent.getWidth()));
     // update model
     m_model.rebuild(m_cells, m_rowSplits, m_colSplits);
     // cached sizes
