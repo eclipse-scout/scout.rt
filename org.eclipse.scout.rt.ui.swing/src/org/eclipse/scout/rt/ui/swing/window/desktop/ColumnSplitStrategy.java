@@ -35,17 +35,19 @@ public class ColumnSplitStrategy implements IMultiSplitStrategy {
     m_prefs = prefs;
     m_span = 1000;
     m_definedLocation = new int[][]{new int[]{0, 250, 750, 1000}, new int[]{0, 250, 750, 1000}, new int[]{0, 250, 750, 1000}};
-    int[][] saved = null;
-    try {
-      saved = validateImportedLocations(m_prefs.getDesktopColumnSplits(3, 4));
-    }
-    catch (Throwable t) {
-      //nop
-    }
-    if (saved != null) {
-      for (int r = 0; r < m_definedLocation.length; r++) {
-        for (int c = 0; c < m_definedLocation[r].length; c++) {
-          m_definedLocation[r][c] = saved[r][c];
+    if (m_prefs != null) {
+      int[][] saved = null;
+      try {
+        saved = validateImportedLocations(m_prefs.getDesktopColumnSplits(3, 4));
+      }
+      catch (Throwable t) {
+        //nop
+      }
+      if (saved != null) {
+        for (int r = 0; r < m_definedLocation.length; r++) {
+          for (int c = 0; c < m_definedLocation[r].length; c++) {
+            m_definedLocation[r][c] = saved[r][c];
+          }
         }
       }
     }
@@ -151,6 +153,9 @@ public class ColumnSplitStrategy implements IMultiSplitStrategy {
   }
 
   protected void enqueueStore() {
+    if (m_prefs == null) {
+      return;
+    }
     if (m_storageJob == null) {
       m_storageJob = new Job("Store column splits") {
         @Override
