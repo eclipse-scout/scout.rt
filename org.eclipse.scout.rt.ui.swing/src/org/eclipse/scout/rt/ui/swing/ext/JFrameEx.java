@@ -29,15 +29,12 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
  * <li>iconify</li>
  * <li>using {@link JRootPaneEx} with min/max size validation</li>
  * <li>fire property "state" whenever extendedState is changed</li>
- * <li>enable windows 7 keystrokes: WINDOWS-up/down/left/right keys for
- * maximize/minimize/left-align-screen-switch/right-align-screen-switch/</li>
  * </ul>
  */
 public class JFrameEx extends JFrame {
   private static final long serialVersionUID = 1L;
 
   private boolean m_autoCorrectSize;
-  private Windows7KeyHandler m_win7KeyHandler;
   private Rectangle m_nonMaximizedBounds;
 
   public JFrameEx() {
@@ -45,16 +42,6 @@ public class JFrameEx extends JFrame {
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     enableEvents(AWTEvent.COMPONENT_EVENT_MASK);
     m_autoCorrectSize = true;
-  }
-
-  @Override
-  protected void setRootPane(JRootPane root) {
-    if (m_win7KeyHandler == null) {
-      m_win7KeyHandler = new Windows7KeyHandler();
-    }
-    m_win7KeyHandler.uninstall();
-    super.setRootPane(root);
-    m_win7KeyHandler.install();
   }
 
   public boolean isAutoCorrectSize() {
