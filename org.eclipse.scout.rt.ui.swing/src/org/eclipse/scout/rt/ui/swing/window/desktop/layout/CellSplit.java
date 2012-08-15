@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -50,6 +50,9 @@ class CellSplit {
   }
 
   public void setLocation(int loc) {
+    if (loc == m_location) {
+      return;
+    }
     m_location = loc;
     if (m_strategy != null) {
       m_strategy.setSplitLocation(m_row, m_col, loc);
