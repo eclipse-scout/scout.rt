@@ -30,7 +30,7 @@ public class ColumnFilterMenu extends AbstractMenu {
 
   @Override
   protected void execPrepareAction() throws ProcessingException {
-    setVisible(m_table.getColumnFilterManager() != null);
+    setVisible(m_table != null && m_table.getColumnFilterManager() != null && m_table.getContextColumn() != null);
   }
 
   @Override
