@@ -1594,6 +1594,9 @@ Text[SINGLE][BORDER]:disabled {
   border: 1px solid #c9dadf;
   background-color: #f4f8fc;
 }
+Text[SINGLE][BORDER]:read-only {
+  border: 1px solid #c9dadf;
+}
 Text[MULTI][BORDER] {
   border: 1px solid #95b7c1;
   border-radius: 4px;
@@ -1607,6 +1610,9 @@ Text[MULTI][BORDER] {
 Text[MULTI][BORDER]:disabled {
   border: 1px solid #c9dadf;
   background-color: #f4f8fc;
+}
+Text[MULTI][BORDER]:read-only {
+  border: 1px solid #c9dadf;
 }
 Text-Message {
   color: #a7a6aa;
