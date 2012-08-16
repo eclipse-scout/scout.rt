@@ -1,0 +1,207 @@
+/*******************************************************************************
+ * Copyright (c) 2012 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.commons;
+
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+
+/**
+ * Utility class for creating, parsing and converting {@link URI}s and {@link URL}s.
+ * 
+ * @since 3.8.1
+ */
+public final class UriUtility {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UriUtility.class);
+  public static final String ISO_8859_1 = "ISO-8859-1";
+
+  private UriUtility() {
+  }
+
+  /**
+   * Parses the given URL's query string using encoding ISO-8859-1 and extracts the query parameter.
+   * 
+   * @param uri
+   * @return map with parsed query parameters. Never <code>null</code>.
+   * @throws ProcessingException
+   */
+  public static Map<String, String> getQueryParameters(URL url) throws ProcessingException {
+    return getQueryParameters(url, null);
+  }
+
+  /**
+   * Parses the given URL's query string using the given encoding and extracts the query parameter.
+   * 
+   * @param uri
+   * @param encoding
+   *          encoding of the query parameter. If <code>null</code> ISO-8859-1 is used.
+   * @return map with parsed query parameters. Never <code>null</code>.
+   * @throws ProcessingException
+   */
+  public static Map<String, String> getQueryParameters(URL url, String encoding) throws ProcessingException {
+    if (url == null) {
+      return Collections.emptyMap();
+    }
+    return getQueryParameters(urlToUri(url), encoding);
+  }
+
+  /**
+   * Parses the given URI's query string using encoding ISO-8859-1 and extracts the query parameter.
+   * 
+   * @param uri
+   * @return map with parsed query parameters. Never <code>null</code>.
+   * @throws ProcessingException
+   */
+  public static Map<String, String> getQueryParameters(URI uri) throws ProcessingException {
+    return getQueryParameters(uri, null);
+  }
+
+  /**
+   * Parses the given URI's query string using the given encoding and extracts the query parameter.
+   * 
+   * @param uri
+   * @param encoding
+   *          encoding of the query parameter. If <code>null</code> ISO-8859-1 is used.
+   * @return map with parsed query parameters. Never <code>null</code>.
+   * @throws ProcessingException
+   */
+  public static Map<String, String> getQueryParameters(URI uri, String encoding) throws ProcessingException {
+    if (uri == null || uri.getQuery() == null) {
+      return Collections.emptyMap();
+    }
+    Map<String, String> result = new HashMap<String, String>();
+    for (String param : uri.getQuery().split("&")) {
+      String[] parts = StringUtility.split(param, "=");
+      if (parts.length != 2) {
+        throw new ProcessingException("invalid query parameter: '" + param + "'");
+      }
+      try {
+        if (encoding == null) {
+          encoding = ISO_8859_1;
+        }
+        String key = URLDecoder.decode(parts[0], encoding);
+        String value = URLDecoder.decode(parts[1], encoding);
+        String existingMapping = result.put(key, value);
+        if (existingMapping != null) {
+          LOG.warn("parameter key is used multiple times [key='" + key + "', oldValue='" + existingMapping + "', newValue='" + value + "'");
+        }
+      }
+      catch (UnsupportedEncodingException e) {
+        throw new ProcessingException("unsupported encoding '" + encoding + "'", e);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Splits the path of the given {@link URI} in its elements.
+   * 
+   * @param uri
+   * @return the path elements or an empty string array if the uri or its path is <code>null</code>.
+   */
+  public static String[] getPath(URI uri) {
+    if (uri == null || uri.getPath() == null) {
+      return new String[0];
+    }
+    String path = uri.getPath();
+    if (path.startsWith("/")) {
+      path = path.substring(1);
+    }
+    return StringUtility.split(path, "/");
+  }
+
+  /**
+   * Converts the given URL into an URI.
+   * 
+   * @param url
+   * @return <code>null</code> if the given url is <code>null</code>.
+   * @throws ProcessingException
+   */
+  public static URI urlToUri(URL url) throws ProcessingException {
+    if (url == null) {
+      return null;
+    }
+    try {
+      return url.toURI();
+    }
+    catch (URISyntaxException e) {
+      throw new ProcessingException("Exception while converting URL to URI", e);
+    }
+  }
+
+  /**
+   * Converts the given URI into an URL.
+   * 
+   * @param uri
+   * @return <code>null</code> if the given uri is <code>null</code>.
+   * @throws ProcessingException
+   */
+  public static URL uriToUrl(URI uri) throws ProcessingException {
+    if (uri == null) {
+      return null;
+    }
+    try {
+      return uri.toURL();
+    }
+    catch (MalformedURLException e) {
+      throw new ProcessingException("Exception while converting URI to URL", e);
+    }
+  }
+
+  /**
+   * Parses the given string into an {@link URI}.
+   * 
+   * @param uri
+   * @return <code>null</code> if the given string is null or has no text or a parsed {@link URI} instance.
+   * @throws ProcessingException
+   */
+  public static URI toUri(String uri) throws ProcessingException {
+    if (!StringUtility.hasText(uri)) {
+      return null;
+    }
+    try {
+      return new URI(uri);
+    }
+    catch (URISyntaxException e) {
+      throw new ProcessingException("Exception while parsing URI", e);
+    }
+  }
+
+  /**
+   * Parses the given string into an {@link URL}.
+   * 
+   * @param url
+   * @return <code>null</code> if the given string is null or has no text or a parsed {@link URL} instance.
+   * @throws ProcessingException
+   */
+  public static URL toUrl(String url) throws ProcessingException {
+    if (!StringUtility.hasText(url)) {
+      return null;
+    }
+    try {
+      return new URL(url);
+    }
+    catch (MalformedURLException e) {
+      throw new ProcessingException("Exception while parsing URL", e);
+    }
+  }
+}
