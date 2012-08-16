@@ -178,6 +178,11 @@ public class ButtonEx extends Button {
     fireMenuSelection(e);
   }
 
+  public void handleButtonSelectionFromKeyStroke(Event event) {
+    event.widget = this;
+    handleButtonSelection(event);
+  }
+
   private class P_DelegateSelectionListener implements Listener {
     private static final long serialVersionUID = 1L;
     private long timeLastEvent = 0L;

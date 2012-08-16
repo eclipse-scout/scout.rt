@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
@@ -133,7 +134,18 @@ public class RwtScoutRadioButtonGroup extends RwtScoutValueFieldComposite<IRadio
           break;
       }
       index = index % m_uiRadioButtons.size();
-      m_uiRadioButtons.get(index).setFocus();
+      Button newButton = m_uiRadioButtons.get(index);
+      Button oldButton = (Button) e.widget;
+
+      oldButton.setSelection(false);
+      newButton.setFocus();
+      newButton.setSelection(true);
+
+      if (newButton instanceof ButtonEx) {
+        ((ButtonEx) newButton).handleButtonSelectionFromKeyStroke(e);
+      }
+
+      e.doit = false;
     }
   }
 
