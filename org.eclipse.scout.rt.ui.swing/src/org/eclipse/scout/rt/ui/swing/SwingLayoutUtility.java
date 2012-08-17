@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -100,7 +100,7 @@ public final class SwingLayoutUtility {
         availTextWidth = viewR.width;
       }
       else {
-        availTextWidth = viewR.width - (iconR.width + gap);
+        availTextWidth = viewR.width - (((icon == null) ? 0 : icon.getIconWidth()) + gap);
       }
       v.setSize(availTextWidth, 0);
       //PATCH END
