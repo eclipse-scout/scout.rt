@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.scout.rt.testing.feature"
       label="%featureName"
-      version="3.8.0.qualifier"
+      version="3.8.1.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.scout.rt.feature.about">
 
@@ -36,7 +36,7 @@ BSI Business Systems Integration AG - initial API and implementation
          optional="true"/>
 
    <requires>
-      <import feature="org.eclipse.scout.rt.feature" version="3.8.0.qualifier"/>
+      <import feature="org.eclipse.scout.rt.feature" version="3.8.1.qualifier"/>
       <import plugin="org.junit4"/>
       <import plugin="org.easymock"/>
       <import plugin="org.apache.ant"/>
