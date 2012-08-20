@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.io.StringWriter;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
@@ -41,6 +43,7 @@ import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -734,9 +737,46 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     updateKeyStrokes();
     // master listener, now the inner field is available
     if (getConfiguredMasterField() != null) {
-      IValueField master = getForm().getFieldByClass(getConfiguredMasterField());
+      IValueField master = findNearestFieldByClass(getConfiguredMasterField());
       setMasterField(master);
     }
+  }
+
+  /**
+   * Searching the nearest field implementing the specified class by processing the enclosing field list bottom-up.
+   * 
+   * @since 3.8.1
+   */
+  private <T extends IFormField> T findNearestFieldByClass(final Class<T> c) {
+    List<ICompositeField> enclosingFields = getEnclosingFieldList();
+    if (enclosingFields.isEmpty()) {
+      // there are no enclosing fields (i.e. this field is not part of a field template)
+      return getForm().getFieldByClass(c);
+    }
+
+    final Holder<T> found = new Holder<T>(c);
+    IFormFieldVisitor v = new IFormFieldVisitor() {
+      @Override
+      @SuppressWarnings("unchecked")
+      public boolean visitField(IFormField field, int level, int fieldIndex) {
+        if (field.getClass() == c) {
+          found.setValue((T) field);
+        }
+        return found.getValue() == null;
+      }
+    };
+
+    // search requested field within critical parent field
+    Collections.reverse(enclosingFields);
+    for (ICompositeField parentField : enclosingFields) {
+      parentField.visitFields(v, 0);
+      if (found.getValue() != null) {
+        return found.getValue();
+      }
+    }
+
+    // field has not been found in a critical parent field
+    return getForm().getFieldByClass(c);
   }
 
   /**
