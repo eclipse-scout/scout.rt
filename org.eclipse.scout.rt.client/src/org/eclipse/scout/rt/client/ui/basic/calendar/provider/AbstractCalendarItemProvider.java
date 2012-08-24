@@ -47,13 +47,27 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
 
   private P_ReloadJob m_reloadJob;
 
+  private boolean m_initialized;
   private IMenu[] m_menus;
   private Date m_minDateLoaded;
   private Date m_maxDateLoaded;
 
   public AbstractCalendarItemProvider() {
-    initConfig();
-    ensureItemsLoadedInternal(new Date(System.currentTimeMillis() - MONTH_MILLIS), new Date(System.currentTimeMillis() + MONTH_MILLIS));
+    this(true);
+  }
+
+  public AbstractCalendarItemProvider(boolean callInitializer) {
+    if (callInitializer) {
+      callInitializer();
+    }
+  }
+
+  protected void callInitializer() {
+    if (!m_initialized) {
+      initConfig();
+      ensureItemsLoadedInternal(new Date(System.currentTimeMillis() - MONTH_MILLIS), new Date(System.currentTimeMillis() + MONTH_MILLIS));
+      m_initialized = true;
+    }
   }
 
   /*

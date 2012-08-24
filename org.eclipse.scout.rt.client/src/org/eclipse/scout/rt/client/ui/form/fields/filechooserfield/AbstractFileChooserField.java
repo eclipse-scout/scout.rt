@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -40,7 +40,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   private boolean m_showDirectory;
   private boolean m_showFileName;
   private boolean m_showFileExtension;
-  private ArrayList<IMenu> m_menus;
+  private IMenu[] m_menus;
   private IFileChooserFieldUIFacade m_uiFacade;
 
   public AbstractFileChooserField() {
@@ -146,17 +146,35 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
     setFileIconId(getConfiguredFileIconId());
     setMaxLength(getConfiguredMaxLength());
-    m_menus = new ArrayList<IMenu>();
+    // menus
+    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
     Class<? extends IMenu>[] a = getConfiguredMenus();
     for (int i = 0; i < a.length; i++) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, a[i]);
-        m_menus.add(menu);
+        menuList.add(menu);
       }
       catch (Exception e) {
         LOG.warn(null, e);
       }
     }
+    try {
+      injectMenusInternal(menuList);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contributing menus.", e);
+    }
+    m_menus = menuList.toArray(new IMenu[0]);
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to manage menu list and add/remove menus
+   * 
+   * @param menuList
+   *          live and mutable list of configured menus
+   */
+  protected void injectMenusInternal(List<IMenu> menuList) {
   }
 
   @Override
@@ -288,12 +306,12 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
 
   @Override
   public IMenu[] getMenus() {
-    return m_menus.toArray(new IMenu[0]);
+    return m_menus;
   }
 
   @Override
   public boolean hasMenus() {
-    return m_menus.size() > 0;
+    return m_menus.length > 0;
   }
 
   @Override
@@ -460,8 +478,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     @Override
     public IMenu[] firePopupFromUI() {
       ArrayList<IMenu> menus = new ArrayList<IMenu>();
-      for (Iterator<IMenu> it = m_menus.iterator(); it.hasNext();) {
-        IMenu menu = it.next();
+      for (IMenu menu : getMenus()) {
         menu.prepareAction();
         if (menu.isVisible()) {
           menus.add(menu);

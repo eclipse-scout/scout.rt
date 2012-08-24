@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 
+import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -154,18 +156,34 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setDropType(getConfiguredDropType());
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     // menus
+    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
     Class<? extends IMenu>[] a = getConfiguredMenus();
-    m_menus = new IMenu[a != null ? a.length : 0];
-    if (a != null) {
-      for (int i = 0; i < m_menus.length; i++) {
-        try {
-          m_menus[i] = ConfigurationUtility.newInnerInstance(this, a[i]);
-        }
-        catch (Exception e) {
-          LOG.warn(null, e);
-        }
+    for (int i = 0; i < a.length; i++) {
+      try {
+        IMenu menu = ConfigurationUtility.newInnerInstance(this, a[i]);
+        menuList.add(menu);
+      }
+      catch (Exception e) {
+        LOG.warn(null, e);
       }
     }
+    try {
+      injectMenusInternal(menuList);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contributing menus.", e);
+    }
+    m_menus = menuList.toArray(new IMenu[0]);
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to manage menu list and add/remove menus
+   * 
+   * @param menuList
+   *          live and mutable list of configured menus
+   */
+  protected void injectMenusInternal(List<IMenu> menuList) {
   }
 
   /*

@@ -79,7 +79,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   private boolean m_installingRowContext = false;
   private LookupRow m_decorationRow;
 
-  private ArrayList<IMenu> m_menus;
+  private IMenu[] m_menus;
   private TriState m_activeFilter;
   private boolean m_activeFilterEnabled;
   private boolean m_browseAutoExpandAll;
@@ -393,7 +393,6 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
 
   @Override
   protected void initConfig() {
-    m_menus = new ArrayList<IMenu>();
     m_uiFacade = new P_UIFacade();
     m_activeFilter = TriState.TRUE;
     m_decorationRow = new LookupRow(null, "", null, null, null, null, null, true);
@@ -423,30 +422,50 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
       }
     }
+    // menus
+    ArrayList<IMenu> menuList = new ArrayList<IMenu>();
     Class<? extends IMenu>[] a = getConfiguredMenus();
     for (int i = 0; i < a.length; i++) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, a[i]);
-        m_menus.add(menu);
+        menuList.add(menu);
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
       }
     }
+    try {
+      injectMenusInternal(menuList);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contributing menus.", e);
+    }
+    m_menus = menuList.toArray(new IMenu[0]);
+
     // convenience check for allowCustomText=true
     if (isAllowCustomText() && getHolderType() != String.class) {
       LOG.warn(getClass().getName() + ": allowCustomText=true is normally used only on smart fields of generic type String.");
     }
   }
 
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to manage menu list and add/remove menus
+   * 
+   * @param menuList
+   *          live and mutable list of configured menus
+   */
+  protected void injectMenusInternal(List<IMenu> menuList) {
+  }
+
   @Override
   public IMenu[] getMenus() {
-    return m_menus.toArray(new IMenu[0]);
+    return m_menus;
   }
 
   @Override
   public boolean hasMenus() {
-    return m_menus.size() > 0;
+    return m_menus.length > 0;
   }
 
   /**

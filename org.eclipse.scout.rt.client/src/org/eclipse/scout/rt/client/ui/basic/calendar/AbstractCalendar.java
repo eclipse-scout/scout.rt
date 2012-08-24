@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -51,6 +51,7 @@ import org.eclipse.scout.service.SERVICES;
 public abstract class AbstractCalendar extends AbstractPropertyObserver implements ICalendar {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendar.class);
 
+  private boolean m_initialized;
   private IMenu[] m_menus;
   private ICalendarItemProvider[] m_providers;
   private final HashMap<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
@@ -61,11 +62,24 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   private final EventListenerList m_listenerList;
 
   public AbstractCalendar() {
+    this(true);
+  }
+
+  public AbstractCalendar(boolean callInitializer) {
     m_calendarEventBuffer = new ArrayList<CalendarEvent>();
     m_listenerList = new EventListenerList();
     m_dateTimeFormatFactory = new DateTimeFormatFactory();
     m_componentsByProvider = new HashMap<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>>();
-    initConfig();
+    if (callInitializer) {
+      initConfig();
+    }
+  }
+
+  protected void callInitializer() {
+    if (!m_initialized) {
+      initConfig();
+      m_initialized = true;
+    }
   }
 
   /*
@@ -135,6 +149,12 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         LOG.warn(null, e);
       }
     }
+    try {
+      injectMenusInternal(menuList);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contributing menus.", e);
+    }
     m_menus = menuList.toArray(new IMenu[0]);
     // producers
     ArrayList<ICalendarItemProvider> producerList = new ArrayList<ICalendarItemProvider>();
@@ -165,6 +185,16 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
           }
           );
     }
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to manage menu list and add/remove menus
+   * 
+   * @param menuList
+   *          live and mutable list of configured menus
+   */
+  protected void injectMenusInternal(List<IMenu> menuList) {
   }
 
   /*
