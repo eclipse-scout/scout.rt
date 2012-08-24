@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * 
  * @since 3.9.0
  */
-public class AbstractExtensibleTable extends AbstractTable implements IExtensibleScoutObject {
+public abstract class AbstractExtensibleTable extends AbstractTable implements IExtensibleScoutObject {
 
   public AbstractExtensibleTable() {
     super();

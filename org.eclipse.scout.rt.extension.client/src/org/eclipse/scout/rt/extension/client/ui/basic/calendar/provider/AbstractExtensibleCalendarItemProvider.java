@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * 
  * @since 3.9.0
  */
-public class AbstractExtensibleCalendarItemProvider extends AbstractCalendarItemProvider implements IExtensibleScoutObject {
+public abstract class AbstractExtensibleCalendarItemProvider extends AbstractCalendarItemProvider implements IExtensibleScoutObject {
 
   public AbstractExtensibleCalendarItemProvider() {
     super();

@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * 
  * @since 3.9.0
  */
-public class AbstractExtensibleImageField extends AbstractImageField implements IExtensibleScoutObject {
+public abstract class AbstractExtensibleImageField extends AbstractImageField implements IExtensibleScoutObject {
 
   public AbstractExtensibleImageField() {
     super();
