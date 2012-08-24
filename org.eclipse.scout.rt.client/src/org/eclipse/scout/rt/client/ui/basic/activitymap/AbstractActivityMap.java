@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -44,6 +44,7 @@ import org.eclipse.scout.service.SERVICES;
 public abstract class AbstractActivityMap extends AbstractPropertyObserver implements IActivityMap {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractActivityMap.class);
 
+  private boolean m_initialized;
   private EventListenerList m_listenerList;
   private IActivityMapUIFacade m_activityMapUIFacade;
   private long m_minimumActivityDuration;// millis
@@ -57,7 +58,20 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   private boolean m_timeScaleValid;
 
   public AbstractActivityMap() {
-    initConfig();
+    this(true);
+  }
+
+  public AbstractActivityMap(boolean callInitializer) {
+    if (callInitializer) {
+      callInitializer();
+    }
+  }
+
+  protected void callInitializer() {
+    if (!m_initialized) {
+      initConfig();
+      m_initialized = true;
+    }
   }
 
   /*
@@ -219,6 +233,12 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
         LOG.warn(null, e);
       }
     }
+    try {
+      injectMenusInternal(menuList);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contributing menus.", e);
+    }
     m_menus = menuList.toArray(new IMenu[0]);
     // local property observer
     addPropertyChangeListener(new PropertyChangeListener() {
@@ -271,6 +291,16 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
       }
     });
     createTimeScale();
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to manage menu list and add/remove menus
+   * 
+   * @param menuList
+   *          live and mutable list of configured menus
+   */
+  protected void injectMenusInternal(List<IMenu> menuList) {
   }
 
   protected IActivityMapUIFacade createUIFacade() {
