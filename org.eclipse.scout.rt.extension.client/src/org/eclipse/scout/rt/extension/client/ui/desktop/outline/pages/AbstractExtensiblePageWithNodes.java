@@ -11,19 +11,27 @@
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.extension.client.ExtensionUtility;
+import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
+import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility;
 import org.eclipse.scout.rt.shared.ContextMap;
 
 /**
- * Page with nodes implementation using Eclipse extension point mechanisms for adding new pages as well as modifying and
- * removing statically configured ones.
+ * Page with nodes supporting the following Scout extension features:
+ * <ul>
+ * <li>adding, removing and modifying statically configured pages</li>
+ * <li>adding, removing and modifying statically configured menus</li>
+ * </ul>
  * 
  * @since 3.9.0
  */
-public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNodes {
+public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNodes implements IExtensibleScoutObject {
 
   public AbstractExtensiblePageWithNodes() {
     super();
@@ -53,5 +61,12 @@ public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNo
   protected void createChildPagesInternal(Collection<IPage> pageList) throws ProcessingException {
     super.createChildPagesInternal(pageList);
     PageExtensionUtility.adaptPageWithNodes(this, pageList);
+  }
+
+  @Override
+  protected void injectMenusInternal(List<IMenu> menuList) {
+    super.injectMenusInternal(menuList);
+    MenuExtensionUtility.adaptMenus(this, this, menuList);
+    ExtensionUtility.processReplaceAnnotations(menuList);
   }
 }

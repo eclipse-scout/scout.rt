@@ -15,15 +15,18 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
 import org.eclipse.scout.rt.shared.ContextMap;
 
 /**
- * Page with table implementation using Eclipse extension point mechanisms for modifying the child page created by
- * {@link #execCreateChildPage(ITableRow)}.
+ * Page with table implementation supporting the following Scout extension features:
+ * <ul>
+ * <li>adding, removing and modifying statically configured pages</li>
+ * </ul>
  * 
  * @since 3.9.0
  */
-public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends AbstractPageWithTable<T> {
+public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends AbstractPageWithTable<T> implements IExtensibleScoutObject {
 
   public AbstractExtensiblePageWithTable() {
     super();

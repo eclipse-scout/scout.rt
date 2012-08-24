@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
  * @since 3.9.0
  */
 @RunWith(ScoutClientTestRunner.class)
-public class DesktopAnchorFilterTest {
+public class PageAnchorFilterTest {
 
   private P_Outline m_outline;
   private P_OtherOutline m_otherOutline;
@@ -40,8 +40,8 @@ public class DesktopAnchorFilterTest {
   }
 
   @Test
-  public void testAcceptNoFilters() {
-    DesktopAnchorFilter filter = new DesktopAnchorFilter(null, null);
+  public void testAcceptEmpty() {
+    PageAnchorFilter filter = new PageAnchorFilter(null, null);
     assertTrue(filter.accept(null, null, null));
     assertTrue(filter.accept(m_outline, null, null));
     assertTrue(filter.accept(null, m_page, null));
@@ -50,7 +50,7 @@ public class DesktopAnchorFilterTest {
 
   @Test
   public void testAcceptOutlineFilterClass() {
-    DesktopAnchorFilter filter = new DesktopAnchorFilter(P_Outline.class, null);
+    PageAnchorFilter filter = new PageAnchorFilter(P_Outline.class, null);
     assertFalse(filter.accept(null, null, null));
     assertTrue(filter.accept(m_outline, null, null));
     assertFalse(filter.accept(m_otherOutline, null, null));
@@ -60,7 +60,7 @@ public class DesktopAnchorFilterTest {
 
   @Test
   public void testAcceptPageFilterClass() {
-    DesktopAnchorFilter filter = new DesktopAnchorFilter(null, P_Page.class);
+    PageAnchorFilter filter = new PageAnchorFilter(null, P_Page.class);
     assertFalse(filter.accept(null, null, null));
     assertFalse(filter.accept(m_outline, null, null));
     assertTrue(filter.accept(null, m_page, null));
