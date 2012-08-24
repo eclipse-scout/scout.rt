@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.co
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.contribution.DContributionPageWithNodes;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.contribution.PageContributionNodePage;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.contribution.PageContributionOutline;
-import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.DesktopAnchorFilter;
+import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageAnchorFilter;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageContributionExtension;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageExtensionManager;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
@@ -71,11 +71,11 @@ public class PageContributionIntegrationTest {
         //
         CompositePageFilter filter = (CompositePageFilter) ext.getPageFilter();
         assertEquals(3, filter.size());
-        assertSame(DesktopAnchorFilter.class, filter.getFilters()[0].getClass());
+        assertSame(PageAnchorFilter.class, filter.getFilters()[0].getClass());
         assertSame(APageFilter.class, filter.getFilters()[1].getClass());
         assertSame(BPageFilter.class, filter.getFilters()[2].getClass());
         //
-        DesktopAnchorFilter anchor = (DesktopAnchorFilter) filter.getFilters()[0];
+        PageAnchorFilter anchor = (PageAnchorFilter) filter.getFilters()[0];
         assertNull(anchor.getOutlineFilterClass());
         assertSame(CContributionPageWithNodes.class, anchor.getParentPageFilterClass());
         //

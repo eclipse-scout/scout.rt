@@ -8,33 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages;
+package org.eclipse.scout.rt.extension.client.ui.action.menu;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.extension.client.internal.AbstractCompositeExtensionFilter;
 
 /**
- * Composite page filter class containing other page filters. Invoking {@link #accept(IOutline, IPage, IPage)} returns
+ * Composite menu filter class containing other menu filters. Invoking {@link #accept(Object, Object, IMenu)} returns
  * <code>true</code>, iff all contained filters return <code>true</code>. Otherwise <code>false</code>.
  * 
  * @since 3.9.0
  */
-public class CompositePageFilter extends AbstractCompositeExtensionFilter<IPageExtensionFilter> implements IPageExtensionFilter {
+public class CompositeMenuFilter extends AbstractCompositeExtensionFilter<IMenuExtensionFilter> implements IMenuExtensionFilter {
 
-  public CompositePageFilter(IPageExtensionFilter... filters) {
+  public CompositeMenuFilter(IMenuExtensionFilter... filters) {
     super(filters);
   }
 
   /**
-   * Returns <code>true</code> if all contained page filters return <code>true</code>. Otherwise <code>false</code>.
+   * Returns <code>true</code> if all contained menu filters return <code>true</code>. Otherwise <code>false</code>.
    * 
-   * @see IPageExtensionFilter#accept(IOutline, IPage, IPage)
+   * @see IMenuExtensionFilter#accept(Object, Object, IMenu)
    */
   @Override
-  public boolean accept(IOutline outline, IPage parentPage, IPage affectedPage) {
-    for (IPageExtensionFilter filter : getFilters()) {
-      if (!filter.accept(outline, parentPage, affectedPage)) {
+  public boolean accept(Object anchor, Object container, IMenu menu) {
+    for (IMenuExtensionFilter filter : getFilters()) {
+      if (!filter.accept(anchor, container, menu)) {
         return false;
       }
     }

@@ -10,7 +10,18 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.scout.rt.extension.client,
+ org.eclipse.scout.rt.extension.client.internal,
+ org.eclipse.scout.rt.extension.client.ui.action.menu,
+ org.eclipse.scout.rt.extension.client.ui.action.menu.internal,
+ org.eclipse.scout.rt.extension.client.ui.basic.activitymap,
+ org.eclipse.scout.rt.extension.client.ui.basic.calendar,
+ org.eclipse.scout.rt.extension.client.ui.basic.calendar.provider,
  org.eclipse.scout.rt.extension.client.ui.basic.table,
+ org.eclipse.scout.rt.extension.client.ui.basic.tree,
  org.eclipse.scout.rt.extension.client.ui.desktop.outline,
  org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages,
- org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal
+ org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal,
+ org.eclipse.scout.rt.extension.client.ui.form.fields.button,
+ org.eclipse.scout.rt.extension.client.ui.form.fields.filechooserfield,
+ org.eclipse.scout.rt.extension.client.ui.form.fields.imagebox,
+ org.eclipse.scout.rt.extension.client.ui.form.fields.smartfield

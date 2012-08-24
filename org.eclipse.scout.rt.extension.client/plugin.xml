@@ -2,5 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="pages" name="Pages" schema="schema/pages.exsd"/>
+   <extension-point id="menus" name="Menus" schema="schema/menus.exsd"/>
 
 </plugin>

@@ -17,12 +17,12 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExten
 /**
  * @since 3.9.0
  */
-public class DesktopAnchorFilter implements IPageExtensionFilter {
+public class PageAnchorFilter implements IPageExtensionFilter {
 
   private final Class<? extends IOutline> m_outlineFilterClass;
   private final Class<? extends IPage> m_parentPageFilterClass;
 
-  public DesktopAnchorFilter(Class<? extends IOutline> outlineFilterClass, Class<? extends IPage> parentPageFilterClass) {
+  public PageAnchorFilter(Class<? extends IOutline> outlineFilterClass, Class<? extends IPage> parentPageFilterClass) {
     m_outlineFilterClass = outlineFilterClass;
     m_parentPageFilterClass = parentPageFilterClass;
   }
