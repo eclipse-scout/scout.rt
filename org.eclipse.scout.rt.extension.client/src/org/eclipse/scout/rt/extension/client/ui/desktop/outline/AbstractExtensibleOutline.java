@@ -15,14 +15,18 @@ import java.util.Collection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.PageExtensionUtility;
 
 /**
- * This class supports to modify statically configured outlines by using Eclipse's extension mechanisms.
+ * Outline supporting the following Scout extension features:
+ * <ul>
+ * <li>adding, removing and modifying statically configured pages</li>
+ * </ul>
  * 
  * @since 3.9.0
  */
-public abstract class AbstractExtensibleOutline extends AbstractOutline {
+public abstract class AbstractExtensibleOutline extends AbstractOutline implements IExtensibleScoutObject {
 
   @Override
   protected void createChildPagesInternal(Collection<IPage> pageList) throws ProcessingException {

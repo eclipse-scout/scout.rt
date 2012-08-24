@@ -3,10 +3,10 @@
 <schema targetNamespace="org.eclipse.scout.rt.extension.client" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.scout.rt.extension.client" id="pages" name="Pages"/>
+         <meta.schema plugin="org.eclipse.scout.rt.extension.client" id="menus" name="Menus"/>
       </appinfo>
       <documentation>
-         This extension point allows to modify programmed outlines by contributing new pages and by removing or modifying existing pages.
+         This extension point allows to addn, modify and removed programmed menus.
 
 The extensions are processed in the following order:
 &lt;ol&gt;
@@ -24,11 +24,11 @@ The extensions are processed in the following order:
          </appinfo>
       </annotation>
       <complexType>
-         <choice>
-            <element ref="pageContribution" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="pageRemoval" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="pageModification" minOccurs="0" maxOccurs="unbounded"/>
-         </choice>
+         <sequence>
+            <element ref="menuContribution" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="menuModification" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="menuRemoval" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
@@ -56,7 +56,7 @@ The extensions are processed in the following order:
       </complexType>
    </element>
 
-   <element name="pageContribution">
+   <element name="menuContribution">
       <annotation>
          <appinfo>
             <meta.element labelAttribute="class"/>
@@ -65,8 +65,10 @@ The extensions are processed in the following order:
       <complexType>
          <sequence>
             <choice minOccurs="0" maxOccurs="1">
-               <element ref="outline"/>
-               <element ref="parentPage"/>
+               <element ref="page"/>
+               <element ref="formField"/>
+               <element ref="parentMenu"/>
+               <element ref="treeNode"/>
             </choice>
             <element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
@@ -76,30 +78,74 @@ The extensions are processed in the following order:
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.action.menu.IMenu"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="order" type="string" use="required">
+         <attribute name="order" type="string">
             <annotation>
                <documentation>
-                  The order defines the insertion point in the list of existing pages at which the contribution will be added. The order values of existing pages are assigned synthetically. The first child page&apos;s order is 10.0 and the order of every subsequent page is incremented by 10.0. Hence A page contribution having order 15.0 is inserted between the first and second statically configured page.
-
-The following approach is implemented for resolving ambiguous oders: An order value consists of a pair of order number. The main order assigned synthetically to pages proveide by &lt;code&gt;execCreateChildPages&lt;/code&gt; and the order value provided by this attribute for contributed pages. The second number is a counter that is incremented for every page, starting with already available pages. Hence the first static child page has order &amp;lt;10.0, 0&amp;gt, the second &amp;lt;20.0, 1&amp;gt and the n-th &amp;lt;&lt;em&gt;n*10.0&lt;/em&gt;, &lt;em&gt;n-1&lt;/em&gt;&amp;gt. The first contributed page&apos;s main order is provided by this attribute and the counter has vlaue &lt;em&gt;n&lt;/em&gt;, resulting in the order pair &amp;lt;&lt;em&gt;order&lt;/em&gt;, &lt;em&gt;n&lt;/em&gt;&amp;gt.
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="active" type="boolean" use="default" value="true">
             <annotation>
                <documentation>
-                  Whether the contribution should be used.
+                  
                </documentation>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
-   <element name="pageRemoval">
+   <element name="menuModification">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="menu"/>
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <choice minOccurs="0" maxOccurs="1">
+               <element ref="page"/>
+               <element ref="formField"/>
+               <element ref="parentMenu"/>
+               <element ref="treeNode"/>
+            </choice>
+            <element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="menu" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.action.menu.IMenu"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.ui.action.menu.IMenuModifier"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="active" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="menuRemoval">
       <annotation>
          <appinfo>
             <meta.element labelAttribute="class"/>
@@ -108,8 +154,10 @@ The following approach is implemented for resolving ambiguous oders: An order va
       <complexType>
          <sequence>
             <choice minOccurs="0" maxOccurs="1">
-               <element ref="outline"/>
-               <element ref="parentPage"/>
+               <element ref="page"/>
+               <element ref="formField"/>
+               <element ref="parentMenu"/>
+               <element ref="treeNode"/>
             </choice>
             <element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
@@ -119,7 +167,7 @@ The following approach is implemented for resolving ambiguous oders: An order va
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.action.menu.IMenu"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -133,51 +181,7 @@ The following approach is implemented for resolving ambiguous oders: An order va
       </complexType>
    </element>
 
-   <element name="pageModification">
-      <annotation>
-         <appinfo>
-            <meta.element labelAttribute="page"/>
-         </appinfo>
-      </annotation>
-      <complexType>
-         <sequence>
-            <choice minOccurs="0" maxOccurs="1">
-               <element ref="outline"/>
-               <element ref="parentPage"/>
-            </choice>
-            <element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
-         </sequence>
-         <attribute name="page" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="class" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageModifier"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="active" type="boolean" use="default" value="true">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="parentPage">
+   <element name="page">
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
@@ -192,7 +196,7 @@ The following approach is implemented for resolving ambiguous oders: An order va
       </complexType>
    </element>
 
-   <element name="outline">
+   <element name="treeNode">
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
@@ -200,7 +204,37 @@ The following approach is implemented for resolving ambiguous oders: An order va
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.desktop.outline.IOutline"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="formField">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.form.fields.IFormField"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="parentMenu">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.client.ui.action.menu.IMenu"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -215,7 +249,7 @@ The following approach is implemented for resolving ambiguous oders: An order va
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExtensionFilter"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.rt.extension.client.ui.action.menu.IMenuExtensionFilter"/>
                </appinfo>
             </annotation>
          </attribute>

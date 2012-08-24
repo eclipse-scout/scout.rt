@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,11 +27,11 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 /**
  * @since 3.9.0
  */
-public final class ExtensionClientUtility {
+public final class ExtensionUtility {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ExtensionClientUtility.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ExtensionUtility.class);
 
-  private ExtensionClientUtility() {
+  private ExtensionUtility() {
   }
 
   /**
@@ -133,5 +134,54 @@ public final class ExtensionClientUtility {
       }
       list.remove(firstEntry.getValue());
     }
+  }
+
+  /**
+   * Computes the enclosing object for the given object. The enclosing object is the corresponding to
+   * {@link Class#getEnclosingClass()}, but for instances.
+   * 
+   * @param o
+   *          the object to get the enclosing object for
+   * @return the enclosing object or <code>null</code> if the given object is <code>null</code>, if it is a primary
+   *         class or if it is embedded into a static context.
+   */
+  public static Object getEnclosingObject(Object o) {
+    if (o == null) {
+      return null;
+    }
+    int nestedCount = o.getClass().getName().replaceAll("[^$]", "").trim().length();
+    if (nestedCount == 0) {
+      return null;
+    }
+    Object enclosingObject = null;
+    try {
+      Field f = o.getClass().getDeclaredField("this$" + (nestedCount - 1));
+      f.setAccessible(true);
+      enclosingObject = f.get(o);
+    }
+    catch (Throwable t) {
+      // nop
+    }
+    return enclosingObject;
+  }
+
+  /**
+   * Computes the first enclosing object on the given object's enclosing object path that implements the given type.
+   * 
+   * @param o
+   *          the object to get the enclosing object for
+   * @param type
+   *          the expected type of the enclosing object
+   * @return the enclosing object or <code>null</code> if the given object is <code>null</code>, if it is a primary
+   *         class or if it is embedded into a static context.
+   */
+  public static Object getEnclosingObject(Object o, Class<?> type) {
+    Object enclosingObject = getEnclosingObject(o);
+    if (type != null) {
+      while (enclosingObject != null && !type.isInstance(enclosingObject)) {
+        enclosingObject = getEnclosingObject(enclosingObject);
+      }
+    }
+    return enclosingObject;
   }
 }

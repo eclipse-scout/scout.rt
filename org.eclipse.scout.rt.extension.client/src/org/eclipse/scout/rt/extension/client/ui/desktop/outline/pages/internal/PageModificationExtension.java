@@ -62,9 +62,6 @@ public class PageModificationExtension extends AbstractPageExtension {
 
   @Override
   public boolean accept(IOutline outline, IPage parentPage, IPage page) {
-    if (page == null) {
-      return false;
-    }
     if (!getPageClass().isInstance(page)) {
       return false;
     }
@@ -77,7 +74,7 @@ public class PageModificationExtension extends AbstractPageExtension {
       return (IPageModifier<T>) m_pageModifier.newInstance();
     }
     catch (Exception e) {
-      throw new ProcessingException("Error while instantiating extension", e);
+      throw new ProcessingException("Error while instantiating page modifier", e);
     }
   }
 }

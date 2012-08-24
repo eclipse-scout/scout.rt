@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuExtensionManager;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageExtensionManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -30,6 +31,7 @@ public class Activator extends Plugin {
   private static Activator plugin;
 
   private PageExtensionManager m_pagesExtensionManager;
+  private MenuExtensionManager m_menuExtensionManager;
 
   public static Activator getDefault() {
     return plugin;
@@ -40,7 +42,9 @@ public class Activator extends Plugin {
     super.start(context);
     plugin = this;
 
-    m_pagesExtensionManager = new PageExtensionManager(getExtensionRegistry(context));
+    IExtensionRegistry extensionRegistry = getExtensionRegistry(context);
+    m_pagesExtensionManager = new PageExtensionManager(extensionRegistry);
+    m_menuExtensionManager = new MenuExtensionManager(extensionRegistry);
 
     context.addBundleListener(new SynchronousBundleListener() {
       @Override
@@ -50,6 +54,7 @@ public class Activator extends Plugin {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
               m_pagesExtensionManager.start();
+              m_menuExtensionManager.start();
               return Status.OK_STATUS;
             }
           }.schedule();
@@ -64,6 +69,10 @@ public class Activator extends Plugin {
       m_pagesExtensionManager.stop();
       m_pagesExtensionManager = null;
     }
+    if (m_menuExtensionManager != null) {
+      m_menuExtensionManager.stop();
+      m_menuExtensionManager = null;
+    }
 
     plugin = null;
     super.stop(context);
@@ -71,6 +80,10 @@ public class Activator extends Plugin {
 
   public PageExtensionManager getPagesExtensionManager() {
     return m_pagesExtensionManager;
+  }
+
+  public MenuExtensionManager getMenuExtensionManager() {
+    return m_menuExtensionManager;
   }
 
   private IExtensionRegistry getExtensionRegistry(BundleContext context) {

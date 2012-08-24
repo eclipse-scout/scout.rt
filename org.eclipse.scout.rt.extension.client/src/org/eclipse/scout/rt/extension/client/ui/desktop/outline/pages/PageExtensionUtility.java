@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -122,7 +122,7 @@ public final class PageExtensionUtility {
     }
 
     // filter matching extensions
-    List<PageContributionExtension> matchingExtensions = new ArrayList<PageContributionExtension>();
+    List<PageContributionExtension> matchingExtensions = new LinkedList<PageContributionExtension>();
     for (PageContributionExtension e : extensions) {
       if (e.accept(outline, parentPage, null)) {
         matchingExtensions.add(e);
@@ -133,7 +133,6 @@ public final class PageExtensionUtility {
       return;
     }
 
-    // create new and reorder existing pages
     TreeMap<CompositeObject, IPage> orderedPages = new TreeMap<CompositeObject, IPage>();
     // assign synthetic order to existing pages
     int counter = 0;
