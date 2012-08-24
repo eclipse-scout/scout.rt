@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -21,6 +22,8 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -29,6 +32,8 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractButton extends AbstractFormField implements IButton {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractButton.class);
+
   private final EventListenerList m_listenerList = new EventListenerList();
   private int m_systemType;
   private int m_displayStyle;
@@ -229,7 +234,23 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("menu: " + menuArray[i].getName(), t));
       }
     }
+    try {
+      injectMenusInternal(menuList);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contributing menus.", e);
+    }
     m_menus = menuList.toArray(new IMenu[0]);
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to manage menu list and add/remove menus
+   * 
+   * @param menuList
+   *          live and mutable list of configured menus
+   */
+  protected void injectMenusInternal(List<IMenu> menuList) {
   }
 
   /*

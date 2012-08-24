@@ -55,6 +55,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private final EventListenerList m_listenerList = new EventListenerList();
   private ITreeUIFacade m_uiFacade;
   private IMenu[] m_menus;
+  private boolean m_initialized;
 
   // enabled is defined as: enabledGranted && enabledProperty && enabledSlave
   private boolean m_enabledGranted;
@@ -76,13 +77,26 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private boolean m_actionRunning;
 
   public AbstractTree() {
+    this(true);
+  }
+
+  public AbstractTree(boolean callInitialzier) {
     if (DesktopProfiler.getInstance().isEnabled()) {
       DesktopProfiler.getInstance().registerTree(this);
     }
     m_deletedNodes = new HashMap<Object, ITreeNode>();
     m_nodeFilters = new ArrayList<ITreeNodeFilter>(1);
     m_actionRunning = false;
-    initConfig();
+    if (callInitialzier) {
+      callInitializer();
+    }
+  }
+
+  protected void callInitializer() {
+    if (!m_initialized) {
+      initConfig();
+      m_initialized = true;
+    }
   }
 
   /*
