@@ -3,5 +3,6 @@
 <plugin>
    <extension-point id="pages" name="Pages" schema="schema/pages.exsd"/>
    <extension-point id="menus" name="Menus" schema="schema/menus.exsd"/>
+   <extension-point id="desktopExtensions" name="Desktop Extensions" schema="schema/desktopExtensions.exsd"/>
 
 </plugin>

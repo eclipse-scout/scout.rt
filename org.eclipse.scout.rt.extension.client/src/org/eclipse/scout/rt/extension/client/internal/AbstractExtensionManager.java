@@ -68,6 +68,13 @@ public abstract class AbstractExtensionManager implements Listener {
   }
 
   /**
+   * Ensure the extension point tracker is started and initialized with which this extension manager is connected to. 
+   */
+  protected void ensureStarted() {
+    start();
+  }
+
+  /**
    * Adds an extension processor for the given configuration element name. Only one processor can be registered for a
    * particular element. The last processor is used if this method is called several times with the same element name.
    * 
