@@ -55,18 +55,21 @@ public class PageExtensionManager extends AbstractExtensionManager {
 
   public List<PageContributionExtension> getPageContributionExtensions() throws ProcessingException {
     synchronized (getLock()) {
+      ensureStarted();
       return new LinkedList<PageContributionExtension>(m_pageContributionExtensions);
     }
   }
 
   public List<PageRemoveExtension> getPageRemovalExtensions() throws ProcessingException {
     synchronized (getLock()) {
+      ensureStarted();
       return new LinkedList<PageRemoveExtension>(m_pageRemoveExtensions);
     }
   }
 
   public List<PageModificationExtension> getPageModificationExtensions() throws ProcessingException {
     synchronized (getLock()) {
+      ensureStarted();
       return new LinkedList<PageModificationExtension>(m_pageModificationExtensions);
     }
   }

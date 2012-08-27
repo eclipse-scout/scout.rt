@@ -73,6 +73,8 @@ public class MenuExtensionManager extends AbstractExtensionManager {
   }
 
   private <T> List<T> getExtensions(Map<Class<?>, List<T>> extensions, Class<?> anchorType) {
+    ensureStarted();
+    //
     List<T> allMatchingExtensions = new LinkedList<T>();
     // add by anchor type
     List<T> extensionsByAnchorType = extensions.get(anchorType);
