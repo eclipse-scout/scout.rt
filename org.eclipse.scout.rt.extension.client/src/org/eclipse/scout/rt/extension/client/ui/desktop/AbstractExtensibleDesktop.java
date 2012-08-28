@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.extension.client.Activator;
 import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
 
 /**
- * Button supporting the following Scout extension features:
+ * Desktop supporting the following Scout extension features:
  * <ul>
  * <li>adding desktop extensions {@link IDesktopExtension}</li>
  * </ul>
