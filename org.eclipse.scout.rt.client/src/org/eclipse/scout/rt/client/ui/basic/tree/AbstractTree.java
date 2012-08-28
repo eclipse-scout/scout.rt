@@ -1082,6 +1082,18 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  @Override
+  public Object getContainer() {
+    return propertySupport.getProperty(PROP_CONTAINER);
+  }
+
+  /**
+   * do not use this internal method unless you are implementing a container that holds and controls an {@link ITree}
+   */
+  public void setContainerInternal(Object container) {
+    propertySupport.setProperty(PROP_CONTAINER, container);
+  }
+
   private void ensureParentExpanded(ITreeNode parent) {
     if (parent != null) {
       ensureParentExpanded(parent.getParentNode());

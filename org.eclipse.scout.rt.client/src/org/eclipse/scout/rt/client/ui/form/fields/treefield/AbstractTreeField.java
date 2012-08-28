@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -226,6 +227,9 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     if (m_tree == tree) {
       return;
     }
+    if (m_tree instanceof AbstractTree) {
+      ((AbstractTree) m_tree).setContainerInternal(null);
+    }
     if (m_tree != null && !m_treeExternallyManaged) {
       if (m_treeListener != null) {
         m_tree.removeTreeListener(m_treeListener);
@@ -233,6 +237,9 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
       }
     }
     m_tree = tree;
+    if (m_tree instanceof AbstractTree) {
+      ((AbstractTree) m_tree).setContainerInternal(this);
+    }
     if (m_tree != null && !m_treeExternallyManaged) {
       m_tree.setAutoDiscardOnDelete(false);
       m_treeListener = new P_TreeListener();

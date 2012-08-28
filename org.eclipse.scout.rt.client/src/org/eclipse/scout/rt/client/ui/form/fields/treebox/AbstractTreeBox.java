@@ -260,6 +260,9 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     setLoadIncremental(getConfiguredLoadIncremental());
     try {
       m_tree = ConfigurationUtility.newInnerInstance(this, getConfiguredTree());
+      if (m_tree instanceof AbstractTree) {
+        ((AbstractTree) m_tree).setContainerInternal(this);
+      }
       m_tree.setRootNode(getTreeNodeBuilder().createTreeNode(new LookupRow(null, "Root"), ITreeNode.STATUS_NON_CHANGED, false));
       m_tree.setAutoDiscardOnDelete(false);
       updateActiveNodesFilter();

@@ -305,9 +305,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * the {@link AbstractStringColumn#getConfiguredTextWrap()} property to true, the text is wrapped and uses two or more
    * lines.
    * <p>
-   * Subclasses can override this method. Default is {@code false}. If the method is not overridden and at
-   * least one string column has set the {@link AbstractStringColumn#getConfiguredTextWrap()} to true, the multiline
-   * property is set automatically to true.
+   * Subclasses can override this method. Default is {@code false}. If the method is not overridden and at least one
+   * string column has set the {@link AbstractStringColumn#getConfiguredTextWrap()} to true, the multiline property is
+   * set automatically to true.
    * 
    * @return {@code true} if the table supports multiline text, {@code false} otherwise.
    */
@@ -2769,6 +2769,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void setTableCustomizer(ITableCustomizer c) {
     m_tableCustomizer = c;
+  }
+
+  @Override
+  public Object getContainer() {
+    return propertySupport.getProperty(PROP_CONTAINER);
+  }
+
+  /**
+   * do not use this internal method unless you are implementing a container that holds and controls an {@link ITable}
+   */
+  public void setContainerInternal(Object container) {
+    propertySupport.setProperty(PROP_CONTAINER, container);
   }
 
   @Override
