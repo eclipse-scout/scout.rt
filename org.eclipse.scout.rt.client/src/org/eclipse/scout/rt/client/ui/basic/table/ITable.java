@@ -27,7 +27,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilte
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 
@@ -101,7 +104,16 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    * Boolean
    */
   String PROP_SCROLL_TO_SELECTION = "scrollToSelection";
-
+  /**
+   * Object
+   * <p>
+   * Container of this table, {@link IPage}, {@link ITableField}, {@link IListBox}, {@link IPlannerField}
+   * <p>
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * 
+   * @since 3.8.1
+   */
+  String PROP_CONTAINER = "container";
   /**
    * Host for local urls that call back to the table itself and can be handled by overriding
    * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}.
@@ -737,6 +749,15 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   ITableCustomizer getTableCustomizer();
 
   void setTableCustomizer(ITableCustomizer c);
+
+  /**
+   * Container of this table, {@link IPage}, {@link ITableField}, {@link IListBox}, {@link IPlannerField}
+   * <p>
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * 
+   * @since 3.8.1
+   */
+  Object getContainer();
 
   /**
    * Initialize and reset all columns. This operation removes all columns from the table and adds them as if the table

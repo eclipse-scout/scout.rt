@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,8 @@ import java.util.Date;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
+import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
 public interface ICalendar extends IPropertyObserver {
@@ -57,6 +59,16 @@ public interface ICalendar extends IPropertyObserver {
    * type {@link Boolean}
    */
   String PROP_LOAD_IN_PROGRESS = "loadInProgress";
+  /**
+   * {@link Object}
+   * <p>
+   * Container of this calendar, {@link ICalendarField}
+   * <p>
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * 
+   * @since 3.8.1
+   */
+  String PROP_CONTAINER = "container";
 
   void initCalendar() throws ProcessingException;
 
@@ -133,6 +145,17 @@ public interface ICalendar extends IPropertyObserver {
   void setCalendarChanging(boolean b);
 
   boolean isCalendarChanging();
+
+  /**
+   * {@link Object}
+   * <p>
+   * Container of this calendar, {@link ICalendarField}
+   * <p>
+   * {@link IListBox} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * 
+   * @since 3.8.1
+   */
+  Object getContainer();
 
   /*
    * UI interface

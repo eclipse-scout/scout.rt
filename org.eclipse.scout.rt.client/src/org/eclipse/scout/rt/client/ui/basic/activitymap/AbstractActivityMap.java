@@ -1079,6 +1079,19 @@ public abstract class AbstractActivityMap extends AbstractPropertyObserver imple
   }
 
   @Override
+  public Object getContainer() {
+    return propertySupport.getProperty(PROP_CONTAINER);
+  }
+
+  /**
+   * do not use this internal method unless you are implementing a container that holds and controls an
+   * {@link IActivityMap}
+   */
+  public void setContainerInternal(Object container) {
+    propertySupport.setProperty(PROP_CONTAINER, container);
+  }
+
+  @Override
   public void decorateActivityCell(ActivityCell cell) {
     try {
       cell.setObserver(null);

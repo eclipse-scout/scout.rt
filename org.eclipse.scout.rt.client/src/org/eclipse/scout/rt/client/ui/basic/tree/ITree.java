@@ -23,6 +23,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.VirtualPage;
+import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
+import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 
 public interface ITree extends IPropertyObserver, IDNDSupport {
@@ -42,6 +44,16 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
   String PROP_ROOT_HANDLES_VISIBLE = "rootHandlesVisible";
   String PROP_KEY_STROKES = "keyStroks";
   String PROP_SCROLL_TO_SELECTION = "scrollToSelection";
+  /**
+   * Object
+   * <p>
+   * Container of this tree, {@link IPage}, {@link ITreeField}, {@link ITreeBox}
+   * <p>
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * 
+   * @since 3.8.1
+   */
+  String PROP_CONTAINER = "container";
 
   void initTree() throws ProcessingException;
 
@@ -236,6 +248,15 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    * @return a flat array of all checked nodes
    */
   ITreeNode[] getCheckedNodes();
+
+  /**
+   * Container of this tree, {@link IPage}, {@link ITreeField}, {@link ITreeBox}
+   * <p>
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * 
+   * @since 3.8.1
+   */
+  Object getContainer();
 
   /**
    * @return true if parent is equal to child or parent is an ancestor of child

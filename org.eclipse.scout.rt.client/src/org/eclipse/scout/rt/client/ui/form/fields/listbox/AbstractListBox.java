@@ -256,6 +256,9 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     setFilterCheckedRowsValue(getConfiguredFilterCheckedRows());
     try {
       m_table = ConfigurationUtility.newInnerInstance(this, getConfiguredTable());
+      if (m_table instanceof AbstractTable) {
+        ((AbstractTable) m_table).setContainerInternal(this);
+      }
       updateActiveRowsFilter();
       updateCheckedRowsFilter();
       m_table.addTableListener(new TableAdapter() {

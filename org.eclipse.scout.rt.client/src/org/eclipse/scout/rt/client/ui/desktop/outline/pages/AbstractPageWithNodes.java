@@ -98,6 +98,9 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   protected void initConfig() {
     super.initConfig();
     m_table = new P_Table();
+    if (m_table instanceof AbstractTable) {
+      ((AbstractTable) m_table).setContainerInternal(this);
+    }
     m_table.addTableListener(new P_TableListener());
     m_table.setAutoDiscardOnDelete(true);
     try {

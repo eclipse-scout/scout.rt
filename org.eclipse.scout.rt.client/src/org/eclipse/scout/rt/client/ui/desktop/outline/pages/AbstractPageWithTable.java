@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
@@ -356,6 +357,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (tableClass != null) {
       try {
         m_table = (T) ConfigurationUtility.newInnerInstance(this, tableClass);
+        if (m_table instanceof AbstractTable) {
+          ((AbstractTable) m_table).setContainerInternal(this);
+        }
         m_table.addTableListener(new P_TableListener());
         m_table.setEnabled(isEnabled());
         m_table.setAutoDiscardOnDelete(true);

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.Date;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 
 /**
  * The activity map is a specialized model which contains a set of {@link ActivityCell}s that are grouped by resourceId.
@@ -77,6 +78,12 @@ public interface IActivityMap extends IPropertyObserver {
    * {@link Boolean}
    */
   String PROP_DRAW_SECTIONS = "drawSections";
+  /**
+   * {@link Object} Container of this map, {@link IPlannerField} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * 
+   * @since 3.8.1
+   */
+  String PROP_CONTAINER = "container";
 
   int PLANNING_MODE_INTRADAY = 0;
   int PLANNING_MODE_DAY = 1;
@@ -310,6 +317,17 @@ public interface IActivityMap extends IPropertyObserver {
    *          false if not.
    */
   void setDrawSections(boolean drawSections);
+
+  /**
+   * {@link Object}
+   * <p>
+   * Container of this map, {@link IPlannerField}
+   * <p>
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * 
+   * @since 3.8.1
+   */
+  Object getContainer();
 
   IMenu[] getMenus();
 
