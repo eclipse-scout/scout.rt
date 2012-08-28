@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.extension.client.Activator;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuExtensi
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuModificationExtension;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuRemoveExtension;
 import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
+import org.eclipse.scout.rt.extension.client.ui.desktop.internal.OrderedMenuWrapper;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithNodes;
 import org.eclipse.scout.rt.extension.client.ui.form.fields.button.AbstractExtensibleButton;
 import org.eclipse.scout.rt.extension.client.ui.form.fields.filechooserfield.AbstractExtensibleFileChooserField;
@@ -75,22 +77,29 @@ public final class MenuExtensionUtility {
     if (anchor instanceof ITreeNode) {
       return (Class<T>) ITreeNode.class;
     }
+    if (anchor instanceof IDesktop) {
+      return (Class<T>) IDesktop.class;
+    }
     return null;
   }
 
   public static <T> void adaptMenus(T anchor, Object container, List<IMenu> menuList) {
+    adaptMenus(anchor, container, menuList, false);
+  }
+
+  public static <T> void adaptMenus(T anchor, Object container, List<IMenu> menuList, boolean createOrderedMenuWrapper) {
     Class<T> anchorType = getAnchorType(anchor);
     if (anchorType == null || anchor == null || container == null) {
       return;
     }
 
     MenuExtensionManager extensionManager = Activator.getDefault().getMenuExtensionManager();
-    contributeMenus(anchor, container, extensionManager.getMenuContributionExtensions(anchorType), menuList);
+    contributeMenus(anchor, container, extensionManager.getMenuContributionExtensions(anchorType), menuList, createOrderedMenuWrapper);
     removeMenus(anchor, container, extensionManager.getMenuRemoveExtensions(anchorType), menuList);
     modifyMenus(anchor, container, extensionManager.getMenuModificationExtensions(anchorType), menuList);
   }
 
-  static <T> void contributeMenus(T anchor, Object container, List<MenuContributionExtension> extensions, List<IMenu> menuList) {
+  static <T> void contributeMenus(T anchor, Object container, List<MenuContributionExtension> extensions, List<IMenu> menuList, boolean createOrderedMenuWrapper) {
     if (extensions == null || extensions.isEmpty()) {
       return;
     }
@@ -127,6 +136,9 @@ public final class MenuExtensionUtility {
     for (MenuContributionExtension e : matchingExtensions) {
       try {
         IMenu m = e.createContribution(anchor, container);
+        if (createOrderedMenuWrapper) {
+          m = new OrderedMenuWrapper(m, e.getOrder());
+        }
         orderedMenus.put(new CompositeObject(e.getOrder(), counter), m);
         counter++;
       }
