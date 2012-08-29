@@ -37,6 +37,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -635,7 +637,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     // create lookup service call
     m_lookupCall = null;
     if (m_codeTypeClass != null) {
-      m_lookupCall = new CodeLookupCall(m_codeTypeClass);
+      m_lookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
       ICodeType t = CODES.getCodeType(m_codeTypeClass);
       if (t != null) {
         if (!ConfigurationUtility.isMethodOverwrite(AbstractSmartField.class, "getConfiguredBrowseHierarchy", new Class[0], this.getClass())) {
@@ -902,7 +904,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
           else {
             // enqueue LookupRow fetcher
             // this will lateron call installLookupRowContext()
-            LookupCall call = (LookupCall) getLookupCall().clone();
+            LookupCall call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractSmartField.this));
             prepareKeyLookup(call, validKey);
             m_currentGetLookupRowByKeyJob = new P_GetLookupRowByKeyJob(call);
             m_currentGetLookupRowByKeyJob.schedule();
@@ -1145,7 +1147,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     LookupRow[] data = null;
     LookupCall call = getLookupCall();
     if (call != null) {
-      call = (LookupCall) call.clone();
+      call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractSmartField.this));
       prepareKeyLookup(call, key);
       data = call.getDataByKey();
     }
@@ -1185,7 +1187,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   }
 
   private JobEx callTextLookupInternal(String text, int maxRowCount, final ILookupCallFetcher fetcher, final boolean background) {
-    final LookupCall call = (getLookupCall() != null ? (LookupCall) getLookupCall().clone() : null);
+    final LookupCall call = (getLookupCall() != null ? SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractSmartField.this)) : null);
     final IClientSession session = ClientSyncJob.getCurrentSession();
     ILookupCallFetcher internalFetcher = new ILookupCallFetcher() {
       @Override
@@ -1284,7 +1286,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
   }
 
   private JobEx callBrowseLookupInternal(String browseHint, int maxRowCount, TriState activeState, final ILookupCallFetcher fetcher, final boolean background) {
-    final LookupCall call = (getLookupCall() != null ? (LookupCall) getLookupCall().clone() : null);
+    final LookupCall call = (getLookupCall() != null ? SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractSmartField.this)) : null);
     final IClientSession session = ClientSyncJob.getCurrentSession();
     ILookupCallFetcher internalFetcher = new ILookupCallFetcher() {
       @Override
@@ -1358,7 +1360,7 @@ public abstract class AbstractSmartField<T> extends AbstractValueField<T> implem
     LookupRow[] data = null;
     LookupCall call = getLookupCall();
     if (call != null) {
-      call = (LookupCall) call.clone();
+      call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractSmartField.this));
       call.setMaxRowCount(getBrowseMaxRowCount());
       prepareRecLookup(call, parentKey, activeState);
       data = call.getDataByRec();

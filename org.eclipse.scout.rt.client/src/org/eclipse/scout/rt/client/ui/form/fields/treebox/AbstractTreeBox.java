@@ -28,6 +28,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
@@ -479,7 +481,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     // create lookup service call
     m_lookupCall = null;
     if (m_codeTypeClass != null) {
-      m_lookupCall = new CodeLookupCall(m_codeTypeClass);
+      m_lookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
     }
   }
 
@@ -488,7 +490,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     LookupRow[] data = null;
     LookupCall call = getLookupCall();
     if (call != null) {
-      call = (LookupCall) call.clone();
+      call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractTreeBox.this));
       prepareLookupCall(call, parentNode);
       data = call.getDataByRec();
       data = filterLookupResult(call, data);
@@ -506,7 +508,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     LookupRow[] data = null;
     LookupCall call = getLookupCall();
     if (call != null) {
-      call = (LookupCall) call.clone();
+      call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractTreeBox.this));
       prepareLookupCall(call, null);
       data = call.getDataByAll();
       data = filterLookupResult(call, data);

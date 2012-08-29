@@ -30,7 +30,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
-import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallFactoryService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
@@ -327,7 +327,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     // create lookup service call
     m_lookupCall = null;
     if (m_codeTypeClass != null) {
-      m_lookupCall = new CodeLookupCall(m_codeTypeClass);
+      m_lookupCall = SERVICES.getService(ICodeLookupCallFactoryService.class).newInstance(m_codeTypeClass);
     }
   }
 
@@ -618,7 +618,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
     LookupCall call;
     if (codeTypeClass != null) {
-      call = new CodeLookupCall(codeTypeClass);
+      call = SERVICES.getService(ICodeLookupCallFactoryService.class).newInstance(codeTypeClass);
     }
     else {
       call = (LookupCall) lookupCall.clone();

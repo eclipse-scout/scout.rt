@@ -42,5 +42,15 @@
           createImmediately="false"
           factory="org.eclipse.scout.rt.client.services.ClientServiceFactory" >
     </service>
+    <service
+          class="org.eclipse.scout.rt.client.services.lookup.DefaultLookupCallProvisioningService"
+          createImmediately="false"
+          factory="org.eclipse.scout.rt.client.services.ClientServiceFactory">
+    </service>
+    <service
+          class="org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService"
+          createImmediately="false"
+          factory="org.eclipse.scout.rt.client.services.ClientServiceFactory">
+    </service>
   </extension>
 </plugin>
