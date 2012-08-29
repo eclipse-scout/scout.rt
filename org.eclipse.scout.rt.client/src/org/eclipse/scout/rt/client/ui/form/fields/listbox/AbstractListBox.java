@@ -29,6 +29,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -175,7 +177,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     LookupRow[] data;
     // (1) get data by service
     if (getLookupCall() != null) {
-      LookupCall call = (LookupCall) getLookupCall().clone();
+      LookupCall call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractListBox.this));
       prepareLookupCall(call);
       data = call.getDataByAll();
       data = filterLookupResult(call, data);
@@ -545,7 +547,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<T[]> impleme
     // create lookup service call
     m_lookupCall = null;
     if (m_codeTypeClass != null) {
-      m_lookupCall = new CodeLookupCall(m_codeTypeClass);
+      m_lookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
     }
   }
 

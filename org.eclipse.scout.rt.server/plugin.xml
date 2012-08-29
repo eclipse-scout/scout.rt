@@ -14,6 +14,11 @@
      <service class="org.eclipse.scout.rt.server.services.common.processing.ServerProcessingCancelService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession"/>
      <service class="org.eclipse.scout.rt.shared.services.common.text.ScoutTextProviderService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession" ranking="-50"/>
      <service class="org.eclipse.scout.rt.server.services.common.session.DefaultServerSessionService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" />
+     <service
+           class="org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService"
+           createImmediately="false"
+           factory="org.eclipse.scout.rt.server.services.ServerServiceFactory">
+     </service>
    </extension>
   <extension id="app" name="Server Application" point="org.eclipse.core.runtime.applications">
     <application>

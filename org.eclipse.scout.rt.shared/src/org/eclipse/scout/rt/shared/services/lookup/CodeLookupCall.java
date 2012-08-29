@@ -23,12 +23,20 @@ import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * @see LookupCall
  */
 public class CodeLookupCall extends LocalLookupCall implements Serializable {
   private static final long serialVersionUID = 0L;
+
+  /**
+   * Helper method to create a lookup call from a codetype using the {@link ICodeLookupCallFactoryService}.
+   */
+  public static CodeLookupCall newInstanceByService(Class<? extends ICodeType> codeTypeClass) {
+    return SERVICES.getService(ICodeLookupCallFactoryService.class).newInstance(codeTypeClass);
+  }
 
   private Class<? extends ICodeType> m_codeTypeClass;
   private ICodeLookupCallVisitor m_filter;
@@ -142,14 +150,10 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
    */
   @Override
   public LookupRow[] getDataByKey() throws ProcessingException {
-    Object key = getKey();
     ArrayList<ICode<?>> list = new ArrayList<ICode<?>>(1);
-    ICodeType t = CODES.getCodeType(m_codeTypeClass);
-    if (t != null) {
-      ICode c = t.getCode(key);
-      if (c != null) {
-        list.add(c);
-      }
+    ICode c = resolveCodeByKey();
+    if (c != null) {
+      list.add(c);
     }
     return execCreateLookupRowsFromCodes(list);
   }
@@ -175,10 +179,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
         return true;
       }
     };
-    ICodeType t = CODES.getCodeType(m_codeTypeClass);
-    if (t != null) {
-      t.visit(v, false);
-    }
+    resolveCodes(v);
     List<LookupRow> result = v.getLookupRows();
     if (result.size() > 1) {
       Comparator<LookupRow> comparator = getSortComparator();
@@ -210,10 +211,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
         return true;
       }
     };
-    ICodeType t = CODES.getCodeType(m_codeTypeClass);
-    if (t != null) {
-      t.visit(v, false);
-    }
+    resolveCodes(v);
     List<LookupRow> result = v.getLookupRows();
     if (result.size() > 1) {
       Comparator<LookupRow> comparator = getSortComparator();
@@ -252,10 +250,7 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
         return true;
       }
     };
-    ICodeType t = CODES.getCodeType(m_codeTypeClass);
-    if (t != null) {
-      t.visit(v, false);
-    }
+    resolveCodes(v);
     List<LookupRow> result = v.getLookupRows();
     if (result.size() > 1) {
       Comparator<LookupRow> comparator = getSortComparator();
@@ -264,6 +259,36 @@ public class CodeLookupCall extends LocalLookupCall implements Serializable {
       }
     }
     return result.toArray(new LookupRow[result.size()]);
+  }
+
+  /**
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388242
+   * <p>
+   * 
+   * @return the result of this lookup call into a single code or null.
+   * @since 3.8.1
+   */
+  protected ICode<?> resolveCodeByKey() throws ProcessingException {
+    Object key = getKey();
+    ICodeType t = CODES.getCodeType(m_codeTypeClass);
+    if (t == null) {
+      return null;
+    }
+    return t.getCode(key);
+  }
+
+  /**
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388242
+   * <p>
+   * 
+   * @return the result of this lookup call into multiple codes matching the filter.
+   * @since 3.8.1
+   */
+  protected void resolveCodes(ICodeVisitor v) throws ProcessingException {
+    ICodeType t = CODES.getCodeType(m_codeTypeClass);
+    if (t != null) {
+      t.visit(v, false);
+    }
   }
 
   private static abstract class AbstractLookupRowCollector implements ICodeVisitor {

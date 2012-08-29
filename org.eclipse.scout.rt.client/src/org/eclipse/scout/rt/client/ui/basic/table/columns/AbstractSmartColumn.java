@@ -19,6 +19,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
+import org.eclipse.scout.rt.client.services.lookup.TableProvisioningContext;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
@@ -26,6 +28,7 @@ import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implements ISmartColumn<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSmartColumn.class);
@@ -150,7 +153,7 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
     // create lookup service call
     m_lookupCall = null;
     if (m_codeTypeClass != null) {
-      m_lookupCall = new CodeLookupCall(m_codeTypeClass);
+      m_lookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
     }
   }
 
@@ -183,7 +186,7 @@ public abstract class AbstractSmartColumn<T> extends AbstractColumn<T> implement
   @Override
   public LookupCall prepareLookupCall(ITableRow row) {
     if (getLookupCall() != null) {
-      LookupCall call = (LookupCall) getLookupCall().clone();
+      LookupCall call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new TableProvisioningContext(getTable(), row, AbstractSmartColumn.this));
       call.setKey(getValue(row));
       call.setText(null);
       call.setAll(null);
