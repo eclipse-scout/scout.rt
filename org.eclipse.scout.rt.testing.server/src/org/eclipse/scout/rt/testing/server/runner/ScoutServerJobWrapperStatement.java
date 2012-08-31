@@ -71,6 +71,9 @@ public class ScoutServerJobWrapperStatement extends Statement {
       catch (Exception e) {
         throw e;
       }
+      catch (Error e) {
+        throw e;
+      }
       catch (Throwable e) {
         throw new Exception(e);
       }
