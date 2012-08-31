@@ -283,7 +283,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       return "";
     }
     else {
-      return "<img style=\" width=\"16\" height=\"16\" src=\"cid:" + iconId + "\"/>";
+      return "<img width=\"16\" height=\"16\" src=\"cid:" + iconId + "\"/>";
     }
   }
 

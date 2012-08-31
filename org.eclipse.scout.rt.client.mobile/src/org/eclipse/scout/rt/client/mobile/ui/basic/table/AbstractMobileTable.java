@@ -17,8 +17,6 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
@@ -28,7 +26,6 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   private DrillDownStyleMap m_drillDownStyleMap;
   private int m_tableRowFormDisplayHint;
   private String m_tableRowFormDisplayViewId;
-  private FormListener m_clearSelectionFormListener;
 
   public AbstractMobileTable() {
     this(true);
@@ -107,27 +104,7 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     form.setDisplayViewId(getTableRowFormDisplayViewId());
     form.setModal(IForm.DISPLAY_HINT_DIALOG == form.getDisplayHint());
     form.start();
-    form.addFormListener(getClearSelectionFormListener());
-  }
-
-  /**
-   * Returns a form listener which clears the selection on form closed if it is attached to a form.
-   */
-  protected FormListener getClearSelectionFormListener() {
-    if (m_clearSelectionFormListener == null) {
-      m_clearSelectionFormListener = new FormListener() {
-
-        @Override
-        public void formChanged(FormEvent e) throws ProcessingException {
-          if (FormEvent.TYPE_CLOSED == e.getType()) {
-            clearSelection();
-          }
-        }
-
-      };
-    }
-
-    return m_clearSelectionFormListener;
+    form.addFormListener(new ClearTableSelectionFormCloseListener(this));
   }
 
   protected void clearSelectionDelayed() {

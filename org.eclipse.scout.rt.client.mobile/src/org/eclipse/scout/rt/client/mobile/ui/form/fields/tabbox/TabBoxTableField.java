@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.ClearTableSelectionFormCloseListener;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.TabBoxTableField.Table;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
@@ -102,7 +103,7 @@ public class TabBoxTableField extends AbstractTableField<Table> {
       form.setDisplayViewId(getForm().getDisplayViewId());
       form.setModal(IForm.DISPLAY_HINT_DIALOG == form.getDisplayHint());
       form.start();
-      form.addFormListener(getClearSelectionFormListener());
+      form.addFormListener(new ClearTableSelectionFormCloseListener(this));
     }
 
     @Override
