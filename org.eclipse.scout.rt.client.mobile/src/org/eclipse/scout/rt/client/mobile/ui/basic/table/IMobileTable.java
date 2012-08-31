@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 
 /**
@@ -19,6 +20,15 @@ public interface IMobileTable extends ITable {
 
   String PROP_DRILL_DOWN_STYLE_MAP = "drillDownStyleMap";
   String PROP_AUTO_CREATE_TABLE_ROW_FORM = "autoCreateTableRowForm";
+  String PROP_DEFAULT_DRILL_DOWN_STYLE = IRowSummaryColumn.PROP_DEFAULT_DRILL_DOWN_STYLE;
+
+  String DRILL_DOWN_STYLE_NONE = IRowSummaryColumn.DRILL_DOWN_STYLE_NONE;
+  String DRILL_DOWN_STYLE_ICON = IRowSummaryColumn.DRILL_DOWN_STYLE_ICON;
+  String DRILL_DOWN_STYLE_BUTTON = IRowSummaryColumn.DRILL_DOWN_STYLE_BUTTON;
+
+  String getDefaultDrillDownStyle();
+
+  void setDefaultDrillDownStyle(String defaultDrillDownStyle);
 
   DrillDownStyleMap getDrillDownStyleMap();
 
