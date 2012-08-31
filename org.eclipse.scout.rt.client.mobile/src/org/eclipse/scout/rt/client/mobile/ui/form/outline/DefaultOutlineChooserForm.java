@@ -144,10 +144,6 @@ public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineC
         }
 
         @Override
-        protected void execRowClick(ITableRow row) throws ProcessingException {
-        }
-
-        @Override
         protected void execRowsSelected(ITableRow[] rows) throws ProcessingException {
           if (rows == null || rows.length == 0) {
             return;

@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.AbstractRowSumm
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.PropertyBucket;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableUIFacade;
@@ -90,7 +92,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
       setRowHeightHint((m_maxCellDetailColumns + 1) * ROW_HEIGHT);
     }
 
-    getContentColumn().setDefaultDrillDownStyle(execComputeDrillDownStyle());
+    getContentColumn().setDefaultDrillDownStyle(getDefaultDrillDownStyle());
     setDrillDownStyleMap(getDrillDownStyleMap(getOriginalTable()));
   }
 
@@ -108,9 +110,20 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     return true;
   }
 
+  @Override
   protected String execComputeDrillDownStyle() {
+    String defaultDrillDownStyle = getDefaultDrillDownStyle(getOriginalTable());
+    if (defaultDrillDownStyle != null) {
+      return defaultDrillDownStyle;
+    }
+
     if (getOriginalTable().isCheckable()) {
       return IRowSummaryColumn.DRILL_DOWN_STYLE_NONE;
+    }
+
+    //Check if the original table already has a selection behavior implemented. If yes, use the drill down button style to not break the original selection behavior.
+    if (!(getOriginalTable() instanceof IMobileTable) && ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "execRowsSelected", new Class[]{ITableRow[].class}, getOriginalTable().getClass())) {
+      return IRowSummaryColumn.DRILL_DOWN_STYLE_BUTTON;
     }
 
     return IRowSummaryColumn.DRILL_DOWN_STYLE_ICON;
@@ -146,6 +159,8 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
         //Prevent loop which could happen because delegation of selection is done from this to original table and vice versa
         return;
       }
+
+      //Delegate to original table
       getOriginalTable().getUIFacade().setSelectedRowsFromUI(getRowMapColumn().getValues(rows));
 
       ITableRow originalRow = null;
@@ -167,28 +182,31 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
 
   @Override
   protected void execRowClick(ITableRow row) throws ProcessingException {
+    //Delegate to original table
     ITableRow originalRow = getRowMapColumn().getValue(row);
-    if (IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(getDrillDownStyle(originalRow))) {
-      //nop
-    }
-    else {
-      //Drill down actions should be handled by listening to selection and not click events so click events are not fired in such a case
-      getOriginalTable().getUIFacade().fireRowClickFromUI(originalRow);
-    }
+    getOriginalTable().getUIFacade().fireRowClickFromUI(originalRow);
   }
 
   @Override
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+    //Delegate to original table
+    ITableRow originalRow = getRowMapColumn().getValue(getSelectedRow());
+    getOriginalTable().getUIFacade().fireHyperlinkActionFromUI(originalRow, null, url);
+
     if (AbstractRowSummaryColumn.isDrillDownButtonUrl(url, path, local)) {
       execDrillDownButtonAction();
-    }
-    else {
-      getOriginalTable().getUIFacade().fireHyperlinkActionFromUI(getRowMapColumn().getValue(getSelectedRow()), null, url);
     }
   }
 
   protected void execDrillDownButtonAction() throws ProcessingException {
-    // nop. No default implemented yet
+    if (isAutoCreateTableRowForm()) {
+      ITableRow originalRow = null;
+      ITableRow selectedRow = getSelectedRow();
+      if (selectedRow != null) {
+        originalRow = getRowMapColumn().getValue(selectedRow);
+      }
+      startTableRowForm(originalRow);
+    }
   }
 
   public ContentColumn getContentColumn() {
@@ -385,6 +403,14 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     return PropertyBucket.getInstance().getProperty(table, IMobileTable.PROP_DRILL_DOWN_STYLE_MAP);
   }
 
+  public static void setDefaultDrillDownStyle(ITable table, String defaultDrillDownStyle) {
+    PropertyBucket.getInstance().setProperty(table, IMobileTable.PROP_DEFAULT_DRILL_DOWN_STYLE, defaultDrillDownStyle);
+  }
+
+  public static String getDefaultDrillDownStyle(ITable table) {
+    return PropertyBucket.getInstance().getProperty(table, IMobileTable.PROP_DEFAULT_DRILL_DOWN_STYLE);
+  }
+
   /**
    * Used to directly dispatch ui events to the original table or to completely deny certain events
    */
@@ -422,6 +448,11 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     }
 
     //------------- do not process events --------------------------
+    @Override
+    public void fireRowActionFromUI(ITableRow row) {
+      //nop; not allowed
+    }
+
     @Override
     public void fireColumnMovedFromUI(IColumn<?> c, int toViewIndex) {
       //nop; not allowed
