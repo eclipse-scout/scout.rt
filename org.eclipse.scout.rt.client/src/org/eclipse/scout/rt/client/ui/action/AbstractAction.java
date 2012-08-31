@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action;
 
-import java.beans.PropertyChangeListener;
 import java.security.Permission;
 
 import org.eclipse.scout.commons.EventListenerList;
@@ -257,23 +256,13 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void addPropertyChangeListener(PropertyChangeListener listener) {
-    propertySupport.addPropertyChangeListener(listener);
+  public Object getProperty(String name) {
+    return propertySupport.getProperty(name);
   }
 
   @Override
-  public void addPropertyChangeListener(String propName, PropertyChangeListener listener) {
-    propertySupport.addPropertyChangeListener(propName, listener);
-  }
-
-  @Override
-  public void removePropertyChangeListener(PropertyChangeListener listener) {
-    propertySupport.removePropertyChangeListener(listener);
-  }
-
-  @Override
-  public void removePropertyChangeListener(String propName, PropertyChangeListener listener) {
-    propertySupport.removePropertyChangeListener(propName, listener);
+  public void setProperty(String name, Object value) {
+    propertySupport.setProperty(name, value);
   }
 
   @Override

@@ -1210,6 +1210,21 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  public Object getProperty(String name) {
+    return propertySupport.getProperty(name);
+  }
+
+  @Override
+  public void setProperty(String name, Object value) {
+    propertySupport.setProperty(name, value);
+  }
+
+  @Override
+  public boolean hasProperty(String name) {
+    return propertySupport.hasProperty(name);
+  }
+
+  @Override
   public boolean isCheckable() {
     return propertySupport.getPropertyBool(PROP_CHECKABLE);
   }

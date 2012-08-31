@@ -1164,14 +1164,26 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     calculateLabelVisible();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public Object getCustomProperty(String propName) {
-    return propertySupport.getProperty(propName);
+    return getProperty(propName);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void setCustomProperty(String propName, Object o) {
+    setProperty(propName, o);
   }
 
   @Override
-  public void setCustomProperty(String propName, Object o) {
-    propertySupport.setProperty(propName, o);
+  public Object getProperty(String name) {
+    return propertySupport.getProperty(name);
+  }
+
+  @Override
+  public void setProperty(String name, Object value) {
+    propertySupport.setProperty(name, value);
   }
 
   @Override
