@@ -48,7 +48,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   private int m_maxCellDetailColumns;
   private OptimisticLock m_selectionLock;
 
-  private TablePropertyDelegator<? extends ITable> m_propertyDelegator;
+  private MobileTablePropertyDelegator m_propertyDelegator;
 
   private P_TableEventListener m_tableListener;
 
@@ -59,12 +59,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     filter.add(ITable.PROP_ROW_HEIGHT_HINT);
     filter.add(ITable.PROP_DEFAULT_ICON);
     filter.add(ITable.PROP_HEADER_VISIBLE);
-    if (originalTable instanceof IMobileTable) {
-      m_propertyDelegator = new MobileTablePropertyDelegator((IMobileTable) originalTable, this, filter);
-    }
-    else {
-      m_propertyDelegator = new TablePropertyDelegator<ITable>(originalTable, this, filter);
-    }
+    m_propertyDelegator = new MobileTablePropertyDelegator(originalTable, this, filter);
     callInitializer();
 
     try {

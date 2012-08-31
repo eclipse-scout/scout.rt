@@ -12,16 +12,23 @@ package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
 import java.util.Set;
 
-/**
- *
- */
-public class MobileTablePropertyDelegator extends TablePropertyDelegator<IMobileTable> {
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 
-  public MobileTablePropertyDelegator(IMobileTable sender, IMobileTable receiver) {
+/**
+ * Delegates the table properties and also the additional properties of the {@link IMobileTable}.
+ * <p>
+ * The sender does not necessarily need to be of type {@link IMobileTable}, if the properties are set, they will be
+ * delegated.
+ * 
+ * @since 3.9.0
+ */
+public class MobileTablePropertyDelegator extends TablePropertyDelegator<ITable, IMobileTable> {
+
+  public MobileTablePropertyDelegator(ITable sender, IMobileTable receiver) {
     super(sender, receiver);
   }
 
-  public MobileTablePropertyDelegator(IMobileTable sender, IMobileTable receiver, Set<String> filteredPropertyNames) {
+  public MobileTablePropertyDelegator(ITable sender, IMobileTable receiver, Set<String> filteredPropertyNames) {
     super(sender, receiver, filteredPropertyNames);
   }
 
@@ -29,8 +36,12 @@ public class MobileTablePropertyDelegator extends TablePropertyDelegator<IMobile
   public void init() {
     super.init();
 
-    getReceiver().setAutoCreateTableRowForm(getSender().isAutoCreateTableRowForm());
-    getReceiver().setDrillDownStyleMap(getSender().getDrillDownStyleMap());
+    if (getSender().hasProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM)) {
+      getReceiver().setAutoCreateTableRowForm((Boolean) getSender().getProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM));
+    }
+    if (getSender().hasProperty(IMobileTable.PROP_DRILL_DOWN_STYLE_MAP)) {
+      getReceiver().setDrillDownStyleMap((DrillDownStyleMap) getSender().getProperty(IMobileTable.PROP_DRILL_DOWN_STYLE_MAP));
+    }
   }
 
   @Override
@@ -38,10 +49,10 @@ public class MobileTablePropertyDelegator extends TablePropertyDelegator<IMobile
     super.handlePropertyChange(name, newValue);
 
     if (name.equals(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM)) {
-      getReceiver().setAutoCreateTableRowForm(getSender().isAutoCreateTableRowForm());
+      getReceiver().setAutoCreateTableRowForm((Boolean) newValue);
     }
     else if (name.equals(IMobileTable.PROP_DRILL_DOWN_STYLE_MAP)) {
-      getReceiver().setDrillDownStyleMap(getSender().getDrillDownStyleMap());
+      getReceiver().setDrillDownStyleMap((DrillDownStyleMap) newValue);
     }
   }
 
