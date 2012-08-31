@@ -380,9 +380,30 @@ public interface IFormField extends IPropertyObserver {
 
   void setLabelSuppressed(boolean b);
 
+  /**
+   * @deprecated Use {@link #getProperty(String)} instead.
+   */
+  @Deprecated
   Object getCustomProperty(String propName);
 
+  /**
+   * @deprecated Use {@link #setProperty(String, Object)} instead.
+   */
+  @Deprecated
   void setCustomProperty(String propName, Object o);
+
+  Object getProperty(String name);
+
+  /**
+   * With this method it's possible to set (custom) properties.
+   * <p>
+   * <b>Important: </b> Although this method is intended to be used for custom properties, it's actually possible to
+   * change main properties as well. Keep in mind that directly changing main properties may result in unexpected
+   * behavior, so do it only if you really know what you are doing. Rather use the officially provided api instead. <br>
+   * Example for an unexpected behavior: setVisible() does not only set the property PROP_VISIBLE but also executes
+   * additional code. This code would NOT be executed by directly setting the property PROP_VISIBLE with setProperty().
+   */
+  void setProperty(String name, Object value);
 
   boolean isInitialized();
 
