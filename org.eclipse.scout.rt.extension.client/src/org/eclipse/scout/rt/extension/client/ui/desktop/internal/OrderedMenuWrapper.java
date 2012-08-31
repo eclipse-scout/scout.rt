@@ -67,6 +67,16 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
   }
 
   @Override
+  public Object getProperty(String name) {
+    return m_menu.getProperty(name);
+  }
+
+  @Override
+  public void setProperty(String name, Object value) {
+    m_menu.setProperty(name, value);
+  }
+
+  @Override
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     m_menu.removePropertyChangeListener(propertyName, listener);
   }

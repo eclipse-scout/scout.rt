@@ -240,6 +240,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
+   * Interception method used for customizing the default menu. Should be used by the framework only.
+   * 
+   * @since 3.8.1
+   */
+  protected Class<? extends IMenu> getDefaultMenuInternal() {
+    return getConfiguredDefaultMenu();
+  }
+
+  /**
    * Configures whether deleted rows are automatically erased or cached for later processing (service deletion).
    * <p>
    * Subclasses can override this method. Default is {@code false}.
@@ -618,7 +627,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @ConfigOperation
   @Order(90)
   protected void execRowAction(ITableRow row) throws ProcessingException {
-    Class<? extends IMenu> defaultMenuType = getConfiguredDefaultMenu();
+    Class<? extends IMenu> defaultMenuType = getDefaultMenuInternal();
     if (defaultMenuType != null) {
       try {
         runMenu(defaultMenuType);
@@ -755,7 +764,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     //add ENTER key stroke when default menu is used or execRowAction has an override
-    Class<? extends IMenu> defaultMenuType = getConfiguredDefaultMenu();
+    Class<? extends IMenu> defaultMenuType = getDefaultMenuInternal();
     if (defaultMenuType != null || ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "execRowAction", new Class[]{ITableRow.class}, this.getClass())) {
       ksList.add(new KeyStroke("ENTER") {
         @Override
