@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -59,6 +60,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   private IDesktop m_desktop;
   private PageFormManager m_pageFormManager;
   private ToolFormHandler m_toolFormHandler;
+  private boolean m_gridDataDirty;
 
   public MobileDeviceTransformer(IDesktop desktop) {
     if (desktop == null) {
@@ -120,11 +122,21 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformForm(IForm form) throws ProcessingException {
-    form.setAskIfNeedSave(false);
+    m_gridDataDirty = false;
+
+    if (shouldCancelConfirmationBeDisabled()) {
+      form.setAskIfNeedSave(false);
+    }
+
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
       transformView(form);
     }
     transformFormFields(form);
+
+    if (isGridDataDirty()) {
+      FormUtility.rebuildFieldGrid(form, true);
+      m_gridDataDirty = false;
+    }
   }
 
   protected void transformView(IForm form) {
@@ -199,9 +211,13 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     m_modifiedForms.put(form, new WeakReference<IForm>(form));
   }
 
-  private void transformFormField(IFormField field) {
+  protected void transformFormField(IFormField field) {
     if (shouldLabelBeMovedToTop()) {
       moveLabelToTop(field);
+    }
+
+    if (shouldFieldBeMadeScalable()) {
+      makeFieldScalable(field);
     }
 
     if (field instanceof IGroupBox) {
@@ -211,6 +227,31 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       transformSmartField((ISmartField) field);
     }
 
+  }
+
+  /**
+   * Makes sure weightX is set to 1 which makes the field scalable.
+   * <p>
+   * Reason:<br>
+   * The width of the field should be adjusted according to the display width, otherwise it may be too big to be
+   * displayed. <br>
+   * Additionally, since we use a one column layout, setting weightX to 0 might destroy the layout because it affects
+   * all the fields in the groupBox.
+   */
+  protected void makeFieldScalable(IFormField field) {
+    //Since a sequencebox contains several fields it's very risky to modify the gridData because it could make the fields too big or too small.
+    if (field.getParentField() instanceof ISequenceBox) {
+      return;
+    }
+
+    //Make sure weightX is set to 1 so the field grows and shrinks and does not break the 1 column layout
+    GridData gridDataHints = field.getGridDataHints();
+    if (gridDataHints.weightX == 0) {
+      gridDataHints.weightX = 1;
+      field.setGridDataHints(gridDataHints);
+
+      markGridDataDirty();
+    }
   }
 
   protected void moveLabelToTop(IFormField field) {
@@ -232,20 +273,20 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     }
   }
 
-  private void transformMainBox(IGroupBox groupBox) throws ProcessingException {
+  protected void transformMainBox(IGroupBox groupBox) throws ProcessingException {
     if (!groupBox.isScrollable()) {
       groupBox.setScrollable(true);
 
       //GridDataHints have been modified by setScrollable. Update the actual gridData with those hints.
-      FormUtility.rebuildFieldGrid(groupBox.getForm(), true);
+      markGridDataDirty();
     }
   }
 
-  private void transformGroupBox(IGroupBox groupBox) {
+  protected void transformGroupBox(IGroupBox groupBox) {
     groupBox.setGridColumnCountHint(1);
   }
 
-  private void transformSmartField(ISmartField<?> field) {
+  protected void transformSmartField(ISmartField<?> field) {
     if (field.getBrowseMaxRowCount() > getSmartFieldBrowseMaxRowCount()) {
       field.setBrowseMaxRowCount(getSmartFieldBrowseMaxRowCount());
     }
@@ -331,6 +372,22 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   protected boolean shouldLabelBeMovedToTop() {
     return true;
+  }
+
+  protected boolean shouldFieldBeMadeScalable() {
+    return true;
+  }
+
+  protected boolean shouldCancelConfirmationBeDisabled() {
+    return true;
+  }
+
+  protected boolean isGridDataDirty() {
+    return m_gridDataDirty;
+  }
+
+  protected void markGridDataDirty() {
+    m_gridDataDirty = true;
   }
 
   private class P_BackAction extends AbstractMobileBackAction {
