@@ -151,10 +151,6 @@ public class TableRowForm extends AbstractForm {
       m_rowMapper.exportRowData();
     }
 
-    @Override
-    protected void execFinally() throws ProcessingException {
-      m_rowMapper.importRowData();
-    }
   }
 
   private void handleRowDeleted() {
