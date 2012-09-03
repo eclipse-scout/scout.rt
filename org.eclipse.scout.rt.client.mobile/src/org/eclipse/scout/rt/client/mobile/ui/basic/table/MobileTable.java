@@ -121,9 +121,12 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
       return IRowSummaryColumn.DRILL_DOWN_STYLE_NONE;
     }
 
-    //Check if the original table already has a selection behavior implemented. If yes, use the drill down button style to not break the original selection behavior.
-    if (!(getOriginalTable() instanceof IMobileTable) && ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "execRowsSelected", new Class[]{ITableRow[].class}, getOriginalTable().getClass())) {
-      return IRowSummaryColumn.DRILL_DOWN_STYLE_BUTTON;
+    //Check if the original table already has a selection or click behavior implemented. If yes, use the drill down button style to not break the original selection or click behavior.
+    if (!(getOriginalTable() instanceof IMobileTable)) {
+      if (ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "execRowsSelected", new Class[]{ITableRow[].class}, getOriginalTable().getClass()) ||
+          ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "execRowClick", new Class[]{ITableRow.class}, getOriginalTable().getClass())) {
+        return IRowSummaryColumn.DRILL_DOWN_STYLE_BUTTON;
+      }
     }
 
     return IRowSummaryColumn.DRILL_DOWN_STYLE_ICON;
