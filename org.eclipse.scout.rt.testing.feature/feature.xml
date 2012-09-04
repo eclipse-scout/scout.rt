@@ -44,14 +44,6 @@ BSI Business Systems Integration AG - initial API and implementation
    </requires>
 
    <plugin
-         id="org.eclipse.scout.rt.extension.client.test.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.scout.rt.testing.server"
          download-size="0"
          install-size="0"
