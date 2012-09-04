@@ -20,11 +20,10 @@
     <version>3.9.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.eclipse.scout.rt-feature</groupId>
-  <artifactId>org.eclipse.scout.rt.rap</artifactId>
+  <artifactId>org.eclipse.scout.rt</artifactId>
   <packaging>eclipse-feature</packaging>
 
-  <name>Eclipse Scout RAP Runtime Feature</name>
+  <name>Eclipse Scout Runtime Feature</name>
 
   <build>
     <plugins>
@@ -41,6 +40,8 @@
             <configuration>
               <excludes>
                 <plugin id="org.eclipse.scout.rt.feature.about" />
+                <plugin id="org.apache.derby.jdbc_1053.fragment" />
+                <plugin id="org.apache.derby.jdbc_1082.fragment" />
               </excludes>
             </configuration>
           </execution>
@@ -61,4 +62,5 @@
       </plugin>
     </plugins>
   </build>
+  <groupId>org.eclipse.scout.rt.feature</groupId>
 </project>

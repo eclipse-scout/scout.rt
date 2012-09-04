@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.scout.rt.testing.feature"
+      id="org.eclipse.scout.rt.testing"
       label="%featureName"
       version="3.9.0.qualifier"
       provider-name="%providerName"
@@ -24,7 +24,7 @@
    </url>
 
    <requires>
-      <import feature="org.eclipse.scout.rt.feature" version="3.9.0.qualifier"/>
+      <import feature="org.eclipse.scout.rt" version="3.9.0.qualifier"/>
       <import plugin="org.junit4"/>
       <import plugin="org.easymock"/>
       <import plugin="org.apache.ant"/>

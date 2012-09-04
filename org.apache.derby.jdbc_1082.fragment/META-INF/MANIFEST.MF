@@ -102,5 +102,6 @@ Export-Package: org.apache.derby.authentication,
  org.apache.derby.security,
  org.apache.derby.tools,
  org.apache.derby.vti
+Eclipse-BundleShape: dir
 Fenix-Unpack: true
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

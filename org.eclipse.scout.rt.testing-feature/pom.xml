@@ -20,7 +20,7 @@
     <version>3.9.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.eclipse.scout.rt.testing.feature</artifactId>
+  <artifactId>org.eclipse.scout.rt.testing</artifactId>
   <packaging>eclipse-feature</packaging>
 
   <name>Eclipse Scout Runtime Testing Feature</name>
@@ -60,4 +60,5 @@
       </plugin>
     </plugins>
   </build>
+  <groupId>org.eclipse.scout.rt.feature</groupId>
 </project>
