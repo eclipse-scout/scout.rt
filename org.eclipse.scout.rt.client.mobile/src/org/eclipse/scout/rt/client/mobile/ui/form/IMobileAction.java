@@ -8,19 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.ui.action;
+package org.eclipse.scout.rt.client.mobile.ui.form;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
-public class MainBoxActionButton extends ActionWrappingButton {
+/**
+ * @since 3.9.0
+ */
+public interface IMobileAction extends IMenu {
 
-  public MainBoxActionButton(IAction action) {
-    super(action);
-  }
+  String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
 
-  @Override
-  protected boolean getConfiguredProcessButton() {
-    return true;
-  }
+  int HORIZONTAL_ALIGNMENT_LEFT = -1;
+  int HORIZONTAL_ALIGNMENT_RIGHT = 1;
 
+  int getHorizontalAlignment();
+
+  /**
+   * @param alignment
+   *          negative for left and positive for right alignment
+   */
+  void setHorizontalAlignment(int alignment);
 }
