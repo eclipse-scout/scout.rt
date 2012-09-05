@@ -10,10 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.action;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.mobile.ui.form.IMobileAction;
+import org.eclipse.scout.rt.client.mobile.ui.form.outline.AutoLeafPageWithNodes;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
 /**
@@ -21,10 +26,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
  */
 public class ActionButtonBarUtility {
 
-  public static List<IMenu> convertButtonsToActions(IButton[] buttons) {
-    List<IMenu> menuList = new LinkedList<IMenu>();
+  public static List<IMobileAction> convertButtonsToActions(IButton[] buttons) {
+    List<IMobileAction> menuList = new LinkedList<IMobileAction>();
     for (IButton button : buttons) {
-      IMenu action = convertButtonToAction(button);
+      IMobileAction action = convertButtonToAction(button);
       if (action != null) {
         menuList.add(action);
       }
@@ -33,7 +38,7 @@ public class ActionButtonBarUtility {
     return menuList;
   }
 
-  public static IMenu convertButtonToAction(IButton button) {
+  public static IMobileAction convertButtonToAction(IButton button) {
     if (button == null) {
       return null;
     }
@@ -62,19 +67,21 @@ public class ActionButtonBarUtility {
     }
   }
 
-  public static List<IButton> convertActionsToMainButtons(IMenu[] actions) {
-    List<IButton> buttons = new LinkedList<IButton>();
-    if (actions == null) {
-      return buttons;
+  /**
+   * Fetches the actions of the given page (tree node and table row menus).
+   */
+  public static List<IMenu> fetchPageActions(IPage page) {
+    List<IMenu> pageActions = new LinkedList<IMenu>();
+
+    //Fetch the menus of the given page (getUIFacade().fireNodePopupFromUI() is not possible since the selected node may not the same as the given page)
+    pageActions.addAll(Arrays.asList(page.getTree().fetchMenusForNodesInternal(new ITreeNode[]{page})));
+    if (page instanceof AutoLeafPageWithNodes) {
+      //AutoLeafPage has no parent so the table row actions are not fetched by the regular way (see AbstractOutline#P_OutlineListener).
+      //Instead we directly fetch the table row actions
+      pageActions.addAll(Arrays.asList(((AutoLeafPageWithNodes) page).getTableRow().getTable().getUIFacade().fireRowPopupFromUI()));
     }
 
-    for (IMenu action : actions) {
-      if (!action.isSeparator()) {
-        MainBoxActionButton button = new MainBoxActionButton(action);
-        buttons.add(button);
-      }
-    }
-
-    return buttons;
+    return pageActions;
   }
+
 }

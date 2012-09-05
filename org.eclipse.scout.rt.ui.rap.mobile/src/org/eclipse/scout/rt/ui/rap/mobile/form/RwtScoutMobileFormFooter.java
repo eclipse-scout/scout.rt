@@ -10,15 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
+import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileAction;
+import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.FormFooterActionFetcher;
+import org.eclipse.scout.rt.client.mobile.ui.form.IActionFetcher;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.rap.mobile.action.AbstractRwtScoutActionBar;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormFooter;
 import org.eclipse.swt.SWT;
@@ -31,14 +35,13 @@ public class RwtScoutMobileFormFooter extends AbstractRwtScoutActionBar<IForm> i
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutMobileFormFooter.class);
   private static final String VARIANT_FORM_FOOTER = "mobileFormFooter";
 
-  private List<IMenu> m_leftBarActions;
+  private List<IMenu> m_actions;
 
   @Override
   protected void initializeUi(Composite parent) {
     setMenuOpeningDirection(SWT.UP);
-    if (getScoutObject().getRootGroupBox().getCustomProcessButtonCount() > 0) {
-      m_leftBarActions = createLeftBarActions();
-    }
+
+    m_actions = fetchActions();
 
     super.initializeUi(parent);
 
@@ -47,22 +50,56 @@ public class RwtScoutMobileFormFooter extends AbstractRwtScoutActionBar<IForm> i
 
   @Override
   protected void collectMenusForLeftButtonBar(final List<IMenu> menuList) {
-    if (m_leftBarActions != null && m_leftBarActions.size() > 0) {
-      menuList.addAll(m_leftBarActions);
+    if (m_actions == null) {
+      return;
+
+    }
+
+    for (IMenu action : m_actions) {
+      if (AbstractMobileAction.getHorizontalAlignment(action) < 0) {
+        menuList.add(action);
+      }
     }
   }
 
-  protected List<IMenu> convertCustomProcessButtons() {
-    IButton[] customProcessButtons = getScoutObject().getRootGroupBox().getCustomProcessButtons();
-    if (customProcessButtons == null || customProcessButtons.length == 0) {
-      return null;
+  @Override
+  protected void collectMenusForRightButtonBar(List<IMenu> menuList) {
+    if (m_actions == null) {
+      return;
+
     }
 
-    return ActionButtonBarUtility.convertButtonsToActions(getScoutObject().getRootGroupBox().getCustomProcessButtons());
+    for (IMenu action : m_actions) {
+      if (AbstractMobileAction.getHorizontalAlignment(action) > 0) {
+        menuList.add(action);
+      }
+    }
   }
 
-  protected List<IMenu> createLeftBarActions() {
-    return convertCustomProcessButtons();
-  }
+  public List<IMenu> fetchActions() {
+    final List<IMenu> actionList = new LinkedList<IMenu>();
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        IActionFetcher actionFetcher = AbstractMobileForm.getFooterActionFetcher(getScoutObject());
+        if (actionFetcher == null) {
+          actionFetcher = new FormFooterActionFetcher(getScoutObject());
+        }
+        List<IMenu> actions = actionFetcher.fetch();
+        if (actions != null) {
+          actionList.addAll(actions);
+        }
+      }
+    };
 
+    JobEx job = getUiEnvironment().invokeScoutLater(t, 5000);
+    try {
+      job.join(2000);
+    }
+    catch (InterruptedException ex) {
+      LOG.warn("Exception occured while collecting menus.", ex);
+    }
+
+    return actionList;
+  }
 }

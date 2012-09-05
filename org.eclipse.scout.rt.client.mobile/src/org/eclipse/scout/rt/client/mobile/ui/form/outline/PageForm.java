@@ -13,18 +13,17 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.DrillDownStyleMap;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.MobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.IActionFetcher;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.AbstractMobileTableField;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageDetailFormField;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageTableGroupBox;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageForm.MainBox.PageTableGroupBox.PageTableField;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -144,20 +143,23 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     return null;
   }
 
+  @Override
+  protected IActionFetcher createHeaderActionFetcher() {
+    return new PageFormHeaderActionFetcher(this);
+  }
+
+  @Override
+  protected IActionFetcher createFooterActionFetcher() {
+    return new PageFormFooterActionFetcher(this);
+  }
+
   private void initMainButtons() throws ProcessingException {
     List<IButton> buttonList = new LinkedList<IButton>();
-    if (m_page.getTree().isTreeChanging()) {
-      //FIXME CGU Since actions are fetched by a tree event the event will be postponed if tree changing is set to true -> no menus returned.
-      LOG.warn("Actions might be incomplete for page " + m_page);
-    }
-    buttonList.addAll(fetchNodeActionsAndConvertToButtons());
 
+    //Add buttons of the detail form to the main box
     if (m_page.getDetailForm() != null) {
-      //Buttons of the auto table form are the same as the node actions, so only the buttons of regular detail forms are added
-      if (!(m_page.getDetailForm() instanceof TableRowForm) || m_page instanceof AutoLeafPageWithNodes) {
-        IButton[] detailFormCustomButtons = m_page.getDetailForm().getRootGroupBox().getCustomProcessButtons();
-        buttonList.addAll(Arrays.asList(detailFormCustomButtons));
-      }
+      IButton[] detailFormCustomButtons = m_page.getDetailForm().getRootGroupBox().getCustomProcessButtons();
+      buttonList.addAll(Arrays.asList(detailFormCustomButtons));
     }
 
     m_mainboxButtons = buttonList;
@@ -222,20 +224,6 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
 
     return PageFormManager.isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), tableRow));
-  }
-
-  private List<IButton> fetchNodeActionsAndConvertToButtons() throws ProcessingException {
-    IMenu[] nodeActions = m_page.getTree().getUIFacade().fireNodePopupFromUI();
-    List<IMenu> nodeActionList = new LinkedList<IMenu>();
-
-    //Remove separators
-    for (IMenu action : nodeActions) {
-      if (!action.isSeparator()) {
-        nodeActionList.add(action);
-      }
-    }
-
-    return ActionButtonBarUtility.convertActionsToMainButtons(nodeActionList.toArray(new IMenu[nodeActionList.size()]));
   }
 
   public void formAddedNotify() throws ProcessingException {
