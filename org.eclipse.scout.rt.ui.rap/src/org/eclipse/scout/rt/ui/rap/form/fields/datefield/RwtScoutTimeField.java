@@ -376,7 +376,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().setDateTimeFromUI(newDate);
+            getScoutObject().getUIFacade().setTimeFromUI(newDate);
           }
         };
         getUiEnvironment().invokeScoutLater(t, 0);
@@ -397,14 +397,14 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     Object[] shellListeners = ShellEvent.getListeners(m_timeChooserDialog.getShell());
     for (Object object : shellListeners) {
       if (object.getClass().isInstance(this)
-            || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
         m_timeChooserDialog.getShell().removeShellListener((ShellListener) object);
       }
     }
     Object[] disposeListeners = DisposeEvent.getListeners(m_timeChooserDialog.getShell());
     for (Object object : disposeListeners) {
       if (object.getClass().isInstance(this)
-            || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
         m_timeChooserDialog.getShell().removeDisposeListener((DisposeListener) object);
       }
     }
@@ -461,15 +461,10 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
         && getUiField().getEditable()
         && getUiField().isVisible()) {
       if (level >= 0) {
-        final String newDisplayText = getUiField().getText();
         // notify Scout
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            // store current (possibly changed) value
-            if (!CompareUtility.equals(newDisplayText, getScoutObject().getDisplayText())) {
-              getScoutObject().getUIFacade().setDateTimeTextFromUI(newDisplayText);
-            }
             getScoutObject().getUIFacade().fireTimeShiftActionFromUI(level, value);
           }
         };
