@@ -426,14 +426,14 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     Object[] shellListeners = ShellEvent.getListeners(m_dateChooserDialog.getShell());
     for (Object object : shellListeners) {
       if (object.getClass().isInstance(this)
-            || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
         m_dateChooserDialog.getShell().removeShellListener((ShellListener) object);
       }
     }
     Object[] disposeListeners = DisposeEvent.getListeners(m_dateChooserDialog.getShell());
     for (Object object : disposeListeners) {
       if (object.getClass().isInstance(this)
-            || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
         m_dateChooserDialog.getShell().removeDisposeListener((DisposeListener) object);
       }
     }
@@ -466,15 +466,10 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
         && getUiField().getEditable()
         && getUiField().isVisible()) {
       if (level >= 0) {
-        final String newDisplayText = getUiField().getText();
         // notify Scout
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            // store current (possibly changed) value
-            if (!CompareUtility.equals(newDisplayText, getScoutObject().getDisplayText())) {
-              getScoutObject().getUIFacade().setDateTimeTextFromUI(newDisplayText);
-            }
             getScoutObject().getUIFacade().fireDateShiftActionFromUI(level, value);
           }
         };
