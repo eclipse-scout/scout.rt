@@ -58,8 +58,6 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
 
   public String getURL() {
     StringBuffer url = new StringBuffer();
-    url.append(RWT.getRequest().getContextPath());
-    url.append(RWT.getRequest().getServletPath());
     url.append("?");
     url.append(IServiceHandler.REQUEST_PARAM);
     url.append("=");
