@@ -4,3 +4,8 @@
 *.jar
 *.war
 *.ear
+*.zip
+
+# Eclipse #
+bin/
+classes/
