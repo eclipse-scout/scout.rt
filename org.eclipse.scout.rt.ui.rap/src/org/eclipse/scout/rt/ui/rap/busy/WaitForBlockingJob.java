@@ -134,4 +134,8 @@ public class WaitForBlockingJob extends BusyJob {
     return part != null && !part.getClass().getSimpleName().contains("Popup");
   }
 
+  protected List<IRwtScoutPart> getParts() {
+    return m_parts;
+  }
+
 }

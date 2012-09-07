@@ -2169,7 +2169,11 @@ Text {
 Composite.form {
   background-color: #ebf4f8;
 }
-/* ToolBar at the moment only used for busy decoration */
-ToolBar {
-  font: 12px Arial, Helvetica, sans-serif;
+Shell.busy-dialog {
+  border-radius: 3px;
+  border: 1px solid #3a7597;
+  background-color: #67a8ce;
+}
+Label.busy-dialog {
+  color: white;
 }
