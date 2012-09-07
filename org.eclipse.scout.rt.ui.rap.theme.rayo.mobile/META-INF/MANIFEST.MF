@@ -5,3 +5,4 @@ Bundle-SymbolicName: org.eclipse.scout.rt.ui.rap.theme.rayo.mobile;singleton:=tr
 Bundle-Version: 3.9.0.qualifier
 Fragment-Host: org.eclipse.scout.rt.ui.rap.theme.rayo;bundle-version="3.9.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Eclipse Scout Project

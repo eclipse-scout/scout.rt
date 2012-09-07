@@ -14,11 +14,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
@@ -28,7 +27,6 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   private DrillDownStyleMap m_drillDownStyleMap;
   private int m_tableRowFormDisplayHint;
   private String m_tableRowFormDisplayViewId;
-  private FormListener m_clearSelectionFormListener;
 
   public AbstractMobileTable() {
     this(true);
@@ -44,6 +42,7 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
 
     m_drillDownStyleMap = new DrillDownStyleMap();
     setAutoCreateTableRowForm(execIsAutoCreateTableRowForm());
+    setDefaultDrillDownStyle(execComputeDrillDownStyle());
   }
 
   @Override
@@ -54,6 +53,16 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   @Override
   public void setAutoCreateTableRowForm(boolean autoCreateTableRowForm) {
     propertySupport.setPropertyBool(PROP_AUTO_CREATE_TABLE_ROW_FORM, autoCreateTableRowForm);
+  }
+
+  @Override
+  public String getDefaultDrillDownStyle() {
+    return propertySupport.getPropertyString(PROP_DEFAULT_DRILL_DOWN_STYLE);
+  }
+
+  @Override
+  public void setDefaultDrillDownStyle(String defaultDrillDownStyle) {
+    propertySupport.setPropertyString(PROP_DEFAULT_DRILL_DOWN_STYLE, defaultDrillDownStyle);
   }
 
   public void putDrillDownStyle(ITableRow row, String drillDownStyle) {
@@ -101,33 +110,23 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     return true;
   }
 
+  protected String execComputeDrillDownStyle() {
+    if (isCheckable()) {
+      return IRowSummaryColumn.DRILL_DOWN_STYLE_NONE;
+    }
+
+    return IRowSummaryColumn.DRILL_DOWN_STYLE_ICON;
+  }
+
   protected void startTableRowForm(ITableRow row) throws ProcessingException {
     TableRowForm form = new TableRowForm(row);
     form.setDisplayHint(getTableRowFormDisplayHint());
     form.setDisplayViewId(getTableRowFormDisplayViewId());
     form.setModal(IForm.DISPLAY_HINT_DIALOG == form.getDisplayHint());
     form.start();
-    form.addFormListener(getClearSelectionFormListener());
-  }
-
-  /**
-   * Returns a form listener which clears the selection on form closed if it is attached to a form.
-   */
-  protected FormListener getClearSelectionFormListener() {
-    if (m_clearSelectionFormListener == null) {
-      m_clearSelectionFormListener = new FormListener() {
-
-        @Override
-        public void formChanged(FormEvent e) throws ProcessingException {
-          if (FormEvent.TYPE_CLOSED == e.getType()) {
-            clearSelection();
-          }
-        }
-
-      };
+    if (IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(getDrillDownStyle(row))) {
+      form.addFormListener(new ClearTableSelectionFormCloseListener(this));
     }
-
-    return m_clearSelectionFormListener;
   }
 
   protected void clearSelectionDelayed() {

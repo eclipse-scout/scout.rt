@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.tablefield.RwtScoutTableField;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutActionBar;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutMobileTableField extends RwtScoutTableField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutMobileTableField.class);

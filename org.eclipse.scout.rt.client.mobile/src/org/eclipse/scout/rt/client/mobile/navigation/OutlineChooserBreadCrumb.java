@@ -31,8 +31,8 @@ public class OutlineChooserBreadCrumb extends BreadCrumb {
 
     //Clear any outline selection to make sure drill down works as expected again and again
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-    if (desktop.getOutline() != null) {
-      desktop.getOutline().selectNode(null);
+    for (IOutline outline : desktop.getAvailableOutlines()) {
+      outline.selectNode(null);
     }
     desktop.setOutline((IOutline) null);
   }

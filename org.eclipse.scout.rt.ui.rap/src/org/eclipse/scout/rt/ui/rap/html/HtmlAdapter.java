@@ -94,8 +94,7 @@ public class HtmlAdapter {
         String imageName = m.group(3);
         String location = resolveImageResourceName(imageName);
         if (location != null) {
-          String imageUrl = getImageUrl(location);
-          rawHtml = rawHtml.replace(m.group(1) + cidMarker + imageName + m.group(4), m.group(1) + imageUrl + m.group(4));
+          rawHtml = rawHtml.replace(m.group(1) + cidMarker + imageName + m.group(4), m.group(1) + location + m.group(4));
         }
         else {
           LOG.warn("Image resource name could not be resolved. Image: " + imageName);
@@ -108,10 +107,6 @@ public class HtmlAdapter {
     }
 
     return rawHtml;
-  }
-
-  protected String getImageUrl(String location) {
-    return RWT.getRequest().getContextPath() + "/" + location;
   }
 
   @SuppressWarnings("restriction")

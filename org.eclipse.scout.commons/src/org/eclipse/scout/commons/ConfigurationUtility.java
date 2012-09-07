@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
 
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -63,11 +64,24 @@ public final class ConfigurationUtility {
   }
 
   /**
-   * Sorts the elements according to their {@link Order} annotation.
-   * <p>
-   * If one of the objects is not annotated with {@link Order}, its index in the list is used as order value.
+   * @deprecated use {@link #sortByOrder(Collection)} instead.
    */
+  @Deprecated
   public static <T> Collection<T> sortByOrderAnnotation(Collection<T> list) {
+    return sortByOrder(list);
+  }
+
+  /**
+   * Sorts the elements according to their order:
+   * <ol>
+   * <li>If an {@link Order} annotation is available, its {@link Order#value()} is used</li>
+   * <li>If the object implements {@link IOrdered}, {@link IOrdered#getOrder()} is used.</li>
+   * <li>Finally, the index in the original collection is used</li>
+   * </ol>
+   * 
+   * @since 3.8.1
+   */
+  public static <T> Collection<T> sortByOrder(Collection<T> list) {
     if (list == null) {
       return null;
     }
@@ -75,25 +89,29 @@ public final class ConfigurationUtility {
     int index = 0;
     for (T element : list) {
       Class<?> c = element.getClass();
+      double order;
       if (c.isAnnotationPresent(Order.class)) {
-        Order order = c.getAnnotation(Order.class);
-        sortMap.put(new CompositeObject(order.value(), index), element);
+        order = c.getAnnotation(Order.class).value();
+      }
+      else if (element instanceof IOrdered) {
+        order = ((IOrdered) element).getOrder();
       }
       else {
-        sortMap.put(new CompositeObject((double) index, index), element);
+        order = (double) index;
       }
+      sortMap.put(new CompositeObject(order, index), element);
       index++;
     }
     return sortMap.values();
   }
 
   /**
-   * Filters the given class array and returns the first occurence of an
-   * instantiatable class of filter
+   * Filters the given class array and returns the first occurrence of an
+   * instantiable class of filter
    * 
    * @param classes
    * @param filter
-   * @return first occurence of filter, might be annotated with {@link InjectFieldTo}
+   * @return first occurrence of filter, might be annotated with {@link InjectFieldTo}
    */
   @SuppressWarnings("unchecked")
   public static <T> Class<T> filterClass(Class[] classes, Class<T> filter) {
@@ -107,7 +125,8 @@ public final class ConfigurationUtility {
 
   /**
    * same as {@link #filterClass(Class[], Class)} but ignoring classes with {@link InjectFieldTo} annotation
-   * @since 3.9
+   * 
+   * @since 3.8.1
    */
   @SuppressWarnings("unchecked")
   public static <T> Class<T> filterClassIgnoringInjectFieldAnnotation(Class[] classes, Class<T> filter) {
@@ -122,13 +141,13 @@ public final class ConfigurationUtility {
   }
 
   /**
-   * Filters the given class array and returns all occurences of instantiatable
+   * Filters the given class array and returns all occurrences of instantiable
    * classes of filter
-   * @since 3.9
    * 
    * @param classes
    * @param filter
-   * @return all occurences of filter
+   * @return all occurrences of filter
+   * @since 3.8.1
    */
   @SuppressWarnings("unchecked")
   public static <T> Class<T>[] filterClasses(Class[] classes, Class<T> filter) {
@@ -143,7 +162,8 @@ public final class ConfigurationUtility {
 
   /**
    * same as {@link #filterClasses(Class[], Class)} but ignoring classes with {@link InjectFieldTo} annotation
-   * @since 3.9
+   * 
+   * @since 3.8.1
    */
   @SuppressWarnings("unchecked")
   public static <T> Class<T>[] filterClassesIgnoringInjectFieldAnnotation(Class[] classes, Class<T> filter) {
@@ -160,7 +180,8 @@ public final class ConfigurationUtility {
 
   /**
    * same as {@link #filterClasses(Class[], Class)} but only accepting classes with {@link InjectFieldTo} annotation
-   * @since 3.9
+   * 
+   * @since 3.8.1
    */
   @SuppressWarnings("unchecked")
   public static <T> Class<T>[] filterClassesWithInjectFieldAnnotation(Class[] classes, Class<T> filter) {

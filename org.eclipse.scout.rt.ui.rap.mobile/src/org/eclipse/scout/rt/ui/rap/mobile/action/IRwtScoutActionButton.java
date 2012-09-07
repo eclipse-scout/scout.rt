@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.swt.SWT;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public interface IRwtScoutActionButton extends IRwtScoutComposite<IAction> {
 

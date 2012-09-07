@@ -28,11 +28,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutTableActionBar extends AbstractRwtScoutActionBar<ITableField<? extends ITable>> {
-  private static final String VARIANT_ACTION_BAR_CONTAINER = "mobileTableActionBarContainer";
-
   private P_TableRowSelectionListener m_rowSelectionListener;
   private ITable m_table;
 
@@ -92,11 +90,6 @@ public class RwtScoutTableActionBar extends AbstractRwtScoutActionBar<ITableFiel
   @Override
   protected void collectMenusForRightButtonBar(List<IMenu> menuList) {
 
-  }
-
-  @Override
-  protected String getActionBarContainerVariant() {
-    return VARIANT_ACTION_BAR_CONTAINER;
   }
 
   @Override

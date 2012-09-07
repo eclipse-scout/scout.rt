@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.datefield.RwtScoutDateTimeComposi
 import org.eclipse.scout.rt.ui.rap.form.fields.datefield.RwtScoutTimeField;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutMobileDateTimeCompositeField extends RwtScoutDateTimeCompositeField {
 

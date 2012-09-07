@@ -15,13 +15,13 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.PropertyDelegator;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 
-public class TablePropertyDelegator<T extends ITable> extends PropertyDelegator<T, T> {
+public class TablePropertyDelegator<SENDER extends ITable, RECEIVER extends ITable> extends PropertyDelegator<SENDER, RECEIVER> {
 
-  public TablePropertyDelegator(T sender, T receiver) {
+  public TablePropertyDelegator(SENDER sender, RECEIVER receiver) {
     super(sender, receiver);
   }
 
-  public TablePropertyDelegator(T sender, T receiver, Set<String> filteredPropertyNames) {
+  public TablePropertyDelegator(SENDER sender, RECEIVER receiver, Set<String> filteredPropertyNames) {
     super(sender, receiver, filteredPropertyNames);
   }
 

@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
  * 
  * @since 3.9.0
  */
-public class AbstractExtensibleMenu extends AbstractMenu implements IExtensibleScoutObject {
+public abstract class AbstractExtensibleMenu extends AbstractMenu implements IExtensibleScoutObject {
 
   public AbstractExtensibleMenu() {
     super();

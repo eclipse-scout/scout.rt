@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class MobileSmartTableForm extends SmartTableForm {
   private P_FormListener m_formListener;

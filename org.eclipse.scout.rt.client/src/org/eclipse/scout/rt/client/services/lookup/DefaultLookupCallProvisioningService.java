@@ -8,19 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.ui.action;
+package org.eclipse.scout.rt.client.services.lookup;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.service.AbstractService;
 
-public class MainBoxActionButton extends ActionWrappingButton {
-
-  public MainBoxActionButton(IAction action) {
-    super(action);
-  }
+/**
+ * @since 3.8.1
+ */
+@Priority(-1)
+public class DefaultLookupCallProvisioningService extends AbstractService implements ILookupCallProvisioningService {
 
   @Override
-  protected boolean getConfiguredProcessButton() {
-    return true;
+  public LookupCall newClonedInstance(LookupCall templateCall, IProvisioningContext context) {
+    return (LookupCall) templateCall.clone();
   }
 
 }

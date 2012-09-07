@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.form;
 import org.eclipse.scout.rt.ui.rap.form.RwtScoutForm;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutMobileForm extends RwtScoutForm {
 

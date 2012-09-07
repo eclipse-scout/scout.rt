@@ -28,6 +28,10 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
     m_tableRow = row;
   }
 
+  public ITableRow getTableRow() {
+    return m_tableRow;
+  }
+
   @Override
   protected void execInitPage() throws ProcessingException {
     Cell cell = getCellForUpdate();

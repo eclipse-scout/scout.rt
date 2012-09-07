@@ -223,8 +223,6 @@ public class BrowserExtension {
       String localUrl = m.group(2);
       String externalKey = "" + generatedMappings.size();
       StringBuilder urlBuf = new StringBuilder();
-      urlBuf.append(RWT.getRequest().getContextPath());
-      urlBuf.append(RWT.getRequest().getServletPath());
       urlBuf.append("?");
       urlBuf.append(IServiceHandler.REQUEST_PARAM);
       urlBuf.append("=");

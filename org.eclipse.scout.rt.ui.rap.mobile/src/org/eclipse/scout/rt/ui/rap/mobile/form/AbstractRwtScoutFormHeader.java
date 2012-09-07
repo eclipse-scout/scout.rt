@@ -10,7 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.FormHeaderActionFetcher;
+import org.eclipse.scout.rt.client.mobile.ui.form.IActionFetcher;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.mobile.action.AbstractRwtScoutActionBar;
 import org.eclipse.scout.rt.ui.rap.mobile.action.ActionButtonBar;
@@ -18,10 +28,10 @@ import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class AbstractRwtScoutFormHeader extends AbstractRwtScoutActionBar<IForm> implements IRwtScoutFormHeader {
-
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtScoutFormHeader.class);
   private static final String VARIANT_FORM_HEADER = "mobileFormHeader";
 
   @Override
@@ -61,5 +71,32 @@ public class AbstractRwtScoutFormHeader extends AbstractRwtScoutActionBar<IForm>
     if (name.equals(IForm.PROP_TITLE)) {
       setTitle((String) newValue);
     }
+  }
+
+  public List<IMenu> fetchActions() {
+    final List<IMenu> actionList = new LinkedList<IMenu>();
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        IActionFetcher actionFetcher = AbstractMobileForm.getHeaderActionFetcher(getScoutObject());
+        if (actionFetcher == null) {
+          actionFetcher = new FormHeaderActionFetcher(getScoutObject());
+        }
+        List<IMenu> actions = actionFetcher.fetch();
+        if (actions != null) {
+          actionList.addAll(actions);
+        }
+      }
+    };
+
+    JobEx job = getUiEnvironment().invokeScoutLater(t, 5000);
+    try {
+      job.join(2000);
+    }
+    catch (InterruptedException ex) {
+      LOG.warn("Exception occured while collecting menus.", ex);
+    }
+
+    return actionList;
   }
 }

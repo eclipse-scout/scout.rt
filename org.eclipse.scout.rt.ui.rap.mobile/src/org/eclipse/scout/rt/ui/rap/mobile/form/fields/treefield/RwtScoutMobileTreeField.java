@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.treefield.RwtScoutTreeField;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutActionBar;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutMobileTreeField extends RwtScoutTreeField {
 

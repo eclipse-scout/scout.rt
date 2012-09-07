@@ -420,7 +420,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
     }
-    m_availableOutlines = ConfigurationUtility.sortByOrderAnnotation(outlineList).toArray(new IOutline[outlineList.size()]);
+    m_availableOutlines = ConfigurationUtility.sortByOrder(outlineList).toArray(new IOutline[outlineList.size()]);
     //actions (keyStroke, menu, viewButton, toolButton)
     ArrayList<IAction> actionList = new ArrayList<IAction>();
     if (extensions != null) {
@@ -447,11 +447,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
     //build completed menu, viewButton, toolButton arrays
     List<IMenu> menuList = new ActionFinder().findActions(actionList, IMenu.class, false); // only top level menus
-    m_menus = ConfigurationUtility.sortByOrderAnnotation(menuList).toArray(new IMenu[menuList.size()]);
+    m_menus = ConfigurationUtility.sortByOrder(menuList).toArray(new IMenu[menuList.size()]);
     List<IViewButton> viewButtonList = new ActionFinder().findActions(actionList, IViewButton.class, false);
-    m_viewButtons = ConfigurationUtility.sortByOrderAnnotation(viewButtonList).toArray(new IViewButton[viewButtonList.size()]);
+    m_viewButtons = ConfigurationUtility.sortByOrder(viewButtonList).toArray(new IViewButton[viewButtonList.size()]);
     List<IToolButton> toolButtonList = new ActionFinder().findActions(actionList, IToolButton.class, false);
-    m_toolButtons = ConfigurationUtility.sortByOrderAnnotation(toolButtonList).toArray(new IToolButton[toolButtonList.size()]);
+    m_toolButtons = ConfigurationUtility.sortByOrder(toolButtonList).toArray(new IToolButton[toolButtonList.size()]);
     //add dynamic keyStrokes
     List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class, true);
     addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
@@ -1546,7 +1546,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     // gather tool button forms
     for (IToolButton toolButton : getToolButtons()) {
       if (toolButton instanceof AbstractFormToolButton) {
-        AbstractFormToolButton formToolButton = (AbstractFormToolButton) toolButton;
+        AbstractFormToolButton<?> formToolButton = (AbstractFormToolButton<?>) toolButton;
         IForm form = formToolButton.getForm();
         if (form != null) {
           openForms.add(form);

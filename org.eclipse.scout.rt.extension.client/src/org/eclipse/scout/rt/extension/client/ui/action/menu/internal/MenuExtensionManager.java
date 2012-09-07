@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.extension.client.internal.AbstractExtensionManager;
@@ -73,6 +74,8 @@ public class MenuExtensionManager extends AbstractExtensionManager {
   }
 
   private <T> List<T> getExtensions(Map<Class<?>, List<T>> extensions, Class<?> anchorType) {
+    ensureStarted();
+    //
     List<T> allMatchingExtensions = new LinkedList<T>();
     // add by anchor type
     List<T> extensionsByAnchorType = extensions.get(anchorType);
@@ -165,6 +168,7 @@ public class MenuExtensionManager extends AbstractExtensionManager {
     anchorConfigurations.put("formField", IFormField.class);
     anchorConfigurations.put("parentMenu", IMenu.class);
     anchorConfigurations.put("treeNode", ITreeNode.class);
+    anchorConfigurations.put("desktop", IDesktop.class);
     //
     Class<?> anchorType = null;
     Class<?> anchorClass = null;
