@@ -38,6 +38,7 @@ import javax.jms.TopicSubscriber;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -76,6 +77,7 @@ public class JmsTransactionMember extends AbstractTransactionMember {
   public JmsTransactionMember(JmsJndiConfig config) {
     super(new Long(config.getCrc()).toString());
     m_config = config;
+    m_useSecurityCredential = StringUtility.hasText(config.getUserName());
   }
 
   /**
