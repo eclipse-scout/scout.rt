@@ -240,6 +240,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
+   * Interception method used for customizing the default menu. Should be used by the framework only.
+   * 
+   * @since 3.8.1
+   */
+  protected Class<? extends IMenu> getDefaultMenuInternal() {
+    return getConfiguredDefaultMenu();
+  }
+
+  /**
    * Configures whether deleted rows are automatically erased or cached for later processing (service deletion).
    * <p>
    * Subclasses can override this method. Default is {@code false}.
@@ -305,9 +314,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * the {@link AbstractStringColumn#getConfiguredTextWrap()} property to true, the text is wrapped and uses two or more
    * lines.
    * <p>
-   * Subclasses can override this method. Default is {@code false}. If the method is not overridden and at
-   * least one string column has set the {@link AbstractStringColumn#getConfiguredTextWrap()} to true, the multiline
-   * property is set automatically to true.
+   * Subclasses can override this method. Default is {@code false}. If the method is not overridden and at least one
+   * string column has set the {@link AbstractStringColumn#getConfiguredTextWrap()} to true, the multiline property is
+   * set automatically to true.
    * 
    * @return {@code true} if the table supports multiline text, {@code false} otherwise.
    */
@@ -618,7 +627,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @ConfigOperation
   @Order(90)
   protected void execRowAction(ITableRow row) throws ProcessingException {
-    Class<? extends IMenu> defaultMenuType = getConfiguredDefaultMenu();
+    Class<? extends IMenu> defaultMenuType = getDefaultMenuInternal();
     if (defaultMenuType != null) {
       try {
         runMenu(defaultMenuType);
@@ -755,7 +764,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     //add ENTER key stroke when default menu is used or execRowAction has an override
-    Class<? extends IMenu> defaultMenuType = getConfiguredDefaultMenu();
+    Class<? extends IMenu> defaultMenuType = getDefaultMenuInternal();
     if (defaultMenuType != null || ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "execRowAction", new Class[]{ITableRow.class}, this.getClass())) {
       ksList.add(new KeyStroke("ENTER") {
         @Override
@@ -1207,6 +1216,21 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public boolean isCellEditable(ITableRow row, IColumn<?> column) {
     return row != null && column != null && column.isVisible() && column.isCellEditable(row);
+  }
+
+  @Override
+  public Object getProperty(String name) {
+    return propertySupport.getProperty(name);
+  }
+
+  @Override
+  public void setProperty(String name, Object value) {
+    propertySupport.setProperty(name, value);
+  }
+
+  @Override
+  public boolean hasProperty(String name) {
+    return propertySupport.hasProperty(name);
   }
 
   @Override
@@ -2769,6 +2793,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void setTableCustomizer(ITableCustomizer c) {
     m_tableCustomizer = c;
+  }
+
+  @Override
+  public Object getContainer() {
+    return propertySupport.getProperty(PROP_CONTAINER);
+  }
+
+  /**
+   * do not use this internal method unless you are implementing a container that holds and controls an {@link ITable}
+   */
+  public void setContainerInternal(Object container) {
+    propertySupport.setProperty(PROP_CONTAINER, container);
   }
 
   @Override

@@ -23,8 +23,10 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
@@ -157,6 +159,9 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     if (getConfiguredResourceTable() != null) {
       try {
         m_resourceTable = (T) ConfigurationUtility.newInnerInstance(this, getConfiguredResourceTable());
+        if (m_resourceTable instanceof AbstractTable) {
+          ((AbstractTable) m_resourceTable).setContainerInternal(this);
+        }
         m_resourceTable.setEnabled(isEnabled());
       }
       catch (Exception e) {
@@ -178,6 +183,9 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
       }
       catch (Exception e) {
         LOG.warn(null, e);
+      }
+      if (m_activityMap instanceof AbstractActivityMap) {
+        ((AbstractActivityMap) m_activityMap).setContainerInternal(this);
       }
     }
     else {

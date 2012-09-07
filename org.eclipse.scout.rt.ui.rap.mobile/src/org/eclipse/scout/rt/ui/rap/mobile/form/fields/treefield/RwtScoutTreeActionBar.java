@@ -28,7 +28,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @since 3.8.0
+ * @since 3.9.0
  */
 public class RwtScoutTreeActionBar extends AbstractRwtScoutActionBar<ITreeField> {
   private P_TreeNodeSelectionListener m_nodeSelectionListener;

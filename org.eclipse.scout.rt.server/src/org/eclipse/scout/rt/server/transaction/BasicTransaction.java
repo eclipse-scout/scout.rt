@@ -11,7 +11,8 @@
 package org.eclipse.scout.rt.server.transaction;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -22,7 +23,7 @@ public class BasicTransaction implements ITransaction {
 
   private final long m_transactionSequence;
   private final Object m_memberMapLock = new Object();
-  private final HashMap<String, ITransactionMember> m_memberMap = new HashMap<String, ITransactionMember>();
+  private final Map<String, ITransactionMember> m_memberMap = new LinkedHashMap<String, ITransactionMember>();
   private ArrayList<Throwable> m_failures = new ArrayList<Throwable>();
   private boolean m_commitPhase;
   private boolean m_cancelled;

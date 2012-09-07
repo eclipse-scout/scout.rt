@@ -1440,13 +1440,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       visitFields(collector);
       if (collector.getCollectionCount() > 0 && isAskIfNeedSave()) {
         MessageBox messageBox = new MessageBox(
-                null,
-                getCancelVerificationText(),
-                null,
-                TEXTS.get("YesButton"),
-                TEXTS.get("NoButton"),
-                TEXTS.get("CancelButton")
-                );
+            null,
+            getCancelVerificationText(),
+            null,
+            TEXTS.get("YesButton"),
+            TEXTS.get("NoButton"),
+            TEXTS.get("CancelButton")
+            );
         messageBox.setSeverity(IProcessingStatus.INFO);
         int result = messageBox.startMessageBox();
         if (result == IMessageBox.YES_OPTION) {
@@ -1803,14 +1803,26 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return m_blockingCondition.isBlocking();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public Object getCustomProperty(String propName) {
-    return propertySupport.getProperty(propName);
+    return getProperty(propName);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void setCustomProperty(String propName, Object o) {
+    setProperty(propName, o);
   }
 
   @Override
-  public void setCustomProperty(String propName, Object o) {
-    propertySupport.setProperty(propName, o);
+  public Object getProperty(String name) {
+    return propertySupport.getProperty(name);
+  }
+
+  @Override
+  public void setProperty(String name, Object value) {
+    propertySupport.setProperty(name, value);
   }
 
   @Override

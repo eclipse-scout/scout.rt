@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 
@@ -54,6 +55,9 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
     if (getConfiguredCalendar() != null) {
       try {
         m_calendar = (T) ConfigurationUtility.newInnerInstance(this, getConfiguredCalendar());
+        if (m_calendar instanceof AbstractCalendar) {
+          ((AbstractCalendar) m_calendar).setContainerInternal(this);
+        }
         // restore calendar settings
         m_calendar.setDisplayMode(env.getCalendarDisplayMode(ICalendar.DISPLAY_MODE_MONTH));
         m_calendar.setDisplayCondensed(env.getCalendarDisplayCondensed(true));

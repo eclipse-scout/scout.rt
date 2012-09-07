@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.extension.client;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.extension.client.EnclosingObjectFixture.InnerClass.InnerInnerClass;
@@ -93,54 +95,72 @@ public class ExtensionUtilityTest {
   }
 
   @Test
-  public void testprocessReplaceAnnotationsNullAndEmpty() {
+  public void testProcessReplaceAnnotationsNullAndEmpty() {
     // no exceptions
-    ExtensionUtility.processReplaceAnnotations(null);
-    ExtensionUtility.processReplaceAnnotations(Collections.emptyList());
+    Map<Object, Object> replacementMap = ExtensionUtility.processReplaceAnnotations(null);
+    assertNotNull(replacementMap);
+    assertTrue(replacementMap.isEmpty());
+    //
+    replacementMap = ExtensionUtility.processReplaceAnnotations(Collections.emptyList());
+    assertNotNull(replacementMap);
+    assertTrue(replacementMap.isEmpty());
   }
 
   @Test
-  public void testprocessReplaceAnnotationsNoRemoveAnnotation() {
+  public void testProcessReplaceAnnotationsNoRemoveAnnotation() {
     List<Object> list = Arrays.asList(m_a, m_b, m_c);
-    ExtensionUtility.processReplaceAnnotations(list);
+    Map<Object, Object> replacementMap = ExtensionUtility.processReplaceAnnotations(list);
     assertEquals(Arrays.asList(m_a, m_b, m_c), list);
+    assertNotNull(replacementMap);
+    assertTrue(replacementMap.isEmpty());
   }
 
   @Test
-  public void testprocessReplaceAnnotationsSuperclass() {
+  public void testProcessReplaceAnnotationsSuperclass() {
     // m_a is removed
-    ExtensionUtility.processReplaceAnnotations(m_instanceList);
+    Map<Object, Object> replacementMap = ExtensionUtility.processReplaceAnnotations(m_instanceList);
     assertEquals(Arrays.asList(m_aExt, m_b, m_c), m_instanceList);
+    assertNotNull(replacementMap);
+    assertEquals(1, replacementMap.size());
+    assertSame(m_aExt, replacementMap.get(m_a));
 
     // no effect when processing the list a second time
-    ExtensionUtility.processReplaceAnnotations(m_instanceList);
+    replacementMap = ExtensionUtility.processReplaceAnnotations(m_instanceList);
     assertEquals(Arrays.asList(m_aExt, m_b, m_c), m_instanceList);
+    assertNotNull(replacementMap);
+    assertTrue(replacementMap.isEmpty());
   }
 
   @Test
-  public void testprocessReplaceAnnotationsCustomCalss() {
+  public void testProcessReplaceAnnotationsCustomCalss() {
     List<Object> list = new ArrayList<Object>();
     list.add(m_a);
     list.add(m_b);
     list.add(m_c);
     list.add(m_d);
-    ExtensionUtility.processReplaceAnnotations(list);
+    Map<Object, Object> replacementMap = ExtensionUtility.processReplaceAnnotations(list);
     assertEquals(Arrays.asList(m_a, m_c, m_d), list);
+    assertNotNull(replacementMap);
+    assertEquals(1, replacementMap.size());
+    assertSame(m_d, replacementMap.get(m_b));
   }
 
   @Test
-  public void testprocessReplaceAnnotationsAbstractClass1() {
+  public void testProcessReplaceAnnotationsAbstractClass1() {
     P_E1 e1 = new P_E1();
     P_F f = new P_F();
     List<Object> list = new ArrayList<Object>();
     list.add(f);
     list.add(e1);
-    ExtensionUtility.processReplaceAnnotations(list);
+    Map<Object, Object> replacementMap = ExtensionUtility.processReplaceAnnotations(list);
     assertEquals(Arrays.asList(f), list);
+    assertNotNull(replacementMap);
+    assertEquals(1, replacementMap.size());
+    assertSame(f, replacementMap.get(e1));
   }
 
   @Test
-  public void testprocessReplaceAnnotationsAbstractClass2() {
+  public void testProcessReplaceAnnotationsAbstractClass2() {
     P_E1 e1 = new P_E1();
     P_E2 e2 = new P_E2();
     P_F f = new P_F();
@@ -148,17 +168,22 @@ public class ExtensionUtilityTest {
     list.add(e2);
     list.add(f);
     list.add(e1);
-    ExtensionUtility.processReplaceAnnotations(list);
+    Map<Object, Object> replacementMap = ExtensionUtility.processReplaceAnnotations(list);
     assertEquals(Arrays.asList(f, e1), list);
+    assertNotNull(replacementMap);
+    assertEquals(1, replacementMap.size());
+    assertSame(f, replacementMap.get(e2));
   }
 
   @Test
-  public void testprocessReplaceAnnotationsPrimitiveType() {
+  public void testProcessReplaceAnnotationsPrimitiveType() {
     P_G g = new P_G();
     List<Object> list = new ArrayList<Object>();
     list.add(g);
-    ExtensionUtility.processReplaceAnnotations(list);
+    Map<Object, Object> replacementMap = ExtensionUtility.processReplaceAnnotations(list);
     assertEquals(Arrays.asList(g), list);
+    assertNotNull(replacementMap);
+    assertTrue(replacementMap.isEmpty());
   }
 
   @Test

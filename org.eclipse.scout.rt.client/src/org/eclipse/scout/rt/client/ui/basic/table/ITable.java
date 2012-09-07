@@ -27,7 +27,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilte
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 
@@ -101,7 +104,16 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
    * Boolean
    */
   String PROP_SCROLL_TO_SELECTION = "scrollToSelection";
-
+  /**
+   * Object
+   * <p>
+   * Container of this table, {@link IPage}, {@link ITableField}, {@link IListBox}, {@link IPlannerField}
+   * <p>
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * 
+   * @since 3.8.1
+   */
+  String PROP_CONTAINER = "container";
   /**
    * Host for local urls that call back to the table itself and can be handled by overriding
    * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}.
@@ -376,6 +388,21 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   /*
    * Properties observer section
    */
+
+  Object getProperty(String name);
+
+  /**
+   * With this method it's possible to set (custom) properties.
+   * <p>
+   * <b>Important: </b> Although this method is intended to be used for custom properties, it's actually possible to
+   * change main properties as well. Keep in mind that directly changing main properties may result in unexpected
+   * behavior, so do it only if you really know what you are doing. Rather use the officially provided api instead. <br>
+   * Example for an unexpected behavior: setVisible() does not only set the property PROP_VISIBLE but also executes
+   * additional code. This code would NOT be executed by directly setting the property PROP_VISIBLE with setProperty().
+   */
+  void setProperty(String name, Object value);
+
+  boolean hasProperty(String name);
 
   boolean isCheckable();
 
@@ -737,6 +764,15 @@ public interface ITable extends IPropertyObserver, IDNDSupport {
   ITableCustomizer getTableCustomizer();
 
   void setTableCustomizer(ITableCustomizer c);
+
+  /**
+   * Container of this table, {@link IPage}, {@link ITableField}, {@link IListBox}, {@link IPlannerField}
+   * <p>
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * 
+   * @since 3.8.1
+   */
+  Object getContainer();
 
   /**
    * Initialize and reset all columns. This operation removes all columns from the table and adds them as if the table

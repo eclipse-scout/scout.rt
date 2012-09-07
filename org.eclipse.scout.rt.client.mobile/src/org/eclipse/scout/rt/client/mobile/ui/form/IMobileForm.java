@@ -17,8 +17,18 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  */
 public interface IMobileForm extends IForm {
   String PROP_FOOTER_VISIBLE = "footerVisible";
+  String PROP_HEADER_ACTION_FETCHER = "headerActionFetcher";
+  String PROP_FOOTER_ACTION_FETCHER = "footerActionFetcher";
 
   boolean isFooterVisible();
 
   void setFooterVisible(boolean visible);
+
+  IActionFetcher getHeaderActionFetcher();
+
+  void setHeaderActionFetcher(IActionFetcher headerActionFetcher);
+
+  IActionFetcher getFooterActionFetcher();
+
+  void setFooterActionFetcher(IActionFetcher footerActionFetcher);
 }

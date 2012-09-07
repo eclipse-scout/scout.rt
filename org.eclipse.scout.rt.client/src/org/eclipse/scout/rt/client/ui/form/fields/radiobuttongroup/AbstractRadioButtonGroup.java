@@ -28,6 +28,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -245,7 +247,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     // create lookup service call
     m_lookupCall = null;
     if (m_codeTypeClass != null) {
-      m_lookupCall = new CodeLookupCall(m_codeTypeClass);
+      m_lookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
     }
 
     // If no label is configured use the code type's text
@@ -284,7 +286,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     LookupCall call = null;
     // Get the data
     if (getLookupCall() != null) {
-      call = (LookupCall) getLookupCall().clone();
+      call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractRadioButtonGroup.this));
       prepareLookupCall(call);
       data = call.getDataByAll();
     }

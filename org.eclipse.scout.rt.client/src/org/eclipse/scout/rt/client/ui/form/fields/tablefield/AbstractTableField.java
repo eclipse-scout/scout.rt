@@ -39,6 +39,7 @@ import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
@@ -331,6 +332,9 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     if (m_table == table) {
       return;
     }
+    if (m_table instanceof AbstractTable) {
+      ((AbstractTable) m_table).setContainerInternal(null);
+    }
     if (m_table != null) {
       if (!m_tableExternallyManaged) {
         if (m_managedTableListener != null) {
@@ -344,6 +348,9 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
       }
     }
     m_table = table;
+    if (m_table instanceof AbstractTable) {
+      ((AbstractTable) m_table).setContainerInternal(this);
+    }
     if (m_table != null) {
       if (!m_tableExternallyManaged) {
         // ticket 84893

@@ -12,8 +12,11 @@ package org.eclipse.scout.rt.extension.client;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -61,9 +64,9 @@ public final class ExtensionUtility {
    * Removes those objects of the given list that match any {@link Replace} annotation on other elements being part of
    * the same list.
    */
-  public static <T> void processReplaceAnnotations(List<T> list) {
+  public static <T> Map<T, T> processReplaceAnnotations(List<T> list) {
     if (list == null || list.isEmpty()) {
-      return;
+      return Collections.emptyMap();
     }
 
     // get instances replacing other instances (i.e. replacements)
@@ -80,9 +83,10 @@ public final class ExtensionUtility {
 
     if (replacements.isEmpty()) {
       // no replacements
-      return;
+      return Collections.emptyMap();
     }
 
+    Map<T, T> replacementMap = new HashMap<T, T>();
     for (T replacement : replacements) {
       Class<?> replacementClass = replacement.getClass();
       Replace replace = replacementClass.getAnnotation(Replace.class);
@@ -133,7 +137,9 @@ public final class ExtensionUtility {
         }
       }
       list.remove(firstEntry.getValue());
+      replacementMap.put(firstEntry.getValue(), replacement);
     }
+    return replacementMap;
   }
 
   /**

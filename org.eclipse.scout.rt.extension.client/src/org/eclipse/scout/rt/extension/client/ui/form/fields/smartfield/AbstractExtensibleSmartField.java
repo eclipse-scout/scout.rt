@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * 
  * @since 3.9.0
  */
-public class AbstractExtensibleSmartField<T> extends AbstractSmartField<T> implements IExtensibleScoutObject {
+public abstract class AbstractExtensibleSmartField<T> extends AbstractSmartField<T> implements IExtensibleScoutObject {
 
   public AbstractExtensibleSmartField() {
     super();

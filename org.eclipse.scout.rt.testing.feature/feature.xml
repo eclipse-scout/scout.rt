@@ -36,20 +36,12 @@ BSI Business Systems Integration AG - initial API and implementation
          optional="true"/>
 
    <requires>
-      <import feature="org.eclipse.scout.rt.feature" version="3.9.0.qualifier"/>
+      <import feature="org.eclipse.scout.rt.feature" version="3.8.0.qualifier"/>
       <import plugin="org.junit4"/>
       <import plugin="org.easymock"/>
       <import plugin="org.apache.ant"/>
       <import plugin="org.junit"/>
    </requires>
-
-   <plugin
-         id="org.eclipse.scout.rt.extension.client.test.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
 
    <plugin
          id="org.eclipse.scout.rt.testing.server"

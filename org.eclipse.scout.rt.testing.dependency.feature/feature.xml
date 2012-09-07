@@ -31,7 +31,7 @@ BSI Business Systems Integration AG - initial API and implementation
    </url>
 
    <requires>
-      <import feature="org.eclipse.scout.rt.feature" version="3.9.0.qualifier"/>
+      <import feature="org.eclipse.scout.rt.feature" version="3.8.0.qualifier"/>
       <import plugin="org.junit4"/>
    </requires>
 

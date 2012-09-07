@@ -10,13 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.rt.extension.client.internal.AbstractExtensionManager;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuExtensionManager;
+import org.eclipse.scout.rt.extension.client.ui.desktop.internal.DesktopExtensionManager;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.PageExtensionManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -30,11 +36,22 @@ public class Activator extends Plugin {
   public static final String PLUGIN_ID = "org.eclipse.scout.rt.extension.client";
   private static Activator plugin;
 
-  private PageExtensionManager m_pagesExtensionManager;
-  private MenuExtensionManager m_menuExtensionManager;
+  private final Map<Class<? extends AbstractExtensionManager>, AbstractExtensionManager> m_extensionManagers;
 
   public static Activator getDefault() {
     return plugin;
+  }
+
+  public Activator() {
+    m_extensionManagers = new HashMap<Class<? extends AbstractExtensionManager>, AbstractExtensionManager>();
+  }
+
+  private void addExtensionManager(AbstractExtensionManager em) {
+    m_extensionManagers.put(em.getClass(), em);
+  }
+
+  private <T> T getExtensionManager(Class<T> type) {
+    return type.cast(m_extensionManagers.get(type));
   }
 
   @Override
@@ -43,8 +60,9 @@ public class Activator extends Plugin {
     plugin = this;
 
     IExtensionRegistry extensionRegistry = getExtensionRegistry(context);
-    m_pagesExtensionManager = new PageExtensionManager(extensionRegistry);
-    m_menuExtensionManager = new MenuExtensionManager(extensionRegistry);
+    addExtensionManager(new PageExtensionManager(extensionRegistry));
+    addExtensionManager(new MenuExtensionManager(extensionRegistry));
+    addExtensionManager(new DesktopExtensionManager(extensionRegistry));
 
     context.addBundleListener(new SynchronousBundleListener() {
       @Override
@@ -53,8 +71,9 @@ public class Activator extends Plugin {
           new Job("Initialize Scout client extensions") {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
-              m_pagesExtensionManager.start();
-              m_menuExtensionManager.start();
+              for (AbstractExtensionManager em : m_extensionManagers.values()) {
+                em.start();
+              }
               return Status.OK_STATUS;
             }
           }.schedule();
@@ -65,25 +84,25 @@ public class Activator extends Plugin {
 
   @Override
   public void stop(BundleContext context) throws Exception {
-    if (m_pagesExtensionManager != null) {
-      m_pagesExtensionManager.stop();
-      m_pagesExtensionManager = null;
+    for (Iterator<AbstractExtensionManager> it = m_extensionManagers.values().iterator(); it.hasNext();) {
+      AbstractExtensionManager em = it.next();
+      it.remove();
+      em.stop();
     }
-    if (m_menuExtensionManager != null) {
-      m_menuExtensionManager.stop();
-      m_menuExtensionManager = null;
-    }
-
     plugin = null;
     super.stop(context);
   }
 
   public PageExtensionManager getPagesExtensionManager() {
-    return m_pagesExtensionManager;
+    return getExtensionManager(PageExtensionManager.class);
   }
 
   public MenuExtensionManager getMenuExtensionManager() {
-    return m_menuExtensionManager;
+    return getExtensionManager(MenuExtensionManager.class);
+  }
+
+  public DesktopExtensionManager getDesktopExtensionManager() {
+    return getExtensionManager(DesktopExtensionManager.class);
   }
 
   private IExtensionRegistry getExtensionRegistry(BundleContext context) {

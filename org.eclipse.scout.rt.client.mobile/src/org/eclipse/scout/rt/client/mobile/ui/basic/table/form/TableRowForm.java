@@ -19,21 +19,19 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.mobile.Icons;
-import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields.ColumnFieldBuilder;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
+import org.eclipse.scout.rt.client.mobile.ui.form.IActionFetcher;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.AbstractBackButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRowMapper;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -43,7 +41,7 @@ import org.eclipse.scout.service.SERVICES;
  * 
  * @since 3.9.0
  */
-public class TableRowForm extends AbstractForm {
+public class TableRowForm extends AbstractMobileForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableRowForm.class);
 
   private ITable m_table;
@@ -92,19 +90,13 @@ public class TableRowForm extends AbstractForm {
     return VIEW_ID_PAGE_DETAIL;
   }
 
+  @Override
+  protected IActionFetcher createHeaderActionFetcher() {
+    return new TableRowFormHeaderActionFetcher(this, getTable());
+  }
+
   @Order(10.0f)
   public class MainBox extends AbstractGroupBox {
-
-    @Override
-    protected void injectFieldsInternal(List<IFormField> fieldList) {
-      if (getTable().isTableChanging()) {
-        //FIXME CGU Since actions are fetched by a table event the event will be postponed if table changing is set to true -> no menus returned.
-        LOG.warn("Actions might be incomplete for table " + getTable());
-      }
-      IMenu[] tableRowActions = getTable().getUIFacade().fireRowPopupFromUI();
-      fieldList.addAll(ActionButtonBarUtility.convertActionsToMainButtons(tableRowActions));
-      super.injectFieldsInternal(fieldList);
-    }
 
     @Order(10.0f)
     public class GroupBox extends AbstractGroupBox {
@@ -124,17 +116,8 @@ public class TableRowForm extends AbstractForm {
     }
 
     @Order(5)
-    public class CloseButton extends AbstractCloseButton {
+    public class BackButton extends AbstractBackButton {
 
-      @Override
-      protected String getConfiguredLabel() {
-        return null;
-      }
-
-      @Override
-      protected String getConfiguredIconId() {
-        return Icons.BackAction;
-      }
     }
 
   }
@@ -161,10 +144,6 @@ public class TableRowForm extends AbstractForm {
       m_rowMapper.exportRowData();
     }
 
-    @Override
-    protected void execFinally() throws ProcessingException {
-      m_rowMapper.importRowData();
-    }
   }
 
   private void handleRowDeleted() {
