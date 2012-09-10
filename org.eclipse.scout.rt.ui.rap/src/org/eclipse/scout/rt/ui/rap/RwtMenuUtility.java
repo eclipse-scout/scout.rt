@@ -135,25 +135,19 @@ public final class RwtMenuUtility {
       return;
     }
 
-    int count = scoutActionNodes.size();
-    int index = 0;
-    for (IActionNode scoutActionNode : scoutActionNodes) {
-      fillContextMenuRec(scoutActionNode, uiEnvironment, index, count, menu);
-      index++;
+    List<IActionNode> cleanedScoutActions = cleanup(scoutActionNodes);
+    for (IActionNode scoutActionNode : cleanedScoutActions) {
+      fillContextMenuRec(scoutActionNode, uiEnvironment, menu);
     }
+
   }
 
-  private static void fillContextMenuRec(IActionNode<?> scoutActionNode, IRwtEnvironment uiEnvironment, int index, int count, Menu menu) {
+  private static void fillContextMenuRec(IActionNode<?> scoutActionNode, IRwtEnvironment uiEnvironment, Menu menu) {
     if (!scoutActionNode.isVisible()) {
       return;
     }
     if (scoutActionNode.isSeparator()) {
-      if (menu.getItemCount() > 0 && (SWT.SEPARATOR & menu.getItem(menu.getItemCount() - 1).getStyle()) == 0) {
-        // ignore trailing separator
-        if (index + 1 < count) {
-          new MenuItem(menu, SWT.SEPARATOR);
-        }
-      }
+      new MenuItem(menu, SWT.SEPARATOR);
     }
     else if (scoutActionNode instanceof ICheckBoxMenu) {
       new RwtScoutCheckboxMenu(menu, (ICheckBoxMenu) scoutActionNode, uiEnvironment);
@@ -163,11 +157,9 @@ public final class RwtMenuUtility {
       RwtScoutMenuGroup group = new RwtScoutMenuGroup(menu, scoutActionNode, uiEnvironment);
       Menu subMenu = new Menu(menu);
       group.getUiMenuItem().setMenu(subMenu);
-      int subIndex = 0;
-      int subCount = scoutActionNode.getChildActions().size();
-      for (IActionNode<?> subAction : scoutActionNode.getChildActions()) {
-        fillContextMenuRec(subAction, uiEnvironment, subIndex, subCount, subMenu);
-        subIndex++;
+      List<IActionNode> childActions = cleanup(scoutActionNode.getChildActions());
+      for (IActionNode<?> subAction : childActions) {
+        fillContextMenuRec(subAction, uiEnvironment, subMenu);
       }
     }
     else {
@@ -263,6 +255,56 @@ public final class RwtMenuUtility {
     }
 
     return separatedMenus;
+  }
+
+  /**
+   * Removes invisible actions. Also removes leading and trailing separators as well as multiple consecutive separators.
+   * 
+   * @since 3.8.1
+   */
+  public static List<IActionNode> cleanup(List<? extends IActionNode> scoutActionNodes) {
+    if (scoutActionNodes == null) {
+      return null;
+    }
+
+    List<IActionNode> cleanedActions = new LinkedList<IActionNode>();
+    for (int i = 0; i < scoutActionNodes.size(); i++) {
+      IActionNode actionNode = scoutActionNodes.get(i);
+      //Ignore invisible actions
+      if (!actionNode.isVisible()) {
+        continue;
+      }
+      if (actionNode.isSeparator()) {
+        //Ignore leading and trailing separators
+        if (i == 0 || i == scoutActionNodes.size() - 1) {
+          continue;
+        }
+        //Ignore multiple consecutive separators
+        IAction nextVisibleAction = getFirstVisibleAction(scoutActionNodes, i + 1);
+        if (nextVisibleAction == null || nextVisibleAction.isSeparator()) {
+          continue;
+        }
+      }
+
+      cleanedActions.add(actionNode);
+    }
+
+    return cleanedActions;
+  }
+
+  private static IAction getFirstVisibleAction(List<? extends IActionNode> scoutActionNodes, int startIndex) {
+    if (scoutActionNodes == null) {
+      return null;
+    }
+
+    for (int i = startIndex; i < scoutActionNodes.size(); i++) {
+      IActionNode action = scoutActionNodes.get(i);
+      if (action.isVisible()) {
+        return action;
+      }
+    }
+
+    return null;
   }
 
   public static boolean hasChildActions(IAction action) {

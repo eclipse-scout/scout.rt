@@ -23,6 +23,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
@@ -115,28 +116,35 @@ public final class SwtMenuUtility {
   }
 
   public static void fillContextMenu(IMenu[] scoutMenus, Menu menu, ISwtEnvironment environment) {
-    if (scoutMenus != null && scoutMenus.length > 0) {
-      int count = scoutMenus.length;
-      int index = 0;
-      for (IMenu scoutMenu : scoutMenus) {
-        fillContextMenuRec(scoutMenu, index, count, menu, environment);
-        index++;
-      }
+    if (scoutMenus == null || scoutMenus.length == 0) {
+      return;
     }
 
+    List<IActionNode> scoutActionNodes = new LinkedList<IActionNode>();
+    for (IMenu scoutMenu : scoutMenus) {
+      scoutActionNodes.add(scoutMenu);
+    }
+
+    fillContextMenu(scoutActionNodes, menu, environment);
   }
 
-  private static void fillContextMenuRec(IActionNode<?> scoutActionNode, int index, int count, Menu menu, ISwtEnvironment environment) {
+  public static void fillContextMenu(List<? extends IActionNode> scoutActionNodes, Menu menu, ISwtEnvironment environment) {
+    if (scoutActionNodes == null || scoutActionNodes.size() == 0) {
+      return;
+    }
+
+    List<IActionNode> cleanedScoutActions = cleanup(scoutActionNodes);
+    for (IActionNode scoutActionNode : cleanedScoutActions) {
+      fillContextMenuRec(scoutActionNode, menu, environment);
+    }
+  }
+
+  private static void fillContextMenuRec(IActionNode<?> scoutActionNode, Menu menu, ISwtEnvironment environment) {
     if (!scoutActionNode.isVisible()) {
       return;
     }
     if (scoutActionNode.isSeparator()) {
-      if (menu.getItemCount() > 0 && (SWT.SEPARATOR & menu.getItem(menu.getItemCount() - 1).getStyle()) == 0) {
-        // ignore trailing separator
-        if (index + 1 < count) {
-          new MenuItem(menu, SWT.SEPARATOR);
-        }
-      }
+      new MenuItem(menu, SWT.SEPARATOR);
     }
     else if (scoutActionNode instanceof ICheckBoxMenu) {
       new SwtScoutCheckboxMenu(menu, (ICheckBoxMenu) scoutActionNode, environment);
@@ -146,11 +154,9 @@ public final class SwtMenuUtility {
       SwtScoutMenuGroup group = new SwtScoutMenuGroup(menu, scoutActionNode, environment);
       Menu subMenu = new Menu(menu);
       group.getSwtMenuItem().setMenu(subMenu);
-      int subIndex = 0;
-      int subCount = scoutActionNode.getChildActions().size();
-      for (IActionNode<?> subAction : scoutActionNode.getChildActions()) {
-        fillContextMenuRec(subAction, subIndex, subCount, subMenu, environment);
-        subIndex++;
+      List<IActionNode> childActions = cleanup(scoutActionNode.getChildActions());
+      for (IActionNode<?> subAction : childActions) {
+        fillContextMenuRec(subAction, subMenu, environment);
       }
     }
     else {
@@ -222,6 +228,56 @@ public final class SwtMenuUtility {
 
   public static IMenu[] collectEmptySpaceMenus(final ITree tree, ISwtEnvironment uiEnvironment) {
     return collectMenus(tree, true, false, uiEnvironment);
+  }
+
+  /**
+   * Removes invisible actions. Also removes leading and trailing separators as well as multiple consecutive separators.
+   * 
+   * @since 3.8.1
+   */
+  public static List<IActionNode> cleanup(List<? extends IActionNode> scoutActionNodes) {
+    if (scoutActionNodes == null) {
+      return null;
+    }
+
+    List<IActionNode> cleanedActions = new LinkedList<IActionNode>();
+    for (int i = 0; i < scoutActionNodes.size(); i++) {
+      IActionNode actionNode = scoutActionNodes.get(i);
+      //Ignore invisible actions
+      if (!actionNode.isVisible()) {
+        continue;
+      }
+      if (actionNode.isSeparator()) {
+        //Ignore leading and trailing separators
+        if (i == 0 || i == scoutActionNodes.size() - 1) {
+          continue;
+        }
+        //Ignore multiple consecutive separators
+        IAction nextVisibleAction = getFirstVisibleAction(scoutActionNodes, i + 1);
+        if (nextVisibleAction == null || nextVisibleAction.isSeparator()) {
+          continue;
+        }
+      }
+
+      cleanedActions.add(actionNode);
+    }
+
+    return cleanedActions;
+  }
+
+  private static IAction getFirstVisibleAction(List<? extends IActionNode> scoutActionNodes, int startIndex) {
+    if (scoutActionNodes == null) {
+      return null;
+    }
+
+    for (int i = startIndex; i < scoutActionNodes.size(); i++) {
+      IActionNode action = scoutActionNodes.get(i);
+      if (action.isVisible()) {
+        return action;
+      }
+    }
+
+    return null;
   }
 
 }
