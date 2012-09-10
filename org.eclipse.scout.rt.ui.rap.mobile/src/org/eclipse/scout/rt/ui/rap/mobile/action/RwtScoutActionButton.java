@@ -267,7 +267,7 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
    * (scout.css) it breaks.
    */
   private int estimateMenuHeight() {
-    List<? extends IActionNode> actions = getChildActions();
+    List<? extends IActionNode> actions = RwtMenuUtility.cleanup(getChildActions());
     if (actions == null || actions.size() == 0) {
       return 0;
     }
