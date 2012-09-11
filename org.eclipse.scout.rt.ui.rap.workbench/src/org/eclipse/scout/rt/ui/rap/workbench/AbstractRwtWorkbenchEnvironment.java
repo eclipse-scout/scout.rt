@@ -17,12 +17,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -35,11 +38,13 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.ui.rap.AbstractRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.WidgetPrinter;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.workbench.window.editor.AbstractScoutEditorPart;
 import org.eclipse.scout.rt.ui.rap.workbench.window.editor.ScoutFormEditorInput;
 import org.eclipse.scout.rt.ui.rap.workbench.window.view.AbstractScoutView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -331,6 +336,39 @@ public abstract class AbstractRwtWorkbenchEnvironment extends AbstractRwtEnviron
   protected void fireGuiDetachedFromUIInternal() {
     super.fireGuiDetachedFromUIInternal();
     getDisplay().asyncExec(new P_HideScoutViews());
+  }
+
+  @Override
+  public Shell getParentShellIgnoringPopups(int modalities) {
+    Shell shell = Display.getCurrent().getActiveShell();
+    if (shell == null) {
+      if (PlatformUI.getWorkbench().getActiveWorkbenchWindow() != null) {
+        shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+      }
+    }
+    if (shell != null) {
+      while (RwtUtility.isPopupShell(shell) && shell.getParent() instanceof Shell) {
+        shell = (Shell) shell.getParent();
+      }
+    }
+    // traverse complete tree
+    if (shell == null) {
+      TreeMap<CompositeLong, Shell> map = new TreeMap<CompositeLong, Shell>();
+      for (IWorkbenchWindow w : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+        RwtUtility.visitShellTreeRec(w.getShell(), modalities, 0, map);
+      }
+      if (map.size() > 0) {
+        shell = map.get(map.firstKey());
+      }
+    }
+
+    if (shell != null && shell.getData() instanceof ProgressMonitorDialog) {
+      // do also ignore the ProgressMonitorDialog, otherwise there will be some strange behaviors
+      // when displaying a shell on top of the ProgressMonitorDialog-shell (f.e. when the
+      // ProgressMonitorDialog-shell disappears)
+      shell = (Shell) shell.getParent();
+    }
+    return shell;
   }
 
   private class P_HideScoutViews implements Runnable {
