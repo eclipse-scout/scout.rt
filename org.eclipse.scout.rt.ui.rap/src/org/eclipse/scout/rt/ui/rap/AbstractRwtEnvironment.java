@@ -249,7 +249,13 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   @Override
   public String getLogoutLandingUri() {
-    return RWT.getRequest().getRequestURI();
+    String path = RWT.getRequest().getServletPath();
+
+    if (path.length() > 0 && '/' == path.charAt(0)) {
+      path = path.substring(1);
+    }
+
+    return path;
   }
 
   public void logout() {
