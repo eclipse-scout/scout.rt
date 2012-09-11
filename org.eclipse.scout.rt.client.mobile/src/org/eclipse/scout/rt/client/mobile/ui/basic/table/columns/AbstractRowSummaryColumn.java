@@ -126,20 +126,6 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     return false;
   }
 
-  public void updateValue(ITableRow[] rows, ITableRow[] modelRows) throws ProcessingException {
-    updateValue(rows, modelRows, null);
-  }
-
-  public void updateValue(ITableRow[] rows, ITableRow[] modelRows, DrillDownStyleMap drillDownStyles) throws ProcessingException {
-    if (rows.length != modelRows.length) {
-      throw new ProcessingException("Given rows not consistent.");
-    }
-
-    for (int i = 0; i < rows.length; i++) {
-      updateValue(rows[i], modelRows[i], drillDownStyles);
-    }
-  }
-
   public void updateValue(ITableRow row, ITableRow modelRow, DrillDownStyleMap drillDownStyle) throws ProcessingException {
     setValue(row, computeContentColumnValue(modelRow, drillDownStyle));
   }
@@ -186,11 +172,12 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     int maxRowsToConsider = 10;
 
     for (int row = 0; row < Math.min(maxRowsToConsider, table.getRowCount()); row++) {
-      final String columnDisplayText = column.getDisplayText(table.getRow(row));
+      ITableRow tableRow = table.getRow(row);
+      final String columnDisplayText = column.getDisplayText(tableRow);
       if (StringUtility.hasText(columnDisplayText)) {
         columnEmpty = false;
 
-        String cellHeaderText = getCellHeaderText(table, row);
+        String cellHeaderText = getCellHeaderText(tableRow);
         if (cellHeaderText != null && cellHeaderText.contains(columnDisplayText)) {
           return false;
         }
@@ -206,12 +193,12 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     return true;
   }
 
-  private String getCellHeaderText(ITable table, int i) {
+  private String getCellHeaderText(ITableRow row) {
     if (m_cellHeaderColumn != null) {
-      return m_cellHeaderColumn.getDisplayText(table.getRow(i));
+      return m_cellHeaderColumn.getDisplayText(row);
     }
     else {
-      return table.getSummaryCell(i).getText();
+      return row.getTable().getSummaryCell(row).getText();
     }
   }
 
@@ -220,7 +207,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       return null;
     }
 
-    String cellHeaderText = getCellHeaderText(row.getTable(), row.getRowIndex());
+    String cellHeaderText = getCellHeaderText(row);
     if (cellHeaderText == null) {
       cellHeaderText = "";
     }
