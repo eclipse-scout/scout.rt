@@ -1541,7 +1541,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
     }
-    fireDesktopClosed();
 
     // gather tool button forms
     for (IToolButton toolButton : getToolButtons()) {
@@ -1572,6 +1571,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       outline.removeAllChildNodes(outline.getRootNode());
       outline.disposeTree();
     }
+
+    fireDesktopClosed();
   }
 
   public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {

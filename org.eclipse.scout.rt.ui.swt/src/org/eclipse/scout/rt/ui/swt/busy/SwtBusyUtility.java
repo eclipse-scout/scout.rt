@@ -111,8 +111,6 @@ public final class SwtBusyUtility {
    * Does NOT call {@link Display#syncExec(Runnable)} since this could lead to dead-locks.
    * <p>
    * Blocks and returns once the runnable has finished running.
-   * <p>
-   * Uses
    */
   public static void showWorkbenchIndicator(final SwtBusyHandler busyHandler, final IRunnableWithProgress runnable) {
     if (!busyHandler.isEnabled()) {

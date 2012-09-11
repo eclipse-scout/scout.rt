@@ -45,11 +45,11 @@ public class BusyJob extends Job {
 
   @Override
   protected IStatus run(IProgressMonitor monitor) {
-    if (!getBusyHandler().isBusy()) {
+    if (!getBusyHandler().isBusy() || !getBusyHandler().isEnabled()) {
       return Status.OK_STATUS;
     }
     runBusy(monitor);
-    if (!getBusyHandler().isBusy()) {
+    if (!getBusyHandler().isBusy() || !getBusyHandler().isEnabled()) {
       return Status.OK_STATUS;
     }
     runBlocking(monitor);
