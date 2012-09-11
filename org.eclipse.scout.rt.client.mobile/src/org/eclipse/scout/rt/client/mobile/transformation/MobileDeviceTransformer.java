@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -226,6 +227,9 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     else if (field instanceof ISmartField) {
       transformSmartField((ISmartField) field);
     }
+    else if (field instanceof IPlaceholderField) {
+      transformPlaceholderField((IPlaceholderField) field);
+    }
 
   }
 
@@ -290,6 +294,13 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (field.getBrowseMaxRowCount() > getSmartFieldBrowseMaxRowCount()) {
       field.setBrowseMaxRowCount(getSmartFieldBrowseMaxRowCount());
     }
+  }
+
+  /**
+   * Makes placeholder fields invisible since they just waste space on 1 column layouts
+   */
+  protected void transformPlaceholderField(IPlaceholderField field) {
+    field.setVisible(false);
   }
 
   /**
