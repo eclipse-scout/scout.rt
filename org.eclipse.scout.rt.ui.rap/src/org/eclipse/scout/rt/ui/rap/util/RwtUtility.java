@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.rwt.RWT;
 import org.eclipse.scout.commons.CompositeLong;
@@ -68,8 +67,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Version;
 
 public final class RwtUtility {
@@ -1616,44 +1613,6 @@ public final class RwtUtility {
   }
 
   /**
-   * @param modalities
-   *          combination of {@link SWT#SYSTEM_MODAL}, {@link SWT#APPLICATION_MODAL}, {@link SWT#MODELESS}
-   * @return best effort to get the "current" parent shell
-   *         <p>
-   *         Never null
-   */
-  public static Shell getParentShellIgnoringPopups(int modalities) {
-    Shell shell = Display.getCurrent().getActiveShell();
-    if (shell == null) {
-      if (PlatformUI.getWorkbench().getActiveWorkbenchWindow() != null) {
-        shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-      }
-    }
-    if (shell != null) {
-      while (isPopupShell(shell) && shell.getParent() instanceof Shell) {
-        shell = (Shell) shell.getParent();
-      }
-    }
-    // traverse complete tree
-    if (shell == null) {
-      TreeMap<CompositeLong, Shell> map = new TreeMap<CompositeLong, Shell>();
-      for (IWorkbenchWindow w : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-        visitShellTreeRec(w.getShell(), modalities, 0, map);
-      }
-      if (map.size() > 0) {
-        shell = map.get(map.firstKey());
-      }
-    }
-    if (shell != null && shell.getData() instanceof ProgressMonitorDialog) {
-      // do also ignore the ProgressMonitorDialog, otherwise there will be some strange behaviors
-      // when displaying a shell on top of the ProgressMonitorDialog-shell (f.e. when the
-      // ProgressMonitorDialog-shell disappears)
-      shell = (Shell) shell.getParent();
-    }
-    return shell;
-  }
-
-  /**
    * Visit the complete workbench shell tree.
    * Ignore popup shells and shells
    * with extendedStyle popup
@@ -1662,7 +1621,7 @@ public final class RwtUtility {
    * 1. system modal before application modal before modeless<br>
    * 2. sub shells before parent shells before top level shells
    */
-  private static void visitShellTreeRec(Shell shell, int modalities, int level, TreeMap<CompositeLong, Shell> out) {
+  public static void visitShellTreeRec(Shell shell, int modalities, int level, TreeMap<CompositeLong, Shell> out) {
     if (shell == null) {
       return;
     }

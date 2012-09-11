@@ -1179,14 +1179,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Shell getParentShellIgnoringPopups(int modalities) {
-    return RwtUtility.getParentShellIgnoringPopups(modalities);
-  }
-
   @Override
   public IClientSession getClientSession() {
     return m_clientSession;
