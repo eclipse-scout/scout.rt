@@ -15,21 +15,24 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.AbstractBackButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield.MobileSmartTableForm.MainBox.GroupBox.FilterField;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
+import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTableForm;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * @since 3.9.0
@@ -47,6 +50,7 @@ public class MobileSmartTableForm extends SmartTableForm {
 
     setTitle(TEXTS.get("MobileSmartFormTitle", getSmartField().getLabel()));
     getResultTableField().getTable().setCheckable(true);
+    getResultTableField().getTable().addTableListener(new P_TableListener());
 
     GridData tableFieldGridDataHints = getResultTableField().getGridDataHints();
     tableFieldGridDataHints.useUiHeight = false;
@@ -86,7 +90,14 @@ public class MobileSmartTableForm extends SmartTableForm {
 
   @Override
   protected void execResultTableRowClicked(ITableRow row) throws ProcessingException {
-    // nop. Selecting a row must NOT close the form.
+    // nop. Clicking a row must NOT close the form.
+  }
+
+  private void acceptProposal() throws ProcessingException {
+    LookupRow lookupRow = getAcceptedProposal();
+    if (lookupRow != null) {
+      getSmartField().acceptProposal(lookupRow);
+    }
   }
 
   @Override
@@ -147,13 +158,34 @@ public class MobileSmartTableForm extends SmartTableForm {
     }
 
     @Order(99)
-    public class OkButton extends AbstractOkButton {
+    public class BackButton extends AbstractBackButton {
 
     }
 
-    @Order(100)
-    public class CancelButton extends AbstractCancelButton {
+  }
 
+  private void handleTableRowsUpdated(ITableRow[] rows) {
+    if (rows != null && rows.length > 0) {
+      try {
+        //Accept proposal if a row gets checked. This makes sure the smartfield menus work.
+        acceptProposal();
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+    }
+  }
+
+  private class P_TableListener extends TableAdapter {
+
+    @Override
+    public void tableChanged(TableEvent e) {
+      switch (e.getType()) {
+        case TableEvent.TYPE_ROWS_UPDATED: {
+          handleTableRowsUpdated(e.getRows());
+          break;
+        }
+      }
     }
   }
 

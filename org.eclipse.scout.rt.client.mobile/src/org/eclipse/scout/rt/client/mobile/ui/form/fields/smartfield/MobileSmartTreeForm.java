@@ -15,21 +15,24 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.AbstractBackButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield.MobileSmartTreeForm.MainBox.GroupBox.FilterField;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartTreeForm;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * @since 3.9.0
@@ -47,6 +50,7 @@ public class MobileSmartTreeForm extends SmartTreeForm {
 
     setTitle(TEXTS.get("MobileSmartFormTitle", getSmartField().getLabel()));
     getResultTreeField().getTree().setCheckable(true);
+    getResultTreeField().getTree().addTreeListener(new P_TreeListener());
 
     GridData treeFieldGridDataHints = getResultTreeField().getGridDataHints();
     treeFieldGridDataHints.useUiHeight = false;
@@ -86,7 +90,14 @@ public class MobileSmartTreeForm extends SmartTreeForm {
 
   @Override
   protected void execResultTreeNodeClick(ITreeNode node) throws ProcessingException {
-    // nop. Selecting a node must NOT close the form.
+    // nop. Clicking a node must NOT close the form.
+  }
+
+  private void acceptProposal() throws ProcessingException {
+    LookupRow lookupRow = getAcceptedProposal();
+    if (lookupRow != null) {
+      getSmartField().acceptProposal(lookupRow);
+    }
   }
 
   @Override
@@ -147,13 +158,33 @@ public class MobileSmartTreeForm extends SmartTreeForm {
     }
 
     @Order(99)
-    public class OkButton extends AbstractOkButton {
+    public class BackButton extends AbstractBackButton {
 
     }
+  }
 
-    @Order(100)
-    public class CancelButton extends AbstractCancelButton {
+  private void handleTreeNodesUpdated(ITreeNode[] nodes) {
+    if (nodes != null && nodes.length > 0) {
+      try {
+        //Accept proposal if a node gets checked. This makes sure the smartfield menus work.
+        acceptProposal();
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+    }
+  }
 
+  private class P_TreeListener extends TreeAdapter {
+
+    @Override
+    public void treeChanged(TreeEvent e) {
+      switch (e.getType()) {
+        case TreeEvent.TYPE_NODES_UPDATED: {
+          handleTreeNodesUpdated(e.getNodes());
+          break;
+        }
+      }
     }
   }
 
