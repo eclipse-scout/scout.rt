@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.button;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 
 /**
  * @since 3.9.0
  */
-public class AbstractBackButton extends AbstractCloseButton {
+public class AbstractBackButton extends AbstractButton implements IMobileButton {
 
   @Override
   protected String getConfiguredLabel() {
@@ -26,6 +27,21 @@ public class AbstractBackButton extends AbstractCloseButton {
   @Override
   protected String getConfiguredIconId() {
     return Icons.BackAction;
+  }
+
+  @Override
+  protected String getConfiguredTooltipText() {
+    return null;
+  }
+
+  @Override
+  protected int getConfiguredSystemType() {
+    return SYSTEM_TYPE_BACK;
+  }
+
+  @Override
+  protected void execClickAction() throws ProcessingException {
+    getForm().doOk();
   }
 
 }

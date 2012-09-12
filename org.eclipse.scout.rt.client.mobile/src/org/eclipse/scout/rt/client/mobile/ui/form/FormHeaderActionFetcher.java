@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.scout.rt.client.mobile.ui.action.ActionButtonBarUtility;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.IMobileButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -124,6 +125,7 @@ public class FormHeaderActionFetcher extends AbstractFormActionFetcher {
     List<Integer> systemTypesToConsider = new LinkedList<Integer>();
     systemTypesToConsider.add(IButton.SYSTEM_TYPE_CANCEL);
     systemTypesToConsider.add(IButton.SYSTEM_TYPE_CLOSE);
+    systemTypesToConsider.add(IMobileButton.SYSTEM_TYPE_BACK);
     return systemTypesToConsider;
   }
 

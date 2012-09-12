@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.IMobileButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -359,6 +360,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
           case IButton.SYSTEM_TYPE_CANCEL:
           case IButton.SYSTEM_TYPE_CLOSE:
           case IButton.SYSTEM_TYPE_OK:
+          case IMobileButton.SYSTEM_TYPE_BACK:
             if (wrappedButton.isVisible() && wrappedButton.isEnabled()) {
               return true;
             }
