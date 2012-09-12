@@ -380,7 +380,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   protected boolean shouldPageTableStatusBeHidden() {
-    return true;
+    return false;
   }
 
   protected boolean shouldLabelBeMovedToTop() {
