@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
@@ -31,6 +32,7 @@ import org.eclipse.swt.widgets.Composite;
  * @since 3.9.0
  */
 public class RwtScoutTableActionBar extends AbstractRwtScoutActionBar<ITableField<? extends ITable>> {
+  private static final String VARIANT_SMART_FIELD_ACTION_BAR = "smartFieldActionBar";
   private P_TableRowSelectionListener m_rowSelectionListener;
   private ITable m_table;
 
@@ -60,6 +62,15 @@ public class RwtScoutTableActionBar extends AbstractRwtScoutActionBar<ITableFiel
     gd.weighty = 0.0;
     gd.fillHorizontal = true;
     container.setLayoutData(gd);
+  }
+
+  @Override
+  protected String getActionBarContainerVariant() {
+    if (getScoutObject().getForm() instanceof ISmartFieldProposalForm) {
+      return VARIANT_SMART_FIELD_ACTION_BAR;
+    }
+
+    return super.getActionBarContainerVariant();
   }
 
   @Override
