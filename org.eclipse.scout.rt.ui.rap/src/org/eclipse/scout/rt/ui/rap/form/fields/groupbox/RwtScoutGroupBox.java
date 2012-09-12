@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.rap.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.rap.IValidateRoot;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
-import org.eclipse.scout.rt.ui.rap.ext.ScrolledFormEx;
 import org.eclipse.scout.rt.ui.rap.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
@@ -28,6 +27,10 @@ import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFormFieldGridData;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -36,6 +39,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.SizeCache;
 
 /**
  * <h3>RwtScoutGroupBox</h3>
@@ -62,7 +66,7 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
   /**
    * is null if the group box is not a scrolled group box
    */
-  private ScrolledFormEx m_scrolledForm;
+  private ScrolledComposite m_scrolledComposite;
   private Section m_section;
   private Group m_group;
   private Label m_label;
@@ -73,23 +77,37 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
   private BorderDecoration m_borderDecoration;
   private String m_containerLabel;
   private String m_containerImage;
+  private SizeCache m_sizeCache;
 
   @Override
   protected void initializeUi(Composite parent) {
     m_borderDecoration = resolveBorderDecoration();
     Composite rootPane = createContainer(parent);
     if (getScoutObject().isScrollable()) {
-      m_scrolledForm = getUiEnvironment().getFormToolkit().createScrolledFormEx(rootPane, SWT.V_SCROLL);
+      m_scrolledComposite = new ScrolledComposite(rootPane, SWT.V_SCROLL);
+      m_bodyPart = getUiEnvironment().getFormToolkit().createComposite(m_scrolledComposite);
+      m_scrolledComposite.setContent(m_bodyPart);
+      m_scrolledComposite.setExpandHorizontal(true);
+      m_scrolledComposite.setExpandVertical(true);
 
       //Mainly necessary to better support finger scrolling.
       //If the flag is not set rap tries to scroll to the top of the page. This makes scrolling of scrolled composites or listboxes impossible if they are located inside a form (not fullscreen).
-      m_scrolledForm.setShowFocusedControl(true);
+      m_scrolledComposite.setShowFocusedControl(true);
 
       GridData bodyData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL);
       bodyData.horizontalIndent = 0;
       bodyData.verticalIndent = 0;
-      m_scrolledForm.setLayoutData(bodyData);
-      m_bodyPart = m_scrolledForm.getBody();
+      m_scrolledComposite.setLayoutData(bodyData);
+      m_scrolledComposite.addControlListener(new ControlAdapter() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void controlResized(ControlEvent e) {
+          if (m_scrolledComposite != null && !m_scrolledComposite.isDisposed()) {
+            m_scrolledComposite.setMinSize(computeScrolledCompositeMinSize(false));
+          }
+        }
+      });
     }
     else {
       m_bodyPart = getUiEnvironment().getFormToolkit().createComposite(rootPane);
@@ -102,10 +120,8 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
       @Override
       public void validate() {
         super.validate();
-        if (m_scrolledForm != null) {
-          if (!m_scrolledForm.isDisposed()) {
-            m_scrolledForm.reflow(true);
-          }
+        if (m_scrolledComposite != null && !m_scrolledComposite.isDisposed()) {
+          m_scrolledComposite.setMinSize(computeScrolledCompositeMinSize(true));
         }
       }
     });
@@ -123,6 +139,22 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
       RwtScoutFormFieldGridData layoutData = new RwtScoutFormFieldGridData(field);
       uiScoutComposite.getUiContainer().setLayoutData(layoutData);
     }
+  }
+
+  /**
+   * Computes the preferred size of the {@link #m_bodyPart}, inspired by the class SharedScrolledComposite.
+   */
+  private Point computeScrolledCompositeMinSize(boolean flushCache) {
+    if (m_sizeCache == null) {
+      m_sizeCache = new SizeCache();
+    }
+
+    m_sizeCache.setControl(m_bodyPart);
+    if (flushCache) {
+      m_sizeCache.flush();
+    }
+
+    return m_sizeCache.computeSize(m_scrolledComposite.getClientArea().width, SWT.DEFAULT);
   }
 
   protected Composite createButtonbar(Composite parent) {
