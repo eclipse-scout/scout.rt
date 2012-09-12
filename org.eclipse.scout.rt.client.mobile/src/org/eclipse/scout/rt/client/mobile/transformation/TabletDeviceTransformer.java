@@ -99,11 +99,6 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
   }
 
   @Override
-  protected boolean shouldPageTableStatusBeHidden() {
-    return false;
-  }
-
-  @Override
   protected boolean autoAddBackActionToFormHeader() {
     return false;
   }
