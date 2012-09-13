@@ -16,7 +16,10 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.ui.rap.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.IValidateRoot;
+import org.eclipse.scout.rt.ui.rap.RwtShellValidateRoot;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
@@ -144,6 +147,10 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
     m_uiDialog = new DialogImpl((style & SWT.APPLICATION_MODAL) != 0 ? parentShell : null, style);
     m_uiDialog.create();
     m_uiDialog.getShell().setData(WidgetUtil.CUSTOM_VARIANT, getDialogShellVariant());
+    DefaultValidateRoot shellValidateRoot = createShellValidateRoot(m_uiDialog.getShell(), getUiEnvironment());
+    if (shellValidateRoot != null) {
+      m_uiDialog.getShell().setData(IValidateRoot.VALIDATE_ROOT_DATA, shellValidateRoot);
+    }
     m_uiDialog.getShell().addShellListener(new ShellListener() {
       private static final long serialVersionUID = 1L;
 
@@ -370,6 +377,10 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
 
   protected IFormBoundsProvider getBoundsProvider() {
     return m_boundsProvider;
+  }
+
+  protected DefaultValidateRoot createShellValidateRoot(Shell shell, IRwtEnvironment env) {
+    return new RwtShellValidateRoot(shell, env);
   }
 
   private class DialogImpl extends Dialog {
