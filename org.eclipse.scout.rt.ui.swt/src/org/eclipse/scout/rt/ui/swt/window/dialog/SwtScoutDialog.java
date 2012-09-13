@@ -22,7 +22,10 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.IValidateRoot;
+import org.eclipse.scout.rt.ui.swt.SwtShellValidateRoot;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.VersionUtility;
@@ -85,6 +88,10 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
         GridData d = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
         m_uiForm.getSwtContainer().setLayoutData(d);
         attachScout(scoutForm);
+        DefaultValidateRoot shellValidateRoot = createShellValidateRoot(getShell(), getEnvironment());
+        if (shellValidateRoot != null) {
+          getShell().setData(IValidateRoot.VALIDATE_ROOT_DATA, shellValidateRoot);
+        }
       }
       finally {
         m_contentPane.setRedraw(true);
@@ -340,6 +347,10 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
     else if (name.equals(IForm.PROP_SAVE_NEEDED)) {
       setSaveNeededFromScout(((Boolean) newValue).booleanValue());
     }
+  }
+
+  protected DefaultValidateRoot createShellValidateRoot(Shell shell, ISwtEnvironment environment) {
+    return new SwtShellValidateRoot(shell, environment);
   }
 
   private class P_ScoutPropertyChangeListener implements PropertyChangeListener {
