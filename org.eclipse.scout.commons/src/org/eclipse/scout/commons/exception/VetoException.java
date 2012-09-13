@@ -41,6 +41,10 @@ public class VetoException extends ProcessingException implements Serializable {
     super(new ProcessingStatus(null, message, cause, errorCode, IProcessingStatus.ERROR));
   }
 
+  public VetoException(String message, int errorCode, int severity) {
+    super(new ProcessingStatus(null, message, null, errorCode, severity));
+  }
+
   public VetoException(String message, Throwable cause, int errorCode, int severity) {
     super(new ProcessingStatus(null, message, cause, errorCode, severity));
   }
@@ -55,6 +59,10 @@ public class VetoException extends ProcessingException implements Serializable {
 
   public VetoException(String title, String message, Throwable cause, int errorCode) {
     super(new ProcessingStatus(title, message, cause, errorCode, IProcessingStatus.ERROR));
+  }
+
+  public VetoException(String title, String message, int errorCode, int severity) {
+    super(new ProcessingStatus(title, message, null, errorCode, severity));
   }
 
   public VetoException(String title, String message, Throwable cause, int errorCode, int severity) {
