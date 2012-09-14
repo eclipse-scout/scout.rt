@@ -46,7 +46,7 @@ public class DefaultServerSessionService extends AbstractService implements ISes
   public JobEx createAsyncJob(String name, IJobRunnable runnable) {
     IServerSession session = getCurrentSession();
     if (session == null) {
-      LOG.error("server session not availbale");
+      LOG.error("server session not available");
       return null;
     }
     if (name == null) {
