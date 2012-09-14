@@ -202,6 +202,44 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     }
   }
 
+  private static final Pattern bodyPartPattern = Pattern.compile("(.*<body[^>]*>)(.*)(</body>.*)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+  private static final Pattern htmlPartPattern = Pattern.compile("(.*<html[^>]*>)(.*)(</html>.*)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+  /**
+   * Wraps the existing html with a div having a border on the bottom to visually separate the rows. This would actually
+   * be the job of the GUI, but it seems not to be possible with the list widget of rap.
+   */
+  private String addGridLine(String existingHtml) {
+    String borderDivStart = "<div style=\"position: absolute; width: 100%; height: 100%; border-bottom:1px solid #e1efec\">";
+    String borderDivEnd = "</div>";
+    String prePart = "";
+    String mainPart = "";
+    String postPart = "";
+
+    Matcher m = bodyPartPattern.matcher(existingHtml);
+    boolean found = m.find();
+    if (!found) {
+      m = htmlPartPattern.matcher(existingHtml);
+      found = m.find();
+    }
+    if (found) {
+      prePart = m.group(1);
+      mainPart = m.group(2);
+      postPart = m.group(3);
+    }
+    else {
+      mainPart = existingHtml;
+    }
+
+    return prePart + borderDivStart + mainPart + borderDivEnd + postPart;
+  }
+
+  protected String adaptExistingHtmlInCellHeader(String cellHeaderHtml) {
+    cellHeaderHtml = addGridLine(cellHeaderHtml);
+
+    return cellHeaderHtml;
+  }
+
   private String computeContentColumnValue(ITableRow row, DrillDownStyleMap drillDownStyles) throws ProcessingException {
     if (row == null) {
       return null;
@@ -214,6 +252,8 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     //Don't generate cell content if the only column contains html.
     //It is assumed that such a column is already optimized for mobile devices.
     if (m_cellDetailColumns.size() == 0 && cellHeaderText.contains("<html>")) {
+      cellHeaderText = adaptExistingHtmlInCellHeader(cellHeaderText);
+
       //Make sure drill down style is set to none
       if (drillDownStyles != null) {
         drillDownStyles.put(row, IRowSummaryColumn.DRILL_DOWN_STYLE_NONE);
@@ -372,12 +412,17 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     }
     text = StringUtility.removeNewLines(text);
     text = StringUtility.trim(text);
-
-    //See replace spaces with non breakable spaces.
-    //Can't use &nbsp; because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=379088
-    text = text.replaceAll("\\s", "&#160;");
+    text = replaceSpaces(text);
 
     return text;
+  }
+
+  /**
+   * Replace spaces with non breaking spaces.
+   * Can't use &nbsp; because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=379088
+   */
+  private String replaceSpaces(String text) {
+    return text.replaceAll("\\s", "&#160;");
   }
 
   private String extractCellDisplayText(IColumn column, ITableRow row) {
