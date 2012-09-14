@@ -47,7 +47,7 @@ public class DefaultClientSessionService extends AbstractService implements ISes
   public JobEx createAsyncJob(String name, IJobRunnable runnable) {
     IClientSession session = getCurrentSession();
     if (session == null) {
-      LOG.error("client session not availbale");
+      LOG.error("client session not available");
       return null;
     }
     if (name == null) {
