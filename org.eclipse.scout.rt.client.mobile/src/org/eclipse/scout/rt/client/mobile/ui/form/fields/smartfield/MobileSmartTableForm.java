@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.AbstractBackButton;
@@ -48,7 +49,14 @@ public class MobileSmartTableForm extends SmartTableForm {
   protected void initConfig() throws ProcessingException {
     super.initConfig();
 
-    setTitle(TEXTS.get("MobileSmartFormTitle", getSmartField().getLabel()));
+    String title = getSmartField().getLabel();
+    if (StringUtility.hasText(title)) {
+      title = TEXTS.get("MobileSmartFormTitle", title);
+    }
+    else {
+      title = TEXTS.get("MobileSmartFormTitleDefault");
+    }
+    setTitle(title);
     getResultTableField().getTable().setCheckable(true);
     getResultTableField().getTable().addTableListener(new P_TableListener());
 
