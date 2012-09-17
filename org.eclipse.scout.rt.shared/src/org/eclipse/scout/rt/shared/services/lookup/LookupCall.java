@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.shared.services.common.session.IJobRunnable;
 import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
+import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -58,6 +59,7 @@ public class LookupCall implements Cloneable, Serializable {
   private static final long serialVersionUID = 0L;
 
   private Object m_key;
+  @MaxLength(2000)
   private String m_text;
   private String m_all;
   private Object m_rec;
