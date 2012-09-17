@@ -59,8 +59,6 @@ public abstract class AbstractCalendarDocumentBuilder {
 
   private final static String FONT = "Arial";
 
-  private final static String PROP_GRID_DATE = "Date";
-
   private final static String LINK_COMPONENT_PREFIX = "http://local/comp/";
   private final static String LINK_DISPLAY_MODE_PREFIX = "http://local/displayMode/";
   private final static String LINK_GRID_PREFIX = "http://local/grid/";
@@ -108,6 +106,7 @@ public abstract class AbstractCalendarDocumentBuilder {
   private CalendarComponent m_selectedComponent;
   private CalendarComponent[] m_components;
   private int m_numContextMenus;
+  private final HashMap<Element, Date> m_gridDateMap;
 
   protected AbstractCalendarDocumentBuilder(String svgFile) {
     // read document
@@ -168,6 +167,7 @@ public abstract class AbstractCalendarDocumentBuilder {
       m_elTimeLineTexts[i] = doc.getElementById("tlt" + i);
     }
     m_displayModeTextWidth = new float[m_elDisplayMode.length];
+    m_gridDateMap = new HashMap<Element, Date>();
 
     // set fonts
     CalendarSvgUtility.setFont(m_elTitle, FONT);
@@ -312,7 +312,7 @@ public abstract class AbstractCalendarDocumentBuilder {
     for (int i = 0; i < m_elDisplayMode.length; i++) {
       boolean isCurrentDisplayMode = linkMenuIds[i] == getDisplayMode();
       Element e = m_elDisplayMode[i];
-      e.setTextContent(m_displayModeLabels[i]);
+      SVGUtility.setTextContent(e, m_displayModeLabels[i]);
       CalendarSvgUtility.setFontWeightNormal(e);
       CalendarSvgUtility.setFont(e, FONT);
       CalendarSvgUtility.setFontSize(e, ORIG_FONT_SIZE);
@@ -334,11 +334,11 @@ public abstract class AbstractCalendarDocumentBuilder {
   private void initTimeLineText() {
     Element early = getSVGDocument().getElementById("tlt0");
     if (early != null) {
-      early.setTextContent(ScoutTexts.get("Calendar_earlier"));
+      SVGUtility.setTextContent(early, ScoutTexts.get("Calendar_earlier"));
     }
     Element late = getSVGDocument().getElementById("tlt13");
     if (late != null) {
-      late.setTextContent(ScoutTexts.get("Calendar_later"));
+      SVGUtility.setTextContent(late, ScoutTexts.get("Calendar_later"));
     }
   }
 
@@ -376,7 +376,7 @@ public abstract class AbstractCalendarDocumentBuilder {
       String label = getWeekDayLabel(1 + ((i + weekstart) % (NUM_DAYS_IN_WEEK)));
       Element e = m_elWeekDayHeadings[i];
       if (e != null) {
-        e.setTextContent(label);
+        SVGUtility.setTextContent(e, label);
         CalendarSvgUtility.setFontWeightBold(e);
         CalendarSvgUtility.setTextAlignCenter(e);
         CalendarSvgUtility.setFont(e, FONT);
@@ -561,7 +561,7 @@ public abstract class AbstractCalendarDocumentBuilder {
         if (textElement != null) {
           String dayTitle = getDayTitle(cal);
           if (dayTitle != null) {
-            textElement.setTextContent(dayTitle);
+            SVGUtility.setTextContent(textElement, dayTitle);
           }
           CalendarSvgUtility.setTextAlignCenter(textElement);
         }
@@ -584,14 +584,14 @@ public abstract class AbstractCalendarDocumentBuilder {
         }
 
         // tag data
-        gridElement.setUserData(PROP_GRID_DATE, curDate, null);
+        m_gridDateMap.put(gridElement, curDate);
 
         cal.add(Calendar.DAY_OF_MONTH, 1);
       }
     });
 
     // write month title
-    m_elTitle.setTextContent(getRangeTitle(createCalendar(getShownDate())));
+    SVGUtility.setTextContent(m_elTitle, getRangeTitle(createCalendar(getShownDate())));
 
     // only highlight the selected box, if the date is in the currently shown range
     setSelectedDate(getSelectedDate());
@@ -618,7 +618,7 @@ public abstract class AbstractCalendarDocumentBuilder {
   }
 
   private Date getDateOfGridElement(Element e) {
-    return (Date) e.getUserData(PROP_GRID_DATE);
+    return m_gridDateMap.get(e);
   }
 
   private String getGridClickUrl(int weekday, int week) {
@@ -755,7 +755,8 @@ public abstract class AbstractCalendarDocumentBuilder {
   }
 
   private Date getDateAt(int weekday, int week) {
-    return (Date) m_elGridBox[week][weekday].getUserData(PROP_GRID_DATE);
+    Element e = m_elGridBox[week][weekday];
+    return m_gridDateMap.get(e);
   }
 
   public Date getEndDate() {

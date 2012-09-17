@@ -46,7 +46,7 @@ public abstract class AbstractComponentElementFactory implements IComponentEleme
 
     // Tooltip
     Element title = template.getOwnerDocument().createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_TITLE_TAG);
-    title.setTextContent(c.getTooltip(day));
+    SVGUtility.setTextContent(title, c.getTooltip(day));
     newEl.appendChild(title);
 
     // ID
