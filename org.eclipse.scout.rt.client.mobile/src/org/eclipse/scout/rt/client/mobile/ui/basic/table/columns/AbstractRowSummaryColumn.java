@@ -240,6 +240,21 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     return cellHeaderHtml;
   }
 
+  /**
+   * @return true if the text starts with {@code <html>}, false if not. The check is case insensitive.
+   */
+  private boolean containsHtml(String text) {
+    if (text == null || text.length() < 6) {
+      return false;
+    }
+    if (text.charAt(0) == '<' && text.charAt(5) == '>') {
+      String tag = text.substring(1, 5);
+      return tag.equalsIgnoreCase("html");
+    }
+
+    return false;
+  }
+
   private String computeContentColumnValue(ITableRow row, DrillDownStyleMap drillDownStyles) throws ProcessingException {
     if (row == null) {
       return null;
@@ -251,7 +266,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     }
     //Don't generate cell content if the only column contains html.
     //It is assumed that such a column is already optimized for mobile devices.
-    if (m_cellDetailColumns.size() == 0 && cellHeaderText.contains("<html>")) {
+    if (m_cellDetailColumns.size() == 0 && containsHtml(cellHeaderText)) {
       cellHeaderText = adaptExistingHtmlInCellHeader(cellHeaderText);
 
       //Make sure drill down style is set to none
