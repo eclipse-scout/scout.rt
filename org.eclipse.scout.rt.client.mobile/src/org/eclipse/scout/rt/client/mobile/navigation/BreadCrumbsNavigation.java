@@ -213,17 +213,39 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     }
     else {
       IBreadCrumb[] breadCrumbs = getBreadCrumbs().toArray(new IBreadCrumb[getBreadCrumbs().size()]);
+      int pos = 0;
       for (IBreadCrumb breadCrumb : breadCrumbs) {
         if (breadCrumb.belongsTo(form)) {
           LOG.debug("Removing existing bread crumb: " + breadCrumb);
 
           getBreadCrumbs().remove(breadCrumb);
+          mergeDuplicates(pos);
 
           LOG.debug("Current bread crumbs way: " + toString());
           fireBreadCrumbsChanged();
           return;
         }
+        pos++;
       }
+    }
+  }
+
+  /**
+   * Makes sure that the bread crumbs at position pos and pos -1 are not the same.
+   * <p>
+   * Such successive duplicate bread crumbs make no sense because pressing back on such a duplicate would just open the
+   * same form again.
+   */
+  private void mergeDuplicates(int pos) {
+    if (pos <= 0 || pos >= getBreadCrumbs().size()) {
+      return;
+    }
+
+    IBreadCrumb predecessor = getBreadCrumbs().get(pos - 1);
+    IBreadCrumb successor = getBreadCrumbs().get(pos);
+    if (predecessor.getForm() == successor.getForm()) {
+      getBreadCrumbs().remove(successor);
+      LOG.debug("Removing duplicate bread crumb: " + successor);
     }
   }
 
