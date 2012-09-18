@@ -49,6 +49,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   private List<IButton> m_mainboxButtons;
   private IPage m_page;
   private P_PageTableListener m_pageTableListener;
+  private P_PageTableSelectionListener m_pageTableSelectionListener;
   private PageFormConfig m_pageFormConfig;
   private PageFormManager m_pageFormManager;
   private Map<ITableRow, AutoLeafPageWithNodes> m_autoLeafPageMap;
@@ -236,6 +237,8 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   public void formAddedNotify() throws ProcessingException {
+    LOG.debug(this + " added for " + m_page);
+
     //Clear selection if form gets visible again. It must not happen earlier, since the actions typically depend on the selected row.
     clearTableSelectionIfNecessary();
 
@@ -247,6 +250,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       m_page.getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(m_page);
     }
 
+    addTableSelectionListener();
     processSelectedTableRow();
   }
 
@@ -257,11 +261,14 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
     ITableRow selectedRow = getPageTableField().getTable().getSelectedRow();
     if (isDrillDownRow(selectedRow)) {
+      LOG.debug("Clearing row for table " + getPageTableField().getTable());
+
       getPageTableField().getTable().selectRow(null);
     }
   }
 
   public void formRemovedNotify() throws ProcessingException {
+    removeTableSelectionListener();
   }
 
   private void addTableListener() {
@@ -285,6 +292,29 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       table.removeTableListener(m_pageTableListener);
     }
     m_pageTableListener = null;
+  }
+
+  private void addTableSelectionListener() {
+    if (m_pageTableSelectionListener != null) {
+      return;
+    }
+    m_pageTableSelectionListener = new P_PageTableSelectionListener();
+
+    ITable table = getPageTableField().getTable();
+    if (table != null) {
+      table.addTableListener(m_pageTableSelectionListener);
+    }
+  }
+
+  private void removeTableSelectionListener() {
+    if (m_pageTableSelectionListener == null) {
+      return;
+    }
+    ITable table = getPageTableField().getTable();
+    if (table != null) {
+      table.removeTableListener(m_pageTableSelectionListener);
+    }
+    m_pageTableSelectionListener = null;
   }
 
   private void processSelectedTableRow() throws ProcessingException {
@@ -449,7 +479,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       return;
     }
     if (tableRow == null) {
-      //Make sure there always is a selected row. if NodePageSwitch is enabled the same page and therefore the is on different pageForms
+      //Make sure there always is a selected row. if NodePageSwitch is enabled the same page and therefore the same table is on different pageForms
       if (m_pageFormConfig.isKeepSelection()) {
         selectPageTableRowIfNecessary(table);
       }
@@ -564,10 +594,6 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     public void tableChanged(TableEvent event) {
       try {
         switch (event.getType()) {
-          case TableEvent.TYPE_ROWS_SELECTED: {
-            handleTableRowSelected(event);
-            break;
-          }
           case TableEvent.TYPE_ALL_ROWS_DELETED:
           case TableEvent.TYPE_ROWS_DELETED: {
             handleTableRowDeleted(event);
@@ -582,15 +608,6 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       }
     }
 
-    private void handleTableRowSelected(TableEvent event) throws ProcessingException {
-      if (event.isConsumed()) {
-        return;
-      }
-
-      ITableRow tableRow = event.getFirstRow();
-      PageForm.this.handleTableRowSelected(event.getTable(), tableRow);
-    }
-
     private void handleTableRowDeleted(TableEvent event) throws ProcessingException {
       PageForm.this.handleTableRowsDeleted(event.getTable(), event.getRows());
       updateTableFieldVisibility();
@@ -599,6 +616,33 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     private void handleTableRowsInserted(TableEvent event) throws ProcessingException {
       PageForm.this.handleTableRowsInserted(event.getTable(), event.getRows());
       updateTableFieldVisibility();
+    }
+
+  }
+
+  private class P_PageTableSelectionListener extends TableAdapter {
+    @Override
+    public void tableChanged(TableEvent event) {
+      try {
+        switch (event.getType()) {
+          case TableEvent.TYPE_ROWS_SELECTED: {
+            handleTableRowSelected(event);
+            break;
+          }
+        }
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+    }
+
+    private void handleTableRowSelected(TableEvent event) throws ProcessingException {
+      if (event.isConsumed()) {
+        return;
+      }
+
+      ITableRow tableRow = event.getFirstRow();
+      PageForm.this.handleTableRowSelected(event.getTable(), tableRow);
     }
 
   }
