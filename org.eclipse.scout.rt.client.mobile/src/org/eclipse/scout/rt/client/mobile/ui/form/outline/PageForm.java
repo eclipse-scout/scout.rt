@@ -130,6 +130,9 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
   }
 
+  /**
+   * Creates a {@link TableRowForm} out of the selected table row if the parent page is a {@link IPageWithTable}.
+   */
   private TableRowForm createAutoDetailForm() throws ProcessingException {
     ITable table = null;
     IPage parentPage = m_page.getParentPage();
@@ -185,8 +188,14 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
     MobileTable.setAutoCreateRowForm(pageTable, false);
     getPageTableField().setTable(pageTable, true);
+    addTableListener();
     updateTableFieldVisibility();
     getPageTableField().setTableStatusVisible(m_pageFormConfig.isTableStatusVisible());
+  }
+
+  @Override
+  protected void execDisposeForm() throws ProcessingException {
+    removeTableListener();
   }
 
   private void updateDrillDownStyle() {
@@ -234,9 +243,10 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     updateDrillDownStyle();
 
     //Make sure the page which belongs to the form is active when the form is shown
-    m_page.getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(m_page);
+    if (!m_page.isSelectedNode()) {
+      m_page.getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(m_page);
+    }
 
-    addTableListener();
     processSelectedTableRow();
   }
 
@@ -252,7 +262,6 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   public void formRemovedNotify() throws ProcessingException {
-    removeTableListener();
   }
 
   private void addTableListener() {
@@ -460,7 +469,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     if (rowPage == null) {
       //Create auto leaf page including an outline and activate it.
       //Adding to a "real" outline is not possible because the page to row maps in AbstractPageWithTable resp. AbstractPageWithNodes can only be modified by the page itself.
-      AutoLeafPageWithNodes autoPage = new AutoLeafPageWithNodes(tableRow);
+      AutoLeafPageWithNodes autoPage = new AutoLeafPageWithNodes(tableRow, m_page);
       AutoOutline autoOutline = new AutoOutline();
       autoOutline.setRootNode(autoPage);
       autoOutline.selectNode(autoPage);
