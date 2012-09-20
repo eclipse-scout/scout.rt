@@ -20,6 +20,7 @@
     <version>3.9.0-SNAPSHOT</version>
   </parent>
 
+  <groupId>org.eclipse.scout.rt.feature</groupId>
   <artifactId>org.eclipse.scout.rt</artifactId>
   <packaging>eclipse-feature</packaging>
 
@@ -62,5 +63,4 @@
       </plugin>
     </plugins>
   </build>
-  <groupId>org.eclipse.scout.rt.feature</groupId>
 </project>
