@@ -22,8 +22,15 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.osgi.framework.Bundle;
 
 /**
- * Browser classes in a bundle This browser checks in order: 1. / (zipped
- * bundles) 2. bin/ (workspace bundles) 3. classes/ (workspace bundles)
+ * Browses classes in a bundle.
+ * <p>
+ * This browser checks for classes in the following order:
+ * <ol>
+ * <li>/bin/ (workspace bundles)</li>
+ * <li>/classes/ (workspace bundles)</li>
+ * <li>/target/classes/ (maven workspace bundles)</li>
+ * <li>/ (zipped bundles)</li>
+ * </ol>
  */
 public class BundleBrowser {
   public static final IScoutLogger LOG = ScoutLogManager.getLogger(BundleBrowser.class);
@@ -53,11 +60,9 @@ public class BundleBrowser {
   }
 
   /**
-   * @param includeInnerTypes
-   * @param includeSubtree
    * @return all found classes in side the bundle
-   *         If the bundle is a binary bundle, simply visits all its classes, otherwise visits the bin/ or the /classes
-   *         folder
+   *         If the bundle is a binary bundle, simply visits all its classes, otherwise visits the /bin, the /classes or
+   *         the /target/classes folder
    */
   public String[] getClasses(boolean includeInnerTypes, boolean includeSubtree) {
     m_includeInnerTypes = includeInnerTypes;
@@ -70,6 +75,10 @@ public class BundleBrowser {
       Enumeration<String> en = getResourcesEnumeration(m_bundle, m_prefix + path);
       if (en == null) {
         m_prefix = "/classes/";
+        en = getResourcesEnumeration(m_bundle, m_prefix + path);
+      }
+      if (en == null) {
+        m_prefix = "/target/classes/";
         en = getResourcesEnumeration(m_bundle, m_prefix + path);
       }
       if (en == null) {
@@ -126,7 +135,6 @@ public class BundleBrowser {
     return Collections.enumeration(paths);
   }
 
-  @SuppressWarnings("unchecked")
   private void visit(Enumeration<String> en) {
     if (en != null) {
       while (en.hasMoreElements()) {

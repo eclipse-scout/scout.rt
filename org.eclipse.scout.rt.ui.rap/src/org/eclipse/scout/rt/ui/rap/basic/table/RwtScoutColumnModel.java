@@ -106,6 +106,10 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
             getUiTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
               @Override
               public void run() {
+                if (getUiTable().isUiDisposed()) {
+                  return;
+                }
+
                 getUiTable().getUiTableViewer().refresh();
               }
             });
@@ -133,6 +137,10 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
             getUiTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
               @Override
               public void run() {
+                if (getUiTable().isUiDisposed()) {
+                  return;
+                }
+
                 getUiTable().getUiTableViewer().refresh();
               }
             });

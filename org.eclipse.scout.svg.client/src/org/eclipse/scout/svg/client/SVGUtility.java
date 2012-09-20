@@ -38,6 +38,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.w3c.dom.svg.SVGAElement;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGElement;
@@ -221,11 +222,11 @@ public final class SVGUtility {
       nl.item(i).getParentNode().removeChild(nl.item(i));
     }
     if (value == null || value.length() == 0) {
-      textElement.setTextContent(null);
+      setTextContent(textElement, null);
       return;
     }
     if (!value.contains("\n")) {
-      textElement.setTextContent(value);
+      setTextContent(textElement, value);
       return;
     }
     //get font height
@@ -252,7 +253,7 @@ public final class SVGUtility {
     float rowHeight = fontHeight + rowGap;
     //create tspan lines
     float y = 0;
-    textElement.setTextContent(null);
+    setTextContent(textElement, null);
     for (String line : value.split("[\n\r]")) {
       SVGTSpanElement tspanElem = (SVGTSpanElement) textElement.getOwnerDocument().createElementNS(SVG_NS, SVGConstants.SVG_TSPAN_TAG);
       textElement.appendChild(tspanElem);
@@ -261,6 +262,21 @@ public final class SVGUtility {
       tspanElem.setAttribute("y", String.valueOf(y));
       y += rowHeight;
     }
+  }
+
+  /**
+   * @param set
+   *          the text content on a node by using the child text node. Use this instead of e.setTextContent to be
+   *          compatible with batik 1.6 (jdk 1.4)
+   */
+  public static void setTextContent(Element e, String textContent) {
+    //remove children
+    while (e.getFirstChild() != null) {
+      e.removeChild(e.getFirstChild());
+    }
+    //add child text node
+    Text textNode = e.getOwnerDocument().createTextNode(textContent);
+    e.appendChild(textNode);
   }
 
   /**
@@ -291,7 +307,7 @@ public final class SVGUtility {
       }
       line = line.replaceAll("[\\s]+", " ").trim();
       try {
-        contextElement.setTextContent(line);
+        setTextContent(contextElement, line);
         float[] w = new float[line.length()];
         for (int i = 0; i < w.length; i++) {
           w[i] = contextElement.getExtentOfChar(i).getWidth();
@@ -344,7 +360,7 @@ public final class SVGUtility {
         }
       }
       finally {
-        contextElement.setTextContent(null);
+        setTextContent(contextElement, null);
       }
     }
     while (wrappedLines.size() > 0 && wrappedLines.get(wrappedLines.size() - 1).length() == 0) {
@@ -397,7 +413,7 @@ public final class SVGUtility {
     }
     String suffix = "...";
     try {
-      contextElement.setTextContent(text + suffix);
+      setTextContent(contextElement, text + suffix);
       int textLen = text.length();
       int suffixLen = suffix.length();
       float textWidth = 0;
@@ -423,7 +439,7 @@ public final class SVGUtility {
       return text.substring(0, i + 1) + suffix;
     }
     finally {
-      contextElement.setTextContent(null);
+      setTextContent(contextElement, null);
     }
   }
 
@@ -442,7 +458,7 @@ public final class SVGUtility {
       return 0;
     }
     try {
-      contextElement.setTextContent(text);
+      setTextContent(contextElement, text);
       int textLen = text.length();
       float textWidth = 0;
       for (int i = 0; i < textLen; i++) {
@@ -451,7 +467,7 @@ public final class SVGUtility {
       return textWidth;
     }
     finally {
-      contextElement.setTextContent(null);
+      setTextContent(contextElement, null);
     }
   }
 

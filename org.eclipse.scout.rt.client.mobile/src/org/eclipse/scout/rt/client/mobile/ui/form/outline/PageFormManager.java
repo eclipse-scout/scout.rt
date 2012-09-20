@@ -248,7 +248,7 @@ public class PageFormManager {
     }
 
     //If same page gets selected again, move it to the left.
-    if (pageForm.getPage().equals(selectedPage)) {
+    if (pageForm != null && pageForm.getPage().equals(selectedPage)) {
       showPageInLeftForm(selectedPage);
     }
     //A AutoLeafPage is not attached to a real outline. Since it already has been activated just show it.
@@ -338,6 +338,15 @@ public class PageFormManager {
     }
     finally {
       m_pageFormMap.remove(page);
+    }
+
+    // Normally, when removing the selected page, the parent page gets selected and the corresponding page form shown.
+    // In case of the AutoLeafPageWithNodes, the parent page already is selected, so no selection event will be fired. Therefore we need to show the page form manually.
+    if (page instanceof AutoLeafPageWithNodes) {
+      IPage parentPage = ((AutoLeafPageWithNodes) page).getActualParentPage();
+      if (parentPage.isSelectedNode()) {
+        showPage(parentPage);
+      }
     }
   }
 

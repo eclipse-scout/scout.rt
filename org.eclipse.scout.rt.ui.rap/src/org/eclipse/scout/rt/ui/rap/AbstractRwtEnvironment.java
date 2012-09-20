@@ -47,6 +47,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.busy.IBusyHandler;
 import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
@@ -157,6 +158,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private RwtScoutNavigationSupport m_historySupport;
   private LayoutValidateManager m_layoutValidateManager;
   private HtmlAdapter m_htmlAdapter;
+  private IBusyHandler m_busyHandler;
 
   public AbstractRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     m_applicationBundle = applicationBundle;
@@ -230,10 +232,13 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         m_formToolkit.dispose();
         m_formToolkit = null;
       }
-
       detachScoutListeners();
       if (m_synchronizer != null) {
         m_synchronizer = null;
+      }
+      if (m_busyHandler != null) {
+        m_busyHandler.setEnabled(false);
+        m_busyHandler = null;
       }
 
       m_status = RwtEnvironmentEvent.STOPPED;
@@ -249,7 +254,13 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   @Override
   public String getLogoutLandingUri() {
-    return RWT.getRequest().getRequestURI();
+    String path = RWT.getRequest().getServletPath();
+
+    if (path.length() > 0 && '/' == path.charAt(0)) {
+      path = path.substring(1);
+    }
+
+    return path;
   }
 
   public void logout() {
@@ -395,7 +406,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       m_status = RwtEnvironmentEvent.STARTED;
       fireEnvironmentChanged(new RwtEnvironmentEvent(this, m_status));
 
-      attachBusyHandler();
+      m_busyHandler = attachBusyHandler();
     }
     finally {
       if (m_status == RwtEnvironmentEvent.STARTING) {
@@ -1166,14 +1177,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     else {
       LOG.warn("synchronizer is null; session is closed");
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Shell getParentShellIgnoringPopups(int modalities) {
-    return RwtUtility.getParentShellIgnoringPopups(modalities);
   }
 
   @Override

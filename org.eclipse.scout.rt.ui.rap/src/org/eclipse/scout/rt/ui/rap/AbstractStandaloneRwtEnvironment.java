@@ -12,12 +12,15 @@ package org.eclipse.scout.rt.ui.rap;
 
 import java.lang.reflect.Field;
 import java.security.AccessController;
+import java.util.TreeMap;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.rwt.service.SettingStoreException;
+import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -45,6 +48,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStandaloneRwtEnvironment.class);
 
   private Display m_display;
+  private Shell m_rootShell;
   private RwtScoutDesktop m_uiDesktop;
   private RwtScoutFormButtonBar m_uiButtonArea;
 
@@ -107,6 +111,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     }
 
     Shell shell = new Shell(m_display, SWT.NO_TRIM);
+    m_rootShell = shell;
     createApplicationContent(shell);
     createNonmodalFormButtonArea(shell);
     //layout
@@ -144,6 +149,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
         }
       }
     });
+
     while (!shell.isDisposed()) {
       if (getClientSession() != null) {
         LocaleThreadLocal.set(getClientSession().getLocale());
@@ -153,6 +159,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
       }
     }
     m_display.dispose();
+    m_rootShell = null;
     return 0;
   }
 
@@ -254,5 +261,41 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
         m_uiButtonArea.getUiContainer().getParent().layout(true, true);
       }
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Shell getParentShellIgnoringPopups(int modalities) {
+    Shell shell = Display.getCurrent().getActiveShell();
+    if (shell != null) {
+      while (RwtUtility.isPopupShell(shell) && shell.getParent() instanceof Shell) {
+        shell = (Shell) shell.getParent();
+      }
+    }
+    // traverse available shells
+    if (shell == null) {
+      TreeMap<CompositeLong, Shell> map = new TreeMap<CompositeLong, Shell>();
+      for (Shell s : Display.getCurrent().getShells()) {
+        RwtUtility.visitShellTreeRec(s, modalities, 0, map);
+      }
+      if (map.size() > 0) {
+        shell = map.get(map.firstKey());
+      }
+    }
+
+    if (shell != null && shell.getData() instanceof ProgressMonitorDialog) {
+      // do also ignore the ProgressMonitorDialog, otherwise there will be some strange behaviors
+      // when displaying a shell on top of the ProgressMonitorDialog-shell (f.e. when the
+      // ProgressMonitorDialog-shell disappears)
+      shell = (Shell) shell.getParent();
+    }
+
+    if (shell == null) {
+      shell = m_rootShell;
+    }
+
+    return shell;
   }
 }

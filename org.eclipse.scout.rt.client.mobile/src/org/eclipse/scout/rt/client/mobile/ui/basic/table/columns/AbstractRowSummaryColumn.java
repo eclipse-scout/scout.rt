@@ -126,20 +126,6 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     return false;
   }
 
-  public void updateValue(ITableRow[] rows, ITableRow[] modelRows) throws ProcessingException {
-    updateValue(rows, modelRows, null);
-  }
-
-  public void updateValue(ITableRow[] rows, ITableRow[] modelRows, DrillDownStyleMap drillDownStyles) throws ProcessingException {
-    if (rows.length != modelRows.length) {
-      throw new ProcessingException("Given rows not consistent.");
-    }
-
-    for (int i = 0; i < rows.length; i++) {
-      updateValue(rows[i], modelRows[i], drillDownStyles);
-    }
-  }
-
   public void updateValue(ITableRow row, ITableRow modelRow, DrillDownStyleMap drillDownStyle) throws ProcessingException {
     setValue(row, computeContentColumnValue(modelRow, drillDownStyle));
   }
@@ -186,11 +172,12 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     int maxRowsToConsider = 10;
 
     for (int row = 0; row < Math.min(maxRowsToConsider, table.getRowCount()); row++) {
-      final String columnDisplayText = column.getDisplayText(table.getRow(row));
+      ITableRow tableRow = table.getRow(row);
+      final String columnDisplayText = column.getDisplayText(tableRow);
       if (StringUtility.hasText(columnDisplayText)) {
         columnEmpty = false;
 
-        String cellHeaderText = getCellHeaderText(table, row);
+        String cellHeaderText = getCellHeaderText(tableRow);
         if (cellHeaderText != null && cellHeaderText.contains(columnDisplayText)) {
           return false;
         }
@@ -206,13 +193,66 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     return true;
   }
 
-  private String getCellHeaderText(ITable table, int i) {
+  private String getCellHeaderText(ITableRow row) {
     if (m_cellHeaderColumn != null) {
-      return m_cellHeaderColumn.getDisplayText(table.getRow(i));
+      return m_cellHeaderColumn.getDisplayText(row);
     }
     else {
-      return table.getSummaryCell(i).getText();
+      return row.getTable().getSummaryCell(row).getText();
     }
+  }
+
+  private static final Pattern bodyPartPattern = Pattern.compile("(.*<body[^>]*>)(.*)(</body>.*)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+  private static final Pattern htmlPartPattern = Pattern.compile("(.*<html[^>]*>)(.*)(</html>.*)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+  /**
+   * Wraps the existing html with a div having a border on the bottom to visually separate the rows. This would actually
+   * be the job of the GUI, but it seems not to be possible with the list widget of rap.
+   */
+  private String addGridLine(String existingHtml) {
+    String borderDivStart = "<div style=\"position: absolute; width: 100%; height: 100%; border-bottom:1px solid #e1efec\">";
+    String borderDivEnd = "</div>";
+    String prePart = "";
+    String mainPart = "";
+    String postPart = "";
+
+    Matcher m = bodyPartPattern.matcher(existingHtml);
+    boolean found = m.find();
+    if (!found) {
+      m = htmlPartPattern.matcher(existingHtml);
+      found = m.find();
+    }
+    if (found) {
+      prePart = m.group(1);
+      mainPart = m.group(2);
+      postPart = m.group(3);
+    }
+    else {
+      mainPart = existingHtml;
+    }
+
+    return prePart + borderDivStart + mainPart + borderDivEnd + postPart;
+  }
+
+  protected String adaptExistingHtmlInCellHeader(String cellHeaderHtml) {
+    cellHeaderHtml = addGridLine(cellHeaderHtml);
+
+    return cellHeaderHtml;
+  }
+
+  /**
+   * @return true if the text starts with {@code <html>}, false if not. The check is case insensitive.
+   */
+  private boolean containsHtml(String text) {
+    if (text == null || text.length() < 6) {
+      return false;
+    }
+    if (text.charAt(0) == '<' && text.charAt(5) == '>') {
+      String tag = text.substring(1, 5);
+      return tag.equalsIgnoreCase("html");
+    }
+
+    return false;
   }
 
   private String computeContentColumnValue(ITableRow row, DrillDownStyleMap drillDownStyles) throws ProcessingException {
@@ -220,13 +260,15 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       return null;
     }
 
-    String cellHeaderText = getCellHeaderText(row.getTable(), row.getRowIndex());
+    String cellHeaderText = getCellHeaderText(row);
     if (cellHeaderText == null) {
       cellHeaderText = "";
     }
     //Don't generate cell content if the only column contains html.
     //It is assumed that such a column is already optimized for mobile devices.
-    if (m_cellDetailColumns.size() == 0 && cellHeaderText.contains("<html>")) {
+    if (m_cellDetailColumns.size() == 0 && containsHtml(cellHeaderText)) {
+      cellHeaderText = adaptExistingHtmlInCellHeader(cellHeaderText);
+
       //Make sure drill down style is set to none
       if (drillDownStyles != null) {
         drillDownStyles.put(row, IRowSummaryColumn.DRILL_DOWN_STYLE_NONE);
@@ -385,12 +427,17 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     }
     text = StringUtility.removeNewLines(text);
     text = StringUtility.trim(text);
-
-    //See replace spaces with non breakable spaces.
-    //Can't use &nbsp; because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=379088
-    text = text.replaceAll("\\s", "&#160;");
+    text = replaceSpaces(text);
 
     return text;
+  }
+
+  /**
+   * Replace spaces with non breaking spaces.
+   * Can't use &nbsp; because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=379088
+   */
+  private String replaceSpaces(String text) {
+    return text.replaceAll("\\s", "&#160;");
   }
 
   private String extractCellDisplayText(IColumn column, ITableRow row) {

@@ -23,7 +23,7 @@ public class TimeLineTextComponentElementFactory extends TimeLineComponentElemen
     float x = parentDimension.x + (parentDimension.width / 2.0f);
     float y = parentDimension.y + (parentDimension.height / 2.0f) + TEXT_Y_OFFSET;
 
-    txt.setTextContent(c.getLabel(day));
+    SVGUtility.setTextContent(txt, c.getLabel(day));
     CalendarSvgUtility.setTextPos(txt, x, y);
     CalendarSvgUtility.setTextAlignCenter(txt);
 

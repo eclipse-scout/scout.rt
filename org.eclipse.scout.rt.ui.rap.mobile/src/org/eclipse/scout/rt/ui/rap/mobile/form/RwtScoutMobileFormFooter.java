@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.rap.mobile.form;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -40,12 +39,14 @@ public class RwtScoutMobileFormFooter extends AbstractRwtScoutActionBar<IForm> i
   @Override
   protected void initializeUi(Composite parent) {
     setMenuOpeningDirection(SWT.UP);
-
     m_actions = fetchActions();
 
     super.initializeUi(parent);
+  }
 
-    getUiContainer().setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FORM_FOOTER);
+  @Override
+  protected String getActionBarContainerVariant() {
+    return VARIANT_FORM_FOOTER;
   }
 
   @Override

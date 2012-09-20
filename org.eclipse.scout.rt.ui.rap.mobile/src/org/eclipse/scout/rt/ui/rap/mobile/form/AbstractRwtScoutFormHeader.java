@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.rap.mobile.form;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -25,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.mobile.action.AbstractRwtScoutActionBar;
 import org.eclipse.scout.rt.ui.rap.mobile.action.ActionButtonBar;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
-import org.eclipse.swt.widgets.Composite;
 
 /**
  * @since 3.9.0
@@ -35,10 +33,8 @@ public class AbstractRwtScoutFormHeader extends AbstractRwtScoutActionBar<IForm>
   private static final String VARIANT_FORM_HEADER = "mobileFormHeader";
 
   @Override
-  protected void initializeUi(Composite parent) {
-    super.initializeUi(parent);
-
-    getUiContainer().setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FORM_HEADER);
+  protected String getActionBarContainerVariant() {
+    return VARIANT_FORM_HEADER;
   }
 
   @Override

@@ -2047,15 +2047,18 @@ Sash {
 Composite.mobileFormHeader {
   background-color: #67a8ce;
 }
-Composite.mobileFormFooter {
-  background-image: gradient(linear, left top, left bottom, from(#ddebf4), to(#d4e1e7));
-}
-CLabel.actionBarContainer {
+CLabel.mobileFormHeader {
   color: white;
   padding: 3px 0px;
   text-shadow: 0px -1px 0px #2a78a5;
   font: bold 17px Arial, Helvetica, sans-serif;
   background-color: transparent;
+}
+Composite.mobileFormFooter {
+  background-image: gradient(linear, left top, left bottom, from(#ddebf4), to(#d4e1e7));
+}
+Composite.smartFieldActionBar {
+  background-image: gradient(linear, left top, left bottom, from(#ddebf4), to(#d4e1e7));
 }
 CLabel {
   /* Top and bottom padding depend on logical grid row height. The text of the label should be aligned with the text of the field. */
@@ -2169,7 +2172,17 @@ Text {
 Composite.form {
   background-color: #ebf4f8;
 }
-/* ToolBar at the moment only used for busy decoration */
-ToolBar {
-  font: 12px Arial, Helvetica, sans-serif;
+Shell.busy-dialog {
+  border-radius: 3px;
+  border: 1px solid #3a7597;
+  background-color: #67a8ce;
+}
+Label.busy-dialog {
+  color: white;
+}
+Label.outlineTableStatus {
+  color: #2a5a76;
+}
+Label.tableStatus {
+  color: #2a5a76;
 }

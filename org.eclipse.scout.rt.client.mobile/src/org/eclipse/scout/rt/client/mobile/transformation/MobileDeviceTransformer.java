@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.IMobileButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -45,6 +46,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -226,6 +228,9 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     else if (field instanceof ISmartField) {
       transformSmartField((ISmartField) field);
     }
+    else if (field instanceof IPlaceholderField) {
+      transformPlaceholderField((IPlaceholderField) field);
+    }
 
   }
 
@@ -293,6 +298,13 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   /**
+   * Makes placeholder fields invisible since they just waste space on 1 column layouts
+   */
+  protected void transformPlaceholderField(IPlaceholderField field) {
+    field.setVisible(false);
+  }
+
+  /**
    * Used to keep the row count small which speeds up the list.
    */
   protected int getSmartFieldBrowseMaxRowCount() {
@@ -348,6 +360,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
           case IButton.SYSTEM_TYPE_CANCEL:
           case IButton.SYSTEM_TYPE_CLOSE:
           case IButton.SYSTEM_TYPE_OK:
+          case IMobileButton.SYSTEM_TYPE_BACK:
             if (wrappedButton.isVisible() && wrappedButton.isEnabled()) {
               return true;
             }
@@ -367,7 +380,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   protected boolean shouldPageTableStatusBeHidden() {
-    return true;
+    return false;
   }
 
   protected boolean shouldLabelBeMovedToTop() {

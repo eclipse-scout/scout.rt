@@ -16,20 +16,27 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   private ITableRow m_tableRow;
+  private IPage m_actualParentPage;
 
-  public AutoLeafPageWithNodes(ITableRow row) {
+  public AutoLeafPageWithNodes(ITableRow row, IPage parentPage) {
     if (row == null) {
       throw new IllegalArgumentException("Row must not be null");
     }
 
     m_tableRow = row;
+    m_actualParentPage = parentPage;
   }
 
   public ITableRow getTableRow() {
     return m_tableRow;
+  }
+
+  public IPage getActualParentPage() {
+    return m_actualParentPage;
   }
 
   @Override

@@ -303,16 +303,12 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     try {
       setTableChanging(true);
       try {
-        ITableRow[] rows = getRowMapColumn().findRows(originalRows);
-        if (rows.length > 0) {
-          getContentColumn().updateValue(rows, originalRows, getDrillDownStyleMap());
-
-          if (isCheckable()) {
-            for (ITableRow originalRow : originalRows) {
-              ITableRow row = getRowMapColumn().findRow(originalRow);
-              if (row != null) {
-                checkRow(row, originalRow.isChecked());
-              }
+        for (ITableRow originalRow : originalRows) {
+          ITableRow row = getRowMapColumn().findRow(originalRow);
+          if (row != null) {
+            getContentColumn().updateValue(row, originalRow, getDrillDownStyleMap());
+            if (isCheckable()) {
+              checkRow(row, originalRow.isChecked());
             }
           }
 

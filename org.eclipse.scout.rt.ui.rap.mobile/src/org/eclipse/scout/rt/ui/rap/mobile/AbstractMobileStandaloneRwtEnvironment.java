@@ -19,7 +19,9 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.rap.AbstractStandaloneRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
+import org.eclipse.scout.rt.ui.rap.mobile.busy.RwtMobileBusyHandler;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileForm;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileFormFooter;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileFormHeader;
@@ -109,4 +111,8 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
     return new MobileBrowserWindowHandler();
   }
 
+  @Override
+  protected RwtBusyHandler createBusyHandler() {
+    return new RwtMobileBusyHandler(getClientSession(), this);
+  }
 }

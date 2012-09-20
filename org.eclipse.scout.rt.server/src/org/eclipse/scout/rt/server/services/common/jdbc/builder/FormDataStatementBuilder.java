@@ -497,18 +497,23 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * )
    * </pre></code> <br>
    * The selectClause is something like <code><pre>
-   * ( SELECT &lt;column/&gt;
+   * ( SELECT &lt; selectParts/&gt;
    * FROM PERSON @PERSON@
    * WHERE @PERSON@.PERSON_ID=@parent.PERSON@.PERSON_ID
    * &lt;whereParts/&gt;
    * )
-   * </pre></code> <br>
+   * </pre></code> It is not allowed, that the selectClause contains a <i>UNION</i> because this part is needed for
+   * aggregation too.<br>
+   * The <i>selectParts</i> tag is replaced with all attributes which are selected.
+   * If there are more than one attributes, they are separated by a comma
+   * "<i>attribute1</i> <i>,</i> <i>attribute2</i>".<br>
    * The <i>whereParts</i> tag is replaced with all attributes contained in the entity that have no aggregation type.
    * Every attribute contributes a "AND <i>attribute</i> <i>op</i> <i>value</i>" line.<br>
    * The <i>groupBy</i> tag is only used when there are attributes in the entity that have an aggregation type.<br>
    * The <i>havingParts</i> tag is replaced with all attributes contained in the entity that have an aggregation type.
    * Every aggregation attribute contributes a "AND <i>fun</i>(<i>attribute</i>) <i>op</i> <i>value</i>" line.<br>
    */
+
   public void setDataModelEntityDefinition(Class<? extends IDataModelEntity> entityType, String whereClause, String selectClause) {
     setDataModelEntityDefinition(new DataModelEntityPartDefinition(entityType, whereClause, selectClause));
   }
