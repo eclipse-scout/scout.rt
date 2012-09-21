@@ -11,6 +11,7 @@
 package org.eclipse.scout.commons.internal;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.scout.commons.CollationRulesPatch;
 import org.osgi.framework.BundleContext;
 
 public class Activator extends Plugin {
@@ -26,6 +27,7 @@ public class Activator extends Plugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     m_plugin = this;
+    CollationRulesPatch.patchDefaultCollationRules();
   }
 
   @Override
