@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,7 +12,6 @@ package org.eclipse.scout.commons;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Hashtable;
 
 import javax.swing.text.StyleContext;
@@ -180,7 +179,7 @@ public final class CSSPatch {
     }
     //extends CSS.Attribute.allAttributes
     Field f = Attribute.class.getDeclaredField("allAttributes");
-    removeFinalFlagOnField(f);
+    ReflectionUtility.removeFinalFlagOnField(f);
     f.setAccessible(true);
     Attribute[] allAttributes = (Attribute[]) f.get(null);
     Attribute[] newArray = new Attribute[allAttributes.length + additionalAttributes.length];
@@ -222,13 +221,4 @@ public final class CSSPatch {
     c.setAccessible(true);
     return c.newInstance();
   }
-
-  private static void removeFinalFlagOnField(Field f) throws Exception {
-    Field reflectedModifier = Field.class.getDeclaredField("modifiers");
-    reflectedModifier.setAccessible(true);
-    int modifiers = (Integer) reflectedModifier.get(f);
-    modifiers = modifiers & ~Modifier.FINAL;
-    reflectedModifier.set(f, modifiers);
-  }
-
 }
