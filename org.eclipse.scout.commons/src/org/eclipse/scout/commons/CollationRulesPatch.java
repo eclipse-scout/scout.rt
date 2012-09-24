@@ -34,9 +34,25 @@ public class CollationRulesPatch {
     }
   }
 
+  public static void revertPatchDefaultCollationRules() {
+    try {
+      revertDefaultCollationRules();
+      clearCollatorCache();
+    }
+    catch (Throwable t) {
+      // nop
+    }
+  }
+
   private static void changeDefaultCollationRules() throws Exception {
     Field defaultRulesField = getDefaultCollationRulesField();
-    replaceDefaultCollationRules(defaultRulesField);
+    replaceDefaultCollationRules(defaultRulesField, "<'\u005f'", "<'\u0020','\u002D'<'\u005f'");
+    ReflectionUtility.setFinalFlagOnField(defaultRulesField);
+  }
+
+  private static void revertDefaultCollationRules() throws Exception {
+    Field defaultRulesField = getDefaultCollationRulesField();
+    replaceDefaultCollationRules(defaultRulesField, "<'\u0020','\u002D'<'\u005f'", "<'\u005f'");
     ReflectionUtility.setFinalFlagOnField(defaultRulesField);
   }
 
@@ -47,13 +63,13 @@ public class CollationRulesPatch {
     return defaultRulesField;
   }
 
-  private static void replaceDefaultCollationRules(Field defaultRulesField) throws Exception {
+  private static void replaceDefaultCollationRules(Field defaultRulesField, String oldRule, String newRule) throws Exception {
     defaultRulesField.setAccessible(true);
     String defaultRules = (String) defaultRulesField.get(null);
-    if (defaultRules.contains("<'\u0020','\u002D'<'\u005f'")) {
+    if (defaultRules.contains(newRule)) {
       return;
     }
-    String newRules = defaultRules.replaceAll("<'\u005f'", "<'\u0020','\u002D'<'\u005f'");
+    String newRules = defaultRules.replaceAll(oldRule, newRule);
     defaultRulesField.set(null, newRules);
     defaultRulesField.setAccessible(false);
   }
