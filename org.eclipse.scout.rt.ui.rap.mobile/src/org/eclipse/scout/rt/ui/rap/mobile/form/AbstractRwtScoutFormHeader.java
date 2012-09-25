@@ -74,6 +74,11 @@ public class AbstractRwtScoutFormHeader extends AbstractRwtScoutActionBar<IForm>
     Runnable t = new Runnable() {
       @Override
       public void run() {
+        //Don't fetch actions if the form has already been removed from the desktop.
+        if (!getScoutObject().isShowing()) {
+          return;
+        }
+
         IActionFetcher actionFetcher = AbstractMobileForm.getHeaderActionFetcher(getScoutObject());
         if (actionFetcher == null) {
           actionFetcher = new FormHeaderActionFetcher(getScoutObject());
