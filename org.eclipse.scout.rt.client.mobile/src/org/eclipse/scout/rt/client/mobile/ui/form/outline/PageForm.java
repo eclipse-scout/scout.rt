@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -53,6 +52,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   private PageFormConfig m_pageFormConfig;
   private PageFormManager m_pageFormManager;
   private Map<ITableRow, AutoLeafPageWithNodes> m_autoLeafPageMap;
+  private boolean m_rowSelectionRequired;
 
   public PageForm(IPage page, PageFormManager manager, PageFormConfig pageFormConfig) throws ProcessingException {
     super(false);
@@ -68,6 +68,11 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     initMainButtons();
     callInitializer();
     initFields();
+  }
+
+  @Override
+  public PageFormConfig getPageFormConfig() {
+    return m_pageFormConfig;
   }
 
   @Override
@@ -140,8 +145,18 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     if (parentPage instanceof IPageWithTable) {
       table = ((IPageWithTable) parentPage).getTable();
     }
-    if (table != null && table.getSelectedRow() != null) {
-      return new TableRowForm(table.getSelectedRow());
+    if (table != null) {
+      if (table.getSelectedRow() == null) {
+        //If the parent page has not been selected before there is no row selected -> select it to create the tableRowForm
+        ITableRow row = MobileDesktopUtility.getTableRowFor(m_page.getParentPage(), m_page);
+        if (row != null) {
+          row.getTable().selectRow(row);
+        }
+      }
+      if (table.getSelectedRow() != null) {
+        return new TableRowForm(table.getSelectedRow());
+      }
+
     }
 
     return null;
@@ -237,7 +252,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   public void formAddedNotify() throws ProcessingException {
-    LOG.debug(this + " added for " + m_page);
+    LOG.debug(this + " added");
 
     //Clear selection if form gets visible again. It must not happen earlier, since the actions typically depend on the selected row.
     clearTableSelectionIfNecessary();
@@ -245,13 +260,23 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     //Make sure the rows display the correct drill down style
     updateDrillDownStyle();
 
-    //Make sure the page which belongs to the form is active when the form is shown
     if (!m_page.isSelectedNode()) {
+      selectChildPageTableRowIfNecessary();
+
+      //Make sure the page which belongs to the form is active when the form is shown
       m_page.getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(m_page);
     }
 
     addTableSelectionListener();
     processSelectedTableRow();
+  }
+
+  @Override
+  public void pageSelectedNotify() throws ProcessingException {
+    if (m_rowSelectionRequired) {
+      selectPageTableRowIfNecessary(getPageTableField().getTable());
+      m_rowSelectionRequired = false;
+    }
   }
 
   private void clearTableSelectionIfNecessary() {
@@ -260,7 +285,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
 
     ITableRow selectedRow = getPageTableField().getTable().getSelectedRow();
-    if (isDrillDownRow(selectedRow)) {
+    if (selectedRow != null && isDrillDownRow(selectedRow)) {
       LOG.debug("Clearing row for table " + getPageTableField().getTable());
 
       getPageTableField().getTable().selectRow(null);
@@ -461,28 +486,41 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   @Override
+  public Object computeExclusiveKey() throws ProcessingException {
+    return m_page;
+  }
+
+  @Override
   public void start() throws ProcessingException {
-    startInternal(new FormHandler());
+    startInternalExclusive(new FormHandler());
   }
 
   @Order(10.0f)
   public class FormHandler extends AbstractFormHandler {
+
+    @Override
+    protected boolean getConfiguredOpenExclusive() {
+      return true;
+    }
+
   }
 
   private void handleTableRowSelected(ITable table, ITableRow tableRow) throws ProcessingException {
     LOG.debug("Table row selected: " + tableRow);
 
+    // If children are not loaded rowPage cannot be estimated.
+    //This is the case when the rows get replaced which restores the selection before the children are loaded (e.g. executed by a search).
     if (!m_page.isLeaf() && !m_page.isChildrenLoaded()) {
-      // If children are not loaded rowPage cannot be estimated.
-      //This is the case when the rows get replaced which restores the selection before the children are loaded (e.g. executed by a search).
-      //FIXME CGU A search typically uses the BookmarkUtility which selects the node of the outline. That's why it works for non leaf pages. Is this safe?
+      if (tableRow == null) {
+        //Postpone the row selection since it cannot be done if the row page cannot be estimated
+        m_rowSelectionRequired = true;
+      }
       return;
     }
+
     if (tableRow == null) {
       //Make sure there always is a selected row. if NodePageSwitch is enabled the same page and therefore the same table is on different pageForms
-      if (m_pageFormConfig.isKeepSelection()) {
-        selectPageTableRowIfNecessary(table);
-      }
+      selectPageTableRowIfNecessary(table);
       return;
     }
 
@@ -506,11 +544,6 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       m_autoLeafPageMap.put(tableRow, autoPage);
 
       rowPage = autoPage;
-    }
-
-    if (m_pageFormConfig.isNodePageSwitchEnabled() && (rowPage instanceof IPageWithNodes)) {
-      //If it's a page with nodes show it on the left side (tablet)
-      rowPage = rowPage.getParentPage();
     }
 
     m_pageFormManager.pageSelectedNotify(this, rowPage);
@@ -546,6 +579,24 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       }
     }
 
+  }
+
+  /**
+   * If the currently selected page is a child page belonging to this form, make sure the table reflects that -> select
+   * the child page in the table
+   */
+  private void selectChildPageTableRowIfNecessary() {
+    if (!m_pageFormConfig.isKeepSelection()) {
+      return;
+    }
+
+    IPage selectedPage = (IPage) m_page.getOutline().getSelectedNode();
+    if (selectedPage != null && selectedPage.getParentPage() == m_page) {
+      ITableRow row = MobileDesktopUtility.getTableRowFor(m_page, selectedPage);
+      if (row != null && !isDrillDownRow(row)) {
+        row.getTable().selectRow(row);
+      }
+    }
   }
 
   private class PlaceholderTable extends AbstractTable {
@@ -645,5 +696,10 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       PageForm.this.handleTableRowSelected(event.getTable(), tableRow);
     }
 
+  }
+
+  @Override
+  public String toString() {
+    return super.toString() + " with page " + m_page;
   }
 }

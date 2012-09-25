@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.DefaultPageChangeStrategy;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -23,13 +25,17 @@ import org.eclipse.scout.service.SERVICES;
  * @since 3.9.0
  */
 public class MultiPageChangeStrategy implements IPageChangeStrategy {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MultiPageChangeStrategy.class);
+
   private IOutline m_outline;
   private IPage m_mainPage;
   private IPage m_subPage;
+  private PageFormManager m_pageFormManager;
   private DefaultPageChangeStrategy m_defaultPageChangeStrategy;
 
-  public MultiPageChangeStrategy() {
+  public MultiPageChangeStrategy(PageFormManager pageFormManager) {
     m_defaultPageChangeStrategy = new DefaultPageChangeStrategy();
+    m_pageFormManager = pageFormManager;
   }
 
   @Override
@@ -44,40 +50,51 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
       m_outline = outline;
     }
 
-    if (m_mainPage == null) {
+    if (selectedPage == null) {
       activateMainPage(deselectedPage, selectedPage);
-    }
-    else if (PageFormManager.isDrillDownPage(selectedPage)) {
-      activateMainPage(deselectedPage, selectedPage);
-    }
-    else if (isChildOfMainPage(selectedPage)) {
-      activateSubPage(selectedPage);
     }
     else {
-      activateMainPage(deselectedPage, selectedPage);
+      String pageFormSlot = m_pageFormManager.computePageFormSlot(selectedPage);
+      if (m_pageFormManager.getLeftPageSlotViewId().equals(pageFormSlot)) {
+        activateMainPage(deselectedPage, selectedPage);
+      }
+      else {
+        activateMainPage(deselectedPage, selectedPage.getParentPage());
+        activateSubPage(selectedPage);
+      }
     }
   }
 
   private void activateMainPage(IPage deselectedPage, IPage selectedPage) {
+    if (m_mainPage == selectedPage) {
+      return;
+    }
     deactivateSubPage();
 
     m_defaultPageChangeStrategy.pageChanged(m_outline, deselectedPage, selectedPage);
     m_mainPage = selectedPage;
+
+    LOG.debug("Main page activated: " + selectedPage);
   }
 
   private void activateSubPage(IPage selectedPage) {
-    if (selectedPage == null || m_subPage == selectedPage) {
+    if (m_subPage == selectedPage) {
       return;
     }
+    deactivateSubPage();
 
     m_subPage = selectedPage;
-    m_subPage.pageActivatedNotify();
+    if (m_subPage != null) {
+      m_subPage.pageActivatedNotify();
 
-    try {
-      m_subPage.ensureChildrenLoaded();
-    }
-    catch (ProcessingException e1) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e1);
+      try {
+        m_subPage.ensureChildrenLoaded();
+      }
+      catch (ProcessingException e1) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e1);
+      }
+
+      LOG.debug("Sub page activated: " + selectedPage);
     }
   }
 
