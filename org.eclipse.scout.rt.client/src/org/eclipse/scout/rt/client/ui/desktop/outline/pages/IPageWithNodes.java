@@ -33,6 +33,11 @@ public interface IPageWithNodes extends IPage {
   ITreeNode getTreeNodeFor(ITableRow tableRow);
 
   /**
+   * @since 3.8.2
+   */
+  ITableRow getTableRowFor(ITreeNode childPageNode);
+
+  /**
    * @param childPageNode
    * @return the value {@link ITableRow#isFilterAccepted()} on the corresponding row of the inner table
    */
