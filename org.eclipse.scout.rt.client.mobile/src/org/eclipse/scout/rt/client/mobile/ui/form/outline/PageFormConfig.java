@@ -11,22 +11,10 @@
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 public class PageFormConfig {
-  private boolean m_nodePageSwitchEnabled;
   private boolean m_tablePageAllowed;
   private boolean m_detailFormVisible;
   private boolean m_keepSelection;
   private boolean m_tableStatusVisible;
-
-  /**
-   * If enabled, clicking on a page with nodes will lead to a selection of the parent node.
-   */
-  public boolean isNodePageSwitchEnabled() {
-    return m_nodePageSwitchEnabled;
-  }
-
-  public void setNodePageSwitchEnabled(boolean nodePageSwitchEnabled) {
-    m_nodePageSwitchEnabled = nodePageSwitchEnabled;
-  }
 
   public boolean isTablePageAllowed() {
     return m_tablePageAllowed;

@@ -72,13 +72,14 @@ public class ActionButtonBarUtility {
    */
   public static List<IMenu> fetchPageActions(IPage page) {
     List<IMenu> pageActions = new LinkedList<IMenu>();
-
-    //Fetch the menus of the given page (getUIFacade().fireNodePopupFromUI() is not possible since the selected node may not the same as the given page)
-    pageActions.addAll(Arrays.asList(page.getTree().fetchMenusForNodesInternal(new ITreeNode[]{page})));
-    if (page instanceof AutoLeafPageWithNodes) {
-      //AutoLeafPage has no parent so the table row actions are not fetched by the regular way (see AbstractOutline#P_OutlineListener).
-      //Instead we directly fetch the table row actions
-      pageActions.addAll(Arrays.asList(((AutoLeafPageWithNodes) page).getTableRow().getTable().getUIFacade().fireRowPopupFromUI()));
+    if (page.getTree() != null) {
+      //Fetch the menus of the given page (getUIFacade().fireNodePopupFromUI() is not possible since the selected node may not the same as the given page)
+      pageActions.addAll(Arrays.asList(page.getTree().fetchMenusForNodesInternal(new ITreeNode[]{page})));
+      if (page instanceof AutoLeafPageWithNodes) {
+        //AutoLeafPage has no parent so the table row actions are not fetched by the regular way (see AbstractOutline#P_OutlineListener).
+        //Instead we directly fetch the table row actions
+        pageActions.addAll(Arrays.asList(((AutoLeafPageWithNodes) page).getTableRow().getTable().getUIFacade().fireRowPopupFromUI()));
+      }
     }
 
     return pageActions;

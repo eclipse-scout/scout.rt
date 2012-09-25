@@ -45,7 +45,7 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
     PageFormManager manager = new PageFormManager(desktop, IForm.VIEW_ID_CENTER, IForm.VIEW_ID_E);
     manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
 
-    initMultiPageChangeStrategy();
+    initMultiPageChangeStrategy(manager);
 
     return manager;
   }
@@ -63,8 +63,8 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
     return viewIds;
   }
 
-  private void initMultiPageChangeStrategy() {
-    IPageChangeStrategy strategy = new MultiPageChangeStrategy();
+  private void initMultiPageChangeStrategy(PageFormManager pageFormManager) {
+    IPageChangeStrategy strategy = new MultiPageChangeStrategy(pageFormManager);
     for (IOutline outline : getDesktop().getAvailableOutlines()) {
       outline.setPageChangeStrategy(strategy);
     }
