@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.swing.ext;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
@@ -108,6 +110,33 @@ public class JStatusLabelEx extends JComponent {
 
   public void setMandatory(boolean b) {
     m_label.setBold(b);
+  }
+
+  @Override
+  public void setForeground(Color fg) {
+    super.setForeground(fg);
+
+    m_label.setForeground(fg);
+  }
+
+  @Override
+  public void setBackground(Color bg) {
+    super.setBackground(bg);
+
+    m_label.setBackground(bg);
+    m_label.setOpaque(bg != null);
+  }
+
+  @Override
+  public void setFont(Font font) {
+    super.setFont(font);
+
+    m_label.setFont(font);
+  }
+
+  @Override
+  public Font getFont() {
+    return m_label.getFont();
   }
 
   public void showMandatoryIcon(boolean b) {
