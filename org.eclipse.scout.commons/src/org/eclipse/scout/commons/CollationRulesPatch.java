@@ -66,7 +66,7 @@ public class CollationRulesPatch {
   private static void replaceDefaultCollationRules(Field defaultRulesField, String oldRule, String newRule) throws Exception {
     defaultRulesField.setAccessible(true);
     String defaultRules = (String) defaultRulesField.get(null);
-    if (defaultRules.contains(newRule)) {
+    if (defaultRules.contains(newRule) && !defaultRules.contains(oldRule)) {
       return;
     }
     String newRules = defaultRules.replaceAll(oldRule, newRule);
