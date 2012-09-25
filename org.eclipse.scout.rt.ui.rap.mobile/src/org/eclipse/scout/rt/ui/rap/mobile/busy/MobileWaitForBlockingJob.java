@@ -23,7 +23,7 @@ public class MobileWaitForBlockingJob extends WaitForBlockingJob {
   @Override
   protected void runBlocking(IProgressMonitor monitor) {
     //schedule blocking job
-    new BusyBlockDialogJob(getName(), getBusyHandler(), getParts()).schedule();
+    new BusyBlockDialogJob(getName(), getBusyHandler()).schedule();
   }
 
 }
