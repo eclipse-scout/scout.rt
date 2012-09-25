@@ -34,6 +34,11 @@ import org.eclipse.swt.widgets.Control;
  * @since 1.0.0 19.05.2008
  */
 public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtScoutComposite<T> implements ISwtScoutFormField<T> {
+
+  protected static final String CLIENT_PROP_INITIAL_LABEL_FONT = "scoutInitialLabelFont";
+  protected static final String CLIENT_PROP_INITIAL_LABEL_BACKGROUND = "scoutInitialLabelBackground";
+  protected static final String CLIENT_PROP_INITIAL_LABEL_FOREGROUND = "scoutInitialLabelForeground";
+
   private ILabelComposite m_swtLabel;
   private ISwtKeyStroke[] m_keyStrokes;
 
@@ -81,6 +86,8 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     if (getScoutObject() != null) {
       setBackgroundFromScout(getScoutObject().getBackgroundColor());
       setForegroundFromScout(getScoutObject().getForegroundColor());
+      setLabelBackgroundFromScout(getScoutObject().getLabelBackgroundColor());
+      setLabelForegroundFromScout(getScoutObject().getLabelForegroundColor());
       setVisibleFromScout(getScoutObject().isVisible());
       setEnabledFromScout(getScoutObject().isEnabled());
       setMandatoryFromScout(getScoutObject().isMandatory());
@@ -95,6 +102,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
         setTooltipTextFromScout(getScoutObject().getLabel());
       }
       setFontFromScout(getScoutObject().getFont());
+      setLabelFontFromScout(getScoutObject().getLabelFont());
       setSaveNeededFromScout(getScoutObject().isSaveNeeded());
       setFocusableFromScout(getScoutObject().isFocusable());
       updateKeyStrokesFromScout();
@@ -290,6 +298,61 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
         fld.setData(CLIENT_PROP_INITIAL_FONT, currentFont);
       }
       Font initFont = (Font) fld.getData(CLIENT_PROP_INITIAL_FONT);
+      Font f = getEnvironment().getFont(scoutFont, initFont);
+      if (f == null) {
+        f = initFont;
+      }
+      if (currentFont == null || !currentFont.equals(f)) {
+        // only set the new font if it is different to the current one
+        fld.setFont(f);
+      }
+    }
+    if (isConnectedToScout()) {
+      SwtLayoutUtility.invalidateLayout(getSwtContainer());
+    }
+  }
+
+  protected void setLabelBackgroundFromScout(String scoutColor) {
+    if (getSwtLabel() != null) {
+      ILabelComposite fld = getSwtLabel();
+      if (fld.getData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND) == null) {
+        fld.setData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND, fld.getBackground());
+      }
+      Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND);
+      Color c = getEnvironment().getColor(scoutColor);
+      if (getMandatoryFieldBackgroundColor() != null) {
+        c = getMandatoryFieldBackgroundColor();
+      }
+      if (c == null) {
+        c = initCol;
+      }
+      fld.setBackground(c);
+    }
+  }
+
+  protected void setLabelForegroundFromScout(String scoutColor) {
+    if (getSwtLabel() != null) {
+      ILabelComposite fld = getSwtLabel();
+      if (fld.getData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND) == null) {
+        fld.setData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND, fld.getForeground());
+      }
+      Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND);
+      Color c = getEnvironment().getColor(scoutColor);
+      if (c == null) {
+        c = initCol;
+      }
+      fld.setForeground(c);
+    }
+  }
+
+  protected void setLabelFontFromScout(FontSpec scoutFont) {
+    if (getSwtLabel() != null) {
+      ILabelComposite fld = getSwtLabel();
+      Font currentFont = fld.getFont();
+      if (fld.getData(CLIENT_PROP_INITIAL_LABEL_FONT) == null) {
+        fld.setData(CLIENT_PROP_INITIAL_LABEL_FONT, currentFont);
+      }
+      Font initFont = (Font) fld.getData(CLIENT_PROP_INITIAL_LABEL_FONT);
       Font f = getEnvironment().getFont(scoutFont, initFont);
       if (f == null) {
         f = initFont;

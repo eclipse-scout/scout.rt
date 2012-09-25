@@ -264,6 +264,48 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
+   * Configures the foreground color of the label. The color is represented by the HEX value (e.g. FFFFFF).
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Foreground color HEX value of the label.
+   */
+  @ConfigProperty(ConfigProperty.COLOR)
+  @Order(60)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredLabelForegroundColor() {
+    return null;
+  }
+
+  /**
+   * Configures the background color of the label. The color is represented by the HEX value (e.g. FFFFFF).
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Background color HEX value of the label.
+   */
+  @ConfigProperty(ConfigProperty.COLOR)
+  @Order(70)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredLabelBackgroundColor() {
+    return null;
+  }
+
+  /**
+   * Configures the font of the label. See {@link FontSpec#parse(String)} for the appropriate format.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   * 
+   * @return Font of the label.
+   */
+  @ConfigProperty(ConfigProperty.FONT)
+  @Order(80)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredLabelFont() {
+    return null;
+  }
+
+  /**
    * Configures the horizontal alignment of the fields inside this group box.<br>
    * This property typically only has an effect if fill horizontal is set to false which can be configured by
    * {@link #getConfiguredFillHorizontal()}.
@@ -710,6 +752,15 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
     if (getConfiguredFont() != null) {
       setFont(FontSpec.parse(getConfiguredFont()));
+    }
+    if (getConfiguredLabelBackgroundColor() != null) {
+      setLabelBackgroundColor((getConfiguredLabelBackgroundColor()));
+    }
+    if (getConfiguredLabelForegroundColor() != null) {
+      setLabelForegroundColor((getConfiguredLabelForegroundColor()));
+    }
+    if (getConfiguredLabelFont() != null) {
+      setLabelFont(FontSpec.parse(getConfiguredLabelFont()));
     }
     setFocusable(getConfiguredFocusable());
     setGridDataHints(new GridData(getConfiguredGridX(), getConfiguredGridY(), getConfiguredGridW(), getConfiguredGridH(), getConfiguredGridWeightX(), getConfiguredGridWeightY(), getConfiguredGridUseUiWidth(), getConfiguredGridUseUiHeight(), getConfiguredHorizontalAlignment(), getConfiguredVerticalAlignment(), getConfiguredFillHorizontal(), getConfiguredFillVertical(), getConfiguredWidthInPixel(), getConfiguredHeightInPixel()));
@@ -1523,6 +1574,36 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public FontSpec getFont() {
     return (FontSpec) propertySupport.getProperty(PROP_FONT);
+  }
+
+  @Override
+  public void setLabelForegroundColor(String c) {
+    propertySupport.setProperty(PROP_LABEL_FOREGROUND_COLOR, c);
+  }
+
+  @Override
+  public String getLabelForegroundColor() {
+    return (String) propertySupport.getProperty(PROP_LABEL_FOREGROUND_COLOR);
+  }
+
+  @Override
+  public void setLabelBackgroundColor(String c) {
+    propertySupport.setProperty(PROP_LABEL_BACKGROUND_COLOR, c);
+  }
+
+  @Override
+  public String getLabelBackgroundColor() {
+    return (String) propertySupport.getProperty(PROP_LABEL_BACKGROUND_COLOR);
+  }
+
+  @Override
+  public void setLabelFont(FontSpec f) {
+    propertySupport.setProperty(PROP_LABEL_FONT, f);
+  }
+
+  @Override
+  public FontSpec getLabelFont() {
+    return (FontSpec) propertySupport.getProperty(PROP_LABEL_FONT);
   }
 
   @Override

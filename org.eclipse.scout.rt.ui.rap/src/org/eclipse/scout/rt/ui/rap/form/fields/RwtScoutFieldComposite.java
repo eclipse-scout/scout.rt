@@ -29,6 +29,11 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Control;
 
 public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtScoutComposite<T> implements IRwtScoutFormField<T> {
+
+  protected static final String CLIENT_PROP_INITIAL_LABEL_FONT = "scoutInitialLabelFont";
+  protected static final String CLIENT_PROP_INITIAL_LABEL_BACKGROUND = "scoutInitialLabelBackground";
+  protected static final String CLIENT_PROP_INITIAL_LABEL_FOREGROUND = "scoutInitialLabelForeground";
+
   private ILabelComposite m_label;
   private IRwtKeyStroke[] m_keyStrokes;
 
@@ -80,6 +85,8 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
     if (getScoutObject() != null) {
       setBackgroundFromScout(getScoutObject().getBackgroundColor());
       setForegroundFromScout(getScoutObject().getForegroundColor());
+      setLabelBackgroundFromScout(getScoutObject().getLabelBackgroundColor());
+      setLabelForegroundFromScout(getScoutObject().getLabelForegroundColor());
       setVisibleFromScout(getScoutObject().isVisible());
       setEnabledFromScout(getScoutObject().isEnabled());
       // bsh 2010-10-01: The "mandatory" state of a SequenceBoxes is always derived from the
@@ -98,6 +105,7 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
         setTooltipTextFromScout(getScoutObject().getLabel());
       }
       setFontFromScout(getScoutObject().getFont());
+      setLabelFontFromScout(getScoutObject().getLabelFont());
       setSaveNeededFromScout(getScoutObject().isSaveNeeded());
       setFocusableFromScout(getScoutObject().isFocusable());
       updateKeyStrokesFromScout();
@@ -346,6 +354,91 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
     }
   }
 
+  protected void setLabelBackgroundFromScout(String scoutColor) {
+    setLabelBackgroundFromScout(scoutColor, getUiLabel());
+  }
+
+  protected void setLabelBackgroundFromScout(String scoutColor, ILabelComposite field) {
+    if (field == null) {
+      return;
+    }
+
+    boolean init = false;
+    if (field.getData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND) == null) {
+      field.setData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND, field.getBackground());
+      init = true;
+    }
+
+    Color color = getMandatoryFieldBackgroundColor();
+    if (color != null) {
+      field.setBackground(color);
+      return;
+    }
+
+    //Do not change color if not explicitly requested by the scout model.
+    if (init && scoutColor == null) {
+      return;
+    }
+
+    Color initCol = (Color) field.getData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND);
+    color = getUiEnvironment().getColor(scoutColor);
+
+    if (color == null) {
+      color = initCol;
+    }
+    field.setBackground(color);
+  }
+
+  protected void setLabelForegroundFromScout(String scoutColor) {
+    setLabelForegroundFromScout(scoutColor, getUiLabel());
+  }
+
+  protected void setLabelForegroundFromScout(String scoutColor, ILabelComposite field) {
+    if (field == null) {
+      return;
+    }
+
+    boolean init = false;
+    if (field.getData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND) == null) {
+      field.setData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND, field.getForeground());
+      init = true;
+    }
+
+    //Do not change color if not explicitly requested by the scout model.
+    if (init && scoutColor == null) {
+      return;
+    }
+
+    Color initCol = (Color) field.getData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND);
+    Color color = getUiEnvironment().getColor(scoutColor);
+    if (color == null) {
+      color = initCol;
+    }
+    field.setForeground(color);
+  }
+
+  protected void setLabelFontFromScout(FontSpec scoutFont) {
+    if (getUiLabel() != null) {
+      ILabelComposite fld = getUiLabel();
+      Font currentFont = fld.getFont();
+      if (fld.getData(CLIENT_PROP_INITIAL_LABEL_FONT) == null) {
+        fld.setData(CLIENT_PROP_INITIAL_LABEL_FONT, currentFont);
+      }
+      Font initFont = (Font) fld.getData(CLIENT_PROP_INITIAL_LABEL_FONT);
+      Font f = getUiEnvironment().getFont(scoutFont, initFont);
+      if (f == null) {
+        f = initFont;
+      }
+      if (currentFont == null || !currentFont.equals(f)) {
+        // only set the new font if it is different to the current one
+        fld.setFont(f);
+      }
+    }
+    if (isCreated()) {
+      RwtLayoutUtility.invalidateLayout(getUiEnvironment(), getUiContainer());
+    }
+  }
+
   protected boolean isSelectAllOnFocusEnabled() {
     return UiDecorationExtensionPoint.getLookAndFeel().isFormFieldSelectAllOnFocusEnabled();
   }
@@ -438,6 +531,15 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
     }
     else if (name.equals(IFormField.PROP_FONT)) {
       setFontFromScout((FontSpec) newValue);
+    }
+    else if (name.equals(IFormField.PROP_LABEL_FOREGROUND_COLOR)) {
+      setLabelForegroundFromScout((String) newValue);
+    }
+    else if (name.equals(IFormField.PROP_LABEL_BACKGROUND_COLOR)) {
+      setLabelBackgroundFromScout((String) newValue);
+    }
+    else if (name.equals(IFormField.PROP_LABEL_FONT)) {
+      setLabelFontFromScout((FontSpec) newValue);
     }
     else if (name.equals(IFormField.PROP_SAVE_NEEDED)) {
       setSaveNeededFromScout(((Boolean) newValue).booleanValue());
