@@ -119,6 +119,10 @@ public class RwtScoutSplitBox extends RwtScoutFieldComposite<ISplitBox> implemen
   }
 
   protected void setSplitterPositionFromScout() {
+    if (getUiContainer().isDisposed()) {
+      return;
+    }
+
     try {
       if (lockSplitter.acquire()) {
         double position = getScoutObject().getSplitterPosition();
@@ -134,6 +138,10 @@ public class RwtScoutSplitBox extends RwtScoutFieldComposite<ISplitBox> implemen
   }
 
   protected void setSplitterPosition(int leftWidth, int rightWidth) {
+    if (getUiContainer().isDisposed()) {
+      return;
+    }
+
     try {
       if (lockSplitter.acquire()) {
         int total = leftWidth + rightWidth;
