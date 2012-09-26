@@ -3108,7 +3108,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             boolean oldFlag = irow.isFilterAccepted();
             applyRowFiltersInternal(irow);
             boolean newFlag = irow.isFilterAccepted();
-            filterChanged = (oldFlag != newFlag);
+            filterChanged = filterChanged || (oldFlag != newFlag);
           }
         }
       }
