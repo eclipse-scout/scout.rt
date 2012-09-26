@@ -717,9 +717,9 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       return d;
     }
     for (DateFormat t : new DateFormat[]{
-                DateFormat.getDateInstance(DateFormat.SHORT, LocaleThreadLocal.get()),
-                DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get()),
-                DateFormat.getDateInstance(DateFormat.LONG, LocaleThreadLocal.get())}) {
+        DateFormat.getDateInstance(DateFormat.SHORT, LocaleThreadLocal.get()),
+        DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get()),
+        DateFormat.getDateInstance(DateFormat.LONG, LocaleThreadLocal.get())}) {
       if (t instanceof SimpleDateFormat) {
         d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mm a", LocaleThreadLocal.get()), text, includesTime);
         if (d != null) {
@@ -1015,17 +1015,19 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       try {
         Date oldDate = getValue();
         if (d != null) {
-          // preserve date
-          if (oldDate != null) {
-            Calendar calOld = Calendar.getInstance();
-            calOld.setTime(oldDate);
-            Calendar calNew = Calendar.getInstance();
-            calNew.setTime(d);
-            calNew.set(Calendar.YEAR, calOld.get(Calendar.YEAR));
-            calNew.set(Calendar.MONTH, calOld.get(Calendar.MONTH));
-            calNew.set(Calendar.DATE, calOld.get(Calendar.DATE));
-            d = calNew.getTime();
+          if (oldDate == null) {
+            // use today's date
+            oldDate = new Date();
           }
+          // preserve date
+          Calendar calOld = Calendar.getInstance();
+          calOld.setTime(oldDate);
+          Calendar calNew = Calendar.getInstance();
+          calNew.setTime(d);
+          calNew.set(Calendar.YEAR, calOld.get(Calendar.YEAR));
+          calNew.set(Calendar.MONTH, calOld.get(Calendar.MONTH));
+          calNew.set(Calendar.DATE, calOld.get(Calendar.DATE));
+          d = calNew.getTime();
         }
         else if (isHasDate() && oldDate != null) {
           d = applyAutoTime(oldDate);
