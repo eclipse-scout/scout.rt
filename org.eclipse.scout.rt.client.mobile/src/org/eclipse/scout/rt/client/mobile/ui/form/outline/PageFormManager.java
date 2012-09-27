@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -43,6 +45,7 @@ public class PageFormManager {
   private ActiveOutlineObserver m_activeOutlineObserver;
   private P_OutlineTreeListener m_outlineTreeListener;
   private P_DesktopListener m_desktopListener;
+  private Map<IPage, String> m_selectedPageSlotMap;
 
   private String m_leftPageSlotViewId;
   private String m_middlePageSlotViewId;
@@ -69,6 +72,7 @@ public class PageFormManager {
     m_pageFormMap = new PageFormMap();
     m_blockedForms = new LinkedList<IForm>();
     m_activeOutlineObserver = new ActiveOutlineObserver(desktop);
+    m_selectedPageSlotMap = new HashMap<IPage, String>();
 
     //Since the page is activated by the outline and the outline itself also listens to tree selection events,
     //a UI listener is attached to make sure this listener is called at the end and therefore after the page has been activated properly.
@@ -159,45 +163,63 @@ public class PageFormManager {
     }
   }
 
-  private void showPage(IPage page) throws ProcessingException {
+  private IPageForm showPage(IPage page) throws ProcessingException {
+    IPageForm pageForm = getPageForm(page, true);
+    if (pageForm != null) {
+      return pageForm;
+    }
     LOG.debug("Showing page: " + page);
 
     String displayViewId = getLeftPageSlotViewId();
 
     if (!hasOnlyOnePageSlot()) {
-      displayViewId = findPageFormSlot(page);
+      displayViewId = computePageFormSlot(page);
     }
 
-    showPage(page, displayViewId);
+    return showPage(page, displayViewId);
   }
 
-  private String findPageFormSlot(IPage page) {
+  public IPageForm getPageForm(IPage page, boolean onlyShowing) {
+    return m_pageFormMap.get(page, onlyShowing);
+  }
+
+  public String computePageFormSlot(IPage page) {
+    if (page == null) {
+      return null;
+    }
+
     if (page instanceof AutoLeafPageWithNodes) {
       return getMiddlePageSlotViewId();
     }
 
-    IPageForm parentPageForm = m_pageFormMap.get(page.getParentPage(), true);
-    if (parentPageForm == null) {
+    if (page.getParentNode() == null) {
       return getLeftPageSlotViewId();
     }
 
-    if (getLeftPageSlotViewId().equals(parentPageForm.getDisplayViewId())) {
-      if (isDrillDownPage(page)) {
-        return getLeftPageSlotViewId();
-      }
-      else {
-        return getMiddlePageSlotViewId();
-      }
+    //PageWithTables should be displayed on the left side
+    if (isDrillDownPage(page)) {
+      return getLeftPageSlotViewId();
     }
 
-    return getLeftPageSlotViewId();
+    //Special case for nested PageWithTables:
+    //The right side can only contain a pageWithTable if the left side also shows a pageWithTable.
+    //In that case a selection of the "Details" table row of the right side selects the right pageWithTable again.
+    //This pageWithTable should now be displayed on the left side that's why the leftPageSlotViewId is returned.
+    String currentViewId = m_selectedPageSlotMap.get(page);
+    if (getMiddlePageSlotViewId().equals(currentViewId) && page.getParentPage() instanceof IPageWithTable) {
+      return getLeftPageSlotViewId();
+    }
+
+    return getMiddlePageSlotViewId();
   }
 
   private void showPageInLeftForm(IPage page) throws ProcessingException {
     showPage(page, getLeftPageSlotViewId());
   }
 
-  private void showPage(IPage page, String viewId) throws ProcessingException {
+  private IPageForm showPage(IPage page, String viewId) throws ProcessingException {
+    updateLeftPageIfNecessary(page, viewId);
+
     IPageForm pageForm = m_pageFormMap.get(viewId, page);
     if (pageForm == null) {
       if (getLeftPageSlotViewId().equals(viewId)) {
@@ -213,7 +235,38 @@ public class PageFormManager {
       m_pageFormMap.put(pageForm);
     }
 
-    getDesktop().addForm(pageForm);
+    if (!pageForm.isShowing()) {
+      getDesktop().addForm(pageForm);
+    }
+
+    return pageForm;
+  }
+
+  /**
+   * If a page gets shown on the right side it's necessary to make sure the left side displays the correct page, which
+   * is the parent page.
+   * <p>
+   * Normally, on regular drill down, the left page gets shown first and afterwards the right one. In this situation
+   * everything is fine and the method does nothing.<br>
+   * The left page may be wrong if the right page gets shown first, which may happen in case of bookmark activation or a
+   * node page switch. In such situations the left side needs to be updated with the correct page.
+   * <p>
+   * Node page switch: The node page on the right side moves to the left side when selecting a node page, happens on
+   * nested PageWithNodes
+   */
+  private void updateLeftPageIfNecessary(IPage page, String viewId) throws ProcessingException {
+    if (getMiddlePageSlotViewId() == null) {
+      return;
+    }
+
+    if (getMiddlePageSlotViewId().equals(viewId) && page.getParentPage() != null) {
+      IPageForm parentPageForm = m_pageFormMap.get(page.getParentPage(), true);
+      if (parentPageForm == null || getMiddlePageSlotViewId().equals(parentPageForm.getDisplayViewId())) {
+
+        //Make sure there is always the correct page on the left side which is the parent page
+        showPage(page.getParentPage(), getLeftPageSlotViewId());
+      }
+    }
   }
 
   private IMainPageForm createMainPageForm(IPage page) throws ProcessingException {
@@ -232,7 +285,6 @@ public class PageFormManager {
 
   private IPageForm createPageForm(IPage page) throws ProcessingException {
     PageFormConfig config = new PageFormConfig();
-    config.setNodePageSwitchEnabled(true);
     config.setDetailFormVisible(true);
 
     return new PageForm(page, this, config);
@@ -247,19 +299,22 @@ public class PageFormManager {
       return;
     }
 
-    //If same page gets selected again, move it to the left.
-    if (pageForm != null && pageForm.getPage().equals(selectedPage)) {
-      showPageInLeftForm(selectedPage);
-    }
     //A AutoLeafPage is not attached to a real outline. Since it already has been activated just show it.
-    else if (selectedPage instanceof AutoLeafPageWithNodes) {
-      showPage(selectedPage);
-    }
-    else if (selectedPage.isSelectedNode()) {
+    if (selectedPage instanceof AutoLeafPageWithNodes) {
       showPage(selectedPage);
     }
     else {
-      selectAndExpandPage(selectedPage);
+      if (selectedPage.isSelectedNode()) {
+        //Trigger selection again to move it to the left side and to make sure it's treated like a main page (see MultiPageChangeStrategy)
+        selectedPage.getOutline().selectNode(null);
+      }
+      m_selectedPageSlotMap.put(selectedPage, pageForm.getDisplayViewId());
+      try {
+        selectAndExpandPage(selectedPage);
+      }
+      finally {
+        m_selectedPageSlotMap.remove(selectedPage);
+      }
     }
   }
 
@@ -304,7 +359,8 @@ public class PageFormManager {
       return;
     }
 
-    showPage((IPage) selectedNode);
+    IPageForm pageForm = showPage((IPage) selectedNode);
+    pageForm.pageSelectedNotify();
   }
 
   private void handleTreeNodesDeleted(ITreeNode[] deletedNodes) throws ProcessingException {
@@ -313,7 +369,12 @@ public class PageFormManager {
     }
 
     for (ITreeNode node : deletedNodes) {
-      if (node instanceof IPage) {
+
+      //If a node gets deleted the child nodes typically get detached from the tree too, but no separate event will be fired.
+      //So we need to make sure the pageForms of the child pages are properly removed as well.
+      handleTreeNodesDeleted(node.getChildNodes());
+
+      if (node instanceof IPage && node.getTree() == null) {
         IPage page = (IPage) node;
         handlePageRemoved(page);
       }

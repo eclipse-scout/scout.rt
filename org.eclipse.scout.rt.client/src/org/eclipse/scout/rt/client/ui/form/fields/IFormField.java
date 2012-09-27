@@ -81,6 +81,9 @@ public interface IFormField extends IPropertyObserver {
   String PROP_FOREGROUND_COLOR = "foregroundColor";
   String PROP_BACKGROUND_COLOR = "backgroundColor";
   String PROP_FONT = "font";
+  String PROP_LABEL_FOREGROUND_COLOR = "labelForegroundColor";
+  String PROP_LABEL_BACKGROUND_COLOR = "labelBackgroundColor";
+  String PROP_LABEL_FONT = "labelFont";
   String PROP_SAVE_NEEDED = "saveNeeded";
   String PROP_EMPTY = "empty";
   String PROP_LABEL = "label";
@@ -540,6 +543,18 @@ public interface IFormField extends IPropertyObserver {
   FontSpec getFont();
 
   void setFont(FontSpec f);
+
+  String getLabelForegroundColor();
+
+  void setLabelForegroundColor(String c);
+
+  String getLabelBackgroundColor();
+
+  void setLabelBackgroundColor(String c);
+
+  FontSpec getLabelFont();
+
+  void setLabelFont(FontSpec f);
 
   /**
    * @return the grid data hints used by the {@link GridDataBuilder} to create the final grid data which can be

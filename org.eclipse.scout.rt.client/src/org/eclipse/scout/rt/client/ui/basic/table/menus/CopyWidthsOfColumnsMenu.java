@@ -56,7 +56,8 @@ public class CopyWidthsOfColumnsMenu extends AbstractMenu {
       buf.append(COLUMN_COPY_CLIPBOARD_IDENTIFIER);
       buf.append("\n");
 
-      for (IColumn<?> column : getTable().getColumnSet().getColumns()) {
+      // only visible columns are of interest
+      for (IColumn<?> column : getTable().getColumnSet().getVisibleColumns()) {
         buf.append(column.getClass().getName());
         buf.append("\t");
         buf.append(column.getWidth());

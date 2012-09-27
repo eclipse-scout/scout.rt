@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -45,10 +44,8 @@ public class MobileDesktopUtility {
       throw new IllegalStateException("Root node must be visible for this drill down approach.");
     }
 
-    outline.selectNode(outline.getRootPage());
-    outline.collapseAll(outline.getRootPage());
-    if (outline.getRootPage() instanceof AbstractPage && ((AbstractPage) outline.getRootPage()).isInitialExpanded()) {
-      outline.setNodeExpanded(outline.getRootPage(), true);
+    if (outline.getSelectedNode() == null) {
+      outline.selectNode(outline.getRootPage());
     }
   }
 
@@ -211,6 +208,18 @@ public class MobileDesktopUtility {
     }
 
     return (IPage) node;
+  }
+
+  public static ITableRow getTableRowFor(IPage parentPage, IPage page) {
+    ITableRow row = null;
+    if (parentPage instanceof IPageWithNodes) {
+      row = ((IPageWithNodes) parentPage).getTableRowFor(page);
+    }
+    else if (parentPage instanceof IPageWithTable<?>) {
+      row = ((IPageWithTable) parentPage).getTableRowFor(page);
+    }
+
+    return row;
   }
 
 }

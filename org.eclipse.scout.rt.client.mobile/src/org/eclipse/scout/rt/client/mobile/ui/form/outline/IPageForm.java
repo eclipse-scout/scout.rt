@@ -18,5 +18,9 @@ public interface IPageForm extends IForm {
 
   IPage getPage();
 
+  PageFormConfig getPageFormConfig();
+
   void start() throws ProcessingException;
+
+  void pageSelectedNotify() throws ProcessingException;
 }

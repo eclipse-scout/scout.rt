@@ -256,6 +256,11 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     }
   }
 
+  @Override
+  public ITableRow getTableRowFor(ITreeNode childPageNode) {
+    return m_pageToTableRowMap.get(childPageNode);
+  }
+
   private ITreeNode[] getTreeNodesFor(ITableRow[] tableRows) {
     ITreeNode[] nodes = new ITreeNode[tableRows.length];
     int missingCount = 0;

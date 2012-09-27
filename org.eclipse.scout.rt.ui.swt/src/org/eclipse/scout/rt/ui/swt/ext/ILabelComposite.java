@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swt.ext;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 
 /**
  * <h3>ILabelComposite</h3> ...
@@ -44,4 +45,16 @@ public interface ILabelComposite {
   boolean getVisible();
 
   void setVisible(boolean b);
+
+  Object getData(String key);
+
+  void setData(String key, Object value);
+
+  Object getBackground();
+
+  void setBackground(Color c);
+
+  Font getFont();
+
+  void setFont(Font f);
 }

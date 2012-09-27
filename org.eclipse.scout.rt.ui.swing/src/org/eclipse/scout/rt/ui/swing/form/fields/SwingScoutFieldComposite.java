@@ -38,6 +38,12 @@ import org.eclipse.scout.rt.ui.swing.ext.JTextAreaEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
 
 public abstract class SwingScoutFieldComposite<T extends IFormField> extends SwingScoutComposite<T> implements ISwingScoutFormField<T> {
+
+  public static final String CLIENT_PROP_INITIAL_LABEL_OPAQUE = "scoutInitialLabelOpaque";
+  public static final String CLIENT_PROP_INITIAL_LABEL_FONT = "scoutInitialLabelFont";
+  public static final String CLIENT_PROP_INITIAL_LABEL_BACKGROUND = "scoutInitialLabelBackground";
+  public static final String CLIENT_PROP_INITIAL_LABEL_FOREGROUND = "scoutInitialLabelForeground";
+
   private JComponent m_swingContainer;
   private JStatusLabelEx m_swingStatusLabel;
   // cache
@@ -65,6 +71,30 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
   @Override
   public JStatusLabelEx getSwingLabel() {
     return m_swingStatusLabel;
+  }
+
+  @Override
+  protected void cacheSwingClientProperties() {
+    super.cacheSwingClientProperties();
+    JStatusLabelEx fld = getSwingLabel();
+    if (fld != null) {
+      // opaque
+      if (!existsClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_OPAQUE)) {
+        putClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_OPAQUE, new Boolean(fld.isOpaque()));
+      }
+      // background
+      if (!existsClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_BACKGROUND)) {
+        putClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_BACKGROUND, fld.getBackground());
+      }
+      // foreground
+      if (!existsClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_FOREGROUND)) {
+        putClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_FOREGROUND, fld.getForeground());
+      }
+      // font
+      if (!existsClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_FONT)) {
+        putClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_FONT, fld.getFont());
+      }
+    }
   }
 
   protected void setSwingLabel(JStatusLabelEx swingLabel) {
@@ -105,6 +135,9 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
       setBackgroundFromScout(scoutField.getBackgroundColor());
       setForegroundFromScout(scoutField.getForegroundColor());
       setFontFromScout(scoutField.getFont());
+      setLabelBackgroundFromScout(scoutField.getLabelBackgroundColor());
+      setLabelForegroundFromScout(scoutField.getLabelForegroundColor());
+      setLabelFontFromScout(scoutField.getLabelFont());
       setSaveNeededFromScout(scoutField.isSaveNeeded());
       setEmptyFromScout(scoutField.isEmpty());
       setFocusableFromScout(scoutField.isFocusable());
@@ -307,6 +340,45 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     }
   }
 
+  protected void setLabelBackgroundFromScout(String scoutColor) {
+    JComponent fld = getSwingLabel();
+    if (fld != null) {
+      Color initCol = (Color) getClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_BACKGROUND);
+      boolean initOpaque = ((Boolean) getClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_OPAQUE)).booleanValue();
+      Color c = SwingUtility.createColor(scoutColor);
+      boolean opaque = (c != null ? true : initOpaque);
+      if (c == null) {
+        c = initCol;
+      }
+      fld.setOpaque(opaque);
+      fld.setBackground(c);
+    }
+  }
+
+  protected void setLabelForegroundFromScout(String scoutColor) {
+    JComponent fld = getSwingLabel();
+    if (fld != null) {
+      Color initCol = (Color) getClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_FOREGROUND);
+      Color c = SwingUtility.createColor(scoutColor);
+      if (c == null) {
+        c = initCol;
+      }
+      fld.setForeground(c);
+    }
+  }
+
+  protected void setLabelFontFromScout(FontSpec scoutFont) {
+    JComponent fld = getSwingLabel();
+    if (fld != null) {
+      Font initFont = (Font) getClientProperty(fld, CLIENT_PROP_INITIAL_LABEL_FONT);
+      Font f = SwingUtility.createFont(scoutFont, initFont);
+      if (f == null) {
+        f = initFont;
+      }
+      fld.setFont(f);
+    }
+  }
+
   protected void setSaveNeededFromScout(boolean b) {
   }
 
@@ -409,6 +481,15 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     }
     else if (name.equals(IFormField.PROP_FONT)) {
       setFontFromScout((FontSpec) newValue);
+    }
+    else if (name.equals(IFormField.PROP_LABEL_FOREGROUND_COLOR)) {
+      setLabelForegroundFromScout((String) newValue);
+    }
+    else if (name.equals(IFormField.PROP_LABEL_BACKGROUND_COLOR)) {
+      setLabelBackgroundFromScout((String) newValue);
+    }
+    else if (name.equals(IFormField.PROP_LABEL_FONT)) {
+      setLabelFontFromScout((FontSpec) newValue);
     }
     else if (name.equals(IFormField.PROP_SAVE_NEEDED)) {
       setSaveNeededFromScout(((Boolean) newValue).booleanValue());
