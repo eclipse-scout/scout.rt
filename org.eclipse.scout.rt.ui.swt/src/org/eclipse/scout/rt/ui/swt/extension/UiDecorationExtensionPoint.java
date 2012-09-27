@@ -81,20 +81,10 @@ public final class UiDecorationExtensionPoint {
     IConfigurationElement[] properties = propertiesElement.getChildren("property");
     for (IConfigurationElement prop : properties) {
       String propName = null, propValue = null;
-      try {
-        propName = prop.getAttribute("name");
-        propValue = prop.getAttribute("value");
-        if (ILookAndFeelProperties.PROP_COLOR_FOREGROUND_DISABLED.equals(propName) ||
-            ILookAndFeelProperties.PROP_FORM_FIELD_LABEL_ALIGNMENT.equals(propName)) {
-          props.setPropertyString(propName, propValue);
-        }
-        else {
-          props.setPropertyInt(propName, Integer.valueOf(propValue));
-        }
-      }
-      catch (Exception e) {
-        LOG.error("could not parse extension look and feel of contributor '" + propertiesElement.getContributor().getName() + "' property name='" + propName + "' value='" + propValue + "'");
-      }
+      propName = prop.getAttribute("name");
+      propValue = prop.getAttribute("value");
+      props.setProperty(propName, propValue);
+      props.setContributor(propertiesElement.getContributor().getName());
     }
     return props;
   }
@@ -251,6 +241,9 @@ public final class UiDecorationExtensionPoint {
       }
       if (props.getPropertyString(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_HEIGHT) != null) {
         LOOK_AND_FEEL.setMessageBoxMinHeight(props.getPropertyInt(ILookAndFeelProperties.PROP_MESSAGE_BOX_MIN_HEIGHT));
+      }
+      if (props.getPropertyString(ILookAndFeelProperties.PROP_TABLE_MOUSE_MOVE_SELECTION_SUPPORT_ENABLED) != null) {
+        LOOK_AND_FEEL.setTableMouseMoveSelectionSupportEnabled(props.getPropertyBool(ILookAndFeelProperties.PROP_TABLE_MOUSE_MOVE_SELECTION_SUPPORT_ENABLED));
       }
     }
   }

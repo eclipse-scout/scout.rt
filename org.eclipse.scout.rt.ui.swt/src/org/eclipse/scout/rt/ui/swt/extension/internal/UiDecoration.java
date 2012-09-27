@@ -39,6 +39,7 @@ public class UiDecoration implements IUiDecoration {
   private String m_colorForegroundDisabled;
   private int m_messageBoxMinWidth = 400;
   private int m_messageBoxMinHeight = 100;
+  private boolean m_tableMouseMoveSelectionSupportEnabled;
 
   /**
    * one of SWT.RIGHT SWT.LEFT SWT.CENTER
@@ -232,5 +233,14 @@ public class UiDecoration implements IUiDecoration {
 
   public void setMessageBoxMinHeight(int messageBoxMinHeight) {
     m_messageBoxMinHeight = messageBoxMinHeight;
+  }
+
+  public void setTableMouseMoveSelectionSupportEnabled(boolean tableMouseMoveSelectionSupportEnabled) {
+    m_tableMouseMoveSelectionSupportEnabled = tableMouseMoveSelectionSupportEnabled;
+  }
+
+  @Override
+  public boolean isTableMouseMoveSelectionSupportEnabled() {
+    return m_tableMouseMoveSelectionSupportEnabled;
   }
 }

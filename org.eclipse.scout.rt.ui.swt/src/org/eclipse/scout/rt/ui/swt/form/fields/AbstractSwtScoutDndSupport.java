@@ -117,6 +117,15 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
 
   protected abstract TransferObject handleSwtDragRequest();
 
+  protected boolean acceptDrag() {
+    return true;
+  }
+
+  @Override
+  public boolean isDraggingEnabled() {
+    return m_control.getData(DND_DRAG_SOURCE) != null;
+  }
+
   protected void updateDragSupportFromScout() {
     if (m_scoutObject == null || m_control == null || m_control.isDisposed()) {
       return;
@@ -233,6 +242,13 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
   } // end class P_SwtDropTargetListener
 
   private class P_SwtDragSourceListener extends DragSourceAdapter {
+    @Override
+    public void dragStart(DragSourceEvent event) {
+      if (!acceptDrag()) {
+        event.doit = false;
+      }
+    }
+
     @Override
     public void dragSetData(DragSourceEvent event) {
       TransferObject scoutTransferObject = handleSwtDragRequest();
