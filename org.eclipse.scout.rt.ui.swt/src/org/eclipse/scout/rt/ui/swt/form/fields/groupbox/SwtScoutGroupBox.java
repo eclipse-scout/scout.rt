@@ -337,6 +337,11 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
     //end notify
   }
 
+  @Override
+  protected void setBackgroundFromScout(String scoutColor) {
+    setBackgroundFromScout(scoutColor, getSwtContainer());
+  }
+
   private class P_ExpansionListener extends ExpansionAdapter {
     @Override
     public void expansionStateChanged(ExpansionEvent e) {
