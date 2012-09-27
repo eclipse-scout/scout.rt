@@ -41,7 +41,7 @@ public class CalendarItemContainer implements Comparable {
     m_item = item;
     m_bounds = new Rectangle(1, 2, 3, 4);
     long repTimeOfDayStart = AbstractCell.getTimeOfDayMillis(m_cell.getDate().getTime());
-    // TODO: why + 1
+    // TODO why + 1
     long displayInterval = CalendarConstants.HOUR_MILLIS * (CalendarConstants.DAY_TIMELINE_END_TIME /* TODO need this? + 1 */- CalendarConstants.DAY_TIMELINE_START_TIME);
     CalendarModel model = m_cell.getCalendar().getModel();
     //

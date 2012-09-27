@@ -5,9 +5,8 @@ Bundle-SymbolicName: org.eclipse.scout.net;singleton:=true
 Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.net.NetActivator
 Bundle-Vendor: Eclipse Scout Project
-Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.scout.net
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.net;bundle-version="1.1.0"
-Bundle-ClassPath: .
+Export-Package: org.eclipse.scout.net
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

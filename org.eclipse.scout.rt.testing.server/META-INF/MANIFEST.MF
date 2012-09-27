@@ -4,11 +4,11 @@ Bundle-Name: Scout Server Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.server
 Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.rt.testing.server.Activator
+Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.testing.shared;visibility:=reexport,
  org.eclipse.scout.rt.server
-Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.scout.rt.testing.server,
  org.eclipse.scout.rt.testing.server.runner
-Bundle-Vendor: Eclipse Scout Project
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
