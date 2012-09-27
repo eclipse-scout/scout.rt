@@ -257,22 +257,28 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     }
   }
 
-  protected void setBackgroundFromScout(String scoutColor) {
-    if (getSwtField() != null) {
-      Control fld = getSwtField();
-      if (fld.getData(CLIENT_PROP_INITIAL_BACKGROUND) == null) {
-        fld.setData(CLIENT_PROP_INITIAL_BACKGROUND, fld.getBackground());
-      }
-      Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_BACKGROUND);
-      Color c = getEnvironment().getColor(scoutColor);
-      if (getMandatoryFieldBackgroundColor() != null) {
-        c = getMandatoryFieldBackgroundColor();
-      }
-      if (c == null) {
-        c = initCol;
-      }
-      fld.setBackground(c);
+  protected void setBackgroundFromScout(String scoutColor, Control field) {
+    if (field == null) {
+      return;
     }
+
+    Control fld = field;
+    if (fld.getData(CLIENT_PROP_INITIAL_BACKGROUND) == null) {
+      fld.setData(CLIENT_PROP_INITIAL_BACKGROUND, fld.getBackground());
+    }
+    Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_BACKGROUND);
+    Color c = getEnvironment().getColor(scoutColor);
+    if (getMandatoryFieldBackgroundColor() != null) {
+      c = getMandatoryFieldBackgroundColor();
+    }
+    if (c == null) {
+      c = initCol;
+    }
+    fld.setBackground(c);
+  }
+
+  protected void setBackgroundFromScout(String scoutColor) {
+    setBackgroundFromScout(scoutColor, getSwtField());
   }
 
   protected void setForegroundFromScout(String scoutColor) {
