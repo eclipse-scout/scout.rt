@@ -46,6 +46,7 @@ public class SwingScoutDropDownPopup extends SwingScoutPopup {
   private Component m_focusComponent;
   private FocusListener m_focusFocusListener;
   private AWTEventListener m_awtListener;
+  private Window m_ownerComponentWindow;
 
   public SwingScoutDropDownPopup(ISwingEnvironment env, Component ownerComponent, Component focusComponent) {
     super(env, ownerComponent, new Rectangle(ownerComponent.getLocationOnScreen(), ownerComponent.getSize()));
@@ -95,40 +96,12 @@ public class SwingScoutDropDownPopup extends SwingScoutPopup {
             }
             Point p = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), getSwingOwnerComponent());
             if (!getSwingOwnerComponent().contains(p)) {
-              // close window later (let potential field verifier run first)
-              SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                  if (getSwingWindow().isVisible()) {
-                    closeView();
-                    fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutDropDownPopup.this, SwingScoutViewEvent.TYPE_CLOSED));
-                  }
-                }
-              });
+              closeWindow(getSwingWindow());
             }
           }
         }
       };
       Toolkit.getDefaultToolkit().addAWTEventListener(m_awtListener, AWTEvent.MOUSE_EVENT_MASK);
-    }
-    // add listener to adjust location
-    if (m_ownerComponentListener == null) {
-      m_ownerComponentListener = new ComponentAdapter() {
-        @Override
-        public void componentResized(ComponentEvent event) {
-          autoAdjustBounds();
-        }
-
-        @Override
-        public void componentMoved(ComponentEvent event) {
-          autoAdjustBounds();
-        }
-      };
-      Window w = SwingUtilities.getWindowAncestor(getSwingOwnerComponent());
-      if (w != null) {
-        w.addComponentListener(m_ownerComponentListener);
-      }
-      getSwingOwnerComponent().addComponentListener(m_ownerComponentListener);
     }
     // add listener to track focus
     if (m_focusComponent != null) {
@@ -157,23 +130,80 @@ public class SwingScoutDropDownPopup extends SwingScoutPopup {
       Toolkit.getDefaultToolkit().removeAWTEventListener(m_awtListener);
       m_awtListener = null;
     }
-    //
-    if (m_ownerComponentListener != null) {
-      Window w = SwingUtilities.getWindowAncestor(getSwingOwnerComponent());
-      if (w != null) {
-        w.removeComponentListener(m_ownerComponentListener);
-      }
-      getSwingOwnerComponent().removeComponentListener(m_ownerComponentListener);
-      m_ownerComponentListener = null;
-    }
-    //
+    
     if (m_focusComponent != null) {
       if (m_focusFocusListener != null) {
         m_focusComponent.removeFocusListener(m_focusFocusListener);
         m_focusFocusListener = null;
       }
     }
-    //
+
     super.handleSwingWindowClosed();
+  }
+
+  @Override
+  protected void registerOwnerComponentListener() {
+    if (m_ownerComponentListener != null) {
+      return;
+    }
+    m_ownerComponentListener = new P_OwnerComponentListener();
+    m_ownerComponentWindow = SwingUtilities.getWindowAncestor(getSwingOwnerComponent());
+    if (m_ownerComponentWindow != null) {
+      m_ownerComponentWindow.addComponentListener(m_ownerComponentListener);
+    }
+    getSwingOwnerComponent().addComponentListener(m_ownerComponentListener);
+  }
+
+  @Override
+  protected void unregisterOwnerComponentListener() {
+    if (m_ownerComponentListener == null) {
+      return;
+    }
+    if (m_ownerComponentWindow != null) {
+      m_ownerComponentWindow.removeComponentListener(m_ownerComponentListener);
+      m_ownerComponentWindow = null;
+    }
+    getSwingOwnerComponent().removeComponentListener(m_ownerComponentListener);
+    m_ownerComponentListener = null;
+  }
+
+  private void closeWindow(final Window window) {
+    // close window later (let potential field verifier run first)
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        if (window != null && window.isVisible()) {
+          closeView();
+          fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutDropDownPopup.this, SwingScoutViewEvent.TYPE_CLOSED));
+        }
+      }
+    });
+  }
+
+  /**
+   * Component listener to adjust location
+   * In case the event is sent from the ownerComponentWindow, the pop-up window will be closed.
+   */
+  private class P_OwnerComponentListener extends ComponentAdapter {
+    @Override
+    public void componentResized(ComponentEvent event) {
+      handleOwnerComponentEvent(event);
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent event) {
+      handleOwnerComponentEvent(event);
+    }
+
+    private void handleOwnerComponentEvent(ComponentEvent event) {
+      if (event.getSource() instanceof Window) {
+        Window window = (Window) event.getSource();
+        if (window == m_ownerComponentWindow) {
+          closeWindow(getSwingWindow());
+          return;
+        }
+      }
+      autoAdjustBounds();
+    }
   }
 }
