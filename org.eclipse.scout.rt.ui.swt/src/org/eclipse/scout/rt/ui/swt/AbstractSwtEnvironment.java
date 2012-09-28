@@ -888,7 +888,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           parentShell = getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS);
         }
         else {
-          parentShell = getParentShellIgnoringPopups(0);
+          parentShell = getParentShellIgnoringPopups(SWT.MODELESS);
         }
         SwtScoutDialog dialog = createSwtScoutDialog(parentShell, dialogStyle);
         try {
