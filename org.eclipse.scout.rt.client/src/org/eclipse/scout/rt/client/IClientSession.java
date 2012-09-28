@@ -140,4 +140,8 @@ public interface IClientSession extends ISession {
    * @return
    */
   IIconLocator getIconLocator();
+
+  void addLocaleListener(ILocaleListener listener);
+
+  void removeLocaleListener(ILocaleListener listener);
 }

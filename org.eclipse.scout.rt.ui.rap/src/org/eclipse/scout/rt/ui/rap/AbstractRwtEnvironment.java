@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
@@ -47,6 +48,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ILocaleListener;
+import org.eclipse.scout.rt.client.LocaleChangeEvent;
 import org.eclipse.scout.rt.client.busy.IBusyHandler;
 import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
@@ -126,6 +129,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private Bundle m_applicationBundle;
   private RwtScoutSynchronizer m_synchronizer;
   private SessionStoreListener m_sessionStoreListener;
+  private ILocaleListener m_localeListener;
 
   private final Object m_immediateUiJobsLock = new Object();
   private final List<Runnable> m_immediateUiJobs = new ArrayList<Runnable>();
@@ -165,6 +169,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     m_clientSessionClazz = clientSessionClazz;
     m_sessionStoreListener = new P_SessionStoreListener();
     m_environmentListeners = new EventListenerList();
+    m_localeListener = new P_LocaleListener();
     m_openForms = new HashMap<IForm, IRwtScoutPart>();
     m_status = RwtEnvironmentEvent.INACTIVE;
     m_desktopKeyStrokes = new ArrayList<IRwtKeyStroke>();
@@ -365,6 +370,8 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       }
       //put the the display on the session data
       m_clientSession.setData(ENVIRONMENT_KEY, this);
+
+      m_clientSession.addLocaleListener(m_localeListener);
 
       //
       RwtUtility.setNlsTextsOnDisplay(getDisplay(), m_clientSession.getTexts());
@@ -1278,6 +1285,34 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   protected void setActivateDesktopCalled(boolean activateDesktopCalled) {
     m_activateDesktopCalled = activateDesktopCalled;
+  }
+
+  private class P_LocaleListener implements ILocaleListener {
+    @Override
+    public void localeChanged(LocaleChangeEvent event) {
+      final Locale locale = event.getLocale();
+      invokeUiLater(new Runnable() {
+        @Override
+        public void run() {
+          if (!hasSameLocale(RWT.getLocale(), locale)) {
+            setLocale(locale);
+          }
+        }
+      });
+    }
+
+    private void setLocale(Locale locale) {
+      LocaleThreadLocal.set(locale);
+      RWT.setLocale(locale);
+    }
+
+    private boolean hasSameLocale(Locale locale1, Locale locale2) {
+      boolean result = false;
+      if (locale1 != null && locale2 != null) {
+        result = locale1.equals(locale2);
+      }
+      return result;
+    }
   }
 
   private static final class P_SessionStoreListener implements SessionStoreListener {

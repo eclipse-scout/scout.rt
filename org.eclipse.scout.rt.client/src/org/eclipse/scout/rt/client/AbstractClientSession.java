@@ -13,8 +13,10 @@ package org.eclipse.scout.rt.client;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.security.auth.Subject;
 
@@ -79,6 +81,7 @@ public abstract class AbstractClientSession implements IClientSession {
   private ScoutTexts m_scoutTexts;
   private Locale m_locale;
   private UserAgent m_userAgent;
+  private Vector<ILocaleListener> m_localeListener = new Vector<ILocaleListener>();
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
@@ -131,7 +134,11 @@ public abstract class AbstractClientSession implements IClientSession {
   @Override
   public final void setLocale(Locale locale) {
     if (locale != null) {
+      Locale oldLocale = m_locale;
       m_locale = locale;
+      if (!locale.equals(oldLocale)) {
+        notifyLocaleListeners(locale);
+      }
     }
   }
 
@@ -355,6 +362,9 @@ public abstract class AbstractClientSession implements IClientSession {
       }
       m_desktop = null;
     }
+    if (!m_localeListener.isEmpty()) {
+      m_localeListener.clear();
+    }
     try {
       if (getServiceTunnel() != null) {
         SERVICES.getService(ILogoutService.class).logout();
@@ -497,4 +507,22 @@ public abstract class AbstractClientSession implements IClientSession {
     m_userAgent = userAgent;
   }
 
+  @Override
+  public void addLocaleListener(ILocaleListener listener) {
+    m_localeListener.add(listener);
+  }
+
+  @Override
+  public void removeLocaleListener(ILocaleListener listener) {
+    m_localeListener.remove(listener);
+  }
+
+  protected void notifyLocaleListeners(Locale locale) {
+    LocaleChangeEvent event = new LocaleChangeEvent(this, locale);
+    Iterator it = ((Vector) m_localeListener.clone()).iterator();
+    while (it.hasNext()) {
+      ILocaleListener listener = (ILocaleListener) it.next();
+      listener.localeChanged(event);
+    }
+  }
 }
