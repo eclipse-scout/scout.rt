@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -75,6 +74,7 @@ import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.RwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
+import org.eclipse.scout.rt.ui.rap.internal.servletfilter.LogoutFilter;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.KeyStrokeManager;
 import org.eclipse.scout.rt.ui.rap.util.BrowserInfo;
@@ -257,28 +257,32 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
+  /**
+   * @deprecated use {@link #getLogoutLocation()} instead.
+   */
+  @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public String getLogoutLandingUri() {
+    return getLogoutLocation();
+  }
+
+  /**
+   * @see {@link LogoutFilter}
+   */
+  protected String getLogoutLocation() {
     String path = RWT.getRequest().getServletPath();
 
     if (path.length() > 0 && '/' == path.charAt(0)) {
       path = path.substring(1);
     }
 
+    path += "?" + LogoutFilter.LOGOUT_PARAM;
+
     return path;
   }
 
   public void logout() {
-    RWT.getRequest().getSession().setMaxInactiveInterval(1);
-
-    final HttpSession session = RWT.getSessionStore().getHttpSession();
-    new Thread() {
-      @Override
-      public void run() {
-        session.invalidate();
-      }
-    }.start();
-
     HttpServletResponse response = RWT.getResponse();
     String logoutUri = response.encodeRedirectURL(getLogoutLandingUri());
     String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", logoutUri);
