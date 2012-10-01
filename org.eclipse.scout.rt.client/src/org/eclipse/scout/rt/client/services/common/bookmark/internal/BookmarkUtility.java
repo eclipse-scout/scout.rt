@@ -25,11 +25,13 @@ import java.util.zip.CRC32;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -37,6 +39,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.NodePageState;
@@ -604,7 +607,11 @@ public final class BookmarkUtility {
         }
       }
       else {
-        if (tablePage.getChildNodeCount() > 0) {
+        ITreeNode[] filteredChildNodes = tablePage.getFilteredChildNodes();
+        if (filteredChildNodes.length > 0) {
+          childPage = (IPage) filteredChildNodes[0];
+        }
+        else if (tablePage.getChildNodeCount() > 0) {
           childPage = tablePage.getChildPage(0);
         }
       }
@@ -628,6 +635,35 @@ public final class BookmarkUtility {
           table.selectRows(rowList.toArray(new ITableRow[0]));
         }
       }
+    }
+
+    // ensure that the child page is not filtered out by column filters.
+    if (childPage != null && !childPage.isFilterAccepted()) {
+      if (table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled()) {
+        try {
+          // disable table column filters and check if page is visible
+          table.getColumnFilterManager().setEnabled(false);
+          if (childPage.isFilterAccepted()) {
+            // page was filtered out hence reset column filters
+            table.getColumnFilterManager().reset();
+            tablePage.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResetColumnFilters"), ProcessingStatus.WARNING));
+          }
+        }
+        finally {
+          table.getColumnFilterManager().setEnabled(true);
+        }
+      }
+    }
+
+    if (childPage == null || !childPage.isFilterAccepted()) {
+      // child page cannot be resolved or it is filtered out
+      if (tablePage.isSearchActive() && tablePage.getSearchFormInternal() != null) {
+        tablePage.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), ProcessingStatus.WARNING));
+      }
+      else {
+        tablePage.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceled"), ProcessingStatus.WARNING));
+      }
+      return null;
     }
     return childPage;
   }
