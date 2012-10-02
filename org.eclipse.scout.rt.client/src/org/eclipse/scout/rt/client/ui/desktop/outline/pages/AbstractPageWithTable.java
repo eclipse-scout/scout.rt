@@ -610,8 +610,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   @Override
   public void setTablePopulateStatus(IProcessingStatus status) {
-    getTable().tablePopulated();
     m_tablePopulateStatus = status;
+    getTable().tablePopulated();
   }
 
   /**
