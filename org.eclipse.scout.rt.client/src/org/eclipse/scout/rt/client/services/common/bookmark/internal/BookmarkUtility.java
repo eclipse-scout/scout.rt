@@ -238,6 +238,7 @@ public final class BookmarkUtility {
       boolean pathFullyRestored = true;
       List<AbstractPageState> path = bm.getPath();
       AbstractPageState parentPageState = path.get(0);
+      boolean resetViewAndWarnOnFail = bm.getId() != 0;
       for (int i = 1; i < path.size(); i++) {
         // try to find correct child page (next parentPage)
         IPage childPage = null;
@@ -246,14 +247,14 @@ public final class BookmarkUtility {
           TablePageState tablePageState = (TablePageState) parentPageState;
           if (parentPage instanceof IPageWithTable) {
             IPageWithTable tablePage = (IPageWithTable) parentPage;
-            childPage = bmLoadTablePage(tablePage, tablePageState, false);
+            childPage = bmLoadTablePage(tablePage, tablePageState, false, resetViewAndWarnOnFail);
           }
         }
         else if (parentPageState instanceof NodePageState) {
           NodePageState nodePageState = (NodePageState) parentPageState;
           if (parentPage instanceof IPageWithNodes) {
             IPageWithNodes nodePage = (IPageWithNodes) parentPage;
-            childPage = bmLoadNodePage(nodePage, nodePageState, childState);
+            childPage = bmLoadNodePage(nodePage, nodePageState, childState, resetViewAndWarnOnFail);
           }
         }
         // next
@@ -261,17 +262,17 @@ public final class BookmarkUtility {
           parentPage = childPage;
           parentPageState = childState;
         }
-        else if (i + 1 < path.size()) {
+        else if (i < path.size()) {
           pathFullyRestored = false;
           break;
         }
       }
       if (pathFullyRestored) {
         if (parentPageState instanceof TablePageState && parentPage instanceof IPageWithTable) {
-          bmLoadTablePage((IPageWithTable) parentPage, (TablePageState) parentPageState, true);
+          bmLoadTablePage((IPageWithTable) parentPage, (TablePageState) parentPageState, true, resetViewAndWarnOnFail);
         }
         else if (parentPage instanceof IPageWithNodes) {
-          bmLoadNodePage((IPageWithNodes) parentPage, (NodePageState) parentPageState, null);
+          bmLoadNodePage((IPageWithNodes) parentPage, (NodePageState) parentPageState, null, resetViewAndWarnOnFail);
         }
       }
       /*
@@ -531,7 +532,7 @@ public final class BookmarkUtility {
   }
 
   @SuppressWarnings("deprecation")
-  private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean leafState) throws ProcessingException {
+  private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean leafState, boolean resetViewAndWarnOnFail) throws ProcessingException {
     ITable table = tablePage.getTable();
     if (tablePageState.getTableCustomizerData() != null && tablePage.getTable().getTableCustomizer() != null) {
       byte[] newData = tablePageState.getTableCustomizerData();
@@ -635,46 +636,52 @@ public final class BookmarkUtility {
           table.selectRows(rowList.toArray(new ITableRow[0]));
         }
       }
+
+      return childPage;
     }
 
-    // ensure that the child page is not filtered out by column filters.
-    if (childPage != null && !childPage.isFilterAccepted()) {
-      if (table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled()) {
-        try {
-          // disable table column filters and check if page is visible
-          table.getColumnFilterManager().setEnabled(false);
-          if (childPage.isFilterAccepted()) {
-            // page was filtered out hence reset column filters
-            table.getColumnFilterManager().reset();
-            tablePage.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResetColumnFilters"), ProcessingStatus.WARNING));
-          }
-        }
-        finally {
-          table.getColumnFilterManager().setEnabled(true);
-        }
+    // check, whether table column filter must be reset
+    if (resetViewAndWarnOnFail) {
+      if (childPage == null
+          || (!childPage.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled())) {
+        table.getColumnFilterManager().reset();
+        tablePage.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResetColumnFilters"), ProcessingStatus.WARNING));
       }
     }
 
+    // child page is not available or filtered out
     if (childPage == null || !childPage.isFilterAccepted()) {
-      // child page cannot be resolved or it is filtered out
-      if (tablePage.isSearchActive() && tablePage.getSearchFormInternal() != null) {
-        tablePage.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), ProcessingStatus.WARNING));
+      if (resetViewAndWarnOnFail) {
+        // set appropriate warning
+        if (tablePage.isSearchActive() && tablePage.getSearchFormInternal() != null) {
+          tablePage.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), ProcessingStatus.WARNING));
+        }
+        else {
+          tablePage.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceled"), ProcessingStatus.WARNING));
+        }
       }
-      else {
-        tablePage.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceled"), ProcessingStatus.WARNING));
-      }
-      return null;
+      childPage = null;
     }
+
     return childPage;
   }
 
-  private static IPage bmLoadNodePage(IPageWithNodes nodePage, NodePageState nodePageState, AbstractPageState childState) throws ProcessingException {
+  private static IPage bmLoadNodePage(IPageWithNodes nodePage, NodePageState nodePageState, AbstractPageState childState, boolean resetView) throws ProcessingException {
     IPage childPage = null;
     if (childState != null) {
       nodePage.ensureChildrenLoaded();
       IPage p = BookmarkUtility.resolvePage(nodePage.getChildPages(), childState.getPageClassName(), childState.getBookmarkIdentifier());
       if (p != null) {
-        childPage = p;
+        ITable table = nodePage.getInternalTable();
+        // reset table column filter if requested
+        if (resetView && !p.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled()) {
+          table.getColumnFilterManager().reset();
+        }
+
+        // check table column filter
+        if (p.isFilterAccepted()) {
+          childPage = p;
+        }
       }
     }
     return childPage;
