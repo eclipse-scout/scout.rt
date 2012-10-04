@@ -355,6 +355,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         RWT.getSessionStore().setAttribute(IClientSession.class.getName(), tempClientSession);
         RWT.getSessionStore().addSessionStoreListener(m_sessionStoreListener);
 
+        // init RWT locale with the locale of the client session
+        if (tempClientSession.getLocale() != null && !tempClientSession.getLocale().equals(RWT.getLocale())) {
+          RWT.setLocale(tempClientSession.getLocale());
+        }
         newSession.setValue(true);
       }
       else {
