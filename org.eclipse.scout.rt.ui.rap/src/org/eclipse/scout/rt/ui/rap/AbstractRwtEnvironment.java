@@ -1310,7 +1310,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
 
     private void setLocale(Locale locale) {
-      LocaleThreadLocal.set(locale);
       RWT.setLocale(locale);
     }
 
