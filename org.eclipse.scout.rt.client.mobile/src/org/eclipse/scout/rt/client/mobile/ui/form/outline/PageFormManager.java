@@ -259,7 +259,7 @@ public class PageFormManager {
       return;
     }
 
-    if (getMiddlePageSlotViewId().equals(viewId) && page.getParentPage() != null) {
+    if (getMiddlePageSlotViewId().equals(viewId) && page.getParentPage() != null && !(page instanceof AutoLeafPageWithNodes)) {
       IPageForm parentPageForm = m_pageFormMap.get(page.getParentPage(), true);
       if (parentPageForm == null || getMiddlePageSlotViewId().equals(parentPageForm.getDisplayViewId())) {
 
