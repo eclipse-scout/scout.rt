@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -212,6 +213,14 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   @Override
   protected void execDisposeForm() throws ProcessingException {
     removeTableListener();
+    for (AutoLeafPageWithNodes autoLeafPage : m_autoLeafPageMap.values()) {
+      disposeAutoLeafPage(autoLeafPage);
+    }
+
+    if (m_page != null && m_page.getDetailForm() != null) {
+      m_page.getDetailForm().doClose();
+      m_page.setDetailForm(null);
+    }
   }
 
   private void updateDrillDownStyle() {
@@ -538,8 +547,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       //Create auto leaf page including an outline and activate it.
       //Adding to a "real" outline is not possible because the page to row maps in AbstractPageWithTable resp. AbstractPageWithNodes can only be modified by the page itself.
       AutoLeafPageWithNodes autoPage = new AutoLeafPageWithNodes(tableRow, m_page);
-      AutoOutline autoOutline = new AutoOutline();
-      autoOutline.setRootNode(autoPage);
+      AutoOutline autoOutline = new AutoOutline(autoPage);
       autoOutline.selectNode(autoPage);
       m_autoLeafPageMap.put(tableRow, autoPage);
 
@@ -555,12 +563,23 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
 
     for (ITableRow tableRow : tableRows) {
-      AutoLeafPageWithNodes autoPage = m_autoLeafPageMap.get(tableRow);
+      AutoLeafPageWithNodes autoPage = m_autoLeafPageMap.remove(tableRow);
       if (autoPage != null) {
-        m_autoLeafPageMap.remove(autoPage);
+        disposeAutoLeafPage(autoPage);
+
         m_pageFormManager.pageRemovedNotify(this, autoPage);
       }
     }
+  }
+
+  private void disposeAutoLeafPage(AutoLeafPageWithNodes page) {
+    if (page == null || page.getOutline() == null) {
+      return;
+    }
+
+    IOutline outline = page.getOutline();
+    outline.removeAllChildNodes(outline.getRootNode());
+    outline.disposeTree();
   }
 
   private void handleTableRowsInserted(ITable table, ITableRow[] tableRows) throws ProcessingException {
