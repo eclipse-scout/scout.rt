@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -104,4 +105,12 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   public void setTableVisible(boolean b) {
   }
 
+  @Override
+  public IProcessingStatus getPagePopulateStatus() {
+    return null;
+  }
+
+  @Override
+  public void setPagePopulateStatus(IProcessingStatus status) {
+  }
 }

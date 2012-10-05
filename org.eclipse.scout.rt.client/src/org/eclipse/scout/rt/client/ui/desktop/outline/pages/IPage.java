@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 
 /**
  * A page is a tree node for the outline and a table in the main view<br>
@@ -96,6 +98,26 @@ public abstract interface IPage extends ITreeNode {
   boolean isTableVisible();
 
   void setTableVisible(boolean b);
+
+  /**
+   * see {@link ITableField#getTablePopulateStatus()}
+   * <p>
+   * This method is temporary and will be removed in future releases (long term) when the {@link IPage} is legacy and
+   * replaced by a simple page with just N forms.
+   * 
+   * @since 3.8.2
+   */
+  IProcessingStatus getPagePopulateStatus();
+
+  /**
+   * see {@link ITableField#setTablePopulateStatus(IProcessingStatus)}
+   * <p>
+   * This method is temporary and will be removed in future releases (long term) when the {@link IPage} is legacy and
+   * replaced by a simple page with just N forms.
+   * 
+   * @since 3.8.2
+   */
+  void setPagePopulateStatus(IProcessingStatus status);
 
   /**
    * Call this method to refresh all listeners on that dataTypes.<br>
