@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -115,26 +116,30 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
           return;
         }
         IOutline outline = getDesktop().getOutline();
+        // populate status
+        IProcessingStatus populateStatus = null;
+        if (outline != null && outline.getActivePage() != null) {
+          IPage activePage = outline.getActivePage();
+          populateStatus = activePage.getPagePopulateStatus();
+        }
+        setTablePopulateStatus(populateStatus);
+
+        // selection status for table pages only
+        IProcessingStatus selectionStatus = null;
         if (outline != null && outline.getActivePage() instanceof IPageWithTable<?>) {
-          //popuplate status
           IPageWithTable<?> tablePage = (IPageWithTable<?>) outline.getActivePage();
-          IProcessingStatus populateStatus = tablePage.getTablePopulateStatus();
-          setTablePopulateStatus(populateStatus);
           //selection status
           if (tablePage.isSearchActive() && tablePage.getSearchFilter() != null && (!tablePage.getSearchFilter().isCompleted()) && tablePage.isSearchRequired()) {
-            setTableSelectionStatus(null);
+            // clear status
           }
           else if (populateStatus != null && populateStatus.getSeverity() == IProcessingStatus.WARNING) {
-            setTableSelectionStatus(null);
+            // clear status
           }
           else {
-            setTableSelectionStatus(new ProcessingStatus(createDefaultTableStatus(), IProcessingStatus.INFO));
+            selectionStatus = new ProcessingStatus(createDefaultTableStatus(), IProcessingStatus.INFO);
           }
         }
-        else {
-          setTablePopulateStatus(null);
-          setTableSelectionStatus(null);
-        }
+        setTableSelectionStatus(selectionStatus);
       }
 
       @Override
