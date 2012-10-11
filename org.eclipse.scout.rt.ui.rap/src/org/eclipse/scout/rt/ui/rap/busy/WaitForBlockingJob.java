@@ -67,7 +67,7 @@ public class WaitForBlockingJob extends BusyJob {
     }
     finally {
       if (display != null && !display.isDisposed()) {
-        display.syncExec(new Runnable() {
+        display.asyncExec(new Runnable() {
           @Override
           public void run() {
             if (busyControl != null && !busyControl.isDisposed()) {
