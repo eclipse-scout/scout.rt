@@ -17,6 +17,7 @@ import java.util.Map;
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.util.BrowserInfo;
@@ -52,7 +53,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
   private HashMap<IForm, RwtScoutDesktopForm> m_openForms;
   private ArrayList<RwtScoutDesktopForm> m_formStack;
   private Map<IForm, IFormBoundsProvider> m_formBoundsProviders;
-
+  private P_DesktopListner m_desktopListener;
   private Composite m_tabBar;
 
   private Composite m_container;
@@ -64,7 +65,8 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     m_formStack = new ArrayList<RwtScoutDesktopForm>(3);
     m_formBoundsProviders = new HashMap<IForm, IFormBoundsProvider>();
     addListener(SWT.Resize, new P_ResizeListener());
-    getUiEnvironment().getScoutDesktop().addDesktopListener(new P_DesktopListner());
+    m_desktopListener = new P_DesktopListner();
+    getUiEnvironment().getScoutDesktop().addDesktopListener(m_desktopListener);
     setData(WidgetUtil.CUSTOM_VARIANT, getVariant());
     createContent(this);
   }
@@ -273,7 +275,15 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
       case DesktopEvent.TYPE_FORM_REMOVED:
         removeForm(e.getForm());
         break;
+      case DesktopEvent.TYPE_DESKTOP_CLOSED:
+        handleDesktopClosed(e.getDesktop());
+        break;
     }
+  }
+
+  private void handleDesktopClosed(IDesktop desktop) {
+    desktop.removeDesktopListener(m_desktopListener);
+    m_desktopListener = null;
   }
 
   private class P_ViewTabSelectionListener implements IViewTabSelectionListener {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,6 +22,8 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -50,6 +52,15 @@ public class AbstractSwtMenuAction {
     if (createInitial) {
       callInitializers(m_swtMenu);
     }
+
+    m_swtMenu.addDisposeListener(new DisposeListener() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetDisposed(DisposeEvent event) {
+        disconnectFromScout();
+      }
+    });
   }
 
   protected final void callInitializers(Menu swtMenu) {
@@ -83,6 +94,13 @@ public class AbstractSwtMenuAction {
     if (m_scoutPropertyListener == null) {
       m_scoutPropertyListener = new P_ScoutPropertyChangeListener();
       m_scoutAction.addPropertyChangeListener(m_scoutPropertyListener);
+    }
+  }
+
+  protected void detachScoutListeners() {
+    if (m_scoutPropertyListener != null) {
+      m_scoutAction.removePropertyChangeListener(m_scoutPropertyListener);
+      m_scoutPropertyListener = null;
     }
   }
 
@@ -138,9 +156,6 @@ public class AbstractSwtMenuAction {
   }
 
   protected void initializeSwt(Menu swtMenu) {
-  }
-
-  protected void detachScoutListeners() {
   }
 
   public ISwtEnvironment getEnvironment() {
