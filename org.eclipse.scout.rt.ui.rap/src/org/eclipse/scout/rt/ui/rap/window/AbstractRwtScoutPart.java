@@ -182,10 +182,8 @@ public abstract class AbstractRwtScoutPart implements IRwtScoutPart {
     switch (e.getType()) {
       case DesktopEvent.TYPE_FORM_REMOVED: {
         //auto-detach listener
-        IDesktop desktop = getUiEnvironment().getScoutDesktop();
-        if (desktop != null) {
-          desktop.removeDesktopListener(m_desktopListener);
-        }
+        IDesktop desktop = e.getDesktop();
+        desktop.removeDesktopListener(m_desktopListener);
         try {
           closePart();
         }
