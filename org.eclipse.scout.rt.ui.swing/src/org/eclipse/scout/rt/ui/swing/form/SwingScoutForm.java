@@ -268,23 +268,39 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
         break;
       }
       case FormEvent.TYPE_TO_FRONT: {
-        Window w = SwingUtilities.getWindowAncestor(getView().getSwingContentPane());
-        if (w.isShowing()) {
-          w.toFront();
-        }
+        handleToFrontFromScout();
         break;
       }
       case FormEvent.TYPE_TO_BACK: {
-        Window w = SwingUtilities.getWindowAncestor(getView().getSwingContentPane());
-        if (w.isShowing()) {
-          w.toBack();
-        }
+        handleToBackFromScout();
         break;
       }
       case FormEvent.TYPE_REQUEST_FOCUS: {
         handleRequestFocusFromScout(e.getFormField(), false);
         break;
       }
+    }
+  }
+
+  protected void handleToFrontFromScout() {
+    if (getView() == null) {
+      return;
+    }
+
+    Window w = SwingUtilities.getWindowAncestor(getView().getSwingContentPane());
+    if (w.isShowing()) {
+      w.toFront();
+    }
+  }
+
+  protected void handleToBackFromScout() {
+    if (getView() == null) {
+      return;
+    }
+
+    Window w = SwingUtilities.getWindowAncestor(getView().getSwingContentPane());
+    if (w.isShowing()) {
+      w.toBack();
     }
   }
 
@@ -440,9 +456,7 @@ public class SwingScoutForm extends SwingScoutComposite<IForm> implements ISwing
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              if (getView() != null) {
-                handleScoutFormEventInUi(e);
-              }
+              handleScoutFormEventInUi(e);
             }
           };
           getSwingEnvironment().invokeSwingLater(t);
