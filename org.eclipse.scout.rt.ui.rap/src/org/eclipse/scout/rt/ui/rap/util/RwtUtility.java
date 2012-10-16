@@ -118,10 +118,14 @@ public final class RwtUtility {
     BrowserInfo info = (BrowserInfo) RWT.getSessionStore().getAttribute(BROWSER_INFO);
     if (info == null) {
       HttpServletRequest request = RWT.getRequest();
-      info = new BrowserInfoBuilder().createBrowserInfo(request);
+      info = createBrowserInfo(request);
       RWT.getSessionStore().setAttribute(BROWSER_INFO, info);
     }
     return info;
+  }
+
+  public static BrowserInfo createBrowserInfo(HttpServletRequest request) {
+    return new BrowserInfoBuilder().createBrowserInfo(request);
   }
 
   public static Object createUiTransferable(TransferObject scoutT) {
