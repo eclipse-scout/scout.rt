@@ -1055,7 +1055,25 @@ public class StatementProcessor implements IStatementProcessor {
       // continue
       String[] newPath = new String[path.length - 1];
       System.arraycopy(path, 1, newPath, 0, newPath.length);
-      return createInputRec(bindToken, newPath, o, nullType);
+      IBindInput input = null;
+      if (o instanceof IHolder<?>) {
+        /* dereference value if current object is an IHolder. If input cannot be resolved (i.e. ProcessingException occurs),
+         * search given property names on holder. Hence both of the following forms are supported on holder types:
+         * :holder.property
+         * :holder.value.property
+         */
+        try {
+          input = createInputRec(bindToken, newPath, ((IHolder) o).getValue(), nullType);
+        }
+        catch (ProcessingException pe) {
+          // nop, see below
+        }
+      }
+      if (input == null) {
+        // strict search without dereferncing holder objects
+        input = createInputRec(bindToken, newPath, o, nullType);
+      }
+      return input;
     }
     else {
       return null;
