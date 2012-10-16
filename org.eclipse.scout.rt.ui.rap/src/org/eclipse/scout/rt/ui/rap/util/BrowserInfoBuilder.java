@@ -58,6 +58,14 @@ public class BrowserInfoBuilder {
         || userAgent.indexOf("Win32") != -1
         || userAgent.indexOf("Win64") != -1) {
       info.setSystem(BrowserInfo.System.WINDOWS);
+      if (userAgent.indexOf("Windows Phone") != -1
+          || userAgent.indexOf("IEMobile") != -1) {
+        info.setSystemVersion(parseWindowsPhoneVersion(userAgent));
+        info.setMobile(true);
+      }
+      else {
+        info.setSystemVersion(parseWindowsVersion(userAgent));
+      }
     }
     else if (userAgent.indexOf("Macintosh") != -1
         || userAgent.indexOf("MacPPC") != -1
@@ -69,12 +77,8 @@ public class BrowserInfoBuilder {
         || userAgent.indexOf("BSD") != -1) {//FIXME
       if (userAgent.indexOf("Android") != -1) {
         info.setSystem(BrowserInfo.System.ANDROID);
-        if (userAgent.indexOf("GT") != -1) {
-          info.setTablet(true);
-        }
-        else {
-          info.setMobile(true);
-        }
+        info.setSystemVersion(parseAndroidVersion(userAgent));
+        initAndroidMobileFlags(info);
       }
       else {
         info.setSystem(BrowserInfo.System.UNIX);
@@ -82,11 +86,13 @@ public class BrowserInfoBuilder {
     }
     else if (userAgent.indexOf("iPad") != -1) {
       info.setSystem(BrowserInfo.System.IOS);
+      info.setSystemVersion(parseIosVersion(userAgent));
       info.setTablet(true);
     }
     else if (userAgent.indexOf("iPhone") != -1
         || userAgent.indexOf("iPod") != -1) {
       info.setSystem(BrowserInfo.System.IOS);
+      info.setSystemVersion(parseIosVersion(userAgent));
       info.setMobile(true);
     }
     else {
@@ -94,6 +100,29 @@ public class BrowserInfoBuilder {
     }
 
     return info;
+  }
+
+  private void initAndroidMobileFlags(BrowserInfo info) {
+    if (info.getSystemVersion() == null) {
+      info.setMobile(true);
+      return;
+    }
+
+    if (info.getSystemVersion().getMajor() <= 2) {
+      info.setMobile(true);
+    }
+    else if (info.getSystemVersion().getMajor() == 3) {
+      info.setTablet(true);
+    }
+    else {
+      //Android 4 is used on smartphones and tablets
+      if (info.getUserAgent().indexOf("Mobile") != -1) {
+        info.setMobile(true);
+      }
+      else {
+        info.setTablet(true);
+      }
+    }
   }
 
   private BrowserInfo createBrowserInfo(String userAgent) {
@@ -131,7 +160,7 @@ public class BrowserInfoBuilder {
       }
       else if (userAgent.indexOf("Safari") != -1) {
         if (userAgent.indexOf("Android") != -1) {
-          info = new BrowserInfo(BrowserInfo.Type.GOOGLE_CHROME, v);
+          info = new BrowserInfo(BrowserInfo.Type.ANDROID, v);
         }
         else {
           info = new BrowserInfo(BrowserInfo.Type.APPLE_SAFARI, v);
@@ -201,31 +230,62 @@ public class BrowserInfoBuilder {
   }
 
   private Version parseBrowserVersion(String userAgent, String regex) {
-    Version v = null;
     Matcher matcher = Pattern.compile(".*" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL).matcher(userAgent);
     if (matcher.matches()) {
       String s = matcher.group(1);
-      s = s.replaceAll("^[/\\s]*", "");
+      return createVersion(s);
+    }
 
-      int[] vArr = new int[]{0, 0, 0};
-      //Searches for 3 groups containing numbers separated with a dot.
-      //Group 3 is optional (MSIE only has a major and a minor version, no micro)
-      Matcher m = Pattern.compile("([0-9]+)\\.([0-9]+)[\\.]?([0-9]*)").matcher(s);
+    return null;
+  }
 
-//      // Fix Opera version to match wikipedia style
-//      version = version.substring( 0, 3 ) + "." + version.substring ( 3);FIXME sle
-      if (m.find()) {
-        for (int i = 1; i <= 3; i++) {
-          String versionPart = m.group(i);
-          if (StringUtility.hasText(versionPart)) {
-            vArr[i - 1] = Integer.valueOf(versionPart);
-          }
+  private Version parseSystemVersion(String userAgent, String regex) {
+    Matcher matcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(userAgent);
+    if (matcher.find()) {
+      String s = matcher.group(1);
+      return createVersion(s);
+    }
+
+    return null;
+  }
+
+  private Version parseAndroidVersion(String userAgent) {
+    return parseSystemVersion(userAgent, "Android\\s([^\\s;]+)");
+  }
+
+  private Version parseIosVersion(String userAgent) {
+    userAgent = userAgent.replace("_", ".");
+    return parseSystemVersion(userAgent, "\\sOS\\s([^\\s;]+)");
+  }
+
+  private Version parseWindowsPhoneVersion(String userAgent) {
+    return parseSystemVersion(userAgent, "\\sOS\\s([^\\s;]+)");
+  }
+
+  private Version parseWindowsVersion(String userAgent) {
+    return parseSystemVersion(userAgent, "Windows\\sNT\\s([^\\s;]+)");
+  }
+
+  private Version createVersion(String versionString) {
+    versionString = versionString.replaceAll("^[/\\s]*", "");
+
+    int[] vArr = new int[]{0, 0, 0};
+    //Searches for 3 groups containing numbers separated with a dot.
+    //Group 3 is optional (MSIE only has a major and a minor version, no micro)
+    Matcher m = Pattern.compile("([0-9]+)\\.([0-9]+)[\\.]?([0-9]*)").matcher(versionString);
+
+//    // Fix Opera version to match wikipedia style
+//    version = version.substring( 0, 3 ) + "." + version.substring ( 3);FIXME sle
+    if (m.find()) {
+      for (int i = 1; i <= 3; i++) {
+        String versionPart = m.group(i);
+        if (StringUtility.hasText(versionPart)) {
+          vArr[i - 1] = Integer.valueOf(versionPart);
         }
       }
-
-      v = new Version(vArr[0], vArr[1], vArr[2]);
     }
-    return v;
+
+    return new Version(vArr[0], vArr[1], vArr[2]);
   }
 
 }

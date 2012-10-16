@@ -16,7 +16,7 @@ import org.osgi.framework.Version;
 
 public class BrowserInfo {
   public enum Type {
-    GOOGLE_CHROME, APPLE_SAFARI,
+    ANDROID, GOOGLE_CHROME, APPLE_SAFARI,
     OMNI_WEB, SHIRA,
     BLACKPIXEL_NETNEWSWIRE, REALNETWORKS_REALPLAYER,
     MOZILLA_FIREFOX, MOZILLA_CAMINO, GNOME_GALOEN,
@@ -32,6 +32,7 @@ public class BrowserInfo {
 
   private final Type m_type;
   private Version m_version;
+  private Version m_systemVersion;
 
   private boolean m_isWebkit = false;
   private boolean m_isGecko = false;
@@ -154,6 +155,18 @@ public class BrowserInfo {
     return m_version;
   }
 
+  public void setVersion(Version version) {
+    m_version = version;
+  }
+
+  public Version getSystemVersion() {
+    return m_systemVersion;
+  }
+
+  public void setSystemVersion(Version systemVersion) {
+    m_systemVersion = systemVersion;
+  }
+
   public boolean isDesktop() {
     return !isTablet()
         && !isMobile();
@@ -174,6 +187,7 @@ public class BrowserInfo {
     result = prime * result + ((m_type == null) ? 0 : m_type.hashCode());
     result = prime * result + ((m_userAgent == null) ? 0 : m_userAgent.hashCode());
     result = prime * result + ((m_version == null) ? 0 : m_version.hashCode());
+    result = prime * result + ((m_systemVersion == null) ? 0 : m_systemVersion.hashCode());
     return result;
   }
 
@@ -203,12 +217,17 @@ public class BrowserInfo {
       if (other.m_version != null) return false;
     }
     else if (!m_version.equals(other.m_version)) return false;
+    if (m_systemVersion == null) {
+      if (other.m_systemVersion != null) return false;
+    }
+    else if (!m_systemVersion.equals(other.m_systemVersion)) return false;
     return true;
   }
 
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer("System: ").append(getSystem());
+    sb.append("/ SystemVersion: ").append(getSystemVersion());
     if (isWebkit()) {
       sb.append("/ isWebkit");
     }
