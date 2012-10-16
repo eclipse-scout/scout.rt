@@ -15,12 +15,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -67,7 +65,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
-import org.osgi.framework.Version;
 
 public final class RwtUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtUtility.class);
@@ -121,203 +118,10 @@ public final class RwtUtility {
     BrowserInfo info = (BrowserInfo) RWT.getSessionStore().getAttribute(BROWSER_INFO);
     if (info == null) {
       HttpServletRequest request = RWT.getRequest();
-      info = createBrowserInfo(request);
+      info = new BrowserInfoBuilder().createBrowserInfo(request);
       RWT.getSessionStore().setAttribute(BROWSER_INFO, info);
     }
     return info;
-  }
-
-  public static BrowserInfo createBrowserInfo(HttpServletRequest request) {
-    BrowserInfo info;
-    if (LOG.isInfoEnabled()) {
-      Enumeration headerNames = request.getHeaderNames();
-      while (headerNames.hasMoreElements()) {
-        String headerName = (String) headerNames.nextElement();
-        String header = request.getHeader(headerName);
-        headerName = headerName + (headerName.length() <= 11 ? "\t\t" : "\t");
-        LOG.info(headerName + header);
-      }
-    }
-    String userAgent = request.getHeader("User-Agent");
-
-    info = createBrowserInfo(userAgent);
-    info.setUserAgent(userAgent);
-    info.setLocale(request.getLocale());
-
-    if (userAgent.indexOf("Windows") != -1
-        || userAgent.indexOf("Win32") != -1
-        || userAgent.indexOf("Win64") != -1) {
-      info.setSystem(BrowserInfo.System.WINDOWS);
-    }
-    else if (userAgent.indexOf("Macintosh") != -1
-        || userAgent.indexOf("MacPPC") != -1
-        || userAgent.indexOf("MacIntel") != -1) {//FIXME
-      info.setSystem(BrowserInfo.System.OSX);
-    }
-    else if (userAgent.indexOf("X11") != -1
-        || userAgent.indexOf("Linux") != -1
-        || userAgent.indexOf("BSD") != -1) {//FIXME
-      if (userAgent.indexOf("Android") != -1) {
-        info.setSystem(BrowserInfo.System.ANDROID);
-        if (userAgent.indexOf("GT") != -1) {
-          info.setTablet(true);
-        }
-        else {
-          info.setMobile(true);
-        }
-      }
-      else {
-        info.setSystem(BrowserInfo.System.UNIX);
-      }
-    }
-    else if (userAgent.indexOf("iPad") != -1) {
-      info.setSystem(BrowserInfo.System.IOS);
-      info.setTablet(true);
-    }
-    else if (userAgent.indexOf("iPhone") != -1
-        || userAgent.indexOf("iPod") != -1) {
-      info.setSystem(BrowserInfo.System.IOS);
-      info.setMobile(true);
-    }
-    else {
-      info.setSystem(BrowserInfo.System.UNKNOWN);
-    }
-    if (LOG.isInfoEnabled()) {
-      LOG.info(info.toString());
-    }
-    return info;
-  }
-
-  private static BrowserInfo createBrowserInfo(String userAgent) {
-    BrowserInfo info = null;
-    Version v = null;
-
-    //Opera
-    String regex = "Opera[\\s\\/]([0-9\\.]*)";
-    boolean isOpera = StringUtility.contains(userAgent, regex);
-    if (isOpera) {
-      v = getBrowserVersion(userAgent, regex);
-      info = new BrowserInfo(BrowserInfo.Type.OPERA, v);
-      info.setOpera(isOpera);
-      return info;
-    }
-
-    //Konqueror
-    regex = "KHTML\\/([0-9-\\.]*)";
-    boolean isKonqueror = StringUtility.contains(userAgent, regex);
-    if (isKonqueror) {
-      v = getBrowserVersion(userAgent, regex);
-      info = new BrowserInfo(BrowserInfo.Type.KONQUEROR, null);
-      info.setWebkit(isKonqueror);
-      return info;
-    }
-
-    //Webkit Browsers
-    regex = "AppleWebKit\\/([^ ]+)";
-    boolean isWebkit = userAgent.indexOf("AppleWebKit") != -1
-                   && StringUtility.contains(userAgent, regex);
-    if (isWebkit) {
-      v = getBrowserVersion(userAgent, regex);
-      if (userAgent.indexOf("Chrome") != -1) {
-        info = new BrowserInfo(BrowserInfo.Type.GOOGLE_CHROME, v);
-      }
-      else if (userAgent.indexOf("Safari") != -1) {
-        if (userAgent.indexOf("Android") != -1) {
-          info = new BrowserInfo(BrowserInfo.Type.GOOGLE_CHROME, v);
-        }
-        else {
-          info = new BrowserInfo(BrowserInfo.Type.APPLE_SAFARI, v);
-        }
-      }
-      else if (userAgent.indexOf("OmniWeb") != -1) {
-        info = new BrowserInfo(BrowserInfo.Type.OMNI_WEB, v);
-      }
-      else if (userAgent.indexOf("Shiira") != -1) {
-        info = new BrowserInfo(BrowserInfo.Type.SHIRA, v);
-      }
-      else if (userAgent.indexOf("NetNewsWire") != -1) {
-        info = new BrowserInfo(BrowserInfo.Type.BLACKPIXEL_NETNEWSWIRE, v);
-      }
-      else if (userAgent.indexOf("RealPlayer") != -1) {
-        info = new BrowserInfo(BrowserInfo.Type.REALNETWORKS_REALPLAYER, v);
-      }
-      else if (userAgent.indexOf("Mobile") != -1) {
-        // iPad reports this in fullscreen mode
-        info = new BrowserInfo(BrowserInfo.Type.APPLE_SAFARI, v);
-      }
-      else {
-        info = new BrowserInfo(BrowserInfo.Type.UNKNOWN, null);
-      }
-      info.setWebkit(isWebkit);
-      return info;
-    }
-
-    //Gecko Browsers (Firefox)
-    regex = "rv\\:([^\\);]+)(\\)|;)";
-    boolean isGecko = userAgent.indexOf("Gecko") != -1
-        && StringUtility.contains(userAgent, regex);
-    if (isGecko) {
-      v = getBrowserVersion(userAgent, regex);
-      if (userAgent.indexOf("Firefox") != -1) {
-        info = new BrowserInfo(BrowserInfo.Type.MOZILLA_FIREFOX, v);
-      }
-      else if (userAgent.indexOf("Camino") != -1) {
-        info = new BrowserInfo(BrowserInfo.Type.MOZILLA_CAMINO, v);
-      }
-      else if (userAgent.indexOf("Galeon") != -1) {
-        info = new BrowserInfo(BrowserInfo.Type.GNOME_GALOEN, v);
-      }
-      else {
-        info = new BrowserInfo(BrowserInfo.Type.UNKNOWN, null);
-      }
-      info.setGecko(isGecko);
-      return info;
-    }
-
-    //Internet Explorer
-    regex = "MSIE\\s+([^\\);]+)(\\)|;)";
-    boolean isMshtml = StringUtility.contains(userAgent, regex);
-    if (isMshtml) {
-      v = getBrowserVersion(userAgent, regex);
-      if (userAgent.indexOf("MSIE") != -1) {
-        info = new BrowserInfo(BrowserInfo.Type.IE, v);
-      }
-      else {
-        info = new BrowserInfo(BrowserInfo.Type.UNKNOWN, null);
-      }
-      info.setMshtml(isMshtml);
-      return info;
-    }
-    info = new BrowserInfo(BrowserInfo.Type.UNKNOWN, null);
-    return info;
-  }
-
-  private static Version getBrowserVersion(String userAgent, String regex) {
-    Version v = null;
-    Matcher matcher = Pattern.compile(".*" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL).matcher(userAgent);
-    if (matcher.matches()) {
-      String s = matcher.group(1);
-      s = s.replaceAll("^[/\\s]*", "");
-
-      int[] vArr = new int[]{0, 0, 0};
-      //Searches for 3 groups containing numbers separated with a dot.
-      //Group 3 is optional (MSIE only has a major and a minor version, no micro)
-      Matcher m = Pattern.compile("([0-9]+)\\.([0-9]+)[\\.]?([0-9]*)").matcher(s);
-
-//      // Fix Opera version to match wikipedia style
-//      version = version.substring( 0, 3 ) + "." + version.substring ( 3);FIXME sle
-      if (m.find()) {
-        for (int i = 1; i <= 3; i++) {
-          String versionPart = m.group(i);
-          if (StringUtility.hasText(versionPart)) {
-            vArr[i - 1] = Integer.valueOf(versionPart);
-          }
-        }
-      }
-
-      v = new Version(vArr[0], vArr[1], vArr[2]);
-    }
-    return v;
   }
 
   public static Object createUiTransferable(TransferObject scoutT) {
