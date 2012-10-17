@@ -211,7 +211,6 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
       m_uiField.addListener(SWT.FocusIn, listener);
       m_uiField.addListener(SWT.FocusOut, listener);
       m_uiField.addListener(SWT.Traverse, listener);
-      m_uiField.addListener(SWT.Verify, listener);
       m_uiField.addListener(SWT.Dispose, listener);
     }
   }
@@ -350,11 +349,6 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
         return;
       }
       switch (event.type) {
-        case SWT.Verify:
-          if (event.text.equals("\t")) {
-            event.doit = false;
-          }
-          break;
         case SWT.Traverse:
           switch (event.keyCode) {
             case SWT.ARROW_DOWN:
