@@ -62,6 +62,8 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
   private boolean m_validateOnAnyKey;
   private boolean m_linkDecoration;
   private TextFieldEditableSupport m_editableSupport;
+  private P_RwtValidateOnAnyKeyModifyListener m_validateOnAnyKeyModifyListener;
+  private P_UpperLowerCaseVerifyListener m_upperLowerCaseVerifyListener;
 
   public RwtScoutStringField() {
   }
@@ -110,9 +112,7 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
   }
 
   protected void addDefaultUiListeners(StyledText textField) {
-    textField.addModifyListener(new P_RwtTextListener());
     textField.addSelectionListener(new P_RwtTextSelectionListener());
-    textField.addVerifyListener(new P_TextVerifyListener());
     textField.addFocusListener(new P_RwtTextFocsListener());
   }
 
@@ -190,15 +190,31 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
   }
 
   protected void setFormatFromScout(String s) {
-
     if (IStringField.FORMAT_UPPER.equals(s)) {
       m_characterType = UPPER_CASE;
+      addUpperLowerCaseVerifyListener();
     }
     else if (IStringField.FORMAT_LOWER.equals(s)) {
       m_characterType = LOWER_CASE;
+      addUpperLowerCaseVerifyListener();
     }
     else {
       m_characterType = DEFAULT_CASE;
+      removeUpperLowerCaseVerifyListener();
+    }
+  }
+
+  protected void addUpperLowerCaseVerifyListener() {
+    if (m_upperLowerCaseVerifyListener == null) {
+      m_upperLowerCaseVerifyListener = new P_UpperLowerCaseVerifyListener();
+      getUiField().addVerifyListener(m_upperLowerCaseVerifyListener);
+    }
+  }
+
+  protected void removeUpperLowerCaseVerifyListener() {
+    if (m_upperLowerCaseVerifyListener != null) {
+      getUiField().removeVerifyListener(m_upperLowerCaseVerifyListener);
+      m_upperLowerCaseVerifyListener = null;
     }
   }
 
@@ -270,6 +286,26 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
 
   protected void setValidateOnAnyKeyFromScout(boolean b) {
     m_validateOnAnyKey = b;
+    if (b) {
+      addValidateOnAnyKeyModifyListener();
+    }
+    else {
+      removeValidateOnAnyKeyModifyListener();
+    }
+  }
+
+  protected void addValidateOnAnyKeyModifyListener() {
+    if (m_validateOnAnyKeyModifyListener == null) {
+      m_validateOnAnyKeyModifyListener = new P_RwtValidateOnAnyKeyModifyListener();
+      getUiField().addModifyListener(m_validateOnAnyKeyModifyListener);
+    }
+  }
+
+  protected void removeValidateOnAnyKeyModifyListener() {
+    if (m_validateOnAnyKeyModifyListener != null) {
+      getUiField().removeModifyListener(m_validateOnAnyKeyModifyListener);
+      m_validateOnAnyKeyModifyListener = null;
+    }
   }
 
   protected void setSelectionFromScout(int startIndex, int endIndex) {
@@ -403,7 +439,7 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
     return super.isSelectAllOnFocusEnabled() && getScoutObject().isSelectAllOnFocus();
   }
 
-  private class P_TextVerifyListener implements VerifyListener {
+  private class P_UpperLowerCaseVerifyListener implements VerifyListener {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -419,7 +455,7 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
     }
   } // end class P_TextVerifyListener
 
-  private class P_RwtTextListener implements ModifyListener {
+  private class P_RwtValidateOnAnyKeyModifyListener implements ModifyListener {
     private static final long serialVersionUID = 1L;
 
     /*
@@ -427,15 +463,17 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
      */
     @Override
     public void modifyText(ModifyEvent e) {
-      if (m_validateOnAnyKey) {
-        if (getOnFieldLabelDecorator() != null) {
-          if (e.getSource() instanceof StyledText && (StringUtility.isNullOrEmpty(((StyledText) e.getSource()).getText()) || CompareUtility.equals(((StyledText) e.getSource()).getText(), getScoutObject().getInitialLabel()))) {
-            return;
-          }
+      if (!m_validateOnAnyKey) {
+        return;
+      }
+
+      if (getOnFieldLabelDecorator() != null) {
+        if (e.getSource() instanceof StyledText && (StringUtility.isNullOrEmpty(((StyledText) e.getSource()).getText()) || CompareUtility.equals(((StyledText) e.getSource()).getText(), getScoutObject().getInitialLabel()))) {
+          return;
         }
-        if (getUpdateUiFromScoutLock().isReleased()) {
-          sendVerifyToScoutAndIgnoreResponses();
-        }
+      }
+      if (getUpdateUiFromScoutLock().isReleased()) {
+        sendVerifyToScoutAndIgnoreResponses();
       }
     }
 
