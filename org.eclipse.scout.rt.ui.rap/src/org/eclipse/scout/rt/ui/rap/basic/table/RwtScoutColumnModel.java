@@ -35,8 +35,8 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   private Image m_imgCheckboxTrue;
   private Color m_disabledForegroundColor;
   private boolean m_multiline;
-  private double[] m_newlines = null;
-  private double[] m_htmlTableRows = null;
+  private double[][] m_newlines = null;
+  private double[][] m_htmlTableRows = null;
   private int m_defaultRowHeight;
 
   public RwtScoutColumnModel(ITable scoutTable, IRwtScoutTableForPatch uiTable, TableColumnManager columnManager) {
@@ -78,7 +78,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
       if (text == null) {
         text = "";
       }
-      if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
+      else if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
         text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
         text = getUiTable().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getUiTable(), text);
       }
@@ -92,64 +92,19 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
           text = StringUtility.replace(text, "\n", " ");
         }
       }
+
       TableEx table = getUiTable().getUiField();
       if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-        if (m_htmlTableRows == null || m_htmlTableRows.length != getScoutTable().getRowCount()) {
-          double[] tempArray = new double[getScoutTable().getRowCount()];
-          for (int i = 0; i < tempArray.length; i++) {
-            tempArray[i] = 1;
-          }
-          if (m_htmlTableRows == null) {
-            m_htmlTableRows = tempArray;
-          }
-          else {
-            getUiTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-              @Override
-              public void run() {
-                if (getUiTable().isUiDisposed()) {
-                  return;
-                }
-
-                getUiTable().getUiTableViewer().refresh();
-              }
-            });
-            m_htmlTableRows = tempArray;
-          }
-        }
-        m_htmlTableRows[((ITableRow) element).getRowIndex()] = HtmlTextUtility.countHtmlTableRows(text);
-        double medianHtmlTableRows = NumberUtility.median(m_htmlTableRows);
-        int htmlTableRowRowHeight = NumberUtility.toDouble(NumberUtility.round(medianHtmlTableRows, 1.0)).intValue() * 19;
+        m_htmlTableRows = updateRowArray(m_htmlTableRows);
+        int htmlTableRowRowHeight = calculateHtmlTableRowHeight(m_htmlTableRows, text, ((ITableRow) element).getRowIndex(), columnIndex - 1);
         if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
             || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTableRowRowHeight) < 0) {
           table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), htmlTableRowRowHeight)).intValue());
         }
       }
       else {
-        if (m_newlines == null || m_newlines.length != getScoutTable().getRowCount()) {
-          double[] tempArray = new double[getScoutTable().getRowCount()];
-          for (int i = 0; i < tempArray.length; i++) {
-            tempArray[i] = 1;
-          }
-          if (m_newlines == null) {
-            m_newlines = tempArray;
-          }
-          else {
-            getUiTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-              @Override
-              public void run() {
-                if (getUiTable().isUiDisposed()) {
-                  return;
-                }
-
-                getUiTable().getUiTableViewer().refresh();
-              }
-            });
-            m_newlines = tempArray;
-          }
-        }
-        m_newlines[((ITableRow) element).getRowIndex()] = HtmlTextUtility.countLineBreaks(text);
-        double medianNewlines = NumberUtility.median(m_newlines);
-        int newLineRowHeight = NumberUtility.toDouble(NumberUtility.round(medianNewlines, 1.0)).intValue() * 15;
+        m_newlines = updateRowArray(m_newlines);
+        int newLineRowHeight = calculateNewLineRowHeight(m_newlines, text, ((ITableRow) element).getRowIndex(), columnIndex - 1);
         if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
             || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(newLineRowHeight) < 0) {
           table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), newLineRowHeight)).intValue());
@@ -158,6 +113,65 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
       return text;
     }
     return "";
+  }
+
+  private double[][] updateRowArray(double[][] rowArray) {
+    if (rowArray != null && rowArray.length == getScoutTable().getRowCount() && rowArray[0].length == getScoutTable().getColumnCount()) {
+      return rowArray;
+    }
+    else {
+      double[][] tempArray = new double[getScoutTable().getRowCount()][getScoutTable().getColumnCount()];
+      for (int i = 0; i < tempArray.length; i++) {
+        for (int j = 0; j < tempArray[i].length; j++) {
+          tempArray[i][j] = 1;
+        }
+      }
+      if (rowArray == null) {
+        return tempArray;
+      }
+      else {
+        getUiTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
+          @Override
+          public void run() {
+            if (getUiTable().isUiDisposed()) {
+              return;
+            }
+
+            getUiTable().getUiTableViewer().refresh();
+          }
+        });
+        return tempArray;
+      }
+    }
+  }
+
+  private int calculateHtmlTableRowHeight(double[][] htmlTableRows, String text, int rowIndex, int columnIndex) {
+    htmlTableRows[rowIndex][columnIndex] = HtmlTextUtility.countHtmlTableRows(text);
+    int htmlTableRowHeight = calculateRowHeigtMedian(htmlTableRows, 19);
+    return htmlTableRowHeight;
+  }
+
+  private int calculateNewLineRowHeight(double[][] newlines, String text, int rowIndex, int columnIndex) {
+    newlines[rowIndex][columnIndex] = HtmlTextUtility.countLineBreaks(text);
+    int newLineRowHeight = calculateRowHeigtMedian(newlines, 15);
+    return newLineRowHeight;
+  }
+
+  private int calculateRowHeigtMedian(double[][] rows, int lineHeight) {
+    boolean hasMultilines = false;
+    double[] columnMedians = new double[rows.length];
+    for (int i = 0; i < rows.length; i++) {
+      columnMedians[i] = NumberUtility.max(rows[i]);
+      if (NumberUtility.max(rows[i]) > 1) {
+        hasMultilines = true;
+      }
+    }
+    double median = NumberUtility.median(columnMedians);
+    if (hasMultilines && median < 2) {
+      median = 2;
+    }
+    int newLineRowHeight = NumberUtility.toDouble(NumberUtility.round(median, 1.0)).intValue() * lineHeight;
+    return newLineRowHeight;
   }
 
   protected int getDefaultRowHeight() {
