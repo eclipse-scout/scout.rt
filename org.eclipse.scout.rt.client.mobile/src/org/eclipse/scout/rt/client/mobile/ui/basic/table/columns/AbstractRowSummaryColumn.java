@@ -391,7 +391,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       String displayText = extractCellDisplayText(column, row);
 
       if (StringUtility.hasText(displayText)) {
-        if (isHeaderdiscriptionNeeded(row, column)) {
+        if (isHeaderDescriptionNeeded(row, column)) {
           content += extractColumnHeader(column);
           content += ": ";
         }
@@ -459,7 +459,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
   /**
    * Columns with a reasonable text don't need the header description.
    */
-  private boolean isHeaderdiscriptionNeeded(ITableRow row, IColumn column) {
+  private boolean isHeaderDescriptionNeeded(ITableRow row, IColumn column) {
     if (column instanceof ISmartColumn<?>) {
       return column.getValue(row) instanceof Boolean;
     }
