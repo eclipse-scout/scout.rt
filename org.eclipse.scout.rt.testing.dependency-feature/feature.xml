@@ -26,8 +26,8 @@ BSI Business Systems Integration AG - initial API and implementation
    </license>
 
    <url>
-      <update label="Juno" url="http://download.eclipse.org/releases/kepler"/>
-      <discovery label="Juno" url="http://download.eclipse.org/releases/kepler"/>
+      <update label="Kepler" url="http://download.eclipse.org/releases/kepler"/>
+      <discovery label="Kepler" url="http://download.eclipse.org/releases/kepler"/>
    </url>
 
    <requires>
