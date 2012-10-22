@@ -26,6 +26,11 @@
   <version>3.9.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <scm>
+    <url>http://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/</url>
+    <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git</connection>
+  </scm>
+
   <properties>
     <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git</tycho.scmUrl>
   </properties>
