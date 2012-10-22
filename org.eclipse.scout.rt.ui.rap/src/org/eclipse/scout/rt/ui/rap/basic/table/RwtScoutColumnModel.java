@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.ui.rap.basic.table;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -25,6 +26,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class RwtScoutColumnModel extends ColumnLabelProvider {
   private static final long serialVersionUID = 1L;
+
+  private static final int HTML_ROW_LINE_HIGHT = 19;
+  private static final int NEWLINE_LINE_HIGHT = 15;
 
   private transient ListenerList listenerList = null;
   private final ITable m_scoutTable;
@@ -95,19 +99,23 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
 
       TableEx table = getUiTable().getUiField();
       if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-        m_htmlTableRows = updateRowArray(m_htmlTableRows);
-        int htmlTableRowRowHeight = calculateHtmlTableRowHeight(m_htmlTableRows, text, ((ITableRow) element).getRowIndex(), columnIndex - 1);
-        if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
-            || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTableRowRowHeight) < 0) {
-          table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), htmlTableRowRowHeight)).intValue());
+        m_newlines = updateRowArray(m_newlines, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+        if (getScoutTable().getColumnSet().getColumn(columnIndex).isVisible()) {
+          int htmlTableRowRowHeight = calculateHtmlTableRowHeight(m_htmlTableRows, text, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+          if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
+              || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTableRowRowHeight) != 0) {
+            table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), htmlTableRowRowHeight)).intValue());
+          }
         }
       }
       else {
-        m_newlines = updateRowArray(m_newlines);
-        int newLineRowHeight = calculateNewLineRowHeight(m_newlines, text, ((ITableRow) element).getRowIndex(), columnIndex - 1);
-        if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
-            || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(newLineRowHeight) < 0) {
-          table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), newLineRowHeight)).intValue());
+        m_newlines = updateRowArray(m_newlines, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+        if (getScoutTable().getColumnSet().getColumn(columnIndex).isVisible()) {
+          int newLineRowHeight = calculateNewLineRowHeight(m_newlines, text, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+          if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
+              || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(newLineRowHeight) != 0) {
+            table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), newLineRowHeight)).intValue());
+          }
         }
       }
       return text;
@@ -115,45 +123,46 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     return "";
   }
 
-  private double[][] updateRowArray(double[][] rowArray) {
-    if (rowArray != null && rowArray.length == getScoutTable().getRowCount() && rowArray[0].length == getScoutTable().getColumnCount()) {
-      return rowArray;
-    }
-    else {
-      double[][] tempArray = new double[getScoutTable().getRowCount()][getScoutTable().getColumnCount()];
-      for (int i = 0; i < tempArray.length; i++) {
-        for (int j = 0; j < tempArray[i].length; j++) {
-          tempArray[i][j] = 1;
-        }
-      }
+  private double[][] updateRowArray(double[][] rowArray, int rowIndex, int columnIndex) {
+    double[][] tempRowArray = rowArray;
+    if (rowArray == null || rowArray.length <= rowIndex) {
       if (rowArray == null) {
-        return tempArray;
+        tempRowArray = new double[rowIndex + 1][columnIndex + 1];
       }
       else {
-        getUiTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            if (getUiTable().isUiDisposed()) {
-              return;
-            }
-
-            getUiTable().getUiTableViewer().refresh();
-          }
-        });
-        return tempArray;
+        tempRowArray = Arrays.copyOf(rowArray, rowIndex + 1);
       }
     }
+    for (int i = 0; i < tempRowArray.length; i++) {
+      if (tempRowArray[i] == null || tempRowArray[i].length <= columnIndex) {
+        double[] tempColumnArray = null;
+        if (tempRowArray[i] == null) {
+          tempColumnArray = new double[columnIndex + 1];
+        }
+        else {
+          tempColumnArray = Arrays.copyOf(tempRowArray[i], columnIndex + 1);
+        }
+        tempRowArray[i] = tempColumnArray;
+      }
+
+      for (int j = 0; j < tempRowArray[i].length; j++) {
+        if (tempRowArray[i][j] == 0) {
+          tempRowArray[i][j] = 1;
+        }
+      }
+    }
+    return tempRowArray;
   }
 
   private int calculateHtmlTableRowHeight(double[][] htmlTableRows, String text, int rowIndex, int columnIndex) {
     htmlTableRows[rowIndex][columnIndex] = HtmlTextUtility.countHtmlTableRows(text);
-    int htmlTableRowHeight = calculateRowHeigtMedian(htmlTableRows, 19);
+    int htmlTableRowHeight = calculateRowHeigtMedian(htmlTableRows, HTML_ROW_LINE_HIGHT);
     return htmlTableRowHeight;
   }
 
   private int calculateNewLineRowHeight(double[][] newlines, String text, int rowIndex, int columnIndex) {
     newlines[rowIndex][columnIndex] = HtmlTextUtility.countLineBreaks(text);
-    int newLineRowHeight = calculateRowHeigtMedian(newlines, 15);
+    int newLineRowHeight = calculateRowHeigtMedian(newlines, NEWLINE_LINE_HIGHT);
     return newLineRowHeight;
   }
 
