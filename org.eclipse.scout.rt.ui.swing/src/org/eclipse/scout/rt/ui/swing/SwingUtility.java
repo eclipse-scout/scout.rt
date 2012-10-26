@@ -1230,6 +1230,15 @@ public final class SwingUtility {
         (-c.getLocationOnScreen().y) + intersection.y);
   }
 
+  public static boolean hasScoutLookAndFeelFrameAndDialog() {
+    String useScoutLafFrameAndDialog = System.getProperty("scout.laf.useLafFrameAndDialog");
+    boolean useLafFrameAndDialog = true;
+    if (StringUtility.hasText(useScoutLafFrameAndDialog)) {
+      useLafFrameAndDialog = Boolean.parseBoolean(useScoutLafFrameAndDialog);
+    }
+    return useLafFrameAndDialog;
+  }
+
   private static class CopyPasteMenuSupport extends MouseAdapter implements FocusListener {
     private JTextComponent m_comp;
 

@@ -29,6 +29,10 @@ public class StringColumnFieldPropertyDelegator extends ColumnFieldPropertyDeleg
     getReceiver().setInputMasked(getSender().isInputMasked());
     getReceiver().setFormat(getSender().getDisplayFormat());
     getReceiver().setWrapText(getSender().isTextWrap());
+    if (getSender().isTextWrap()) {
+      //Text wrap typically only works if multiline is enabled
+      getReceiver().setMultilineText(true);
+    }
   }
 
 }

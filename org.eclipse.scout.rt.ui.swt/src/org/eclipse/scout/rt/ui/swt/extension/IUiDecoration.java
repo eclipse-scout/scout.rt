@@ -55,4 +55,6 @@ public interface IUiDecoration {
   int getMessageBoxMinHeight();
 
   int getMessageBoxMinWidth();
+
+  boolean isTableMouseMoveSelectionSupportEnabled();
 }

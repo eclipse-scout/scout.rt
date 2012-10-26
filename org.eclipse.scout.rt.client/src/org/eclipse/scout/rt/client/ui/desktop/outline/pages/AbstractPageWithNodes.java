@@ -17,6 +17,7 @@ import java.util.HashMap;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -120,6 +121,12 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     return m_table;
   }
 
+  @Override
+  public void setPagePopulateStatus(IProcessingStatus status) {
+    super.setPagePopulateStatus(status);
+    getInternalTable().tablePopulated();
+  }
+
   /**
    * Called whenever this page is selected in the outline tree.
    * <p>
@@ -208,7 +215,14 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
       }
     }
     // copy to table
-    rebuildTableInternal();
+    try {
+      getInternalTable().setTableChanging(true);
+      rebuildTableInternal();
+      setPagePopulateStatus(null);
+    }
+    finally {
+      getInternalTable().setTableChanging(false);
+    }
   }
 
   @Override

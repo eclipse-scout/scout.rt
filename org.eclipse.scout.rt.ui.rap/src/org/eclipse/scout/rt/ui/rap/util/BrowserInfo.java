@@ -16,7 +16,7 @@ import org.osgi.framework.Version;
 
 public class BrowserInfo {
   public enum Type {
-    GOOGLE_CHROME, APPLE_SAFARI,
+    ANDROID, GOOGLE_CHROME, APPLE_SAFARI,
     OMNI_WEB, SHIRA,
     BLACKPIXEL_NETNEWSWIRE, REALNETWORKS_REALPLAYER,
     MOZILLA_FIREFOX, MOZILLA_CAMINO, GNOME_GALOEN,
@@ -32,6 +32,7 @@ public class BrowserInfo {
 
   private final Type m_type;
   private Version m_version;
+  private Version m_systemVersion;
 
   private boolean m_isWebkit = false;
   private boolean m_isGecko = false;
@@ -44,11 +45,11 @@ public class BrowserInfo {
   private System m_system;
   private Locale m_locale = null;
 
-  BrowserInfo(Type type, Version version) {
+  public BrowserInfo(Type type, Version version) {
     this(type, version, System.UNKNOWN);
   }
 
-  BrowserInfo(Type type, Version version, System system) {
+  public BrowserInfo(Type type, Version version, System system) {
     m_type = type;
     m_version = version;
     m_system = system;
@@ -154,14 +155,79 @@ public class BrowserInfo {
     return m_version;
   }
 
+  public void setVersion(Version version) {
+    m_version = version;
+  }
+
+  public Version getSystemVersion() {
+    return m_systemVersion;
+  }
+
+  public void setSystemVersion(Version systemVersion) {
+    m_systemVersion = systemVersion;
+  }
+
   public boolean isDesktop() {
     return !isTablet()
         && !isMobile();
   }
 
   @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (m_isGecko ? 1231 : 1237);
+    result = prime * result + (m_isMobile ? 1231 : 1237);
+    result = prime * result + (m_isMshtml ? 1231 : 1237);
+    result = prime * result + (m_isOpera ? 1231 : 1237);
+    result = prime * result + (m_isTablet ? 1231 : 1237);
+    result = prime * result + (m_isWebkit ? 1231 : 1237);
+    result = prime * result + ((m_locale == null) ? 0 : m_locale.hashCode());
+    result = prime * result + ((m_system == null) ? 0 : m_system.hashCode());
+    result = prime * result + ((m_type == null) ? 0 : m_type.hashCode());
+    result = prime * result + ((m_userAgent == null) ? 0 : m_userAgent.hashCode());
+    result = prime * result + ((m_version == null) ? 0 : m_version.hashCode());
+    result = prime * result + ((m_systemVersion == null) ? 0 : m_systemVersion.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    BrowserInfo other = (BrowserInfo) obj;
+    if (m_isGecko != other.m_isGecko) return false;
+    if (m_isMobile != other.m_isMobile) return false;
+    if (m_isMshtml != other.m_isMshtml) return false;
+    if (m_isOpera != other.m_isOpera) return false;
+    if (m_isTablet != other.m_isTablet) return false;
+    if (m_isWebkit != other.m_isWebkit) return false;
+    if (m_locale == null) {
+      if (other.m_locale != null) return false;
+    }
+    else if (!m_locale.equals(other.m_locale)) return false;
+    if (m_system != other.m_system) return false;
+    if (m_type != other.m_type) return false;
+    if (m_userAgent == null) {
+      if (other.m_userAgent != null) return false;
+    }
+    else if (!m_userAgent.equals(other.m_userAgent)) return false;
+    if (m_version == null) {
+      if (other.m_version != null) return false;
+    }
+    else if (!m_version.equals(other.m_version)) return false;
+    if (m_systemVersion == null) {
+      if (other.m_systemVersion != null) return false;
+    }
+    else if (!m_systemVersion.equals(other.m_systemVersion)) return false;
+    return true;
+  }
+
+  @Override
   public String toString() {
     StringBuffer sb = new StringBuffer("System: ").append(getSystem());
+    sb.append("/ SystemVersion: ").append(getSystemVersion());
     if (isWebkit()) {
       sb.append("/ isWebkit");
     }
@@ -171,6 +237,14 @@ public class BrowserInfo {
     else if (isMshtml()) {
       sb.append("/ isMshtml");
     }
+
+    if (isTablet()) {
+      sb.append("/ isTablet");
+    }
+    else if (isMobile()) {
+      sb.append("/ isMobile");
+    }
+
     sb.append("/ Browser: ").append(getType());
     sb.append("/ EngineVersion: ").append(getVersion());
     sb.append("\nUserAgent: ").append(m_userAgent);

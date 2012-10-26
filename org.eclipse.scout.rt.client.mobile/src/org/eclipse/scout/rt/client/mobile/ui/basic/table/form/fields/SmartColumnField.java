@@ -16,12 +16,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 /**
  * @since 3.9.0
  */
-public class SmartColumnField extends AbstractSmartField implements IColumnWrapper<ISmartColumn<?>> {
-  private SmartColumnFieldPropertyDelegator m_propertyDelegator;
+public class SmartColumnField<T> extends AbstractSmartField<T> implements IColumnWrapper<ISmartColumn<T>> {
+  private SmartColumnFieldPropertyDelegator<T> m_propertyDelegator;
 
-  public SmartColumnField(ISmartColumn<?> column) {
+  public SmartColumnField(ISmartColumn<T> column) {
     super(false);
-    m_propertyDelegator = new SmartColumnFieldPropertyDelegator(column, this);
+    m_propertyDelegator = new SmartColumnFieldPropertyDelegator<T>(column, this);
     callInitializer();
   }
 
@@ -33,7 +33,12 @@ public class SmartColumnField extends AbstractSmartField implements IColumnWrapp
   }
 
   @Override
-  public ISmartColumn<?> getWrappedObject() {
+  public ISmartColumn<T> getWrappedObject() {
     return m_propertyDelegator.getSender();
+  }
+
+  @Override
+  public Class<T> getHolderType() {
+    return getWrappedObject().getDataType();
   }
 }

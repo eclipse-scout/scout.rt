@@ -379,6 +379,15 @@
              value="true">
        </init-param>
     </filter>
+    <filter
+          aliases="/"
+          class="org.eclipse.scout.rt.ui.rap.internal.servletfilter.LogoutFilter"
+          ranking="-1000000">
+       <init-param
+             name="active"
+             value="true">
+       </init-param>
+    </filter>
   </extension>
 
 </plugin>

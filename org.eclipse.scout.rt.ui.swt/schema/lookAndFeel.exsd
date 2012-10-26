@@ -123,6 +123,8 @@
                   </enumeration>
                   <enumeration value="messageBox.minHeight">
                   </enumeration>
+                  <enumeration value="table.mouseMoveSelectionSupport.enabled">
+                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>

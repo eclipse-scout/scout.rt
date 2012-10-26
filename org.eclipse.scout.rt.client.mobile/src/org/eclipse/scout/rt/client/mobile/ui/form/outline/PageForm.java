@@ -30,10 +30,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -188,11 +190,11 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     if (m_pageFormConfig.isDetailFormVisible()) {
       getPageDetailFormField().setInnerForm(m_page.getDetailForm());
     }
-    getPageDetailFormField().setVisible(getPageDetailFormField().getInnerForm() != null);
-    getPageTableGroupBox().setBorderVisible(getPageDetailFormField().getInnerForm() != null);
 
-    IPage page = m_page;
-    ITable pageTable = MobileDesktopUtility.getPageTable(page);
+    //Don't display detail form field if there is no detail form -> saves space
+    getPageDetailFormField().setVisible(getPageDetailFormField().getInnerForm() != null);
+
+    ITable pageTable = MobileDesktopUtility.getPageTable(m_page);
 
     //Make sure the preview form does only contain folder pages.
     if (!m_pageFormConfig.isTablePageAllowed() && m_page instanceof IPageWithTable) {
@@ -205,13 +207,38 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     MobileTable.setAutoCreateRowForm(pageTable, false);
     getPageTableField().setTable(pageTable, true);
     addTableListener();
+
     updateTableFieldVisibility();
+
+    //If there is no table make sure the table group box is invisible and the detail form grows and takes all the space.
+    if (!getPageTableField().isVisible()) {
+      getPageTableGroupBox().setVisible(false);
+
+      GridData gridData = getPageDetailFormField().getGridDataHints();
+      gridData.weightY = 1;
+      getPageDetailFormField().setGridDataHints(gridData);
+      getRootGroupBox().rebuildFieldGrid();
+    }
+
+    if (getPageTableGroupBox().isVisible()) {
+      //If there is a table but no detail form, don't display a border -> make the table as big as the form.
+      //If there is a table and a detail form, display a border to make it look better.
+      getPageTableGroupBox().setBorderVisible(getPageDetailFormField().getInnerForm() != null);
+    }
     getPageTableField().setTableStatusVisible(m_pageFormConfig.isTableStatusVisible());
   }
 
   @Override
   protected void execDisposeForm() throws ProcessingException {
     removeTableListener();
+    for (AutoLeafPageWithNodes autoLeafPage : m_autoLeafPageMap.values()) {
+      disposeAutoLeafPage(autoLeafPage);
+    }
+
+    if (m_page != null && m_page.getDetailForm() != null) {
+      m_page.getDetailForm().doClose();
+      m_page.setDetailForm(null);
+    }
   }
 
   private void updateDrillDownStyle() {
@@ -449,7 +476,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     if (getPage() instanceof IPageWithTable<?>) {
       //popuplate status
       IPageWithTable<?> tablePage = (IPageWithTable<?>) getPage();
-      IProcessingStatus populateStatus = tablePage.getTablePopulateStatus();
+      IProcessingStatus populateStatus = tablePage.getPagePopulateStatus();
       getPageTableField().setTablePopulateStatus(populateStatus);
       //selection status
       if (tablePage.isSearchActive() && tablePage.getSearchFilter() != null && (!tablePage.getSearchFilter().isCompleted()) && tablePage.isSearchRequired()) {
@@ -538,8 +565,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       //Create auto leaf page including an outline and activate it.
       //Adding to a "real" outline is not possible because the page to row maps in AbstractPageWithTable resp. AbstractPageWithNodes can only be modified by the page itself.
       AutoLeafPageWithNodes autoPage = new AutoLeafPageWithNodes(tableRow, m_page);
-      AutoOutline autoOutline = new AutoOutline();
-      autoOutline.setRootNode(autoPage);
+      AutoOutline autoOutline = new AutoOutline(autoPage);
       autoOutline.selectNode(autoPage);
       m_autoLeafPageMap.put(tableRow, autoPage);
 
@@ -555,12 +581,23 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
 
     for (ITableRow tableRow : tableRows) {
-      AutoLeafPageWithNodes autoPage = m_autoLeafPageMap.get(tableRow);
+      AutoLeafPageWithNodes autoPage = m_autoLeafPageMap.remove(tableRow);
       if (autoPage != null) {
-        m_autoLeafPageMap.remove(autoPage);
+        disposeAutoLeafPage(autoPage);
+
         m_pageFormManager.pageRemovedNotify(this, autoPage);
       }
     }
+  }
+
+  private void disposeAutoLeafPage(AutoLeafPageWithNodes page) {
+    if (page == null || page.getOutline() == null) {
+      return;
+    }
+
+    IOutline outline = page.getOutline();
+    outline.removeAllChildNodes(outline.getRootNode());
+    outline.disposeTree();
   }
 
   private void handleTableRowsInserted(ITable table, ITableRow[] tableRows) throws ProcessingException {

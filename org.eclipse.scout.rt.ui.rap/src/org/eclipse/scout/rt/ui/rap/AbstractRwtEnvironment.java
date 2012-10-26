@@ -18,11 +18,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -47,6 +47,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ILocaleListener;
+import org.eclipse.scout.rt.client.LocaleChangeEvent;
 import org.eclipse.scout.rt.client.busy.IBusyHandler;
 import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
@@ -72,9 +74,9 @@ import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.RwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
+import org.eclipse.scout.rt.ui.rap.internal.servletfilter.LogoutFilter;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.KeyStrokeManager;
-import org.eclipse.scout.rt.ui.rap.util.BrowserInfo;
 import org.eclipse.scout.rt.ui.rap.util.ColorFactory;
 import org.eclipse.scout.rt.ui.rap.util.DeviceUtility;
 import org.eclipse.scout.rt.ui.rap.util.FontRegistry;
@@ -126,6 +128,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private Bundle m_applicationBundle;
   private RwtScoutSynchronizer m_synchronizer;
   private SessionStoreListener m_sessionStoreListener;
+  private ILocaleListener m_localeListener;
 
   private final Object m_immediateUiJobsLock = new Object();
   private final List<Runnable> m_immediateUiJobs = new ArrayList<Runnable>();
@@ -154,6 +157,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   private final Class<? extends IClientSession> m_clientSessionClazz;
   private IClientSession m_clientSession;
+  private IDesktop m_desktop;
 
   private RwtScoutNavigationSupport m_historySupport;
   private LayoutValidateManager m_layoutValidateManager;
@@ -165,6 +169,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     m_clientSessionClazz = clientSessionClazz;
     m_sessionStoreListener = new P_SessionStoreListener();
     m_environmentListeners = new EventListenerList();
+    m_localeListener = new P_LocaleListener();
     m_openForms = new HashMap<IForm, IRwtScoutPart>();
     m_status = RwtEnvironmentEvent.INACTIVE;
     m_desktopKeyStrokes = new ArrayList<IRwtKeyStroke>();
@@ -252,28 +257,32 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
+  /**
+   * @deprecated use {@link #getLogoutLocation()} instead.
+   */
+  @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public String getLogoutLandingUri() {
+    return getLogoutLocation();
+  }
+
+  /**
+   * @see {@link LogoutFilter}
+   */
+  protected String getLogoutLocation() {
     String path = RWT.getRequest().getServletPath();
 
     if (path.length() > 0 && '/' == path.charAt(0)) {
       path = path.substring(1);
     }
 
+    path += "?" + LogoutFilter.LOGOUT_PARAM;
+
     return path;
   }
 
   public void logout() {
-    RWT.getRequest().getSession().setMaxInactiveInterval(1);
-
-    final HttpSession session = RWT.getSessionStore().getHttpSession();
-    new Thread() {
-      @Override
-      public void run() {
-        session.invalidate();
-      }
-    }.start();
-
     HttpServletResponse response = RWT.getResponse();
     String logoutUri = response.encodeRedirectURL(getLogoutLandingUri());
     String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", logoutUri);
@@ -346,6 +355,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         RWT.getSessionStore().setAttribute(IClientSession.class.getName(), tempClientSession);
         RWT.getSessionStore().addSessionStoreListener(m_sessionStoreListener);
 
+        // init RWT locale with the locale of the client session
+        if (tempClientSession.getLocale() != null && !tempClientSession.getLocale().equals(RWT.getLocale())) {
+          RWT.setLocale(tempClientSession.getLocale());
+        }
         newSession.setValue(true);
       }
       else {
@@ -360,11 +373,14 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       else {
         m_clientSession = tempClientSession;
       }
+      m_desktop = m_clientSession.getDesktop();
       if (m_synchronizer == null) {
         m_synchronizer = new RwtScoutSynchronizer(this);
       }
       //put the the display on the session data
       m_clientSession.setData(ENVIRONMENT_KEY, this);
+
+      m_clientSession.addLocaleListener(m_localeListener);
 
       //
       RwtUtility.setNlsTextsOnDisplay(getDisplay(), m_clientSession.getTexts());
@@ -613,12 +629,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   // desktop handling
   @Override
   public final IDesktop getScoutDesktop() {
-    if (m_clientSession != null) {
-      return m_clientSession.getDesktop();
-    }
-    else {
-      return null;
-    }
+    return m_desktop;
   }
 
   protected void attachScoutListeners() {
@@ -634,15 +645,18 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   protected void detachScoutListeners() {
     IDesktop desktop = getScoutDesktop();
-    if (desktop != null) {
-      if (m_scoutDesktopListener != null) {
-        desktop.removeDesktopListener(m_scoutDesktopListener);
-        m_scoutDesktopListener = null;
-      }
-      if (m_desktopPropertyListener != null) {
-        desktop.removePropertyChangeListener(m_desktopPropertyListener);
-        m_desktopPropertyListener = null;
-      }
+    if (desktop == null) {
+      LOG.warn("Desktop is null, cannot remove listeners.");
+      return;
+    }
+
+    if (m_scoutDesktopListener != null) {
+      desktop.removeDesktopListener(m_scoutDesktopListener);
+      m_scoutDesktopListener = null;
+    }
+    if (m_desktopPropertyListener != null) {
+      desktop.removePropertyChangeListener(m_desktopPropertyListener);
+      m_desktopPropertyListener = null;
     }
   }
 
@@ -1280,22 +1294,47 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     m_activateDesktopCalled = activateDesktopCalled;
   }
 
+  private class P_LocaleListener implements ILocaleListener {
+    @Override
+    public void localeChanged(LocaleChangeEvent event) {
+      final Locale locale = event.getLocale();
+      invokeUiLater(new Runnable() {
+        @Override
+        public void run() {
+          if (!hasSameLocale(RWT.getLocale(), locale)) {
+            setLocale(locale);
+          }
+        }
+      });
+    }
+
+    private void setLocale(Locale locale) {
+      RWT.setLocale(locale);
+    }
+
+    private boolean hasSameLocale(Locale locale1, Locale locale2) {
+      boolean result = false;
+      if (locale1 != null && locale2 != null) {
+        result = locale1.equals(locale2);
+      }
+      return result;
+    }
+  }
+
   private static final class P_SessionStoreListener implements SessionStoreListener {
     private static final long serialVersionUID = 1L;
 
     @Override
     public void beforeDestroy(SessionStoreEvent event) {
       ISessionStore sessionStore = event.getSessionStore();
-      String userAgent = "";
-      BrowserInfo browserInfo = (BrowserInfo) sessionStore.getAttribute(RwtUtility.BROWSER_INFO);
-      if (browserInfo != null) {
-        userAgent = browserInfo.getUserAgent();
-      }
-      String msg = "Thread: {0} Session goes down...; UserAgent: {2}";
-      LOG.warn(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
-
       IClientSession clientSession = (IClientSession) sessionStore.getAttribute(IClientSession.class.getName());
       if (clientSession != null) {
+        if (LOG.isInfoEnabled()) {
+          UserAgent userAgent = clientSession.getUserAgent();
+          String msg = "Thread: {0} Session goes down...; UserAgent: {2}";
+          LOG.info(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
+        }
+
         new ClientAsyncJob("HTTP session inactivator", clientSession) {
           @Override
           protected void runVoid(IProgressMonitor monitor) throws Throwable {

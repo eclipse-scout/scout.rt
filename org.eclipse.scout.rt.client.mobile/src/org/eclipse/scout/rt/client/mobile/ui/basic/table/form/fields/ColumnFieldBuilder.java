@@ -48,6 +48,7 @@ public class ColumnFieldBuilder {
     return fields;
   }
 
+  @SuppressWarnings("unchecked")
   protected IFormField createValueField(IColumn<?> column, ITableRow row) throws ProcessingException {
     if (column.isEditable()) {
       IFormField field = createEditableField(column, row);
@@ -61,7 +62,7 @@ public class ColumnFieldBuilder {
       return new StringColumnField((IStringColumn) column);
     }
     if (column instanceof ISmartColumn) {
-      return new SmartColumnField((ISmartColumn) column);
+      return new SmartColumnField((ISmartColumn<?>) column);
     }
     if (column instanceof IDoubleColumn) {
       return new DoubleColumnField((IDoubleColumn) column);

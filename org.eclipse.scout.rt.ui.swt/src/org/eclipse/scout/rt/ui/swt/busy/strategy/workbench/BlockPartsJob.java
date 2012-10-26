@@ -88,7 +88,7 @@ public class BlockPartsJob extends BusyJob {
       //
     }
     finally {
-      display.syncExec(new Runnable() {
+      display.asyncExec(new Runnable() {
         @Override
         public void run() {
           for (SwtScoutPartBlockingDecorator deco : decoList) {
