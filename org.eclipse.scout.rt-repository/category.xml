@@ -12,6 +12,12 @@
    <feature url="features/org.eclipse.scout.rt.testing.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.source" version="0.0.0">
       <category name="Eclipse Scout RT"/>
    </feature>
+   <feature url="features/org.eclipse.scout.rt.rap_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.rap.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.rap.source" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
    <category-def name="Eclipse Scout RT" label="Scout Application Development RT">
       <description>
          Scout Application Development RT

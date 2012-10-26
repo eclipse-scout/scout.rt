@@ -75,7 +75,7 @@
 
     <module>org.eclipse.scout.rt.feature.about</module>
     <module>org.eclipse.scout.rt-feature</module>
-<!--     <module>org.eclipse.scout.rt.rap</module> -->
+    <module>org.eclipse.scout.rt.rap-feature</module>
     <module>org.eclipse.scout.rt.testing-feature</module>
 
     <module>org.eclipse.scout.rt-repository</module>
