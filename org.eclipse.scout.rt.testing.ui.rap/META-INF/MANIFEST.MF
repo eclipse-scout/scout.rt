@@ -9,7 +9,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.testing.client;bundle-version="1.0.0";visibility:=reexport,
  org.eclipse.scout.rt.testing.shared;bundle-version="1.0.0";visibility:=reexport,
  org.eclipse.scout.rt.ui.rap;bundle-version="3.7.0";visibility:=reexport,
- com.thoughtworks.selenium;bundle-version="2.21.0"
+ com.thoughtworks.selenium;bundle-version="2.20.0"
 Import-Package: com.google.common.base;version="12.0.0"
 Export-Package: org.eclipse.scout.rt.testing.ui.rap
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
