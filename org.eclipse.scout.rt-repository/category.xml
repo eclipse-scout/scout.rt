@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipse.scout.rt_0.0.0.qualifier.jar" id="org.eclipse.scout.rt" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.source" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.testing_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.rt.testing.source_0.0.0.qualifier.jar" id="org.eclipse.scout.rt.testing.source" version="0.0.0">
+      <category name="Eclipse Scout RT"/>
+   </feature>
+   <category-def name="Eclipse Scout RT" label="Scout Application Development RT">
+      <description>
+         Scout Application Development RT
+      </description>
+   </category-def>
+</site>

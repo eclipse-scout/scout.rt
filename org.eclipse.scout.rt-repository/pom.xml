@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (c) 2012 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+
+  Contributors:
+     Stephan Leicht Vogt - initial implementation
+-->
+
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.scout.rt</groupId>
+    <artifactId>eclipse.scout.rt</artifactId>
+    <version>3.9.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>org.eclipse.scout.rt-repository</artifactId>
+  <packaging>eclipse-repository</packaging>
+
+  <name>Eclipse Scout RT Repository</name>
+
+  <properties>
+    <p2repo-zip-path>${project.build.directory}/org.eclipse.scout.rt-repository-${project.version}.zip</p2repo-zip-path>
+  </properties>
+
+  <build>
+    <extensions>
+      <!-- Enabling the use of FTP -->
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ftp</artifactId>
+        <version>1.0-beta-6</version>
+      </extension>
+    </extensions>
+
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-p2-publisher-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <publishArtifacts>true</publishArtifacts>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>build-server</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.dash.maven</groupId>
+            <artifactId>eclipse-signing-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>pack</id>
+                <configuration>
+                  <inputFile>${p2repo-zip-path}</inputFile>
+                </configuration>
+                <phase>package</phase>
+                <goals>
+                  <goal>pack</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>sign</id>
+                <configuration>
+                  <inputFile>${p2repo-zip-path}</inputFile>
+                  <signerInputDirectory>${signer-input-directory}</signerInputDirectory>
+                </configuration>
+                <phase>package</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>repack</id>
+                <configuration>
+                  <inputFile>${project.build.directory}/signed/site_assembly.zip</inputFile>
+                </configuration>
+                <phase>package</phase>
+                <goals>
+                  <goal>pack</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>fixCheckSums</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>fixCheckSums</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>deploy</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <delete includeemptydirs="false">
+                      <fileset dir="${download-publish-path}">
+                        <include name="**" />
+                      </fileset>
+                    </delete>
+                    <copy includeemptydirs="false" todir="${download-publish-path}">
+                      <fileset dir="target/checksumFix">
+                        <include name="**" />
+                      </fileset>
+                    </copy>
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- This profile is used to upload the repo -->
+    <profile>
+      <id>uploadRepo</id>
+      <properties>
+        <!-- Properties relative to the distant host where to upload the repo -->
+        <ftp.url>ftp://bsivp9022.bsiag.local</ftp.url>
+        <ftp.toDir>org.eclipse.scout</ftp.toDir>
+        <!-- Relative path to the repo being uploaded -->
+        <repo.path>${project.build.directory}/repository/</repo.path>
+      </properties>
+
+      <build>
+        <plugins>
+          <!-- Upload the repo to the server -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>wagon-maven-plugin</artifactId>
+            <version>1.0-beta-4</version>
+            <executions>
+              <execution>
+                <id>upload-repo</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>upload</goal>
+                </goals>
+                <configuration>
+                  <fromDir>${repo.path}</fromDir>
+                  <includes>**</includes>
+                  <toDir>${ftp.toDir}</toDir>
+                  <url>${ftp.url}</url>
+                  <serverId>ftp-bsivp9022</serverId>
+                  <!-- Points to your settings.xml where the connection settings are
+                    stored as shown below -->
+                  <!-- <server> -->
+                  <!-- <id>ftp-bsivp9022</id> -->
+                  <!-- <username>username</username> -->
+                  <!-- <password>password</password> -->
+                  <!-- </server> -->
+                  <!-- if connection gets reset on a windows 7 machine following command has to be executed -->
+                  <!-- "netsh advfirewall set global StatefulFTP disable" -->
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
