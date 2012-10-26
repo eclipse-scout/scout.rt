@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDec
 public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal> implements IBigDecimalColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
-  private String m_format = null;
+  private String m_format;
   private boolean m_groupingUsed;
   private int m_maxFractionDigits;
   private int m_minFractionDigits;
@@ -53,6 +53,10 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
    * Configures the format used to render the value. See {@link DecimalFormat#applyPattern(String)} for more information
    * about the expected format.
    * <p>
+   * This property has higher priority than {@link #getConfiguredMaxFractionDigits()},
+   * {@link #getConfiguredMinFractionDigits()} and {@link #getConfiguredGroupingUsed()}. Hence, if a format is
+   * specified, these properties will be ignored.
+   * <p>
    * Subclasses can override this method. Default is {@code null}.
    * 
    * @return Format of this column.
@@ -67,6 +71,8 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
   /**
    * Configures the minimum number of fraction digits used to display the value. To use an exact number of fraction
    * digits, the same number as for {@link #getConfiguredMaxFractionDigits()} must be returned.
+   * <p>
+   * This property only has an effect if no format is specified by {@link #getConfiguredFormat()}.
    * <p>
    * Subclasses can override this method. Default is {@code 2}.
    * 
@@ -83,6 +89,8 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
    * Configures the maximum number of fraction digits used to display the value. To use an exact number of fraction
    * digits, the same number as for {@link #getConfiguredMinFractionDigits()} must be returned.
    * <p>
+   * This property only has an effect if no format is specified by {@link #getConfiguredFormat()}.
+   * <p>
    * Subclasses can override this method. Default is {@code 2}.
    * 
    * @return maximum number of fraction digits of this column.
@@ -97,6 +105,8 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
   /**
    * Configures whether grouping is used for this column. If grouping is used, the values may be displayed with a digit
    * group separator.
+   * <p>
+   * This property only has an effect if no format is specified by {@link #getConfiguredFormat()}.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
    * 
@@ -259,6 +269,7 @@ public abstract class AbstractBigDecimalColumn extends AbstractColumn<BigDecimal
     f.setFormat(getFormat());
     f.setMaxFractionDigits(getMaxFractionDigits());
     f.setMinFractionDigits(getMinFractionDigits());
+    f.setFractionDigits(getNumberFormat().getMaximumFractionDigits());
     f.setMultiplier(getMultiplier());
     f.setGroupingUsed(isGroupingUsed());
     f.setPercent(isPercent());
