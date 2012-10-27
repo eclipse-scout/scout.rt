@@ -21,6 +21,8 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +41,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
@@ -451,7 +452,27 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   private Class<? extends IFormField>[] getConfiguredInjectedFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClassesWithInjectFieldAnnotation(dca, IFormField.class);
+    Class<IFormField>[] filteredClasses = ConfigurationUtility.filterClassesWithInjectFieldAnnotation(dca, IFormField.class);
+    // sort injected fields by enclosing class so that sub classes are before parent classes
+    // this order is required so that sub classes may inject fields to other injected fields defined in a super class
+    // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=392972
+    Comparator<Class<?>> comparator = new Comparator<Class<?>>() {
+      @Override
+      public int compare(Class<?> c1, Class<?> c2) {
+        Class<?> ec1 = c1.getEnclosingClass();
+        Class<?> ec2 = c2.getEnclosingClass();
+
+        if (ec1 == ec2) {
+          return 0;
+        }
+        if (ec2 != null && ec2.getSuperclass() == ec1) {
+          return 1;
+        }
+        return -1;
+      }
+    };
+    Arrays.sort(filteredClasses, comparator);
+    return filteredClasses;
   }
 
   protected void initConfig() throws ProcessingException {
@@ -461,27 +482,25 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // prepare injected fields
     Class<? extends IFormField>[] fieldArray = getConfiguredInjectedFields();
     DefaultFormFieldInjection injectedFields = null;
-    for (Class<? extends IFormField> clazz : fieldArray) {
-      if (!clazz.isAnnotationPresent(InjectFieldTo.class)) {
-        continue;
-      }
-      try {
-        IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
-        if (f != null) {
-          if (injectedFields == null) {
-            injectedFields = new DefaultFormFieldInjection();
-          }
-          injectedFields.addField(f);
-        }
-      }// end try
-      catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + clazz.getName(), t));
-      }
+    if (fieldArray.length > 0) {
+      injectedFields = new DefaultFormFieldInjection();
     }
     IGroupBox rootBox = getRootGroupBox();
     try {
       if (injectedFields != null) {
         FormFieldInjectionThreadLocal.push(injectedFields);
+        // create instances of injected fields
+        for (Class<? extends IFormField> clazz : fieldArray) {
+          try {
+            IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
+            if (f != null) {
+              injectedFields.addField(f);
+            }
+          }// end try
+          catch (Throwable t) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("field: " + clazz.getName(), t));
+          }
+        }
       }
       //
       // add mainbox if getter returns null
