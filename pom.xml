@@ -28,7 +28,7 @@
 
   <scm>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/</url>
-    <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git</connection>
+    <connection>${tycho.scmUrl}</connection>
   </scm>
 
   <properties>
@@ -36,53 +36,6 @@
   </properties>
 
   <modules>
-    <module>org.eclipse.scout.commons</module>
-    <module>org.eclipse.scout.commons.test</module>
-
-    <module>org.eclipse.scout.service</module>
-
-    <module>org.eclipse.scout.rt.shared</module>
-    <module>org.eclipse.scout.rt.shared.test</module>
-    <module>org.eclipse.scout.rt.shared.legacy.texts.fragment</module>
-
-    <module>org.eclipse.scout.rt.client</module>
-    <module>org.eclipse.scout.rt.client.mobile</module>
-    <module>org.eclipse.scout.http.servletfilter</module>
-    <module>org.eclipse.scout.rt.server</module>
-    <module>org.apache.derby.jdbc_1053.fragment</module>
-    <module>org.apache.derby.jdbc_1082.fragment</module>
-    <module>org.eclipse.scout.rt.jdbc.derby</module>
-    <module>org.eclipse.scout.jaxws216</module>
-    <module>org.eclipse.scout.rt.ui.swing</module>
-    <module>org.eclipse.scout.rt.ui.swing.browser.swt.fragment</module>
-    <module>org.eclipse.scout.rt.ui.swt</module>
-    <module>org.eclipse.scout.rt.ui.rap</module>
-    <module>org.eclipse.scout.rt.ui.rap.workbench</module>
-<!--This Bundle needs changes in rap not commited yet
-    <module>org.eclipse.scout.rt.ui.rap.mobile</module>
--->
-    <module>org.eclipse.scout.rt.ui.rap.theme.rayo</module>
-    <module>org.eclipse.scout.rt.ui.rap.theme.rayo.mobile</module>
-    <module>org.eclipse.scout.rt.ui.svg.calendar</module>
-    <module>org.eclipse.scout.svg.client</module>
-    <module>org.eclipse.scout.svg.ui.swing</module>
-    <module>org.eclipse.scout.svg.ui.swt</module>
-    <module>org.eclipse.scout.svg.ui.rap</module>
-    <module>org.eclipse.scout.net</module>
-    <module>org.eclipse.scout.rt.testing.shared</module>
-    <module>org.eclipse.scout.rt.testing.client</module>
-    <module>org.eclipse.scout.rt.testing.server</module>
-    <module>org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment</module>
-    <module>org.eclipse.scout.rt.testing.ui.swing</module>
-    <module>org.eclipse.scout.rt.testing.ui.swt</module>
-    <module>org.eclipse.scout.rt.extension.client</module>
-    <module>org.eclipse.scout.rt.extension.client.test.fragment</module>
-
-    <module>org.eclipse.scout.rt.feature.about</module>
-    <module>org.eclipse.scout.rt-feature</module>
-    <module>org.eclipse.scout.rt.rap-feature</module>
-    <module>org.eclipse.scout.rt.testing-feature</module>
-
-    <module>org.eclipse.scout.rt-repository</module>
+    <module>org.eclipse.scout.rt.parent</module>
   </modules>
 </project>
