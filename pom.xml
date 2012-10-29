@@ -37,6 +37,8 @@
 
   <modules>
     <module>org.eclipse.scout.commons</module>
+    <module>org.eclipse.scout.commons.test</module> 
+
     <module>org.eclipse.scout.service</module>
     <module>org.eclipse.scout.rt.shared</module>
     <module>org.eclipse.scout.rt.shared.legacy.texts.fragment</module>
