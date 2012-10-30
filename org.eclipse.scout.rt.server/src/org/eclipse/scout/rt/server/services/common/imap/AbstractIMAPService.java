@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,7 @@ import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Store;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
@@ -30,6 +31,7 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
 
   private String m_host;
   private int m_port;
+  private String m_sslProtocols;
   private String m_mailbox;
   private String m_username;
   private String m_password;
@@ -69,6 +71,21 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
 
   public void setPort(int i) {
     m_port = i;
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(25)
+  @ConfigPropertyValue("null")
+  protected String getConfiguredSslProtocols() {
+    return null;
+  }
+
+  public String getSslProtocols() {
+    return m_sslProtocols;
+  }
+
+  public void setSslProtocols(String s) {
+    m_sslProtocols = s;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
@@ -130,13 +147,18 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
       if (m_port > 0) {
         props.put("mail.imap.port", "" + m_port);
       }
+      if (!StringUtility.isNullOrEmpty(getSslProtocols())) {
+        props.put("mail.imap.ssl.protocols", getSslProtocols());
+      }
       if (m_username != null) {
         props.put("mail.imap.user", m_username);
       }
       if (useSSL) {
-        props.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.setProperty("mail.imap.socketFactory.fallback", "false");
-        props.setProperty("mail.imap.socketFactory.port", "993");
+        props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.imap.socketFactory.fallback", "false");
+        if (m_port > 0) {
+          props.put("mail.imap.socketFactory.port", "" + m_port);
+        }
       }
       Session session = Session.getInstance(props, null);
       m_store = session.getStore("imap");
