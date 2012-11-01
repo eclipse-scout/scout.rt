@@ -86,14 +86,17 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
         text = getUiTable().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getUiTable(), text);
       }
-      else if (text.indexOf("\n") >= 0) {
-        if (getScoutTable().isMultilineText()) {
-          //transform to html
-          text = "<html>" + HtmlTextUtility.transformPlainTextToHtml(text) + "</html>";
-          text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
+      else {
+        boolean multiline = false;
+        if (text.indexOf("\n") >= 0) {
+          multiline = getScoutTable().isMultilineText();
+          if (!multiline) {
+            text = StringUtility.replaceNewLines(text, " ");
+          }
         }
-        else {
-          text = StringUtility.replace(text, "\n", " ");
+        boolean markupEnabled = Boolean.TRUE.equals(getUiTable().getUiField().getData(RWT.MARKUP_ENABLED));
+        if (markupEnabled || multiline) {
+          text = HtmlTextUtility.transformPlainTextToHtml(text);
         }
       }
 
