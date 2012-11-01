@@ -17,6 +17,7 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.rwt.RWT;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -151,7 +152,7 @@ public class RwtScoutListModel implements IRwtScoutListModel {
   }
 
   @Override
-  public RwtScoutList getRwtScoutList() {
+  public RwtScoutList getUiList() {
     return m_uiList;
   }
 
@@ -176,14 +177,17 @@ public class RwtScoutListModel implements IRwtScoutListModel {
       text = m_uiList.getUiEnvironment().adaptHtmlCell(m_uiList, text);
       text = m_uiList.getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(m_uiList, text);
     }
-    else if (text.indexOf("\n") >= 0) {
-      if (isMultiline()) {
-        //transform to html
-        text = "<html>" + HtmlTextUtility.transformPlainTextToHtml(text) + "</html>";
-        text = m_uiList.getUiEnvironment().adaptHtmlCell(m_uiList, text);
+    else {
+      boolean multiline = false;
+      if (text.indexOf("\n") >= 0) {
+        multiline = isMultiline();
+        if (!multiline) {
+          text = StringUtility.replaceNewLines(text, " ");
+        }
       }
-      else {
-        text = StringUtility.replace(text, "\n", " ");
+      boolean markupEnabled = Boolean.TRUE.equals(getUiList().getUiField().getData(RWT.MARKUP_ENABLED));
+      if (markupEnabled || multiline) {
+        text = HtmlTextUtility.transformPlainTextToHtml(text);
       }
     }
     return text;
