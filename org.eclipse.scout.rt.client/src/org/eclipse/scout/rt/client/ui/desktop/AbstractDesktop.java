@@ -522,6 +522,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public boolean isShowing(IForm form) {
+    if (form == null) {
+      return false;
+    }
+    if (form.getOuterForm() != null) {
+      return form.getOuterForm().isShowing();
+    }
+
     for (IForm f : m_viewStack) {
       if (f == form) {
         return true;
