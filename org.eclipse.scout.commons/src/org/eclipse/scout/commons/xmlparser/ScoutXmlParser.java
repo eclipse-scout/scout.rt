@@ -39,7 +39,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Title : Scout XML Parser Description: Copyright : Copyright (c) 2006 BSI AG,
- * ETH Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
+ * ETH ZÃ¼rich, Stefan Vogt Company : BSI AG www.bsiag.com
  * 
  * @version 1.0
  */

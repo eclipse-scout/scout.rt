@@ -122,7 +122,7 @@ public class StringUtilityTest extends Assert {
   @Test
   public void testDecompress_umlauts() throws Exception {
     // UTF-8 length is 13 to avoid accidental buffer size matches
-    final String CHARACTERS = "aou�����";
+    final String CHARACTERS = "aouäöüàé";
 
     StringBuilder builder = new StringBuilder();
     for (int i = 0; i < 100000; i++) {

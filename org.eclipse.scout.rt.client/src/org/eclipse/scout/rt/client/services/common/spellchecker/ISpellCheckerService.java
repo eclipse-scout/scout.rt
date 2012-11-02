@@ -193,7 +193,7 @@ public interface ISpellCheckerService extends IService {
 
   /**
    * Returns whether words are split and checked separately (e.g.
-   * 'Zusammenf¸hren' -> 'Zusammen' and 'f¸hren').
+   * 'Zusammenf√ºhren' -> 'Zusammen' and 'f√ºhren').
    */
   boolean isSplittingWords();
 

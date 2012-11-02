@@ -34,7 +34,7 @@ public class DecompressedReader extends Reader {
 
   public DecompressedReader(RemoteFile f, String charsetName) {
     m_remoteFile = f;
-    m_buffer = new ByteArrayInputStream(m_remoteFile.getCompressedData()); // enth‰lt
+    m_buffer = new ByteArrayInputStream(m_remoteFile.getCompressedData()); // enth√§lt
     // komprimierte
     // daten
     m_inflater = new Inflater();
