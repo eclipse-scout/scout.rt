@@ -16,3 +16,5 @@
 *.dll binary
 *.png binary
 *.jpg binary
+*.ai binary
+*.vsd binary
