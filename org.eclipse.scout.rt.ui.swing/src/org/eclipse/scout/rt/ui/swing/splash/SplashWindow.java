@@ -20,13 +20,9 @@ import java.awt.Frame;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JRootPane;
@@ -55,20 +51,7 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
       m_title = Platform.getProduct().getName();
       v = Version.parseVersion("" + Platform.getProduct().getDefiningBundle().getHeaders().get("Bundle-Version"));
     }
-    Icon icon = UIManager.getIcon("Window.icon");
-    if (icon instanceof ImageIcon) {
-      setIconImage(((ImageIcon) icon).getImage());
-    }
-    Object icons = UIManager.getDefaults().get("Window.icons");
-    if (icons instanceof List<?>) {
-      List<Image> iconList = new ArrayList<Image>();
-      for (Object ico : ((List<?>) icons)) {
-        if (ico instanceof Image) {
-          iconList.add((Image) ico);
-        }
-      }
-      setIconImages(iconList);
-    }
+    SwingUtility.setDefaultImageIcons(this);
     setTitle(m_title);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     setFont(new Font("Dialog", Font.PLAIN, 8));
