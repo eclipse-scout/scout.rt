@@ -31,6 +31,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.FlowLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.JDialogEx;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
@@ -48,6 +49,7 @@ public class LoginDialog extends JDialogEx {
   public LoginDialog(AuthStatus status) {
     super();
     m_status = status;
+    SwingUtility.setDefaultImageIcons(this);
     setTitle(UIManager.getString("LoginDialog.title"));
     createContents();
     pack();

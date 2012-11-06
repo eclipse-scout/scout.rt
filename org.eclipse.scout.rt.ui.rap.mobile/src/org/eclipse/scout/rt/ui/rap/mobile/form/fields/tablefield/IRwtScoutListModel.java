@@ -22,5 +22,5 @@ public interface IRwtScoutListModel extends IStructuredContentProvider, ILabelPr
 
   void consumeTableModelEvent(RwtScoutTableEvent uiTableEvent);
 
-  IRwtScoutList getRwtScoutList();
+  IRwtScoutList getUiList();
 }

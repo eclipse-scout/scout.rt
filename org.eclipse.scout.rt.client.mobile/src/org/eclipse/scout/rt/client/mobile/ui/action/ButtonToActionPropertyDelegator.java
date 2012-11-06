@@ -42,7 +42,8 @@ public class ButtonToActionPropertyDelegator extends PropertyDelegator<IButton, 
     getReceiver().setSelected(getSender().isSelected());
   }
 
-  private void handleButtonPropertyChange(String name, Object newValue) {
+  @Override
+  protected void handlePropertyChange(String name, Object newValue) {
     if (name.equals(IFormField.PROP_ENABLED)) {
       getReceiver().setEnabled(((Boolean) newValue).booleanValue());
     }

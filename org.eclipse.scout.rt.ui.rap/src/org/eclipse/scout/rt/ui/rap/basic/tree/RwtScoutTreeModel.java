@@ -174,8 +174,14 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
           }
         }
       }
-      else if (text.indexOf("\n") >= 0) {
-        text = StringUtility.replace(text, "\n", " ");
+      else {
+        if (text.indexOf("\n") >= 0) {
+          text = StringUtility.replaceNewLines(text, " ");
+        }
+        boolean markupEnabled = Boolean.TRUE.equals(getUiTree().getUiField().getData(RWT.MARKUP_ENABLED));
+        if (markupEnabled) {
+          text = HtmlTextUtility.transformPlainTextToHtml(text);
+        }
       }
       return text;
     }

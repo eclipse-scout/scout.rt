@@ -77,50 +77,57 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
 
   public String getColumnText(ITableRow element, int columnIndex) {
     ICell cell = getCell(element, columnIndex);
-    if (cell != null) {
-      String text = cell.getText();
-      if (text == null) {
-        text = "";
-      }
-      else if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
-        text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
-        text = getUiTable().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getUiTable(), text);
-      }
-      else if (text.indexOf("\n") >= 0) {
-        if (getScoutTable().isMultilineText()) {
-          //transform to html
-          text = "<html>" + HtmlTextUtility.transformPlainTextToHtml(text) + "</html>";
-          text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
-        }
-        else {
-          text = StringUtility.replace(text, "\n", " ");
-        }
-      }
-
-      TableEx table = getUiTable().getUiField();
-      if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-        m_newlines = updateRowArray(m_newlines, ((ITableRow) element).getRowIndex(), columnIndex - 1);
-        if (getScoutTable().getColumnSet().getColumn(columnIndex).isVisible()) {
-          int htmlTableRowRowHeight = calculateHtmlTableRowHeight(m_htmlTableRows, text, ((ITableRow) element).getRowIndex(), columnIndex - 1);
-          if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
-              || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTableRowRowHeight) != 0) {
-            table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), htmlTableRowRowHeight)).intValue());
-          }
-        }
-      }
-      else {
-        m_newlines = updateRowArray(m_newlines, ((ITableRow) element).getRowIndex(), columnIndex - 1);
-        if (getScoutTable().getColumnSet().getColumn(columnIndex).isVisible()) {
-          int newLineRowHeight = calculateNewLineRowHeight(m_newlines, text, ((ITableRow) element).getRowIndex(), columnIndex - 1);
-          if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
-              || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(newLineRowHeight) != 0) {
-            table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), newLineRowHeight)).intValue());
-          }
-        }
-      }
-      return text;
+    if (cell == null) {
+      return "";
     }
-    return "";
+
+    String text = cell.getText();
+    if (text == null) {
+      text = "";
+    }
+    else if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
+      text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
+      text = getUiTable().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getUiTable(), text);
+    }
+    else {
+      boolean multiline = false;
+      if (text.indexOf("\n") >= 0) {
+        multiline = getScoutTable().isMultilineText();
+        if (!multiline) {
+          text = StringUtility.replaceNewLines(text, " ");
+        }
+      }
+      boolean markupEnabled = Boolean.TRUE.equals(getUiTable().getUiField().getData(RWT.MARKUP_ENABLED));
+      if (markupEnabled || multiline) {
+        text = HtmlTextUtility.transformPlainTextToHtml(text);
+      }
+    }
+
+    IColumn<?> column = m_columnManager.getColumnByModelIndex(columnIndex - 1);
+    if (column.isVisible()) {
+      updateTableRowHeight(text, element, columnIndex);
+    }
+    return text;
+  }
+
+  private void updateTableRowHeight(String cellText, ITableRow element, int columnIndex) {
+    TableEx table = getUiTable().getUiField();
+    if (HtmlTextUtility.isTextWithHtmlMarkup(cellText)) {
+      m_htmlTableRows = updateRowArray(m_htmlTableRows, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+      int htmlTableRowRowHeight = calculateHtmlTableRowHeight(m_htmlTableRows, cellText, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+      if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
+          || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTableRowRowHeight) != 0) {
+        table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), htmlTableRowRowHeight)).intValue());
+      }
+    }
+    else {
+      m_newlines = updateRowArray(m_newlines, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+      int newLineRowHeight = calculateNewLineRowHeight(m_newlines, cellText, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+      if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
+          || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(newLineRowHeight) != 0) {
+        table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), newLineRowHeight)).intValue());
+      }
+    }
   }
 
   private double[][] updateRowArray(double[][] rowArray, int rowIndex, int columnIndex) {
