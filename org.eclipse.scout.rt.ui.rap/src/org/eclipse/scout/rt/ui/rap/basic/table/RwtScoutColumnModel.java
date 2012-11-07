@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.rwt.RWT;
+import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -104,7 +105,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     }
 
     IColumn<?> column = m_columnManager.getColumnByModelIndex(columnIndex - 1);
-    if (column.isVisible()) {
+    if (getScoutTable().getRowHeightHint() < 0 && column.isVisible()) {
       updateTableRowHeight(text, element, columnIndex);
     }
     return text;
@@ -293,7 +294,11 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         text = cell.getTooltipText();
         if (text == null) {
           text = cell.getText();
-          if (text == null || text.indexOf("\n") <= 0 || HtmlTextUtility.isTextWithHtmlMarkup(text)) {
+          if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
+            //Tooltips don't support html -> convert to plain text
+            text = HTMLUtility.getPlainText(text);
+          }
+          if (text == null || text.indexOf("\n") <= 0) {
             text = "";
           }
         }
