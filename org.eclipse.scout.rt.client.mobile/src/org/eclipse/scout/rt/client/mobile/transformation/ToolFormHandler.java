@@ -61,7 +61,7 @@ public class ToolFormHandler {
    * This is a delegate and needs to be explicitly called.<br>
    * It's purpose is to close tool forms after a search or after a bookmark activation.
    */
-  public void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
     MobileDesktopUtility.closeAllToolForms();
   }
 

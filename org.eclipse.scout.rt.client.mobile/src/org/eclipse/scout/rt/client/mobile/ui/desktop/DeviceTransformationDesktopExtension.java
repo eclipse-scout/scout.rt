@@ -124,8 +124,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
 
-    //FIXME CGU separate into acceptTransformation and acceptAdditionToDesktop
-    if (!getDeviceTransformer().acceptForm(form)) {
+    if (!getDeviceTransformer().acceptFormAddingToDesktop(form)) {
       formHolder.setValue(null);
       return ContributionCommand.Stop;
     }
@@ -139,7 +138,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
       return super.execTablePageLoaded(tablePage);
     }
 
-    getDeviceTransformer().tablePageLoaded(tablePage);
+    getDeviceTransformer().notifyTablePageLoaded(tablePage);
 
     return ContributionCommand.Continue;
   }

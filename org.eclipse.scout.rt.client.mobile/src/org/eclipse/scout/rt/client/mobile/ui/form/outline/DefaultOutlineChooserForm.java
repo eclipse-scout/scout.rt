@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.mobile.ui.form.outline;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
+import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformation;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.DefaultOutlineChooserForm.MainBox.OutlinesTableField;
@@ -25,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.service.SERVICES;
 
 public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineChooserForm {
 
@@ -70,6 +73,15 @@ public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineC
     @Override
     protected boolean getConfiguredBorderVisible() {
       return false;
+    }
+
+    @Override
+    protected void execInitField() throws ProcessingException {
+      //Table already is scrollable, it's not necessary to make the form scrollable too
+      IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
+      if (service != null) {
+        service.getDeviceTransformer().getDeviceTransformationExcluder().excludeFieldTransformation(this, MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
+      }
     }
 
     @Order(10.0)

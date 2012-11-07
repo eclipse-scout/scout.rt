@@ -13,6 +13,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
+import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformation;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.DrillDownStyleMap;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.MobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
@@ -221,9 +223,18 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
 
     if (getPageTableGroupBox().isVisible()) {
-      //If there is a table but no detail form, don't display a border -> make the table as big as the form.
-      //If there is a table and a detail form, display a border to make it look better.
-      getPageTableGroupBox().setBorderVisible(getPageDetailFormField().getInnerForm() != null);
+      if (getPageDetailFormField().getInnerForm() == null) {
+        //If there is a table but no detail form, don't display a border -> make the table as big as the form.
+        //If there is a table and a detail form, display a border to make it look better.
+        getPageTableGroupBox().setBorderVisible(false);
+
+        //If there is just the table, the form itself does not need to be scrollable because the table already is
+        IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
+        if (service != null) {
+          service.getDeviceTransformer().getDeviceTransformationExcluder().excludeFieldTransformation(getRootGroupBox(), MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
+        }
+      }
+
     }
     getPageTableField().setTableStatusVisible(m_pageFormConfig.isTableStatusVisible());
   }
