@@ -63,6 +63,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   private PageFormManager m_pageFormManager;
   private ToolFormHandler m_toolFormHandler;
   private boolean m_gridDataDirty;
+  private DeviceTransformationExcluder m_deviceTransformationExcluder;
 
   public MobileDeviceTransformer(IDesktop desktop) {
     if (desktop == null) {
@@ -75,6 +76,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
     m_pageFormManager = createPageFormManager(desktop);
     m_toolFormHandler = createToolFormHandler(desktop);
+    m_deviceTransformationExcluder = createDeviceTransformationExcluder();
 
     SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation(desktop).trackDisplayViewId(IForm.VIEW_ID_CENTER);
   }
@@ -94,6 +96,15 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     return new ToolFormHandler(getDesktop());
   }
 
+  protected DeviceTransformationExcluder createDeviceTransformationExcluder() {
+    return new DeviceTransformationExcluder();
+  }
+
+  @Override
+  public DeviceTransformationExcluder getDeviceTransformationExcluder() {
+    return m_deviceTransformationExcluder;
+  }
+
   @Override
   public List<String> getAcceptedViewIds() {
     List<String> viewIds = new LinkedList<String>();
@@ -103,9 +114,9 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
     if (m_toolFormHandler != null) {
-      m_toolFormHandler.tablePageLoaded(tablePage);
+      m_toolFormHandler.notifyTablePageLoaded(tablePage);
     }
   }
 
@@ -124,6 +135,10 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformForm(IForm form) throws ProcessingException {
+    if (getDeviceTransformationExcluder().isFormExcluded(form)) {
+      return;
+    }
+
     m_gridDataDirty = false;
 
     if (shouldCancelConfirmationBeDisabled()) {
@@ -164,7 +179,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public boolean acceptForm(IForm form) {
+  public boolean acceptFormAddingToDesktop(IForm form) {
     return m_pageFormManager.acceptForm(form);
   }
 
@@ -201,13 +216,19 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     form.visitFields(new IFormFieldVisitor() {
       @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
+        if (getDeviceTransformationExcluder().isFieldExcluded(field)) {
+          return true;
+        }
+
         transformFormField(field);
 
         return true;
       }
     });
 
-    transformMainBox(form.getRootGroupBox());
+    if (!getDeviceTransformationExcluder().isFieldExcluded(form.getRootGroupBox())) {
+      transformMainBox(form.getRootGroupBox());
+    }
 
     //mark form as modified
     m_modifiedForms.put(form, new WeakReference<IForm>(form));
@@ -279,6 +300,20 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   protected void transformMainBox(IGroupBox groupBox) throws ProcessingException {
+    if (getDeviceTransformationExcluder().isFieldTransformationExcluded(groupBox, MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE)) {
+      return;
+    }
+
+    //Detail forms will be displayed as inner forms on page forms.
+    //Make sure these inner forms are not scrollable because the page form already is
+    if (groupBox.getForm() == getDesktop().getPageDetailForm()) {
+      if (groupBox.isScrollable()) {
+        groupBox.setScrollable(false);
+        markGridDataDirty();
+      }
+      return;
+    }
+
     if (!groupBox.isScrollable()) {
       groupBox.setScrollable(true);
 
