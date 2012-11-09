@@ -73,6 +73,7 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
         setActiveButton(m_tabButton);
       }
     });
+    registerCompositeOnWidget(m_tabButton, this);
 
     getUiEnvironment().addKeyStroke(m_tabButton, new P_KeyListener(SWT.ARROW_LEFT), false);
     getUiEnvironment().addKeyStroke(m_tabButton, new P_KeyListener(SWT.ARROW_RIGHT), false);

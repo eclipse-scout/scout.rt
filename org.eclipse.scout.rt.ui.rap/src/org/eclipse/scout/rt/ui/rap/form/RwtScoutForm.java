@@ -22,8 +22,6 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
 import org.eclipse.scout.rt.ui.rap.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.rap.IValidateRoot;
@@ -34,6 +32,7 @@ import org.eclipse.scout.rt.ui.rap.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFormFieldGridData;
+import org.eclipse.scout.rt.ui.rap.util.FocusUtility;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -106,8 +105,8 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
   }
 
   @Override
-  public IForm getScoutObject() {
-    return super.getScoutObject();
+  public Composite getUiField() {
+    return (Composite) super.getUiField();
   }
 
   @Override
@@ -124,29 +123,34 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
       }
     }
     if (modelField == null) {
-      for (IFormField f : getScoutObject().getAllFields()) {
-        if ((f instanceof IValueField || f instanceof IButton)
-            && f.isFocusable()
-            && f.isVisible()
-            && f.isEnabled()) {
-          modelField = f;
-          break;
-        }
-      }
+      setFocusOnFirstField();
     }
-    if (modelField != null) {
+    else {
       handleRequestFocusFromScout(modelField, true);
     }
   }
 
-  private Control findUiField(IFormField modelField) {
+  /**
+   * Sets the focus into the first focusable control in the mainbox.
+   * <p>
+   * This should actually be done by rap itself, but the implementation seems not to be finished, see
+   * Shell.traverseGroup
+   */
+  private void setFocusOnFirstField() {
+    Control firstFocusableControl = FocusUtility.findFirstFocusableControl(getUiField());
+    if (firstFocusableControl != null) {
+      firstFocusableControl.setFocus();
+    }
+  }
+
+  private Composite findUiContainer(IFormField modelField) {
     if (modelField == null) {
       return null;
     }
     for (Control comp : RwtUtility.findChildComponents(getUiContainer(), Control.class)) {
       IRwtScoutComposite<?> composite = RwtScoutFieldComposite.getCompositeOnWidget(comp);
       if (composite != null && composite.getScoutObject() == modelField) {
-        return composite.getUiField();
+        return composite.getUiContainer();
       }
     }
     return null;
@@ -230,19 +234,14 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
     if (modelField == null) {
       return;
     }
-    Control comp = findUiField(modelField);
-    if (comp != null && comp.getVisible()) {
-      Control[] tabList = (comp instanceof Composite ? ((Composite) comp).getTabList() : null);
-      if (tabList != null && tabList.length > 0) {
-        comp = tabList[0];
+    Composite comp = findUiContainer(modelField);
+    Control control = FocusUtility.findFirstFocusableControl(comp);
+    if (control != null) {
+      if (force) {
+        control.forceFocus();
       }
-      if (comp != null && comp.getVisible()) {
-        if (force) {
-          comp.forceFocus();
-        }
-        else {
-          comp.setFocus();
-        }
+      else {
+        control.setFocus();
       }
     }
   }
