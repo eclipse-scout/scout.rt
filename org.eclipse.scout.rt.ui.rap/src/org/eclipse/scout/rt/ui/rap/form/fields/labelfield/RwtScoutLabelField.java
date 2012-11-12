@@ -10,24 +10,24 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.labelfield;
 
+import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
-import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>RwtScoutLabelField</h3> ...
- * 
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public class RwtScoutLabelField extends RwtScoutValueFieldComposite<ILabelField> implements IRwtScoutLabelField {
+  private static final String VARIANT_LABELFIELD = "labelfield";
 
   @Override
   protected void initializeUi(Composite parent) {
@@ -42,16 +42,25 @@ public class RwtScoutLabelField extends RwtScoutValueFieldComposite<ILabelField>
     if (getScoutObject().isWrapText()) {
       style |= SWT.WRAP;
     }
-    Label text = getUiEnvironment().getFormToolkit().createLabel(container, "", style);
-    LogicalGridData textData = LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData());
-    textData.topInset = 4;
-    text.setLayoutData(textData);
+
+    //LabelContainer is only necessary because labels don't support margins -> see css for container padding
+    final Composite labelContainer = getUiEnvironment().getFormToolkit().createComposite(container);
+    labelContainer.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
+    labelContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_LABELFIELD);
+    labelContainer.setLayout(new FillLayout());
+
+    Label text = getUiEnvironment().getFormToolkit().createLabel(labelContainer, "", style);
     setUiField(text);
     //
     container.setTabList(new Control[]{});
     setUiContainer(container);
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
+  }
+
+  @Override
+  protected boolean isAutoSetLayoutData() {
+    return false;
   }
 
   @Override
