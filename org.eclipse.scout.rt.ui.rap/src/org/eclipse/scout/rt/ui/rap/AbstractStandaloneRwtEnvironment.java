@@ -65,11 +65,6 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
       }
       setSubject(subject);
     }
-    if (RwtUtility.getBrowserInfo().isDesktop()) {
-      //Necessary for client notifications. Disabled on mobile devices to avoid having a constant circle of doom.
-      //TODO: Make it dependent on client notification enabled state. Should actually also be enabled for mobile devices so that client notifications works.
-      UICallBack.activate(getClass().getName() + getClass().hashCode());
-    }
     m_display = Display.getDefault();
     if (m_display == null) {
       m_display = new Display();
@@ -150,6 +145,11 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
       }
     });
 
+    if (needsClientNotificationUICallBack()) {
+      // Necessary for client notifications.
+      UICallBack.activate(getClass().getName() + getClass().hashCode());
+    }
+
     while (!shell.isDisposed()) {
       if (getClientSession() != null) {
         LocaleThreadLocal.set(getClientSession().getLocale());
@@ -180,6 +180,15 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
 
   protected RwtScoutDesktop createUiDesktop() {
     return new RwtScoutDesktop();
+  }
+
+  /**
+   * @return <code>boolean</code> indicating if a permanent {@link UICallBack} for client notifications should be
+   *         established.
+   */
+  protected boolean needsClientNotificationUICallBack() {
+    // necessary if client notification polling is enabled
+    return getClientSession().getServiceTunnel().getClientNotificationPollInterval() > -1;
   }
 
   @Override
