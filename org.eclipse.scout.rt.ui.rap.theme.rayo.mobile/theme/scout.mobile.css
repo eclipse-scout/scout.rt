@@ -881,6 +881,10 @@ Button.datefield:hover {
   background-image: url(theme/img/button/datefield_date_mouse_over.png);
   border: none;
 }
+Button-FocusIndicator.datefield {
+  background-color: transparent;
+  border: none;
+}
 /* DateChooserDialog */
 Shell.datechooser-dialog {
   border: 2px solid #67a8ce;
@@ -935,6 +939,22 @@ Button.datechooser-dialog-next-month:hover {
   border-radius: 5px;
   border: none;
 }
+Button-FocusIndicator.datechooser-dialog-last-year {
+  background-color: transparent;
+  border: none;
+}
+Button-FocusIndicator.datechooser-dialog-last-month {
+  background-color: transparent;
+  border: none;
+}
+Button-FocusIndicator.datechooser-dialog-next-year {
+  background-color: transparent;
+  border: none;
+}
+Button-FocusIndicator.datechooser-dialog-next-month {
+  background-color: transparent;
+  border: none;
+}
 /*Filechooser*/
 Composite.filechooserfield_file {
   padding: 1px 0px 0px 0px;
@@ -971,6 +991,10 @@ FileUpload.filechooserfield_file:disabled {
   background-image: url(theme/img/button/filechooserfield_file_disabled.png);
   cursor: default;
 }
+FileUpload-FocusIndicator.filechooserfield_file {
+  background-color: transparent;
+  border: none;
+}
 FileUpload.filechooserfield_file_menu {
   background-image: url(theme/img/button/filechooserfield_file_menu.png);
   border-radius: 5px;
@@ -985,6 +1009,10 @@ FileUpload.filechooserfield_file_menu:hover {
 FileUpload.filechooserfield_file_menu:disabled {
   background-image: url(theme/img/button/filechooserfield_file_menu_disabled.png);
   cursor: default;
+}
+FileUpload-FocusIndicator.filechooserfield_file_menu {
+  background-color: transparent;
+  border: none;
 }
 /* Group */
 Group {
@@ -1088,6 +1116,11 @@ Label-SeparatorLine[SHADOW_IN] {
 }
 Label-SeparatorLine[SHADOW_OUT] {
   border: 1px outset;
+}
+Composite.labelfield {
+  /* a little padding to make sure the label is on the same line as the field's label */
+
+  padding: 4px 0px 0px 0px;
 }
 /* Label end */
 Text.onFieldLabel {
@@ -1315,6 +1348,10 @@ Button.smartfield_browse:disabled {
 Button.smartfield_browse:hover {
   background-image: url(theme/img/button/smartfield_browse_mouse_over.png);
 }
+Button-FocusIndicator.smartfield_browse {
+  background-color: transparent;
+  border: none;
+}
 Button.smartfield_browse_menu {
   background-image: url(theme/img/button/smartfield_browse_menu.png);
   cursor: pointer;
@@ -1325,6 +1362,10 @@ Button.smartfield_browse_menu:disabled {
 }
 Button.smartfield_browse_menu:hover {
   background-image: url(theme/img/button/smartfield_browse_menu_mouse_over.png);
+}
+Button-FocusIndicator.smartfield_browse_menu {
+  background-color: transparent;
+  border: none;
 }
 /* Popup (Smartfield...) */
 Shell.popup {
@@ -1656,6 +1697,10 @@ Button.timefield:hover {
   background-image: url(theme/img/button/datefield_time_mouse_over.png);
   border: none;
 }
+Button-FocusIndicator.timefield {
+  background-color: transparent;
+  border: none;
+}
 /* TimeChooserDialog */
 Shell.timechooser-dialog {
   border: 2px solid #67a8ce;
@@ -1703,6 +1748,10 @@ Button.toolButton:pressed,
 Button.toolButton:hover {
   background-image: none;
 }
+Button-FocusIndicator.toolButton {
+  background-color: transparent;
+  border: none;
+}
 Button.toolButton-active {
   background-image: none;
   background-color: #cde3ee;
@@ -1711,6 +1760,7 @@ Button.toolButton-active {
   font: bold 14px Arial, Helvetica, sans-serif;
 }
 Button-FocusIndicator.toolButton-active {
+  background-color: transparent;
   border: none;
 }
 Button.toolButton-active:pressed,
