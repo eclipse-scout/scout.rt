@@ -60,6 +60,13 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
   }
 
   @Override
+  protected boolean needsClientNotificationUICallBack() {
+    // Disabled on mobile devices to avoid having a constant circle of doom.
+    // TODO: Should actually also be enabled for mobile devices so that client notifications works.
+    return false;
+  }
+
+  @Override
   protected IRwtScoutPart createUiScoutDialog(IForm form, Shell shell, int dialogStyle) {
     dialogStyle = SWT.APPLICATION_MODAL;
 
