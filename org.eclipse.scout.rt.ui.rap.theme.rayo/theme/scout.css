@@ -1117,6 +1117,11 @@ Label-SeparatorLine[SHADOW_IN] {
 Label-SeparatorLine[SHADOW_OUT] {
   border: 1px outset;
 }
+Composite.labelfield {
+  /* a little padding to make sure the label is on the same line as the field's label */
+
+  padding: 4px 0px 0px 0px;
+}
 /* Label end */
 Text.onFieldLabel {
   color: gray;
