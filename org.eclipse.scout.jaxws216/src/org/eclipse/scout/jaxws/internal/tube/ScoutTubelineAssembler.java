@@ -49,6 +49,7 @@ import com.sun.xml.internal.ws.api.pipe.TubelineAssembler;
 /**
  * Tube line assembler which installs a security handler at runtime.
  */
+@SuppressWarnings("restriction")
 public class ScoutTubelineAssembler implements TubelineAssembler {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutTubelineAssembler.class);

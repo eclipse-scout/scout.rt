@@ -20,6 +20,7 @@ import com.sun.xml.internal.ws.api.server.BoundEndpoint;
 import com.sun.xml.internal.ws.api.server.Container;
 import com.sun.xml.internal.ws.api.server.WebModule;
 
+@SuppressWarnings("restriction")
 public class ServletContainer extends Container {
 
   private final WebModule m_module = new P_ServletModule();

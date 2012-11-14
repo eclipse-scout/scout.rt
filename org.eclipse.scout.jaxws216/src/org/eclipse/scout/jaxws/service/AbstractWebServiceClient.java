@@ -68,6 +68,7 @@ import com.sun.xml.internal.ws.client.BindingProviderProperties;
  *          enclosing WSDL document. A port type is a named set of abstract operations and the abstract messages
  *          involved. The port type is unique among all port types defined within in the enclosing WSDL document.
  */
+@SuppressWarnings("restriction")
 @ScoutWebServiceClient
 public class AbstractWebServiceClient<S extends Service, P> extends AbstractService implements IWebServiceClient {
 

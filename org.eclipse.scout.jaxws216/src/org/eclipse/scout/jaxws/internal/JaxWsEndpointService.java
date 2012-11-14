@@ -53,6 +53,7 @@ import com.sun.xml.internal.ws.transport.http.DeploymentDescriptorParser;
 import com.sun.xml.internal.ws.transport.http.DeploymentDescriptorParser.AdapterFactory;
 import com.sun.xml.internal.ws.transport.http.ResourceLoader;
 
+@SuppressWarnings("restriction")
 public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpointService {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JaxWsEndpointService.class);

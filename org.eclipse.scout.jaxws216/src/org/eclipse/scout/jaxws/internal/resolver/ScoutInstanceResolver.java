@@ -45,6 +45,7 @@ import com.sun.xml.internal.ws.server.AbstractMultiInstanceResolver;
  * This resolver intercepts webservice requests prior to being propagated to the port type in order to
  * bind the call to a {@link IServerSession} context.
  */
+@SuppressWarnings("restriction")
 public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutInstanceResolver.class);

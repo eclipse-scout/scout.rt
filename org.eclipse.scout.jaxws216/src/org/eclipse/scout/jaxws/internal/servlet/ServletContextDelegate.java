@@ -24,6 +24,7 @@ import com.sun.xml.internal.ws.api.server.WSEndpoint;
 import com.sun.xml.internal.ws.api.server.WebServiceContextDelegate;
 import com.sun.xml.internal.ws.transport.http.HttpAdapter;
 
+@SuppressWarnings("restriction")
 public class ServletContextDelegate implements WebServiceContextDelegate {
 
   private HttpAdapter m_servletAdapter;

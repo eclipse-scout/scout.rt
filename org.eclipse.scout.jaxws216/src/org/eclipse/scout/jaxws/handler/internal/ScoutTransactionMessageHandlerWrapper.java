@@ -23,6 +23,7 @@ import org.eclipse.scout.jaxws.internal.ScoutTransactionDelegate;
 import com.sun.xml.internal.ws.api.handler.MessageHandler;
 import com.sun.xml.internal.ws.api.handler.MessageHandlerContext;
 
+@SuppressWarnings("restriction")
 public class ScoutTransactionMessageHandlerWrapper<T extends MessageHandlerContext> implements MessageHandler<T>, IScoutTransactionHandlerWrapper<T> {
 
   protected final ScoutTransactionDelegate m_transactionDelegate;
