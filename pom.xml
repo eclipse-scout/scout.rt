@@ -18,7 +18,6 @@
     <groupId>org.eclipse.scout</groupId>
     <artifactId>org.eclipse.scout.parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../org.eclipse.scout.parent</relativePath>
   </parent>
 
   <groupId>org.eclipse.scout.rt</groupId>
