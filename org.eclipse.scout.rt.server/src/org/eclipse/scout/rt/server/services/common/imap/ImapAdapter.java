@@ -24,16 +24,15 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 
+import org.eclipse.scout.commons.ListUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 public class ImapAdapter {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ImapAdapter.class);
-
   public static final String TRASH_FOLDER_NAME = "Trash";
   private boolean m_useSSL;
+  private String[] m_sslProtocols;
   private String m_host;
   private int m_port = 143;
   private String m_username;
@@ -188,13 +187,18 @@ public class ImapAdapter {
         props.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.setProperty("mail.imap.socketFactory.fallback", "false");
         props.setProperty("mail.imap.socketFactory.port", "993");
+
+        if (ListUtility.length(getSSLProtocols()) > 0) {
+          props.setProperty("mail.imap.ssl.protocols", StringUtility.join(" ", getSSLProtocols()));
+        }
       }
+      interceptProperties(props);
       Session session = Session.getInstance(props, null);
       try {
         m_store = session.getStore("imap");
         if (!m_store.isConnected()) {
           if (getUsername() != null && getHost() != null) {
-            m_store.connect(System.getProperty("mail.imap.host"), getUsername(), getPassword());
+            m_store.connect(getHost(), getUsername(), getPassword());
           }
           else {
             m_store.connect();
@@ -209,6 +213,15 @@ public class ImapAdapter {
       }
       m_connected = true;
     }
+  }
+
+  /**
+   * Callback to modify IMAP mail properties.
+   * 
+   * @param props
+   *          live list of mail properties
+   */
+  protected void interceptProperties(Properties props) {
   }
 
   protected Folder findFolder(String name) throws ProcessingException {
@@ -266,6 +279,7 @@ public class ImapAdapter {
             }
           }
           catch (Throwable fatal) {
+            // nop
           }
         }
       }
@@ -279,7 +293,7 @@ public class ImapAdapter {
       }
       m_cachedFolders.clear();
       m_connected = false;
-      if (exceptions.size() > 0) {
+      if (!exceptions.isEmpty()) {
         throw new ProcessingException(exceptions.get(0).getMessage());
       }
     }
@@ -342,4 +356,11 @@ public class ImapAdapter {
     m_useSSL = useSSL;
   }
 
+  public String[] getSSLProtocols() {
+    return m_sslProtocols;
+  }
+
+  public void setSSLProtocols(String[] sslProtocols) {
+    m_sslProtocols = sslProtocols;
+  }
 }

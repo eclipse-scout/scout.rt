@@ -26,9 +26,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
  * @since 3.9.0
  */
 public interface IDeviceTransformer {
-  void adaptDesktopActions(Collection<IAction> actions);
-
-  void tablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException;
 
   void transformForm(IForm form) throws ProcessingException;
 
@@ -36,11 +33,15 @@ public interface IDeviceTransformer {
 
   void transformPageDetailTable(ITable table) throws ProcessingException;
 
-  boolean acceptForm(IForm form);
-
   void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList);
 
   void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList);
+
+  void adaptDesktopActions(Collection<IAction> actions);
+
+  void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException;
+
+  boolean acceptFormAddingToDesktop(IForm form);
 
   boolean acceptMobileTabBoxTransformation(ITabBox tabBox);
 
@@ -49,4 +50,6 @@ public interface IDeviceTransformer {
    * @see {@link IForm}
    */
   List<String> getAcceptedViewIds();
+
+  DeviceTransformationExcluder getDeviceTransformationExcluder();
 }
