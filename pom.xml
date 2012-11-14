@@ -37,4 +37,18 @@
   <modules>
     <module>org.eclipse.scout.rt.parent</module>
   </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-compiler-plugin</artifactId>
+        <configuration>
+          <compilerArguments>
+            <properties>${project.basedir}/../org.eclipse.scout.rt-feature/.settings/org.eclipse.jdt.core.prefs</properties>
+          </compilerArguments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
