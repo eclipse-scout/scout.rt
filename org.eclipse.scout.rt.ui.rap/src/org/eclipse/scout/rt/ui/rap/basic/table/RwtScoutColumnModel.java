@@ -1,11 +1,13 @@
 package org.eclipse.scout.rt.ui.rap.basic.table;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.rwt.RWT;
+import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -26,6 +28,9 @@ import org.eclipse.swt.widgets.Display;
 public class RwtScoutColumnModel extends ColumnLabelProvider {
   private static final long serialVersionUID = 1L;
 
+  private static final int HTML_ROW_LINE_HIGHT = 19;
+  private static final int NEWLINE_LINE_HIGHT = 15;
+
   private transient ListenerList listenerList = null;
   private final ITable m_scoutTable;
   private HashMap<ITableRow, HashMap<IColumn<?>, ICell>> m_cachedCells;
@@ -35,8 +40,8 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   private Image m_imgCheckboxTrue;
   private Color m_disabledForegroundColor;
   private boolean m_multiline;
-  private double[] m_newlines = null;
-  private double[] m_htmlTableRows = null;
+  private double[][] m_newlines = null;
+  private double[][] m_htmlTableRows = null;
   private int m_defaultRowHeight;
 
   public RwtScoutColumnModel(ITable scoutTable, IRwtScoutTableForPatch uiTable, TableColumnManager columnManager) {
@@ -73,91 +78,117 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
 
   public String getColumnText(ITableRow element, int columnIndex) {
     ICell cell = getCell(element, columnIndex);
-    if (cell != null) {
-      String text = cell.getText();
-      if (text == null) {
-        text = "";
-      }
-      if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-        text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
-        text = getUiTable().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getUiTable(), text);
-      }
-      else if (text.indexOf("\n") >= 0) {
-        if (getScoutTable().isMultilineText()) {
-          //transform to html
-          text = "<html>" + HtmlTextUtility.transformPlainTextToHtml(text) + "</html>";
-          text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
-        }
-        else {
-          text = StringUtility.replace(text, "\n", " ");
-        }
-      }
-      TableEx table = getUiTable().getUiField();
-      if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-        if (m_htmlTableRows == null || m_htmlTableRows.length != getScoutTable().getRowCount()) {
-          double[] tempArray = new double[getScoutTable().getRowCount()];
-          for (int i = 0; i < tempArray.length; i++) {
-            tempArray[i] = 1;
-          }
-          if (m_htmlTableRows == null) {
-            m_htmlTableRows = tempArray;
-          }
-          else {
-            getUiTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-              @Override
-              public void run() {
-                if (getUiTable().isUiDisposed()) {
-                  return;
-                }
+    if (cell == null) {
+      return "";
+    }
 
-                getUiTable().getUiTableViewer().refresh();
-              }
-            });
-            m_htmlTableRows = tempArray;
-          }
+    String text = cell.getText();
+    if (text == null) {
+      text = "";
+    }
+    else if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
+      text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
+      text = getUiTable().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getUiTable(), text);
+    }
+    else {
+      boolean multiline = false;
+      if (text.indexOf("\n") >= 0) {
+        multiline = getScoutTable().isMultilineText();
+        if (!multiline) {
+          text = StringUtility.replaceNewLines(text, " ");
         }
-        m_htmlTableRows[((ITableRow) element).getRowIndex()] = HtmlTextUtility.countHtmlTableRows(text);
-        double medianHtmlTableRows = NumberUtility.median(m_htmlTableRows);
-        int htmlTableRowRowHeight = NumberUtility.toDouble(NumberUtility.round(medianHtmlTableRows, 1.0)).intValue() * 19;
-        if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
-            || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTableRowRowHeight) < 0) {
-          table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), htmlTableRowRowHeight)).intValue());
-        }
+      }
+      boolean markupEnabled = Boolean.TRUE.equals(getUiTable().getUiField().getData(RWT.MARKUP_ENABLED));
+      if (markupEnabled || multiline) {
+        text = HtmlTextUtility.transformPlainTextToHtml(text);
+      }
+    }
+
+    IColumn<?> column = m_columnManager.getColumnByModelIndex(columnIndex - 1);
+    if (getScoutTable().getRowHeightHint() < 0 && column.isVisible()) {
+      updateTableRowHeight(text, element, columnIndex);
+    }
+    return text;
+  }
+
+  private void updateTableRowHeight(String cellText, ITableRow element, int columnIndex) {
+    TableEx table = getUiTable().getUiField();
+    if (HtmlTextUtility.isTextWithHtmlMarkup(cellText)) {
+      m_htmlTableRows = updateRowArray(m_htmlTableRows, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+      int htmlTableRowRowHeight = calculateHtmlTableRowHeight(m_htmlTableRows, cellText, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+      if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
+          || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTableRowRowHeight) != 0) {
+        table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), htmlTableRowRowHeight)).intValue());
+      }
+    }
+    else {
+      m_newlines = updateRowArray(m_newlines, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+      int newLineRowHeight = calculateNewLineRowHeight(m_newlines, cellText, ((ITableRow) element).getRowIndex(), columnIndex - 1);
+      if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
+          || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(newLineRowHeight) != 0) {
+        table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), newLineRowHeight)).intValue());
+      }
+    }
+  }
+
+  private double[][] updateRowArray(double[][] rowArray, int rowIndex, int columnIndex) {
+    double[][] tempRowArray = rowArray;
+    if (rowArray == null || rowArray.length <= rowIndex) {
+      if (rowArray == null) {
+        tempRowArray = new double[rowIndex + 1][columnIndex + 1];
       }
       else {
-        if (m_newlines == null || m_newlines.length != getScoutTable().getRowCount()) {
-          double[] tempArray = new double[getScoutTable().getRowCount()];
-          for (int i = 0; i < tempArray.length; i++) {
-            tempArray[i] = 1;
-          }
-          if (m_newlines == null) {
-            m_newlines = tempArray;
-          }
-          else {
-            getUiTable().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-              @Override
-              public void run() {
-                if (getUiTable().isUiDisposed()) {
-                  return;
-                }
-
-                getUiTable().getUiTableViewer().refresh();
-              }
-            });
-            m_newlines = tempArray;
-          }
+        tempRowArray = Arrays.copyOf(rowArray, rowIndex + 1);
+      }
+    }
+    for (int i = 0; i < tempRowArray.length; i++) {
+      if (tempRowArray[i] == null || tempRowArray[i].length <= columnIndex) {
+        double[] tempColumnArray = null;
+        if (tempRowArray[i] == null) {
+          tempColumnArray = new double[columnIndex + 1];
         }
-        m_newlines[((ITableRow) element).getRowIndex()] = HtmlTextUtility.countLineBreaks(text);
-        double medianNewlines = NumberUtility.median(m_newlines);
-        int newLineRowHeight = NumberUtility.toDouble(NumberUtility.round(medianNewlines, 1.0)).intValue() * 15;
-        if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
-            || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(newLineRowHeight) < 0) {
-          table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), newLineRowHeight)).intValue());
+        else {
+          tempColumnArray = Arrays.copyOf(tempRowArray[i], columnIndex + 1);
+        }
+        tempRowArray[i] = tempColumnArray;
+      }
+
+      for (int j = 0; j < tempRowArray[i].length; j++) {
+        if (tempRowArray[i][j] == 0) {
+          tempRowArray[i][j] = 1;
         }
       }
-      return text;
     }
-    return "";
+    return tempRowArray;
+  }
+
+  private int calculateHtmlTableRowHeight(double[][] htmlTableRows, String text, int rowIndex, int columnIndex) {
+    htmlTableRows[rowIndex][columnIndex] = HtmlTextUtility.countHtmlTableRows(text);
+    int htmlTableRowHeight = calculateRowHeigtMedian(htmlTableRows, HTML_ROW_LINE_HIGHT);
+    return htmlTableRowHeight;
+  }
+
+  private int calculateNewLineRowHeight(double[][] newlines, String text, int rowIndex, int columnIndex) {
+    newlines[rowIndex][columnIndex] = HtmlTextUtility.countLineBreaks(text);
+    int newLineRowHeight = calculateRowHeigtMedian(newlines, NEWLINE_LINE_HIGHT);
+    return newLineRowHeight;
+  }
+
+  private int calculateRowHeigtMedian(double[][] rows, int lineHeight) {
+    boolean hasMultilines = false;
+    double[] columnMedians = new double[rows.length];
+    for (int i = 0; i < rows.length; i++) {
+      columnMedians[i] = NumberUtility.max(rows[i]);
+      if (NumberUtility.max(rows[i]) > 1) {
+        hasMultilines = true;
+      }
+    }
+    double median = NumberUtility.median(columnMedians);
+    if (hasMultilines && median < 2) {
+      median = 2;
+    }
+    int newLineRowHeight = NumberUtility.toDouble(NumberUtility.round(median, 1.0)).intValue() * lineHeight;
+    return newLineRowHeight;
   }
 
   protected int getDefaultRowHeight() {
@@ -263,7 +294,11 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         text = cell.getTooltipText();
         if (text == null) {
           text = cell.getText();
-          if (text == null || text.indexOf("\n") <= 0 || HtmlTextUtility.isTextWithHtmlMarkup(text)) {
+          if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
+            //Tooltips don't support html -> convert to plain text
+            text = HTMLUtility.getPlainText(text);
+          }
+          if (text == null || text.indexOf("\n") <= 0) {
             text = "";
           }
         }

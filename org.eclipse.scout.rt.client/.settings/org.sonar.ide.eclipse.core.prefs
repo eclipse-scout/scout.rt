@@ -1,0 +1,7 @@
+analyseLocally=false
+eclipse.preferences.version=1
+projectArtifactId=org.eclipse.scout.rt.client
+projectBranch=
+projectGroupId=org.eclipse.scout.rt
+serverUrl=http\://bsivp9022.bsiag.local\:8080/sonar
+version=1

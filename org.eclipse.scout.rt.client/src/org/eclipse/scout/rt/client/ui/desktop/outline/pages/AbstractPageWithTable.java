@@ -56,7 +56,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPageWithTable.class);
 
   private T m_table;
-  private IProcessingStatus m_tablePopulateStatus;
   private ISearchForm m_searchForm;
   private FormListener m_searchFormListener;
   private boolean m_searchRequired;
@@ -250,10 +249,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
     //update table data status
     if (isSearchActive() && getSearchFilter() != null && (!getSearchFilter().isCompleted()) && isSearchRequired()) {
-      setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("TooManyRows"), ProcessingStatus.WARNING));
+      setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("TooManyRows"), ProcessingStatus.WARNING));
     }
     else {
-      setTablePopulateStatus(null);
+      setPagePopulateStatus(null);
     }
   }
 
@@ -604,14 +603,21 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   @Override
-  public IProcessingStatus getTablePopulateStatus() {
-    return m_tablePopulateStatus;
+  public void setPagePopulateStatus(IProcessingStatus status) {
+    super.setPagePopulateStatus(status);
+    getTable().tablePopulated();
   }
 
   @Override
+  @SuppressWarnings("deprecation")
+  public IProcessingStatus getTablePopulateStatus() {
+    return getPagePopulateStatus();
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
   public void setTablePopulateStatus(IProcessingStatus status) {
-    getTable().tablePopulated();
-    m_tablePopulateStatus = status;
+    setPagePopulateStatus(status);
   }
 
   /**
@@ -636,10 +642,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           pe = new ProcessingException(t.getMessage(), t);
         }
         if (pe.isInterruption()) {
-          setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("SearchWasCanceled"), ProcessingStatus.CANCEL));
+          setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("SearchWasCanceled"), ProcessingStatus.CANCEL));
         }
         else {
-          setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("ErrorWhileLoadingData"), ProcessingStatus.CANCEL));
+          setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("ErrorWhileLoadingData"), ProcessingStatus.CANCEL));
         }
         throw pe;
       }

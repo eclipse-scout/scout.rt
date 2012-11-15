@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.TriState;
@@ -700,8 +698,6 @@ public class StatementProcessor implements IStatementProcessor {
     return buf.toString();
   }
 
-  private static final Pattern TEXT_SECTION_PATTERN = Pattern.compile("'([^']|'')*'", Pattern.DOTALL);
-
   private static int findNextBind(String s, int start) {
     if (s == null || start < 0 || start >= s.length()) {
       return -1;
@@ -710,7 +706,7 @@ public class StatementProcessor implements IStatementProcessor {
     if (candidate < 0) {
       return -1;
     }
-    Matcher red = TEXT_SECTION_PATTERN.matcher(s);
+    P_TextSectionFinder red = new P_TextSectionFinder(s);
     while (red.find()) {
       if (candidate < red.start()) {
         //outside red section
@@ -727,6 +723,82 @@ public class StatementProcessor implements IStatementProcessor {
       //continue with next red section
     }
     return candidate;
+  }
+
+  /**
+   * Replacement for:
+   * <p>
+   * <code>
+   * Pattern TEXT_SECTION_PATTERN = Pattern.compile("'([^']|'')*'", Pattern.DOTALL);
+   * Matcher red = TEXT_SECTION_PATTERN.matcher(s);
+   * </code>
+   * <p>
+   * which is broken due to <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6337993">Sun bug 6337993</a>
+   * when matching large (> ~1000 characters) texts.
+   */
+  private static class P_TextSectionFinder {
+
+    private final String m_string;
+    private P_TextSection m_currentTextSection = null;
+
+    public P_TextSectionFinder(String s) {
+      m_string = s;
+    }
+
+    public boolean find() {
+      int start = 0;
+      if (m_currentTextSection != null) {
+        start = m_currentTextSection.to + 1;
+      }
+      m_currentTextSection = findNextTextSection(m_string, start);
+      return (m_currentTextSection != null);
+    }
+
+    public int start() {
+      return (m_currentTextSection == null ? -1 : m_currentTextSection.from);
+    }
+
+    public int end() {
+      return (m_currentTextSection == null ? -1 : m_currentTextSection.to);
+    }
+
+    private static P_TextSection findNextTextSection(String s, int start) {
+      if (s == null || start < 0 || start >= s.length()) {
+        return null;
+      }
+      int secStart = -1;
+      int pos = start;
+      while (pos < s.length()) {
+        char c = s.charAt(pos);
+        if (c == '\'') {
+          if (secStart < 0) {
+            // Outside section -> start a new one
+            secStart = pos;
+          }
+          else {
+            // Inside section
+            if (pos == s.length() - 1 || s.charAt(pos + 1) != '\'') {
+              // Last position or next position is not a ' -> we found a section
+              return new P_TextSection(secStart, pos + 1);
+            }
+            // Skip double '
+            pos++;
+          }
+        }
+        pos++;
+      }
+      return null;
+    }
+
+    private static class P_TextSection {
+      public int from;
+      public int to;
+
+      public P_TextSection(int from, int to) {
+        this.from = from;
+        this.to = to;
+      }
+    }
   }
 
   protected void dump() {
@@ -983,7 +1055,25 @@ public class StatementProcessor implements IStatementProcessor {
       // continue
       String[] newPath = new String[path.length - 1];
       System.arraycopy(path, 1, newPath, 0, newPath.length);
-      return createInputRec(bindToken, newPath, o, nullType);
+      IBindInput input = null;
+      if (o instanceof IHolder<?>) {
+        /* dereference value if current object is an IHolder. If input cannot be resolved (i.e. ProcessingException occurs),
+         * search given property names on holder. Hence both of the following forms are supported on holder types:
+         * :holder.property
+         * :holder.value.property
+         */
+        try {
+          input = createInputRec(bindToken, newPath, ((IHolder) o).getValue(), nullType);
+        }
+        catch (ProcessingException pe) {
+          // nop, see below
+        }
+      }
+      if (input == null) {
+        // strict search without dereferncing holder objects
+        input = createInputRec(bindToken, newPath, o, nullType);
+      }
+      return input;
     }
     else {
       return null;

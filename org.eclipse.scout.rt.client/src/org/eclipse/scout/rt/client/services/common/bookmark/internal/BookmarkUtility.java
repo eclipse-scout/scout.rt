@@ -25,11 +25,15 @@ import java.util.zip.CRC32;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -37,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.NodePageState;
@@ -45,6 +50,8 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 public final class BookmarkUtility {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BookmarkUtility.class);
 
   private BookmarkUtility() {
   }
@@ -101,7 +108,7 @@ public final class BookmarkUtility {
     return null;
   }
 
-  public static IPage resolvePage(IPage[] pages, String className, String bookmarkIdentifier) {
+  public static IPage resolvePage(IPage[] pages, String className, String userPreferenceContext) {
     if (className == null) {
       return null;
     }
@@ -109,26 +116,35 @@ public final class BookmarkUtility {
     String simpleClassName = className.replaceAll("^.*\\.", "");
     int index = 0;
     for (IPage p : pages) {
-      int i1 = 0;
-      int i2 = 0;
+      int classNameScore = 0;
+      int userPreferenceContextScore = 0;
       if (p.getClass().getName().equals(className)) {
-        i1 = -2;
+        classNameScore = -2;
       }
       else if (p.getClass().getSimpleName().equalsIgnoreCase(simpleClassName)) {
-        i1 = -1;
+        classNameScore = -1;
       }
-      if (bookmarkIdentifier == null || bookmarkIdentifier.equalsIgnoreCase(p.getUserPreferenceContext())) {
-        i2 = -1;
+      if (userPreferenceContext == null || userPreferenceContext.equalsIgnoreCase(p.getUserPreferenceContext())) {
+        userPreferenceContextScore = -1;
       }
-      sortMap.put(new CompositeObject(i1, i2, index), p);
+      if (classNameScore != 0 && userPreferenceContextScore != 0) {
+        sortMap.put(new CompositeObject(classNameScore, userPreferenceContextScore, index), p);
+      }
       index++;
     }
-    if (sortMap.size() > 0) {
-      return sortMap.get(sortMap.firstKey());
-    }
-    else {
+    if (sortMap.isEmpty()) {
       return null;
     }
+    CompositeObject bestMatchingKey = sortMap.firstKey();
+    IPage bestMatchingPage = sortMap.remove(bestMatchingKey);
+    if (!sortMap.isEmpty()) {
+      // check ambiguity
+      CompositeObject nextKey = sortMap.firstKey();
+      if (CompareUtility.equals(bestMatchingKey.getComponent(0), nextKey.getComponent(0)) && CompareUtility.equals(bestMatchingKey.getComponent(1), nextKey.getComponent(1))) {
+        LOG.warn("More than one pages found for page class [" + className + "] and user preference context [" + userPreferenceContext + "]");
+      }
+    }
+    return bestMatchingPage;
   }
 
   /**
@@ -235,6 +251,7 @@ public final class BookmarkUtility {
       boolean pathFullyRestored = true;
       List<AbstractPageState> path = bm.getPath();
       AbstractPageState parentPageState = path.get(0);
+      boolean resetViewAndWarnOnFail = bm.getId() != 0;
       for (int i = 1; i < path.size(); i++) {
         // try to find correct child page (next parentPage)
         IPage childPage = null;
@@ -243,14 +260,14 @@ public final class BookmarkUtility {
           TablePageState tablePageState = (TablePageState) parentPageState;
           if (parentPage instanceof IPageWithTable) {
             IPageWithTable tablePage = (IPageWithTable) parentPage;
-            childPage = bmLoadTablePage(tablePage, tablePageState, false);
+            childPage = bmLoadTablePage(tablePage, tablePageState, false, resetViewAndWarnOnFail);
           }
         }
         else if (parentPageState instanceof NodePageState) {
           NodePageState nodePageState = (NodePageState) parentPageState;
           if (parentPage instanceof IPageWithNodes) {
             IPageWithNodes nodePage = (IPageWithNodes) parentPage;
-            childPage = bmLoadNodePage(nodePage, nodePageState, childState);
+            childPage = bmLoadNodePage(nodePage, nodePageState, childState, resetViewAndWarnOnFail);
           }
         }
         // next
@@ -258,17 +275,17 @@ public final class BookmarkUtility {
           parentPage = childPage;
           parentPageState = childState;
         }
-        else if (i + 1 < path.size()) {
+        else if (i < path.size()) {
           pathFullyRestored = false;
           break;
         }
       }
       if (pathFullyRestored) {
         if (parentPageState instanceof TablePageState && parentPage instanceof IPageWithTable) {
-          bmLoadTablePage((IPageWithTable) parentPage, (TablePageState) parentPageState, true);
+          bmLoadTablePage((IPageWithTable) parentPage, (TablePageState) parentPageState, true, resetViewAndWarnOnFail);
         }
         else if (parentPage instanceof IPageWithNodes) {
-          bmLoadNodePage((IPageWithNodes) parentPage, (NodePageState) parentPageState, null);
+          bmLoadNodePage((IPageWithNodes) parentPage, (NodePageState) parentPageState, null, resetViewAndWarnOnFail);
         }
       }
       /*
@@ -527,8 +544,7 @@ public final class BookmarkUtility {
     return b;
   }
 
-  @SuppressWarnings("deprecation")
-  private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean leafState) throws ProcessingException {
+  private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean leafState, boolean resetViewAndWarnOnFail) throws ProcessingException {
     ITable table = tablePage.getTable();
     if (tablePageState.getTableCustomizerData() != null && tablePage.getTable().getTableCustomizer() != null) {
       byte[] newData = tablePageState.getTableCustomizerData();
@@ -547,6 +563,7 @@ public final class BookmarkUtility {
     try {
       table.setTableChanging(true);
       //legacy support
+      @SuppressWarnings("deprecation")
       List<TableColumnState> allColumns = tablePageState.getVisibleColumns();
       if (allColumns == null || allColumns.size() == 0) {
         allColumns = tablePageState.getAvailableColumns();
@@ -604,7 +621,11 @@ public final class BookmarkUtility {
         }
       }
       else {
-        if (tablePage.getChildNodeCount() > 0) {
+        ITreeNode[] filteredChildNodes = tablePage.getFilteredChildNodes();
+        if (filteredChildNodes.length > 0) {
+          childPage = (IPage) filteredChildNodes[0];
+        }
+        else if (tablePage.getChildNodeCount() > 0) {
           childPage = tablePage.getChildPage(0);
         }
       }
@@ -628,17 +649,56 @@ public final class BookmarkUtility {
           table.selectRows(rowList.toArray(new ITableRow[0]));
         }
       }
+
+      return childPage;
     }
+
+    // check, whether table column filter must be reset
+    if (resetViewAndWarnOnFail) {
+      if (childPage == null
+          || (!childPage.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled())) {
+        table.getColumnFilterManager().reset();
+        tablePage.setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResetColumnFilters"), ProcessingStatus.WARNING));
+      }
+    }
+
+    // child page is not available or filtered out
+    if (childPage == null || !childPage.isFilterAccepted()) {
+      if (resetViewAndWarnOnFail) {
+        // set appropriate warning
+        if (tablePage.isSearchActive() && tablePage.getSearchFormInternal() != null) {
+          tablePage.setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), ProcessingStatus.WARNING));
+        }
+        else {
+          tablePage.setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceled"), ProcessingStatus.WARNING));
+        }
+      }
+      childPage = null;
+    }
+
     return childPage;
   }
 
-  private static IPage bmLoadNodePage(IPageWithNodes nodePage, NodePageState nodePageState, AbstractPageState childState) throws ProcessingException {
+  private static IPage bmLoadNodePage(IPageWithNodes nodePage, NodePageState nodePageState, AbstractPageState childState, boolean resetViewAndWarnOnFail) throws ProcessingException {
     IPage childPage = null;
     if (childState != null) {
       nodePage.ensureChildrenLoaded();
       IPage p = BookmarkUtility.resolvePage(nodePage.getChildPages(), childState.getPageClassName(), childState.getBookmarkIdentifier());
       if (p != null) {
-        childPage = p;
+        ITable table = nodePage.getInternalTable();
+        // reset table column filter if requested
+        if (resetViewAndWarnOnFail && !p.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled()) {
+          table.getColumnFilterManager().reset();
+        }
+
+        // check table column filter
+        if (p.isFilterAccepted()) {
+          childPage = p;
+        }
+      }
+      // set appropriate warning if child page is not available or filtered out
+      if (childPage == null && resetViewAndWarnOnFail) {
+        nodePage.setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceled"), ProcessingStatus.WARNING));
       }
     }
     return childPage;

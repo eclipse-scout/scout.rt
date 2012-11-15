@@ -31,6 +31,7 @@ import com.sun.xml.internal.ws.developer.JAXWSProperties;
 import com.sun.xml.internal.ws.transport.http.HttpAdapter;
 import com.sun.xml.internal.ws.transport.http.WSHTTPConnection;
 
+@SuppressWarnings("restriction")
 public class ServletConnection extends WSHTTPConnection {
 
   private static final PropertyMap PROP_MODEL;

@@ -50,7 +50,9 @@ import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.table.celleditor.SwtScoutTableCellEditor;
 import org.eclipse.scout.rt.ui.swt.ext.table.TableEx;
 import org.eclipse.scout.rt.ui.swt.ext.table.util.TableRolloverSupport;
+import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.AbstractSwtScoutDndSupport;
+import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutDndSupport;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.util.SwtTransferObject;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
@@ -108,8 +110,9 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   private TableViewer m_viewer;
   private ISwtKeyStroke[] m_keyStrokes;
   private ClientSyncJob m_storeColumnWidthsJob;
-
   private TableKeyboardNavigationSupport m_keyboardNavigationSupport;
+  private TableMouseMoveSelectionSupport m_mouseMoveSelectionSupport;
+  private ISwtScoutDndSupport m_dndSupport;
 
   public SwtScoutTable() {
   }
@@ -144,11 +147,14 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     viewer.setUseHashlookup(true);
     setSwtTableViewer(viewer);
     setSwtField(table);
+
     //cell editing support
     m_cellEditorComposite = new SwtScoutTableCellEditor(this);
+
     // header menu
     m_headerMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
     table.addMenuDetectListener(new P_SwtHeaderMenuDetectListener());
+
     //columns
     initializeColumns();
 
@@ -292,8 +298,14 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     updateKeyStrokeFormScout();
     updateKeyboardNavigationFromScout();
     updateAutoResizeColumnsFromScout();
-    // dnd support
-    new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
+
+    if (m_dndSupport == null) {
+      m_dndSupport = new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
+    }
+    if (m_mouseMoveSelectionSupport == null && UiDecorationExtensionPoint.getLookAndFeel().isTableMouseMoveSelectionSupportEnabled()) {
+      m_mouseMoveSelectionSupport = new P_MouseMoveSelectionSupport(getSwtField(), m_dndSupport);
+    }
+
     //handle events from recent history
     final IEventHistory<TableEvent> h = getScoutObject().getEventHistory();
     if (h != null) {
@@ -1244,6 +1256,15 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
 
     @Override
+    protected boolean acceptDrag() {
+      if (m_mouseMoveSelectionSupport != null) {
+        return m_mouseMoveSelectionSupport.acceptDrag();
+      }
+
+      return super.acceptDrag();
+    }
+
+    @Override
     protected TransferObject handleSwtDragRequest() {
       final Holder<TransferObject> result = new Holder<TransferObject>(TransferObject.class, null);
       Runnable t = new Runnable() {
@@ -1290,5 +1311,20 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       handleKeyboardNavigationFromSwt(tableItem);
     }
   } // P_KeyBoardNavigationSupport
+
+  private class P_MouseMoveSelectionSupport extends TableMouseMoveSelectionSupport {
+
+    public P_MouseMoveSelectionSupport(Table table, ISwtScoutDndSupport dndSupport) {
+      super(table, dndSupport);
+    }
+
+    @Override
+    protected void selectingStopped() {
+      //Selection event seems not to be fired properly after selecting the items so it's necessary to manually call setSelectionFromSwt
+      StructuredSelection selection = (StructuredSelection) getSwtTableViewer().getSelection();
+      setSelectionFromSwt(selection);
+    }
+
+  }
 
 }

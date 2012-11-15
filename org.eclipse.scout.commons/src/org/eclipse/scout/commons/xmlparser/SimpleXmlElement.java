@@ -1263,14 +1263,14 @@ public class SimpleXmlElement {
     ENTITIES.put("apos", "'");
     ENTITIES.put("lt", "<");
     ENTITIES.put("gt", ">");
-    ENTITIES.put("auml", "ä");
-    ENTITIES.put("ouml", "ö");
-    ENTITIES.put("uuml", "ü");
-    ENTITIES.put("Auml", "Ä");
-    ENTITIES.put("Ouml", "Ö");
-    ENTITIES.put("Uuml", "Ü");
+    ENTITIES.put("auml", "Ã¤");
+    ENTITIES.put("ouml", "Ã¶");
+    ENTITIES.put("uuml", "Ã¼");
+    ENTITIES.put("Auml", "Ã„");
+    ENTITIES.put("Ouml", "Ã–");
+    ENTITIES.put("Uuml", "Ãœ");
     // reverse entities are used for exporting xml
-    // normally ä,ö,ü are NOT excaped since encoding formats like ISO.. are used
+    // normally Ã¤,Ã¶,Ã¼ are NOT excaped since encoding formats like ISO.. are used
     INVERSE_ENTITIES = new HashMap<String, String>();
     INVERSE_ENTITIES.put("&", "&amp;");
     INVERSE_ENTITIES.put("\"", "&quot;");

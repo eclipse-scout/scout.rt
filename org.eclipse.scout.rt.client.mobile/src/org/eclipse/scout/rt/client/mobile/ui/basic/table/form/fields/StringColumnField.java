@@ -36,4 +36,15 @@ public class StringColumnField extends AbstractStringField implements IColumnWra
   public IStringColumn getWrappedObject() {
     return m_propertyDelegator.getSender();
   }
+
+  @Override
+  protected int getConfiguredGridH() {
+    //If text wrap is set to true the field typically contains a lot of information.
+    //Therefore make it bigger so the user can read it.
+    if (getWrappedObject().isTextWrap()) {
+      return 2;
+    }
+
+    return super.getConfiguredGridH();
+  }
 }

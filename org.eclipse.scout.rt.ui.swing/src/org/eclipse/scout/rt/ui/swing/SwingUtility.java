@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -1230,6 +1231,32 @@ public final class SwingUtility {
         (-c.getLocationOnScreen().y) + intersection.y);
   }
 
+  public static boolean hasScoutLookAndFeelFrameAndDialog() {
+    String useScoutLafFrameAndDialog = System.getProperty("scout.laf.useLafFrameAndDialog");
+    boolean useLafFrameAndDialog = true;
+    if (StringUtility.hasText(useScoutLafFrameAndDialog)) {
+      useLafFrameAndDialog = Boolean.parseBoolean(useScoutLafFrameAndDialog);
+    }
+    return useLafFrameAndDialog;
+  }
+
+  public static void setDefaultImageIcons(Window window) {
+    Icon icon = UIManager.getIcon("Window.icon");
+    if (icon instanceof ImageIcon) {
+      window.setIconImage(((ImageIcon) icon).getImage());
+    }
+    Object icons = UIManager.getDefaults().get("Window.icons");
+    if (icons instanceof List<?>) {
+      List<Image> iconList = new ArrayList<Image>();
+      for (Object ico : ((List<?>) icons)) {
+        if (ico instanceof Image) {
+          iconList.add((Image) ico);
+        }
+      }
+      window.setIconImages(iconList);
+    }
+  }
+
   private static class CopyPasteMenuSupport extends MouseAdapter implements FocusListener {
     private JTextComponent m_comp;
 
@@ -1301,7 +1328,7 @@ public final class SwingUtility {
             m_comp.copy();
           }
           else {
-            //Ticket 86'427: Kopieren - Einfügen
+            //Ticket 86'427: Kopieren - EinfÃ¼gen
             boolean hasSelection = StringUtility.hasText(m_comp.getSelectedText());
             if (hasSelection) {
               m_comp.copy();

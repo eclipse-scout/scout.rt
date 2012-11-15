@@ -91,7 +91,7 @@ public class BlockPartsJob extends BusyJob {
       //
     }
     finally {
-      display.syncExec(new Runnable() {
+      display.asyncExec(new Runnable() {
         @Override
         public void run() {
           if (busyControl != null && !busyControl.isDisposed()) {

@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
@@ -32,19 +31,15 @@ public interface IPageWithTable<T extends ITable> extends IPage {
   T getTable();
 
   /**
-   * see {@link ITableField#getTablePopulateStatus()}
-   * <p>
-   * This method is temporary and will be removed in future releases (long term) when the {@link IPageWithTable} is
-   * legacy and replaced by a simple page with just N forms.
+   * @deprecated use {@link IPage#getPagePopulateStatus()}
    */
+  @Deprecated
   IProcessingStatus getTablePopulateStatus();
 
   /**
-   * see {@link ITableField#setTablePopulateStatus(IProcessingStatus)}
-   * <p>
-   * This method is temporary and will be removed in future releases (long term) when the {@link IPageWithTable} is
-   * legacy and replaced by a simple page with just N forms.
+   * @deprecated use {@link IPage#setPagePopulateStatus(IProcessingStatus)}
    */
+  @Deprecated
   void setTablePopulateStatus(IProcessingStatus status);
 
   ITreeNode getTreeNodeFor(ITableRow tableRow);

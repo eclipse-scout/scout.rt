@@ -22,6 +22,8 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -52,6 +54,15 @@ public class AbstractRwtMenuAction {
     if (createInitial) {
       callInitializers(m_uiMenu);
     }
+
+    m_uiMenu.addDisposeListener(new DisposeListener() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void widgetDisposed(DisposeEvent event) {
+        disconnectFromScout();
+      }
+    });
   }
 
   protected final void callInitializers(Menu menu) {
@@ -85,6 +96,13 @@ public class AbstractRwtMenuAction {
     if (m_scoutPropertyListener == null) {
       m_scoutPropertyListener = new P_ScoutPropertyChangeListener();
       m_scoutAction.addPropertyChangeListener(m_scoutPropertyListener);
+    }
+  }
+
+  protected void detachScoutListeners() {
+    if (m_scoutPropertyListener != null) {
+      m_scoutAction.removePropertyChangeListener(m_scoutPropertyListener);
+      m_scoutPropertyListener = null;
     }
   }
 
@@ -146,9 +164,6 @@ public class AbstractRwtMenuAction {
   }
 
   protected void initializeUi(Menu menu) {
-  }
-
-  protected void detachScoutListeners() {
   }
 
   public IAction getScoutAction() {

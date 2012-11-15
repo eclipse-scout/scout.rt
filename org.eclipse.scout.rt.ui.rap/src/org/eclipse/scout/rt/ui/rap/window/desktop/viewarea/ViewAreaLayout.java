@@ -96,7 +96,7 @@ public class ViewAreaLayout extends Layout {
     }
 
     Sash verticalRight = viewArea.getSash(SashKey.VERTICAL_RIGHT);
-    if (verticalLeft != null && verticalRight.getVisible()) {
+    if (verticalRight != null && verticalRight.getVisible()) {
       Rectangle bounds = new Rectangle(boundsSashRight.x, boundsSashRight.y, boundsSashRight.width, boundsSashRight.height);
       bounds.height = clientArea.height;
       verticalRight.setBounds(bounds);
@@ -200,31 +200,38 @@ public class ViewAreaLayout extends Layout {
       if (viewArea.isSashCreationEnabled()) {
         Sash leftSash = viewArea.getSash(SashKey.VERTICAL_LEFT);
         Sash rightSash = viewArea.getSash(SashKey.VERTICAL_RIGHT);
-        leftSash.setVisible(false);
-        rightSash.setVisible(false);
+        boolean leftSashVisible = false;
+        boolean rightSashVisible = false;
 
         // all 3 parts visible
         if (boundsLeft.width > 0 && boundsCenter.width > 0 && boundsRight.width > 0) {
-          leftSash.setVisible(true);
-          rightSash.setVisible(true);
+          leftSashVisible = true;
+          rightSashVisible = true;
           boundsSashLeft.width = m_sashWidth;
           boundsSashRight.width = m_sashWidth;
         }
         // left and center visible
         else if (boundsLeft.width > 0 && boundsCenter.width > 0) {
-          leftSash.setVisible(true);
-          rightSash.setVisible(false);
+          leftSashVisible = true;
+          rightSashVisible = false;
           boundsSashLeft.width = m_sashWidth;
         }
         else if (boundsLeft.width > 0 && boundsRight.width > 0) {
-          leftSash.setVisible(true);
-          rightSash.setVisible(false);
+          leftSashVisible = true;
+          rightSashVisible = false;
           boundsSashLeft.width = m_sashWidth;
         }
         else if (boundsCenter.width > 0 && boundsRight.width > 0) {
-          leftSash.setVisible(false);
-          rightSash.setVisible(true);
+          leftSashVisible = false;
+          rightSashVisible = true;
           boundsSashRight.width = m_sashWidth;
+        }
+
+        if (leftSash != null) {
+          leftSash.setVisible(leftSashVisible);
+        }
+        if (rightSash != null) {
+          rightSash.setVisible(rightSashVisible);
         }
       }
       int pos = viewArea.getSashPosition(SashKey.VERTICAL_LEFT);

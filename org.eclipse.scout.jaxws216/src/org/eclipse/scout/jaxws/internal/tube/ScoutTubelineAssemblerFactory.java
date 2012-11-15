@@ -18,6 +18,7 @@ import com.sun.xml.internal.ws.api.pipe.TubelineAssemblerFactory;
  * Factory to provide a custom tubeline assembler. This factory is registered in file
  * META-INF/services/com.sun.xml.ws.api.pipe.TubelineAssemblerFactory.
  */
+@SuppressWarnings("restriction")
 public class ScoutTubelineAssemblerFactory extends TubelineAssemblerFactory {
 
   @Override

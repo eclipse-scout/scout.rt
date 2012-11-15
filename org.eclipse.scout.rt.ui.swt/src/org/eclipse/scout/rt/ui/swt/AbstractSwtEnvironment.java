@@ -140,6 +140,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   private final String m_perspectiveId;
   private final Class<? extends IClientSession> m_clientSessionClass;
   private IClientSession m_clientSession;
+  private IDesktop m_desktop;
 
   private int m_status;
 
@@ -397,6 +398,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       else {
         m_clientSession = tempClientSession;
       }
+      m_desktop = m_clientSession.getDesktop();
       SwtUtility.setNlsTextsOnDisplay(getDisplay(), m_clientSession.getTexts());
       if (m_synchronizer == null) {
         m_synchronizer = new SwtScoutSynchronizer(this);
@@ -764,12 +766,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   // desktop handling
   @Override
   public final IDesktop getScoutDesktop() {
-    if (m_clientSession != null) {
-      return m_clientSession.getDesktop();
-    }
-    else {
-      return null;
-    }
+    return m_desktop;
   }
 
   protected void attachScoutListeners() {
@@ -785,15 +782,18 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   protected void detachScoutListeners() {
     IDesktop desktop = getScoutDesktop();
-    if (desktop != null) {
-      if (m_scoutDesktopListener != null) {
-        desktop.removeDesktopListener(m_scoutDesktopListener);
-        m_scoutDesktopListener = null;
-      }
-      if (m_desktopPropertyListener != null) {
-        desktop.removePropertyChangeListener(m_desktopPropertyListener);
-        m_desktopPropertyListener = null;
-      }
+    if (desktop == null) {
+      LOG.warn("Desktop is null, cannot remove listeners.");
+      return;
+    }
+
+    if (m_scoutDesktopListener != null) {
+      desktop.removeDesktopListener(m_scoutDesktopListener);
+      m_scoutDesktopListener = null;
+    }
+    if (m_desktopPropertyListener != null) {
+      desktop.removePropertyChangeListener(m_desktopPropertyListener);
+      m_desktopPropertyListener = null;
     }
   }
 
@@ -888,7 +888,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           parentShell = getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS);
         }
         else {
-          parentShell = getParentShellIgnoringPopups(0);
+          parentShell = getParentShellIgnoringPopups(SWT.MODELESS);
         }
         SwtScoutDialog dialog = createSwtScoutDialog(parentShell, dialogStyle);
         try {

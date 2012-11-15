@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -129,7 +129,6 @@ public class BundleProxyClassLoader extends ClassLoader {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Enumeration<URL> resolve(Bundle bundle) throws ResourceNotFoundException {
       try {
         Enumeration<URL> urls = bundle.getResources(m_name);
@@ -159,7 +158,6 @@ public class BundleProxyClassLoader extends ClassLoader {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Enumeration<URL> resolve(Bundle bundle) throws ResourceNotFoundException {
       try {
         Enumeration<URL> urls = bundle.getResources(m_name);

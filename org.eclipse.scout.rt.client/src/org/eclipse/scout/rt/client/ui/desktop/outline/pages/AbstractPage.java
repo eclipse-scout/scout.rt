@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -45,6 +46,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   private boolean m_tableVisible;
   private DataChangeListener m_internalDataChangeListener;
   private final String m_userPreferenceContext;
+  private IProcessingStatus m_pagePopulateStatus;
 
   /**
    * use this static method to create a string based on the vargs that can be used as userPreferenceContext
@@ -322,6 +324,16 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
       cell.setIconId(getConfiguredIconId());
     }
     execInitPage();
+  }
+
+  @Override
+  public IProcessingStatus getPagePopulateStatus() {
+    return m_pagePopulateStatus;
+  }
+
+  @Override
+  public void setPagePopulateStatus(IProcessingStatus status) {
+    m_pagePopulateStatus = status;
   }
 
   /**

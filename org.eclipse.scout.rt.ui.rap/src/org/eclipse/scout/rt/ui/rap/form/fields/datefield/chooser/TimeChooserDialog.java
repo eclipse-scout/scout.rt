@@ -83,6 +83,13 @@ public class TimeChooserDialog extends Dialog {
     showDialogFor(c);
   }
 
+  /**
+   * Returns the choosen time from the time table. The time value is represented in a Date object and
+   * should be used.
+   * The date value part is uninitialized. Therefore, it should NOT be used.
+   * 
+   * @return Choosen time value.
+   */
   public Date getReturnTime() {
     return m_returnTime;
   }

@@ -12,7 +12,7 @@ package org.eclipse.scout.commons.xmlparser;
 
 /**
  * Title : Scout XML Exception Description: Copyright : Copyright (c) 2006 BSI
- * AG, ETH Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
+ * AG, ETH ZÃ¼rich, Stefan Vogt Company : BSI AG www.bsiag.com
  * 
  * @version 1.0
  */

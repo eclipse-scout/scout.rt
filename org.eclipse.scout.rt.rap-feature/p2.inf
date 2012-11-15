@@ -1,0 +1,3 @@
+provides.1.namespace=A.PDE.Target.Platform
+provides.1.name=Cannot be installed into the IDE
+provides.1.range=1.0.0

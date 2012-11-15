@@ -120,6 +120,17 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
       setLabelWidthInPixelFromScout();
       setLabelHorizontalAlignmentFromScout();
       setEnabledFromScout(scoutField.isEnabled());
+
+      /*
+       * The setters for the label must be executed before setMandatoryFromScout since in Swing UIs
+       * labels of mandatory fields are set to bold by default ({@link org.eclipse.scout.rt.ui.swing.ext.JLabelEx.setBold}.
+       * Therefore, setMandatoryFromScout has a higher precedence than the other label settings and should override them
+       * in case they don't match.
+       */
+      setLabelBackgroundFromScout(scoutField.getLabelBackgroundColor());
+      setLabelForegroundFromScout(scoutField.getLabelForegroundColor());
+      setLabelFontFromScout(scoutField.getLabelFont());
+
       // bsh 2010-10-01: The "mandatory" state of a SequenceBoxes is always derived from the
       // inner fields. Don't use the model value (it will always be false).
       if (!(scoutField instanceof ISequenceBox)) {
@@ -135,9 +146,6 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
       setBackgroundFromScout(scoutField.getBackgroundColor());
       setForegroundFromScout(scoutField.getForegroundColor());
       setFontFromScout(scoutField.getFont());
-      setLabelBackgroundFromScout(scoutField.getLabelBackgroundColor());
-      setLabelForegroundFromScout(scoutField.getLabelForegroundColor());
-      setLabelFontFromScout(scoutField.getLabelFont());
       setSaveNeededFromScout(scoutField.isSaveNeeded());
       setEmptyFromScout(scoutField.isEmpty());
       setFocusableFromScout(scoutField.isFocusable());

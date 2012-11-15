@@ -5,6 +5,9 @@ Bundle-SymbolicName: org.eclipse.scout.commons;singleton:=true
 Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.commons.internal.Activator
 Bundle-Vendor: Eclipse Scout Project
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.equinox.security;bundle-version="1.0.1";visibility:=reexport,
+ org.apache.xerces;bundle-version="2.9.0";resolution:=optional
 Import-Package: org.osgi.framework;version="1.3.0"
 Export-Package: org.eclipse.scout.commons,
  org.eclipse.scout.commons.annotations,
@@ -26,8 +29,5 @@ Export-Package: org.eclipse.scout.commons,
  org.eclipse.scout.commons.runtime,
  org.eclipse.scout.commons.security,
  org.eclipse.scout.commons.xmlparser
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.equinox.security;bundle-version="1.0.1";visibility:=reexport,
- org.apache.xerces;bundle-version="2.9.0";resolution:=optional
-Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

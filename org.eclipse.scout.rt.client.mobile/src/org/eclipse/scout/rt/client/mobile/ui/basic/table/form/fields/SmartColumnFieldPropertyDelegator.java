@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 /**
  * @since 3.9.0
  */
-public class SmartColumnFieldPropertyDelegator extends ColumnFieldPropertyDelegator<ISmartColumn<?>, ISmartField<?>> {
+public class SmartColumnFieldPropertyDelegator<T> extends ColumnFieldPropertyDelegator<ISmartColumn<T>, ISmartField<T>> {
 
-  public SmartColumnFieldPropertyDelegator(ISmartColumn<?> sender, ISmartField<?> receiver) {
+  public SmartColumnFieldPropertyDelegator(ISmartColumn<T> sender, ISmartField<T> receiver) {
     super(sender, receiver);
   }
 

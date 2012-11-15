@@ -636,7 +636,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(createNewUnexpectedProcessingExcpetion(t));
       }
     }
     else {
@@ -750,7 +750,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    m_menus = menuList.toArray(new IMenu[0]);
+    m_menus = menuList.toArray(new IMenu[menuList.size()]);
     // key strokes
     ArrayList<IKeyStroke> ksList = new ArrayList<IKeyStroke>();
     Class<? extends IKeyStroke>[] ksArray = getConfiguredKeyStrokes();
@@ -1678,7 +1678,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       Arrays.fill(newToOld, -1);
       HashMap<CompositeObject, Integer> newRowIndexMap = new HashMap<CompositeObject, Integer>();
       for (int i = newRows.length - 1; i >= 0; i--) {
-        newRowIndexMap.put(new CompositeObject(getRowKeys(newRows[i])), new Integer(i));
+        newRowIndexMap.put(new CompositeObject(getRowKeys(newRows[i])), Integer.valueOf(i));
       }
       int mappedCount = 0;
       for (int i = 0, ni = getRowCount(); i < ni; i++) {
@@ -1800,7 +1800,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
       }
       if (resolvedRowList.size() > 0) {
-        fireRowsUpdated(resolvedRowList.toArray(new ITableRow[0]));
+        fireRowsUpdated(resolvedRowList.toArray(new ITableRow[resolvedRowList.size()]));
       }
       if (getColumnSet().getSortColumnCount() > 0) {
         // restore order of rows according to sort criteria
@@ -1911,7 +1911,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     if (!m_selectedRows.equals(newSelection)) {
       m_selectedRows = newSelection;
-      fireRowsSelected(m_selectedRows.toArray(new ITableRow[0]));
+      fireRowsSelected(m_selectedRows.toArray(new ITableRow[m_selectedRows.size()]));
     }
   }
 
@@ -1965,7 +1965,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       newSelection.addAll(m_selectedRows);
       if (newSelection.removeAll(Arrays.asList(rows))) {
         m_selectedRows = newSelection;
-        fireRowsSelected(m_selectedRows.toArray(new ITableRow[0]));
+        fireRowsSelected(m_selectedRows.toArray(new ITableRow[m_selectedRows.size()]));
       }
     }
   }
@@ -1992,7 +1992,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         newList.add(row);
       }
     }
-    selectRows(newList.toArray(new ITableRow[0]), false);
+    selectRows(newList.toArray(new ITableRow[newList.size()]), false);
   }
 
   @Override
@@ -2004,7 +2004,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         newList.add(selectedRows[i]);
       }
     }
-    deselectRows(newList.toArray(new ITableRow[0]));
+    deselectRows(newList.toArray(new ITableRow[newList.size()]));
   }
 
   @Override
@@ -2273,7 +2273,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   @Override
   public ITableRow[] getDeletedRows() {
-    return m_deletedRows.values().toArray(new ITableRow[0]);
+    return m_deletedRows.values().toArray(new ITableRow[m_deletedRows.size()]);
   }
 
   @Override
@@ -2537,7 +2537,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         rowList.add(row);
       }
     }
-    deleteRows(rowList.toArray(new ITableRow[0]));
+    deleteRows(rowList.toArray(new ITableRow[rowList.size()]));
   }
 
   @Override
@@ -2660,7 +2660,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         rowList.add(row);
       }
     }
-    discardRows(rowList.toArray(new ITableRow[0]));
+    discardRows(rowList.toArray(new ITableRow[rowList.size()]));
   }
 
   @Override
@@ -3058,7 +3058,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               }
               else {
                 tableRowList.add(row);
-                columnIndexList.add(new Integer(col.getColumnIndex()));
+                columnIndexList.add(Integer.valueOf(col.getColumnIndex()));
                 batchCall.addLookupCall(call);
               }
             }
@@ -3071,7 +3071,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       m_cellLookupBuffer.clear();
       //
       if (batchCall != null && tableRowList != null && columnIndexList != null && !batchCall.isEmpty()) {
-        ITableRow[] tableRows = tableRowList.toArray(new ITableRow[0]);
+        ITableRow[] tableRows = tableRowList.toArray(new ITableRow[tableRowList.size()]);
         LookupRow[][] resultArray;
         IBatchLookupService service = SERVICES.getService(IBatchLookupService.class);
         resultArray = service.getBatchDataByKey(batchCall);
@@ -3227,7 +3227,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         try {
           setTableChanging(true);
           //
-          fireTableEventBatchInternal(sortedCoalescedMap.values().toArray(new TableEvent[0]));
+          fireTableEventBatchInternal(sortedCoalescedMap.values().toArray(new TableEvent[sortedCoalescedMap.size()]));
         }
         finally {
           setTableChanging(false);
@@ -3259,7 +3259,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           colList.addAll(Arrays.asList(t.getColumns()));
         }
       }
-      ce.setColumns(colList.toArray(new IColumn<?>[0]));
+      ce.setColumns(colList.toArray(new IColumn<?>[colList.size()]));
       //rows
       HashSet<ITableRow> rowList = new HashSet<ITableRow>();
       for (TableEvent t : list) {
@@ -3274,7 +3274,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           }
         }
       }
-      ce.setRows(rowList.toArray(new ITableRow[0]));
+      ce.setRows(rowList.toArray(new ITableRow[rowList.size()]));
       //
       return ce;
     }
@@ -3443,7 +3443,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
     catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      SERVICES.getService(IExceptionHandlerService.class).handleException(createNewUnexpectedProcessingExcpetion(t));
     }
   }
 
@@ -3460,7 +3460,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
     catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      SERVICES.getService(IExceptionHandlerService.class).handleException(createNewUnexpectedProcessingExcpetion(t));
     }
   }
 
@@ -3579,7 +3579,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(createNewUnexpectedProcessingExcpetion(t));
       }
     }
   }
@@ -3625,7 +3625,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
           }
           catch (Throwable t) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+            SERVICES.getService(IExceptionHandlerService.class).handleException(createNewUnexpectedProcessingExcpetion(t));
           }
         }
       }
@@ -3924,6 +3924,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public ITableUIFacade getUIFacade() {
     return m_uiFacade;
+  }
+
+  private ProcessingException createNewUnexpectedProcessingExcpetion(Throwable t) {
+    return new ProcessingException("Unexpected", t);
   }
 
   /*

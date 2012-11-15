@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.scout.rt.testing.dependency"
+      label="%featureName"
+      version="3.9.0.qualifier"
+      provider-name="%providerName"
+      plugin="org.eclipse.scout.rt.feature.about">
+
+   <description>
+      Dependencies for Scout runtime testing environment.
+   </description>
+
+   <copyright>
+      Copyright (c) 2010 BSI Business Systems Integration AG.
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License
+v1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html
+Contributors:
+BSI Business Systems Integration AG - initial API and implementation
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="Kepler" url="http://download.eclipse.org/releases/kepler"/>
+      <discovery label="Kepler" url="http://download.eclipse.org/releases/kepler"/>
+   </url>
+
+   <requires>
+      <import feature="org.eclipse.scout.rt.feature" version="3.8.0.qualifier"/>
+      <import plugin="org.junit4"/>
+   </requires>
+
+   <plugin
+         id="org.easymock"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.junit"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.apache.ant"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+</feature>

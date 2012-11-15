@@ -10,6 +10,7 @@ import com.sun.xml.internal.ws.transport.http.ResourceLoader;
 /**
  * Adapter Factory to adapt a {@link ResourceLoader} into a {@link com.sun.xml.internal.ws.api.ResourceLoader} object.
  */
+@SuppressWarnings("restriction")
 public class ResourceLoaderAdapterFactory implements IAdapterFactory {
 
   @Override

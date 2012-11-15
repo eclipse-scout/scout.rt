@@ -4,5 +4,5 @@ Bundle-Name: Scout Legacy Texts Fragment
 Bundle-SymbolicName: org.eclipse.scout.rt.shared.legacy.texts.fragment;singleton:=true
 Bundle-Version: 3.9.0.qualifier
 Bundle-Vendor: Eclipse Scout Project
-Fragment-Host: org.eclipse.scout.rt.shared;bundle-version="3.7.0"
+Fragment-Host: org.eclipse.scout.rt.shared;bundle-version="3.9.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

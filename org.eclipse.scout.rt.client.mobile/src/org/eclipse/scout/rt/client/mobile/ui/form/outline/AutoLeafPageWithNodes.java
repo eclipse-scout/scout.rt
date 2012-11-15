@@ -78,4 +78,13 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
       form.start();
     }
   }
+
+  @Override
+  protected void execDisposePage() throws ProcessingException {
+    super.execDisposePage();
+    if (getDetailForm() != null) {
+      getDetailForm().doClose();
+      setDetailForm(null);
+    }
+  }
 }

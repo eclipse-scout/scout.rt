@@ -209,6 +209,7 @@ public interface IRwtEnvironment {
    */
   String styleHtmlText(IRwtScoutFormField<?> uiComposite, String rawHtml);
 
+  @Deprecated
   String getLogoutLandingUri();
 
   Display getDisplay();

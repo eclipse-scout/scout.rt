@@ -307,6 +307,10 @@
                name="color.forground.disabled"
                value="9e9e9e">
          </property>
+         <property
+               name="table.mouseMoveSelectionSupport.enabled"
+               value="true">
+         </property>
       </properties>
    </extension>
    <extension point="org.eclipse.scout.service.services">

@@ -1,19 +1,18 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Import-Package: javax.servlet,
- javax.servlet.http
 Bundle-Name: Scout Server
 Bundle-SymbolicName: org.eclipse.scout.rt.server;singleton:=true
 Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.rt.server.internal.Activator
 Bundle-Vendor: Eclipse Scout Project
-Eclipse-BuddyPolicy: registered
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.equinox.http.registry;visibility:=reexport,
  org.eclipse.scout.service;visibility:=reexport,
  org.eclipse.scout.commons;visibility:=reexport,
  org.eclipse.scout.rt.shared;visibility:=reexport,
  org.eclipse.scout.http.servletfilter
+Import-Package: javax.servlet;version="[2.5.0,3.0.0)",
+ javax.servlet.http;version="[2.5.0,3.0.0)"
 Export-Package: org.eclipse.scout.rt.server,
  org.eclipse.scout.rt.server.admin.html,
  org.eclipse.scout.rt.server.admin.html.view,
@@ -47,6 +46,6 @@ Export-Package: org.eclipse.scout.rt.server,
  org.eclipse.scout.rt.server.servlet.filter,
  org.eclipse.scout.rt.server.servlet.test,
  org.eclipse.scout.rt.server.transaction
-Bundle-ClassPath: .
-Bundle-ActivationPolicy: lazy
+Eclipse-BuddyPolicy: registered
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

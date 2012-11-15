@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Derby JDBC Fragment Version 10.5.3
 Bundle-SymbolicName: org.apache.derby.jdbc_1053.fragment
 Bundle-Version: 10.5.3.qualifier
+Bundle-Vendor: Eclipse Scout Project
 Fragment-Host: system.bundle
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/derby.jar
 Export-Package: org.apache.derby.authentication,
  org.apache.derby.catalog,
@@ -102,5 +102,6 @@ Export-Package: org.apache.derby.authentication,
  org.apache.derby.shared.common.sanity,
  org.apache.derby.tools,
  org.apache.derby.vti
+Eclipse-BundleShape: dir
 Fenix-Unpack: true
-Bundle-Vendor: Eclipse Scout Project
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

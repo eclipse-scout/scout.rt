@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
@@ -199,7 +200,7 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
     m_uiField = uiField;
     if (m_uiField != null) {
       // the layout data check is used to pack a tree within a composite.
-      if (getScoutObject() instanceof IFormField && m_uiField.getLayoutData() == null) {
+      if (isAutoSetLayoutData() && getScoutObject() instanceof IFormField && m_uiField.getLayoutData() == null) {
         m_uiField.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
       }
 
@@ -211,9 +212,20 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
       m_uiField.addListener(SWT.FocusIn, listener);
       m_uiField.addListener(SWT.FocusOut, listener);
       m_uiField.addListener(SWT.Traverse, listener);
-      m_uiField.addListener(SWT.Verify, listener);
       m_uiField.addListener(SWT.Dispose, listener);
     }
+  }
+
+  /**
+   * If true is returned, it will automatically set the {@link LogicalGridData} on the {@link #getUiField()} if no
+   * layout data is set and the scout object is a {@link IFormField}.
+   * <p>
+   * Default is true.
+   * 
+   * @return
+   */
+  protected boolean isAutoSetLayoutData() {
+    return true;
   }
 
   @Override
@@ -350,11 +362,6 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
         return;
       }
       switch (event.type) {
-        case SWT.Verify:
-          if (event.text.equals("\t")) {
-            event.doit = false;
-          }
-          break;
         case SWT.Traverse:
           switch (event.keyCode) {
             case SWT.ARROW_DOWN:

@@ -30,10 +30,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Sash;
 
 /**
- * <h3>ViewArea</h3> ...
- * 
  * @author Andreas Hoegger
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public class ViewArea extends Composite implements IViewArea {
 
@@ -117,24 +115,85 @@ public class ViewArea extends Composite implements IViewArea {
       }
     }
     // sashes
-    for (SashKey k : SashKey.values()) {
+    for (SashKey sashKey : SashKey.values()) {
       int style = SWT.HORIZONTAL;
-      switch (k) {
+      switch (sashKey) {
         case VERTICAL_LEFT:
         case VERTICAL_RIGHT:
           style = SWT.VERTICAL;
           break;
       }
       Sash sash = null;
-      if (isSashCreationEnabled()) {
+      if (isSashCreationEnabled() && isSashCreationNecessary(sashKey)) {
         sash = createSash(parent, style);
         if (sash != null) {
-          sash.setData("SASH_KEY", k);
+          sash.setData("SASH_KEY", sashKey);
           sash.addListener(SWT.Selection, m_sashListener);
         }
       }
-      m_sashes.put(k, sash);
+      m_sashes.put(sashKey, sash);
     }
+  }
+
+  /**
+   * @return true if the sash for the given sashKey would separate existing view stacks. If there are no view stacks at
+   *         the given position, no sash is required and therefore false returned.
+   */
+  private boolean isSashCreationNecessary(SashKey sashKey) {
+    switch (sashKey) {
+      case VERTICAL_LEFT:
+        if (containsViewStackAtColumn(0) && containsViewStackAtColumn(1)) {
+          return true;
+        }
+        break;
+      case VERTICAL_RIGHT:
+        if (containsViewStackAtColumn(1) && containsViewStackAtColumn(2)) {
+          return true;
+        }
+        break;
+      case HORIZONTAL_LEFT_TOP:
+        if (m_viewStacks[0][0] != null && m_viewStacks[0][1] != null) {
+          return true;
+        }
+        break;
+      case HORIZONTAL_CENTER_TOP:
+        if (m_viewStacks[1][0] != null && m_viewStacks[1][1] != null) {
+          return true;
+        }
+        break;
+      case HORIZONTAL_RIGHT_TOP:
+        if (m_viewStacks[2][0] != null && m_viewStacks[2][1] != null) {
+          return true;
+        }
+        break;
+      case HORIZONTAL_LEFT_BOTTOM:
+        if (m_viewStacks[0][1] != null && m_viewStacks[0][2] != null) {
+          return true;
+        }
+        break;
+      case HORIZONTAL_CENTER_BOTTOM:
+        if (m_viewStacks[1][1] != null && m_viewStacks[1][2] != null) {
+          return true;
+        }
+        break;
+      case HORIZONTAL_RIGHT_BOTTOM:
+        if (m_viewStacks[2][1] != null && m_viewStacks[2][2] != null) {
+          return true;
+        }
+        break;
+    }
+
+    return false;
+  }
+
+  private boolean containsViewStackAtColumn(int column) {
+    for (int y = 0; y < m_viewStacks[column].length; y++) {
+      if (m_viewStacks[column][y] != null) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   protected Sash createSash(Composite parent, int style) {
@@ -151,7 +210,7 @@ public class ViewArea extends Composite implements IViewArea {
   }
 
   /**
-   * Controls whether shashes should be created at all. May be overridden.
+   * Controls whether sashes should be created at all. May be overridden.
    * <p>
    * Default is true.
    */

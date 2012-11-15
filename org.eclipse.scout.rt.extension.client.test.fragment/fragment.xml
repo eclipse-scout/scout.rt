@@ -127,7 +127,7 @@
          <filter
                class="org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.BPageFilter">
          </filter>
-      </pageModification>
+      </pageModification>
       <pageModification
             active="true"
             class="org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.modification.MarkingPageModification"

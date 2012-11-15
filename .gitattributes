@@ -1,13 +1,20 @@
 # Set default behaviour, in case users don't have core.autocrlf set.
 * text=auto
 
-# Explicitly declare text files we want to always be normalized and converted 
-# to native line endings on checkout.
+#
+# The above will handle all files NOT found below
+#
+# These files are text and should be normalized (Convert crlf => lf)
 *.java text
+*.xml text
+*.txt text
 
-# Declare files that will always have CRLF line endings on checkout.
-#*.sln text eol=crlf
-
-# Denote all files that are truly binary and should not be modified.
+# These files are binary and should be left untouched
+# (binary is a macro for -text -diff)
+*.jar binary
+*.so binary
+*.dll binary
 *.png binary
 *.jpg binary
+*.ai binary
+*.vsd binary

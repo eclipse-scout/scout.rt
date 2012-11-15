@@ -21,6 +21,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -57,6 +60,7 @@ public class SwingScoutPopup implements ISwingScoutView {
   private ISwingEnvironment m_env;
   private EventListenerList m_listenerList;
   private Component m_ownerComponent;
+  private ComponentListener m_ownerComponentListener;
   private Rectangle m_ownerBounds;
   private JWindowEx m_swingWindow;
   private boolean m_resizable;
@@ -260,10 +264,12 @@ public class SwingScoutPopup implements ISwingScoutView {
   }
 
   protected void handleSwingWindowOpened() {
+    registerOwnerComponentListener();
     fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutPopup.this, SwingScoutViewEvent.TYPE_OPENED));
   }
 
   protected void handleSwingWindowClosed() {
+    unregisterOwnerComponentListener();
     if (getSwingWindow().isFocused()) {
       Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
       if (focusOwner != null && focusOwner instanceof JComponent && ((JComponent) focusOwner).getInputVerifier() != null) {
@@ -271,6 +277,20 @@ public class SwingScoutPopup implements ISwingScoutView {
       }
     }
     fireSwingScoutViewEvent(new SwingScoutViewEvent(SwingScoutPopup.this, SwingScoutViewEvent.TYPE_CLOSED));
+  }
+
+  protected void registerOwnerComponentListener() {
+    if (m_ownerComponentListener == null) {
+      m_ownerComponentListener = new P_OwnerComponentListener();
+      getSwingWindow().getOwner().addComponentListener(m_ownerComponentListener);
+    }
+  }
+
+  protected void unregisterOwnerComponentListener() {
+    if (m_ownerComponentListener != null) {
+      getSwingWindow().getOwner().removeComponentListener(m_ownerComponentListener);
+      m_ownerComponentListener = null;
+    }
   }
 
   @Override
@@ -536,4 +556,16 @@ public class SwingScoutPopup implements ISwingScoutView {
     }
 
   }// end private class
+
+  private class P_OwnerComponentListener extends ComponentAdapter {
+    @Override
+    public void componentResized(ComponentEvent e) {
+      handleSwingWindowClosed();
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+      handleSwingWindowClosed();
+    }
+  }
 }

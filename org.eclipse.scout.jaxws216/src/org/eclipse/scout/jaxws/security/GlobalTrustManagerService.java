@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -56,14 +55,36 @@ public class GlobalTrustManagerService extends AbstractService {
 
   private static final String PATH_CERTS = "/certificates";
 
+  /**
+   * Installs the global trustmanager for 'TLS' server socket protocol and the default trustmanager algorithm as
+   * specified in the java security properties, or an implementation-specific default if no such property exists.
+   * 
+   * @throws ProcessingException
+   */
   public void installGlobalTrustManager() throws ProcessingException {
+    installGlobalTrustManager("TLS", TrustManagerFactory.getDefaultAlgorithm());
+  }
+
+  /**
+   * Installs the global trustmanager for the given server socket protocol and trustmanager algorithm.
+   * 
+   * @param protocol
+   *          the server socket protocol (e.g. TLS or SSL) used to identify the protocol implementing {@link SSLContext}
+   *          . This context is injected with a custom {@link TrustManager} to further check server identity with
+   *          certificates located not only in keystore but also in 'externalfiles/certificates' folder.
+   * @param tmAlgorithm
+   *          {@link TrustManager} algorithm (e.g. SunX509 or IbmX509)
+   * @throws ProcessingException
+   */
+  public void installGlobalTrustManager(String protocol, String tmAlgorithm) throws ProcessingException {
     X509TrustManager globalTrustManager;
     try {
-      globalTrustManager = createGlobalTrustManager();
+      X509Certificate[] trustedCerts = getTrustedCertificates();
+      globalTrustManager = createGlobalTrustManager(tmAlgorithm, trustedCerts);
 
-      SSLContext sslContext = SSLContext.getInstance("SSL");
+      SSLContext sslContext = SSLContext.getInstance(protocol);
       sslContext.init(null, new TrustManager[]{globalTrustManager}, new SecureRandom());
-      HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+      SSLContext.setDefault(sslContext);
     }
     catch (Exception e) {
       throw new ProcessingException("could not install global trust manager.", e);
@@ -107,11 +128,8 @@ public class GlobalTrustManagerService extends AbstractService {
     return trustedCerts.toArray(new X509Certificate[trustedCerts.size()]);
   }
 
-  protected X509TrustManager createGlobalTrustManager() throws Exception {
-    X509Certificate[] trustedCerts = getTrustedCertificates();
-
-    P_GlobalTrustManager globalTrustManager = new P_GlobalTrustManager(trustedCerts);
-    return globalTrustManager;
+  protected X509TrustManager createGlobalTrustManager(String tmAlgorithm, X509Certificate[] trustedCerts) throws Exception {
+    return new P_GlobalTrustManager(trustedCerts, tmAlgorithm);
   }
 
   private X509Certificate readX509Cert(InputStream inputStream) throws CertificateException, IOException {
@@ -136,7 +154,7 @@ public class GlobalTrustManagerService extends AbstractService {
     private TrustManager[] m_installedTrustManagers;
     private X509Certificate[] m_trustedCerts;
 
-    public P_GlobalTrustManager(X509Certificate[] trustedCerts) throws Exception {
+    public P_GlobalTrustManager(X509Certificate[] trustedCerts, String tmAlgorithm) throws Exception {
       if (trustedCerts != null) {
         m_trustedCerts = trustedCerts;
       }
@@ -149,7 +167,7 @@ public class GlobalTrustManagerService extends AbstractService {
       // 2. check, whether the following truststore exists: %JAVA_HOME%/lib/security/jssecacerts
       // 3. check, whether the following truststore exists: %JAVA_HOME%/lib/security/cacerts
       // 4. empty truststore with no certificates in it is used
-      TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
+      TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(tmAlgorithm);
       trustManagerFactory.init((KeyStore) null);
       m_installedTrustManagers = trustManagerFactory.getTrustManagers();
 

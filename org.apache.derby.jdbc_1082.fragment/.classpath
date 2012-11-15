@@ -2,10 +2,6 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/derby.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/E:/eclipse/eclipse-3.6-bsi-trunk/plugins/org.eclipse.platform.doc.isv_3.6.2.r362_v20110111.jar!/reference/api"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry exported="true" kind="lib" path="lib/derby.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

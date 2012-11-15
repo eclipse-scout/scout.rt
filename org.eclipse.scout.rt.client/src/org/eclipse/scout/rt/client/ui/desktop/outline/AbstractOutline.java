@@ -58,6 +58,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     super();
   }
 
+  public AbstractOutline(boolean callInitialzier) {
+    super(callInitialzier);
+  }
+
   /*
    * Configuration
    */

@@ -18,6 +18,8 @@ import java.util.List;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
+import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformation;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.AbstractBackButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield.MobileSmartTreeForm.MainBox.GroupBox.FilterField;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -149,6 +151,17 @@ public class MobileSmartTreeForm extends SmartTreeForm {
   }
 
   public class MainBox extends SmartTreeForm.MainBox {
+
+    @Override
+    protected void execInitField() throws ProcessingException {
+      super.execInitField();
+
+      //It's sufficient if table is scrollable, form itself does not need to be
+      IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
+      if (service != null) {
+        service.getDeviceTransformer().getDeviceTransformationExcluder().excludeFieldTransformation(this, MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
+      }
+    }
 
     @Override
     protected int getConfiguredHeightInPixel() {

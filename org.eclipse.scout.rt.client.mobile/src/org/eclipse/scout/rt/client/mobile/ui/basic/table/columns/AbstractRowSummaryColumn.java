@@ -391,7 +391,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       String displayText = extractCellDisplayText(column, row);
 
       if (StringUtility.hasText(displayText)) {
-        if (isHeaderdiscriptionNeeded(row, column)) {
+        if (isHeaderDescriptionNeeded(row, column)) {
           content += extractColumnHeader(column);
           content += ": ";
         }
@@ -418,8 +418,9 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       return null;
     }
 
-    //Remove html tags
-    if (text.contains("<html>")) {
+    boolean containsHtml = text.contains("<html>");
+    if (containsHtml) {
+      //Ignore every html code by removing all the tags to make sure it does not destroy the layout
       String textWithoutHtml = HTMLUtility.getPlainText(text);
       if (textWithoutHtml != null) {
         text = textWithoutHtml;
@@ -427,6 +428,10 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     }
     text = StringUtility.removeNewLines(text);
     text = StringUtility.trim(text);
+    if (!containsHtml) {
+      //If the text is not surrounded by <html> the html must not be interpreted but displayed as it is including all the html tags.
+      text = StringUtility.htmlEncode(text);
+    }
     text = replaceSpaces(text);
 
     return text;
@@ -459,7 +464,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
   /**
    * Columns with a reasonable text don't need the header description.
    */
-  private boolean isHeaderdiscriptionNeeded(ITableRow row, IColumn column) {
+  private boolean isHeaderDescriptionNeeded(ITableRow row, IColumn column) {
     if (column instanceof ISmartColumn<?>) {
       return column.getValue(row) instanceof Boolean;
     }
