@@ -1058,6 +1058,25 @@ public final class StringUtility {
     return s.split(regex);
   }
 
+  /**
+   * @param s
+   * @return
+   * @since 3.8.2
+   */
+  public static String splitCamelCase(String s) {
+    if (s == null || s.trim().length() == 0) {
+      return null;
+    }
+    return s.replaceAll(
+        String.format("%s|%s|%s",
+            "(?<=[A-Z])(?=[A-Z][a-z])",
+            "(?<=[^A-Z])(?=[A-Z])",
+            "(?<=[A-Za-z])(?=[^A-Za-z])"
+            ),
+        " "
+        );
+  }
+
   public static String substring(String s, int start) {
     if (s == null || start >= s.length()) {
       return "";
