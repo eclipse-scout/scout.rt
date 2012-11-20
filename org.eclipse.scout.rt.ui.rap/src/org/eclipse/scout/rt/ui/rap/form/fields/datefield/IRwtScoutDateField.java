@@ -11,14 +11,12 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.datefield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
-import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Control;
 
 /**
- * <h3>IRwtScoutDateField</h3> ...
- * 
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public interface IRwtScoutDateField extends IRwtScoutFormField<IDateField> {
 
@@ -28,5 +26,9 @@ public interface IRwtScoutDateField extends IRwtScoutFormField<IDateField> {
   Button getDropDownButton();
 
   @Override
-  StyledText getUiField();
+  Control getUiField();
+
+  void setIgnoreLabel(boolean ignoreLabel);
+
+  void setDateTimeCompositeMember(boolean dateTimeCompositeMember);
 }
