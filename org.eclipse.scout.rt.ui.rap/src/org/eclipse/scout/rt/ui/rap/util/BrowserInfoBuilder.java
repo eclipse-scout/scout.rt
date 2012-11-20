@@ -72,17 +72,15 @@ public class BrowserInfoBuilder {
         || userAgent.indexOf("MacIntel") != -1) {//FIXME
       info.setSystem(BrowserInfo.System.OSX);
     }
+    else if (userAgent.indexOf("Android") != -1) {
+      info.setSystem(BrowserInfo.System.ANDROID);
+      info.setSystemVersion(parseAndroidVersion(userAgent));
+      initAndroidMobileFlags(info);
+    }
     else if (userAgent.indexOf("X11") != -1
         || userAgent.indexOf("Linux") != -1
         || userAgent.indexOf("BSD") != -1) {//FIXME
-      if (userAgent.indexOf("Android") != -1) {
-        info.setSystem(BrowserInfo.System.ANDROID);
-        info.setSystemVersion(parseAndroidVersion(userAgent));
-        initAndroidMobileFlags(info);
-      }
-      else {
-        info.setSystem(BrowserInfo.System.UNIX);
-      }
+      info.setSystem(BrowserInfo.System.UNIX);
     }
     else if (userAgent.indexOf("iPad") != -1) {
       info.setSystem(BrowserInfo.System.IOS);
@@ -239,14 +237,18 @@ public class BrowserInfoBuilder {
     return null;
   }
 
-  private Version parseSystemVersion(String userAgent, String regex) {
+  private Version parseSystemVersion(String userAgent, String regex, int group) {
     Matcher matcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(userAgent);
     if (matcher.find()) {
-      String s = matcher.group(1);
+      String s = matcher.group(group);
       return createVersion(s);
     }
 
     return null;
+  }
+
+  private Version parseSystemVersion(String userAgent, String regex) {
+    return parseSystemVersion(userAgent, regex, 1);
   }
 
   private Version parseAndroidVersion(String userAgent) {
@@ -259,7 +261,7 @@ public class BrowserInfoBuilder {
   }
 
   private Version parseWindowsPhoneVersion(String userAgent) {
-    return parseSystemVersion(userAgent, "\\sOS\\s([^\\s;]+)");
+    return parseSystemVersion(userAgent, "Windows\\sPhone\\s(OS )?([^\\s;]+)", 2);
   }
 
   private Version parseWindowsVersion(String userAgent) {
