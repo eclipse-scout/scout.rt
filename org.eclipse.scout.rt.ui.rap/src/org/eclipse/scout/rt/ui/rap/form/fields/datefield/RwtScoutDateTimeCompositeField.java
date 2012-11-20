@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Control;
 public class RwtScoutDateTimeCompositeField extends RwtScoutValueFieldComposite<IDateField> implements IRwtScoutFormField<IDateField>, IPopupSupport {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDateTimeCompositeField.class);
 
-  private RwtScoutDateField m_dateField;
-  private RwtScoutTimeField m_timeField;
+  private IRwtScoutDateField m_dateField;
+  private IRwtScoutTimeField m_timeField;
 
   private Set<IPopupSupportListener> m_popupEventListeners;
   private Object m_popupEventListenerLock;
@@ -75,18 +75,17 @@ public class RwtScoutDateTimeCompositeField extends RwtScoutValueFieldComposite<
     container.setLayout(new LogicalGridLayout(1, 0));
   }
 
-  protected RwtScoutDateField createRwtScoutDateField() {
+  protected IRwtScoutDateField createRwtScoutDateField() {
     return new RwtScoutDateField();
   }
 
-  protected RwtScoutTimeField createRwtScoutTimeField() {
+  protected IRwtScoutTimeField createRwtScoutTimeField() {
     return new RwtScoutTimeField();
   }
 
   @Override
   protected void setFieldEnabled(Control rwtField, boolean enabled) {
-    m_dateField.setFieldEnabled(rwtField, enabled);
-    m_timeField.setFieldEnabled(rwtField, enabled);
+    // nop
   }
 
   protected LogicalGridData createDateFieldGridData() {
@@ -115,13 +114,19 @@ public class RwtScoutDateTimeCompositeField extends RwtScoutValueFieldComposite<
 
   @Override
   public void addPopupEventListener(IPopupSupportListener listener) {
-    m_dateField.addPopupEventListener(listener);
-    m_timeField.addPopupEventListener(listener);
+    if (m_dateField instanceof IPopupSupport) {
+      IPopupSupport popupSupport = (IPopupSupport) m_dateField;
+      popupSupport.addPopupEventListener(listener);
+      popupSupport.addPopupEventListener(listener);
+    }
   }
 
   @Override
   public void removePopupEventListener(IPopupSupportListener listener) {
-    m_dateField.removePopupEventListener(listener);
-    m_timeField.removePopupEventListener(listener);
+    if (m_dateField instanceof IPopupSupport) {
+      IPopupSupport popupSupport = (IPopupSupport) m_dateField;
+      popupSupport.removePopupEventListener(listener);
+      popupSupport.removePopupEventListener(listener);
+    }
   }
 }

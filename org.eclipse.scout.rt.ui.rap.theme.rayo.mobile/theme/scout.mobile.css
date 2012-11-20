@@ -2162,20 +2162,68 @@ Button-FocusIndicator[RADIO] {
   background-image: none;
   border: 0px;
 }
+Composite.smartfield {
+  padding: 0px;
+}
+Composite.smartfield-disabled {
+  padding: 0px;
+}
 Composite.smartfield:hover {
   background-color: #fef9f1;
 }
-Composite.datefield:hover {
-  background-color: #fef9f1;
+Label.smartfield {
+  border-radius: 4px;
+  background-image: none;
+  background-color: transparent;
 }
-Composite.timefield:hover {
-  background-color: #fef9f1;
+Label.smartfield:disabled {
+  background-color: #f4f8fc;
 }
 Composite.smartfield_browse {
   background-image: url(theme/img/button/smartfield_browse.png);
 }
-Composite.smartfield_browse:disabled {
+Composite.smartfield_browse-disabled {
   background-image: url(theme/img/button/smartfield_browse_disabled.png);
+}
+Composite.datefield_icon {
+  background-image: url(theme/img/button/datefield_date.png);
+  border-radius: 5px;
+  border: none;
+}
+Label.datefield {
+  border-radius: 4px;
+  background-image: none;
+  background-color: transparent;
+}
+Label.datefield:disabled {
+  background-color: #f4f8fc;
+}
+Composite.datefield:hover {
+  background-color: #fef9f1;
+}
+Composite.datefield_icon-disabled {
+  background-image: url(theme/img/button/datefield_date_disabled.png);
+  border: none;
+}
+Composite.timefield:hover {
+  background-color: #fef9f1;
+}
+Label.timefield {
+  border-radius: 4px;
+  background-image: none;
+  background-color: transparent;
+}
+Label.timefield:disabled {
+  background-color: #f4f8fc;
+}
+Composite.timefield_icon {
+  background-image: url(theme/img/button/datefield_time.png);
+  border-radius: 5px;
+  border: none;
+}
+Composite.timefield_icon-disabled {
+  background-image: url(theme/img/button/datefield_time_disabled.png);
+  border: none;
 }
 ScrollBar {
   width: 0px;

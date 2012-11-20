@@ -66,6 +66,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
   private TimeChooserDialog m_timeChooserDialog = null;
   private FocusAdapter m_textFieldFocusAdapter = null;
 
+  @Override
   public void setIgnoreLabel(boolean ignoreLabel) {
     m_ignoreLabel = ignoreLabel;
     if (ignoreLabel) {
@@ -84,6 +85,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     return m_dateTimeCompositeMember;
   }
 
+  @Override
   public void setDateTimeCompositeMember(boolean dateTimeCompositeMember) {
     m_dateTimeCompositeMember = dateTimeCompositeMember;
   }
