@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -520,6 +522,35 @@ public final class FileUtility {
     }
     ext = ext.toLowerCase();
     return EXT_TO_MIME_TYPE_MAP.get(ext);
+  }
+
+  /**
+   * @return Returns <code>true</code> if the given file is a zip file.
+   */
+  public static boolean isZipFile(File file) {
+    if (file == null || file.isDirectory() || !file.canRead() || file.length() < 4) {
+      return false;
+    }
+    DataInputStream in = null;
+    try {
+      in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+      int test = in.readInt();
+      return test == 0x504b0304; // magic number of a zip file
+    }
+    catch (Throwable e) {
+      return false;
+    }
+    finally {
+      if (in != null) {
+        try {
+          in.close();
+        }
+        catch (Throwable t) {
+          // nop
+        }
+        in = null;
+      }
+    }
   }
 
 }
