@@ -500,12 +500,15 @@ public final class FileUtility {
     }
     name = name.substring(prefix.length() + 1);
     name = name.replace('\\', '/');
+    long timestamp = src.lastModified();
     byte[] data = readFile(src);
-    addFileToJar(name, data, zOut);
+    addFileToJar(name, data, timestamp, zOut);
   }
 
-  private static void addFileToJar(String name, byte[] data, JarOutputStream zOut) throws IOException {
-    zOut.putNextEntry(new ZipEntry(name));
+  private static void addFileToJar(String name, byte[] data, long timestamp, JarOutputStream zOut) throws IOException {
+    ZipEntry entry = new ZipEntry(name);
+    entry.setTime(timestamp);
+    zOut.putNextEntry(entry);
     zOut.write(data);
     zOut.closeEntry();
   }
