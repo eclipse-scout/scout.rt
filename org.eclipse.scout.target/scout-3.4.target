@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<?pde version="3.8"?>
+<target name="scout-3.4.target" sequenceNumber="3">
+  <locations>
+    <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <unit id="org.eclipse.core.net" version="0.0.0"/>
+      <unit id="org.eclipse.core.runtime.compatibility" version="0.0.0"/>
+      <unit id="org.eclipse.equinox.security" version="0.0.0"/>
+      <unit id="org.eclipse.jdt" version="0.0.0"/>
+      <unit id="org.eclipse.swt" version="0.0.0"/>
+      <unit id="org.eclipse.ui" version="0.0.0"/>
+      <unit id="org.eclipse.ui.forms" version="0.0.0"/>
+      <unit id="org.eclipse.jface.text" version="0.0.0"/>
+      <repository location="http://download.eclipse.org/releases/ganymede/"/>
+    </location>
+    <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <unit id="javax.wsdl.source" version="1.6.2.v201012040545"/>
+      <unit id="javax.wsdl" version="1.6.2.v201012040545"/>
+      <unit id="org.apache.ant" version="0.0.0"/>
+      <unit id="org.apache.batik.css" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.css.source" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.util.gui" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.util.gui.source" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.util" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.util.source" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.bridge" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.dom" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.dom.svg" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.ext.awt" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.parser" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.svggen" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.swing" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.transcoder" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.batik.xml" version="1.6.0.v201011041432"/>
+      <unit id="org.apache.xerces" version="0.0.0"/>
+      <unit id="org.easymock" version="0.0.0"/>
+      <unit id="org.junit" version="0.0.0"/>
+      <unit id="org.w3c.dom.svg" version="0.0.0"/>
+      <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20120526062928/repository/"/>
+    </location>
+    <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+      <unit id="org.eclipse.rap.runtime.requirements.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.rap.runtime.feature.group" version="0.0.0"/>
+      <repository location="http://download.eclipse.org/rt/rap/1.5/runtime"/>
+    </location>
+  </locations>
+</target>

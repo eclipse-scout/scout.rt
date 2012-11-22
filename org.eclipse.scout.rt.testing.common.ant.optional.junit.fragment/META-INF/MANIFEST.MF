@@ -5,5 +5,6 @@ Bundle-SymbolicName: org.eclipse.scout.rt.testing.common.ant.optional.junit.frag
 Bundle-Version: 3.9.0.qualifier
 Bundle-Vendor: Eclipse Scout Project
 Fragment-Host: org.apache.ant
-Require-Bundle: org.junit4,
+Require-Bundle: org.junit,
  org.eclipse.core.runtime.compatibility
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

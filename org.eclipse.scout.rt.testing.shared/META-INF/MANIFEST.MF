@@ -6,10 +6,10 @@ Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.rt.testing.shared.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
- org.apache.ant;bundle-version="1.7.1";visibility:=reexport,
  org.eclipse.scout.rt.shared,
- org.junit4;bundle-version="4.5.0";visibility:=reexport,
- org.easymock;bundle-version="2.4.0";visibility:=reexport
+ org.apache.ant;bundle-version="[1.7.1,2.0.0)";visibility:=reexport,
+ org.junit;bundle-version="[4.5.0,5.0.0)",
+ org.easymock;bundle-version="[2.4.0,3.0.0)";visibility:=reexport
 Export-Package: org.eclipse.scout.rt.testing.shared,
  org.eclipse.scout.rt.testing.shared.runner,
  org.eclipse.scout.rt.testing.shared.services.common.code,
