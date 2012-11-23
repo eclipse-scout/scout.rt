@@ -39,7 +39,6 @@ public class RwtScoutListModel implements IRwtScoutListModel {
   public RwtScoutListModel(ITable scoutTable, RwtScoutList uiTable) {
     m_scoutTable = scoutTable;
     m_uiList = uiTable;
-    rebuildCache();
   }
 
   @Override
@@ -118,42 +117,32 @@ public class RwtScoutListModel implements IRwtScoutListModel {
 
   @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    // nop
   }
 
   @Override
   public void consumeTableModelEvent(RwtScoutTableEvent uiTableEvent) {
-    rebuildCache();
+    // nop
   }
 
   protected ICell getCell(Object row) {
     IColumn<?> column = m_scoutTable.getColumnSet().getVisibleColumns()[0];
     if (column != null) {
-      if (m_cachedCells.get(row) == null) {
-        rebuildCache();
-      }
-      return m_cachedCells.get(row).get(column);
+      ITableRow tableRow = (ITableRow) row;
+      return tableRow.getCell(column);
     }
     else {
       return null;
     }
   }
 
-  private void rebuildCache() {
-    m_cachedCells = new HashMap<ITableRow, HashMap<IColumn<?>, ICell>>();
-    if (m_scoutTable != null) {
-      for (ITableRow scoutRow : m_scoutTable.getRows()) {
-        HashMap<IColumn<?>, ICell> cells = new HashMap<IColumn<?>, ICell>();
-        for (IColumn<?> col : m_scoutTable.getColumnSet().getVisibleColumns()) {
-          cells.put(col, m_scoutTable.getCell(scoutRow, col));
-        }
-        m_cachedCells.put(scoutRow, cells);
-      }
-    }
-  }
-
   @Override
   public RwtScoutList getUiList() {
     return m_uiList;
+  }
+
+  public ITable getScoutTable() {
+    return m_scoutTable;
   }
 
   @Override

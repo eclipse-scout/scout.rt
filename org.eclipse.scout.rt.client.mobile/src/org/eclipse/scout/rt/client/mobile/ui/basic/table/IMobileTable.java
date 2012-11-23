@@ -21,6 +21,9 @@ public interface IMobileTable extends ITable {
   String PROP_DRILL_DOWN_STYLE_MAP = "drillDownStyleMap";
   String PROP_AUTO_CREATE_TABLE_ROW_FORM = "autoCreateTableRowForm";
   String PROP_DEFAULT_DRILL_DOWN_STYLE = IRowSummaryColumn.PROP_DEFAULT_DRILL_DOWN_STYLE;
+  String PROP_PAGING_ENABLED = "pagingEnabled";
+  String PROP_PAGE_SIZE = "pageSize";
+  String PROP_PAGE_INDEX = "pageIndex";
 
   String DRILL_DOWN_STYLE_NONE = IRowSummaryColumn.DRILL_DOWN_STYLE_NONE;
   String DRILL_DOWN_STYLE_ICON = IRowSummaryColumn.DRILL_DOWN_STYLE_ICON;
@@ -37,4 +40,19 @@ public interface IMobileTable extends ITable {
   boolean isAutoCreateTableRowForm();
 
   void setAutoCreateTableRowForm(boolean autoCreateRowForm);
+
+  boolean isPagingEnabled();
+
+  void setPagingEnabled(boolean enabled);
+
+  void setPageSize(int pageSize);
+
+  int getPageSize();
+
+  void setPageIndex(int index);
+
+  int getPageIndex();
+
+  @Override
+  IMobileTableUiFacade getUIFacade();
 }

@@ -13,6 +13,10 @@ package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -26,6 +30,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.RowIndexComparator;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
@@ -66,12 +71,16 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
   private UiRedrawHandler m_redrawHandler;
   private ListViewer m_uiViewer;
   private String m_variant = "";
+  private Set<ITableRowFilter> m_tableRowSelectionFilters;
+  private boolean m_ignoreNextSelectionEvent;
 
   public RwtScoutList() {
+    this(null);
   }
 
   public RwtScoutList(String variant) {
     m_variant = variant;
+    m_tableRowSelectionFilters = new HashSet<ITableRowFilter>();
   }
 
   @Override
@@ -330,6 +339,10 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
   }
 
   protected void setSelectionFromScout(ITableRow[] selectedRows) {
+    setSelectionFromScout(selectedRows, true);
+  }
+
+  protected void setSelectionFromScout(ITableRow[] selectedRows, boolean considerScrollToSelection) {
     if (getUiField().isDisposed()) {
       return;
     }
@@ -342,8 +355,10 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
       if (selectedRows == null) {
         selectedRows = new ITableRow[0];
       }
-      getUiTableViewer().setSelection(new StructuredSelection(selectedRows), true);
-      updateScrollToSelectionFromScout();
+      getUiTableViewer().setSelection(new StructuredSelection(selectedRows), considerScrollToSelection);
+      if (considerScrollToSelection) {
+        updateScrollToSelectionFromScout();
+      }
     }
   }
 
@@ -387,84 +402,159 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     return visualCellIndex;
   }
 
+  /**
+   * @param informScoutModel
+   *          if false, only the ui selection will be cleared, the selection in the model won't be modified
+   */
+  public void clearSelection(boolean informScoutModel) {
+    if (!informScoutModel) {
+      m_ignoreNextSelectionEvent = true;
+    }
+    getUiField().deselectAll();
+  }
+
+  /**
+   * Restores the selection in the ui with the selected rows from the scout model.
+   */
+  public void restoreSelection() {
+    setSelectionFromScout(getScoutObject().getSelectedRows(), false);
+  }
+
   protected void setSelectionFromUi(final StructuredSelection selection) {
+    if (m_ignoreNextSelectionEvent) {
+      m_ignoreNextSelectionEvent = false;
+      return;
+    }
+    if (getScoutObject() == null) {
+      return;
+    }
     if (getUpdateUiFromScoutLock().isAcquired()) {
       return;
     }
-    //
-    if (getScoutObject() != null) {
-      // notify Scout
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          try {
-            addIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_ROWS_SELECTED);
-            //
-            getScoutObject().getUIFacade().setSelectedRowsFromUI(RwtUtility.getItemsOfSelection(ITableRow.class, selection));
-          }
-          finally {
-            removeIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_ROWS_SELECTED);
-          }
-        }
-      };
-      getUiEnvironment().invokeScoutLater(t, 0);
-      // end notify
+
+    ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, selection);
+    final ITableRow[] selectedRowsFiltered = filterTableRows(selectedRows);
+    if (selectedRows.length > 0 && selectedRowsFiltered.length == 0) {
+      //Don't notify model if every row was removed due to the filter
+      return;
     }
+
+    // notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          addIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_ROWS_SELECTED);
+          //
+          getScoutObject().getUIFacade().setSelectedRowsFromUI(selectedRowsFiltered);
+        }
+        finally {
+          removeIgnoredScoutEvent(TableEvent.class, "" + TableEvent.TYPE_ROWS_SELECTED);
+        }
+      }
+    };
+    getUiEnvironment().invokeScoutLater(t, 0);
+    // end notify
+  }
+
+  public void addTableRowSelectionFilter(ITableRowFilter filter) {
+    m_tableRowSelectionFilters.add(filter);
+  }
+
+  public void removeTableRowSelectionFilter(ITableRowFilter filter) {
+    m_tableRowSelectionFilters.remove(filter);
+  }
+
+  private ITableRow[] filterTableRows(ITableRow... rows) {
+    if (rows == null) {
+      return new ITableRow[0];
+    }
+    if (m_tableRowSelectionFilters.size() == 0) {
+      return rows;
+    }
+
+    List<ITableRow> filteredRows = new LinkedList<ITableRow>();
+    for (ITableRow row : rows) {
+      boolean accept = false;
+      for (ITableRowFilter filter : m_tableRowSelectionFilters) {
+        accept = filter.accept(row);
+        if (!accept) {
+          break;
+        }
+      }
+
+      if (accept) {
+        filteredRows.add(row);
+      }
+
+    }
+
+    return filteredRows.toArray(new ITableRow[filteredRows.size()]);
   }
 
   protected void handleUiRowClick(final ITableRow row) {
-    if (getScoutObject() != null) {
-      if (row != null) {
-        // notify Scout
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            getScoutObject().getUIFacade().fireRowClickFromUI(row);
-          }
-        };
-        getUiEnvironment().invokeScoutLater(t, 0);
-        // end notify
-      }
+    if (getScoutObject() == null || row == null) {
+      return;
     }
+    ITableRow[] filteredRows = filterTableRows(row);
+    if (filteredRows.length == 0) {
+      return;
+    }
+
+    // notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        getScoutObject().getUIFacade().fireRowClickFromUI(row);
+      }
+    };
+    getUiEnvironment().invokeScoutLater(t, 0);
+    // end notify
   }
 
   protected void handleUiRowAction(final ITableRow row) {
-    if (getScoutObject() != null) {
-      if (!getScoutObject().isCheckable() && row != null) {
-        // notify Scout
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            getScoutObject().getUIFacade().fireRowActionFromUI(row);
-          }
-        };
-        getUiEnvironment().invokeScoutLater(t, 0);
-        // end notify
-      }
+    if (getScoutObject() == null || row == null || getScoutObject().isCheckable()) {
+      return;
     }
+    ITableRow[] filteredRows = filterTableRows(row);
+    if (filteredRows.length == 0) {
+      return;
+    }
+
+    // notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        getScoutObject().getUIFacade().fireRowActionFromUI(row);
+      }
+    };
+    getUiEnvironment().invokeScoutLater(t, 0);
+    // end notify
   }
 
   protected void handleUiHyperlinkAction(String urlText) {
-    if (getScoutObject() != null) {
-      final URL url;
-      try {
-        url = new URL(urlText);
-      }
-      catch (MalformedURLException e) {
-        //nop
-        return;
-      }
-      // notify Scout
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          ITable table = getScoutObject();
-          table.getUIFacade().fireHyperlinkActionFromUI(table.getSelectedRow(), table.getContextColumn(), url);
-        }
-      };
-      getUiEnvironment().invokeScoutLater(t, 0);
-      // end notify
+    if (getScoutObject() == null) {
+      return;
     }
+
+    final URL url;
+    try {
+      url = new URL(urlText);
+    }
+    catch (MalformedURLException e) {
+      //nop
+      return;
+    }
+    // notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        ITable table = getScoutObject();
+        table.getUIFacade().fireHyperlinkActionFromUI(table.getSelectedRow(), table.getContextColumn(), url);
+      }
+    };
+    getUiEnvironment().invokeScoutLater(t, 0);
+    // end notify
   }
 
   protected void handleUiToggleAcction(Event e) {
