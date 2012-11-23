@@ -42,6 +42,15 @@ public class MobileTablePropertyDelegator extends TablePropertyDelegator<ITable,
     if (getSender().hasProperty(IMobileTable.PROP_DRILL_DOWN_STYLE_MAP)) {
       getReceiver().setDrillDownStyleMap((DrillDownStyleMap) getSender().getProperty(IMobileTable.PROP_DRILL_DOWN_STYLE_MAP));
     }
+    if (getSender().hasProperty(IMobileTable.PROP_PAGING_ENABLED)) {
+      getReceiver().setPagingEnabled((Boolean) getSender().getProperty(IMobileTable.PROP_PAGING_ENABLED));
+    }
+    if (getSender().hasProperty(IMobileTable.PROP_PAGE_SIZE)) {
+      getReceiver().setPageSize((Integer) getSender().getProperty(IMobileTable.PROP_PAGE_SIZE));
+    }
+    if (getSender().hasProperty(IMobileTable.PROP_PAGE_INDEX)) {
+      getReceiver().setPageIndex((Integer) getSender().getProperty(IMobileTable.PROP_PAGE_INDEX));
+    }
   }
 
   @Override
@@ -54,6 +63,14 @@ public class MobileTablePropertyDelegator extends TablePropertyDelegator<ITable,
     else if (name.equals(IMobileTable.PROP_DRILL_DOWN_STYLE_MAP)) {
       getReceiver().setDrillDownStyleMap((DrillDownStyleMap) newValue);
     }
+    else if (name.equals(IMobileTable.PROP_PAGING_ENABLED)) {
+      getReceiver().setPagingEnabled((Boolean) newValue);
+    }
+    else if (name.equals(IMobileTable.PROP_PAGE_SIZE)) {
+      getReceiver().setPageSize((Integer) newValue);
+    }
+    else if (name.equals(IMobileTable.PROP_PAGE_INDEX)) {
+      getReceiver().setPageIndex((Integer) newValue);
+    }
   }
-
 }

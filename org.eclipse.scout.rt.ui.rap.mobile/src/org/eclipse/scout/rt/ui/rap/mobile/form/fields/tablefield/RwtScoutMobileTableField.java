@@ -43,7 +43,7 @@ public class RwtScoutMobileTableField extends RwtScoutTableField {
 
   @Override
   protected IRwtScoutTable createRwtScoutTable() {
-    return new RwtScoutList();
+    return new RwtScoutMobileList();
   }
 
   @Override
