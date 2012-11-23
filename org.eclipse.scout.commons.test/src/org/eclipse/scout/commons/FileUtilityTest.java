@@ -1,19 +1,20 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2012 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ *     Stephan Merkli - initial API and implementation
+ *     Stephan Leicht Vogt - Correction for tycho surefire testing
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
 import java.io.File;
-import java.net.URL;
+import java.io.InputStream;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.utility.TestUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,13 +24,23 @@ import org.junit.Test;
 public class FileUtilityTest extends Assert {
 
   @Test
-  public void testIsZipFile() throws ProcessingException {
-    Assert.assertTrue("zip.zip is not a zip file", FileUtility.isZipFile(getFile("zip.zip")));
-    Assert.assertFalse("nozip.zip is a zip file", FileUtility.isZipFile(getFile("nozip.zip")));
+  public void testIsZipFile() throws Exception {
+    File zipFile = null;
+    File noZipFile = null;
+    try {
+      zipFile = getFile("/zip.zip");
+      noZipFile = getFile("/nozip.zip");
+      Assert.assertTrue("zip.zip is not a zip file", FileUtility.isZipFile(zipFile));
+      Assert.assertFalse("nozip.zip is a zip file", FileUtility.isZipFile(noZipFile));
+    }
+    finally {
+      TestUtility.deleteTempFile(zipFile);
+      TestUtility.deleteTempFile(noZipFile);
+    }
   }
 
-  private File getFile(String fileName) throws ProcessingException {
-    URL resource = FileUtilityTest.class.getResource(fileName);
-    return new File(resource.getPath());
+  private File getFile(String fileName) throws Exception {
+    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+    return TestUtility.createTempFileFromResource(inputStream);
   }
 }
