@@ -33,4 +33,8 @@ public final class TestUtility {
       tempFile.delete();
     }
   }
+
+  private TestUtility() {
+    //empty hidden constructor
+  }
 }
