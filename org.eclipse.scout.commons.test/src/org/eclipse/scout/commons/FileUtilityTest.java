@@ -39,7 +39,7 @@ public class FileUtilityTest extends Assert {
     }
   }
 
-  private File getFile(String fileName) throws Exception {
+  private File getFile(String fileName) {
     InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
     return TestUtility.createTempFileFromResource(inputStream);
   }
