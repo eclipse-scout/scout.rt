@@ -128,6 +128,15 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     return IRowSummaryColumn.DRILL_DOWN_STYLE_ICON;
   }
 
+  /**
+   * Makes sure page index is not greater than page count
+   */
+  private void updatePageIndex() {
+    if (getPageIndex() >= getPageCount()) {
+      setPageIndex(getOriginalTable(), getPageCount() - 1);
+    }
+  }
+
   public void dispose() {
     if (m_tableListener == null) {
       return;
@@ -265,6 +274,12 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   private void handleWrappedTableRowsInserted(ITableRow[] rows) {
+    insertWrappedTableRows(rows);
+
+    updatePageIndex();
+  }
+
+  private void insertWrappedTableRows(ITableRow[] rows) {
     if (!getContentColumn().isInitialized()) {
       getContentColumn().initializeDecorationConfiguration(getOriginalTable(), m_maxCellDetailColumns);
     }
@@ -342,8 +357,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
       reset();
 
       if (originalTable.getRows().length > 0) {
-        //'fire' a rows inserted event with all rows
-        tableChanged(new TableEvent(originalTable, TableEvent.TYPE_ROWS_INSERTED, originalTable.getRows()));
+        insertWrappedTableRows(originalTable.getRows());
       }
 
       selectRows();

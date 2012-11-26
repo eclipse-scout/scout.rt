@@ -53,6 +53,8 @@ public interface IMobileTable extends ITable {
 
   int getPageIndex();
 
+  int getPageCount();
+
   @Override
   IMobileTableUiFacade getUIFacade();
 }

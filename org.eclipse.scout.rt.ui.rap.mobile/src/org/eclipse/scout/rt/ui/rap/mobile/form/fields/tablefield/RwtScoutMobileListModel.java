@@ -31,6 +31,15 @@ public class RwtScoutMobileListModel extends RwtScoutListModel {
   }
 
   @Override
+  public void dispose() {
+    super.dispose();
+    if (m_pagingSupport != null) {
+      m_pagingSupport.dispose();
+      m_pagingSupport = null;
+    }
+  }
+
+  @Override
   public IMobileTable getScoutTable() {
     return (IMobileTable) super.getScoutTable();
   }
