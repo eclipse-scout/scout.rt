@@ -31,7 +31,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmartField<?>> implements IRwtScoutSmartField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutMobileSmartField.class);
@@ -50,7 +50,7 @@ public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmart
     m_smartContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
     m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
 
-    Label textField = new Label(m_smartContainer, SWT.NONE);
+    Text textField = new Text(m_smartContainer, SWT.NONE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
 
     // correction to look like a normal text
@@ -70,12 +70,11 @@ public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmart
     m_smartContainer.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
     GridLayout gridLayout = RwtLayoutUtility.createGridLayoutNoSpacing(2, false);
     //Paddings cannot be set in css because then mouse click won't work in that region
-    gridLayout.marginLeft = 5;
-    gridLayout.marginRight = 5;
+    gridLayout.marginLeft = 6;
+    gridLayout.marginRight = 6;
     m_smartContainer.setLayout(gridLayout);
 
     GridData textLayoutData = new GridData(SWT.FILL, SWT.CENTER, true, true);
-    textLayoutData.verticalIndent = 1;
     textField.setLayoutData(textLayoutData);
 
     GridData buttonLayoutData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
@@ -97,8 +96,8 @@ public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmart
   }
 
   @Override
-  public Label getUiField() {
-    return (Label) super.getUiField();
+  public Text getUiField() {
+    return (Text) super.getUiField();
   }
 
   @Override
@@ -115,14 +114,17 @@ public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmart
       if (s == null) {
         s = "";
       }
-      Label field = getUiField();
-      field.setText(s);
+      getUiField().setText(s);
     }
   }
 
   @Override
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
+
+    //Textfields are never disabled, see TextFieldEditableSupport.
+    getUiField().setEnabled(true);
+    getUiField().setEditable(false);
 
     if (b) {
       m_smartContainer.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
@@ -136,8 +138,7 @@ public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<ISmart
 
   @Override
   protected void setFieldEnabled(Control field, boolean enabled) {
-    //Textfields are never disabled, see TextFieldEditableSupport.
-    super.setFieldEnabled(field, true);
+    // nop
   }
 
   private void updateBrowseIconVariant(boolean enabled, String iconId) {

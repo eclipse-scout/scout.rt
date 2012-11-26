@@ -2171,13 +2171,8 @@ Composite.smartfield-disabled {
 Composite.smartfield:hover {
   background-color: #fef9f1;
 }
-Label.smartfield {
-  border-radius: 4px;
-  background-image: none;
-  background-color: transparent;
-}
-Label.smartfield:disabled {
-  background-color: #f4f8fc;
+Text.smartfield {
+  padding: 0px;
 }
 Composite.smartfield_browse {
   background-image: url(theme/img/button/smartfield_browse.png);
@@ -2190,13 +2185,8 @@ Composite.datefield_icon {
   border-radius: 5px;
   border: none;
 }
-Label.datefield {
-  border-radius: 4px;
-  background-image: none;
-  background-color: transparent;
-}
-Label.datefield:disabled {
-  background-color: #f4f8fc;
+Text.datefield {
+  padding: 0px;
 }
 Composite.datefield:hover {
   background-color: #fef9f1;
@@ -2208,13 +2198,8 @@ Composite.datefield_icon-disabled {
 Composite.timefield:hover {
   background-color: #fef9f1;
 }
-Label.timefield {
-  border-radius: 4px;
-  background-image: none;
-  background-color: transparent;
-}
-Label.timefield:disabled {
-  background-color: #f4f8fc;
+Text.timefield {
+  padding: 0px;
 }
 Composite.timefield_icon {
   background-image: url(theme/img/button/datefield_time.png);

@@ -34,8 +34,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * @since 3.9.0
@@ -58,7 +58,7 @@ public class RwtScoutMobileDateField extends RwtScoutValueFieldComposite<IDateFi
     m_dateContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
     m_dateContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
 
-    Label textField = new Label(m_dateContainer, SWT.NONE);
+    Text textField = new Text(m_dateContainer, SWT.NONE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
     textField.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
 
@@ -74,12 +74,11 @@ public class RwtScoutMobileDateField extends RwtScoutValueFieldComposite<IDateFi
     m_dateContainer.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
     GridLayout gridLayout = RwtLayoutUtility.createGridLayoutNoSpacing(2, false);
     //Paddings cannot be set in css because then mouse click won't work in that region
-    gridLayout.marginLeft = 5;
-    gridLayout.marginRight = 5;
+    gridLayout.marginLeft = 6;
+    gridLayout.marginRight = 6;
     m_dateContainer.setLayout(gridLayout);
 
     GridData textLayoutData = new GridData(SWT.FILL, SWT.CENTER, true, true);
-    textLayoutData.verticalIndent = 1;
     textField.setLayoutData(textLayoutData);
 
     GridData buttonLayoutData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
@@ -98,8 +97,8 @@ public class RwtScoutMobileDateField extends RwtScoutValueFieldComposite<IDateFi
   }
 
   @Override
-  public Label getUiField() {
-    return (Label) super.getUiField();
+  public Text getUiField() {
+    return (Text) super.getUiField();
   }
 
   @Override
@@ -130,6 +129,10 @@ public class RwtScoutMobileDateField extends RwtScoutValueFieldComposite<IDateFi
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
 
+    //Textfields are never disabled, see TextFieldEditableSupport.
+    getUiField().setEnabled(true);
+    getUiField().setEditable(false);
+
     if (b) {
       m_dateContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
       m_iconContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD_ICON);
@@ -142,8 +145,7 @@ public class RwtScoutMobileDateField extends RwtScoutValueFieldComposite<IDateFi
 
   @Override
   protected void setFieldEnabled(Control field, boolean enabled) {
-    //Textfields are never disabled, see TextFieldEditableSupport.
-    super.setFieldEnabled(field, true);
+    // nop
   }
 
   @Override
