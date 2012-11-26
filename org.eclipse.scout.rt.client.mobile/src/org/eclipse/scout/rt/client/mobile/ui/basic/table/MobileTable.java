@@ -66,7 +66,8 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
       m_tableListener = new P_TableEventListener();
 
       m_tableListener.initalizeWith(originalTable);
-      getOriginalTable().addTableListener(m_tableListener);
+      //Attach as UI listener to make sure every "business logic" listener comes first
+      getOriginalTable().addUITableListener(m_tableListener);
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -176,8 +177,6 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
         originalRow = getRowMapColumn().getValue(rows[0]);
       }
       if (originalRow != null) {
-        // TODO CGU: Attention: Drill Down style may not be accurate at this time.
-        // This may happen if the events are executed as batch and another listener sets the style on a rows inserted event (see PageForm)
         if (isAutoCreateTableRowForm() && IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(getDrillDownStyle(originalRow))) {
           startTableRowForm(originalRow);
         }
