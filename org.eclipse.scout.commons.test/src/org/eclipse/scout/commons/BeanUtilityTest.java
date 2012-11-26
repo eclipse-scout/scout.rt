@@ -134,22 +134,28 @@ public class BeanUtilityTest {
     assertNotNull(BeanUtility.createInstance(NonStaticInnerClass.class, this));
   }
 
+  static final long TEST_LONG_42 = 42L;
+  static final long TEST_LONG_NEG_42 = -42L;
+
+  static final String EXPECTED_CONSTR_PRIM_LONG = "Expected constructor with primitive type long";
+  static final String EXPECTED_CONSTR_LONG = "Expected constructor with complex type java.lang.Long";
+
   @Test
   public void testCreateInstancePrimitiveType() throws Exception {
     {
-      PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{42L});
+      PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{TEST_LONG_42});
       assertNotNull(obj);
-      assertEquals("Expected constructor with primitive type long", 42L, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
     }
     {
-      PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, new Class<?>[]{Long.class}, new Object[]{42L});
+      PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, new Class<?>[]{Long.class}, new Object[]{TEST_LONG_42});
       assertNotNull(obj);
-      assertEquals("Expected constructor with primitive type long", 42L, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
     }
     {
-      PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, 42L);
+      PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, TEST_LONG_42);
       assertNotNull(obj);
-      assertEquals("Expected constructor with complex type java.lang.Long", 42L, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_LONG, TEST_LONG_42, obj.getLong());
     }
     {
       PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, new Object[]{null});
@@ -160,76 +166,79 @@ public class BeanUtilityTest {
   @Test
   public void testCreateInstanceComplexType() throws Exception {
     {
-      ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, new Class<?>[]{Long.class}, new Object[]{42L});
+      ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, new Class<?>[]{Long.class}, new Object[]{TEST_LONG_42});
       assertNotNull(obj);
-      assertEquals("Expected constructor with primitive type long", 42L, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
     }
     {
-      ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{42L});
+      ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{TEST_LONG_42});
       assertNotNull(obj);
-      assertEquals("Expected constructor with primitive type long", 42L, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
     }
     {
-      ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, 42L);
+      ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, TEST_LONG_42);
       assertNotNull(obj);
-      assertEquals("Expected constructor with complex type java.lang.Long", 42L, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_LONG, TEST_LONG_42, obj.getLong());
     }
     {
       ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, new Object[]{null});
       assertNotNull(obj);
-      assertEquals("Expected constructor with complex type java.lang.Long", Long.MAX_VALUE, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_LONG, Long.MAX_VALUE, obj.getLong());
     }
   }
 
   @Test
   public void testCreateInstancePrimitiveAndComplexType() throws Exception {
     {
-      PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{42L});
+      PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{TEST_LONG_42});
       assertNotNull(obj);
-      assertEquals("Expected constructor with primitive type long", 42L, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_42, obj.getLong());
     }
     {
-      PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, new Class<?>[]{Long.class}, new Object[]{42L});
+      PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, new Class<?>[]{Long.class}, new Object[]{TEST_LONG_42});
       assertNotNull(obj);
-      assertEquals("Expected constructor with primitive type long", -42L, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_PRIM_LONG, TEST_LONG_NEG_42, obj.getLong());
     }
     {
-      PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, 42L);
+      PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, TEST_LONG_42);
       assertNotNull(obj);
-      assertEquals("Expected constructor with complex type java.lang.Long", -42L, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_LONG, TEST_LONG_NEG_42, obj.getLong());
     }
     {
       PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, new Object[]{null});
       assertNotNull(obj);
-      assertEquals("Expected constructor with complex type java.lang.Long", Long.MAX_VALUE, obj.getLong());
+      assertEquals(EXPECTED_CONSTR_LONG, Long.MAX_VALUE, obj.getLong());
     }
   }
+
+  static final String HELLO = "hello";
+  static final String WORLD = "world";
 
   @Test
   public void testCreateInstanceArray() throws Exception {
     {
-      ArrayConstructor obj = BeanUtility.createInstance(ArrayConstructor.class, new Class<?>[]{String[].class}, new Object[]{new String[]{"hello", "world"}});
+      ArrayConstructor obj = BeanUtility.createInstance(ArrayConstructor.class, new Class<?>[]{String[].class}, new Object[]{new String[]{HELLO, WORLD}});
       assertNotNull(obj);
-      assertArrayEquals(new String[]{"hello", "world"}, obj.getStringArray());
+      assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
     }
     {
-      ArrayConstructor obj = BeanUtility.createInstance(ArrayConstructor.class, (Object) new String[]{"hello", "world"});
+      ArrayConstructor obj = BeanUtility.createInstance(ArrayConstructor.class, (Object) new String[]{HELLO, WORLD});
       assertNotNull(obj);
-      assertArrayEquals(new String[]{"hello", "world"}, obj.getStringArray());
+      assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
     }
   }
 
   @Test
   public void testCreateInstanceVararg() throws Exception {
     {
-      VarargConstructor obj = BeanUtility.createInstance(VarargConstructor.class, new Class<?>[]{String[].class}, new Object[]{new String[]{"hello", "world"}});
+      VarargConstructor obj = BeanUtility.createInstance(VarargConstructor.class, new Class<?>[]{String[].class}, new Object[]{new String[]{HELLO, WORLD}});
       assertNotNull(obj);
-      assertArrayEquals(new String[]{"hello", "world"}, obj.getStringArray());
+      assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
     }
     {
-      VarargConstructor obj = BeanUtility.createInstance(VarargConstructor.class, (Object) new String[]{"hello", "world"});
+      VarargConstructor obj = BeanUtility.createInstance(VarargConstructor.class, (Object) new String[]{HELLO, WORLD});
       assertNotNull(obj);
-      assertArrayEquals(new String[]{"hello", "world"}, obj.getStringArray());
+      assertArrayEquals(new String[]{HELLO, WORLD}, obj.getStringArray());
     }
   }
 

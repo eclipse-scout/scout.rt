@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,7 +24,7 @@ public class MatrixUtilityTest {
   private static final Object[] E4 = new Object[]{4L, "c", 10L, "ñ"};
   private static final Object[] E5 = new Object[]{5L, "ä", 10L, "ë"};
 
-  private Object[][] m_array;
+  private Object[][] m_array = null;
 
   @Before
   public void setUp() {

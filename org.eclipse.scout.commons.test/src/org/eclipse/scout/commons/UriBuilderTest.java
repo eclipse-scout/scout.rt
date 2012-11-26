@@ -25,6 +25,11 @@ import org.junit.Test;
  */
 public class UriBuilderTest {
 
+  static final String SCHEME = "scheme";
+  static final String HOST = "host";
+  static final String PATH_TO_SCHEME = "/path/to";
+  static final String ANCHOR = "anchor";
+
   @Test
   public void testScheme() throws Exception {
     UriBuilder builder = new UriBuilder();
@@ -125,13 +130,18 @@ public class UriBuilderTest {
     //
     assertSame(builder, builder.fragment(null));
     //
-    String fragment = "anchor";
+    String fragment = ANCHOR;
     builder.fragment(fragment);
     assertEquals(fragment, builder.getFragment());
     //
     builder = new UriBuilder("http://acme.com:1234/scout/test/3#bottomPart");
     assertEquals("bottomPart", builder.getFragment());
   }
+
+  static final String NAME1 = "name1";
+  static final String NAME2 = "name2";
+  static final String VALUE1 = "value1";
+  static final String VALUE2 = "value2";
 
   @Test
   public void testParamenter() throws Exception {
@@ -140,20 +150,20 @@ public class UriBuilderTest {
     assertTrue(builder.getParameters().isEmpty());
     //
     builder.parameter(null, null);
-    builder.parameter("name1", null);
-    builder.parameter(null, "value1");
-    builder.parameter("name2", "value2");
+    builder.parameter(NAME1, null);
+    builder.parameter(null, VALUE1);
+    builder.parameter(NAME2, VALUE2);
     assertEquals(1, builder.getParameters().size());
-    assertEquals("value2", builder.getParameters().get("name2"));
-    builder.parameter("name2", null);
+    assertEquals(VALUE2, builder.getParameters().get(NAME2));
+    builder.parameter(NAME2, null);
     assertTrue(builder.getParameters().isEmpty());
     //
     assertSame(builder, builder.parameter(null, null));
     //
     builder = new UriBuilder("http://acme.com:1234/scout?name1=value1&name2=value2");
     assertEquals(2, builder.getParameters().size());
-    assertEquals("value1", builder.getParameters().get("name1"));
-    assertEquals("value2", builder.getParameters().get("name2"));
+    assertEquals(VALUE1, builder.getParameters().get(NAME1));
+    assertEquals(VALUE2, builder.getParameters().get(NAME2));
   }
 
   @Test
@@ -162,31 +172,31 @@ public class UriBuilderTest {
     assertEquals(URI.create(""), builder.createURI());
     //
     builder = new UriBuilder();
-    builder.scheme("scheme").host("host");
+    builder.scheme(SCHEME).host(HOST);
     assertEquals(URI.create("scheme://host"), builder.createURI());
     //
     builder = new UriBuilder();
-    builder.scheme("scheme").path("/path/to");
+    builder.scheme(SCHEME).path(PATH_TO_SCHEME);
     assertEquals(URI.create("scheme:/path/to"), builder.createURI());
     //
     builder = new UriBuilder();
-    builder.scheme("scheme").host("host").path("/path/to");
+    builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME);
     assertEquals(URI.create("scheme://host/path/to"), builder.createURI());
     //
     builder = new UriBuilder();
-    builder.scheme("scheme").host("host").path("/path/to").fragment("anchor");
+    builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR);
     assertEquals(URI.create("scheme://host/path/to#anchor"), builder.createURI());
     //
     builder = new UriBuilder();
-    builder.scheme("scheme").host("host").path("/path/to").fragment("anchor").parameter("key", "value");
+    builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "value");
     assertEquals(URI.create("scheme://host/path/to?key=value#anchor"), builder.createURI());
     //
     builder = new UriBuilder();
-    builder.scheme("scheme").host("host").path("/path/to").fragment("anchor").parameter("key", "äöü");
+    builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "äöü");
     assertEquals("scheme://host/path/to?key=%25E4%25F6%25FC#anchor", builder.createURI().toASCIIString());
     //
     builder = new UriBuilder();
-    builder.scheme("scheme").host("host").path("/path/to").fragment("anchor").parameter("key", "äöü");
+    builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "äöü");
     assertEquals("scheme://host/path/to?key=%25C3%25A4%25C3%25B6%25C3%25BC#anchor", builder.createURI("UTF-8").toASCIIString());
     //
     URI baseUri = new URI("http://www.eclipse.org/scout");
