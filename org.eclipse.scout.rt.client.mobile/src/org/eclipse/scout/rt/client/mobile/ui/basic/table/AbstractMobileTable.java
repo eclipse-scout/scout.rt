@@ -79,6 +79,14 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   }
 
   @Override
+  public int getPageCount() {
+    if (getRowCount() == 0) {
+      return 1;
+    }
+    return new Double(Math.ceil((double) getRowCount() / (double) getPageSize())).intValue();
+  }
+
+  @Override
   public boolean isAutoCreateTableRowForm() {
     return propertySupport.getPropertyBool(PROP_AUTO_CREATE_TABLE_ROW_FORM);
   }

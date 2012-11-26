@@ -29,11 +29,16 @@ public class AbstractPagingSupport {
 
   public AbstractPagingSupport(IMobileTable table) {
     m_table = table;
+    initProperties();
+  }
+
+  protected void initProperties() {
     setPageSize(m_table.getPageSize());
     setPageIndex(m_table.getPageIndex());
   }
 
   public ITableRow[] getElementsOfCurrentPage(ITableRow[] rows) {
+    initProperties();
     if (m_pageSize <= 0 || m_currentPageStartRowIndex < 0 || m_currentPageStartRowIndex >= rows.length) {
       return rows;
     }
@@ -77,12 +82,12 @@ public class AbstractPagingSupport {
     return m_pageIndex;
   }
 
-  public void setPageSize(int pageSize) {
+  protected void setPageSize(int pageSize) {
     m_pageSize = pageSize;
     m_currentPageStartRowIndex = m_pageIndex * m_pageSize;
   }
 
-  public void setPageIndex(int pageIndex) {
+  protected void setPageIndex(int pageIndex) {
     m_pageIndex = pageIndex;
     m_currentPageStartRowIndex = m_pageIndex * m_pageSize;
   }

@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -28,6 +31,8 @@ public class RwtPagingSupport extends AbstractPagingSupport {
   private RwtScoutList m_uiList;
   private P_TableRowSelectionFilter m_tableRowSelectionFilter;
   private P_SelectionListener m_selectionListener;
+  private P_PropertyChangeListener m_propertyChangeListener;
+  private boolean m_propertyLoadLock;
 
   public RwtPagingSupport(RwtScoutList uiList, IMobileTable table) {
     super(table);
@@ -37,11 +42,14 @@ public class RwtPagingSupport extends AbstractPagingSupport {
     m_uiList.getUiTableViewer().addSelectionChangedListener(m_selectionListener);
     m_tableRowSelectionFilter = new P_TableRowSelectionFilter();
     m_uiList.addTableRowSelectionFilter(m_tableRowSelectionFilter);
+    m_propertyChangeListener = new P_PropertyChangeListener();
+    table.addPropertyChangeListener(m_propertyChangeListener);
   }
 
   public void dispose() {
     m_uiList.removeTableRowSelectionFilter(m_tableRowSelectionFilter);
     m_uiList.getUiTableViewer().removeSelectionChangedListener(m_selectionListener);
+    getTable().removePropertyChangeListener(m_propertyChangeListener);
   }
 
   public boolean handleSelection(ITableRow[] rows) {
@@ -71,6 +79,16 @@ public class RwtPagingSupport extends AbstractPagingSupport {
     return false;
   }
 
+  @Override
+  protected void initProperties() {
+    if (m_propertyLoadLock) {
+      return;
+    }
+    else {
+      super.initProperties();
+    }
+  }
+
   /**
    * Refreshes the viewer. Also restores the model selection.
    * <p>
@@ -78,9 +96,20 @@ public class RwtPagingSupport extends AbstractPagingSupport {
    * just changing pages.
    */
   private void refreshAfterPageChange() {
-    m_uiList.clearSelection(false);
+    //Since setPageIndexFromUi is async, it's not sure when it's really written in the model -> lock during refresh 
+    m_propertyLoadLock = true;
+    try {
+      m_uiList.clearSelection(false);
+      refresh();
+      m_uiList.restoreSelection();
+    }
+    finally {
+      m_propertyLoadLock = false;
+    }
+  }
+
+  private void refresh() {
     m_uiList.getUiTableViewer().refresh();
-    m_uiList.restoreSelection();
   }
 
   private void setPageIndexFromUi(final int pageIndex) {
@@ -112,6 +141,34 @@ public class RwtPagingSupport extends AbstractPagingSupport {
       }
 
       return true;
+    }
+
+  }
+
+  protected void handleScoutPropertyChange(String name, Object newValue) {
+    if (IMobileTable.PROP_PAGE_INDEX.equals(name)) {
+      if (getPageIndex() != (Integer) newValue) {
+        refresh();
+      }
+    }
+    else if (IMobileTable.PROP_PAGE_SIZE.equals(name)) {
+      if (getPageSize() != (Integer) newValue) {
+        refresh();
+      }
+    }
+  }
+
+  private class P_PropertyChangeListener implements PropertyChangeListener {
+
+    @Override
+    public void propertyChange(final PropertyChangeEvent evt) {
+      m_uiList.getUiEnvironment().invokeUiLater(new Runnable() {
+
+        @Override
+        public void run() {
+          handleScoutPropertyChange(evt.getPropertyName(), evt.getNewValue());
+        }
+      });
     }
 
   }
