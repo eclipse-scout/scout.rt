@@ -116,13 +116,14 @@ public class StringUtilityTest extends Assert {
     Assert.assertEquals(s, StringUtility.removeMnemonic(s));
   }
 
+  // UTF-8 length is 13 to avoid accidental buffer size matches
+  static final String CHARACTERS = "aouäöüàé";
+
   /**
    * ticket 90988
    */
   @Test
   public void testDecompress_umlauts() throws Exception {
-    // UTF-8 length is 13 to avoid accidental buffer size matches
-    final String CHARACTERS = "aouäöüàé";
 
     StringBuilder builder = new StringBuilder();
     for (int i = 0; i < 100000; i++) {

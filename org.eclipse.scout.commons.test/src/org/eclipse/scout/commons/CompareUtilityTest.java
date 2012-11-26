@@ -20,16 +20,22 @@ import org.junit.Test;
  */
 public class CompareUtilityTest {
 
+  static final String TEST_STRING = "test";
+  static final String FOO_STRING = "foo";
+  static final String BAR_STRING = "bar";
+
+  static final long NUMBER_12 = 12L;
+
   @Test
   public void testIsOneOf() {
-    assertFalse(CompareUtility.isOneOf("test", (Object[]) null));
-    assertFalse(CompareUtility.isOneOf("test", new Object[0]));
-    assertFalse(CompareUtility.isOneOf("test", "foo", "bar"));
-    assertFalse(CompareUtility.isOneOf("test", "foo", 12L));
-    assertFalse(CompareUtility.isOneOf(null, "foo", 12L));
+    assertFalse(CompareUtility.isOneOf(TEST_STRING, (Object[]) null));
+    assertFalse(CompareUtility.isOneOf(TEST_STRING, new Object[0]));
+    assertFalse(CompareUtility.isOneOf(TEST_STRING, FOO_STRING, BAR_STRING));
+    assertFalse(CompareUtility.isOneOf(TEST_STRING, FOO_STRING, NUMBER_12));
+    assertFalse(CompareUtility.isOneOf(null, FOO_STRING, NUMBER_12));
     assertFalse(CompareUtility.isOneOf(null, (Object[]) null));
-    assertTrue(CompareUtility.isOneOf("test", "test", 12L));
-    assertTrue(CompareUtility.isOneOf(null, "test", 12L, null));
+    assertTrue(CompareUtility.isOneOf(TEST_STRING, TEST_STRING, NUMBER_12));
+    assertTrue(CompareUtility.isOneOf(null, TEST_STRING, NUMBER_12, null));
     assertTrue(CompareUtility.isOneOf(null, (Object) null));
   }
 }

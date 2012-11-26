@@ -27,15 +27,17 @@ import org.junit.Test;
  */
 public class UriUtilityTest {
 
+  static final String UTF8_ENCODING = "UTF-8";
+
   @Test
   public void testGetQueryParametersNull() throws Exception {
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null, null));
-    assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null, "UTF-8"));
+    assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null, UTF8_ENCODING));
     assertEquals(Collections.singletonMap("value", "1"), UriUtility.getQueryParameters(URI.create("scheme://test.com/path?value=1"), null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null, null));
-    assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null, "UTF-8"));
+    assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null, UTF8_ENCODING));
     assertEquals(Collections.singletonMap("value", "1"), UriUtility.getQueryParameters(new URL("http://test.com/path?value=1"), null));
   }
 
@@ -53,8 +55,8 @@ public class UriUtilityTest {
     URI uri = builder.createURI();
     assertEquals(Collections.singletonMap("key", "äöü"), UriUtility.getQueryParameters(uri));
     //
-    URI utfUri = builder.createURI("UTF-8");
-    assertEquals(Collections.singletonMap("key", "äöü"), UriUtility.getQueryParameters(utfUri, "UTF-8"));
+    URI utfUri = builder.createURI(UTF8_ENCODING);
+    assertEquals(Collections.singletonMap("key", "äöü"), UriUtility.getQueryParameters(utfUri, UTF8_ENCODING));
   }
 
   @Test
