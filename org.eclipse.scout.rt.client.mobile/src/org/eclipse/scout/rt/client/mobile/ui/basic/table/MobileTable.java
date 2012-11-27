@@ -64,8 +64,8 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     try {
       m_selectionLock = new OptimisticLock();
       m_tableListener = new P_TableEventListener();
+      m_tableListener.init();
 
-      m_tableListener.initalizeWith(originalTable);
       //Attach as UI listener to make sure every "business logic" listener comes first
       getOriginalTable().addUITableListener(m_tableListener);
     }
@@ -273,9 +273,15 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   private void handleWrappedTableRowsInserted(ITableRow[] rows) {
-    insertWrappedTableRows(rows);
+    try {
+      setTableChanging(true);
+      insertWrappedTableRows(rows);
 
-    updatePageIndex();
+      updatePageIndex();
+    }
+    finally {
+      setTableChanging(false);
+    }
   }
 
   private void insertWrappedTableRows(ITableRow[] rows) {
@@ -283,20 +289,18 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
       getContentColumn().initializeDecorationConfiguration(getOriginalTable(), m_maxCellDetailColumns);
     }
 
-    try {
-      setTableChanging(true);
-      for (ITableRow insertedRow : rows) {
-        try {
-          ITableRow row = addRowByArray(new Object[]{insertedRow, "", ""});
-          getContentColumn().updateValue(row, insertedRow, getDrillDownStyleMap());
-        }
-        catch (ProcessingException exception) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(exception);
-        }
+    for (ITableRow insertedRow : rows) {
+      if (!insertedRow.isFilterAccepted()) {
+        continue;
       }
-    }
-    finally {
-      setTableChanging(false);
+
+      try {
+        ITableRow row = addRowByArray(new Object[]{insertedRow, "", ""});
+        getContentColumn().updateValue(row, insertedRow, getDrillDownStyleMap());
+      }
+      catch (ProcessingException exception) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(exception);
+      }
     }
   }
 
@@ -334,7 +338,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     }
   }
 
-  private void selectRows() {
+  private void syncSelectedRows() {
     if (getOriginalTable().getSelectedRowCount() == 0) {
       return;
     }
@@ -342,7 +346,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     selectRows(getRowMapColumn().findRows(getOriginalTable().getSelectedRows()));
   }
 
-  private void checkRows() throws ProcessingException {
+  private void syncCheckedRows() throws ProcessingException {
     if (!isCheckable() || getOriginalTable().getCheckedRows().length == 0) {
       return;
     }
@@ -350,17 +354,27 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     checkRows(getRowMapColumn().findRows(getOriginalTable().getCheckedRows()), true);
   }
 
+  private void syncTableRows() {
+    if (getOriginalTable().getRowCount() == 0) {
+      return;
+    }
+
+    insertWrappedTableRows(getOriginalTable().getRows());
+  }
+
   private class P_TableEventListener extends TableAdapter {
 
-    protected void initalizeWith(ITable originalTable) throws ProcessingException {
-      reset();
+    protected void init() throws ProcessingException {
+      try {
+        setTableChanging(true);
 
-      if (originalTable.getRows().length > 0) {
-        insertWrappedTableRows(originalTable.getRows());
+        syncTableRows();
+        syncSelectedRows();
+        syncCheckedRows();
       }
-
-      selectRows();
-      checkRows();
+      finally {
+        setTableChanging(false);
+      }
     }
 
     @Override
