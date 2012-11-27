@@ -31,11 +31,13 @@ public class ToolFormHandler {
   private P_OutlineListener m_outlineListener;
   private IOutline m_activeOutline;
   private IDesktop m_desktop;
+  private boolean m_closeToolFormsAfterTablePageLoaded;
 
   public ToolFormHandler(IDesktop desktop) {
     m_desktop = desktop;
     m_desktopListener = new P_DesktopListener();
     m_desktop.addDesktopListener(m_desktopListener);
+    m_closeToolFormsAfterTablePageLoaded = true;
   }
 
   private void destroy() {
@@ -57,12 +59,26 @@ public class ToolFormHandler {
     return false;
   }
 
+  public boolean isCloseToolFormsAfterTablePageLoaded() {
+    return m_closeToolFormsAfterTablePageLoaded;
+  }
+
+  /**
+   * Set to true to to close tool forms after a table page has been loaded, which happens after a search or after a
+   * bookmark activation.
+   */
+  public void setCloseToolFormsAfterTablePageLoaded(boolean closeToolFormsAfterTablePageLoaded) {
+    m_closeToolFormsAfterTablePageLoaded = closeToolFormsAfterTablePageLoaded;
+  }
+
   /**
    * This is a delegate and needs to be explicitly called.<br>
    * It's purpose is to close tool forms after a search or after a bookmark activation.
    */
   public void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
-    MobileDesktopUtility.closeAllToolForms();
+    if (isCloseToolFormsAfterTablePageLoaded()) {
+      MobileDesktopUtility.closeAllToolForms();
+    }
   }
 
   private class P_DesktopListener implements DesktopListener {
