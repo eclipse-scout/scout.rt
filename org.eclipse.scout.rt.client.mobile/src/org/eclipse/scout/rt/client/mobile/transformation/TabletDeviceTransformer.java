@@ -80,7 +80,10 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
       form.setDisplayViewId(IForm.VIEW_ID_E);
     }
     if (IForm.VIEW_ID_E.equals(form.getDisplayViewId())) {
-      MobileDesktopUtility.setFormWidthHint(form, EAST_FORM_WIDTH);
+      boolean valueSet = MobileDesktopUtility.setFormWidthHint(form, EAST_FORM_WIDTH);
+      if (valueSet) {
+        markGridDataDirty();
+      }
     }
   }
 
