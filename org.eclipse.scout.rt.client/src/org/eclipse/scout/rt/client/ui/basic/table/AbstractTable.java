@@ -18,8 +18,10 @@ import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -3253,7 +3255,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       ce.setCopyObject(last.getCopyObject());
       ce.addPopupMenus(last.getPopupMenus());
       //columns
-      HashSet<IColumn> colList = new HashSet<IColumn>();
+      Set<IColumn> colList = new LinkedHashSet<IColumn>();
       for (TableEvent t : list) {
         if (t.getColumns() != null) {
           colList.addAll(Arrays.asList(t.getColumns()));
@@ -3261,7 +3263,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       ce.setColumns(colList.toArray(new IColumn<?>[0]));
       //rows
-      HashSet<ITableRow> rowList = new HashSet<ITableRow>();
+      Set<ITableRow> rowList = new LinkedHashSet<ITableRow>();
       for (TableEvent t : list) {
         if (t.getRowCount() > 0) {
           for (ITableRow row : t.getRows()) {
