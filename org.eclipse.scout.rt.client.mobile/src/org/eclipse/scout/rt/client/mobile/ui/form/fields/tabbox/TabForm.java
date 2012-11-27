@@ -36,18 +36,25 @@ public class TabForm extends AbstractForm {
   @Order(10)
   public class Mainbox extends AbstractGroupBox {
 
-    @Override
-    protected void initConfig() {
-      super.initConfig();
+    @Order(10)
+    public class Groupbox extends AbstractGroupBox {
 
-      new GroupBoxPropertyDelegator(m_tabGroupBox, this).init();
-    }
+      @Override
+      protected void initConfig() {
+        super.initConfig();
 
-    @Override
-    protected void injectFieldsInternal(List<IFormField> fieldList) {
-      super.injectFieldsInternal(fieldList);
+        new GroupBoxPropertyDelegator(m_tabGroupBox, this).init();
 
-      fieldList.addAll(Arrays.asList(m_tabGroupBox.getFields()));
+        setTitle(m_tabGroupBox.getLabel());
+        setBorderDecoration(BORDER_DECORATION_EMPTY);
+      }
+
+      @Override
+      protected void injectFieldsInternal(List<IFormField> fieldList) {
+        super.injectFieldsInternal(fieldList);
+
+        fieldList.addAll(Arrays.asList(m_tabGroupBox.getFields()));
+      }
     }
 
     @Order(10)
@@ -74,8 +81,7 @@ public class TabForm extends AbstractForm {
 
     @Override
     protected void execLoad() throws ProcessingException {
-      setTitle(m_tabGroupBox.getLabel());
-      m_tabGroupBox.setBorderDecoration(IGroupBox.BORDER_DECORATION_EMPTY);
+
     }
 
   }
