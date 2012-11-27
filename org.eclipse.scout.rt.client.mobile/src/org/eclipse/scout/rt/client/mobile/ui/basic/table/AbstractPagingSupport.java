@@ -67,11 +67,11 @@ public class AbstractPagingSupport {
   }
 
   private ITableRow createPreviousElementsTableRow() {
-    return new PageChangeTableRow(m_table.getColumnSet(), PageChangeTableRow.Type.back);
+    return new PagingTableRow(m_table.getColumnSet(), PagingTableRow.Type.back);
   }
 
   private ITableRow createNextElementsTableRow() {
-    return new PageChangeTableRow(m_table.getColumnSet(), PageChangeTableRow.Type.forward);
+    return new PagingTableRow(m_table.getColumnSet(), PagingTableRow.Type.forward);
   }
 
   public int getCurrentPageStartRowIndex() {
