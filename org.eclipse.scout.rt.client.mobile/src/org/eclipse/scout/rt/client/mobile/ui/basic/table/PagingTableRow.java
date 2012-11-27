@@ -19,8 +19,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-public class PageChangeTableRow extends TableRow {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PageChangeTableRow.class);
+public class PagingTableRow extends TableRow {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PagingTableRow.class);
   private static String s_htmlCellTemplate;
 
   static {
@@ -34,7 +34,7 @@ public class PageChangeTableRow extends TableRow {
 
   private Type m_type;
 
-  public PageChangeTableRow(ColumnSet columnSet, Type type) {
+  public PagingTableRow(ColumnSet columnSet, Type type) {
     super(columnSet);
     m_type = type;
     updateContent(columnSet);
