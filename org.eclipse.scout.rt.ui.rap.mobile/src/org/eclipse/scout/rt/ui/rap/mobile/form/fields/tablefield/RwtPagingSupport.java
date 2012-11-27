@@ -13,15 +13,16 @@ package org.eclipse.scout.rt.ui.rap.mobile.form.fields.tablefield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractPagingSupport;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.IMobileTable;
-import org.eclipse.scout.rt.client.mobile.ui.basic.table.PageChangeTableRow;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.PagingTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 /**
  * @since 3.9.0
@@ -39,7 +40,7 @@ public class RwtPagingSupport extends AbstractPagingSupport {
     m_uiList = uiList;
 
     m_selectionListener = new P_SelectionListener();
-    m_uiList.getUiTableViewer().addSelectionChangedListener(m_selectionListener);
+    m_uiList.getUiField().addListener(SWT.MouseUp, m_selectionListener);
     m_tableRowSelectionFilter = new P_TableRowSelectionFilter();
     m_uiList.addTableRowSelectionFilter(m_tableRowSelectionFilter);
     m_propertyChangeListener = new P_PropertyChangeListener();
@@ -48,7 +49,7 @@ public class RwtPagingSupport extends AbstractPagingSupport {
 
   public void dispose() {
     m_uiList.removeTableRowSelectionFilter(m_tableRowSelectionFilter);
-    m_uiList.getUiTableViewer().removeSelectionChangedListener(m_selectionListener);
+    m_uiList.getUiField().removeListener(SWT.MouseUp, m_selectionListener);
     getTable().removePropertyChangeListener(m_propertyChangeListener);
   }
 
@@ -96,15 +97,17 @@ public class RwtPagingSupport extends AbstractPagingSupport {
    * just changing pages.
    */
   private void refreshAfterPageChange() {
-    //Since setPageIndexFromUi is async, it's not sure when it's really written in the model -> lock during refresh 
+    //Since setPageIndexFromUi is async, it's not sure when it's really written in the model -> lock during refresh
     m_propertyLoadLock = true;
+    m_uiList.setPreventSelectionHandling(true);
     try {
-      m_uiList.clearSelection(false);
       refresh();
+      m_uiList.clearSelection();
       m_uiList.restoreSelection();
     }
     finally {
       m_propertyLoadLock = false;
+      m_uiList.setPreventSelectionHandling(false);
     }
   }
 
@@ -123,20 +126,27 @@ public class RwtPagingSupport extends AbstractPagingSupport {
     }, 0);
   }
 
-  private class P_SelectionListener implements ISelectionChangedListener {
+  private class P_SelectionListener implements Listener {
+
+    private static final long serialVersionUID = 1L;
 
     @Override
-    public void selectionChanged(SelectionChangedEvent event) {
-      StructuredSelection selection = (StructuredSelection) event.getSelection();
-      ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, selection);
-      handleSelection(selectedRows);
+    public void handleEvent(Event event) {
+      if (event.type == SWT.MouseUp) {
+        StructuredSelection selection = (StructuredSelection) m_uiList.getUiTableViewer().getSelection();
+        ITableRow[] selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, selection);
+        if (handleSelection(selectedRows)) {
+          event.doit = false;
+        }
+      }
     }
+
   }
 
   private class P_TableRowSelectionFilter implements ITableRowFilter {
     @Override
     public boolean accept(ITableRow row) {
-      if (row instanceof PageChangeTableRow) {
+      if (row instanceof PagingTableRow) {
         return false;
       }
 

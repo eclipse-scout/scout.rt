@@ -72,7 +72,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
   private ListViewer m_uiViewer;
   private String m_variant = "";
   private Set<ITableRowFilter> m_tableRowSelectionFilters;
-  private boolean m_ignoreNextSelectionEvent;
+  private boolean m_preventSelectionHandling;
 
   public RwtScoutList() {
     this(null);
@@ -329,8 +329,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
   }
 
   protected void setHeaderVisibleFromScout(boolean headerVisible) {
-    //FIXME CGU create  header to allow sorting
-//    getUiField().setHeaderVisible(headerVisible);
+    // nop
   }
 
   @Override
@@ -402,14 +401,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     return visualCellIndex;
   }
 
-  /**
-   * @param informScoutModel
-   *          if false, only the ui selection will be cleared, the selection in the model won't be modified
-   */
-  public void clearSelection(boolean informScoutModel) {
-    if (!informScoutModel) {
-      m_ignoreNextSelectionEvent = true;
-    }
+  public void clearSelection() {
     getUiField().deselectAll();
   }
 
@@ -420,9 +412,16 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     setSelectionFromScout(getScoutObject().getSelectedRows(), false);
   }
 
+  /**
+   * If set to true the selection listener {@link P_RwtSelectionListener} will be disabled. The caller is responsible to
+   * re enable if afterwards.
+   */
+  public void setPreventSelectionHandling(boolean preventSelectionHandling) {
+    m_preventSelectionHandling = preventSelectionHandling;
+  }
+
   protected void setSelectionFromUi(final StructuredSelection selection) {
-    if (m_ignoreNextSelectionEvent) {
-      m_ignoreNextSelectionEvent = false;
+    if (m_preventSelectionHandling) {
       return;
     }
     if (getScoutObject() == null) {
@@ -645,6 +644,11 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
 
     @Override
     public void handleEvent(Event event) {
+      //Doit can be used by other listeners to prevent the execution of this one
+      if (!event.doit) {
+        return;
+      }
+
       switch (event.type) {
         case SWT.MouseUp: {
           setContextColumnFromUi();
