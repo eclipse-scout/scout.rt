@@ -13,11 +13,8 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MultiPageChangeStrategy;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.TabForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IPageForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
@@ -50,6 +47,13 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
     return manager;
   }
 
+  @Override
+  protected ToolFormHandler createToolFormHandler(IDesktop desktop) {
+    ToolFormHandler toolFormHandler = new ToolFormHandler(getDesktop());
+    toolFormHandler.setCloseToolFormsAfterTablePageLoaded(false);
+    return toolFormHandler;
+  }
+
   /**
    * On tablet devices there are at maximum two view stacks, on mobile only one. So it is not necessary to create the
    * other ones which saves unnecessary composites and therefore loading time.
@@ -71,15 +75,6 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
   }
 
   @Override
-  public void transformForm(IForm form) throws ProcessingException {
-    super.transformForm(form);
-
-    if (execCloseToolFormsOnFormOpen(form)) {
-      MobileDesktopUtility.closeAllToolForms();
-    }
-  }
-
-  @Override
   protected void transformView(IForm form) {
     if (!(form instanceof IPageForm || form instanceof IOutlineChooserForm)) {
       form.setDisplayViewId(IForm.VIEW_ID_E);
@@ -87,10 +82,6 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
     if (IForm.VIEW_ID_E.equals(form.getDisplayViewId())) {
       MobileDesktopUtility.setFormWidthHint(form, EAST_FORM_WIDTH);
     }
-  }
-
-  protected boolean execCloseToolFormsOnFormOpen(IForm form) {
-    return !(form instanceof TableRowForm) && !(form instanceof TabForm);
   }
 
   @Override
