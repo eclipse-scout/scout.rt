@@ -179,10 +179,15 @@ public class MobileDesktopUtility {
     return false;
   }
 
-  public static void setFormWidthHint(IForm form, int widthHint) {
+  public static boolean setFormWidthHint(IForm form, int widthHint) {
     GridData gridDataHints = form.getRootGroupBox().getGridDataHints();
+    if (gridDataHints.widthInPixel == widthHint) {
+      return false;
+    }
+
     gridDataHints.widthInPixel = widthHint;
     form.getRootGroupBox().setGridDataHints(gridDataHints);
+    return true;
   }
 
   public static ITable getPageTable(IPage page) {
