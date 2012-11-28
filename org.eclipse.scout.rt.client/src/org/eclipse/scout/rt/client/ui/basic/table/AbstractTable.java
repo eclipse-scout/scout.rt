@@ -1532,6 +1532,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {
     for (IMenu m : getMenus()) {
       if (m.getClass() == menuType) {
+        if (!m.isEnabledProcessingAction()) {
+          return false;
+        }
         if ((!m.isInheritAccessibility()) || isEnabled()) {
           m.prepareAction();
           if (m.isVisible() && m.isEnabled()) {

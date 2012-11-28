@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -229,17 +228,12 @@ public class ColumnSet {
   }
 
   public IColumn[] getAllColumnsInUserOrder() {
-    double[] visibleOrdersSorted = new double[getVisibleColumnCount()];
     IColumn[] visibleCols = getVisibleColumns();
-    for (int i = 0; i < visibleOrdersSorted.length; i++) {
-      visibleOrdersSorted[i] = visibleCols[i].getViewOrder();
-    }
-    Arrays.sort(visibleOrdersSorted);
     //
     int counter = 0;
     TreeMap<CompositeObject, IColumn> sortMap = new TreeMap<CompositeObject, IColumn>();
     for (int i = 0; i < visibleCols.length; i++) {
-      sortMap.put(new CompositeObject(visibleOrdersSorted[i], counter++), visibleCols[i]);
+      sortMap.put(new CompositeObject(visibleCols[i].getVisibleColumnIndexHint(), counter++), visibleCols[i]);
     }
     //
     for (IColumn column : getColumns()) {
@@ -247,7 +241,7 @@ public class ColumnSet {
         //already in map
       }
       else {
-        sortMap.put(new CompositeObject(column.getViewOrder(), counter++), column);
+        sortMap.put(new CompositeObject(column.getVisibleColumnIndexHint(), counter++), column);
       }
     }
     return sortMap.values().toArray(new IColumn[sortMap.size()]);
