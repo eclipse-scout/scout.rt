@@ -10,12 +10,11 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.button;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Arrays;
 
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.WeakEventListener;
-import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -25,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
+import org.eclipse.scout.rt.ui.rap.action.MenuSizeEstimator;
 import org.eclipse.scout.rt.ui.rap.ext.ButtonEx;
 import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.scout.rt.ui.rap.extension.IUiDecoration;
@@ -33,6 +33,8 @@ import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -46,9 +48,7 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 
 /**
- * <h3>RwtScoutButton</h3> ...
- * 
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements IRwtScoutButton {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutButton.class);
@@ -59,6 +59,7 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
   private boolean m_handleActionPending;
 
   private Menu m_contextMenu;
+  private IMenu[] m_scoutActions;
 
   public RwtScoutButton() {
     m_selectionLock = new OptimisticLock();
@@ -288,9 +289,43 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
   }
 
   protected void requestPopupFromScout() {
-    if (m_contextMenu != null) {
-      m_contextMenu.setVisible(true);
+    if (m_contextMenu == null) {
+      return;
     }
+
+    m_scoutActions = RwtMenuUtility.collectMenus(getScoutObject(), getUiEnvironment());
+    int menuHeight = new MenuSizeEstimator(m_contextMenu).estimateMenuHeight(Arrays.asList(m_scoutActions));
+    Point menuPosition = null;
+    if (shouldMenuOpenOnTop(menuHeight)) {
+      menuPosition = computeMenuPositionForTop(menuHeight);
+    }
+    else {
+      menuPosition = computeMenuPositionForBottom();
+    }
+
+    m_contextMenu.setLocation(menuPosition);
+    m_contextMenu.setVisible(true);
+  }
+
+  private boolean shouldMenuOpenOnTop(int menuHeight) {
+    Rectangle buttonBounds = getUiField().getBounds();
+    Point menuLocationAbsolute = getUiField().getParent().toDisplay(buttonBounds.x, buttonBounds.y);
+    int displayHeight = getUiEnvironment().getDisplay().getBounds().height;
+    return menuLocationAbsolute.y + buttonBounds.height + menuHeight > displayHeight;
+  }
+
+  private Point computeMenuPositionForTop(int menuHeight) {
+    Rectangle buttonBounds = getUiField().getBounds();
+    int menuLocationX = buttonBounds.x;
+    int menuLocationY = buttonBounds.y - menuHeight;
+    return getUiField().toDisplay(menuLocationX, menuLocationY);
+  }
+
+  private Point computeMenuPositionForBottom() {
+    Rectangle buttonBounds = getUiField().getBounds();
+    int menuLocationX = buttonBounds.x;
+    int menuLocationY = buttonBounds.y + buttonBounds.height;
+    return getUiField().toDisplay(menuLocationX, menuLocationY);
   }
 
   /**
@@ -383,25 +418,14 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          IMenu[] scoutMenus = getScoutObject().getUIFacade().fireButtonPopupFromUI();
-          scoutMenusRef.set(scoutMenus);
-        }
-      };
-      JobEx job = RwtScoutButton.this.getUiEnvironment().invokeScoutLater(t, 1200);
       try {
-        job.join(1200);
+        if (m_scoutActions == null) {
+          m_scoutActions = RwtMenuUtility.collectMenus(getScoutObject(), getUiEnvironment());
+        }
+        RwtMenuUtility.fillContextMenu(m_scoutActions, RwtScoutButton.this.getUiEnvironment(), m_contextMenu);
       }
-      catch (InterruptedException ex) {
-        //nop
-      }
-      // grab the actions out of the job, when the actions are providden within
-      // the scheduled time the popup will be handled.
-      if (scoutMenusRef.get() != null) {
-        RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), RwtScoutButton.this.getUiEnvironment(), m_contextMenu);
+      finally {
+        m_scoutActions = null;
       }
     }
   } // end class P_ContextMenuListener

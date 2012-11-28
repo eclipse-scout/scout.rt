@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
+import org.eclipse.scout.rt.ui.rap.action.MenuSizeEstimator;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.ext.MenuAdapterEx;
 import org.eclipse.swt.SWT;
@@ -238,7 +239,7 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
     Point menuPosition = null;
 
     if (getMenuOpeningDirection() == SWT.UP) {
-      menuPosition = computeMenuPositionForTop();
+      menuPosition = computeMenuPositionForTop(menu);
     }
     else {
       menuPosition = computeMenuPositionForBottom();
@@ -248,10 +249,10 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
     menu.setVisible(true);
   }
 
-  private Point computeMenuPositionForTop() {
+  private Point computeMenuPositionForTop(Menu menu) {
     Rectangle buttonBounds = getUiField().getBounds();
     int menuLocationX = buttonBounds.x;
-    int menuLocationY = buttonBounds.y - estimateMenuHeight();
+    int menuLocationY = buttonBounds.y - new MenuSizeEstimator(menu).estimateMenuHeight(getChildActions());
     return getUiField().getParent().toDisplay(menuLocationX, menuLocationY);
   }
 
@@ -260,36 +261,6 @@ public class RwtScoutActionButton extends RwtScoutComposite<IAction> implements 
     int menuLocationX = buttonBounds.x;
     int menuLocationY = buttonBounds.y + buttonBounds.height;
     return getUiField().getParent().toDisplay(menuLocationX, menuLocationY);
-  }
-
-  /**
-   * Estimates the menu height based on the actions to be displayed. If the font or padding properties changes
-   * (scout.css) it breaks.
-   */
-  private int estimateMenuHeight() {
-    List<? extends IActionNode> actions = RwtMenuUtility.cleanup(getChildActions());
-    if (actions == null || actions.size() == 0) {
-      return 0;
-    }
-
-    int height = 0;
-    int itemNum = 0;
-    for (IActionNode<?> actionNode : actions) {
-      if (actionNode.isSeparator()) {
-        if (itemNum != 0 && itemNum != actions.size() - 1 && !actions.get(itemNum - 1).isSeparator()) {
-          height += 4 + 7; // separator padding and height
-        }
-      }
-      else {
-        height += 14 + 15; // menu item padding and height
-      }
-      itemNum++;
-    }
-    if (height > 0) {
-      height += 8 + 4; // menu padding and border width
-    }
-
-    return height;
   }
 
   public boolean hasChildActions() {
