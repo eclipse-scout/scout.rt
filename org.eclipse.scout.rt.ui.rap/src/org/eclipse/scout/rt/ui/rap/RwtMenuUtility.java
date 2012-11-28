@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.rap.action.RwtScoutAction;
 import org.eclipse.scout.rt.ui.rap.action.RwtScoutCheckboxMenu;
 import org.eclipse.scout.rt.ui.rap.action.RwtScoutMenuAction;
@@ -165,6 +166,26 @@ public final class RwtMenuUtility {
     else {
       new RwtScoutMenuAction(menu, scoutActionNode, uiEnvironment);
     }
+  }
+
+  public static IMenu[] collectMenus(final IButton button, IRwtEnvironment uiEnvironment) {
+    final List<IMenu> menuList = new LinkedList<IMenu>();
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        menuList.addAll(Arrays.asList(button.getUIFacade().fireButtonPopupFromUI()));
+      }
+    };
+
+    JobEx job = uiEnvironment.invokeScoutLater(t, 5000);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      LOG.warn("Exception occured while collecting menus.", ex);
+    }
+
+    return menuList.toArray(new IMenu[menuList.size()]);
   }
 
   public static IMenu[] collectMenus(final ITree tree, final boolean emptySpaceActions, final boolean nodeActions, IRwtEnvironment uiEnvironment) {
