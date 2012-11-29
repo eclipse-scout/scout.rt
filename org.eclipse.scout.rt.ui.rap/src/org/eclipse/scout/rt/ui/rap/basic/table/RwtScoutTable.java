@@ -416,6 +416,12 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     if (h >= 0) {
       getUiField().setData(RWT.CUSTOM_ITEM_HEIGHT, h);
     }
+    else {
+      int defaultTableRowHeight = UiDecorationExtensionPoint.getLookAndFeel().getTableRowHeight();
+      if (defaultTableRowHeight >= 0) {
+        getUiField().setData(RWT.CUSTOM_ITEM_HEIGHT, defaultTableRowHeight);
+      }
+    }
     if (isCreated()) {
       getUiTableViewer().refresh();
     }
