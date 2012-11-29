@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
@@ -187,8 +188,12 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
    *         established.
    */
   protected boolean needsClientNotificationUICallBack() {
-    // necessary if client notification polling is enabled
-    return getClientSession().getServiceTunnel().getClientNotificationPollInterval() > -1;
+    IServiceTunnel serviceTunnel = getClientSession().getServiceTunnel();
+    if (serviceTunnel != null) {
+      // necessary if client notification polling is enabled
+      return serviceTunnel.getClientNotificationPollInterval() > -1;
+    }
+    return false;
   }
 
   @Override
