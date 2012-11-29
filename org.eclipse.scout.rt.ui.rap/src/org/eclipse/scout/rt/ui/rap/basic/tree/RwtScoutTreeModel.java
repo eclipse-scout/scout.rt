@@ -17,7 +17,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.rwt.RWT;
-import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -30,7 +29,6 @@ import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Tree;
 
 public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProvider, IFontProvider, IColorProvider {
   private static final long serialVersionUID = 1L;
@@ -43,8 +41,6 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   private Image m_imgCheckboxTrue;
   private Image m_imgCheckboxFalse;
   private Color m_disabledForegroundColor;
-  private final int m_defaultNodeHeight;
-  private double[] m_htmlTableNodes = null;
 
   public RwtScoutTreeModel(ITree tree, IRwtScoutTree uiTree, TreeViewer treeViewer) {
     m_scoutTree = tree;
@@ -53,7 +49,6 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     m_imgCheckboxTrue = getUiTree().getUiEnvironment().getIcon(RwtIcons.CheckboxYes);
     m_imgCheckboxFalse = getUiTree().getUiEnvironment().getIcon(RwtIcons.CheckboxNo);
     m_disabledForegroundColor = getUiTree().getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
-    m_defaultNodeHeight = UiDecorationExtensionPoint.getLookAndFeel().getTreeNodeHeight();
   }
 
   protected ITree getScoutTree() {
@@ -144,35 +139,6 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
       if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
         text = getUiTree().getUiEnvironment().adaptHtmlCell(getUiTree(), text);
         text = getUiTree().getUiEnvironment().convertLinksWithLocalUrlsInHtmlCell(getUiTree(), text);
-
-        Tree tree = getUiTree().getUiField();
-        if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-          if (m_htmlTableNodes == null || m_htmlTableNodes.length != getScoutTree().getRootNode().getChildNodeCount()) {
-            double[] tempArray = new double[getScoutTree().getRootNode().getChildNodeCount()];
-            for (int i = 0; i < tempArray.length; i++) {
-              tempArray[i] = 1;
-            }
-            if (m_htmlTableNodes == null) {
-              m_htmlTableNodes = tempArray;
-            }
-            else {
-              getUiTree().getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                  getUiTree().getUiTreeViewer().refresh();
-                }
-              });
-              m_htmlTableNodes = tempArray;
-            }
-          }
-          m_htmlTableNodes[((ITreeNode) element).getChildNodeIndex()] = HtmlTextUtility.countHtmlTableRows(text);
-          double medianHtmlTableRows = NumberUtility.median(m_htmlTableNodes);
-          int htmlTreeNodeHeight = NumberUtility.toDouble(NumberUtility.round(medianHtmlTableRows, 1.0)).intValue() * 20;
-          if (tree.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
-              || ((Integer) tree.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTreeNodeHeight) < 0) {
-            tree.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultNodeHeight(), htmlTreeNodeHeight)).intValue());
-          }
-        }
       }
       else {
         if (text.indexOf("\n") >= 0) {
@@ -186,10 +152,6 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
       return text;
     }
     return "";
-  }
-
-  protected int getDefaultNodeHeight() {
-    return m_defaultNodeHeight;
   }
 
   @Override
