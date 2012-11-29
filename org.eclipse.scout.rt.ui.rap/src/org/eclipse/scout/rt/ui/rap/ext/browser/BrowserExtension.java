@@ -219,6 +219,8 @@ public class BrowserExtension {
       urlBuf.append(RWT.getRequest().getContextPath());
       urlBuf.append(RWT.getRequest().getServletPath());
       urlBuf.append("?");
+      urlBuf.append("nocache='+new Date().getTime()+'");
+      urlBuf.append("&amp;");
       urlBuf.append(IServiceHandler.REQUEST_PARAM);
       urlBuf.append("=");
       urlBuf.append(rwtServiceHandler);
