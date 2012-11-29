@@ -224,6 +224,8 @@ public class BrowserExtension {
       String externalKey = "" + generatedMappings.size();
       StringBuilder urlBuf = new StringBuilder();
       urlBuf.append("?");
+      urlBuf.append("nocache='+new Date().getTime()+'");
+      urlBuf.append("&amp;");
       urlBuf.append(IServiceHandler.REQUEST_PARAM);
       urlBuf.append("=");
       urlBuf.append(rwtServiceHandler);
