@@ -19,7 +19,11 @@ import org.eclipse.scout.service.IService2;
  */
 public interface IBreadCrumbsNavigationService extends IService2 {
 
-  IBreadCrumbsNavigation getBreadCrumbsNavigation(IDesktop desktop);
+  void install();
+
+  void install(IDesktop desktop);
+
+  void uninstall();
 
   IBreadCrumbsNavigation getBreadCrumbsNavigation();
 }

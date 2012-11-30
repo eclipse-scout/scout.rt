@@ -59,7 +59,10 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
     ClientSyncJob job = new ClientSyncJob("Adapting form header left menus", getUiEnvironment().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer().adaptFormHeaderLeftActions(getScoutObject(), menuListToAdapt);
+        IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
+        if (service != null && service.getDeviceTransformer() != null) {
+          service.getDeviceTransformer().adaptFormHeaderLeftActions(getScoutObject(), menuListToAdapt);
+        }
 
         synchronized (RwtScoutMobileFormHeader.this) {
           if (!filled.getValue()) {
@@ -105,7 +108,10 @@ public class RwtScoutMobileFormHeader extends AbstractRwtScoutFormHeader {
     ClientSyncJob job = new ClientSyncJob("Adapting form header left menus", getUiEnvironment().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer().adaptFormHeaderRightActions(getScoutObject(), menuListToAdapt);
+        IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
+        if (service != null && service.getDeviceTransformer() != null) {
+          service.getDeviceTransformer().adaptFormHeaderRightActions(getScoutObject(), menuListToAdapt);
+        }
 
         synchronized (RwtScoutMobileFormHeader.this) {
           if (!filled.getValue()) {

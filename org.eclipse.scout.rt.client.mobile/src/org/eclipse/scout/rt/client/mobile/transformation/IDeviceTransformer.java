@@ -39,6 +39,8 @@ public interface IDeviceTransformer {
 
   void adaptDesktopActions(Collection<IAction> actions);
 
+  void adaptDesktopOutlines(Collection<IOutline> outlines);
+
   void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException;
 
   boolean acceptFormAddingToDesktop(IForm form);

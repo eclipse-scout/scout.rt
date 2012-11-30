@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
+import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
@@ -78,7 +79,10 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     m_toolFormHandler = createToolFormHandler(desktop);
     m_deviceTransformationExcluder = createDeviceTransformationExcluder();
 
-    SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation(desktop).trackDisplayViewId(IForm.VIEW_ID_CENTER);
+    IBreadCrumbsNavigation breadCrumbsNavigation = SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation();
+    if (breadCrumbsNavigation != null) {
+      breadCrumbsNavigation.trackDisplayViewId(IForm.VIEW_ID_CENTER);
+    }
   }
 
   public MobileDeviceTransformer() {
@@ -92,8 +96,16 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     return manager;
   }
 
+  public PageFormManager getPageFormManager() {
+    return m_pageFormManager;
+  }
+
   protected ToolFormHandler createToolFormHandler(IDesktop desktop) {
     return new ToolFormHandler(getDesktop());
+  }
+
+  public ToolFormHandler getToolFormHandler() {
+    return m_toolFormHandler;
   }
 
   protected DeviceTransformationExcluder createDeviceTransformationExcluder() {
@@ -131,6 +143,10 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
         iterator.remove();
       }
     }
+  }
+
+  @Override
+  public void adaptDesktopOutlines(Collection<IOutline> outlines) {
   }
 
   @Override
