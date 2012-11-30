@@ -17,7 +17,12 @@ import org.eclipse.scout.service.IService2;
  * @since 3.9.0
  */
 public interface IDeviceTransformationService extends IService2 {
-  IDeviceTransformer getDeviceTransformer();
 
-  IDeviceTransformer getDeviceTransformer(IDesktop desktop);
+  void install();
+
+  void install(IDesktop desktop);
+
+  void uninstall();
+
+  IDeviceTransformer getDeviceTransformer();
 }

@@ -21,6 +21,28 @@ import org.eclipse.scout.service.AbstractService;
 public class BreadCrumbsNavigationService extends AbstractService implements IBreadCrumbsNavigationService {
   private String SESSION_DATA_KEY = "BreadCrumbsNavigationData";
 
+  @Override
+  public void install() {
+    install(null);
+  }
+
+  @Override
+  public void install(IDesktop desktop) {
+    if (getBreadCrumbsNavigation() != null) {
+      return;
+    }
+
+    IClientSession session = ClientJob.getCurrentSession();
+    IBreadCrumbsNavigation data = createBreadCrumbsNavigation(desktop);
+    session.setData(SESSION_DATA_KEY, data);
+  }
+
+  @Override
+  public void uninstall() {
+    IClientSession session = ClientJob.getCurrentSession();
+    session.setData(SESSION_DATA_KEY, null);
+  }
+
   protected IBreadCrumbsNavigation createBreadCrumbsNavigation() {
     return new BreadCrumbsNavigation();
   }
@@ -30,20 +52,9 @@ public class BreadCrumbsNavigationService extends AbstractService implements IBr
   }
 
   @Override
-  public IBreadCrumbsNavigation getBreadCrumbsNavigation(IDesktop desktop) {
-    IClientSession session = ClientJob.getCurrentSession();
-    IBreadCrumbsNavigation data = (IBreadCrumbsNavigation) session.getData(SESSION_DATA_KEY);
-
-    if (data == null) {
-      data = createBreadCrumbsNavigation(desktop);
-      session.setData(SESSION_DATA_KEY, data);
-    }
-    return data;
-  }
-
-  @Override
   public IBreadCrumbsNavigation getBreadCrumbsNavigation() {
-    return getBreadCrumbsNavigation(null);
+    IClientSession session = ClientJob.getCurrentSession();
+    return (IBreadCrumbsNavigation) session.getData(SESSION_DATA_KEY);
   }
 
 }

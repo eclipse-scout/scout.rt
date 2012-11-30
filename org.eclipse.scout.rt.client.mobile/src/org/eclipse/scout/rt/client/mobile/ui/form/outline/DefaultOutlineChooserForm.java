@@ -79,7 +79,7 @@ public class DefaultOutlineChooserForm extends AbstractForm implements IOutlineC
     protected void execInitField() throws ProcessingException {
       //Table already is scrollable, it's not necessary to make the form scrollable too
       IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
-      if (service != null) {
+      if (service != null && service.getDeviceTransformer() != null) {
         service.getDeviceTransformer().getDeviceTransformationExcluder().excludeFieldTransformation(this, MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
       }
     }

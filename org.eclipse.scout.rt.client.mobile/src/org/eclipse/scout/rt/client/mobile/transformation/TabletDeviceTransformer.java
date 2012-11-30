@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,9 +43,15 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
     PageFormManager manager = new PageFormManager(desktop, IForm.VIEW_ID_CENTER, IForm.VIEW_ID_E);
     manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
 
-    initMultiPageChangeStrategy(manager);
-
     return manager;
+  }
+
+  @Override
+  public void adaptDesktopOutlines(Collection<IOutline> outlines) {
+    IPageChangeStrategy strategy = new MultiPageChangeStrategy(getPageFormManager());
+    for (IOutline outline : outlines) {
+      outline.setPageChangeStrategy(strategy);
+    }
   }
 
   @Override
@@ -65,13 +72,6 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
     viewIds.add(IForm.VIEW_ID_E);
 
     return viewIds;
-  }
-
-  private void initMultiPageChangeStrategy(PageFormManager pageFormManager) {
-    IPageChangeStrategy strategy = new MultiPageChangeStrategy(pageFormManager);
-    for (IOutline outline : getDesktop().getAvailableOutlines()) {
-      outline.setPageChangeStrategy(strategy);
-    }
   }
 
   @Override

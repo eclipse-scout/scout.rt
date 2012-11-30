@@ -20,8 +20,29 @@ import org.eclipse.scout.service.AbstractService;
  * @since 3.9.0
  */
 public class DeviceTransformationService extends AbstractService implements IDeviceTransformationService {
-
   private String SESSION_DATA_KEY = "DeviceTransformationServiceData";
+
+  @Override
+  public void install() {
+    install(null);
+  }
+
+  @Override
+  public void install(IDesktop desktop) {
+    if (getDeviceTransformer() != null) {
+      return;
+    }
+
+    IClientSession session = ClientJob.getCurrentSession();
+    IDeviceTransformer data = createDeviceTransformer(desktop);
+    session.setData(SESSION_DATA_KEY, data);
+  }
+
+  @Override
+  public void uninstall() {
+    IClientSession session = ClientJob.getCurrentSession();
+    session.setData(SESSION_DATA_KEY, null);
+  }
 
   protected IDeviceTransformer createDeviceTransformer(IDesktop desktop) {
     if (UserAgentUtility.isTabletDevice()) {
@@ -34,19 +55,8 @@ public class DeviceTransformationService extends AbstractService implements IDev
 
   @Override
   public IDeviceTransformer getDeviceTransformer() {
-    return getDeviceTransformer(null);
-  }
-
-  @Override
-  public IDeviceTransformer getDeviceTransformer(IDesktop desktop) {
     IClientSession session = ClientJob.getCurrentSession();
-    IDeviceTransformer data = (IDeviceTransformer) session.getData(SESSION_DATA_KEY);
-
-    if (data == null) {
-      data = createDeviceTransformer(desktop);
-      session.setData(SESSION_DATA_KEY, data);
-    }
-    return data;
+    return (IDeviceTransformer) session.getData(SESSION_DATA_KEY);
   }
 
 }
