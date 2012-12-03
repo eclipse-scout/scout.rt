@@ -21,7 +21,7 @@
     <relativePath>../org.eclipse.scout.rt.parent</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.rt-repository</artifactId>
+  <artifactId>org.eclipse.scout.rt.v34v35-repository</artifactId>
   <packaging>eclipse-repository</packaging>
 
   <name>Eclipse Scout RT Repository</name>

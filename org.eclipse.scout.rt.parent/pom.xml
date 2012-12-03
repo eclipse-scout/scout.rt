@@ -25,6 +25,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>../org.eclipse.scout.target</module>
     <module>../org.eclipse.scout.commons</module>
     <module>../org.eclipse.scout.service</module>
     <module>../org.eclipse.scout.rt.shared</module>
@@ -49,7 +50,7 @@
     <module>../org.eclipse.scout.rt.feature.about</module>
     <module>../org.eclipse.scout.rt-feature</module>
   </modules>
-  
+
   <profiles>
     <profile>
       <id>rap-build</id>
@@ -57,46 +58,53 @@
          <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-				<module>../org.eclipse.scout.rt.ui.rap</module>
-				<module>../org.eclipse.scout.rt.ui.rap.workbench</module>
+        <module>../org.eclipse.scout.rt.ui.rap</module>
+        <module>../org.eclipse.scout.rt.ui.rap.workbench</module>
 <!-- This Bundle needs changes in rap not commited yet
-				<module>../org.eclipse.scout.rt.ui.rap.mobile</module>
--->	
-				<module>../org.eclipse.scout.rt.ui.rap.theme.rayo</module>
-				<module>../org.eclipse.scout.rt.ui.rap.theme.rayo.mobile</module>
-				<module>../org.eclipse.scout.svg.ui.rap</module>
-				<module>../org.eclipse.scout.rt.rap-feature</module>	
+        <module>../org.eclipse.scout.rt.ui.rap.mobile</module>
+-->
+        <module>../org.eclipse.scout.rt.ui.rap.theme.rayo</module>
+        <module>../org.eclipse.scout.rt.ui.rap.theme.rayo.mobile</module>
+        <module>../org.eclipse.scout.svg.ui.rap</module>
+        <module>../org.eclipse.scout.rt.rap-feature</module>
       </modules>
     </profile>
-    
+
     <profile>
       <id>testing-build</id>
       <activation>
          <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-				<module>../org.eclipse.scout.commons.test</module>
-				<module>../org.eclipse.scout.rt.shared.test</module>
-				<module>../org.eclipse.scout.rt.testing.shared</module>
-				<module>../org.eclipse.scout.rt.testing.client</module>
-				<module>../org.eclipse.scout.rt.testing.server</module>
-				<module>../org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment</module>
-				<module>../org.eclipse.scout.rt.testing.ui.swing</module>
-				<module>../org.eclipse.scout.rt.testing.ui.swt</module>
-				<module>../org.eclipse.scout.rt.extension.client.test.fragment</module>
-				<module>../org.eclipse.scout.rt.testing-feature</module>    	
+        <module>../org.eclipse.scout.commons.test</module>
+        <module>../org.eclipse.scout.rt.shared.test</module>
+        <module>../org.eclipse.scout.rt.testing.shared</module>
+        <module>../org.eclipse.scout.rt.testing.client</module>
+        <module>../org.eclipse.scout.rt.testing.server</module>
+        <module>../org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment</module>
+        <module>../org.eclipse.scout.rt.testing.ui.swing</module>
+        <module>../org.eclipse.scout.rt.testing.ui.swt</module>
+        <module>../org.eclipse.scout.rt.extension.client.test.fragment</module>
+        <module>../org.eclipse.scout.rt.testing-feature</module>
       </modules>
     </profile>
-    
+
     <profile>
       <id>repository-build</id>
       <activation>
          <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-				<module>../org.eclipse.scout.rt-repository</module>  	
+        <module>../org.eclipse.scout.rt-repository</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>repositoryv34v35-build</id>
+      <modules>
+        <module>../org.eclipse.scout.rt.v34v35-repository</module>
       </modules>
     </profile>
   </profiles>
-  
+
 </project>
