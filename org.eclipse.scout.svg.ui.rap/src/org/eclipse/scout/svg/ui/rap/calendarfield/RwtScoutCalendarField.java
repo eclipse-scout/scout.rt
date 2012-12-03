@@ -100,6 +100,7 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
         getScoutObject().getCalendar().addPropertyChangeListener(m_innerCalPropertyListener);
       }
 
+      initDocBuilder(getDocBuilder());
       updateSvgDocument();
     }
   }
