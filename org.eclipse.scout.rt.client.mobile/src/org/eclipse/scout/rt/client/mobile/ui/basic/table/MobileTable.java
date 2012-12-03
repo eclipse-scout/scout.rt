@@ -406,7 +406,6 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
         }
       }
     }
-
   }
 
   public static void setAutoCreateRowForm(ITable table, Boolean autoCreateRowForm) {
@@ -437,7 +436,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     return (Boolean) table.getProperty(IMobileTable.PROP_PAGING_ENABLED);
   }
 
-  public void setPagingEnabled(ITable table, Boolean enabled) {
+  public static void setPagingEnabled(ITable table, Boolean enabled) {
     table.setProperty(IMobileTable.PROP_PAGING_ENABLED, enabled);
   }
 

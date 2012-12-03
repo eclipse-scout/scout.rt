@@ -49,7 +49,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.service.SERVICES;
 
@@ -262,9 +261,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (field instanceof IGroupBox) {
       transformGroupBox((IGroupBox) field);
     }
-    else if (field instanceof ISmartField) {
-      transformSmartField((ISmartField) field);
-    }
     else if (field instanceof IPlaceholderField) {
       transformPlaceholderField((IPlaceholderField) field);
     }
@@ -342,24 +338,11 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     groupBox.setGridColumnCountHint(1);
   }
 
-  protected void transformSmartField(ISmartField<?> field) {
-    if (field.getBrowseMaxRowCount() > getSmartFieldBrowseMaxRowCount()) {
-      field.setBrowseMaxRowCount(getSmartFieldBrowseMaxRowCount());
-    }
-  }
-
   /**
    * Makes placeholder fields invisible since they just waste space on 1 column layouts
    */
   protected void transformPlaceholderField(IPlaceholderField field) {
     field.setVisible(false);
-  }
-
-  /**
-   * Used to keep the row count small which speeds up the list.
-   */
-  protected int getSmartFieldBrowseMaxRowCount() {
-    return 20;
   }
 
   protected IDesktop getDesktop() {
