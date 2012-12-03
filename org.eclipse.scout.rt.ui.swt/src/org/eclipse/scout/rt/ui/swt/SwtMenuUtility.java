@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
@@ -58,7 +59,7 @@ public final class SwtMenuUtility {
           contributionItems.add(manager);
         }
         else if (scoutAction instanceof ICheckBoxMenu) {
-          contributionItems.add(new ActionContributionItem(new SwtScoutAction(scoutAction, environment, SWT.CHECK).getSwtAction()));
+          contributionItems.add(new ActionContributionItem(new SwtScoutAction(scoutAction, environment, Action.AS_CHECK_BOX).getSwtAction()));
         }
         else {
           contributionItems.add(new ActionContributionItem(new SwtScoutAction(scoutAction, environment).getSwtAction()));
@@ -80,7 +81,7 @@ public final class SwtMenuUtility {
         item = manager;
       }
       else if (scoutAction instanceof ICheckBoxMenu) {
-        item = new ActionContributionItem(new SwtScoutAction(scoutAction, environment, SWT.CHECK).getSwtAction());
+        item = new ActionContributionItem(new SwtScoutAction(scoutAction, environment, Action.AS_CHECK_BOX).getSwtAction());
       }
       else {
         item = new ActionContributionItem(new SwtScoutAction(scoutAction, environment).getSwtAction());
@@ -106,7 +107,7 @@ public final class SwtMenuUtility {
           manager.add(childManager);
         }
         else if (scoutAction instanceof ICheckBoxMenu) {
-          manager.add(new ActionContributionItem(new SwtScoutAction(scoutAction, environment, SWT.CHECK).getSwtAction()));
+          manager.add(new ActionContributionItem(new SwtScoutAction(scoutAction, environment, Action.AS_CHECK_BOX).getSwtAction()));
         }
         else {
           manager.add(new ActionContributionItem(new SwtScoutAction(scoutAction, environment).getSwtAction()));
