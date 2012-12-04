@@ -2,7 +2,6 @@ package org.eclipse.scout.svg.ui.rap.calendarfield;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -230,19 +229,7 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
   }
 
   private IMenu[] getContextMenusFromScout() {
-    final boolean componentSelected = getScoutObject().getCalendar().getSelectedComponent() != null;
-    ArrayList<IMenu> menus = new ArrayList<IMenu>();
-    // always add the new menus as always a cell is selected.
-    for (IMenu m : getScoutObject().getCalendar().getUIFacade().fireNewPopupFromUI()) {
-      menus.add(m);
-    }
-    if (componentSelected) {
-      // if an item is selected: also add the component menus
-      for (IMenu m : getScoutObject().getCalendar().getUIFacade().fireComponentPopupFromUI()) {
-        menus.add(m);
-      }
-    }
-    return menus.toArray(new IMenu[menus.size()]);
+    return RwtMenuUtility.collectMenus(getScoutObject().getCalendar(), true, true, getUiEnvironment());
   }
 
   private final class P_InnerCalendarPropertyChangeListener implements PropertyChangeListener {
