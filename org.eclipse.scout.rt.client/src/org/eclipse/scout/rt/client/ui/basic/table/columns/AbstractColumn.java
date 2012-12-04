@@ -196,7 +196,8 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Configures whether the column width is fixed, meaning that it cannot be resized by the user or by resizing/auto-resizing.
+   * Configures whether the column width is fixed, meaning that it is not changed by resizing/auto-resizing
+   * and cannot be resized by the user.
    * If <code>true</code>, the configured width is fixed.
    * Defaults to <code>false</code>.
    */
