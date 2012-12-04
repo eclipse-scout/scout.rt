@@ -236,6 +236,10 @@ public interface IColumn<T> extends IPropertyObserver {
    */
   void setWidthInternal(int w);
 
+  /**
+   * @return <code>true</code>, if the column width is fixed, meaning that it is not changed by resizing/auto-resizing
+   *         and cannot be resized by the user.
+   */
   boolean isFixedWidth();
 
   void setFixedWidth(boolean fixedWidth);
