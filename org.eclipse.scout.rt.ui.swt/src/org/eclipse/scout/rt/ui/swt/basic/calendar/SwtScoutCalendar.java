@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
+import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutAction;
 import org.eclipse.scout.rt.ui.swt.basic.calendar.widgets.SwtCalendar;
 import org.eclipse.scout.rt.ui.swt.form.fields.calendar.SwtScoutCalendarField;
@@ -93,7 +94,7 @@ public class SwtScoutCalendar extends SwtCalendar {
   @Override
   public void showGeneralContextMenu(IMenuManager manager) {
     // pop up with a general menu
-    IMenu[] scoutMenus = m_field.getScoutObject().getCalendar().getUIFacade().fireNewPopupFromUI();
+    IMenu[] scoutMenus = SwtMenuUtility.collectEmptySpaceMenus(m_scoutCalendarModel, m_field.getEnvironment());
     if (scoutMenus != null) {
       for (IMenu menuItem : scoutMenus) {
         if (menuItem instanceof IMenu) {
@@ -110,8 +111,7 @@ public class SwtScoutCalendar extends SwtCalendar {
 
   @Override
   public void showItemContextMenu(IMenuManager manager, Object item) {
-
-    IMenu[] scoutMenus = m_field.getScoutObject().getCalendar().getUIFacade().fireComponentPopupFromUI();
+    IMenu[] scoutMenus = SwtMenuUtility.collectComponentMenus(m_scoutCalendarModel, m_field.getEnvironment());
     if (scoutMenus != null) {
       for (IMenu menuItem : scoutMenus) {
         if (menuItem instanceof IMenu) {
