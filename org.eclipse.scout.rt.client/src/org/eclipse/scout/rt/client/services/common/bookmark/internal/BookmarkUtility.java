@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
@@ -42,6 +43,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.NodePageState;
@@ -241,7 +243,7 @@ public final class BookmarkUtility {
       throw new ProcessingException("outline '" + bm.getOutlineClassName() + "' was not found");
     }
     if (!(outline.isVisible() && outline.isEnabled())) {
-      throw new ProcessingException("activate outline " + outline.getTitle() + " denied");
+      throw new VetoException(TEXTS.get("BookmarkActivationFailedOutlineNotAvailable", outline.getTitle()));
     }
     desktop.setOutline(outline);
     try {
