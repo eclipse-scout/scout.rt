@@ -196,6 +196,18 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   }
 
   /**
+   * Configures whether the column width is fixed, meaning that it cannot be resized by the user or by resizing/auto-resizing.
+   * If <code>true</code>, the configured width is fixed.
+   * Defaults to <code>false</code>.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(75)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredFixedWidth() {
+    return false;
+  }
+
+  /**
    * Configures whether the column is displayable or not. A non-displayable column is always invisible for the user. A
    * displayable column may be visible for a user, depending on {@link #getConfiguredVisible()}.
    * <p>
@@ -685,6 +697,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     setViewOrder(viewOrder);
     //
     setWidth(getConfiguredWidth());
+    setFixedWidth(getConfiguredFixedWidth());
     m_primaryKey = getConfiguredPrimaryKey();
     m_summary = getConfiguredSummary();
     setEditable(getConfiguredEditable());
@@ -1287,6 +1300,16 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   @Override
   public void setWidthInternal(int w) {
     propertySupport.setPropertyNoFire(PROP_WIDTH, w);
+  }
+
+  @Override
+  public boolean isFixedWidth() {
+    return propertySupport.getPropertyBool(PROP_FIXED_WIDTH);
+  }
+
+  @Override
+  public void setFixedWidth(boolean fixedWidth) {
+    propertySupport.setPropertyBool(PROP_FIXED_WIDTH, fixedWidth);
   }
 
   @Override

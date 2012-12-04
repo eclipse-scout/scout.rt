@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,6 +27,10 @@ public class SwingTableColumn extends TableColumn {
     setMinWidth(0);
     setPreferredWidth(w);
     setWidth(w);
+    if (m_scoutColumn.isFixedWidth()) {
+      setMinWidth(w);
+      setMaxWidth(w);
+    }
   }
 
   public IColumn getScoutColumn() {

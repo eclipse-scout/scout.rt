@@ -264,6 +264,9 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         swtCol.setToolTipText(cell.getTooltipText());
         updateHeaderText(swtCol, scoutColumn);
         swtCol.setWidth(scoutColumn.getWidth());
+        if (scoutColumn.isFixedWidth()) {
+          swtCol.setResizable(false);
+        }
         if (cell.isSortActive()) {
           getSwtField().setSortColumn(swtCol);
           getSwtField().setSortDirection(cell.isSortAscending() ? SWT.UP : SWT.DOWN);
@@ -815,7 +818,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       }
       actualWidth += col.getWidth();
       Object data = col.getData(SwtScoutTable.KEY_SCOUT_COLUMN);
-      if (data instanceof IColumn<?>) {
+      if (data instanceof IColumn<?> && !((IColumn<?>) data).isFixedWidth()) {
         int width = ((IColumn<?>) data).getInitialWidth();
         columnWeights.put(col, width);
         totalWeight += width;
