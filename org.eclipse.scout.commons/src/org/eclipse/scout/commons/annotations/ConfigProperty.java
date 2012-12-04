@@ -168,7 +168,6 @@ public @interface ConfigProperty {
   /**
    * Fully qualified class name of a ISwingChartProvider class with bundle
    * symbolic name prefix<br>
-   * Example: <code>com.bsiag.crm.ui.swing/com.bsiag.crm.ui.swing.chart.ForecastChart</code>
    */
   String CHART_QNAME = "CHART_QNAME";
   /**
@@ -197,4 +196,8 @@ public @interface ConfigProperty {
    * Horizontal alignment of the label of a form field.
    */
   String LABEL_HORIZONTAL_ALIGNMENT = "LABEL_HORIZONTAL_ALIGNMENT";
+  /**
+   * Border decoration enumeration according to the BORDER_DECORATION_* constants
+   */
+  String BORDER_DECORATION = "BORDER_DECORATION";
 }
