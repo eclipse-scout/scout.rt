@@ -1508,12 +1508,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
           wherePart = StringUtility.replaceTags(wherePart, "attribute", "1=1").trim();
           String sql = createSqlPart(wherePart, bindNames, bindValues, plainBind, parentAliasMap);
           if (sql != null) {
-            if (isAg) {
-              contrib.getHavingParts().add(sql);
-            }
-            else {
-              contrib.getWhereParts().add(sql);
-            }
+            contrib.getWhereParts().add(sql);
           }
         }
         break;
@@ -1526,12 +1521,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
             if (negation) {
               sql = "NOT(" + sql + ")";
             }
-            if (isAg) {
-              contrib.getHavingParts().add(sql);
-            }
-            else {
-              contrib.getWhereParts().add(sql);
-            }
+            contrib.getWhereParts().add(sql);
           }
         }
         break;
