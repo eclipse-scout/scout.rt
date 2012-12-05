@@ -10,10 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
-import junit.framework.Assert;
-
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.holders.LongArrayHolder;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TypeCastUtilityTest extends Assert {

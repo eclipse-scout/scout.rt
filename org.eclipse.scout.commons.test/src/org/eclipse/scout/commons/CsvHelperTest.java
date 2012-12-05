@@ -17,11 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.eclipse.scout.commons.csv.CsvHelper;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.utility.TestUtility;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class CsvHelperTest {

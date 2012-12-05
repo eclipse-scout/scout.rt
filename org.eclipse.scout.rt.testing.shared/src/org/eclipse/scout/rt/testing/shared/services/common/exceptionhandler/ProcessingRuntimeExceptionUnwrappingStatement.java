@@ -4,17 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.runners.model.Statement;
 
 /**
- * JUnit Statement that unpacks a wrapped {@link ProcessingException}.
+ * JUnit Statement that unpacks a wrapped {@link org.eclipse.scout.commons.exception.ProcessingException}.
  * 
  * @see WrappingProcessingRuntimeExceptionHandlerService
  */
