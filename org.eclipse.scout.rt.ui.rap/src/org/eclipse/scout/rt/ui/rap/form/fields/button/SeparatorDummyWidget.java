@@ -8,21 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.transformation;
+package org.eclipse.scout.rt.ui.rap.form.fields.button;
 
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.service.IService2;
+import org.eclipse.swt.widgets.Widget;
 
-/**
- * @since 3.9.0
- */
-public interface IDeviceTransformationService extends IService2 {
+public class SeparatorDummyWidget extends Widget {
 
-  void install();
+  private static final long serialVersionUID = 1L;
 
-  void install(IDesktop desktop);
+  public static int STYLE_SEPARATOR = 1 << 8;
 
-  void uninstall();
+  public SeparatorDummyWidget(Widget parent) {
+    super(parent, STYLE_SEPARATOR);
+  }
 
-  IDeviceTransformer getDeviceTransformer();
 }

@@ -27,6 +27,10 @@ public class SwingTableColumn extends TableColumn {
     setMinWidth(0);
     setPreferredWidth(w);
     setWidth(w);
+    if (m_scoutColumn.isFixedWidth()) {
+      setMinWidth(w);
+      setMaxWidth(w);
+    }
   }
 
   public IColumn getScoutColumn() {

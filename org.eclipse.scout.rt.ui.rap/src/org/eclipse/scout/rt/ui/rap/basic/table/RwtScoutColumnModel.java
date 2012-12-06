@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.ui.rap.basic.table;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -8,7 +7,6 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.rwt.RWT;
 import org.eclipse.scout.commons.HTMLUtility;
-import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -16,7 +14,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.ui.rap.RwtIcons;
-import org.eclipse.scout.rt.ui.rap.ext.table.TableEx;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
 import org.eclipse.swt.graphics.Color;
@@ -39,9 +36,6 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   private Image m_imgCheckboxFalse;
   private Image m_imgCheckboxTrue;
   private Color m_disabledForegroundColor;
-  private boolean m_multiline;
-  private double[][] m_newlines = null;
-  private double[][] m_htmlTableRows = null;
   private int m_defaultRowHeight;
 
   public RwtScoutColumnModel(ITable scoutTable, IRwtScoutTableForPatch uiTable, TableColumnManager columnManager) {
@@ -51,7 +45,6 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     m_imgCheckboxTrue = getUiTable().getUiEnvironment().getIcon(RwtIcons.CheckboxYes);
     m_imgCheckboxFalse = getUiTable().getUiEnvironment().getIcon(RwtIcons.CheckboxNo);
     m_disabledForegroundColor = getUiTable().getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
-    m_defaultRowHeight = UiDecorationExtensionPoint.getLookAndFeel().getTableRowHeight();
     rebuildCache();
   }
 
@@ -103,92 +96,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         text = HtmlTextUtility.transformPlainTextToHtml(text);
       }
     }
-
-    IColumn<?> column = m_columnManager.getColumnByModelIndex(columnIndex - 1);
-    if (getScoutTable().getRowHeightHint() < 0 && column.isVisible()) {
-      updateTableRowHeight(text, element, columnIndex);
-    }
     return text;
-  }
-
-  private void updateTableRowHeight(String cellText, ITableRow element, int columnIndex) {
-    TableEx table = getUiTable().getUiField();
-    if (HtmlTextUtility.isTextWithHtmlMarkup(cellText)) {
-      m_htmlTableRows = updateRowArray(m_htmlTableRows, ((ITableRow) element).getRowIndex(), columnIndex - 1);
-      int htmlTableRowRowHeight = calculateHtmlTableRowHeight(m_htmlTableRows, cellText, ((ITableRow) element).getRowIndex(), columnIndex - 1);
-      if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
-          || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(htmlTableRowRowHeight) != 0) {
-        table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), htmlTableRowRowHeight)).intValue());
-      }
-    }
-    else {
-      m_newlines = updateRowArray(m_newlines, ((ITableRow) element).getRowIndex(), columnIndex - 1);
-      int newLineRowHeight = calculateNewLineRowHeight(m_newlines, cellText, ((ITableRow) element).getRowIndex(), columnIndex - 1);
-      if (table.getData(RWT.CUSTOM_ITEM_HEIGHT) == null
-          || ((Integer) table.getData(RWT.CUSTOM_ITEM_HEIGHT)).compareTo(newLineRowHeight) != 0) {
-        table.setData(RWT.CUSTOM_ITEM_HEIGHT, Double.valueOf(NumberUtility.max(getDefaultRowHeight(), newLineRowHeight)).intValue());
-      }
-    }
-  }
-
-  private double[][] updateRowArray(double[][] rowArray, int rowIndex, int columnIndex) {
-    double[][] tempRowArray = rowArray;
-    if (rowArray == null || rowArray.length <= rowIndex) {
-      if (rowArray == null) {
-        tempRowArray = new double[rowIndex + 1][columnIndex + 1];
-      }
-      else {
-        tempRowArray = Arrays.copyOf(rowArray, rowIndex + 1);
-      }
-    }
-    for (int i = 0; i < tempRowArray.length; i++) {
-      if (tempRowArray[i] == null || tempRowArray[i].length <= columnIndex) {
-        double[] tempColumnArray = null;
-        if (tempRowArray[i] == null) {
-          tempColumnArray = new double[columnIndex + 1];
-        }
-        else {
-          tempColumnArray = Arrays.copyOf(tempRowArray[i], columnIndex + 1);
-        }
-        tempRowArray[i] = tempColumnArray;
-      }
-
-      for (int j = 0; j < tempRowArray[i].length; j++) {
-        if (tempRowArray[i][j] == 0) {
-          tempRowArray[i][j] = 1;
-        }
-      }
-    }
-    return tempRowArray;
-  }
-
-  private int calculateHtmlTableRowHeight(double[][] htmlTableRows, String text, int rowIndex, int columnIndex) {
-    htmlTableRows[rowIndex][columnIndex] = HtmlTextUtility.countHtmlTableRows(text);
-    int htmlTableRowHeight = calculateRowHeigtMedian(htmlTableRows, HTML_ROW_LINE_HIGHT);
-    return htmlTableRowHeight;
-  }
-
-  private int calculateNewLineRowHeight(double[][] newlines, String text, int rowIndex, int columnIndex) {
-    newlines[rowIndex][columnIndex] = HtmlTextUtility.countLineBreaks(text);
-    int newLineRowHeight = calculateRowHeigtMedian(newlines, NEWLINE_LINE_HIGHT);
-    return newLineRowHeight;
-  }
-
-  private int calculateRowHeigtMedian(double[][] rows, int lineHeight) {
-    boolean hasMultilines = false;
-    double[] columnMedians = new double[rows.length];
-    for (int i = 0; i < rows.length; i++) {
-      columnMedians[i] = NumberUtility.max(rows[i]);
-      if (NumberUtility.max(rows[i]) > 1) {
-        hasMultilines = true;
-      }
-    }
-    double median = NumberUtility.median(columnMedians);
-    if (hasMultilines && median < 2) {
-      median = 2;
-    }
-    int newLineRowHeight = NumberUtility.toDouble(NumberUtility.round(median, 1.0)).intValue() * lineHeight;
-    return newLineRowHeight;
   }
 
   protected int getDefaultRowHeight() {

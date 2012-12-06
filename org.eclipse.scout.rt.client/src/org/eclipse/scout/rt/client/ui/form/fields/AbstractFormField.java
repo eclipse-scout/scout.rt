@@ -1055,12 +1055,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     List<ICompositeField> enclosingFieldList = getEnclosingFieldList();
     for (ICompositeField field : enclosingFieldList) {
       SimpleXmlElement enclosingField = new SimpleXmlElement("enclosingField");
-      setXmlFormFieldIds(enclosingField, field);
+      setXmlFormFieldId(enclosingField, field);
       // Enclosing fields are traversed from outside to inside. Hence add XML child at the end.
       x.addChild(enclosingField);
     }
     // set field ids
-    setXmlFormFieldIds(x, this);
+    setXmlFormFieldId(x, this);
   }
 
   @Override
@@ -1082,7 +1082,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return enclosingFieldList;
   }
 
-  private void setXmlFormFieldIds(SimpleXmlElement x, IFormField f) {
+  protected final void setXmlFormFieldId(SimpleXmlElement x, IFormField f) {
     x.setAttribute("fieldId", f.getFieldId());
     x.setAttribute("fieldQname", f.getClass().getName());
   }

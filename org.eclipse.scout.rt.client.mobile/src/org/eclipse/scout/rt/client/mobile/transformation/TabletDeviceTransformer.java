@@ -10,14 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MultiPageChangeStrategy;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.TabForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IPageForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
@@ -45,9 +43,22 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
     PageFormManager manager = new PageFormManager(desktop, IForm.VIEW_ID_CENTER, IForm.VIEW_ID_E);
     manager.setTableStatusVisible(!shouldPageTableStatusBeHidden());
 
-    initMultiPageChangeStrategy(manager);
-
     return manager;
+  }
+
+  @Override
+  public void adaptDesktopOutlines(Collection<IOutline> outlines) {
+    IPageChangeStrategy strategy = new MultiPageChangeStrategy(getPageFormManager());
+    for (IOutline outline : outlines) {
+      outline.setPageChangeStrategy(strategy);
+    }
+  }
+
+  @Override
+  protected ToolFormHandler createToolFormHandler(IDesktop desktop) {
+    ToolFormHandler toolFormHandler = new ToolFormHandler(getDesktop());
+    toolFormHandler.setCloseToolFormsAfterTablePageLoaded(false);
+    return toolFormHandler;
   }
 
   /**
@@ -63,34 +74,17 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
     return viewIds;
   }
 
-  private void initMultiPageChangeStrategy(PageFormManager pageFormManager) {
-    IPageChangeStrategy strategy = new MultiPageChangeStrategy(pageFormManager);
-    for (IOutline outline : getDesktop().getAvailableOutlines()) {
-      outline.setPageChangeStrategy(strategy);
-    }
-  }
-
-  @Override
-  public void transformForm(IForm form) throws ProcessingException {
-    super.transformForm(form);
-
-    if (execCloseToolFormsOnFormOpen(form)) {
-      MobileDesktopUtility.closeAllToolForms();
-    }
-  }
-
   @Override
   protected void transformView(IForm form) {
     if (!(form instanceof IPageForm || form instanceof IOutlineChooserForm)) {
       form.setDisplayViewId(IForm.VIEW_ID_E);
     }
     if (IForm.VIEW_ID_E.equals(form.getDisplayViewId())) {
-      MobileDesktopUtility.setFormWidthHint(form, EAST_FORM_WIDTH);
+      boolean valueSet = MobileDesktopUtility.setFormWidthHint(form, EAST_FORM_WIDTH);
+      if (valueSet) {
+        markGridDataDirty();
+      }
     }
-  }
-
-  protected boolean execCloseToolFormsOnFormOpen(IForm form) {
-    return !(form instanceof TableRowForm) && !(form instanceof TabForm);
   }
 
   @Override

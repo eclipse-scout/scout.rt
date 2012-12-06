@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.ui.swt.action.SwtScoutAction;
@@ -215,6 +216,31 @@ public final class SwtMenuUtility {
     return menuList.toArray(new IMenu[menuList.size()]);
   }
 
+  public static IMenu[] collectMenus(final ICalendar calendar, final boolean emptySpaceActions, final boolean componentActions, ISwtEnvironment swtEnvironment) {
+    final List<IMenu> menuList = new LinkedList<IMenu>();
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        if (emptySpaceActions) {
+          menuList.addAll(Arrays.asList(calendar.getUIFacade().fireNewPopupFromUI()));
+        }
+        if (componentActions) {
+          menuList.addAll(Arrays.asList(calendar.getUIFacade().fireComponentPopupFromUI()));
+        }
+      }
+    };
+
+    JobEx job = swtEnvironment.invokeScoutLater(t, 5000);
+    try {
+      job.join(1200);
+    }
+    catch (InterruptedException ex) {
+      LOG.warn("Exception occured while collecting menus.", ex);
+    }
+
+    return menuList.toArray(new IMenu[menuList.size()]);
+  }
+
   public static IMenu[] collectRowMenus(final ITable table, ISwtEnvironment uiEnvironment) {
     return collectMenus(table, false, true, uiEnvironment);
   }
@@ -229,6 +255,14 @@ public final class SwtMenuUtility {
 
   public static IMenu[] collectEmptySpaceMenus(final ITree tree, ISwtEnvironment uiEnvironment) {
     return collectMenus(tree, true, false, uiEnvironment);
+  }
+
+  public static IMenu[] collectComponentMenus(final ICalendar calendar, ISwtEnvironment swtEnvironment) {
+    return collectMenus(calendar, false, true, swtEnvironment);
+  }
+
+  public static IMenu[] collectEmptySpaceMenus(final ICalendar calendar, ISwtEnvironment swtEnvironment) {
+    return collectMenus(calendar, true, false, swtEnvironment);
   }
 
   /**

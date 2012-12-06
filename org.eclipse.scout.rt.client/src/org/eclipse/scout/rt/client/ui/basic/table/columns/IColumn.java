@@ -36,6 +36,10 @@ public interface IColumn<T> extends IPropertyObserver {
    */
   String PROP_WIDTH = "width";
   /**
+   * type boolean
+   */
+  String PROP_FIXED_WIDTH = "fixedWidth";
+  /**
    * type int
    */
   String PROP_VIEW_COLUMN_INDEX_HINT = "viewColumnIndexHint";
@@ -231,6 +235,14 @@ public interface IColumn<T> extends IPropertyObserver {
    * set the width of the column without firing events
    */
   void setWidthInternal(int w);
+
+  /**
+   * @return <code>true</code>, if the column width is fixed, meaning that it is not changed by resizing/auto-resizing
+   *         and cannot be resized by the user.
+   */
+  boolean isFixedWidth();
+
+  void setFixedWidth(boolean fixedWidth);
 
   int getVisibleColumnIndexHint();
 

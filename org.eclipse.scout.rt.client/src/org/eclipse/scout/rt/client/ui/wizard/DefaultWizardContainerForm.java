@@ -160,8 +160,8 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
         }
 
         @Override
-        protected String getConfiguredBorderDecoration() {
-          return BORDER_DECORATION_EMPTY;
+        protected boolean getConfiguredBorderVisible() {
+          return false;
         }
 
         @Order(10.0f)

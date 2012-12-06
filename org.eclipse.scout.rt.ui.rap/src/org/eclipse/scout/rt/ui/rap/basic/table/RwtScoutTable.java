@@ -274,6 +274,9 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         rwtCol.setToolTipText(cell.getTooltipText());
         updateHeaderText(rwtCol, scoutColumn);
         rwtCol.setWidth(scoutColumn.getWidth());
+        if (scoutColumn.isFixedWidth()) {
+          rwtCol.setResizable(false);
+        }
         if (cell.isSortActive()) {
           getUiField().setSortColumn(rwtCol);
           getUiField().setSortDirection(cell.isSortAscending() ? SWT.UP : SWT.DOWN);
@@ -415,6 +418,12 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     int h = getScoutObject().getRowHeightHint();
     if (h >= 0) {
       getUiField().setData(RWT.CUSTOM_ITEM_HEIGHT, h);
+    }
+    else {
+      int defaultTableRowHeight = UiDecorationExtensionPoint.getLookAndFeel().getTableRowHeight();
+      if (defaultTableRowHeight >= 0) {
+        getUiField().setData(RWT.CUSTOM_ITEM_HEIGHT, defaultTableRowHeight);
+      }
     }
     if (isCreated()) {
       getUiTableViewer().refresh();
@@ -879,7 +888,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       }
       actualWidth += col.getWidth();
       Object data = col.getData(RwtScoutTable.KEY_SCOUT_COLUMN);
-      if (data instanceof IColumn<?>) {
+      if (data instanceof IColumn<?> && !((IColumn<?>) data).isFixedWidth()) {
         int width = ((IColumn<?>) data).getInitialWidth();
         columnWeights.put(col, width);
         totalWeight += width;

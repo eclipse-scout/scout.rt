@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.AbstractRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.PropertyBucket;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -49,9 +48,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   private static final int ROW_HEIGHT = 18;
   private int m_maxCellDetailColumns;
   private OptimisticLock m_selectionLock;
-
   private MobileTablePropertyDelegator m_propertyDelegator;
-
   private P_TableEventListener m_tableListener;
 
   public MobileTable(ITable originalTable) {
@@ -67,9 +64,10 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     try {
       m_selectionLock = new OptimisticLock();
       m_tableListener = new P_TableEventListener();
+      m_tableListener.init();
 
-      m_tableListener.initalizeWith(originalTable);
-      getOriginalTable().addTableListener(m_tableListener);
+      //Attach as UI listener to make sure every "business logic" listener comes first
+      getOriginalTable().addUITableListener(m_tableListener);
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -93,7 +91,6 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     }
 
     getContentColumn().setDefaultDrillDownStyle(getDefaultDrillDownStyle());
-    setDrillDownStyleMap(getDrillDownStyleMap(getOriginalTable()));
   }
 
   @Override
@@ -111,7 +108,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   @Override
-  protected String execComputeDrillDownStyle() {
+  protected String execComputeDefaultDrillDownStyle() {
     String defaultDrillDownStyle = getDefaultDrillDownStyle(getOriginalTable());
     if (defaultDrillDownStyle != null) {
       return defaultDrillDownStyle;
@@ -130,6 +127,15 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     }
 
     return IRowSummaryColumn.DRILL_DOWN_STYLE_ICON;
+  }
+
+  /**
+   * Makes sure page index is not greater than page count
+   */
+  private void updatePageIndex() {
+    if (getPageIndex() >= getPageCount()) {
+      setPageIndex(getOriginalTable(), getPageCount() - 1);
+    }
   }
 
   public void dispose() {
@@ -171,8 +177,6 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
         originalRow = getRowMapColumn().getValue(rows[0]);
       }
       if (originalRow != null) {
-        // TODO CGU: Attention: Drill Down style may not be accurate at this time.
-        // This may happen if the events are executed as batch and another listener sets the style on a rows inserted event (see PageForm)
         if (isAutoCreateTableRowForm() && IRowSummaryColumn.DRILL_DOWN_STYLE_ICON.equals(getDrillDownStyle(originalRow))) {
           startTableRowForm(originalRow);
         }
@@ -237,7 +241,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
 
   @Override
   protected ITableUIFacade createUIFacade() {
-    return new P_MobileTableUIFacade();
+    return new P_DispatchingMobileTableUIFacade();
   }
 
   private void reset() {
@@ -269,24 +273,34 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   private void handleWrappedTableRowsInserted(ITableRow[] rows) {
+    try {
+      setTableChanging(true);
+      insertWrappedTableRows(rows);
+
+      updatePageIndex();
+    }
+    finally {
+      setTableChanging(false);
+    }
+  }
+
+  private void insertWrappedTableRows(ITableRow[] rows) {
     if (!getContentColumn().isInitialized()) {
       getContentColumn().initializeDecorationConfiguration(getOriginalTable(), m_maxCellDetailColumns);
     }
 
-    try {
-      setTableChanging(true);
-      for (ITableRow insertedRow : rows) {
-        try {
-          ITableRow row = addRowByArray(new Object[]{insertedRow, "", ""});
-          getContentColumn().updateValue(row, insertedRow, getDrillDownStyleMap());
-        }
-        catch (ProcessingException exception) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(exception);
-        }
+    for (ITableRow insertedRow : rows) {
+      if (!insertedRow.isFilterAccepted()) {
+        continue;
       }
-    }
-    finally {
-      setTableChanging(false);
+
+      try {
+        ITableRow row = addRowByArray(new Object[]{insertedRow, "", ""});
+        getContentColumn().updateValue(row, insertedRow, getDrillDownStyleMap());
+      }
+      catch (ProcessingException exception) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(exception);
+      }
     }
   }
 
@@ -324,7 +338,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     }
   }
 
-  private void selectRows() {
+  private void syncSelectedRows() {
     if (getOriginalTable().getSelectedRowCount() == 0) {
       return;
     }
@@ -332,7 +346,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     selectRows(getRowMapColumn().findRows(getOriginalTable().getSelectedRows()));
   }
 
-  private void checkRows() throws ProcessingException {
+  private void syncCheckedRows() throws ProcessingException {
     if (!isCheckable() || getOriginalTable().getCheckedRows().length == 0) {
       return;
     }
@@ -340,18 +354,27 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     checkRows(getRowMapColumn().findRows(getOriginalTable().getCheckedRows()), true);
   }
 
+  private void syncTableRows() {
+    if (getOriginalTable().getRowCount() == 0) {
+      return;
+    }
+
+    insertWrappedTableRows(getOriginalTable().getRows());
+  }
+
   private class P_TableEventListener extends TableAdapter {
 
-    protected void initalizeWith(ITable originalTable) throws ProcessingException {
-      reset();
+    protected void init() throws ProcessingException {
+      try {
+        setTableChanging(true);
 
-      if (originalTable.getRows().length > 0) {
-        //'fire' a rows inserted event with all rows
-        tableChanged(new TableEvent(originalTable, TableEvent.TYPE_ROWS_INSERTED, originalTable.getRows()));
+        syncTableRows();
+        syncSelectedRows();
+        syncCheckedRows();
       }
-
-      selectRows();
-      checkRows();
+      finally {
+        setTableChanging(false);
+      }
     }
 
     @Override
@@ -383,37 +406,60 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
         }
       }
     }
-
   }
 
   public static void setAutoCreateRowForm(ITable table, Boolean autoCreateRowForm) {
-    PropertyBucket.getInstance().setPropertyBoolean(table, IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM, autoCreateRowForm);
+    table.setProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM, autoCreateRowForm);
   }
 
   public static Boolean isAutoCreateRowForm(ITable table) {
-    return PropertyBucket.getInstance().getPropertyBoolean(table, IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM);
+    return (Boolean) table.getProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM);
   }
 
   public static void setDrillDownStyleMap(ITable table, DrillDownStyleMap drillDownStyles) {
-    PropertyBucket.getInstance().setProperty(table, IMobileTable.PROP_DRILL_DOWN_STYLE_MAP, drillDownStyles);
+    table.setProperty(IMobileTable.PROP_DRILL_DOWN_STYLE_MAP, drillDownStyles);
   }
 
   public static DrillDownStyleMap getDrillDownStyleMap(ITable table) {
-    return PropertyBucket.getInstance().getProperty(table, IMobileTable.PROP_DRILL_DOWN_STYLE_MAP);
+    return (DrillDownStyleMap) table.getProperty(IMobileTable.PROP_DRILL_DOWN_STYLE_MAP);
   }
 
   public static void setDefaultDrillDownStyle(ITable table, String defaultDrillDownStyle) {
-    PropertyBucket.getInstance().setProperty(table, IMobileTable.PROP_DEFAULT_DRILL_DOWN_STYLE, defaultDrillDownStyle);
+    table.setProperty(IMobileTable.PROP_DEFAULT_DRILL_DOWN_STYLE, defaultDrillDownStyle);
   }
 
   public static String getDefaultDrillDownStyle(ITable table) {
-    return PropertyBucket.getInstance().getProperty(table, IMobileTable.PROP_DEFAULT_DRILL_DOWN_STYLE);
+    return (String) table.getProperty(IMobileTable.PROP_DEFAULT_DRILL_DOWN_STYLE);
+  }
+
+  public static Boolean isPagingEnabled(ITable table) {
+    return (Boolean) table.getProperty(IMobileTable.PROP_PAGING_ENABLED);
+  }
+
+  public static void setPagingEnabled(ITable table, Boolean enabled) {
+    table.setProperty(IMobileTable.PROP_PAGING_ENABLED, enabled);
+  }
+
+  public static Integer getPageSize(ITable table) {
+    return (Integer) table.getProperty(IMobileTable.PROP_PAGE_SIZE);
+  }
+
+  public static void setPageSize(ITable table, int pageSize) {
+    table.setProperty(IMobileTable.PROP_PAGE_SIZE, pageSize);
+  }
+
+  public static Integer getPageIndex(ITable table) {
+    return (Integer) table.getProperty(IMobileTable.PROP_PAGE_INDEX);
+  }
+
+  public static void setPageIndex(ITable table, int index) {
+    table.setProperty(IMobileTable.PROP_PAGE_INDEX, index);
   }
 
   /**
    * Used to directly dispatch ui events to the original table or to completely deny certain events
    */
-  protected class P_MobileTableUIFacade extends P_TableUIFacade {
+  protected class P_DispatchingMobileTableUIFacade extends P_MobileTableUIFacade {
 
     //------------- pass events only to original table -------------
     @Override
@@ -444,6 +490,11 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     @Override
     public boolean fireKeyTypedFromUI(String keyStrokeText, char keyChar) {
       return getOriginalTable().getUIFacade().fireKeyTypedFromUI(keyStrokeText, keyChar);
+    }
+
+    @Override
+    public void setPageIndexFromUi(int pageIndex) {
+      getOriginalTable().setProperty(PROP_PAGE_INDEX, pageIndex);
     }
 
     //------------- do not process events --------------------------

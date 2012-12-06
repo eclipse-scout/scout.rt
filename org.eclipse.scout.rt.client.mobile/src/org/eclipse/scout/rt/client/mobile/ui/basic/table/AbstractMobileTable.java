@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColu
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableUIFacade;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
@@ -41,8 +42,48 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     super.initConfig();
 
     m_drillDownStyleMap = new DrillDownStyleMap();
+    setPagingEnabled(getConfiguredPagingEnabled());
+    setPageSize(getConfiguredPageSize());
     setAutoCreateTableRowForm(execIsAutoCreateTableRowForm());
-    setDefaultDrillDownStyle(execComputeDrillDownStyle());
+    setDefaultDrillDownStyle(execComputeDefaultDrillDownStyle());
+  }
+
+  @Override
+  public boolean isPagingEnabled() {
+    return propertySupport.getPropertyBool(PROP_PAGING_ENABLED);
+  }
+
+  @Override
+  public void setPagingEnabled(boolean enabled) {
+    propertySupport.setPropertyBool(PROP_PAGING_ENABLED, enabled);
+  }
+
+  @Override
+  public int getPageSize() {
+    return propertySupport.getPropertyInt(PROP_PAGE_SIZE);
+  }
+
+  @Override
+  public void setPageSize(int pageSize) {
+    propertySupport.setPropertyInt(PROP_PAGE_SIZE, pageSize);
+  }
+
+  @Override
+  public int getPageIndex() {
+    return propertySupport.getPropertyInt(PROP_PAGE_INDEX);
+  }
+
+  @Override
+  public void setPageIndex(int index) {
+    propertySupport.setPropertyInt(PROP_PAGE_INDEX, index);
+  }
+
+  @Override
+  public int getPageCount() {
+    if (getRowCount() == 0) {
+      return 1;
+    }
+    return new Double(Math.ceil((double) getRowCount() / (double) getPageSize())).intValue();
   }
 
   @Override
@@ -102,6 +143,14 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     return m_drillDownStyleMap;
   }
 
+  protected boolean getConfiguredPagingEnabled() {
+    return true;
+  }
+
+  protected int getConfiguredPageSize() {
+    return 50;
+  }
+
   protected boolean execIsAutoCreateTableRowForm() {
     if (isCheckable()) {
       return false;
@@ -110,7 +159,7 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
     return true;
   }
 
-  protected String execComputeDrillDownStyle() {
+  protected String execComputeDefaultDrillDownStyle() {
     if (isCheckable()) {
       return IRowSummaryColumn.DRILL_DOWN_STYLE_NONE;
     }
@@ -144,4 +193,24 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   protected void clearSelection() {
     selectRow(null);
   }
+
+  @Override
+  protected ITableUIFacade createUIFacade() {
+    return new P_MobileTableUIFacade();
+  }
+
+  @Override
+  public IMobileTableUiFacade getUIFacade() {
+    return (IMobileTableUiFacade) super.getUIFacade();
+  }
+
+  protected class P_MobileTableUIFacade extends P_TableUIFacade implements IMobileTableUiFacade {
+
+    @Override
+    public void setPageIndexFromUi(int pageIndex) {
+      setPageIndex(pageIndex);
+    }
+
+  }
+
 }

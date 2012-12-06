@@ -138,6 +138,22 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       boolean hasTableRows = table != null && table.getRowCount() > 0;
       getPageTableField().setVisible(hasTableRows);
     }
+
+    //If there is no table make sure the table group box is invisible and the detail form grows and takes all the space.
+    //If there is a table, the detail form must not grow because the table does
+    if (getPageTableField().isVisible() != getPageTableGroupBox().isVisible()) {
+      getPageTableGroupBox().setVisible(getPageTableField().isVisible());
+
+      GridData gridData = getPageDetailFormField().getGridDataHints();
+      if (!getPageTableField().isVisible()) {
+        gridData.weightY = 1;
+      }
+      else {
+        gridData.weightY = 0;
+      }
+      getPageDetailFormField().setGridDataHints(gridData);
+      getRootGroupBox().rebuildFieldGrid();
+    }
   }
 
   /**
@@ -194,7 +210,8 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
 
     //Don't display detail form field if there is no detail form -> saves space
-    getPageDetailFormField().setVisible(getPageDetailFormField().getInnerForm() != null);
+    boolean hasDetailForm = getPageDetailFormField().getInnerForm() != null;
+    getPageDetailFormField().setVisible(hasDetailForm);
 
     ITable pageTable = MobileDesktopUtility.getPageTable(m_page);
 
@@ -208,35 +225,21 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
     MobileTable.setAutoCreateRowForm(pageTable, false);
     getPageTableField().setTable(pageTable, true);
+    getPageTableField().setTableStatusVisible(m_pageFormConfig.isTableStatusVisible());
     addTableListener();
-
     updateTableFieldVisibility();
 
-    //If there is no table make sure the table group box is invisible and the detail form grows and takes all the space.
-    if (!getPageTableField().isVisible()) {
-      getPageTableGroupBox().setVisible(false);
+    if (getPageTableGroupBox().isVisible() && !hasDetailForm) {
+      //If there is a table but no detail form, don't display a border -> make the table as big as the form.
+      //If there is a table and a detail form, display a border to make it look better.
+      getPageTableGroupBox().setBorderVisible(false);
 
-      GridData gridData = getPageDetailFormField().getGridDataHints();
-      gridData.weightY = 1;
-      getPageDetailFormField().setGridDataHints(gridData);
-      getRootGroupBox().rebuildFieldGrid();
-    }
-
-    if (getPageTableGroupBox().isVisible()) {
-      if (getPageDetailFormField().getInnerForm() == null) {
-        //If there is a table but no detail form, don't display a border -> make the table as big as the form.
-        //If there is a table and a detail form, display a border to make it look better.
-        getPageTableGroupBox().setBorderVisible(false);
-
-        //If there is just the table, the form itself does not need to be scrollable because the table already is
-        IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
-        if (service != null) {
-          service.getDeviceTransformer().getDeviceTransformationExcluder().excludeFieldTransformation(getRootGroupBox(), MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
-        }
+      //If there is just the table, the form itself does not need to be scrollable because the table already is
+      IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
+      if (service != null && service.getDeviceTransformer() != null) {
+        service.getDeviceTransformer().getDeviceTransformationExcluder().excludeFieldTransformation(getRootGroupBox(), MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
       }
-
     }
-    getPageTableField().setTableStatusVisible(m_pageFormConfig.isTableStatusVisible());
   }
 
   @Override

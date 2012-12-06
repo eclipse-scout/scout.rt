@@ -12,11 +12,14 @@ package org.eclipse.scout.service;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.service.internal.Activator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 
@@ -84,9 +87,7 @@ public final class SERVICES {
         if (service != null) {
           return service;
         }
-
       }
-
     }
     return null;
   }
@@ -123,8 +124,26 @@ public final class SERVICES {
   /**
    * @return the services in order of registration (not by ranking)
    */
-  @SuppressWarnings("unchecked")
   public static <T extends Object> T[] getServices(Class<T> serviceInterfaceClass, String filter) {
+    return getServicesInternal(serviceInterfaceClass, null, false);
+  }
+
+  /**
+   * @return the services in order of ranking
+   */
+  public static <T extends Object> T[] getServicesOrdered(Class<T> serviceInterfaceClass) {
+    return getServicesOrdered(serviceInterfaceClass, null);
+  }
+
+  /**
+   * @return the services in order of ranking
+   */
+  public static <T extends Object> T[] getServicesOrdered(Class<T> serviceInterfaceClass, String filter) {
+    return getServicesInternal(serviceInterfaceClass, null, true);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T extends Object> T[] getServicesInternal(Class<T> serviceInterfaceClass, String filter, boolean ordered) {
     Activator a = Activator.getDefault();
     if (a == null || serviceInterfaceClass == null) {
       return (T[]) Array.newInstance(serviceInterfaceClass, 0);
@@ -144,6 +163,14 @@ public final class SERVICES {
       // nop
     }
     if (refs != null) {
+      if (ordered) {
+        Arrays.sort(refs, new Comparator<ServiceReference>() {
+          @Override
+          public int compare(ServiceReference ref1, ServiceReference ref2) {
+            return ((Comparable) ref2.getProperty(Constants.SERVICE_RANKING)).compareTo(((Comparable) ref1.getProperty(Constants.SERVICE_RANKING)));
+          }
+        });
+      }
       ArrayList<T> list = new ArrayList<T>(refs.length);
       for (ServiceReference ref : refs) {
         T s = resolveService(serviceInterfaceClass, context, ref);

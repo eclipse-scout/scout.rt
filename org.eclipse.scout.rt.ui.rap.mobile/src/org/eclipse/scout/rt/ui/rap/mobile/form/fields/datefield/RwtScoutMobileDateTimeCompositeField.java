@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile.form.fields.datefield;
 
-import org.eclipse.scout.rt.ui.rap.form.fields.datefield.RwtScoutDateField;
+import org.eclipse.scout.rt.ui.rap.form.fields.datefield.IRwtScoutDateField;
+import org.eclipse.scout.rt.ui.rap.form.fields.datefield.IRwtScoutTimeField;
 import org.eclipse.scout.rt.ui.rap.form.fields.datefield.RwtScoutDateTimeCompositeField;
-import org.eclipse.scout.rt.ui.rap.form.fields.datefield.RwtScoutTimeField;
 
 /**
  * @since 3.9.0
@@ -20,12 +20,12 @@ import org.eclipse.scout.rt.ui.rap.form.fields.datefield.RwtScoutTimeField;
 public class RwtScoutMobileDateTimeCompositeField extends RwtScoutDateTimeCompositeField {
 
   @Override
-  protected RwtScoutDateField createRwtScoutDateField() {
+  protected IRwtScoutDateField createRwtScoutDateField() {
     return new RwtScoutMobileDateField();
   }
 
   @Override
-  protected RwtScoutTimeField createRwtScoutTimeField() {
+  protected IRwtScoutTimeField createRwtScoutTimeField() {
     return new RwtScoutMobileTimeField();
   }
 

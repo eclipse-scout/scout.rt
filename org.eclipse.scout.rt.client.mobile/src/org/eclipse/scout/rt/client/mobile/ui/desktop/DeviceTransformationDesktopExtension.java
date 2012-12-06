@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileHomeAction;
+import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformer;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.ContributionCommand;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -53,9 +55,19 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
     m_active = active;
   }
 
+  @Override
+  public void setCoreDesktop(IDesktop desktop) {
+    super.setCoreDesktop(desktop);
+
+    if (isActive()) {
+      SERVICES.getService(IBreadCrumbsNavigationService.class).install(getCoreDesktop());
+      SERVICES.getService(IDeviceTransformationService.class).install(getCoreDesktop());
+    }
+  }
+
   public IDeviceTransformer getDeviceTransformer() {
     if (m_deviceTransformer == null) {
-      m_deviceTransformer = SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer(getCoreDesktop());
+      m_deviceTransformer = SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer();
     }
 
     return m_deviceTransformer;
@@ -66,9 +78,6 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
     if (!isActive()) {
       return super.execInit();
     }
-
-    //Create transformer
-    getDeviceTransformer();
 
     return ContributionCommand.Continue;
   }
@@ -82,6 +91,17 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
     getDeviceTransformer().adaptDesktopActions(actions);
 
     super.contributeActions(actions);
+  }
+
+  @Override
+  public void contributeOutlines(Collection<IOutline> outlines) {
+    if (!isActive()) {
+      return;
+    }
+
+    getDeviceTransformer().adaptDesktopOutlines(outlines);
+
+    super.contributeOutlines(outlines);
   }
 
   @Override

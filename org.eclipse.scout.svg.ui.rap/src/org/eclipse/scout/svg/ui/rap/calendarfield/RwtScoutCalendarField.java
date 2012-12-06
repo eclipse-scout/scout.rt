@@ -3,7 +3,6 @@ package org.eclipse.scout.svg.ui.rap.calendarfield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
@@ -284,22 +283,7 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
-      final long TIMEOUT = 1200;
-      final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
-
-      try {
-        RwtScoutCalendarField.this.getUiEnvironment().invokeScoutLater(new Runnable() {
-          @Override
-          public void run() {
-            scoutMenusRef.set(getContextMenusFromScout());
-          }
-        }, TIMEOUT).join(TIMEOUT);
-      }
-      catch (InterruptedException ex) {
-        //nop
-      }
-
-      RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), RwtScoutCalendarField.this.getUiEnvironment(), m_contextMenu);
+      RwtMenuUtility.fillContextMenu(getContextMenusFromScout(), RwtScoutCalendarField.this.getUiEnvironment(), m_contextMenu);
     }
   } // end class P_ContextMenuListener
 

@@ -59,7 +59,11 @@ public class MobileTabBoxFactory implements IFormFieldFactory {
 
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        accepted.setValue(SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer().acceptMobileTabBoxTransformation(tabBox));
+        IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
+        if (service == null || service.getDeviceTransformer() == null) {
+          return;
+        }
+        accepted.setValue(service.getDeviceTransformer().acceptMobileTabBoxTransformation(tabBox));
       }
 
     };

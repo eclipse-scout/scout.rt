@@ -66,6 +66,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
   private TimeChooserDialog m_timeChooserDialog = null;
   private FocusAdapter m_textFieldFocusAdapter = null;
 
+  @Override
   public void setIgnoreLabel(boolean ignoreLabel) {
     m_ignoreLabel = ignoreLabel;
     if (ignoreLabel) {
@@ -84,6 +85,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     return m_dateTimeCompositeMember;
   }
 
+  @Override
   public void setDateTimeCompositeMember(boolean dateTimeCompositeMember) {
     m_dateTimeCompositeMember = dateTimeCompositeMember;
   }
@@ -255,29 +257,21 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
 
   @Override
   protected void setDisplayTextFromScout(String s) {
-    IDateField f = getScoutObject();
-    if (f.getErrorStatus() != null) {
-      return;
-    }
+    IDateField scoutField = getScoutObject();
     if (s == null) {
       s = "";
     }
     m_displayTextToVerify = s;
-    Date value = f.getValue();
-    if (value == null) {
-      getUiField().setText(m_displayTextToVerify);
-      super.handleUiFocusGained();
-      getUiField().setCaretOffset(0);
-      return;
-    }
-    DateFormat format = f.getIsolatedTimeFormat();
+    Date value = scoutField.getValue();
+    if (value != null) {
+      DateFormat format = scoutField.getIsolatedTimeFormat();
     if (format != null) {
       m_displayTextToVerify = format.format(value);
+      }
+    }
       getUiField().setText(m_displayTextToVerify);
-      super.handleUiFocusGained();
       getUiField().setCaretOffset(0);
     }
-  }
 
   @Override
   protected void setBackgroundFromScout(String scoutColor) {
