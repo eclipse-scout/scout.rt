@@ -158,24 +158,18 @@ public class RwtScoutMobileTimeField extends RwtScoutValueFieldComposite<IDateFi
 
   @Override
   protected void setDisplayTextFromScout(String s) {
-    IDateField f = getScoutObject();
-    if (f.getErrorStatus() != null) {
-      return;
-    }
+    IDateField scoutField = getScoutObject();
     if (s == null) {
       s = "";
     }
-    Date value = f.getValue();
-    if (value == null) {
-      getUiField().setText(s);
-    }
-    else {
-      DateFormat format = f.getIsolatedTimeFormat();
+    Date value = scoutField.getValue();
+    if (value != null) {
+      DateFormat format = scoutField.getIsolatedTimeFormat();
       if (format != null) {
         s = format.format(value);
-        getUiField().setText(s);
       }
     }
+    getUiField().setText(s);
   }
 
   @Override

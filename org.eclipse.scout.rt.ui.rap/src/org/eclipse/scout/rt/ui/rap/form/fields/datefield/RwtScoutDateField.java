@@ -259,29 +259,20 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
 
   @Override
   protected void setDisplayTextFromScout(String s) {
-    IDateField f = getScoutObject();
-    if (f.getErrorStatus() != null) {
-      return;
-    }
+    IDateField scoutField = getScoutObject();
     if (s == null) {
       s = "";
     }
     m_displayTextToVerify = s;
-    Date value = f.getValue();
-    if (value == null) {
-      //only date field
-      getUiField().setText(m_displayTextToVerify);
-      super.handleUiFocusGained();
-      getUiField().setCaretOffset(0);
-      return;
+    Date value = scoutField.getValue();
+    if (value != null) {
+      DateFormat format = scoutField.getIsolatedDateFormat();
+      if (format != null) {
+        m_displayTextToVerify = format.format(value);
+      }
     }
-    DateFormat format = f.getIsolatedDateFormat();
-    if (format != null) {
-      m_displayTextToVerify = format.format(value);
-      getUiField().setText(m_displayTextToVerify);
-      super.handleUiFocusGained();
-      getUiField().setCaretOffset(0);
-    }
+    getUiField().setText(m_displayTextToVerify);
+    getUiField().setCaretOffset(0);
   }
 
   @Override
