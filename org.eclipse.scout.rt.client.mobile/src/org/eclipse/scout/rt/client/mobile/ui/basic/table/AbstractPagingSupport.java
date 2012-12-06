@@ -66,11 +66,11 @@ public class AbstractPagingSupport {
     return currentPage.toArray(new ITableRow[currentPage.size()]);
   }
 
-  private ITableRow createPreviousElementsTableRow() {
+  protected ITableRow createPreviousElementsTableRow() {
     return new PagingTableRow(m_table.getColumnSet(), PagingTableRow.Type.back);
   }
 
-  private ITableRow createNextElementsTableRow() {
+  protected ITableRow createNextElementsTableRow() {
     return new PagingTableRow(m_table.getColumnSet(), PagingTableRow.Type.forward);
   }
 
