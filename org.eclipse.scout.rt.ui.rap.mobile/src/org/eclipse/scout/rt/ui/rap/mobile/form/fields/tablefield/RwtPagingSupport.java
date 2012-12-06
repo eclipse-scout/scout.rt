@@ -14,6 +14,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractPagingSupport;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.IMobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.PagingTableRow;
@@ -28,6 +32,7 @@ import org.eclipse.swt.widgets.Listener;
  * @since 3.9.0
  */
 public class RwtPagingSupport extends AbstractPagingSupport {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtPagingSupport.class);
 
   private RwtScoutList m_uiList;
   private P_TableRowSelectionFilter m_tableRowSelectionFilter;
@@ -88,6 +93,50 @@ public class RwtPagingSupport extends AbstractPagingSupport {
     else {
       super.initProperties();
     }
+  }
+
+  @Override
+  protected ITableRow createNextElementsTableRow() {
+    final Holder<ITableRow> resultHolder = new Holder<ITableRow>(ITableRow.class);
+
+    JobEx job = m_uiList.getUiEnvironment().invokeScoutLater(new Runnable() {
+
+      @Override
+      public void run() {
+        resultHolder.setValue(RwtPagingSupport.super.createNextElementsTableRow());
+      }
+
+    }, 0);
+    try {
+      job.join(3000);
+    }
+    catch (InterruptedException e) {
+      LOG.error("Failed to create NextPagingTableRow", e);
+    }
+
+    return resultHolder.getValue();
+  }
+
+  @Override
+  protected ITableRow createPreviousElementsTableRow() {
+    final Holder<ITableRow> resultHolder = new Holder<ITableRow>(ITableRow.class);
+
+    JobEx job = m_uiList.getUiEnvironment().invokeScoutLater(new Runnable() {
+
+      @Override
+      public void run() {
+        resultHolder.setValue(RwtPagingSupport.super.createPreviousElementsTableRow());
+      }
+
+    }, 0);
+    try {
+      job.join(3000);
+    }
+    catch (InterruptedException e) {
+      LOG.error("Failed to create PreviousPagingTableRow", e);
+    }
+
+    return resultHolder.getValue();
   }
 
   /**
