@@ -37,6 +37,7 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
   private final EventListenerList m_listeners;
   private final Object m_waitForLock;
   private boolean m_waitFor;
+  private final ClientJobContext m_context;
 
   /**
    * @param name
@@ -76,6 +77,15 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
     m_waitForLock = new Object();
     if (sync) {
       setRule(new ClientRule(session));
+    }
+
+    // inherit the client job context by a copy of the current client job context
+    ClientJobContext currentContext = ClientJobContextThreadLocal.get();
+    if (currentContext != null) {
+      m_context = new ClientJobContext(currentContext);
+    }
+    else {
+      m_context = new ClientJobContext();
     }
   }
 
@@ -153,17 +163,19 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
     Locale oldLocale = LocaleThreadLocal.get();
     ScoutTexts oldTexts = TextsThreadLocal.get();
     IClientSession oldSession = ClientSessionThreadLocal.get();
+    ClientJobContext oldContext = ClientJobContextThreadLocal.get();
     try {
       ClientSessionThreadLocal.set(getClientSession());
       LocaleThreadLocal.set(m_session.getLocale());
       TextsThreadLocal.set(m_session.getTexts());
-      //
+      ClientJobContextThreadLocal.set(m_context);
       return runStatus(monitor);
     }
     finally {
       ClientSessionThreadLocal.set(oldSession);
       LocaleThreadLocal.set(oldLocale);
       TextsThreadLocal.set(oldTexts);
+      ClientJobContextThreadLocal.set(oldContext);
     }
   }
 
