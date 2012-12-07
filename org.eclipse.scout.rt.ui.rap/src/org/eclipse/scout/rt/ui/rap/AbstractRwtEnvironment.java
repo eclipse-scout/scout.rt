@@ -29,8 +29,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.internal.widgets.JSExecutor;
+import org.eclipse.rwt.lifecycle.PhaseEvent;
+import org.eclipse.rwt.lifecycle.PhaseId;
+import org.eclipse.rwt.lifecycle.PhaseListener;
+import org.eclipse.rwt.lifecycle.PhaseListenerUtil;
 import org.eclipse.rwt.lifecycle.UICallBack;
-import org.eclipse.rwt.service.SessionStoreListener;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.ListUtility;
@@ -125,7 +128,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   private Bundle m_applicationBundle;
   private RwtScoutSynchronizer m_synchronizer;
-  private SessionStoreListener m_sessionStoreListener;
   private ILocaleListener m_localeListener;
 
   private final Object m_immediateUiJobsLock = new Object();
@@ -161,12 +163,14 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private LayoutValidateManager m_layoutValidateManager;
   private HtmlAdapter m_htmlAdapter;
   private IBusyHandler m_busyHandler;
+  private P_RequestInterceptor m_requestInterceptor;
 
   public AbstractRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     m_applicationBundle = applicationBundle;
     m_clientSessionClazz = clientSessionClazz;
     m_environmentListeners = new EventListenerList();
     m_localeListener = new P_LocaleListener();
+    m_requestInterceptor = new P_RequestInterceptor();
     m_openForms = new HashMap<IForm, IRwtScoutPart>();
     m_status = RwtEnvironmentEvent.INACTIVE;
     m_desktopKeyStrokes = new ArrayList<IRwtKeyStroke>();
@@ -242,6 +246,9 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         m_busyHandler.setEnabled(false);
         m_busyHandler = null;
       }
+      if (m_requestInterceptor != null) {
+        RWT.getLifeCycle().removePhaseListener(m_requestInterceptor);
+      }
 
       m_status = RwtEnvironmentEvent.STOPPED;
       fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STOPPED));
@@ -314,39 +321,16 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     if (Thread.currentThread() != getDisplay().getThread()) {
       throw new IllegalStateException("must be called in display thread");
     }
-
-    getDisplay().addListener(SWT.Dispose, new Listener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void handleEvent(Event event) {
-        getDisplay().removeListener(SWT.Dispose, this);
-
-        if (LOG.isInfoEnabled()) {
-          UserAgent userAgent = getClientSession().getUserAgent();
-          String msg = "Thread: {0} Rap session goes down; UserAgent: {2}";
-          LOG.info(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
-        }
-
-        invokeScoutLater(new Runnable() {
-
-          @Override
-          public void run() {
-            if (getClientSession().getDesktop() == null) {
-              //Desktop already closed, probably by the model itself
-              return;
-            }
-            getClientSession().getDesktop().getUIFacade().fireDesktopClosingFromUI();
-          }
-
-        }, 0);
-
-        stopScout();
-      }
-    });
+    getDisplay().addListener(SWT.Dispose, new P_DisplayDisposeListener());
 
     try {
       m_status = RwtEnvironmentEvent.STARTING;
+
+      // enable HTTP request handling
+      // the first beforeRequest-event has to be fired manually, because currently no PhaseListener is attached
+      beforeHttpRequest();
+      RWT.getLifeCycle().addPhaseListener(m_requestInterceptor);
+
       fireEnvironmentChanged(new RwtEnvironmentEvent(this, m_status));
 
       if (getSubject() == null) {
@@ -443,6 +427,21 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   protected UserAgent initUserAgent() {
     return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, RwtUtility.getBrowserInfo().getUserAgent());
+  }
+
+  /**
+   * Handles event before a HTTP request will be processed.
+   */
+  protected void beforeHttpRequest() {
+    if (getClientSession() != null) {
+      LocaleThreadLocal.set(getClientSession().getLocale());
+    }
+  }
+
+  /**
+   * Handles event after a HTTP request has been processed.
+   */
+  protected void afterHttpRequest() {
   }
 
   protected RwtBusyHandler attachBusyHandler() {
@@ -1318,4 +1317,61 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
+  private final class P_RequestInterceptor implements PhaseListener {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public PhaseId getPhaseId() {
+      return PhaseId.ANY;
+    }
+
+    @Override
+    public void beforePhase(PhaseEvent event) {
+      if (!PhaseListenerUtil.isPrepareUIRoot(event)) {
+        return;
+      }
+
+      beforeHttpRequest();
+    }
+
+    @Override
+    public void afterPhase(PhaseEvent event) {
+      if (!PhaseListenerUtil.isRender(event)) {
+        return;
+      }
+
+      afterHttpRequest();
+    }
+  }
+
+  private class P_DisplayDisposeListener implements Listener {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void handleEvent(Event event) {
+      getDisplay().removeListener(SWT.Dispose, this);
+
+      if (LOG.isInfoEnabled()) {
+        UserAgent userAgent = getClientSession().getUserAgent();
+        String msg = "Thread: {0} Rap session goes down; UserAgent: {2}";
+        LOG.info(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
+      }
+
+      invokeScoutLater(new Runnable() {
+
+        @Override
+        public void run() {
+          if (getClientSession().getDesktop() == null) {
+            //Desktop already closed, probably by the model itself
+            return;
+          }
+          getClientSession().getDesktop().getUIFacade().fireDesktopClosingFromUI();
+        }
+
+      }, 0);
+
+      stopScout();
+    }
+
+  }
 }
