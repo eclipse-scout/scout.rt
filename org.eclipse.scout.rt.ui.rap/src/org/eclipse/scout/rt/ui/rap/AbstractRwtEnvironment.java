@@ -26,13 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.internal.widgets.JSExecutor;
 import org.eclipse.rwt.lifecycle.UICallBack;
-import org.eclipse.rwt.service.ISessionStore;
-import org.eclipse.rwt.service.SessionStoreEvent;
 import org.eclipse.rwt.service.SessionStoreListener;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
@@ -44,7 +41,6 @@ import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
@@ -108,6 +104,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolTip;
@@ -167,7 +165,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   public AbstractRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     m_applicationBundle = applicationBundle;
     m_clientSessionClazz = clientSessionClazz;
-    m_sessionStoreListener = new P_SessionStoreListener();
     m_environmentListeners = new EventListenerList();
     m_localeListener = new P_LocaleListener();
     m_openForms = new HashMap<IForm, IRwtScoutPart>();
@@ -208,7 +205,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     return m_openForms.remove(form);
   }
 
-  protected void stopScout() throws CoreException {
+  protected void stopScout() {
     try {
       if (m_historySupport != null) {
         m_historySupport.uninstall();
@@ -317,24 +314,37 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     if (Thread.currentThread() != getDisplay().getThread()) {
       throw new IllegalStateException("must be called in display thread");
     }
-    // workbench must exist
-//    if (PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {
-//      throw new IllegalStateException("workbench must be active");
-//    }
-//    // close views that were opened due to workbench caching the latest layout
-//    // of views
-//    for (IWorkbenchWindow workbenchWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-//      for (IWorkbenchPage workbenchPage : workbenchWindow.getPages()) {
-//        for (IViewReference viewReference : workbenchPage.getViewReferences()) {
-//          if (m_scoutPartIdToUiPartId.containsValue(viewReference.getId())) {
-//            if (workbenchPage.isPartVisible(viewReference.getPart(false))) {
-//              workbenchPage.hideView(viewReference);
-//            }
-//          }
-//        }
-//      }
-//    }
-    //
+
+    getDisplay().addListener(SWT.Dispose, new Listener() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void handleEvent(Event event) {
+        getDisplay().removeListener(SWT.Dispose, this);
+
+        if (LOG.isInfoEnabled()) {
+          UserAgent userAgent = getClientSession().getUserAgent();
+          String msg = "Thread: {0} Rap session goes down; UserAgent: {2}";
+          LOG.info(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
+        }
+
+        invokeScoutLater(new Runnable() {
+
+          @Override
+          public void run() {
+            if (getClientSession().getDesktop() == null) {
+              //Desktop already closed, probably by the model itself
+              return;
+            }
+            getClientSession().getDesktop().getUIFacade().fireDesktopClosingFromUI();
+          }
+
+        }, 0);
+
+        stopScout();
+      }
+    });
+
     try {
       m_status = RwtEnvironmentEvent.STARTING;
       fireEnvironmentChanged(new RwtEnvironmentEvent(this, m_status));
@@ -353,7 +363,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString(), userAgent);
 
         RWT.getSessionStore().setAttribute(IClientSession.class.getName(), tempClientSession);
-        RWT.getSessionStore().addSessionStoreListener(m_sessionStoreListener);
 
         // init RWT locale with the locale of the client session
         if (tempClientSession.getLocale() != null && !tempClientSession.getLocale().equals(RWT.getLocale())) {
@@ -1084,19 +1093,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              try {
-                stopScout();
-              }
-              catch (CoreException ex) {
-                LOG.error("desktop closed", ex);
-              }
-              getDisplay().asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                  logout();
-                }
-              });
+              logout();
             }
           };
           invokeUiLater(t);
@@ -1321,27 +1318,4 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
-  private static final class P_SessionStoreListener implements SessionStoreListener {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void beforeDestroy(SessionStoreEvent event) {
-      ISessionStore sessionStore = event.getSessionStore();
-      IClientSession clientSession = (IClientSession) sessionStore.getAttribute(IClientSession.class.getName());
-      if (clientSession != null) {
-        if (LOG.isInfoEnabled()) {
-          UserAgent userAgent = clientSession.getUserAgent();
-          String msg = "Thread: {0} Session goes down...; UserAgent: {2}";
-          LOG.info(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
-        }
-
-        new ClientAsyncJob("HTTP session inactivator", clientSession) {
-          @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
-            getClientSession().stopSession();
-          }
-        }.runNow(new NullProgressMonitor());
-      }
-    }
-  }
 }

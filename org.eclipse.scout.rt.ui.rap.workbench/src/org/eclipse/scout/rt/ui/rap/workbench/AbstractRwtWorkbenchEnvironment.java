@@ -135,36 +135,12 @@ public abstract class AbstractRwtWorkbenchEnvironment extends AbstractRwtEnviron
         }
       }
     }
-//    PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
-//      @Override
-//      public boolean preShutdown(IWorkbench workbench, boolean forced) {
-//        return true;
-//      }
-//
-//      @Override
-//      public void postShutdown(IWorkbench workbench) {
-//        Runnable t = new Runnable() {
-//          @Override
-//          public void run() {
-//            getScoutDesktop().getUIFacade().fireGuiDetached();
-//            getScoutDesktop().getUIFacade().fireDesktopClosingFromUI();
-//          }
-//        };
-//        JobEx job = invokeScoutLater(t, 0);
-////        try {
-////          job.join(600000);
-////        }
-////        catch (InterruptedException e) {
-////          //nop
-////        }
-//      }
-//    });
     super.init();
     attachUiListeners();
   }
 
   @Override
-  protected void stopScout() throws CoreException {
+  protected void stopScout() {
     super.stopScout();
     detachUiListeners();
   }
@@ -335,7 +311,9 @@ public abstract class AbstractRwtWorkbenchEnvironment extends AbstractRwtEnviron
   @Override
   protected void fireGuiDetachedFromUIInternal() {
     super.fireGuiDetachedFromUIInternal();
-    getDisplay().asyncExec(new P_HideScoutViews());
+    if (getDisplay() != null) {
+      getDisplay().asyncExec(new P_HideScoutViews());
+    }
   }
 
   @Override

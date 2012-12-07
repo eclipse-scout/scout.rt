@@ -17,12 +17,9 @@ import java.util.TreeMap;
 import javax.security.auth.Subject;
 
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.UICallBack;
-import org.eclipse.rwt.service.SettingStoreException;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.LocaleThreadLocal;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -33,8 +30,6 @@ import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
 import org.eclipse.scout.rt.ui.rap.window.desktop.nonmodalFormBar.RwtScoutFormButtonBar;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -84,7 +79,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
         @Override
         public void handleEvent(Event event) {
           try {
-            // WORKAROUND for memory leaks
+            // WORKAROUND for memory leaks (display reference in workbench still exists after dispose)
             // workbench should be closed instead, but NPEs are thrown
             f.set(wb, null);
           }
@@ -98,13 +93,6 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
       //nop
     }
     //XXX end Workaround for rwt npe
-
-    try {
-      RWT.getSettingStore().setAttribute("SessionID", RWT.getRequest().getSession().getId());
-    }
-    catch (SettingStoreException e) {
-      //nop
-    }
 
     Shell shell = new Shell(m_display, SWT.NO_TRIM);
     m_rootShell = shell;
@@ -127,24 +115,6 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     shell.setMaximized(true);
     shell.open();
     shell.layout(true, true);
-    shell.addDisposeListener(new DisposeListener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent event) {
-        String sessionID = RWT.getSettingStore().getAttribute("SessionID");
-        if (StringUtility.isNullOrEmpty(sessionID) || !sessionID.equals(RWT.getRequest().getSession().getId())) {
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              getScoutDesktop().getUIFacade().fireGuiDetached();
-              getScoutDesktop().getUIFacade().fireDesktopClosingFromUI();
-            }
-          };
-          invokeScoutLater(t, 0);
-        }
-      }
-    });
 
     if (needsClientNotificationUICallBack()) {
       // Necessary for client notifications.
@@ -159,8 +129,6 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
         m_display.sleep();
       }
     }
-    m_display.dispose();
-    m_rootShell = null;
     return 0;
   }
 

@@ -1522,6 +1522,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void closeInternal() throws ProcessingException {
+    detachGui();
+
     List<IForm> openForms = new ArrayList<IForm>();
     // remove views
     for (IForm view : getViewStack()) {
@@ -1580,6 +1582,58 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     fireDesktopClosed();
+  }
+
+  private void attachGui() {
+    if (isGuiAvailable()) {
+      return;
+    }
+    setGuiAvailableInternal(true);
+
+    //extensions
+    IDesktopExtension[] extensions = getDesktopExtensions();
+    if (extensions != null) {
+      for (IDesktopExtension ext : extensions) {
+        try {
+          ContributionCommand cc = ext.guiAttachedDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
+        }
+        catch (ProcessingException e) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        }
+        catch (Throwable t) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
+        }
+      }
+    }
+  }
+
+  private void detachGui() {
+    if (!isGuiAvailable()) {
+      return;
+    }
+    setGuiAvailableInternal(false);
+
+    //extensions
+    IDesktopExtension[] extensions = getDesktopExtensions();
+    if (extensions != null) {
+      for (IDesktopExtension ext : extensions) {
+        try {
+          ContributionCommand cc = ext.guiDetachedDelegate();
+          if (cc == ContributionCommand.Stop) {
+            break;
+          }
+        }
+        catch (ProcessingException e) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        }
+        catch (Throwable t) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
+        }
+      }
+    }
   }
 
   public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {
@@ -1736,48 +1790,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     @Override
     public void fireGuiAttached() {
-      setGuiAvailableInternal(true);
-      //extensions
-      IDesktopExtension[] extensions = getDesktopExtensions();
-      if (extensions != null) {
-        for (IDesktopExtension ext : extensions) {
-          try {
-            ContributionCommand cc = ext.guiAttachedDelegate();
-            if (cc == ContributionCommand.Stop) {
-              break;
-            }
-          }
-          catch (ProcessingException e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-          }
-          catch (Throwable t) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
-          }
-        }
-      }
+      attachGui();
     }
 
     @Override
     public void fireGuiDetached() {
-      setGuiAvailableInternal(false);
-      //extensions
-      IDesktopExtension[] extensions = getDesktopExtensions();
-      if (extensions != null) {
-        for (IDesktopExtension ext : extensions) {
-          try {
-            ContributionCommand cc = ext.guiDetachedDelegate();
-            if (cc == ContributionCommand.Stop) {
-              break;
-            }
-          }
-          catch (ProcessingException e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-          }
-          catch (Throwable t) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
-          }
-        }
-      }
+      detachGui();
     }
 
     @Override
