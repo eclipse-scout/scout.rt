@@ -65,9 +65,14 @@ public class RwtScoutNavigationSupport {
   }
 
   public void uninstall() {
-    if (m_historyService != null && m_scoutListener != null) {
-      m_historyService.removeNavigationHistoryListener(m_scoutListener);
-    }
+    new ClientSyncJob("", getUiEnvironment().getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        if (m_historyService != null && m_scoutListener != null) {
+          m_historyService.removeNavigationHistoryListener(m_scoutListener);
+        }
+      }
+    }.schedule();
     if (m_uiHistory != null) {
       m_uiHistory.removeBrowserHistoryListener(m_uiListener);
     }
