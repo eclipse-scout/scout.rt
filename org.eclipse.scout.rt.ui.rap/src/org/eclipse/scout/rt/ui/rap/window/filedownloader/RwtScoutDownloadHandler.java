@@ -23,9 +23,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.service.IServiceHandler;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.swt.widgets.Display;
 
 public class RwtScoutDownloadHandler implements IServiceHandler {
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDownloadHandler.class);
 
   private File m_file;
   private URI m_bundleURI;
@@ -38,7 +41,6 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
     m_requestId = id;
     m_fileName = fileName;
     m_contentType = contentType;
-    RWT.getServiceManager().registerServiceHandler(m_requestId, this);
   }
 
   public RwtScoutDownloadHandler(String id, File file, String contentType, String fileName) {
@@ -51,8 +53,15 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
     m_bundleURI = bundleURI;
   }
 
-  public void startDownload(Shell parentShell) {
-    m_sdd = new RwtScoutDownloadDialog(parentShell, getURL());
+  public void startDownload() {
+    RWT.getServiceManager().unregisterServiceHandler(m_requestId);
+    if (m_sdd != null) {
+      m_sdd.close();
+      m_sdd = null;
+    }
+
+    RWT.getServiceManager().registerServiceHandler(m_requestId, this);
+    m_sdd = new RwtScoutDownloadDialog(null, getURL());
     m_sdd.open();
   }
 
@@ -69,7 +78,27 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
 
   @Override
   public void service() throws IOException, ServletException {
-    HttpServletResponse response = RWT.getResponse();
+    try {
+      HttpServletResponse response = RWT.getResponse();
+      writeResponse(response);
+    }
+    finally {
+      if (m_sdd != null) {
+        Display display = m_sdd.getShell().getDisplay();
+        display.asyncExec(new Runnable() {
+
+          @Override
+          public void run() {
+            m_sdd.close();
+            m_sdd = null;
+          }
+        });
+      }
+      RWT.getServiceManager().unregisterServiceHandler(m_requestId);
+    }
+  }
+
+  protected void writeResponse(HttpServletResponse response) throws IOException {
     if (StringUtility.hasText(m_contentType)) {
       response.setContentType(m_contentType);
     }
@@ -101,30 +130,12 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
         }
       }
       catch (IOException e) {
-        e.printStackTrace();
+        LOG.error("IOEception while writing file.", e);
       }
       finally {
         srcStream.close();
-//        if (m_file != null) {
-//          try {
-//            m_file.delete();
-//            File parentPath = new File(m_file.getParent());
-//            if (parentPath.isDirectory() && parentPath.listFiles().length == 0) {
-//              parentPath.delete();
-//            }
-//          }
-//          catch (Exception e) {
-//            // NOP
-//          }
-//        }
       }
     }
   }
 
-  public void dispose() {
-    if (m_sdd != null) {
-      m_sdd.close();
-    }
-    RWT.getServiceManager().unregisterServiceHandler(m_requestId + hashCode());
-  }
 }
