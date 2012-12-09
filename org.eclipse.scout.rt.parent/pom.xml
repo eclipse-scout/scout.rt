@@ -84,6 +84,7 @@
         <module>../org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment</module>
         <module>../org.eclipse.scout.rt.testing.ui.swing</module>
         <module>../org.eclipse.scout.rt.testing.ui.swt</module>
+        <module>../org.eclipse.scout.rt.testing.ui.rap</module>
         <module>../org.eclipse.scout.rt.extension.client.test.fragment</module>
         <module>../org.eclipse.scout.rt.testing-feature</module>
       </modules>
