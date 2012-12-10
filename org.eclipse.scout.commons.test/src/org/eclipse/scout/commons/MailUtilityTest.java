@@ -20,6 +20,7 @@ import org.junit.Test;
 /**
  *
  */
+@SuppressWarnings("restriction")
 public class MailUtilityTest {
 
   /**

@@ -184,6 +184,7 @@ public final class SERVICES {
   }
 
   private static Object safeGetService(BundleContext context, ServiceReference ref) {
+    @SuppressWarnings("unchecked")
     Object o = context.getService(ref);
     if (o instanceof INullService) {
       o = null;

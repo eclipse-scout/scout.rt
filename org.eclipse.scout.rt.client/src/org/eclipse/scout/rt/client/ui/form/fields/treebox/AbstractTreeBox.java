@@ -371,6 +371,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<T[]> impleme
     getTree().disposeTree();
   }
 
+  @SuppressWarnings("unchecked")
   public TreeBoxFilterBox getTreeBoxFilterBox() {
     return getFieldByClass(TreeBoxFilterBox.class);
   }

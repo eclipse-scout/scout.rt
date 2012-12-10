@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
  * @since Build 192
  *        (Extracted out of JmsService class to an autonomous class)
  */
+@SuppressWarnings("restriction")
 public class JmsTransactionMember extends AbstractTransactionMember {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JmsTransactionMember.class);
 

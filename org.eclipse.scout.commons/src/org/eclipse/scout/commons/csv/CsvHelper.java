@@ -49,13 +49,13 @@ public class CsvHelper {
   public static final String IGNORED_COLUMN_NAME = "null";
 
   private Locale m_locale;
-  private char m_separatorChar;// ;
-  private char m_textDelimiterChar;// "
-  private String m_lineSeparator;// \n
+  private char m_separatorChar;// ";"
+  private char m_textDelimiterChar;// "\""
+  private String m_lineSeparator;// "\n"
   private int m_colCount;
-  private ArrayList<String> m_colNames;
-  private ArrayList<String> m_colTypes;
-  private ArrayList<Format> m_colFormat;
+  private List<String> m_colNames;
+  private List<String> m_colTypes;
+  private List<Format> m_colFormat;
   private boolean[] m_ignoredColumns;
 
   public CsvHelper() {
@@ -67,10 +67,7 @@ public class CsvHelper {
   }
 
   public CsvHelper(Locale locale, char separatorChar, char textDelimiterChar, String lineSeparator) {
-    if (locale == null) {
-      locale = NlsUtility.getDefaultLocale();
-    }
-    m_locale = locale;
+    m_locale = locale == null ? NlsUtility.getDefaultLocale() : locale;
     m_separatorChar = separatorChar != 0x00 ? separatorChar : ';';
     m_textDelimiterChar = textDelimiterChar != 0x00 ? textDelimiterChar : '"';
     m_lineSeparator = lineSeparator != null ? lineSeparator : "\n";
@@ -215,7 +212,7 @@ public class CsvHelper {
         headerRowCount--;
       }
       // data
-      ArrayList<String> cellList;
+      List<String> cellList;
       lineNr = 1;
       while ((cellList = importRow(reader)) != null && lineNr <= rowCount) {
         // fill up with empty row if allowed
@@ -225,7 +222,7 @@ public class CsvHelper {
         // convert data types
         ArrayList<Object> objList = new ArrayList<Object>(cellList.size());
         for (colIndex = 0; colIndex < cellList.size(); colIndex++) {
-          if (m_ignoredColumns == null || m_ignoredColumns.length == 0 || m_ignoredColumns.length < colIndex || m_ignoredColumns[colIndex] == false) {
+          if (m_ignoredColumns == null || m_ignoredColumns.length == 0 || m_ignoredColumns.length < colIndex || !m_ignoredColumns[colIndex]) {
             cell = cellList.get(colIndex);
             objList.add(importCell(cell, getColumnFormat(colIndex)));
           }
@@ -315,7 +312,7 @@ public class CsvHelper {
       }
     }
     catch (IOException e) {
-      throw new ProcessingException("line=" + line + " colIndex=" + colIndex + " value=" + val + " cell=" + cell);
+      throw new ProcessingException("line=" + line + " colIndex=" + colIndex + " value=" + val + " cell=" + cell, e);
     }
   }
 
@@ -352,7 +349,7 @@ public class CsvHelper {
       writer.write(m_lineSeparator);
     }
     catch (IOException e) {
-      throw new ProcessingException("line=" + Arrays.asList(row));
+      throw new ProcessingException("line=" + Arrays.asList(row), e);
     }
     finally {
       if (closeWriter) {
@@ -374,8 +371,8 @@ public class CsvHelper {
     }
   }
 
-  private ArrayList<String> importRow(Reader reader) throws IOException {
-    ArrayList<String> cellList = new ArrayList<String>(Math.max(m_colCount, 2));
+  private List<String> importRow(Reader reader) throws IOException {
+    List<String> cellList = new ArrayList<String>(Math.max(m_colCount, 2));
     boolean inString = false;
     StringBuffer curBuf = new StringBuffer();
     String token;
@@ -460,11 +457,10 @@ public class CsvHelper {
   private Object importCell(String text, Format f) throws ProcessingException {
     if (text != null && f != null) {
       try {
-        text = text.trim();
-        return f.parseObject(text);
+        return f.parseObject(text.trim());
       }
       catch (ParseException e) {
-        throw new ProcessingException("text=" + text + " format=" + f);
+        throw new ProcessingException("text=" + text + " format=" + f, e);
       }
     }
     else {
@@ -567,7 +563,7 @@ public class CsvHelper {
       return importRow(bufferedReader);
     }
     catch (Exception e) {
-      throw new ProcessingException("reading header row");
+      throw new ProcessingException("reading header row", e);
     }
     finally {
       if (bufferedReader != null) {

@@ -117,7 +117,7 @@ public final class NlsUtility {
         while (m.find(start)) {
           b.append(text.substring(start, m.start()));
           int index = Integer.parseInt(m.group(1));
-          if (messageArguments != null && index < messageArguments.length) {
+          if (index < messageArguments.length) {
             if (messageArguments[index] != null) {
               b.append(messageArguments[index]);
             }

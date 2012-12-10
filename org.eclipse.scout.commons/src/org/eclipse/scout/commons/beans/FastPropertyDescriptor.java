@@ -126,7 +126,7 @@ public class FastPropertyDescriptor {
     if (this == obj) {
       return true;
     }
-    if (obj != null && obj instanceof FastPropertyDescriptor) {
+    if (obj instanceof FastPropertyDescriptor) {
       FastPropertyDescriptor other = (FastPropertyDescriptor) obj;
       Method otherReadMethod = other.getReadMethod();
       Method otherWriteMethod = other.getWriteMethod();

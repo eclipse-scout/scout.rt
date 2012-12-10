@@ -163,6 +163,7 @@ public final class EclipseProxySelector extends ProxySelector {
     ServiceReference ref = context.getServiceReference(IProxyService.class.getName());
     if (ref != null) {
       try {
+        @SuppressWarnings("unchecked")
         IProxyService service = (IProxyService) context.getService(ref);
 
         //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2

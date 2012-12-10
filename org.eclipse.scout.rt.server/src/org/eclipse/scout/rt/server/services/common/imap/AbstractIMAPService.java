@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.service.AbstractService;
 
+@SuppressWarnings("restriction")
 public abstract class AbstractIMAPService extends AbstractService implements IIMAPService {
 
   private String m_host;

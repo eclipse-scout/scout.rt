@@ -35,6 +35,7 @@ import java.util.zip.ZipEntry;
  * @since 1.0
  */
 public final class FileUtility {
+  static final int KILO_BYTE = 1024;
 
   private FileUtility() {
   }
@@ -339,7 +340,7 @@ public final class FileUtility {
           output = new FileOutputStream(dest).getChannel();
 
           try {
-            int maxCount = (mbCount * 1024 * 1024) - (32 * 1024);
+            int maxCount = (mbCount * KILO_BYTE * KILO_BYTE) - (32 * KILO_BYTE);
             long size = input.size();
             long position = 0;
             while (position < size) {

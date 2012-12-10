@@ -46,7 +46,7 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
   public void setOnFieldLabelFromScout(String text, String label) {
     if (text == null || text.length() == 0) {
       if (getUiField() != null && getUiField() instanceof StyledText) {
-        Integer length = (Integer) getScoutObject().getCustomProperty(IStringField.PROP_MAX_LENGTH);
+        Integer length = (Integer) getScoutObject().getProperty(IStringField.PROP_MAX_LENGTH);
         if (length != null && label.length() > 0) {
           if (length < label.length()) {
             ((StyledText) getUiField()).setTextLimit(label.length());
@@ -57,7 +57,7 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
       }
     }
     else if (getUiField() instanceof Control) {
-      Integer length = (Integer) getScoutObject().getCustomProperty(IStringField.PROP_MAX_LENGTH);
+      Integer length = (Integer) getScoutObject().getProperty(IStringField.PROP_MAX_LENGTH);
       if (length != null) {
         ((TextEx) getUiField()).setTextLimit(length);
       }

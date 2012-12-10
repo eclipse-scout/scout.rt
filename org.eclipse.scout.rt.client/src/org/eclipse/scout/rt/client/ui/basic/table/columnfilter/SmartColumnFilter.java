@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * @deprecated This class will be removed in the next release because it is not used anymore.
  */
 @Deprecated
-@SuppressWarnings("deprecation")
 public class SmartColumnFilter<T> implements ITableColumnFilter<T>, Serializable {
   private static final long serialVersionUID = 1L;
   private ISmartColumn<T> m_column;

@@ -25,10 +25,10 @@ public class TypeCastUtilityTest extends Assert {
       handler.setLevel(Level.FINEST);
     }
     */
-    Class<?> T;
+    Class<?> genericT;
     //
-    T = TypeCastUtility.getGenericsParameterClass(LongArrayHolder.class, IHolder.class, 0);
-    assertEquals(Long[].class, T);
+    genericT = TypeCastUtility.getGenericsParameterClass(LongArrayHolder.class, IHolder.class, 0);
+    assertEquals(Long[].class, genericT);
     //
     try {
       TypeCastUtility.getGenericsParameterClass(X0.class, X0.class, 0);
@@ -44,14 +44,14 @@ public class TypeCastUtilityTest extends Assert {
     catch (IllegalArgumentException t) {
       //nop
     }
-    T = TypeCastUtility.getGenericsParameterClass(X2.class, X0.class, 0);
-    assertEquals(Data2.class, T);
+    genericT = TypeCastUtility.getGenericsParameterClass(X2.class, X0.class, 0);
+    assertEquals(Data2.class, genericT);
     //
-    T = TypeCastUtility.getGenericsParameterClass(Y3.class, Y0.class, 0);
-    assertEquals(Data3.class, T);
+    genericT = TypeCastUtility.getGenericsParameterClass(Y3.class, Y0.class, 0);
+    assertEquals(Data3.class, genericT);
     //
-    T = TypeCastUtility.getGenericsParameterClass(Y3.class, Y0.class, 1);
-    assertEquals(Flavor3.class, T);
+    genericT = TypeCastUtility.getGenericsParameterClass(Y3.class, Y0.class, 1);
+    assertEquals(Flavor3.class, genericT);
   }
 
   static class Data0 {

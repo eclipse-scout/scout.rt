@@ -78,6 +78,7 @@ import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 
+@SuppressWarnings("restriction")
 public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailField> implements ISwingScoutMailField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutMailField.class);
   private static final String KEY_FROM = "From";

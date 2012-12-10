@@ -37,6 +37,7 @@ public class SwingMailAttachmentView extends JPanel {
     setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
   }
 
+  @SuppressWarnings("restriction")
   protected void createContent() {
     JLabelEx iconLabel = new JLabelEx();
     sun.awt.shell.ShellFolder shellFolder;

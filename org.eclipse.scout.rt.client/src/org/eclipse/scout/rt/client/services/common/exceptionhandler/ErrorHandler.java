@@ -201,7 +201,6 @@ public class ErrorHandler {
     StringWriter buf = new StringWriter();
     t = exception;
     String indent = "";
-    int index = 0;
     while (t != null) {
       String s = null;
       if (t instanceof ProcessingException) {
@@ -219,7 +218,6 @@ public class ErrorHandler {
       }
       buf.append("\n");
       // next
-      index++;
       indent += "  ";
       t = t.getCause();
     }
