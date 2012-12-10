@@ -37,8 +37,8 @@ public class DefaultTestClientSessionProvider implements ITestClientSessionProvi
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultTestClientSessionProvider.class);
 
-  private static final Map<String, IClientSession> m_cache = new HashMap<String, IClientSession>();
-  private static final Object m_cacheLock = new Object();
+  private static final Map<String, IClientSession> CACHE = new HashMap<String, IClientSession>();
+  private static final Object CACHE_LOCK = new Object();
 
   @Override
   @SuppressWarnings("unchecked")
@@ -55,13 +55,13 @@ public class DefaultTestClientSessionProvider implements ITestClientSessionProvi
     }
     final Bundle bundle = Platform.getBundle(symbolicName);
     if (bundle != null) {
-      synchronized (m_cacheLock) {
+      synchronized (CACHE_LOCK) {
         String cacheKey = createSessionCacheKey(clazz, bundle, runAs);
-        IClientSession clientSession = m_cache.get(cacheKey);
+        IClientSession clientSession = CACHE.get(cacheKey);
         if (clientSession == null || !clientSession.isActive() || createNew) {
           try {
             clientSession = clazz.newInstance();
-            m_cache.put(cacheKey, clientSession);
+            CACHE.put(cacheKey, clientSession);
             clientSession.setUserAgent(UserAgent.createDefault());
             ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
               @Override
@@ -141,7 +141,7 @@ public class DefaultTestClientSessionProvider implements ITestClientSessionProvi
    */
   protected void simulateDesktopOpened(IClientSession clientSession) {
     IDesktop desktop = clientSession.getDesktop();
-    if (desktop != null && !desktop.isOpened() && desktop instanceof AbstractDesktop) {
+    if (desktop instanceof AbstractDesktop && !desktop.isOpened()) {
       desktop.getUIFacade().fireGuiAttached();
       desktop.getUIFacade().fireDesktopOpenedFromUI();
     }

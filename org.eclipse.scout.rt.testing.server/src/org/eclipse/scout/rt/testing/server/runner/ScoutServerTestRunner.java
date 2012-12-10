@@ -23,9 +23,7 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.testing.server.DefaultTestServerSessionProvider;
 import org.eclipse.scout.rt.testing.server.ITestServerSessionProvider;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionUnwrappingStatement;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
@@ -54,9 +52,9 @@ import org.junit.runners.model.Statement;
  * <td>each test case is invoked in a separate Scout server session and therefore in a separate Scout transaction. A
  * particular test cas consists of the following methods:
  * <ul>
- * <li>all methdos annotated with {@link Before}</li>
- * <li>the test case itself annotated with {@link Test}</li>
- * <li>all methdos annotated with {@link After}</li>
+ * <li>all methdos annotated with {@link org.junit.Before}</li>
+ * <li>the test case itself annotated with {@link org.junit.Test}</li>
+ * <li>all methdos annotated with {@link org.junit.After}</li>
  * </ul>
  * </td>
  * </tr>
@@ -79,18 +77,18 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
   @Target({ElementType.TYPE, ElementType.METHOD})
   public @interface ServerTest {
 
-    public Class<? extends IServerSession> serverSessionClass() default IServerSession.class;
+    Class<? extends IServerSession> serverSessionClass() default IServerSession.class;
 
-    public Class<? extends ITestServerSessionProvider> sessionProvider() default NullTestServerSessionProvider.class;
+    Class<? extends ITestServerSessionProvider> sessionProvider() default NullTestServerSessionProvider.class;
 
-    public String runAs() default "";
+    String runAs() default "";
   }
 
   /**
    * Null-provider used as default value in the {@link ServerTest} annotation (since annotation values must not be
    * <code>null</code>).
    */
-  public static interface NullTestServerSessionProvider extends ITestServerSessionProvider {
+  public interface NullTestServerSessionProvider extends ITestServerSessionProvider {
   }
 
   /**
