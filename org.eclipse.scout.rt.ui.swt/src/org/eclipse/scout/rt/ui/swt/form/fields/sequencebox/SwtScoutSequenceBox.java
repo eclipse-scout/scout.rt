@@ -104,7 +104,6 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
     // layout
     fieldContainer.setLayout(new LogicalGridLayout(6, 0));
     container.setLayout(new LogicalGridLayout(1, 0));
-    setChildMandatoryFromScout();
   }
 
   private boolean removeLabelCompletely(ISwtScoutFormField swtScoutFormField) {
@@ -219,7 +218,7 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
     for (IFormField f : getScoutObject().getFields()) {
       f.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, m_scoutErrorStatusChangeListener);
     }
-
+    setChildMandatoryFromScout();
   }
 
   @Override
