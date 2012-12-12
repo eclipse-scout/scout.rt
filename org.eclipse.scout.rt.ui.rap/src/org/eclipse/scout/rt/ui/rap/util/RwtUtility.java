@@ -79,6 +79,8 @@ public final class RwtUtility {
   private static final HashMap<String, Integer> SCOUT_RWT_KEY_MAP;
   private static final HashMap<Integer, String> RWT_SCOUT_KEY_MAP;
 
+  public static final String EXTENDED_STYLE = "extendedStyle";
+
   private RwtUtility() {
   }
 
@@ -447,7 +449,7 @@ public final class RwtUtility {
 
   public static boolean isPopupShell(Shell shell) {
     int style = shell.getStyle();
-    Integer extendedStyle = (Integer) shell.getData("extendedStyle");
+    Integer extendedStyle = (Integer) shell.getData(EXTENDED_STYLE);
     if (extendedStyle != null) {
       style = style | extendedStyle;
     }
