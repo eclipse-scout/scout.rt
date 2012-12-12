@@ -316,7 +316,7 @@ public abstract class AbstractRwtWorkbenchEnvironment extends AbstractRwtEnviron
   @Override
   protected void fireGuiDetachedFromUIInternal() {
     super.fireGuiDetachedFromUIInternal();
-    if (getDisplay() != null) {
+    if (getDisplay() != null && !getDisplay().isDisposed()) {
       getDisplay().asyncExec(new P_HideScoutViews());
     }
   }

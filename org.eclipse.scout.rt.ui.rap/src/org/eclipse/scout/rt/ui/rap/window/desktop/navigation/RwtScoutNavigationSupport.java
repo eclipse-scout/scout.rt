@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.window.desktop.navigation;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.rwt.IBrowserHistory;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.events.BrowserHistoryEvent;
@@ -73,6 +74,8 @@ public class RwtScoutNavigationSupport {
         }
       }
     }.schedule();
+    //It seems that jobs aren't reliably executed on shutdown, explicitly calling resume makes sure this job will be executed.
+    Job.getJobManager().resume();
     if (m_uiHistory != null) {
       m_uiHistory.removeBrowserHistoryListener(m_uiListener);
     }
