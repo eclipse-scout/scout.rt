@@ -89,7 +89,7 @@ public class RwtScoutPopup extends AbstractRwtScoutPart {
     m_maxWidthHint = SWT.DEFAULT;
 
     m_window = new Shell(ownerComponent.getShell(), style);
-    m_window.setData("extendedStyle", SWT.POP_UP);
+    m_window.setData(RwtUtility.EXTENDED_STYLE, SWT.POP_UP);
     m_window.setLayout(new FillLayout());
     m_window.setData(WidgetUtil.CUSTOM_VARIANT, POPUP_CUSTOM_VARIANT);
     //add close listener

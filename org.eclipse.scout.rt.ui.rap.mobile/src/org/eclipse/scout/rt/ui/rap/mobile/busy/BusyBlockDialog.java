@@ -54,6 +54,13 @@ public class BusyBlockDialog extends Dialog {
   }
 
   @Override
+  public void create() {
+    super.create();
+
+    getShell().setData(RwtUtility.EXTENDED_STYLE, SWT.POP_UP);
+  }
+
+  @Override
   protected Control createDialogArea(Composite parent) {
     getShell().setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
 
