@@ -150,6 +150,11 @@ public abstract class AbstractRwtWorkbenchEnvironment extends AbstractRwtEnviron
     if (form == null) {
       return;
     }
+    if (form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW) {
+      super.showFormPart(form);
+      return;
+    }
+
     String scoutViewId = form.getDisplayViewId();
     String uiViewId = getUiPartIdForScoutPartId(scoutViewId);
     if (uiViewId == null) {
