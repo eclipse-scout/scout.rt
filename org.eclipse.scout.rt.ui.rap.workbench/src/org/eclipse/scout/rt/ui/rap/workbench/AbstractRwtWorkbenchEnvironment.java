@@ -110,7 +110,7 @@ public abstract class AbstractRwtWorkbenchEnvironment extends AbstractRwtEnviron
   }
 
   @Override
-  protected synchronized void init() throws CoreException {
+  protected synchronized void init(Runnable additionalInitCallback) throws CoreException {
     if (getSubject() == null) {
       Subject subject = Subject.getSubject(AccessController.getContext());
       if (subject == null) {
@@ -135,13 +135,13 @@ public abstract class AbstractRwtWorkbenchEnvironment extends AbstractRwtEnviron
         }
       }
     }
-    super.init();
+    super.init(additionalInitCallback);
     attachUiListeners();
   }
 
   @Override
-  protected void stopScout() {
-    super.stopScout();
+  protected void dispose() {
+    super.dispose();
     detachUiListeners();
   }
 
@@ -318,6 +318,12 @@ public abstract class AbstractRwtWorkbenchEnvironment extends AbstractRwtEnviron
     super.fireGuiDetachedFromUIInternal();
     if (getDisplay() != null && !getDisplay().isDisposed()) {
       getDisplay().asyncExec(new P_HideScoutViews());
+    }
+  }
+
+  protected void fireDesktopActivatedFromUIInternal() {
+    if (getScoutDesktop() != null) {
+      getScoutDesktop().ensureViewStackVisible();
     }
   }
 

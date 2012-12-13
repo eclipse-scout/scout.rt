@@ -128,14 +128,18 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     return 0;
   }
 
-  protected void createApplicationContent(Composite parent) {
+  protected void createApplicationContent(final Composite parent) {
     m_uiDesktop = createUiDesktop();
-    ensureInitialized();
+    ensureInitialized(new Runnable() {
+      @Override
+      public void run() {
+        m_uiDesktop.createUiField(parent, getScoutDesktop(), AbstractStandaloneRwtEnvironment.this);
+      }
+    });
     if (!isInitialized()) {
       throw new SecurityException("Cannot initialize application");
     }
     getKeyStrokeManager().setGlobalKeyStrokesActivated(true);
-    m_uiDesktop.createUiField(parent, getScoutDesktop(), this);
   }
 
   protected void createNonmodalFormButtonArea(Composite parent) {
