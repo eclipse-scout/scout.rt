@@ -415,6 +415,9 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
       return false;
     }
 
+    /**
+     * Only close dialog, don't notify scout model
+     */
     public boolean closePhysically() {
       return super.close();
     }

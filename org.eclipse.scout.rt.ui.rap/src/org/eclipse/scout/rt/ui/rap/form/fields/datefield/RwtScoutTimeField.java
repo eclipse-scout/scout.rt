@@ -347,6 +347,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
         @Override
         public void widgetDisposed(DisposeEvent event) {
           getTimeFromClosedDateChooserDialog();
+          m_timeChooserDialog = null;
         }
       });
 

@@ -25,6 +25,8 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -63,13 +65,13 @@ public class SwtScoutMessageBoxDialog extends Dialog {
     int dialogStyle = SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL;
     setShellStyle(dialogStyle);
     setBlockOnOpen(false);
-
   }
 
   @Override
   public void create() {
     super.create();
     attachScout();
+    getShell().addDisposeListener(new P_DisposeListener());
   }
 
   void attachScout() {
@@ -177,9 +179,9 @@ public class SwtScoutMessageBoxDialog extends Dialog {
   }
 
   protected void dettachScout() {
-    if (m_scoutMessageBoxListener == null) {
-      m_scoutMessageBoxListener = new P_ScoutMessageBoxListener();
-      getScoutObject().addMessageBoxListener(m_scoutMessageBoxListener);
+    if (m_scoutMessageBoxListener != null) {
+      getScoutObject().removeMessageBoxListener(m_scoutMessageBoxListener);
+      m_scoutMessageBoxListener = null;
     }
   }
 
@@ -419,4 +421,14 @@ public class SwtScoutMessageBoxDialog extends Dialog {
     }
   }// end private class
 
+  private class P_DisposeListener implements DisposeListener {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void widgetDisposed(DisposeEvent event) {
+      dettachScout();
+    }
+
+  }
 }
