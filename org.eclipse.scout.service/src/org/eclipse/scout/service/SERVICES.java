@@ -124,26 +124,8 @@ public final class SERVICES {
   /**
    * @return the services in order of registration (not by ranking)
    */
-  public static <T extends Object> T[] getServices(Class<T> serviceInterfaceClass, String filter) {
-    return getServicesInternal(serviceInterfaceClass, null, false);
-  }
-
-  /**
-   * @return the services in order of ranking
-   */
-  public static <T extends Object> T[] getServicesOrdered(Class<T> serviceInterfaceClass) {
-    return getServicesOrdered(serviceInterfaceClass, null);
-  }
-
-  /**
-   * @return the services in order of ranking
-   */
-  public static <T extends Object> T[] getServicesOrdered(Class<T> serviceInterfaceClass, String filter) {
-    return getServicesInternal(serviceInterfaceClass, null, true);
-  }
-
   @SuppressWarnings("unchecked")
-  private static <T extends Object> T[] getServicesInternal(Class<T> serviceInterfaceClass, String filter, boolean ordered) {
+  public static <T extends Object> T[] getServices(Class<T> serviceInterfaceClass, String filter) {
     Activator a = Activator.getDefault();
     if (a == null || serviceInterfaceClass == null) {
       return (T[]) Array.newInstance(serviceInterfaceClass, 0);
@@ -163,14 +145,12 @@ public final class SERVICES {
       // nop
     }
     if (refs != null) {
-      if (ordered) {
-        Arrays.sort(refs, new Comparator<ServiceReference>() {
-          @Override
-          public int compare(ServiceReference ref1, ServiceReference ref2) {
-            return ((Comparable) ref2.getProperty(Constants.SERVICE_RANKING)).compareTo(((Comparable) ref1.getProperty(Constants.SERVICE_RANKING)));
-          }
-        });
-      }
+      Arrays.sort(refs, new Comparator<ServiceReference>() {
+        @Override
+        public int compare(ServiceReference ref1, ServiceReference ref2) {
+          return ((Comparable) ref2.getProperty(Constants.SERVICE_RANKING)).compareTo(((Comparable) ref1.getProperty(Constants.SERVICE_RANKING)));
+        }
+      });
       ArrayList<T> list = new ArrayList<T>(refs.length);
       for (ServiceReference ref : refs) {
         T s = resolveService(serviceInterfaceClass, context, ref);

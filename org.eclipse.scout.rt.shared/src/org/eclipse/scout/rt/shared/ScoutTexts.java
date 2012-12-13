@@ -41,7 +41,7 @@ public class ScoutTexts {
   private final ITextProviderService[] m_textProviders;
 
   public ScoutTexts() {
-    this(SERVICES.getServicesOrdered(ITextProviderService.class));
+    this(SERVICES.getServices(ITextProviderService.class));
   }
 
   public ScoutTexts(ITextProviderService[] textProviders) {
