@@ -113,9 +113,8 @@ public class RwtScoutNavigationSupport {
 
   protected void handleBookmarkAddedFromScout(Bookmark bookmark) {
     String id = getId(bookmark);
-    StringBuilder textBuilder = new StringBuilder(getUiEnvironment().getClientSession().getDesktop().getTitle() + " - ");
-    textBuilder.append(cleanNl(bookmark.getText()));
-    m_uiHistory.createEntry(id, textBuilder.toString());
+    //Title is set to null because it doesn't work properly, see also https://bugs.eclipse.org/bugs/show_bug.cgi?id=396400
+    m_uiHistory.createEntry(id, null);
   }
 
   private String cleanNl(String s) {
