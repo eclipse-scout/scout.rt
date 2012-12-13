@@ -154,32 +154,33 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     if (attachments == null || iconName == null) {
       return;
     }
+    String tempIconName = iconName;
     ByteArrayInputStream is = null;
     try {
       int index;
       // determine file format
       String format = null;
-      index = iconName.lastIndexOf(".");
+      index = tempIconName.lastIndexOf('.');
       if (index > 0) {
-        format = iconName.substring(index);
-        iconName = iconName.substring(0, index);
+        format = tempIconName.substring(index);
+        tempIconName = tempIconName.substring(0, index);
       }
       // determine icon base name
-      String baseIconName = iconName;
-      index = iconName.lastIndexOf("_");
+      String baseIconName = tempIconName;
+      index = tempIconName.lastIndexOf('_');
       if (index > 0) {
-        baseIconName = iconName.substring(0, index);
+        baseIconName = tempIconName.substring(0, index);
       }
 
       // load icon
       IIconLocator iconLocator = ClientSyncJob.getCurrentSession().getIconLocator();
-      IconSpec iconSpec = iconLocator.getIconSpec(iconName);
-      if (iconSpec == null && !iconName.equals(baseIconName)) {
+      IconSpec iconSpec = iconLocator.getIconSpec(tempIconName);
+      if (iconSpec == null && !tempIconName.equals(baseIconName)) {
         iconSpec = iconLocator.getIconSpec(baseIconName);
       }
 
       if (iconSpec != null) {
-        RemoteFile iconFile = new RemoteFile(StringUtility.join("", iconName, format), 0);
+        RemoteFile iconFile = new RemoteFile(StringUtility.join("", tempIconName, format), 0);
         is = new ByteArrayInputStream(iconSpec.getContent());
         iconFile.readData(is);
         is.close();
@@ -187,7 +188,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
       }
     }
     catch (Throwable t) {
-      LOG.warn("Failed to load icon '" + iconName + "'", t);
+      LOG.warn("Failed to load icon '" + tempIconName + "'", t);
     }
     finally {
       if (is != null) {
