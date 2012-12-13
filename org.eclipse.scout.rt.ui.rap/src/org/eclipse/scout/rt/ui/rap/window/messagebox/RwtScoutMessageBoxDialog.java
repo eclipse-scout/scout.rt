@@ -66,6 +66,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
   public void create() {
     super.create();
     attachScout();
+    getShell().addDisposeListener(new P_DisposeListener());
   }
 
   void attachScout() {
@@ -156,9 +157,9 @@ public class RwtScoutMessageBoxDialog extends Dialog {
   }
 
   protected void dettachScout() {
-    if (m_scoutMessageBoxListener == null) {
-      m_scoutMessageBoxListener = new P_ScoutMessageBoxListener();
-      getScoutObject().addMessageBoxListener(m_scoutMessageBoxListener);
+    if (m_scoutMessageBoxListener != null) {
+      getScoutObject().removeMessageBoxListener(m_scoutMessageBoxListener);
+      m_scoutMessageBoxListener = null;
     }
   }
 
@@ -411,4 +412,14 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     }
   }// end private class
 
+  private class P_DisposeListener implements DisposeListener {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void widgetDisposed(DisposeEvent event) {
+      dettachScout();
+    }
+
+  }
 }

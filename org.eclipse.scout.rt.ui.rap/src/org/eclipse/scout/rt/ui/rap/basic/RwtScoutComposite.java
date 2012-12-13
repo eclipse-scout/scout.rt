@@ -157,7 +157,12 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
       }
     }
     catch (Exception e) {
-      LOG.error("could not initialize component '" + getScoutObject().getClass().getName() + "' to '" + this.getClass().getName() + "'.", e);
+      if (getScoutObject() == null) {
+        LOG.error("Could not initialize rwt scout composite " + this.getClass().getName() + " because scout object is null.");
+      }
+      else {
+        LOG.error("Could not initialize component '" + getScoutObject().getClass().getName() + "' to '" + this.getClass().getName() + "'.", e);
+      }
     }
     finally {
       m_created = true;
