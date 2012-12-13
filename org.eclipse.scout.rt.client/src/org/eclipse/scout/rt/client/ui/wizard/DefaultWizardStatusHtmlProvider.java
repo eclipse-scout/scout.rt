@@ -20,8 +20,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
@@ -58,6 +58,10 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     }
   }
 
+  protected String getHtmlTemplate() {
+    return m_htmlTemplate;
+  }
+
   @Override
   public String createHtml(IWizard w) throws ProcessingException {
     String html = m_htmlTemplate;
@@ -76,8 +80,10 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
       int index = 1;
       for (IWizardStep<?> step : w.getSteps()) {
         String s = createHtmlForStep(step, index, (step == w.getActiveStep()));
-        listPart.append(s);
-        index++;
+        if (StringUtility.hasText(s)) {
+          listPart.append(s);
+          index++;
+        }
       }
     }
     html = html.replace("#FONT_SIZE_UNIT#", UserAgentUtility.getFontSizeUnit());
@@ -90,11 +96,6 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
   /**
    * Adds a step to the HTML document. Uses old school HTML 3.2 with transparent graphics to enforce heights and widths
    * background colors since HTMLEditorToolkit of swing does not support CSS level 2.
-   * 
-   * @param buf
-   * @param cssClass
-   * @param index
-   * @param step
    */
   protected String createHtmlForStep(IWizardStep<?> step, int index, boolean selected) {
     String cssClass;
@@ -134,8 +135,6 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
    * To be overwritten in order to provide custom attachments. <br/>
    * The default implementation provides default icons for
    * wizard steps.
-   * 
-   * @return
    */
   protected List<RemoteFile> collectAttachments() {
     List<RemoteFile> attachments = new LinkedList<RemoteFile>();
@@ -150,17 +149,21 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
 
   /**
    * To load an icon into the given attachments live list
-   * 
-   * @param attachments
-   * @param iconName
    */
   protected void loadIcon(List<RemoteFile> attachments, String iconName) {
+    if (attachments == null || iconName == null) {
+      return;
+    }
+    ByteArrayInputStream is = null;
     try {
+      int index;
       // determine file format
-      int index = iconName.lastIndexOf(".");
-      String format = iconName.substring(iconName.lastIndexOf("."));
-      // determine icon name
-      iconName = iconName.substring(0, iconName.lastIndexOf("."));
+      String format = null;
+      index = iconName.lastIndexOf(".");
+      if (index > 0) {
+        format = iconName.substring(index);
+        iconName = iconName.substring(0, index);
+      }
       // determine icon base name
       String baseIconName = iconName;
       index = iconName.lastIndexOf("_");
@@ -169,22 +172,32 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
       }
 
       // load icon
-      IClientSession clientSession = ClientSyncJob.getCurrentSession();
-      IconSpec iconSpec = clientSession.getIconLocator().getIconSpec(iconName);
+      IIconLocator iconLocator = ClientSyncJob.getCurrentSession().getIconLocator();
+      IconSpec iconSpec = iconLocator.getIconSpec(iconName);
       if (iconSpec == null && !iconName.equals(baseIconName)) {
-        iconSpec = clientSession.getIconLocator().getIconSpec(baseIconName);
+        iconSpec = iconLocator.getIconSpec(baseIconName);
       }
 
       if (iconSpec != null) {
-        RemoteFile iconFile = new RemoteFile(iconName + format, 0);
-        ByteArrayInputStream is = new ByteArrayInputStream(iconSpec.getContent());
+        RemoteFile iconFile = new RemoteFile(StringUtility.join("", iconName, format), 0);
+        is = new ByteArrayInputStream(iconSpec.getContent());
         iconFile.readData(is);
         is.close();
         attachments.add(iconFile);
       }
     }
-    catch (Exception e) {
-      LOG.warn("failed to load image for " + AbstractIcons.WizardBullet, e);
+    catch (Throwable t) {
+      LOG.warn("Failed to load icon '" + iconName + "'", t);
+    }
+    finally {
+      if (is != null) {
+        try {
+          is.close();
+        }
+        catch (Throwable t) {
+          // nop
+        }
+      }
     }
   }
 }
