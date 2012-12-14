@@ -16,6 +16,9 @@ import java.sql.Timestamp;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
+/**
+ * Utility class for comparing objects considering <code>null</code> values and other commonly used special cases.
+ */
 public final class CompareUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(CompareUtility.class);
 
@@ -94,6 +97,16 @@ public final class CompareUtility {
     return false;
   }
 
+  /**
+   * Indicates whether some Object a is not "equal to" another Object b. See {@link #equals} for more
+   * detail.
+   * 
+   * @param a
+   *          the second Object to be compared.
+   * @param b
+   *          the second Object to be compared.
+   * @return <code>true</code> if a is not same as b, <code>false</code> otherwise.
+   */
   public static <T> boolean notEquals(T a, T b) {
     return !equals(a, b);
   }
@@ -115,7 +128,7 @@ public final class CompareUtility {
 
   /**
    * @return Returns <code>true</code> if the given object is in the list of the given elements. The objects are
-   *         compared using {@link #equals(Object)}.
+   *         compared using {@link #equals}.
    * @since 3.8.1
    */
   public static boolean isOneOf(Object o, Object... elements) {
