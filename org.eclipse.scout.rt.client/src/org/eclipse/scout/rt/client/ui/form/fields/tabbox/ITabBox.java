@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,20 @@ public interface ITabBox extends ICompositeField {
    */
   String PROP_SELECTED_TAB = "selectedTab";
 
+  String PROP_MARK_STRATEGY = "markStrategy";
+
+  /**
+   * Define the default mark strategy of the tabs. This means the marker is set on the tabs if at least one field is not
+   * empty.
+   */
+  int MARK_STRATEGY_EMPTY = 0;
+
+  /**
+   * Define a optional mark strategy of the tabs. This means the marker is set on the tabs if at least one field is
+   * marked as "save needed".
+   */
+  int MARK_STRATEGY_SAVE_NEEDED = 1;
+
   /*
    * Runtime
    */
@@ -29,6 +43,9 @@ public interface ITabBox extends ICompositeField {
 
   void setSelectedTab(IGroupBox box);
 
-  ITabBoxUIFacade getUIFacade();
+  int getMarkStrategy();
 
+  void setMarkStrategy(int markStrategy);
+
+  ITabBoxUIFacade getUIFacade();
 }
