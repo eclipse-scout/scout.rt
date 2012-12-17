@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
 public final class FormUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormUtility.class);
@@ -83,6 +84,19 @@ public final class FormUtility {
   public static void disposeFormFields(IForm form) {
     DisposeFieldVisitor v = new DisposeFieldVisitor();
     form.visitFields(v);
+  }
+
+  /**
+   * With this method it's possible to set the mark strategy of all tab boxes of the given form.
+   * 
+   * @param form
+   *          the form
+   * @param strategy
+   *          one of {@link ITabBox#MARK_STRATEGY_EMPTY}, {@link ITabBox#MARK_STRATEGY_SAVE_NEEDED}
+   * @since 3.8.2
+   */
+  public static void setTabBoxMarkStrategy(IForm form, int strategy) {
+    form.visitFields(new TabBoxMarkStrategyVisitor(strategy));
   }
 
   private static class PostInitConfigFieldVisitor implements IFormFieldVisitor {
@@ -180,4 +194,19 @@ public final class FormUtility {
     }
   }
 
+  private static final class TabBoxMarkStrategyVisitor implements IFormFieldVisitor {
+    private final int m_strategy;
+
+    private TabBoxMarkStrategyVisitor(int strategy) {
+      m_strategy = strategy;
+    }
+
+    @Override
+    public boolean visitField(IFormField field, int level, int fieldIndex) {
+      if (field instanceof ITabBox) {
+        ((ITabBox) field).setMarkStrategy(m_strategy);
+      }
+      return true;
+    }
+  }
 }
