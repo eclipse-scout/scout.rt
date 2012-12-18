@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
@@ -41,8 +41,6 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -51,6 +49,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
+//TODO RAP 2.0 Migration
+//check shell listener removal
 public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> implements IRwtScoutDateField, IPopupSupport {
 
   private Button m_dropDownButton;
@@ -65,6 +65,7 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
   private String m_displayTextToVerify;
   private DateChooserDialog m_dateChooserDialog = null;
   private FocusAdapter m_textFieldFocusAdapter = null;
+  P_DateChooserDisposeListener m_disposeListener;
 
   @Override
   public void setIgnoreLabel(boolean ignoreLabel) {
@@ -99,14 +100,14 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_dateContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
-    m_dateContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
+    m_dateContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
 
     StyledText textField = new StyledTextEx(m_dateContainer, SWT.SINGLE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
-    textField.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
+    textField.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
 
     ButtonEx dateChooserButton = getUiEnvironment().getFormToolkit().createButtonEx(m_dateContainer, SWT.PUSH | SWT.NO_FOCUS);
-    dateChooserButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
+    dateChooserButton.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
     m_dateContainer.setTabList(new Control[]{textField});
     container.setTabList(new Control[]{m_dateContainer});
 
@@ -237,10 +238,10 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     super.setEnabledFromScout(b);
     m_dropDownButton.setEnabled(b);
     if (b) {
-      m_dateContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD);
+      m_dateContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
     }
     else {
-      m_dateContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_DATEFIELD_DISABLED);
+      m_dateContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD_DISABLED);
     }
   }
 
@@ -369,15 +370,8 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     m_dateChooserDialog = createDateChooserDialog(getUiField().getShell(), oldDate);
     if (m_dateChooserDialog != null) {
 
-      m_dateChooserDialog.getShell().addDisposeListener(new DisposeListener() {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void widgetDisposed(DisposeEvent event) {
-          getDateFromClosedDateChooserDialog();
-          m_dateChooserDialog = null;
-        }
-      });
+      m_disposeListener = new P_DateChooserDisposeListener();
+      m_dateChooserDialog.getShell().addDisposeListener(m_disposeListener);
 
       m_dateChooserDialog.openDateChooser(getUiField());
       installFocusListenerOnTextField();
@@ -389,7 +383,12 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
   }
 
   private void getDateFromClosedDateChooserDialog() {
-    removeListenersFromDateChooserDialog();
+    // TODO RAP 2.0 migration - check
+    // old code removeListenersFromDateChooserDialog();
+    Shell dateChooserShell = m_dateChooserDialog.getShell();
+    if (m_disposeListener != null) {
+      dateChooserShell.removeDisposeListener(m_disposeListener);
+    }
     boolean setFocusToUiField = false;
     try {
       final Date newDate = m_dateChooserDialog.getReturnDate();
@@ -416,20 +415,31 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     }
   }
 
-  private void removeListenersFromDateChooserDialog() {
-    Object[] shellListeners = ShellEvent.getListeners(m_dateChooserDialog.getShell());
-    for (Object object : shellListeners) {
-      if (object.getClass().isInstance(this)
-          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
-        m_dateChooserDialog.getShell().removeShellListener((ShellListener) object);
-      }
-    }
-    Object[] disposeListeners = DisposeEvent.getListeners(m_dateChooserDialog.getShell());
-    for (Object object : disposeListeners) {
-      if (object.getClass().isInstance(this)
-          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
-        m_dateChooserDialog.getShell().removeDisposeListener((DisposeListener) object);
-      }
+  // TODO RAP 2.0 migration check ShellEvent removal
+//  private void removeListenersFromDateChooserDialog() {
+//    Object[] shellListeners = ShellEvent.getListeners(m_dateChooserDialog.getShell());
+//    for (Object object : shellListeners) {
+//      if (object.getClass().isInstance(this)
+//          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+//        m_dateChooserDialog.getShell().removeShellListener((ShellListener) object);
+//      }
+//    }
+//    Object[] disposeListeners = DisposeEvent.getListeners(m_dateChooserDialog.getShell());
+//    for (Object object : disposeListeners) {
+//      if (object.getClass().isInstance(this)
+//          || (object.getClass().getEnclosingClass() != null && object.getClass().getEnclosingClass().isInstance(this))) {
+//        m_dateChooserDialog.getShell().removeDisposeListener((DisposeListener) object);
+//      }
+//    }
+//  }
+
+  private final class P_DateChooserDisposeListener implements DisposeListener {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void widgetDisposed(DisposeEvent event) {
+      getDateFromClosedDateChooserDialog();
+      m_dateChooserDialog = null;
     }
   }
 

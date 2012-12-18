@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.ext.table;
 
-import org.eclipse.rwt.internal.textsize.TextSizeUtil;
+import org.eclipse.rap.rwt.internal.textsize.TextSizeUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;

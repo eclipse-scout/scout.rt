@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap;
 
-import org.eclipse.rwt.lifecycle.IEntryPoint;
+import org.eclipse.rap.rwt.application.EntryPoint;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtDesktop;
 
-public interface IRwtStandaloneEnvironment extends IRwtEnvironment, IEntryPoint {
+public interface IRwtStandaloneEnvironment extends IRwtEnvironment, EntryPoint {
 
   IRwtDesktop getUiDesktop();
 }

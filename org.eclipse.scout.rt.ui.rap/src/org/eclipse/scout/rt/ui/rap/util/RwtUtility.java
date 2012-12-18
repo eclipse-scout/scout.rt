@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.rwt.RWT;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
@@ -120,11 +120,11 @@ public final class RwtUtility {
   }
 
   public static BrowserInfo getBrowserInfo() {
-    BrowserInfo info = (BrowserInfo) RWT.getSessionStore().getAttribute(BROWSER_INFO);
+    BrowserInfo info = (BrowserInfo) RWT.getUISession().getAttribute(BROWSER_INFO);
     if (info == null) {
       HttpServletRequest request = RWT.getRequest();
       info = createBrowserInfo(request);
-      RWT.getSessionStore().setAttribute(BROWSER_INFO, info);
+      RWT.getUISession().setAttribute(BROWSER_INFO, info);
     }
     return info;
   }

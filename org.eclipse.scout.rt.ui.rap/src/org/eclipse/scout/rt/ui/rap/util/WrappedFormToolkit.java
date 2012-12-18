@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.util;
 
-import org.eclipse.rwt.widgets.FileUpload;
+import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;

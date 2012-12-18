@@ -21,16 +21,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.lifecycle.UICallBack;
-import org.eclipse.rwt.resources.IResourceManager;
-import org.eclipse.rwt.resources.IResourceManager.RegisterOptions;
-import org.eclipse.rwt.service.IServiceHandler;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.service.ResourceManager;
+import org.eclipse.rap.rwt.service.ServerPushSession;
+import org.eclipse.rap.rwt.service.ServiceHandler;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.internal.events.EventTypes;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 /**
  * <h3>BrowserSupport</h3> adding hyperlink callback support as in normal swt to the rwt browser
@@ -47,7 +52,8 @@ public class BrowserExtension {
   private final Browser m_browser;
   private final HashMap<String, String> m_hyperlinkMap;
   private final String m_serviceHandlerId;
-  private IServiceHandler m_serviceHandler;
+  private ServiceHandler m_serviceHandler;
+  private ServerPushSession m_pushSession;
   //
   private HashSet<String> m_tempFileNames = new HashSet<String>();
 
@@ -64,17 +70,21 @@ public class BrowserExtension {
     return m_serviceHandlerId;
   }
 
-  private String getUiCallbackId() {
-    return getClass().getName() + "" + hashCode();
-  }
+  // TODO RAP 2.0 migration - old code
+//  private String getUiCallbackId() {
+//    return getClass().getName() + "" + hashCode();
+//  }
 
   public void attach() {
     if (m_serviceHandler == null) {
-      UICallBack.activate(getUiCallbackId());
-      m_serviceHandler = new IServiceHandler() {
+      // TODO RAP 2.0 migration - old code
+// old code       UICallBack.activate(getUiCallbackId());
+      m_pushSession = new ServerPushSession();
+      m_pushSession.start();
+      m_serviceHandler = new ServiceHandler() {
         @Override
-        public void service() throws IOException, ServletException {
-          String localUrl = m_hyperlinkMap.get(RWT.getRequest().getParameter("p"));
+        public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+          String localUrl = m_hyperlinkMap.get(request.getParameter("p"));
           if (localUrl == null) {
             return;
           }
@@ -86,20 +96,15 @@ public class BrowserExtension {
   }
 
   public void detach() {
-    UICallBack.deactivate(getUiCallbackId());
+    // TODO RAP 2.0 migration - old code
+// old code   UICallBack.deactivate(getUiCallbackId());
+    m_pushSession.stop();
     clearLocalHyperlinkCache();
     clearResourceCache();
     if (m_serviceHandler != null) {
       m_serviceHandler = null;
       RWT.getServiceManager().unregisterServiceHandler(m_serviceHandlerId);
     }
-  }
-
-  /**
-   * @return the web url of the resource valid for calls from outside
-   */
-  public String addResource(String name, InputStream content) {
-    return addResource(name, content, null, null);
   }
 
   /**
@@ -114,15 +119,9 @@ public class BrowserExtension {
    * 
    * @param content
    *          the content of the resource to add.
-   * @param charset
-   *          the name of the charset which was used when the resource
-   *          was stored. If set to <code>null</code> neither charset nor options will be set.
-   * @param options
-   *          an enumeration which specifies whether the resource will
-   *          be versioned and/or compressed. If set to <code>null</code> neither charset nor options will be set.
    * @return the web url of the resource valid for calls from outside
    */
-  public String addResource(String name, InputStream content, String charset, RegisterOptions options) {
+  public String addResource(String name, InputStream content) {
     name = name.replaceAll("\\\\", "/");
     if (name == null || name.length() == 0) {
       return null;
@@ -132,18 +131,13 @@ public class BrowserExtension {
     }
     String uniqueName = m_serviceHandlerId + name;
     m_tempFileNames.add(uniqueName);
-    IResourceManager resourceManager = RWT.getResourceManager();
-    if (charset != null && options != null) {
-      resourceManager.register(uniqueName, content, charset, options);
-    }
-    else {
-      resourceManager.register(uniqueName, content);
-    }
+    ResourceManager resourceManager = RWT.getResourceManager();
+    resourceManager.register(uniqueName, content);
     return resourceManager.getLocation(uniqueName);
   }
 
   public void clearResourceCache() {
-    IResourceManager resourceManager = RWT.getResourceManager();
+    ResourceManager resourceManager = RWT.getResourceManager();
     try {
       for (String name : m_tempFileNames) {
         resourceManager.unregister(name);
@@ -180,20 +174,37 @@ public class BrowserExtension {
   }
 
   private void fireLocationChangedEvent(final String location) {
+
     m_browser.getDisplay().asyncExec(new Runnable() {
       @Override
       public void run() {
         try {
-          Constructor<?> c = LocationEvent.class.getDeclaredConstructor(Object.class, int.class, String.class);
+          Constructor<?> c = LocationEvent.class.getDeclaredConstructor(Object.class);
           c.setAccessible(true);
           //send changing
-          LocationEvent event = (LocationEvent) c.newInstance(m_browser, LocationEvent.CHANGING, location);
+          LocationEvent event = (LocationEvent) c.newInstance(new Event());
+          event.location = location;
           event.top = true;
-          event.processEvent();
+
+          //send changing
+          final Listener[] locationChangingListeners = m_browser.getListeners(EventTypes.LOCALTION_CHANGING);
+          if (locationChangingListeners != null) {
+            for (Listener l : locationChangingListeners) {
+              if (l instanceof LocationListener) {
+                ((LocationListener) l).changing(event);
+              }
+            }
+          }
           //send changed
-          event = (LocationEvent) c.newInstance(m_browser, LocationEvent.CHANGED, location);
-          event.top = true;
-          event.processEvent();
+          final Listener[] locationChangedListeners = m_browser.getListeners(EventTypes.LOCALTION_CHANGED);
+          if (locationChangedListeners != null) {
+            for (Listener l : locationChangedListeners) {
+              if (l instanceof LocationListener) {
+                ((LocationListener) l).changed(event);
+              }
+            }
+          }
+
         }
         catch (Throwable t) {
           //nop
@@ -226,7 +237,7 @@ public class BrowserExtension {
       urlBuf.append("?");
       urlBuf.append("nocache='+new Date().getTime()+'");
       urlBuf.append("&amp;");
-      urlBuf.append(IServiceHandler.REQUEST_PARAM);
+      urlBuf.append("custom_service_handler");
       urlBuf.append("=");
       urlBuf.append(rwtServiceHandler);
       urlBuf.append("&amp;");

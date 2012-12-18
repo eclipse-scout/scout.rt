@@ -23,8 +23,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -97,7 +96,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     ListEx list = new ListEx(parent, style);
 
     if (StringUtility.hasText(m_variant)) {
-      list.setData(WidgetUtil.CUSTOM_VARIANT, m_variant);
+      list.setData(RWT.CUSTOM_VARIANT, m_variant);
     }
     list.setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
     list.setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);

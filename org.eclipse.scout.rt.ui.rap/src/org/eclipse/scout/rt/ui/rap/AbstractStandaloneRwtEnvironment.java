@@ -17,7 +17,7 @@ import java.util.TreeMap;
 import javax.security.auth.Subject;
 
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.rwt.lifecycle.UICallBack;
+import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -46,6 +46,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
   private Shell m_rootShell;
   private RwtScoutDesktop m_uiDesktop;
   private RwtScoutFormButtonBar m_uiButtonArea;
+  private ServerPushSession m_pushSession;
 
   public AbstractStandaloneRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     super(applicationBundle, clientSessionClazz);
@@ -115,9 +116,12 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     shell.open();
     shell.layout(true, true);
 
-    if (needsClientNotificationUICallBack()) {
+    if (needsClientNotificationServerPushSession()) {
       // Necessary for client notifications.
-      UICallBack.activate(getClass().getName() + getClass().hashCode());
+      // TODO RAP 2.0 Migration - check
+      // old code UICallBack.activate(getClass().getName() + getClass().hashCode());
+      m_pushSession = new ServerPushSession();
+      m_pushSession.start();
     }
 
     while (!shell.isDisposed()) {
@@ -152,13 +156,13 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
   }
 
   /**
-   * @return <code>boolean</code> indicating if a permanent {@link UICallBack} for client notifications should be
+   * @return <code>boolean</code> indicating if a permanent {@link ServerPushSession} for client notifications should be
    *         established.
    */
-  protected boolean needsClientNotificationUICallBack() {
+  protected boolean needsClientNotificationServerPushSession() {
     IServiceTunnel serviceTunnel = getClientSession().getServiceTunnel();
     if (serviceTunnel != null) {
-    // necessary if client notification polling is enabled
+      // necessary if client notification polling is enabled
       return serviceTunnel.getClientNotificationPollInterval() > -1;
     }
     return false;

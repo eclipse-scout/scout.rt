@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.form.fields.datefield;
 import java.text.DateFormat;
 import java.util.Date;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
@@ -56,14 +56,14 @@ public class RwtScoutMobileTimeField extends RwtScoutValueFieldComposite<IDateFi
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_timeContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
-    m_timeContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
+    m_timeContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
 
     Text textField = new Text(m_timeContainer, SWT.NONE);
     getUiEnvironment().getFormToolkit().adapt(textField, false, false);
-    textField.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
+    textField.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
 
     m_iconContainer = getUiEnvironment().getFormToolkit().createComposite(m_timeContainer, SWT.NONE);
-    m_iconContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD_ICON);
+    m_iconContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD_ICON);
 
     setUiContainer(container);
     setUiLabel(label);
@@ -135,12 +135,12 @@ public class RwtScoutMobileTimeField extends RwtScoutValueFieldComposite<IDateFi
     getUiField().setEditable(false);
 
     if (b) {
-      m_timeContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
-      m_iconContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD_ICON);
+      m_timeContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
+      m_iconContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD_ICON);
     }
     else {
-      m_timeContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD_DISABLED);
-      m_iconContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TIMEFIELD_ICON_DISABLED);
+      m_timeContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD_DISABLED);
+      m_iconContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD_ICON_DISABLED);
     }
   }
 
@@ -230,7 +230,7 @@ public class RwtScoutMobileTimeField extends RwtScoutValueFieldComposite<IDateFi
   private class P_FieldSelectionListener extends MouseAdapter {
     private static final long serialVersionUID = 1L;
 
-  @Override
+    @Override
     public void mouseUp(MouseEvent e) {
       if (!getScoutObject().isEnabled()) {
         return;

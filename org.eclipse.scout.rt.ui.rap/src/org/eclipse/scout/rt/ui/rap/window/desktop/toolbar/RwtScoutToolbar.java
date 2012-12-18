@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.window.desktop.toolbar;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
@@ -42,7 +42,7 @@ public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> implements IRwt
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    container.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOLBAR_CONTAINER);
+    container.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOLBAR_CONTAINER);
 
     Control viewButtonbar = createViewButtonBar(container);
     Control busyIndicator = createBusyIndicator(container);
@@ -94,7 +94,7 @@ public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> implements IRwt
 
   protected Control createBusyIndicator(Composite parent) {
     Composite busyComposite = getUiEnvironment().getFormToolkit().createComposite(parent);
-    busyComposite.setData(WidgetUtil.CUSTOM_VARIANT, RwtBusyHandler.CUSTOM_VARIANT_CSS_NAME);
+    busyComposite.setData(RWT.CUSTOM_VARIANT, RwtBusyHandler.CUSTOM_VARIANT_CSS_NAME);
     busyComposite.setLayout(new Layout() {
       private static final long serialVersionUID = 1L;
 

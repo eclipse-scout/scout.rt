@@ -18,16 +18,17 @@ import java.net.URI;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.service.IServiceHandler;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.service.ServiceHandler;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.swt.widgets.Display;
 
-public class RwtScoutDownloadHandler implements IServiceHandler {
+public class RwtScoutDownloadHandler implements ServiceHandler {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutDownloadHandler.class);
 
   private File m_file;
@@ -65,21 +66,15 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
     m_sdd.open();
   }
 
-  public String getURL() {
-    StringBuffer url = new StringBuffer();
-    url.append("?");
-    url.append(IServiceHandler.REQUEST_PARAM);
-    url.append("=");
-    url.append(m_requestId);
-
-    String encodedURL = RWT.getResponse().encodeURL(url.toString());
+  protected String getURL() {
+    String url = RWT.getServiceManager().getServiceHandlerUrl(m_requestId);
+    String encodedURL = RWT.getResponse().encodeURL(url);
     return encodedURL;
   }
 
   @Override
-  public void service() throws IOException, ServletException {
+  public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     try {
-      HttpServletResponse response = RWT.getResponse();
       writeResponse(response);
     }
     finally {

@@ -17,7 +17,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -128,10 +128,10 @@ public class TimeChooserDialog extends Dialog {
 
   @Override
   protected Control createContents(Composite parent) {
-    parent.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    parent.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
 
     Composite rootArea = new Composite(parent, SWT.NONE);
-    rootArea.setData(WidgetUtil.CUSTOM_VARIANT, getDialogVariant());
+    rootArea.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
 
     m_timeChooser = createTimeChooser(rootArea);
     m_timeChooser.addChangeListener(new ChangeListener() {

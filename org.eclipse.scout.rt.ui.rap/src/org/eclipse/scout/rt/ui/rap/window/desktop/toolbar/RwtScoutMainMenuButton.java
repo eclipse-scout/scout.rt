@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.window.desktop.toolbar;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -78,7 +78,7 @@ public class RwtScoutMainMenuButton extends RwtScoutComposite<IDesktop> implemen
         menu.setVisible(true);
       }
     });
-    m_menuButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOLBAR_MENU_BUTTON);
+    m_menuButton.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOLBAR_MENU_BUTTON);
     Menu contextMenu = new Menu(m_menuButton.getShell(), SWT.POP_UP);
     RwtMenuUtility.fillContextMenu(getScoutObject().getMenus(), getUiEnvironment(), contextMenu);
     m_menuButton.setMenu(contextMenu);

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.groupbox;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
@@ -39,7 +39,7 @@ public class RwtScoutGroupBoxButtonbar implements IRwtScoutGroupBoxButtonbar {
     m_scoutGroupBox = scoutGroupBox;
     m_uiEnvironment = (IRwtEnvironment) uiEnvironment;
     m_container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    m_container.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_GROUP_BOX_BUTTON_BAR);
+    m_container.setData(RWT.CUSTOM_VARIANT, VARIANT_GROUP_BOX_BUTTON_BAR);
     m_leftPart = getUiEnvironment().getFormToolkit().createComposite(m_container);
     m_rightPart = getUiEnvironment().getFormToolkit().createComposite(m_container);
 

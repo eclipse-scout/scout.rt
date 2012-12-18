@@ -60,7 +60,7 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
   }
 
   @Override
-  protected boolean needsClientNotificationUICallBack() {
+  protected boolean needsClientNotificationServerPushSession() {
     // Disabled on mobile devices to avoid having a constant circle of doom.
     // TODO: Should actually also be enabled for mobile devices so that client notifications works.
     return false;

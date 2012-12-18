@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.action;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
@@ -48,7 +48,7 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
   @Override
   protected void initializeUi(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
-    container.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
+    container.setData(RWT.CUSTOM_VARIANT, getActionBarContainerVariant());
     setUiContainer(container);
 
     createContent();
@@ -182,7 +182,7 @@ public abstract class AbstractRwtScoutActionBar<T extends IPropertyObserver> ext
 
   protected Composite createTitleBar(Composite parent) {
     m_titleField = getUiEnvironment().getFormToolkit().createCLabel(parent, null, SWT.CENTER);
-    m_titleField.setData(WidgetUtil.CUSTOM_VARIANT, getActionBarContainerVariant());
+    m_titleField.setData(RWT.CUSTOM_VARIANT, getActionBarContainerVariant());
 
     return m_titleField;
   }

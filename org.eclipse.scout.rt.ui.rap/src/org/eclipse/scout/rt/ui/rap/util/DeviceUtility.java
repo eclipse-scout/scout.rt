@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.util;
 
-import org.eclipse.rwt.RWT;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 
@@ -21,11 +21,11 @@ public class DeviceUtility {
   public static final String SESSION_ATTR_DEVICE_TYPE = "device-type";
 
   public static IUiDeviceType getCurrentDeviceType() {
-    return (IUiDeviceType) RWT.getSessionStore().getAttribute(SESSION_ATTR_DEVICE_TYPE);
+    return (IUiDeviceType) RWT.getUISession().getAttribute(SESSION_ATTR_DEVICE_TYPE);
   }
 
   public static void setCurrentDeviceType(IUiDeviceType uiDeviceType) {
-    RWT.getSessionStore().setAttribute(SESSION_ATTR_DEVICE_TYPE, uiDeviceType);
+    RWT.getUISession().setAttribute(SESSION_ATTR_DEVICE_TYPE, uiDeviceType);
   }
 
   public static boolean isMobileOrTabletDevice() {

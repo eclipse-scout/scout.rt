@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.treefield;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartFieldProposalForm;
@@ -83,7 +83,7 @@ public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implem
       //XXX somehow the tableContainer does absorb the mouse-clicks when used in the outline
       else {
         Composite treeContainer = new Composite(getUiContainer(), SWT.NONE);
-        treeContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TREE_CONTAINER);
+        treeContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TREE_CONTAINER);
         treeContainer.setLayout(new LogicalGridLayout(1, 0));
         m_treeComposite.createUiField(treeContainer, getScoutObject().getTree(), getUiEnvironment());
         treeContainer.setLayoutData(LogicalGridDataBuilder.createField(getScoutObject().getGridData()));
@@ -136,7 +136,7 @@ public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implem
     super.setEnabledFromScout(b);
     // Workaround, because ":disabled" state seems to be ignored by RAP
     if (m_treeContainer != null) {
-      m_treeContainer.setData(WidgetUtil.CUSTOM_VARIANT, (b ? VARIANT_TREE_CONTAINER : VARIANT_TREE_CONTAINER_DISABLED));
+      m_treeContainer.setData(RWT.CUSTOM_VARIANT, (b ? VARIANT_TREE_CONTAINER : VARIANT_TREE_CONTAINER_DISABLED));
     }
   }
 

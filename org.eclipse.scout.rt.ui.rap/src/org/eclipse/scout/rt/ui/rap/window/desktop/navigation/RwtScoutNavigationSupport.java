@@ -14,10 +14,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.rwt.IBrowserHistory;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.events.BrowserHistoryEvent;
-import org.eclipse.rwt.events.BrowserHistoryListener;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.BrowserNavigation;
+import org.eclipse.rap.rwt.client.service.BrowserNavigationEvent;
+import org.eclipse.rap.rwt.client.service.BrowserNavigationListener;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -29,18 +29,19 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.service.SERVICES;
 
+////TODO RAP 2.0 Migration
 public class RwtScoutNavigationSupport {
 
   private final IRwtEnvironment m_uiEnvironment;
-  private IBrowserHistory m_uiHistory;
+  private BrowserNavigation m_uiNavigation;
   private INavigationHistoryService m_historyService;
   private P_NavigationHistoryListener m_scoutListener;
-  private BrowserHistoryListener m_uiListener = new BrowserHistoryListener() {
+  private BrowserNavigationListener m_uiNavigationListener = new BrowserNavigationListener() {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void navigated(BrowserHistoryEvent event) {
-      handleNavigationFromUi(event.entryId);
+    public void navigated(BrowserNavigationEvent event) {
+      handleNavigationFromUi(event.getState());
     }
   };
 
@@ -49,9 +50,14 @@ public class RwtScoutNavigationSupport {
   }
 
   public void install() {
-    if (m_uiHistory == null) {
-      m_uiHistory = RWT.getBrowserHistory();
-      m_uiHistory.addBrowserHistoryListener(m_uiListener);
+    if (m_uiNavigation == null) {
+      // TODO RAP 2.0 migration - check
+// old code    m_uiHistory = RWT.getBrowserHistory();
+// old code   m_uiHistory.addBrowserHistoryListener(m_uiListener);
+      m_uiNavigation = RWT.getClient().getService(BrowserNavigation.class);
+      if (m_uiNavigation != null) {
+        m_uiNavigation.addBrowserNavigationListener(m_uiNavigationListener);
+      }
     }
 
     m_uiEnvironment.invokeScoutLater(new Runnable() {
@@ -81,18 +87,20 @@ public class RwtScoutNavigationSupport {
       //It seems that jobs aren't reliably executed on shutdown, explicitly calling Job.getJobManager().resume() doesn't work either.
       //RunNow should be save here because the job just removes a listener
     }.runNow(new NullProgressMonitor());
-    if (m_uiHistory != null) {
-      m_uiHistory.removeBrowserHistoryListener(m_uiListener);
+    if (m_uiNavigation != null) {
+      // TODO RAP 2.0 migration - check
+//      m_uiHistory.removeBrowserHistoryListener(m_uiListener);
+      m_uiNavigation.removeBrowserNavigationListener(m_uiNavigationListener);
     }
   }
 
-  protected void handleNavigationFromUi(final String entryId) {
+  protected void handleNavigationFromUi(final String state) {
     Runnable t = new Runnable() {
       @Override
       public void run() {
         try {
           for (Bookmark b : m_historyService.getBookmarks()) {
-            if (getId(b).equals(entryId)) {
+            if (getId(b).equals(state)) {
               m_historyService.stepTo(b);
               break;
             }
@@ -114,7 +122,11 @@ public class RwtScoutNavigationSupport {
   protected void handleBookmarkAddedFromScout(Bookmark bookmark) {
     String id = getId(bookmark);
     //Title is set to null because it doesn't work properly, see also https://bugs.eclipse.org/bugs/show_bug.cgi?id=396400
-    m_uiHistory.createEntry(id, null);
+    // TODO RAP 2.0 migration - check
+//    old code m_uiHistory.createEntry(id, null);
+    StringBuilder textBuilder = new StringBuilder(getUiEnvironment().getClientSession().getDesktop().getTitle() + " - ");
+    textBuilder.append(cleanNl(bookmark.getText()));
+    m_uiNavigation.pushState(id, textBuilder.toString());
   }
 
   private String cleanNl(String s) {

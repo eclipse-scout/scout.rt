@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.workbench;
 
-import org.eclipse.rwt.lifecycle.IEntryPoint;
+import org.eclipse.rap.rwt.application.EntryPoint;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.WorkbenchAdvisor;
@@ -21,7 +21,7 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
  * @author Andreas Hoegger
  * @since 1.0.8 31.03.2011
  */
-public abstract class AbstractWorkbenchEntryPoint implements IEntryPoint {
+public abstract class AbstractWorkbenchEntryPoint implements EntryPoint {
 
   @Override
   public int createUI() {

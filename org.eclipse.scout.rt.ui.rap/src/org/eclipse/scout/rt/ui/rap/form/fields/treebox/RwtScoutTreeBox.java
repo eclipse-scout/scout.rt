@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.treebox;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
@@ -46,7 +46,7 @@ public class RwtScoutTreeBox extends RwtScoutValueFieldComposite<ITreeBox<?>> im
     // getScoutObject().getTree()); //FIXME AHO: please finish this pending task. I disabled this line meanwhile because it doens't works. regards MHA
     Composite treeContainer = new Composite(container, SWT.NONE);
     treeContainer.setLayout(new LogicalGridLayout(1, 0));
-    treeContainer.setData(WidgetUtil.CUSTOM_VARIANT, RwtUtility.VARIANT_LISTBOX);
+    treeContainer.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_LISTBOX);
     m_treeContainer = treeContainer;
     m_treeComposite = new RwtScoutTree();
     m_treeComposite.createUiField(treeContainer, getScoutObject().getTree(), getUiEnvironment());
@@ -87,7 +87,7 @@ public class RwtScoutTreeBox extends RwtScoutValueFieldComposite<ITreeBox<?>> im
     super.setEnabledFromScout(b);
     // Workaround, because ":disabled" state seems to be ignored by RAP
     if (m_treeContainer != null) {
-      m_treeContainer.setData(WidgetUtil.CUSTOM_VARIANT, (b ? RwtUtility.VARIANT_LISTBOX : RwtUtility.VARIANT_LISTBOX_DISABLED));
+      m_treeContainer.setData(RWT.CUSTOM_VARIANT, (b ? RwtUtility.VARIANT_LISTBOX : RwtUtility.VARIANT_LISTBOX_DISABLED));
     }
   }
 }

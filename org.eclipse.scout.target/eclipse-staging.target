@@ -73,8 +73,8 @@
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="rap_1.5" location="http://download.eclipse.org/rt/rap/1.5/runtime"/>
 
-      <unit id="org.eclipse.rap.runtime.requirements.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.rap.runtime.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.rap.equinox.juno.target.feature.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
     </location>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="scout_nightly" location="http://download.eclipse.org/scout/nightly"/>

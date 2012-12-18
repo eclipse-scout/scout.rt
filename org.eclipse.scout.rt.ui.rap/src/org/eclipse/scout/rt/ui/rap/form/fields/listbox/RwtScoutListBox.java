@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields.listbox;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
@@ -45,7 +45,7 @@ public class RwtScoutListBox extends RwtScoutValueFieldComposite<IListBox<?>> im
 
     Composite tableContainer = new Composite(container, SWT.NONE);
     tableContainer.setLayout(new LogicalGridLayout(1, 0));
-    tableContainer.setData(WidgetUtil.CUSTOM_VARIANT, RwtUtility.VARIANT_LISTBOX);
+    tableContainer.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_LISTBOX);
     m_tableContainer = tableContainer;
     m_tableComposite = SERVICES.getService(IPatchedClassService.class).createRwtScoutTable(RwtUtility.VARIANT_LISTBOX);
     m_tableComposite.createUiField(tableContainer, getScoutObject().getTable(), getUiEnvironment());
@@ -85,7 +85,7 @@ public class RwtScoutListBox extends RwtScoutValueFieldComposite<IListBox<?>> im
     super.setEnabledFromScout(b);
     // Workaround, because ":disabled" state seems to be ignored by RAP
     if (m_tableContainer != null) {
-      m_tableContainer.setData(WidgetUtil.CUSTOM_VARIANT, (b ? RwtUtility.VARIANT_LISTBOX : RwtUtility.VARIANT_LISTBOX_DISABLED));
+      m_tableContainer.setData(RWT.CUSTOM_VARIANT, (b ? RwtUtility.VARIANT_LISTBOX : RwtUtility.VARIANT_LISTBOX_DISABLED));
     }
   }
 }

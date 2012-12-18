@@ -27,8 +27,7 @@ import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -116,7 +115,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     style |= SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL;
     TreeEx tree = getUiEnvironment().getFormToolkit().createTree(parent, style);
     if (StringUtility.hasText(m_variant)) {
-      tree.setData(WidgetUtil.CUSTOM_VARIANT, m_variant);
+      tree.setData(RWT.CUSTOM_VARIANT, m_variant);
     }
     tree.setLayoutDeferred(true);
     // Measure item call ends up in a layout error on windows 2000

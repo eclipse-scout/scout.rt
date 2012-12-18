@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.util;
 
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.rwt.widgets.FileUpload;
+import org.eclipse.rap.rwt.widgets.FileUpload;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.rap.basic.comp.CLabelEx;
 import org.eclipse.scout.rt.ui.rap.basic.comp.HyperlinkEx;
