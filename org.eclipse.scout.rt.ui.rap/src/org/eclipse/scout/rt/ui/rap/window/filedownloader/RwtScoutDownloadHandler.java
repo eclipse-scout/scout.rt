@@ -18,6 +18,7 @@ import java.net.URI;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.rwt.RWT;
@@ -72,7 +73,9 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
     url.append("=");
     url.append(m_requestId);
 
-    String encodedURL = RWT.getResponse().encodeURL(url.toString());
+    //TODO RAP 2.0 Migration
+    String url = RWT.getServiceManager().getServiceHandlerUrl(m_requestId);
+    String encodedURL = RWT.getResponse().encodeURL(url);
     return encodedURL;
   }
 

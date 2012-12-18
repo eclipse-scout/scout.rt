@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.form.fields.datefield;
 import java.text.DateFormat;
 import java.util.Date;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;

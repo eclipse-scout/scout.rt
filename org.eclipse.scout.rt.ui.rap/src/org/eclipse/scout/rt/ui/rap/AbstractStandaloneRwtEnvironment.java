@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.util.TreeMap;
@@ -17,7 +18,8 @@ import java.util.TreeMap;
 import javax.security.auth.Subject;
 
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.rwt.lifecycle.UICallBack;
+import org.eclipse.rwt.RWT;
+import org.eclipse.rap.rwt.lifecycle.UICallBack;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;

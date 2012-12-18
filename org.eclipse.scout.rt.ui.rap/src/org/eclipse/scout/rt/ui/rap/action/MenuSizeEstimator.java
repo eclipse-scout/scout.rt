@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.rap.action;
 
 import java.util.List;
 
-import org.eclipse.rwt.internal.theme.AbstractThemeAdapter;
-import org.eclipse.rwt.internal.theme.WidgetMatcher;
+import org.eclipse.rap.rwt.internal.theme.AbstractThemeAdapter;
+import org.eclipse.rap.rwt.internal.theme.WidgetMatcher;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;

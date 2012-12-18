@@ -16,8 +16,8 @@ import java.util.Date;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.rt.ui.rap.ext.table.util.TableCellRolloverSupport;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;

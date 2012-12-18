@@ -14,10 +14,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.rwt.IBrowserHistory;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.events.BrowserHistoryEvent;
-import org.eclipse.rwt.events.BrowserHistoryListener;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.BrowserNavigation;
+import org.eclipse.rap.rwt.client.service.BrowserNavigationEvent;
+import org.eclipse.rap.rwt.client.service.BrowserNavigationListener;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -29,18 +29,19 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.service.SERVICES;
 
+////TODO RAP 2.0 Migration
 public class RwtScoutNavigationSupport {
 
   private final IRwtEnvironment m_uiEnvironment;
-  private IBrowserHistory m_uiHistory;
+  private BrowserNavigation m_uiHistory;
   private INavigationHistoryService m_historyService;
   private P_NavigationHistoryListener m_scoutListener;
-  private BrowserHistoryListener m_uiListener = new BrowserHistoryListener() {
+  private BrowserNavigationListener m_uiListener = new BrowserNavigationListener() {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void navigated(BrowserHistoryEvent event) {
-      handleNavigationFromUi(event.entryId);
+    public void navigated(BrowserNavigationEvent event) {
+      handleNavigationFromUi(event.getState());
     }
   };
 

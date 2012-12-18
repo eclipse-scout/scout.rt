@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.commons.logger.IScoutLogger;

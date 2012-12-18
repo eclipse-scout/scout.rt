@@ -17,7 +17,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.rwt.resources.IResourceManager.RegisterOptions;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -142,7 +141,7 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
     }
     else {
       try {
-        String indexFile = m_browserExtension.addResource("index.html", new ByteArrayInputStream(cleanHtml.getBytes("UTF-8")), "UTF-8", RegisterOptions.VERSION);
+        String indexFile = m_browserExtension.addResource("index.html", new ByteArrayInputStream(cleanHtml.getBytes("UTF-8")));
         getUiField().setUrl(indexFile);
       }
       catch (UnsupportedEncodingException e) {
