@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.ext.tree;
 
-import org.eclipse.rwt.internal.textsize.TextSizeUtil;
+import org.eclipse.rap.rwt.internal.textsize.TextSizeUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.swt.SWT;

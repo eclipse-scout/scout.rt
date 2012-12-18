@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.rap.ext;
 
 import java.util.Date;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.window.desktop;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -63,7 +63,7 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
       Composite desktopComposite = parent;
       Control toolbar = createToolBar(desktopComposite);
       Control viewsArea = createViewsArea(desktopComposite);
-      viewsArea.setData(WidgetUtil.CUSTOM_VARIANT, getViewsAreaVariant());
+      viewsArea.setData(RWT.CUSTOM_VARIANT, getViewsAreaVariant());
 
       initLayout(desktopComposite, toolbar, viewsArea);
 

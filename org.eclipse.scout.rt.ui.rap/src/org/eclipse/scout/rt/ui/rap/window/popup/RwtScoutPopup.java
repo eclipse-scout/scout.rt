@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.rap.window.popup;
 
 import java.util.EventListener;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -91,7 +91,7 @@ public class RwtScoutPopup extends AbstractRwtScoutPart {
     m_window = new Shell(ownerComponent.getShell(), style);
     m_window.setData("extendedStyle", SWT.POP_UP);
     m_window.setLayout(new FillLayout());
-    m_window.setData(WidgetUtil.CUSTOM_VARIANT, POPUP_CUSTOM_VARIANT);
+    m_window.setData(RWT.CUSTOM_VARIANT, POPUP_CUSTOM_VARIANT);
     //add close listener
     m_window.addDisposeListener(new P_RwtWindowDisposeListener());
 

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.window.desktop.nonmodalFormBar;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
@@ -37,7 +37,7 @@ public class RwtScoutFormButton extends RwtScoutComposite<IAction> implements IR
   @Override
   protected void initializeUi(Composite parent) {
     Button tabButton = getUiEnvironment().getFormToolkit().createButton(parent, "", SWT.TOGGLE);
-    tabButton.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActive);
+    tabButton.setData(RWT.CUSTOM_VARIANT, m_variantInActive);
     setUiField(tabButton);
     makeButtonActive();
     tabButton.addSelectionListener(new SelectionAdapter() {
@@ -54,14 +54,14 @@ public class RwtScoutFormButton extends RwtScoutComposite<IAction> implements IR
   public void makeButtonActive() {
     Control[] children = getUiField().getParent().getChildren();
     for (Control child : children) {
-      child.setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActive);
+      child.setData(RWT.CUSTOM_VARIANT, m_variantInActive);
     }
-    getUiField().setData(WidgetUtil.CUSTOM_VARIANT, m_variantActive);
+    getUiField().setData(RWT.CUSTOM_VARIANT, m_variantActive);
   }
 
   @Override
   public void makeButtonInactive() {
-    getUiField().setData(WidgetUtil.CUSTOM_VARIANT, m_variantInActive);
+    getUiField().setData(RWT.CUSTOM_VARIANT, m_variantInActive);
   }
 
   @Override

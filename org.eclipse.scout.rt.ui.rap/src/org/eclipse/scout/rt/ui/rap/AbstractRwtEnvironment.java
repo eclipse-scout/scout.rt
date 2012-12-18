@@ -28,12 +28,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.internal.widgets.JSExecutor;
-import org.eclipse.rwt.lifecycle.UICallBack;
-import org.eclipse.rwt.service.ISessionStore;
-import org.eclipse.rwt.service.SessionStoreEvent;
-import org.eclipse.rwt.service.SessionStoreListener;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
+import org.eclipse.rap.rwt.lifecycle.UICallBack;
+import org.eclipse.rap.rwt.service.UISession;
+import org.eclipse.rap.rwt.service.UISessionEvent;
+import org.eclipse.rap.rwt.service.UISessionListener;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.ListUtility;
@@ -127,7 +127,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   private Bundle m_applicationBundle;
   private RwtScoutSynchronizer m_synchronizer;
-  private SessionStoreListener m_sessionStoreListener;
+  private UISessionListener m_sessionStoreListener;
   private ILocaleListener m_localeListener;
 
   private final Object m_immediateUiJobsLock = new Object();
@@ -286,7 +286,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     HttpServletResponse response = RWT.getResponse();
     String logoutUri = response.encodeRedirectURL(getLogoutLandingUri());
     String browserText = MessageFormat.format("parent.window.location.href = \"{0}\";", logoutUri);
-    JSExecutor.executeJS(browserText);
+    JavaScriptExecutor executor = RWT.getClient().getService(JavaScriptExecutor.class);
+    if (executor != null) {
+      executor.execute(browserText);
+    }
   }
 
   @Override
@@ -1321,13 +1324,14 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
-  private static final class P_SessionStoreListener implements SessionStoreListener {
+  private static final class P_SessionStoreListener implements UISessionListener {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void beforeDestroy(SessionStoreEvent event) {
-      ISessionStore sessionStore = event.getSessionStore();
-      IClientSession clientSession = (IClientSession) sessionStore.getAttribute(IClientSession.class.getName());
+    public void beforeDestroy(UISessionEvent event) {
+      //TODO RAP 2.0 Migration
+      UISession rapSession = event.getUISession();
+      IClientSession clientSession = (IClientSession) rapSession.getAttribute(IClientSession.class.getName());
       if (clientSession != null) {
         if (LOG.isInfoEnabled()) {
           UserAgent userAgent = clientSession.getUserAgent();

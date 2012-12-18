@@ -14,8 +14,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.eclipse.rwt.internal.widgets.JSExecutor;
-import org.eclipse.rwt.widgets.ExternalBrowser;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
+import org.eclipse.rap.rwt.widgets.ExternalBrowser;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -88,8 +89,10 @@ public class BrowserWindowHandler {
     if (link == null) {
       return;
     }
-
-    JSExecutor.executeJS("window.location='" + link + "'");
+    JavaScriptExecutor executor = RWT.getClient().getService(JavaScriptExecutor.class);
+    if (executor != null) {
+      executor.execute("window.location='" + link + "'");
+    }
   }
 
   public void downloadFile(String link) {

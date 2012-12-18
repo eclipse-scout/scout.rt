@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.rap.mobile.action;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;

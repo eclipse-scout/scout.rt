@@ -14,7 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
@@ -81,10 +81,10 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
   @Override
   protected void initializeUi(Composite parent) {
     Composite toolButtonBar = getUiEnvironment().getFormToolkit().createComposite(parent);
-    toolButtonBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR);
+    toolButtonBar.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR);
     if (isShowingCollapseButtonEnabled()) {
       m_toolButtonCollapseButton = getUiEnvironment().getFormToolkit().createButton(toolButtonBar, "", SWT.PUSH);
-      m_toolButtonCollapseButton.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR_COLLAPSE_BUTTON);
+      m_toolButtonCollapseButton.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR_COLLAPSE_BUTTON);
       m_toolButtonCollapseButton.addSelectionListener(new SelectionAdapter() {
         private static final long serialVersionUID = 1L;
 
@@ -96,7 +96,7 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
     }
     if (isShowingLabelEnabled()) {
       m_toolButtonsLabel = getUiEnvironment().getFormToolkit().createLabel(toolButtonBar, "", SWT.CENTER);
-      m_toolButtonsLabel.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON);
+      m_toolButtonsLabel.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON);
       m_toolButtonsLabel.addMouseListener(new MouseAdapter() {
         private static final long serialVersionUID = 1L;
 
@@ -107,7 +107,7 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
       });
     }
     m_toolButtonContainer = getUiEnvironment().getFormToolkit().createComposite(toolButtonBar);
-    m_toolButtonContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR);
+    m_toolButtonContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR);
     for (IToolButton scoutButton : getScoutObject().getToolButtons()) {
       if (!(scoutButton instanceof AbstractFormToolButton)) {
         continue;
@@ -204,7 +204,7 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
       }
       if (scoutButton.isSelected()) {
         label = scoutButton.getText();
-        m_toolButtonContainer.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR_ACTIVE);
+        m_toolButtonContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOL_BUTTON_BAR_ACTIVE);
       }
     }
     GridData collapseButtonData = null;

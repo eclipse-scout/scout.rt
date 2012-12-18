@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.window.desktop;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.swt.SWT;

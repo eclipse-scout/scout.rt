@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.ui.rap.window.desktop.navigation;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.rwt.IBrowserHistory;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.events.BrowserHistoryEvent;
-import org.eclipse.rwt.events.BrowserHistoryListener;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.BrowserNavigation;
+import org.eclipse.rap.rwt.client.service.BrowserNavigationEvent;
+import org.eclipse.rap.rwt.client.service.BrowserNavigationListener;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -28,18 +28,19 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.service.SERVICES;
 
+////TODO RAP 2.0 Migration
 public class RwtScoutNavigationSupport {
 
   private final IRwtEnvironment m_uiEnvironment;
-  private IBrowserHistory m_uiHistory;
+  private BrowserNavigation m_uiHistory;
   private INavigationHistoryService m_historyService;
   private P_NavigationHistoryListener m_scoutListener;
-  private BrowserHistoryListener m_uiListener = new BrowserHistoryListener() {
+  private BrowserNavigationListener m_uiListener = new BrowserNavigationListener() {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void navigated(BrowserHistoryEvent event) {
-      handleNavigationFromUi(event.entryId);
+    public void navigated(BrowserNavigationEvent event) {
+      handleNavigationFromUi(event.getState());
     }
   };
 
@@ -49,8 +50,8 @@ public class RwtScoutNavigationSupport {
 
   public void install() {
     if (m_uiHistory == null) {
-      m_uiHistory = RWT.getBrowserHistory();
-      m_uiHistory.addBrowserHistoryListener(m_uiListener);
+      m_uiHistory = RWT.getClient().getService(BrowserNavigation.class);
+      m_uiHistory.addBrowserNavigationListener(m_uiListener);
     }
     new ClientSyncJob("", getUiEnvironment().getClientSession()) {
       @Override
@@ -69,7 +70,7 @@ public class RwtScoutNavigationSupport {
       m_historyService.removeNavigationHistoryListener(m_scoutListener);
     }
     if (m_uiHistory != null) {
-      m_uiHistory.removeBrowserHistoryListener(m_uiListener);
+      m_uiHistory.addBrowserNavigationListener(m_uiListener);
     }
   }
 
@@ -102,7 +103,7 @@ public class RwtScoutNavigationSupport {
     String id = getId(bookmark);
     StringBuilder textBuilder = new StringBuilder(getUiEnvironment().getClientSession().getDesktop().getTitle() + " - ");
     textBuilder.append(cleanNl(bookmark.getText()));
-    m_uiHistory.createEntry(id, textBuilder.toString());
+    m_uiHistory.pushState(id, textBuilder.toString());
   }
 
   private String cleanNl(String s) {

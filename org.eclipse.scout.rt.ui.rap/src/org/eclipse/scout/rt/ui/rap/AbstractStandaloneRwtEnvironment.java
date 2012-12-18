@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.util.TreeMap;
@@ -17,9 +18,8 @@ import java.util.TreeMap;
 import javax.security.auth.Subject;
 
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.lifecycle.UICallBack;
-import org.eclipse.rwt.service.SettingStoreException;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.lifecycle.UICallBack;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
@@ -102,7 +102,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     try {
       RWT.getSettingStore().setAttribute("SessionID", RWT.getRequest().getSession().getId());
     }
-    catch (SettingStoreException e) {
+    catch (IOException e) {
       //nop
     }
 
@@ -190,7 +190,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
   protected boolean needsClientNotificationUICallBack() {
     IServiceTunnel serviceTunnel = getClientSession().getServiceTunnel();
     if (serviceTunnel != null) {
-    // necessary if client notification polling is enabled
+      // necessary if client notification polling is enabled
       return serviceTunnel.getClientNotificationPollInterval() > -1;
     }
     return false;

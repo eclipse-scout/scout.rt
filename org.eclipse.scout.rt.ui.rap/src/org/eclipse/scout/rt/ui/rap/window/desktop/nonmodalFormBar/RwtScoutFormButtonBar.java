@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.rap.window.desktop.nonmodalFormBar;
 
 import java.util.HashMap;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -94,7 +94,7 @@ public class RwtScoutFormButtonBar extends RwtScoutComposite<IDesktop> {
   @Override
   protected void initializeUi(Composite parent) {
     m_buttonBar = getUiEnvironment().getFormToolkit().createComposite(parent);
-    m_buttonBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_FORMBAR_CONTAINER);
+    m_buttonBar.setData(RWT.CUSTOM_VARIANT, VARIANT_FORMBAR_CONTAINER);
     RowLayout layout = new RowLayout(SWT.HORIZONTAL);
     layout.marginBottom = 0;
     layout.marginTop = 0;

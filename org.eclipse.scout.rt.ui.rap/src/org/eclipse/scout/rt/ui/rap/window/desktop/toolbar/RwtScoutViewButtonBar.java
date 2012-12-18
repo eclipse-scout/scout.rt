@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.rap.window.desktop.toolbar;
 
 import java.util.HashMap;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
@@ -77,7 +77,7 @@ public class RwtScoutViewButtonBar extends RwtScoutComposite<IDesktop> implement
 
   protected Control createButtons(Composite parent) {
     Composite buttonBar = getUiEnvironment().getFormToolkit().createComposite(parent);
-    buttonBar.setData(WidgetUtil.CUSTOM_VARIANT, VARIANT_TOOLBAR_CONTAINER);
+    buttonBar.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOLBAR_CONTAINER);
     for (IViewButton scoutButton : getScoutObject().getViewButtons()) {
       if (scoutButton.isVisible()) {
         IRwtScoutToolButtonForPatch uiButton = SERVICES.getService(IPatchedClassService.class).createRwtScoutToolButton(true, false, VARIANT_VIEW_BUTTON, VARIANT_VIEW_BUTTON_ACTIVE);

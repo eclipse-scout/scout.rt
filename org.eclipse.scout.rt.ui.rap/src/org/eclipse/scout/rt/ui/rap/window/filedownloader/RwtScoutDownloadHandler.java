@@ -18,14 +18,16 @@ import java.net.URI;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.service.IServiceHandler;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.service.ServiceHandler;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.swt.widgets.Shell;
 
-public class RwtScoutDownloadHandler implements IServiceHandler {
+//TODO RAP 2.0 Migration
+public class RwtScoutDownloadHandler implements ServiceHandler {
 
   private File m_file;
   private URI m_bundleURI;
@@ -57,19 +59,20 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
   }
 
   public String getURL() {
-    StringBuffer url = new StringBuffer();
-    url.append("?");
-    url.append(IServiceHandler.REQUEST_PARAM);
-    url.append("=");
-    url.append(m_requestId);
+//    StringBuffer url = new StringBuffer();
+//    url.append("?");
+//    url.append(IServiceHandler.REQUEST_PARAM);
+//    url.append("=");
+//    url.append(m_requestId);
 
-    String encodedURL = RWT.getResponse().encodeURL(url.toString());
+    //TODO RAP 2.0 Migration
+    String url = RWT.getServiceManager().getServiceHandlerUrl(m_requestId);
+    String encodedURL = RWT.getResponse().encodeURL(url);
     return encodedURL;
   }
 
   @Override
-  public void service() throws IOException, ServletException {
-    HttpServletResponse response = RWT.getResponse();
+  public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     if (StringUtility.hasText(m_contentType)) {
       response.setContentType(m_contentType);
     }
@@ -127,4 +130,5 @@ public class RwtScoutDownloadHandler implements IServiceHandler {
     }
     RWT.getServiceManager().unregisterServiceHandler(m_requestId + hashCode());
   }
+
 }

@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.window.dialog;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -146,7 +146,7 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
 
     m_uiDialog = new DialogImpl((style & SWT.APPLICATION_MODAL) != 0 ? parentShell : null, style);
     m_uiDialog.create();
-    m_uiDialog.getShell().setData(WidgetUtil.CUSTOM_VARIANT, getDialogShellVariant());
+    m_uiDialog.getShell().setData(RWT.CUSTOM_VARIANT, getDialogShellVariant());
     DefaultValidateRoot shellValidateRoot = createShellValidateRoot(m_uiDialog.getShell(), getUiEnvironment());
     if (shellValidateRoot != null) {
       m_uiDialog.getShell().setData(IValidateRoot.VALIDATE_ROOT_DATA, shellValidateRoot);

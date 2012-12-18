@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.resources.IResourceManager;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.service.IResourceManager;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.StringUtility;

@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.keystroke;
 
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.lifecycle.PhaseListener;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.lifecycle.PhaseListener;
 import org.eclipse.scout.rt.ui.rap.form.fields.stringfield.RwtScoutStringField;
 import org.eclipse.swt.SWT;
 
