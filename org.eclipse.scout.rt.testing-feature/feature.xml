@@ -30,9 +30,6 @@
    <requires>
       <import plugin="org.apache.ant" version="1.7.1" match="compatible"/>
       <import plugin="org.junit" version="4.5.0" match="compatible"/>
-      <import plugin="org.easymock" version="2.4.0" match="compatible"/>
-      <import plugin="org.apache.commons.codec" version="1.1.4" match="greaterOrEqual"/>
-      <import plugin="org.apache.commons.exec" version="1.1.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
