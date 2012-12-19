@@ -14,12 +14,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
-import java.lang.reflect.Array;
-import java.util.HashMap;
 
-import org.eclipse.scout.commons.internal.Activator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.IObjectReplacer;
 import org.osgi.framework.Bundle;
 
 /**
@@ -29,37 +27,24 @@ import org.osgi.framework.Bundle;
  */
 public class BundleObjectInputStream extends ObjectInputStream {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BundleObjectInputStream.class);
-
-  /** table mapping primitive type names to corresponding class objects */
-  private static final HashMap<String, Class> PRIMITIVE_TYPES;
-  static {
-    PRIMITIVE_TYPES = new HashMap<String, Class>(8, 1f);
-    PRIMITIVE_TYPES.put("boolean", boolean.class);
-    PRIMITIVE_TYPES.put("byte", byte.class);
-    PRIMITIVE_TYPES.put("char", char.class);
-    PRIMITIVE_TYPES.put("short", short.class);
-    PRIMITIVE_TYPES.put("int", int.class);
-    PRIMITIVE_TYPES.put("long", long.class);
-    PRIMITIVE_TYPES.put("float", float.class);
-    PRIMITIVE_TYPES.put("double", double.class);
-    PRIMITIVE_TYPES.put("void", void.class);
-    //
-    PRIMITIVE_TYPES.put("Z", boolean.class);
-    PRIMITIVE_TYPES.put("B", byte.class);
-    PRIMITIVE_TYPES.put("C", char.class);
-    PRIMITIVE_TYPES.put("S", short.class);
-    PRIMITIVE_TYPES.put("I", int.class);
-    PRIMITIVE_TYPES.put("J", long.class);
-    PRIMITIVE_TYPES.put("F", float.class);
-    PRIMITIVE_TYPES.put("D", double.class);
-    PRIMITIVE_TYPES.put("V", void.class);
-  }
-
-  private Bundle[] m_bundleList;
+  private final ClassLoader m_classLoader;
+  private final IObjectReplacer m_objectReplacer;
 
   public BundleObjectInputStream(InputStream in, Bundle[] bundleList) throws IOException {
+    this(in, new BundleListClassLoader(bundleList), null);
+  }
+
+  public BundleObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {
+    this(in, classLoader, null);
+  }
+
+  public BundleObjectInputStream(InputStream in, ClassLoader classLoader, IObjectReplacer objectReplacer) throws IOException {
     super(in);
-    m_bundleList = bundleList;
+    if (classLoader == null) {
+      throw new IllegalArgumentException("classLoader must not be null");
+    }
+    m_classLoader = classLoader;
+    m_objectReplacer = objectReplacer;
     enableResolveObject(true);
   }
 
@@ -68,86 +53,14 @@ public class BundleObjectInputStream extends ObjectInputStream {
    */
   @Override
   public Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-    return defaultResolveClass(desc.getName());
+    return m_classLoader.loadClass(desc.getName());
   }
 
-  private Class<?> defaultResolveClass(String className) throws ClassNotFoundException, IOException {
-    Class c = PRIMITIVE_TYPES.get(className);
-    if (c != null) {
-      return c;
+  @Override
+  protected Object resolveObject(Object obj) throws IOException {
+    if (m_objectReplacer != null) {
+      return m_objectReplacer.resolveObject(obj);
     }
-    try {
-      int arrayDim = 0;
-      while (className.startsWith("[")) {
-        className = className.substring(1);
-        arrayDim++;
-      }
-      if (className.matches("L.*;")) {
-        className = className.substring(1, className.length() - 1);
-      }
-      if (arrayDim > 0) {
-        c = defaultResolveClass(className);
-        int[] dimensions = new int[arrayDim];
-        c = Array.newInstance(c, dimensions).getClass();
-      }
-      else {
-        //1. try activated bundles
-        for (Bundle b : m_bundleList) {
-          if (b.getState() == Bundle.ACTIVE) {
-            try {
-              c = b.loadClass(className);
-              break;
-            }
-            catch (ClassNotFoundException e) {
-              // nop
-            }
-          }
-        }
-        if (c != null) {
-          return c;
-        }
-        //2. try resolved bundles which prefix the class
-        for (Bundle b : m_bundleList) {
-          if (b.getState() == Bundle.RESOLVED && className.startsWith(b.getSymbolicName())) {
-            try {
-              c = b.loadClass(className);
-              break;
-            }
-            catch (ClassNotFoundException e) {
-              // nop
-            }
-          }
-        }
-        if (c != null) {
-          return c;
-        }
-        //3. try all bundles
-        for (Bundle b : m_bundleList) {
-          try {
-            c = b.loadClass(className);
-            break;
-          }
-          catch (ClassNotFoundException e) {
-            // nop
-          }
-        }
-        if (c != null) {
-          return c;
-        }
-        //
-        if (Activator.getDefault() == null) {
-          //outside osgi
-          c = Class.forName(className);
-          return c;
-        }
-        throw new ClassNotFoundException(className);
-      }
-      return c;
-    }
-    catch (ClassNotFoundException e) {
-      LOG.error("reading serialized object from http proxy tunnel: " + e.getMessage(), e);
-      throw e;
-    }
+    return super.resolveObject(obj);
   }
-
 }

@@ -4,23 +4,20 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.bookmark;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService;
 
@@ -155,25 +152,13 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   @ConfigOperation
   @Order(30)
   protected BookmarkFolder execResolveBookmarkFolder(long id, Object binaryData) throws ProcessingException {
-    ObjectInputStream oin = null;
     try {
       byte[] bytesResolved = (byte[]) binaryData;
-      ByteArrayInputStream bin = new ByteArrayInputStream(bytesResolved);
-      oin = new ObjectInputStream(bin);
-      return (BookmarkFolder) oin.readObject();
+      return SerializationUtility.createObjectSerializer().deserialize(bytesResolved, BookmarkFolder.class);
     }
     catch (Throwable t) {
       //delete is also an option: execStoreBookmarkFolder(id, kind, null);
       throw new ProcessingException("loading object" + id, t);
-    }
-    finally {
-      if (oin != null) {
-        try {
-          oin.close();
-        }
-        catch (Throwable t) {
-        }
-      }
     }
   }
 
@@ -219,52 +204,23 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
 
   @Override
   protected void writeUserFolder(BookmarkFolder folder, Object userId) throws ProcessingException {
-    ObjectOutputStream oout = null;
     try {
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      oout = new ObjectOutputStream(bout);
-      oout.writeObject(folder);
-      oout.close();
-      oout = null;
-      execStoreUserBookmarkFolder(userId, folder.getId(), bout.toByteArray());
+      byte[] data = SerializationUtility.createObjectSerializer().serialize(folder);
+      execStoreUserBookmarkFolder(userId, folder.getId(), data);
     }
     catch (IOException e) {
       throw new ProcessingException("storing user bookmarks", e);
-    }
-    finally {
-      if (oout != null) {
-        try {
-          oout.close();
-        }
-        catch (Throwable t) {
-        }
-      }
     }
   }
 
   @Override
   protected void writeGlobalFolder(BookmarkFolder folder) throws ProcessingException {
-    ObjectOutputStream oout = null;
     try {
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      oout = new ObjectOutputStream(bout);
-      oout.writeObject(folder);
-      oout.close();
-      oout = null;
-      execStoreGlobalBookmarkFolder(folder.getId(), bout.toByteArray());
+      byte[] data = SerializationUtility.createObjectSerializer().serialize(folder);
+      execStoreGlobalBookmarkFolder(folder.getId(), data);
     }
     catch (IOException e) {
       throw new ProcessingException("storing global bookmarks", e);
     }
-    finally {
-      if (oout != null) {
-        try {
-          oout.close();
-        }
-        catch (Throwable t) {
-        }
-      }
-    }
   }
-
 }

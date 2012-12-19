@@ -25,6 +25,7 @@ Export-Package: org.eclipse.scout.commons,
  org.eclipse.scout.commons.prefs,
  org.eclipse.scout.commons.runtime,
  org.eclipse.scout.commons.security,
+ org.eclipse.scout.commons.serialization,
  org.eclipse.scout.commons.xmlparser
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.equinox.security;bundle-version="1.0.1";visibility:=reexport,

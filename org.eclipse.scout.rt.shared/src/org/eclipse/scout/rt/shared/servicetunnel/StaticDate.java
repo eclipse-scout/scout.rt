@@ -18,7 +18,7 @@ import java.util.GregorianCalendar;
  * Static date representation as string, independent of TimeZone and daylight
  * saving
  * <p>
- * {@link ServiceTunnelInputStream} / {@link ServiceTunnelOutputStream}
+ * {@link ServiceTunnelObjectReplacer}
  */
 public class StaticDate implements java.io.Serializable {
   private static final long serialVersionUID = -3278051886953717195L;
