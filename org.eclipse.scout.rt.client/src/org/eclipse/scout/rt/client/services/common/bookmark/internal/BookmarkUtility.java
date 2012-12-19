@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.services.common.bookmark.internal;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import java.util.zip.CRC32;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.exception.VetoException;
@@ -149,15 +151,25 @@ public final class BookmarkUtility {
     return bestMatchingPage;
   }
 
+  @Deprecated
+  public static Object[] makeSerializableKeys(Object[] a) {
+    return makeSerializableKeys(a, true);
+  }
+
   /**
    * intercept objects that are not remoting-capable or not serializable and
    * replace by strings
    */
-  public static Object[] makeSerializableKeys(Object[] a) {
-    return (Object[]) makeSerializableKey(a);
+  public static Object[] makeSerializableKeys(Object[] a, boolean useLegacySupport) {
+    return (Object[]) makeSerializableKey(a, useLegacySupport);
   }
 
+  @Deprecated
   public static Object makeSerializableKey(Object o) {
+    return makeSerializableKey(o, true);
+  }
+
+  public static Object makeSerializableKey(Object o, boolean useLegacySupport) {
     if (o == null) {
       return o;
     }
@@ -171,6 +183,9 @@ public final class BookmarkUtility {
       return o;
     }
     else if (o instanceof Date) {
+      return o;
+    }
+    else if (!useLegacySupport && o instanceof Serializable) {
       return o;
     }
     else if (o.getClass().isArray()) {
@@ -191,11 +206,20 @@ public final class BookmarkUtility {
       }
       Object b = Array.newInstance(makeSerializableClass(xc), dim);
       for (int i = 0; i < dim[0]; i++) {
-        Array.set(b, i, makeSerializableKey(Array.get(o, i)));
+        Array.set(b, i, makeSerializableKey(Array.get(o, i), useLegacySupport));
       }
       return b;
     }
     else {
+      // check if key object overrides toString()
+      if (!useLegacySupport && !(o instanceof String)) {
+        if (ConfigurationUtility.isMethodOverwrite(Object.class, "toString", new Class[0], o.getClass())) {
+          LOG.warn("Bookmark key is not serializable. Falling back to toString(). Note: keys may not be stable [class=" + o.getClass() + ", string representation: " + o.toString() + "]");
+        }
+        else {
+          LOG.error("Bookmark key is not serializable. Falling back to toString() which is not overriden by the given class [" + o.getClass() + "]");
+        }
+      }
       return o.toString();
     }
   }
@@ -613,8 +637,9 @@ public final class BookmarkUtility {
       CompositeObject childPk = tablePageState.getExpandedChildPrimaryKey();
       if (childPk != null) {
         for (int r = 0; r < table.getRowCount(); r++) {
-          CompositeObject testPk = new CompositeObject(BookmarkUtility.makeSerializableKeys(table.getRowKeys(r)));
-          if (testPk.equals(childPk)) {
+          CompositeObject testPkLegacy = new CompositeObject(BookmarkUtility.makeSerializableKeys(table.getRowKeys(r), true));
+          CompositeObject testPk = new CompositeObject(BookmarkUtility.makeSerializableKeys(table.getRowKeys(r), false));
+          if (testPk.equals(childPk) || testPkLegacy.equals(childPk)) {
             if (r < tablePage.getChildNodeCount()) {
               childPage = tablePage.getChildPage(r);
             }
@@ -639,8 +664,9 @@ public final class BookmarkUtility {
         HashSet<CompositeObject> selectionSet = new HashSet<CompositeObject>(tablePageState.getSelectedChildrenPrimaryKeys());
         ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
         for (ITableRow row : table.getRows()) {
-          CompositeObject testPk = new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues()));
-          if (selectionSet.contains(testPk)) {
+          CompositeObject testPkLegacy = new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues(), true));
+          CompositeObject testPk = new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues(), false));
+          if (selectionSet.contains(testPk) || selectionSet.contains(testPkLegacy)) {
             //row must not be filtered out
             if (row.isFilterAccepted()) {
               rowList.add(row);
@@ -726,7 +752,7 @@ public final class BookmarkUtility {
     //
     ArrayList<CompositeObject> pkList = new ArrayList<CompositeObject>();
     for (ITableRow row : table.getSelectedRows()) {
-      pkList.add(new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues())));
+      pkList.add(new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues(), false)));
     }
     state.setSelectedChildrenPrimaryKeys(pkList);
     //
@@ -734,7 +760,7 @@ public final class BookmarkUtility {
       for (int j = 0; j < table.getRowCount(); j++) {
         if (page.getChildNode(j) == childPage) {
           ITableRow childRow = table.getRow(j);
-          state.setExpandedChildPrimaryKey(new CompositeObject(BookmarkUtility.makeSerializableKeys(childRow.getKeyValues())));
+          state.setExpandedChildPrimaryKey(new CompositeObject(BookmarkUtility.makeSerializableKeys(childRow.getKeyValues(), false)));
           break;
         }
       }

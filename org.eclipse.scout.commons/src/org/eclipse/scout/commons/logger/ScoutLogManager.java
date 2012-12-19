@@ -130,8 +130,6 @@ public final class ScoutLogManager {
     if (Activator.getDefault() != null) {
       return Activator.getDefault().getBundle().getBundleContext().getProperty(property);
     }
-    else {
-    }
     return System.getProperty(property, null);
   }
 

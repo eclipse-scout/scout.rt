@@ -34,7 +34,7 @@ public final class CloneUtility {
    * Creates a deep copy of the object using serialize/deserialize.
    * Other than Object.clone this will create a correct copy of the object and all its references.
    */
-  public static Object createDeepCopyBySerializing(Object obj) throws Exception {
+  public static <T> T createDeepCopyBySerializing(T obj) throws Exception {
     ByteArrayOutputStream o = new ByteArrayOutputStream();
     DeepCopyObjectWriter oo = new DeepCopyObjectWriter(o);
     oo.writeObject(obj);
@@ -42,7 +42,9 @@ public final class CloneUtility {
     DeepCopyObjectReader oi = new DeepCopyObjectReader(new ByteArrayInputStream(o.toByteArray()), oo.getUsedClassLoaders());
     Object copy = oi.readObject();
     oi.close();
-    return copy;
+    @SuppressWarnings("unchecked")
+    T castedCopy = (T) copy;
+    return castedCopy;
   }
 
   private static class DeepCopyObjectWriter extends ObjectOutputStream {

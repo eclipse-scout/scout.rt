@@ -17,6 +17,7 @@ import java.util.Date;
 
 import org.eclipse.scout.commons.UTCDate;
 import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 
 /**
  * Serialization override<br>
@@ -25,7 +26,11 @@ import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
  * {@link UTCDate}s are not converted and pass unchanged.
  * <p>
  * converts {@link Permissions} to {@link LenientPermissionsWrapper}
+ * 
+ * @deprecated This class will be removed in Scout 3.9. Use {@link SerializationUtility} and
+ *             {@link ServiceTunnelObjectReplacer} instead.
  */
+@Deprecated
 public class ServiceTunnelOutputStream extends BundleObjectOutputStream {
 
   public ServiceTunnelOutputStream(OutputStream out) throws IOException {

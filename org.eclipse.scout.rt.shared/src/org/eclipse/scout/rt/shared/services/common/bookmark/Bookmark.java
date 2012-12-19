@@ -10,11 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.bookmark;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +20,7 @@ import java.util.zip.CRC32;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 
 public class Bookmark implements Serializable, Cloneable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(Bookmark.class);
@@ -174,37 +171,19 @@ public class Bookmark implements Serializable, Cloneable {
 
   public byte[] getSerializedData() throws ProcessingException {
     if (m_serializedData == null) {
-      ObjectOutputStream oout = null;
       try {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        oout = new ObjectOutputStream(bout);
-        oout.writeObject(this);
-        oout.close();
-        oout = null;
-        m_serializedData = bout.toByteArray();
+        m_serializedData = SerializationUtility.createObjectSerializer().serialize(this);
       }
       catch (IOException e) {
         throw new ProcessingException("title: " + getTitle(), e);
-      }
-      finally {
-        if (oout != null) {
-          try {
-            oout.close();
-          }
-          catch (Throwable t) {
-          }
-        }
       }
     }
     return m_serializedData;
   }
 
   public void setSerializedData(byte[] data) throws ProcessingException {
-    ObjectInputStream oin = null;
     try {
-      ByteArrayInputStream bin = new ByteArrayInputStream(data);
-      oin = new ObjectInputStream(bin);
-      Bookmark bm = (Bookmark) oin.readObject();
+      Bookmark bm = SerializationUtility.createObjectSerializer().deserialize(data, Bookmark.class);
       importData(bm);
     }
     catch (IOException e) {
@@ -212,15 +191,6 @@ public class Bookmark implements Serializable, Cloneable {
     }
     catch (ClassNotFoundException e) {
       throw new ProcessingException("title: " + getTitle(), e);
-    }
-    finally {
-      if (oin != null) {
-        try {
-          oin.close();
-        }
-        catch (Throwable t) {
-        }
-      }
     }
     m_serializedData = data;
   }

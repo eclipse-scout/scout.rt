@@ -1967,7 +1967,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         SimpleXmlElement xProp = (SimpleXmlElement) it.next();
         String name = xProp.getStringAttribute("name");
         try {
-          Object value = xProp.getObjectAttribute("value", null, getClass().getClassLoader());
+          Object value = xProp.getObjectAttribute("value", null);
           props.put(name, value);
         }
         catch (Exception e) {

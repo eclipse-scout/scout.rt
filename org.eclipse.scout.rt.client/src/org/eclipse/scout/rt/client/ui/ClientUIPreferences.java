@@ -11,10 +11,6 @@
 package org.eclipse.scout.rt.client.ui;
 
 import java.awt.Rectangle;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -25,8 +21,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
-import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
@@ -270,31 +265,28 @@ public class ClientUIPreferences {
     return key;
   }
 
+  /**
+   * TODO 3.9 remove
+   * 
+   * @deprecated use {@link #getTableCustomizerData(String)} instead. This method will be removed in 3.9.
+   */
+  @Deprecated
   public Object getTableCustomizerData(String customizerKey, Bundle loaderBundle) {
+    return getTableCustomizerData(customizerKey);
+  }
+
+  public Object getTableCustomizerData(String customizerKey) {
     String key = TABLE_CUSTOMIZER_DATA + customizerKey;
     byte[] serialData = m_env.getByteArray(key, null);
     if (serialData != null) {
-      ObjectInputStream in = null;
       try {
-        in = new BundleObjectInputStream(new ByteArrayInputStream(serialData), new Bundle[]{loaderBundle});
-        Object customizerData = in.readObject();
-        in.close();
-        in = null;
+        Object customizerData = SerializationUtility.createObjectSerializer().deserialize(serialData, null);
         return customizerData;
       }
       catch (Throwable t) {
         LOG.error("Failed reading custom table data for " + key + ": " + t);
         m_env.remove(key);
         return null;
-      }
-      finally {
-        if (in != null) {
-          try {
-            in.close();
-          }
-          catch (Throwable t) {
-          }
-        }
       }
     }
     else {
@@ -308,27 +300,13 @@ public class ClientUIPreferences {
   public void setTableCustomizerData(String customizerKey, Object customizerData) {
     String key = TABLE_CUSTOMIZER_DATA + customizerKey;
     if (customizerData != null) {
-      ObjectOutputStream out = null;
       try {
-        ByteArrayOutputStream serialData = new ByteArrayOutputStream();
-        out = new BundleObjectOutputStream(serialData);
-        out.writeObject(customizerData);
-        out.close();
-        out = null;
-        m_env.putByteArray(key, serialData.toByteArray());
+        byte[] data = SerializationUtility.createObjectSerializer().serialize(customizerData);
+        m_env.putByteArray(key, data);
       }
       catch (Throwable t) {
         LOG.error("Failed storing custom table data for " + key, t);
         m_env.remove(key);
-      }
-      finally {
-        if (out != null) {
-          try {
-            out.close();
-          }
-          catch (Throwable t) {
-          }
-        }
       }
     }
     else {

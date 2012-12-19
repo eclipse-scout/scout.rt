@@ -456,7 +456,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           for (int i = 1; i <= 5; i++) {
             String valueName = (i == 1 ? "value" : "value" + i);
             if (xmlElem.hasAttribute(valueName)) {
-              valueList.add(xmlElem.getObjectAttribute(valueName, null, getClass().getClassLoader()));
+              valueList.add(xmlElem.getObjectAttribute(valueName, null));
             }
           }
         }

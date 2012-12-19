@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,9 +21,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
-import org.eclipse.scout.commons.osgi.BundleObjectOutputStream;
-import org.eclipse.scout.rt.client.Activator;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
@@ -35,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.osgi.framework.Bundle;
 
 /**
  * Default implementation for {@link ITableColumnFilterManager}
@@ -187,44 +180,25 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
   public byte[] getSerializedFilter(IColumn col) {
     ITableColumnFilter filter = m_filterMap.get(col);
     if (filter != null) {
-      ObjectOutputStream out = null;
-      ByteArrayOutputStream serialData = new ByteArrayOutputStream();
       try {
-        out = new BundleObjectOutputStream(serialData);
         filter.setColumn(null);
-        out.writeObject(filter);
-        out.close();
-        out = null;
+        return SerializationUtility.createObjectSerializer().serialize(filter);
       }
       catch (Throwable t) {
         LOG.error("Failed storing filter data for " + t);
       }
       finally {
-        if (out != null) {
-          try {
-            out.close();
-          }
-          catch (Throwable t) {
-            LOG.error("Failed closing ObjectOutputStream");
-          }
-        }
         filter.setColumn(col);
       }
-      return serialData.toByteArray();
     }
     return null;
   }
 
   @Override
   public void setSerializedFilter(byte[] filterData, IColumn col) {
-    ObjectInputStream in = null;
     try {
-      in = new BundleObjectInputStream(new ByteArrayInputStream(filterData), new Bundle[]{Activator.getDefault().getBundle()});
-      Object customizerData = in.readObject();
-      in.close();
-      in = null;
-      ITableColumnFilter filter = (ITableColumnFilter) customizerData;
       if (col != null) {
+        ITableColumnFilter filter = SerializationUtility.createObjectSerializer().deserialize(filterData, ITableColumnFilter.class);
         filter.setColumn(col);
         this.m_filterMap.put(col, filter);
       }
@@ -232,16 +206,6 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     }
     catch (Throwable t) {
       LOG.error("Failed reading filter data: " + t);
-    }
-    finally {
-      if (in != null) {
-        try {
-          in.close();
-        }
-        catch (Throwable t) {
-          LOG.error("Failed closing ObjectInputStream");
-        }
-      }
     }
   }
 
