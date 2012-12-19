@@ -3,8 +3,7 @@
       id="org.eclipse.scout.rt.rap"
       label="%featureName"
       version="3.9.0.qualifier"
-      provider-name="%providerName"
-      plugin="org.eclipse.scout.rt.feature.about">
+      provider-name="%providerName">
 
    <description url="http://www.eclipse.org/scout/">
       %description
