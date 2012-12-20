@@ -31,12 +31,17 @@ public final class TestBookmarkUtility {
     test(new Bookmark[]{new Bookmark()});
     test(new SerializablePrimaryKey(1234L));
     test(new UnSerializablePrimaryKey(1234L));
+    test(new UnSerializablePrimaryKeyWithToString(1234L));
+    test(new SerializablePrimaryKey[]{new SerializablePrimaryKey(1234L)});
+    test(new UnSerializablePrimaryKey[]{new UnSerializablePrimaryKey(1234L)});
+    test(new UnSerializablePrimaryKeyWithToString[]{new UnSerializablePrimaryKeyWithToString(1234L)});
   }
 
   public static void test(Object a) {
     Object b = BookmarkUtility.makeSerializableKey(a, false);
     System.out.println("Input:  " + (a != null ? a.getClass() : null) + " " + VerboseUtility.dumpObject(a));
     System.out.println("Output: " + (b != null ? b.getClass() : null) + " " + VerboseUtility.dumpObject(b));
+    System.out.println();
   }
 
   private static class SerializablePrimaryKey implements Serializable {
@@ -55,6 +60,20 @@ public final class TestBookmarkUtility {
 
     public UnSerializablePrimaryKey(long id) {
       m_id = id;
+    }
+  }
+
+  private static class UnSerializablePrimaryKeyWithToString {
+
+    private final long m_id;
+
+    public UnSerializablePrimaryKeyWithToString(long id) {
+      m_id = id;
+    }
+
+    @Override
+    public String toString() {
+      return "UnSerializablePrimaryKeyWithToString [m_id=" + m_id + "]";
     }
   }
 }
