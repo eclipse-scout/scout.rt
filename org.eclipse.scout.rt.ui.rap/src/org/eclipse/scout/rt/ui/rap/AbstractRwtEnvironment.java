@@ -81,6 +81,7 @@ import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.internal.servletfilter.LogoutFilter;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.KeyStrokeManager;
+import org.eclipse.scout.rt.ui.rap.testing.TestingUtility;
 import org.eclipse.scout.rt.ui.rap.util.ColorFactory;
 import org.eclipse.scout.rt.ui.rap.util.DeviceUtility;
 import org.eclipse.scout.rt.ui.rap.util.FontRegistry;
@@ -489,15 +490,34 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
    * Handles event before a HTTP request will be processed.
    */
   protected void beforeHttpRequest() {
+  }
+
+  /**
+   * Do NOT override this internal method, instead use {@link #beforeHttpRequest()}.
+   */
+  protected void beforeHttpRequestInternal() {
     if (getClientSession() != null) {
       LocaleThreadLocal.set(getClientSession().getLocale());
     }
+
+    beforeHttpRequest();
   }
 
   /**
    * Handles event after a HTTP request has been processed.
    */
   protected void afterHttpRequest() {
+  }
+
+  /**
+   * Do NOT override this internal method, instead use {@link #afterHttpRequest()}.
+   */
+  protected void afterHttpRequestInternal() {
+    afterHttpRequest();
+
+    if (TestingUtility.isSyncRequestsEnabled()) {
+      TestingUtility.waitForClientJobs();
+    }
   }
 
   protected RwtBusyHandler attachBusyHandler() {
@@ -1405,7 +1425,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         return;
       }
 
-      beforeHttpRequest();
+      beforeHttpRequestInternal();
     }
 
     @Override
@@ -1414,7 +1434,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         return;
       }
 
-      afterHttpRequest();
+      afterHttpRequestInternal();
     }
   }
 
@@ -1443,25 +1463,22 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
     @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
-      if (m_clientSession == null || !m_clientSession.isActive()) {
-        //client session was probably already stopped by the model itself
-        return;
-      }
-
       if (LOG.isInfoEnabled()) {
         UserAgent userAgent = m_clientSession.getUserAgent();
         String msg = "Thread: {0} Session goes down...; UserAgent: {2}";
         LOG.info(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
       }
 
+      final IDesktop desktop = m_clientSession.getDesktop();
+      if (!m_clientSession.isActive() || desktop == null || !desktop.isOpened()) {
+        //client session was probably already stopped by the model itself
+        return;
+      }
+
       new ClientAsyncJob("HTTP session inactivator", m_clientSession) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          if (m_clientSession == null || !m_clientSession.isActive()) {
-            return;
-          }
-
-          m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI();
+          desktop.getUIFacade().fireDesktopClosingFromUI();
         }
       }.runNow(new NullProgressMonitor());
     }
