@@ -151,6 +151,11 @@ public final class BookmarkUtility {
     return bestMatchingPage;
   }
 
+  /**
+   * TODO 3.9 remove
+   * 
+   * @deprecated This method will be removed in 3.9. Use {@link #makeSerializableKeys(Object[], boolean)} instead
+   */
   @Deprecated
   public static Object[] makeSerializableKeys(Object[] a) {
     return makeSerializableKeys(a, true);
@@ -164,6 +169,11 @@ public final class BookmarkUtility {
     return (Object[]) makeSerializableKey(a, useLegacySupport);
   }
 
+  /**
+   * TODO 3.9 remove
+   * 
+   * @deprecated This method will be removed in 3.9. Use {@link #makeSerializableKey(Object, boolean)} instead
+   */
   @Deprecated
   public static Object makeSerializableKey(Object o) {
     return makeSerializableKey(o, true);
@@ -185,9 +195,6 @@ public final class BookmarkUtility {
     else if (o instanceof Date) {
       return o;
     }
-    else if (!useLegacySupport && o instanceof Serializable) {
-      return o;
-    }
     else if (o.getClass().isArray()) {
       ArrayList<Integer> dimList = new ArrayList<Integer>();
       Class xc = o.getClass();
@@ -204,11 +211,14 @@ public final class BookmarkUtility {
       for (int i = 0; i < dim.length; i++) {
         dim[i] = dimList.get(i);
       }
-      Object b = Array.newInstance(makeSerializableClass(xc), dim);
+      Object b = Array.newInstance(makeSerializableClass(xc, useLegacySupport), dim);
       for (int i = 0; i < dim[0]; i++) {
         Array.set(b, i, makeSerializableKey(Array.get(o, i), useLegacySupport));
       }
       return b;
+    }
+    else if (!useLegacySupport && o instanceof Serializable) {
+      return o;
     }
     else {
       // check if key object overrides toString()
@@ -225,10 +235,20 @@ public final class BookmarkUtility {
   }
 
   /**
+   * TODO 3.9 remove
+   * 
+   * @deprecated This method will be removed in 3.9. Use {@link #makeSerializableClass(Class, boolean)} instead
+   */
+  @Deprecated
+  public static Class makeSerializableClass(Class c) {
+    return makeSerializableClass(c, true);
+  }
+
+  /**
    * return String.class for classes that are not remoting-capable or not
    * serializable
    */
-  public static Class makeSerializableClass(Class c) {
+  public static Class makeSerializableClass(Class c, boolean useLegacySupport) {
     if (c == null) {
       throw new IllegalArgumentException("class must not be null");
     }
@@ -251,6 +271,9 @@ public final class BookmarkUtility {
       return c;
     }
     else if (Object.class == c) {
+      return c;
+    }
+    else if (!useLegacySupport && Serializable.class.isAssignableFrom(c)) {
       return c;
     }
     else {
