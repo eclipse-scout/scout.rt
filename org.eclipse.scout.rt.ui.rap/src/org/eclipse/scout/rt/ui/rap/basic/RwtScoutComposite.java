@@ -16,6 +16,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.rwt.internal.lifecycle.UITestUtil;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.testing.CustomWidgetIdGenerator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -37,6 +39,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * @since 3.8.0
  */
+@SuppressWarnings("restriction")
 public abstract class RwtScoutComposite<T extends IPropertyObserver> implements IRwtScoutComposite<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutComposite.class);
 
@@ -141,11 +144,13 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
         if (getCompositeOnWidget(getUiContainer()) == null) {
           registerCompositeOnWidget(getUiContainer(), this);
         }
+        setCustomWidgetIds(getUiContainer());
       }
       if (getUiField() != null) {
         if (getCompositeOnWidget(getUiField()) == null) {
           registerCompositeOnWidget(getUiField(), this);
         }
+        setCustomWidgetIds(getUiField());
       }
       try {
         getUpdateUiFromScoutLock().acquire();
@@ -167,6 +172,14 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
     finally {
       m_created = true;
     }
+  }
+
+  private void setCustomWidgetIds(Widget widget) {
+    if (!UITestUtil.isEnabled()) {
+      return;
+    }
+
+    CustomWidgetIdGenerator.getInstance().setCustomWidgetIds(widget, getScoutObject(), getClass().getName());
   }
 
   @Override
