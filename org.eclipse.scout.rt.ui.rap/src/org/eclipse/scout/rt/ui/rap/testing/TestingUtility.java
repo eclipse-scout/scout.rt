@@ -45,6 +45,10 @@ public class TestingUtility {
   static {
     String property = System.getProperty(ENABLE_SYNC_REQUESTS);
     m_syncRequestsEnabled = Boolean.valueOf(property).booleanValue();
+
+    if (m_syncRequestsEnabled) {
+      LOG.info("Sync requests enabled.");
+    }
   }
 
   public static boolean isSyncRequestsEnabled() {
