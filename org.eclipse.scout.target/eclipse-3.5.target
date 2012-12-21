@@ -2,7 +2,7 @@
 <?pde version="3.6"?>
 <target name="scout-3.5.target" sequenceNumber="3">
   <locations>
-    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+    <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="eclipse_galileo" location="http://download.eclipse.org/releases/galileo/"/>
 
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
@@ -11,7 +11,7 @@
       <unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.equinox.serverside.sdk.feature.group" version="0.0.0"/>
     </location>
-    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+    <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="orbit_R20120526062928" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20120526062928/repository/"/>
 
       <unit id="javax.servlet" version="2.5.0.v201103041518"/>

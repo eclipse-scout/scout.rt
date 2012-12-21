@@ -2,7 +2,7 @@
 <?pde version="3.6"?>
 <target name="scout-3.6.target" sequenceNumber="9">
   <locations>
-    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+    <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="eclipse_helios" location="http://download.eclipse.org/releases/helios/"/>
 
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
@@ -11,7 +11,7 @@
       <unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.equinox.serverside.sdk.feature.group" version="0.0.0"/>
     </location>
-    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+    <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="orbit_S20121207152029" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20121207152029/repository/"/>
 
       <unit id="javax.wsdl" version="1.6.2.v201012040545"/>
@@ -70,7 +70,7 @@
       <unit id="com.google.guava" version="12.0.0.v201209270621"/>
       <unit id="com.google.guava.source" version="12.0.0.v201209270621"/>
     </location>
-    <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+    <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
       <repository id="rap_1.5" location="http://download.eclipse.org/rt/rap/1.5/runtime"/>
 
       <unit id="org.eclipse.rap.runtime.requirements.feature.group" version="0.0.0"/>
