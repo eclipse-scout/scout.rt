@@ -15,6 +15,7 @@ import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.ui.rap.Activator;
 
 /**
  * To load test a web application, a typical approach is to record the requests and play them back multiple times. This
@@ -43,7 +44,7 @@ public class TestingUtility {
   public static final String ENABLE_SYNC_REQUESTS = "org.eclipse.scout.rt.ui.rap.enableSyncRequests";
 
   static {
-    String property = System.getProperty(ENABLE_SYNC_REQUESTS);
+    String property = Activator.getDefault().getBundle().getBundleContext().getProperty(ENABLE_SYNC_REQUESTS);
     m_syncRequestsEnabled = Boolean.valueOf(property).booleanValue();
 
     if (m_syncRequestsEnabled) {
@@ -57,6 +58,9 @@ public class TestingUtility {
 
   /**
    * Waits until every client job has been completed.
+   * <p>
+   * <b> Important: </b>Use this with care! Make sure there are no continuous jobs running, like
+   * ClientNotificationPollingJob. Otherwise it will wait forever.
    */
   public static void waitForClientJobs() {
     while (hasRunningClientJobs()) {
