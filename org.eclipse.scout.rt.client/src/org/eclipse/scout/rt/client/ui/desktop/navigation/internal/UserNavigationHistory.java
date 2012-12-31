@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -196,38 +197,36 @@ public class UserNavigationHistory {
   }
 
   private boolean isSameBookmark(Bookmark oldbm, Bookmark newbm) {
+    List<AbstractPageState> oldPath = oldbm.getPath();
+    List<AbstractPageState> newPath = newbm.getPath();
     if (CompareUtility.equals(oldbm.getTitle(), newbm.getTitle())) {
-      TablePageState oldLastNode = null;
-      TablePageState newLastNode = null;
-      List<AbstractPageState> list = oldbm.getPath();
-      if (list != null && list.size() > 0) {
-        AbstractPageState s = list.get(list.size() - 1);
-        if (s instanceof TablePageState) {
-          oldLastNode = (TablePageState) s;
+      if (CompareUtility.equals(oldPath.size(), newPath.size())) {
+        ListIterator<AbstractPageState> oldIt = oldPath.listIterator(oldPath.size());
+        ListIterator<AbstractPageState> newIt = newPath.listIterator(newPath.size());
+        while (oldIt.hasPrevious()) {
+          AbstractPageState oldState = oldIt.previous();
+          TablePageState oldNode = null;
+          TablePageState newNode = null;
+          if (oldState instanceof TablePageState) {
+            oldNode = (TablePageState) oldState;
+          }
+          AbstractPageState newState = newIt.previous();
+          if (newState instanceof TablePageState) {
+            newNode = (TablePageState) newState;
+          }
+          if (oldNode != null && newNode != null) {
+            if (CompareUtility.notEquals(oldNode.getSearchFormState(), newNode.getSearchFormState())) {
+              return false;
+            }
+          }
+          else if (oldState != null && oldState.getLabel() != null && !oldState.getLabel().equals(newState.getLabel())) {
+            return false;
+          }
         }
-      }
-      list = newbm.getPath();
-      if (list != null && list.size() > 0) {
-        AbstractPageState s = list.get(list.size() - 1);
-        if (s instanceof TablePageState) {
-          newLastNode = (TablePageState) s;
-        }
-      }
-      if (oldLastNode != null && newLastNode != null) {
-        if (CompareUtility.equals(oldLastNode.getSearchFormState(), newLastNode.getSearchFormState())) {
-          return true;
-        }
-        else {
-          return false;
-        }
-      }
-      else {
         return true;
       }
     }
-    else {
-      return false;
-    }
+    return false;
   }
 
   public Bookmark getActiveBookmark() {
