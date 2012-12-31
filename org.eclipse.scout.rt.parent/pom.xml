@@ -78,6 +78,7 @@
       <modules>
         <module>../org.eclipse.scout.commons.test</module>
         <module>../org.eclipse.scout.rt.shared.test</module>
+        <module>../org.eclipse.scout.rt.client.test</module>
         <module>../org.eclipse.scout.rt.testing.shared</module>
         <module>../org.eclipse.scout.rt.testing.client</module>
         <module>../org.eclipse.scout.rt.testing.server</module>
