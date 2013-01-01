@@ -13,8 +13,13 @@ package org.eclipse.scout.rt.shared.services.common.test;
 import java.util.List;
 
 /**
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ *
  * Context used to run a series of tests using {@link TestUtility#runTests(ITestContext, java.util.Collection)}
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public interface ITestContext {
 
   /**

@@ -15,10 +15,16 @@ import org.eclipse.scout.rt.shared.services.common.test.AbstractTest;
 import org.eclipse.scout.rt.shared.services.common.test.ITest;
 
 /**
+ * 
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ *
  * Abstract client test implementation.
  * <p>
  * {@link #getConfiguredProduct()} has special default value calling session symbolic name
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractServerTest extends AbstractTest implements ITest {
 
   @Override

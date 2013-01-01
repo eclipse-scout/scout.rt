@@ -44,6 +44,10 @@ import org.eclipse.scout.rt.shared.services.common.test.TestUtility;
 import org.eclipse.scout.service.SERVICES;
 
 /**
+ * 
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ *
  * Typically this servlet is registered in the
  * org.eclipse.scout.commons.servlets extension in your project. It must provide
  * the init-parameters
@@ -52,6 +56,8 @@ import org.eclipse.scout.service.SERVICES;
  * <li>runAs</li>
  * </ul>
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class TestServlet extends HttpServletEx {
   private static final long serialVersionUID = 1L;
 

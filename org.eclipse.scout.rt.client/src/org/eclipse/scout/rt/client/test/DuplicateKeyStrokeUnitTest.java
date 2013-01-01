@@ -17,6 +17,12 @@ import org.eclipse.scout.rt.client.services.common.test.AbstractClientTest;
 import org.eclipse.scout.rt.client.services.common.test.ClientTestUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
+/**
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class DuplicateKeyStrokeUnitTest extends AbstractClientTest {
 
   ArrayList<String> keyStrokes = new ArrayList<String>();

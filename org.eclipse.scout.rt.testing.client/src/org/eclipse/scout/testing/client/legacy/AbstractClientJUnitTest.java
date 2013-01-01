@@ -22,11 +22,15 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
 /**
+ * @deprecated use {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} to create and run Unit tests.
+ *
  * Base class for JUnit based client tests. The class can be used with
  * the existing ITest/TestUtility framework of Scout. However, it is possible
  * to use the features of JUnit such as annotations to mark test/set up/tear down
  * methods and assertions.
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractClientJUnitTest extends AbstractTest implements ITest {
 
   @Override

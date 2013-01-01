@@ -16,6 +16,11 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.osgi.framework.Bundle;
 
+/**
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ */
+@Deprecated
 public final class ServerTestUtility {
 
   private ServerTestUtility() {

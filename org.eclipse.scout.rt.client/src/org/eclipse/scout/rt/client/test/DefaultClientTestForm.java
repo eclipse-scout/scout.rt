@@ -51,7 +51,13 @@ import org.eclipse.scout.rt.shared.services.common.test.ITest;
 import org.eclipse.scout.rt.shared.services.common.test.TestUtility;
 import org.eclipse.scout.service.SERVICES;
 
+/**
+ * @deprecated Use Scout JUnit Testing Support: {@link org.eclipse.scout.testing.client.runner.ScoutClientTestRunner} or
+ *             {@link org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner} to run Unit tests.
+ */
 @FormData
+@Deprecated
+@SuppressWarnings("deprecation")
 public class DefaultClientTestForm extends AbstractForm {
 
   public DefaultClientTestForm() throws ProcessingException {
