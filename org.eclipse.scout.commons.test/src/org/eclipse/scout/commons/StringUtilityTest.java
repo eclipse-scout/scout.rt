@@ -163,4 +163,96 @@ public class StringUtilityTest extends Assert {
     s = "com.test.*";
     Assert.assertEquals("com\\.test\\..*", StringUtility.toRegExPattern(s));
   }
+
+  @Test
+  public void testHtmlEncodeBackslash() {
+    assertEqualsAfterEncodeDecode("\"");
+  }
+
+  @Test
+  public void testHtmlEncodeAmp() {
+    assertEqualsAfterEncodeDecode("&");
+  }
+
+  @Test
+  public void testHtmlEncodeLt() {
+    assertEqualsAfterEncodeDecode("<");
+  }
+
+  @Test
+  public void testHtmlEncodeGt() {
+    assertEqualsAfterEncodeDecode(">");
+  }
+
+  @Test
+  public void testHtmlEncodeApostrophe() {
+    assertEqualsAfterEncodeDecode("'");
+  }
+
+  @Test
+  public void testHtmlEncodeBr() {
+    assertEqualsAfterEncodeDecode("\n");
+  }
+
+  @Test
+  public void testHtmlEncodeTab() {
+    assertEqualsAfterEncodeDecode("\t");
+  }
+
+  @Test
+  public void testHtmlEncodeNull() {
+    assertEqualsAfterEncodeDecode(null);
+  }
+
+  @Test
+  public void testHtmlEncodeEmpty() {
+    assertEqualsAfterEncodeDecode("");
+  }
+
+  @Test
+  public void testHtmlEncodeSpace() {
+    assertEqualsAfterEncodeDecode("\\s", true);
+  }
+
+  @Test
+  public void testHtmlEncodeDecodeHref() {
+    String testHtml = "<li><a href=\"/home.html\" class=\"active\" title=\"Home\">Home</a></li>";
+    assertEqualsAfterEncodeDecode(testHtml);
+  }
+
+  /**
+   * Test for https://bugs.eclipse.org/bugs/show_bug.cgi?id=347254
+   */
+  @Test
+  public void testHtmlEncodeAmpLT() {
+    String testHtml = "<a &lt; b>";
+    assertEqualsAfterEncodeDecode(testHtml);
+    String htmlDecode = StringUtility.htmlDecode("&lt;a &amp;lt; b&gt;");
+    Assert.assertEquals("<a &lt; b>", htmlDecode);
+  }
+
+  /**
+   * Tests if the result string is equal to the original after applying encode and decode.
+   * 
+   * @param original
+   *          the original String
+   */
+  private void assertEqualsAfterEncodeDecode(String original) {
+    assertEqualsAfterEncodeDecode(original, false);
+  }
+
+  /**
+   * Tests if the result string is equal to the original after applying encode and decode.
+   * 
+   * @param original
+   *          the original String
+   * @param replaceSpace
+   *          replace all spaces when encoding
+   */
+  private void assertEqualsAfterEncodeDecode(String original, boolean replaceSpaces) {
+    String encoded = StringUtility.htmlEncode(original, replaceSpaces);
+    String decoded = StringUtility.htmlDecode(encoded);
+    Assert.assertEquals(original, decoded);
+  }
+
 }
