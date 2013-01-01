@@ -61,7 +61,7 @@ public class RadioButtonGroupGrid {
       m_gridRows = 1;
     }
     else if (m_fields.length <= 0) {
-      LOG.error(m_group.getClass().getName() + " has fieldCount=" + parentData.h + "; expected value>0");
+      LOG.error(m_group.getClass().getName() + " has fieldCount=" + m_fields.length + "; expected value>0");
       m_gridRows = 1;
     }
     else {
