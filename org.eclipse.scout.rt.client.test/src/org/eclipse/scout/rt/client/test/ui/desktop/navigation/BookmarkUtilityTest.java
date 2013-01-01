@@ -26,7 +26,6 @@ public class BookmarkUtilityTest {
     Bookmark[] in = new Bookmark[]{new Bookmark()};
     Object out = BookmarkUtility.makeSerializableKey(in);
     assertTrue(out instanceof String[]);
-    assertTrue(((String[]) out)[0] instanceof String);
   }
 
   /**
@@ -89,11 +88,13 @@ public class BookmarkUtilityTest {
   }
 
   private void assertValidKey(Object in, Object out) {
-    assertTrue(CompareUtility.equals(in, out));
-    assertTrue(in.getClass().equals(out.getClass()));
     if (LOG.isDebugEnabled()) {
       LOG.debug("Input:  " + (in != null ? in.getClass() : null) + " " + VerboseUtility.dumpObject(in));
       LOG.debug("Output: " + (out != null ? out.getClass() : null) + " " + VerboseUtility.dumpObject(out));
+    }
+    assertTrue(CompareUtility.equals(in, out));
+    if (in != null && out != null) {
+      assertTrue(in.getClass().equals(out.getClass()));
     }
   }
 

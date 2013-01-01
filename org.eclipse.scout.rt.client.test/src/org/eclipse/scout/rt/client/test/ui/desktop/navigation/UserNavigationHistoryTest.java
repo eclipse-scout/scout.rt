@@ -86,12 +86,13 @@ public class UserNavigationHistoryTest {
     history.addStep(bookmark0);
     history.addStep(bookmark1);
     history.addStep(bookmark2);
+    int initialHistorySize = 3;
 
     history.stepBackward();
 
-    Bookmark bookmark4 = getTestBookmark(4L);
+    Bookmark bookmark4 = getTestBookmark();
     history.addStep(bookmark4);
-    assertEquals(3, history.getSize());
+    assertEquals(initialHistorySize, history.getSize());
     assertEquals(bookmark4, history.getActiveBookmark());
   }
 
@@ -108,12 +109,13 @@ public class UserNavigationHistoryTest {
     history.addStep(bookmark0);
     history.addStep(bookmark1);
     history.addStep(bookmark2);
+    int initialHistorySize = 3;
 
     history.stepBackward();
     history.stepBackward();
     history.addStep(bookmark1);
 
-    assertEquals(3, history.getSize());
+    assertEquals(initialHistorySize, history.getSize());
     assertEquals(bookmark1, history.getActiveBookmark());
   }
 
@@ -130,11 +132,12 @@ public class UserNavigationHistoryTest {
     history.addStep(bookmark0);
     history.addStep(bookmark1);
     history.addStep(bookmark2);
+    int initialHistorySize = 3;
 
     history.stepBackward();
     assertEquals(bookmark1, history.getActiveBookmark());
     assertEquals(1, history.getIndex());
-    assertEquals(3, history.getSize());
+    assertEquals(initialHistorySize, history.getSize());
 
     assertTrue(history.hasForwardBookmarks());
     assertTrue(history.getForwardBookmarks().contains(bookmark2));
@@ -178,12 +181,13 @@ public class UserNavigationHistoryTest {
     history.addStep(bookmark0);
     history.addStep(bookmark1);
     history.addStep(bookmark2);
+    int initialHistorySize = 3;
 
     history.stepBackward();
     history.stepForward();
     assertEquals(bookmark2, history.getActiveBookmark());
     assertEquals(2, history.getIndex());
-    assertEquals(3, history.getSize());
+    assertEquals(initialHistorySize, history.getSize());
 
     assertFalse(history.hasForwardBookmarks());
     assertTrue(history.hasBackwardBookmarks());
@@ -217,7 +221,7 @@ public class UserNavigationHistoryTest {
     history.addStep(bookmark1);
     history.addStep(bookmark2);
 
-    history.stepTo(getTestBookmark(7L));
+    history.stepTo(getTestBookmark());
     Assert.assertEquals(bookmark2, history.getActiveBookmark());
   }
 
@@ -271,7 +275,7 @@ public class UserNavigationHistoryTest {
     assertEquals(historySize - 1, history.getIndex());
     assertEquals("Last added bookmark should be active.", testBookmark, history.getActiveBookmark());
     assertEquals("There should be backward bookmarks.", historySize - 1, history.getBackwardBookmarks().size());
-    assertTrue("There should be no forward bookmarks.", history.getForwardBookmarks().isEmpty());
+    assertTrue(history.getForwardBookmarks().isEmpty());
     assertEquals("There should be one menu.", historySize, history.getMenus().length);
   }
 
@@ -430,7 +434,7 @@ public class UserNavigationHistoryTest {
   /**
    * Helper Class for tracking events
    */
-  class TestNavigationHistoryTracker implements NavigationHistoryListener {
+  static class TestNavigationHistoryTracker implements NavigationHistoryListener {
 
     private List<NavigationHistoryEvent> m_events = new LinkedList<NavigationHistoryEvent>();
 
