@@ -86,7 +86,7 @@ public class UserNavigationHistoryTest {
     history.addStep(bookmark0);
     history.addStep(bookmark1);
     history.addStep(bookmark2);
-    int initialHistorySize = 3;
+    final int initialHistorySize = 3;
 
     history.stepBackward();
 
@@ -109,7 +109,7 @@ public class UserNavigationHistoryTest {
     history.addStep(bookmark0);
     history.addStep(bookmark1);
     history.addStep(bookmark2);
-    int initialHistorySize = 3;
+    final int initialHistorySize = 3;
 
     history.stepBackward();
     history.stepBackward();
@@ -132,7 +132,7 @@ public class UserNavigationHistoryTest {
     history.addStep(bookmark0);
     history.addStep(bookmark1);
     history.addStep(bookmark2);
-    int initialHistorySize = 3;
+    final int initialHistorySize = 3;
 
     history.stepBackward();
     assertEquals(bookmark1, history.getActiveBookmark());
@@ -147,6 +147,9 @@ public class UserNavigationHistoryTest {
     assertEquals(1, history.getBackwardBookmarks().size());
   }
 
+  /**
+   * Tests, if adding still works, when an exception is thrown in stepping backwards.
+   */
   @Test
   public void testAddingAfterSteppingBackwardsFails() throws ProcessingException {
     UserNavigationHistory history = getNavigationHistoryWitoutActivation();
@@ -181,7 +184,7 @@ public class UserNavigationHistoryTest {
     history.addStep(bookmark0);
     history.addStep(bookmark1);
     history.addStep(bookmark2);
-    int initialHistorySize = 3;
+    final int initialHistorySize = 3;
 
     history.stepBackward();
     history.stepForward();
@@ -195,6 +198,9 @@ public class UserNavigationHistoryTest {
     assertEquals(2, history.getBackwardBookmarks().size());
   }
 
+  /**
+   * Tests stepping to an existing bookmark.
+   */
   @Test
   public void testSteppingToExistingBookmark() throws ProcessingException {
     UserNavigationHistory history = getNavigationHistoryWitoutActivation();
@@ -210,6 +216,9 @@ public class UserNavigationHistoryTest {
     assertEquals(bookmark0, history.getActiveBookmark());
   }
 
+  /**
+   * Tests, if the active bookmarks stays unchanged when stepping to an non-existing bookmark.
+   */
   @Test
   public void testSteppingToNonExistingBookmark() throws ProcessingException {
     UserNavigationHistory history = getNavigationHistoryWitoutActivation();
@@ -279,6 +288,9 @@ public class UserNavigationHistoryTest {
     assertEquals("There should be one menu.", historySize, history.getMenus().length);
   }
 
+  /**
+   * Tests, if NavigationHistoryEvent can be received when a listener is added.
+   */
   @Test
   public void testNavigationHistoryListener() {
     TestNavigationHistoryTracker tracker = new TestNavigationHistoryTracker();
@@ -292,6 +304,9 @@ public class UserNavigationHistoryTest {
     assertContainsEvent(events, NavigationHistoryEvent.TYPE_CHANGED);
   }
 
+  /**
+   * Tests removing a NavigationHistoryListener works
+   **/
   @Test
   public void testRemovingNavigationHistoryListener() {
     TestNavigationHistoryTracker tracker = new TestNavigationHistoryTracker();
@@ -361,6 +376,9 @@ public class UserNavigationHistoryTest {
 //    assertEquals(2, history.getSize());
 //  }
 
+  /**
+   * Tests that a bookmark with the same path is not added
+   **/
   @Test
   public void testAddingDuplicatesSamePaths() {
     UserNavigationHistory history = new UserNavigationHistory();
@@ -376,6 +394,9 @@ public class UserNavigationHistoryTest {
     assertEquals(1, history.getSize());
   }
 
+  /**
+   * Tests that a bookmark with the same path, but different search form state is added.
+   **/
   @Test
   public void testAddingDuplicatesPathsDifferentSearchFormState() {
     UserNavigationHistory history = new UserNavigationHistory();
@@ -413,6 +434,9 @@ public class UserNavigationHistoryTest {
 //    assertEquals(2, history.getSize());
 //  }
 
+  /**
+   * Tests that a bookmark with the same label is not added
+   **/
   @Test
   public void testAddingDuplicatesPathsSameLabel() {
     UserNavigationHistory history = new UserNavigationHistory();
@@ -432,16 +456,22 @@ public class UserNavigationHistoryTest {
   }
 
   /**
-   * Helper Class for tracking events
+   * Helper Class for tracking events. Stores the received events in a list.
    */
   static class TestNavigationHistoryTracker implements NavigationHistoryListener {
 
     private List<NavigationHistoryEvent> m_events = new LinkedList<NavigationHistoryEvent>();
 
+    /**
+     * @return the stored events
+     */
     public List<NavigationHistoryEvent> getEvents() {
       return m_events;
     }
 
+    /**
+     * stores the navigation events in a list
+     */
     @Override
     public void navigationChanged(NavigationHistoryEvent e) {
       m_events.add(e);
