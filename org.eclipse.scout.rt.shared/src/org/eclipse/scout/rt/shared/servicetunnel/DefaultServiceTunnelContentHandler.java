@@ -38,6 +38,8 @@ import org.eclipse.scout.commons.SoapHandlingUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.IObjectSerializer;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.Activator;
 import org.osgi.framework.Bundle;
 
@@ -140,6 +142,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   private Boolean m_sendCompressed;
   private Boolean m_receivedCompressed;
   private final EventListenerList m_listeners;
+  private IObjectSerializer m_objectSerializer;
 
   public DefaultServiceTunnelContentHandler() {
     m_listeners = new EventListenerList();
@@ -155,6 +158,15 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       // nop
     }
     m_sendCompressed = COMPRESS;
+    m_objectSerializer = createObjectSerializer();
+  }
+
+  /**
+   * @return Creates an {@link IObjectSerializer} instance used for serializing and deserializing data.
+   * @since 3.8.2
+   */
+  protected IObjectSerializer createObjectSerializer() {
+    return SerializationUtility.createObjectSerializer(new ServiceTunnelObjectReplacer());
   }
 
   @Override
@@ -272,38 +284,19 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
 
   protected void setData(StringBuilder buf, Object msg, boolean compressed) throws IOException {
     Deflater deflater = null;
-    ServiceTunnelOutputStream serialout = null;
     try {
       // build serialized data
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      OutputStream out = bos;
       if (compressed) {
         deflater = new Deflater(Deflater.BEST_SPEED);
-        DeflaterOutputStream deflaterStream = new DeflaterOutputStream(bos, deflater);
-        serialout = new ServiceTunnelOutputStream(deflaterStream);
-        serialout.writeObject(msg);
-        serialout.flush();
-        deflaterStream.finish();
-        serialout.close();
-        serialout = null;
+        out = new DeflaterOutputStream(bos, deflater);
       }
-      else {
-        serialout = new ServiceTunnelOutputStream(bos);
-        serialout.writeObject(msg);
-        serialout.flush();
-        serialout.close();
-        serialout = null;
-      }
+      m_objectSerializer.serialize(out, msg);
       String base64Data = StringUtility.wrapText(Base64Utility.encode(bos.toByteArray()), 10000);
       buf.append(base64Data);
     }
     finally {
-      if (serialout != null) {
-        try {
-          serialout.close();
-        }
-        catch (Throwable fatal) {
-        }
-      }
       if (deflater != null) {
         try {
           deflater.end();
@@ -380,30 +373,17 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
 
   protected Object getData(String dataPart, boolean compressed) throws IOException, ClassNotFoundException {
     Inflater inflater = null;
-    ServiceTunnelInputStream serialin = null;
     try {
       String base64Data = dataPart.replaceAll("[\\n\\r]", "");
       // decode serial data
+      InputStream in = new ByteArrayInputStream(Base64Utility.decode(base64Data));
       if (compressed) {
         inflater = new Inflater();
-        InflaterInputStream inflaterStream = new InflaterInputStream(new ByteArrayInputStream(Base64Utility.decode(base64Data)), inflater);
-        serialin = new ServiceTunnelInputStream(inflaterStream, m_bundleList);
-        return serialin.readObject();
+        in = new InflaterInputStream(in, inflater);
       }
-      else {
-        InputStream in = new ByteArrayInputStream(Base64Utility.decode(base64Data));
-        serialin = new ServiceTunnelInputStream(in, m_bundleList);
-        return serialin.readObject();
-      }
+      return m_objectSerializer.deserialize(in, null);
     }
     finally {
-      if (serialin != null) {
-        try {
-          serialin.close();
-        }
-        catch (Throwable fatal) {
-        }
-      }
       if (inflater != null) {
         try {
           inflater.end();

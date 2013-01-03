@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.AbstractServiceTunnel;
@@ -168,8 +169,8 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
   public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) throws ProcessingException {
     if (m_contentHandler == null) {
       m_contentHandler = new DefaultServiceTunnelContentHandler();
-      String prefix = getClientSession().getClass().getPackage().getName().replaceAll("^(.*\\.)(client|shared|server)(\\.core)?.*$", "$1");
-      m_contentHandler.initialize(BundleInspector.getOrderedBundleList(prefix, "org.eclipse.scout."), getClientSession().getClass().getClassLoader());
+      String[] bundleOrderPrefixes = SerializationUtility.getBundleOrderPrefixes();
+      m_contentHandler.initialize(BundleInspector.getOrderedBundleList(bundleOrderPrefixes), getClientSession().getClass().getClassLoader());
     }
     return super.invokeService(serviceInterfaceClass, operation, callerArgs);
   }

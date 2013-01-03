@@ -17,12 +17,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,17 +34,17 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.internal.widgets.JSExecutor;
+import org.eclipse.rwt.lifecycle.PhaseEvent;
+import org.eclipse.rwt.lifecycle.PhaseId;
+import org.eclipse.rwt.lifecycle.PhaseListener;
+import org.eclipse.rwt.lifecycle.PhaseListenerUtil;
 import org.eclipse.rwt.lifecycle.UICallBack;
-import org.eclipse.rwt.service.ISessionStore;
-import org.eclipse.rwt.service.SessionStoreEvent;
-import org.eclipse.rwt.service.SessionStoreListener;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.ListUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -77,6 +81,7 @@ import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.internal.servletfilter.LogoutFilter;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.KeyStrokeManager;
+import org.eclipse.scout.rt.ui.rap.testing.TestingUtility;
 import org.eclipse.scout.rt.ui.rap.util.ColorFactory;
 import org.eclipse.scout.rt.ui.rap.util.DeviceUtility;
 import org.eclipse.scout.rt.ui.rap.util.FontRegistry;
@@ -108,6 +113,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolTip;
@@ -127,7 +134,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   private Bundle m_applicationBundle;
   private RwtScoutSynchronizer m_synchronizer;
-  private SessionStoreListener m_sessionStoreListener;
   private ILocaleListener m_localeListener;
 
   private final Object m_immediateUiJobsLock = new Object();
@@ -163,13 +169,13 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   private LayoutValidateManager m_layoutValidateManager;
   private HtmlAdapter m_htmlAdapter;
   private IBusyHandler m_busyHandler;
+  private P_RequestInterceptor m_requestInterceptor;
 
   public AbstractRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     m_applicationBundle = applicationBundle;
     m_clientSessionClazz = clientSessionClazz;
-    m_sessionStoreListener = new P_SessionStoreListener();
     m_environmentListeners = new EventListenerList();
-    m_localeListener = new P_LocaleListener();
+    m_requestInterceptor = new P_RequestInterceptor();
     m_openForms = new HashMap<IForm, IRwtScoutPart>();
     m_status = RwtEnvironmentEvent.INACTIVE;
     m_desktopKeyStrokes = new ArrayList<IRwtKeyStroke>();
@@ -208,8 +214,20 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     return m_openForms.remove(form);
   }
 
-  protected void stopScout() throws CoreException {
+  private void closeFormParts() {
+    if (m_openForms == null) {
+      return;
+    }
+    List<IForm> openForms = new LinkedList<IForm>(m_openForms.keySet());
+    for (IForm form : openForms) {
+      //Close the gui part, the form itself may stay open
+      hideFormPart(form);
+    }
+  }
+
+  protected void dispose() {
     try {
+      closeFormParts();
       if (m_historySupport != null) {
         m_historySupport.uninstall();
         m_historySupport = null;
@@ -245,6 +263,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         m_busyHandler.setEnabled(false);
         m_busyHandler = null;
       }
+      if (m_requestInterceptor != null) {
+        RWT.getLifeCycle().removePhaseListener(m_requestInterceptor);
+        m_requestInterceptor = null;
+      }
 
       m_status = RwtEnvironmentEvent.STOPPED;
       fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STOPPED));
@@ -255,6 +277,14 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STARTED));
       }
     }
+  }
+
+  /**
+   * @deprecated use {@link #dispose()} instead
+   */
+  @Deprecated
+  protected void stopScout() {
+    dispose();
   }
 
   /**
@@ -296,9 +326,13 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   @Override
   public final void ensureInitialized() {
+    ensureInitialized(null);
+  }
+
+  protected final void ensureInitialized(Runnable additionalInitCallback) {
     if (m_status == RwtEnvironmentEvent.INACTIVE || m_status == RwtEnvironmentEvent.STOPPED) {
       try {
-        init();
+        init(additionalInitCallback);
       }
       catch (Exception e) {
         LOG.error("could not initialize Environment", e);
@@ -306,7 +340,12 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
-  protected synchronized void init() throws CoreException {
+  /**
+   * @param additionalInitCallback
+   *          if not null, the callback is executed at the end of the initialization but before the {@link IDesktop} is
+   *          notified.
+   */
+  protected synchronized void init(Runnable additionalInitCallback) throws CoreException {
     if (m_status == RwtEnvironmentEvent.STARTING
         || m_status == RwtEnvironmentEvent.STARTED
         || m_status == RwtEnvironmentEvent.STOPPING) {
@@ -317,26 +356,16 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     if (Thread.currentThread() != getDisplay().getThread()) {
       throw new IllegalStateException("must be called in display thread");
     }
-    // workbench must exist
-//    if (PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {
-//      throw new IllegalStateException("workbench must be active");
-//    }
-//    // close views that were opened due to workbench caching the latest layout
-//    // of views
-//    for (IWorkbenchWindow workbenchWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-//      for (IWorkbenchPage workbenchPage : workbenchWindow.getPages()) {
-//        for (IViewReference viewReference : workbenchPage.getViewReferences()) {
-//          if (m_scoutPartIdToUiPartId.containsValue(viewReference.getId())) {
-//            if (workbenchPage.isPartVisible(viewReference.getPart(false))) {
-//              workbenchPage.hideView(viewReference);
-//            }
-//          }
-//        }
-//      }
-//    }
-    //
+    getDisplay().addListener(SWT.Dispose, new P_DisplayDisposeListener());
+
     try {
       m_status = RwtEnvironmentEvent.STARTING;
+
+      // enable HTTP request handling
+      // the first beforeRequest-event has to be fired manually, because currently no PhaseListener is attached
+      beforeHttpRequest();
+      RWT.getLifeCycle().addPhaseListener(m_requestInterceptor);
+
       fireEnvironmentChanged(new RwtEnvironmentEvent(this, m_status));
 
       if (getSubject() == null) {
@@ -345,42 +374,29 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
       UserAgent userAgent = initUserAgent();
       DeviceUtility.setCurrentDeviceType(userAgent.getUiDeviceType());
-
-      final BooleanHolder newSession = new BooleanHolder(true);
-      IClientSession tempClientSession = (IClientSession) RWT.getSessionStore().getAttribute(IClientSession.class.getName());
-      if (tempClientSession == null || !tempClientSession.isActive()) {
-        LocaleThreadLocal.set(RwtUtility.getBrowserInfo().getLocale());
-        tempClientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString(), userAgent);
-
-        RWT.getSessionStore().setAttribute(IClientSession.class.getName(), tempClientSession);
-        RWT.getSessionStore().addSessionStoreListener(m_sessionStoreListener);
-
-        // init RWT locale with the locale of the client session
-        if (tempClientSession.getLocale() != null && !tempClientSession.getLocale().equals(RWT.getLocale())) {
-          RWT.setLocale(tempClientSession.getLocale());
-        }
-        newSession.setValue(true);
-      }
-      else {
-        newSession.setValue(false);
-      }
-      if (!tempClientSession.isActive()) {
-        showClientSessionLoadError(tempClientSession.getLoadError());
+      IClientSession clientSession = initClientSession(userAgent);
+      if (!clientSession.isActive()) {
+        showClientSessionLoadError(clientSession.getLoadError());
         LOG.error("ClientSession is not active, there must be a problem with loading or starting");
         m_status = RwtEnvironmentEvent.INACTIVE;
         return;
       }
       else {
-        m_clientSession = tempClientSession;
+        m_clientSession = clientSession;
       }
       m_desktop = m_clientSession.getDesktop();
+
+      // init RWT locale with the locale of the client session
+      if (clientSession.getLocale() != null && !clientSession.getLocale().equals(RWT.getLocale())) {
+        RWT.setLocale(clientSession.getLocale());
+      }
+
       if (m_synchronizer == null) {
         m_synchronizer = new RwtScoutSynchronizer(this);
       }
+
       //put the the display on the session data
       m_clientSession.setData(ENVIRONMENT_KEY, this);
-
-      m_clientSession.addLocaleListener(m_localeListener);
 
       //
       RwtUtility.setNlsTextsOnDisplay(getDisplay(), m_clientSession.getTexts());
@@ -394,6 +410,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       }
       m_layoutValidateManager = new LayoutValidateManager();
       attachScoutListeners();
+
       // desktop keystokes
       for (IKeyStroke scoutKeyStroke : getClientSession().getDesktop().getKeyStrokes()) {
         IRwtKeyStroke[] uiStrokes = RwtUtility.getKeyStrokes(scoutKeyStroke, this);
@@ -402,19 +419,23 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
           addGlobalKeyStroke(uiStroke, false);
         }
       }
+
+      if (additionalInitCallback != null) {
+        additionalInitCallback.run();
+      }
+      applyScoutState();
+
       // notify ui available
       // notify desktop that it is loaded
       UICallBack.activate(AbstractRwtEnvironment.class.getName() + AbstractRwtEnvironment.this.hashCode());
       new ClientSyncJob("Desktop opened", getClientSession()) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          if (newSession.getValue()) {
+          if (!getScoutDesktop().isOpened()) {
             fireDesktopOpenedFromUIInternal();
-            fireGuiAttachedFromUIInternal();
           }
-          else {
+          if (!getScoutDesktop().isGuiAvailable()) {
             fireGuiAttachedFromUIInternal();
-            fireDesktopActivatedFromUIInternal();
           }
         }
       }.schedule();
@@ -432,8 +453,71 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
+  /**
+   * As default, the {@link IClientSession} is attached to the http session. This means, the client session lives as
+   * long the http session lives. If the http session expires, the client session will be stopped.
+   * <p>
+   * This method creates and loads a new client session if there is no client session attached to the http session yet.
+   * If there already is one attached, the attached session will be returned.
+   */
+  protected IClientSession initClientSession(UserAgent userAgent) {
+    HttpSession httpSession = RWT.getSessionStore().getHttpSession();
+    IClientSession clientSession = (IClientSession) httpSession.getAttribute(IClientSession.class.getName());
+    if (clientSession != null) {
+      if (!userAgent.equals(clientSession.getUserAgent())) {
+        //Force client session shutdown
+        httpSession.setAttribute(P_HttpSessionInvalidationListener.class.getName(), null);
+        //Make sure a new client session will be initialized
+        clientSession = null;
+      }
+    }
+    if (clientSession == null || !clientSession.isActive()) {
+      LocaleThreadLocal.set(RwtUtility.getBrowserInfo().getLocale());
+      clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString(), userAgent);
+
+      httpSession.setAttribute(IClientSession.class.getName(), clientSession);
+      httpSession.setAttribute(P_HttpSessionInvalidationListener.class.getName(), new P_HttpSessionInvalidationListener(clientSession));
+    }
+
+    return clientSession;
+  }
+
   protected UserAgent initUserAgent() {
     return UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, RwtUtility.getBrowserInfo().getUserAgent());
+  }
+
+  /**
+   * Handles event before a HTTP request will be processed.
+   */
+  protected void beforeHttpRequest() {
+  }
+
+  /**
+   * Do NOT override this internal method, instead use {@link #beforeHttpRequest()}.
+   */
+  protected void beforeHttpRequestInternal() {
+    if (getClientSession() != null) {
+      LocaleThreadLocal.set(getClientSession().getLocale());
+    }
+
+    beforeHttpRequest();
+  }
+
+  /**
+   * Handles event after a HTTP request has been processed.
+   */
+  protected void afterHttpRequest() {
+  }
+
+  /**
+   * Do NOT override this internal method, instead use {@link #afterHttpRequest()}.
+   */
+  protected void afterHttpRequestInternal() {
+    afterHttpRequest();
+
+    if (TestingUtility.isSyncRequestsEnabled()) {
+      TestingUtility.waitForClientJobs();
+    }
   }
 
   protected RwtBusyHandler attachBusyHandler() {
@@ -473,12 +557,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   protected void fireGuiDetachedFromUIInternal() {
     if (getScoutDesktop() != null) {
       getScoutDesktop().getUIFacade().fireGuiDetached();
-    }
-  }
-
-  protected void fireDesktopActivatedFromUIInternal() {
-    if (getScoutDesktop() != null) {
-      getScoutDesktop().ensureViewStackVisible();
     }
   }
 
@@ -633,6 +711,11 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   protected void attachScoutListeners() {
+    if (m_localeListener == null) {
+      m_localeListener = new P_LocaleListener();
+      m_clientSession.addLocaleListener(m_localeListener);
+    }
+
     if (m_scoutDesktopListener == null) {
       m_scoutDesktopListener = new P_ScoutDesktopListener();
       getScoutDesktop().addDesktopListener(m_scoutDesktopListener);
@@ -644,40 +727,59 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   protected void detachScoutListeners() {
+    if (m_clientSession == null) {
+      LOG.warn("ClientSession is null, cannot remove listeners.");
+    }
+    else {
+      if (m_localeListener != null) {
+        m_clientSession.removeLocaleListener(m_localeListener);
+        m_localeListener = null;
+      }
+    }
+
     IDesktop desktop = getScoutDesktop();
     if (desktop == null) {
       LOG.warn("Desktop is null, cannot remove listeners.");
-      return;
     }
-
-    if (m_scoutDesktopListener != null) {
-      desktop.removeDesktopListener(m_scoutDesktopListener);
-      m_scoutDesktopListener = null;
-    }
-    if (m_desktopPropertyListener != null) {
-      desktop.removePropertyChangeListener(m_desktopPropertyListener);
-      m_desktopPropertyListener = null;
+    else {
+      if (m_scoutDesktopListener != null) {
+        desktop.removeDesktopListener(m_scoutDesktopListener);
+        m_scoutDesktopListener = null;
+      }
+      if (m_desktopPropertyListener != null) {
+        desktop.removePropertyChangeListener(m_desktopPropertyListener);
+        m_desktopPropertyListener = null;
+      }
     }
   }
 
   protected void applyScoutState() {
     IDesktop desktop = getScoutDesktop();
-    // load state of internal frames and dialogs
-    for (IForm form : desktop.getViewStack()) {
-      if (form.isAutoAddRemoveOnDesktop()) {
-        showFormPart(form);
+    final IForm[] viewStack = desktop.getViewStack();
+    final IForm[] dialogs = desktop.getDialogStack();
+    final IMessageBox[] messageBoxes = desktop.getMessageBoxStack();
+    if (viewStack.length == 0 && dialogs.length == 0 && messageBoxes.length == 0) {
+      return;
+    }
+
+    //Schedule the opening because the root shell hasn't probably been layouted yet
+    //and therefore the computation for the dialog location might be wrong
+    getDisplay().asyncExec(new Runnable() {
+
+      @Override
+      public void run() {
+        for (IForm form : viewStack) {
+          showFormPart(form);
+        }
+        for (IForm dialog : dialogs) {
+          showFormPart(dialog);
+        }
+        for (IMessageBox messageBoxe : messageBoxes) {
+          showMessageBoxFromScout(messageBoxe);
+        }
       }
-    }
-    // dialogs
-    IForm[] dialogs = desktop.getDialogStack();
-    for (IForm dialog : dialogs) {
-      // showDialogFromScout(dialogs[i]);
-      showFormPart(dialog);
-    }
-    IMessageBox[] messageBoxes = desktop.getMessageBoxStack();
-    for (IMessageBox messageBoxe : messageBoxes) {
-      showMessageBoxFromScout(messageBoxe);
-    }
+
+    });
   }
 
   public IFormField findFocusOwnerField() {
@@ -1084,19 +1186,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              try {
-                stopScout();
-              }
-              catch (CoreException ex) {
-                LOG.error("desktop closed", ex);
-              }
-              getDisplay().asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                  logout();
-                }
-              });
+              logout();
             }
           };
           invokeUiLater(t);
@@ -1321,27 +1411,77 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
     }
   }
 
-  private static final class P_SessionStoreListener implements SessionStoreListener {
+  private final class P_RequestInterceptor implements PhaseListener {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void beforeDestroy(SessionStoreEvent event) {
-      ISessionStore sessionStore = event.getSessionStore();
-      IClientSession clientSession = (IClientSession) sessionStore.getAttribute(IClientSession.class.getName());
-      if (clientSession != null) {
-        if (LOG.isInfoEnabled()) {
-          UserAgent userAgent = clientSession.getUserAgent();
-          String msg = "Thread: {0} Session goes down...; UserAgent: {2}";
-          LOG.info(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
-        }
+    public PhaseId getPhaseId() {
+      return PhaseId.ANY;
+    }
 
-        new ClientAsyncJob("HTTP session inactivator", clientSession) {
-          @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
-            getClientSession().stopSession();
-          }
-        }.runNow(new NullProgressMonitor());
+    @Override
+    public void beforePhase(PhaseEvent event) {
+      if (!PhaseListenerUtil.isPrepareUIRoot(event)) {
+        return;
       }
+
+      beforeHttpRequestInternal();
+    }
+
+    @Override
+    public void afterPhase(PhaseEvent event) {
+      if (!PhaseListenerUtil.isRender(event)) {
+        return;
+      }
+
+      afterHttpRequestInternal();
     }
   }
+
+  private class P_DisplayDisposeListener implements Listener {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void handleEvent(Event event) {
+      getDisplay().removeListener(SWT.Dispose, this);
+
+      stopScout();
+    }
+
+  }
+
+  private static final class P_HttpSessionInvalidationListener implements HttpSessionBindingListener {
+    private IClientSession m_clientSession;
+
+    public P_HttpSessionInvalidationListener(IClientSession clientSession) {
+      m_clientSession = clientSession;
+    }
+
+    @Override
+    public void valueBound(HttpSessionBindingEvent event) {
+    }
+
+    @Override
+    public void valueUnbound(HttpSessionBindingEvent event) {
+      if (LOG.isInfoEnabled()) {
+        UserAgent userAgent = m_clientSession.getUserAgent();
+        String msg = "Thread: {0} Session goes down...; UserAgent: {2}";
+        LOG.info(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
+      }
+
+      final IDesktop desktop = m_clientSession.getDesktop();
+      if (!m_clientSession.isActive() || desktop == null || !desktop.isOpened()) {
+        //client session was probably already stopped by the model itself
+        return;
+      }
+
+      new ClientAsyncJob("HTTP session inactivator", m_clientSession) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          desktop.getUIFacade().fireDesktopClosingFromUI();
+        }
+      }.runNow(new NullProgressMonitor());
+    }
+  }
+
 }

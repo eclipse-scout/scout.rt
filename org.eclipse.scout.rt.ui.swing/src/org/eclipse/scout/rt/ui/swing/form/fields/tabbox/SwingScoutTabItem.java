@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,6 +25,7 @@ import javax.swing.UIManager;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.groupbox.ISwingScoutGroupBox;
 
@@ -87,7 +88,18 @@ public class SwingScoutTabItem extends SwingScoutComposite<IGroupBox> implements
   }
 
   protected void setSaveNeededFromScout() {
-    if (getScoutObject().getForm() instanceof ISearchForm) {
+    boolean updateMarker = false;
+    if (getScoutObject().getParentField() instanceof ITabBox) {
+      if (((ITabBox) getScoutObject().getParentField()).getMarkStrategy() == ITabBox.MARK_STRATEGY_SAVE_NEEDED) {
+        updateMarker = true;
+      }
+    }
+    else if (getScoutObject().getForm() instanceof ISearchForm) {
+      // legacy
+      updateMarker = true;
+    }
+
+    if (updateMarker) {
       if (getSwingTabIcon() instanceof SwingTabIcon) {
         ((SwingTabIcon) getSwingTabIcon()).setMarked(getScoutObject().isSaveNeeded());
       }
@@ -96,7 +108,18 @@ public class SwingScoutTabItem extends SwingScoutComposite<IGroupBox> implements
   }
 
   protected void setEmptyFromScout() {
-    if (!(getScoutObject().getForm() instanceof ISearchForm)) {
+    boolean updateMarker = false;
+    if (getScoutObject().getParentField() instanceof ITabBox) {
+      if (((ITabBox) getScoutObject().getParentField()).getMarkStrategy() == ITabBox.MARK_STRATEGY_EMPTY) {
+        updateMarker = true;
+      }
+    }
+    else if (!(getScoutObject().getForm() instanceof ISearchForm)) {
+      // legacy
+      updateMarker = true;
+    }
+
+    if (updateMarker) {
       if (getSwingTabIcon() instanceof SwingTabIcon) {
         ((SwingTabIcon) getSwingTabIcon()).setMarked(!getScoutObject().isEmpty());
       }

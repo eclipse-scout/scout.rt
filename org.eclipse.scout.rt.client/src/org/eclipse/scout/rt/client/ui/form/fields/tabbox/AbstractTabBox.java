@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -57,10 +58,27 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   protected void execTabSelected(IGroupBox selectedBox) throws ProcessingException {
   }
 
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @ConfigPropertyValue("MARK_STRATEGY_EMPTY")
+  protected int getConfiguredMarkStrategy() {
+    return MARK_STRATEGY_EMPTY;
+  }
+
+  @Override
+  public int getMarkStrategy() {
+    return propertySupport.getPropertyInt(PROP_MARK_STRATEGY);
+  }
+
+  @Override
+  public void setMarkStrategy(int markStrategy) {
+    propertySupport.setPropertyInt(PROP_MARK_STRATEGY, markStrategy);
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
     m_grid = new TabBoxGrid(this);
+    setMarkStrategy(getConfiguredMarkStrategy());
     super.initConfig();
     addPropertyChangeListener(PROP_SELECTED_TAB, new PropertyChangeListener() {
       @Override

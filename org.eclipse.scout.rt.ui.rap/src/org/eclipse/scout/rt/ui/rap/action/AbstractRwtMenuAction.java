@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.action;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.rwt.internal.lifecycle.UITestUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
+import org.eclipse.scout.rt.ui.rap.testing.CustomWidgetIdGenerator;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -29,7 +31,9 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Widget;
 
+@SuppressWarnings("restriction")
 public class AbstractRwtMenuAction {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtMenuAction.class);
 
@@ -188,6 +192,15 @@ public class AbstractRwtMenuAction {
     }
 
     m_uiMenuItem.addSelectionListener(m_menuSelectionListener);
+    setCustomWidgetIds(m_uiMenuItem);
+  }
+
+  private void setCustomWidgetIds(Widget parent) {
+    if (!UITestUtil.isEnabled()) {
+      return;
+    }
+
+    CustomWidgetIdGenerator.getInstance().setCustomWidgetIds(parent, getScoutAction(), getClass().getName());
   }
 
   protected Menu getMenu() {

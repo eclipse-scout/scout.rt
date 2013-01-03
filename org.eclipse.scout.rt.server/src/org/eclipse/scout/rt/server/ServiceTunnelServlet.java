@@ -41,6 +41,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.http.servletfilter.HttpServletEx;
 import org.eclipse.scout.http.servletfilter.helper.HttpAuthJaasFilter;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -192,8 +193,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
   private Bundle[] getOrderedBundleList() {
     synchronized (m_orderedBundleListLock) {
       if (m_orderedBundleList == null) {
-        String prefix = m_serverSessionClass.getPackage().getName().replaceAll("^(.*\\.)(client|shared|server)(\\.core)?.*$", "$1");
-        m_orderedBundleList = BundleInspector.getOrderedBundleList(prefix, "org.eclipse.scout.");
+        String[] bundleOrderPrefixes = SerializationUtility.getBundleOrderPrefixes();
+        m_orderedBundleList = BundleInspector.getOrderedBundleList(bundleOrderPrefixes);
       }
     }
     return m_orderedBundleList;

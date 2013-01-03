@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,7 +14,9 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigPropertyValue;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
 /**
  * Search form for the outline must contain a SearchHandler<br>
@@ -25,6 +27,18 @@ public abstract class AbstractSearchForm extends AbstractForm implements ISearch
 
   public AbstractSearchForm() throws ProcessingException {
     super();
+  }
+
+  @Override
+  public void initForm() throws ProcessingException {
+    // form
+    initFormInternal();
+    // fields
+    FormUtility.initFormFields(this);
+    // mark strategy
+    FormUtility.setTabBoxMarkStrategy(this, ITabBox.MARK_STRATEGY_SAVE_NEEDED);
+    // custom
+    execInitForm();
   }
 
   @ConfigPropertyValue("true")

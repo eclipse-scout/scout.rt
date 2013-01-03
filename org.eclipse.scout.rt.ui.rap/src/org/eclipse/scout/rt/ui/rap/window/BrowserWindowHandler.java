@@ -21,9 +21,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.rap.AbstractRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.window.filedownloader.RwtScoutDownloadHandler;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.widgets.Shell;
 
 /**
  * @since 3.8.0
@@ -94,27 +91,17 @@ public class BrowserWindowHandler {
 
   public void downloadFile(String link) {
     try {
-      File file = validatelink(link);
+      File file = validateLink(link);
       String nextId = UUID.randomUUID().toString();
-      final RwtScoutDownloadHandler handler = new RwtScoutDownloadHandler(nextId, file, "", file.getName());
-      //do not use an existing shell since this one might disappear before the download completed...
-      Shell parentShell = new Shell();
-      parentShell.addDisposeListener(new DisposeListener() {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void widgetDisposed(DisposeEvent event) {
-          handler.dispose();
-        }
-      });
-      handler.startDownload(parentShell);
+      RwtScoutDownloadHandler handler = new RwtScoutDownloadHandler(nextId, file, "", file.getName());
+      handler.startDownload();
     }
     catch (IOException e) {
       LOG.error("Unexpected: " + link, e);
     }
   }
 
-  public File validatelink(String link) throws IOException {
+  protected File validateLink(String link) throws IOException {
     String px = link.replace('\\', File.separatorChar);
     File file = new File(px);
     if (file.exists()) {

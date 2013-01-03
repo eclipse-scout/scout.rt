@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -272,6 +272,35 @@ public final class BundleInspector {
       LOG.warn("Could not resolve host of fragment bundle [" + bundle.getBundleId() + "]", e);
     }
     return null;
+  }
+
+  /**
+   * Filters all Plug-in bundles. Fragment bundles are replaced by their corresponding host bundle. Every bundle is
+   * contained at most one time in the resulting bundle list, at its first position it occurred in the original
+   * original bundle list.
+   * 
+   * @return Returns never <code>null</code>.
+   * @since 3.8.2
+   */
+  public static Bundle[] filterPluginBundles(Bundle... bundles) {
+    if (bundles == null) {
+      return new Bundle[0];
+    }
+
+    List<Bundle> filteredBundles = new ArrayList<Bundle>();
+    for (Bundle b : bundles) {
+      if (b == null) {
+        continue;
+      }
+      if (Platform.isFragment(b)) {
+        b = getHostBundle(b);
+      }
+      if (!filteredBundles.contains(b)) {
+        // add the the bundle only if it is not already part of the list (which could happen if a fragment's host was already added before)
+        filteredBundles.add(b);
+      }
+    }
+    return filteredBundles.toArray(new Bundle[filteredBundles.size()]);
   }
 
   private static final class P_BundleNamePrefixComparator implements Comparator<Bundle> {

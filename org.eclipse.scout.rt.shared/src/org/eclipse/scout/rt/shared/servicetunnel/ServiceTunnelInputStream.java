@@ -14,13 +14,18 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.osgi.framework.Bundle;
 
 /**
  * Serialization override<br>
  * used to make Date's timezone independent using StaticDate class
  * and lazy (convenient) permissions loading using {@link LenientPermissionsWrapper}
+ * 
+ * @deprecated This class will be removed in Scout 3.9. Use {@link SerializationUtility} and
+ *             {@link ServiceTunnelObjectReplacer} instead.
  */
+@Deprecated
 public class ServiceTunnelInputStream extends BundleObjectInputStream {
 
   public ServiceTunnelInputStream(InputStream in, Bundle[] bundleList) throws IOException {

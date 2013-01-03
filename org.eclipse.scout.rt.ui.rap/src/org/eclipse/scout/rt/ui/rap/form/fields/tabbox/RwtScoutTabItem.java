@@ -230,13 +230,23 @@ public class RwtScoutTabItem extends RwtScoutGroupBox implements IRwtScoutTabIte
 
   @Override
   protected void setSaveNeededFromScout(boolean b) {
-    if (getScoutObject().getForm() instanceof ISearchForm) {
+    if (getScoutObject().getParentField() instanceof ITabBox) {
+      if (((ITabBox) getScoutObject().getParentField()).getMarkStrategy() == ITabBox.MARK_STRATEGY_SAVE_NEEDED) {
+        setButtonMarker(m_tabButton, b);
+      }
+    }
+    else if (getScoutObject().getForm() instanceof ISearchForm) {
       setButtonMarker(m_tabButton, b);
     }
   }
 
   protected void setEmptyFromScout(boolean b) {
-    if (!(getScoutObject().getForm() instanceof ISearchForm)) {
+    if (getScoutObject().getParentField() instanceof ITabBox) {
+      if (((ITabBox) getScoutObject().getParentField()).getMarkStrategy() == ITabBox.MARK_STRATEGY_EMPTY) {
+        setButtonMarker(m_tabButton, !b);
+      }
+    }
+    else if (!(getScoutObject().getForm() instanceof ISearchForm)) {
       setButtonMarker(m_tabButton, !b);
     }
   }

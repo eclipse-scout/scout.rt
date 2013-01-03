@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.window.desktop.navigation;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.rwt.IBrowserHistory;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.events.BrowserHistoryEvent;
@@ -52,22 +53,34 @@ public class RwtScoutNavigationSupport {
       m_uiHistory = RWT.getBrowserHistory();
       m_uiHistory.addBrowserHistoryListener(m_uiListener);
     }
-    new ClientSyncJob("", getUiEnvironment().getClientSession()) {
+
+    m_uiEnvironment.invokeScoutLater(new Runnable() {
+
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      public void run() {
         m_historyService = SERVICES.getService(INavigationHistoryService.class);
         if (m_scoutListener == null) {
           m_scoutListener = new P_NavigationHistoryListener();
           m_historyService.addNavigationHistoryListener(m_scoutListener);
         }
       }
-    }.schedule();
+
+    }, 0);
   }
 
   public void uninstall() {
-    if (m_historyService != null && m_scoutListener != null) {
-      m_historyService.removeNavigationHistoryListener(m_scoutListener);
-    }
+    new ClientSyncJob("", getUiEnvironment().getClientSession()) {
+
+      @Override
+      protected void runVoid(IProgressMonitor monitor) {
+        if (m_historyService != null && m_scoutListener != null) {
+          m_historyService.removeNavigationHistoryListener(m_scoutListener);
+        }
+      }
+
+      //It seems that jobs aren't reliably executed on shutdown, explicitly calling Job.getJobManager().resume() doesn't work either.
+      //RunNow should be save here because the job just removes a listener
+    }.runNow(new NullProgressMonitor());
     if (m_uiHistory != null) {
       m_uiHistory.removeBrowserHistoryListener(m_uiListener);
     }
@@ -100,9 +113,8 @@ public class RwtScoutNavigationSupport {
 
   protected void handleBookmarkAddedFromScout(Bookmark bookmark) {
     String id = getId(bookmark);
-    StringBuilder textBuilder = new StringBuilder(getUiEnvironment().getClientSession().getDesktop().getTitle() + " - ");
-    textBuilder.append(cleanNl(bookmark.getText()));
-    m_uiHistory.createEntry(id, textBuilder.toString());
+    //Title is set to null because it doesn't work properly, see also https://bugs.eclipse.org/bugs/show_bug.cgi?id=396400
+    m_uiHistory.createEntry(id, null);
   }
 
   private String cleanNl(String s) {

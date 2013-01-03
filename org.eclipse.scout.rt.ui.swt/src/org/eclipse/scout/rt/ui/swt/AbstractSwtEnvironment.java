@@ -440,7 +440,6 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              getScoutDesktop().getUIFacade().fireGuiDetached();
               getScoutDesktop().getUIFacade().fireDesktopClosingFromUI();
             }
           };

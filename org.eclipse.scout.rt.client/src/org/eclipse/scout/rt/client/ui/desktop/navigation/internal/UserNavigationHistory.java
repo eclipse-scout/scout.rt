@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -37,14 +38,19 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
 
 /**
- *
+ * A limited navigation history for storing the navigation history and navigating in that
+ * history.
+ * 
+ * @see org.eclipse.scout.rt.client.ui.desktop.navigation.internal.NavigationHistoryService
+ *      NavigationHistoryService
  */
 public class UserNavigationHistory {
+  private static final int MAX_HISTORY_SIZE = 25;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UserNavigationHistory.class);
 
   private final EventListenerList m_listenerList;
   private final LinkedList<Bookmark> m_bookmarks;
-  private int m_index;// 0...inf
+  private int m_index;// 0...MAX_HISTORY_SIZE-1
   private boolean m_addStepEnabled;
 
   public UserNavigationHistory() {
@@ -98,6 +104,17 @@ public class UserNavigationHistory {
     bm.setIconId(iconId);
   }
 
+  /**
+   * Logs a warning and returns <code>null</code> for the bookmark that should
+   * be used in
+   * case of the error.
+   * 
+   * @param t
+   *          error to be handled
+   * @param bm
+   *          corresponding bookmark
+   * @return <code>null</code>
+   */
   protected Bookmark handleAddStepError(Throwable t, Bookmark bm) {
     String bookmarkTitle = "";
     if (bm != null) {
@@ -131,6 +148,21 @@ public class UserNavigationHistory {
     }
   }
 
+  /**
+   * Adds a bookmark to the history as newest element, if it is not null and not
+   * the same as the last element.
+   * <p>
+   * Removes all elements newer than the currently active element, if the next element in the history is not the same as
+   * the element to add. TODO check, if this is really intended.
+   * <p>
+   * </p>
+   * Truncates the history to the maximum number of elements.
+   * </p>
+   * 
+   * @param bm
+   *          bookmark to add
+   * @return added bookmark
+   */
   public Bookmark addStep(Bookmark bm) {
     if (!m_addStepEnabled) {
       return null;
@@ -157,23 +189,29 @@ public class UserNavigationHistory {
       m_index = nextPos;
     }
     else {
+      //remove elements after current index
       while (nextPos < m_bookmarks.size()) {
         Bookmark removedBookmark = m_bookmarks.removeLast();
-        m_index = m_index - 1;
         fireBookmarkRemoved(removedBookmark);
       }
       m_bookmarks.add(bm);
       m_index = m_bookmarks.size() - 1;
       fireBookmarkAdded(bm);
     }
-    // size check, if list larger than 25 entries, truncate it
-    while (m_bookmarks.size() > 25) {
+    truncateHistory();
+    fireNavigationChanged();
+    return bm;
+  }
+
+  /**
+   * Truncates history, if larger than maximum size
+   */
+  private void truncateHistory() {
+    while (m_bookmarks.size() > MAX_HISTORY_SIZE) {
       Bookmark removedBookmark = m_bookmarks.removeFirst();
       m_index = Math.max(0, m_index - 1);
       fireBookmarkRemoved(removedBookmark);
     }
-    fireNavigationChanged();
-    return bm;
   }
 
   private void saveCurrentStep() {
@@ -195,41 +233,48 @@ public class UserNavigationHistory {
     }
   }
 
+  /**
+   * @param oldbm
+   *          the old bookmark to compare
+   * @param newbm
+   *          the new bookmark to compare
+   * @return true, if the bookmarks oldbm and newbm have the same title and the
+   *         same parent search form states and parent labels.
+   */
   private boolean isSameBookmark(Bookmark oldbm, Bookmark newbm) {
-    if (CompareUtility.equals(oldbm.getTitle(), newbm.getTitle())) {
-      TablePageState oldLastNode = null;
-      TablePageState newLastNode = null;
-      List<AbstractPageState> list = oldbm.getPath();
-      if (list != null && list.size() > 0) {
-        AbstractPageState s = list.get(list.size() - 1);
-        if (s instanceof TablePageState) {
-          oldLastNode = (TablePageState) s;
+    List<AbstractPageState> oldPath = oldbm.getPath();
+    List<AbstractPageState> newPath = newbm.getPath();
+    if (CompareUtility.equals(oldbm.getTitle(), newbm.getTitle()) && CompareUtility.equals(oldPath.size(), newPath.size())) {
+      ListIterator<AbstractPageState> oldIt = oldPath.listIterator(oldPath.size());
+      ListIterator<AbstractPageState> newIt = newPath.listIterator(newPath.size());
+      while (oldIt.hasPrevious()) {
+        AbstractPageState oldState = oldIt.previous();
+        TablePageState oldNode = null;
+        TablePageState newNode = null;
+        if (oldState instanceof TablePageState) {
+          oldNode = (TablePageState) oldState;
         }
-      }
-      list = newbm.getPath();
-      if (list != null && list.size() > 0) {
-        AbstractPageState s = list.get(list.size() - 1);
-        if (s instanceof TablePageState) {
-          newLastNode = (TablePageState) s;
+        AbstractPageState newState = newIt.previous();
+        if (newState instanceof TablePageState) {
+          newNode = (TablePageState) newState;
         }
-      }
-      if (oldLastNode != null && newLastNode != null) {
-        if (CompareUtility.equals(oldLastNode.getSearchFormState(), newLastNode.getSearchFormState())) {
-          return true;
+
+        if (oldNode != null && newNode != null && CompareUtility.notEquals(oldNode.getSearchFormState(), newNode.getSearchFormState())) {
+          return false;
         }
-        else {
+        else if (oldState != null && oldState.getLabel() != null && !oldState.getLabel().equals(newState.getLabel())) {
           return false;
         }
       }
-      else {
-        return true;
-      }
+      return true;
     }
-    else {
-      return false;
-    }
+    return false;
   }
 
+  /**
+   * @return the currently active bookmark or <code>null</code>, if no bookmark
+   *         is active
+   */
   public Bookmark getActiveBookmark() {
     if (m_index < m_bookmarks.size()) {
       return m_bookmarks.get(m_index);
@@ -281,6 +326,13 @@ public class UserNavigationHistory {
     return (startIndex >= 0 && endIndex >= startIndex);
   }
 
+  /**
+   * Steps forward in the history by one step and activates that bookmark.
+   * <p>
+   * If stepping forward is not possible anymore, because no more bookmarks are available in the history, the active
+   * bookmark stays the same.
+   * </p>
+   */
   public void stepForward() throws ProcessingException {
     int nextPos = m_index + 1;
     if (nextPos >= 0 && nextPos < m_bookmarks.size()) {
@@ -300,6 +352,13 @@ public class UserNavigationHistory {
     }
   }
 
+  /**
+   * Steps backward in the history by one step and activates that bookmark.
+   * <p>
+   * If stepping backward is not possible anymore, because no more bookmarks are available in the history, the active
+   * bookmark stays the same.
+   * </p>
+   */
   public void stepBackward() throws ProcessingException {
     int nextPos = m_index - 1;
     if (nextPos >= 0 && nextPos < m_bookmarks.size()) {
@@ -355,6 +414,9 @@ public class UserNavigationHistory {
     return newList.toArray(new IMenu[newList.size()]);
   }
 
+  /**
+   * @return the current number of bookmarks in the history.
+   */
   public int getSize() {
     return m_bookmarks.size();
   }

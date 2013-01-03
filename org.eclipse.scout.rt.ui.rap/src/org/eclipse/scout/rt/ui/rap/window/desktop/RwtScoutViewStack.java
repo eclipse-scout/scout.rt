@@ -27,6 +27,8 @@ import org.eclipse.scout.rt.ui.rap.window.IFormBoundsProvider;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -69,6 +71,7 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
     getUiEnvironment().getScoutDesktop().addDesktopListener(m_desktopListener);
     setData(WidgetUtil.CUSTOM_VARIANT, getVariant());
     createContent(this);
+    addDisposeListener(new P_DisposeListener());
   }
 
   protected String getVariant() {
@@ -354,6 +357,19 @@ public class RwtScoutViewStack extends Composite implements IRwtScoutViewStack {
       }
     }
 
+  }
+
+  private class P_DisposeListener implements DisposeListener {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void widgetDisposed(DisposeEvent event) {
+      if (m_desktopListener == null) {
+        return;
+      }
+
+      getUiEnvironment().getScoutDesktop().removeDesktopListener(m_desktopListener);
+    }
   }
 
 }

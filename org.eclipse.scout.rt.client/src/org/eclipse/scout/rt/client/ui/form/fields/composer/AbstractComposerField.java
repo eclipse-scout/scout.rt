@@ -314,14 +314,14 @@ public abstract class AbstractComposerField extends AbstractFormField implements
               public void treeChanged(TreeEvent e) {
                 switch (e.getType()) {
                   case TreeEvent.TYPE_NODES_DELETED:
-                          case TreeEvent.TYPE_NODES_INSERTED:
-                          case TreeEvent.TYPE_NODES_UPDATED: {
-                          checkSaveNeeded();
-                          checkEmpty();
-                          break;
-                        }
-                      }
-                    }
+                  case TreeEvent.TYPE_NODES_INSERTED:
+                  case TreeEvent.TYPE_NODES_UPDATED: {
+                    checkSaveNeeded();
+                    checkEmpty();
+                    break;
+                  }
+                }
+              }
             }
             );
       }
@@ -456,7 +456,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           for (int i = 1; i <= 5; i++) {
             String valueName = (i == 1 ? "value" : "value" + i);
             if (xmlElem.hasAttribute(valueName)) {
-              valueList.add(xmlElem.getObjectAttribute(valueName, null, getClass().getClassLoader()));
+              valueList.add(xmlElem.getObjectAttribute(valueName, null));
             }
           }
         }
@@ -769,6 +769,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         data.setAggregationType(anode.getAggregationType());
         data.setOperator(anode.getOp().getOperator());
         data.setValues(anode.getValues());
+        data.setTexts(anode.getTexts());
         return data;
       }
       else if (node instanceof EitherOrNode) {

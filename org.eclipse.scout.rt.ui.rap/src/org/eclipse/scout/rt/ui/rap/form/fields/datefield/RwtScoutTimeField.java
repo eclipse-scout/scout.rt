@@ -265,13 +265,13 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
     Date value = scoutField.getValue();
     if (value != null) {
       DateFormat format = scoutField.getIsolatedTimeFormat();
-    if (format != null) {
-      m_displayTextToVerify = format.format(value);
+      if (format != null) {
+        m_displayTextToVerify = format.format(value);
       }
     }
-      getUiField().setText(m_displayTextToVerify);
-      getUiField().setCaretOffset(0);
-    }
+    getUiField().setText(m_displayTextToVerify);
+    getUiField().setCaretOffset(0);
+  }
 
   @Override
   protected void setBackgroundFromScout(String scoutColor) {
@@ -347,6 +347,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
         @Override
         public void widgetDisposed(DisposeEvent event) {
           getTimeFromClosedDateChooserDialog();
+          m_timeChooserDialog = null;
         }
       });
 

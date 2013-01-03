@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.tabbox;
 
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.fields.groupbox.SwtScoutGroupBox;
@@ -134,11 +135,21 @@ public class SwtScoutTabItem extends SwtScoutGroupBox implements ISwtScoutTabIte
       }
       // underline
       boolean isUnderline = false;
-      if (getScoutObject().getForm() instanceof ISearchForm && getScoutObject().isSaveNeeded()) {
-        isUnderline = true;
+      if (getScoutObject().getParentField() instanceof ITabBox) {
+        if (((ITabBox) getScoutObject().getParentField()).getMarkStrategy() == ITabBox.MARK_STRATEGY_SAVE_NEEDED && getScoutObject().isSaveNeeded()) {
+          isUnderline = true;
+        }
+        else if (((ITabBox) getScoutObject().getParentField()).getMarkStrategy() == ITabBox.MARK_STRATEGY_EMPTY && !getScoutObject().isEmpty()) {
+          isUnderline = true;
+        }
       }
-      else if (!(getScoutObject().getForm() instanceof ISearchForm) && !getScoutObject().isEmpty()) {
-        isUnderline = true;
+      else {
+        if (getScoutObject().getForm() instanceof ISearchForm && getScoutObject().isSaveNeeded()) {
+          isUnderline = true;
+        }
+        else if (!(getScoutObject().getForm() instanceof ISearchForm) && !getScoutObject().isEmpty()) {
+          isUnderline = true;
+        }
       }
       if (isUnderline) {
         gc.setForeground(getSwtContainer().getDisplay().getSystemColor(SWT.COLOR_WHITE));

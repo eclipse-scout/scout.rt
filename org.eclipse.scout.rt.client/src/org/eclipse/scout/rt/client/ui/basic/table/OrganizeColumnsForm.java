@@ -1184,8 +1184,10 @@ public class OrganizeColumnsForm extends AbstractForm {
         try {
           m_table.setTableChanging(true);
           Object[][] tableData = m_table.getTableData();
-          m_table.getTableCustomizer().removeAllColumns();
-          m_table.getTableCustomizer().setSerializedData(m_tableCustomizerData);
+          if (m_table.getTableCustomizer() != null) {
+            m_table.getTableCustomizer().removeAllColumns();
+            m_table.getTableCustomizer().setSerializedData(m_tableCustomizerData);
+          }
           m_table.resetColumnConfiguration();
           BookmarkUtility.restoreTableColumns(m_table, m_oldColumns);
           m_table.addRowsByMatrix(tableData);

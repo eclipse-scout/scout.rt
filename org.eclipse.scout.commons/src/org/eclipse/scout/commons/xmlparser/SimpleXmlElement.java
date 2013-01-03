@@ -13,13 +13,10 @@ package org.eclipse.scout.commons.xmlparser;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -33,6 +30,8 @@ import java.util.TreeMap;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.osgi.ContextFinderBasedObjectInputStream;
+import org.eclipse.scout.commons.serialization.IObjectSerializer;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 
 /**
  * Simple xml parser/writer. Very efficient and performant when handling xml
@@ -358,8 +357,27 @@ public class SimpleXmlElement {
     }
   }
 
+  /**
+   * Returns the given attribute's object value.
+   * 
+   * @param name
+   *          attribute name
+   * @param defaultValue
+   *          the default value returned in case the attribute is not available or it has no value.
+   * @return Returns the given attribute's object value or the given default value, if the attribute's value is
+   *         <code>null</code>.
+   */
   public Object getObjectAttribute(String name, Object defaultValue) throws IOException, ClassNotFoundException {
-    return getObjectAttribute(name, defaultValue, null);
+    String base64 = getStringAttribute(name, "");
+    if (base64.length() <= 0) {
+      return defaultValue;
+    }
+    byte[] raw = Base64Utility.decode(base64);
+    Object o = SerializationUtility.createObjectSerializer().deserialize(raw, null);
+    if (o == null) {
+      o = defaultValue;
+    }
+    return o;
   }
 
   /**
@@ -367,31 +385,24 @@ public class SimpleXmlElement {
    *         that tries
    *         to find the class using default osgi class loading and in a
    *         second stage using the caller classes class loaders.
+   * @deprecated This method will be removed in Scout 3.9. Use {@link #getObjectAttribute(String, Object)} instead.
+   *             Reason: the given primaryLoader is not used anymore. Scout provides an {@link IObjectSerializer} which
+   *             is responsible for any serialization tasks.
    */
+  @Deprecated
   public Object getObjectAttribute(String name, Object defaultValue, ClassLoader primaryLoader) throws IOException, ClassNotFoundException {
-    String base64 = getStringAttribute(name, "");
-    if (base64.length() <= 0) {
-      return defaultValue;
-    }
-    byte[] raw = Base64Utility.decode(base64);
-    ContextFinderBasedObjectInputStream oi = new ContextFinderBasedObjectInputStream(new ByteArrayInputStream(raw), primaryLoader);
-    Object o = oi.readObject();
-    if (o == null) {
-      o = defaultValue;
-    }
-    oi.close();
-    return o;
+    return getObjectAttribute(name, defaultValue);
   }
 
   /**
    * write a serialized object attribute
    */
   public void setObjectAttribute(String name, Object o) throws IOException {
-    ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    ObjectOutputStream out = new ObjectOutputStream(bout);
-    out.writeObject(o);
-    out.close();
-    String base64 = Base64Utility.encode(bout.toByteArray()).trim();
+    String base64 = null;
+    if (o != null) {
+      byte[] data = SerializationUtility.createObjectSerializer().serialize(o);
+      base64 = Base64Utility.encode(data).trim();
+    }
     this.setAttribute(name, base64);
   }
 
