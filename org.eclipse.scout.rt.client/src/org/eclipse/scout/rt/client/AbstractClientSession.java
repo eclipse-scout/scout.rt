@@ -373,7 +373,6 @@ public abstract class AbstractClientSession implements IClientSession {
     catch (Throwable t) {
       LOG.info("logout on server", t);
     }
-    m_clientSessionData.clear();
     setActive(false);
     if (LOG.isInfoEnabled()) {
       LOG.info("end session event loop");
