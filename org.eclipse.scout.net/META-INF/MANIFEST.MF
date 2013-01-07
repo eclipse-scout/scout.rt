@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Java Net Provider
 Bundle-SymbolicName: org.eclipse.scout.net;singleton:=true
-Bundle-Version: 3.8.1.qualifier
+Bundle-Version: 3.8.2.qualifier
 Bundle-Activator: org.eclipse.scout.net.NetActivator
 Bundle-Vendor: Eclipse Scout Project
 Bundle-ActivationPolicy: lazy

@@ -4,7 +4,7 @@ Import-Package: javax.servlet,
  javax.servlet.http
 Bundle-Name: Scout Server
 Bundle-SymbolicName: org.eclipse.scout.rt.server;singleton:=true
-Bundle-Version: 3.8.1.qualifier
+Bundle-Version: 3.8.2.qualifier
 Bundle-Activator: org.eclipse.scout.rt.server.internal.Activator
 Bundle-Vendor: Eclipse Scout Project
 Eclipse-BuddyPolicy: registered
