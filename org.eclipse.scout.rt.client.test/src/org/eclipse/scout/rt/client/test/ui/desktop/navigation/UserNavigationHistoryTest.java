@@ -362,19 +362,21 @@ public class UserNavigationHistoryTest {
     assertEquals("There should be one menu.", 1, history.getMenus().length);
   }
 
-// uncomment when Bug 392030 is merged
-//  @Test
-//  public void testAddingDuplicatesDifferentPathLength(){
-//    UserNavigationHistory history = new UserNavigationHistory();
-//    Bookmark testBookmark1 = getTestBookmark();
-//    Bookmark testBookmark2 = getTestBookmark();
-//    testBookmark2.addPathElement(new TablePageState());
-//
-//    history.addStep(testBookmark1);
-//    history.addStep(testBookmark2);
-//
-//    assertEquals(2, history.getSize());
-//  }
+  /**
+   * Tests that a bookmark with different pathlength is not added.
+   */
+  @Test
+  public void testAddingDuplicatesDifferentPathLength() {
+    UserNavigationHistory history = new UserNavigationHistory();
+    Bookmark testBookmark1 = getTestBookmark();
+    Bookmark testBookmark2 = getTestBookmark();
+    testBookmark2.addPathElement(new TablePageState());
+
+    history.addStep(testBookmark1);
+    history.addStep(testBookmark2);
+
+    assertEquals(2, history.getSize());
+  }
 
   /**
    * Tests that a bookmark with the same path is not added
@@ -415,24 +417,26 @@ public class UserNavigationHistoryTest {
     assertEquals(2, history.getSize());
   }
 
-// TODO uncomment when Bug 392030 is merged
-//  @Test
-//  public void testAddingDuplicatesPathsDifferentLabel(){
-//    UserNavigationHistory history = new UserNavigationHistory();
-//    Bookmark testBookmark1 = getTestBookmark();
-//    Bookmark testBookmark2 = getTestBookmark();
-//    NodePageState tablePageState1 = new NodePageState();
-//    tablePageState1.setLabel("label1");
-//    NodePageState tablePageState2 = new NodePageState();
-//    tablePageState2.setLabel("label2");
-//    testBookmark1.addPathElement(tablePageState1);
-//    testBookmark2.addPathElement(tablePageState2);
-//
-//    history.addStep(testBookmark1);
-//    history.addStep(testBookmark2);
-//
-//    assertEquals(2, history.getSize());
-//  }
+  /**
+   * Tests that a bookmark with different label is added.
+   */
+  @Test
+  public void testAddingDuplicatesPathsDifferentLabel() {
+    UserNavigationHistory history = new UserNavigationHistory();
+    Bookmark testBookmark1 = getTestBookmark();
+    Bookmark testBookmark2 = getTestBookmark();
+    NodePageState tablePageState1 = new NodePageState();
+    tablePageState1.setLabel("label1");
+    NodePageState tablePageState2 = new NodePageState();
+    tablePageState2.setLabel("label2");
+    testBookmark1.addPathElement(tablePageState1);
+    testBookmark2.addPathElement(tablePageState2);
+
+    history.addStep(testBookmark1);
+    history.addStep(testBookmark2);
+
+    assertEquals(2, history.getSize());
+  }
 
   /**
    * Tests that a bookmark with the same label is not added
