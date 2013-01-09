@@ -65,6 +65,7 @@ import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormFieldFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
@@ -846,7 +847,17 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
+  public void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled) throws ProcessingException {
+    importFormData(source, valueChangeTriggersEnabled, null);
+  }
+
+  @Override
   public void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter) throws ProcessingException {
+    importFormData(source, valueChangeTriggersEnabled, filter, null);
+  }
+
+  @Override
+  public void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter) throws ProcessingException {
     if (filter == null) {
       filter = new FormDataPropertyFilter();
     }
@@ -873,23 +884,25 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         FindFieldByFormDataIdVisitor v = new FindFieldByFormDataIdVisitor(fieldQId);
         visitFields(v);
         IFormField f = v.getField();
-        if (f != null) {
-          dataMap.put(f, data);
-          if (f.getMasterField() != null) {
-            int index = slaveList.indexOf(f.getMasterField());
-            if (index >= 0) {
-              slaveList.add(index + 1, f);
+        if (formFieldFilter == null || formFieldFilter.accept(f)) {
+          if (f != null) {
+            dataMap.put(f, data);
+            if (f.getMasterField() != null) {
+              int index = slaveList.indexOf(f.getMasterField());
+              if (index >= 0) {
+                slaveList.add(index + 1, f);
+              }
+              else {
+                slaveList.add(0, f);
+              }
             }
             else {
-              slaveList.add(0, f);
+              masterList.add(f);
             }
           }
           else {
-            masterList.add(f);
+            LOG.warn("cannot find field data for '" + fieldQId + " in form " + getClass().getName() + "'");
           }
-        }
-        else {
-          LOG.warn("cannot find field data for '" + fieldQId + " in form " + getClass().getName() + "'");
         }
       }
     }
