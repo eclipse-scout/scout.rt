@@ -2083,6 +2083,7 @@ Composite.viewsArea {
 }
 Composite.viewPart {
   border: 0px;
+  border-radius: 0px;
 }
 Composite.viewPartNoRadius {
   border: 0px;
