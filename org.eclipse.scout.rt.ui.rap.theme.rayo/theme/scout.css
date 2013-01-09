@@ -1123,10 +1123,6 @@ Composite.labelfield {
   padding: 4px 0px 0px 0px;
 }
 /* Label end */
-Text.onFieldLabel {
-  color: gray;
-  font: italic 12px Arial, Helvetica, sans-serif;
-}
 Button.menuButton {
   background-image: url(theme/img/button/icon_menu.png);
   background-color: #ffffff;

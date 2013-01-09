@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
 
 public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtScoutComposite<T> implements IRwtScoutFormField<T> {
 
@@ -39,15 +40,10 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
   private IRwtKeyStroke[] m_keyStrokes;
 
   private Color m_mandatoryFieldBackgroundColor;
-  private OnFieldLabelDecorator m_onFieldLabelDecorator;
 
   @Override
   public ILabelComposite getUiLabel() {
     return m_label;
-  }
-
-  public OnFieldLabelDecorator getOnFieldLabelDecorator() {
-    return m_onFieldLabelDecorator;
   }
 
   protected void setUiLabel(ILabelComposite label) {
@@ -99,7 +95,6 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
       setLabelFromScout(getScoutObject().getLabel());
       setLabelWidthInPixelFromScout();
       setLabelVisibleFromScout();
-      setLabelPositionFromScout();
       setLabelHorizontalAlignmentFromScout();
       setTooltipTextFromScout(getScoutObject().getTooltipText());
       if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD && getScoutObject().getLabel() != null && getScoutObject().getTooltipText() == null) {
@@ -189,26 +184,6 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
     }
   }
 
-  protected void setLabelPositionFromScout() {
-    if (getUiField() != null) {
-      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
-        if (m_onFieldLabelDecorator == null) {
-          m_onFieldLabelDecorator = new OnFieldLabelDecorator(getUiField(), getScoutObject().isMandatory(), this);
-          m_onFieldLabelDecorator.setLabel(getScoutObject().getLabel());
-        }
-        m_onFieldLabelDecorator.attach(getUiField());
-      }
-      else {
-        if (m_onFieldLabelDecorator != null) {
-          m_onFieldLabelDecorator.detach(getUiField());
-        }
-      }
-      getUiField().redraw();
-    }
-    setLabelVisibleFromScout();
-    setLabelFromScout(getScoutObject().getLabel());
-  }
-
   protected void setLabelWidthInPixelFromScout() {
     if (getUiLabel() == null) {
       return;
@@ -231,13 +206,33 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
   }
 
   protected void setLabelFromScout(String s) {
-    if (m_onFieldLabelDecorator != null) {
-      m_onFieldLabelDecorator.setLabel(s);
+    if (m_label == null || s == null) {
+      return;
+    }
+
+    if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
+      setLabelOnField(s);
     }
     else {
-      if (m_label != null && s != null) {
-        m_label.setText(s);
-      }
+      m_label.setText(s);
+    }
+  }
+
+  /**
+   * Uses {@link Text#setMessage(String)} to display the label on the field. Does nothing, if the {@link #getUiField()}
+   * is not of type {@link Text}.
+   */
+  protected void setLabelOnField(String label) {
+    if (getUiField() == null) {
+      return;
+    }
+    if (label == null) {
+      label = "";
+    }
+
+    if (getUiField() instanceof Text) {
+      Text textField = (Text) getUiField();
+      textField.setMessage(label);
     }
   }
 
