@@ -326,9 +326,6 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       }
       Color initCol = (Color) fld.getData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND);
       Color c = getEnvironment().getColor(scoutColor);
-      if (getMandatoryFieldBackgroundColor() != null) {
-        c = getMandatoryFieldBackgroundColor();
-      }
       if (c == null) {
         c = initCol;
       }
