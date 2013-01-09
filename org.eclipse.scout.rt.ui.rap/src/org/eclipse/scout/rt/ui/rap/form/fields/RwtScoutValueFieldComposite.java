@@ -10,20 +10,10 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form.fields;
 
-import org.eclipse.rwt.lifecycle.WidgetUtil;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
-import org.eclipse.scout.rt.ui.rap.ext.TextEx;
-import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
-import org.eclipse.swt.widgets.Control;
 
 /**
- * <h3>RwtScoutValueFieldComposite</h3> ...
- * 
- * @since 3.7.0 June 2011
- * @param <T>
+ * @since 3.8.0
  */
 public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> extends RwtScoutFieldComposite<T> {
 
@@ -32,9 +22,6 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
     super.attachScout();
     setValueFromScout();
     setDisplayTextFromScout(getScoutObject().getDisplayText());
-    if (getOnFieldLabelDecorator() != null) {
-      setOnFieldLabelFromScout(getScoutObject().getDisplayText(), getScoutObject().getLabel());
-    }
   }
 
   protected void setValueFromScout() {
@@ -43,37 +30,12 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
   protected void setDisplayTextFromScout(String s) {
   }
 
-  public void setOnFieldLabelFromScout(String text, String label) {
-    if (text == null || text.length() == 0) {
-      if (getUiField() != null && getUiField() instanceof StyledText) {
-        Integer length = (Integer) getScoutObject().getCustomProperty(IStringField.PROP_MAX_LENGTH);
-        if (length != null && label.length() > 0) {
-          if (length < label.length()) {
-            ((StyledText) getUiField()).setTextLimit(label.length());
-          }
-        }
-        ((TextEx) getUiField()).setOnFieldLabel(label);
-        getUiField().setData(WidgetUtil.CUSTOM_VARIANT, "onFieldLabel");
-      }
-    }
-    else if (getUiField() instanceof Control) {
-      Integer length = (Integer) getScoutObject().getCustomProperty(IStringField.PROP_MAX_LENGTH);
-      if (length != null) {
-        ((TextEx) getUiField()).setTextLimit(length);
-      }
-      getUiField().setData(WidgetUtil.CUSTOM_VARIANT, null);
-    }
-  }
-
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
     if (name.equals(IValueField.PROP_DISPLAY_TEXT)) {
       String displayText = (String) newValue;
       setDisplayTextFromScout(displayText);
-      if (getOnFieldLabelDecorator() != null && StringUtility.hasText(displayText) && CompareUtility.notEquals(displayText, getScoutObject().getLabel())) {
-        setOnFieldLabelFromScout(displayText, getScoutObject().getLabel());
-      }
     }
     else if (name.equals(IValueField.PROP_VALUE)) {
       setValueFromScout();

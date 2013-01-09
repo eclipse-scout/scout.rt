@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.rap.form.fields.stringfield;
 import java.beans.PropertyChangeEvent;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
@@ -467,11 +466,6 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
         return;
       }
 
-      if (getOnFieldLabelDecorator() != null) {
-        if (e.getSource() instanceof StyledText && (StringUtility.isNullOrEmpty(((StyledText) e.getSource()).getText()) || CompareUtility.equals(((StyledText) e.getSource()).getText(), getScoutObject().getInitialLabel()))) {
-          return;
-        }
-      }
       if (getUpdateUiFromScoutLock().isReleased()) {
         sendVerifyToScoutAndIgnoreResponses();
       }
