@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.rap.form.fields;
 
 import java.util.ArrayList;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -278,10 +279,8 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
       return;
     }
 
-    boolean init = false;
     if (field.getData(CLIENT_PROP_INITIAL_BACKGROUND) == null) {
       field.setData(CLIENT_PROP_INITIAL_BACKGROUND, field.getBackground());
-      init = true;
     }
 
     Color color = getMandatoryFieldBackgroundColor();
@@ -290,18 +289,15 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
       return;
     }
 
-    //Do not change color if not explicitly requested by the scout model.
-    if (init && scoutColor == null) {
-      return;
-    }
-
     Color initCol = (Color) field.getData(CLIENT_PROP_INITIAL_BACKGROUND);
     color = getUiEnvironment().getColor(scoutColor);
-
     if (color == null) {
       color = initCol;
     }
-    field.setBackground(color);
+    //Only set the color if explicitly requested by the scout model (to respect the settings of the stylesheet)
+    if (!CompareUtility.equals(color, field.getBackground())) {
+      field.setBackground(color);
+    }
   }
 
   protected void setForegroundFromScout(String scoutColor) {
@@ -313,23 +309,18 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
       return;
     }
 
-    boolean init = false;
     if (field.getData(CLIENT_PROP_INITIAL_FOREGROUND) == null) {
       field.setData(CLIENT_PROP_INITIAL_FOREGROUND, field.getForeground());
-      init = true;
     }
-
-    //Do not change color if not explicitly requested by the scout model.
-    if (init && scoutColor == null) {
-      return;
-    }
-
     Color initCol = (Color) field.getData(CLIENT_PROP_INITIAL_FOREGROUND);
     Color color = getUiEnvironment().getColor(scoutColor);
     if (color == null) {
       color = initCol;
     }
-    field.setForeground(color);
+    //Only set the color if explicitly requested by the scout model (to respect the settings of the stylesheet)
+    if (!CompareUtility.equals(color, field.getForeground())) {
+      field.setForeground(color);
+    }
   }
 
   protected void setFontFromScout(FontSpec scoutFont) {
@@ -358,63 +349,49 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
     setLabelBackgroundFromScout(scoutColor, getUiLabel());
   }
 
-  protected void setLabelBackgroundFromScout(String scoutColor, ILabelComposite field) {
-    if (field == null) {
+  protected void setLabelBackgroundFromScout(String scoutColor, ILabelComposite label) {
+    if (label == null) {
       return;
     }
 
-    boolean init = false;
-    if (field.getData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND) == null) {
-      field.setData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND, field.getBackground());
-      init = true;
+    if (label.getData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND) == null) {
+      label.setData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND, label.getBackground());
     }
 
     Color color = getMandatoryFieldBackgroundColor();
-    if (color != null) {
-      field.setBackground(color);
-      return;
-    }
-
-    //Do not change color if not explicitly requested by the scout model.
-    if (init && scoutColor == null) {
-      return;
-    }
-
-    Color initCol = (Color) field.getData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND);
+    Color initCol = (Color) label.getData(CLIENT_PROP_INITIAL_LABEL_BACKGROUND);
     color = getUiEnvironment().getColor(scoutColor);
-
     if (color == null) {
       color = initCol;
     }
-    field.setBackground(color);
+    //Only set the color if explicitly requested by the scout model (to respect the settings of the stylesheet)
+    if (!CompareUtility.equals(color, label.getBackground())) {
+      label.setBackground(color);
+    }
   }
 
   protected void setLabelForegroundFromScout(String scoutColor) {
     setLabelForegroundFromScout(scoutColor, getUiLabel());
   }
 
-  protected void setLabelForegroundFromScout(String scoutColor, ILabelComposite field) {
-    if (field == null) {
+  protected void setLabelForegroundFromScout(String scoutColor, ILabelComposite label) {
+    if (label == null) {
       return;
     }
 
-    boolean init = false;
-    if (field.getData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND) == null) {
-      field.setData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND, field.getForeground());
-      init = true;
+    if (label.getData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND) == null) {
+      label.setData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND, label.getForeground());
     }
 
-    //Do not change color if not explicitly requested by the scout model.
-    if (init && scoutColor == null) {
-      return;
-    }
-
-    Color initCol = (Color) field.getData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND);
+    Color initCol = (Color) label.getData(CLIENT_PROP_INITIAL_LABEL_FOREGROUND);
     Color color = getUiEnvironment().getColor(scoutColor);
     if (color == null) {
       color = initCol;
     }
-    field.setForeground(color);
+    //Only set the color if explicitly requested by the scout model (to respect the settings of the stylesheet)
+    if (!CompareUtility.equals(color, label.getForeground())) {
+      label.setForeground(color);
+    }
   }
 
   protected void setLabelFontFromScout(FontSpec scoutFont) {
