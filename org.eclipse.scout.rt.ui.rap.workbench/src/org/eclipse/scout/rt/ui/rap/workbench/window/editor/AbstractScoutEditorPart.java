@@ -35,7 +35,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart2;
@@ -314,11 +313,6 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements IRwt
 
   @Override
   public boolean isSaveOnCloseNeeded() {
-    // ensure the traversal is done to write eventually changes to model
-    Control focusControl = m_rootArea.getDisplay().getFocusControl();
-    if (focusControl != null && !focusControl.isDisposed()) {
-      //XXX rap       focusControl.traverse(SWT.TRAVERSE_TAB_NEXT);
-    }
     return isDirty();
   }
 

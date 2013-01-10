@@ -308,8 +308,6 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
       //nop
     }
     getUiEnvironment().dispatchImmediateUiJobs();
-    // end notify
-    return;
   }
 
   @Override

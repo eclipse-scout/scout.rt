@@ -41,4 +41,11 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
       setValueFromScout();
     }
   }
+
+  /**
+   * Forces UI Input to be verified.
+   */
+  public void verifyUiInput() {
+    handleUiInputVerifier(true);
+  }
 }
