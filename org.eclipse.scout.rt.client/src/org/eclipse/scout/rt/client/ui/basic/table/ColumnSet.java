@@ -435,7 +435,10 @@ public class ColumnSet {
       m_table.setTableChanging(true);
       //
       IColumn[] resolvedColumns = resolveColumns(columns);
-      if (resolvedColumns.length > 0) {
+      if (columns == null) {
+        columns = new IColumn[0];
+      }
+      if (resolvedColumns.length > 0 || columns.length == 0) {
         ArrayList<IColumn> newColumns = new ArrayList<IColumn>();
         for (IColumn col : columns) {
           if (col.isDisplayable()) {
