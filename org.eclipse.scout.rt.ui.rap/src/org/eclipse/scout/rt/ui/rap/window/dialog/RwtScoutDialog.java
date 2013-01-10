@@ -303,12 +303,6 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
       if (m_boundsProvider != null) {
         m_boundsProvider.storeBounds(m_uiDialog.getShell().getBounds());
       }
-
-      // ensure the traversal is done to write eventually changes to model
-      Control focusControl = m_uiDialog.getShell().getDisplay().getFocusControl();
-      if (focusControl != null && !focusControl.isDisposed()) {
-        //XXX rap       focusControl.traverse(SWT.TRAVERSE_TAB_NEXT);
-      }
       detachScout();
     }
     finally {
@@ -404,6 +398,10 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
 
     @Override
     public boolean close() {
+      // force UI input to be verified on the last focused field, so that changes will be written to the model.
+      Control focusControl = m_uiDialog.getShell().getDisplay().getFocusControl();
+      RwtUtility.verifyUiInput(focusControl);
+
       //override and delegate to scout model
       Runnable job = new Runnable() {
         @Override

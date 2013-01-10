@@ -420,8 +420,6 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
     }
     doit = result.getValue();
     getUiEnvironment().dispatchImmediateUiJobs();
-    // end notify
-    return;
   }
 
   @Override

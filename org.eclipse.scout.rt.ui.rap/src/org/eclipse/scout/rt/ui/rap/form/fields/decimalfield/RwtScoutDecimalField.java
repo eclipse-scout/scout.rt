@@ -108,8 +108,6 @@ public class RwtScoutDecimalField extends RwtScoutValueFieldComposite<IDecimalFi
       //nop
     }
     getUiEnvironment().dispatchImmediateUiJobs();
-    // end notify
-    return;
   }
 
   @Override

@@ -106,8 +106,6 @@ public class RwtScoutNumberField extends RwtScoutValueFieldComposite<INumberFiel
       //nop
     }
     getUiEnvironment().dispatchImmediateUiJobs();
-    // end notify
-    return;
   }
 
   @Override
@@ -118,6 +116,5 @@ public class RwtScoutNumberField extends RwtScoutValueFieldComposite<INumberFiel
       getUiField().setSelection(0, getUiField().getText().length());
     }
   }
-
 
 }

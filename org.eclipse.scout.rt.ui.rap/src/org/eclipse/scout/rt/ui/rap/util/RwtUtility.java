@@ -39,6 +39,9 @@ import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtScoutKeyStroke;
 import org.eclipse.swt.SWT;
@@ -1493,5 +1496,16 @@ public final class RwtUtility {
   @Deprecated
   public static GridLayout createGridLayoutNoSpacing(int columnCount, boolean makeColumnsEqualWidth) {
     return RwtLayoutUtility.createGridLayoutNoSpacing(columnCount, makeColumnsEqualWidth);
+  }
+
+  public static void verifyUiInput(Control control) {
+    if (control == null || control.isDisposed()) {
+      return;
+    }
+
+    IRwtScoutComposite compositeOnWidget = RwtScoutComposite.getCompositeOnWidget(control);
+    if (compositeOnWidget != null && compositeOnWidget instanceof RwtScoutValueFieldComposite) {
+      ((RwtScoutValueFieldComposite) compositeOnWidget).verifyUiInput();
+    }
   }
 }

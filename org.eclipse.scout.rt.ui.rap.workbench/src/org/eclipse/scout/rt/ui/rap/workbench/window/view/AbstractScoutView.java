@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.ui.rap.workbench.IRwtWorkbenchEnvironment;
 import org.eclipse.scout.rt.ui.rap.workbench.util.listener.PartListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -39,9 +38,7 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * <h3>AbstractScoutView</h3> ...
- * 
- * @since 1.0.9 03.07.2008
+ * @since 3.8.0
  */
 public abstract class AbstractScoutView extends ViewPart implements IRwtScoutPart, ISaveablePart2 {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutView.class);
@@ -433,10 +430,6 @@ public abstract class AbstractScoutView extends ViewPart implements IRwtScoutPar
 
   @Override
   public boolean isSaveOnCloseNeeded() {
-    Control focusControl = m_rootArea.getDisplay().getFocusControl();
-    if (focusControl != null && !focusControl.isDisposed()) {
-      //XXX rap       focusControl.traverse(SWT.TRAVERSE_TAB_NEXT);
-    }
     return isDirty();
   }
 
