@@ -554,8 +554,10 @@ public class OrganizeColumnsForm extends AbstractForm {
           @Override
           protected void execClickAction() throws ProcessingException {
             for (ITableRow row : getColumnsTableField().getTable().getRows()) {
-              setColumnVisible(row, true);
+              getColumnsTableField().getTable().getVisibleColumn().setValue(row, true);
             }
+
+            updateColumnVisibilityAndOrder();
           }
 
         }
@@ -576,8 +578,10 @@ public class OrganizeColumnsForm extends AbstractForm {
           @Override
           protected void execClickAction() throws ProcessingException {
             for (ITableRow row : getColumnsTableField().getTable().getRows()) {
-              setColumnVisible(row, false);
+              getColumnsTableField().getTable().getVisibleColumn().setValue(row, false);
             }
+
+            updateColumnVisibilityAndOrder();
           }
 
         }
@@ -1045,7 +1049,6 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   private void setColumnVisible(ITableRow row, Boolean visible) throws ProcessingException {
     getColumnsTableField().getTable().getVisibleColumn().setValue(row, visible);
-    getColumnsTableField().getTable().getKeyColumn().getValue(row).setVisible(visible);
 
     updateColumnVisibilityAndOrder();
   }
