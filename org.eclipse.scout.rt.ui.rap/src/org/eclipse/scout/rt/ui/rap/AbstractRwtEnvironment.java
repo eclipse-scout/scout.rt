@@ -80,7 +80,6 @@ import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.internal.servletfilter.LogoutFilter;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.KeyStrokeManager;
-import org.eclipse.scout.rt.ui.rap.testing.TestingUtility;
 import org.eclipse.scout.rt.ui.rap.util.ColorFactory;
 import org.eclipse.scout.rt.ui.rap.util.DeviceUtility;
 import org.eclipse.scout.rt.ui.rap.util.FontRegistry;
@@ -509,10 +508,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
    */
   protected void afterHttpRequestInternal() {
     afterHttpRequest();
-
-    if (TestingUtility.isSyncRequestsEnabled()) {
-      TestingUtility.waitForClientJobs();
-    }
   }
 
   protected RwtBusyHandler attachBusyHandler() {
