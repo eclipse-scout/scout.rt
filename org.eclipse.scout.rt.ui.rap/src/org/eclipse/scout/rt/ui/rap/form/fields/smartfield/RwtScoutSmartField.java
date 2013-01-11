@@ -54,6 +54,7 @@ import org.eclipse.scout.rt.ui.rap.window.popup.RwtScoutDropDownPopup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -116,9 +117,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     textField.setData(WidgetUtil.CUSTOM_VARIANT, getSmartfieldVariant());
 
     m_browseButton = getUiEnvironment().getFormToolkit().createDropDownButton(m_smartContainer, SWT.DROP_DOWN | SWT.NO_FOCUS);
-    // mouseDown-handler to ensure the text is validated on a context menu call is not
-    // necessary as handleUiInputVerifier is already triggered by FocusOut-event in
-    // org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite.P_RwtFieldListener<T>.
 
     setUiContainer(container);
     setUiLabel(label);
@@ -145,13 +143,16 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
     // listeners
     getUiField().addModifyListener(new P_ModifyListener());
-    getUiField().addTraverseListener(new P_TraverseListener());
+    if (!getScoutObject().isAllowCustomText()) {
+      getUiField().addTraverseListener(new P_TraverseListener());
+    }
+    else {
+      getUiField().addFocusListener(new P_RwtFocusListener());
+    }
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_DOWN), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_UP), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_DOWN), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.PAGE_UP), false);
-    m_tabKeyListener = new P_KeyListener(SWT.TAB);
-    m_shiftTabKeyListener = new P_KeyListener(SWT.TAB, SWT.SHIFT);
 
     P_RwtBrowseButtonListener browseButtonListener = new P_RwtBrowseButtonListener();
     getUiBrowseButton().addSelectionListener(browseButtonListener);
@@ -276,12 +277,31 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     // close old
     hideProposalPopup();
 
+    //Prevent showing if it should not be displayed
+    if (getScoutObject().isAllowCustomText() && !getUiField().isFocusControl()) {
+      //If the user writes fast and presses tab before the proposal popup shows up, the popup needs to stay closed
+      getUiEnvironment().invokeScoutLater(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            form.doClose();
+          }
+          catch (ProcessingException e) {
+            LOG.warn("Closing proposal form failed.", e);
+          }
+        }
+
+      }, 0);
+
+      return;
+    }
+
+    // make sure tab won't go to next field
+    if (!getScoutObject().isAllowCustomText()) {
+      disableTabbing();
+    }
+
     // show new
-
-    // make shure tab won't go to next field
-    getUiEnvironment().addKeyStroke(getUiField(), m_tabKeyListener, true);
-    getUiEnvironment().addKeyStroke(getUiField(), m_shiftTabKeyListener, true);
-
     m_proposalPopup = new RwtScoutDropDownPopup();
     m_proposalPopup.createPart(form, m_smartContainer, getUiField(), SWT.RESIZE, getUiEnvironment());
     m_proposalPopup.setMaxHeightHint(280);
@@ -401,9 +421,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   protected boolean hideProposalPopup() {
     synchronized (m_popupLock) {
-      // make shure tab won't go to next field
-      getUiEnvironment().removeKeyStroke(getUiField(), m_tabKeyListener);
-      getUiEnvironment().removeKeyStroke(getUiField(), m_shiftTabKeyListener);
+      enableTabbing();
       if (m_proposalPopup != null && m_proposalPopup.isVisible()) {
         m_proposalPopup.closePart();
         m_proposalPopup = null;
@@ -411,6 +429,26 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       }
       return false;
     }
+  }
+
+  private void enableTabbing() {
+    if (m_tabKeyListener != null) {
+      getUiEnvironment().removeKeyStroke(getUiField(), m_tabKeyListener);
+    }
+    if (m_shiftTabKeyListener != null) {
+      getUiEnvironment().removeKeyStroke(getUiField(), m_shiftTabKeyListener);
+    }
+  }
+
+  private void disableTabbing() {
+    if (m_tabKeyListener == null) {
+      m_tabKeyListener = new P_KeyListener(SWT.TAB);
+    }
+    if (m_shiftTabKeyListener == null) {
+      m_shiftTabKeyListener = new P_KeyListener(SWT.TAB, SWT.SHIFT);
+    }
+    getUiEnvironment().addKeyStroke(getUiField(), m_tabKeyListener, true);
+    getUiEnvironment().addKeyStroke(getUiField(), m_shiftTabKeyListener, true);
   }
 
   protected void requestProposalSupportFromUi(String text, boolean selectCurrentValue, long initialDelay) {
@@ -469,11 +507,12 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected void handleUiInputVerifier(boolean doit) {
-    // void since handle swt input verifier works with focus and not traverse events
+    // nop
     return;
   }
 
-  protected boolean handleUiTraverseVerifier() {
+  @Override
+  public void verifyUiInput() {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
         m_pendingProposalJob.cancel();
@@ -497,17 +536,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     catch (InterruptedException e) {
       //nop
     }
-    boolean processed = job.getState() == JobEx.NONE;
     // end notify
     getUiEnvironment().dispatchImmediateUiJobs();
-    if (processed && (!result.getValue())) {
-      // keep focus
-      return false;
-    }
-    else {
-      // advance focus
-      return true;
-    }
   }
 
   protected void handleUiBrowseAction() {
@@ -567,15 +597,10 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       case SWT.PAGE_DOWN:
       case SWT.PAGE_UP:
       case SWT.CR:
-        // void break
-        break;
       case SWT.ESC:
-        if (m_proposalPopup != null) {
-          event.doit = false;
-        }
         break;
       default:
-        event.doit = handleUiTraverseVerifier();
+        verifyUiInput();
     }
   }
 
@@ -612,6 +637,27 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
   }
 
+  public class P_RwtFocusListener implements FocusListener {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void focusGained(FocusEvent event) {
+      //nop
+    }
+
+    @Override
+    public void focusLost(FocusEvent event) {
+      // filter all temporary focus events
+      if (getUiField() != null && getUiField().getDisplay().getActiveShell() != null
+          && getUiField().getShell() != getUiField().getDisplay().getActiveShell()) {
+        return;
+      }
+
+      verifyUiInput();
+    }
+  }
+
   private class P_ModifyListener implements ModifyListener {
     private static final long serialVersionUID = 1L;
 
@@ -635,8 +681,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       switch (e.keyCode) {
         case SWT.TAB:
           if (m_proposalPopup == null) {
-            getUiEnvironment().removeKeyStroke(getUiField(), m_tabKeyListener);
-            getUiEnvironment().removeKeyStroke(getUiField(), m_shiftTabKeyListener);
+            enableTabbing();
           }
           break;
 
