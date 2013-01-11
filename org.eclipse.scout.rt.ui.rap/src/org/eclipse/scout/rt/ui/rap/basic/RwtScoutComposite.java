@@ -395,7 +395,6 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
               return;
           }
           // guarantee the value be written back to the model
-          m_timestamp = event.time;
           handleUiInputVerifier(event.doit);
           break;
         case SWT.FocusIn:
