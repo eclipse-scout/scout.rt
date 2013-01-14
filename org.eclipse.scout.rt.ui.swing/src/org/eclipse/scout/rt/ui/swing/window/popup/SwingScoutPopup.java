@@ -414,8 +414,8 @@ public class SwingScoutPopup implements ISwingScoutView {
          * size, its reported minimumSize, preferredSize and maximumSize are
          * cached instead of beeing calculated using layout manager
          */
-        for (Component c : parent.getComponents()) {
-          c.setBounds(0, 0, 0, 0);
+        if (!SwingUtility.IS_JAVA_7_OR_GREATER && SwingUtility.DO_RESET_COMPONENT_BOUNDS) {
+          SwingUtility.setZeroBounds(parent.getComponents());
         }
         //
         Insets insets = parent.getInsets();

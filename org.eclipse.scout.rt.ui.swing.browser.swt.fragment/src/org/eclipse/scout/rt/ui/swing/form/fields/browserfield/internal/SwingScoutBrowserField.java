@@ -1,8 +1,12 @@
 package org.eclipse.scout.rt.ui.swing.form.fields.browserfield.internal;
 
+import java.awt.AWTEvent;
 import java.awt.Canvas;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +22,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.browserfield.ISwingScoutBrowserField;
@@ -50,6 +55,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   private final Object m_swtCommandQueueLock;
   private P_CanvasEx m_canvas;
   private P_HierarchyListener m_hierarchyListener;
+  private P_MouseEventListener m_mouseEventListener = null;
 
   public SwingScoutBrowserField() {
     m_swtCommandQueueLock = new Object();
@@ -67,6 +73,19 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     setSwingContainer(container);
     setSwingField(wordComponent);
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
+  }
+
+  /**
+   * The mouse listener is a workaround for Bugzilla 389786 and needs only to be installed when Java 7
+   * is used.
+   */
+  private void installMouseListener() {
+    if (SwingUtility.IS_JAVA_7_OR_GREATER) {
+      // attach an event listener to fix focus problems with embedded word
+      m_mouseEventListener = new P_MouseEventListener();
+      m_mouseEventListener.setSwtShell(m_swtShell);
+      Toolkit.getDefaultToolkit().addAWTEventListener(m_mouseEventListener, AWTEvent.MOUSE_EVENT_MASK);
+    }
   }
 
   @Override
@@ -121,6 +140,8 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
                 fireAfterLocationChangedFromSwt(event.location);
               }
             });
+
+            installMouseListener();
           }
           catch (Exception e) {
             LOG.error("Unexpected error occured while attaching Microsoft Word. All resources safely disposed.", e);
@@ -157,8 +178,24 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
         }
       });
     }
-    catch (Exception e) {
-      LOG.error("Error occured while detaching SWT.", e);
+    catch (Throwable t) {
+      LOG.error("Error occured while detaching SWT.", t);
+    }
+    finally {
+      removeMouseListener();
+    }
+  }
+
+  /**
+   * The mouse listener is a workaround for Bugzilla 389786 and is only installed when Java 7 is used.
+   * The listener is only removed if it was installed before.
+   */
+  private void removeMouseListener() {
+    // now remove the event listener
+    if (m_mouseEventListener != null) {
+      Toolkit.getDefaultToolkit().removeAWTEventListener(m_mouseEventListener);
+      m_mouseEventListener.setSwtShell(null);
+      m_mouseEventListener = null;
     }
   }
 
@@ -350,4 +387,40 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
       return m_display;
     }
   }
+
+  /**
+   * This listener is only added as a workaround since there is a focus problem
+   * in the SWT_AWT bridge when using Java 7 which was reported in Bugzilla 389786
+   * (@see https://bugs.eclipse.org/bugs/show_bug.cgi?id=389786).
+   * This workaround should be removed if the ticket gets fixed. The workaround installs
+   * an MouseEvent listener. Upon clicking on a Swing field, the SWT shell gets disabled
+   * and re-enabled again which forces the focus to be released on the SWT field so that
+   * the Swing field will regain the focus.
+   */
+  private class P_MouseEventListener implements AWTEventListener {
+
+    private Shell m_swtShell;
+
+    public void setSwtShell(Shell swtShell) {
+      m_swtShell = swtShell;
+    }
+
+    @Override
+    public void eventDispatched(AWTEvent e) {
+      if (e.getID() == MouseEvent.MOUSE_CLICKED) {
+        if (m_swtShell != null) {
+          swtDisplay.syncExec(new Runnable() {
+            @Override
+            public void run() {
+              if (m_swtShell.getEnabled()) {
+                m_swtShell.setEnabled(false);
+                m_swtShell.setEnabled(true);
+              }
+            }
+          });
+        }
+      }
+    }
+  }
+
 }

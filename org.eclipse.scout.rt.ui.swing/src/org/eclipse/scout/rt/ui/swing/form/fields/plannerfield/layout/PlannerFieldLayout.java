@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,6 +18,7 @@ import java.util.HashMap;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 
 /**
@@ -73,7 +74,9 @@ public class PlannerFieldLayout extends AbstractLayoutManager2 {
          * size, its reported minimumSize, preferredSize and maximumSize are
          * cached instead of beeing calculated using layout manager
          */
-        c.setBounds(0, 0, 0, 0);
+        if (!SwingUtility.IS_JAVA_7_OR_GREATER && SwingUtility.DO_RESET_COMPONENT_BOUNDS) {
+          SwingUtility.setZeroBounds(c);
+        }
         //
         PlannerFieldLayoutConstraints cons = m_constraints.get(c);
         if (cons != null) {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -67,10 +67,10 @@ public class SingleLayout extends AbstractLayoutManager2 {
        * size, its reported minimumSize, preferredSize and maximumSize are
        * cached instead of beeing calculated using layout manager
        */
-      for (Component c : parent.getComponents()) {
-        c.setBounds(0, 0, 0, 0);
+      if (!SwingUtility.IS_JAVA_7_OR_GREATER && SwingUtility.DO_RESET_COMPONENT_BOUNDS) {
+        SwingUtility.setZeroBounds(parent.getComponents());
       }
-      //
+
       for (Component c : parent.getComponents()) {
         if (c.isVisible()) {
           Rectangle r = new Rectangle(new Point(0, 0), parent.getSize());

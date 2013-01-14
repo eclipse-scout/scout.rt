@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,11 +14,13 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 
 import javax.swing.SwingConstants;
 
 import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
+import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 
 /**
@@ -172,8 +174,14 @@ public class FlowLayoutEx extends AbstractLayoutManager2 implements SwingConstan
        * size, its reported minimumSize, preferredSize and maximumSize are
        * cached instead of beeing calculated using layout manager
        */
-      for (Component c : parent.getComponents()) {
-        c.setBounds(0, 0, 0, 0);
+      if (!SwingUtility.IS_JAVA_7_OR_GREATER) {
+        SwingUtility.setZeroBounds(parent.getComponents());
+      }
+      else {
+        for (Component c : parent.getComponents()) {
+          Rectangle r = c.getBounds();
+          c.setBounds(r.x, r.y, 0, 0);
+        }
       }
       //
       int n = m_visibleComponents.length;

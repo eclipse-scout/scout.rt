@@ -277,7 +277,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
           IKeyStroke scoutKs = m_installedScoutKs[i];
           KeyStroke swingKs = SwingUtility.createKeystroke(scoutKs);
           //
-          InputMap imap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+          InputMap imap = component.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
           imap.remove(swingKs);
           ActionMap amap = component.getActionMap();
           amap.remove(scoutKs.getActionId());
@@ -287,7 +287,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
       // add new key strokes
       IKeyStroke[] scoutKeyStrokes = getScoutObject().getKeyStrokes();
       for (IKeyStroke scoutKs : scoutKeyStrokes) {
-        int swingWhen = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
+        int swingWhen = JComponent.WHEN_IN_FOCUSED_WINDOW;
         KeyStroke swingKs = SwingUtility.createKeystroke(scoutKs);
         SwingScoutAction<IAction> action = new SwingScoutAction<IAction>();
         action.createField(scoutKs, getSwingEnvironment());
