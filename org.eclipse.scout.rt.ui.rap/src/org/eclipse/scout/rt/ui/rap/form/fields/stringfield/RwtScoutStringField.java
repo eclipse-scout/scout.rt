@@ -31,10 +31,6 @@ import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -90,14 +86,6 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
       style |= SWT.WRAP;
     }
     StyledText textField = getUiEnvironment().getFormToolkit().createStyledText(container, style);
-    //
-    textField.addDisposeListener(new DisposeListener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-      }
-    });
 
     setUiContainer(container);
     setUiLabel(label);
@@ -112,7 +100,7 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
 
   protected void addDefaultUiListeners(StyledText textField) {
     textField.addSelectionListener(new P_RwtTextSelectionListener());
-    textField.addFocusListener(new P_RwtTextFocsListener());
+    attachFocusListener(textField, true);
   }
 
   @Override
@@ -542,20 +530,5 @@ public class RwtScoutStringField extends RwtScoutValueFieldComposite<IStringFiel
       getUiEnvironment().invokeScoutLater(job, 200);
     }
   }// end class P_DndSupport
-
-  public class P_RwtTextFocsListener implements FocusListener {
-
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void focusGained(FocusEvent event) {
-      //nop
-    }
-
-    @Override
-    public void focusLost(FocusEvent event) {
-      handleUiInputVerifier(true);
-    }
-  }// end class P_RwtTextFocsListener
 
 }
