@@ -146,6 +146,10 @@ public class TimeChooser {
 
       @Override
       public void run() {
+        if (m_table == null || m_table.isDisposed()) {
+          return;
+        }
+
         m_table.showSelection();
       }
     });
