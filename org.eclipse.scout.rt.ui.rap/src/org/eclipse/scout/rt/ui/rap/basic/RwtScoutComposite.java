@@ -195,7 +195,7 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
   protected void setUiContainer(Composite uiContainer) {
     m_uiContainer = uiContainer;
     if (m_uiContainer != null) {
-      P_RwtContainerListener listener = new P_RwtContainerListener();
+      P_RwtContainerDisposeListener listener = new P_RwtContainerDisposeListener();
       m_uiContainer.addListener(SWT.Dispose, listener);
     }
   }
@@ -226,12 +226,20 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
       for (IRwtKeyStroke stroke : getUiKeyStrokes()) {
         getUiEnvironment().addKeyStroke(uiField, stroke, true);
       }
-      P_RwtFieldListener listener = new P_RwtFieldListener();
-      m_uiField.addListener(SWT.FocusIn, listener);
-      m_uiField.addListener(SWT.FocusOut, listener);
-      m_uiField.addListener(SWT.Traverse, listener);
+      P_RwtFieldDisposeListener listener = new P_RwtFieldDisposeListener();
       m_uiField.addListener(SWT.Dispose, listener);
     }
+  }
+
+  /**
+   * Attaches a focus listener on the given field in order to call {@link #handleUiFocusGained()} respectively
+   * {@link #handleUiFocusLost()}. Also calls {@link #handleUiInputVerifier(boolean)} on focus out if callInputVerifier
+   * is set to true.
+   */
+  protected void attachFocusListener(Control field, boolean callInputVerifier) {
+    P_RwtFieldFocusListener listener = new P_RwtFieldFocusListener(callInputVerifier);
+    field.addListener(SWT.FocusIn, listener);
+    field.addListener(SWT.FocusOut, listener);
   }
 
   /**
@@ -337,12 +345,21 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
   protected void handleScoutPropertyChange(String name, Object newValue) {
   }
 
+  /**
+   * @see #attachFocusListener(Control, boolean)
+   */
   protected void handleUiFocusGained() {
   }
 
+  /**
+   * @see #attachFocusListener(Control, boolean)
+   */
   protected void handleUiFocusLost() {
   }
 
+  /**
+   * @see #attachFocusListener(Control, boolean)
+   */
   protected void handleUiInputVerifier(boolean doit) {
     //do nothing
   }
@@ -370,9 +387,13 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
     return m_uiEnvironment;
   }
 
-  private class P_RwtFieldListener implements Listener {
+  private class P_RwtFieldFocusListener implements Listener {
     private static final long serialVersionUID = 1L;
-    private long m_timestamp;
+    private boolean m_callInputVerifier;
+
+    public P_RwtFieldFocusListener(boolean callInputVerifier) {
+      m_callInputVerifier = callInputVerifier;
+    }
 
     @Override
     public void handleEvent(Event event) {
@@ -380,23 +401,6 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
         return;
       }
       switch (event.type) {
-        case SWT.Traverse:
-          switch (event.keyCode) {
-            case SWT.ARROW_DOWN:
-            case SWT.ARROW_UP:
-            case SWT.ARROW_LEFT:
-            case SWT.ARROW_RIGHT:
-            case SWT.HOME:
-            case SWT.END:
-            case SWT.PAGE_DOWN:
-            case SWT.PAGE_UP:
-            case SWT.ESC:
-            case SWT.CR:
-              return;
-          }
-          // guarantee the value be written back to the model
-          handleUiInputVerifier(event.doit);
-          break;
         case SWT.FocusIn:
           handleUiFocusGained();
           break;
@@ -407,14 +411,10 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
             return;
           }
           else {
-            handleUiInputVerifier(true);
+            if (m_callInputVerifier) {
+              handleUiInputVerifier(true);
+            }
             handleUiFocusLost();
-          }
-          break;
-        case SWT.Dispose:
-          if (m_uiContainer == null) {
-            // only activated when there is no container
-            handleUiDispose();
           }
           break;
         default:
@@ -423,7 +423,23 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
     }
   }
 
-  private class P_RwtContainerListener implements Listener {
+  private class P_RwtFieldDisposeListener implements Listener {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void handleEvent(Event event) {
+      switch (event.type) {
+        case SWT.Dispose:
+          if (m_uiContainer == null) {
+            // only activated when there is no container
+            handleUiDispose();
+          }
+          break;
+      }
+    }
+  }
+
+  private class P_RwtContainerDisposeListener implements Listener {
     private static final long serialVersionUID = 1L;
 
     @Override

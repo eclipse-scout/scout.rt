@@ -122,6 +122,7 @@ public class RwtScoutTimeField extends RwtScoutValueFieldComposite<IDateField> i
 
     // listener
     timeChooserButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtBrowseButtonListener());
+    attachFocusListener(textField, true);
     textField.addMouseListener(new MouseAdapter() {
       private static final long serialVersionUID = 1L;
 

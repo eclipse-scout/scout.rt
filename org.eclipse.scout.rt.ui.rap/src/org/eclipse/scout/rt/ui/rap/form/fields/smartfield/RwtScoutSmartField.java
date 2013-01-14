@@ -54,7 +54,6 @@ import org.eclipse.scout.rt.ui.rap.window.popup.RwtScoutDropDownPopup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -145,9 +144,10 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     getUiField().addModifyListener(new P_ModifyListener());
     if (!getScoutObject().isAllowCustomText()) {
       getUiField().addTraverseListener(new P_TraverseListener());
+      attachFocusListener(getUiField(), false);
     }
     else {
-      getUiField().addFocusListener(new P_RwtFocusListener());
+      attachFocusListener(getUiField(), true);
     }
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_DOWN), false);
     getUiEnvironment().addKeyStroke(getUiField(), new P_KeyListener(SWT.ARROW_UP), false);
@@ -507,12 +507,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected void handleUiInputVerifier(boolean doit) {
-    // nop
-    return;
-  }
-
-  @Override
-  public void verifyUiInput() {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
         m_pendingProposalJob.cancel();
@@ -600,7 +594,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       case SWT.ESC:
         break;
       default:
-        verifyUiInput();
+        handleUiInputVerifier(true);
     }
   }
 
@@ -634,27 +628,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     @Override
     public void keyTraversed(TraverseEvent event) {
       handleTraverseFromUi(event);
-    }
-  }
-
-  public class P_RwtFocusListener implements FocusListener {
-
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void focusGained(FocusEvent event) {
-      //nop
-    }
-
-    @Override
-    public void focusLost(FocusEvent event) {
-      // filter all temporary focus events
-      if (getUiField() != null && getUiField().getDisplay().getActiveShell() != null
-          && getUiField().getShell() != getUiField().getDisplay().getActiveShell()) {
-        return;
-      }
-
-      verifyUiInput();
     }
   }
 

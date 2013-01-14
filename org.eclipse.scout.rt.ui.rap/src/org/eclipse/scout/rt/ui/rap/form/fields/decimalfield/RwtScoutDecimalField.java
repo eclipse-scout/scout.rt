@@ -45,6 +45,7 @@ public class RwtScoutDecimalField extends RwtScoutValueFieldComposite<IDecimalFi
 
     StyledText text = new StyledTextEx(container, style);
     text.setTextLimit(32);
+    attachFocusListener(text, true);
     //
     setUiContainer(container);
     setUiLabel(label);

@@ -123,6 +123,7 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
 
     // listener
     dateChooserButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtBrowseButtonListener());
+    attachFocusListener(textField, true);
     textField.addMouseListener(new MouseAdapter() {
       private static final long serialVersionUID = 1L;
 
@@ -136,6 +137,7 @@ public class RwtScoutDateField extends RwtScoutValueFieldComposite<IDateField> i
     setUiLabel(label);
     setDropDownButton(dateChooserButton);
     setUiField(textField);
+
     // layout
     container.setLayout(new LogicalGridLayout(1, 0));
 
