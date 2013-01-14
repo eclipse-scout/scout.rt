@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
@@ -47,73 +48,69 @@ public final class SwtMenuUtility {
   public static IContributionItem[] getMenuContribution(IActionNode<?>[] scoutActionNodes, ISwtEnvironment environment) {
     ArrayList<IContributionItem> contributionItems = new ArrayList<IContributionItem>();
     for (IActionNode<?> scoutAction : scoutActionNodes) {
-      if (scoutAction.isVisible()) {
-        if (scoutAction.isSeparator()) {
-          if (!(contributionItems.size() > 0 && contributionItems.get(contributionItems.size() - 1).isSeparator())) {
-            contributionItems.add(new Separator());
-          }
-        }
-        else if (scoutAction.hasChildActions()) {
-          IMenuManager manager = new MenuManager(scoutAction.getText(), scoutAction.getActionId());
-          fillMenuManager(scoutAction.getChildActions().toArray(new IActionNode<?>[scoutAction.getChildActionCount()]), manager, environment);
-          contributionItems.add(manager);
-        }
-        else if (scoutAction instanceof ICheckBoxMenu) {
-          contributionItems.add(new ActionContributionItem(new SwtScoutAction(scoutAction, environment, SWT.CHECK).getSwtAction()));
-        }
-        else {
-          contributionItems.add(new ActionContributionItem(new SwtScoutAction(scoutAction, environment).getSwtAction()));
-        }
+      if (!scoutAction.isVisible()) {
+        continue;
       }
+      if (scoutAction.isSeparator()
+          //ignore trailing separator
+          && contributionItems.size() > 0 && contributionItems.get(contributionItems.size() - 1).isSeparator()) {
+        continue;
+      }
+
+      contributionItems.add(getMenuContributionItem(scoutAction, environment));
     }
     return contributionItems.toArray(new IContributionItem[contributionItems.size()]);
   }
 
-  public static IContributionItem getMenuContributionItem(IActionNode<?> scoutAction, ISwtEnvironment environment) {
-    IContributionItem item = null;
-    if (scoutAction.isVisible()) {
-      if (scoutAction.isSeparator()) {
-        item = new Separator();
+  private static void fillMenuManager(IActionNode<?>[] scoutActionNodes, IMenuManager manager, ISwtEnvironment environment, boolean disableChildren) {
+    for (IActionNode<?> scoutAction : scoutActionNodes) {
+      if (!scoutAction.isVisible()) {
+        continue;
       }
-      else if (scoutAction.hasChildActions()) {
-        IMenuManager manager = new MenuManager(scoutAction.getText(), scoutAction.getActionId());
-        fillMenuManager(scoutAction.getChildActions().toArray(new IActionNode<?>[scoutAction.getChildActionCount()]), manager, environment);
-        item = manager;
+      if (scoutAction.isSeparator()
+          //ignore trailing separator
+          && manager.getItems().length > 0 && manager.getItems()[manager.getItems().length - 1].isSeparator()) {
+        continue;
       }
-      else if (scoutAction instanceof ICheckBoxMenu) {
-        item = new ActionContributionItem(new SwtScoutAction(scoutAction, environment, SWT.CHECK).getSwtAction());
-      }
-      else {
-        item = new ActionContributionItem(new SwtScoutAction(scoutAction, environment).getSwtAction());
-      }
+
+      manager.add(getMenuContributionItem(scoutAction, environment, disableChildren));
     }
-    return item;
   }
 
-  private static void fillMenuManager(IActionNode<?>[] scoutActionNodes, IMenuManager manager, ISwtEnvironment environment) {
-    for (IActionNode<?> scoutAction : scoutActionNodes) {
-      if (scoutAction.isVisible()) {
-        if (scoutAction.isSeparator()) {
-          if (manager.getItems().length > 0 && manager.getItems()[manager.getItems().length - 1].isSeparator()) {
+  public static IContributionItem getMenuContributionItem(IActionNode<?> scoutAction, ISwtEnvironment environment) {
+    return getMenuContributionItem(scoutAction, environment, false);
+  }
 
-          }
-          else {
-            manager.add(new Separator());
-          }
-        }
-        else if (scoutAction.hasChildActions()) {
-          IMenuManager childManager = new MenuManager(scoutAction.getText(), scoutAction.getActionId());
-          fillMenuManager(scoutAction.getChildActions().toArray(new IActionNode<?>[scoutAction.getChildActionCount()]), childManager, environment);
-          manager.add(childManager);
-        }
-        else if (scoutAction instanceof ICheckBoxMenu) {
-          manager.add(new ActionContributionItem(new SwtScoutAction(scoutAction, environment, SWT.CHECK).getSwtAction()));
-        }
-        else {
-          manager.add(new ActionContributionItem(new SwtScoutAction(scoutAction, environment).getSwtAction()));
-        }
-      }
+  public static IContributionItem getMenuContributionItem(IActionNode<?> scoutAction, ISwtEnvironment environment, boolean disableItem) {
+    if (!scoutAction.isVisible()) {
+      return null;
     }
+
+    if (scoutAction.isSeparator()) {
+      return new Separator();
+    }
+
+    if (scoutAction.hasChildActions()) {
+      IMenuManager manager = new MenuManager(scoutAction.getText(), scoutAction.getActionId());
+      //Disable children since menuManager itself can't be disabled
+      boolean disableChilds = !scoutAction.isEnabled() || disableItem;
+      fillMenuManager(scoutAction.getChildActions().toArray(new IActionNode<?>[scoutAction.getChildActionCount()]), manager, environment, disableChilds);
+      return manager;
+    }
+
+    if (scoutAction instanceof ICheckBoxMenu) {
+      Action swtAction = new SwtScoutAction(scoutAction, environment, SWT.CHECK).getSwtAction();
+      if (disableItem) {
+        swtAction.setEnabled(false);
+      }
+      return new ActionContributionItem(swtAction);
+    }
+
+    Action swtAction = new SwtScoutAction(scoutAction, environment).getSwtAction();
+    if (disableItem) {
+      swtAction.setEnabled(false);
+    }
+    return new ActionContributionItem(swtAction);
   }
 
   public static void fillContextMenu(IMenu[] scoutMenus, Menu menu, ISwtEnvironment environment) {

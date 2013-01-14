@@ -67,6 +67,7 @@ public class RwtScoutAction {
     }
     m_uiAction.setToolTipText(m_scoutAction.getTooltipText());
     m_uiAction.setImageDescriptor(getUiEnvironment().getImageDescriptor(m_scoutAction.getIconId()));
+    m_uiAction.setEnabled(scoutAction.isEnabled());
 
     setKeyStrokeFromScout(keyStroke);
   }

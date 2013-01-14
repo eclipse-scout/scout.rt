@@ -46,6 +46,7 @@ public class SwtScoutAction {
     m_swtAction.setText(m_scoutAction.getText());
     m_swtAction.setToolTipText(m_scoutAction.getTooltipText());
     m_swtAction.setImageDescriptor(m_environment.getImageDescriptor(m_scoutAction.getIconId()));
+    m_swtAction.setEnabled(m_scoutAction.isEnabled());
 
     setKeyStrokeFromScout(keyStroke);
   }
