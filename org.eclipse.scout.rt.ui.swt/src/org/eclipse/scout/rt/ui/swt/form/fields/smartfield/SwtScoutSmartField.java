@@ -295,18 +295,18 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
             public void formChanged(FormEvent e) throws ProcessingException {
               switch (e.getType()) {
                 case FormEvent.TYPE_STRUCTURE_CHANGED:
-                Runnable job = new Runnable() {
-                  @Override
-                  public void run() {
-                    if (m_proposalPopup != null) {
-                      m_proposalPopup.autoAdjustBounds();
+                  Runnable job = new Runnable() {
+                    @Override
+                    public void run() {
+                      if (m_proposalPopup != null) {
+                        m_proposalPopup.autoAdjustBounds();
+                      }
                     }
-                  }
-                };
-                getEnvironment().invokeSwtLater(job);
-                break;
+                  };
+                  getEnvironment().invokeSwtLater(job);
+                  break;
+              }
             }
-          }
           });
           //enqueue a later display job since there may be waiting display tasks in the queue that change the table/tree
           getSwtField().getDisplay().asyncExec(new Runnable() {
@@ -358,7 +358,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
         m_pendingProposalJob.cancel();
       }
       m_pendingProposalJob.update(text, selectCurrentValue);
-      int delay = 400;
+      int delay = 200;
       if (m_proposalPopup == null) {
         delay = 0;
       }
@@ -401,11 +401,6 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
 
   @Override
   protected boolean handleSwtInputVerifier() {
-    // void since handle swt input verifier works with focus and not traverse events
-    return true;
-  }
-
-  protected boolean handleSwtTraverseVerifier() {
     synchronized (m_pendingProposalJobLock) {
       if (m_pendingProposalJob != null) {
         m_pendingProposalJob.cancel();
@@ -515,25 +510,11 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<ISmartField<
 
   protected void handleTraverseFromUi(Event event) {
     switch (event.keyCode) {
-      case SWT.ARROW_DOWN:
-      case SWT.ARROW_UP:
-      case SWT.ARROW_LEFT:
-      case SWT.ARROW_RIGHT:
-      case SWT.HOME:
-      case SWT.END:
-      case SWT.PAGE_DOWN:
-      case SWT.PAGE_UP:
-      case SWT.CR:
-        // void break
-        break;
       case SWT.ESC:
         if (m_proposalPopup != null) {
           event.doit = false;
         }
         break;
-      default:
-        event.doit = handleSwtTraverseVerifier();
-
     }
 
   }
