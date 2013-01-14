@@ -70,6 +70,7 @@ import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.JTextComponent;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
@@ -92,6 +93,9 @@ import org.eclipse.scout.rt.ui.swing.simulator.SwingScoutSimulator;
 
 public final class SwingUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingUtility.class);
+
+  public static final boolean IS_JAVA_7_OR_GREATER = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") >= 0;
+  public static final boolean DO_RESET_COMPONENT_BOUNDS = StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty("scout.ui.layout.resetBoundsOnInvalidate"), true);
 
   private SwingUtility() {
   }
@@ -1254,6 +1258,17 @@ public final class SwingUtility {
         }
       }
       window.setIconImages(iconList);
+    }
+  }
+
+  /*
+   * necessary as workaround for awt bug: when component does not change
+   * size, its reported minimumSize, preferredSize and maximumSize are
+   * cached instead of beeing calculated using layout manager
+   */
+  public static void setZeroBounds(Component... components) {
+    for (Component c : components) {
+      c.setBounds(0, 0, 0, 0);
     }
   }
 

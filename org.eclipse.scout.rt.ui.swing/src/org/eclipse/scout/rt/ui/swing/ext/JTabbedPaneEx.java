@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JTabbedPane;
@@ -113,7 +114,13 @@ public class JTabbedPaneEx extends JTabbedPane implements ChangeListener {
     for (int i = 0, n = this.getComponentCount(); i < n; i++) {
       Component comp = this.getComponent(i);
       if (comp != selected) {
-        comp.setBounds(0, 0, 0, 0);
+        if (!SwingUtility.IS_JAVA_7_OR_GREATER) {
+          SwingUtility.setZeroBounds(comp);
+        }
+        else {
+          Rectangle r = comp.getBounds();
+          comp.setBounds(r.x, r.y, 0, 0);
+        }
       }
       else {
         // nop
