@@ -395,8 +395,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   }
 
   /**
-   * called just before the transaction is being committed or rollbacked<br>
-   * do not call commit here, the flag is just meant as a hint
+   * Called just before the transaction is being committed or rollbacked.<br>
+   * Do not call commit here, the flag is just meant as a hint.
+   * Statements are executed, even if the transaction is canceled.
    */
   @ConfigOperation
   @Order(50)
@@ -900,7 +901,13 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     public void commitPhase2() {
       try {
         // this is the end of the transaction
-        execEndTransaction(true);
+        try {
+          setFinishingTransaction(true);
+          execEndTransaction(false);
+        }
+        finally {
+          setFinishingTransaction(false);
+        }
         m_conn.commit();
       }
       catch (Exception e) {
@@ -912,7 +919,13 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     public void rollback() {
       try {
         // this is the end of the transaction
-        execEndTransaction(false);
+        try {
+          setFinishingTransaction(true);
+          execEndTransaction(false);
+        }
+        finally {
+          setFinishingTransaction(false);
+        }
         m_conn.rollback();
       }
       catch (Exception e) {

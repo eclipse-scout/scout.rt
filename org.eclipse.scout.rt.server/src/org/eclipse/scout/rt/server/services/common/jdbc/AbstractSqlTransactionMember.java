@@ -16,6 +16,9 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
   private final HashSet<Statement> m_activeStatements = new HashSet<Statement>();
   private boolean m_cancelled;
 
+  /** true during completion phase (commit/rollback) */
+  private boolean m_finishingTransaction;
+
   public AbstractSqlTransactionMember(String transactionMemberId) {
     super(transactionMemberId);
   }
@@ -30,6 +33,10 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
     return true;
   }
 
+  protected void setFinishingTransaction(boolean finishingTransaction) {
+    m_finishingTransaction = finishingTransaction;
+  }
+
   /**
    * Registers a statement in order to be canceled by {@link ITransaction#cancel()}
    * 
@@ -39,7 +46,7 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
    */
   public void registerActiveStatement(Statement statement) throws SQLException {
     synchronized (m_activeStatementsLock) {
-      if (m_cancelled) {
+      if (m_cancelled && !m_finishingTransaction) {
         throw new SQLException("Transaction was cancelled");
       }
       m_activeStatements.add(statement);
