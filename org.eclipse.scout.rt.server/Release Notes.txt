@@ -402,3 +402,17 @@ Bugzilla 379721: OfflineDispatcherService: dispatcher thread should be 'offline 
 Migration:
 None
 
+
+15.01.2013 jgu
+Bugzilla ticket: 398087
+Problem:
+After having canceled a transaction (e.g. by pressing "Press Here to Cancel" in the client application), the execute of a DB call within the execEndTransaction method of an SqlService implementation fails because Scout prevents the execution by throwing an SQLException ("Transaction was cancelled").
+
+Executing a DB call within execEndTransaction can be required in the scenario of a custom audit trail implementation, where each transaction must be logged on the database.
+
+Solution:
+Statements called in execEndTransaction are executed even if the transaction is cancelled. This is done by a new Property in AbstractSqlTransactionMember.
+
+Migration:
+None
+
