@@ -293,6 +293,10 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   protected void moveLabelToTop(IFormField field) {
+    if (field instanceof IGroupBox) {
+      return;
+    }
+
     if (IFormField.LABEL_POSITION_ON_FIELD == field.getLabelPosition()) {
       return;
     }

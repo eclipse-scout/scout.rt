@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableUIFacade;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -141,6 +142,54 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   @Override
   public DrillDownStyleMap getDrillDownStyleMap() {
     return m_drillDownStyleMap;
+  }
+
+  public static void setAutoCreateRowForm(ITable table, Boolean autoCreateRowForm) {
+    table.setProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM, autoCreateRowForm);
+  }
+
+  public static Boolean isAutoCreateRowForm(ITable table) {
+    return (Boolean) table.getProperty(IMobileTable.PROP_AUTO_CREATE_TABLE_ROW_FORM);
+  }
+
+  public static void setDrillDownStyleMap(ITable table, DrillDownStyleMap drillDownStyles) {
+    table.setProperty(IMobileTable.PROP_DRILL_DOWN_STYLE_MAP, drillDownStyles);
+  }
+
+  public static DrillDownStyleMap getDrillDownStyleMap(ITable table) {
+    return (DrillDownStyleMap) table.getProperty(IMobileTable.PROP_DRILL_DOWN_STYLE_MAP);
+  }
+
+  public static void setDefaultDrillDownStyle(ITable table, String defaultDrillDownStyle) {
+    table.setProperty(IMobileTable.PROP_DEFAULT_DRILL_DOWN_STYLE, defaultDrillDownStyle);
+  }
+
+  public static String getDefaultDrillDownStyle(ITable table) {
+    return (String) table.getProperty(IMobileTable.PROP_DEFAULT_DRILL_DOWN_STYLE);
+  }
+
+  public static Boolean isPagingEnabled(ITable table) {
+    return (Boolean) table.getProperty(IMobileTable.PROP_PAGING_ENABLED);
+  }
+
+  public static void setPagingEnabled(ITable table, Boolean enabled) {
+    table.setProperty(IMobileTable.PROP_PAGING_ENABLED, enabled);
+  }
+
+  public static Integer getPageSize(ITable table) {
+    return (Integer) table.getProperty(IMobileTable.PROP_PAGE_SIZE);
+  }
+
+  public static void setPageSize(ITable table, int pageSize) {
+    table.setProperty(IMobileTable.PROP_PAGE_SIZE, pageSize);
+  }
+
+  public static Integer getPageIndex(ITable table) {
+    return (Integer) table.getProperty(IMobileTable.PROP_PAGE_INDEX);
+  }
+
+  public static void setPageIndex(ITable table, int index) {
+    table.setProperty(IMobileTable.PROP_PAGE_INDEX, index);
   }
 
   protected boolean getConfiguredPagingEnabled() {

@@ -16,10 +16,12 @@ public class AbstractMobileBackAction extends AbstractMenu {
 
   @Override
   protected void execInitAction() throws ProcessingException {
+    IBreadCrumbsNavigation breadCrumbsNavigation = SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation();
     if (m_breadCrumbsListener == null) {
       m_breadCrumbsListener = new P_BreadCrumbsListener();
-      SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation().addBreadCrumbsListener(m_breadCrumbsListener);
+      breadCrumbsNavigation.addBreadCrumbsListener(m_breadCrumbsListener);
     }
+    setVisible(breadCrumbsNavigation.isSteppingBackPossible());
   }
 
   @Override
