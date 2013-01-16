@@ -481,7 +481,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
    * method {@code isSaveAndRestoreScrollbars()} returns {@code true}.
    */
   protected void saveScrollbarValues() {
-    if (!getScoutObject().isSaveAndRestoreScrollbars()) {
+    if (getScoutObject() == null || !getScoutObject().isSaveAndRestoreScrollbars()) {
       return;
     }
 
@@ -505,7 +505,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
    * tree's model method {@code isSaveAndRestoreScrollbars()} return {@code true}.
    */
   protected void restoreScrollbarValues() {
-    if (!getScoutObject().isSaveAndRestoreScrollbars()) {
+    if (getScoutObject() == null || !getScoutObject().isSaveAndRestoreScrollbars()) {
       return;
     }
 
