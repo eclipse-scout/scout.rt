@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformation;
-import org.eclipse.scout.rt.client.mobile.ui.basic.table.MobileTable;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.AbstractBackButton;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.smartfield.MobileSmartTableForm.MainBox.GroupBox.FilterField;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -71,8 +71,8 @@ public class MobileSmartTableForm extends SmartTableForm {
     setTitle(title);
     getResultTableField().getTable().setCheckable(true);
     getResultTableField().getTable().addTableListener(new P_TableListener());
-    MobileTable.setPagingEnabled(getResultTableField().getTable(), true);
-    MobileTable.setPageSize(getResultTableField().getTable(), DEFAULT_TABLE_PAGE_SIZE);
+    AbstractMobileTable.setPagingEnabled(getResultTableField().getTable(), true);
+    AbstractMobileTable.setPageSize(getResultTableField().getTable(), DEFAULT_TABLE_PAGE_SIZE);
 
     GridData tableFieldGridDataHints = getResultTableField().getGridDataHints();
     tableFieldGridDataHints.useUiHeight = false;

@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformation;
+import org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.DrillDownStyleMap;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.MobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
@@ -223,7 +224,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       pageTable.setDefaultIconId(m_page.getCell().getIconId());
     }
 
-    MobileTable.setAutoCreateRowForm(pageTable, false);
+    AbstractMobileTable.setAutoCreateRowForm(pageTable, false);
     getPageTableField().setTable(pageTable, true);
     getPageTableField().setTableStatusVisible(m_pageFormConfig.isTableStatusVisible());
     addTableListener();
@@ -270,7 +271,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     DrillDownStyleMap drillDownMap = MobileTable.getDrillDownStyleMap(table);
     if (drillDownMap == null) {
       drillDownMap = new DrillDownStyleMap();
-      MobileTable.setDrillDownStyleMap(table, drillDownMap);
+      AbstractMobileTable.setDrillDownStyleMap(table, drillDownMap);
     }
 
     for (ITableRow row : rows) {
