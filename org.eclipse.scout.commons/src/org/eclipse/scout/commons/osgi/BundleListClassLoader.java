@@ -67,7 +67,15 @@ public class BundleListClassLoader extends ClassLoader {
     Arrays.sort(m_bundlesSortedByBundleSymbolicNameLenght, new Comparator<Bundle>() {
       @Override
       public int compare(Bundle b1, Bundle b2) {
-        // b1 and b2 are never null
+        if (b1 == null && b2 == null) {
+          return 0;
+        }
+        if (b1 == null) {
+          return -1;
+        }
+        if (b2 == null) {
+          return 1;
+        }
         return StringUtility.length(b2.getSymbolicName()) - StringUtility.length(b1.getSymbolicName());
       }
     });
