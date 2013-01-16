@@ -294,6 +294,9 @@ public final class BundleInspector {
       }
       if (Platform.isFragment(b)) {
         b = getHostBundle(b);
+        if (b == null) {
+          continue;
+        }
       }
       if (!filteredBundles.contains(b)) {
         // add the the bundle only if it is not already part of the list (which could happen if a fragment's host was already added before)
