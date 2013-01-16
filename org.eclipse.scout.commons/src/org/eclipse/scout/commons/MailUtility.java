@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -453,7 +454,7 @@ public final class MailUtility {
       boolean hasPlainText = false;
       if (plainTextFile.exists()) {
         Reader reader = new FileReader(plainTextFile);
-        plainTextMessage = IOUtility.getContent(reader);
+        plainTextMessage = IOUtility.getContent(new InputStreamReader(new FileInputStream(plainTextFile), "UTF-8"));
         reader.close();
         hasPlainText = StringUtility.hasText(plainTextMessage);
       }
@@ -484,7 +485,7 @@ public final class MailUtility {
       boolean hasHtml = false;
       if (htmlFile.exists()) {
         Reader reader = new FileReader(htmlFile);
-        htmlMessage = IOUtility.getContent(reader);
+        htmlMessage = IOUtility.getContent(new InputStreamReader(new FileInputStream(htmlFile), "UTF-8"));
         reader.close();
         // replace directory entry
         // replace all paths to the 'files directory' with the root directory
