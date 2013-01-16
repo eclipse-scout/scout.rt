@@ -75,6 +75,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private IEventHistory<TreeEvent> m_eventHistory;
   // only do one action at a time
   private boolean m_actionRunning;
+  private boolean m_saveAndRestoreScrollbars;
 
   public AbstractTree() {
     this(true);
@@ -214,6 +215,24 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return false;
   }
 
+  /**
+   * Configures whether this tree should save and restore its coordinates of the vertical and horizontal scrollbars.
+   * If this property is set to {@code true}, the tree saves its scrollbars coordinates to the {@link #ClientSession}
+   * upon
+   * detaching the UI component from Scout. The coordinates are restored (if the coordnates are available), when the UI
+   * component is attached to Scout.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   * 
+   * @return {@code true} if this tree should save and restore its scrollbars coordinates, {@code false} otherwise
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(90)
+  @ConfigPropertyValue("false")
+  protected boolean getConfiguredSaveAndRestoreScrollbars() {
+    return false;
+  }
+
   private Class<? extends IKeyStroke>[] getConfiguredKeyStrokes() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
@@ -332,6 +351,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setRootNodeVisible(getConfiguredRootNodeVisible());
     setRootHandlesVisible(getConfiguredRootHandlesVisible());
     setScrollToSelection(getConfiguredScrollToSelection());
+    setSaveAndRestoreScrollbars(getConfiguredSaveAndRestoreScrollbars());
     setRootNode(new AbstractTreeNode() {
     });
     // add Convenience observer for drag & drop callbacks and event history
@@ -2385,6 +2405,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public ITreeUIFacade getUIFacade() {
     return m_uiFacade;
+  }
+
+  @Override
+  public boolean isSaveAndRestoreScrollbars() {
+    return m_saveAndRestoreScrollbars;
+  }
+
+  @Override
+  public void setSaveAndRestoreScrollbars(boolean b) {
+    m_saveAndRestoreScrollbars = b;
   }
 
   private abstract class P_AbstractCollectingTreeVisitor implements ITreeVisitor {

@@ -23,11 +23,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
@@ -46,6 +48,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -177,6 +180,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     if (getScoutObject() == null) {
       return;
     }
+    saveScrollbarValues();
     if (m_scoutTreeListener != null) {
       getScoutObject().removeTreeListener(m_scoutTreeListener);
       m_scoutTreeListener = null;
@@ -223,6 +227,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         }
       });
     }
+    restoreScrollbarValues();
   }
 
   /*
@@ -467,6 +472,82 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
           getSwingTree().scrollRowToVisible(nextIndex);
         }
         getSwingTree().scrollRowToVisible(index);
+      }
+    }
+  }
+
+  /**
+   * Saves the coordinates of the vertical and horizontal scrollbars to the {@link ClientSession} if the tree's model
+   * method {@code isSaveAndRestoreScrollbars()} returns {@code true}.
+   */
+  protected void saveScrollbarValues() {
+    if (!getScoutObject().isSaveAndRestoreScrollbars()) {
+      return;
+    }
+
+    final int verticalValue = m_swingScrollPane.getVerticalScrollBar() != null ? m_swingScrollPane.getVerticalScrollBar().getValue() : 0;
+    final int horizontalValue = m_swingScrollPane.getHorizontalScrollBar() != null ? m_swingScrollPane.getHorizontalScrollBar().getValue() : 0;
+
+    // save values in Scout ClientSession
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        ClientJob.getCurrentSession().setData(Scrollbar.VERTICAL.getType() + "_" + getScoutObject().toString(), verticalValue);
+        ClientJob.getCurrentSession().setData(Scrollbar.HORIZONTAL.getType() + "_" + getScoutObject().toString(), horizontalValue);
+      }
+    };
+
+    getSwingEnvironment().invokeScoutLater(t, 1234);
+  }
+
+  /**
+   * Restores the coordinates of the vertical and horizontal scrollbars if available in the {@link ClientSession} if the
+   * tree's model method {@code isSaveAndRestoreScrollbars()} return {@code true}.
+   */
+  protected void restoreScrollbarValues() {
+    if (!getScoutObject().isSaveAndRestoreScrollbars()) {
+      return;
+    }
+
+    final AtomicReference<ScrollbarValues> scrollbarValues = new AtomicReference<ScrollbarValues>();
+
+    // restore Scrollbar values from Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        Integer verticalValue = (Integer) ClientJob.getCurrentSession().getData(Scrollbar.VERTICAL.getType() + "_" + getScoutObject().toString());
+        Integer horizontalValue = (Integer) ClientJob.getCurrentSession().getData(Scrollbar.HORIZONTAL.getType() + "_" + getScoutObject().toString());
+
+        if (horizontalValue != null || verticalValue != null) {
+          scrollbarValues.set(new ScrollbarValues(horizontalValue, verticalValue));
+        }
+      }
+    };
+
+    try {
+      getSwingEnvironment().invokeScoutLater(t, 1234).join(1234);
+    }
+    catch (InterruptedException e) {
+      LOG.debug("exception occured while joining on model thread: " + e);
+    }
+    if (scrollbarValues.get() != null) {
+      /*
+       * Since the scrollbars are relative to the selection before, we need to scroll to the selected
+       * tree node before restoring the scrollbars.
+       */
+      scrollToSelection();
+
+      Integer horizontal = scrollbarValues.get().horizontal;
+      Integer vertical = scrollbarValues.get().vertical;
+
+      JScrollBar horizontalScrollBar = m_swingScrollPane.getHorizontalScrollBar();
+      if (horizontal != null && horizontalScrollBar != null && horizontalScrollBar.isVisible()) {
+        horizontalScrollBar.setValue(horizontal);
+      }
+
+      JScrollBar verticalScrollBar = m_swingScrollPane.getVerticalScrollBar();
+      if (vertical != null && verticalScrollBar != null && verticalScrollBar.isVisible()) {
+        verticalScrollBar.setValue(vertical);
       }
     }
   }
@@ -1078,4 +1159,28 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     }
   }// end private class
 
+  private enum Scrollbar {
+    HORIZONTAL("HORIZONTAL_SCROLLBAR"),
+    VERTICAL("VERTICAL_SCROLLBAR");
+
+    private final String m_scrollbarType;
+
+    Scrollbar(String scrollbarType) {
+      m_scrollbarType = scrollbarType;
+    }
+
+    public String getType() {
+      return m_scrollbarType;
+    }
+  }
+
+  private static class ScrollbarValues {
+    protected final Integer horizontal;
+    protected final Integer vertical;
+
+    public ScrollbarValues(Integer horizontal, Integer vertical) {
+      this.horizontal = horizontal;
+      this.vertical = vertical;
+    }
+  }
 }

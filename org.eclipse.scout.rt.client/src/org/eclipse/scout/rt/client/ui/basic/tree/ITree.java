@@ -475,4 +475,17 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    * UI Processes
    */
   ITreeUIFacade getUIFacade();
+
+  /**
+   * @return if {@code true}, the attached UI will save or restore its horizontal and vertical coordinates of its
+   *         scrollbars.
+   */
+  boolean isSaveAndRestoreScrollbars();
+
+  /**
+   * @param b
+   *          {@code true} advices the attached UI to save or restore its horizontal and vertical coordinates of its
+   *          scrollbars.
+   */
+  void setSaveAndRestoreScrollbars(boolean b);
 }
