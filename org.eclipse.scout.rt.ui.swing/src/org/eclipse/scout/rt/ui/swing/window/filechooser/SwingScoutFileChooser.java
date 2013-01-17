@@ -62,7 +62,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
     }
   }
 
-  private File[] showFileChooserSwing() {
+  protected File[] showFileChooserSwing() {
     String[] extensions = m_scoutFileChooser.getFileExtensions();
     boolean openMode = m_scoutFileChooser.isTypeLoad();
     File curDir = m_scoutFileChooser.getDirectory();
@@ -74,21 +74,11 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
     try {
       SecurityManager sm = System.getSecurityManager();
       System.setSecurityManager(null);
-      if (curDir != null) {
-        dlg = new JFileChooser(curDir);
-      }
-      else {
-        dlg = new JFileChooser();
-      }
+      dlg = createFileChooserSwing(curDir);
       System.setSecurityManager(sm);
     }
     catch (Exception e) {
-      if (curDir != null) {
-        dlg = new JFileChooser(curDir);
-      }
-      else {
-        dlg = new JFileChooser();
-      }
+      dlg = createFileChooserSwing(curDir);
     }
     // end workaround
     if (folderMode) {
@@ -154,7 +144,14 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
     return f != null ? new File[]{f} : new File[0];
   }
 
-  private File[] showFileChooserAWT() {
+  protected JFileChooser createFileChooserSwing(File curDir) {
+    if (curDir != null) {
+      return new JFileChooser(curDir);
+    }
+    return new JFileChooser();
+  }
+
+  protected File[] showFileChooserAWT() {
     String[] extensions = m_scoutFileChooser.getFileExtensions();
     boolean openMode = m_scoutFileChooser.isTypeLoad();
     File curDir = m_scoutFileChooser.getDirectory();
@@ -179,27 +176,11 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
       if (buf.length() == 0) {
         buf.append("*.*");
       }
-      if (m_owner instanceof Dialog) {
-        dlg = new FileDialog((Dialog) m_owner, buf.toString(), openMode ? FileDialog.LOAD : FileDialog.SAVE);
-      }
-      else if (m_owner instanceof Frame) {
-        dlg = new FileDialog((Frame) m_owner, buf.toString(), openMode ? FileDialog.LOAD : FileDialog.SAVE);
-      }
-      else {
-        dlg = new FileDialog(new Frame(), buf.toString(), openMode ? FileDialog.LOAD : FileDialog.SAVE);
-      }
+      dlg = createFileChooserAWT(m_owner, buf.toString(), openMode);
       System.setSecurityManager(sm);
     }
     catch (Exception e) {
-      if (m_owner instanceof Dialog) {
-        dlg = new FileDialog((Dialog) m_owner);
-      }
-      else if (m_owner instanceof Frame) {
-        dlg = new FileDialog((Frame) m_owner);
-      }
-      else {
-        dlg = new FileDialog(new Frame());
-      }
+      dlg = createFileChooserAWT(m_owner);
     }
     finally {
       try {
@@ -273,6 +254,20 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
       }
     }
     return f != null ? new File[]{f} : new File[0];
+  }
+
+  protected FileDialog createFileChooserAWT(Window owner) {
+    return createFileChooserAWT(owner, "", true);
+  }
+
+  protected FileDialog createFileChooserAWT(Window owner, String title, boolean openMode) {
+    if (owner instanceof Dialog) {
+      return new FileDialog((Dialog) owner, title, openMode ? FileDialog.LOAD : FileDialog.SAVE);
+    }
+    else if (m_owner instanceof Frame) {
+      return new FileDialog((Frame) m_owner, title, openMode ? FileDialog.LOAD : FileDialog.SAVE);
+    }
+    return new FileDialog(new Frame(), title, openMode ? FileDialog.LOAD : FileDialog.SAVE);
   }
 
   private class ExtensionFileFilter extends javax.swing.filechooser.FileFilter {
