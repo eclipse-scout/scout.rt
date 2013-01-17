@@ -13,10 +13,14 @@ package org.eclipse.scout.rt.ui.rap.form.fields.browserfield;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
@@ -105,48 +109,16 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
     if (location == null && r != null && r.exists()) {
       try {
         if (r.getName().matches(".*\\.(zip|jar)")) {
-          File tempDir = IOUtility.createTempDirectory("browser");
-          try {
-            r.writeZipContentToDirectory(tempDir);
-            String simpleName = r.getName().replaceAll("\\.(zip|jar)", ".htm");
-            //rewrite local urls and register resource
-            int prefixLen = tempDir.getAbsolutePath().length() + 1;
-            for (File f : IOUtility.listFilesInSubtree(tempDir, null)) {
-              if (f.isFile()) {
-                String path = f.getAbsolutePath().substring(prefixLen);
-                if (path.toLowerCase().matches(".*\\.(htm|html)")) {
-                  String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f), "UTF-8"));
-                  content = m_browserExtension.adaptLocalHyperlinks(content, 1);
-                  if (location == null && path.startsWith(simpleName)) {
-                    //this is the index.html
-                    location = m_browserExtension.addResource(simpleName, new ByteArrayInputStream(content.getBytes("UTF-8")));
-                  }
-                  else {
-                    m_browserExtension.addResource(path, new ByteArrayInputStream(content.getBytes("UTF-8")));
-                  }
-                }
-                else if (path.toLowerCase().matches(".*\\.(svg)")) {
-                  String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f)));
-                  content = m_browserExtension.adaptLocalHyperlinks(content, 1);
-                  m_browserExtension.addResource(path, new ByteArrayInputStream(content.getBytes("UTF-8")));
-                }
-                else {
-                  m_browserExtension.addResource(path, new FileInputStream(f));
-                }
-              }
-            }
-          }
-          finally {
-            if (tempDir != null) {
-              IOUtility.deleteDirectory(tempDir);
-            }
-          }
+          location = registerResourcesInZip(r);
         }
         else {
-          //rewrite local urls
           String content = IOUtility.getContent(r.getDecompressedReader());
           content = m_browserExtension.adaptLocalHyperlinks(content, 1);
           location = m_browserExtension.addResource(r.getName(), new ByteArrayInputStream(content.getBytes("UTF-8")));
+        }
+        //Prevent caching by making the request unique
+        if (location != null) {
+          location += "?nocache=" + System.currentTimeMillis();
         }
       }
       catch (Throwable t) {
@@ -160,6 +132,47 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
     else {
       getUiField().setText("");
     }
+  }
+
+  private String registerResourcesInZip(RemoteFile zipFile) throws ProcessingException, IOException, UnsupportedEncodingException, FileNotFoundException {
+    String location = null;
+    File tempDir = IOUtility.createTempDirectory("browser");
+    try {
+      zipFile.writeZipContentToDirectory(tempDir);
+      String simpleName = zipFile.getName().replaceAll("\\.(zip|jar)", ".htm");
+      //rewrite local urls and register resource
+      int prefixLen = tempDir.getAbsolutePath().length() + 1;
+      for (File f : IOUtility.listFilesInSubtree(tempDir, null)) {
+        if (f.isFile()) {
+          String path = f.getAbsolutePath().substring(prefixLen);
+          if (path.toLowerCase().matches(".*\\.(htm|html)")) {
+            String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f), "UTF-8"));
+            content = m_browserExtension.adaptLocalHyperlinks(content, 1);
+            if (location == null && path.startsWith(simpleName)) {
+              //this is the index.html
+              location = m_browserExtension.addResource(simpleName, new ByteArrayInputStream(content.getBytes("UTF-8")));
+            }
+            else {
+              m_browserExtension.addResource(path, new ByteArrayInputStream(content.getBytes("UTF-8")));
+            }
+          }
+          else if (path.toLowerCase().matches(".*\\.(svg)")) {
+            String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f)));
+            content = m_browserExtension.adaptLocalHyperlinks(content, 1);
+            m_browserExtension.addResource(path, new ByteArrayInputStream(content.getBytes("UTF-8")));
+          }
+          else {
+            m_browserExtension.addResource(path, new FileInputStream(f));
+          }
+        }
+      }
+    }
+    finally {
+      if (tempDir != null) {
+        IOUtility.deleteDirectory(tempDir);
+      }
+    }
+    return location;
   }
 
   @Override
