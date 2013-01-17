@@ -115,7 +115,7 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
               if (f.isFile()) {
                 String path = f.getAbsolutePath().substring(prefixLen);
                 if (path.toLowerCase().matches(".*\\.(htm|html)")) {
-                  String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f)));
+                  String content = IOUtility.getContent(new InputStreamReader(new FileInputStream(f), "UTF-8"));
                   content = m_browserExtension.adaptLocalHyperlinks(content, 1);
                   if (location == null && path.startsWith(simpleName)) {
                     //this is the index.html
