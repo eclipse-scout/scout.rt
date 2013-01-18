@@ -650,6 +650,9 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
   @Override
   public boolean removeGlobalKeyStroke(IRwtKeyStroke stroke) {
+    if (m_keyStrokeManager == null) {
+      return false;
+    }
     return m_keyStrokeManager.removeGlobalKeyStroke(stroke);
   }
 
