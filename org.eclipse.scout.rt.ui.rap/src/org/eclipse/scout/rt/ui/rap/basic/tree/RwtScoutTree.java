@@ -54,7 +54,6 @@ import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.internal.widgets.MarkupValidator;
@@ -65,17 +64,13 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 
 /**
- * <h3>RwtScoutTree</h3> ...
- * 
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 @SuppressWarnings("restriction")
 public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutTree {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutTree.class);
 
   private P_ScoutTreeListener m_scoutTreeListener;
-
-  private Menu m_contextMenu;
 
   private TreeViewer m_treeViewer;
 
@@ -111,13 +106,9 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     viewer.getTree().addListener(SWT.MouseDown, treeListener);
     viewer.getTree().addListener(SWT.MouseUp, treeListener);
     viewer.getTree().addListener(SWT.KeyUp, treeListener);
+    viewer.getTree().addListener(SWT.MenuDetect, treeListener);
 
     getUiEnvironment().addKeyStroke(viewer.getTree(), new P_RwtKeyReturnAvoidDoubleClickListener(), false);
-
-    // context menu
-    m_contextMenu = new Menu(viewer.getTree().getShell(), SWT.POP_UP);
-    m_contextMenu.addMenuListener(new P_ContextMenuListener());
-    viewer.getTree().setMenu(m_contextMenu);
   }
 
   protected TreeViewer createTreeModel(Composite parent) {
@@ -701,19 +692,27 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
   } // end class P_RwtSelectionListener
 
-  private void showMenu(Point eventPosition) {
-    getUiField().setMenu(m_contextMenu);
-    getUiField().getMenu().addMenuListener(new MenuAdapter() {
-      private static final long serialVersionUID = 1L;
+  private Menu createMenu() {
+    if (getUiField().getMenu() != null) {
+      getUiField().getMenu().dispose();
+      getUiField().setMenu(null);
+    }
 
-      @Override
-      public void menuHidden(MenuEvent e) {
-        getUiField().setMenu(null);
-        ((Menu) e.getSource()).removeMenuListener(this);
-      }
-    });
-    getUiField().getMenu().setLocation(eventPosition);
-    getUiField().getMenu().setVisible(true);
+    Menu contextMenu = new Menu(getUiField().getShell(), SWT.POP_UP);
+    contextMenu.addMenuListener(new P_ContextMenuListener());
+    getUiField().setMenu(contextMenu);
+
+    return contextMenu;
+  }
+
+  private void createAndShowMenu(Point location) {
+    Menu menu = createMenu();
+    showMenu(menu, location);
+  }
+
+  private void showMenu(Menu menu, Point location) {
+    menu.setLocation(location);
+    menu.setVisible(true);
   }
 
   /**
@@ -773,6 +772,11 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
           updateScrollToSelectionFromScout();
           break;
         }
+        case SWT.MenuDetect: {
+          Point eventPosition = new Point(event.x, event.y);
+          createAndShowMenu(eventPosition);
+          break;
+        }
       }
     }
   }
@@ -824,16 +828,6 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
 
     @Override
-    protected Menu getContextMenu() {
-      return m_contextMenu;
-    }
-
-    @Override
-    protected void setContextMenu(Menu contextMenu) {
-      m_contextMenu = contextMenu;
-    }
-
-    @Override
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
@@ -844,7 +838,8 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       final boolean emptySpace = (getUiField().getContextItem() == null);
       IMenu[] menus = RwtMenuUtility.collectMenus(getScoutObject(), emptySpace, !emptySpace, getUiEnvironment());
 
-      RwtMenuUtility.fillContextMenu(menus, getUiEnvironment(), m_contextMenu);
+      Menu menu = ((Menu) e.getSource());
+      RwtMenuUtility.fillContextMenu(menus, getUiEnvironment(), menu);
     }
 
   } // end class P_ContextMenuListener

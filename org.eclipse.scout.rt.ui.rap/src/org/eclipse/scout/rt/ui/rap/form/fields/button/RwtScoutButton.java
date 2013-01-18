@@ -31,6 +31,8 @@ import org.eclipse.scout.rt.ui.rap.extension.IUiDecoration;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -58,7 +60,6 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;
 
-  private Menu m_contextMenu;
   private IMenu[] m_scoutActions;
 
   public RwtScoutButton() {
@@ -103,13 +104,10 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
     //
     setUiLabel(null);
     if (uiFieldAsButton != null) {
-      // context menu
-      m_contextMenu = new Menu(uiFieldAsButton.getShell(), SWT.POP_UP);
-      m_contextMenu.addMenuListener(new P_ContextMenuListener(uiFieldAsButton, uiFieldAsButton.getParent()));
-      uiFieldAsButton.setMenu(m_contextMenu);
 
       // attach rwt listeners
       uiFieldAsButton.addListener(ButtonEx.SELECTION_ACTION, new P_RwtSelectionListener());
+      uiFieldAsButton.addMenuDetectListener(new P_RwtMenuDetectListener());
 
       setUiField(uiFieldAsButton);
 
@@ -289,12 +287,10 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
   }
 
   protected void requestPopupFromScout() {
-    if (m_contextMenu == null) {
-      return;
-    }
+    Menu menu = createMenu();
 
     m_scoutActions = RwtMenuUtility.collectMenus(getScoutObject(), getUiEnvironment());
-    int menuHeight = new MenuSizeEstimator(m_contextMenu).estimateMenuHeight(Arrays.asList(m_scoutActions));
+    int menuHeight = new MenuSizeEstimator(menu).estimateMenuHeight(Arrays.asList(m_scoutActions));
     Point menuPosition = null;
     if (shouldMenuOpenOnTop(menuHeight)) {
       menuPosition = computeMenuPositionForTop(menuHeight);
@@ -303,8 +299,29 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
       menuPosition = computeMenuPositionForBottom();
     }
 
-    m_contextMenu.setLocation(menuPosition);
-    m_contextMenu.setVisible(true);
+    showMenu(menu, menuPosition);
+  }
+
+  private Menu createMenu() {
+    if (getUiField().getMenu() != null) {
+      getUiField().getMenu().dispose();
+      getUiField().setMenu(null);
+    }
+    Menu contextMenu = new Menu(getUiField().getShell(), SWT.POP_UP);
+    contextMenu.addMenuListener(new P_ContextMenuListener(getUiField(), getUiField().getParent()));
+    getUiField().setMenu(contextMenu);
+
+    return contextMenu;
+  }
+
+  private void createAndShowMenu(Point location) {
+    Menu menu = createMenu();
+    showMenu(menu, location);
+  }
+
+  private void showMenu(Menu menu, Point location) {
+    menu.setLocation(location);
+    menu.setVisible(true);
   }
 
   private boolean shouldMenuOpenOnTop(int menuHeight) {
@@ -405,16 +422,6 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
     }
 
     @Override
-    protected Menu getContextMenu() {
-      return m_contextMenu;
-    }
-
-    @Override
-    protected void setContextMenu(Menu contextMenu) {
-      m_contextMenu = contextMenu;
-    }
-
-    @Override
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
@@ -422,11 +429,23 @@ public class RwtScoutButton extends RwtScoutFieldComposite<IButton> implements I
         if (m_scoutActions == null) {
           m_scoutActions = RwtMenuUtility.collectMenus(getScoutObject(), getUiEnvironment());
         }
-        RwtMenuUtility.fillContextMenu(m_scoutActions, RwtScoutButton.this.getUiEnvironment(), m_contextMenu);
+        Menu menu = ((Menu) e.getSource());
+        RwtMenuUtility.fillContextMenu(m_scoutActions, RwtScoutButton.this.getUiEnvironment(), menu);
       }
       finally {
         m_scoutActions = null;
       }
     }
   } // end class P_ContextMenuListener
+
+  private class P_RwtMenuDetectListener implements MenuDetectListener {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void menuDetected(MenuDetectEvent e) {
+      createAndShowMenu(new Point(e.x, e.y));
+    }
+
+  }
 }

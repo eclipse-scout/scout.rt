@@ -10,21 +10,12 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.ext;
 
-import java.util.Date;
-
 import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
-import org.eclipse.scout.rt.ui.rap.basic.AbstractOpenMenuJob;
-import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
-import org.eclipse.scout.rt.ui.rap.util.BrowserInfo;
-import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -33,9 +24,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 
 public class DropDownButton extends Button implements IDropDownButtonForPatch {
   private static final long serialVersionUID = 1L;
@@ -53,80 +43,14 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
   public DropDownButton(Composite parent, int style) {
     super(parent, style | SWT.DOUBLE_BUFFERED);
 
-    addListener(SWT.Traverse, new Listener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void handleEvent(Event e) {
-        switch (e.detail) {
-          /* Do tab group traversal */
-          case SWT.TRAVERSE_ESCAPE:
-          case SWT.TRAVERSE_RETURN:
-          case SWT.TRAVERSE_TAB_NEXT:
-          case SWT.TRAVERSE_TAB_PREVIOUS:
-            e.doit = true;
-            break;
-        }
-      }
-    });
-    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(' '), false);
-    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(SWT.CR), false);
-    getUiEnvironment().addKeyStroke(this, new P_KeyStroke(SWT.ARROW_DOWN), false);
-
-    addFocusListener(new FocusAdapter() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void focusGained(FocusEvent e) {
-        redraw();
-      }
-
-      @Override
-      public void focusLost(FocusEvent e) {
-        redraw();
-      }
-    });
     addMouseListener(new MouseAdapter() {
       private static final long serialVersionUID = 1L;
-
-      private long m_mouseDownTime = 0;
-      private P_OpenMenuJob m_openMenuJob = new P_OpenMenuJob(DropDownButton.this);
-
-      @Override
-      public void mouseDown(MouseEvent event) {
-        m_mouseDownPosition = new Point(event.x, event.y);
-        if (isDropdownEnabled()) {
-          m_mouseDownTime = new Date().getTime();
-          m_openMenuJob.startOpenJob(m_mouseDownPosition);
-        }
-        redraw();
-      }
 
       @Override
       public void mouseUp(MouseEvent event) {
         if (event.button == 1) {
-          BrowserInfo browserInfo = RwtUtility.getBrowserInfo();
-          if (browserInfo.isTablet()
-              || browserInfo.isMobile()) {
-            long mouseUpTime = new Date().getTime();
-            if (mouseUpTime - m_mouseDownTime <= 500L) {
-              m_openMenuJob.stopOpenJob();
-            }
-          }
           handleSelectionInternal(event);
         }
-        m_mouseDownPosition = null;
-        redraw();
-      }
-    });
-
-    addDisposeListener(new DisposeListener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-        // remove key strokes
-        getUiEnvironment().removeKeyStrokes(DropDownButton.this);
       }
     });
   }
@@ -160,11 +84,27 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
       fireSelectionEvent(new SelectionEvent(e));
     }
     else if (m_dropDownArea.contains(pt) && isDropdownEnabled()) {
-      if (getMenu() != null) {
-        getMenu().setLocation(toDisplay(event.x, event.y));
-        getMenu().setVisible(true);
+      Menu menu = createMenu();
+      if (menu != null) {
+        menu.setLocation(toDisplay(event.x, event.y));
+        menu.setVisible(true);
       }
     }
+  }
+
+  private Menu createMenu() {
+    if (getMenu() != null) {
+      getMenu().dispose();
+      setMenu(null);
+    }
+    Menu contextMenu = new Menu(getShell(), SWT.POP_UP);
+    for (MenuListener listener : m_eventListeners.getListeners(MenuListener.class)) {
+      contextMenu.addMenuListener(listener);
+    }
+
+    setMenu(contextMenu);
+
+    return contextMenu;
   }
 
   @Override
@@ -187,6 +127,16 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
   }
 
   @Override
+  public void addMenuListener(MenuListener listener) {
+    m_eventListeners.add(MenuListener.class, listener);
+  }
+
+  @Override
+  public void removeMenuListener(MenuListener listener) {
+    m_eventListeners.remove(MenuListener.class, listener);
+  }
+
+  @Override
   public void setDropdownEnabled(boolean enabled) {
     m_dropdownEnabled = enabled;
     if (!StringUtility.hasText(m_originalVariant)) {
@@ -195,7 +145,6 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
     String customVariant = m_dropdownEnabled ? m_originalVariant + "_menu" : m_originalVariant;
     setData(WidgetUtil.CUSTOM_VARIANT, customVariant);
     super.setEnabled(isButtonEnabled());
-    redraw();
   }
 
   @Override
@@ -207,7 +156,6 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
   public void setButtonEnabled(boolean enabled) {
     m_buttonEnabled = enabled;
     super.setEnabled(isButtonEnabled());
-    redraw();
   }
 
   @Override
@@ -220,7 +168,6 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
     super.setEnabled(enabled);
     m_buttonEnabled = enabled;
     m_dropdownEnabled = enabled;
-    redraw();
   }
 
   @Override
@@ -232,51 +179,4 @@ public class DropDownButton extends Button implements IDropDownButtonForPatch {
     return (IRwtEnvironment) getDisplay().getData(IRwtEnvironment.class.getName());
   }
 
-  private class P_KeyStroke extends RwtKeyStroke {
-    public P_KeyStroke(int keyCode) {
-      super(keyCode);
-    }
-
-    @Override
-    public void handleUiAction(Event e) {
-      switch (e.keyCode) {
-        case ' ':
-        case SWT.CR: {
-          SelectionEvent selEvent = new SelectionEvent(e);
-          fireSelectionEvent(selEvent);
-          break;
-        }
-        case SWT.ARROW_DOWN: {
-          if (isDropdownEnabled() && getMenu() != null) {
-            getMenu().setLocation(toDisplay(e.x, e.y));
-            getMenu().setVisible(true);
-          }
-          break;
-        }
-        default:
-          break;
-      }
-    }
-  }
-
-  private final class P_OpenMenuJob extends AbstractOpenMenuJob {
-
-    public P_OpenMenuJob(Control UiField) {
-      super(UiField);
-    }
-
-    @Override
-    public void showMenu(Point pt) {
-      getMenu().setLocation(pt);
-      getMenu().setVisible(true);
-    }
-
-    @Override
-    public boolean openMenuCheck() {
-      return isDropdownEnabled()
-          && !isDisposed()
-          && getMenu() != null
-          && !getMenu().isDisposed();
-    }
-  }
 }

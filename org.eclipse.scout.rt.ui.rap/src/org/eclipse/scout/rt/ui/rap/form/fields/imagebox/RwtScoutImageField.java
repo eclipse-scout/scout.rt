@@ -34,22 +34,22 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
 /**
- * <h3>SwtScoutImageBox</h3> ...
- * 
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public class RwtScoutImageField extends RwtScoutFieldComposite<IImageField> implements IRwtScoutImageBox {
 
   private Image m_image;
-  private Menu m_contextMenu;
 
   @Override
   protected void initializeUi(Composite parent) {
@@ -69,10 +69,7 @@ public class RwtScoutImageField extends RwtScoutFieldComposite<IImageField> impl
         freeResources();
       }
     });
-
-    m_contextMenu = new Menu(imgViewer.getShell(), SWT.POP_UP);
-    m_contextMenu.addMenuListener(new P_ContextMenuListener(imgViewer, getUiField()));
-    imgViewer.setMenu(m_contextMenu);
+    imgViewer.addMenuDetectListener(new P_RwtMenuDetectListener());
 
     // layout
     getUiContainer().setLayout(new LogicalGridLayout(1, 0));
@@ -142,21 +139,30 @@ public class RwtScoutImageField extends RwtScoutFieldComposite<IImageField> impl
 
   }
 
+  private Menu createMenu() {
+    if (getUiField().getMenu() != null) {
+      getUiField().getMenu().dispose();
+      getUiField().setMenu(null);
+    }
+
+    Menu contextMenu = new Menu(getUiField().getShell(), SWT.POP_UP);
+    contextMenu.addMenuListener(new P_ContextMenuListener(getUiField(), getUiField()));
+    getUiField().setMenu(contextMenu);
+
+    return contextMenu;
+  }
+
+  private void createAndShowMenu(Point location) {
+    Menu menu = createMenu();
+    menu.setLocation(location);
+    menu.setVisible(true);
+  }
+
   private class P_ContextMenuListener extends MenuAdapterEx {
     private static final long serialVersionUID = 1L;
 
     public P_ContextMenuListener(Control menuControl, Control keyStrokeWidget) {
       super(menuControl, keyStrokeWidget);
-    }
-
-    @Override
-    protected Menu getContextMenu() {
-      return m_contextMenu;
-    }
-
-    @Override
-    protected void setContextMenu(Menu contextMenu) {
-      m_contextMenu = contextMenu;
     }
 
     @Override
@@ -181,10 +187,22 @@ public class RwtScoutImageField extends RwtScoutFieldComposite<IImageField> impl
       // grab the actions out of the job, when the actions are provided within
       // the scheduled time the popup will be handled.
       if (scoutMenusRef.get() != null) {
-        RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), RwtScoutImageField.this.getUiEnvironment(), m_contextMenu);
+        Menu menu = ((Menu) e.getSource());
+        RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), RwtScoutImageField.this.getUiEnvironment(), menu);
       }
     }
   } // end class P_ContextMenuListener
+
+  private class P_RwtMenuDetectListener implements MenuDetectListener {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void menuDetected(MenuDetectEvent e) {
+      createAndShowMenu(new Point(e.x, e.y));
+    }
+
+  }
 
   private class P_DndSupport extends AbstractRwtScoutDndSupport {
     public P_DndSupport(IPropertyObserver scoutObject, IDNDSupport scoutDndSupportable, Control control) {

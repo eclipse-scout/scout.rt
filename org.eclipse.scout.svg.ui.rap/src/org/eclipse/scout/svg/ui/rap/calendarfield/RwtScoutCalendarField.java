@@ -15,13 +15,9 @@ import org.eclipse.scout.rt.ui.svg.calendar.builder.listener.ICalendarDocumentLi
 import org.eclipse.scout.svg.ui.rap.AbstractRwtScoutSvgComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.w3c.dom.svg.SVGDocument;
 
@@ -31,8 +27,6 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
 
   private P_InnerCalendarPropertyChangeListener m_innerCalPropertyListener;
   private AbstractCalendarDocumentBuilder[] m_documentBuilders;
-
-  private Menu m_contextMenu;
 
   public RwtScoutCalendarField() {
     m_documentBuilders = new AbstractCalendarDocumentBuilder[4];
@@ -51,24 +45,6 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
 
     // continue refresh
     super.updateSvgDocument();
-  }
-
-  @Override
-  protected void initializeUi(Composite parent) {
-    super.initializeUi(parent);
-
-    m_contextMenu = new Menu(getUiField().getShell(), SWT.POP_UP);
-    m_contextMenu.addMenuListener(new P_ContextMenuListener());
-    getUiField().addDisposeListener(new DisposeListener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-        if (m_contextMenu != null && !m_contextMenu.isDisposed()) {
-          m_contextMenu.dispose();
-        }
-      }
-    });
   }
 
   @Override
@@ -162,18 +138,30 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
     Rectangle calBounds = getAbsoluteCalendarBounds();
     Point contextMenuPos = new Point(calBounds.x + calBounds.width - CONTEXT_MENU_POS_INSET, calBounds.y + calBounds.height - CONTEXT_MENU_POS_INSET);
 
-    getUiField().setMenu(m_contextMenu);
-    m_contextMenu.addMenuListener(new MenuAdapter() {
-      private static final long serialVersionUID = 1L;
+    createAndShowMenu(contextMenuPos);
+  }
 
-      @Override
-      public void menuHidden(MenuEvent e) {
-        getUiField().setMenu(null);
-        ((Menu) e.getSource()).removeMenuListener(this);
-      }
-    });
-    m_contextMenu.setLocation(contextMenuPos);
-    m_contextMenu.setVisible(true);
+  private Menu createMenu() {
+    if (getUiField().getMenu() != null) {
+      getUiField().getMenu().dispose();
+      getUiField().setMenu(null);
+    }
+
+    Menu contextMenu = new Menu(getUiField().getShell(), SWT.POP_UP);
+    contextMenu.addMenuListener(new P_ContextMenuListener());
+    getUiField().setMenu(contextMenu);
+
+    return contextMenu;
+  }
+
+  private void createAndShowMenu(Point location) {
+    Menu menu = createMenu();
+    showMenu(menu, location);
+  }
+
+  private void showMenu(Menu menu, Point location) {
+    menu.setLocation(location);
+    menu.setVisible(true);
   }
 
   private Rectangle getAbsoluteCalendarBounds() {
@@ -268,20 +256,11 @@ public class RwtScoutCalendarField extends AbstractRwtScoutSvgComposite<ICalenda
     }
 
     @Override
-    protected Menu getContextMenu() {
-      return m_contextMenu;
-    }
-
-    @Override
-    protected void setContextMenu(Menu contextMenu) {
-      m_contextMenu = contextMenu;
-    }
-
-    @Override
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
-      RwtMenuUtility.fillContextMenu(getContextMenusFromScout(), RwtScoutCalendarField.this.getUiEnvironment(), m_contextMenu);
+      Menu menu = ((Menu) e.getSource());
+      RwtMenuUtility.fillContextMenu(getContextMenusFromScout(), RwtScoutCalendarField.this.getUiEnvironment(), menu);
     }
   } // end class P_ContextMenuListener
 

@@ -13,25 +13,24 @@ package org.eclipse.scout.rt.ui.rap.ext;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.keystroke.RwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
- * <h3>MenuAdapterEx</h3> ...
- * 
  * @author sle
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 public abstract class MenuAdapterEx extends MenuAdapter {
   private static final long serialVersionUID = 1L;
 
   private final Control m_menuControl;
   private final Control m_keyStrokeWidget;
+  private P_EscKeyStroke m_escKeyStroke;
 
   public MenuAdapterEx(Control menuControl, Control keyStrokeWidget) {
     m_menuControl = menuControl;
@@ -46,58 +45,52 @@ public abstract class MenuAdapterEx extends MenuAdapter {
     return m_keyStrokeWidget;
   }
 
-  protected abstract Menu getContextMenu();
-
-  protected abstract void setContextMenu(Menu contextMenu);
-
   @Override
   public void menuShown(MenuEvent e) {
+    Menu menu = ((Menu) e.getSource());
     final IRwtEnvironment uiEnvironment = RwtUtility.getUiEnvironment(e.display);
-    //add escape-keystroke to close the contextmenu with esc
-    RwtKeyStroke keyStroke = new RwtKeyStroke(RwtUtility.scoutToRwtKey("escape")) {
+    m_escKeyStroke = new P_EscKeyStroke(menu);
+
+    uiEnvironment.addKeyStroke(getKeyStrokeWidget(), m_escKeyStroke, true);
+    menu.addDisposeListener(new DisposeListener() {
+      private static final long serialVersionUID = 1L;
 
       @Override
-      public void handleUiAction(Event keyEvent) {
-        if (getContextMenu() != null && !getContextMenu().isDisposed()) {
-          for (MenuItem item : getContextMenu().getItems()) {
-            disposeMenuItem(item);
-          }
-          getContextMenu().dispose();
+      public void widgetDisposed(DisposeEvent event) {
+        if (m_escKeyStroke != null) {
+          uiEnvironment.removeKeyStroke(getKeyStrokeWidget(), m_escKeyStroke);
+          m_escKeyStroke = null;
         }
-
-        if ((getContextMenu() == null || getContextMenu().isDisposed())
-                && !getMenuControl().isDisposed()
-                && !getMenuControl().getShell().isDisposed()) {
-          setContextMenu(new Menu(getMenuControl().getShell(), SWT.POP_UP));
-          getContextMenu().addMenuListener(MenuAdapterEx.this);
-          getMenuControl().setMenu(getContextMenu());
-        }
-
-        uiEnvironment.removeKeyStroke(getKeyStrokeWidget(), this);
-
-        keyEvent.doit = false;
       }
-    };
-    uiEnvironment.addKeyStroke(getKeyStrokeWidget(), keyStroke, true);
+    });
+  }
 
-    // clear all previous
-    // Windows BUG: fires menu hide before the selection on the menu item is
-    // propagated.
-    if (getContextMenu() != null) {
-      for (MenuItem item : getContextMenu().getItems()) {
-        disposeMenuItem(item);
-      }
+  @Override
+  public void menuHidden(MenuEvent e) {
+    if (m_escKeyStroke != null) {
+      IRwtEnvironment uiEnvironment = RwtUtility.getUiEnvironment(e.display);
+      uiEnvironment.removeKeyStroke(getKeyStrokeWidget(), m_escKeyStroke);
+      m_escKeyStroke = null;
     }
   }
 
-  protected void disposeMenuItem(MenuItem item) {
-    Menu menu = item.getMenu();
-    if (menu != null) {
-      for (MenuItem childItem : menu.getItems()) {
-        disposeMenuItem(childItem);
-      }
-      menu.dispose();
+  //add escape-keystroke to close the contextmenu with esc, resp. prevent closing the surrounding dialog when a contextmenu is open.
+  private class P_EscKeyStroke extends RwtKeyStroke {
+    private Menu m_menu;
+
+    public P_EscKeyStroke(Menu menu) {
+      super(RwtUtility.scoutToRwtKey("escape"));
+      m_menu = menu;
     }
-    item.dispose();
+
+    @Override
+    public void handleUiAction(Event keyEvent) {
+      final IRwtEnvironment uiEnvironment = RwtUtility.getUiEnvironment(keyEvent.display);
+      if (m_menu != null) {
+        m_menu.dispose();
+      }
+      uiEnvironment.removeKeyStroke(getKeyStrokeWidget(), this);
+      keyEvent.doit = false;
+    }
   }
 }
