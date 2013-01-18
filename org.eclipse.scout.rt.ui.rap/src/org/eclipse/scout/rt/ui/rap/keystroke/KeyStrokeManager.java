@@ -173,13 +173,17 @@ public class KeyStrokeManager implements IKeyStrokeManager {
     List<String> widgetActiveKeys = m_widgetActiveKeys.get(control);
     if (widgetActiveKeys != null) {
       widgetActiveKeys.remove(resolveKeyString(stroke));
-      m_widgetActiveKeys.put(control, widgetActiveKeys);
+      if (widgetActiveKeys.size() == 0) {
+        m_widgetActiveKeys.remove(control);
+      }
     }
 
     List<String> widgetCancelKeys = m_widgetCancelKeys.get(control);
     if (widgetCancelKeys != null) {
       widgetCancelKeys.remove(resolveKeyString(stroke));
-      m_widgetCancelKeys.put(control, widgetCancelKeys);
+      if (widgetCancelKeys.size() == 0) {
+        m_widgetCancelKeys.remove(control);
+      }
     }
     updateControlKeys(control);
 

@@ -94,6 +94,7 @@ public class AbstractRwtMenuAction {
       detachScoutListeners();
       m_connectedToScout = false;
     }
+    removeKeyStrokes();
   }
 
   protected void attachScoutListeners() {
@@ -150,13 +151,18 @@ public class AbstractRwtMenuAction {
     }
   }
 
-  protected void updateKeyStrokeFromScout() {
-    // remove old
-    if (m_uiKeyStrokes != null) {
-      for (IRwtKeyStroke uiStroke : m_uiKeyStrokes) {
-        getUiEnvironment().removeGlobalKeyStroke(uiStroke);
-      }
+  private void removeKeyStrokes() {
+    if (m_uiKeyStrokes == null) {
+      return;
     }
+
+    for (IRwtKeyStroke uiStroke : m_uiKeyStrokes) {
+      getUiEnvironment().removeGlobalKeyStroke(uiStroke);
+    }
+  }
+
+  protected void updateKeyStrokeFromScout() {
+    removeKeyStrokes();
     m_uiKeyStrokes = null;
     if (getScoutAction().getKeyStroke() != null) {
       IKeyStroke scoutKeyStroke = new KeyStroke(getScoutAction().getKeyStroke());
@@ -267,10 +273,5 @@ public class AbstractRwtMenuAction {
       handleUiAction();
     }
 
-    @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-      // TODO Auto-generated method stub
-      super.widgetDefaultSelected(e);
-    }
   }
 }
