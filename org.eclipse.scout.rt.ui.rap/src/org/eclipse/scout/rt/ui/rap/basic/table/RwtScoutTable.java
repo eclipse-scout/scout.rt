@@ -64,11 +64,6 @@ import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.util.UiRedrawHandler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -81,13 +76,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- * <h3>RwtScoutTable</h3> ...
  * knownIssues - multi column sorting is not supported, unable to get any key
  * mask in the selection event.
  * <p>
@@ -95,7 +87,7 @@ import org.eclipse.swt.widgets.TableItem;
  * <p>
  * - multi line support in row texts is not supported so far. Might probably be done by customized table rows.
  * 
- * @since 3.7.0 June 2011
+ * @since 3.8.0
  */
 @SuppressWarnings("restriction")
 public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScoutTableForPatch {
@@ -108,8 +100,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
   private TableColumnManager m_uiColumnManager = new TableColumnManager();
   private RwtScoutTableCellEditor m_uiCellEditorComposite;
   private int[] m_uiColumnOrder;
-  private Menu m_contextMenu;
-  private Menu m_headerMenu;
   private TableViewer m_uiViewer;
   private IRwtKeyStroke[] m_uiKeyStrokes;
   private ClientSyncJob m_storeColumnWidthsJob;
@@ -148,19 +138,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     table.setHeaderVisible(true);
     table.setTouchEnabled(RwtUtility.getBrowserInfo().isTablet() || RwtUtility.getBrowserInfo().isMobile());
     new TableRolloverSupport(table);
-    table.addDisposeListener(new DisposeListener() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-        if (m_headerMenu != null && !m_headerMenu.isDisposed()) {
-          m_headerMenu.dispose();
-        }
-        if (m_contextMenu != null && !m_contextMenu.isDisposed()) {
-          m_contextMenu.dispose();
-        }
-      }
-    });
     TableViewer viewer = new TableViewerEx(table);
     ColumnViewerToolTipSupport.enableFor(viewer);
     viewer.setUseHashlookup(true);
@@ -168,9 +145,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     setUiField(table);
     //cell editing support
     m_uiCellEditorComposite = new RwtScoutTableCellEditor(this);
-    // header menu
-    m_headerMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
-    table.addMenuDetectListener(new P_RwtHeaderMenuDetectListener());
 
     //columns
     initializeUiColumns();
@@ -194,11 +168,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         handleUiToggleAcction(e);
       }
     }, false);
-
-    // context menu
-    Menu contextMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
-    contextMenu.addMenuListener(new P_ContextMenuListener());
-    m_contextMenu = contextMenu;
   }
 
   @Override
@@ -1102,22 +1071,26 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
   }// end P_ScoutTableListener
 
-  private void showMenu(Point eventPosition) {
-    Point pt = getUiField().getDisplay().map(null, getUiField(), eventPosition);
+  private Menu createMenu(boolean headerMenu) {
+    if (getUiField().getMenu() != null) {
+      getUiField().getMenu().dispose();
+      getUiField().setMenu(null);
+    }
+    Menu contextMenu = new Menu(getUiField().getShell(), SWT.POP_UP);
+    contextMenu.addMenuListener(new P_ContextMenuListener(headerMenu));
+    getUiField().setMenu(contextMenu);
+
+    return contextMenu;
+  }
+
+  private void createAndShowMenu(Point location) {
+    Point pt = getUiField().getDisplay().map(null, getUiField(), location);
     Rectangle clientArea = getUiField().getClientArea();
     boolean header = clientArea.y <= pt.y && pt.y < clientArea.y + getUiField().getHeaderHeight();
-    getUiField().setMenu(header ? m_headerMenu : m_contextMenu);
-    getUiField().getMenu().addMenuListener(new MenuAdapter() {
-      private static final long serialVersionUID = 1L;
 
-      @Override
-      public void menuHidden(MenuEvent e) {
-        getUiField().setMenu(null);
-        ((Menu) e.getSource()).removeMenuListener(this);
-      }
-    });
-    getUiField().getMenu().setLocation(eventPosition);
-    getUiField().getMenu().setVisible(true);
+    Menu menu = createMenu(header);
+    menu.setLocation(location);
+    menu.setVisible(true);
   }
 
   private class P_RwtTableListener implements Listener {
@@ -1171,7 +1144,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           break;
         }
         case SWT.MenuDetect: {
-          showMenu(eventPosition);
+          createAndShowMenu(eventPosition);
           break;
         }
       }
@@ -1241,56 +1214,34 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
   } // end class P_ColumnSortListener
 
   private class P_ContextMenuListener extends MenuAdapterEx {
+    private boolean m_header;
 
     private static final long serialVersionUID = 1L;
 
-    public P_ContextMenuListener() {
-      super(RwtScoutTable.this.getUiTableViewer().getTable(), RwtScoutTable.this.getUiTableViewer().getTable().getParent());
-    }
-
-    @Override
-    protected Menu getContextMenu() {
-      return m_contextMenu;
-    }
-
-    @Override
-    protected void setContextMenu(Menu contextMenu) {
-      m_contextMenu = contextMenu;
+    public P_ContextMenuListener(boolean header) {
+      super(RwtScoutTable.this.getUiTableViewer().getTable(), RwtScoutTable.this.getUiTableViewer().getTable());
+      m_header = header;
     }
 
     @Override
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
-      final boolean emptySelection = getUiTableViewer().getSelection().isEmpty();
-      IMenu[] menus = RwtMenuUtility.collectMenus(getScoutObject(), emptySelection, !emptySelection, getUiEnvironment());
-
-      RwtMenuUtility.fillContextMenu(menus, getUiEnvironment(), m_contextMenu);
+      IMenu[] menus = null;
+      if (m_header) {
+        menus = collectHeaderMenus();
+      }
+      else {
+        final boolean emptySelection = getUiTableViewer().getSelection().isEmpty();
+        menus = RwtMenuUtility.collectMenus(getScoutObject(), emptySelection, !emptySelection, getUiEnvironment());
+      }
+      if (menus != null) {
+        Menu menu = ((Menu) e.getSource());
+        RwtMenuUtility.fillContextMenu(menus, getUiEnvironment(), menu);
+      }
     }
 
-  } // end class P_ContextMenuListener
-
-  private class P_RwtHeaderMenuDetectListener implements MenuDetectListener {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void menuDetected(MenuDetectEvent event) {
-      Table table = getUiField();
-      Point pTable = table.getDisplay().map(null, table, new Point(event.x, event.y));
-      Rectangle clientArea = table.getClientArea();
-      boolean header = clientArea.y <= pTable.y && pTable.y < clientArea.y + table.getHeaderHeight();
-      if (!header) {
-        return;
-      }
-      // clear all previous
-      // Windows BUG: fires menu hide before the selection on the menu item is
-      // propagated.
-      if (m_headerMenu != null) {
-        for (MenuItem item : m_headerMenu.getItems()) {
-          disposeMenuItem(item);
-        }
-      }
-      setContextColumnFromUi(RwtUtility.getRwtColumnAt(getUiTableViewer().getTable(), pTable));
+    private IMenu[] collectHeaderMenus() {
       final AtomicReference<IMenu[]> scoutMenusRef = new AtomicReference<IMenu[]>();
       Runnable t = new Runnable() {
         @Override
@@ -1309,21 +1260,12 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       // grab the actions out of the job, when the actions are providden
       // within the scheduled time the popup will be handled.
       if (scoutMenusRef.get() != null) {
-        RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), getUiEnvironment(), m_headerMenu);
+        return scoutMenusRef.get();
       }
-    }
 
-    protected void disposeMenuItem(MenuItem item) {
-      Menu menu = item.getMenu();
-      if (menu != null) {
-        for (MenuItem childItem : menu.getItems()) {
-          disposeMenuItem(childItem);
-        }
-        menu.dispose();
-      }
-      item.dispose();
+      return new IMenu[0];
     }
-  } // end class P_HeaderMenuListener
+  }
 
   private class P_DndSupport extends AbstractRwtScoutDndSupport {
     public P_DndSupport(IPropertyObserver scoutObject, IDNDSupport scoutDndSupportable, Control control) {

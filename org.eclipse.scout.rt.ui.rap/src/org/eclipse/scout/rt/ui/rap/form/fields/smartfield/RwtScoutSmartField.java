@@ -54,6 +54,8 @@ import org.eclipse.scout.rt.ui.rap.window.popup.RwtScoutDropDownPopup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -87,7 +89,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
   // popup
   private RwtScoutDropDownPopup m_proposalPopup;
   private final Object m_popupLock = new Object();
-  private Menu m_contextMenu;
   private TextFieldEditableSupport m_editableSupport;
 
   private P_KeyListener m_tabKeyListener;
@@ -133,9 +134,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     });
 
     // context menu
-    m_contextMenu = new Menu(m_browseButton.getShell(), SWT.POP_UP);
-    m_contextMenu.addMenuListener(new P_ContextMenuListener((Control) getUiBrowseButton(), getUiField()));
-    m_browseButton.setMenu(m_contextMenu);
+    m_browseButton.addMenuDetectListener(new P_RwtMenuDetectListener());
+    m_browseButton.addMenuListener(new P_ContextMenuListener((Control) getUiBrowseButton(), getUiField()));
 
     // F2 key stroke
     getUiEnvironment().addKeyStroke(getUiContainer(), new P_F2KeyStroke(), false);
@@ -622,6 +622,24 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
   }
 
+  private Menu createMenu() {
+    if (m_browseButton.getMenu() != null) {
+      m_browseButton.getMenu().dispose();
+      m_browseButton.setMenu(null);
+    }
+    Menu contextMenu = new Menu(m_browseButton.getShell(), SWT.POP_UP);
+    contextMenu.addMenuListener(new P_ContextMenuListener((Control) getUiBrowseButton(), getUiField()));
+    m_browseButton.setMenu(contextMenu);
+
+    return contextMenu;
+  }
+
+  private void createAndShowMenu(Point location) {
+    Menu menu = createMenu();
+    menu.setLocation(location);
+    menu.setVisible(true);
+  }
+
   private class P_TraverseListener implements TraverseListener {
     private static final long serialVersionUID = 1L;
 
@@ -738,16 +756,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
     }
 
     @Override
-    protected Menu getContextMenu() {
-      return m_contextMenu;
-    }
-
-    @Override
-    protected void setContextMenu(Menu contextMenu) {
-      m_contextMenu = contextMenu;
-    }
-
-    @Override
     public void menuShown(MenuEvent e) {
       super.menuShown(e);
 
@@ -769,7 +777,8 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       // grab the actions out of the job, when the actions are providden within
       // the scheduled time the popup will be handled.
       if (scoutMenusRef.get() != null) {
-        RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), RwtScoutSmartField.this.getUiEnvironment(), m_contextMenu);
+        Menu menu = ((Menu) e.getSource());
+        RwtMenuUtility.fillContextMenu(scoutMenusRef.get(), RwtScoutSmartField.this.getUiEnvironment(), menu);
       }
     }
   } // end class P_ContextMenuListener
@@ -794,4 +803,15 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<ISmartField<
       handleUiBrowseAction();
     }
   } // end class P_F2KeyStroke
+
+  private class P_RwtMenuDetectListener implements MenuDetectListener {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void menuDetected(MenuDetectEvent e) {
+      createAndShowMenu(new Point(e.x, e.y));
+    }
+
+  }
 }

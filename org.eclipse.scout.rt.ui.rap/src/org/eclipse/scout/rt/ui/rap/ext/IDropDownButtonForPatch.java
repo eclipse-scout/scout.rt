@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.rap.ext;
 
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -35,6 +37,12 @@ public interface IDropDownButtonForPatch {
 
   void addFocusListener(FocusListener listener);
 
+  void addMenuDetectListener(MenuDetectListener listener);
+
+  void addMenuListener(MenuListener listener);
+
+  void removeMenuListener(MenuListener listener);
+
   Shell getShell();
 
   void setText(String text);
@@ -46,6 +54,8 @@ public interface IDropDownButtonForPatch {
   Image getImage();
 
   void setBackground(Color color);
+
+  Menu getMenu();
 
   void setMenu(Menu menu);
 
