@@ -3,5 +3,6 @@ eclipse.preferences.version=1
 projectArtifactId=org.eclipse.scout.rt.extension.client.test.fragment
 projectBranch=
 projectGroupId=org.eclipse.scout.rt
+projectKey=org.eclipse.scout.rt\:org.eclipse.scout.rt.extension.client.test.fragment\:master
 serverUrl=https\://scout.bsiag.com/sonar
-version=1
+version=2
